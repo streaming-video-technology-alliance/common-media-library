@@ -1,0 +1,16 @@
+{
+	"name": "Avia JS Code Interview Dev Container",
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"customizations": {
+		"vscode": {
+			"extensions": []
+		}
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+	},
+	"forwardPorts": [
+		3000
+	]
+}
