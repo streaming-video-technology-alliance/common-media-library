@@ -1,6 +1,6 @@
 {
   "name": "@svta.org/common-media-library-workspace",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -18,7 +18,7 @@
     "build": "npm run build -w lib",
     "test": "npm test -w dev",
     "pub": "npm publish -w lib --provenance --access public",
-    "ver": "node scripts/version.js"
+    "ver": "node --loader ts-node/esm scripts/version.ts"
   },
   "workspaces": [
     "dev",

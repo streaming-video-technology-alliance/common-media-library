@@ -1,6 +1,6 @@
-import { spawn } from 'node:child_process';
+import { spawn, SpawnOptionsWithoutStdio } from 'node:child_process';
 
-export function cmd(cmd, args, options) {
+export function cmd(cmd: string, args?: string[], options?: SpawnOptionsWithoutStdio) {
 	const opts = Object.assign({
 		cwd: process.cwd(),
 		env: process.env,
@@ -8,7 +8,7 @@ export function cmd(cmd, args, options) {
 		shell: true,
 	}, options);
 
-	return new Promise((resolve, reject) => {
+	return new Promise<void>((resolve, reject) => {
 		const proc = spawn(cmd, args, opts);
 		proc.on('error', reject);
 		proc.on('close', (code) => {
