@@ -13,14 +13,15 @@ env:
 jobs:
   main_cd:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          registry-url: "https://registry.npmjs.org"
-          scope: "@svta.org"
 
       - name: Cache dependencies
         uses: actions/cache@v3

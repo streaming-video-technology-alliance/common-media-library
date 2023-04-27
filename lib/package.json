@@ -12,6 +12,12 @@
   "bugs": {
     "url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "provenance": true,
+    "scope": "svta.org"
+  },
   "files": [
     "dist/**/*"
   ],
