@@ -12,10 +12,5 @@ export function toQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	
 	const params = encodeCmcd(cmcd, options);
 
-	if (options?.searchParams) {
-		options.searchParams.set('CMCD', params);
-		return params;
-	}
-
 	return `CMCD=${encodeURIComponent(params)}`;
 }

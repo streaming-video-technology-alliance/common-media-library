@@ -1,6 +1,6 @@
 import { CmcdHeaderField } from '@svta.org/common-media-library/cmcd/CmcdHeaderField';
 import { toHeaders } from '@svta.org/common-media-library/cmcd/toHeaders';
-import { deepEqual, equal } from 'node:assert';
+import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { data } from './data.js';
 
@@ -29,14 +29,5 @@ describe('CMCD Header serialization', () => {
 
 	it('handles null data object', () => {
 		deepEqual(toHeaders(null as any), {});
-	});
-
-
-	it('populates the Headers object if provided', () => {
-		const headers = new Headers();
-		const results = toHeaders({ br: 200 }, { headers });
-		const expected = 'br=200';
-		deepEqual(results, { 'CMCD-Object': expected });
-		equal(headers.get('CMCD-Object'), expected);
 	});
 });
