@@ -16,5 +16,8 @@
     "build": "rimraf ./dist && tsc",
     "pretest": "npm run build",
     "test": "node --test"
+  },
+  "devDependencies": {
+    "@svta.org/common-media-library": "*"
   }
 }
