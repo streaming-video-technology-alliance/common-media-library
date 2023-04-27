@@ -33,5 +33,10 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "ESNext",
-  }
+  },
+  "exclude": [
+    "**/dist",
+    "**/node_modules",
+    "**/docs"
+  ]
 }
