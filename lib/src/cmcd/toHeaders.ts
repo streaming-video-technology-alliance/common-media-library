@@ -38,7 +38,6 @@ export function toHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 		headerGroups[index][key] = value;
 	});
 	
-	const headers = options?.headers;
 	headerGroups.forEach((group, index) => {
 		const value = encodeCmcd(group, options);
 		if (!value) {
@@ -47,10 +46,6 @@ export function toHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 		
 		const shard = `CMCD-${toHeaderCase(CmcdHeaderField[index])}`;
 		results[shard] = value;
-		
-		if (headers) {
-			headers.set(shard, value);
-		}
 	});
 
 	return results;

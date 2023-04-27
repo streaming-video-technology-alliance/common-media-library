@@ -9,10 +9,10 @@ export { CmcdObjectType } from './CmcdObjectType.js';
 export { CmcdStreamType } from './CmcdStreamType.js';
 export { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 export type { CmcdValue } from './CmcdValue.js';
+export { appendToHeaders } from './appendToHeaders.js';
+export { appendToUrl } from './appendToUrl.js';
 export { decodeCmcd } from './decodeCmcd.js';
 export { encodeCmcd } from './encodeCmcd.js';
 export { toHeaders } from './toHeaders.js';
 export { toJson } from './toJson.js';
 export { toQuery } from './toQuery.js';
-
-
