@@ -1,0 +1,90 @@
+{
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended"
+	],
+	"parser": "@typescript-eslint/parser",
+	"plugins": [
+		"@typescript-eslint",
+		"eslint-plugin-tsdoc"
+	],
+	"env": {
+		"es6": true,
+		"browser": true,
+		"node": true
+	},
+	"rules": {
+		"@typescript-eslint/no-use-before-define": "off",
+		"@typescript-eslint/no-unused-vars": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/no-inferrable-types": "off",
+		"@typescript-eslint/no-empty-function": "off",
+		"no-unused-vars": "off",
+		"no-case-declarations": "off",
+		"no-fallthrough": "off",
+		"semi": [
+			"error",
+			"always"
+		],
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1,
+				"MemberExpression": 1,
+				"ignoredNodes": [
+					"FunctionExpression > .params[decorators.length > 0]",
+					"FunctionExpression > .params > :matches(Decorator,:not(:first-child))",
+					"ClassBody.body > PropertyDefinition[decorators.length > 0] > .key"
+				]
+			}
+		],
+		"space-infix-ops": [
+			"error"
+		],
+		"key-spacing": [
+			"error"
+		],
+		"eol-last": [
+			"error",
+			"always"
+		],
+		"comma-dangle": [
+			"error",
+			"always-multiline"
+		],
+		"quotes": [
+			"error",
+			"single",
+			{
+				"allowTemplateLiterals": true,
+				"avoidEscape": true
+			}
+		],
+		"keyword-spacing": [
+			"error",
+			{
+				"after": true
+			}
+		],
+		"curly": [
+			"error"
+		],
+		"object-curly-spacing": [
+			"error",
+			"always"
+		],
+		"brace-style": [
+			"error",
+			"stroustrup",
+			{
+				"allowSingleLine": false
+			}
+		],
+		"tsdoc/syntax": "warn"
+	},
+	"ignorePatterns": [
+		"**/dist"
+	]
+}

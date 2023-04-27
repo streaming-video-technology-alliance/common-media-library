@@ -1,0 +1,9 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "./src/index.ts"
+  ],
+  "hideGenerator": true,
+  "out": "docs",
+  "searchInComments": true
+}

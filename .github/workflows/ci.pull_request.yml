@@ -1,0 +1,40 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+
+jobs:
+  pull_request_ci:
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@cbsinteractive"
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Change Log
+        uses: dangoslen/changelog-enforcer@v3

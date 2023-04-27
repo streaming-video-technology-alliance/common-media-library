@@ -1,5 +1,5 @@
 {
-	"name": "Avia JS Code Interview Dev Container",
+	"name": "Common Media Library Dev Container",
 	"image": "mcr.microsoft.com/devcontainers/universal:2",
 	"customizations": {
 		"vscode": {
