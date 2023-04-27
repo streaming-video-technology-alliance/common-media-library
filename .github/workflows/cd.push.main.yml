@@ -28,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Publish
-        run: npm publish --provenance --access public
+        run: npm run pub
       
       - name: get-npm-version
         id: package-version
