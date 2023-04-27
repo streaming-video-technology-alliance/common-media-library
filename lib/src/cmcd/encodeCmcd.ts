@@ -3,8 +3,8 @@ import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { CmcdError } from './CmcdError.js';
 import { CmcdKey } from './CmcdKey.js';
 import { CmcdValue } from './CmcdValue.js';
+import { isTokenField } from './isTokenField.js';
 
-const isTokenField = (key: string) => key === 'ot' || key === 'sf' || key === 'st';
 const isValid = (value: CmcdValue) => value != null && value !== '' && value !== false;
 
 type Mapper<T> = (key: string, value: CmcdValue) => T;

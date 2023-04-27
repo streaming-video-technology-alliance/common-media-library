@@ -10,6 +10,7 @@ export { CmcdObjectType } from './CmcdObjectType.js';
 export { CmcdStreamType } from './CmcdStreamType.js';
 export { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 export type { CmcdValue } from './CmcdValue.js';
+export { decodeCmcd } from './decodeCmcd.js';
 export { encodeCmcd } from './encodeCmcd.js';
 
 
