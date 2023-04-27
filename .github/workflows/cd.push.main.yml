@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - ".github/**"
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -30,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Publish
-        run: npm publish
+        run: npm publish --provenance --access public
       
       - name: get-npm-version
         id: package-version
