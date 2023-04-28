@@ -85,7 +85,6 @@
 		"tsdoc/syntax": "warn"
 	},
 	"ignorePatterns": [
-		"**/dist",
-		"**/docs"
+		"**/dist"
 	]
 }

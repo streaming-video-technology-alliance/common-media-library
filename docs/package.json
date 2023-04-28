@@ -1,5 +1,5 @@
 {
-  "name": "@svta.org/common-media-library",
+  "name": "@svta.org/common-media-library-docs",
   "version": "0.1.1",
   "license": "MIT",
   "type": "module",
@@ -12,30 +12,11 @@
   "bugs": {
     "url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org",
-    "provenance": true,
-    "scope": "svta.org"
-  },
-  "files": [
-    "dist/**/*"
-  ],
-  "exports": {
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "default": "./dist/*.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "dist/*"
-      ]
-    }
-  },
   "scripts": {
-    "build": "rimraf ./dist && tsc",
-    "prepublish": "npm run build"
+    "build": "rimraf ./dist && typedoc",
+    "start": "npm run build && npx -y http-server docs --cors -p 8080"
+  },
+  "devDependencies": {
+    "typedoc": "^0.24.6"
   }
 }

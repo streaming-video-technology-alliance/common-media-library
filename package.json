@@ -13,16 +13,18 @@
     "url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
   },
   "scripts": {
-    "format": "eslint . --ext .js,.ts --fix",
+    "format": "npm run lint -- --fix",
     "lint": "eslint . --ext .js,.ts",
     "build": "npm run build -w lib",
-    "test": "npm test -w dev",
+    "pretest": "npm run build",
+    "test": "npm run lint && npm test -ws --if-present",
     "pub": "npm publish -w lib --provenance --access public",
     "ver": "node --loader ts-node/esm scripts/version.ts"
   },
   "workspaces": [
     "dev",
-    "lib"
+    "lib",
+    "docs"
   ],
   "devDependencies": {
     "@types/node": "^18.16.1",
