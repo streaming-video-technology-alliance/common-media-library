@@ -1,10 +1,10 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": [
-    "./src/index.ts"
+    "../lib/src/index.ts"
   ],
   "hideGenerator": true,
-  "out": "docs",
-  "readme": "./README.md",
+  "out": "./dist",
+  "readme": "../lib/README.md",
   "searchInComments": true
 }

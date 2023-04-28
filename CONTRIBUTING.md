@@ -20,25 +20,24 @@ Scan through our [existing issues](https://github.com/streaming-video-technology
 
 ### Make Changes
 
-#### Make changes in a codespace
-
-For more information about using a codespace for working on GitHub documentation, see "[Working in a codespace](https://github.com/github/docs/blob/main/contributing/codespace.md)."
-
-#### Make changes locally
-
 1. Fork the repository.
 [Fork the repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so that you can make your changes without affecting the original project until you're ready to merge them.
 
-2. Install or update to **Node.js**, at the version specified in `.node-version`.
+2. Install or update to **Node.js**.
 
 3. Create a working branch and start with your changes!
 
-### Update the CHANGELOG
-Make sure to update the change log with the change you've made, along with a referene to the issue.  See the [CHANGELOG](./CHANGELOG.md) for more information.
+4. Update the CHANGELOG. Make sure to update the change log with the change you've made, along with a referene to the issue.  See the [CHANGELOG](./CHANGELOG.md) for more information.
+
+5. Add tests for your changes.
+
+6. Add documentation for your changes.
 
 ### Commit your update
 
-Commit the changes once you are happy with them.
+1. Run `npm run format` to format the code before committing.
+
+1. Make sure all tests pass by running `npm run test`.
 
 ### Pull Request
 
