@@ -1,6 +1,6 @@
 {
   "name": "@svta.org/common-media-library",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -22,6 +22,10 @@
     "dist/**/*"
   ],
   "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./*": {
       "types": "./dist/*.d.ts",
       "default": "./dist/*.js"

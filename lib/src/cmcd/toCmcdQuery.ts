@@ -5,7 +5,7 @@ import { encodeCmcd } from './encodeCmcd.js';
 /**
  * Convert a CMCD data object to query args
  */
-export function toQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
+export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	if (!cmcd) {
 		return '';
 	}

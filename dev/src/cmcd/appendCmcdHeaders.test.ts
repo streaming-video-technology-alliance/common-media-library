@@ -1,4 +1,4 @@
-import { appendToHeaders } from '@svta.org/common-media-library/cmcd/appendToHeaders';
+import { appendCmcdHeaders } from '@svta.org/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 
@@ -12,11 +12,11 @@ describe('CMCD appendToHeaders', () => {
 	};
 
 	it('handles null data object', () => {
-		deepEqual(appendToHeaders(headers, null as any), headers);
+		deepEqual(appendCmcdHeaders(headers, null as any), headers);
 	});
 
 	it('appends headers', () => {
-		deepEqual(appendToHeaders(headers, data), {
+		deepEqual(appendCmcdHeaders(headers, data), {
 			...headers,
 			['CMCD-Object']: 'br=1000',
 		});

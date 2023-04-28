@@ -37,5 +37,8 @@
     "**/dist",
     "**/node_modules",
     "**/docs"
-  ]
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }
