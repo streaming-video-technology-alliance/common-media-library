@@ -16,6 +16,7 @@
     "format": "npm run lint -- --fix",
     "lint": "eslint . --ext .js,.ts",
     "build": "npm run build -w lib",
+    "pretest": "npm run build",
     "test": "npm run lint && npm test -ws --if-present",
     "pub": "npm publish -w lib --provenance --access public",
     "ver": "node --loader ts-node/esm scripts/version.ts"
