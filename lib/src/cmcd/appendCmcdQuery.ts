@@ -1,11 +1,11 @@
 import { Cmcd } from './Cmcd.js';
-import { toQuery } from './toQuery.js';
+import { toCmcdQuery } from './toCmcdQuery.js';
 
 /**
  * Append CMCD query args to a URL.
  */
-export function appendToUrl(cmcd: Cmcd, url: string) {
-	const query = toQuery(cmcd);
+export function appendCmcdQuery(cmcd: Cmcd, url: string) {
+	const query = toCmcdQuery(cmcd);
 	if (!query) {
 		return url;
 	}

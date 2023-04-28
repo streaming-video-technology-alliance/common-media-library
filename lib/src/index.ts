@@ -1,3 +1,3 @@
-export * from './cmcd/index.js';
-export * from './utils/index.js';
+export * from './cmcd.js';
+export * from './utils.js';
 

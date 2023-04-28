@@ -18,7 +18,7 @@ const toHeaderCase = (value: string) => `${value[0].toUpperCase()}${value.slice(
 /**
  * Convert a CMCD data object to request headers
  */
-export function toHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
+export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	const results: Record<string, string> = {};
 
 	if (!cmcd) {
