@@ -39,8 +39,5 @@
     "prepublish": "npm run build",
     "build:docs": "rimraf ./docs && typedoc",
     "start:docs": "npm run build:docs && npx -y http-server docs --cors -p 8080"
-  },
-  "devDependencies": {
-    "typedoc": "^0.24.6"
   }
 }
