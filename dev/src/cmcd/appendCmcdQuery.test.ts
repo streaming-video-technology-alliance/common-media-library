@@ -9,14 +9,14 @@ describe('CMCD appendToUrl', () => {
 	};
 
 	it('handles null data object', () => {
-		equal(appendCmcdQuery(null as any, url), url);
+		equal(appendCmcdQuery(url, null as any), url);
 	});
 
 	it('add ? when query does not exist', () => {
-		equal(appendCmcdQuery(data, url), `${url}?CMCD=br%3D1000`);
+		equal(appendCmcdQuery(url, data), `${url}?CMCD=br%3D1000`);
 	});
 
 	it('add & when query does exist', () => {
-		equal(appendCmcdQuery(data, `${url}?hello=world`), `${url}?hello=world&CMCD=br%3D1000`);
+		equal(appendCmcdQuery(`${url}?hello=world`, data), `${url}?hello=world&CMCD=br%3D1000`);
 	});
 });

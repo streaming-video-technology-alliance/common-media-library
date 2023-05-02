@@ -4,7 +4,7 @@ import { toCmcdQuery } from './toCmcdQuery.js';
 /**
  * Append CMCD query args to a URL.
  */
-export function appendCmcdQuery(cmcd: Cmcd, url: string) {
+export function appendCmcdQuery(url: string, cmcd: Cmcd) {
 	const query = toCmcdQuery(cmcd);
 	if (!query) {
 		return url;
