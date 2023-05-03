@@ -26,11 +26,11 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Publish
-        run: npm run pub
-
       - name: Test
         run: npm test
+
+      - name: Publish
+        run: npm run pub
 
       - name: Get Version
         run: echo "version=`node -p "require('./package').version"`" >> $GITHUB_ENV
