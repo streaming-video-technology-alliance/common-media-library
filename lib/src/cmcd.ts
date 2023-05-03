@@ -6,6 +6,7 @@ export type { CmcdFormatter } from './cmcd/CmcdFormatter.js';
 export { CmcdHeaderField } from './cmcd/CmcdHeaderField.js';
 export type { CmcdKey } from './cmcd/CmcdKey.js';
 export { CmcdObjectType } from './cmcd/CmcdObjectType.js';
+export { CMCD_PARAM } from './cmcd/CmcdParam.js';
 export { CmcdStreamType } from './cmcd/CmcdStreamType.js';
 export { CmcdStreamingFormat } from './cmcd/CmcdStreamingFormat.js';
 export type { CmcdValue } from './cmcd/CmcdValue.js';
@@ -16,4 +17,3 @@ export { encodeCmcd } from './cmcd/encodeCmcd.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
-

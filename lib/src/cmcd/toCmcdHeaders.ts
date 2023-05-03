@@ -3,6 +3,7 @@ import { CmcdCustomKey } from './CmcdCustomKey.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { CmcdHeaderField } from './CmcdHeaderField.js';
 import { CmcdKey } from './CmcdKey.js';
+import { CMCD_PARAM } from './CmcdParam.js';
 import { CmcdValue } from './CmcdValue.js';
 import { encodeCmcd } from './encodeCmcd.js';
 
@@ -44,7 +45,7 @@ export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 			return;
 		}
 		
-		const shard = `CMCD-${toHeaderCase(CmcdHeaderField[index])}`;
+		const shard = `${CMCD_PARAM}-${toHeaderCase(CmcdHeaderField[index])}`;
 		results[shard] = value;
 	});
 
