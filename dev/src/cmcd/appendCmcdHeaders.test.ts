@@ -2,7 +2,7 @@ import { appendCmcdHeaders } from '@svta.org/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 
-describe('CMCD appendToHeaders', () => {
+describe('appendCmcdHeaders', () => {
 	const headers = {
 		hello: 'world',
 	};

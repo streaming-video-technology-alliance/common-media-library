@@ -1,6 +1,6 @@
 {
   "name": "@svta.org/common-media-library-dev",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -13,6 +13,7 @@
     "url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
   },
   "scripts": {
+    "pretest": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
     "test": "node --no-warnings --loader ts-node/esm --test"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ import { appendCmcdQuery } from '@svta.org/common-media-library';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-describe('CMCD appendToUrl', () => {
+describe('appendCmcdQuery', () => {
 	const url = 'https://test.com';
 	const data = {
 		br: 1000,

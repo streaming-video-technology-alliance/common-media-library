@@ -1,0 +1,1 @@
+export const cmcdString = 'br=200,bs,cid="content-id",com.example-exists,com.example-hello="world",com.example-quote="\\"Quote\\"",com.example-testing=1234,com.example-token=s,d=325,mtp=10000,nor="..%2Ftesting%2F3.m4v",nrr="0-99",ot=m,sid="session-id"';
