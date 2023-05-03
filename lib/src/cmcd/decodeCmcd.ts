@@ -9,7 +9,11 @@ export function decodeCmcd(cmcd: string): Cmcd {
 		.split(',')
 		.reduce((acc: Record<string, boolean | number | string>, part) => {
 			const [key, value] = part.split('=');
-
+			
+			if (!key) {
+				return acc;
+			}
+			
 			if (!value) {
 				acc[key] = true;
 			}

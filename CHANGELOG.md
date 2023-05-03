@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.2.5] - 2023-05-03
+
+### Fixed
+- Fix issue where `decodeCmcd` produces incorrect results for empty strings
+
+
 ## [0.2.4] - 2023-05-03
 
 ### Changed
@@ -73,7 +79,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap project [#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2)
 
 
-[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.4...HEAD  
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.5...HEAD  
+[0.2.5]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.4...v0.2.5  
 [0.2.4]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.3...v0.2.4  
 [0.2.3]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.2...v0.2.3  
 [0.2.2]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.1...v0.2.2  
