@@ -24,7 +24,7 @@ jobs:
           scope: "@svta.org"
 
       - name: Install
-        run: npm run ci
+        run: npm ci
 
       - name: Publish
         run: npm run pub
