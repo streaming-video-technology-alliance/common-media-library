@@ -1,20 +1,19 @@
-name: Main CD
+name: Publish
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
 jobs:
-  main_cd:
+  publish:
     runs-on: ubuntu-latest
+    
     permissions:
       contents: read
       id-token: write
-
+    
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -25,11 +24,14 @@ jobs:
           scope: "@svta.org"
 
       - name: Install
-        run: npm ci
+        run: npm run ci
 
       - name: Publish
         run: npm run pub
-      
+
+      - name: Test
+        run: npm test
+
       - name: Get Version
         run: echo "version=`node -p "require('./package').version"`" >> $GITHUB_ENV
 

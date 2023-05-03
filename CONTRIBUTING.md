@@ -39,6 +39,8 @@ Scan through our [existing issues](https://github.com/streaming-video-technology
 
 1. Make sure all tests pass by running `npm run test`.
 
+1. Mare sure to include a committ message that describes the change, following the [Conventional Commits](https://www.conventionalcommits.org/) format.
+
 ### Pull Request
 
-When you're finished with the changes, create a pull request, also known as a PR.
+When you're finished with the changes, create a pull request.
