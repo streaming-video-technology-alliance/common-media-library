@@ -1,6 +1,6 @@
 {
   "name": "@svta.org/common-media-library-workspace",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -22,7 +22,7 @@
     "ver": "node --no-warnings --loader ts-node/esm scripts/version.ts"
   },
   "workspaces": [
-    "dev",
+    "test",
     "lib",
     "docs"
   ],

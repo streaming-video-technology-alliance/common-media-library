@@ -11,7 +11,8 @@
     "isolatedModules": true,
     "lib": [
       "DOM",
-      "ES2016"
+      "DOM.Iterable",
+      "ESNext",
     ],
     "module": "ESNEXT",
     "moduleResolution": "node",

@@ -1,7 +1,8 @@
 import { decodeCmcd } from '@svta.org/common-media-library/cmcd/decodeCmcd';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { cmcdString } from './cmcdString.js';
+import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.js';
+import { CMCD_STRING } from './data/CMCD_STRING.js';
 
 describe('decodeCmcd', () => {
 	it('handles null data object', () => {
@@ -13,21 +14,6 @@ describe('decodeCmcd', () => {
 	});
 
 	it('returns encoded string', () => {
-		deepEqual(decodeCmcd(cmcdString), {
-			'com.example-exists': true,
-			'com.example-hello': 'world',
-			'com.example-quote': '"Quote"',
-			'com.example-testing': 1234,
-			'com.example-token': 's',
-			br: 200,
-			bs: true,
-			cid: 'content-id',
-			d: 325,
-			mtp: 10000,
-			nor: '../testing/3.m4v',
-			nrr: '0-99',
-			ot: 'm',
-			sid: 'session-id',
-		});
+		deepEqual(decodeCmcd(CMCD_STRING), CMCD_OUTPUT);
 	});
 });

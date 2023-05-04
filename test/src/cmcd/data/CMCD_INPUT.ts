@@ -1,7 +1,7 @@
 import { Cmcd } from '@svta.org/common-media-library/cmcd/Cmcd';
 import { CmcdObjectType } from '@svta.org/common-media-library/cmcd/CmcdObjectType';
 
-export const cmcdData: Cmcd = {
+export const CMCD_INPUT: Cmcd = {
 	sid: 'session-id',
 	cid: 'content-id',
 	su: false,

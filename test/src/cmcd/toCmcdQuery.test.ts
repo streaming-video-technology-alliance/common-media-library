@@ -1,8 +1,8 @@
 import { toCmcdQuery } from '@svta.org/common-media-library';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { cmcdData } from './cmcdData.js';
-import { cmcdString } from './cmcdString.js';
+import { CMCD_INPUT } from './data/CMCD_INPUT.js';
+import { CMCD_QUERY } from './data/CMCD_QUERY.js';
 
 describe('toCmcdQuery', () => {
 	it('handles null data object', () => {
@@ -10,6 +10,6 @@ describe('toCmcdQuery', () => {
 	});
 
 	it('returns encoded query string', () => {
-		equal(toCmcdQuery(cmcdData), `CMCD=${encodeURIComponent(cmcdString)}`);
+		equal(toCmcdQuery(CMCD_INPUT), CMCD_QUERY);
 	});
 });

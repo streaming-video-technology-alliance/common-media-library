@@ -1,0 +1,16 @@
+export const CMCD_OUTPUT = {
+	'com.example-exists': true,
+	'com.example-hello': 'world',
+	'com.example-quote': '"Quote"',
+	'com.example-testing': 1234,
+	'com.example-token': 's',
+	br: 200,
+	bs: true,
+	cid: 'content-id',
+	d: 325,
+	mtp: 10000,
+	nor: '../testing/3.m4v',
+	nrr: '0-99',
+	ot: 'm',
+	sid: 'session-id',
+};

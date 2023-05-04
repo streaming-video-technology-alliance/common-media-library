@@ -1,8 +1,8 @@
 import { encodeCmcd } from '@svta.org/common-media-library/cmcd/encodeCmcd';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { cmcdData } from './cmcdData.js';
-import { cmcdString } from './cmcdString.js';
+import { CMCD_INPUT } from './data/CMCD_INPUT.js';
+import { CMCD_STRING } from './data/CMCD_STRING.js';
 
 describe('encodeCmcd', () => {
 	it('handles null data object', () => {
@@ -10,6 +10,6 @@ describe('encodeCmcd', () => {
 	});
 
 	it('returns encoded string', () => {
-		equal(encodeCmcd(cmcdData), cmcdString);
+		equal(encodeCmcd(CMCD_INPUT), CMCD_STRING);
 	});
 });
