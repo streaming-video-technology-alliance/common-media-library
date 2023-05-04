@@ -5,7 +5,9 @@ import { CmcdStreamType } from './CmcdStreamType.js';
 import { CmcdValue } from './CmcdValue.js';
 
 /**
- * CMCD
+ * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.
+ * 
+ * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD Spec}
  */
 export interface Cmcd {
 

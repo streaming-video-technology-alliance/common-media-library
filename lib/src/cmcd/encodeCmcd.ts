@@ -5,6 +5,11 @@ import { processCmcd } from './processCmcd.js';
 
 /**
  * Encode a CMCD object to a string.
+ * 
+ * @param obj - The CMCD object to encode.
+ * @param options - Options for encoding.
+ * 
+ * @returns The encoded CMCD string.
  */
 export function encodeCmcd(obj: Cmcd, options: CmcdEncodeOptions = {}) {
 	return processCmcd<string | undefined>(obj, (key, value) => {

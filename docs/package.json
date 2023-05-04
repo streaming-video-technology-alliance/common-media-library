@@ -1,5 +1,6 @@
 {
   "name": "@svta.org/common-media-library-docs",
+  "private": true,
   "version": "0.3.0",
   "license": "MIT",
   "type": "module",
@@ -14,7 +15,7 @@
   },
   "scripts": {
     "build": "rimraf ./dist && typedoc",
-    "start": "npm run build && npx -y http-server docs --cors -p 8080"
+    "start": "npm run build && npx -y http-server dist --cors -p 8080"
   },
   "devDependencies": {
     "typedoc": "^0.24.6"

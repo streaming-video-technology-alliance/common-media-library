@@ -1,5 +1,6 @@
 {
   "name": "@svta.org/common-media-library-dev",
+  "private": true,
   "version": "0.3.0",
   "license": "MIT",
   "type": "module",

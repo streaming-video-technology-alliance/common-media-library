@@ -1,3 +1,8 @@
+/**
+ * A collection of tools for working with Common Media Client Data (CMCD).
+ * 
+ * @packageDocumentation
+ */
 export type { Cmcd } from './cmcd/Cmcd.js';
 export type { CmcdCustomKey } from './cmcd/CmcdCustomKey.js';
 export type { CmcdEncodeOptions } from './cmcd/CmcdEncodeOptions.js';
@@ -20,4 +25,3 @@ export { fromCmcdQuery } from './cmcd/fromCmcdQuery.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
-

@@ -3,6 +3,10 @@ import { isTokenField } from './isTokenField.js';
 
 /**
  * Decode a CMCD string to an object.
+ * 
+ * @param cmcd - The CMCD string to decode.
+ * 
+ * @returns The decoded CMCD object.
  */
 export function decodeCmcd(cmcd: string): Cmcd {
 	if (!cmcd) {

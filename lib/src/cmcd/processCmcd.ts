@@ -8,6 +8,15 @@ type Mapper<T> = (key: string, value: CmcdValue) => T;
 
 const isValid = (value: CmcdValue) => value != null && value !== '' && value !== false;
 
+/**
+ * Internal CMCD processing function.
+ * 
+ * @param obj - The CMCD object to process.
+ * @param map - The mapping function to use.
+ * @param options - Options for encoding.
+ * 
+ * @internal
+ */
 export function processCmcd<T>(obj: Cmcd | null | undefined, map: Mapper<T>, options?: CmcdEncodeOptions): T[] {
 	const results: T[] = [];
 

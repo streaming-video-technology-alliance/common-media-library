@@ -1,11 +1,16 @@
 import { Cmcd } from './Cmcd.js';
-import { CmcdCustomKey } from './CmcdCustomKey.js';
-import { CmcdHeaderField } from './CmcdHeaderField.js';
+import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { toCmcdHeaders } from './toCmcdHeaders.js';
 
 /**
  * Append CMCD query args to a header object.
+ * 
+ * @param headers - The headers to append to.
+ * @param cmcd - The CMCD object to append.
+ * @param customHeaderMap - A map of custom CMCD keys to header fields.
+ * 
+ * @returns The headers with the CMCD header shards appended.
  */
-export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, customHeaderMap?: Record<CmcdCustomKey, CmcdHeaderField>) {
-	return Object.assign(headers, toCmcdHeaders(cmcd, customHeaderMap));
+export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions) {
+	return Object.assign(headers, toCmcdHeaders(cmcd, options));
 }

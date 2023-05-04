@@ -1,5 +1,7 @@
 /**
  * Generate a random v4 UUID
+ * 
+ * @returns A random v4 UUID
  */
 export function uuid(): string {
 	try {
