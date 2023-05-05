@@ -40,6 +40,7 @@
   },
   "scripts": {
     "build": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
+    "test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
     "prepublishOnly": "npm run build"
   }
 }
