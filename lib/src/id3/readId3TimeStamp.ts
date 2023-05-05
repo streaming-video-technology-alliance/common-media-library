@@ -9,9 +9,9 @@ import { DecodedId3Frame } from './DecodedId3Frame.js';
  * 
  * @internal
  */
-export const readId3TimeStamp = (
+export function readId3Timestamp(
 	timeStampFrame: DecodedId3Frame<ArrayBuffer>,
-): number | undefined => {
+): number | undefined {
 	if (timeStampFrame.data.byteLength === 8) {
 		const data = new Uint8Array(timeStampFrame.data);
 		// timestamp is 33 bit expressed as a big-endian eight-octet number,
@@ -29,4 +29,4 @@ export const readId3TimeStamp = (
 	}
 
 	return undefined;
-};
+}

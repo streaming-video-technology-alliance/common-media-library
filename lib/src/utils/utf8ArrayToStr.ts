@@ -16,10 +16,10 @@
  * 
  * @returns The string
  */
-export const utf8ArrayToStr = (
+export function utf8ArrayToStr(
 	array: Uint8Array,
 	exitOnNull: boolean = false,
-): string => {
+): string {
 	if (typeof TextDecoder !== 'undefined') {
 		const decoder = new TextDecoder('utf-8');
 		const decoded = decoder.decode(array);
@@ -79,4 +79,4 @@ export const utf8ArrayToStr = (
 		}
 	}
 	return out;
-};
+}

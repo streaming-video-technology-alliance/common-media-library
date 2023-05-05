@@ -10,8 +10,10 @@ import { decodeId3UrlFrame } from './decodeId3UrlFrame.js';
  * @param frame - the ID3 frame
  * 
  * @returns The decoded ID3 frame
+ * 
+ * @internal
  */
-export const decodeId3Frame = (frame: RawId3Frame): Id3Frame | undefined => {
+export function decodeId3Frame(frame: RawId3Frame): Id3Frame | undefined {
 	if (frame.type === 'PRIV') {
 		return decodeId3PrivFrame(frame);
 	}
@@ -20,4 +22,4 @@ export const decodeId3Frame = (frame: RawId3Frame): Id3Frame | undefined => {
 	}
 
 	return decodeId3TextFrame(frame);
-};
+}

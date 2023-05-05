@@ -6,11 +6,13 @@ import { Id3Frame } from './Id3Frame';
  * @param frame - the ID3 frame
  * 
  * @returns True if the ID3 frame is an Elementary Stream timestamp frame
+ * 
+ * @internal
  */
-export const isId3TimeStampFrame = (frame: Id3Frame): boolean => {
+export function isId3TimestampFrame(frame: Id3Frame): boolean {
 	return (
 		frame &&
 		frame.key === 'PRIV' &&
 		frame.info === 'com.apple.streaming.transportStreamTimestamp'
 	);
-};
+}

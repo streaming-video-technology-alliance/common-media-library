@@ -13,7 +13,7 @@ import { readId3Size } from './readId3Size.js';
  * 
  * @returns Array of ID3 frame objects
  */
-export const getId3Frames = (id3Data: Uint8Array): Id3Frame[] => {
+export function getId3Frames(id3Data: Uint8Array): Id3Frame[] {
 	let offset = 0;
 	const frames: Id3Frame[] = [];
 
@@ -40,4 +40,4 @@ export const getId3Frames = (id3Data: Uint8Array): Id3Frame[] => {
 	}
 
 	return frames;
-};
+}

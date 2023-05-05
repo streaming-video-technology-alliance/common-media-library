@@ -11,9 +11,9 @@ import { RawId3Frame } from './RawFrame.js';
  * 
  * @internal
  */
-export const decodeId3PrivFrame = (
+export function decodeId3PrivFrame(
 	frame: RawId3Frame,
-): DecodedId3Frame<ArrayBuffer> | undefined => {
+): DecodedId3Frame<ArrayBuffer> | undefined {
 	/*
 	Format: <text string>\0<binary data>
 	*/
@@ -25,4 +25,4 @@ export const decodeId3PrivFrame = (
 	const privateData = new Uint8Array(frame.data.subarray(owner.length + 1));
 
 	return { key: frame.type, info: owner, data: privateData.buffer };
-};
+}

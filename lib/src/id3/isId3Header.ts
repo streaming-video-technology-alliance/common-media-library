@@ -6,8 +6,10 @@
  * @param offset - The offset at which to start searching
  * 
  * @returns True if an ID3 header is found
+ * 
+ * @internal
  */
-export const isId3Header = (data: Uint8Array, offset: number): boolean => {
+export function isId3Header(data: Uint8Array, offset: number): boolean {
 	/*
 	 * http://id3.org/id3v2.3.0
 	 * [0]     = 'I'
@@ -44,4 +46,4 @@ export const isId3Header = (data: Uint8Array, offset: number): boolean => {
 	}
 
 	return false;
-};
+}

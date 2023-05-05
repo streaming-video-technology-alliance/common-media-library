@@ -9,9 +9,9 @@ import { readId3Size } from './readId3Size.js';
  * 
  * @returns True if an ID3 tag is found
  */
-export const canParseId3 = (data: Uint8Array, offset: number): boolean => {
+export function canParseId3(data: Uint8Array, offset: number): boolean {
 	return (
 		isId3Header(data, offset) &&
 		readId3Size(data, offset + 6) + 10 <= data.length - offset
 	);
-};
+}

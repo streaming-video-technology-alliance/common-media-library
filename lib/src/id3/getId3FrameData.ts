@@ -10,7 +10,7 @@ import { readId3Size } from './readId3Size.js';
  * 
  * @internal
  */
-export const getId3FrameData = (data: Uint8Array): RawId3Frame => {
+export function getId3FrameData(data: Uint8Array): RawId3Frame {
 	/*
 	Frame ID       $xx xx xx xx (four characters)
 	Size           $xx xx xx xx
@@ -23,4 +23,4 @@ export const getId3FrameData = (data: Uint8Array): RawId3Frame => {
 	const offset = 10;
 
 	return { type, size, data: data.subarray(offset, offset + size) };
-};
+}

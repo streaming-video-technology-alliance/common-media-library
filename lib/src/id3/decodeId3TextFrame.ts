@@ -11,7 +11,7 @@ import { RawId3Frame } from './RawFrame.js';
  * 
  * @internal
  */
-export const decodeId3TextFrame = (frame: RawId3Frame): DecodedId3Frame<string> | undefined => {
+export function decodeId3TextFrame(frame: RawId3Frame): DecodedId3Frame<string> | undefined {
 	if (frame.size < 2) {
 		return undefined;
 	}
@@ -36,5 +36,5 @@ export const decodeId3TextFrame = (frame: RawId3Frame): DecodedId3Frame<string> 
 	[1-?] = {Value}
 	*/
 	const text = utf8ArrayToStr(frame.data.subarray(1));
-	return { key: frame.type, data: text };
-};
+	return { key: frame.type, info: '', data: text };
+}

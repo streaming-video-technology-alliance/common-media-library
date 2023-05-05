@@ -5,8 +5,10 @@
  * @param offset - The offset at which to start searching
  * 
  * @returns True if an ID3 footer is found
+ * 
+ * @internal
  */
-export const isId3Footer = (data: Uint8Array, offset: number): boolean => {
+export function isId3Footer(data: Uint8Array, offset: number): boolean {
 	/*
 	 * The footer is a copy of the header, but with a different identifier
 	 */
@@ -33,4 +35,4 @@ export const isId3Footer = (data: Uint8Array, offset: number): boolean => {
 	}
 
 	return false;
-};
+}

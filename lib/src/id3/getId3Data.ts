@@ -10,11 +10,13 @@ import { readId3Size } from './readId3Size.js';
  * 
  * @returns The block of data containing any ID3 tags found
  * or `undefined` if no header is found at the starting offset
+ * 
+ * @internal
  */
-export const getId3Data = (
+export function getId3Data(
 	data: Uint8Array,
 	offset: number,
-): Uint8Array | undefined => {
+): Uint8Array | undefined {
 	const front = offset;
 	let length = 0;
 
@@ -38,4 +40,4 @@ export const getId3Data = (
 	}
 
 	return undefined;
-};
+}

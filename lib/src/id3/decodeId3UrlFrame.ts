@@ -11,7 +11,7 @@ import { RawId3Frame } from './RawFrame.js';
  * 
  * @internal
  */
-export const decodeId3UrlFrame = (frame: RawId3Frame): DecodedId3Frame<string> | undefined => {
+export function decodeId3UrlFrame(frame: RawId3Frame): DecodedId3Frame<string> | undefined {
 	if (frame.type === 'WXXX') {
 		/*
 		Format:
@@ -38,5 +38,5 @@ export const decodeId3UrlFrame = (frame: RawId3Frame): DecodedId3Frame<string> |
 	[0-?] = {URL}
 	*/
 	const url: string = utf8ArrayToStr(frame.data);
-	return { key: frame.type, data: url };
-};
+	return { key: frame.type, info: '', data: url };
+}
