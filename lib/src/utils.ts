@@ -3,4 +3,5 @@
  * 
  * @packageDocumentation
  */
+export * from './utils/utf8ArrayToStr.js';
 export * from './utils/uuid.js';
