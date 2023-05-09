@@ -38,3 +38,6 @@ import { appendCmcdQuery, CmcdObjectType } from '@svta.org/common-media-library'
 ```typescript
 import { appendCmcdQuery, CmcdObjectType } from '@svta.org/common-media-library/cmcd';
 ```
+
+## Documentation
+API docs can be found [here](https://svta-org.github.io/common-media-library/).
