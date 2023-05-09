@@ -1,9 +1,14 @@
 {
   "$schema": "https://typedoc.org/schema.json",
+  "categorizeByGroup": true,
+  "cleanOutputDir": true,
   "entryPoints": [
     "../lib/src/index.ts"
   ],
   "hideGenerator": true,
+  "navigation": {
+    "includeGroups": true
+  },
   "out": "./dist",
   "readme": "../lib/README.md",
   "searchInComments": true

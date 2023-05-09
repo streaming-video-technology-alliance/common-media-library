@@ -10,6 +10,8 @@ import { processCmcd } from './processCmcd.js';
  * @param options - Options for encoding the CMCD object.
  * 
  * @returns The CMCD JSON.
+ * 
+ * @group CMCD
  */
 export function toCmcdJson(cmcd: Partial<Cmcd>, options?: CmcdEncodeOptions) {
 	const toValue = (value: CmcdValue) => typeof value == 'symbol' ? value.description : value;

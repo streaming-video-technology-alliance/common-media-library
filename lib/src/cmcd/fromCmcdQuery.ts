@@ -8,6 +8,8 @@ import { decodeCmcd } from './decodeCmcd.js';
  * @param query - The query string to decode.
  * 
  * @returns The decoded CMCD data.
+ * 
+ * @group CMCD
  */
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd {
 	if (typeof query === 'string') {

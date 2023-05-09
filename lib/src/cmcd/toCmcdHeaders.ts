@@ -11,6 +11,8 @@ import { encodeCmcd } from './encodeCmcd.js';
  * @param options - Options for encoding the CMCD object.
  * 
  * @returns The CMCD header shards.
+ * 
+ * @group CMCD
  */
 export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	if (!cmcd) {

@@ -7,7 +7,9 @@ import { readId3Size } from './readId3Size.js';
  * @param data - The data to check
  * @param offset - The offset at which to start checking
  * 
- * @returns True if an ID3 tag is found
+ * @returns `true` if an ID3 tag is found
+ * 
+ * @group ID3
  */
 export function canParseId3(data: Uint8Array, offset: number): boolean {
 	return (

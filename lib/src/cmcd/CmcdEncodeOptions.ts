@@ -4,6 +4,8 @@ import { CmcdValue } from './CmcdValue.js';
 
 /**
  * Options for encoding CMCD values.
+ * 
+ * @group CMCD
  */
 export interface CmcdEncodeOptions {
   /**

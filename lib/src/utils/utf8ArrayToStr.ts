@@ -15,6 +15,8 @@
  * @param array - The UTF-8 array to convert
  * 
  * @returns The string
+ * 
+ * @group Utils
  */
 export function utf8ArrayToStr(
 	array: Uint8Array,

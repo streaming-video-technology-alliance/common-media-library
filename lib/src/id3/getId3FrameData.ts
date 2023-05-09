@@ -9,6 +9,8 @@ import { readId3Size } from './readId3Size.js';
  * @returns The data of the ID3 frame
  * 
  * @internal
+ * 
+ * @group ID3
  */
 export function getId3FrameData(data: Uint8Array): RawId3Frame {
 	/*

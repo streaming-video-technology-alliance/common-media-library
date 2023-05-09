@@ -8,6 +8,8 @@ import { DecodedId3Frame } from './DecodedId3Frame.js';
  * @returns The timestamp
  * 
  * @internal
+ * 
+ * @group ID3
  */
 export function readId3Timestamp(
 	timeStampFrame: DecodedId3Frame<ArrayBuffer>,

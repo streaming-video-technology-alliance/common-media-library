@@ -1,5 +1,7 @@
 /**
  * CMCD Object Type
+ * 
+ * @group CMCD
  */
 export enum CmcdObjectType {
   /**

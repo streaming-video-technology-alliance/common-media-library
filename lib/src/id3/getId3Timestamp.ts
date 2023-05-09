@@ -10,6 +10,8 @@ import { readId3Timestamp } from './readId3Timestamp.js';
  * @param data - Block of data containing one or more ID3 tags
  * 
  * @returns The timestamp
+ * 
+ * @group ID3
  */
 export function getId3Timestamp(data: Uint8Array): number | undefined {
 	const frames: Id3Frame[] = getId3Frames(data);

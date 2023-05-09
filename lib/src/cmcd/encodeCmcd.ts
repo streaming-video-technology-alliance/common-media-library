@@ -10,6 +10,8 @@ import { processCmcd } from './processCmcd.js';
  * @param options - Options for encoding.
  * 
  * @returns The encoded CMCD string.
+ * 
+ * @group CMCD
  */
 export function encodeCmcd(obj: Cmcd, options: CmcdEncodeOptions = {}) {
 	return processCmcd<string | undefined>(obj, (key, value) => {

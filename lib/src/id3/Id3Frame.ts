@@ -1,6 +1,8 @@
-import { DecodedId3Frame } from './DecodedId3Frame.js';
+import type { DecodedId3Frame } from './DecodedId3Frame.js';
 
 /**
  * ID3 frame.
+ * 
+ * @group ID3
  */
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;

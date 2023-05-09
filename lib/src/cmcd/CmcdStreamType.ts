@@ -1,5 +1,7 @@
 /**
  * CMCD Streaming Type
+ * 
+ * @group CMCD
  */
 export enum CmcdStreamType {
 	/**

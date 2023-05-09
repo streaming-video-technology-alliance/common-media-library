@@ -3,5 +3,7 @@
  * to ensure that there will not be a namespace collision with future 
  * revisions to this specification. Clients SHOULD use a reverse-DNS 
  * syntax when defining their own prefix.
+ * 
+ * @group CMCD
  */
 export type CmcdCustomKey = `${string}-${string}`;

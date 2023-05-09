@@ -10,6 +10,8 @@ import { encodeCmcd } from './encodeCmcd.js';
  * @param options - Options for encoding the CMCD object.
  * 
  * @returns The CMCD query arg.
+ * 
+ * @group CMCD
  */
 export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	if (!cmcd) {

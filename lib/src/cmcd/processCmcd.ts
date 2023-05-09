@@ -16,6 +16,8 @@ const isValid = (value: CmcdValue) => value != null && value !== '' && value !==
  * @param options - Options for encoding.
  * 
  * @internal
+ * 
+ * @group CMCD
  */
 export function processCmcd<T>(obj: Cmcd | null | undefined, map: Mapper<T>, options?: CmcdEncodeOptions): T[] {
 	const results: T[] = [];

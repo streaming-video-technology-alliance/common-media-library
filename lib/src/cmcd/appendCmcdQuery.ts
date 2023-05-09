@@ -10,6 +10,8 @@ import { toCmcdQuery } from './toCmcdQuery.js';
  * @param options - Options for encoding the CMCD object.
  * 
  * @returns The URL with the CMCD query args appended.
+ * 
+ * @group CMCD
  */
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions) {
 	const query = toCmcdQuery(cmcd, options);

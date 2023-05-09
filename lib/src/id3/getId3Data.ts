@@ -12,6 +12,8 @@ import { readId3Size } from './readId3Size.js';
  * or `undefined` if no header is found at the starting offset
  * 
  * @internal
+ * 
+ * @group ID3
  */
 export function getId3Data(
 	data: Uint8Array,

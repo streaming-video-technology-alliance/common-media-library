@@ -10,6 +10,8 @@ import { toCmcdHeaders } from './toCmcdHeaders.js';
  * @param customHeaderMap - A map of custom CMCD keys to header fields.
  * 
  * @returns The headers with the CMCD header shards appended.
+ * 
+ * @group CMCD
  */
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions) {
 	return Object.assign(headers, toCmcdHeaders(cmcd, options));

@@ -8,6 +8,8 @@ import { decodeCmcd } from './decodeCmcd.js';
  * @param headers - The request headers to decode.
  * 
  * @returns The decoded CMCD data.
+ * 
+ * @group CMCD
  */
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd {
 	const keys = Object.keys(CmcdHeaderMap);
