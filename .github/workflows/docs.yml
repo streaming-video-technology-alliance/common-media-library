@@ -7,7 +7,7 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
 jobs:
-  publish:
+  docs:
     runs-on: ubuntu-latest
     
     permissions:
@@ -27,7 +27,7 @@ jobs:
         run: npm ci
         
       - name: Build Docs
-        run: npm run docs
+        run: npm run build
 
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v3

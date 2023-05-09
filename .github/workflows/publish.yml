@@ -57,9 +57,9 @@ jobs:
 
           draft: true
           prerelease: false
-      
+
       - name: Build Docs
-        run: npm run docs
+        run: npm run build -w docs
 
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v3
