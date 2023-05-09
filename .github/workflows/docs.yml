@@ -1,0 +1,36 @@
+name: Docs
+
+on:
+  workflow_dispatch:
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+          registry-url: "https://registry.npmjs.org"
+          scope: "@svta.org"
+
+      - name: Install
+        run: npm ci
+        
+      - name: Build Docs
+        run: npm run docs
+
+      - name: Deploy Docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./docs/dist/
+          personal_token: ${{ secrets.GH_ACTIONS }}

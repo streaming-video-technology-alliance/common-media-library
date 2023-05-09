@@ -20,7 +20,8 @@
     "test": "npm run lint && npm test -ws --if-present",
     "pub": "npm publish -w lib --provenance --access public",
     "exec": "node --no-warnings --loader ts-node/esm",
-    "ver": "npm run exec scripts/version.ts"
+    "ver": "npm run exec scripts/version.ts",
+    "docs": "npm run build -w docs"
   },
   "workspaces": [
     "lib",
