@@ -40,4 +40,4 @@ import { appendCmcdQuery, CmcdObjectType } from '@svta.org/common-media-library/
 ```
 
 ## Documentation
-API docs can be found [here](https://svta-org.github.io/common-media-library/).
+API docs can be found [here](https://streaming-video-technology-alliance.github.io/common-media-library/).
