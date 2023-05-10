@@ -1,8 +1,21 @@
 /**
  * Decoded ID3 frame.
  * 
- * @internal
- * 
  * @group ID3
  */
-export type DecodedId3Frame<T> = { key: string; data: T; info?: any; };
+export type DecodedId3Frame<T> = {
+  /**
+   * The four letter frame ID.
+   */
+  key: string;
+
+  /**
+   * The data payload.
+   */
+  data: T;
+
+  /**
+   * A text description of the frame if provided.
+   */
+  info?: any;
+};
