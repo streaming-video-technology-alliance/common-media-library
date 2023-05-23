@@ -1,4 +1,4 @@
-import { ResourceTiming } from './ResourceTiming'
+import { ResourceTiming } from './ResourceTiming';
 
 /**
  * Common response API.

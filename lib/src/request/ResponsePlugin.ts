@@ -1,4 +1,4 @@
-import { CommonMediaResponse } from './CommonMediaResponse.js'
+import { CommonMediaResponse } from './CommonMediaResponse.js';
 
 /**
  * Response plugin API.

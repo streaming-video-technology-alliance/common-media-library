@@ -1,4 +1,4 @@
-import { CommonMediaRequest } from './CommonMediaRequest.js'
+import { CommonMediaRequest } from './CommonMediaRequest.js';
 
 /**
  * Request plugin API.

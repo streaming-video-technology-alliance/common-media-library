@@ -1,5 +1,5 @@
-import { CommonMediaResponse } from './CommonMediaResponse'
-import { Cmcd } from '../cmcd'
+import { CommonMediaResponse } from './CommonMediaResponse';
+import { Cmcd } from '../cmcd';
 
 /**
  * Common request API.
