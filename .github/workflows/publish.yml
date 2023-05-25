@@ -48,7 +48,7 @@ jobs:
             *
 
             ## Documentation
-            https://streaming-video-technology-alliance.github.io/common-media-library/
+            - API Docs: https://streaming-video-technology-alliance.github.io/common-media-library/
 
             ## NPM Package
             ```sh
