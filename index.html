@@ -12,7 +12,11 @@
 <div class="col-content">
 <div class="tsd-page-title">
 <h2>@svta.org/common-media-library</h2></div>
-<div class="tsd-panel tsd-typography"><a id="md:common-media-library" class="tsd-anchor"></a><h1><a href="#md:common-media-library">common-media-library</a></h1><p>A common library for media playback in JavaScript</p>
+<div class="tsd-panel tsd-typography"><blockquote>
+<p><strong>Warning</strong>
+This library has moved to a new org! The NPM org has changed from <code>svta.org</code> to <code>svta</code> Please use <a href="https://github.com/streaming-video-technology-alliance/common-media-library">@svta/common-media-library</a>. This org will be deleted in the future.</p>
+</blockquote>
+<a id="md:common-media-library" class="tsd-anchor"></a><h1><a href="#md:common-media-library">common-media-library</a></h1><p>A common library for media playback in JavaScript</p>
 <p>Looking at open source players like <a href="https://github.com/video-dev/hls.js/">hls.js</a>, <a href="https://github.com/Dash-Industry-Forum/dash.js/">dash.js</a> and <a href="https://github.com/shaka-project/shaka-player">shaka-player</a> there are common pieces of functionality that have been implemented independently, and sometimes copy and pasted, across the libraries. This is particularly true when looking at standards based features, like ID3 parsing, 608 parsing and CMCD. Since the functionality is shared in spirit but not implementation, they can fall out of sync where certain bugs are fixed in one player but not the others. The goal of this library is to create a single place where these utilities can be maintained and distributed.</p>
 <a id="md:project-structure" class="tsd-anchor"></a><h2><a href="#md:project-structure">Project structure</a></h2><p>This project is a mono-repo with the following workspaces: <code>lib</code>, <code>docs</code>. The <code>lib</code> package contains the compiled code for the library which is published to npm. The <code>docs</code> package contains the documentation for the library and is published to GitHub pages.</p>
 <a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><pre><code class="language-bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">@svta.org/common-media-library</span>
@@ -89,6 +93,7 @@ individually from the library.</p>
 <details class="tsd-index-accordion" data-key="ID3"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg><span>ID3</span></summary>
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
+<li><a href="types/DecodedId3Frame.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>Decoded<wbr/>Id3<wbr/>Frame</span></a></li>
 <li><a href="types/Id3Frame.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>Id3<wbr/>Frame</span></a></li>
 <li><a href="functions/canParseId3.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>can<wbr/>Parse<wbr/>Id3</span></a></li>
 <li><a href="functions/getId3Data.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>get<wbr/>Id3<wbr/>Data</span></a></li>
