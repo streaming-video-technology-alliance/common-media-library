@@ -1,4 +1,4 @@
-import { encodeCmcd } from '@svta.org/common-media-library/cmcd/encodeCmcd';
+import { encodeCmcd } from '@svta/common-media-library/cmcd/encodeCmcd';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_INPUT } from './data/CMCD_INPUT.js';

@@ -1,4 +1,4 @@
-import { getId3Frames } from '@svta.org/common-media-library';
+import { getId3Frames } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { DATA, DATA_BYTES, DATA_UINT8 } from './data/DATA.js';

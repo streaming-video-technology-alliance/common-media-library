@@ -1,5 +1,5 @@
-import { Cmcd } from '@svta.org/common-media-library/cmcd/Cmcd';
-import { CmcdObjectType } from '@svta.org/common-media-library/cmcd/CmcdObjectType';
+import { Cmcd } from '@svta/common-media-library/cmcd/Cmcd';
+import { CmcdObjectType } from '@svta/common-media-library/cmcd/CmcdObjectType';
 
 export const CMCD_INPUT: Cmcd = {
 	sid: 'session-id',
