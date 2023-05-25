@@ -1,4 +1,4 @@
-import { getId3Data } from '@svta.org/common-media-library';
+import { getId3Data } from '@svta/common-media-library';
 import { assert } from 'node:console';
 import { describe, it } from 'node:test';
 import { PTS } from './data/PTS.js';

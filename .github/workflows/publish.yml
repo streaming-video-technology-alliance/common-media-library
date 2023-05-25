@@ -21,7 +21,7 @@ jobs:
           node-version: 20
           cache: 'npm'
           registry-url: "https://registry.npmjs.org"
-          scope: "@svta.org"
+          scope: "@svta"
 
       - name: Install
         run: npm ci
@@ -48,11 +48,11 @@ jobs:
             *
 
             ## Documentation
-            TBD
+            - API Docs: https://streaming-video-technology-alliance.github.io/common-media-library/
 
             ## NPM Package
             ```sh
-            npm install @svta.org/common-media-library@${{ env.version }}
+            npm install @svta/common-media-library@${{ env.version }}
             ```
 
           draft: true

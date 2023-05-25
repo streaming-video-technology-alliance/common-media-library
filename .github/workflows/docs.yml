@@ -21,7 +21,7 @@ jobs:
           node-version: 20
           cache: 'npm'
           registry-url: "https://registry.npmjs.org"
-          scope: "@svta.org"
+          scope: "@svta"
 
       - name: Install
         run: npm ci

@@ -1,4 +1,4 @@
-import { canParseId3 } from '@svta.org/common-media-library';
+import { canParseId3 } from '@svta/common-media-library';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { PTS } from './data/PTS.js';

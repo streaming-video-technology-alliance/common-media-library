@@ -1,4 +1,4 @@
-import { decodeCmcd } from '@svta.org/common-media-library/cmcd/decodeCmcd';
+import { decodeCmcd } from '@svta/common-media-library/cmcd/decodeCmcd';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.js';

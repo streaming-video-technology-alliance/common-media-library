@@ -1,4 +1,4 @@
-import { appendCmcdHeaders } from '@svta.org/common-media-library';
+import { appendCmcdHeaders } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

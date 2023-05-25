@@ -1,4 +1,4 @@
-import { utf8ArrayToStr } from '@svta.org/common-media-library';
+import { utf8ArrayToStr } from '@svta/common-media-library';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { strToCodes } from './strToCodes.js';
