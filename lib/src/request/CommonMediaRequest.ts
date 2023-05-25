@@ -26,7 +26,7 @@ export interface CommonMediaRequest {
   /**
    * The headers object associated with the request.
    */
-  headers: Record<string, string>
+  headers?: Record<string, string>
 
   /**
    * Indicates whether the user agent should send or receive cookies from the other domain in the case of cross-origin requests.
