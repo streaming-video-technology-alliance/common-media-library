@@ -1,4 +1,4 @@
-import { isId3TimestampFrame } from '@svta.org/common-media-library';
+import { isId3TimestampFrame } from '@svta/common-media-library';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { PTS_FRAME } from './data/PTS.js';

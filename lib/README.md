@@ -1,6 +1,6 @@
 
 > **Warning**
-> This library has moved to a new org! The NPM org has changed from `svta.org` to `svta` Please use [@svta/common-media-library](https://github.com/streaming-video-technology-alliance/common-media-library). This org will be deleted in the future.
+> This library has moved to a new org! The NPM org has changed from `svta.org` to `svta` Please use [@svta/common-media-library](https://www.npmjs.com/package/@svta/common-media-library). The `svta.org` NPM org will be deleted in the future.
 
 # common-media-library
 A common library for media playback in JavaScript
@@ -12,15 +12,15 @@ This project is a mono-repo with the following workspaces: `lib`, `docs`. The `l
 
 ## Installation
 ```bash
-npm install @svta.org/common-media-library
+npm install @svta/common-media-library
 ```
 
 ## Usage
 Too ensure the smallest bundle sizes possible, it is best practice to import all members and type definitions
 individually from the library.
 ```typescript
-import { appendCmcdQuery } from '@svta.org/common-media-library/cmcd/appendCmcdQuery';
-import { CmcdObjectType } from '@svta.org/common-media-library/cmcd/CmcdObjectType';
+import { appendCmcdQuery } from '@svta/common-media-library/cmcd/appendCmcdQuery';
+import { CmcdObjectType } from '@svta/common-media-library/cmcd/CmcdObjectType';
 
 const cmcd = {
 	sid: '4f2867f2-b0fd-4db7-a3e0-cea7dff44cfb',
@@ -37,10 +37,10 @@ console.log(cmcdUrl);
 
 If bundle size isn't a concern, all members and type definitions can also be imported from the root of the library, or from the feature namespace.
 ```typescript
-import { appendCmcdQuery, CmcdObjectType } from '@svta.org/common-media-library';
+import { appendCmcdQuery, CmcdObjectType } from '@svta/common-media-library';
 ```
 ```typescript
-import { appendCmcdQuery, CmcdObjectType } from '@svta.org/common-media-library/cmcd';
+import { appendCmcdQuery, CmcdObjectType } from '@svta/common-media-library/cmcd';
 ```
 
 ## Documentation
