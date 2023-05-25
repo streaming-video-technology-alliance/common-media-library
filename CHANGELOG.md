@@ -19,6 +19,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.4.2] - 2023-05-25
+
+### Changed
+- The project has moved to a new NPM org. First release under `@svta/common-media-library`.
+
+
+## [0.4.1] - 2023-05-25
+
+### Changed
+- The project has moved to a new NPM org. Last release under `@svta.org/common-media-library`.
+
+
 ## [0.4.0] - 2023-05-05
 
 ### Added
@@ -97,7 +109,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap project [#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2)
 
 
-[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.0...HEAD  
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.2...HEAD  
+[0.4.2]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.0...v0.4.2  
 [0.4.0]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.3.0...v0.4.0   
 [0.3.0]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.6...v0.3.0  
 [0.2.6]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.2.5...v0.2.6  
