@@ -1,7 +1,7 @@
 {
   "name": "@svta.org/common-media-library-docs",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
