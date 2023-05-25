@@ -39,11 +39,6 @@ export interface CommonMediaResponse {
   type?: string
 
   /**
-   * The length as number of bytes of the response body payload.
-   */
-  length?: number
-
-  /**
    * The response headers.
    */
   headers?: Record<string, string>

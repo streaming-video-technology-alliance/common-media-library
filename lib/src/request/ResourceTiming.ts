@@ -8,7 +8,7 @@ export interface ResourceTiming {
   startTime: number
 
   // The size (in octets) of the payload body before removing any applied content encodings.
-  encodedBodySize?: number
+  encodedBodySize: number
   
   // The timestamp immediately after the browser receives the first byte of the response from the server.
   responseStart?: number
