@@ -1,5 +1,5 @@
 {
-  "name": "@svta.org/common-media-library",
+  "name": "@svta/common-media-library",
   "version": "0.4.1",
   "license": "MIT",
   "type": "module",
@@ -16,7 +16,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org",
     "provenance": true,
-    "scope": "svta.org"
+    "scope": "svta"
   },
   "files": [
     "dist/**/*"
