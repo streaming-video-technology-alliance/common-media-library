@@ -1,4 +1,3 @@
-import { CommonMediaResponse } from './CommonMediaResponse';
 import { Cmcd } from '../cmcd';
 
 /**
@@ -95,9 +94,4 @@ export interface CommonMediaRequest {
    * Note: a RequestPlugin that executes the request shall provide this callback function (see RequestPlugin API)
    */
   abort?: () => void
-  
-  /**
-   * The received response.
-   */
-  response?: CommonMediaResponse
 }

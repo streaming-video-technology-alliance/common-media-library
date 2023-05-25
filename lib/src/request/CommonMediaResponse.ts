@@ -1,3 +1,4 @@
+import { CommonMediaRequest } from './CommonMediaRequest';
 import { ResourceTiming } from './ResourceTiming';
 
 /**
@@ -7,6 +8,11 @@ import { ResourceTiming } from './ResourceTiming';
  */
 
 export interface CommonMediaResponse {
+  /**
+   * The origin request.
+   */
+  request: CommonMediaRequest
+
   /**
    * The final URL obtained after any redirects.
    */
