@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `NOTICE` file for attributions
 - Export library in cjs format [#11](https://github.com/streaming-video-technology-alliance/common-media-library/issues/11)
 
+### Changed
+- Switch to inline source maps
+
 
 ## [0.4.2] - 2023-05-25
 
