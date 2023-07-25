@@ -1,4 +1,3 @@
-
 // http://stackoverflow.com/questions/8936984/uint8array-to-string-in-javascript/22373197
 // http://www.onicos.com/staff/iz/amuse/javascript/expert/utf.txt
 /* utf.js - UTF-8 <=> UTF-16 convertion

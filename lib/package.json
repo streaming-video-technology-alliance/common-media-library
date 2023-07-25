@@ -1,6 +1,6 @@
 {
   "name": "@svta/common-media-library",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -19,28 +19,35 @@
     "scope": "svta"
   },
   "files": [
+    "NOTICE.md",
     "dist/**/*"
   ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "default": "./dist/index.js",
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/index.js"
     },
     "./*": {
       "types": "./dist/*.d.ts",
-      "default": "./dist/*.js"
+      "default": "./dist/*.js",
+      "require": "./dist/cjs/*.js",
+      "import": "./dist/*.js"
     }
   },
   "typesVersions": {
     "*": {
       "*": [
-        "dist/*"
+        "dist/*",
+        "dist/cjs/*"
       ]
     }
   },
   "scripts": {
     "build": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
     "test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && npm run build:cjs"
   }
 }

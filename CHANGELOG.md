@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.4.3] - 2023-07-25
+
+### Added
+- Add `NOTICE` file for attributions
+- Export library in cjs format [#11](https://github.com/streaming-video-technology-alliance/common-media-library/issues/11)
+
+### Changed
+- Switch to inline source maps
+
+
 ## [0.4.2] - 2023-05-25
 
 ### Changed
@@ -109,7 +119,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap project [#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2)
 
 
-[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.2...HEAD  
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.3...HEAD  
+[0.4.3]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.2...v0.4.3  
 [0.4.2]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.1...v0.4.2  
 [0.4.1]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.0...v0.4.1  
 [0.4.0]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.3.0...v0.4.0   
