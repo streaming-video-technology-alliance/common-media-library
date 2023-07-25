@@ -5,6 +5,11 @@ on:
     inputs:
       tag:
         description: "The npm tag (i.e @svta/common-media-library@dev)"
+        default: 'dev'
+        required: true
+      id:
+        description: "An id to append to the version. Defaults to the current timestamp"
+        type: string
         required: false
       
 env:
@@ -32,6 +37,20 @@ jobs:
 
       - name: Test
         run: npm test
+      
+      - name: Get Version
+        run: echo "version=`node -p "require('./package').version"`" >> $GITHUB_ENV
+
+      - name: Get Time
+        if: github.event.inputs.id == ''
+        run: echo "id=`date +%s`" >> $GITHUB_ENV
+
+      - name: Get ID
+        if: github.event.inputs.id != ''
+        run: echo "id=${{ github.event.inputs.id }}" >> $GITHUB_ENV
+
+      - name: Generate Version
+        run: npm version ${{ env.version }}-${{ github.event.inputs.tag }}.${{ env.id }} --no-git-tag-version
 
       - name: Publish Tag
         run: npm run pub --tag ${{ github.event.inputs.tag }}
