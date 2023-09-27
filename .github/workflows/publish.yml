@@ -35,6 +35,9 @@ jobs:
       - name: Get Version
         run: echo "version=`node -p "require('./package').version"`" >> $GITHUB_ENV
 
+      - name: Create Release Notes
+        run: npm run notes
+
       - name: Draft Release
         uses: actions/create-release@v1
         env:
@@ -43,18 +46,7 @@ jobs:
           tag_name: v${{ env.version }}
           release_name: ${{ env.version }}
           commitish: main
-          body: |
-            ## Release Notes
-            *
-
-            ## Documentation
-            - API Docs: https://streaming-video-technology-alliance.github.io/common-media-library/
-
-            ## NPM Package
-            ```sh
-            npm install @svta/common-media-library@${{ env.version }}
-            ```
-
+          body_path: ./RELEASE.md
           draft: true
           prerelease: false
 
