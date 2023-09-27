@@ -1,4 +1,4 @@
-import { Cmcd } from '../cmcd';
+import { Cmcd } from '../cmcd.js';
 
 /**
  * Common request API.

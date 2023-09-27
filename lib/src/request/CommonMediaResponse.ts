@@ -1,5 +1,5 @@
-import { CommonMediaRequest } from './CommonMediaRequest';
-import { ResourceTiming } from './ResourceTiming';
+import { CommonMediaRequest } from './CommonMediaRequest.js';
+import { ResourceTiming } from './ResourceTiming.js';
 
 /**
  * Common response API.
