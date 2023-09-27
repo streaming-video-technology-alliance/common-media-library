@@ -8,7 +8,7 @@
   "authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/streaming-video-technology-alliance/common-media-library"
+    "url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
   },
   "bugs": {
     "url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
