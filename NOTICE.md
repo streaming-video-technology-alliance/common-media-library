@@ -1,1 +1,0 @@
-lib/NOTICE.md
