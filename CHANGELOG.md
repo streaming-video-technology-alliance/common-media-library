@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
-## [0.4.4] - 2023-09-27
+## [0.4.4] - 2023-10-11
 
 ### Fixed
 - Module not found: Error: Default condition should be last one [#22](https://github.com/streaming-video-technology-alliance/common-media-library/issues/22)
