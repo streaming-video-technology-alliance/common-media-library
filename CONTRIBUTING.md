@@ -1,8 +1,8 @@
-# Welcome to the Common Media Library contributing guide <!-- omit in toc -->
+# Common Media Library Contributing Guide
 
 Thank you for investing your time in contributing to the Common Media Library. 
 
-<!-- Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approachable and respectable. -->
+Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approachable and respectable.
 
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.
 
@@ -23,15 +23,17 @@ Scan through our [existing issues](https://github.com/streaming-video-technology
 1. Fork the repository.
 [Fork the repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so that you can make your changes without affecting the original project until you're ready to merge them.
 
-2. Install or update to **Node.js**.
+1. Install or update to **Node.js**.
 
-3. Create a working branch and start with your changes!
+1. Create a working branch and start with your changes!
 
-4. Update the CHANGELOG. Make sure to update the change log with the change you've made, along with a referene to the issue.  See the [CHANGELOG](./CHANGELOG.md) for more information.
+1. Update the [CHANGELOG](./CHANGELOG.md). Make sure to update the change log with the change you've made, along with a referene to the issue.
 
-5. Add tests for your changes.
+1. Add yourself to the [Contributors List](./CONTRIBUTORS.md) if you haven't already.
 
-6. Add documentation for your changes.
+1. Add tests for your changes.
+
+1. Add documentation for your changes.
 
 ### Commit your update
 
