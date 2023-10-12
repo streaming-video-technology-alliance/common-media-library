@@ -1,6 +1,6 @@
 {
   "name": "@svta/common-media-library",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "license": "Apache-2.0",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -28,6 +28,11 @@
       "require": "./dist/cjs/index.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./*.js": {
+      "require": "./dist/cjs/*.js",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
     },
     "./*": {
       "types": "./dist/*.d.ts",
