@@ -1,6 +1,6 @@
+import { CMCD_PARAM } from './CMCD_PARAM.js';
 import { Cmcd } from './Cmcd.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { CMCD_PARAM } from './CmcdParam.js';
 import { encodeCmcd } from './encodeCmcd.js';
 
 /**
@@ -11,7 +11,7 @@ import { encodeCmcd } from './encodeCmcd.js';
  * 
  * @returns The CMCD query arg.
  * 
- * @group CMCD
+ * @tag CMCD
  */
 export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	if (!cmcd) {
