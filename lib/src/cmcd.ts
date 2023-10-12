@@ -3,6 +3,7 @@
  * 
  * @packageDocumentation
  */
+export { CMCD_PARAM } from './cmcd/CMCD_PARAM.js';
 export type { Cmcd } from './cmcd/Cmcd.js';
 export type { CmcdCustomKey } from './cmcd/CmcdCustomKey.js';
 export type { CmcdEncodeOptions } from './cmcd/CmcdEncodeOptions.js';
@@ -12,7 +13,6 @@ export { CmcdHeaderField } from './cmcd/CmcdHeaderField.js';
 export type { CmcdHeadersMap } from './cmcd/CmcdHeadersMap.js';
 export type { CmcdKey } from './cmcd/CmcdKey.js';
 export { CmcdObjectType } from './cmcd/CmcdObjectType.js';
-export { CMCD_PARAM } from './cmcd/CmcdParam.js';
 export { CmcdStreamType } from './cmcd/CmcdStreamType.js';
 export { CmcdStreamingFormat } from './cmcd/CmcdStreamingFormat.js';
 export type { CmcdValue } from './cmcd/CmcdValue.js';
