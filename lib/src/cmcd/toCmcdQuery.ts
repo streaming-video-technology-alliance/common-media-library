@@ -11,7 +11,7 @@ import { encodeCmcd } from './encodeCmcd.js';
  * 
  * @returns The CMCD query arg.
  * 
- * @tag CMCD
+ * @group CMCD
  */
 export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	if (!cmcd) {
