@@ -37,6 +37,9 @@ Scan through our [existing issues](https://github.com/streaming-video-technology
 
 ### Commit your update
 
+> **Warning**
+> This library requires all commits to sign the DCO. See https://github.com/apps/dco for more information.
+
 1. Run `npm run format` to format the code before committing.
 
 1. Make sure all tests pass by running `npm run test`.
