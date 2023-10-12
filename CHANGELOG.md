@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.5] - 2023-10-12
 
+### Fixed
+- Allow imports with file extensions [#26](https://github.com/streaming-video-technology-alliance/common-media-library/issues/26)
+
 
 ## [0.4.4] - 2023-10-11
 
