@@ -29,6 +29,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./*.js": {
+      "require": "./dist/cjs/*.js",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    },
     "./*": {
       "types": "./dist/*.d.ts",
       "require": "./dist/cjs/*.js",
