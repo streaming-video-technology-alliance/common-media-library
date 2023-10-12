@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `CMCD_PARAM` constant does not match file name [#27](https://github.com/streaming-video-technology-alliance/common-media-library/issues/27)
 - lint errors when using typedoc specific tags [#32](https://github.com/streaming-video-technology-alliance/common-media-library/issues/32)
+- Allow imports with file extensions [#26](https://github.com/streaming-video-technology-alliance/common-media-library/issues/26)
 
 
 ## [0.4.4] - 2023-10-11
