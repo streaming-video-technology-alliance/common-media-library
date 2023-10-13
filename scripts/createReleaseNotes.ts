@@ -10,7 +10,7 @@ ${changes}
 
 ## NPM Package
 \`\`\`sh
-npm install @svta/common-media-library@${{ version }}
+npm install @svta/common-media-library@${version}
 \`\`\`
 `;
 }
@@ -19,7 +19,8 @@ async function getChanges(version: string) {
 	const changeLog = await fs.readFile('./CHANGELOG.md', 'utf8');
 	const logs = changeLog.split('\n\n\n');
 	const match = `## [${version}]`;
-	return logs.find(log => log.includes(match)) || '';
+	const log = logs.find(log => log.includes(match)) || '';
+	return log.split('\n\n').slice(1).join('\n\n');
 }
 
 async function getVersion() {
