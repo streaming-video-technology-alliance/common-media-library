@@ -1,3 +1,2 @@
-import { SfBareItem } from './SfBareItem';
 
-export type SfParameters = Record<string, SfBareItem>;
+export type SfParameters = Record<string, any>;

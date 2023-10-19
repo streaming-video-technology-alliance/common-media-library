@@ -3,8 +3,7 @@ import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { CmcdFormatters } from './CmcdFormatters.js';
 import { CmcdKey } from './CmcdKey.js';
 import { CmcdValue } from './CmcdValue.js';
-
-type Mapper<T> = (key: string, value: CmcdValue) => T;
+import { isTokenField } from './isTokenField.js';
 
 const isValid = (value: CmcdValue) => value != null && value !== '' && value !== false;
 
@@ -19,8 +18,8 @@ const isValid = (value: CmcdValue) => value != null && value !== '' && value !==
  * 
  * @group CMCD
  */
-export function processCmcd<T>(obj: Cmcd | null | undefined, map: Mapper<T>, options?: CmcdEncodeOptions): T[] {
-	const results: T[] = [];
+export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOptions): Cmcd {
+	const results: Cmcd = {};
 
 	if (obj == null || typeof obj !== 'object') {
 		return results;
@@ -30,11 +29,11 @@ export function processCmcd<T>(obj: Cmcd | null | undefined, map: Mapper<T>, opt
 	const formatters = Object.assign({}, CmcdFormatters, options?.formatters);
 
 	keys.forEach(key => {
-		let value = obj[key];
+		let value = obj[key] as CmcdValue;
 
-		// ignore invalid values
-		if (!isValid(value)) {
-			return;
+		const formatter = formatters[key];
+		if (formatter) {
+			value = formatter(value);
 		}
 
 		// Version should only be reported if not equal to 1.
@@ -47,13 +46,16 @@ export function processCmcd<T>(obj: Cmcd | null | undefined, map: Mapper<T>, opt
 			return;
 		}
 
-		const formatter = formatters[key];
-		if (formatter) {
-			value = formatter(value);
+		// ignore invalid values
+		if (!isValid(value)) {
+			return;
 		}
 
-		const result = map(key, value);
-		results.push(result);
+		if (isTokenField(key) && typeof value === 'string') {
+			value = Symbol.for(value);
+		}
+
+		results[key as any] = value as any;
 	});
 
 	return results;

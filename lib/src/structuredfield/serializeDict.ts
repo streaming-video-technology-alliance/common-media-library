@@ -1,3 +1,4 @@
+import { SfEncodeOptions } from './SfEncodeOptions.js';
 import { SfItem } from './SfItem.js';
 import { err } from './err.js';
 import { serializeInnerList } from './serializeInnerList.js';
@@ -43,12 +44,14 @@ import { serializeParams } from './serializeParams.js';
 //         2.  Append a single SP to output.
 //
 // 3.  Return output.
-export function serializeDict(dict: Record<string, any> | Map<string, any>) {
+export function serializeDict(dict: Record<string, any> | Map<string, any>, options: SfEncodeOptions = { whitespace: true }) {
 	if (typeof dict !== 'object') {
 		throw new Error(err`failed to serialize "${dict}" as Dict`);
 	}
 
 	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict);
+	const optionalWhiteSpace = options?.whitespace ? ' ' : '';
+
 	return Array.from(entries)
 		.map(([key, item]) => {
 			if (item instanceof SfItem === false) {
@@ -69,5 +72,5 @@ export function serializeDict(dict: Record<string, any> | Map<string, any>) {
 			}
 			return output;
 		})
-		.join(', ');
+		.join(`,${optionalWhiteSpace}`);
 }

@@ -1,3 +1,4 @@
+import { symbolToStr } from '../cmcd/symbolToStr.js';
 import { err } from './err.js';
 
 // 4.1.7.  Serializing a Token
@@ -20,7 +21,7 @@ import { err } from './err.js';
 const TOKEN = /^([a-zA-Z*])([!#$%&'*+\-.^_`|~\w:/]*)$/;
 
 export function serializeToken(token: symbol) {
-	const value = Symbol.keyFor(token);
+	const value = Symbol.keyFor(token) || symbolToStr(token);
 	if (value && TOKEN.test(value) === false) {
 		throw new Error(err`failed to serialize "${value}" as token`);
 	}

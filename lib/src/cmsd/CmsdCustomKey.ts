@@ -8,4 +8,4 @@ import { CmCustomKey } from '../cta/CmCustomKey.js';
  * 
  * @group CMCD
  */
-export type CmcdCustomKey = CmCustomKey;
+export type CmsdCustomKey = CmCustomKey;

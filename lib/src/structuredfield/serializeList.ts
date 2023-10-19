@@ -1,3 +1,4 @@
+import { SfEncodeOptions } from './SfEncodeOptions.js';
 import { SfItem } from './SfItem.js';
 import { SfMember } from './SfMember.js';
 import { err } from './err.js';
@@ -27,10 +28,12 @@ import { serializeItem } from './serializeItem.js';
 //         2.  Append a single SP to output.
 //
 // 3.  Return output.
-export function serializeList(list: SfMember[]) {
+export function serializeList(list: SfMember[], options?: SfEncodeOptions) {
 	if (Array.isArray(list) === false) {
 		throw new Error(err`failed to serialize "${list}" as List`);
 	}
+
+	const optionalWhiteSpace = options?.whitespace ? ' ' : '';
 
 	return list
 		.map(item => {
@@ -46,5 +49,5 @@ export function serializeList(list: SfMember[]) {
 
 			return serializeItem(i);
 		})
-		.join(', ');
+		.join(`,${optionalWhiteSpace}`);
 }

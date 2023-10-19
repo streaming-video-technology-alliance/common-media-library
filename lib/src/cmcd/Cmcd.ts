@@ -1,7 +1,7 @@
 import { CmcdCustomKey } from './CmcdCustomKey.js';
 import { CmcdObjectType } from './CmcdObjectType.js';
-import { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 import { CmcdStreamType } from './CmcdStreamType.js';
+import { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 import { CmcdValue } from './CmcdValue.js';
 
 /**

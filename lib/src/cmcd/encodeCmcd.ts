@@ -1,39 +1,24 @@
+import { encodeSfDict } from '../structuredfield.js';
 import { Cmcd } from './Cmcd.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { isTokenField } from './isTokenField.js';
 import { processCmcd } from './processCmcd.js';
 
 /**
  * Encode a CMCD object to a string.
  * 
- * @param obj - The CMCD object to encode.
+ * @param cmcd - The CMCD object to encode.
  * @param options - Options for encoding.
  * 
  * @returns The encoded CMCD string.
  * 
  * @group CMCD
  */
-export function encodeCmcd(obj: Cmcd, options: CmcdEncodeOptions = {}) {
-	return processCmcd<string | undefined>(obj, (key, value) => {
-		switch (typeof value) {
-			case 'boolean':
-				return key;
+export function encodeCmcd(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
+	if (!cmcd) {
+		return '';
+	}
 
-			case 'number':
-				return `${key}=${value}`;
+	const processed = processCmcd(cmcd, options);
 
-			case 'symbol':
-				return `${key}=${value.description || value.toString().replace(/^Symbol\((.*)\)$/, '$1')}`;
-
-			case 'string':
-				if (isTokenField(key)) {
-					return `${key}=${value}`;
-				}
-
-				return `${key}=${JSON.stringify(value)}`;
-
-			default:
-				return undefined;
-		}
-	}, options).join(',');
+	return encodeSfDict(processed, Object.assign({ whitespace: false }, options));
 }

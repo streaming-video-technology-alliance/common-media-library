@@ -1,7 +1,7 @@
 import { Cmcd } from './Cmcd.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { CmcdValue } from './CmcdValue.js';
 import { processCmcd } from './processCmcd.js';
+import { symbolToStr } from './symbolToStr.js';
 
 /**
  * Convert a CMCD data object to JSON.
@@ -13,9 +13,8 @@ import { processCmcd } from './processCmcd.js';
  * 
  * @group CMCD
  */
-export function toCmcdJson(cmcd: Partial<Cmcd>, options?: CmcdEncodeOptions) {
-	const toValue = (value: CmcdValue) => typeof value == 'symbol' ? value.description : value;
-	const data = processCmcd(cmcd, (key, value) => [key, toValue(value)], options);
-  
-	return JSON.stringify(Object.fromEntries(data));
+export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions) {
+	const data = processCmcd(cmcd, options);
+
+	return JSON.stringify(data, (_, value) => typeof value === 'symbol' ? symbolToStr(value) : value);
 }
