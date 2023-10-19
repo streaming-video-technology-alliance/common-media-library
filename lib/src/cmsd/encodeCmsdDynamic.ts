@@ -5,7 +5,7 @@ import { CmsdDynamic } from './CmsdDynamic.js';
 /**
  * Encode a CMSD Dynamic object.
  * 
- * @param value - The server name or list of SfItems to encode.
+ * @param value - The server name or list of `SfItems` to encode.
  * @param cmcd - The CMSD object to encode.
  * 
  * @returns The encoded CMSD string.

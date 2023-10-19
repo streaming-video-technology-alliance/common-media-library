@@ -22,6 +22,14 @@ import { parseItem } from './parseItem.js';
 // 7.  If input_string is not empty, fail parsing.
 //
 // 8.  Otherwise, return output.
+/**
+ * Decode a structured field string into a structured field item
+ * 
+ * @param input - The structured field string to decode
+ * @returns The structured field item
+ * 
+ * @group Structured Field
+ */
 export function decodeSfItem(input: string) {
 	try {
 		const { input_string, value } = parseItem(input.trim());

@@ -10,4 +10,3 @@ export { decodeSfList } from './structuredfield/decodeSfList.js';
 export { encodeSfDict } from './structuredfield/encodeSfDict.js';
 export { encodeSfItem } from './structuredfield/encodeSfItem.js';
 export { encodeSfList } from './structuredfield/encodeSfList.js';
-
