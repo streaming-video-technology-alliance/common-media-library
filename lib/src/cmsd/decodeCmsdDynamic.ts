@@ -2,7 +2,7 @@ import { decodeSfList } from '../structuredfield/decodeSfList.js';
 import { CmsdDynamic } from './CmsdDynamic.js';
 
 /**
- * Decode a CMSD dynamci string to an object.
+ * Decode a CMSD dynamic string to an object.
  * 
  * @param cmcd - The CMSD string to decode.
  * 
@@ -10,9 +10,9 @@ import { CmsdDynamic } from './CmsdDynamic.js';
  * 
  * @group CMSD
  */
-export function decodeCmsdDynamic(cmsd: string): CmsdDynamic {
+export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[] {
 	if (!cmsd) {
-		return {};
+		return [];
 	}
 
 	const sfDict = decodeSfList(cmsd);

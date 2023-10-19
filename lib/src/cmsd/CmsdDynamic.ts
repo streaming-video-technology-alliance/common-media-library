@@ -1,5 +1,5 @@
-import { CmCustomKey } from '../cta/CmCustomKey';
-import { CmValue } from '../cta/CmValue';
+import { CmsdCustomKey } from './CmsdCustomKey';
+import { CmsdValue } from './CmsdValue';
 
 /**
  * Common Media Server Data (CMSD) dynamic response header fields.
@@ -13,7 +13,7 @@ export class CmsdDynamic {
    * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
    * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
    */
-  [index: CmCustomKey]: CmValue;
+  [index: CmsdCustomKey]: CmsdValue;
 
   /**
    * Duress

@@ -15,7 +15,10 @@ export function decodeCmsdStatic(cmsd: string): CmsdStatic {
 		return {};
 	}
 
-	const sfDict = decodeSfDict(cmsd);
-
-	return sfDict as any;
+	return Object
+		.entries(decodeSfDict(cmsd))
+		.reduce((result, [key, value]) => {
+			result[key as any] = value.value;
+			return result;
+		}, {} as CmsdStatic);
 }

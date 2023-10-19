@@ -1,8 +1,8 @@
-import { CmCustomKey } from '../cta/CmCustomKey.js';
-import { CmObjectType } from '../cta/CmObjectType.js';
-import { CmStreamType } from '../cta/CmStreamType.js';
-import { CmStreamingFormat } from '../cta/CmStreamingFormat.js';
-import { CmValue } from '../cta/CmValue.js';
+import { CmsdCustomKey } from './CmsdCustomKey.js';
+import { CmsdObjectType } from './CmsdObjectType.js';
+import { CmsdStreamType } from './CmsdStreamType.js';
+import { CmsdStreamingFormat } from './CmsdStreamingFormat.js';
+import { CmsdValue } from './CmsdValue.js';
 
 /**
  * Common Media Server Data (CMSD) static response header fields.
@@ -17,7 +17,7 @@ export interface CmsdStatic {
    * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
    * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
    */
-  [index: CmCustomKey]: CmValue;
+  [index: CmsdCustomKey]: CmsdValue;
 
   /**
    * Availability time
@@ -117,7 +117,7 @@ export interface CmsdStatic {
    * 
    * Token
    */
-  ot?: CmObjectType;
+  ot?: CmsdObjectType;
 
   /**
    * Streaming format
@@ -133,7 +133,7 @@ export interface CmsdStatic {
    * 
    * Token
    */
-  sf?: CmStreamingFormat;
+  sf?: CmsdStreamingFormat;
 
   /**
    * Stream type
@@ -142,7 +142,7 @@ export interface CmsdStatic {
    * 
    * Token
    */
-  st?: CmStreamType;
+  st?: CmsdStreamType;
 
   /**
    * Startup

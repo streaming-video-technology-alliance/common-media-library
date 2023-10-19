@@ -8,13 +8,13 @@ import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.js';
 describe('decodeCmsdDynamic', () => {
 	it('handles null data object', () => {
 		// @ts-expect-error
-		deepEqual(decodeCmsdDynamic(undefined), {});
+		deepEqual(decodeCmsdDynamic(undefined), []);
 		// @ts-expect-error
-		deepEqual(decodeCmsdDynamic(null), {});
+		deepEqual(decodeCmsdDynamic(null), []);
 	});
 
 	it('handles empty string', () => {
-		deepEqual(decodeCmsdDynamic(''), {});
+		deepEqual(decodeCmsdDynamic(''), []);
 	});
 
 	it('returns encoded string from list', () => {
