@@ -1,5 +1,6 @@
-import { err } from './err.js';
-import { parseDictionary } from './parseDictionary.js';
+import { parseDict } from './parse/parseDict.js';
+import { parseError } from './parse/parseError.js';
+import { DICT } from './util/DICT.js';
 
 /**
  * Decode a structured field string into a structured field dictionary
@@ -11,13 +12,13 @@ import { parseDictionary } from './parseDictionary.js';
  */
 export function decodeSfDict(input: string) {
 	try {
-		const { input_string, value } = parseDictionary(input.trim());
-		if (input_string !== '') {
-			throw new Error(err`failed to parse "${input_string}" as Dict`);
+		const { src, value } = parseDict(input.trim());
+		if (src !== '') {
+			throw parseError(src, DICT);
 		}
 		return value;
 	}
 	catch (cause) {
-		throw new Error(err`failed to parse "${input}" as Dict`, { cause });
+		throw parseError(input, DICT, cause);
 	}
 }

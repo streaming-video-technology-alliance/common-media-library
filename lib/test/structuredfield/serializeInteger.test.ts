@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeInteger } from '../../src/structuredfield/serializeInteger.js';
+import { serializeInteger } from '../../src/structuredfield/serialize/serializeInteger.js';
 
 test('serializeInteger', () => {
 	assert.deepStrictEqual(serializeInteger(0), '0');

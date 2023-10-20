@@ -1,10 +1,10 @@
 import { Id3Frame } from './Id3Frame.js';
-import { RawId3Frame } from './RawFrame.js';
-import { decodeId3Frame } from './decodeId3Frame.js';
-import { getId3FrameData } from './getId3FrameData.js';
-import { isId3Footer } from './isId3Footer.js';
-import { isId3Header } from './isId3Header.js';
-import { readId3Size } from './readId3Size.js';
+import { RawId3Frame } from './util/RawFrame.js';
+import { decodeId3Frame } from './util/decodeId3Frame.js';
+import { getId3FrameData } from './util/getId3FrameData.js';
+import { isId3Footer } from './util/isId3Footer.js';
+import { isId3Header } from './util/isId3Header.js';
+import { readId3Size } from './util/readId3Size.js';
 
 /**
  * Returns an array of ID3 frames found in all the ID3 tags in the id3Data

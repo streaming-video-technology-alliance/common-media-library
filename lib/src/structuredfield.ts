@@ -1,5 +1,6 @@
 export type { SfBareItem } from './structuredfield/SfBareItem.js';
 export type { SfDictionary } from './structuredfield/SfDictionary.js';
+export type { SfEncodeOptions } from './structuredfield/SfEncodeOptions.js';
 export type { SfInnerList } from './structuredfield/SfInnerList.js';
 export { SfItem } from './structuredfield/SfItem.js';
 export type { SfMember } from './structuredfield/SfMember.js';

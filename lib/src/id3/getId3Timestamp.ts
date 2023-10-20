@@ -2,7 +2,7 @@ import { DecodedId3Frame } from './DecodedId3Frame.js';
 import { Id3Frame } from './Id3Frame.js';
 import { getId3Frames } from './getId3Frames.js';
 import { isId3TimestampFrame } from './isId3TimestampFrame.js';
-import { readId3Timestamp } from './readId3Timestamp.js';
+import { readId3Timestamp } from './util/readId3Timestamp.js';
 
 /**
  * Searches for the Elementary Stream timestamp found in the ID3 data chunk

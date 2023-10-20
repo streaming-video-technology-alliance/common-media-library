@@ -1,5 +1,5 @@
-import { err } from './err.js';
-import { parseItem } from './parseItem.js';
+import { parseError } from './parse/parseError.js';
+import { parseItem } from './parse/parseItem.js';
 
 // 4.2.  Parsing Structured Fields
 //
@@ -32,13 +32,13 @@ import { parseItem } from './parseItem.js';
  */
 export function decodeSfItem(input: string) {
 	try {
-		const { input_string, value } = parseItem(input.trim());
-		if (input_string !== '') {
-			throw new Error(err`failed to parse "${input_string}" as Item`);
+		const { src, value } = parseItem(input.trim());
+		if (src !== '') {
+			throw parseError(src, 'Item');
 		}
 		return value;
 	}
 	catch (cause) {
-		throw new Error(err`failed to parse "${input}" as Item`, { cause });
+		throw parseError(input, 'Item', cause);
 	}
 }

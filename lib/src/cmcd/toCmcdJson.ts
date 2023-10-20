@@ -1,7 +1,7 @@
 import { Cmcd } from './Cmcd.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { processCmcd } from './processCmcd.js';
-import { symbolToStr } from './symbolToStr.js';
+import { processCmcd } from './util/processCmcd.js';
+import { symbolToStr } from './util/symbolToStr.js';
 
 /**
  * Convert a CMCD data object to JSON.

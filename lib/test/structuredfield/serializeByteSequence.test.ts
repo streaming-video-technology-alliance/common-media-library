@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeByteSequence } from '../../src/structuredfield/serializeByteSequence.js';
+import { serializeByteSequence } from '../../src/structuredfield/serialize/serializeByteSequence.js';
 
 test('serializeByteSequence', () => {
 	const value = Uint8Array.from([

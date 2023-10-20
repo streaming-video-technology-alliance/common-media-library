@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
 import { SfItem } from '../../src/structuredfield/SfItem.js';
-import { parseList } from '../../src/structuredfield/parseList.js';
+import { parseList } from '../../src/structuredfield/parse/parseList.js';
 
 describe('parseList', () => {
 	test('string list', () => {
@@ -12,7 +12,7 @@ describe('parseList', () => {
 					new SfItem(`foo`),
 					new SfItem(`bar`),
 					new SfItem(`It was the best of times.`),
-				], input_string: ``,
+				], src: ``,
 			}
 		);
 	});
@@ -24,7 +24,7 @@ describe('parseList', () => {
 				value: [
 					new SfItem(Symbol.for(`foo`)),
 					new SfItem(Symbol.for(`bar`)),
-				], input_string: ``,
+				], src: ``,
 			}
 		);
 	});
@@ -41,7 +41,7 @@ describe('parseList', () => {
 					new SfItem(true),
 					new SfItem(new Uint8Array([1, 2, 3])),
 					new SfItem(new Date(1659578233 * 1000)),
-				], input_string: ``,
+				], src: ``,
 			}
 		);
 	});
@@ -55,7 +55,7 @@ describe('parseList', () => {
 					new SfItem(['baz']),
 					new SfItem(['bat', 'one']),
 					new SfItem([]),
-				], input_string: ``,
+				], src: ``,
 			}
 		);
 	});
@@ -67,7 +67,7 @@ describe('parseList', () => {
 					new SfItem('foo', { 'a': 1, 'b': 2 }),
 				], { 'lvl': 5 }),
 				new SfItem(['bar', 'baz'], { 'lvl': 1 }),
-			], input_string: ``,
+			], src: ``,
 		});
 	});
 

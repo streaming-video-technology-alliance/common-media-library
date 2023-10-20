@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeList } from '../../src/structuredfield/serializeList.js';
+import { serializeList } from '../../src/structuredfield/serialize/serializeList.js';
 
 test('serializeList', () => {
 	assert.deepStrictEqual(serializeList([1, 2, 3]), '1, 2, 3');

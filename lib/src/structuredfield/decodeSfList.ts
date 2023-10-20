@@ -1,5 +1,6 @@
-import { err } from './err.js';
-import { parseList } from './parseList.js';
+import { parseError } from './parse/parseError.js';
+import { parseList } from './parse/parseList.js';
+import { LIST } from './util/LIST.js';
 
 /**
  * Decode a structured field string into a structured field list
@@ -11,13 +12,13 @@ import { parseList } from './parseList.js';
  */
 export function decodeSfList(input: string) {
 	try {
-		const { input_string, value } = parseList(input.trim());
-		if (input_string !== '') {
-			throw new Error(err`failed to parse "${input_string}" as List`);
+		const { src, value } = parseList(input.trim());
+		if (src !== '') {
+			throw parseError(src, LIST);
 		}
 		return value;
 	}
 	catch (cause) {
-		throw new Error(err`failed to parse "${input}" as List`, { cause });
+		throw parseError(input, LIST, cause);
 	}
 }

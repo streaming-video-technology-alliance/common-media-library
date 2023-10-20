@@ -1,7 +1,7 @@
 import { SfItem } from '../structuredfield.js';
 import { decodeSfDict } from '../structuredfield/decodeSfDict.js';
 import { Cmcd } from './Cmcd.js';
-import { symbolToStr } from './symbolToStr.js';
+import { symbolToStr } from './util/symbolToStr.js';
 
 /**
  * Decode a CMCD string to an object.

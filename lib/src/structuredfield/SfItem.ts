@@ -1,5 +1,5 @@
-import { SfBareItem } from './SfBareItem';
-import { SfParameters } from './SfParameters';
+import { SfBareItem } from './SfBareItem.js';
+import { SfParameters } from './SfParameters.js';
 
 export class SfItem {
 

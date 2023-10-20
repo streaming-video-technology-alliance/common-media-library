@@ -1,5 +1,5 @@
 import { SfEncodeOptions } from './SfEncodeOptions.js';
-import { serializeDict } from './serializeDict.js';
+import { serializeDict } from './serialize/serializeDict.js';
 
 /**
  * Encode an object into a structured field dictionary

@@ -1,7 +1,7 @@
 import { SfBareItem } from './SfBareItem.js';
 import { SfItem } from './SfItem.js';
 import { SfParameters } from './SfParameters.js';
-import { serializeItem } from './serializeItem.js';
+import { serializeItem } from './serialize/serializeItem.js';
 
 /**
  * Encode an item into a structured field dictionary

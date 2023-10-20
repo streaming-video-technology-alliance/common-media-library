@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeDict } from '../../src/structuredfield/serializeDict.js';
+import { serializeDict } from '../../src/structuredfield/serialize/serializeDict.js';
 
 test('serializeDict', () => {
 	assert.deepStrictEqual(serializeDict(new Map()), '');
