@@ -1,5 +1,6 @@
 import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
 import { CmsdStatic } from './CmsdStatic.js';
+import { processCmsd } from './utils/processCmsd.js';
 
 /**
  * Encode a CMSD Static object.
@@ -15,5 +16,5 @@ export function encodeCmsdStatic(cmsd: CmsdStatic): string {
 		return '';
 	}
 
-	return encodeSfDict(cmsd);
+	return encodeSfDict(processCmsd(cmsd), { whitespace: false });
 }

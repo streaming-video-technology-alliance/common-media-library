@@ -1,8 +1,12 @@
+import { CmsdObjectType } from '@svta/common-media-library/cmsd/CmsdObjectType';
+import { CmsdStreamType } from '@svta/common-media-library/cmsd/CmsdStreamType';
+import { CmsdStreamingFormat } from '@svta/common-media-library/cmsd/CmsdStreamingFormat';
+
 export const CMSD_STATIC_OBJ = {
-	br: 2000,
+	ot: CmsdObjectType.VIDEO,
+	sf: CmsdStreamingFormat.HLS,
+	st: CmsdStreamType.VOD,
 	d: 5000,
+	br: 2000,
 	n: 'OriginProviderA',
-	ot: Symbol.for('v'),
-	sf: Symbol.for('h'),
-	st: Symbol.for('v'),
 };

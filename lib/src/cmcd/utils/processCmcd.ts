@@ -1,11 +1,10 @@
+import { isTokenField } from '../../cta/utils/isTokenField.js';
+import { isValid } from '../../cta/utils/isValid.js';
 import { Cmcd } from '../Cmcd.js';
 import { CmcdEncodeOptions } from '../CmcdEncodeOptions.js';
 import { CmcdFormatters } from '../CmcdFormatters.js';
 import { CmcdKey } from '../CmcdKey.js';
 import { CmcdValue } from '../CmcdValue.js';
-import { isTokenField } from './isTokenField.js';
-
-const isValid = (value: CmcdValue) => value != null && value !== '' && value !== false;
 
 /**
  * Internal CMCD processing function.
@@ -27,8 +26,13 @@ export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOp
 
 	const keys = Object.keys(obj).sort() as CmcdKey[];
 	const formatters = Object.assign({}, CmcdFormatters, options?.formatters);
+	const filter = options?.filter;
 
 	keys.forEach(key => {
+		if (filter?.(key)) {
+			return;
+		}
+
 		let value = obj[key] as CmcdValue;
 
 		const formatter = formatters[key];

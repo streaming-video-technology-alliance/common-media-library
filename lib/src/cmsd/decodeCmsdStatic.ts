@@ -1,3 +1,4 @@
+import { symbolToStr } from '../cta/utils/symbolToStr.js';
 import { decodeSfDict } from '../structuredfield/decodeSfDict.js';
 import { CmsdStatic } from './CmsdStatic.js';
 
@@ -17,8 +18,9 @@ export function decodeCmsdStatic(cmsd: string): CmsdStatic {
 
 	return Object
 		.entries(decodeSfDict(cmsd))
-		.reduce((result, [key, value]) => {
-			result[key as any] = value.value;
-			return result;
+		.reduce((acc, [key, item]) => {
+			const { value }: any = item;
+			acc[key as any] = (typeof value === 'symbol' ? symbolToStr(value) : value) as any;
+			return acc;
 		}, {} as CmsdStatic);
 }

@@ -1,4 +1,4 @@
-import { symbolToStr } from '../../cmcd/util/symbolToStr.js';
+import { symbolToStr } from '../../cta/utils/symbolToStr.js';
 import { TOKEN } from '../util/TOKEN.js';
 import { serializeError } from './serializeError.js';
 
