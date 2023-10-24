@@ -1,3 +1,4 @@
+import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfParameters } from '../SfParameters.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseBareItem } from './parseBareItem.js';
@@ -41,7 +42,7 @@ import { parseKey } from './parseKey.js';
 //
 // Note that when duplicate Parameter keys are encountered, this has the
 // effect of ignoring all but the last instance.
-export function parseParameters(src: string): ParsedValue<SfParameters | undefined> {
+export function parseParameters(src: string, options?: SfDecodeOptions): ParsedValue<SfParameters | undefined> {
 	let parameters: SfParameters | undefined = undefined;
 	while (src.length > 0) {
 		if (src[0] !== ';') {
@@ -54,7 +55,7 @@ export function parseParameters(src: string): ParsedValue<SfParameters | undefin
 		src = parsedKey.src;
 		if (src[0] === '=') {
 			src = src.substring(1);
-			const parsedBareItem = parseBareItem(src);
+			const parsedBareItem = parseBareItem(src, options);
 			value = parsedBareItem.value as any;
 			src = parsedBareItem.src;
 		}

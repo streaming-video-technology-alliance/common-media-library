@@ -1,6 +1,7 @@
+import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfInnerList } from '../SfInnerList.js';
 import { SfItem } from '../SfItem.js';
-import { INNER } from '../util/INNER.js';
+import { INNER } from '../utils/INNER.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseItem } from './parseItem.js';
@@ -39,7 +40,7 @@ import { parseParameters } from './parseParameters.js';
 //         parsing.
 //
 // 4.  The end of the inner list was not found; fail parsing.
-export function parseInnerList(src: string): ParsedValue<SfInnerList> {
+export function parseInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfInnerList> {
 	if (src[0] !== '(') {
 		throw parseError(src, INNER);
 	}
@@ -49,13 +50,13 @@ export function parseInnerList(src: string): ParsedValue<SfInnerList> {
 		src = src.trim();
 		if (src[0] === ')') {
 			src = src.substring(1);
-			const parsedParameters = parseParameters(src);
+			const parsedParameters = parseParameters(src, options);
 			return {
 				value: new SfItem(innerList, parsedParameters.value) as any,
 				src: parsedParameters.src,
 			};
 		}
-		const parsedItem = parseItem(src);
+		const parsedItem = parseItem(src, options);
 		innerList.push(parsedItem.value);
 		src = parsedItem.src;
 		if (src[0] !== ' ' && src[0] !== ')') {

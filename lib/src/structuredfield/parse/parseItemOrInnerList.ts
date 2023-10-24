@@ -1,3 +1,4 @@
+import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfInnerList } from '../SfInnerList.js';
 import { SfItem } from '../SfItem.js';
 import { ParsedValue } from './ParsedValue.js';
@@ -17,9 +18,9 @@ import { parseItem } from './parseItem.js';
 //
 // 2.  Return the result of running Parsing an Item (Section 4.2.3) with
 //     input_string.
-export function parseItemOrInnerList(src: string): ParsedValue<SfItem | SfInnerList> {
+export function parseItemOrInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfItem | SfInnerList> {
 	if (src[0] === '(') {
-		return parseInnerList(src);
+		return parseInnerList(src, options);
 	}
-	return parseItem(src);
+	return parseItem(src, options);
 }

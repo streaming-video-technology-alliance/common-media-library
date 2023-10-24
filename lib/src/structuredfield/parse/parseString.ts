@@ -1,4 +1,4 @@
-import { STRING_REGEX } from '../util/STRING_REGEX.js';
+import { STRING_REGEX } from '../utils/STRING_REGEX.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 

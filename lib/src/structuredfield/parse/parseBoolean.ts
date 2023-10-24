@@ -1,4 +1,4 @@
-import { BOOLEAN } from '../util/BOOLEAN.js';
+import { BOOLEAN } from '../utils/BOOLEAN.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 

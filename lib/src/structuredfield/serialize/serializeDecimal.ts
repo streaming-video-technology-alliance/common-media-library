@@ -1,5 +1,5 @@
 import { roundToEven } from '../../utils/roundToEven.js';
-import { DECIMAL } from '../util/DECIMAL.js';
+import { DECIMAL } from '../utils/DECIMAL.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.5.  Serializing a Decimal

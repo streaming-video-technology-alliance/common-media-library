@@ -1,4 +1,5 @@
-import { BARE_ITEM } from '../util/BARE_ITEM.js';
+import { SfToken } from '../SfToken.js';
+import { BARE_ITEM } from '../utils/BARE_ITEM.js';
 import { serializeBoolean } from './serializeBoolean.js';
 import { serializeByteSequence } from './serializeByteSequence.js';
 import { serializeDate } from './serializeDate.js';
@@ -54,6 +55,9 @@ export function serializeBareItem(value: any) {
 			}
 			if (value instanceof Uint8Array) {
 				return serializeByteSequence(value);
+			}
+			if (value instanceof SfToken) {
+				return serializeToken(value);
 			}
 		default:
 			// fail

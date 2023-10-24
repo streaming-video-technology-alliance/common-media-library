@@ -1,4 +1,6 @@
-import { TOKEN } from '../util/TOKEN.js';
+import { SfDecodeOptions } from '../SfDecodeOptions.js';
+import { SfToken } from '../SfToken.js';
+import { TOKEN } from '../utils/TOKEN.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
@@ -23,7 +25,7 @@ import { parseError } from './parseError.js';
 //     3.  Append char to output_string.
 //
 // 4.  Return output_string.
-export function parseToken(src: string): ParsedValue<symbol> {
+export function parseToken(src: string, options?: SfDecodeOptions): ParsedValue<symbol | SfToken> {
 	if (/^[a-zA-Z*]$/.test(src[0]) === false) {
 		throw parseError(src, TOKEN);
 	}
@@ -31,7 +33,7 @@ export function parseToken(src: string): ParsedValue<symbol> {
 	const value = (re.exec(src) as any)[1];
 	src = src.substring(re.lastIndex);
 	return {
-		value: Symbol.for(value),
+		value: options?.useSymbol === false ? new SfToken(value) : Symbol.for(value),
 		src,
 	};
 }

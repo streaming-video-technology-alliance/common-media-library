@@ -1,5 +1,6 @@
 import { symbolToStr } from '../../cta/utils/symbolToStr.js';
-import { TOKEN } from '../util/TOKEN.js';
+import { SfToken } from '../SfToken.js';
+import { TOKEN } from '../utils/TOKEN.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.7.  Serializing a Token
@@ -19,8 +20,10 @@ import { serializeError } from './serializeError.js';
 // 4.  Append input_token to output.
 //
 // 5.  Return output.
-export function serializeToken(token: symbol) {
-	const value = Symbol.keyFor(token) || symbolToStr(token);
+export function serializeToken(token: symbol): string;
+export function serializeToken(token: SfToken): string;
+export function serializeToken(token: symbol | SfToken) {
+	const value = symbolToStr(token);
 	if (/^([a-zA-Z*])([!#$%&'*+\-.^_`|~\w:/]*)$/.test(value) === false) {
 		throw serializeError(value, TOKEN);
 	}

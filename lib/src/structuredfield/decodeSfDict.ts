@@ -1,6 +1,7 @@
+import { SfDecodeOptions } from './SfDecodeOptions.js';
 import { parseDict } from './parse/parseDict.js';
 import { parseError } from './parse/parseError.js';
-import { DICT } from './util/DICT.js';
+import { DICT } from './utils/DICT.js';
 
 /**
  * Decode a structured field string into a structured field dictionary
@@ -10,9 +11,9 @@ import { DICT } from './util/DICT.js';
  * 
  * @group Structured Field
  */
-export function decodeSfDict(input: string) {
+export function decodeSfDict(input: string, options?: SfDecodeOptions) {
 	try {
-		const { src, value } = parseDict(input.trim());
+		const { src, value } = parseDict(input.trim(), options);
 		if (src !== '') {
 			throw parseError(src, DICT);
 		}

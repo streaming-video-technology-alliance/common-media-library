@@ -1,3 +1,4 @@
+import { SfDecodeOptions } from './SfDecodeOptions.js';
 import { parseError } from './parse/parseError.js';
 import { parseItem } from './parse/parseItem.js';
 
@@ -30,9 +31,9 @@ import { parseItem } from './parse/parseItem.js';
  * 
  * @group Structured Field
  */
-export function decodeSfItem(input: string) {
+export function decodeSfItem(input: string, options?: SfDecodeOptions) {
 	try {
-		const { src, value } = parseItem(input.trim());
+		const { src, value } = parseItem(input.trim(), options);
 		if (src !== '') {
 			throw parseError(src, 'Item');
 		}

@@ -1,7 +1,7 @@
 import { SfEncodeOptions } from '../SfEncodeOptions.js';
 import { SfItem } from '../SfItem.js';
 import { SfMember } from '../SfMember.js';
-import { LIST } from '../util/LIST.js';
+import { LIST } from '../utils/LIST.js';
 import { serializeError } from './serializeError.js';
 import { serializeInnerList } from './serializeInnerList.js';
 import { serializeItem } from './serializeItem.js';

@@ -1,5 +1,6 @@
 import { isTokenField } from '../../cta/utils/isTokenField.js';
 import { isValid } from '../../cta/utils/isValid.js';
+import { SfToken } from '../../structuredfield/SfToken.js';
 import { Cmcd } from '../Cmcd.js';
 import { CmcdEncodeOptions } from '../CmcdEncodeOptions.js';
 import { CmcdFormatters } from '../CmcdFormatters.js';
@@ -27,6 +28,7 @@ export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOp
 	const keys = Object.keys(obj).sort() as CmcdKey[];
 	const formatters = Object.assign({}, CmcdFormatters, options?.formatters);
 	const filter = options?.filter;
+	const useSymbol = options?.useSymbol !== false;
 
 	keys.forEach(key => {
 		if (filter?.(key)) {
@@ -56,7 +58,7 @@ export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOp
 		}
 
 		if (isTokenField(key) && typeof value === 'string') {
-			value = Symbol.for(value);
+			value = useSymbol ? Symbol.for(value) : new SfToken(value);
 		}
 
 		results[key as any] = value as any;

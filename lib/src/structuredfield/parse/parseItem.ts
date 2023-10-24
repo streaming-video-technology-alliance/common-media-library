@@ -1,3 +1,4 @@
+import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfItem } from '../SfItem.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseBareItem } from './parseBareItem.js';
@@ -16,10 +17,10 @@ import { parseParameters } from './parseParameters.js';
 //     (Section 4.2.3.2) with input_string.
 //
 // 3.  Return the tuple (bare_item, parameters).
-export function parseItem(src: string): ParsedValue<SfItem> {
-	const parsedBareItem = parseBareItem(src);
+export function parseItem(src: string, options?: SfDecodeOptions): ParsedValue<SfItem> {
+	const parsedBareItem = parseBareItem(src, options);
 	src = parsedBareItem.src;
-	const parsedParameters = parseParameters(src);
+	const parsedParameters = parseParameters(src, options);
 	src = parsedParameters.src;
 
 	return {

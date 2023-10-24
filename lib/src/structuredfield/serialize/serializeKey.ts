@@ -1,4 +1,4 @@
-import { KEY } from '../util/KEY.js';
+import { KEY } from '../utils/KEY.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.1.3.  Serializing a Key

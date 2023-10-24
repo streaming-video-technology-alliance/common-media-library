@@ -1,5 +1,6 @@
 import { SfBareItem } from '../SfBareItem.js';
-import { BARE_ITEM } from '../util/BARE_ITEM.js';
+import { SfDecodeOptions } from '../SfDecodeOptions.js';
+import { BARE_ITEM } from '../utils/BARE_ITEM.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseBoolean } from './parseBoolean.js';
 import { parseByteSequence } from './parseByteSequence.js';
@@ -37,7 +38,7 @@ import { parseToken } from './parseToken.js';
 //     of running Parsing a Date (Section 4.2.9) with input_string.
 //
 // 7.  Otherwise, the item type is unrecognized; fail parsing.
-export function parseBareItem(src: string): ParsedValue<SfBareItem> {
+export function parseBareItem(src: string, options?: SfDecodeOptions): ParsedValue<SfBareItem> {
 	const first = src[0];
 	if (first === `"`) {
 		return parseString(src);
@@ -52,7 +53,7 @@ export function parseBareItem(src: string): ParsedValue<SfBareItem> {
 		return parseByteSequence(src);
 	}
 	if (/^[a-zA-Z*]/.test(first)) {
-		return parseToken(src);
+		return parseToken(src, options);
 	}
 	if (first === `@`) {
 		return parseDate(src);

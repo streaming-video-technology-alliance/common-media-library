@@ -1,5 +1,6 @@
+import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfMember } from '../SfMember.js';
-import { LIST } from '../util/LIST.js';
+import { LIST } from '../utils/LIST.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseItemOrInnerList } from './parseItemOrInnerList.js';
@@ -31,10 +32,10 @@ import { parseItemOrInnerList } from './parseItemOrInnerList.js';
 //
 // 3.  No structured data has been found; return members (which is
 //     empty).
-export function parseList(src: string): ParsedValue<SfMember[]> {
+export function parseList(src: string, options?: SfDecodeOptions): ParsedValue<SfMember[]> {
 	const value: SfMember[] = [];
 	while (src.length > 0) {
-		const parsedItemOrInnerList = parseItemOrInnerList(src);
+		const parsedItemOrInnerList = parseItemOrInnerList(src, options);
 		value.push(parsedItemOrInnerList.value);
 
 		src = parsedItemOrInnerList.src.trim();

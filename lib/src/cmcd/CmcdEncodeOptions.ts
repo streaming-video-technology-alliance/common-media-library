@@ -26,4 +26,11 @@ export interface CmcdEncodeOptions {
    * @returns `true` if the key should be included, `false` otherwise.
    */
   filter?: (key: CmcdKey) => boolean;
+
+  /**
+   * Use Symbol to represent token values
+   * 
+   * @defaultValue `true`
+   */
+  useSymbol?: boolean;
 }

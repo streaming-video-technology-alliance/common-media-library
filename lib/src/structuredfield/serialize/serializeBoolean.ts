@@ -1,4 +1,4 @@
-import { BOOLEAN } from '../util/BOOLEAN.js';
+import { BOOLEAN } from '../utils/BOOLEAN.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.9.  Serializing a Boolean

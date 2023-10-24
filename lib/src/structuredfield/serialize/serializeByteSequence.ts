@@ -1,5 +1,5 @@
 import { base64encode } from '../../utils/base64encode.js';
-import { BYTE_SEQ } from '../util/BYTE_SEQ.js';
+import { BYTES } from '../utils/BYTES.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.8.  Serializing a Byte Sequence
@@ -28,7 +28,7 @@ import { serializeError } from './serializeError.js';
 // implementation constraints.
 export function serializeByteSequence(value: Uint8Array) {
 	if (ArrayBuffer.isView(value) === false) {
-		throw serializeError(value, BYTE_SEQ);
+		throw serializeError(value, BYTES);
 	}
 	return `:${base64encode(value)}:`;
 }

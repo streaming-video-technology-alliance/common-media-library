@@ -1,4 +1,4 @@
-import { INTEGER } from '../util/INTEGER.js';
+import { INTEGER } from '../utils/INTEGER.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.4.  Serializing an Integer

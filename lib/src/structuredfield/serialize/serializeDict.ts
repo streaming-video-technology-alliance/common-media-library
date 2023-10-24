@@ -1,6 +1,6 @@
 import { SfEncodeOptions } from '../SfEncodeOptions.js';
 import { SfItem } from '../SfItem.js';
-import { DICT } from '../util/DICT.js';
+import { DICT } from '../utils/DICT.js';
 import { serializeError } from './serializeError.js';
 import { serializeInnerList } from './serializeInnerList.js';
 import { serializeItem } from './serializeItem.js';

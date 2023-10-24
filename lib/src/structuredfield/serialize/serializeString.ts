@@ -1,5 +1,5 @@
-import { STRING } from '../util/STRING.js';
-import { STRING_REGEX } from '../util/STRING_REGEX.js';
+import { STRING } from '../utils/STRING.js';
+import { STRING_REGEX } from '../utils/STRING_REGEX.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.6.  Serializing a String

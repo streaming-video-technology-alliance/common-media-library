@@ -1,4 +1,4 @@
-import { INTEGER_DECIMAL } from '../util/INTEGER_DECIMAL.js';
+import { INTEGER_DECIMAL } from '../utils/INTEGER_DECIMAL.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 

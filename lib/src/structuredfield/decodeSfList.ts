@@ -1,6 +1,7 @@
+import { SfDecodeOptions } from './SfDecodeOptions.js';
 import { parseError } from './parse/parseError.js';
 import { parseList } from './parse/parseList.js';
-import { LIST } from './util/LIST.js';
+import { LIST } from './utils/LIST.js';
 
 /**
  * Decode a structured field string into a structured field list
@@ -10,9 +11,9 @@ import { LIST } from './util/LIST.js';
  * 
  * @group Structured Field
  */
-export function decodeSfList(input: string) {
+export function decodeSfList(input: string, options?: SfDecodeOptions) {
 	try {
-		const { src, value } = parseList(input.trim());
+		const { src, value } = parseList(input.trim(), options);
 		if (src !== '') {
 			throw parseError(src, LIST);
 		}
