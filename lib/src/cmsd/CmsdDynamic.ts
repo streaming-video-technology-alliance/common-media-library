@@ -7,8 +7,10 @@ import { CmsdValue } from './CmsdValue';
  * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5006-final.pdf|CMSD Spec}
  * 
  * @group CMSD
+ * 
+ * @beta
  */
-export class CmsdDynamic {
+export interface CmsdDynamic {
   /**
    * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
    * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.

@@ -11,6 +11,8 @@ import { processCmsd } from './utils/processCmsd.js';
  * @returns The encoded CMSD string.
  * 
  * @group CMSD
+ * 
+ * @beta
  */
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string {
 	if (!cmsd) {

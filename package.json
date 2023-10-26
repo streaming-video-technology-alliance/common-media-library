@@ -41,16 +41,17 @@
     "docs"
   ],
   "devDependencies": {
-    "@types/fs-extra": "11.0.2",
-    "@types/node": "18.16.5",
-    "@typescript-eslint/eslint-plugin": "5.59.2",
-    "@typescript-eslint/parser": "5.59.2",
-    "eslint": "8.40.0",
+    "@microsoft/api-extractor": "7.38.0",
+    "@types/fs-extra": "11.0.3",
+    "@types/node": "20.8.9",
+    "@typescript-eslint/eslint-plugin": "6.9.0",
+    "@typescript-eslint/parser": "6.9.0",
+    "eslint": "8.52.0",
     "eslint-plugin-tsdoc": "0.2.17",
     "fs-extra": "11.1.1",
-    "glob": "10.2.2",
+    "glob": "10.3.10",
     "hi-base32": "0.5.1",
     "ts-node": "10.9.1",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   }
 }

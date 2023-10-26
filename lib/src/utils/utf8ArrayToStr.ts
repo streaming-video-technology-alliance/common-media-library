@@ -16,6 +16,8 @@
  * @returns The string
  * 
  * @group Utils
+ * 
+ * @beta
  */
 export function utf8ArrayToStr(
 	array: Uint8Array,

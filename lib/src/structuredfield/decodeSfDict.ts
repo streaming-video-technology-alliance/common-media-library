@@ -10,6 +10,8 @@ import { DICT } from './utils/DICT.js';
  * @returns The structured field dictionary
  * 
  * @group Structured Field
+ * 
+ * @beta
  */
 export function decodeSfDict(input: string, options?: SfDecodeOptions) {
 	try {

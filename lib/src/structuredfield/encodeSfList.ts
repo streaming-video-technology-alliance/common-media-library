@@ -9,6 +9,8 @@ import { serializeList } from './serialize/serializeList.js';
  * @returns The structured field string
  * 
  * @group Structured Field
+ * 
+ * @beta
  */
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions) {
 	return serializeList(value, options);

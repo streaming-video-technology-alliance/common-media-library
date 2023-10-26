@@ -9,6 +9,8 @@ import { CmsdDynamic } from './CmsdDynamic.js';
  * @returns The decoded CMSD object.
  * 
  * @group CMSD
+ * 
+ * @beta
  */
 export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[] {
 	if (!cmsd) {

@@ -6,6 +6,8 @@ import { CmcdValue } from './CmcdValue.js';
  * Options for encoding CMCD values.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export interface CmcdEncodeOptions {
   /**
@@ -26,11 +28,4 @@ export interface CmcdEncodeOptions {
    * @returns `true` if the key should be included, `false` otherwise.
    */
   filter?: (key: CmcdKey) => boolean;
-
-  /**
-   * Use Symbol to represent token values
-   * 
-   * @defaultValue `true`
-   */
-  useSymbol?: boolean;
 }

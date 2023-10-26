@@ -1,3 +1,8 @@
+/**
+ * A collection of tools for working with ID3v2 tags.
+ * 
+ * @packageDocumentation
+ */
 export type { DecodedId3Frame } from './id3/DecodedId3Frame.js';
 export type { Id3Frame } from './id3/Id3Frame.js';
 export { canParseId3 } from './id3/canParseId3.js';

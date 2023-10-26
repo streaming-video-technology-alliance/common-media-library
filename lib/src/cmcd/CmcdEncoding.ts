@@ -2,6 +2,8 @@
  * CMCD encoding types.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export enum CmcdEncoding {
   /**

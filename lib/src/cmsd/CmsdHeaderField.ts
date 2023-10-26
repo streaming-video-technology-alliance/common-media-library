@@ -5,6 +5,8 @@ import { CMSD_STATIC } from './CMSD_STATIC.js';
  * CMSD header fields.
  * 
  * @group CMSD
+ * 
+ * @beta
  */
 export enum CmsdHeaderField {
 	/**

@@ -1,7 +1,9 @@
 /**
  * Options for encoding CMCD values.
  * 
- * @group CMCD
+ * @group CMSD
+ * 
+ * @beta
  */
 export interface CmsdEncodeOptions {
   /**

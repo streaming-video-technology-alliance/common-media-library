@@ -11,6 +11,8 @@ import { Cmcd } from './Cmcd.js';
  * @returns The decoded CMCD object.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export function decodeCmcd(cmcd: string): Cmcd {
 	if (!cmcd) {

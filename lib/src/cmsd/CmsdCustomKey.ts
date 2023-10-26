@@ -7,5 +7,7 @@ import { CmCustomKey } from '../cta/CmCustomKey.js';
  * syntax when defining their own prefix.
  * 
  * @group CMSD
+ * 
+ * @beta
  */
 export type CmsdCustomKey = CmCustomKey;

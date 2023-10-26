@@ -10,6 +10,8 @@ import { CmsdStatic } from './CmsdStatic.js';
  * @returns The decoded CMSD object.
  * 
  * @group CMSD
+ * 
+ * @beta
  */
 export function decodeCmsdStatic(cmsd: string): CmsdStatic {
 	if (!cmsd) {

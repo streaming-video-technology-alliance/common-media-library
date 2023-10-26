@@ -1,1 +1,11 @@
-export { CmObjectType as CmsdObjectType } from '../cta/CmObjectType.js';
+import { CmObjectType } from '../cta/CmObjectType.js';
+
+/**
+ * Common Media Object Type
+ * 
+ * @group CMSD
+ * 
+ * @beta
+ */
+export { CmObjectType as CmsdObjectType };
+

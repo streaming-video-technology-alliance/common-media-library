@@ -14,6 +14,8 @@ import { readId3Size } from './util/readId3Size.js';
  * @returns Array of ID3 frame objects
  * 
  * @group ID3
+ * 
+ * @beta
  */
 export function getId3Frames(id3Data: Uint8Array): Id3Frame[] {
 	let offset = 0;

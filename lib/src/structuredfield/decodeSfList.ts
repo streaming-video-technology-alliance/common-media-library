@@ -10,6 +10,8 @@ import { LIST } from './utils/LIST.js';
  * @returns The structured field list
  * 
  * @group Structured Field
+ * 
+ * @beta
  */
 export function decodeSfList(input: string, options?: SfDecodeOptions) {
 	try {

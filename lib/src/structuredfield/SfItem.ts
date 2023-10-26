@@ -1,6 +1,13 @@
 import { SfBareItem } from './SfBareItem.js';
 import { SfParameters } from './SfParameters.js';
 
+/**
+ * Structured Field Item
+ * 
+ * @group Structured Field
+ * 
+ * @beta
+ */
 export class SfItem {
 
 	value: SfBareItem;

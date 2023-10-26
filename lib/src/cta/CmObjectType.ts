@@ -3,6 +3,8 @@
  * 
  * @group CMCD
  * @group CMSD
+ * 
+ * @beta
  */
 export enum CmObjectType {
   /**

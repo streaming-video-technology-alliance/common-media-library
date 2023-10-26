@@ -3,17 +3,32 @@ import { encodeSfList } from '../structuredfield/encodeSfList.js';
 import { CmsdDynamic } from './CmsdDynamic.js';
 
 /**
- * Encode a CMSD Dynamic object.
+ * Encode a list of CMSD Dynamic objects.
  * 
- * @param value - The server name or list of `SfItems` to encode.
+ * @param value - The list of `SfItems` to encode.
+ * 
+ * @returns The encoded CMSD string.
+ * 
+ * @group CMSD
+ * 
+ * @beta
+ */
+export function encodeCmsdDynamic(value: SfItem[]): string;
+
+/**
+ * Encode a single CMSD Dynamic object.
+ * 
+ * @param value - The server name
  * @param cmcd - The CMSD object to encode.
  * 
  * @returns The encoded CMSD string.
  * 
  * @group CMSD
+ * 
+ * @beta
  */
-export function encodeCmsdDynamic(value: SfItem[]): string;
 export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
+
 export function encodeCmsdDynamic(value: string | SfItem[], cmsd?: CmsdDynamic): string {
 	if (!value) {
 		return '';

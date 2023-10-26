@@ -1,3 +1,8 @@
+/**
+ * A collection of tools for working with structured fields.
+ * 
+ * @packageDocumentation
+ */
 export type { SfBareItem } from './structuredfield/SfBareItem.js';
 export type { SfDecodeOptions } from './structuredfield/SfDecodeOptions.js';
 export type { SfDictionary } from './structuredfield/SfDictionary.js';
@@ -13,4 +18,3 @@ export { decodeSfList } from './structuredfield/decodeSfList.js';
 export { encodeSfDict } from './structuredfield/encodeSfDict.js';
 export { encodeSfItem } from './structuredfield/encodeSfItem.js';
 export { encodeSfList } from './structuredfield/encodeSfList.js';
-

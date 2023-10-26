@@ -30,6 +30,8 @@ import { parseItem } from './parse/parseItem.js';
  * @returns The structured field item
  * 
  * @group Structured Field
+ * 
+ * @beta
  */
 export function decodeSfItem(input: string, options?: SfDecodeOptions) {
 	try {

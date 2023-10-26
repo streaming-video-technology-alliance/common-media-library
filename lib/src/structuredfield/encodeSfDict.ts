@@ -8,6 +8,8 @@ import { serializeDict } from './serialize/serializeDict.js';
  * @returns The structured field string
  * 
  * @group Structured Field
+ * 
+ * @beta
  */
 export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions) {
 	return serializeDict(value, options);
