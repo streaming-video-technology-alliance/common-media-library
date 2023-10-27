@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
-## [0.5.0] - ????-??-??
+## [0.5.0] - 2023-??-??
 
 ### Added
 - Implement Common Media Server Data (CMSD) utilities [#35](https://github.com/streaming-video-technology-alliance/common-media-library/issues/35)
