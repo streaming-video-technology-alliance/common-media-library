@@ -1,7 +1,7 @@
 import { CmcdCustomKey } from './CmcdCustomKey.js';
 import { CmcdObjectType } from './CmcdObjectType.js';
-import { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 import { CmcdStreamType } from './CmcdStreamType.js';
+import { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 import { CmcdValue } from './CmcdValue.js';
 
 /**
@@ -10,6 +10,8 @@ import { CmcdValue } from './CmcdValue.js';
  * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD Spec}
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export interface Cmcd {
 

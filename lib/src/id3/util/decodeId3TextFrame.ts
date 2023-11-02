@@ -1,5 +1,5 @@
-import { utf8ArrayToStr } from '../utils/utf8ArrayToStr.js';
-import { DecodedId3Frame } from './DecodedId3Frame.js';
+import { utf8ArrayToStr } from '../../utils/utf8ArrayToStr.js';
+import { DecodedId3Frame } from '../DecodedId3Frame.js';
 import { RawId3Frame } from './RawFrame.js';
 
 /**

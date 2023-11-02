@@ -12,6 +12,8 @@ import { toCmcdQuery } from './toCmcdQuery.js';
  * @returns The URL with the CMCD query args appended.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions) {
 	const query = toCmcdQuery(cmcd, options);

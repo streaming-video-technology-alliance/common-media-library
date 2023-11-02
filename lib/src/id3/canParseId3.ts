@@ -1,5 +1,5 @@
-import { isId3Header } from './isId3Header.js';
-import { readId3Size } from './readId3Size.js';
+import { isId3Header } from './util/isId3Header.js';
+import { readId3Size } from './util/readId3Size.js';
 
 /**
  * Checks if the given data contains an ID3 tag.
@@ -10,6 +10,8 @@ import { readId3Size } from './readId3Size.js';
  * @returns `true` if an ID3 tag is found
  * 
  * @group ID3
+ * 
+ * @beta
  */
 export function canParseId3(data: Uint8Array, offset: number): boolean {
 	return (

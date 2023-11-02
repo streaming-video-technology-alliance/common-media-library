@@ -12,12 +12,14 @@ import { encodeCmcd } from './encodeCmcd.js';
  * @returns The CMCD query arg.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 	if (!cmcd) {
 		return '';
 	}
-	
+
 	const params = encodeCmcd(cmcd, options);
 
 	return `${CMCD_PARAM}=${encodeURIComponent(params)}`;

@@ -10,13 +10,15 @@ import { decodeCmcd } from './decodeCmcd.js';
  * @returns The decoded CMCD data.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd {
 	if (typeof query === 'string') {
 		query = new URLSearchParams(query);
 	}
-  
+
 	const value = query.get(CMCD_PARAM);
-  
+
 	return decodeCmcd(value as string);
 }
