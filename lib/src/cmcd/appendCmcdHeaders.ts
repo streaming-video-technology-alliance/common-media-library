@@ -12,6 +12,8 @@ import { toCmcdHeaders } from './toCmcdHeaders.js';
  * @returns The headers with the CMCD header shards appended.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions) {
 	return Object.assign(headers, toCmcdHeaders(cmcd, options));

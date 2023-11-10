@@ -9,6 +9,7 @@ export type { CmcdCustomKey } from './cmcd/CmcdCustomKey.js';
 export type { CmcdEncodeOptions } from './cmcd/CmcdEncodeOptions.js';
 export { CmcdEncoding } from './cmcd/CmcdEncoding.js';
 export type { CmcdFormatter } from './cmcd/CmcdFormatter.js';
+export { CmcdFormatters } from './cmcd/CmcdFormatters.js';
 export { CmcdHeaderField } from './cmcd/CmcdHeaderField.js';
 export type { CmcdHeadersMap } from './cmcd/CmcdHeadersMap.js';
 export type { CmcdKey } from './cmcd/CmcdKey.js';
@@ -25,3 +26,4 @@ export { fromCmcdQuery } from './cmcd/fromCmcdQuery.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
+

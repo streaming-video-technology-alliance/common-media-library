@@ -2,6 +2,8 @@
  * Decoded ID3 frame.
  * 
  * @group ID3
+ * 
+ * @beta
  */
 export type DecodedId3Frame<T> = {
   /**

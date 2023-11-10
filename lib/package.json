@@ -49,8 +49,20 @@
       ]
     }
   },
+  "keywords": [
+    "CTA-5004",
+    "Common Media Client Data",
+    "CMCD",
+    "CTA-5006",
+    "Common Media Server Data",
+    "CMSD",
+    "RFC8941",
+    "Structured Field Values",
+    "ID3"
+  ],
   "scripts": {
     "build": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
+    "postbuild": "api-extractor run --local",
     "build:cjs": "tsc --module commonjs --outDir dist/cjs",
     "test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
     "prepublishOnly": "npm run build && npm run build:cjs"
