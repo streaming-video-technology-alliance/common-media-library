@@ -21,7 +21,9 @@
     "CMSD",
     "RFC8941",
     "Structured Field Values",
-    "ID3"
+    "ID3",
+    "Common Media Request",
+    "Common Media Response"
   ],
   "scripts": {
     "format": "npm run lint -- --fix",
