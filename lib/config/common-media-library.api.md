@@ -174,6 +174,33 @@ export { CmStreamType as CmsdStreamType }
 // @beta
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
 
+// @public
+export interface CommonMediaRequest {
+    // Warning: (ae-incompatible-release-tags) The symbol "cmcd" is marked as @public, but its signature references "Cmcd" which is marked as @beta
+    cmcd?: Cmcd;
+    credentials?: RequestCredentials;
+    customData?: any;
+    headers?: Record<string, string>;
+    method: string;
+    mode?: RequestMode;
+    responseType?: string;
+    timeout?: number;
+    url: string;
+}
+
+// @public
+export interface CommonMediaResponse {
+    data?: any;
+    headers?: Record<string, string>;
+    redirected?: boolean;
+    request: CommonMediaRequest;
+    resourceTiming: ResourceTiming;
+    status?: number;
+    statusText?: string;
+    type?: string;
+    url?: string;
+}
+
 // @beta
 export function decodeCmcd(cmcd: string): Cmcd;
 
@@ -247,6 +274,26 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 //
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
+
+// @public
+export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
+
+// @public
+export interface ResourceTiming {
+    // (undocumented)
+    duration?: number;
+    // (undocumented)
+    encodedBodySize: number;
+    // (undocumented)
+    responseEnd?: number;
+    // (undocumented)
+    responseStart?: number;
+    // (undocumented)
+    startTime: number;
+}
+
+// @public
+export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
