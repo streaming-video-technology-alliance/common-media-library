@@ -2,6 +2,8 @@
  * Resource Timing.
  * 
  * @group Request
+ * 
+ * @beta
  */
 export interface ResourceTiming {
   // The timestamp for the time a resource fetch started.

@@ -5,6 +5,8 @@ import { ResourceTiming } from './ResourceTiming.js';
  * Common response API.
  * 
  * @group Request
+ * 
+ * @beta
  */
 
 export interface CommonMediaResponse {

@@ -174,9 +174,8 @@ export { CmStreamType as CmsdStreamType }
 // @beta
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
 
-// @public
+// @beta
 export interface CommonMediaRequest {
-    // Warning: (ae-incompatible-release-tags) The symbol "cmcd" is marked as @public, but its signature references "Cmcd" which is marked as @beta
     cmcd?: Cmcd;
     credentials?: RequestCredentials;
     customData?: any;
@@ -188,7 +187,7 @@ export interface CommonMediaRequest {
     url: string;
 }
 
-// @public
+// @beta
 export interface CommonMediaResponse {
     data?: any;
     headers?: Record<string, string>;
@@ -275,10 +274,10 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
-// @public
+// @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
-// @public
+// @beta
 export interface ResourceTiming {
     // (undocumented)
     duration?: number;
@@ -292,7 +291,7 @@ export interface ResourceTiming {
     startTime: number;
 }
 
-// @public
+// @beta
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
 
 // @beta

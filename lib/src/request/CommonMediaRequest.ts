@@ -4,6 +4,8 @@ import { Cmcd } from '../cmcd.js';
  * Common request API.
  * 
  * @group Request
+ * 
+ * @beta
  */
 export interface CommonMediaRequest {
 
