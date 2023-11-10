@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implement Common Media Server Data (CMSD) utilities [#35](https://github.com/streaming-video-technology-alliance/common-media-library/issues/35)
+- Add request and response interceptors API
 
 
 ## [0.4.5] - 2023-10-12
