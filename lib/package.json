@@ -58,7 +58,9 @@
     "CMSD",
     "RFC8941",
     "Structured Field Values",
-    "ID3"
+    "ID3",
+    "Common Media Request",
+    "Common Media Response"
   ],
   "scripts": {
     "build": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
