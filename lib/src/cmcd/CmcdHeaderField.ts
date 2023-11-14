@@ -2,6 +2,8 @@
  * CMCD header fields.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export enum CmcdHeaderField {
 	/**

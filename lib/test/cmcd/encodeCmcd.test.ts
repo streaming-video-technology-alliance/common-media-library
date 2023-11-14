@@ -1,4 +1,5 @@
 import { encodeCmcd } from '@svta/common-media-library/cmcd/encodeCmcd';
+import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_INPUT } from './data/CMCD_INPUT.js';
@@ -11,5 +12,10 @@ describe('encodeCmcd', () => {
 
 	it('returns encoded string', () => {
 		equal(encodeCmcd(CMCD_INPUT), CMCD_STRING);
+	});
+
+	it('returns encoded string when SfToken is used', () => {
+		const input = Object.assign({}, CMCD_INPUT, { 'com.example-token': new SfToken('s') });
+		equal(encodeCmcd(input), CMCD_STRING);
 	});
 });

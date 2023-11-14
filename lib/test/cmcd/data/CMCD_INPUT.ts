@@ -18,7 +18,7 @@ export const CMCD_INPUT: Cmcd = {
 	['com.example-hello']: 'world',
 	['com.example-testing']: 1234,
 	['com.example-exists']: true,
-	['com.example-notExists']: false,
+	['com.example-not-exists']: false,
 	['com.example-token']: Symbol('s'),
 	['com.example-quote']: '"Quote"',
 };

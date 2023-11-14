@@ -1,7 +1,8 @@
+import { symbolToStr } from '../cta/utils/symbolToStr.js';
+import { SfToken } from '../structuredfield.js';
 import { Cmcd } from './Cmcd.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { CmcdValue } from './CmcdValue.js';
-import { processCmcd } from './processCmcd.js';
+import { processCmcd } from './utils/processCmcd.js';
 
 /**
  * Convert a CMCD data object to JSON.
@@ -12,10 +13,11 @@ import { processCmcd } from './processCmcd.js';
  * @returns The CMCD JSON.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
-export function toCmcdJson(cmcd: Partial<Cmcd>, options?: CmcdEncodeOptions) {
-	const toValue = (value: CmcdValue) => typeof value == 'symbol' ? value.description : value;
-	const data = processCmcd(cmcd, (key, value) => [key, toValue(value)], options);
-  
-	return JSON.stringify(Object.fromEntries(data));
+export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions) {
+	const data = processCmcd(cmcd, options);
+
+	return JSON.stringify(data, (_, value) => typeof value === 'symbol' || value instanceof SfToken ? symbolToStr(value) : value);
 }

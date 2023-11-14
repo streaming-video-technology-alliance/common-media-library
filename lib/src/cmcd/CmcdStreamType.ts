@@ -1,16 +1,8 @@
 /**
- * CMCD Streaming Type
+ * Common Media Streaming Type
  * 
  * @group CMCD
+ * 
+ * @beta
  */
-export enum CmcdStreamType {
-	/**
-	 *  All segments are available – e.g., VOD
-	 */
-	VOD = 'v',
-
-	/**
-	 * Segments become available over time – e.g., LIVE
-	 */
-	LIVE = 'l',
-}
+export { CmStreamType as CmcdStreamType } from '../cta/CmStreamType.js';
