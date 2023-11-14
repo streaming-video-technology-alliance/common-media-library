@@ -8,5 +8,7 @@ import { CmcdValue } from './CmcdValue.js';
  * @returns The formatted value.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export type CmcdFormatter = (value: CmcdValue) => string;

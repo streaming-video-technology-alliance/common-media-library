@@ -1,26 +1,8 @@
 /**
- * CMCD Streaming Format
+ * Common Media Streaming Format
  * 
  * @group CMCD
+ * 
+ * @beta
  */
-export enum CmcdStreamingFormat {
-	/**
-	 * MPEG DASH
-	 */
-	DASH = 'd',
-
-	/**
-	 * HTTP Live Streaming (HLS)
-	 */
-	HLS = 'h',
-
-	/**
-	 * Smooth Streaming
-	 */
-	SMOOTH = 's',
-
-	/**
-	 * Other
-	 */
-	OTHER = 'o',
-}
+export { CmStreamingFormat as CmcdStreamingFormat } from '../cta/CmStreamingFormat.js';

@@ -1,6 +1,6 @@
 {
   "name": "@svta/common-media-library",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "license": "Apache-2.0",
   "type": "module",
   "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -49,8 +49,22 @@
       ]
     }
   },
+  "keywords": [
+    "CTA-5004",
+    "Common Media Client Data",
+    "CMCD",
+    "CTA-5006",
+    "Common Media Server Data",
+    "CMSD",
+    "RFC8941",
+    "Structured Field Values",
+    "ID3",
+    "Common Media Request",
+    "Common Media Response"
+  ],
   "scripts": {
     "build": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
+    "postbuild": "api-extractor run --local",
     "build:cjs": "tsc --module commonjs --outDir dist/cjs",
     "test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
     "prepublishOnly": "npm run build && npm run build:cjs"
