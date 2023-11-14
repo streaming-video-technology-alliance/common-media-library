@@ -2,7 +2,7 @@
 
 ## Overview
 
-The purpose of the Common Media Library is to consolidate common pieces of functionality  and interfaces relating to browser-based media playback that have been implemented independently across multiple open-source libraries leading to mismatched functionality and feature sets.
+The purpose of the Common Media Library is to consolidate common pieces of functionality and interfaces relating to browser-based media playback that have been implemented independently across multiple open-source libraries leading to mismatched functionality and feature sets.
 
 In our work across Hls.js, Dash.js and Shaka player, we have noticed common pieces of functionality that have been implemented independently, and sometimes copied and pasted, across the libraries. This is particularly true when looking at standards-based features, like ID3 parsing, 608 parsing and CMCD. Since the functionality is shared in spirit but not implementation, they can fall out of sync where certain bugs are fixed in one player but not the others. Having a common library creates a single place where these utilities can be maintained. It also creates a single place for standards groups to request and oversee feature implementation.
 

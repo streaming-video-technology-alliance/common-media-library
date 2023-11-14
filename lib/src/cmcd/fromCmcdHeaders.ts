@@ -10,6 +10,8 @@ import { decodeCmcd } from './decodeCmcd.js';
  * @returns The decoded CMCD data.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd {
 	const keys = Object.keys(CmcdHeaderMap);
@@ -17,7 +19,7 @@ export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd
 	if (!(headers instanceof Headers)) {
 		headers = new Headers(headers);
 	}
-  
+
 	return keys.reduce((acc, key) => {
 		const value = (headers as Headers).get(key);
 		return Object.assign(acc, decodeCmcd(value as string));
