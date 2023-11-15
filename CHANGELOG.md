@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.1] - 2023-11-15
 
+### Changed
+- Remove `BigInt` notation
+
 
 ## [0.5.0] - 2023-11-14
 

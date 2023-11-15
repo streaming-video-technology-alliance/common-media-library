@@ -1,4 +1,5 @@
 import { INTEGER } from '../utils/INTEGER.js';
+import { isInvalidInt } from '../utils/isInvalidInt.js';
 import { serializeError } from './serializeError.js';
 
 // 4.1.4.  Serializing an Integer
@@ -20,7 +21,7 @@ import { serializeError } from './serializeError.js';
 //
 // 5.  Return output.
 export function serializeInteger(value: number) {
-	if (value < -999999999999999n || 999999999999999n < value) {
+	if (isInvalidInt(value)) {
 		throw serializeError(value, INTEGER);
 	}
 
