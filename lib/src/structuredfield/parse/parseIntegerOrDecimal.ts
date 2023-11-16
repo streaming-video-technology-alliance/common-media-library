@@ -1,4 +1,5 @@
 import { INTEGER_DECIMAL } from '../utils/INTEGER_DECIMAL.js';
+import { isInvalidInt } from '../utils/isInvalidInt.js';
 import { ParsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
@@ -117,7 +118,7 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 			throw parseError(orig, INTEGER_DECIMAL);
 		}
 		value = parseInt(num) * sign;
-		if (value < -999999999999999n || 999999999999999n < value) {
+		if (isInvalidInt(value)) {
 			throw parseError(num, INTEGER_DECIMAL);
 		}
 	}
