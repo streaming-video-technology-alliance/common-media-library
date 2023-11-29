@@ -1,9 +1,9 @@
 /**
  * Common Media Streaming Format
- * 
+ *
  * @group CMCD
  * @group CMSD
- * 
+ *
  * @beta
  */
 export enum CmStreamingFormat {
