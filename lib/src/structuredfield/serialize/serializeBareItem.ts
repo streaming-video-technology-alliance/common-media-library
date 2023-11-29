@@ -39,6 +39,10 @@ import { serializeToken } from './serializeToken.js';
 export function serializeBareItem(value: any) {
 	switch (typeof value) {
 		case 'number':
+			if (!Number.isFinite(value)) {
+				throw serializeError(value, BARE_ITEM);
+			}
+
 			if (Number.isInteger(value)) {
 				return serializeInteger(value);
 			}
