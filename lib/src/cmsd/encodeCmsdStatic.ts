@@ -5,13 +5,13 @@ import { processCmsd } from './utils/processCmsd.js';
 
 /**
  * Encode a CMSD Static object.
- * 
+ *
  * @param cmcd - The CMSD object to encode.
- * 
+ *
  * @returns The encoded CMSD string.
- * 
+ *
  * @group CMSD
- * 
+ *
  * @beta
  */
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string {

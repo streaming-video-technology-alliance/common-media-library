@@ -25,12 +25,12 @@ import { parseItem } from './parse/parseItem.js';
 // 8.  Otherwise, return output.
 /**
  * Decode a structured field string into a structured field item
- * 
+ *
  * @param input - The structured field string to decode
  * @returns The structured field item
- * 
+ *
  * @group Structured Field
- * 
+ *
  * @beta
  */
 export function decodeSfItem(input: string, options?: SfDecodeOptions) {

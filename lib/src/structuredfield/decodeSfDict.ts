@@ -5,12 +5,12 @@ import { DICT } from './utils/DICT.js';
 
 /**
  * Decode a structured field string into a structured field dictionary
- * 
+ *
  * @param input - The structured field string to decode
  * @returns The structured field dictionary
- * 
+ *
  * @group Structured Field
- * 
+ *
  * @beta
  */
 export function decodeSfDict(input: string, options?: SfDecodeOptions) {

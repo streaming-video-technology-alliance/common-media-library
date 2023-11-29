@@ -10,13 +10,13 @@
 
 /**
  * Converts a UTF-8 array to a string.
- * 
+ *
  * @param array - The UTF-8 array to convert
- * 
+ *
  * @returns The string
- * 
+ *
  * @group Utils
- * 
+ *
  * @beta
  */
 export function utf8ArrayToStr(
