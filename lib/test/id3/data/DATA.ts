@@ -1,4 +1,4 @@
-import { strToCodes } from '../../util/strToCodes.js';
+import { strToCodes } from '../../utils/strToCodes.js';
 
 export const DATA = 'data';
 export const DATA_BYTES = strToCodes(DATA);
