@@ -1,3 +1,4 @@
+import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { CmcdValue } from './CmcdValue.js';
 
 /**
@@ -11,4 +12,4 @@ import { CmcdValue } from './CmcdValue.js';
  * 
  * @beta
  */
-export type CmcdFormatter = (value: CmcdValue) => string;
+export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;

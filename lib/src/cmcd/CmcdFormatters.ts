@@ -1,7 +1,15 @@
+import { urlToRelativePath } from '../utils.js';
+import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import { CmcdFormatter } from './CmcdFormatter.js';
 import { CmcdValue } from './CmcdValue.js';
 
 const toRounded = (value: CmcdValue) => Math.round(value as number);
-const toUrlSafe = (value: CmcdValue) => encodeURIComponent(value as string);
+const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions) => {
+	if (options?.baseUrl) {
+		value = urlToRelativePath(value as string, options.baseUrl);
+	}
+	return encodeURIComponent(value as string);
+};
 const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100;
 
 /**
@@ -11,7 +19,7 @@ const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100;
  * 
  * @beta
  */
-export const CmcdFormatters: Record<string, (value: CmcdValue) => number | string | boolean> = {
+export const CmcdFormatters: Record<string, CmcdFormatter> = {
 	/**
 	 * Bitrate (kbps) rounded integer
 	 */
