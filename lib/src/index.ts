@@ -1,6 +1,6 @@
 /**
  * The Common Media Libray
- * 
+ *
  * @packageDocumentation
  */
 export * from './cmcd.js';

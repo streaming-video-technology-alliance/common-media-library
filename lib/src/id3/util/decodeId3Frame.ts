@@ -6,13 +6,13 @@ import { decodeId3UrlFrame } from './decodeId3UrlFrame.js';
 
 /**
  * Decode an ID3 frame.
- * 
+ *
  * @param frame - the ID3 frame
- * 
+ *
  * @returns The decoded ID3 frame
- * 
+ *
  * @internal
- * 
+ *
  * @group ID3
  */
 export function decodeId3Frame(frame: RawId3Frame): Id3Frame | undefined {

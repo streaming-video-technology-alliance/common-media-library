@@ -6,13 +6,13 @@ import { readId3Timestamp } from './util/readId3Timestamp.js';
 
 /**
  * Searches for the Elementary Stream timestamp found in the ID3 data chunk
- * 
+ *
  * @param data - Block of data containing one or more ID3 tags
- * 
+ *
  * @returns The timestamp
- * 
+ *
  * @group ID3
- * 
+ *
  * @beta
  */
 export function getId3Timestamp(data: Uint8Array): number | undefined {

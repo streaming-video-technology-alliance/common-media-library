@@ -9,13 +9,13 @@ import { CmcdValue } from '../CmcdValue.js';
 
 /**
  * Internal CMCD processing function.
- * 
+ *
  * @param obj - The CMCD object to process.
  * @param map - The mapping function to use.
  * @param options - Options for encoding.
- * 
+ *
  * @internal
- * 
+ *
  * @group CMCD
  */
 export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOptions): Cmcd {
@@ -38,7 +38,7 @@ export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOp
 
 		const formatter = formatters[key];
 		if (formatter) {
-			value = formatter(value);
+			value = formatter(value, options);
 		}
 
 		// Version should only be reported if not equal to 1.

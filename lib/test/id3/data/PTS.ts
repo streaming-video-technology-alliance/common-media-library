@@ -1,5 +1,5 @@
 import { getId3Frames } from '@svta/common-media-library';
-import { strToCodes } from '../../util/strToCodes.js';
+import { strToCodes } from '../../utils/strToCodes.js';
 import { createId3 } from './createId3.js';
 
 export const PTS = createId3('PRIV', new Uint8Array([
