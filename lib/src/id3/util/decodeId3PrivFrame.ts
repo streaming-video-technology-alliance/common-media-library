@@ -4,13 +4,13 @@ import { RawId3Frame } from './RawFrame.js';
 
 /**
  * Decode an ID3 PRIV frame.
- * 
+ *
  * @param frame - the ID3 PRIV frame
- * 
+ *
  * @returns The decoded ID3 PRIV frame
- * 
+ *
  * @internal
- * 
+ *
  * @group ID3
  */
 export function decodeId3PrivFrame(

@@ -9,13 +9,13 @@ import { CmcdValue } from '../CmcdValue.js';
 
 /**
  * Internal CMCD processing function.
- * 
+ *
  * @param obj - The CMCD object to process.
  * @param map - The mapping function to use.
  * @param options - Options for encoding.
- * 
+ *
  * @internal
- * 
+ *
  * @group CMCD
  */
 export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOptions): Cmcd {

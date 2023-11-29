@@ -1,4 +1,4 @@
-import { strToCodes } from '../../util/strToCodes.js';
+import { strToCodes } from '../../utils/strToCodes.js';
 import { ID3_BYTES, ID3_VERSION_BYTES } from './ID3.js';
 
 function createId3Size(size: number) {
@@ -25,15 +25,15 @@ export function createId3(type: string, data: Uint8Array) {
 		...ID3_VERSION_BYTES,
 
 		// Flags (1 byte)
-		0x00, 
-	
+		0x00,
+
 		// Size (4 bytes)
 		...createId3Size(data.byteLength + 10),
 
 		///////////
 		// Frame //
 		///////////
-    
+
 		// Type (4 bytes)
 		...strToCodes(type),
 

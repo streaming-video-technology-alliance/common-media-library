@@ -4,13 +4,13 @@ import { decodeCmcd } from './decodeCmcd.js';
 
 /**
  * Decode CMCD data from request headers.
- * 
+ *
  * @param headers - The request headers to decode.
- * 
+ *
  * @returns The decoded CMCD data.
- * 
+ *
  * @group CMCD
- * 
+ *
  * @beta
  */
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd {

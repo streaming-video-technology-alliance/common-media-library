@@ -14,9 +14,9 @@ const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100;
 
 /**
  * The default formatters for CMCD values.
- * 
+ *
  * @group CMCD
- * 
+ *
  * @beta
  */
 export const CmcdFormatters: Record<string, CmcdFormatter> = {

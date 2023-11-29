@@ -6,14 +6,14 @@ import { processCmcd } from './utils/processCmcd.js';
 
 /**
  * Convert a CMCD data object to JSON.
- * 
+ *
  * @param cmcd - The CMCD object to convert.
  * @param options - Options for encoding the CMCD object.
- * 
+ *
  * @returns The CMCD JSON.
- * 
+ *
  * @group CMCD
- * 
+ *
  * @beta
  */
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions) {
