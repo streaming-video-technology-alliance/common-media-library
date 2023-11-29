@@ -31,6 +31,7 @@
     "build": "npm run build -ws --if-present",
     "pretest": "npm run build && npm run lint",
     "test": "npm test -ws --if-present",
+    "start": "npm start -w dev",
     "pub": "npm publish -w lib --provenance --access public",
     "exec": "node --no-warnings --loader ts-node/esm",
     "ver": "npm run exec scripts/version.ts",
@@ -40,7 +41,8 @@
   },
   "workspaces": [
     "lib",
-    "docs"
+    "docs",
+    "dev"
   ],
   "devDependencies": {
     "@microsoft/api-extractor": "7.38.0",
