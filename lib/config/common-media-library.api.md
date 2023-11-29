@@ -50,9 +50,10 @@ export type CmcdCustomKey = CmCustomKey;
 
 // @beta
 export interface CmcdEncodeOptions {
+    baseUrl?: string;
     customHeaderMap?: CmcdHeadersMap;
     filter?: (key: CmcdKey) => boolean;
-    formatters?: Record<CmcdKey, (value: CmcdValue) => number | string>;
+    formatters?: Record<CmcdKey, CmcdFormatter>;
 }
 
 // @beta
@@ -63,10 +64,10 @@ export enum CmcdEncoding {
 }
 
 // @beta
-export type CmcdFormatter = (value: CmcdValue) => string;
+export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
 
 // @beta
-export const CmcdFormatters: Record<string, (value: CmcdValue) => number | string | boolean>;
+export const CmcdFormatters: Record<string, CmcdFormatter>;
 
 // @beta
 export enum CmcdHeaderField {
@@ -349,6 +350,9 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @beta
+export function urlToRelativePath(url: string, base: string): string;
 
 // @beta
 export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;

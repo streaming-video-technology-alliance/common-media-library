@@ -1,0 +1,22 @@
+{
+	"name": "@svta/common-media-library-dev",
+	"private": true,
+	"version": "0.5.1",
+	"license": "Apache-2.0",
+	"type": "module",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
+	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
+	},
+	"bugs": {
+		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
+	},
+	"scripts": {
+		"start": "web-dev-server --node-resolve --open --watch"
+	},
+	"devDependencies": {
+		"typedoc": "0.25.2"
+	}
+}

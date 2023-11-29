@@ -4,15 +4,15 @@ import { readId3Size } from './util/readId3Size.js';
 
 /**
  * Returns any adjacent ID3 tags found in data starting at offset, as one block of data
- * 
+ *
  * @param data - The data to search in
  * @param offset - The offset at which to start searching
- * 
+ *
  * @returns The block of data containing any ID3 tags found
  * or `undefined` if no header is found at the starting offset
- * 
+ *
  * @internal
- * 
+ *
  * @group ID3
  */
 export function getId3Data(

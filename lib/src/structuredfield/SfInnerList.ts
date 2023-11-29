@@ -4,12 +4,12 @@ import { SfParameters } from './SfParameters.js';
 
 /**
  * Structured Field Inner List
- * 
+ *
  * @group Structured Field
- * 
+ *
  * @beta
  */
 export type SfInnerList = {
-  value: SfItem[] | SfBareItem[],
-  params: SfParameters,
+	value: SfItem[] | SfBareItem[],
+	params: SfParameters,
 };

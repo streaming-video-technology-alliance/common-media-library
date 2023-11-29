@@ -3,9 +3,9 @@ import { CmcdHeadersMap } from './CmcdHeadersMap.js';
 
 /**
  * The map of CMCD header fields to official CMCD keys.
- * 
+ *
  * @internal
- * 
+ *
  * @group CMCD
  */
 export const CmcdHeaderMap: CmcdHeadersMap = {

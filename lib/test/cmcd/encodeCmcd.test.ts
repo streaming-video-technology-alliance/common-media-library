@@ -23,4 +23,14 @@ describe('encodeCmcd', () => {
 		const input = Object.assign({}, CMCD_INPUT, { 'com.example-token': new SfToken('s') });
 		equal(encodeCmcd(input), CMCD_STRING);
 	});
+
+	it('returns converts to relative path when baseUrl is provided', () => {
+		const input = {
+			nor: 'http://test.com/base/segments/video/1.mp4',
+		};
+		const options = {
+			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
+		};
+		equal(encodeCmcd(input, options), 'nor="..%2Fsegments%2Fvideo%2F1.mp4"');
+	});
 });
