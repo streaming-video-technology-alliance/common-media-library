@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add the ability to pass a base URL to all CMCD encode utilities to construct relative paths for `nor` [#50](https://github.com/streaming-video-technology-alliance/common-media-library/issues/50)
 
+### Fixed
+- CMCD does not protect against non-Finite numeric values [#45](https://github.com/streaming-video-technology-alliance/common-media-library/issues/45)
+
 
 ## [0.5.1] - 2023-11-16
 
