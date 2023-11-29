@@ -10,6 +10,11 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(null as any), '');
 	});
 
+	it('ignore invalid values', () => {
+		// @ts-expect-error
+		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), '');
+	});
+
 	it('returns encoded string', () => {
 		equal(encodeCmcd(CMCD_INPUT), CMCD_STRING);
 	});
