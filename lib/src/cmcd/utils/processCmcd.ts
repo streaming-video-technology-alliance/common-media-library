@@ -38,7 +38,7 @@ export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOp
 
 		const formatter = formatters[key];
 		if (formatter) {
-			value = formatter(value);
+			value = formatter(value, options);
 		}
 
 		// Version should only be reported if not equal to 1.
