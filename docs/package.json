@@ -1,23 +1,23 @@
 {
-  "name": "@svta/common-media-library-docs",
-  "private": true,
-  "version": "0.5.1",
-  "license": "Apache-2.0",
-  "type": "module",
-  "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
-  "authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
-  },
-  "bugs": {
-    "url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
-  },
-  "scripts": {
-    "build": "typedoc",
-    "start": "npm run build && npx -y http-server dist --cors -p 8080"
-  },
-  "devDependencies": {
-    "typedoc": "0.25.2"
-  }
+	"name": "@svta/common-media-library-docs",
+	"private": true,
+	"version": "0.5.1",
+	"license": "Apache-2.0",
+	"type": "module",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
+	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
+	},
+	"bugs": {
+		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
+	},
+	"scripts": {
+		"build": "typedoc",
+		"start": "npm run build && npx -y http-server dist --cors -p 8080"
+	},
+	"devDependencies": {
+		"typedoc": "0.25.2"
+	}
 }

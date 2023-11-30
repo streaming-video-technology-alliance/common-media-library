@@ -27,4 +27,3 @@ export { fromCmcdQuery } from './cmcd/fromCmcdQuery.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
-
