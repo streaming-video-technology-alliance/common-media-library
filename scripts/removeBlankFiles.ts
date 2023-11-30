@@ -11,13 +11,13 @@ export async function removeBlankFiles(folder: string = 'dist') {
 		if (!fileContent.startsWith('export {};\n//# sourceMappingURL=')) {
 			return;
 		}
-		
+
 		return Promise.all([
 			unlink(file),
 			unlink(file + '.map'),
 		]);
 	};
-	
+
 	for await (const file of files) {
 		pending.push(checkFile(file));
 	}

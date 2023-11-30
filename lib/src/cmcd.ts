@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 export { CMCD_PARAM } from './cmcd/CMCD_PARAM.js';
+export { CMCD_V1 } from './cmcd/CMCD_V1.js';
 export type { Cmcd } from './cmcd/Cmcd.js';
 export type { CmcdCustomKey } from './cmcd/CmcdCustomKey.js';
 export type { CmcdEncodeOptions } from './cmcd/CmcdEncodeOptions.js';
@@ -26,4 +27,3 @@ export { fromCmcdQuery } from './cmcd/fromCmcdQuery.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
-
