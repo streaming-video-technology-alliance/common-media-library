@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - CMCD does not protect against non-Finite numeric values [#45](https://github.com/streaming-video-technology-alliance/common-media-library/issues/45)
+- `appendCmcdQuery` does not account for existing CMCD query params [#48](https://github.com/streaming-video-technology-alliance/common-media-library/issues/48)
 
 
 ## [0.5.1] - 2023-11-16
