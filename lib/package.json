@@ -1,73 +1,73 @@
 {
-  "name": "@svta/common-media-library",
-  "version": "0.5.1",
-  "license": "Apache-2.0",
-  "type": "module",
-  "homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
-  "authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
-  },
-  "bugs": {
-    "url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org",
-    "provenance": true,
-    "scope": "svta"
-  },
-  "files": [
-    "dist/**/*",
-    "NOTICE"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./*.js": {
-      "require": "./dist/cjs/*.js",
-      "import": "./dist/*.js",
-      "default": "./dist/*.js"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "require": "./dist/cjs/*.js",
-      "import": "./dist/*.js",
-      "default": "./dist/*.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "dist/*",
-        "dist/cjs/*"
-      ]
-    }
-  },
-  "keywords": [
-    "CTA-5004",
-    "Common Media Client Data",
-    "CMCD",
-    "CTA-5006",
-    "Common Media Server Data",
-    "CMSD",
-    "RFC8941",
-    "Structured Field Values",
-    "ID3",
-    "Common Media Request",
-    "Common Media Response"
-  ],
-  "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
-    "postbuild": "api-extractor run --local",
-    "build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
-    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
-    "test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
-    "prepublishOnly": "npm run build"
-  }
+	"name": "@svta/common-media-library",
+	"version": "0.5.1",
+	"license": "Apache-2.0",
+	"type": "module",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
+	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
+	},
+	"bugs": {
+		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org",
+		"provenance": true,
+		"scope": "svta"
+	},
+	"files": [
+		"dist/**/*",
+		"NOTICE"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"require": "./dist/cjs/index.js",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./*.js": {
+			"require": "./dist/cjs/*.js",
+			"import": "./dist/*.js",
+			"default": "./dist/*.js"
+		},
+		"./*": {
+			"types": "./dist/*.d.ts",
+			"require": "./dist/cjs/*.js",
+			"import": "./dist/*.js",
+			"default": "./dist/*.js"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"*": [
+				"dist/*",
+				"dist/cjs/*"
+			]
+		}
+	},
+	"keywords": [
+		"CTA-5004",
+		"Common Media Client Data",
+		"CMCD",
+		"CTA-5006",
+		"Common Media Server Data",
+		"CMSD",
+		"RFC8941",
+		"Structured Field Values",
+		"ID3",
+		"Common Media Request",
+		"Common Media Response"
+	],
+	"scripts": {
+		"build": "npm run build:esm && npm run build:cjs",
+		"postbuild": "api-extractor run --local",
+		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
+		"build:cjs": "tsc --module commonjs --outDir dist/cjs",
+		"test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
+		"prepublishOnly": "npm run build"
+	}
 }
