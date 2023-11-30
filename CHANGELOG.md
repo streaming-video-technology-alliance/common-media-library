@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.6.0] - 2023-11-29
+
 ### Added
 - Add the ability to pass a base URL to all CMCD encode utilities to construct relative paths for `nor` [#50](https://github.com/streaming-video-technology-alliance/common-media-library/issues/50)
 - Export constants for CMCD and CMSD version numbers [#44](https://github.com/streaming-video-technology-alliance/common-media-library/issues/44)
@@ -154,7 +157,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap project [#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2)
 
 
-[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.5.1...HEAD  
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.0...HEAD  
+[0.6.0]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.5.1...v0.6.0  
 [0.5.1]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.5.0...v0.5.1  
 [0.5.0]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.5...v0.5.0  
 [0.4.5]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.4.4...v0.4.5  
