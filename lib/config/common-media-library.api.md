@@ -46,6 +46,9 @@ export interface Cmcd {
 export const CMCD_PARAM = "CMCD";
 
 // @beta
+export const CMCD_V1 = 1;
+
+// @beta
 export type CmcdCustomKey = CmCustomKey;
 
 // @beta
@@ -109,6 +112,9 @@ export const CMSD_DYNAMIC = "CMSD-Dynamic";
 
 // @beta
 export const CMSD_STATIC = "CMSD-Static";
+
+// @beta
+export const CMSD_V1 = 1;
 
 // @beta
 export type CmsdCustomKey = CmCustomKey;
