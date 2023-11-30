@@ -5,6 +5,7 @@
  */
 export { CMSD_DYNAMIC } from './cmsd/CMSD_DYNAMIC.js';
 export { CMSD_STATIC } from './cmsd/CMSD_STATIC.js';
+export { CMSD_V1 } from './cmsd/CMSD_V1.js';
 export type { CmsdCustomKey } from './cmsd/CmsdCustomKey.js';
 export type { CmsdDynamic } from './cmsd/CmsdDynamic.js';
 export type { CmsdEncodeOptions } from './cmsd/CmsdEncodeOptions.js';
