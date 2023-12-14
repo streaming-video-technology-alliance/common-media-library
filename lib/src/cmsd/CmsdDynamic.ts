@@ -9,4 +9,14 @@ import { CmsdDynamicParams } from './CmsdDynamicParams';
  *
  * @beta
  */
-export type CmsdDynamic = { value: string, params: CmsdDynamicParams };
+export interface CmsdDynamic {
+	/**
+	 * The server name.
+	 */
+	value: string;
+
+	/**
+	 * The CMSD dynamic parameters.
+	 */
+	params: CmsdDynamicParams
+}
