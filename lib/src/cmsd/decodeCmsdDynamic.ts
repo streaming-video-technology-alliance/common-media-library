@@ -19,5 +19,5 @@ export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[] {
 
 	const sfDict = decodeSfList(cmsd);
 
-	return sfDict as any;
+	return sfDict as CmsdDynamic[];
 }
