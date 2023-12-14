@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.1] - 2023-12-14
 
+### Fixed
+- Incorrect return type for `decodeCmsdDynamic` function [#55](https://github.com/streaming-video-technology-alliance/common-media-library/issues/55)
+
 
 ## [0.6.0] - 2023-11-29
 
