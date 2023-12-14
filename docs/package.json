@@ -1,7 +1,7 @@
 {
 	"name": "@svta/common-media-library-docs",
 	"private": true,
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"license": "Apache-2.0",
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
