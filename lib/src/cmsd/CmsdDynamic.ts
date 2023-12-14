@@ -1,4 +1,3 @@
-import { SfItem } from '../structuredfield/SfItem';
 import { CmsdDynamicParams } from './CmsdDynamicParams';
 
 /**
@@ -10,4 +9,4 @@ import { CmsdDynamicParams } from './CmsdDynamicParams';
  *
  * @beta
  */
-export type CmsdDynamic = SfItem<string, CmsdDynamicParams>;
+export type CmsdDynamic = { value: string, params: CmsdDynamicParams };
