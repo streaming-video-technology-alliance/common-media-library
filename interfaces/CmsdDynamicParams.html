@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>appendCmcdHeaders | @svta/common-media-library</title><meta name="description" content="Documentation for @svta/common-media-library"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>CmsdDynamicParams | @svta/common-media-library</title><meta name="description" content="Documentation for @svta/common-media-library"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -13,34 +13,103 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../modules.html">@svta/common-media-library</a></li>
-<li><a href="appendCmcdHeaders.html">appendCmcdHeaders</a></li></ul>
-<h1>Function appendCmcdHeaders</h1></div>
+<li><a href="CmsdDynamicParams.html">CmsdDynamicParams</a></li></ul>
+<h1>Interface CmsdDynamicParams<code class="tsd-tag ts-flagBeta">Beta</code> </h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>Common Media Server Data (CMSD) dynamic response header field parameters.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<h4>See</h4><p><a href="https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5006-final.pdf|CMSD">Spec</a></p>
+</div></section>
+<section class="tsd-panel tsd-hierarchy">
+<h4>Hierarchy</h4>
+<ul class="tsd-hierarchy">
+<li><span class="target">CmsdDynamicParams</span></li></ul></section>
 <section class="tsd-panel">
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="appendCmcdHeaders"><span class="tsd-kind-call-signature">append<wbr/>Cmcd<wbr/>Headers</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">headers</span>, <span class="tsd-kind-parameter">cmcd</span>, <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#appendCmcdHeaders" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description"><code class="tsd-tag ts-flagBeta">Beta</code> 
-<div class="tsd-comment tsd-typography"><p>Append CMCD query args to a header object.</p>
+<h4 class="tsd-before-signature">Indexable</h4>
+<div class="tsd-signature"><span class="tsd-signature-symbol">[</span>index: <a href="../types/CmsdCustomKey.html" class="tsd-signature-type tsd-kind-type-alias">CmsdCustomKey</a><span class="tsd-signature-symbol">]: </span><a href="../types/CmsdValue.html" class="tsd-signature-type tsd-kind-type-alias">CmsdValue</a></div></section><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/streaming-video-technology-alliance/common-media-library/blob/503f310/lib/src/cmsd/CmsdDynamicParams.ts#L13">cmsd/CmsdDynamicParams.ts:13</a></li></ul></aside>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
+<h5 class="tsd-index-heading uppercase" role="button" aria-expanded="false" tabIndex=0><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="#icon-chevronSmall"></use></svg> Index</h5></summary>
+<div class="tsd-accordion-details">
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading">Properties</h3>
+<div class="tsd-index-list"><a href="CmsdDynamicParams.html#du" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>du?</span></a>
+<a href="CmsdDynamicParams.html#etp" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>etp?</span></a>
+<a href="CmsdDynamicParams.html#mb" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>mb?</span></a>
+<a href="CmsdDynamicParams.html#rd" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>rd?</span></a>
+<a href="CmsdDynamicParams.html#rtt" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>rtt?</span></a>
+</div></section></div></details></section></section>
+<section class="tsd-panel-group tsd-member-group">
+<h2>Properties</h2>
+<section class="tsd-panel tsd-member"><a id="du" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>du</span><a href="#du" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">du</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Duress</p>
+<p>Key is included without a value if the server is under duress, due to cpu, memory, disk IO, network IO or other reasons. The
+thresholds for signaling duress are left to the discretion of the server operator. The intent is that the client will use this
+signal to move away to an alternate server if possible. This key MUST NOT be sent if it is false.</p>
+<p>Boolean</p>
 </div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">headers</span>: <span class="tsd-signature-type ">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
-<div class="tsd-comment tsd-typography"><p>The headers to append to.</p>
-</div>
-<div class="tsd-comment tsd-typography"></div></li>
-<li>
-<h5><span class="tsd-kind-parameter">cmcd</span>: <a href="../interfaces/Cmcd.html" class="tsd-signature-type tsd-kind-interface">Cmcd</a></h5>
-<div class="tsd-comment tsd-typography"><p>The CMCD object to append.</p>
-</div>
-<div class="tsd-comment tsd-typography"></div></li>
-<li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">options</span>: <a href="../interfaces/CmcdEncodeOptions.html" class="tsd-signature-type tsd-kind-interface">CmcdEncodeOptions</a></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><p>The headers with the CMCD header shards appended.</p>
-
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/streaming-video-technology-alliance/common-media-library/blob/503f310/lib/src/cmcd/appendCmcdHeaders.ts#L18">cmcd/appendCmcdHeaders.ts:18</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/streaming-video-technology-alliance/common-media-library/blob/503f310/lib/src/cmsd/CmsdDynamicParams.ts#L29">cmsd/CmsdDynamicParams.ts:29</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="etp" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>etp</span><a href="#etp" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">etp</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>Estimated Throughput</p>
+<p>The throughput between the server and the client over the currently negotiated transport as estimated by the server at the start
+of the response. The value is expressed in units of kilobits per second and rounded to the nearest integer. The time window for
+this estimate is expected to be the duration of the current response at most. The throughput may vary during the response and the
+client SHOULD use this data as an adjunct to its own throughput estimates. As an informative example, this estimate could be
+derived in this way:</p>
+<p>  etp = 8 * send_window / (rtt)</p>
+<p>where send_window = min (cwnd * mss, rwnd) with Congestion Window (cwnd) measured in packets, Maximum Segment Size (mss) in bytes,
+Receiver Window (rwnd) in bytes and rtt in milliseconds. Note that multiple client processes adjacent to the media player may pool
+their requests into the same connection to the server. In this case the server estimate of throughput will be against the entirety
+of the connection, not all of which will be accessible to the media player.</p>
+<p>Integer Kbps</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/streaming-video-technology-alliance/common-media-library/blob/503f310/lib/src/cmsd/CmsdDynamicParams.ts#L49">cmsd/CmsdDynamicParams.ts:49</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="mb" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>mb</span><a href="#mb" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">mb</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>Max suggested bitrate</p>
+<p>The maximum bitrate value that the player SHOULD play in its Adaptive Bit Rate (ABR) ladder. If the player is playing a bitrate higher
+than this value, it SHOULD immediately switch to a bitrate lower than or equal to this value.</p>
+<p>Integer Kbps</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/streaming-video-technology-alliance/common-media-library/blob/503f310/lib/src/cmsd/CmsdDynamicParams.ts#L59">cmsd/CmsdDynamicParams.ts:59</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="rd" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>rd</span><a href="#rd" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">rd</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>Response delay</p>
+<p>The time elapsed between the receipt of the request and when the first byte of the body becomes available to send to the client. The
+intention is for receivers to use this value to more accurately calculate the throughput of the connection [MHV22].</p>
+<p>Integer milliseconds</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/streaming-video-technology-alliance/common-media-library/blob/503f310/lib/src/cmsd/CmsdDynamicParams.ts#L69">cmsd/CmsdDynamicParams.ts:69</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="rtt" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>rtt</span><a href="#rtt" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">rtt</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>Round Trip Time</p>
+<p>Estimated round trip time between client and server. This estimate may be derived from the transport handshake. For subsequent requests
+over the same connection, the value can be refined to be an exponentially weighted moving average of prior instantaneous values. An
+informative example algorithm for this averaging is provided by [18].</p>
+<p>Integer Kbps</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/streaming-video-technology-alliance/common-media-library/blob/503f310/lib/src/cmsd/CmsdDynamicParams.ts#L80">cmsd/CmsdDynamicParams.ts:80</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -54,7 +123,16 @@
 <li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
 <li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
 <div class="tsd-theme-toggle">
-<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div></div>
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li><a href="#du" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>du</span></a></li>
+<li><a href="#etp" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>etp</span></a></li>
+<li><a href="#mb" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>mb</span></a></li>
+<li><a href="#rd" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>rd</span></a></li>
+<li><a href="#rtt" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>rtt</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>@svta/common-media-library</span></a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="..">
@@ -72,7 +150,7 @@
 <details class="tsd-index-accordion" data-key="Functions"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg><span>Functions</span></summary>
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
-<li><a href="encodeSfItem.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg>encodeSfItem</a></li></ul></div></details>
+<li><a href="../functions/encodeSfItem.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg>encodeSfItem</a></li></ul></div></details>
 <details class="tsd-index-accordion" data-key="CMCD"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg><span>CMCD</span></summary>
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
@@ -81,8 +159,8 @@
 <li><a href="../enums/CmcdObjectType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>CmcdObjectType</a></li>
 <li><a href="../enums/CmcdStreamType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>CmcdStreamType</a></li>
 <li><a href="../enums/CmcdStreamingFormat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>CmcdStreamingFormat</a></li>
-<li><a href="../interfaces/Cmcd.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>Cmcd</a></li>
-<li><a href="../interfaces/CmcdEncodeOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>CmcdEncodeOptions</a></li>
+<li><a href="Cmcd.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>Cmcd</a></li>
+<li><a href="CmcdEncodeOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>CmcdEncodeOptions</a></li>
 <li><a href="../types/CmcdCustomKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2097152"></use></svg>CmcdCustomKey</a></li>
 <li><a href="../types/CmcdFormatter.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2097152"></use></svg>CmcdFormatter</a></li>
 <li><a href="../types/CmcdHeadersMap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2097152"></use></svg>CmcdHeadersMap</a></li>
