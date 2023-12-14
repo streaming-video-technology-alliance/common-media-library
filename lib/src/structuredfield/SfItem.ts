@@ -8,15 +8,15 @@ import { SfParameters } from './SfParameters.js';
  *
  * @beta
  */
-export class SfItem {
+export class SfItem<V = SfBareItem, P = SfParameters> {
 
-	value: SfBareItem;
+	value: V;
 
-	params?: SfParameters;
+	params?: P;
 
-	constructor(value: any, params?: SfParameters) {
+	constructor(value: any, params?: P) {
 		if (Array.isArray(value)) {
-			value = value.map((v) => (v instanceof SfItem) ? v : new SfItem(v));
+			value = value.map((v) => (v instanceof SfItem) ? v : new SfItem<V, P>(v));
 		}
 
 		this.value = value;
