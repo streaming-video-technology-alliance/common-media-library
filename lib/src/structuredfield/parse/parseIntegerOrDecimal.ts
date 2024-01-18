@@ -1,6 +1,6 @@
 import { INTEGER_DECIMAL } from '../utils/INTEGER_DECIMAL.js';
 import { isInvalidInt } from '../utils/isInvalidInt.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.4.  Parsing an Integer or Decimal
@@ -74,6 +74,7 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 	let num = '';
 	let value;
 	const i = 0;
+	const error = parseError(orig, INTEGER_DECIMAL);
 
 	if (src[i] === '-') {
 		sign = -1;
@@ -81,13 +82,13 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 	}
 
 	if (src.length <= 0) {
-		throw parseError(orig, 'Integer or Decimal');
+		throw error;
 	}
 
 	const re_integer = /^(\d+)?/g;
 	const result_integer = re_integer.exec(src) as any;
 	if (result_integer[0].length === 0) {
-		throw parseError(orig, 'Integer or Decimal');
+		throw error;
 	}
 	num += result_integer[1];
 	src = src.substring(re_integer.lastIndex);
@@ -95,35 +96,37 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 	if (src[0] === '.') {
 		// decimal
 		if (num.length > 12) {
-			throw parseError(orig, 'Integer or Decimal');
+			throw error;
 		}
+
 		const re_decimal = /^(\.\d+)?/g;
 		const result_decimal = re_decimal.exec(src) as any;
 		src = src.substring(re_decimal.lastIndex);
 		// 9.2.  If the number of characters after "." in input_number is greater than three, fail parsing.
 		if (result_decimal[0].length === 0 || result_decimal[1].length > 4) {
-			throw parseError(orig, INTEGER_DECIMAL);
+			throw error;
 		}
+
 		num += result_decimal[1];
 		// 7.6.  If type is "decimal" and input_number contains more than 16 characters, fail parsing.
 		if (num.length > 16) {
-			throw parseError(orig, INTEGER_DECIMAL);
+			throw error;
 		}
+
 		value = parseFloat(num) * sign;
 	}
 	else {
 		// integer
 		// 7.5.  If type is "integer" and input_number contains more than 15 characters, fail parsing.
 		if (num.length > 15) {
-			throw parseError(orig, INTEGER_DECIMAL);
+			throw error;
 		}
+
 		value = parseInt(num) * sign;
 		if (isInvalidInt(value)) {
 			throw parseError(num, INTEGER_DECIMAL);
 		}
 	}
-	return {
-		value,
-		src,
-	};
+
+	return parsedValue(value, src);
 }

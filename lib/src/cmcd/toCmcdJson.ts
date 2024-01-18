@@ -1,5 +1,5 @@
 import { symbolToStr } from '../cta/utils/symbolToStr.js';
-import { SfToken } from '../structuredfield.js';
+import { SfToken } from '../structuredfield/SfToken.js';
 import { Cmcd } from './Cmcd.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { processCmcd } from './utils/processCmcd.js';

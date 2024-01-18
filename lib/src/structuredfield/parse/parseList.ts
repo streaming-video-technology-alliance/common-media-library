@@ -1,7 +1,7 @@
 import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfMember } from '../SfMember.js';
 import { LIST } from '../utils/LIST.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseItemOrInnerList } from './parseItemOrInnerList.js';
 
@@ -40,7 +40,7 @@ export function parseList(src: string, options?: SfDecodeOptions): ParsedValue<S
 
 		src = parsedItemOrInnerList.src.trim();
 		if (src.length === 0) {
-			return { src, value };
+			return parsedValue(value, src);
 		}
 
 		if (src[0] !== ',') {
@@ -52,9 +52,5 @@ export function parseList(src: string, options?: SfDecodeOptions): ParsedValue<S
 			throw parseError(src, LIST);
 		}
 	}
-	return {
-		value,
-		src,
-	};
+	return parsedValue(value, src);
 }
-

@@ -3,7 +3,7 @@ import { SfDictionary } from '../SfDictionary.js';
 import { SfInnerList } from '../SfInnerList.js';
 import { SfItem } from '../SfItem.js';
 import { DICT } from '../utils/DICT.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseItemOrInnerList } from './parseItemOrInnerList.js';
 import { parseKey } from './parseKey.js';
@@ -60,17 +60,14 @@ import { parseParameters } from './parseParameters.js';
 // Note that when duplicate Dictionary keys are encountered, this has
 // the effect of ignoring all but the last instance.
 export function parseDict(src: string, options?: SfDecodeOptions): ParsedValue<SfDictionary> {
-	const value: [string, SfItem | SfInnerList][] = [];
-
-	function toDict(entries: [string, SfItem | SfInnerList][]) {
-		return Object.fromEntries(entries);
-	}
+	const value: SfDictionary = {};
 
 	while (src.length > 0) {
 		let member: SfItem | SfInnerList;
 		const parsedKey = parseKey(src);
-		const this_key = parsedKey.value;
+		const key = parsedKey.value;
 		src = parsedKey.src;
+
 		if (src[0] === '=') {
 			const parsedItemOrInnerList = parseItemOrInnerList(src.substring(1), options);
 			member = parsedItemOrInnerList.value;
@@ -81,21 +78,23 @@ export function parseDict(src: string, options?: SfDecodeOptions): ParsedValue<S
 			member = new SfItem(true, parsedParameters.value);
 			src = parsedParameters.src;
 		}
-		value.push([this_key, member]);
+
+		value[key] = member;
+
 		src = src.trim();
 		if (src.length === 0) {
-			return { src, value: toDict(value) };
+			return parsedValue(value, src);
 		}
+
 		if (src[0] !== ',') {
 			throw parseError(src, DICT);
 		}
+
 		src = src.substring(1).trim();
 		if (src.length === 0 || src[0] === ',') {
 			throw parseError(src, DICT);
 		}
 	}
-	return {
-		value: toDict(value),
-		src,
-	};
+
+	return parsedValue(value, src);
 }

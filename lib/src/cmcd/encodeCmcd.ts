@@ -1,4 +1,4 @@
-import { encodeSfDict } from '../structuredfield.js';
+import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
 import { Cmcd } from './Cmcd.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { processCmcd } from './utils/processCmcd.js';

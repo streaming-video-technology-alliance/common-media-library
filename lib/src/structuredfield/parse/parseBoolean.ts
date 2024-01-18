@@ -1,5 +1,5 @@
 import { BOOLEAN } from '../utils/BOOLEAN.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.8.  Parsing a Boolean
@@ -23,18 +23,16 @@ export function parseBoolean(src: string): ParsedValue<boolean> {
 	if (src[i] !== '?') {
 		throw parseError(src, BOOLEAN);
 	}
+
 	i++;
+
 	if (src[i] === '1') {
-		return {
-			value: true,
-			src: src.substring(++i),
-		};
+		return parsedValue(true, src.substring(++i));
 	}
+
 	if (src[i] === '0') {
-		return {
-			value: false,
-			src: src.substring(++i),
-		};
+		return parsedValue(false, src.substring(++i));
 	}
+
 	throw parseError(src, BOOLEAN);
 }
