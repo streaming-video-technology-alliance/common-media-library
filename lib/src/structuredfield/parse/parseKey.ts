@@ -1,5 +1,5 @@
 import { KEY } from '../utils/KEY.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.3.3.  Parsing a Key
@@ -28,19 +28,17 @@ export function parseKey(src: string): ParsedValue<string> {
 	if (/^[a-z*]$/.test(src[i]) === false) {
 		throw parseError(src, KEY);
 	}
+
 	let value = '';
+
 	while (src.length > i) {
 		if (/^[a-z0-9_\-.*]$/.test(src[i]) === false) {
-			return {
-				value,
-				src: src.substring(i),
-			};
+			return parsedValue(value, src.substring(i));
 		}
+
 		value += src[i];
 		i++;
 	}
-	return {
-		value,
-		src: src.substring(i),
-	};
+
+	return parsedValue(value, src.substring(i));
 }

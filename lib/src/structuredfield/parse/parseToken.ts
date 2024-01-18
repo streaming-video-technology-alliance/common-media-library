@@ -1,7 +1,7 @@
 import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfToken } from '../SfToken.js';
 import { TOKEN } from '../utils/TOKEN.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.6.  Parsing a Token
@@ -29,11 +29,13 @@ export function parseToken(src: string, options?: SfDecodeOptions): ParsedValue<
 	if (/^[a-zA-Z*]$/.test(src[0]) === false) {
 		throw parseError(src, TOKEN);
 	}
+
 	const re = /^([!#$%&'*+\-.^_`|~\w:/]+)/g;
 	const value = (re.exec(src) as any)[1];
 	src = src.substring(re.lastIndex);
-	return {
-		value: options?.useSymbol === false ? new SfToken(value) : Symbol.for(value),
+
+	return parsedValue(
+		options?.useSymbol === false ? new SfToken(value) : Symbol.for(value),
 		src,
-	};
+	);
 }

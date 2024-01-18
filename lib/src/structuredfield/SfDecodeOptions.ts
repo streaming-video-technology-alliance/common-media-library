@@ -1,4 +1,3 @@
-
 /**
  * Options for decoding Structured Field values
  *
