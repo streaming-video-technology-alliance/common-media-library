@@ -1,4 +1,3 @@
-
 /**
  * Options for encoding a structured field.
  *

@@ -1,4 +1,4 @@
-import { CmsdDynamicParams } from './CmsdDynamicParams';
+import { CmsdDynamicParams } from './CmsdDynamicParams.js';
 
 /**
  * Common Media Server Data (CMSD) dynamic response header fields.

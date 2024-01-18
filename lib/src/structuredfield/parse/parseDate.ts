@@ -1,5 +1,5 @@
 import { DATE } from '../utils/DATE.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.js';
 
@@ -23,13 +23,16 @@ export function parseDate(src: string): ParsedValue<Date> {
 	if (src[i] !== '@') {
 		throw parseError(src, DATE);
 	}
+
 	i++;
 	const date = parseIntegerOrDecimal(src.substring(i));
+
 	if (Number.isInteger(date.value) === false) {
 		throw parseError(src, DATE);
 	}
-	return {
-		value: new Date(date.value * 1000),
-		src: date.src,
-	};
+
+	return parsedValue(
+		new Date(date.value * 1000),
+		date.src,
+	);
 }

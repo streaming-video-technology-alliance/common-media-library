@@ -2,7 +2,7 @@ import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfInnerList } from '../SfInnerList.js';
 import { SfItem } from '../SfItem.js';
 import { INNER } from '../utils/INNER.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseItem } from './parseItem.js';
 import { parseParameters } from './parseParameters.js';
@@ -44,6 +44,7 @@ export function parseInnerList(src: string, options?: SfDecodeOptions): ParsedVa
 	if (src[0] !== '(') {
 		throw parseError(src, INNER);
 	}
+
 	src = src.substring(1);
 	const innerList: SfItem[] = [];
 	while (src.length > 0) {
@@ -51,17 +52,21 @@ export function parseInnerList(src: string, options?: SfDecodeOptions): ParsedVa
 		if (src[0] === ')') {
 			src = src.substring(1);
 			const parsedParameters = parseParameters(src, options);
-			return {
-				value: new SfItem(innerList, parsedParameters.value) as any,
-				src: parsedParameters.src,
-			};
+
+			return parsedValue(
+				new SfItem(innerList, parsedParameters.value) as any,
+				parsedParameters.src,
+			);
 		}
+
 		const parsedItem = parseItem(src, options);
 		innerList.push(parsedItem.value);
 		src = parsedItem.src;
+
 		if (src[0] !== ' ' && src[0] !== ')') {
 			throw parseError(src, INNER);
 		}
 	}
+
 	throw parseError(src, INNER);
 }

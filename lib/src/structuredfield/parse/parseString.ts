@@ -1,5 +1,6 @@
+import { STRING } from '../utils/STRING.js';
 import { STRING_REGEX } from '../utils/STRING_REGEX.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.5.  Parsing a String
@@ -42,35 +43,39 @@ import { parseError } from './parseError.js';
 export function parseString(src: string): ParsedValue<string> {
 	let output = '';
 	let i = 0;
+
 	if (src[i] !== `"`) {
-		throw parseError(src, 'String');
+		throw parseError(src, STRING);
 	}
+
 	i++;
+
 	while (src.length > i) {
-		// console.log(i, input_string[i], output_string)
 		if (src[i] === `\\`) {
 			if (src.length <= i + 1) {
-				throw parseError(src, 'String');
+				throw parseError(src, STRING);
 			}
+
 			i++;
+
 			if (src[i] !== `"` && src[i] !== `\\`) {
-				throw parseError(src, 'String');
+				throw parseError(src, STRING);
 			}
+
 			output += src[i];
 		}
 		else if (src[i] === `"`) {
-			return {
-				value: output,
-				src: src.substring(++i),
-			};
+			return parsedValue(output, src.substring(++i));
 		}
 		else if (STRING_REGEX.test(src[i])) {
-			throw parseError(src, 'String');
+			throw parseError(src, STRING);
 		}
 		else {
 			output += src[i];
 		}
+
 		i++;
 	}
-	throw parseError(src, 'String');
+
+	throw parseError(src, STRING);
 }

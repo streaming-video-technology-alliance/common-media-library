@@ -22,5 +22,6 @@ export function parseItemOrInnerList(src: string, options?: SfDecodeOptions): Pa
 	if (src[0] === '(') {
 		return parseInnerList(src, options);
 	}
+
 	return parseItem(src, options);
 }
