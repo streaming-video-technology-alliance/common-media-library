@@ -1,6 +1,6 @@
 import { base64decode } from '../../utils/base64decode.js';
 import { BYTES } from '../utils/BYTES.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.7.  Parsing a Byte Sequence
@@ -47,16 +47,19 @@ export function parseByteSequence(src: string): ParsedValue<Uint8Array> {
 	if (src[0] !== ':') {
 		throw parseError(src, BYTES);
 	}
+
 	src = src.substring(1);
 	if (src.includes(':') === false) {
 		throw parseError(src, BYTES);
 	}
+
 	const re = /(^.*?)(:)/g;
 	const b64_content = (re.exec(src) as any)[1];
 	src = src.substring(re.lastIndex);
+
 	// pass b64_content char check step 6
-	return {
-		value: base64decode(b64_content),
+	return parsedValue(
+		base64decode(b64_content),
 		src,
-	};
+	);
 }
