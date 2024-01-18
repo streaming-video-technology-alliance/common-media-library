@@ -1,6 +1,6 @@
 import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfParameters } from '../SfParameters.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseBareItem } from './parseBareItem.js';
 import { parseKey } from './parseKey.js';
 
@@ -48,26 +48,27 @@ export function parseParameters(src: string, options?: SfDecodeOptions): ParsedV
 		if (src[0] !== ';') {
 			break;
 		}
+
 		src = src.substring(1).trim();
 		const parsedKey = parseKey(src);
 		const key = parsedKey.value;
 		let value = true;
 		src = parsedKey.src;
+
 		if (src[0] === '=') {
 			src = src.substring(1);
 			const parsedBareItem = parseBareItem(src, options);
 			value = parsedBareItem.value as any;
 			src = parsedBareItem.src;
 		}
+
 		// initialize as object when params exists
 		if (parameters == null) {
 			parameters = {};
 		}
+
 		// override if param_name exists
 		parameters[key] = value;
 	}
-	return {
-		value: parameters,
-		src,
-	};
+	return parsedValue(parameters, src);
 }

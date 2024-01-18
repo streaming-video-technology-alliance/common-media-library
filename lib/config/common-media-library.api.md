@@ -120,10 +120,10 @@ export const CMSD_V1 = 1;
 export type CmsdCustomKey = CmCustomKey;
 
 // @beta
-export type CmsdDynamic = {
-    value: string;
+export interface CmsdDynamic {
     params: CmsdDynamicParams;
-};
+    value: string;
+}
 
 // @beta
 export interface CmsdDynamicParams {

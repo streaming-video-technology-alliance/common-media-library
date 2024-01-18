@@ -1,6 +1,6 @@
 import { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { SfItem } from '../SfItem.js';
-import { ParsedValue } from './ParsedValue.js';
+import { ParsedValue, parsedValue } from './ParsedValue.js';
 import { parseBareItem } from './parseBareItem.js';
 import { parseParameters } from './parseParameters.js';
 
@@ -20,11 +20,12 @@ import { parseParameters } from './parseParameters.js';
 export function parseItem(src: string, options?: SfDecodeOptions): ParsedValue<SfItem> {
 	const parsedBareItem = parseBareItem(src, options);
 	src = parsedBareItem.src;
+
 	const parsedParameters = parseParameters(src, options);
 	src = parsedParameters.src;
 
-	return {
-		value: new SfItem(parsedBareItem.value, parsedParameters.value),
+	return parsedValue(
+		new SfItem(parsedBareItem.value, parsedParameters.value),
 		src,
-	};
+	);
 }

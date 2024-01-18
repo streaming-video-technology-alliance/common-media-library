@@ -1,4 +1,3 @@
-
 /**
  * Returns true if an ID3 header can be found at offset in data
  *

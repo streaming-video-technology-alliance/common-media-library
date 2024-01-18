@@ -2,6 +2,8 @@
  * A collection of tools for working with Common Media Client Data (CMCD).
  *
  * @packageDocumentation
+ *
+ * @beta
  */
 export { CMCD_PARAM } from './cmcd/CMCD_PARAM.js';
 export { CMCD_V1 } from './cmcd/CMCD_V1.js';

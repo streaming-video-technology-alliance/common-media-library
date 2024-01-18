@@ -1,4 +1,4 @@
-import { CmValue } from '../CmValue';
+import { CmValue } from '../CmValue.js';
 
 export const isValid = (value: CmValue) => {
 	if (typeof value === 'number') {

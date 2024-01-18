@@ -1,4 +1,4 @@
-import { urlToRelativePath } from '../utils.js';
+import { urlToRelativePath } from '../utils/urlToRelativePath.js';
 import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { CmcdFormatter } from './CmcdFormatter.js';
 import { CmcdValue } from './CmcdValue.js';
