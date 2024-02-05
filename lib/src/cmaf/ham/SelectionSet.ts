@@ -1,9 +1,9 @@
-export class SelectionSet{
-    id: string;
-    duration: number;
+export class SelectionSet {
+	id: string;
+	duration: number;
 
-    constructor(id:string, duration:number) {
-        this.id = id;
-        this.duration = duration;
-    }
+	constructor(id: string, duration: number) {
+		this.id = id;
+		this.duration = duration;
+	}
 }

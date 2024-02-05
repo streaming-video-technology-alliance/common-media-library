@@ -1,7 +1,7 @@
-export function readHLS(){
+export function readHLS() {
 
 }
 
-export function readDASH(){
+export function readDASH() {
 
 }
