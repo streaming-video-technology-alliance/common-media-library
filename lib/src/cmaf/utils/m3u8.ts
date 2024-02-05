@@ -7,7 +7,6 @@ export function parseM3u8(text: string) {
 	parser.push(text);
 	parser.end();
 	const parsedM3u8 = parser.manifest;
-
 	if (!parsedM3u8) {
 		throw new Error();
 	}
