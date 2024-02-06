@@ -1,4 +1,4 @@
-export class Track{
+export abstract class Track{
     id: string;
     type: string;
     codec:string;
