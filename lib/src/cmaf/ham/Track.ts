@@ -14,4 +14,8 @@ export abstract class Track{
         this.language = language;
         this.bandwidth = bandwidth;
     }
+
+    public getResolution():any{
+        return {};
+    }
 }

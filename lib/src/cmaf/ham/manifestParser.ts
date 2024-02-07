@@ -4,7 +4,7 @@ import { SelectionSet } from './SelectionSet.js';
 import { SwitchingSet } from './SwitchingSet.js';
 import { uuid } from '../../utils.js';
 import { Track } from './Track.js';
-import { PlayList } from './hlsManifest.js';
+import { PlayList, MediaGroups, m3u8 } from './hlsManifest.js';
 import { AudioTrack } from './AudioTrack.js';
 import { Segment } from 'hls-parser/types.js';
 import { VideoTrack } from './VideoTrack.js';
@@ -18,6 +18,55 @@ async function readHLS(manifestUrl: string): Promise<string> {
     });
     return response.text();
 }
+
+export async function HamToM3u8(presentation: Presentation): Promise<m3u8> {
+    const playlists: PlayList[] = [];
+    const mediaGroups: MediaGroups= { AUDIO: {} };
+    const segments: Segment[] = [];
+
+    for (const selectionSet of presentation.selectionsSets) {
+        for (const switchingSet of selectionSet.switchingsSet) {
+            const language = switchingSet.language;
+            const codecs = switchingSet.codec;
+            
+            
+            const playlist: PlayList = {
+                uri: generateUri(switchingSet.id),
+                attributes: {
+                    AUDIO: switchingSet.type === 'audio' ? switchingSet.id : '', 
+                    LANGUAGE: language,
+                    CODECS: codecs,
+                    BANDWIDTH: switchingSet.tracks[0].bandwidth,
+                    RESOLUTION: switchingSet.tracks[0].getResolution(),
+                }
+            };
+            playlists.push(playlist);
+
+            if (switchingSet.type === 'audio') {
+                if (!mediaGroups.AUDIO[switchingSet.id]) {
+                    mediaGroups.AUDIO[switchingSet.id] = {};
+                }
+                mediaGroups.AUDIO[switchingSet.id][language] = { language: language };
+            }
+
+            const segment: any = {
+                duration: switchingSet.duration
+            };
+            segments.push(segment);
+        }
+    }
+
+    return {
+        playlists: playlists,
+        mediaGroups: mediaGroups,
+        segments: []
+    };
+}
+
+function generateUri(id: string): string {
+    return `playlist_${id}.m3u8`;
+}
+
 
 export async function m3u8toHam(url: string): Promise<Presentation> {
     const hls: string = await readHLS(url);
