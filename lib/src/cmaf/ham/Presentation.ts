@@ -1,14 +1,14 @@
 import { SelectionSet } from './SelectionSet';
-export class Presentation {
 
+export class Presentation {
 	id: string;
 	duration: number;
-	selectionsSets: SelectionSet[];
+	selectionSets: SelectionSet[];
 
-	constructor(id: string, duration: number, selectionsSet:SelectionSet[]) {
+	constructor(id: string, duration: number, selectionSet: SelectionSet[]) {
 		this.id = id;
 		this.duration = duration;
-		this.selectionsSets = selectionsSet;
+		this.selectionSets = selectionSet;
 	}
 
 }
