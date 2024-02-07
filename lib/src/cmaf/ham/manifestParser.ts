@@ -6,7 +6,6 @@ import { uuid } from '../../utils.js';
 import { Track } from './Track.js';
 import { PlayList, MediaGroups, m3u8 } from './hlsManifest.js';
 import { AudioTrack } from './AudioTrack.js';
-import { Segment } from 'hls-parser/types.js';
 import { VideoTrack } from './VideoTrack.js';
 
 
@@ -19,10 +18,10 @@ async function readHLS(manifestUrl: string): Promise<string> {
     return response.text();
 }
 
-export async function HamToM3u8(presentation: Presentation): Promise<m3u8> {
+export async function hamToM3u8(presentation: Presentation): Promise<m3u8> {
     const playlists: PlayList[] = [];
     const mediaGroups: MediaGroups= { AUDIO: {} };
-    const segments: Segment[] = [];
+    const segments: any[] = [];
 
     for (const selectionSet of presentation.selectionsSets) {
         for (const switchingSet of selectionSet.switchingsSet) {
@@ -100,11 +99,11 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
             if (audioSearched && !audioInSwitchingSet) switchingSets.push(audioSearched);
         }
 
-        await Promise.all(parsedHlsManifest?.segments?.map(async (segment:Segment) => {
+        await Promise.all(parsedHlsManifest?.segments?.map(async (segment:any) => {
             selectionSetDuration += segment.duration;
             let type = "video";
             let language = playlist.attributes.LANGUAGE;
-            tracks.push(new VideoTrack(uuid(), type,playlist.attributes.CODECS, segment.duration, "", playlist.attributes.BANDWIDTH,playlist.attributes.RESOLUTION.width,playlist.attributes.RESOLUTION.height,0));
+            tracks.push(new VideoTrack(uuid(), type,playlist.attributes.CODECS, segment.duration, playlist.attributes.FRAME_RATE, playlist.attributes.BANDWIDTH,playlist.attributes.RESOLUTION.width,playlist.attributes.RESOLUTION.height,0));
             switchingSets.push(new SwitchingSet(uuid(), type, playlist.attributes.CODECS, segment.duration, language,tracks));
         }));
         selectionSets.push(new SelectionSet(uuid(), selectionSetDuration, switchingSets));
@@ -119,3 +118,6 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
     return new Presentation(uuid(), selectionSets[0].duration, selectionSets);
 }
 
+const url = "https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+const presentation = await m3u8toHam(url);
+console.log(presentation);
