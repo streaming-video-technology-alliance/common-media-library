@@ -1,8 +1,7 @@
 export type PlayList = {
     uri: string;
     attributes: {
-        AUDIO: string;
-        LANGUAGE: string;
+        FRAME_RATE: number;
         CODECS: string;
         BANDWIDTH: number;
         RESOLUTION: {
@@ -24,7 +23,6 @@ export type MediaGroups = {
 
 export type Segment = {
     duration: number;
-    map: string;
 };
 
 export type m3u8 = {
