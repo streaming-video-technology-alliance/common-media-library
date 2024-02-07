@@ -26,10 +26,7 @@ export async function hamToM3u8(presentation: Presentation): Promise<m3u8> {
 
     for (const selectionSet of presentation.selectionsSets) {
         for (const switchingSet of selectionSet.switchingsSet) {
-            const language = switchingSet.language;
-            const codecs = switchingSet.codec;
-            const tracks = switchingSet.tracks;
-            const type = switchingSet.type;
+            const {language, codec, type, tracks} = switchingSet;
             
             if (type == AUDIO_TYPE){
                 let mediaGroup : MediaGroups = {
@@ -47,7 +44,7 @@ export async function hamToM3u8(presentation: Presentation): Promise<m3u8> {
                 let playlist: PlayList = {
                     uri: '',
                     attributes: {
-                        CODECS: codecs,
+                        CODECS: codec,
                         BANDWIDTH: switchingSet.tracks[0].bandwidth,
                         RESOLUTION: resolution,
                         FRAME_RATE: 0
