@@ -6,10 +6,10 @@ import { uuid } from '../../utils.js';
 import { Track } from './Track.js';
 import { PlayList } from './hlsManifest.js';
 import { AudioTrack } from './AudioTrack.js';
-import { VideoTrack } from './VideoTrack.js';
 import { Segment } from './Segment.js';
-const VIDEO_TYPE = 'video';
+import { VideoTrack } from './VideoTrack.js';
 const AUDIO_TYPE = 'audio';
+const VIDEO_TYPE = 'video';
 
 async function readHLS(manifestUrl: string): Promise<string> {
     const response = await fetch(manifestUrl, {
