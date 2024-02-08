@@ -4,9 +4,10 @@ import { SelectionSet } from './SelectionSet.js';
 import { SwitchingSet } from './SwitchingSet.js';
 import { uuid } from '../../utils.js';
 import { Track } from './Track.js';
-import { PlayList, MediaGroups, m3u8 } from './hlsManifest.js';
+import { PlayList } from './hlsManifest.js';
 import { AudioTrack } from './AudioTrack.js';
 import { VideoTrack } from './VideoTrack.js';
+import { Segment } from './Segment.js';
 const VIDEO_TYPE = 'video';
 const AUDIO_TYPE = 'audio';
 
@@ -17,55 +18,6 @@ async function readHLS(manifestUrl: string): Promise<string> {
         }
     });
     return response.text();
-}
-
-export async function hamToM3u8(presentation: Presentation): Promise<m3u8> {
-    let playlists: PlayList[] = [];
-    let mediaGroups: MediaGroups= { AUDIO: {} };
-    let segments: any[] = [];
-
-    for (const selectionSet of presentation.selectionsSets) {
-        for (const switchingSet of selectionSet.switchingsSet) {
-            const {language, codec, type, tracks} = switchingSet;
-            
-            if (type == AUDIO_TYPE){
-                let mediaGroup : MediaGroups = {
-                    AUDIO: {
-                        [switchingSet.id]: {
-                            [language]: {
-                                language: language
-                            }
-                        }
-                    }
-                };
-                mediaGroups = { ...mediaGroups, ...mediaGroup };
-            }else if(type == VIDEO_TYPE){
-                let resolution = tracks[0].getResolution();
-                let playlist: PlayList = {
-                    uri: '',
-                    attributes: {
-                        CODECS: codec,
-                        BANDWIDTH: switchingSet.tracks[0].bandwidth,
-                        RESOLUTION: resolution,
-                        FRAME_RATE: 0
-                    }
-                };
-                playlists.push(playlist);
-            }
-           
-
-            const segment: any = {
-                duration: switchingSet.duration
-            };
-            segments.push(segment);
-        }
-    }
-
-    return {
-        playlists: playlists,
-        mediaGroups: mediaGroups,
-        segments: segments
-    };
 }
 
 
@@ -83,7 +35,7 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         for (let attributes in mediaGroupsAudio[audio]) {
             let language = mediaGroupsAudio[audio][attributes].language;
             audioSwitchingSets.push(new SwitchingSet(audio, AUDIO_TYPE, '', 0, language,[]));
-            audioTracks.push(new AudioTrack(audio, AUDIO_TYPE, '', 0, language, 0, 0, 0));
+            audioTracks.push(new AudioTrack(audio, AUDIO_TYPE, '', 0, language, 0, 0, 0,[]));
         }
     }
 
@@ -103,13 +55,14 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         }
 
         await Promise.all(parsedHlsManifest?.segments?.map(async (segment:any) => {
-            let language = playlist.attributes.LANGUAGE;
-            let codec = playlist.attributes.CODECS;
+            let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
+            let {duration,uri} = segment;
             let resolution = {width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height};
-            let segmentDuration = segment.duration;
-            selectionSetDuration += segmentDuration;
-            tracks.push(new VideoTrack(uuid(), VIDEO_TYPE,codec, segmentDuration, '', playlist.attributes.BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE']));
-            switchingSets.push(new SwitchingSet(uuid(), VIDEO_TYPE, codec, segmentDuration, language,tracks));
+            let {length,offset} = segment.byteRange;
+            selectionSetDuration += duration;
+            let segments = [new Segment(duration ,uri,`${length}@${offset}`)];
+            tracks.push(new VideoTrack(uuid(), VIDEO_TYPE,CODECS, duration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
+            switchingSets.push(new SwitchingSet(uuid(), VIDEO_TYPE, CODECS, duration, LANGUAGE,tracks));
         }));
         selectionSets.push(new SelectionSet(uuid(), selectionSetDuration, switchingSets));
     }));
