@@ -1,9 +1,62 @@
-import { DashManifest } from '../utils/dash/DashManifest';
+import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest';
 import { Presentation } from './Presentation';
 import { SelectionSet } from './SelectionSet';
 import { Track } from './Track';
 import { SwitchingSet } from './SwitchingSet';
 import { Segment } from './Segment';
+import { VideoTrack } from './VideoTrack';
+import { AudioTrack } from './AudioTrack';
+import { TextTrack } from './TextTrack';
+
+function createTrack(
+	type: string,
+	representation: Representation,
+	adaptationSet: AdaptationSet,
+	duration: number,
+	segments: Segment[],
+): AudioTrack | VideoTrack | TextTrack {
+	if (type === 'video') {
+		return new VideoTrack(
+			representation.$.id,
+			adaptationSet.$.contentType,
+			adaptationSet.$.codecs,
+			duration,
+			adaptationSet.$.lang,
+			representation.$.bandwidth,
+			segments,
+			adaptationSet.$.maxWidth ?? 0, // TODO: handle undefined values
+			adaptationSet.$.maxHeight ?? 0,
+			0, // TODO: add frameRate and scanType
+			adaptationSet.$.par ?? '',
+			adaptationSet.$.sar ?? '',
+			'',
+		);
+	}
+	else if (type === 'audio') {
+		return new AudioTrack(
+			representation.$.id,
+			adaptationSet.$.contentType,
+			adaptationSet.$.codecs,
+			duration,
+			adaptationSet.$.lang,
+			representation.$.bandwidth,
+			segments,
+			adaptationSet.$.audioSamplingRate ?? 0,
+			0, // TODO: add channels
+		);
+	}
+	else { // if (type === 'text')
+		return new TextTrack(
+			representation.$.id,
+			adaptationSet.$.contentType,
+			adaptationSet.$.codecs,
+			duration,
+			adaptationSet.$.lang,
+			representation.$.bandwidth,
+			segments,
+		);
+	}
+}
 
 export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 	const presentation: Presentation[] = rawManifest.Period.map((period) => {
@@ -18,15 +71,7 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 					new Segment(duration, url, segment.$.indexRange),
 				);
 
-				return new Track(
-					representation.$.id,
-					adaptationSet.$.contentType,
-					adaptationSet.$.codecs,
-					duration,
-					adaptationSet.$.lang,
-					representation.$.bandwidth,
-					segments,
-				);
+				return createTrack(adaptationSet.$.contentType, representation, adaptationSet, duration, segments);
 			});
 
 			if (!selectionSetGroups[adaptationSet.$.group]) {

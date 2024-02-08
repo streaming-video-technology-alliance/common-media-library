@@ -33,10 +33,15 @@ type AdaptationSet = {
 		segmentAlignment?: string,
 		subsegmentAlignment?: string,
 		subsegmentStartsWithSAP?: string,
-		audioSamplingRate?: string,
+		audioSamplingRate?: number,
 		mimeType?: string,
 		codecs: string,
 		startWithSAP?: string,
+		par?: string;
+		sar?: string;
+		maxWidth?: number;
+		maxHeight?: number;
+
 	},
 	AudioChannelConfiguration?: any[],
 	Role?: any[],
