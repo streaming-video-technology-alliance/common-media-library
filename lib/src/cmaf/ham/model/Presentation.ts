@@ -1,6 +1,8 @@
 import { SelectionSet } from './SelectionSet';
+import { IElement } from '../visitor/HamElement';
+import { ElementVisitor } from '../visitor/ElementVisitor';
 
-export class Presentation {
+export class Presentation implements IElement{
 	id: string;
 	duration: number;
 	selectionSets: SelectionSet[];
@@ -9,6 +11,10 @@ export class Presentation {
 		this.id = id;
 		this.duration = duration;
 		this.selectionSets = selectionSet;
+	}
+
+	accept(visitor: ElementVisitor): void {
+		visitor.visitPresentation(this);
 	}
 
 }

@@ -1,7 +1,8 @@
 import { Track } from './Track';
+import { IElement } from '../visitor/HamElement';
+import { ElementVisitor } from '../visitor/ElementVisitor';
 
-export class SwitchingSet {
-
+export class SwitchingSet implements IElement {
 	id: string;
 	type: string;
 	codec: string;
@@ -16,5 +17,9 @@ export class SwitchingSet {
 		this.duration = duration;
 		this.language = language;
 		this.tracks = tracks;
+	}
+
+	accept(visitor: ElementVisitor): void {
+		visitor.visitSwitchingSet(this);
 	}
 }
