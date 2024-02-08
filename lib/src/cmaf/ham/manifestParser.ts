@@ -12,7 +12,7 @@ export async function readHLS(manifestUrl: string): Promise<string> {
 }
 
 
-export async function m3u8toHam(url: string) {
+export async function m3u8toHam() {
 
 }
 

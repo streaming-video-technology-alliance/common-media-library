@@ -1,12 +1,14 @@
 import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest';
-import { Presentation } from './Presentation';
-import { SelectionSet } from './SelectionSet';
-import { Track } from './Track';
-import { SwitchingSet } from './SwitchingSet';
-import { Segment } from './Segment';
-import { VideoTrack } from './VideoTrack';
-import { AudioTrack } from './AudioTrack';
-import { TextTrack } from './TextTrack';
+import {
+	Presentation,
+	SelectionSet,
+	SwitchingSet,
+	Segment,
+	Track,
+	VideoTrack,
+	AudioTrack,
+	TextTrack,
+} from './model';
 
 function createTrack(
 	type: string,

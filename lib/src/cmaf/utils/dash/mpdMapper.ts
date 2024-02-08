@@ -1,8 +1,5 @@
 import { AdaptationSet, DashManifest, Representation, SegmentMpd } from './DashManifest';
-import { Presentation } from '../../ham/Presentation';
-import { SelectionSet } from '../../ham/SelectionSet';
-import { Segment } from '../../ham/Segment';
-import { Track } from '../../ham/Track';
+import { Presentation, SelectionSet, Segment, Track } from '../../ham/model';
 
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentMpd[] {
 	return hamSegments.map((segment) => {
