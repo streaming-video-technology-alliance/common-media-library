@@ -1,5 +1,3 @@
-// @ts-ignore
-import { parse } from 'mpd-parser';
 import { parseString } from 'xml2js';
 import { DashManifest } from './DashManifest';
 
@@ -11,13 +9,3 @@ export async function parseMpd(raw: string, replace: (manifest: DashManifest) =>
 		replace(result);
 	});
 }
-
-// export function parseMpdVideo(text: string, uri: string) {
-// 	const parsedDash = parse(text, { uri });
-//
-// 	if (!parsedDash) {
-// 		throw new Error();
-// 	}
-//
-// 	return parsedDash;
-// }
