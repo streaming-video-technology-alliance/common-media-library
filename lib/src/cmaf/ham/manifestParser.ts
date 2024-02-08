@@ -20,8 +20,6 @@ async function readHLS(manifestUrl: string): Promise<string> {
     return response.text();
 }
 
-
-
 export async function m3u8toHam(url: string): Promise<Presentation> {
     const hls: string = await readHLS(url);
     const parsedM3u8 = parseM3u8(hls);
@@ -58,7 +56,7 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
             let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
             let {duration,uri} = segment;
             let resolution = {width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height};
-            let {length,offset} = segment.byteRange;
+            let { length, offset } = segment.byterange;
             selectionSetDuration += duration;
             let segments = [new Segment(duration ,uri,`${length}@${offset}`)];
             tracks.push(new VideoTrack(uuid(), VIDEO_TYPE,CODECS, duration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
