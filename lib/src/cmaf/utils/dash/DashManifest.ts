@@ -56,7 +56,16 @@ type Period = {
 }
 
 type DashManifest = {
-	Period: Period[],
+	$?: {
+		xmlns?: string;
+		type?: string;
+		mediaPresentationDuration?: string;
+		minBufferTime?: string;
+		profiles?: string;
+	}
+	MPD: {
+		Period: Period[],
+	}
 }
 
 export type { DashManifest, Period, AdaptationSet, Representation, SegmentMpd };

@@ -1,5 +1,5 @@
-import { Track } from './Track';
-import { Segment } from './Segment';
+import { Track } from './Track.js';
+import { Segment } from './Segment.js';
 
 export class VideoTrack extends Track {
 	width: number;

@@ -1,4 +1,4 @@
-import { ElementVisitor } from './visitor/ElementVisitor';
+import { ElementVisitor } from './visitor/ElementVisitor.js';
 import { Presentation, SelectionSet, SwitchingSet } from './model';
 
 export class DashRenderer implements ElementVisitor {

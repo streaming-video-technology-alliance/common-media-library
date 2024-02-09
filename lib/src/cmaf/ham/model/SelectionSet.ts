@@ -1,6 +1,6 @@
-import { SwitchingSet } from './SwitchingSet';
-import { IElement } from '../visitor/HamElement';
-import { ElementVisitor } from '../visitor/ElementVisitor';
+import { SwitchingSet } from './SwitchingSet.js';
+import { IElement } from '../visitor/HamElement.js';
+import { ElementVisitor } from '../visitor/ElementVisitor.js';
 
 export class SelectionSet implements IElement {
 	id: string;

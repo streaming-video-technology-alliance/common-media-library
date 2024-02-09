@@ -287,6 +287,34 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
+// @public (undocumented)
+export function m3u8toHam(): Promise<void>;
+
+// @public (undocumented)
+export function mpdToHam(manifest: string): Promise<Presentation | undefined>;
+
+// @public (undocumented)
+export function parseM3u8(text: string): any;
+
+// Warning: (ae-forgotten-export) The symbol "IElement" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export class Presentation implements IElement {
+    constructor(id: string, duration: number, selectionSet: SelectionSet[]);
+    // Warning: (ae-forgotten-export) The symbol "ElementVisitor" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
+    // (undocumented)
+    duration: number;
+    // (undocumented)
+    id: string;
+    // Warning: (ae-forgotten-export) The symbol "SelectionSet" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    selectionSets: SelectionSet[];
+}
+
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
@@ -354,6 +382,25 @@ export class SfToken {
     description: string;
 }
 
+// @public (undocumented)
+export class SwitchingSet implements IElement {
+    constructor(id: string, type: string, codec: string, duration: number, language: string, tracks: Track[]);
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
+    // (undocumented)
+    codec: string;
+    // (undocumented)
+    duration: number;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    language: string;
+    // (undocumented)
+    tracks: Track[];
+    // (undocumented)
+    type: string;
+}
+
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};
 
@@ -362,6 +409,27 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @public (undocumented)
+export abstract class Track {
+    constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[]);
+    // (undocumented)
+    bandwidth: number;
+    // (undocumented)
+    codec: string;
+    // (undocumented)
+    duration: number;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    language: string;
+    // Warning: (ae-forgotten-export) The symbol "Segment" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    segments: Segment[];
+    // (undocumented)
+    type: string;
+}
 
 // @beta
 export function urlToRelativePath(url: string, base: string): string;

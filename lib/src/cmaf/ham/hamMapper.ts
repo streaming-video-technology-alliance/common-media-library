@@ -1,4 +1,4 @@
-import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest';
+import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest.js';
 import {
 	Presentation,
 	SelectionSet,
@@ -8,7 +8,7 @@ import {
 	VideoTrack,
 	AudioTrack,
 	TextTrack,
-} from './model';
+} from './model/index.js';
 
 function createTrack(
 	type: string,
@@ -61,7 +61,7 @@ function createTrack(
 }
 
 export function mapMpdToHam(rawManifest: DashManifest): Presentation {
-	const presentation: Presentation[] = rawManifest.Period.map((period) => {
+	const presentation: Presentation[] = rawManifest.MPD.Period.map((period) => {
 		const duration = +period.$.duration;
 		const url = 'url'; // todo: get real url
 

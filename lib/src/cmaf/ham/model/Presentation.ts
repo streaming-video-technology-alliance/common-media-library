@@ -1,6 +1,6 @@
-import { SelectionSet } from './SelectionSet';
-import { IElement } from '../visitor/HamElement';
-import { ElementVisitor } from '../visitor/ElementVisitor';
+import { SelectionSet } from './SelectionSet.js';
+import { IElement } from '../visitor/HamElement.js';
+import { ElementVisitor } from '../visitor/ElementVisitor.js';
 
 export class Presentation implements IElement{
 	id: string;

@@ -1,6 +1,6 @@
-import { parseMpd } from '../utils/dash/mpd';
-import { DashManifest } from '../utils/dash/DashManifest';
-import { mapMpdToHam } from './hamMapper';
+import { parseMpd } from '../utils/dash/mpd.js';
+import { DashManifest } from '../utils/dash/DashManifest.js';
+import { mapMpdToHam } from './hamMapper.js';
 
 export async function readHLS(manifestUrl: string): Promise<string> {
 	const response = await fetch(manifestUrl, {

@@ -1,6 +1,6 @@
-import { Track } from './Track';
-import { IElement } from '../visitor/HamElement';
-import { ElementVisitor } from '../visitor/ElementVisitor';
+import { Track } from './Track.js';
+import { IElement } from '../visitor/HamElement.js';
+import { ElementVisitor } from '../visitor/ElementVisitor.js';
 
 export class SwitchingSet implements IElement {
 	id: string;
