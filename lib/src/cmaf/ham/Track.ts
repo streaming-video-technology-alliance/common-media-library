@@ -1,3 +1,5 @@
+import { VideoTrack } from "./VideoTrack";
+
 export abstract class Track{
     id: string;
     type: string;
@@ -13,5 +15,8 @@ export abstract class Track{
         this.duration = duration;
         this.language = language;
         this.bandwidth = bandwidth;
+    }
+    isVideoTrack(track: any): track is VideoTrack {
+        return track.width !== undefined && track.height !== undefined && track.frameRate !== undefined;
     }
 }
