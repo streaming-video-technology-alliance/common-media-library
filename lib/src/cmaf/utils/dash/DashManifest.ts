@@ -56,7 +56,9 @@ type Period = {
 }
 
 type DashManifest = {
-	Period: Period[],
+	MPD: {
+		Period: Period[],
+	}
 }
 
 export type { DashManifest, Period, AdaptationSet, Representation, SegmentMpd };

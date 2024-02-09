@@ -1,12 +1,12 @@
-import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest';
-import { Presentation } from './Presentation';
-import { SelectionSet } from './SelectionSet';
-import { Track } from './Track';
-import { SwitchingSet } from './SwitchingSet';
-import { Segment } from './Segment';
-import { VideoTrack } from './VideoTrack';
-import { AudioTrack } from './AudioTrack';
-import { TextTrack } from './TextTrack';
+import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest.js';
+import { Presentation } from './Presentation.js';
+import { SelectionSet } from './SelectionSet.js';
+import { Track } from './Track.js';
+import { SwitchingSet } from './SwitchingSet.js';
+import { Segment } from './Segment.js';
+import { VideoTrack } from './VideoTrack.js';
+import { AudioTrack } from './AudioTrack.js';
+import { TextTrack } from './TextTrack.js';
 
 function createTrack(
 	type: string,
@@ -59,7 +59,7 @@ function createTrack(
 }
 
 export function mapMpdToHam(rawManifest: DashManifest): Presentation {
-	const presentation: Presentation[] = rawManifest.Period.map((period) => {
+	const presentation: Presentation[] = rawManifest.MPD.Period.map((period) => {
 		const duration = +period.$.duration;
 		const url = 'url'; // todo: get real url
 

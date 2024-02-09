@@ -1,4 +1,4 @@
-import { Track } from './Track';
+import { Track } from './Track.js';
 
 export class SwitchingSet {
 

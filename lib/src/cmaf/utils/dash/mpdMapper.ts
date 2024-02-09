@@ -46,14 +46,16 @@ function selectionToAdapationSet(selectionsSets: SelectionSet[]): AdaptationSet[
 
 function mapHamToMpd(hamManifest: Presentation): DashManifest {
 	return {
-		Period: [
-			{
-				$: {
-					duration: hamManifest.duration.toString(),
+		MPD: {
+			Period: [
+				{
+					$: {
+						duration: hamManifest.duration.toString(),
+					},
+					AdaptationSet: selectionToAdapationSet(hamManifest.selectionSets),
 				},
-				AdaptationSet: selectionToAdapationSet(hamManifest.selectionSets),
-			},
-		],
+			],
+		},
 	};
 }
 
