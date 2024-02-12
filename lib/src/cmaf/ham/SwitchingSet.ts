@@ -9,7 +9,7 @@ export class SwitchingSet {
     language:string;
     tracks : Track[];
 
-    constructor(id:string, type:string ,codec:string,duration:number,language:string, tracks:Track[]) {
+    constructor(id:string, type:string, codec:string, duration:number, language:string, tracks:Track[]) {
         this.id = id;
         this.type = type;
         this.codec = codec;
