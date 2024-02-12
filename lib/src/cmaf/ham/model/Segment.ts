@@ -1,6 +1,7 @@
 import { ElementVisitor } from '../visitor/ElementVisitor';
+import { IElement } from '../visitor/HamElement';
 
-export class Segment {
+export class Segment implements IElement {
 	duration: number;
 	url: string;
 	byteRange: string | null;

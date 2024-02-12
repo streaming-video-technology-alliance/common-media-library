@@ -2,7 +2,7 @@ import { SelectionSet } from './SelectionSet.js';
 import { IElement } from '../visitor/HamElement.js';
 import { ElementVisitor } from '../visitor/ElementVisitor.js';
 
-export class Presentation implements IElement{
+export class Presentation implements IElement {
 	id: string;
 	duration: number;
 	selectionSets: SelectionSet[];
