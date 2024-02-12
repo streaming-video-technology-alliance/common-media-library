@@ -16,5 +16,4 @@ export class SwitchingSet {
         this.language = language;
         this.tracks = tracks;
     }
-    
 }
