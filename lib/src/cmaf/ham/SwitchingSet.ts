@@ -2,7 +2,7 @@ import { Track } from "./Track";
 
 export class SwitchingSet {
     id: string;
-    type: string ;
+    type: string;
     codec:string;
     duration:number;
     language:string;
