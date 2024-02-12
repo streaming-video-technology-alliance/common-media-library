@@ -1,5 +1,6 @@
 import { Track } from './Track.js';
 import { Segment } from './Segment.js';
+import { ElementVisitor } from '../visitor/ElementVisitor';
 
 export class TextTrack extends Track {
 
@@ -20,6 +21,10 @@ export class TextTrack extends Track {
 		this.language = language;
 		this.bandwidth = bandwidth;
 		this.segments = segments;
+	}
+
+	override accept(visitor: ElementVisitor): void {
+		visitor.visitTextTrack(this);
 	}
 
 }

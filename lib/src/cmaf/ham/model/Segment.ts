@@ -1,3 +1,5 @@
+import { ElementVisitor } from '../visitor/ElementVisitor';
+
 export class Segment {
 	duration: number;
 	url: string;
@@ -7,5 +9,9 @@ export class Segment {
 		this.duration = duration;
 		this.url = url;
 		this.byteRange = byteRange;
+	}
+
+	accept(visitor: ElementVisitor): void {
+		visitor.visitSegment(this);
 	}
 }

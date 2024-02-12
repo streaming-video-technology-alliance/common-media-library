@@ -1,5 +1,6 @@
 import { Track } from './Track.js';
 import { Segment } from './Segment.js';
+import { ElementVisitor } from '../visitor/ElementVisitor';
 
 export class VideoTrack extends Track {
 	width: number;
@@ -31,5 +32,9 @@ export class VideoTrack extends Track {
 		this.par = par;
 		this.sar = sar;
 		this.scanType = scanType;
+	}
+
+	override accept(visitor: ElementVisitor): void {
+		visitor.visitVideoTrack(this);
 	}
 }

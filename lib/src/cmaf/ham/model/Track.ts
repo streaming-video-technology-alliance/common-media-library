@@ -1,4 +1,5 @@
 import { Segment } from './Segment.js';
+import { ElementVisitor } from '../visitor/ElementVisitor';
 
 export abstract class Track {
 	id: string;
@@ -25,5 +26,9 @@ export abstract class Track {
 		this.language = language;
 		this.bandwidth = bandwidth;
 		this.segments = segments;
+	}
+
+	accept(visitor: ElementVisitor): void {
+		visitor.visitTrack(this);
 	}
 }
