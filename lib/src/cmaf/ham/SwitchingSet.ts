@@ -1,6 +1,5 @@
 import { Track } from "./Track";
 
-
 export class SwitchingSet {
     id: string;
     type: string ;
