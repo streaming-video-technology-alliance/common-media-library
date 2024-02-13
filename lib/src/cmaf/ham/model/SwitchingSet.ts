@@ -22,4 +22,9 @@ export class SwitchingSet implements IElement {
 	accept(visitor: ElementVisitor): void {
 		visitor.visitSwitchingSet(this);
 	}
+
+	public getTracks(predicate?: (track: Track) => boolean): Track[] {
+		const tracks = this.tracks;
+		return (predicate) ? tracks.filter(predicate) : tracks;
+	}
 }

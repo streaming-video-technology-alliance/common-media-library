@@ -308,13 +308,17 @@ export class Presentation implements IElement {
     // (undocumented)
     duration: number;
     // (undocumented)
+    getAttributeNames(): string[];
+    // (undocumented)
     id: string;
     // Warning: (ae-forgotten-export) The symbol "SelectionSet" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     selectionSets: SelectionSet[];
     // (undocumented)
-    toJSON(): string;
+    toString(): string;
+    // (undocumented)
+    update(attribute: string): boolean;
 }
 
 // @beta
