@@ -21,7 +21,6 @@ export function canParseId3(data: Uint8Array, offset: number): boolean;
 
 // @public
 export class CaptionScreen {
-    // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
     constructor(logger: CaptionsLogger);
     // (undocumented)
     backSpace(): void;
@@ -29,6 +28,8 @@ export class CaptionScreen {
     clearToEndOfRow(): void;
     // (undocumented)
     copy(other: CaptionScreen): void;
+    // (undocumented)
+    currRow: number;
     // (undocumented)
     equals(other: CaptionScreen): boolean;
     getDisplayText(asOneRow?: boolean): string;
@@ -38,20 +39,67 @@ export class CaptionScreen {
     // (undocumented)
     isEmpty(): boolean;
     // (undocumented)
+    lastOutputScreen: CaptionScreen | null;
+    // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    logger: CaptionsLogger;
+    // (undocumented)
     moveCursor(relPos: number): void;
+    // (undocumented)
+    nrRollUpRows: number | null;
     // (undocumented)
     reset(): void;
     // (undocumented)
     rollUp(): void;
+    // (undocumented)
+    rows: Row[];
     setBkgData(bkgData: Partial<PenStyles>): void;
     // (undocumented)
     setCursor(absPos: number): void;
+    // Warning: (ae-forgotten-export) The symbol "PACData" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     setPAC(pacData: PACData): void;
+    // Warning: (ae-forgotten-export) The symbol "PenStyles" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     setPen(styles: Partial<PenStyles>): void;
     // (undocumented)
     setRollUpRows(nrRows: number | null): void;
+}
+
+// @public (undocumented)
+export class Cea608Parser {
+    // Warning: (ae-forgotten-export) The symbol "SupportedField" needs to be exported by the entry point index.d.ts
+    constructor(field: SupportedField, out1: any, out2: any);
+    addData(time: number | null, byteList: number[]): void;
+    // Warning: (ae-forgotten-export) The symbol "Cea608Channel" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    channels: Array<Cea608Channel | null>;
+    // Warning: (ae-forgotten-export) The symbol "CmdHistory" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    cmdHistory: CmdHistory;
+    cueSplitAtTime(t: number): void;
+    // Warning: (ae-forgotten-export) The symbol "Channels" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    currentChannel: Channels;
+    // (undocumented)
+    getHandler(channel: number): any;
+    interpretPAC(row: number, byte: number): PACData;
+    // (undocumented)
+    logger: CaptionsLogger;
+    parseBackgroundAttributes(a: number, b: number): boolean;
+    parseChars(a: number, b: number): number[] | null;
+    parseCmd(a: number, b: number): boolean;
+    parseMidrow(a: number, b: number): boolean;
+    parsePAC(a: number, b: number): boolean;
+    reset(): void;
+    // (undocumented)
+    setHandler(channel: number, newHandler: any): void;
 }
 
 // @beta
@@ -448,6 +496,8 @@ export function roundToEven(value: number, precision: number): number;
 export class Row {
     constructor(logger: CaptionsLogger);
     backSpace(): void;
+    // Warning: (ae-forgotten-export) The symbol "StyledUnicodeChar" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     chars: StyledUnicodeChar[];
     // (undocumented)
@@ -460,6 +510,10 @@ export class Row {
     copy(other: Row): void;
     // (undocumented)
     cueStartTime: number | null;
+    // Warning: (ae-forgotten-export) The symbol "PenState" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    currPenState: PenState;
     // (undocumented)
     equals(other: Row): boolean;
     // (undocumented)
@@ -469,6 +523,8 @@ export class Row {
     // (undocumented)
     isEmpty(): boolean;
     moveCursor(relPos: number): void;
+    // (undocumented)
+    pos: number;
     setCursor(absPos: number): void;
     // (undocumented)
     setPenStyles(styles: Partial<PenStyles>): void;
