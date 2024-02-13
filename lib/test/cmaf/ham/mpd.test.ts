@@ -8,6 +8,6 @@ describe('mpd2ham', async () => {
 	const convertedHam = await mpdToHam(dash1);
 
 	it('converts dash1 to ham', () => {
-		deepEqual(convertedHam, ham1);
+		deepEqual(convertedHam?.toJSON(), ham1);
 	});
 });

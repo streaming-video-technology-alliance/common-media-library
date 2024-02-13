@@ -1,6 +1,6 @@
 import { Segment } from './Segment.js';
-import { ElementVisitor } from '../visitor/ElementVisitor';
-import { IElement } from '../visitor/HamElement';
+import { ElementVisitor } from '../visitor/ElementVisitor.js';
+import { IElement } from '../visitor/HamElement.js';
 
 export abstract class Track implements IElement {
 	id: string;

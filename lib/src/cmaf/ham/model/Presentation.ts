@@ -13,6 +13,10 @@ export class Presentation implements IElement {
 		this.selectionSets = selectionSet;
 	}
 
+	public toJSON() {
+		return JSON.stringify(this);
+	}
+
 	accept(visitor: ElementVisitor): void {
 		visitor.visitPresentation(this);
 	}

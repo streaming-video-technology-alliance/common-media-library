@@ -1,5 +1,5 @@
-import { ElementVisitor } from '../visitor/ElementVisitor';
-import { IElement } from '../visitor/HamElement';
+import { ElementVisitor } from '../visitor/ElementVisitor.js';
+import { IElement } from '../visitor/HamElement.js';
 
 export class Segment implements IElement {
 	duration: number;

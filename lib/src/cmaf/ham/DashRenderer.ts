@@ -8,7 +8,7 @@ import {
 	TextTrack,
 	Track,
 	VideoTrack,
-} from './model';
+} from './model/index.js';
 
 export class DashRenderer implements ElementVisitor {
 	public visitPresentation(element: Presentation): void {

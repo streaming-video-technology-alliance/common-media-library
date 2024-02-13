@@ -291,7 +291,7 @@ export function isId3TimestampFrame(frame: Id3Frame): boolean;
 export function m3u8toHam(): Promise<void>;
 
 // @public (undocumented)
-export function mpdToHam(manifest: string): Promise<Presentation | undefined>;
+export function mpdToHam(manifest: string): Promise<Presentation | null>;
 
 // @public (undocumented)
 export function parseM3u8(text: string): any;
@@ -313,6 +313,8 @@ export class Presentation implements IElement {
     //
     // (undocumented)
     selectionSets: SelectionSet[];
+    // (undocumented)
+    toJSON(): string;
 }
 
 // @beta
@@ -411,8 +413,10 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public (undocumented)
-export abstract class Track {
+export abstract class Track implements IElement {
     constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[]);
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
     // (undocumented)
     bandwidth: number;
     // (undocumented)

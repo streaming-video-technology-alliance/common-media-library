@@ -1,6 +1,6 @@
 import { Track } from './Track.js';
 import { Segment } from './Segment.js';
-import { ElementVisitor } from '../visitor/ElementVisitor';
+import { ElementVisitor } from '../visitor/ElementVisitor.js';
 
 export class TextTrack extends Track {
 
