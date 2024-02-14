@@ -22,18 +22,6 @@ export class Presentation implements IElement {
 		visitor.visitPresentation(this);
 	}
 
-	public setId(id: string) {
-		this.id = id;
-	}
-
-	public setDuration(duration: number) {
-		this.duration = duration;
-	}
-
-	// public getAttributeNames(): string[] {
-	// 	return Object.getOwnPropertyNames(this).filter(e => e !== 'selectionSets');
-	// }
-
 	public getTracks(predicate?: (track: Track) => boolean): Track[] {
 		const tracks = this.selectionSets.flatMap(selectionSet =>
 			selectionSet.getTracks(),
