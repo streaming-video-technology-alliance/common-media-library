@@ -1,46 +1,53 @@
+import { toUint8 } from '../../../src/id3/util/utf8.js';
+
 export function generateId3(
 	frames: Uint8Array,
 	extendedHeader: boolean = false
-): Uint8Array {
-	// ID3 header prefix
-	const id3HeaderPrefix = stringToInts('ID3');
-	// Standard header setup
-	const standardHeader = new Uint8Array([
-		0x03,
-		0x00, // ID3 version 3.0
-		extendedHeader ? 0x40 : 0x00, // Conditional flag for extended header
-		0x00,
-		0x00,
-		0x00,
-		0x00, // Placeholder for size
-	]);
-
-	// Extended header, included only if specified
-	const extendedHeaderContent = extendedHeader
-		? new Uint8Array([
+) {
+	let result = concat(
+		stringToInts('ID3'),
+		new Uint8Array([
+			0x03,
+			0x00, // version 3.0 of ID3v2 (aka ID3v.2.3.0)
+			0x40, // flags. include an extended header
 			0x00,
 			0x00,
 			0x00,
-			0x06, // Extended header size (excluding itself), no CRC
-			0x00,
-			0x00, // Extended flags
-			0x00,
+			0x00, // size. set later
+			// extended header
 			0x00,
 			0x00,
-			0x02, // Size of padding
-		])
-		: new Uint8Array([]);
-
-	// Concatenate parts to form the complete ID3 header
-	const result = concat(
-		id3HeaderPrefix,
-		standardHeader,
-		extendedHeaderContent,
+			0x00,
+			0x06, // extended header size. no CRC
+			0x00,
+			0x00, // extended flags
+			0x00,
+			0x00,
+			0x00,
+			0x02, // size of padding
+		]),
 		frames
 	);
+	if (!extendedHeader) {
+		result = concat(
+			stringToInts('ID3'),
+			new Uint8Array([
+				0x03,
+				0x00, // version 3.0 of ID3v2 (aka ID3v.2.3.0)
+				0x00, // flags
+				0x00,
+				0x00,
+				0x00,
+				0x00, // size. set later
+			]),
+			frames
+		);
+	}
 
-	// Calculate and set the ID3 size excluding the header itself
-	const size = result.length - 10; // The ID3 header size (10 bytes) is not included in the size calculation
+	// size is stored as a sequence of four 7-bit integers with the
+	// high bit of each byte set to zero
+	const size = result.length - 10;
+
 	result[6] = (size >>> 21) & 0x7f;
 	result[7] = (size >>> 14) & 0x7f;
 	result[8] = (size >>> 7) & 0x7f;
@@ -49,20 +56,23 @@ export function generateId3(
 	return result;
 }
 
-export function generateId3Frame(type: string, value: Uint8Array): Uint8Array {
-	const header = new Uint8Array([
-		0x00,
-		0x00,
-		0x00,
-		0x00, // Placeholder for size
-		0xe0,
-		0x00, // Flags
-	]);
-	const typeBytes = stringToInts(type);
-	const result = concat(typeBytes, header, value);
+export function generateId3Frame(type: string, value: Uint8Array) {
+	const result = concat(
+		stringToInts(type),
+		new Uint8Array([
+			0x00,
+			0x00,
+			0x00,
+			0x00, // size
+			0xe0,
+			0x00, // flags
+		]),
+		value
+	);
 
-	// Calculate and set the size
-	const size = result.length - 10; // Subtract the header length
+	// set the size
+	const size = result.length - 10;
+
 	result[4] = (size >>> 21) & 0x7f;
 	result[5] = (size >>> 14) & 0x7f;
 	result[6] = (size >>> 7) & 0x7f;
@@ -71,36 +81,34 @@ export function generateId3Frame(type: string, value: Uint8Array): Uint8Array {
 	return result;
 }
 
-export function toArrayBuffer(view: BufferSource): ArrayBuffer {
-	if (view instanceof ArrayBuffer) {
-		return view;
-	} 
-	else {
-		if (view.byteOffset === 0 && view.byteLength === view.buffer.byteLength) {
-			// This is a TypedArray covering the whole buffer.
-			return view.buffer;
-		}
-		// This is a 'view' on the buffer. Create a new buffer that only contains
-		// the data. Note that since this isn't an ArrayBuffer, the 'new' call
-		// will allocate a new buffer to hold the copy.
-		return new Uint8Array(view.buffer, view.byteOffset, view.byteLength).buffer;
+function concat(...varArgs: BufferSource[]) {
+	let totalLength = 0;
+	for (let i = 0; i < varArgs.length; ++i) {
+		const value = varArgs[i];
+		totalLength += value.byteLength;
 	}
-}
 
-function stringToInts(str: string): Uint8Array {
-	return new Uint8Array(Array.from(str).map((char) => char.charCodeAt(0)));
-}
-
-function concat(...buffers: Uint8Array[]): Uint8Array {
-	const totalLength = buffers.reduce((acc, val) => acc + val.byteLength, 0);
 	const result = new Uint8Array(totalLength);
-
 	let offset = 0;
-	for (const buffer of buffers) {
-		result.set(buffer, offset);
-		offset += buffer.byteLength;
+
+	for (let i = 0; i < varArgs.length; ++i) {
+		const value = varArgs[i];
+		if (value instanceof Uint8Array) {
+			result.set(value, offset);
+		} 
+		else {
+			result.set(toUint8(value), offset);
+		}
+		offset += value.byteLength;
 	}
 
 	return result;
 }
 
+function stringToInts(string: string) {
+	const result: number[] = [];
+	for (let i = 0; i < string.length; i++) {
+		result[i] = string.charCodeAt(i);
+	}
+	return new Uint8Array(result);
+}

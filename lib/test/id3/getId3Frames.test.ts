@@ -1,5 +1,5 @@
 import { getId3Frames } from '@svta/common-media-library';
-import { equal, deepEqual } from 'node:assert';
+import { deepEqual, deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { DATA, DATA_BYTES, DATA_UINT8 } from './data/DATA.js';
 import { INFO, INFO_BYTES } from './data/INFO.js';
@@ -7,12 +7,12 @@ import { createId3 } from './data/createId3.js';
 import {
 	generateId3,
 	generateId3Frame,
-	toArrayBuffer,
 } from '../structuredfield/util/id3Generator.js';
+import { toArrayBuffer } from '../../src/id3/util/decodeId3ImageFrame.js';
 
 describe('getId3Frames', () => {
 	it('no valid data produces empty output', () => {
-		equal(getId3Frames(new Uint8Array([])), []);
+		deepStrictEqual(getId3Frames(new Uint8Array([])), []);
 	});
 
 	it('parse an APIC frame with image data', () => {
@@ -31,9 +31,7 @@ describe('getId3Frames', () => {
 				data: toArrayBuffer(new Uint8Array([1, 2, 3])),
 			},
 		];
-		const actualFrames = getId3Frames(apicID3);
-		console.log(actualFrames);
-		equal(getId3Frames(apicID3), expectedID3);
+		deepStrictEqual(getId3Frames(apicID3), expectedID3);
 	});
 
 	it('parse an APIC frame with image URL', () => {
@@ -52,9 +50,7 @@ describe('getId3Frames', () => {
 				data: 'google.com',
 			},
 		];
-		const actualFrames = getId3Frames(apicID3);
-		console.log(actualFrames);
-		equal(getId3Frames(apicID3), expectedID3);
+		deepStrictEqual(getId3Frames(apicID3), expectedID3);
 	});
 
 	it('parses PRIV frames', () => {

@@ -26,6 +26,11 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[] {
 
 	while (isId3Header(id3Data, offset)) {
 		const size = readId3Size(id3Data, offset + 6);
+
+		if ((id3Data[offset + 5] >> 6) & 1) {
+			// skip extended header
+			offset += 10;
+		}
 		// skip past ID3 header
 		offset += HEADER_FOOTER_SIZE;
 		const end = offset + size;
