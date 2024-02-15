@@ -16,8 +16,5 @@
 	"scripts": {
 		"build": "typedoc",
 		"start": "npm run build && npx -y http-server dist --cors -p 8080"
-	},
-	"devDependencies": {
-		"typedoc": "0.25.2"
 	}
 }
