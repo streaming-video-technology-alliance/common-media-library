@@ -10,6 +10,21 @@ export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, o
 // @beta
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
+// @public (undocumented)
+export class AudioTrack extends Track {
+    constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[], sampleRate: number, channels: number);
+    // Warning: (ae-forgotten-export) The symbol "ElementVisitor" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
+    // (undocumented)
+    channels: number;
+    // (undocumented)
+    static fromJSON(json: any): AudioTrack;
+    // (undocumented)
+    sampleRate: number;
+}
+
 // @beta
 export function base64decode(str: string): Uint8Array;
 
@@ -301,24 +316,18 @@ export function parseM3u8(text: string): any;
 // @public (undocumented)
 export class Presentation implements IElement {
     constructor(id: string, duration: number, selectionSet: SelectionSet[]);
-    // Warning: (ae-forgotten-export) The symbol "ElementVisitor" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     accept(visitor: ElementVisitor): void;
     // (undocumented)
     duration: number;
     // (undocumented)
-    getAttributeNames(): string[];
+    getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
     id: string;
-    // Warning: (ae-forgotten-export) The symbol "SelectionSet" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     selectionSets: SelectionSet[];
     // (undocumented)
     toString(): string;
-    // (undocumented)
-    update(attribute: string): boolean;
 }
 
 // @beta
@@ -343,6 +352,36 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
+
+// @public (undocumented)
+export class Segment implements IElement {
+    constructor(duration: number, url: string, byteRange: string | null);
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
+    // (undocumented)
+    byteRange: string | null;
+    // (undocumented)
+    duration: number;
+    // (undocumented)
+    static fromJSON(json: any): Segment;
+    // (undocumented)
+    url: string;
+}
+
+// @public (undocumented)
+export class SelectionSet implements IElement {
+    constructor(id: string, duration: number, switchingSet: SwitchingSet[]);
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
+    // (undocumented)
+    duration: number;
+    // (undocumented)
+    getTracks(predicate?: (track: Track) => boolean): Track[];
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    switchingSet: SwitchingSet[];
+}
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
@@ -398,6 +437,10 @@ export class SwitchingSet implements IElement {
     // (undocumented)
     duration: number;
     // (undocumented)
+    static fromJSON(json: any): SwitchingSet;
+    // (undocumented)
+    getTracks(predicate?: (track: Track) => boolean): Track[];
+    // (undocumented)
     id: string;
     // (undocumented)
     language: string;
@@ -405,7 +448,19 @@ export class SwitchingSet implements IElement {
     tracks: Track[];
     // (undocumented)
     type: string;
+    // (undocumented)
+    validateTracks(): boolean;
 }
+
+// @public (undocumented)
+class TextTrack_2 extends Track {
+    constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[]);
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
+    // (undocumented)
+    static fromJSON(json: any): TextTrack_2;
+}
+export { TextTrack_2 as TextTrack }
 
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};
@@ -431,8 +486,6 @@ export abstract class Track implements IElement {
     id: string;
     // (undocumented)
     language: string;
-    // Warning: (ae-forgotten-export) The symbol "Segment" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     segments: Segment[];
     // (undocumented)
@@ -447,5 +500,26 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 
 // @beta
 export function uuid(): string;
+
+// @public (undocumented)
+export class VideoTrack extends Track {
+    constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[], width: number, height: number, frameRate: number, par: string, sar: string, scanType: string);
+    // (undocumented)
+    accept(visitor: ElementVisitor): void;
+    // (undocumented)
+    frameRate: number;
+    // (undocumented)
+    static fromJSON(json: any): VideoTrack;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    par: string;
+    // (undocumented)
+    sar: string;
+    // (undocumented)
+    scanType: string;
+    // (undocumented)
+    width: number;
+}
 
 ```

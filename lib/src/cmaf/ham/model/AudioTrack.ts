@@ -25,4 +25,18 @@ export class AudioTrack extends Track {
 	override accept(visitor: ElementVisitor): void {
 		visitor.visitAudioTrack(this);
 	}
+
+	static fromJSON(json: any): AudioTrack {
+		return new AudioTrack(
+			json.id,
+			json.type,
+			json.codec,
+			+json.duration,
+			json.language,
+			+json.bandwidth,
+			json.segments.map((segment: any) => Segment.fromJSON(segment)),
+			+json.sampleRate,
+			+json.channels,
+		);
+	}
 }

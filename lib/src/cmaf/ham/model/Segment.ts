@@ -15,4 +15,12 @@ export class Segment implements IElement {
 	accept(visitor: ElementVisitor): void {
 		visitor.visitSegment(this);
 	}
+
+	static fromJSON(json: any) {
+		return new Segment(
+			json.duration,
+			json.url,
+			json.byteRange,
+		);
+	}
 }

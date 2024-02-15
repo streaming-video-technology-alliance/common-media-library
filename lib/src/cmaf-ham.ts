@@ -5,8 +5,6 @@
  *
  * @beta
  */
-export { Presentation } from './cmaf/ham/model/Presentation.js';
-export { SwitchingSet } from './cmaf/ham/model/SwitchingSet.js';
-export { Track } from './cmaf/ham/model/Track.js';
+export * from './cmaf/ham/model/index.js';
 export { m3u8toHam, mpdToHam } from './cmaf/ham/manifestParser.js';
 export { parseM3u8 } from './cmaf/utils/m3u8.js';
