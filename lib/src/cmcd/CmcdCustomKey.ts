@@ -1,5 +1,3 @@
-import { CmCustomKey } from '../cta/CmCustomKey.js';
-
 /**
  * A custom key for CMCD. Custom keys MUST carry a hyphenated prefix
  * to ensure that there will not be a namespace collision with future
@@ -10,4 +8,4 @@ import { CmCustomKey } from '../cta/CmCustomKey.js';
  *
  * @beta
  */
-export type CmcdCustomKey = CmCustomKey;
+export type CmcdCustomKey = `${string}-${string}`;

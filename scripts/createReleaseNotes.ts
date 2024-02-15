@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import { readFile, writeFile } from 'node:fs/promises';
 
 function release(version: string, changes: string) {
 	return `## Release Notes
@@ -16,7 +16,7 @@ npm install @svta/common-media-library@${version}
 }
 
 async function getChanges(version: string) {
-	const changeLog = await fs.readFile('./CHANGELOG.md', 'utf8');
+	const changeLog = await readFile('./CHANGELOG.md', 'utf8');
 	const logs = changeLog.split('\n\n\n');
 	const match = `## [${version}]`;
 	const log = logs.find(log => log.includes(match)) || '';
@@ -24,15 +24,15 @@ async function getChanges(version: string) {
 }
 
 async function getVersion() {
-	const pkg = await fs.readJson('./package.json');
-	return pkg.version;
+	const txt = await readFile('./package.json', 'utf8');
+	return JSON.parse(txt).version;
 }
 
 const createReleaseNotes = async () => {
 	const version = await getVersion();
 	const changes = await getChanges(version);
 	const releaseNotes = release(version, changes);
-	await fs.writeFile('./RELEASE.md', releaseNotes);
+	await writeFile('./RELEASE.md', releaseNotes);
 };
 
 createReleaseNotes();

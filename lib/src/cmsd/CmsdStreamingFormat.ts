@@ -1,8 +1,29 @@
 /**
- * Common Media Streaming Format
+ * Common Media Server Data Streaming Format
  *
  * @group CMSD
  *
  * @beta
  */
-export { CmStreamingFormat as CmsdStreamingFormat } from '../cta/CmStreamingFormat.js';
+export enum CmsdStreamingFormat {
+	/**
+	 * MPEG DASH
+	 */
+	DASH = 'd',
+
+	/**
+	 * HTTP Live Streaming (HLS)
+	 */
+	HLS = 'h',
+
+	/**
+	 * Smooth Streaming
+	 */
+	SMOOTH = 's',
+
+	/**
+	 * Other
+	 */
+	OTHER = 'o',
+}
+

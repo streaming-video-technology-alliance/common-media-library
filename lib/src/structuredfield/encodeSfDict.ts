@@ -4,7 +4,9 @@ import { serializeDict } from './serialize/serializeDict.js';
 /**
  * Encode an object into a structured field dictionary
  *
- * @param input - The structured field dictionary to encode
+ * @param value - The structured field dictionary to encode
+ * @param options - Encoding options
+ *
  * @returns The structured field string
  *
  * @group Structured Field

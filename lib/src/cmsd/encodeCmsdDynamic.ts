@@ -19,7 +19,7 @@ export function encodeCmsdDynamic(value: SfItem[]): string;
  * Encode a single CMSD Dynamic object.
  *
  * @param value - The server name
- * @param cmcd - The CMSD object to encode.
+ * @param cmsd - The CMSD object to encode.
  *
  * @returns The encoded CMSD string.
  *

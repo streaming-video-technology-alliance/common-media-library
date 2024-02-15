@@ -6,7 +6,8 @@ import { processCmsd } from './utils/processCmsd.js';
 /**
  * Encode a CMSD Static object.
  *
- * @param cmcd - The CMSD object to encode.
+ * @param cmsd - The CMSD object to encode.
+ * @param options - Encoding options
  *
  * @returns The encoded CMSD string.
  *
