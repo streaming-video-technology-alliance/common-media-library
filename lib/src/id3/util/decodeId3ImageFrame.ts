@@ -1,6 +1,6 @@
 import { DecodedId3Frame } from '../DecodedId3Frame.js';
 import { RawId3Frame } from './RawFrame.js';
-import { toUint8 } from '../../../src/id3/util/utf8.js';
+import { toUint8 } from './utf8.js';
 import { BufferSource } from 'stream/web';
 
 interface MetadataFrame {
