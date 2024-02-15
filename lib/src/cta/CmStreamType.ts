@@ -1,10 +1,7 @@
 /**
- * Common Media Streaming Type
+ * Common Media Stream Type
  *
- * @group CMCD
- * @group CMSD
- *
- * @beta
+ * @internal
  */
 export enum CmStreamType {
 	/**
