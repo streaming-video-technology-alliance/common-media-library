@@ -5,6 +5,7 @@
 	"entryPoints": [
 		"../lib/src/index.ts"
 	],
+	"excludeInternal": true,
 	"excludePrivate": true,
 	"hideGenerator": true,
 	"navigation": {

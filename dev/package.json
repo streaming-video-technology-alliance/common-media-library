@@ -14,9 +14,9 @@
 		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
 	},
 	"scripts": {
-		"start": "web-dev-server --node-resolve --open --watch"
+		"start": "wds --node-resolve --open --watch"
 	},
 	"devDependencies": {
-		"typedoc": "0.25.2"
+		"@web/dev-server": "0.4.2"
 	}
 }

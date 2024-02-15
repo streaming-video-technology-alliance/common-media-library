@@ -5,7 +5,7 @@ import { CmsdStatic } from './CmsdStatic.js';
 /**
  * Decode a CMSD Static dict string to an object.
  *
- * @param cmcd - The CMSD string to decode.
+ * @param cmsd - The CMSD string to decode.
  *
  * @returns The decoded CMSD object.
  *

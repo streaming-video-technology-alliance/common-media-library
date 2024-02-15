@@ -7,7 +7,7 @@ import { toCmcdHeaders } from './toCmcdHeaders.js';
  *
  * @param headers - The headers to append to.
  * @param cmcd - The CMCD object to append.
- * @param customHeaderMap - A map of custom CMCD keys to header fields.
+ * @param options - Encode options.
  *
  * @returns The headers with the CMCD header shards appended.
  *

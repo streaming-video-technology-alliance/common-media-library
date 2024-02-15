@@ -20,7 +20,7 @@ jobs:
           node-version: 20
           cache: 'npm'
           registry-url: "https://npm.pkg.github.com"
-          scope: "@cbsinteractive"
+          scope: "@svta"
 
       - name: Install
         run: npm ci
