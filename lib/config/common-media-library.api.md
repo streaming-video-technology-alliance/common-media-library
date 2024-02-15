@@ -303,6 +303,9 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
 // @public (undocumented)
+export function iso8601DurationToNumber(isoDuration: string): number;
+
+// @public (undocumented)
 export function m3u8toHam(): Promise<void>;
 
 // @public (undocumented)

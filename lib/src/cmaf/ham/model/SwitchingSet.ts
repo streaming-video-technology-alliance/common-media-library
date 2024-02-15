@@ -37,7 +37,6 @@ export class SwitchingSet implements IElement {
 				duration = track.duration;
 			}
 			if (track.duration !== duration) {
-				console.log({ track: track.duration, duration });
 				isValid = false;
 			}
 		});

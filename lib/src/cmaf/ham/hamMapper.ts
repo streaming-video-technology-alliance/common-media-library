@@ -4,11 +4,12 @@ import {
 	SelectionSet,
 	SwitchingSet,
 	Segment,
-	Track,
+	Track,	
 	VideoTrack,
 	AudioTrack,
 	TextTrack,
 } from './model/index.js';
+import { iso8601DurationToNumber } from '../utils/utils.js';
 
 function createTrack(
 	type: string,
@@ -62,7 +63,7 @@ function createTrack(
 
 export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 	const presentation: Presentation[] = rawManifest.MPD.Period.map((period) => {
-		const duration = +period.$.duration;
+		const duration = iso8601DurationToNumber(period.$.duration);
 		const url = 'url'; // todo: get real url
 
 		const selectionSetGroups: { [group: string]: SelectionSet } = {};

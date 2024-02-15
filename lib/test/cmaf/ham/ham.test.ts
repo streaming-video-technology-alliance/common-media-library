@@ -5,18 +5,18 @@ import { switchingSet1 } from './data/switchingSet1.js';
 
 describe('ham validation', () => {
 
-	it('returns empty array when all tracks are valid', () => {
+	it('returns true when all tracks are valid', () => {
 		const switchingSet = SwitchingSet.fromJSON(switchingSet1);
 
 		const valid = switchingSet.validateTracks();
 		equal(valid, true);
 	});
 
-	it('returns empty array when all tracks are valid', () => {
+	it('returns false when at least one track is not valid', () => {
 		const switchingSet = SwitchingSet.fromJSON(switchingSet1);
 		switchingSet.tracks[1].duration = 1;
 
 		const valid = switchingSet.validateTracks();
-		equal(valid, true);
+		equal(valid, false);
 	});
 });
