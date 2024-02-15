@@ -6,6 +6,6 @@ import { CmStreamType } from './CmStreamType.js';
 /**
  * A common media value.
  *
- * @beta
+ * @internal
  */
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;

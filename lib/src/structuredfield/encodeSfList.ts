@@ -5,7 +5,9 @@ import { serializeList } from './serialize/serializeList.js';
 /**
  * Encode a list into a structured field dictionary
  *
- * @param input - The structured field list to encode
+ * @param value - The structured field list to encode
+ * @param options - Encoding options
+ *
  * @returns The structured field string
  *
  * @group Structured Field
