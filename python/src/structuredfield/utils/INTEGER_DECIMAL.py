@@ -1,0 +1,4 @@
+from .DECIMAL import DECIMAL
+from .INTEGER import INTEGER
+
+INTEGER_DECIMAL = f"{INTEGER} or {DECIMAL}"
