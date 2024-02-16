@@ -24,8 +24,6 @@ async function readHLS(manifestUrl: string): Promise<string> {
 export async function m3u8toHam(url: string): Promise<Presentation> {
     const hls: string = await readHLS(url);
     const parsedM3u8 = parseM3u8(hls);
-    console.log(parsedM3u8);
-    // console.log(parsedM3u8)
     const playlists: PlayList[] = parsedM3u8.playlists;
     const mediaGroupsAudio = parsedM3u8.mediaGroups?.AUDIO;
     let audioSwitchingSets: SwitchingSet[] = [];
@@ -37,41 +35,56 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
     for (let audio in mediaGroupsAudio) {
         for (let attributes in mediaGroupsAudio[audio]) {
             let language = mediaGroupsAudio[audio][attributes].language;
-            audioTracks.push(new AudioTrack(audio, AUDIO_TYPE, '', 0, language, 0, 0, 0,[]));
-            audioSwitchingSets.push(new SwitchingSet(audio, AUDIO_TYPE, '', 0, language, audioTracks));
+            let uri = mediaGroupsAudio[audio][attributes].uri;       
+            let manifestUrl = formatSegmentUrl(url, uri);
+            let audioManifest = await readHLS(manifestUrl);
+            let audioParsed = parseM3u8(audioManifest);
+            let segments : Segment[] =await formatSegments(audioParsed?.segments);
+            let targetDuration = audioParsed?.targetDuration;
+            audioTracks.push(new AudioTrack(audio, AUDIO_TYPE, '', targetDuration, language, 0, 0, 0, segments));
+            audioSwitchingSets.push(new SwitchingSet(audio, AUDIO_TYPE, '', language, audioTracks));
         }
     }
 
     selectionSets.push(new SelectionSet(uuid(), audioSwitchingSets));
 
     //Add selection set of type video
+    let switchingSetVideos: SwitchingSet[] = [];
 
     await Promise.all(playlists.map(async (playlist: any) => {
-        console.log("playlist", playlist)
-        let manifestUrl = url.split("/").slice(0, -1).join("/") + "/" + playlist.uri;
+        let manifestUrl = formatSegmentUrl(url, playlist.uri);
         let hlsManifest = await readHLS(manifestUrl);
         let parsedHlsManifest = parseM3u8(hlsManifest);
-        let switchingSets: SwitchingSet[] = [];
         let tracks: Track[]= [];
+        let segments : Segment[] = await formatSegments(parsedHlsManifest?.segments)
+        let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
+        let targetDuration = parsedHlsManifest?.targetDuration;
+        let resolution = {width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height};
+        tracks.push(new VideoTrack(uuid(), VIDEO_TYPE,CODECS, targetDuration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
+        switchingSetVideos.push(new SwitchingSet(uuid(), VIDEO_TYPE, CODECS, LANGUAGE,tracks));
 
-
-        await Promise.all(parsedHlsManifest?.segments?.map(async (segment:any) => {
-            let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
-            let {duration,uri} = segment;
-            let resolution = {width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height};
-            let { length, offset } = segment.byterange;
-            let segments = [new Segment(duration ,uri,`${length}@${offset}`)];
-            tracks.push(new VideoTrack(uuid(), VIDEO_TYPE,CODECS, duration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
-            switchingSets.push(new SwitchingSet(uuid(), VIDEO_TYPE, CODECS, duration, LANGUAGE,tracks));
-        }));
-        selectionSets.push(new SelectionSet(uuid(), switchingSets));
     }));
+    selectionSets.push(new SelectionSet(uuid(), switchingSetVideos));
+
 
     return new Presentation(uuid(), selectionSets);
 }
+
+async function formatSegments(segments:any[]){
+    await Promise.all(segments.map(async (segment:any) => {
+        let {duration,uri} = segment;
+        let { length, offset } = segment.byterange;
+        segments.push(new Segment(duration ,uri,`${length}@${offset}`));
+    }));
+    return segments;
+}
+
+function formatSegmentUrl (url:string, segmentUrl:string){
+    return url.split("/").slice(0, -1).join("/") + "/" + segmentUrl;
+}
 (async () => {
     const url = 'https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/ToS_AVC_HEVC_MutliRate_MultiRes_IFrame_AAC.m3u8';
-    const ham = (await m3u8toHam(url)).selectionsSets[0];
+    const ham = (await m3u8toHam(url)).selectionsSets[1];
     const json =JSON.stringify(ham);
     fs.writeFileSync('ham.json',json) ;
 })();
