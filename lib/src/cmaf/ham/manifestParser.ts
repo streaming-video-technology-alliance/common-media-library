@@ -38,10 +38,10 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
             let manifestUrl = formatSegmentUrl(url, uri);
             let audioManifest = await readHLS(manifestUrl);
             let audioParsed = parseM3u8(audioManifest);
-            let segments : Segment[] =await formatSegments(audioParsed?.segments);
+            let segments : Segment[] = await formatSegments(audioParsed?.segments);
             let targetDuration = audioParsed?.targetDuration;
             audioTracks.push(new AudioTrack(audio, '', targetDuration, language, 0, 0, 0, segments));
-            audioSwitchingSets.push(new SwitchingSet(audio, '', language, audioTracks));
+            audioSwitchingSets.push(new SwitchingSet(audio, audioTracks));
         }
     }
 
@@ -59,8 +59,8 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
         let targetDuration = parsedHlsManifest?.targetDuration;
         let resolution = {width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height};
-        tracks.push(new VideoTrack(uuid(),CODECS, targetDuration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
-        switchingSetVideos.push(new SwitchingSet(uuid(), CODECS, LANGUAGE,tracks));
+        tracks.push(new VideoTrack(uuid(),CODECS, targetDuration, LANGUAGE, BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
+        switchingSetVideos.push(new SwitchingSet(uuid(),tracks));
 
     }));
     selectionSets.push(new SelectionSet(uuid(), switchingSetVideos));
