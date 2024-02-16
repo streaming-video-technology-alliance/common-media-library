@@ -8,6 +8,7 @@ import { PlayList } from './hlsManifest.js';
 import { AudioTrack } from './AudioTrack.js';
 import { Segment } from './Segment.js';
 import { VideoTrack } from './VideoTrack.js';
+import fs from 'fs';
 const AUDIO_TYPE = 'audio';
 const VIDEO_TYPE = 'video';
 
@@ -23,6 +24,8 @@ async function readHLS(manifestUrl: string): Promise<string> {
 export async function m3u8toHam(url: string): Promise<Presentation> {
     const hls: string = await readHLS(url);
     const parsedM3u8 = parseM3u8(hls);
+    console.log(parsedM3u8);
+    // console.log(parsedM3u8)
     const playlists: PlayList[] = parsedM3u8.playlists;
     const mediaGroupsAudio = parsedM3u8.mediaGroups?.AUDIO;
     let audioSwitchingSets: SwitchingSet[] = [];
@@ -34,8 +37,8 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
     for (let audio in mediaGroupsAudio) {
         for (let attributes in mediaGroupsAudio[audio]) {
             let language = mediaGroupsAudio[audio][attributes].language;
-            audioSwitchingSets.push(new SwitchingSet(audio, AUDIO_TYPE, '', 0, language,[]));
             audioTracks.push(new AudioTrack(audio, AUDIO_TYPE, '', 0, language, 0, 0, 0,[]));
+            audioSwitchingSets.push(new SwitchingSet(audio, AUDIO_TYPE, '', 0, language, audioTracks));
         }
     }
 
@@ -44,11 +47,13 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
     //Add selection set of type video
 
     await Promise.all(playlists.map(async (playlist: any) => {
+        console.log("playlist", playlist)
         let manifestUrl = url.split("/").slice(0, -1).join("/") + "/" + playlist.uri;
         let hlsManifest = await readHLS(manifestUrl);
         let parsedHlsManifest = parseM3u8(hlsManifest);
         let switchingSets: SwitchingSet[] = [];
         let tracks: Track[]= [];
+
 
         await Promise.all(parsedHlsManifest?.segments?.map(async (segment:any) => {
             let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
@@ -64,5 +69,13 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
 
     return new Presentation(uuid(), selectionSets);
 }
+(async () => {
+    const url = 'https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/ToS_AVC_HEVC_MutliRate_MultiRes_IFrame_AAC.m3u8';
+    const ham = (await m3u8toHam(url)).selectionsSets[0];
+    const json =JSON.stringify(ham);
+    fs.writeFileSync('ham.json',json) ;
+})();
+
+
 
 

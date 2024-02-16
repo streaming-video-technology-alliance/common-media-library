@@ -9,4 +9,8 @@ export class Presentation {
 		this.selectionsSets = selectionsSet;
 	}
 
+	toJson(): string {
+		return JSON.stringify(this);
+	}
+
 }
