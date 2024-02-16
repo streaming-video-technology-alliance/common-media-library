@@ -4,8 +4,8 @@ export class AudioTrack extends Track{
     sampleRate:number;
     channels:number;
 
-    constructor(id:string, type:string,codec:string,duration:number,language:string,bandwidth:number, sampleRate:number, channels:number, segments:Segment[]) {
-        super(id, type,codec,duration,language,bandwidth,segments);
+    constructor(id:string, codec:string,duration:number,language:string,bandwidth:number, sampleRate:number, channels:number, segments:Segment[]) {
+        super(id,codec,duration,language,bandwidth,segments);
         this.sampleRate = sampleRate;
         this.channels = channels;
     }

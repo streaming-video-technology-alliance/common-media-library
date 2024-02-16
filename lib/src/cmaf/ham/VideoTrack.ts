@@ -7,8 +7,8 @@ export class VideoTrack extends Track{
     frameRate:number;
 
 
-    constructor(id:string, type:string, codec:string, duration:number, language:string, bandwidth:number, width:number, height:number, frameRate:number, segments: Segment[]) {
-        super(id, type, codec, duration, language, bandwidth, segments);
+    constructor(id:string, codec:string, duration:number, language:string, bandwidth:number, width:number, height:number, frameRate:number, segments: Segment[]) {
+        super(id, codec, duration, language, bandwidth, segments);
         this.width = width;
         this.height = height;
         this.frameRate = frameRate;

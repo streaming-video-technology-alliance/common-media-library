@@ -9,8 +9,7 @@ import { AudioTrack } from './AudioTrack.js';
 import { Segment } from './Segment.js';
 import { VideoTrack } from './VideoTrack.js';
 import fs from 'fs';
-const AUDIO_TYPE = 'audio';
-const VIDEO_TYPE = 'video';
+
 
 async function readHLS(manifestUrl: string): Promise<string> {
     const response = await fetch(manifestUrl, {
@@ -41,8 +40,8 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
             let audioParsed = parseM3u8(audioManifest);
             let segments : Segment[] =await formatSegments(audioParsed?.segments);
             let targetDuration = audioParsed?.targetDuration;
-            audioTracks.push(new AudioTrack(audio, AUDIO_TYPE, '', targetDuration, language, 0, 0, 0, segments));
-            audioSwitchingSets.push(new SwitchingSet(audio, AUDIO_TYPE, '', language, audioTracks));
+            audioTracks.push(new AudioTrack(audio, '', targetDuration, language, 0, 0, 0, segments));
+            audioSwitchingSets.push(new SwitchingSet(audio, '', language, audioTracks));
         }
     }
 
@@ -60,8 +59,8 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
         let targetDuration = parsedHlsManifest?.targetDuration;
         let resolution = {width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height};
-        tracks.push(new VideoTrack(uuid(), VIDEO_TYPE,CODECS, targetDuration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
-        switchingSetVideos.push(new SwitchingSet(uuid(), VIDEO_TYPE, CODECS, LANGUAGE,tracks));
+        tracks.push(new VideoTrack(uuid(),CODECS, targetDuration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
+        switchingSetVideos.push(new SwitchingSet(uuid(), CODECS, LANGUAGE,tracks));
 
     }));
     selectionSets.push(new SelectionSet(uuid(), switchingSetVideos));
