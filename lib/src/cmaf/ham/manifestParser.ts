@@ -29,6 +29,8 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
     let audioTracks : AudioTrack[] = [];
     let selectionSets: SelectionSet[] = [];
     
+
+    // Add selection set of type audio
     for (let audio in mediaGroupsAudio) {
         for (let attributes in mediaGroupsAudio[audio]) {
             let language = mediaGroupsAudio[audio][attributes].language;
@@ -37,19 +39,16 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         }
     }
 
+    selectionSets.push(new SelectionSet(uuid(), audioSwitchingSets));
+
+    //Add selection set of type video
+
     await Promise.all(playlists.map(async (playlist: any) => {
         let manifestUrl = url.split("/").slice(0, -1).join("/") + "/" + playlist.uri;
         let hlsManifest = await readHLS(manifestUrl);
         let parsedHlsManifest = parseM3u8(hlsManifest);
         let switchingSets: SwitchingSet[] = [];
         let tracks: Track[]= [];
-        let audioId = playlist.attributes.AUDIO;
-
-        if (audioId) {
-            let audioSearched = audioSwitchingSets.find((audio) => audio.id === audioId);
-            let audioInSwitchingSet = switchingSets.find((audio) => audio.id === audioId);
-            if (audioSearched && !audioInSwitchingSet) switchingSets.push(audioSearched);
-        }
 
         await Promise.all(parsedHlsManifest?.segments?.map(async (segment:any) => {
             let {LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
