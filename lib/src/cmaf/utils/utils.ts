@@ -16,7 +16,7 @@ function iso8601DurationToNumber(isoDuration: string): number {
 	return duration;
 }
 
-function parseDurationMpd(duration: number) {
+function parseDurationMpd(duration: number): string {
 	const hours = Math.floor(duration / 3600);
 	const minutes = Math.floor((duration % 3600) / 60);
 	const seconds = duration % 60;

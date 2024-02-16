@@ -4,7 +4,7 @@ import {
 	SelectionSet,
 	SwitchingSet,
 	Segment,
-	Track,	
+	Track,
 	VideoTrack,
 	AudioTrack,
 	TextTrack,
@@ -25,10 +25,10 @@ function createTrack(
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
-			representation.$.bandwidth,
+			+representation.$.bandwidth,
 			segments,
-			adaptationSet.$.maxWidth ?? 0, // TODO: handle undefined values
-			adaptationSet.$.maxHeight ?? 0,
+			+(adaptationSet.$.maxWidth ?? 0),
+			+(adaptationSet.$.maxHeight ?? 0),
 			0, // TODO: add frameRate and scanType
 			adaptationSet.$.par ?? '',
 			adaptationSet.$.sar ?? '',
@@ -42,9 +42,9 @@ function createTrack(
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
-			representation.$.bandwidth,
+			+representation.$.bandwidth,
 			segments,
-			adaptationSet.$.audioSamplingRate ?? 0,
+			+(adaptationSet.$.audioSamplingRate ?? 0),
 			0, // TODO: add channels
 		);
 	}
@@ -55,7 +55,7 @@ function createTrack(
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
-			representation.$.bandwidth,
+			+representation.$.bandwidth,
 			segments,
 		);
 	}
@@ -63,8 +63,9 @@ function createTrack(
 
 export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 	const presentation: Presentation[] = rawManifest.MPD.Period.map((period) => {
-		const duration = iso8601DurationToNumber(period.$.duration);
-		const url = 'url'; // todo: get real url
+		const duration: number = iso8601DurationToNumber(period.$.duration);
+		const url: string = 'url'; // todo: get real url
+		const presentationId: string = 'presentation-id'; // todo: handle id
 
 		const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
@@ -99,7 +100,7 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 
 		const selectionSet: SelectionSet[] = Object.values(selectionSetGroups);
 
-		return new Presentation('id', duration, selectionSet);
+		return new Presentation(presentationId, duration, selectionSet);
 	});
 
 	return presentation[0];

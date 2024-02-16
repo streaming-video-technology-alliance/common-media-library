@@ -9,7 +9,7 @@ export const switchingSet1 = {
 			type: 'video',
 			duration: 734,
 			language: 'en',
-			bandwidth: '405000',
+			bandwidth: 405000,
 			segments: [
 				{
 					duration: 734,
@@ -17,8 +17,8 @@ export const switchingSet1 = {
 					byteRange: '761-1896',
 				},
 			],
-			width: '1680',
-			height: '750',
+			width: 1680,
+			height: 750,
 			frameRate: 0,
 			par: '56:25',
 			sar: '1:1',
@@ -29,7 +29,7 @@ export const switchingSet1 = {
 			type: 'video',
 			duration: 734,
 			language: 'en',
-			bandwidth: '759000',
+			bandwidth: 759000,
 			segments: [
 				{
 					duration: 734,
@@ -37,8 +37,8 @@ export const switchingSet1 = {
 					byteRange: '760-1895',
 				},
 			],
-			width: '1680',
-			height: '750',
+			width: 1680,
+			height: 750,
 			frameRate: 0,
 			par: '56:25',
 			sar: '1:1',
@@ -49,7 +49,7 @@ export const switchingSet1 = {
 			type: 'video',
 			duration: 734,
 			language: 'en',
-			bandwidth: '1026000',
+			bandwidth: 1026000,
 			segments: [
 				{
 					duration: 734,
@@ -57,8 +57,8 @@ export const switchingSet1 = {
 					byteRange: '761-1896',
 				},
 			],
-			width: '1680',
-			height: '750',
+			width: 1680,
+			height: 750,
 			frameRate: 0,
 			par: '56:25',
 			sar: '1:1',
@@ -69,7 +69,7 @@ export const switchingSet1 = {
 			type: 'video',
 			duration: 734,
 			language: 'en',
-			bandwidth: '1501000',
+			bandwidth: 1501000,
 			segments: [
 				{
 					duration: 734,
@@ -77,8 +77,8 @@ export const switchingSet1 = {
 					byteRange: '762-1897',
 				},
 			],
-			width: '1680',
-			height: '750',
+			width: 1680,
+			height: 750,
 			frameRate: 0,
 			par: '56:25',
 			sar: '1:1',
@@ -89,7 +89,7 @@ export const switchingSet1 = {
 			type: 'video',
 			duration: 734,
 			language: 'en',
-			bandwidth: '2205000',
+			bandwidth: 2205000,
 			segments: [
 				{
 					duration: 734,
@@ -97,8 +97,8 @@ export const switchingSet1 = {
 					byteRange: '762-1897',
 				},
 			],
-			width: '1680',
-			height: '750',
+			width: 1680,
+			height: 750,
 			frameRate: 0,
 			par: '56:25',
 			sar: '1:1',

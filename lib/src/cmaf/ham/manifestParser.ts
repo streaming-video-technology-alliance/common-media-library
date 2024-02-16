@@ -1,4 +1,4 @@
-import { parseMpd } from '../utils/dash/mpd.js';
+import { xmlToJson } from '../utils/xml.js';
 import { DashManifest } from '../utils/dash/DashManifest.js';
 import { mapMpdToHam } from './hamMapper.js';
 import { Presentation } from './model/index.js';
@@ -20,7 +20,7 @@ export async function m3u8toHam() {
 
 export async function mpdToHam(manifest: string): Promise<Presentation | null> {
 	let dashManifest: DashManifest | undefined;
-	await parseMpd(manifest, (result: DashManifest) => dashManifest = result);
+	await xmlToJson(manifest, (result: DashManifest) => dashManifest = result);
 
 	if (!dashManifest) {
 		return null;

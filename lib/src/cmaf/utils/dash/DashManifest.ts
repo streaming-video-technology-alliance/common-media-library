@@ -1,7 +1,7 @@
 type SegmentMpd = {
 	$: {
-		timescale?: number,
-		indexRangeExact?: boolean,
+		timescale?: string,
+		indexRangeExact?: string,
 		indexRange: string | null,
 	},
 	Initialization: [
@@ -16,7 +16,7 @@ type SegmentMpd = {
 type Representation = {
 	$: {
 		id: string,
-		bandwidth: number,
+		bandwidth: string,
 	},
 	BaseURL?: string[],
 	SegmentBase: SegmentMpd[]
@@ -33,14 +33,14 @@ type AdaptationSet = {
 		segmentAlignment?: string,
 		subsegmentAlignment?: string,
 		subsegmentStartsWithSAP?: string,
-		audioSamplingRate?: number,
+		audioSamplingRate?: string,
 		mimeType?: string,
 		codecs: string,
 		startWithSAP?: string,
 		par?: string;
 		sar?: string;
-		maxWidth?: number;
-		maxHeight?: number;
+		maxWidth?: string;
+		maxHeight?: string;
 
 	},
 	AudioChannelConfiguration?: any[],

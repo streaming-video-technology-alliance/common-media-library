@@ -18,14 +18,14 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 		return {
 			$: {
 				id: track.id,
-				bandwidth: track.bandwidth,
+				bandwidth: track.bandwidth.toString(),
 			},
 			SegmentBase: baseSegmentToSegment(track.segments),
 		};
 	});
 }
 
-function selectionToAdapationSet(selectionsSets: SelectionSet[]): AdaptationSet[] {
+function selectionToAdaptationSet(selectionsSets: SelectionSet[]): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
 		return selectionSet.switchingSet.map((switchingSet) => {
 			return {
@@ -50,7 +50,7 @@ function mapHamToMpd(hamManifest: Presentation): DashManifest {
 					$: {
 						duration: parseDurationMpd(hamManifest.duration),
 					},
-					AdaptationSet: selectionToAdapationSet(hamManifest.selectionSets),
+					AdaptationSet: selectionToAdaptationSet(hamManifest.selectionSets),
 				},
 			],
 		},

@@ -1,5 +1,5 @@
 export const ham1 = {
-	id: 'id',
+	id: 'presentation-id',
 	duration: 734,
 	selectionSets: [
 		{
@@ -19,7 +19,7 @@ export const ham1 = {
 							codec: 'mp4a.40.2',
 							duration: 734,
 							language: 'en',
-							bandwidth: '64349',
+							bandwidth: 64349,
 							segments: [
 								{
 									duration: 734,
@@ -27,7 +27,7 @@ export const ham1 = {
 									byteRange: '704-2211',
 								},
 							],
-							sampleRate: '48000',
+							sampleRate: 48000,
 							channels: 0,
 						},
 						{
@@ -36,7 +36,7 @@ export const ham1 = {
 							codec: 'mp4a.40.2',
 							duration: 734,
 							language: 'en',
-							bandwidth: '128407',
+							bandwidth: 128407,
 							segments: [
 								{
 									duration: 734,
@@ -44,7 +44,7 @@ export const ham1 = {
 									byteRange: '704-2211',
 								},
 							],
-							sampleRate: '48000',
+							sampleRate: 48000,
 							channels: 0,
 						},
 					],
@@ -66,7 +66,7 @@ export const ham1 = {
 							type: 'video',
 							duration: 734,
 							language: 'en',
-							bandwidth: '405000',
+							bandwidth: 405000,
 							segments: [
 								{
 									duration: 734,
@@ -74,8 +74,8 @@ export const ham1 = {
 									byteRange: '761-1896',
 								},
 							],
-							width: '1680',
-							height: '750',
+							width: 1680,
+							height: 750,
 							frameRate: 0,
 							par: '56:25',
 							sar: '1:1',
@@ -86,7 +86,7 @@ export const ham1 = {
 							type: 'video',
 							duration: 734,
 							language: 'en',
-							bandwidth: '759000',
+							bandwidth: 759000,
 							segments: [
 								{
 									duration: 734,
@@ -94,8 +94,8 @@ export const ham1 = {
 									byteRange: '760-1895',
 								},
 							],
-							width: '1680',
-							height: '750',
+							width: 1680,
+							height: 750,
 							frameRate: 0,
 							par: '56:25',
 							sar: '1:1',
@@ -106,7 +106,7 @@ export const ham1 = {
 							type: 'video',
 							duration: 734,
 							language: 'en',
-							bandwidth: '1026000',
+							bandwidth: 1026000,
 							segments: [
 								{
 									duration: 734,
@@ -114,8 +114,8 @@ export const ham1 = {
 									byteRange: '761-1896',
 								},
 							],
-							width: '1680',
-							height: '750',
+							width: 1680,
+							height: 750,
 							frameRate: 0,
 							par: '56:25',
 							sar: '1:1',
@@ -126,7 +126,7 @@ export const ham1 = {
 							type: 'video',
 							duration: 734,
 							language: 'en',
-							bandwidth: '1501000',
+							bandwidth: 1501000,
 							segments: [
 								{
 									duration: 734,
@@ -134,8 +134,8 @@ export const ham1 = {
 									byteRange: '762-1897',
 								},
 							],
-							width: '1680',
-							height: '750',
+							width: 1680,
+							height: 750,
 							frameRate: 0,
 							par: '56:25',
 							sar: '1:1',
@@ -146,7 +146,7 @@ export const ham1 = {
 							type: 'video',
 							duration: 734,
 							language: 'en',
-							bandwidth: '2205000',
+							bandwidth: 2205000,
 							segments: [
 								{
 									duration: 734,
@@ -154,8 +154,8 @@ export const ham1 = {
 									byteRange: '762-1897',
 								},
 							],
-							width: '1680',
-							height: '750',
+							width: 1680,
+							height: 750,
 							frameRate: 0,
 							par: '56:25',
 							sar: '1:1',
@@ -182,7 +182,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'en',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -206,7 +206,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'de',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -230,7 +230,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'es',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -254,7 +254,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'fr',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -278,7 +278,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'nl',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -302,7 +302,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'pt-br',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -326,7 +326,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'pt-pt',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -350,7 +350,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'ru',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -374,7 +374,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'zh',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
@@ -398,7 +398,7 @@ export const ham1 = {
 							codec: 'wvtt',
 							duration: 734,
 							language: 'zh-hans',
-							bandwidth: '1000',
+							bandwidth: 1000,
 							segments: [
 								{
 									duration: 734,
