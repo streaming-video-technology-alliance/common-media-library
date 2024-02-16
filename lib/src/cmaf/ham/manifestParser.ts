@@ -42,6 +42,7 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
             let audioParsed = parseM3u8(audioManifest);
             let segments : Segment[] = await formatSegments(audioParsed?.segments);
             let targetDuration = audioParsed?.targetDuration;
+            // TODO: retrieve channels, samplerate, bandwidth and codec
             audioTracks.push(new AudioTrack(audio, '', targetDuration, language, 0, 0, 0, segments));
             audioSwitchingSets.push(new SwitchingSet(audio, audioTracks));
         }
@@ -108,7 +109,7 @@ function formatSegmentUrl (url:string, segmentUrl:string){
 (async () => {
     const url = 'https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/ToS_AVC_HEVC_MutliRate_MultiRes_IFrame_AAC.m3u8';
     const ham = (await m3u8toHam(url));
-    await fs.writeFileSync('ham.json',JSON.stringify(ham.selectionsSets[1])) ;
+    await fs.writeFileSync('ham.json',JSON.stringify(ham)) ;
 })();
 
 
