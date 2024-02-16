@@ -41,7 +41,6 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         let manifestUrl = url.split("/").slice(0, -1).join("/") + "/" + playlist.uri;
         let hlsManifest = await readHLS(manifestUrl);
         let parsedHlsManifest = parseM3u8(hlsManifest);
-        let selectionSetDuration: number = 0;
         let switchingSets: SwitchingSet[] = [];
         let tracks: Track[]= [];
         let audioId = playlist.attributes.AUDIO;
@@ -57,12 +56,11 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
             let {duration,uri} = segment;
             let resolution = {width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height};
             let { length, offset } = segment.byterange;
-            selectionSetDuration += duration;
             let segments = [new Segment(duration ,uri,`${length}@${offset}`)];
             tracks.push(new VideoTrack(uuid(), VIDEO_TYPE,CODECS, duration, '', BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
             switchingSets.push(new SwitchingSet(uuid(), VIDEO_TYPE, CODECS, duration, LANGUAGE,tracks));
         }));
-        selectionSets.push(new SelectionSet(uuid(), selectionSetDuration, switchingSets));
+        selectionSets.push(new SelectionSet(uuid(), switchingSets));
     }));
 
     return new Presentation(uuid(), selectionSets);
