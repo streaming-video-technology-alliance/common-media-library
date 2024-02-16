@@ -1,5 +1,6 @@
 import { AdaptationSet, DashManifest, Representation, SegmentMpd } from './DashManifest.js';
 import { Presentation, SelectionSet, Segment, Track } from '../../ham/model/index.js';
+import { parseDurationMpd } from '../utils.js';
 
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentMpd[] {
 	return hamSegments.map((segment) => {
@@ -47,7 +48,7 @@ function mapHamToMpd(hamManifest: Presentation): DashManifest {
 			Period: [
 				{
 					$: {
-						duration: hamManifest.duration.toString(),
+						duration: parseDurationMpd(hamManifest.duration),
 					},
 					AdaptationSet: selectionToAdapationSet(hamManifest.selectionSets),
 				},
