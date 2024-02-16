@@ -67,7 +67,8 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         }
     }
 
-    selectionSets.push(new SelectionSet(uuid(), subtitleSwitchingSets));
+    if (subtitleSwitchingSets.length > 0)
+        selectionSets.push(new SelectionSet(uuid(), subtitleSwitchingSets));
 
     //Add selection set of type video
     let switchingSetVideos: SwitchingSet[] = [];
@@ -92,12 +93,13 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
 }
 
 async function formatSegments(segments:any[]){
+    let formattedSegments: Segment[] = [];
     await Promise.all(segments.map(async (segment:any) => {
         let {duration,uri} = segment;
         let { length, offset } = segment.byterange;
-        segments.push(new Segment(duration ,uri,`${length}@${offset}`));
+        formattedSegments.push(new Segment(duration ,uri,`${length}@${offset}`));
     }));
-    return segments;
+    return formattedSegments;
 }
 
 function formatSegmentUrl (url:string, segmentUrl:string){
@@ -105,9 +107,8 @@ function formatSegmentUrl (url:string, segmentUrl:string){
 }
 (async () => {
     const url = 'https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/ToS_AVC_HEVC_MutliRate_MultiRes_IFrame_AAC.m3u8';
-    const ham = (await m3u8toHam(url)).selectionsSets[1];
-    const json =JSON.stringify(ham);
-    fs.writeFileSync('ham.json',json) ;
+    const ham = (await m3u8toHam(url));
+    await fs.writeFileSync('ham.json',JSON.stringify(ham.selectionsSets[1])) ;
 })();
 
 
