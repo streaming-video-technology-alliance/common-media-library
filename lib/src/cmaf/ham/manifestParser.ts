@@ -7,6 +7,7 @@ import { Track } from './Track.js';
 import { PlayList } from './hlsManifest.js';
 import { AudioTrack } from './AudioTrack.js';
 import { Segment } from './Segment.js';
+import {TextTrack} from './TextTrack.js';
 import { VideoTrack } from './VideoTrack.js';
 import fs from 'fs';
 
@@ -25,6 +26,7 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
     const parsedM3u8 = parseM3u8(hls);
     const playlists: PlayList[] = parsedM3u8.playlists;
     const mediaGroupsAudio = parsedM3u8.mediaGroups?.AUDIO;
+    const mediaGroupsSubtitles = parsedM3u8.mediaGroups?.SUBTITLES;
     let audioSwitchingSets: SwitchingSet[] = [];
     let audioTracks : AudioTrack[] = [];
     let selectionSets: SelectionSet[] = [];
@@ -46,6 +48,26 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
     }
 
     selectionSets.push(new SelectionSet(uuid(), audioSwitchingSets));
+
+    let textTracks: TextTrack[] = [];
+    let subtitleSwitchingSets: SwitchingSet[] = [];
+    
+    // Add selection set of type subtitles
+    for (let subtitle in mediaGroupsSubtitles) {
+        for (let attributes in mediaGroupsSubtitles[subtitle]) {
+            let language = mediaGroupsSubtitles[subtitle][attributes].language;
+            let uri = mediaGroupsSubtitles[subtitle][attributes].uri;       
+            let manifestUrl = formatSegmentUrl(url, uri);
+            let subtitleManifest = await readHLS(manifestUrl);
+            let subtitleParsed = parseM3u8(subtitleManifest);
+            let segments : Segment[] = await formatSegments(subtitleParsed?.segments);
+            let targetDuration = subtitleParsed?.targetDuration;
+            textTracks.push(new TextTrack(subtitle, '', targetDuration, language, 0, segments));
+            subtitleSwitchingSets.push(new SwitchingSet(subtitle, audioTracks));
+        }
+    }
+
+    selectionSets.push(new SelectionSet(uuid(), subtitleSwitchingSets));
 
     //Add selection set of type video
     let switchingSetVideos: SwitchingSet[] = [];
