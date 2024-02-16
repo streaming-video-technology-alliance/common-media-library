@@ -65,7 +65,7 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
         selectionSets.push(new SelectionSet(uuid(), selectionSetDuration, switchingSets));
     }));
 
-    return new Presentation(uuid(), selectionSets[0].duration, selectionSets);
+    return new Presentation(uuid(), selectionSets);
 }
 
 
