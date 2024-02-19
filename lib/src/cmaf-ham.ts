@@ -6,6 +6,6 @@
  * @beta
  */
 export * from './cmaf/ham/model/index.js';
-export { m3u8toHam, mpdToHam } from './cmaf/ham/manifestParser.js';
+export { m3u8toHam, mpdToHam, hamToMpd } from './cmaf/ham/manifestConverter.js';
 export { parseM3u8 } from './cmaf/utils/m3u8.js';
 export { iso8601DurationToNumber } from './cmaf/utils/utils.js';

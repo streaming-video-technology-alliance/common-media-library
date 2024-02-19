@@ -6,12 +6,12 @@ import { Track } from './Track.js';
 export class SelectionSet implements IElement {
 	id: string;
 	duration: number;
-	switchingSet: SwitchingSet[];
+	switchingSets: SwitchingSet[];
 
 	constructor(id: string, duration: number, switchingSet: SwitchingSet[]) {
 		this.id = id;
 		this.duration = duration;
-		this.switchingSet = switchingSet;
+		this.switchingSets = switchingSet;
 	}
 
 	accept(visitor: ElementVisitor): void {
@@ -19,9 +19,17 @@ export class SelectionSet implements IElement {
 	}
 
 	public getTracks(predicate?: (track: Track) => boolean): Track[] {
-		const tracks = this.switchingSet.flatMap(switchingSet =>
+		const tracks = this.switchingSets.flatMap(switchingSet =>
 			switchingSet.getTracks(),
 		);
 		return (predicate) ? tracks.filter(predicate) : tracks;
+	}
+
+	static fromJSON(json: any): SelectionSet {
+		return new SelectionSet(
+			json.id,
+			+json.duration,
+			json.switchingSets.map((switchingSet: any) => SwitchingSet.fromJSON(switchingSet)),
+		);
 	}
 }

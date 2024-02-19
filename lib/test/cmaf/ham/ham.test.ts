@@ -20,3 +20,10 @@ describe('ham validation', () => {
 		equal(valid, false);
 	});
 });
+
+describe('deserialize ham', () => {
+
+	it ('deserializes track object', () => {
+
+	});
+});

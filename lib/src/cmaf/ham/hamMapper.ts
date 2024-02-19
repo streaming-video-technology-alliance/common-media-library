@@ -86,7 +86,7 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 				);
 			}
 
-			selectionSetGroups[adaptationSet.$.group].switchingSet.push(
+			selectionSetGroups[adaptationSet.$.group].switchingSets.push(
 				new SwitchingSet(
 					adaptationSet.$.id,
 					adaptationSet.$.contentType,

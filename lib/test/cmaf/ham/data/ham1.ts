@@ -5,7 +5,7 @@ export const ham1 = {
 		{
 			id: '1',
 			duration: 734,
-			switchingSet: [
+			switchingSets: [
 				{
 					id: '1',
 					type: 'audio',
@@ -54,7 +54,7 @@ export const ham1 = {
 		{
 			id: '2',
 			duration: 734,
-			switchingSet: [
+			switchingSets: [
 				{
 					id: '12',
 					type: 'video',
@@ -168,7 +168,7 @@ export const ham1 = {
 		{
 			id: '3',
 			duration: 734,
-			switchingSet: [
+			switchingSets: [
 				{
 					id: '2',
 					type: 'text',

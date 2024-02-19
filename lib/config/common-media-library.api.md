@@ -294,6 +294,9 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 // @beta
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
+// @public (undocumented)
+export function hamToMpd(ham: Presentation): Promise<string | null>;
+
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
@@ -323,6 +326,8 @@ export class Presentation implements IElement {
     accept(visitor: ElementVisitor): void;
     // (undocumented)
     duration: number;
+    // (undocumented)
+    static fromJSON(json: any): Presentation;
     // (undocumented)
     getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
@@ -379,11 +384,13 @@ export class SelectionSet implements IElement {
     // (undocumented)
     duration: number;
     // (undocumented)
+    static fromJSON(json: any): SelectionSet;
+    // (undocumented)
     getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
     id: string;
     // (undocumented)
-    switchingSet: SwitchingSet[];
+    switchingSets: SwitchingSet[];
 }
 
 // @beta

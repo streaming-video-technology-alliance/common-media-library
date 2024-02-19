@@ -29,4 +29,11 @@ export class Presentation implements IElement {
 		return (predicate) ? tracks.filter(predicate) : tracks;
 	}
 
+	static fromJSON(json: any): Presentation {
+		return new Presentation(
+			json.id,
+			+json.duration,
+			json.selectionSets.map((selectionSet: any) => SelectionSet.fromJSON(selectionSet)),
+		);
+	}
 }

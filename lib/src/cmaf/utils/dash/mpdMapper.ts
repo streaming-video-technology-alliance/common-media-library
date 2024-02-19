@@ -27,7 +27,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 
 function selectionToAdaptationSet(selectionsSets: SelectionSet[]): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
-		return selectionSet.switchingSet.map((switchingSet) => {
+		return selectionSet.switchingSets.map((switchingSet) => {
 			return {
 				$: {
 					id: switchingSet.id,
