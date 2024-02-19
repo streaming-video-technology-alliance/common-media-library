@@ -8,7 +8,7 @@ describe('decodeId3TextFrame', () => {
 		const frame = {
 			type: 'TXXX',
 			data: new Uint8Array([0, 102, 111, 111, 0, 97, 98, 99]),
-			size: 2, // required by the _decodeTextFrame function
+			size: 2, // required by the decodeTextFrame function
 		};
 
 		const testables = {

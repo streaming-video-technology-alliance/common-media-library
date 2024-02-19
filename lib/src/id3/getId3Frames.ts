@@ -29,7 +29,7 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[] {
 
 		if ((id3Data[offset + 5] >> 6) & 1) {
 			// skip extended header
-			offset += 10;
+			offset += HEADER_FOOTER_SIZE;
 		}
 		// skip past ID3 header
 		offset += HEADER_FOOTER_SIZE;
@@ -43,7 +43,7 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[] {
 			}
 
 			// skip frame header and frame data
-			offset += frameData.size + 10;
+			offset += frameData.size + HEADER_FOOTER_SIZE;
 		}
 
 		if (isId3Footer(id3Data, offset)) {

@@ -3,6 +3,8 @@ import { RawId3Frame } from './RawFrame.js';
 import { toUint8 } from './utf8.js';
 import { BufferSource } from 'stream/web';
 
+type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | Uint8ClampedArray;
+
 interface MetadataFrame {
 	key: string;
 	description: string;
@@ -162,8 +164,6 @@ function fromUTF8(data?: BufferSource) {
 
 	return decoded;
 }
-
-type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | Uint8ClampedArray;
 
 export function toArrayBuffer(view: ArrayBuffer | TypedArray): ArrayBuffer{
 	if (view instanceof ArrayBuffer) {
