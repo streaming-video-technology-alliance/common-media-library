@@ -1,7 +1,7 @@
 import { ElementVisitor } from '../visitor/ElementVisitor.js';
-import { IElement } from '../visitor/HamElement.js';
+import { IVisitorElement } from '../visitor/HamElement.js';
 
-export class Segment implements IElement {
+export class Segment implements IVisitorElement {
 	duration: number;
 	url: string;
 	byteRange: string | null;

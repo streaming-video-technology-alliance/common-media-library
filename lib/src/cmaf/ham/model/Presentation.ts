@@ -1,9 +1,10 @@
 import { SelectionSet } from './SelectionSet.js';
-import { IElement } from '../visitor/HamElement.js';
+import { IVisitorElement } from '../visitor/HamElement.js';
 import { ElementVisitor } from '../visitor/ElementVisitor.js';
 import { Track } from './Track.js';
+import { IHam } from '../interfaces/IHam.js';
 
-export class Presentation implements IElement {
+export class Presentation implements IHam, IVisitorElement {
 	id: string;
 	duration: number;
 	selectionSets: SelectionSet[];
@@ -18,6 +19,14 @@ export class Presentation implements IElement {
 		return JSON.stringify(this);
 	}
 
+	static fromJSON(json: any): Presentation {
+		return new Presentation(
+			json.id,
+			+json.duration,
+			json.selectionSets.map((selectionSet: any) => SelectionSet.fromJSON(selectionSet)),
+		);
+	}
+
 	accept(visitor: ElementVisitor): void {
 		visitor.visitPresentation(this);
 	}
@@ -27,13 +36,5 @@ export class Presentation implements IElement {
 			selectionSet.getTracks(),
 		);
 		return (predicate) ? tracks.filter(predicate) : tracks;
-	}
-
-	static fromJSON(json: any): Presentation {
-		return new Presentation(
-			json.id,
-			+json.duration,
-			json.selectionSets.map((selectionSet: any) => SelectionSet.fromJSON(selectionSet)),
-		);
 	}
 }

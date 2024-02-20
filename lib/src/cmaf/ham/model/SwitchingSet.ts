@@ -1,9 +1,10 @@
 import { Track } from './Track.js';
-import { IElement } from '../visitor/HamElement.js';
+import { IVisitorElement } from '../visitor/HamElement.js';
 import { ElementVisitor } from '../visitor/ElementVisitor.js';
 import { trackFromJSON } from '../../utils/ham/track.js';
+import { IHam } from '../interfaces/IHam.js';
 
-export class SwitchingSet implements IElement {
+export class SwitchingSet implements IHam, IVisitorElement {
 	id: string;
 	type: string;
 	codec: string;
@@ -18,6 +19,21 @@ export class SwitchingSet implements IElement {
 		this.duration = duration;
 		this.language = language;
 		this.tracks = tracks;
+	}
+
+	public toString(): string {
+		return JSON.stringify(this);
+	}
+
+	static fromJSON(json: any): SwitchingSet {
+		return new SwitchingSet(
+			json.id,
+			json.type,
+			json.codec,
+			+json.duration,
+			json.language,
+			json.tracks.map((track: any) => trackFromJSON(track, json.type)),
+		);
 	}
 
 	accept(visitor: ElementVisitor): void {
@@ -41,16 +57,5 @@ export class SwitchingSet implements IElement {
 			}
 		});
 		return isValid;
-	}
-
-	static fromJSON(json: any): SwitchingSet {
-		return new SwitchingSet(
-			json.id,
-			json.type,
-			json.codec,
-			+json.duration,
-			json.language,
-			json.tracks.map((track: any) => trackFromJSON(track, json.type)),
-		);
 	}
 }

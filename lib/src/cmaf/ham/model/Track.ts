@@ -1,8 +1,8 @@
 import { Segment } from './Segment.js';
 import { ElementVisitor } from '../visitor/ElementVisitor.js';
-import { IElement } from '../visitor/HamElement.js';
+import { IVisitorElement } from '../visitor/HamElement.js';
 
-export abstract class Track implements IElement {
+export abstract class Track implements IVisitorElement {
 	id: string;
 	type: string;
 	codec: string;
