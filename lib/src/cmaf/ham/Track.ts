@@ -16,7 +16,4 @@ export abstract class Track{
 		this.segments = segments;
 	}
 
-	public getResolution():any{
-		return {};
-	}
 }

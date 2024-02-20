@@ -1,6 +1,6 @@
-import { SelectionSet } from './SelectionSet';
-export class Presentation {
+import { SelectionSet } from './SelectionSet.js';
 
+export class Presentation {
 	id: string;
 	selectionsSets: SelectionSet[];
 

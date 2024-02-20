@@ -14,8 +14,4 @@ export class VideoTrack extends Track{
 		this.frameRate = frameRate;
 	}
 
-	public override getResolution():any{
-		super.getResolution();
-		return { width: this.width, height: this.height };
-	}
 }

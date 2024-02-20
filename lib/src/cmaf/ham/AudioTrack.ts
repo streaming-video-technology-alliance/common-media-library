@@ -1,5 +1,6 @@
 import { Track } from './Track.js';
 import { Segment } from './Segment.js';
+
 export class AudioTrack extends Track{
 	sampleRate:number;
 	channels:number;
