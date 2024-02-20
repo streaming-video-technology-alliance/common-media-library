@@ -8,8 +8,8 @@ export async function hamToM3u8(presentation: Presentation): Promise<m3u8> {
 	const playlists: PlayList[] = [];
 	let mediaGroups: MediaGroups = { AUDIO: {} };
 	const segments: Segment[] = [];
-	for (const selectionSet of presentation.selectionsSets) {
-		for (const switchingSet of selectionSet.switchingsSet) {
+	for (const selectionSet of presentation.selectionSets) {
+		for (const switchingSet of selectionSet.switchingSet) {
 			const { language, codec, type } = switchingSet;
 			if (type == AUDIO_TYPE){
 				const mediaGroup : MediaGroups = {

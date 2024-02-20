@@ -12,13 +12,13 @@ export type PlayList = {
 };
 
 export type MediaGroups = {
-    AUDIO: {
-        [key: string]: {
-            [key: string]: {
-                language: string;
-            };
-        };
-    };
+	AUDIO: {
+		[key: string]: {
+			[key: string]: {
+				language: string;
+			};
+		};
+	};
 };
 
 export type Segment = {
