@@ -56,6 +56,13 @@ type Period = {
 }
 
 type DashManifest = {
+	$?: {
+		xmlns?: string;
+		type?: string;
+		mediaPresentationDuration?: string;
+		minBufferTime?: string;
+		profiles?: string;
+	}
 	MPD: {
 		Period: Period[],
 	}

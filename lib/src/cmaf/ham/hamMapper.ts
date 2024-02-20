@@ -1,12 +1,14 @@
 import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest.js';
-import { Presentation } from './Presentation.js';
-import { SelectionSet } from './SelectionSet.js';
-import { Track } from './Track.js';
-import { SwitchingSet } from './SwitchingSet.js';
-import { Segment } from './Segment.js';
-import { VideoTrack } from './VideoTrack.js';
-import { AudioTrack } from './AudioTrack.js';
-import { TextTrack } from './TextTrack.js';
+import {
+	Presentation,
+	SelectionSet,
+	SwitchingSet,
+	Segment,
+	Track,
+	VideoTrack,
+	AudioTrack,
+	TextTrack,
+} from './model/index.js';
 
 function createTrack(
 	type: string,
@@ -77,7 +79,6 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 			if (!selectionSetGroups[adaptationSet.$.group]) {
 				selectionSetGroups[adaptationSet.$.group] = new SelectionSet(
 					adaptationSet.$.group,
-					duration,
 					[],
 				);
 			}
@@ -87,7 +88,6 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 					adaptationSet.$.id,
 					adaptationSet.$.contentType,
 					adaptationSet.$.codecs,
-					duration,
 					adaptationSet.$.lang,
 					tracks,
 				),
@@ -96,7 +96,7 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 
 		const selectionSet: SelectionSet[] = Object.values(selectionSetGroups);
 
-		return new Presentation('id', duration, selectionSet);
+		return new Presentation('id', selectionSet);
 	});
 
 	return presentation[0];

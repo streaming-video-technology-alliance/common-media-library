@@ -1,10 +1,12 @@
 /**
- * A collection of tools for working with Common Media Server Data (CMSD).
+ * A collection of tools for working with Common Media Application Format - Hypothetical Application Model (CMAF-HAM).
  *
  * @packageDocumentation
+ *
+ * @beta
  */
-export { Presentation } from './cmaf/ham/Presentation.js';
-export { SwitchingSet } from './cmaf/ham/SwitchingSet.js';
-export { Track } from './cmaf/ham/Track.js';
-export { hamToM3u8 } from './cmaf/ham/manifestParser.js';
+export { Presentation } from './cmaf/ham/model/Presentation.js';
+export { SwitchingSet } from './cmaf/ham/model/SwitchingSet.js';
+export { Track } from './cmaf/ham/model/Track.js';
+export { hamToM3u8, m3u8toHam, mpdToHam } from './cmaf/ham/manifestParser.js';
 export { parseM3u8 } from './cmaf/utils/m3u8.js';
