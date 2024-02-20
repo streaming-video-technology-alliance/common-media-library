@@ -1,6 +1,7 @@
 import { Segment } from './Segment.js';
 import { ElementVisitor } from '../visitor/ElementVisitor.js';
 import { IVisitorElement } from '../visitor/HamElement.js';
+import { VideoTrack } from './VideoTrack.js';
 
 export abstract class Track implements IVisitorElement {
 	id: string;
@@ -31,5 +32,9 @@ export abstract class Track implements IVisitorElement {
 
 	accept(visitor: ElementVisitor): void {
 		visitor.visitTrack(this);
+	}
+
+	isVideoTrack(track: any): track is VideoTrack {
+		return track.width !== undefined && track.height !== undefined && track.frameRate !== undefined;
 	}
 }
