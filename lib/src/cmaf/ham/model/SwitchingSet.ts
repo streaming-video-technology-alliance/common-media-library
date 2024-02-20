@@ -28,7 +28,6 @@ export class SwitchingSet implements IHam, IVisitorElement {
 			json.id,
 			json.type,
 			json.codec,
-			+json.duration,
 			json.language,
 			json.tracks.map((track: any) => trackFromJSON(track, json.type)),
 		);

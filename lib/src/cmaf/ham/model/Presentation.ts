@@ -20,7 +20,6 @@ export class Presentation implements IHam, IVisitorElement {
 	static fromJSON(json: any): Presentation {
 		return new Presentation(
 			json.id,
-			+json.duration,
 			json.selectionSets.map((selectionSet: any) => SelectionSet.fromJSON(selectionSet)),
 		);
 	}
