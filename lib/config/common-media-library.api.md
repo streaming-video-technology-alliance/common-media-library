@@ -279,6 +279,11 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 // @beta
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
+// Warning: (ae-forgotten-export) The symbol "m3u8" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export function hamToM3u8(presentation: Presentation): m3u8;
+
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
@@ -286,9 +291,6 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 //
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
-
-// @public (undocumented)
-export function m3u8toHam(): Promise<void>;
 
 // @public (undocumented)
 export function mpdToHam(manifest: string): Promise<Presentation | null>;
@@ -300,15 +302,11 @@ export function parseM3u8(text: string): any;
 //
 // @public (undocumented)
 export class Presentation implements IElement {
-    constructor(id: string, duration: number, selectionSet: SelectionSet[]);
+    constructor(id: string, selectionSet: SelectionSet[]);
     // Warning: (ae-forgotten-export) The symbol "ElementVisitor" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    getAttributeNames(): string[];
     // (undocumented)
     id: string;
     // Warning: (ae-forgotten-export) The symbol "SelectionSet" needs to be exported by the entry point index.d.ts
@@ -316,9 +314,7 @@ export class Presentation implements IElement {
     // (undocumented)
     selectionSets: SelectionSet[];
     // (undocumented)
-    toString(): string;
-    // (undocumented)
-    update(attribute: string): boolean;
+    toJSON(): string;
 }
 
 // @beta
@@ -390,13 +386,11 @@ export class SfToken {
 
 // @public (undocumented)
 export class SwitchingSet implements IElement {
-    constructor(id: string, type: string, codec: string, duration: number, language: string, tracks: Track[]);
+    constructor(id: string, type: string, codec: string, language: string, tracks: Track[]);
     // (undocumented)
     accept(visitor: ElementVisitor): void;
     // (undocumented)
     codec: string;
-    // (undocumented)
-    duration: number;
     // (undocumented)
     id: string;
     // (undocumented)
@@ -429,6 +423,10 @@ export abstract class Track implements IElement {
     duration: number;
     // (undocumented)
     id: string;
+    // Warning: (ae-forgotten-export) The symbol "VideoTrack" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    isVideoTrack(track: any): track is VideoTrack;
     // (undocumented)
     language: string;
     // Warning: (ae-forgotten-export) The symbol "Segment" needs to be exported by the entry point index.d.ts

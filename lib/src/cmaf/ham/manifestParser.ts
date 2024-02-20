@@ -1,4 +1,4 @@
-import { Presentation } from './Presentation.js';
+import { Presentation } from './model/index.js';
 import { m3u8, PlayList, MediaGroups, Segment } from './hlsManifest.js';
 import { parseMpd } from '../utils/dash/mpd.js';
 import { mapMpdToHam } from './hamMapper.js';
@@ -8,7 +8,7 @@ const AUDIO_TYPE = 'audio';
 const VIDEO_TYPE = 'video';
 
 
-function hamToM3u8(presentation: Presentation): Promise<m3u8> {
+function hamToM3u8(presentation: Presentation): m3u8 {
 	const playlists: PlayList[] = [];
 	let mediaGroups: MediaGroups = { AUDIO: {} };
 	const segments: Segment[] = [];
@@ -44,7 +44,7 @@ function hamToM3u8(presentation: Presentation): Promise<m3u8> {
 				}
 			}
 			const segment: Segment = {
-				duration: switchingSet.duration,
+				duration: switchingSet.tracks[0].duration,
 			};
 			segments.push(segment);
 		}
