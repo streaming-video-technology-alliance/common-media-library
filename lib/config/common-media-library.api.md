@@ -308,13 +308,15 @@ export class Presentation implements IElement {
     // (undocumented)
     accept(visitor: ElementVisitor): void;
     // (undocumented)
+    getTracks(predicate?: (track: Track) => boolean): Track[];
+    // (undocumented)
     id: string;
     // Warning: (ae-forgotten-export) The symbol "SelectionSet" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     selectionSets: SelectionSet[];
     // (undocumented)
-    toJSON(): string;
+    toString(): string;
 }
 
 // @beta
@@ -391,6 +393,8 @@ export class SwitchingSet implements IElement {
     accept(visitor: ElementVisitor): void;
     // (undocumented)
     codec: string;
+    // (undocumented)
+    getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
     id: string;
     // (undocumented)
