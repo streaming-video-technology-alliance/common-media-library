@@ -4,12 +4,10 @@ import { ElementVisitor } from '../visitor/ElementVisitor.js';
 
 export class SelectionSet implements IElement {
 	id: string;
-	duration: number;
 	switchingSet: SwitchingSet[];
 
-	constructor(id: string, duration: number, switchingSet: SwitchingSet[]) {
+	constructor(id: string, switchingSet: SwitchingSet[]) {
 		this.id = id;
-		this.duration = duration;
 		this.switchingSet = switchingSet;
 	}
 
