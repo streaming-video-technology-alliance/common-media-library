@@ -5,12 +5,10 @@ import { Track } from './Track.js';
 
 export class Presentation implements IElement {
 	id: string;
-	duration: number;
 	selectionSets: SelectionSet[];
 
-	constructor(id: string, duration: number, selectionSet: SelectionSet[]) {
+	constructor(id: string, selectionSet: SelectionSet[]) {
 		this.id = id;
-		this.duration = duration;
 		this.selectionSets = selectionSet;
 	}
 

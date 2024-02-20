@@ -47,7 +47,7 @@ function mapHamToMpd(hamManifest: Presentation): DashManifest {
 			Period: [
 				{
 					$: {
-						duration: hamManifest.duration.toString(),
+						duration: hamManifest.selectionSets[0].switchingSet[0].tracks[0].duration.toString(),
 					},
 					AdaptationSet: selectionToAdapationSet(hamManifest.selectionSets),
 				},
