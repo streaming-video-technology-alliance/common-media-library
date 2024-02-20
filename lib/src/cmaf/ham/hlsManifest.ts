@@ -1,15 +1,14 @@
 export type PlayList = {
-	uri: string;
-	attributes: {
-		AUDIO: string;
-		LANGUAGE: string;
-		CODECS: string;
-		BANDWIDTH: number;
-		RESOLUTION: {
-			width: number;
-			height: number;
-		};
-	};
+    uri: string;
+    attributes: {
+        CODECS: string;
+        BANDWIDTH: number;
+        FRAME_RATE: number;
+        RESOLUTION: {
+            width: number;
+            height: number;
+        };
+    };
 };
 
 export type MediaGroups = {
@@ -23,12 +22,11 @@ export type MediaGroups = {
 };
 
 export type Segment = {
-	duration: number;
-	map: string;
+    duration: number;
 };
 
 export type m3u8 = {
-	playlists: PlayList[];
-	mediaGroups: MediaGroups;
-	segments: Segment[];
+    playlists: PlayList[];
+    mediaGroups: MediaGroups;
+    segments: Segment[];
 };
