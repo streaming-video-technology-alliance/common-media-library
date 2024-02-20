@@ -1,29 +1,23 @@
-import { Segment } from './Segment.js';
+import { VideoTrack } from './VideoTrack.js';
 
-export abstract class Track {
+export abstract class Track{
 	id: string;
 	type: string;
-	codec: string;
-	duration: number;
-	language: string;
-	bandwidth: number;
-	segments: Segment[];
+	codec:string;
+	duration:number;
+	language:string;
+	bandwidth:number;
 
-	constructor(
-		id: string,
-		type: string,
-		codec: string,
-		duration: number,
-		language: string,
-		bandwidth: number,
-		segments: Segment[],
-	) {
+	constructor(id:string, type:string,codec:string,duration:number,language:string,bandwidth:number) {
 		this.id = id;
 		this.type = type;
 		this.codec = codec;
 		this.duration = duration;
 		this.language = language;
 		this.bandwidth = bandwidth;
-		this.segments = segments;
+	}
+    
+	isVideoTrack(track: any): track is VideoTrack {
+		return track.width !== undefined && track.height !== undefined && track.frameRate !== undefined;
 	}
 }
