@@ -1,11 +1,11 @@
-import { Track } from "./Track";
+import { Track } from './Track.js';
 
 export class SwitchingSet {
-    id: string;
-    tracks : Track[];
+	id: string;
+	tracks : Track[];
 
-    constructor(id:string, tracks:Track[]) {
-        this.id = id;
-        this.tracks = tracks;
-    }
+	constructor(id:string, tracks:Track[]) {
+		this.id = id;
+		this.tracks = tracks;
+	}
 }
