@@ -6,13 +6,11 @@ import { IHam } from '../interfaces/IHam.js';
 
 export class SelectionSet implements IHam, IVisitorElement {
 	id: string;
-	duration: number;
 	switchingSets: SwitchingSet[];
 
-	constructor(id: string, duration: number, switchingSet: SwitchingSet[]) {
+	constructor(id: string, switchingSets: SwitchingSet[]) {
 		this.id = id;
-		this.duration = duration;
-		this.switchingSets = switchingSet;
+		this.switchingSets = switchingSets;
 	}
 
 	public toString(): string {
@@ -22,7 +20,6 @@ export class SelectionSet implements IHam, IVisitorElement {
 	static fromJSON(json: any): SelectionSet {
 		return new SelectionSet(
 			json.id,
-			+json.duration,
 			json.switchingSets.map((switchingSet: any) => SwitchingSet.fromJSON(switchingSet)),
 		);
 	}

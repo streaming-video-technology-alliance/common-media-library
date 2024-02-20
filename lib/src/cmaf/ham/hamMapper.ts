@@ -81,7 +81,6 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 			if (!selectionSetGroups[adaptationSet.$.group]) {
 				selectionSetGroups[adaptationSet.$.group] = new SelectionSet(
 					adaptationSet.$.group,
-					duration,
 					[],
 				);
 			}
@@ -91,7 +90,6 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 					adaptationSet.$.id,
 					adaptationSet.$.contentType,
 					adaptationSet.$.codecs,
-					duration,
 					adaptationSet.$.lang,
 					tracks,
 				),
@@ -100,7 +98,7 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 
 		const selectionSet: SelectionSet[] = Object.values(selectionSetGroups);
 
-		return new Presentation(presentationId, duration, selectionSet);
+		return new Presentation(presentationId, selectionSet);
 	});
 
 	return presentation[0];

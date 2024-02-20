@@ -6,12 +6,10 @@ import { IHam } from '../interfaces/IHam.js';
 
 export class Presentation implements IHam, IVisitorElement {
 	id: string;
-	duration: number;
 	selectionSets: SelectionSet[];
 
-	constructor(id: string, duration: number, selectionSet: SelectionSet[]) {
+	constructor(id: string, selectionSet: SelectionSet[]) {
 		this.id = id;
-		this.duration = duration;
 		this.selectionSets = selectionSet;
 	}
 
