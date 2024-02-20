@@ -1,4 +1,4 @@
-import { SwitchingSet } from './SwitchingSet';
+import { SwitchingSet } from './SwitchingSet.js';
 export class SelectionSet {
 	id: string;
 	duration: number;

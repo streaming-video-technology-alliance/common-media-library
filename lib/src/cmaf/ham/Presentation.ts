@@ -1,6 +1,5 @@
-import { SelectionSet } from './SelectionSet';
+import { SelectionSet } from './SelectionSet.js';
 export class Presentation {
-
 	id: string;
 	duration: number;
 	selectionsSets: SelectionSet[];
