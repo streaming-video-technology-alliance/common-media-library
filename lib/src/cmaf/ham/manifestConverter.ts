@@ -1,5 +1,5 @@
 import { Presentation } from './model/index.js';
-import { m3u8, PlayList, MediaGroups, Segment } from './hlsManifest.js';
+import { m3u8, PlayList, MediaGroups, Segment } from './HlsManifest.js';
 import { jsonToXml, xmlToJson } from '../utils/xml.js';
 import { mapMpdToHam } from './hamMapper.js';
 import { mapHamToMpd } from '../utils/dash/mpdMapper.js';
