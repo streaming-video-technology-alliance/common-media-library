@@ -19,9 +19,9 @@ async function readHLS(manifestUrl: string): Promise<string> {
 	return response.text();
 }
 
-export async function m3u8toHam(url: string): Promise<Presentation> {
-	const hls: string = await readHLS(url);
-	const parsedM3u8 = parseM3u8(hls);
+
+export async function m3u8toHam(hlsManifest:string,url : string) : Promise<Presentation> {
+	const parsedM3u8 = parseM3u8(hlsManifest);
 	const playlists: PlayList[] = parsedM3u8.playlists;
 	const mediaGroupsAudio = parsedM3u8.mediaGroups?.AUDIO;
 	const mediaGroupsSubtitles = parsedM3u8.mediaGroups?.SUBTITLES;
@@ -89,6 +89,19 @@ export async function m3u8toHam(url: string): Promise<Presentation> {
 	selectionSets.push(new SelectionSet(uuid(), switchingSetVideos));
 
 	return new Presentation(uuid(), selectionSets);
+
+}
+
+
+export async function m3u8toHamFromManifest(hlsManifest:string, baseUrl:string) : Promise<Presentation> {
+	const hamParsed = await m3u8toHam(hlsManifest,baseUrl);
+	return hamParsed;
+}
+
+export async function m3u8toHamFromUrl(url: string): Promise<Presentation> {
+	const hlsManifest: string = await readHLS(url);
+	const hamParsed = await m3u8toHam(hlsManifest,url);
+	return hamParsed;
 }
 
 async function formatSegments(segments:any[]){
