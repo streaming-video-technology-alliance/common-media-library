@@ -6,7 +6,7 @@ export class TextTrack extends Track {
 
 	constructor(
 		id: string,
-		type : string,
+		type: string,
 		codec: string,
 		duration: number,
 		language: string,

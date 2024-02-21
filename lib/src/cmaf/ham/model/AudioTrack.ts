@@ -8,7 +8,7 @@ export class AudioTrack extends Track {
 
 	constructor(
 		id: string,
-		type : string,
+		type: string,
 		codec: string,
 		duration: number,
 		language: string,
@@ -17,7 +17,7 @@ export class AudioTrack extends Track {
 		sampleRate: number,
 		channels: number,
 	) {
-		super(id,type, codec, duration, language, bandwidth, segments);
+		super(id, type, codec, duration, language, bandwidth, segments);
 		this.sampleRate = sampleRate;
 		this.channels = channels;
 	}
