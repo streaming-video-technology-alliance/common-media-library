@@ -31,9 +31,9 @@ function selectionToAdapationSet(selectionsSets: SelectionSet[]): AdaptationSet[
 				$: {
 					id: switchingSet.id,
 					group: selectionSet.id,
-					contentType: switchingSet.type,
-					lang: switchingSet.language,
-					codecs: switchingSet.codec,
+					contentType: switchingSet.tracks[0].type,
+					lang: switchingSet.tracks[0].language,
+					codecs: switchingSet.tracks[0].codec,
 				},
 				Representation: trackToRepresentation(switchingSet.tracks),
 			};
