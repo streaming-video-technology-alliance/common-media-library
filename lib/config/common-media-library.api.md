@@ -388,21 +388,15 @@ export class SfToken {
 
 // @public (undocumented)
 export class SwitchingSet implements IElement {
-    constructor(id: string, type: string, codec: string, language: string, tracks: Track[]);
+    constructor(id: string, tracks: Track[]);
     // (undocumented)
     accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    codec: string;
     // (undocumented)
     getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
     id: string;
     // (undocumented)
-    language: string;
-    // (undocumented)
     tracks: Track[];
-    // (undocumented)
-    type: string;
 }
 
 // @beta
