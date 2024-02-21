@@ -1,4 +1,4 @@
-export type PlayList = {
+type PlayList = {
     uri: string;
     attributes: {
         FRAME_RATE: number;
@@ -11,7 +11,7 @@ export type PlayList = {
     };
 };
 
-export type MediaGroups = {
+type MediaGroups = {
 	AUDIO: {
 		[key: string]: {
 			[key: string]: {
@@ -21,12 +21,14 @@ export type MediaGroups = {
 	};
 };
 
-export type Segment = {
+type SegmentHls = {
     duration: number;
 };
 
-export type m3u8 = {
+type m3u8 = {
     playlists: PlayList[];
     mediaGroups: MediaGroups;
-    segments: Segment[];
+    segments: SegmentHls[];
 };
+
+export type { PlayList, MediaGroups, SegmentHls, m3u8 };

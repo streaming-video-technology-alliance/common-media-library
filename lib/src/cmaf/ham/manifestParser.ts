@@ -1,26 +1,14 @@
-import { parseM3u8 } from '../utils/m3u8.js';
-import { Presentation } from './Presentation.js';
-import { SelectionSet } from './SelectionSet.js';
-import { SwitchingSet } from './SwitchingSet.js';
+import { parseM3u8 } from '../utils/hls/m3u8.js';
 import { uuid } from '../../utils.js';
-import { Track } from './Track.js';
-import { PlayList } from './hlsManifest.js';
-import { AudioTrack } from './AudioTrack.js';
-import { Segment } from './Segment.js';
-import { TextTrack } from './TextTrack.js';
-import { VideoTrack } from './VideoTrack.js';
-
-async function readHLS(manifestUrl: string): Promise<string> {
-	const response = await fetch(manifestUrl, {
-		headers: {
-			'Content-Type': 'application/vnd.apple.mpegurl',
-		},
-	});
-	return response.text();
-}
+import { Presentation, SelectionSet, SwitchingSet , AudioTrack, TextTrack,VideoTrack, Track, Segment } from './model/index.js';
+import { parseMpd } from '../utils/dash/mpd.js';
+import { mapMpdToHam } from './hamMapper.js';
+import { formatSegmentUrl , readHLS , formatSegments } from '../utils/hls/hlsMapper.js';
+import type { DashManifest } from '../utils/dash/DashManifest.js';
+import type { m3u8, PlayList, MediaGroups, SegmentHls } from '../utils/hls/hlsManifest.js';
 
 
-export async function m3u8toHam(hlsManifest:string,url : string) : Promise<Presentation> {
+async function m3u8toHam(hlsManifest:string,url : string) : Promise<Presentation> {
 	const parsedM3u8 = parseM3u8(hlsManifest);
 	const playlists: PlayList[] = parsedM3u8.playlists;
 	const mediaGroupsAudio = parsedM3u8.mediaGroups?.AUDIO;
@@ -41,7 +29,7 @@ export async function m3u8toHam(hlsManifest:string,url : string) : Promise<Prese
 			const segments : Segment[] = await formatSegments(audioParsed?.segments);
 			const targetDuration = audioParsed?.targetDuration;
 			// TODO: retrieve channels, samplerate, bandwidth and codec
-			audioTracks.push(new AudioTrack(audio, '', targetDuration, language, 0, 0, 0, segments));
+			audioTracks.push(new AudioTrack(audio, '', targetDuration, language, 0, segments,0,0));
 			audioSwitchingSets.push(new SwitchingSet(audio, audioTracks));
 		}
 	}
@@ -82,7 +70,7 @@ export async function m3u8toHam(hlsManifest:string,url : string) : Promise<Prese
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 		const targetDuration = parsedHlsManifest?.targetDuration;
 		const resolution = { width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height };
-		tracks.push(new VideoTrack(uuid(),CODECS, targetDuration, LANGUAGE, BANDWIDTH,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],segments));
+		tracks.push(new VideoTrack(uuid(),CODECS, targetDuration, LANGUAGE, BANDWIDTH,segments,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],'','',''));
 		switchingSetVideos.push(new SwitchingSet(uuid(),tracks));
 	}));
 
@@ -92,35 +80,67 @@ export async function m3u8toHam(hlsManifest:string,url : string) : Promise<Prese
 
 }
 
+function hamToM3u8(presentation: Presentation): m3u8 {
+	const playlists: PlayList[] = [];
+	let mediaGroups: MediaGroups = { AUDIO: {} };
+	const segments: SegmentHls[] = [];
+  
+	presentation.selectionSets.forEach(selectionSet => {
+		selectionSet.switchingSet.forEach(switchingSet => {
+			switchingSet.tracks.forEach(track => {
+				if (track instanceof VideoTrack) {
+					playlists.push({
+						uri: '',
+						attributes: {
+							CODECS: track.codec,
+							BANDWIDTH: track.bandwidth,
+							FRAME_RATE: track.frameRate,
+							RESOLUTION: { width: track.width, height: track.height },
+						},
+					});
+				} 
+				else if (track instanceof AudioTrack) {
+					const mediaGroup: MediaGroups = {
+						AUDIO: {
+							[switchingSet.id]: {
+								[track.language]: { language: track.language },
+							},
+						},
+					};
+					mediaGroups = { ...mediaGroups, ...mediaGroup };
+				}
+				segments.push({ duration: switchingSet.tracks[0].duration });
+			});
+		});
+	});
+  
+	return { playlists, mediaGroups, segments };
+}
+  
+async function mpdToHam(manifest: string): Promise<Presentation | null> {
+	let dashManifest: DashManifest | undefined;
+	await parseMpd(manifest, (result: DashManifest) => dashManifest = result);
 
-export async function m3u8toHamFromManifest(hlsManifest:string, baseUrl:string) : Promise<Presentation> {
+	if (!dashManifest) {
+		return null;
+	}
+
+	return mapMpdToHam(dashManifest);
+}
+
+
+async function m3u8toHamFromManifest(hlsManifest:string, baseUrl:string) : Promise<Presentation> {
 	const hamParsed = await m3u8toHam(hlsManifest,baseUrl);
 	return hamParsed;
 }
 
-export async function m3u8toHamFromUrl(url: string): Promise<Presentation> {
+async function m3u8toHamFromUrl(url: string): Promise<Presentation> {
 	const hlsManifest: string = await readHLS(url);
 	const hamParsed = await m3u8toHam(hlsManifest,url);
 	return hamParsed;
 }
 
-async function formatSegments(segments:any[]){
-	const formattedSegments: Segment[] = [];
-	await Promise.all(segments.map(async (segment:any) => {
-		const { duration,uri } = segment;
-		const { length, offset } = segment.byterange;
-		formattedSegments.push(new Segment(duration ,uri,`${length}@${offset}`));
-	}));
 
-	return formattedSegments;
-}
-
-function formatSegmentUrl (url:string, segmentUrl:string){
-	return url.split('/').slice(0, -1).join('/') + '/' + segmentUrl;
-}
-
-
-
-
+export { m3u8toHam, m3u8toHamFromManifest, hamToM3u8, mpdToHam, m3u8toHamFromUrl };
 
 
