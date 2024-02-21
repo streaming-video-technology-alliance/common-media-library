@@ -5,7 +5,7 @@ import { parseMpd } from '../utils/dash/mpd.js';
 import { mapMpdToHam } from './hamMapper.js';
 import { formatSegmentUrl , readHLS , formatSegments } from '../utils/hls/hlsMapper.js';
 import type { DashManifest } from '../utils/dash/DashManifest.js';
-import type { m3u8, PlayList, MediaGroups, SegmentHls } from '../utils/hls/hlsManifest.js';
+import type { m3u8, PlayList, MediaGroups, SegmentHls } from '../utils/hls/HlsManifest.js';
 
 
 async function m3u8toHam(hlsManifest:string,url : string) : Promise<Presentation> {
