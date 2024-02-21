@@ -40,8 +40,6 @@ export class CaptionScreen {
     isEmpty(): boolean;
     // (undocumented)
     lastOutputScreen: CaptionScreen | null;
-    // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     logger: CaptionsLogger;
     // (undocumented)
@@ -67,6 +65,18 @@ export class CaptionScreen {
     setPen(styles: Partial<PenStyles>): void;
     // (undocumented)
     setRollUpRows(nrRows: number | null): void;
+}
+
+// @public (undocumented)
+export class CaptionsLogger {
+    // (undocumented)
+    log(severity: VerboseLevel, msg: string | (() => string)): void;
+    // (undocumented)
+    time: number | null;
+    // Warning: (ae-forgotten-export) The symbol "VerboseLevel" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    verboseLevel: VerboseLevel;
 }
 
 // @public (undocumented)
@@ -370,6 +380,32 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
+// @public (undocumented)
+export class PenState {
+    // (undocumented)
+    background: string;
+    // (undocumented)
+    copy(newPenState: PenState): void;
+    // (undocumented)
+    equals(other: PenState): boolean;
+    // (undocumented)
+    flash: boolean;
+    // (undocumented)
+    foreground: string;
+    // (undocumented)
+    isDefault(): boolean;
+    // (undocumented)
+    italics: boolean;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setStyles(styles: Partial<PenStyles>): void;
+    // (undocumented)
+    toString(): string;
+    // (undocumented)
+    underline: boolean;
+}
+
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
@@ -397,8 +433,6 @@ export function roundToEven(value: number, precision: number): number;
 export class Row {
     constructor(logger: CaptionsLogger);
     backSpace(): void;
-    // Warning: (ae-forgotten-export) The symbol "StyledUnicodeChar" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     chars: StyledUnicodeChar[];
     // (undocumented)
@@ -411,8 +445,6 @@ export class Row {
     copy(other: Row): void;
     // (undocumented)
     cueStartTime: number | null;
-    // Warning: (ae-forgotten-export) The symbol "PenState" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     currPenState: PenState;
     // (undocumented)
@@ -473,6 +505,26 @@ export class SfToken {
     constructor(description: string);
     // (undocumented)
     description: string;
+}
+
+// @public
+export class StyledUnicodeChar {
+    // (undocumented)
+    copy(newChar: StyledUnicodeChar): void;
+    // (undocumented)
+    equals(other: StyledUnicodeChar): boolean;
+    // (undocumented)
+    isEmpty(): boolean;
+    // (undocumented)
+    penState: PenState;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setChar(uchar: string, newPenState: PenState): void;
+    // (undocumented)
+    setPenState(newPenState: PenState): void;
+    // (undocumented)
+    uchar: string;
 }
 
 // @beta
