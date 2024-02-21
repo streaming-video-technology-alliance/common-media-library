@@ -15,7 +15,6 @@ export class TextTrack extends Track {
 	) {
 		super(id, type, codec, duration, language, bandwidth, segments);
 		this.id = id;
-		this.type = type;
 		this.codec = codec;
 		this.duration = duration;
 		this.language = language;

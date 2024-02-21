@@ -6,16 +6,10 @@ import { IHam } from '../interfaces/IHam.js';
 
 export class SwitchingSet implements IHam, IVisitorElement {
 	id: string;
-	type: string;
-	codec: string;
-	language: string;
 	tracks: Track[];
 
-	constructor(id: string, type: string, codec: string, language: string, tracks: Track[]) {
+	constructor(id: string, tracks: Track[]) {
 		this.id = id;
-		this.type = type;
-		this.codec = codec;
-		this.language = language;
 		this.tracks = tracks;
 	}
 

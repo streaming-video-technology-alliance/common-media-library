@@ -88,9 +88,6 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 			selectionSetGroups[adaptationSet.$.group].switchingSets.push(
 				new SwitchingSet(
 					adaptationSet.$.id,
-					adaptationSet.$.contentType,
-					adaptationSet.$.codecs,
-					adaptationSet.$.lang,
 					tracks,
 				),
 			);

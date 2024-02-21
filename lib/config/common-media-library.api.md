@@ -10,21 +10,6 @@ export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, o
 // @beta
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @public (undocumented)
-export class AudioTrack extends Track {
-    constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[], sampleRate: number, channels: number);
-    // Warning: (ae-forgotten-export) The symbol "ElementVisitor" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    channels: number;
-    // (undocumented)
-    static fromJSON(json: any): AudioTrack;
-    // (undocumented)
-    sampleRate: number;
-}
-
 // @beta
 export function base64decode(str: string): Uint8Array;
 
@@ -294,8 +279,10 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 // @beta
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
+// Warning: (ae-forgotten-export) The symbol "m3u8" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export function hamToMpd(ham: Presentation): Promise<string | null>;
+export function hamToM3u8(presentation: Presentation): m3u8;
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -304,12 +291,6 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 //
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
-
-// @public (undocumented)
-export function iso8601DurationToNumber(isoDuration: string): number;
-
-// @public (undocumented)
-export function m3u8toHam(): Promise<void>;
 
 // @public (undocumented)
 export function mpdToHam(manifest: string): Promise<Presentation | null>;
@@ -321,17 +302,17 @@ export function parseM3u8(text: string): any;
 //
 // @public (undocumented)
 export class Presentation implements IElement {
-    constructor(id: string, duration: number, selectionSet: SelectionSet[]);
+    constructor(id: string, selectionSet: SelectionSet[]);
+    // Warning: (ae-forgotten-export) The symbol "ElementVisitor" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    static fromJSON(json: any): Presentation;
     // (undocumented)
     getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
     id: string;
+    // Warning: (ae-forgotten-export) The symbol "SelectionSet" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     selectionSets: SelectionSet[];
     // (undocumented)
@@ -360,38 +341,6 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
-
-// @public (undocumented)
-export class Segment implements IElement {
-    constructor(duration: number, url: string, byteRange: string | null);
-    // (undocumented)
-    accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    byteRange: string | null;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    static fromJSON(json: any): Segment;
-    // (undocumented)
-    url: string;
-}
-
-// @public (undocumented)
-export class SelectionSet implements IElement {
-    constructor(id: string, duration: number, switchingSet: SwitchingSet[]);
-    // (undocumented)
-    accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    static fromJSON(json: any): SelectionSet;
-    // (undocumented)
-    getTracks(predicate?: (track: Track) => boolean): Track[];
-    // (undocumented)
-    id: string;
-    // (undocumented)
-    switchingSets: SwitchingSet[];
-}
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
@@ -439,38 +388,16 @@ export class SfToken {
 
 // @public (undocumented)
 export class SwitchingSet implements IElement {
-    constructor(id: string, type: string, codec: string, duration: number, language: string, tracks: Track[]);
+    constructor(id: string, tracks: Track[]);
     // (undocumented)
     accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    codec: string;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    static fromJSON(json: any): SwitchingSet;
     // (undocumented)
     getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
     id: string;
     // (undocumented)
-    language: string;
-    // (undocumented)
     tracks: Track[];
-    // (undocumented)
-    type: string;
-    // (undocumented)
-    validateTracks(): boolean;
 }
-
-// @public (undocumented)
-class TextTrack_2 extends Track {
-    constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[]);
-    // (undocumented)
-    accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    static fromJSON(json: any): TextTrack_2;
-}
-export { TextTrack_2 as TextTrack }
 
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};
@@ -494,8 +421,14 @@ export abstract class Track implements IElement {
     duration: number;
     // (undocumented)
     id: string;
+    // Warning: (ae-forgotten-export) The symbol "VideoTrack" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    isVideoTrack(track: any): track is VideoTrack;
     // (undocumented)
     language: string;
+    // Warning: (ae-forgotten-export) The symbol "Segment" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     segments: Segment[];
     // (undocumented)
@@ -510,26 +443,5 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 
 // @beta
 export function uuid(): string;
-
-// @public (undocumented)
-export class VideoTrack extends Track {
-    constructor(id: string, type: string, codec: string, duration: number, language: string, bandwidth: number, segments: Segment[], width: number, height: number, frameRate: number, par: string, sar: string, scanType: string);
-    // (undocumented)
-    accept(visitor: ElementVisitor): void;
-    // (undocumented)
-    frameRate: number;
-    // (undocumented)
-    static fromJSON(json: any): VideoTrack;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    par: string;
-    // (undocumented)
-    sar: string;
-    // (undocumented)
-    scanType: string;
-    // (undocumented)
-    width: number;
-}
 
 ```
