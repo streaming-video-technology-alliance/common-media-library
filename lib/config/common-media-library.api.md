@@ -40,8 +40,6 @@ export class CaptionScreen {
     isEmpty(): boolean;
     // (undocumented)
     lastOutputScreen: CaptionScreen | null;
-    // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     logger: CaptionsLogger;
     // (undocumented)
@@ -67,6 +65,18 @@ export class CaptionScreen {
     setPen(styles: Partial<PenStyles>): void;
     // (undocumented)
     setRollUpRows(nrRows: number | null): void;
+}
+
+// @public (undocumented)
+export class CaptionsLogger {
+    // (undocumented)
+    log(severity: VerboseLevel, msg: string | (() => string)): void;
+    // (undocumented)
+    time: number | null;
+    // Warning: (ae-forgotten-export) The symbol "VerboseLevel" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    verboseLevel: VerboseLevel;
 }
 
 // @public (undocumented)
@@ -496,8 +506,6 @@ export function roundToEven(value: number, precision: number): number;
 export class Row {
     constructor(logger: CaptionsLogger);
     backSpace(): void;
-    // Warning: (ae-forgotten-export) The symbol "StyledUnicodeChar" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     chars: StyledUnicodeChar[];
     // (undocumented)
@@ -510,8 +518,6 @@ export class Row {
     copy(other: Row): void;
     // (undocumented)
     cueStartTime: number | null;
-    // Warning: (ae-forgotten-export) The symbol "PenState" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     currPenState: PenState;
     // (undocumented)
