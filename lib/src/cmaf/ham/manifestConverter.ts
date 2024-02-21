@@ -1,21 +1,21 @@
 import {
+	AudioTrack,
 	Presentation,
+	Segment,
 	SelectionSet,
 	SwitchingSet,
-	AudioTrack,
 	TextTrack,
-	VideoTrack,
 	Track,
-	Segment,
+	VideoTrack,
 } from './model/index.js';
 import { parseM3u8 } from '../utils/hls/m3u8.js';
 import { uuid } from '../../utils.js';
-import { m3u8, PlayList, MediaGroups, SegmentHls } from '../utils/hls/HlsManifest.js';
+import { m3u8, MediaGroups, PlayList, SegmentHls } from '../utils/hls/HlsManifest.js';
 import { jsonToXml, xmlToJson } from '../utils/xml.js';
 import { mapMpdToHam } from './hamMapper.js';
 import { mapHamToMpd } from '../utils/dash/mpdMapper.js';
 import type { DashManifest } from '../utils/dash/DashManifest.js';
-
+import { formatSegments, formatSegmentUrl, readHLS } from '../utils/hls/hlsMapper.js';
 
 async function m3u8toHam(hlsManifest: string, url: string): Promise<Presentation> {
 	const parsedM3u8 = parseM3u8(hlsManifest);
@@ -130,14 +130,12 @@ function hamToM3u8(presentation: Presentation): m3u8 {
 }
 
 async function m3u8toHamFromManifest(hlsManifest: string, baseUrl: string): Promise<Presentation> {
-	const hamParsed = await m3u8toHam(hlsManifest, baseUrl);
-	return hamParsed;
+	return await m3u8toHam(hlsManifest, baseUrl);
 }
 
 async function m3u8toHamFromUrl(url: string): Promise<Presentation> {
 	const hlsManifest: string = await readHLS(url);
-	const hamParsed = await m3u8toHam(hlsManifest, url);
-	return hamParsed;
+	return await m3u8toHam(hlsManifest, url);
 }
 
 async function mpdToHam(manifest: string): Promise<Presentation | null> {
