@@ -5,15 +5,16 @@ on:
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  PKG_VERSION: ""
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       id-token: write
-    
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -35,7 +36,7 @@ jobs:
         run: npm run pub
 
       - name: Get Version
-        run: echo "version=`node -p "require('./package').version"`" >> $GITHUB_ENV
+        run: echo "PKG_VERSION=`node -p "require('./package').version"`" >> $GITHUB_ENV
 
       - name: Create Release Notes
         run: npm run notes
@@ -45,8 +46,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
         with:
-          tag_name: v${{ env.version }}
-          release_name: ${{ env.version }}
+          tag_name: v${{ env.PKG_VERSION }}
+          release_name: ${{ env.PKG_VERSION }}
           commitish: main
           body_path: ./RELEASE.md
           draft: true

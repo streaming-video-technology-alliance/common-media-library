@@ -4,6 +4,6 @@
  * revisions to this specification. Clients SHOULD use a reverse-DNS
  * syntax when defining their own prefix.
  *
- * @beta
+ * @internal
  */
 export type CmCustomKey = `${string}-${string}`;

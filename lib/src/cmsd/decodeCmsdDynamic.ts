@@ -4,7 +4,7 @@ import { CmsdDynamic } from './CmsdDynamic.js';
 /**
  * Decode a CMSD dynamic string to an object.
  *
- * @param cmcd - The CMSD string to decode.
+ * @param cmsd - The CMSD string to decode.
  *
  * @returns The decoded CMSD object.
  *

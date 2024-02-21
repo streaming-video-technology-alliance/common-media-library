@@ -1,4 +1,7 @@
-import { CmValue } from '../cta/CmValue.js';
+import type { SfToken } from '../structuredfield/SfToken';
+import type { CmcdObjectType } from './CmcdObjectType';
+import type { CmcdStreamType } from './CmcdStreamType';
+import type { CmcdStreamingFormat } from './CmcdStreamingFormat';
 
 /**
  * CMCD Value
@@ -7,4 +10,4 @@ import { CmValue } from '../cta/CmValue.js';
  *
  * @beta
  */
-export type CmcdValue = CmValue;
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
