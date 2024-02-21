@@ -29,7 +29,7 @@ async function m3u8toHam(hlsManifest:string,url : string) : Promise<Presentation
 			const segments : Segment[] = await formatSegments(audioParsed?.segments);
 			const targetDuration = audioParsed?.targetDuration;
 			// TODO: retrieve channels, samplerate, bandwidth and codec
-			audioTracks.push(new AudioTrack(audio, '', targetDuration, language, 0, segments,0,0));
+			audioTracks.push(new AudioTrack(audio,'AUDIO', '', targetDuration, language, 0, segments,0,0));
 			audioSwitchingSets.push(new SwitchingSet(audio, audioTracks));
 		}
 	}
@@ -49,7 +49,7 @@ async function m3u8toHam(hlsManifest:string,url : string) : Promise<Presentation
 			const subtitleParsed = parseM3u8(subtitleManifest);
 			const segments : Segment[] = await formatSegments(subtitleParsed?.segments);
 			const targetDuration = subtitleParsed?.targetDuration;
-			textTracks.push(new TextTrack(subtitle, '', targetDuration, language, 0, segments));
+			textTracks.push(new TextTrack(subtitle, 'TEXT','', targetDuration, language, 0, segments));
 			subtitleSwitchingSets.push(new SwitchingSet(subtitle, audioTracks));
 		}
 	}
@@ -70,7 +70,7 @@ async function m3u8toHam(hlsManifest:string,url : string) : Promise<Presentation
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 		const targetDuration = parsedHlsManifest?.targetDuration;
 		const resolution = { width: playlist.attributes.RESOLUTION.width, height: playlist.attributes.RESOLUTION.height };
-		tracks.push(new VideoTrack(uuid(),CODECS, targetDuration, LANGUAGE, BANDWIDTH,segments,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],'','',''));
+		tracks.push(new VideoTrack(uuid(),'VIDEO',CODECS, targetDuration, LANGUAGE, BANDWIDTH,segments,resolution.width,resolution.height,playlist.attributes['FRAME-RATE'],'','',''));
 		switchingSetVideos.push(new SwitchingSet(uuid(),tracks));
 	}));
 
@@ -88,7 +88,7 @@ function hamToM3u8(presentation: Presentation): m3u8 {
 	presentation.selectionSets.forEach(selectionSet => {
 		selectionSet.switchingSet.forEach(switchingSet => {
 			switchingSet.tracks.forEach(track => {
-				if (track instanceof VideoTrack) {
+				if (track.type === 'VIDEO' && track.isVideoTrack(track)){
 					playlists.push({
 						uri: '',
 						attributes: {
@@ -99,7 +99,7 @@ function hamToM3u8(presentation: Presentation): m3u8 {
 						},
 					});
 				} 
-				else if (track instanceof AudioTrack) {
+				else if (track.type === 'AUDIO') {
 					const mediaGroup: MediaGroups = {
 						AUDIO: {
 							[switchingSet.id]: {
