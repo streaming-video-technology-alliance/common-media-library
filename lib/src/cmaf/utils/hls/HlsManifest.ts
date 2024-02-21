@@ -1,14 +1,14 @@
 type PlayList = {
-    uri: string;
-    attributes: {
-        FRAME_RATE: number;
-        CODECS: string;
-        BANDWIDTH: number;
-        RESOLUTION: {
-            width: number;
-            height: number;
-        };
-    };
+	uri: string;
+	attributes: {
+		FRAME_RATE: number;
+		CODECS: string;
+		BANDWIDTH: number;
+		RESOLUTION: {
+			width: number;
+			height: number;
+		};
+	};
 };
 
 type MediaGroups = {
@@ -22,13 +22,13 @@ type MediaGroups = {
 };
 
 type SegmentHls = {
-    duration: number;
+	duration: number;
 };
 
 type m3u8 = {
-    playlists: PlayList[];
-    mediaGroups: MediaGroups;
-    segments: SegmentHls[];
+	playlists: PlayList[];
+	mediaGroups: MediaGroups;
+	segments: SegmentHls[];
 };
 
 export type { PlayList, MediaGroups, SegmentHls, m3u8 };

@@ -308,13 +308,15 @@ export class Presentation implements IElement {
     // (undocumented)
     accept(visitor: ElementVisitor): void;
     // (undocumented)
+    getTracks(predicate?: (track: Track) => boolean): Track[];
+    // (undocumented)
     id: string;
     // Warning: (ae-forgotten-export) The symbol "SelectionSet" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     selectionSets: SelectionSet[];
     // (undocumented)
-    toJSON(): string;
+    toString(): string;
 }
 
 // @beta
@@ -386,19 +388,15 @@ export class SfToken {
 
 // @public (undocumented)
 export class SwitchingSet implements IElement {
-    constructor(id: string, type: string, codec: string, language: string, tracks: Track[]);
+    constructor(id: string, tracks: Track[]);
     // (undocumented)
     accept(visitor: ElementVisitor): void;
     // (undocumented)
-    codec: string;
+    getTracks(predicate?: (track: Track) => boolean): Track[];
     // (undocumented)
     id: string;
     // (undocumented)
-    language: string;
-    // (undocumented)
     tracks: Track[];
-    // (undocumented)
-    type: string;
 }
 
 // @beta

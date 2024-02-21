@@ -1,6 +1,6 @@
 import { Segment } from '../../ham/model/Segment.js';
 
-function formatSegmentUrl (url:string, segmentUrl:string){
+function formatSegmentUrl(url: string, segmentUrl: string) {
 	return url.split('/').slice(0, -1).join('/') + '/' + segmentUrl;
 }
 
@@ -13,12 +13,12 @@ async function readHLS(manifestUrl: string): Promise<string> {
 	return response.text();
 }
 
-async function formatSegments(segments:any[]){
+async function formatSegments(segments: any[]) {
 	const formattedSegments: Segment[] = [];
-	await Promise.all(segments.map(async (segment:any) => {
-		const { duration,uri } = segment;
+	await Promise.all(segments.map(async (segment: any) => {
+		const { duration, uri } = segment;
 		const { length, offset } = segment.byterange;
-		formattedSegments.push(new Segment(duration ,uri,`${length}@${offset}`));
+		formattedSegments.push(new Segment(duration, uri, `${length}@${offset}`));
 	}));
 
 	return formattedSegments;
