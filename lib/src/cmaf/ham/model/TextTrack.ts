@@ -6,7 +6,7 @@ export class TextTrack extends Track {
 
 	constructor(
 		id: string,
-		type: string,
+		type : string,
 		codec: string,
 		duration: number,
 		language: string,
@@ -15,7 +15,6 @@ export class TextTrack extends Track {
 	) {
 		super(id, type, codec, duration, language, bandwidth, segments);
 		this.id = id;
-		this.type = type;
 		this.codec = codec;
 		this.duration = duration;
 		this.language = language;

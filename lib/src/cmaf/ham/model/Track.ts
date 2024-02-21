@@ -5,7 +5,7 @@ import { VideoTrack } from './VideoTrack.js';
 
 export abstract class Track implements IElement {
 	id: string;
-	type: string;
+	type : string;
 	codec: string;
 	duration: number;
 	language: string;
@@ -14,7 +14,7 @@ export abstract class Track implements IElement {
 
 	constructor(
 		id: string,
-		type: string,
+		type : string,
 		codec: string,
 		duration: number,
 		language: string,
