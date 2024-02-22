@@ -1,5 +1,5 @@
-export * from './Presentation.js';
-export * from './SelectionSet.js';
-export * from './SwitchingSet.js';
-export * from './Track.js';
-export * from './Segment.js';
+export type * from './Presentation.js';
+export type * from './SelectionSet.js';
+export type * from './SwitchingSet.js';
+export type * from './Track.js';
+export type * from './Segment.js';
