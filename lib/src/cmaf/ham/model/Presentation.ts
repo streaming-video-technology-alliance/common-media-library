@@ -21,10 +21,9 @@ export class Presentation implements IElement {
 	}
 
 	public getTracks(predicate?: (track: Track) => boolean): Track[] {
-		const tracks = this.selectionSets.flatMap(selectionSet =>
-			selectionSet.getTracks(),
+		const tracks = this.selectionSets.flatMap((selectionSet) =>
+			selectionSet.getTracks()
 		);
-		return (predicate) ? tracks.filter(predicate) : tracks;
+		return predicate ? tracks.filter(predicate) : tracks;
 	}
-
 }

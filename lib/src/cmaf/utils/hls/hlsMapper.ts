@@ -15,11 +15,13 @@ async function readHLS(manifestUrl: string): Promise<string> {
 
 async function formatSegments(segments: any[]) {
 	const formattedSegments: Segment[] = [];
-	await Promise.all(segments.map(async (segment: any) => {
-		const { duration, uri } = segment;
-		const { length, offset } = segment.byterange;
-		formattedSegments.push(new Segment(duration, uri, `${length}@${offset}`));
-	}));
+	await Promise.all(
+		segments.map(async (segment: any) => {
+			const { duration, uri } = segment;
+			const { length, offset } = segment.byterange;
+			formattedSegments.push(new Segment(duration, uri, `${length}@${offset}`));
+		})
+	);
 
 	return formattedSegments;
 }

@@ -15,7 +15,7 @@ export class AudioTrack extends Track {
 		bandwidth: number,
 		segments: Segment[],
 		sampleRate: number,
-		channels: number,
+		channels: number
 	) {
 		super(id, type, codec, duration, language, bandwidth, segments);
 		this.sampleRate = sampleRate;

@@ -1,12 +1,14 @@
 {
 	"extends": [
 		"eslint:recommended",
-		"plugin:@typescript-eslint/recommended"
+		"plugin:@typescript-eslint/recommended",
+		"prettier"
 	],
 	"parser": "@typescript-eslint/parser",
 	"plugins": [
 		"@typescript-eslint",
-		"eslint-plugin-tsdoc"
+		"eslint-plugin-tsdoc",
+		"prettier"
 	],
 	"env": {
 		"es6": true,
@@ -82,7 +84,17 @@
 				"allowSingleLine": false
 			}
 		],
-		"tsdoc/syntax": "warn"
+		"tsdoc/syntax": "warn",
+		"prettier/prettier": [
+			0,
+			{
+				"trailingComma": "es5",
+				"tabWidth": 4,
+				"semi": true,
+				"singleQuote": true,
+				"insertFinalNewline": true
+			}
+		]
 	},
 	"ignorePatterns": [
 		"**/dist"

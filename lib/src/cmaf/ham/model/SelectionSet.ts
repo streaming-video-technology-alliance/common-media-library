@@ -17,9 +17,9 @@ export class SelectionSet implements IElement {
 	}
 
 	public getTracks(predicate?: (track: Track) => boolean): Track[] {
-		const tracks = this.switchingSet.flatMap(switchingSet =>
-			switchingSet.getTracks(),
+		const tracks = this.switchingSet.flatMap((switchingSet) =>
+			switchingSet.getTracks()
 		);
-		return (predicate) ? tracks.filter(predicate) : tracks;
+		return predicate ? tracks.filter(predicate) : tracks;
 	}
 }

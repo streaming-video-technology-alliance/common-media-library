@@ -1,4 +1,8 @@
-import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest.js';
+import {
+	AdaptationSet,
+	DashManifest,
+	Representation,
+} from '../utils/dash/DashManifest.js';
 import {
 	Presentation,
 	SelectionSet,
@@ -15,7 +19,7 @@ function createTrack(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
 	duration: number,
-	segments: Segment[],
+	segments: Segment[]
 ): AudioTrack | VideoTrack | TextTrack {
 	if (type === 'video') {
 		return new VideoTrack(
@@ -31,10 +35,9 @@ function createTrack(
 			0, // TODO: add frameRate and scanType
 			adaptationSet.$.par ?? '',
 			adaptationSet.$.sar ?? '',
-			'',
+			''
 		);
-	}
-	else if (type === 'audio') {
+	} else if (type === 'audio') {
 		return new AudioTrack(
 			representation.$.id,
 			adaptationSet.$.contentType,
@@ -44,10 +47,10 @@ function createTrack(
 			representation.$.bandwidth,
 			segments,
 			adaptationSet.$.audioSamplingRate ?? 0,
-			0, // TODO: add channels
+			0 // TODO: add channels
 		);
-	}
-	else { // if (type === 'text')
+	} else {
+		// if (type === 'text')
 		return new TextTrack(
 			representation.$.id,
 			adaptationSet.$.contentType,
@@ -55,7 +58,7 @@ function createTrack(
 			duration,
 			adaptationSet.$.lang,
 			representation.$.bandwidth,
-			segments,
+			segments
 		);
 	}
 }
@@ -68,26 +71,31 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 		const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
 		period.AdaptationSet.map((adaptationSet) => {
-			const tracks: Track[] = adaptationSet.Representation.map((representation) => {
-				const segments = representation.SegmentBase.map((segment) =>
-					new Segment(duration, url, segment.$.indexRange),
-				);
+			const tracks: Track[] = adaptationSet.Representation.map(
+				(representation) => {
+					const segments = representation.SegmentBase.map(
+						(segment) => new Segment(duration, url, segment.$.indexRange)
+					);
 
-				return createTrack(adaptationSet.$.contentType, representation, adaptationSet, duration, segments);
-			});
+					return createTrack(
+						adaptationSet.$.contentType,
+						representation,
+						adaptationSet,
+						duration,
+						segments
+					);
+				}
+			);
 
 			if (!selectionSetGroups[adaptationSet.$.group]) {
 				selectionSetGroups[adaptationSet.$.group] = new SelectionSet(
 					adaptationSet.$.group,
-					[],
+					[]
 				);
 			}
 
 			selectionSetGroups[adaptationSet.$.group].switchingSet.push(
-				new SwitchingSet(
-					adaptationSet.$.id,
-					tracks,
-				),
+				new SwitchingSet(adaptationSet.$.id, tracks)
 			);
 		});
 

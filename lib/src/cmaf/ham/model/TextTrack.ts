@@ -3,7 +3,6 @@ import { Segment } from './Segment.js';
 import { ElementVisitor } from '../visitor/ElementVisitor.js';
 
 export class TextTrack extends Track {
-
 	constructor(
 		id: string,
 		type: string,
@@ -11,7 +10,7 @@ export class TextTrack extends Track {
 		duration: number,
 		language: string,
 		bandwidth: number,
-		segments: Segment[],
+		segments: Segment[]
 	) {
 		super(id, type, codec, duration, language, bandwidth, segments);
 		this.id = id;
@@ -25,5 +24,4 @@ export class TextTrack extends Track {
 	override accept(visitor: ElementVisitor): void {
 		visitor.visitTextTrack(this);
 	}
-
 }

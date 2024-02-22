@@ -19,7 +19,7 @@ export abstract class Track implements IElement {
 		duration: number,
 		language: string,
 		bandwidth: number,
-		segments: Segment[],
+		segments: Segment[]
 	) {
 		this.id = id;
 		this.type = type;
@@ -35,6 +35,10 @@ export abstract class Track implements IElement {
 	}
 
 	isVideoTrack(track: any): track is VideoTrack {
-		return track.width !== undefined && track.height !== undefined && track.frameRate !== undefined;
+		return (
+			track.width !== undefined &&
+			track.height !== undefined &&
+			track.frameRate !== undefined
+		);
 	}
 }
