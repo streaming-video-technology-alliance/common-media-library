@@ -21,25 +21,25 @@ function createTrack(
 	if (type === 'video') {
 		return {
 			bandwidth: +representation.$.bandwidth,
-			codec: adaptationSet.$.codecs,
+			codec: representation.$.codecs,
 			duration: duration,
-			frameRate: 0, // TODO: add frameRate and scanType
-			height: +(adaptationSet.$.maxHeight ?? 0),
+			frameRate: 0, // TODO: add frameRate
+			height: +(representation.$.height ?? 0),
 			id: representation.$.id,
 			language: adaptationSet.$.lang,
 			par: adaptationSet.$.par ?? '',
 			sar: adaptationSet.$.sar ?? '',
-			scanType: '',
+			scanType: representation.$.scanType,
 			segments: segments,
 			type: adaptationSet.$.contentType,
-			width: +(adaptationSet.$.maxWidth ?? 0),
+			width: +(representation.$.width ?? 0),
 
 		} as VideoTrack;
 	}
 	else if (type === 'audio') {
 		return {
 			bandwidth: +representation.$.bandwidth,
-			channels: 0, // TODO: add channels
+			channels: +(adaptationSet.AudioChannelConfiguration![0].$.value ?? 0),
 			codec: adaptationSet.$.codecs,
 			duration: duration,
 			id: representation.$.id,

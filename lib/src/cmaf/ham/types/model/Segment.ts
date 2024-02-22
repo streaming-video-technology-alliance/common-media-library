@@ -1,7 +1,7 @@
 type Segment = {
 	duration: number;
 	url: string;
-	byteRange: string | null;
+	byteRange: string;
 }
 
 export type { Segment };
