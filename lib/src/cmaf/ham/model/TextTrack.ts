@@ -26,4 +26,15 @@ export class TextTrack extends Track {
 		visitor.visitTextTrack(this);
 	}
 
+	static fromJSON(json: any): TextTrack {
+		return new TextTrack(
+			json.id,
+			json.type,
+			json.codec,
+			+json.duration,
+			json.language,
+			+json.bandwidth,
+			json.segments.map((segment: any) => Segment.fromJSON(segment)),
+		);
+	}
 }
