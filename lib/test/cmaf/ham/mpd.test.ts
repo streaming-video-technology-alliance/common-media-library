@@ -7,8 +7,8 @@ import { ham1 } from './data/ham1.js';
 describe('mpd2ham', async () => {
 	const convertedHam = await mpdToHam(dash1);
 
-	it('converts dash1 to ham', () => {
-		deepEqual(convertedHam?.toString(), JSON.stringify(ham1));
+	it('converts dash1 to ham1', () => {
+		deepEqual(convertedHam?.toJSON(), ham1);
 	});
 });
 
@@ -17,7 +17,7 @@ describe('ham2mpd', async () => {
 	const convertedMpd = await hamToMpd(presentation);
 
 	// FIXME: this test throws an error because the strings have different spaces and indentation
-	it.skip('converts dash1 to ham', () => {
-		deepEqual(convertedMpd?.toString(), dash1);
+	it.skip('converts ham1 to dash1', () => {
+		deepEqual(convertedMpd, JSON.parse(dash1));
 	});
 });

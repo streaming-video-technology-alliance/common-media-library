@@ -1,8 +1,5 @@
 export const switchingSet1 = {
 	id: '12',
-	type: 'video',
-	duration: 734,
-	language: 'en',
 	tracks: [
 		{
 			id: 'video_eng=405000',

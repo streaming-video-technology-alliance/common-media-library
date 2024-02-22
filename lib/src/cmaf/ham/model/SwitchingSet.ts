@@ -20,7 +20,7 @@ export class SwitchingSet implements IHam, IVisitorElement {
 	static fromJSON(json: any): SwitchingSet {
 		return new SwitchingSet(
 			json.id,
-			json.tracks.map((track: any) => trackFromJSON(track, json.type)),
+			json.tracks.map((track: any) => trackFromJSON(track, track.type)),
 		);
 	}
 

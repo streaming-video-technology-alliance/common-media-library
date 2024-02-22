@@ -1,17 +1,11 @@
 export const ham1 = {
 	id: 'presentation-id',
-	duration: 734,
 	selectionSets: [
 		{
 			id: '1',
-			duration: 734,
 			switchingSets: [
 				{
 					id: '1',
-					type: 'audio',
-					codec: 'mp4a.40.2',
-					duration: 734,
-					language: 'en',
 					tracks: [
 						{
 							id: 'audio_eng=64349',
@@ -53,13 +47,9 @@ export const ham1 = {
 		},
 		{
 			id: '2',
-			duration: 734,
 			switchingSets: [
 				{
 					id: '12',
-					type: 'video',
-					duration: 734,
-					language: 'en',
 					tracks: [
 						{
 							id: 'video_eng=405000',
@@ -167,14 +157,9 @@ export const ham1 = {
 		},
 		{
 			id: '3',
-			duration: 734,
 			switchingSets: [
 				{
 					id: '2',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'en',
 					tracks: [
 						{
 							id: 'textstream_eng=1000',
@@ -195,10 +180,6 @@ export const ham1 = {
 				},
 				{
 					id: '3',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'de',
 					tracks: [
 						{
 							id: 'textstream_deu=1000',
@@ -219,10 +200,6 @@ export const ham1 = {
 				},
 				{
 					id: '4',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'es',
 					tracks: [
 						{
 							id: 'textstream_spa=1000',
@@ -243,10 +220,6 @@ export const ham1 = {
 				},
 				{
 					id: '5',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'fr',
 					tracks: [
 						{
 							id: 'textstream_fra=1000',
@@ -267,10 +240,6 @@ export const ham1 = {
 				},
 				{
 					id: '6',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'nl',
 					tracks: [
 						{
 							id: 'textstream_nld=1000',
@@ -291,10 +260,6 @@ export const ham1 = {
 				},
 				{
 					id: '7',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'pt-br',
 					tracks: [
 						{
 							id: 'textstream_pt-br=1000',
@@ -315,10 +280,6 @@ export const ham1 = {
 				},
 				{
 					id: '8',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'pt-pt',
 					tracks: [
 						{
 							id: 'textstream_pt-pt=1000',
@@ -339,10 +300,6 @@ export const ham1 = {
 				},
 				{
 					id: '9',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'ru',
 					tracks: [
 						{
 							id: 'textstream_rus=1000',
@@ -363,10 +320,6 @@ export const ham1 = {
 				},
 				{
 					id: '10',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'zh',
 					tracks: [
 						{
 							id: 'textstream_zho=1000',
@@ -387,10 +340,6 @@ export const ham1 = {
 				},
 				{
 					id: '11',
-					type: 'text',
-					codec: 'wvtt',
-					duration: 734,
-					language: 'zh-hans',
 					tracks: [
 						{
 							id: 'textstream_zh-hans=1000',
