@@ -13,4 +13,3 @@ export function parseM3u8(text: string) {
 
 	return parsedM3u8;
 }
-
