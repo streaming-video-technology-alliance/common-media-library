@@ -13,6 +13,16 @@ async function readHLS(manifestUrl: string): Promise<string> {
 	return response.text();
 }
 
+export function formatSegmentsSync(segments: any[]) {
+	const formattedSegments: Segment[] = [];
+	(segments.map(async (segment: any) => {
+		const { duration, uri } = segment;
+		const { length, offset } = segment.byterange;
+		formattedSegments.push(new Segment(duration, uri, `${length}@${offset}`));
+	}));
+
+	return formattedSegments;
+}
 async function formatSegments(segments: any[]) {
 	const formattedSegments: Segment[] = [];
 	await Promise.all(segments.map(async (segment: any) => {

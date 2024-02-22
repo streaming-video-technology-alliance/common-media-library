@@ -1,0 +1,379 @@
+#EXTM3U
+#EXT-X-VERSION:6
+## Created with Unified Streaming Platform(version=1.9.4)
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-TARGETDURATION:6
+#EXT-X-MAP:URI="tears-of-steel-aac-64k.cmfa",BYTERANGE="704@0"
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:50379@2212
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49413@52591
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49545@102004
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49389@151549
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49856@200938
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49634@250794
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49501@300428
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49600@349929
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49777@399529
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49475@449306
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49563@498781
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49330@548344
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49590@597674
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49607@647264
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49417@696871
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49492@746288
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49718@795780
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49597@845498
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49405@895095
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49429@944500
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49627@993929
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49522@1043556
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49523@1093078
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49564@1142601
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49744@1192165
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49439@1241909
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49528@1291348
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49560@1340876
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49654@1390436
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49476@1440090
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49624@1489566
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49476@1539190
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49772@1588666
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49508@1638438
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49542@1687946
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49418@1737488
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49698@1786906
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49541@1836604
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49442@1886145
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49626@1935587
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49625@1985213
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49616@2034838
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49501@2084454
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49523@2133955
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49576@2183478
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49633@2233054
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49362@2282687
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49510@2332049
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49715@2381559
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49605@2431274
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49728@2480879
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49450@2530607
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49705@2580057
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49521@2629762
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49484@2679283
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49547@2728767
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49684@2778314
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49574@2827998
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49585@2877572
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49618@2927157
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49667@2976775
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49612@3026442
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49468@3076054
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49507@3125522
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49756@3175029
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49543@3224785
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49511@3274328
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49438@3323839
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49755@3373277
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49482@3423032
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49511@3472514
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49417@3522025
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49683@3571442
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49485@3621125
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49648@3670610
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49294@3720258
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49663@3769552
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49573@3819215
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49540@3868788
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49488@3918328
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49733@3967816
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49429@4017549
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49521@4066978
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49445@4116499
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49784@4165944
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49465@4215728
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49485@4265193
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49579@4314678
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49589@4364257
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49485@4413846
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49551@4463331
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49404@4512882
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49616@4562286
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49525@4611902
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49476@4661427
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49632@4710903
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49484@4760535
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49446@4810019
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49555@4859465
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49519@4909020
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49803@4958539
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49531@5008342
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49489@5057873
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49491@5107362
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49702@5156853
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49657@5206555
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49428@5256212
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49466@5305640
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49622@5355106
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49427@5404728
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49400@5454155
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49466@5503555
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49644@5553021
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49512@5602665
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49568@5652177
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49522@5701745
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49666@5751267
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49550@5800933
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49406@5850483
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49456@5899889
+tears-of-steel-aac-64k.cmfa
+#EXTINF:6.016, no desc
+#EXT-X-BYTERANGE:49594@5949345
+tears-of-steel-aac-64k.cmfa
+#EXTINF:5.994666, no desc
+#EXT-X-BYTERANGE:49725@5998939
+tears-of-steel-aac-64k.cmfa
+#EXTINF:1.947, no desc
+#EXT-X-BYTERANGE:8547@6048664
+tears-of-steel-aac-64k.cmfa
+#EXT-X-ENDLIST
+#USP-X-MEDIA:BANDWIDTH=67000,AVERAGE-BANDWIDTH=66000,TYPE=AUDIO,GROUP-ID="audio-aacl-64",LANGUAGE="en",NAME="English",AUTOSELECT=YES,CHANNELS="2",CODECS="mp4a.40.2"

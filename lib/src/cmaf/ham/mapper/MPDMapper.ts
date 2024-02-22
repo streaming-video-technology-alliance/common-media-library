@@ -4,9 +4,11 @@ import { IMapper } from './IMapper.js';
 
 export class MPDMapper implements IMapper {
 	toHam(manifest : Manifest) : Presentation[] {
+		console.log (manifest);
 		throw new Error('Not implemented');
 	}
 	toManifest(presentation : Presentation []) : Manifest{
+		console.log(presentation);
 		throw new Error('Not implemented');
 	}
 }
