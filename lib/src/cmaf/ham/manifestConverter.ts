@@ -7,7 +7,7 @@ import {
 	TextTrack,
 	Track,
 	VideoTrack,
-} from './model/index.js';
+} from './types/model/index.js';
 import { parseM3u8 } from '../utils/hls/m3u8.js';
 import { uuid } from '../../utils.js';
 import { m3u8, MediaGroups, PlayList, SegmentHls } from '../utils/hls/HlsManifest.js';
@@ -38,12 +38,22 @@ async function m3u8toHam(hlsManifest: string, url: string): Promise<Presentation
 			const segments: Segment[] = await formatSegments(audioParsed?.segments);
 			const targetDuration = audioParsed?.targetDuration;
 			// TODO: retrieve channels, samplerate, bandwidth and codec
-			audioTracks.push(new AudioTrack(audio, 'AUDIO', '', targetDuration, language, 0, segments, 0, 0));
-			audioSwitchingSets.push(new SwitchingSet(audio, audioTracks));
+			audioTracks.push({
+				id: audio,
+				type: 'AUDIO',
+				codec: '',
+				duration: targetDuration,
+				language,
+				bandwidth: 0,
+				segments,
+				sampleRate: 0,
+				channels: 0,
+			} as AudioTrack);
+			audioSwitchingSets.push({ id: audio, tracks: audioTracks } as SwitchingSet);
 		}
 	}
 
-	selectionSets.push(new SelectionSet(uuid(), audioSwitchingSets));
+	selectionSets.push({ id: uuid(), switchingSets: audioSwitchingSets } as SelectionSet);
 
 	const textTracks: TextTrack[] = [];
 	const subtitleSwitchingSets: SwitchingSet[] = [];
@@ -58,13 +68,23 @@ async function m3u8toHam(hlsManifest: string, url: string): Promise<Presentation
 			const subtitleParsed = parseM3u8(subtitleManifest);
 			const segments: Segment[] = await formatSegments(subtitleParsed?.segments);
 			const targetDuration = subtitleParsed?.targetDuration;
-			textTracks.push(new TextTrack(subtitle, 'TEXT', '', targetDuration, language, 0, segments));
-			subtitleSwitchingSets.push(new SwitchingSet(subtitle, audioTracks));
+			textTracks.push(
+				{
+					id: subtitle,
+					type: 'TEXT',
+					codec: '',
+					duration: targetDuration,
+					language,
+					bandwidth: 0,
+					segments,
+				} as TextTrack,
+			);
+			subtitleSwitchingSets.push({ id: subtitle, tracks: audioTracks } as SwitchingSet);
 		}
 	}
 
 	if (subtitleSwitchingSets.length > 0) {
-		selectionSets.push(new SelectionSet(uuid(), subtitleSwitchingSets));
+		selectionSets.push({ id: uuid(), switchingSets: subtitleSwitchingSets } as SelectionSet);
 	}
 
 	//Add selection set of type video
@@ -82,13 +102,28 @@ async function m3u8toHam(hlsManifest: string, url: string): Promise<Presentation
 			width: playlist.attributes.RESOLUTION.width,
 			height: playlist.attributes.RESOLUTION.height,
 		};
-		tracks.push(new VideoTrack(uuid(), 'VIDEO', CODECS, targetDuration, LANGUAGE, BANDWIDTH, segments, resolution.width, resolution.height, playlist.attributes['FRAME-RATE'], '', '', ''));
-		switchingSetVideos.push(new SwitchingSet(uuid(), tracks));
+		tracks.push(
+			{
+				id: uuid(),
+				type: 'VIDEO',
+				codec: CODECS,
+				duration: targetDuration,
+				language: LANGUAGE,
+				bandwidth: BANDWIDTH,
+				segments,
+				width: resolution.width,
+				height: resolution.height,
+				frameRate: playlist.attributes['FRAME-RATE'],
+				par: '',
+				sar: '',
+				scanType: '',
+			} as VideoTrack);
+		switchingSetVideos.push({ id: uuid(), tracks } as SwitchingSet);
 	}));
 
-	selectionSets.push(new SelectionSet(uuid(), switchingSetVideos));
+	selectionSets.push({ id: uuid(), switchingSets: switchingSetVideos } as SelectionSet);
 
-	return new Presentation(uuid(), selectionSets);
+	return { id: uuid(), selectionSets } as Presentation;
 
 }
 
@@ -100,14 +135,18 @@ function hamToM3u8(presentation: Presentation): m3u8 {
 	presentation.selectionSets.forEach(selectionSet => {
 		selectionSet.switchingSets.forEach(switchingSet => {
 			switchingSet.tracks.forEach(track => {
-				if (track.type === 'VIDEO' && track.isVideoTrack(track)) {
+				if (track.type === 'VIDEO') {
+					const videoTrack = track as VideoTrack;
 					playlists.push({
 						uri: '',
 						attributes: {
-							CODECS: track.codec,
-							BANDWIDTH: track.bandwidth,
-							FRAME_RATE: track.frameRate,
-							RESOLUTION: { width: track.width, height: track.height },
+							CODECS: videoTrack.codec,
+							BANDWIDTH: videoTrack.bandwidth,
+							FRAME_RATE: videoTrack.frameRate,
+							RESOLUTION: {
+								width: videoTrack.width,
+								height: videoTrack.height,
+							},
 						},
 					});
 				}

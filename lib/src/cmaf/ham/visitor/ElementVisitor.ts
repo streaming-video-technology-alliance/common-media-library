@@ -7,7 +7,7 @@ import {
 	TextTrack,
 	Track,
 	VideoTrack,
-} from '../model/index.js';
+} from '../types/model/index.js';
 
 export interface ElementVisitor {
 	visitPresentation(element: Presentation): void;

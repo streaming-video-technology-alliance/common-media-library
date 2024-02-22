@@ -1,14 +1,13 @@
-import { AudioTrack, TextTrack, Track, VideoTrack } from '../../ham/model/index.js';
+import { AudioTrack, TextTrack, Track, VideoTrack } from '../../ham/types/model/index.js';
 
-function trackFromJSON(json: any, type: 'audio' | 'video' | 'text'): Track {
-	if (type === 'audio') {
-		return AudioTrack.fromJSON(json);
-	}
-	else if (type === 'video') {
-		return VideoTrack.fromJSON(json);
-	}
-	else { // if (type === 'text') {
-		return TextTrack.fromJSON(json);
+function trackFromJSON(json: object, type: 'audio' | 'video' | 'text'): Track {
+	switch (type) {
+		case 'video':
+			return json as VideoTrack;
+		case 'audio':
+			return json as AudioTrack;
+		default: // case 'text':
+			return json as TextTrack;
 	}
 }
 

@@ -1,4 +1,4 @@
-import { Segment } from '../../ham/model/Segment.js';
+import { Segment } from '../../ham/types/model/Segment.js';
 
 function formatSegmentUrl(url: string, segmentUrl: string) {
 	return url.split('/').slice(0, -1).join('/') + '/' + segmentUrl;
@@ -18,7 +18,7 @@ async function formatSegments(segments: any[]) {
 	await Promise.all(segments.map(async (segment: any) => {
 		const { duration, uri } = segment;
 		const { length, offset } = segment.byterange;
-		formattedSegments.push(new Segment(duration, uri, `${length}@${offset}`));
+		formattedSegments.push({ duration, url: uri, byteRange: `${length}@${offset}` } as Segment);
 	}));
 
 	return formattedSegments;

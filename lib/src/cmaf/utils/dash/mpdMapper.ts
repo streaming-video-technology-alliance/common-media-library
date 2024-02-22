@@ -1,5 +1,5 @@
 import { AdaptationSet, DashManifest, Representation, SegmentMpd } from './DashManifest.js';
-import { Presentation, SelectionSet, Segment, Track } from '../../ham/model/index.js';
+import { Presentation, SelectionSet, Segment, Track } from '../../ham/types/model/index.js';
 import { parseDurationMpd } from '../utils.js';
 
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentMpd[] {

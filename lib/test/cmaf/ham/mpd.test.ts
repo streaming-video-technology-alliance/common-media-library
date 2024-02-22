@@ -8,12 +8,12 @@ describe('mpd2ham', async () => {
 	const convertedHam = await mpdToHam(dash1);
 
 	it('converts dash1 to ham1', () => {
-		deepEqual(convertedHam?.toJSON(), ham1);
+		deepEqual(convertedHam, ham1);
 	});
 });
 
 describe('ham2mpd', async () => {
-	const presentation = Presentation.fromJSON(ham1);
+	const presentation = ham1 as Presentation;
 	const convertedMpd = await hamToMpd(presentation);
 
 	// FIXME: this test throws an error because the strings have different spaces and indentation
