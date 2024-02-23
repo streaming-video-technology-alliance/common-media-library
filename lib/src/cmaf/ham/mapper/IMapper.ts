@@ -1,4 +1,4 @@
-import { Presentation } from '../model/index.js';
+import { Presentation } from '../types/model/index.js';
 import { Manifest } from '../../utils/types/Manifest.js';
 
 export interface IMapper {

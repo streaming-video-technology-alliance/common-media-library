@@ -1,0 +1,115 @@
+{
+	"id": "2",
+	"switchingSets": [
+		{
+			"id": "12",
+			"tracks": [
+				{
+					"bandwidth": 405000,
+					"codec": "avc1.64001F",
+					"duration": 734,
+					"frameRate": 0,
+					"height": 100,
+					"id": "video_eng=405000",
+					"language": "en",
+					"par": "56:25",
+					"sar": "1:1",
+					"scanType": "progressive",
+					"segments": [
+						{
+							"duration": 734,
+							"url": "url",
+							"byteRange": "761-1896"
+						}
+					],
+					"type": "video",
+					"width": 224
+				},
+				{
+					"bandwidth": 759000,
+					"codec": "avc1.64001F",
+					"duration": 734,
+					"frameRate": 0,
+					"height": 200,
+					"id": "video_eng=759000",
+					"language": "en",
+					"par": "56:25",
+					"sar": "1:1",
+					"scanType": "progressive",
+					"segments": [
+						{
+							"duration": 734,
+							"url": "url",
+							"byteRange": "760-1895"
+						}
+					],
+					"type": "video",
+					"width": 448
+				},
+				{
+					"bandwidth": 1026000,
+					"codec": "avc1.64001F",
+					"duration": 734,
+					"frameRate": 0,
+					"height": 350,
+					"id": "video_eng=1026000",
+					"language": "en",
+					"par": "56:25",
+					"sar": "1:1",
+					"scanType": "progressive",
+					"segments": [
+						{
+							"duration": 734,
+							"url": "url",
+							"byteRange": "761-1896"
+						}
+					],
+					"type": "video",
+					"width": 784
+				},
+				{
+					"bandwidth": 1501000,
+					"codec": "avc1.640028",
+					"duration": 734,
+					"frameRate": 0,
+					"height": 750,
+					"id": "video_eng=1501000",
+					"language": "en",
+					"par": "56:25",
+					"sar": "1:1",
+					"scanType": "progressive",
+					"segments": [
+						{
+							"duration": 734,
+							"url": "url",
+							"byteRange": "762-1897"
+						}
+					],
+					"type": "video",
+					"width": 1680
+				},
+				{
+					"bandwidth": 2205000,
+					"codec": "avc1.640028",
+					"duration": 734,
+					"frameRate": 0,
+					"height": 750,
+					"id": "video_eng=2205000",
+					"language": "en",
+					"par": "56:25",
+					"sar": "1:1",
+					"scanType": "progressive",
+					"segments": [
+						{
+							"duration": 734,
+							"url": "url",
+							"byteRange": "762-1897"
+						}
+					],
+					"type": "video",
+					"width": 1680
+				}
+			]
+		}
+	]
+}

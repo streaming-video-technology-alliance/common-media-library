@@ -1,5 +1,5 @@
 import { Manifest } from '../../utils/types/index.js';
-import { Presentation } from '../model/index.js';
+import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 
 export class MapperContext {
