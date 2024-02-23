@@ -1,11 +1,10 @@
 import { parseM3u8 } from '../../../cmaf-ham.js';
 import { uuid } from '../../../utils.js';
 import { PlayList } from '../../utils/hls/HlsManifest.js';
-import { formatSegmentsSync } from '../../utils/hls/hlsMapper.js';
+import { formatSegments } from '../../utils/hls/formatter.js';
 import { Manifest } from '../../utils/types/index.js';
 import { AudioTrack, Segment, SelectionSet , SwitchingSet ,TextTrack, VideoTrack, Presentation, Track } from '../model/index.js';
 import { IMapper } from './IMapper.js';
-import fs from 'fs';
 import os from 'os';
 export class HLSMapper implements IMapper {
 	toHam(manifest: Manifest): Presentation[] {
@@ -25,7 +24,7 @@ export class HLSMapper implements IMapper {
 			const keys = Object.keys(attributes);
 			const { language } = attributes[keys[0]];
 			const audioParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
-			const segments: Segment[] = formatSegmentsSync(audioParsed?.segments);
+			const segments: Segment[] = formatSegments(audioParsed?.segments);
 			const targetDuration = audioParsed?.targetDuration;
 			// TODO: retrieve channels, samplerate, bandwidth and codec
 			audioTracks.push(
@@ -55,7 +54,7 @@ export class HLSMapper implements IMapper {
 			const textTracks: TextTrack[] = [];
 			const keys = Object.keys(attributes);
 			const { language } = attributes[keys[0]];			const subtitleParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
-			const segments: Segment[] =  formatSegmentsSync(
+			const segments: Segment[] =  formatSegments(
 				subtitleParsed?.segments
 			);
 			const targetDuration = subtitleParsed?.targetDuration;
@@ -83,7 +82,7 @@ export class HLSMapper implements IMapper {
 		playlists.map(async (playlist: any) => {
 			const parsedHlsManifest = parseM3u8(manifestPlaylists[currentPlaylist++]);
 			const tracks: Track[] = [];
-			const segments: Segment[] =  formatSegmentsSync(
+			const segments: Segment[] =  formatSegments(
 				parsedHlsManifest?.segments
 			);
 			const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
