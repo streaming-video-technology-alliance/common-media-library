@@ -22,13 +22,8 @@ export class HLSMapper implements IMapper {
 		for (const audio in mediaGroupsAudio) {
 			const audioTracks: AudioTrack[] = [];
 			const attributes :any = mediaGroupsAudio[audio];
-			//this is an object, how can i get keys
 			const keys = Object.keys(attributes);
 			const { language } = attributes[keys[0]];
-			console.log(language);
-
-			// const { language } = mediaGroupsAudio[audio][attributes];
-			console.log(language);
 			const audioParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
 			const segments: Segment[] = formatSegmentsSync(audioParsed?.segments);
 			const targetDuration = audioParsed?.targetDuration;
@@ -51,7 +46,6 @@ export class HLSMapper implements IMapper {
 		}
 
 		selectionSets.push(new SelectionSet(uuid(), audioSwitchingSets));
-		console.log('audioSwitchingSets', audioSwitchingSets);
 
 		const subtitleSwitchingSets: SwitchingSet[] = [];
 
