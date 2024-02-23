@@ -87,7 +87,7 @@ export class HLSMapper implements IMapper {
 			const segments: Segment[] =  formatSegments(
 				parsedHlsManifest?.segments
 			);
-			const { LANGUAGE, CODECS, BANDWIDTH, uri } = playlist.attributes;
+			const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 			const targetDuration = parsedHlsManifest?.targetDuration;
 			const resolution = {
 				width: playlist.attributes.RESOLUTION.width,
@@ -97,7 +97,7 @@ export class HLSMapper implements IMapper {
 				new VideoTrack(
 					uuid(),
 					'VIDEO',
-					uri,
+					playlist.uri,
 					CODECS,
 					targetDuration,
 					LANGUAGE,
@@ -168,4 +168,3 @@ export class HLSMapper implements IMapper {
 		return { main: mainManifest, playlists: playlists, type: 'm3u8' };
 	}
 }
-

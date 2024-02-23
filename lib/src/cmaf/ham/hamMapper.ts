@@ -21,6 +21,7 @@ function createTrack(
 		return new VideoTrack(
 			representation.$.id,
 			adaptationSet.$.contentType,
+			'',
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
@@ -38,6 +39,7 @@ function createTrack(
 		return new AudioTrack(
 			representation.$.id,
 			adaptationSet.$.contentType,
+			'',
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
@@ -51,6 +53,7 @@ function createTrack(
 		return new TextTrack(
 			representation.$.id,
 			adaptationSet.$.contentType,
+			'',
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
