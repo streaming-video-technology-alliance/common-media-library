@@ -36,7 +36,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 }
 
 function selectionToAdaptationSet(
-	selectionsSets: SelectionSet[]
+	selectionsSets: SelectionSet[],
 ): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
 		return selectionSet.switchingSets.map((switchingSet) => {
@@ -61,7 +61,7 @@ function mapHamToMpd(hamManifest: Presentation): DashManifest {
 				{
 					$: {
 						duration: parseDurationMpd(
-							hamManifest.selectionSets[0].switchingSets[0].tracks[0].duration
+							hamManifest.selectionSets[0].switchingSets[0].tracks[0].duration,
 						),
 					},
 					AdaptationSet: selectionToAdaptationSet(hamManifest.selectionSets),

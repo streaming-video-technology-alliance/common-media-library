@@ -3,7 +3,7 @@ import { DashManifest } from './dash/DashManifest.js';
 
 async function xmlToJson(
 	raw: string,
-	replace: (manifest: DashManifest) => void
+	replace: (manifest: DashManifest) => void,
 ): Promise<void> {
 	return parseString(raw, (err: Error | null, result: DashManifest) => {
 		if (err) {

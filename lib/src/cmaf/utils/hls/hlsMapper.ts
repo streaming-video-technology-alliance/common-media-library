@@ -19,8 +19,10 @@ async function formatSegments(segments: any[]) {
 		segments.map(async (segment: any) => {
 			const { duration, uri } = segment;
 			const { length, offset } = segment.byterange;
-			formattedSegments.push(new Segment(duration, uri, `${length}@${offset}`));
-		})
+			formattedSegments.push(
+				new Segment(duration, uri, `${length}@${offset}`),
+			);
+		}),
 	);
 
 	return formattedSegments;

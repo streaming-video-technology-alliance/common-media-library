@@ -19,7 +19,7 @@ export abstract class Track implements IVisitorElement {
 		duration: number,
 		language: string,
 		bandwidth: number,
-		segments: Segment[]
+		segments: Segment[],
 	) {
 		this.id = id;
 		this.type = type;

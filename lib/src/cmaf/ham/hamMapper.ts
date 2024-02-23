@@ -20,7 +20,7 @@ function createTrack(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
 	duration: number,
-	segments: Segment[]
+	segments: Segment[],
 ): AudioTrack | VideoTrack | TextTrack {
 	if (type === 'video') {
 		return new VideoTrack(
@@ -36,7 +36,7 @@ function createTrack(
 			0, // TODO: add frameRate and scanType
 			adaptationSet.$.par ?? '',
 			adaptationSet.$.sar ?? '',
-			''
+			'',
 		);
 	} else if (type === 'audio') {
 		return new AudioTrack(
@@ -48,7 +48,7 @@ function createTrack(
 			+representation.$.bandwidth,
 			segments,
 			+(adaptationSet.$.audioSamplingRate ?? 0),
-			0 // TODO: add channels
+			0, // TODO: add channels
 		);
 	} else {
 		// if (type === 'text')
@@ -59,7 +59,7 @@ function createTrack(
 			duration,
 			adaptationSet.$.lang,
 			+representation.$.bandwidth,
-			segments
+			segments,
 		);
 	}
 }
@@ -76,7 +76,7 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 			const tracks: Track[] = adaptationSet.Representation.map(
 				(representation) => {
 					const segments = representation.SegmentBase.map(
-						(segment) => new Segment(duration, url, segment.$.indexRange)
+						(segment) => new Segment(duration, url, segment.$.indexRange),
 					);
 
 					return createTrack(
@@ -84,20 +84,20 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 						representation,
 						adaptationSet,
 						duration,
-						segments
+						segments,
 					);
-				}
+				},
 			);
 
 			if (!selectionSetGroups[adaptationSet.$.group]) {
 				selectionSetGroups[adaptationSet.$.group] = new SelectionSet(
 					adaptationSet.$.group,
-					[]
+					[],
 				);
 			}
 
 			selectionSetGroups[adaptationSet.$.group].switchingSets.push(
-				new SwitchingSet(adaptationSet.$.id, tracks)
+				new SwitchingSet(adaptationSet.$.id, tracks),
 			);
 		});
 

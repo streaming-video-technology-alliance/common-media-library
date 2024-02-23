@@ -21,8 +21,8 @@ export class Presentation implements IHam, IVisitorElement {
 		return new Presentation(
 			json.id,
 			json.selectionSets.map((selectionSet: any) =>
-				SelectionSet.fromJSON(selectionSet)
-			)
+				SelectionSet.fromJSON(selectionSet),
+			),
 		);
 	}
 
@@ -32,7 +32,7 @@ export class Presentation implements IHam, IVisitorElement {
 
 	public getTracks(predicate?: (track: Track) => boolean): Track[] {
 		const tracks = this.selectionSets.flatMap((selectionSet) =>
-			selectionSet.getTracks()
+			selectionSet.getTracks(),
 		);
 		return predicate ? tracks.filter(predicate) : tracks;
 	}

@@ -10,7 +10,7 @@ export class TextTrack extends Track {
 		duration: number,
 		language: string,
 		bandwidth: number,
-		segments: Segment[]
+		segments: Segment[],
 	) {
 		super(id, type, codec, duration, language, bandwidth, segments);
 		this.id = id;
@@ -33,7 +33,7 @@ export class TextTrack extends Track {
 			+json.duration,
 			json.language,
 			+json.bandwidth,
-			json.segments.map((segment: any) => Segment.fromJSON(segment))
+			json.segments.map((segment: any) => Segment.fromJSON(segment)),
 		);
 	}
 }

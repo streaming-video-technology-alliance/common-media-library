@@ -23,7 +23,7 @@ export class VideoTrack extends Track {
 		frameRate: number,
 		par: string,
 		sar: string,
-		scanType: string
+		scanType: string,
 	) {
 		super(id, type, codec, duration, language, bandwidth, segments);
 		this.width = width;
@@ -52,7 +52,7 @@ export class VideoTrack extends Track {
 			+json.frameRate,
 			json.par,
 			json.sar,
-			json.scanType
+			json.scanType,
 		);
 	}
 }
