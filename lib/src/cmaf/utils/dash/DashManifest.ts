@@ -1,9 +1,9 @@
 type SegmentMpd = {
 	$: {
-		timescale?: number;
-		indexRangeExact?: boolean;
-		indexRange: string | null;
-	};
+		timescale?: string,
+		indexRangeExact?: string,
+		indexRange: string | null,
+	},
 	Initialization: [
 		{
 			$: {
@@ -15,37 +15,38 @@ type SegmentMpd = {
 
 type Representation = {
 	$: {
-		id: string;
-		bandwidth: number;
-	};
-	BaseURL?: string[];
-	SegmentBase: SegmentMpd[];
-};
+		id: string,
+		bandwidth: string,
+	},
+	BaseURL?: string[],
+	SegmentBase: SegmentMpd[]
+}
 
 type AdaptationSet = {
 	$: {
-		id: string;
-		group: string;
-		contentType: string;
-		lang: string;
-		minBandwidth?: string;
-		maxBandwidth?: string;
-		segmentAlignment?: string;
-		subsegmentAlignment?: string;
-		subsegmentStartsWithSAP?: string;
-		audioSamplingRate?: number;
-		mimeType?: string;
-		codecs: string;
-		startWithSAP?: string;
+		id: string,
+		group: string,
+		contentType: string,
+		lang: string,
+		minBandwidth?: string,
+		maxBandwidth?: string,
+		segmentAlignment?: string,
+		subsegmentAlignment?: string,
+		subsegmentStartsWithSAP?: string,
+		audioSamplingRate?: string,
+		mimeType?: string,
+		codecs: string,
+		startWithSAP?: string,
 		par?: string;
 		sar?: string;
-		maxWidth?: number;
-		maxHeight?: number;
-	};
-	AudioChannelConfiguration?: any[];
-	Role?: any[];
-	Representation: Representation[];
-};
+		maxWidth?: string;
+		maxHeight?: string;
+
+	},
+	AudioChannelConfiguration?: any[],
+	Role?: any[],
+	Representation: Representation[],
+}
 
 type Period = {
 	$: {

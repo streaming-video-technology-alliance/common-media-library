@@ -1,5 +1,5 @@
 import { ElementVisitor } from './ElementVisitor.js';
 
-export interface IElement {
+export interface IVisitorElement {
 	accept(visitor: ElementVisitor): void;
 }

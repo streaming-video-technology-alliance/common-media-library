@@ -13,6 +13,7 @@ import {
 	AudioTrack,
 	TextTrack,
 } from './model/index.js';
+import { iso8601DurationToNumber } from '../utils/utils.js';
 
 function createTrack(
 	type: string,
@@ -28,10 +29,10 @@ function createTrack(
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
-			representation.$.bandwidth,
+			+representation.$.bandwidth,
 			segments,
-			adaptationSet.$.maxWidth ?? 0, // TODO: handle undefined values
-			adaptationSet.$.maxHeight ?? 0,
+			+(adaptationSet.$.maxWidth ?? 0),
+			+(adaptationSet.$.maxHeight ?? 0),
 			0, // TODO: add frameRate and scanType
 			adaptationSet.$.par ?? '',
 			adaptationSet.$.sar ?? '',
@@ -44,10 +45,10 @@ function createTrack(
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
-			representation.$.bandwidth,
+			+representation.$.bandwidth,
 			segments,
-			adaptationSet.$.audioSamplingRate ?? 0,
-			0 // TODO: add channels
+			+(adaptationSet.$.audioSamplingRate ?? 0),
+			0, // TODO: add channels
 		);
 	} else {
 		// if (type === 'text')
@@ -57,16 +58,17 @@ function createTrack(
 			adaptationSet.$.codecs,
 			duration,
 			adaptationSet.$.lang,
-			representation.$.bandwidth,
-			segments
+			+representation.$.bandwidth,
+			segments,
 		);
 	}
 }
 
 export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 	const presentation: Presentation[] = rawManifest.MPD.Period.map((period) => {
-		const duration = +period.$.duration;
-		const url = 'url'; // todo: get real url
+		const duration: number = iso8601DurationToNumber(period.$.duration);
+		const url: string = 'url'; // todo: get real url
+		const presentationId: string = 'presentation-id'; // todo: handle id
 
 		const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
@@ -94,14 +96,17 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 				);
 			}
 
-			selectionSetGroups[adaptationSet.$.group].switchingSet.push(
-				new SwitchingSet(adaptationSet.$.id, tracks)
+			selectionSetGroups[adaptationSet.$.group].switchingSets.push(
+				new SwitchingSet(
+					adaptationSet.$.id,
+					tracks,
+				),
 			);
 		});
 
 		const selectionSet: SelectionSet[] = Object.values(selectionSetGroups);
 
-		return new Presentation('id', selectionSet);
+		return new Presentation(presentationId, selectionSet);
 	});
 
 	return presentation[0];

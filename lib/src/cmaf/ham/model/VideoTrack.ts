@@ -37,4 +37,22 @@ export class VideoTrack extends Track {
 	override accept(visitor: ElementVisitor): void {
 		visitor.visitVideoTrack(this);
 	}
+
+	static fromJSON(json: any): VideoTrack {
+		return new VideoTrack(
+			json.id,
+			json.type,
+			json.codec,
+			+json.duration,
+			json.language,
+			+json.bandwidth,
+			json.segments.map((segment: any) => Segment.fromJSON(segment)),
+			+json.width,
+			+json.height,
+			+json.frameRate,
+			json.par,
+			json.sar,
+			json.scanType,
+		);
+	}
 }
