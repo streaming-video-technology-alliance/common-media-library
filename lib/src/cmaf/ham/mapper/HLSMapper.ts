@@ -22,7 +22,7 @@ export class HLSMapper implements IMapper {
 			const audioTracks: AudioTrack[] = [];
 			const attributes :any = mediaGroupsAudio[audio];
 			const keys = Object.keys(attributes);
-			const { language } = attributes[keys[0]];
+			const { language , uri } = attributes[keys[0]];
 			const audioParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
 			const segments: Segment[] = formatSegments(audioParsed?.segments);
 			const targetDuration = audioParsed?.targetDuration;
@@ -31,6 +31,7 @@ export class HLSMapper implements IMapper {
 				new AudioTrack(
 					audio,
 					'AUDIO',
+					uri,
 					'',
 					targetDuration,
 					language,
@@ -53,7 +54,7 @@ export class HLSMapper implements IMapper {
 			const attributes = mediaGroupsSubtitles[subtitle];
 			const textTracks: TextTrack[] = [];
 			const keys = Object.keys(attributes);
-			const { language } = attributes[keys[0]];			const subtitleParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
+			const { language, uri } = attributes[keys[0]];			const subtitleParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
 			const segments: Segment[] =  formatSegments(
 				subtitleParsed?.segments
 			);
@@ -62,6 +63,7 @@ export class HLSMapper implements IMapper {
 				new TextTrack(
 					subtitle,
 					'TEXT',
+					uri,
 					'',
 					targetDuration,
 					language,
@@ -85,7 +87,7 @@ export class HLSMapper implements IMapper {
 			const segments: Segment[] =  formatSegments(
 				parsedHlsManifest?.segments
 			);
-			const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
+			const { LANGUAGE, CODECS, BANDWIDTH, uri } = playlist.attributes;
 			const targetDuration = parsedHlsManifest?.targetDuration;
 			const resolution = {
 				width: playlist.attributes.RESOLUTION.width,
@@ -95,6 +97,7 @@ export class HLSMapper implements IMapper {
 				new VideoTrack(
 					uuid(),
 					'VIDEO',
+					uri,
 					CODECS,
 					targetDuration,
 					LANGUAGE,
@@ -132,8 +135,7 @@ export class HLSMapper implements IMapper {
 					tracks.map((track) => {
 						if (track.type === 'VIDEO') {
 							const videoTrack = track as VideoTrack;
-							const trackUrl = 'url'; //TODO : Save track url in the model
-							const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS=${videoTrack.codec},RESOLUTION=${videoTrack.width}x${videoTrack.height}  ${newline} ${trackUrl} ${newline}`;
+							const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS=${videoTrack.codec},RESOLUTION=${videoTrack.width}x${videoTrack.height}  ${newline} ${videoTrack.name} ${newline}`;
 							mainManifest += manifestToConcat;
 							let playlist = videoTrack.segments.map((segment) => {
 								return `#EXTINF:${segment.duration}, ${newline} ${segment.url}`;
@@ -143,8 +145,7 @@ export class HLSMapper implements IMapper {
 						}
 						else if (track.type === 'AUDIO') {
 							const audioTrack = track as AudioTrack;
-							const trackUrl = 'url'; //TODO : Save track url in the model 
-							const textToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=${audioTrack.id},NAME=${audioTrack.id},LANGUAGE=${audioTrack.language} ,URI=${trackUrl} ${newline}`;
+							const textToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=${audioTrack.id},NAME=${audioTrack.id},LANGUAGE=${audioTrack.language} ,URI=${audioTrack.name} ${newline}`;
 							mainManifest += textToConcat;
 							let playlist = audioTrack.segments.map((segment) => {
 								return `#EXTINF:${segment.duration},\n${segment.url}`;
@@ -154,8 +155,7 @@ export class HLSMapper implements IMapper {
 						}
 						else if (track.type === 'TEXT') {
 							const textTrack = track as TextTrack;
-							const trackUrl = 'url'; //TODO : Save track url in the model
-							const textToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackUrl} ${newline}`;
+							const textToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name} ${newline}`;
 							mainManifest += textToConcat;
 							playlists.push(textTrack.segments.map((segment) => {
 								return `#EXTINF:${segment.duration},\n${segment.url}`;

@@ -13,6 +13,7 @@ export class VideoTrack extends Track {
 	constructor(
 		id: string,
 		type: string,
+		name : string,
 		codec: string,
 		duration: number,
 		language: string,
@@ -25,7 +26,7 @@ export class VideoTrack extends Track {
 		sar: string,
 		scanType: string,
 	) {
-		super(id, type, codec, duration, language, bandwidth, segments);
+		super(id, type, name,codec, duration, language, bandwidth, segments);
 		this.width = width;
 		this.height = height;
 		this.frameRate = frameRate;
