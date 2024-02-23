@@ -86,7 +86,7 @@
 		],
 		"tsdoc/syntax": "warn",
 		"prettier/prettier": [
-			0,
+			1,
 			{
 				"trailingComma": "es5",
 				"tabWidth": 4,
