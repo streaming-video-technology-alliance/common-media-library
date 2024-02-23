@@ -60,4 +60,12 @@ describe('Row Tests', () => {
 		row.setCursor(1000);
 		equal(row.pos, maxCursorPosition);
 	});
+
+	it('insertChar method', () => {
+		const keyChar = 0x2a;
+		const valueChar = 'á';
+		row.insertChar(keyChar);
+		equal(row.chars[0].uchar, valueChar);
+		equal(row.pos, 1);
+	});
 });
