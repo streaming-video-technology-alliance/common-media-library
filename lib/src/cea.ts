@@ -5,10 +5,10 @@
  *
  * @packageDocumentation
  */
-export { Row } from './cea/608/cea-608-parser.js';
-export { CaptionScreen } from './cea/608/cea-608-parser.js';
-export { CaptionsLogger } from './cea/608/cea-608-parser.js';
-export { PenState } from './cea/608/cea-608-parser.js';
-export { StyledUnicodeChar } from './cea/608/cea-608-parser.js';
-export { Cea608Channel } from './cea/608/cea-608-parser.js';
-export { default as Cea608Parser } from './cea/608/cea-608-parser.js';
+export { Row } from './captions/cea608-708/Row.js';
+export { CaptionScreen } from './captions/cea608-708/CaptionScreen.js';
+export { CaptionsLogger } from './captions/cea608-708/CaptionsLogger.js';
+export { PenState } from './captions/cea608-708/PenState.js';
+export { StyledUnicodeChar } from './captions/cea608-708/StyledUnicodeChar.js';
+export { Cea608Channel } from './captions/cea608-708/Cea608Channel.js';
+export { default as Cea608Parser } from './captions/cea608-708/Cea608Parser.js';

@@ -67,7 +67,7 @@ export class CaptionScreen {
     setRollUpRows(nrRows: number | null): void;
 }
 
-// @public (undocumented)
+// @public
 export class CaptionsLogger {
     // (undocumented)
     log(severity: VerboseLevel, msg: string | (() => string)): void;
@@ -79,7 +79,7 @@ export class CaptionsLogger {
     verboseLevel: VerboseLevel;
 }
 
-// @public (undocumented)
+// @public
 export class Cea608Channel {
     constructor(channelNumber: number, outputFilter: any, // todo check that
     logger: CaptionsLogger);
@@ -159,7 +159,7 @@ export class Cea608Channel {
     writeScreen: CaptionScreen;
 }
 
-// @public (undocumented)
+// @public
 export class Cea608Parser {
     // Warning: (ae-forgotten-export) The symbol "SupportedField" needs to be exported by the entry point index.d.ts
     constructor(field: SupportedField, out1: any, out2: any);
@@ -510,21 +510,7 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
-// @public (undocumented)
-export interface PACData {
-    // (undocumented)
-    color: string | null;
-    // (undocumented)
-    indent: number | null;
-    // (undocumented)
-    italics: boolean;
-    // (undocumented)
-    row: number;
-    // (undocumented)
-    underline: boolean;
-}
-
-// @public (undocumented)
+// @public
 export class PenState {
     // (undocumented)
     background: string;
