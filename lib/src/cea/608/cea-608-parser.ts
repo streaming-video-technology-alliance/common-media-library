@@ -731,7 +731,7 @@ type CaptionModes =
   | 'MODE_TEXT'
   | null;
 
-class Cea608Channel {
+export class Cea608Channel {
 	chNr: number;
 	outputFilter: any;
 	mode: CaptionModes;
@@ -1074,7 +1074,6 @@ class Cea608Parser {
             ')',
 				);
 			}
-
 			cmdFound = this.parseCmd(a, b);
 
 			if (!cmdFound) {
