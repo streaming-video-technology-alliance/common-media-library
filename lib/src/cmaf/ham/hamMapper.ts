@@ -48,7 +48,7 @@ function createTrack(
 			+representation.$.bandwidth,
 			segments,
 			+(adaptationSet.$.audioSamplingRate ?? 0),
-			0, // TODO: add channels
+			0 // TODO: add channels
 		);
 	} else {
 		// if (type === 'text')
@@ -59,7 +59,7 @@ function createTrack(
 			duration,
 			adaptationSet.$.lang,
 			+representation.$.bandwidth,
-			segments,
+			segments
 		);
 	}
 }
@@ -97,10 +97,7 @@ export function mapMpdToHam(rawManifest: DashManifest): Presentation {
 			}
 
 			selectionSetGroups[adaptationSet.$.group].switchingSets.push(
-				new SwitchingSet(
-					adaptationSet.$.id,
-					tracks,
-				),
+				new SwitchingSet(adaptationSet.$.id, tracks)
 			);
 		});
 

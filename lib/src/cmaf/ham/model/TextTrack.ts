@@ -33,7 +33,7 @@ export class TextTrack extends Track {
 			+json.duration,
 			json.language,
 			+json.bandwidth,
-			json.segments.map((segment: any) => Segment.fromJSON(segment)),
+			json.segments.map((segment: any) => Segment.fromJSON(segment))
 		);
 	}
 }

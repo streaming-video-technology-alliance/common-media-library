@@ -20,7 +20,7 @@ export class SwitchingSet implements IHam, IVisitorElement {
 	static fromJSON(json: any): SwitchingSet {
 		return new SwitchingSet(
 			json.id,
-			json.tracks.map((track: any) => trackFromJSON(track, track.type)),
+			json.tracks.map((track: any) => trackFromJSON(track, track.type))
 		);
 	}
 
@@ -36,7 +36,7 @@ export class SwitchingSet implements IHam, IVisitorElement {
 	public validateTracks(): boolean {
 		let duration: number | undefined;
 		let isValid = true;
-		this.getTracks().forEach(track => {
+		this.getTracks().forEach((track) => {
 			if (!duration) {
 				duration = track.duration;
 			}

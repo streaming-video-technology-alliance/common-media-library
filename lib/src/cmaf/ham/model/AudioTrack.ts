@@ -36,7 +36,7 @@ export class AudioTrack extends Track {
 			+json.bandwidth,
 			json.segments.map((segment: any) => Segment.fromJSON(segment)),
 			+json.sampleRate,
-			+json.channels,
+			+json.channels
 		);
 	}
 }

@@ -20,7 +20,9 @@ export class SelectionSet implements IHam, IVisitorElement {
 	static fromJSON(json: any): SelectionSet {
 		return new SelectionSet(
 			json.id,
-			json.switchingSets.map((switchingSet: any) => SwitchingSet.fromJSON(switchingSet)),
+			json.switchingSets.map((switchingSet: any) =>
+				SwitchingSet.fromJSON(switchingSet)
+			)
 		);
 	}
 
@@ -29,8 +31,8 @@ export class SelectionSet implements IHam, IVisitorElement {
 	}
 
 	public getTracks(predicate?: (track: Track) => boolean): Track[] {
-		const tracks = this.switchingSets.flatMap(switchingSet =>
-			switchingSet.getTracks(),
+		const tracks = this.switchingSets.flatMap((switchingSet) =>
+			switchingSet.getTracks()
 		);
 		return predicate ? tracks.filter(predicate) : tracks;
 	}

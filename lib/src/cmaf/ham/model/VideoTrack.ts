@@ -52,7 +52,7 @@ export class VideoTrack extends Track {
 			+json.frameRate,
 			json.par,
 			json.sar,
-			json.scanType,
+			json.scanType
 		);
 	}
 }

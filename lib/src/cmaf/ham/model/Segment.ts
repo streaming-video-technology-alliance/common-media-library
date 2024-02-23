@@ -17,10 +17,6 @@ export class Segment implements IVisitorElement {
 	}
 
 	static fromJSON(json: any) {
-		return new Segment(
-			json.duration,
-			json.url,
-			json.byteRange,
-		);
+		return new Segment(json.duration, json.url, json.byteRange);
 	}
 }
