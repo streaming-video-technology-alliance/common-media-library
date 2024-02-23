@@ -1,5 +1,6 @@
 import { AdaptationSet, DashManifest, Representation, SegmentMpd } from './DashManifest.js';
-import { Presentation, SelectionSet, Segment, Track } from '../../ham/model/index.js';
+import { Presentation, SelectionSet, Segment, Track, VideoTrack } from '../../ham/types/model/index.js';
+import { parseDurationMpd } from '../utils.js';
 
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentMpd[] {
 	return hamSegments.map((segment) => {
@@ -14,19 +15,31 @@ function baseSegmentToSegment(hamSegments: Segment[]): SegmentMpd[] {
 
 function trackToRepresentation(tracks: Track[]): Representation[] {
 	return tracks.map((track) => {
+		let videoProps;
+		if (track.type === 'video') {
+			const videoTrack = track as VideoTrack;
+			videoProps = {
+				id: videoTrack.id,
+				bandwidth: videoTrack.bandwidth.toString(),
+				width: videoTrack.width.toString(),
+				height: videoTrack.height.toString(),
+				codecs: videoTrack.codec,
+				scanType: videoTrack.scanType,
+			};
+		}
 		return {
-			$: {
+			$: videoProps ?? {
 				id: track.id,
-				bandwidth: track.bandwidth,
+				bandwidth: track.bandwidth.toString(),
 			},
 			SegmentBase: baseSegmentToSegment(track.segments),
 		};
 	});
 }
 
-function selectionToAdapationSet(selectionsSets: SelectionSet[]): AdaptationSet[] {
+function selectionToAdaptationSet(selectionsSets: SelectionSet[]): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
-		return selectionSet.switchingSet.map((switchingSet) => {
+		return selectionSet.switchingSets.map((switchingSet) => {
 			return {
 				$: {
 					id: switchingSet.id,
@@ -47,9 +60,9 @@ function mapHamToMpd(hamManifest: Presentation): DashManifest {
 			Period: [
 				{
 					$: {
-						duration: hamManifest.selectionSets[0].switchingSet[0].tracks[0].duration.toString(),
+						duration: parseDurationMpd(hamManifest.selectionSets[0].switchingSets[0].tracks[0].duration),
 					},
-					AdaptationSet: selectionToAdapationSet(hamManifest.selectionSets),
+					AdaptationSet: selectionToAdaptationSet(hamManifest.selectionSets),
 				},
 			],
 		},

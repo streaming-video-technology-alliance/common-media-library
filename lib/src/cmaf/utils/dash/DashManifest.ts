@@ -1,22 +1,26 @@
+type Initialization = {
+	$: {
+		range: string,
+	}
+}
+
 type SegmentMpd = {
 	$: {
-		timescale?: number,
-		indexRangeExact?: boolean,
-		indexRange: string | null,
+		timescale?: string,
+		indexRangeExact?: string,
+		indexRange: string,
 	},
-	Initialization: [
-		{
-			$: {
-				range: string | null,
-			}
-		}
-	]
+	Initialization: Initialization[],
 }
 
 type Representation = {
 	$: {
 		id: string,
-		bandwidth: number,
+		bandwidth: string,
+		width?: string,
+		height?: string,
+		codecs?: string,
+		scanType?: string,
 	},
 	BaseURL?: string[],
 	SegmentBase: SegmentMpd[]
@@ -33,17 +37,22 @@ type AdaptationSet = {
 		segmentAlignment?: string,
 		subsegmentAlignment?: string,
 		subsegmentStartsWithSAP?: string,
-		audioSamplingRate?: number,
+		audioSamplingRate?: string,
 		mimeType?: string,
 		codecs: string,
 		startWithSAP?: string,
 		par?: string;
 		sar?: string;
-		maxWidth?: number;
-		maxHeight?: number;
+		maxWidth?: string;
+		maxHeight?: string;
 
 	},
-	AudioChannelConfiguration?: any[],
+	AudioChannelConfiguration?: {
+		$: {
+			schemeIdUri: string;
+			value: string;
+		}
+	}[],
 	Role?: any[],
 	Representation: Representation[],
 }

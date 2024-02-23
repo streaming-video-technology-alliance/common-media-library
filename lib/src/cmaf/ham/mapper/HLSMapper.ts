@@ -3,7 +3,7 @@ import { uuid } from '../../../utils.js';
 import { PlayList } from '../../utils/hls/HlsManifest.js';
 import { formatSegments } from '../../utils/hls/formatter.js';
 import { Manifest } from '../../utils/types/index.js';
-import { AudioTrack, Segment, SelectionSet , SwitchingSet ,TextTrack, VideoTrack, Presentation, Track } from '../model/index.js';
+import { AudioTrack, Segment, SelectionSet , SwitchingSet ,TextTrack, VideoTrack, Presentation, Track } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 import os from 'os';
 export class HLSMapper implements IMapper {
@@ -28,24 +28,23 @@ export class HLSMapper implements IMapper {
 			const targetDuration = audioParsed?.targetDuration;
 			// TODO: retrieve channels, samplerate, bandwidth and codec
 			audioTracks.push(
-				new AudioTrack(
-					audio,
-					'AUDIO',
-					uri,
-					'',
-					targetDuration,
-					language,
-					0,
-					segments,
-					0,
-					0
-				)
+					{ id: audio,
+						type: 'AUDIO',
+						name: uri,
+						codec: '',
+						duration: targetDuration,
+						language: language,
+						bandwidth: 0,
+						segments: segments,
+						sampleRate: 0,
+						channels: 0,
+					} as AudioTrack
 			);
-			audioSwitchingSets.push(new SwitchingSet(audio, audioTracks));
+			audioSwitchingSets.push({ id: audio, tracks: audioTracks }as SwitchingSet);
 			
 		}
 
-		selectionSets.push(new SelectionSet(uuid(), audioSwitchingSets));
+		selectionSets.push({ id: uuid(),switchingSets: audioSwitchingSets }as SelectionSet);
 
 		const subtitleSwitchingSets: SwitchingSet[] = [];
 
@@ -54,28 +53,26 @@ export class HLSMapper implements IMapper {
 			const attributes = mediaGroupsSubtitles[subtitle];
 			const textTracks: TextTrack[] = [];
 			const keys = Object.keys(attributes);
-			const { language, uri } = attributes[keys[0]];			const subtitleParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
+			const { language, uri } = attributes[keys[0]];			
+			const subtitleParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
 			const segments: Segment[] =  formatSegments(
 				subtitleParsed?.segments
 			);
 			const targetDuration = subtitleParsed?.targetDuration;
 			textTracks.push(
-				new TextTrack(
-					subtitle,
-					'TEXT',
-					uri,
-					'',
-					targetDuration,
-					language,
-					0,
-					segments
-				)
-			);
-			subtitleSwitchingSets.push(new SwitchingSet(subtitle, textTracks));
+				{ id: subtitle,
+					type: 'TEXT',
+					name: uri,
+					codec: '',
+					duration: targetDuration,	
+					language: language,
+					bandwidth: 0,
+					segments: segments } as TextTrack);
+			subtitleSwitchingSets.push({ id: subtitle, tracks: textTracks } as SwitchingSet);
 		}
 
 		if (subtitleSwitchingSets.length > 0) {
-			selectionSets.push(new SelectionSet(uuid(), subtitleSwitchingSets));
+			selectionSets.push({ id: uuid(),switchingSets: subtitleSwitchingSets } as SelectionSet);
 		}
 
 		//Add selection set of type video
@@ -93,30 +90,29 @@ export class HLSMapper implements IMapper {
 				width: playlist.attributes.RESOLUTION.width,
 				height: playlist.attributes.RESOLUTION.height,
 			};
-			tracks.push(
-				new VideoTrack(
-					uuid(),
-					'VIDEO',
-					playlist.uri,
-					CODECS,
-					targetDuration,
-					LANGUAGE,
-					BANDWIDTH,
-					segments,
-					resolution.width,
-					resolution.height,
-					playlist.attributes['FRAME-RATE'],
-					'',
-					'',
-					''
-				)
-			);
-			switchingSetVideos.push(new SwitchingSet(uuid(), tracks));
+			tracks.push({
+				id: uuid(),
+				type: 'VIDEO',
+				name: playlist.uri,
+				codec: CODECS,
+				duration: targetDuration,
+				language: LANGUAGE,
+				bandwidth: BANDWIDTH,
+				segments: segments,
+				width: resolution.width,
+				height: resolution.height,
+				frameRate: playlist.attributes['FRAME-RATE'],
+				par: '',
+				sar: '',
+				scanType: '',
+			} as VideoTrack);
+			
+			switchingSetVideos.push({ id: uuid(), tracks: tracks } as SwitchingSet);
 		});
 
-		selectionSets.push(new SelectionSet(uuid(), switchingSetVideos));
+		selectionSets.push({ id: uuid(),switchingSets: switchingSetVideos } as SelectionSet);
 
-		const presentations = [new Presentation(uuid(), selectionSets)];
+		const presentations = [{ id: uuid(),selectionSets: selectionSets }];
 		return presentations;
 
 	}
@@ -129,7 +125,7 @@ export class HLSMapper implements IMapper {
 		presentation.map((pres) => {
 			const selectionSets = pres.selectionSets;
 			selectionSets.map((selectionSet) => {
-				const switchingSets = selectionSet.switchingSet;
+				const switchingSets = selectionSet.switchingSets;
 				switchingSets.map((switchingSet) => {
 					const tracks = switchingSet.tracks;
 					tracks.map((track) => {
