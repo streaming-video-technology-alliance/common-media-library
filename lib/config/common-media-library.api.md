@@ -443,8 +443,10 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 // @beta
 export function uuid(): string;
 
+// Warning: (ae-forgotten-export) The symbol "TrackValidity" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export function validateTracks(tracks: Track[]): boolean;
+export function validateTracks(tracks: Track[]): TrackValidity;
 
 // @public (undocumented)
 export type VideoTrack = Track & {
