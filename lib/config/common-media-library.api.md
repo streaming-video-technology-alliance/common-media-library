@@ -80,12 +80,90 @@ export class CaptionsLogger {
 }
 
 // @public (undocumented)
+export class Cea608Channel {
+    constructor(channelNumber: number, outputFilter: any, // todo check that
+    logger: CaptionsLogger);
+    // (undocumented)
+    ccAOF(): void;
+    // (undocumented)
+    ccAON(): void;
+    // (undocumented)
+    ccBS(): void;
+    // (undocumented)
+    ccCR(): void;
+    // (undocumented)
+    ccDER(): void;
+    // (undocumented)
+    ccEDM(): void;
+    // (undocumented)
+    ccENM(): void;
+    // (undocumented)
+    ccEOC(): void;
+    // (undocumented)
+    ccFON(): void;
+    // (undocumented)
+    ccMIDROW(secondByte: number): void;
+    // (undocumented)
+    ccRCL(): void;
+    // (undocumented)
+    ccRDC(): void;
+    // (undocumented)
+    ccRTD(): void;
+    // (undocumented)
+    ccRU(nrRows: number | null): void;
+    // (undocumented)
+    ccTO(nrCols: number): void;
+    // (undocumented)
+    ccTR(): void;
+    // (undocumented)
+    chNr: number;
+    // (undocumented)
+    cueSplitAtTime(t: number): void;
+    // (undocumented)
+    cueStartTime: number | null;
+    // (undocumented)
+    currRollUpRow: Row;
+    // (undocumented)
+    displayedMemory: CaptionScreen;
+    // (undocumented)
+    getHandler(): any;
+    // (undocumented)
+    insertChars(chars: number[]): void;
+    // (undocumented)
+    lastOutputScreen: CaptionScreen;
+    // (undocumented)
+    logger: CaptionsLogger;
+    // Warning: (ae-forgotten-export) The symbol "CaptionModes" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    mode: CaptionModes;
+    // (undocumented)
+    nonDisplayedMemory: CaptionScreen;
+    // (undocumented)
+    outputDataUpdate(dispatch?: boolean): void;
+    // (undocumented)
+    outputFilter: any;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setBkgData(bkgData: Partial<PenStyles>): void;
+    // (undocumented)
+    setHandler(newHandler: any): void;
+    // (undocumented)
+    setMode(newMode: CaptionModes): void;
+    // (undocumented)
+    setPAC(pacData: PACData): void;
+    // (undocumented)
+    verbose: number;
+    // (undocumented)
+    writeScreen: CaptionScreen;
+}
+
+// @public (undocumented)
 export class Cea608Parser {
     // Warning: (ae-forgotten-export) The symbol "SupportedField" needs to be exported by the entry point index.d.ts
     constructor(field: SupportedField, out1: any, out2: any);
     addData(time: number | null, byteList: number[]): void;
-    // Warning: (ae-forgotten-export) The symbol "Cea608Channel" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     channels: Array<Cea608Channel | null>;
     // Warning: (ae-forgotten-export) The symbol "CmdHistory" needs to be exported by the entry point index.d.ts
