@@ -4,6 +4,7 @@ import { Ham } from './Ham';
 type Track = Ham & {
 	id: string;
 	type: string;
+	name: string;
 	codec: string;
 	duration: number;
 	language: string;
