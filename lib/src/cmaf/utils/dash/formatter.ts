@@ -1,8 +1,4 @@
-import {
-	AdaptationSet,
-	DashManifest,
-	Representation,
-} from '../utils/dash/DashManifest.js';
+import { AdaptationSet, DashManifest, Representation } from './DashManifest.js';
 import {
 	Presentation,
 	SelectionSet,
@@ -12,8 +8,8 @@ import {
 	VideoTrack,
 	AudioTrack,
 	TextTrack,
-} from './types/model/index.js';
-import { iso8601DurationToNumber } from '../utils/utils.js';
+} from '../../ham/types/model/index.js';
+import { iso8601DurationToNumber } from '../utils.js';
 
 function createTrack(
 	type: string,
