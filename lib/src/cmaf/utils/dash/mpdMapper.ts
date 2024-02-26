@@ -1,5 +1,16 @@
-import { AdaptationSet, DashManifest, Representation, SegmentMpd } from './DashManifest.js';
-import { Presentation, SelectionSet, Segment, Track, VideoTrack } from '../../ham/types/model/index.js';
+import {
+	AdaptationSet,
+	DashManifest,
+	Representation,
+	SegmentMpd,
+} from './DashManifest.js';
+import {
+	Presentation,
+	SelectionSet,
+	Segment,
+	Track,
+	VideoTrack,
+} from '../../ham/types/model/index.js';
 import { parseDurationMpd } from '../utils.js';
 
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentMpd[] {
@@ -37,7 +48,9 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 	});
 }
 
-function selectionToAdaptationSet(selectionsSets: SelectionSet[]): AdaptationSet[] {
+function selectionToAdaptationSet(
+	selectionsSets: SelectionSet[],
+): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
 		return selectionSet.switchingSets.map((switchingSet) => {
 			return {
@@ -60,9 +73,14 @@ function mapHamToMpd(hamManifest: Presentation): DashManifest {
 			Period: [
 				{
 					$: {
-						duration: parseDurationMpd(hamManifest.selectionSets[0].switchingSets[0].tracks[0].duration),
+						duration: parseDurationMpd(
+							hamManifest.selectionSets[0].switchingSets[0]
+								.tracks[0].duration,
+						),
 					},
-					AdaptationSet: selectionToAdaptationSet(hamManifest.selectionSets),
+					AdaptationSet: selectionToAdaptationSet(
+						hamManifest.selectionSets,
+					),
 				},
 			],
 		},

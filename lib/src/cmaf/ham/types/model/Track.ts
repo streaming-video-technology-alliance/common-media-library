@@ -4,12 +4,13 @@ import { Ham } from './Ham';
 type Track = Ham & {
 	id: string;
 	type: string;
+	name: string;
 	codec: string;
 	duration: number;
 	language: string;
 	bandwidth: number;
 	segments: Segment[];
-}
+};
 
 type AudioTrack = Track & {
 	sampleRate: number;

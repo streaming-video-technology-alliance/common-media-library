@@ -22,8 +22,7 @@ function parseDurationMpd(duration: number): string {
 	const seconds = duration % 60;
 	if (hours > 0) {
 		return `PT${hours}H${minutes}M${seconds}S`;
-	}
-	else if (minutes > 0) {
+	} else if (minutes > 0) {
 		return `PT${minutes}M${seconds}S`;
 	}
 	return `PT${seconds}S`;
