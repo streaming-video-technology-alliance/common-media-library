@@ -1,0 +1,14 @@
+node_modules
+dev
+docs
+lib/dist
+*.md
+.github
+.eslintrc.json
+.prettierrc
+.devcontainer
+.docs
+.jsconfig.json
+.tsconfig.json
+.package.json
+.package-lock.json

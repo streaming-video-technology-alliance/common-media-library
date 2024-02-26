@@ -1,4 +1,8 @@
-import { AdaptationSet, DashManifest, Representation } from '../utils/dash/DashManifest.js';
+import {
+	AdaptationSet,
+	DashManifest,
+	Representation,
+} from '../utils/dash/DashManifest.js';
 import {
 	Presentation,
 	SelectionSet,
@@ -33,13 +37,13 @@ function createTrack(
 			segments: segments,
 			type: adaptationSet.$.contentType,
 			width: +(representation.$.width ?? 0),
-
 		} as VideoTrack;
-	}
-	else if (type === 'audio') {
+	} else if (type === 'audio') {
 		return {
 			bandwidth: +representation.$.bandwidth,
-			channels: +(adaptationSet.AudioChannelConfiguration![0].$.value ?? 0),
+			channels: +(
+				adaptationSet.AudioChannelConfiguration![0].$.value ?? 0
+			),
 			codec: adaptationSet.$.codecs,
 			duration: duration,
 			id: representation.$.id,
@@ -47,10 +51,9 @@ function createTrack(
 			sampleRate: +(adaptationSet.$.audioSamplingRate ?? 0),
 			segments: segments,
 			type: adaptationSet.$.contentType,
-
 		} as AudioTrack;
-	}
-	else { // if (type === 'text')
+	} else {
+		// if (type === 'text')
 		return {
 			bandwidth: +representation.$.bandwidth,
 			codec: adaptationSet.$.codecs,
@@ -59,44 +62,61 @@ function createTrack(
 			language: adaptationSet.$.lang,
 			segments: segments,
 			type: adaptationSet.$.contentType,
-
 		} as TextTrack;
 	}
 }
 
 function mapMpdToHam(rawManifest: DashManifest): Presentation {
-	const presentation: Presentation[] = rawManifest.MPD.Period.map((period) => {
-		const duration: number = iso8601DurationToNumber(period.$.duration);
-		const url: string = 'url'; // todo: get real url
-		const presentationId: string = 'presentation-id'; // todo: handle id
+	const presentation: Presentation[] = rawManifest.MPD.Period.map(
+		(period) => {
+			const duration: number = iso8601DurationToNumber(period.$.duration);
+			const url: string = 'url'; // todo: get real url
+			const presentationId: string = 'presentation-id'; // todo: handle id
 
-		const selectionSetGroups: { [group: string]: SelectionSet } = {};
+			const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
-		period.AdaptationSet.map((adaptationSet) => {
-			const tracks: Track[] = adaptationSet.Representation.map((representation) => {
-				const segments = representation.SegmentBase.map((segment) => {
-					return { duration, url, byteRange: segment.$.indexRange } as Segment;
-				});
+			period.AdaptationSet.map((adaptationSet) => {
+				const tracks: Track[] = adaptationSet.Representation.map(
+					(representation) => {
+						const segments = representation.SegmentBase.map(
+							(segment) => {
+								return {
+									duration,
+									url,
+									byteRange: segment.$.indexRange,
+								} as Segment;
+							},
+						);
 
-				return createTrack(adaptationSet.$.contentType, representation, adaptationSet, duration, segments);
+						return createTrack(
+							adaptationSet.$.contentType,
+							representation,
+							adaptationSet,
+							duration,
+							segments,
+						);
+					},
+				);
+
+				if (!selectionSetGroups[adaptationSet.$.group]) {
+					selectionSetGroups[adaptationSet.$.group] = {
+						id: adaptationSet.$.group,
+						switchingSets: [],
+					} as SelectionSet;
+				}
+
+				selectionSetGroups[adaptationSet.$.group].switchingSets.push({
+					id: adaptationSet.$.id,
+					tracks,
+				} as SwitchingSet);
 			});
 
-			if (!selectionSetGroups[adaptationSet.$.group]) {
-				selectionSetGroups[adaptationSet.$.group] = {
-					id: adaptationSet.$.group,
-					switchingSets: [],
-				} as SelectionSet;
-			}
+			const selectionSets: SelectionSet[] =
+				Object.values(selectionSetGroups);
 
-			selectionSetGroups[adaptationSet.$.group].switchingSets.push(
-				{ id: adaptationSet.$.id, tracks } as SwitchingSet,
-			);
-		});
-
-		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups);
-
-		return { id: presentationId, selectionSets } as Presentation;
-	});
+			return { id: presentationId, selectionSets } as Presentation;
+		},
+	);
 
 	return presentation[0];
 }

@@ -8,7 +8,7 @@ export class MPDMapper implements IMapper {
 		throw new Error('Not implemented');
 	}
 
-	toManifest(presentation: Presentation []): Manifest {
+	toManifest(presentation: Presentation[]): Manifest {
 		console.log(presentation);
 		throw new Error('Not implemented');
 	}

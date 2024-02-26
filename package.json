@@ -28,6 +28,9 @@
 	"scripts": {
 		"format": "npm run lint -- --fix",
 		"lint": "eslint . --ext .js,.ts",
+		"prettier": "prettier",
+		"prettier:check": "prettier . --ext .js,.ts --check",
+		"prettier:fix": "npm run prettier -- --write",
 		"build": "npm run build -ws --if-present",
 		"pretest": "npm run build && npm run lint",
 		"test": "npm test -ws --if-present",
@@ -61,7 +64,10 @@
 	},
 	"dependencies": {
 		"@types/xml2js": "^0.4.14",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.1.3",
 		"m3u8-parser": "^7.1.0",
+		"prettier": "^3.2.5",
 		"xml2js": "^0.6.2"
 	}
 }
