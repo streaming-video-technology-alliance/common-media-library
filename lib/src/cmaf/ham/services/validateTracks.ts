@@ -6,7 +6,7 @@ function validateTracks(tracks: Track[]): boolean {
 	}
 	let duration: number | undefined;
 	let isValid = true;
-	tracks.forEach(track => {
+	tracks.forEach((track) => {
 		if (!duration) {
 			duration = track.duration;
 		}

@@ -6,14 +6,19 @@ function formatSegmentUrl(url: string, segmentUrl: string) {
 
 function formatSegments(segments: any[]) {
 	const formattedSegments: Segment[] = [];
-	(segments.map(async (segment: any) => {
+	segments.map(async (segment: any) => {
 		const { duration, uri } = segment;
-		const { length, offset } = segment.byterange ? segment.byterange : { length: 0, offset: 0 };
-		formattedSegments.push({ duration, url: uri, byteRange: `${length}@${offset}` });
-	}));
+		const { length, offset } = segment.byterange
+			? segment.byterange
+			: { length: 0, offset: 0 };
+		formattedSegments.push({
+			duration,
+			url: uri,
+			byteRange: `${length}@${offset}`,
+		});
+	});
 
 	return formattedSegments;
 }
-
 
 export { formatSegmentUrl, formatSegments };

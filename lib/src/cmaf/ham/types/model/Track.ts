@@ -10,7 +10,7 @@ type Track = Ham & {
 	language: string;
 	bandwidth: number;
 	segments: Segment[];
-}
+};
 
 type AudioTrack = Track & {
 	sampleRate: number;

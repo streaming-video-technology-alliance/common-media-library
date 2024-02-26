@@ -6,7 +6,7 @@ import type { DashManifest } from '../utils/dash/DashManifest.js';
 
 async function mpdToHam(manifest: string): Promise<Presentation | null> {
 	let dashManifest: DashManifest | undefined;
-	await xmlToJson(manifest, (result: DashManifest) => dashManifest = result);
+	await xmlToJson(manifest, (result: DashManifest) => (dashManifest = result));
 
 	if (!dashManifest) {
 		return null;
