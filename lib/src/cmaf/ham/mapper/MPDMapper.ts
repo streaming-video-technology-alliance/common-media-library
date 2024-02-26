@@ -4,7 +4,7 @@ import { Manifest } from '../../utils/types/index.js';
 import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 import { mapMpdToHam } from '../hamMapper.js';
-
+import fs from 'fs';
 export class MPDMapper implements IMapper {
 	xmlToJson(raw: string, replace: (manifest: DashManifest) => void): void {
 		return parseString(raw, (err: Error | null, result: DashManifest) => {
@@ -35,3 +35,9 @@ export class MPDMapper implements IMapper {
 		throw new Error('Not implemented');
 	}
 }
+
+const testxml = fs.readFileSync('test.xml', 'utf8');
+const mapper = new MPDMapper();
+const result = mapper.toHam({ main: testxml, playlists: [], type: 'mpd' });
+console.log(result);
+fs.writeFileSync('test.json', JSON.stringify(result));
