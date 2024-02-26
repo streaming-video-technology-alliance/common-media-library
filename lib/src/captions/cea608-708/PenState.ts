@@ -64,7 +64,7 @@ export class PenState {
 		for (let i = 0; i < attribs.length; i++) {
 			const style = attribs[i];
 			if (Object.prototype.hasOwnProperty.call(styles, style)) {
-				(this as any)[style] = (styles as any)[style]; // ToDo: Improvment that
+				(this as any)[style] = (styles as any)[style];
 			}
 		}
 	}
