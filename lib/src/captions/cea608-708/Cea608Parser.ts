@@ -257,7 +257,7 @@ class Cea608Parser {
 
 	/**
    * Parse Preable Access Codes (Table 53).
-   * @returns {Boolean} Tells if PAC found
+   * @returns A Boolean that tells if PAC found
    */
 	parsePAC(a: number, b: number): boolean {
 		let row: number;
