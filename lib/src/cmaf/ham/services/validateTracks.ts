@@ -7,7 +7,7 @@ type TrackValidity = {
 		atLeastOneSegment: boolean;
 	};
 	tracksWithErrors: string[];
-}
+};
 
 function validateTracks(tracks: Track[]): TrackValidity {
 	if (!tracks?.length) {
@@ -28,7 +28,7 @@ function validateTracks(tracks: Track[]): TrackValidity {
 	const tracksWithErrors: string[] = [];
 
 	let duration: number | undefined;
-	tracks.forEach(track => {
+	tracks.forEach((track) => {
 		// Validate same duration
 		if (!duration) {
 			duration = track.duration;

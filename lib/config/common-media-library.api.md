@@ -294,11 +294,6 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 // @public (undocumented)
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
-// Warning: (ae-forgotten-export) The symbol "m3u8" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export function hamToM3u8(presentation: Presentation): m3u8;
-
 // @public (undocumented)
 export function hamToMpd(ham: Presentation): Promise<string | null>;
 
@@ -427,6 +422,7 @@ export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 export type Track = Ham & {
     id: string;
     type: string;
+    name: string;
     codec: string;
     duration: number;
     language: string;

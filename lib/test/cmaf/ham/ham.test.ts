@@ -1,10 +1,13 @@
-import { SelectionSet, validateTracks, getTracksFromSelectionSet } from '@svta/common-media-library';
+import {
+	SelectionSet,
+	validateTracks,
+	getTracksFromSelectionSet,
+} from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it, beforeEach } from 'node:test';
 import jsonSelectionSet1 from './data/selectionSet1.json' assert { type: 'json' };
 
 describe('ham validation', () => {
-
 	let selectionSet: SelectionSet;
 	beforeEach(() => {
 		selectionSet = jsonSelectionSet1 as unknown as SelectionSet;
@@ -30,7 +33,8 @@ describe('ham validation', () => {
 
 	it('returns false when at least one track has different duration', () => {
 		// FIXME: For some reason the changes in the object are affecting other tests
-		const originalDuration = selectionSet.switchingSets[0].tracks[1].duration;
+		const originalDuration =
+			selectionSet.switchingSets[0].tracks[1].duration;
 		selectionSet.switchingSets[0].tracks[1].duration = 1;
 
 		const valid = validateTracks(getTracksFromSelectionSet(selectionSet));
@@ -44,7 +48,8 @@ describe('ham validation', () => {
 
 	it('returns false when at least one track has no segments', () => {
 		// FIXME: For some reason the changes in the object are affecting other tests
-		const originalSegments = selectionSet.switchingSets[0].tracks[1].segments;
+		const originalSegments =
+			selectionSet.switchingSets[0].tracks[1].segments;
 		selectionSet.switchingSets[0].tracks[1].segments = [];
 
 		const valid = validateTracks(getTracksFromSelectionSet(selectionSet));

@@ -4,14 +4,14 @@ import {
 	Representation,
 } from '../utils/dash/DashManifest.js';
 import {
+	AudioTrack,
 	Presentation,
+	Segment,
 	SelectionSet,
 	SwitchingSet,
-	Segment,
+	TextTrack,
 	Track,
 	VideoTrack,
-	AudioTrack,
-	TextTrack,
 } from './types/model/index.js';
 import { iso8601DurationToNumber } from '../utils/utils.js';
 
