@@ -1,26 +1,30 @@
+type Initialization = {
+	$: {
+		range: string,
+	}
+}
+
 type SegmentMpd = {
 	$: {
-		timescale?: string;
-		indexRangeExact?: string;
-		indexRange: string | null;
-	};
-	Initialization: [
-		{
-			$: {
-				range: string | null;
-			};
-		},
-	];
-};
+		timescale?: string,
+		indexRangeExact?: string,
+		indexRange: string,
+	},
+	Initialization: Initialization[],
+}
 
 type Representation = {
 	$: {
-		id: string;
-		bandwidth: string;
-	};
-	BaseURL?: string[];
-	SegmentBase: SegmentMpd[];
-};
+		id: string,
+		bandwidth: string,
+		width?: string,
+		height?: string,
+		codecs?: string,
+		scanType?: string,
+	},
+	BaseURL?: string[],
+	SegmentBase: SegmentMpd[]
+}
 
 type AdaptationSet = {
 	$: {
@@ -41,11 +45,17 @@ type AdaptationSet = {
 		sar?: string;
 		maxWidth?: string;
 		maxHeight?: string;
-	};
-	AudioChannelConfiguration?: any[];
-	Role?: any[];
-	Representation: Representation[];
-};
+
+	},
+	AudioChannelConfiguration?: {
+		$: {
+			schemeIdUri: string;
+			value: string;
+		}
+	}[],
+	Role?: any[],
+	Representation: Representation[],
+}
 
 type Period = {
 	$: {
