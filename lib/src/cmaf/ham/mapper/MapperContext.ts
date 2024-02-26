@@ -16,5 +16,4 @@ export class MapperContext {
 	public getManifestFormat(presentation: Presentation[]): Manifest {
 		return this.strategy.toManifest(presentation);
 	}
-
 }
