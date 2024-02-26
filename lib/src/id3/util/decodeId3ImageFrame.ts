@@ -89,11 +89,6 @@ function fromUTF8(data?: BufferSource) {
 		uint8 = uint8.subarray(3);
 	}
 
-	// Homebrewed UTF-8 decoder based on
-	// https://en.wikipedia.org/wiki/UTF-8#Encoding
-	// Unlike decodeURIComponent, won't throw on bad encoding.
-	// In this way, it is similar to TextDecoder.
-
 	let decoded = '';
 	for (let i = 0; i < uint8.length; ++i) {
 		// By default, the 'replacement character' codepoint.
