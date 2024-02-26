@@ -57,7 +57,7 @@ export class Cea608Channel {
 
 	constructor(
 		channelNumber: number,
-		outputFilter: any, // todo check that
+		outputFilter: any,
 		logger: CaptionsLogger,
 	) {
 		this.chNr = channelNumber;
@@ -86,7 +86,7 @@ export class Cea608Channel {
 		this.cueStartTime = null;
 	}
 
-	getHandler(): any { //todo_check that
+	getHandler(): any {
 		return this.outputFilter;
 	}
 
