@@ -81,7 +81,7 @@ export class CaptionsLogger {
 
 // @public
 export class Cea608Channel {
-    constructor(channelNumber: number, outputFilter: any, // todo check that
+    constructor(channelNumber: number, outputFilter: any,
     logger: CaptionsLogger);
     // (undocumented)
     ccAOF(): void;
