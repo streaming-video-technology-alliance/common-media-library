@@ -72,7 +72,6 @@ function mapMpdToHam(rawManifest: DashManifest): Presentation {
 			const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
 			period.AdaptationSet.map((adaptationSet) => {
-				console.log(adaptationSet);
 				const tracks: Track[] = adaptationSet.Representation.map(
 					(representation) => {
 						const segments = representation.SegmentBase.map(

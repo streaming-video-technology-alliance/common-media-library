@@ -24,6 +24,7 @@ export class MPDMapper implements IMapper {
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
+		//TODO: Handle multiple presentations
 		const jsonMpd = mapHamToMpd(presentation[0]);
 
 		if (!jsonMpd) {
@@ -31,7 +32,6 @@ export class MPDMapper implements IMapper {
 		}
 
 		const mpd = jsonToXml(jsonMpd);
-
 		return { main: mpd, playlists: [], type: 'mpd' };
 	}
 }
