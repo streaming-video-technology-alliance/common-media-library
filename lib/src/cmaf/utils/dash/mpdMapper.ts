@@ -79,7 +79,7 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 			AdaptationSet: selectionToAdaptationSet(hamManifest.selectionSets),
 		};
 	});
-	console.log(periods);
+
 	return {
 		MPD: {
 			Period: periods,
