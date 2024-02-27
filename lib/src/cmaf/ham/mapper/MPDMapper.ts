@@ -5,6 +5,7 @@ import { IMapper } from './IMapper.js';
 import { mapMpdToHam } from '../../utils/dash/formatter.js';
 import { xmlToJson, jsonToXml } from '../../utils/xmlUtils.js';
 import { mapHamToMpd } from '../../utils/dash/mpdMapper.js';
+
 export class MPDMapper implements IMapper {
 	//TODO : Handle SegmentTemplate and SegmentList
 
@@ -24,9 +25,7 @@ export class MPDMapper implements IMapper {
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		//TODO: Handle multiple presentations.
-		//We should iterate over all presentations and concatenate them into a single MPD
-		const jsonMpd = mapHamToMpd(presentation[0]);
+		const jsonMpd = mapHamToMpd(presentation);
 
 		if (!jsonMpd) {
 			return { main: '', playlists: [], type: 'mpd' };
