@@ -2,8 +2,7 @@ import { DecodedId3Frame } from '../DecodedId3Frame.js';
 import { RawId3Frame } from './RawFrame.js';
 import { toUint8 } from './utf8.js';
 import { BufferSource } from 'stream/web';
-
-type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | Uint8ClampedArray;
+import { toArrayBuffer } from './toArrayBuffer.js';
 
 interface MetadataFrame {
 	key: string;
@@ -149,20 +148,4 @@ function fromUTF8(data?: BufferSource) {
 	}
 
 	return decoded;
-}
-
-export function toArrayBuffer(view: ArrayBuffer | TypedArray): ArrayBuffer{
-	if (view instanceof ArrayBuffer) {
-		return view;
-	} 
-	else {
-		if (view.byteOffset == 0 && view.byteLength == view.buffer.byteLength) {
-			// This is a TypedArray over the whole buffer.
-			return view.buffer;
-		}
-		// This is a 'view' on the buffer.  Create a new buffer that only contains
-		// the data.  Note that since this isn't an ArrayBuffer, the 'new' call
-		// will allocate a new buffer to hold the copy.
-		return new Uint8Array(view).buffer;
-	}
 }
