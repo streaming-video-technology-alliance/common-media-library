@@ -1,79 +1,142 @@
-type Initialization = {
+type SegmentURL = {
 	$: {
-		range: string;
+		media?: string;
 	};
 };
 
-type SegmentMpd = {
+type Initialization = {
 	$: {
-		timescale?: string;
-		indexRangeExact?: string;
+		range?: string;
+		sourceURL?: string;
+	};
+};
+
+type SegmentBase = {
+	$: {
 		indexRange: string;
+		indexRangeExact: string;
+		timescale: string;
 	};
 	Initialization: Initialization[];
 };
 
+type SegmentList = {
+	$: {
+		duration: string;
+		timescale: string;
+	};
+	Initialization: Initialization[];
+	SegmentURL?: SegmentURL[];
+};
+
+type SegmentTemplate = {
+	$: {
+		duration: string;
+		initialization: string;
+		media: string;
+		startNumber: string;
+		timescale: string;
+	};
+};
+
+type AudioChannelConfiguration = {
+	$: {
+		schemeIdUri: string;
+		value: string;
+	};
+};
+
 type Representation = {
 	$: {
-		id: string;
+		audioSamplingRate?: string;
 		bandwidth: string;
-		width?: string;
-		height?: string;
 		codecs?: string;
+		frameRate?: string;
+		height?: string;
+		id: string;
+		mimeType?: string;
+		sar?: string;
 		scanType?: string;
+		startWithSAP?: string;
+		width?: string;
 	};
+	AudioChannelConfiguration?: AudioChannelConfiguration[];
 	BaseURL?: string[];
-	SegmentBase: SegmentMpd[];
+	SegmentBase?: SegmentBase[];
+	SegmentList?: SegmentList[];
+};
+
+type ContentComponent = {
+	$: {
+		contentType: string;
+		id: string;
+	};
+};
+
+type Role = {
+	$: {
+		schemeIdUri: string;
+		value: string;
+	};
 };
 
 type AdaptationSet = {
 	$: {
-		id: string;
-		group: string;
-		contentType: string;
-		lang: string;
-		minBandwidth?: string;
-		maxBandwidth?: string;
-		segmentAlignment?: string;
-		subsegmentAlignment?: string;
-		subsegmentStartsWithSAP?: string;
 		audioSamplingRate?: string;
+		codecs?: string;
+		contentType?: string;
+		group?: string;
+		id?: string;
+		lang?: string;
+		maxBandwidth?: string;
+		maxFrameRate?: string;
+		maxHeight?: string;
+		maxWidth?: string;
 		mimeType?: string;
-		codecs: string;
-		startWithSAP?: string;
+		minBandwidth?: string;
 		par?: string;
 		sar?: string;
-		maxWidth?: string;
-		maxHeight?: string;
+		segmentAlignment: string;
+		startWithSAP?: string;
+		subsegmentAlignment?: string;
+		subsegmentStartsWithSAP?: string;
 	};
-	AudioChannelConfiguration?: {
-		$: {
-			schemeIdUri: string;
-			value: string;
-		};
-	}[];
-	Role?: any[];
+	AudioChannelConfiguration?: AudioChannelConfiguration[];
+	ContentComponent?: ContentComponent[];
+	Role?: Role[];
 	Representation: Representation[];
+	SegmentTemplate?: SegmentTemplate[];
 };
 
 type Period = {
 	$: {
 		duration: string;
+		id?: string;
+		start?: string;
 	};
 	AdaptationSet: AdaptationSet[];
 };
 
 type DashManifest = {
-	$?: {
-		xmlns?: string;
-		type?: string;
-		mediaPresentationDuration?: string;
-		minBufferTime?: string;
-		profiles?: string;
-	};
 	MPD: {
+		$?: {
+			maxSegmentDuration?: string;
+			mediaPresentationDuration: string;
+			minBufferTime: string;
+			profiles: string;
+			type: string;
+			xmlns: string;
+		};
 		Period: Period[];
 	};
 };
 
-export type { DashManifest, Period, AdaptationSet, Representation, SegmentMpd };
+export type {
+	DashManifest,
+	Period,
+	AdaptationSet,
+	Representation,
+	SegmentBase,
+	SegmentList,
+	SegmentTemplate,
+};

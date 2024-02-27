@@ -78,7 +78,7 @@
 			"always"
 		],
 		"brace-style": [
-			"error",
+			"warn",
 			"1tbs",
 			{
 				"allowSingleLine": true
