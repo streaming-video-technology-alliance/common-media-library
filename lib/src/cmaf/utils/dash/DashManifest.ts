@@ -117,22 +117,20 @@ type Period = {
 	AdaptationSet: AdaptationSet[];
 };
 
-type DashManifest = {
-	MPD: {
-		$?: {
-			maxSegmentDuration?: string;
-			mediaPresentationDuration: string;
-			minBufferTime: string;
-			profiles: string;
-			type: string;
-			xmlns: string;
-		};
-		Period: Period[];
+type MPD = {
+	$?: {
+		maxSegmentDuration?: string;
+		mediaPresentationDuration: string;
+		minBufferTime: string;
+		profiles: string;
+		type: string;
+		xmlns: string;
 	};
+	Period: Period[];
 };
 
 export type {
-	DashManifest,
+	MPD,
 	Period,
 	AdaptationSet,
 	Representation,

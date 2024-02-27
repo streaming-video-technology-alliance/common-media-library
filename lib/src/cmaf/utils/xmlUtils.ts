@@ -1,11 +1,8 @@
 import { Builder, parseString } from 'xml2js';
-import { DashManifest } from './dash/DashManifest.js';
+import { MPD } from './dash/DashManifest.js';
 
-function xmlToJson(
-	raw: string,
-	replace: (manifest: DashManifest) => void,
-): void {
-	return parseString(raw, (err: Error | null, result: DashManifest) => {
+function xmlToJson(raw: string, replace: (manifest: MPD) => void): void {
+	return parseString(raw, (err: Error | null, result: MPD) => {
 		if (err) {
 			throw new Error(err.message);
 		}

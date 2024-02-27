@@ -1,6 +1,6 @@
 import {
 	AdaptationSet,
-	DashManifest,
+	MPD,
 	Representation,
 	SegmentBase,
 } from './DashManifest.js';
@@ -68,7 +68,7 @@ function selectionToAdaptationSet(
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+function mapHamToMpd(hamManifests: Presentation[]): MPD {
 	const periods = hamManifests.map((hamManifest) => {
 		return {
 			$: {
@@ -82,9 +82,7 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	});
 
 	return {
-		MPD: {
-			Period: periods,
-		},
+		Period: periods,
 	};
 }
 

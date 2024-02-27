@@ -1,4 +1,4 @@
-import { DashManifest } from '../../utils/dash/DashManifest.js';
+import { MPD } from '../../utils/dash/DashManifest.js';
 import { Manifest } from '../../utils/types/index.js';
 import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
@@ -10,11 +10,8 @@ export class MPDMapper implements IMapper {
 	//TODO : Handle SegmentTemplate and SegmentList
 
 	toHam(manifest: Manifest): Presentation[] {
-		let dashManifest: DashManifest | undefined;
-		xmlToJson(
-			manifest.main,
-			(result: DashManifest) => (dashManifest = result),
-		);
+		let dashManifest: MPD | undefined;
+		xmlToJson(manifest.main, (result: MPD) => (dashManifest = result));
 
 		if (!dashManifest) {
 			return [];
