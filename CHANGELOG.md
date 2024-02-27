@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Unit tests for id3 feature helper functions [#74](https://github.com/streaming-video-technology-alliance/common-media-library/pull/74)
+- CEA608/708 parser [#75](https://github.com/streaming-video-technology-alliance/common-media-library/pull/75)
 
 
 ## [0.6.2] - 2023-01-18
