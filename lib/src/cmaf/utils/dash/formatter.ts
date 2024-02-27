@@ -13,8 +13,8 @@ import {
 	TextTrack,
 	Track,
 	VideoTrack,
-} from './types/model/index.js';
-import { iso8601DurationToNumber } from '../utils/utils.js';
+} from '../../ham/types/model/index.js';
+import { iso8601DurationToNumber } from '../utils.js';
 
 function getContentType(adaptationSet: AdaptationSet): string {
 	if (adaptationSet.$.contentType) {
@@ -130,11 +130,10 @@ function mpdSegmentsToHamSegments(
 	}
 }
 
-function mapMpdToHam(rawManifest: DashManifest): Presentation {
-	const presentation: Presentation[] = rawManifest.MPD.Period.map(
+function mapMpdToHam(rawManifest: DashManifest): Presentation[] {
+	const presentations: Presentation[] = rawManifest.MPD.Period.map(
 		(period) => {
 			const duration: number = iso8601DurationToNumber(period.$.duration);
-			// const url: string = 'url'; // todo: get real url
 			const presentationId: string = 'presentation-id'; // todo: handle id
 
 			const selectionSetGroups: { [group: string]: SelectionSet } = {};
@@ -178,7 +177,7 @@ function mapMpdToHam(rawManifest: DashManifest): Presentation {
 		},
 	);
 
-	return presentation[0];
+	return presentations;
 }
 
 export { mapMpdToHam };

@@ -68,22 +68,22 @@ function selectionToAdaptationSet(
 	});
 }
 
-function mapHamToMpd(hamManifest: Presentation): DashManifest {
+function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+	const periods = hamManifests.map((hamManifest) => {
+		return {
+			$: {
+				duration: parseDurationMpd(
+					hamManifest.selectionSets[0].switchingSets[0].tracks[0]
+						.duration,
+				),
+			},
+			AdaptationSet: selectionToAdaptationSet(hamManifest.selectionSets),
+		};
+	});
+
 	return {
 		MPD: {
-			Period: [
-				{
-					$: {
-						duration: parseDurationMpd(
-							hamManifest.selectionSets[0].switchingSets[0]
-								.tracks[0].duration,
-						),
-					},
-					AdaptationSet: selectionToAdaptationSet(
-						hamManifest.selectionSets,
-					),
-				},
-			],
+			Period: periods,
 		},
 	};
 }
