@@ -12,7 +12,7 @@ function formatSegments(segments: any[]) {
 			? segment.byterange
 			: { length: 0, offset: 0 };
 		formattedSegments.push({
-			duration,
+			duration: duration,
 			url: uri,
 			byteRange: `${length}@${offset}`,
 		} as Segment);

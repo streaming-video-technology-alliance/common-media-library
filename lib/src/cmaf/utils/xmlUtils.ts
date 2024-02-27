@@ -1,10 +1,10 @@
 import { Builder, parseString } from 'xml2js';
 import { DashManifest } from './dash/DashManifest.js';
 
-async function xmlToJson(
+function xmlToJson(
 	raw: string,
 	replace: (manifest: DashManifest) => void,
-): Promise<void> {
+): void {
 	return parseString(raw, (err: Error | null, result: DashManifest) => {
 		if (err) {
 			throw new Error(err.message);
@@ -13,7 +13,7 @@ async function xmlToJson(
 	});
 }
 
-async function jsonToXml(json: object): Promise<string> {
+function jsonToXml(json: object): string {
 	const builder = new Builder();
 	return builder.buildObject(json);
 }
