@@ -62,8 +62,8 @@ function createTrack(
 	}
 }
 
-function mapMpdToHam(rawManifest: DashManifest): Presentation[] {
-	const presentations : Presentation[] = rawManifest.MPD.Period.map(
+function mpdToHam(rawManifest: DashManifest): Presentation[] {
+	const presentations: Presentation[] = rawManifest.MPD.Period.map(
 		(period) => {
 			const duration: number = iso8601DurationToNumber(period.$.duration);
 			const url: string = 'url'; // todo: get real url
@@ -117,4 +117,4 @@ function mapMpdToHam(rawManifest: DashManifest): Presentation[] {
 	return presentations;
 }
 
-export { mapMpdToHam };
+export { mpdToHam };
