@@ -24,15 +24,6 @@ export function decodeId3ImageFrame(
 		pictureType: null,
 	};
 
-	/**
-	 * Format:
-	 * [0]       = {Text Encoding}
-	 * [1 - X]   = {MIME Type}\0
-	 * [X+1]     = {Picture Type}
-	 * [X+2 - Y] = {Description}\0
-	 * [Y - ?]   = {Picture Data or Picture URL}
-	 */
-
 	const utf8Encoding = 0x03;
 
 	if (frame.size < 2) {
