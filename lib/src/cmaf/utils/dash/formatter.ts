@@ -1,13 +1,13 @@
 import { AdaptationSet, DashManifest, Representation } from './DashManifest.js';
 import {
+	AudioTrack,
 	Presentation,
+	Segment,
 	SelectionSet,
 	SwitchingSet,
-	Segment,
+	TextTrack,
 	Track,
 	VideoTrack,
-	AudioTrack,
-	TextTrack,
 } from '../../ham/types/model/index.js';
 import { iso8601DurationToNumber } from '../utils.js';
 

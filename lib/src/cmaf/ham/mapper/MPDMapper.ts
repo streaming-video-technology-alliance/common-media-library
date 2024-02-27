@@ -24,7 +24,7 @@ export class MPDMapper implements IMapper {
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		//TODO: Handle multiple presentations. 
+		//TODO: Handle multiple presentations.
 		//We should iterate over all presentations and concatenate them into a single MPD
 		const jsonMpd = mapHamToMpd(presentation[0]);
 

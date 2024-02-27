@@ -1,4 +1,4 @@
-import { parseString, Builder } from 'xml2js';
+import { Builder, parseString } from 'xml2js';
 import { DashManifest } from './dash/DashManifest.js';
 
 function xmlToJson(

@@ -79,9 +79,9 @@
 		],
 		"brace-style": [
 			"error",
-			"stroustrup",
+			"1tbs",
 			{
-				"allowSingleLine": false
+				"allowSingleLine": true
 			}
 		],
 		"tsdoc/syntax": "warn",

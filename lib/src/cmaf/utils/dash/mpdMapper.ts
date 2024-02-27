@@ -6,8 +6,8 @@ import {
 } from './DashManifest.js';
 import {
 	Presentation,
-	SelectionSet,
 	Segment,
+	SelectionSet,
 	Track,
 	VideoTrack,
 } from '../../ham/types/model/index.js';
@@ -74,13 +74,10 @@ function mapHamToMpd(hamManifest: Presentation): DashManifest {
 				{
 					$: {
 						duration: parseDurationMpd(
-							hamManifest.selectionSets[0].switchingSets[0]
-								.tracks[0].duration,
+							hamManifest.selectionSets[0].switchingSets[0].tracks[0].duration,
 						),
 					},
-					AdaptationSet: selectionToAdaptationSet(
-						hamManifest.selectionSets,
-					),
+					AdaptationSet: selectionToAdaptationSet(hamManifest.selectionSets),
 				},
 			],
 		},

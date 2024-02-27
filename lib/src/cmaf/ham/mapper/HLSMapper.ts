@@ -5,16 +5,17 @@ import { formatSegments } from '../../utils/hls/formatter.js';
 import { Manifest } from '../../utils/types/index.js';
 import {
 	AudioTrack,
+	Presentation,
 	Segment,
 	SelectionSet,
 	SwitchingSet,
 	TextTrack,
-	VideoTrack,
-	Presentation,
 	Track,
+	VideoTrack,
 } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 import os from 'os';
+
 export class HLSMapper implements IMapper {
 	toHam(manifest: Manifest): Presentation[] {
 		const mainManifestParsed = parseM3u8(manifest.main);
@@ -66,12 +67,8 @@ export class HLSMapper implements IMapper {
 			const textTracks: TextTrack[] = [];
 			const keys = Object.keys(attributes);
 			const { language, uri } = attributes[keys[0]];
-			const subtitleParsed = parseM3u8(
-				manifestPlaylists[currentPlaylist++],
-			);
-			const segments: Segment[] = formatSegments(
-				subtitleParsed?.segments,
-			);
+			const subtitleParsed = parseM3u8(manifestPlaylists[currentPlaylist++]);
+			const segments: Segment[] = formatSegments(subtitleParsed?.segments);
 			const targetDuration = subtitleParsed?.targetDuration;
 			textTracks.push({
 				id: subtitle,
@@ -100,13 +97,9 @@ export class HLSMapper implements IMapper {
 		const switchingSetVideos: SwitchingSet[] = [];
 
 		playlists.map(async (playlist: any) => {
-			const parsedHlsManifest = parseM3u8(
-				manifestPlaylists[currentPlaylist++],
-			);
+			const parsedHlsManifest = parseM3u8(manifestPlaylists[currentPlaylist++]);
 			const tracks: Track[] = [];
-			const segments: Segment[] = formatSegments(
-				parsedHlsManifest?.segments,
-			);
+			const segments: Segment[] = formatSegments(parsedHlsManifest?.segments);
 			const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 			const targetDuration = parsedHlsManifest?.targetDuration;
 			const resolution = {
