@@ -16,4 +16,8 @@ export class MapperContext {
 	public getManifestFormat(presentation: Presentation[]): Manifest {
 		return this.strategy.toManifest(presentation);
 	}
+
+	public getManifestMetadata(): JSON | undefined {
+		return this.strategy.getManifestMetadata();
+	}
 }

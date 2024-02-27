@@ -5,9 +5,18 @@ import { IMapper } from './IMapper.js';
 import { mpdToHam } from '../../utils/dash/mpdToHam.js';
 import { xmlToJson, jsonToXml } from '../../utils/xmlUtils.js';
 import { hamToMPD } from '../../utils/dash/hamToMPD.js';
+import { getMetadata } from '../../utils/manifestUtils.js';
 
 export class MPDMapper implements IMapper {
-	//TODO : Handle SegmentTemplate and SegmentList
+	private manifest: Manifest | undefined;
+
+	public MPDMapper(manifest: Manifest) {
+		this.manifest = manifest;
+	}
+
+	getManifestMetadata(): JSON | undefined {
+		return getMetadata(this.manifest);
+	}
 
 	toHam(manifest: Manifest): Presentation[] {
 		let dashManifest: DashManifest | undefined;
