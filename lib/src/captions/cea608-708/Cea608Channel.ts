@@ -90,7 +90,7 @@ export class Cea608Channel {
 		return this.outputFilter;
 	}
 
-	setHandler(newHandler: any) { // check that
+	setHandler(newHandler: any) {
 		this.outputFilter = newHandler;
 	}
 
