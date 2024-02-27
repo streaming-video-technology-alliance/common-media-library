@@ -3,7 +3,7 @@ import { Manifest } from '../../utils/types/index.js';
 import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 import { mapMpdToHam } from '../../utils/dash/formatter.js';
-import { xmlToJson, jsonToXml } from '../../utils/xml.js';
+import { xmlToJson, jsonToXml } from '../../utils/xmlUtils.js';
 import { mapHamToMpd } from '../../utils/dash/mpdMapper.js';
 export class MPDMapper implements IMapper {
 	//TODO : Handle SegmentTemplate and SegmentList
