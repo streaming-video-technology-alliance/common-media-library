@@ -4,6 +4,17 @@ import { IMapper } from './IMapper.js';
 
 export class MapperContext {
 	private strategy!: IMapper;
+	private static instance: MapperContext;
+
+	private constructor() {}
+
+	public static getInstance(): MapperContext {
+		if (!MapperContext.instance) {
+			MapperContext.instance = new MapperContext();
+		}
+
+		return MapperContext.instance;
+	}
 
 	public setStrategy(strategy: IMapper): void {
 		this.strategy = strategy;
