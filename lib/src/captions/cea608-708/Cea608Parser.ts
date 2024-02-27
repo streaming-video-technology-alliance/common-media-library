@@ -48,7 +48,7 @@ class Cea608Parser {
 	cmdHistory: CmdHistory = createCmdHistory();
 	logger: CaptionsLogger;
 
-	constructor(field: SupportedField, out1: any, out2: any) { // check that
+	constructor(field: SupportedField, out1: any, out2: any) {
 		const logger = (this.logger = new CaptionsLogger());
 		this.channels = [
 			null,
@@ -61,7 +61,7 @@ class Cea608Parser {
 		return (this.channels[channel] as Cea608Channel).getHandler();
 	}
 
-	setHandler(channel: number, newHandler: any) { // check that
+	setHandler(channel: number, newHandler: any) {
 		(this.channels[channel] as Cea608Channel).setHandler(newHandler);
 	}
 
