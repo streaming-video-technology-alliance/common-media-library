@@ -19,8 +19,8 @@ export class MPDMapper implements IMapper {
 			return [];
 		}
 
-		const presentation = mapMpdToHam(dashManifest);
-		return [presentation];
+		const presentations = mapMpdToHam(dashManifest);
+		return presentations;
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
