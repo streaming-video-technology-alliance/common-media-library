@@ -1,5 +1,5 @@
-import { parseM3u8 } from '../../../cmaf-ham';
-import { uuid } from '../../../utils';
+import { parseM3u8 } from '../../../cmaf-ham.js';
+import { uuid } from '../../../utils.js';
 import {
 	AudioTrack,
 	TextTrack,
@@ -9,11 +9,13 @@ import {
 	Track,
 	VideoTrack,
 } from '../../ham/types/model';
+import { addMetadataToHLS } from '../manifestUtils.js';
 import { Manifest } from '../types';
-import { PlayList } from './HlsManifest';
+import { PlayList } from './HlsManifest.js';
 
 function m3u8ToHam(manifest: Manifest) {
 	const mainManifestParsed = parseM3u8(manifest.manifest);
+	manifest = addMetadataToHLS(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
 	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
