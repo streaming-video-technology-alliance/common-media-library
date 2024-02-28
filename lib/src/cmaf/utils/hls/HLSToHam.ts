@@ -1,4 +1,4 @@
-import { parseM3u8 } from '../../../cmaf-ham.js';
+import { parseM3u8 } from '../hls/m3u8';
 import { uuid } from '../../../utils.js';
 import {
 	AudioTrack,

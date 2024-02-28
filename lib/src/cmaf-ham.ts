@@ -6,7 +6,6 @@
  * @beta
  */
 export type * from './cmaf/ham/types/model/index.js';
-export { parseM3u8 } from './cmaf/utils/hls/m3u8.js';
 export * from './cmaf/ham/services/getTracks.js';
 export * from './cmaf/ham/services/validateTracks.js';
 export {
@@ -17,4 +16,3 @@ export {
 	m3u8ToHam,
 	hamToM3U8,
 } from './cmaf/ham/services/converters/m3u8Converter.js';
-export { iso8601DurationToNumber } from './cmaf/utils/utils.js';
