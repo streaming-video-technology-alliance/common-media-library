@@ -2,7 +2,7 @@ type Format = 'm3u8' | 'mpd';
 
 type Manifest = {
 	manifest: string;
-	anciallaryManifests?: Manifest[];
+	ancillaryManifests?: Manifest[];
 	type: Format;
 	metaData?: Map<string, string>;
 };
