@@ -1,9 +1,3 @@
-import { CaptionsLogger } from './CaptionsLogger.js';
-import { Cea608Channel } from './Cea608Channel.js';
-import { VerboseLevel, rowsLowCh1, rowsLowCh2, rowsHighCh1, rowsHighCh2, backgroundColors } from './utilities/constants.js';
-import { Channels, CmdHistory, SupportedField, PACData, PenStyles } from './utilities/types.js';
-import { numArrayToHexArray, getCharForByte, createCmdHistory, hasCmdRepeated, setLastCmd } from './utilities/utils.js';
-
 /**
  *
  * This code was ported from the dash.js project at:
@@ -41,6 +35,12 @@ import { numArrayToHexArray, getCharForByte, createCmdHistory, hasCmdRepeated, s
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
+import { CaptionsLogger } from './CaptionsLogger.js';
+import { Cea608Channel } from './Cea608Channel.js';
+import { VerboseLevel, rowsLowCh1, rowsLowCh2, rowsHighCh1, rowsHighCh2, backgroundColors } from './utilities/constants.js';
+import { Channels, CmdHistory, SupportedField, PACData, PenStyles } from './utilities/types.js';
+import { numArrayToHexArray, getCharForByte, createCmdHistory, hasCmdRepeated, setLastCmd } from './utilities/utils.js';
 
 class Cea608Parser {
 	channels: Array<Cea608Channel | null>;
