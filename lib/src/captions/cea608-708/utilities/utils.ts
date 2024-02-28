@@ -1,7 +1,7 @@
 import { specialCea608CharsCodes } from './constants.js';
 import { CmdHistory } from './types.js';
 
-export const getCharForByte = function (byte: number) {
+export const getCharForByte = function (byte: number): string {
 	let charCode = byte;
 	if (Object.prototype.hasOwnProperty.call(specialCea608CharsCodes, byte)) {
 		charCode = specialCea608CharsCodes[byte];
@@ -23,12 +23,12 @@ export function setLastCmd(
 	a: number | null,
 	b: number | null,
 	cmdHistory: CmdHistory,
-) {
+) : void {
 	cmdHistory.a = a;
 	cmdHistory.b = b;
 }
 
-export function hasCmdRepeated(a: number, b: number, cmdHistory: CmdHistory) {
+export function hasCmdRepeated(a: number, b: number, cmdHistory: CmdHistory): boolean {
 	return cmdHistory.a === a && cmdHistory.b === b;
 }
 
@@ -39,8 +39,7 @@ export function createCmdHistory(): CmdHistory {
 	};
 }
 
-
-export function extractCea608DataFromRange(raw: any, cea608Range: any) {
+export function extractCea608DataFromRange(raw: DataView, cea608Range: Array<number>) : Array<Array<number>> {
 	let pos = cea608Range[0];
 	const fieldData: number[][] = [[], []];
 
@@ -71,7 +70,7 @@ export function extractCea608DataFromRange(raw: any, cea608Range: any) {
 	return fieldData;
 }
 
-export function findCea608Nalus(raw: DataView, startPos: number, size: number) {
+export function findCea608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>> {
 	let nalSize = 0,
 		cursor = startPos,
 		nalType = 0;

@@ -1,10 +1,3 @@
-import { CaptionsLogger } from './CaptionsLogger.js';
-import { PenState } from './PenState.js';
-import { StyledUnicodeChar } from './StyledUnicodeChar.js';
-import { NR_COLS, VerboseLevel } from './utilities/constants.js';
-import { PenStyles } from './utilities/types.js';
-import { getCharForByte } from './utilities/utils.js';
-
 /**
  *
  * This code was ported from the dash.js project at:
@@ -43,6 +36,13 @@ import { getCharForByte } from './utilities/utils.js';
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { CaptionsLogger } from './CaptionsLogger.js';
+import { PenState } from './PenState.js';
+import { StyledUnicodeChar } from './StyledUnicodeChar.js';
+import { NR_COLS, VerboseLevel } from './utilities/constants.js';
+import { PenStyles } from './utilities/types.js';
+import { getCharForByte } from './utilities/utils.js';
+
 /**
  * CEA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
  * @constructor
@@ -61,7 +61,7 @@ export class Row {
 		this.logger = logger;
 	}
 
-	equals(other: Row) {
+	equals(other: Row): boolean {
 		for (let i = 0; i < NR_COLS; i++) {
 			if (!this.chars[i].equals(other.chars[i])) {
 				return false;
@@ -70,7 +70,7 @@ export class Row {
 		return true;
 	}
 
-	copy(other: Row) {
+	copy(other: Row): void {
 		for (let i = 0; i < NR_COLS; i++) {
 			this.chars[i].copy(other.chars[i]);
 		}
@@ -90,7 +90,7 @@ export class Row {
 	/**
    *  Set the cursor to a valid column.
    */
-	setCursor(absPos: number) {
+	setCursor(absPos: number): void {
 		if (this.pos !== absPos) {
 			this.pos = absPos;
 		}
@@ -114,7 +114,7 @@ export class Row {
 	/**
    * Move the cursor relative to current position.
    */
-	moveCursor(relPos: number) {
+	moveCursor(relPos: number) : void {
 		const newPos = this.pos + relPos;
 		if (relPos > 1) {
 			for (let i = this.pos + 1; i < newPos + 1; i++) {
@@ -127,12 +127,12 @@ export class Row {
 	/**
    * Backspace, move one step back and clear character.
    */
-	backSpace() {
+	backSpace(): void {
 		this.moveCursor(-1);
 		this.chars[this.pos].setChar(' ', this.currPenState);
 	}
 
-	insertChar(byte: number) {
+	insertChar(byte: number): void {
 		if (byte >= 0x90) {
 			// Extended char
 			this.backSpace();
@@ -156,24 +156,24 @@ export class Row {
 		this.moveCursor(1);
 	}
 
-	clearFromPos(startPos: number) {
+	clearFromPos(startPos: number): void {
 		let i: number;
 		for (i = startPos; i < NR_COLS; i++) {
 			this.chars[i].reset();
 		}
 	}
 
-	clear() {
+	clear(): void {
 		this.clearFromPos(0);
 		this.pos = 0;
 		this.currPenState.reset();
 	}
 
-	clearToEndOfRow() {
+	clearToEndOfRow(): void {
 		this.clearFromPos(this.pos);
 	}
 
-	getTextString() {
+	getTextString(): string {
 		const chars: string[] = [];
 		let empty = true;
 		for (let i = 0; i < NR_COLS; i++) {
@@ -192,7 +192,7 @@ export class Row {
 		}
 	}
 
-	setPenStyles(styles: Partial<PenStyles>) {
+	setPenStyles(styles: Partial<PenStyles>): void {
 		this.currPenState.setStyles(styles);
 		const currChar = this.chars[this.pos];
 		currChar.setPenState(this.currPenState);

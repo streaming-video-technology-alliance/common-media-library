@@ -1,5 +1,3 @@
-import { VerboseLevel } from './utilities/constants.js';
-
 /**
  *
  * This code was ported from the dash.js project at:
@@ -37,6 +35,8 @@ import { VerboseLevel } from './utilities/constants.js';
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
+import { VerboseLevel } from './utilities/constants.js';
 
 export class CaptionsLogger {
 	public time: number | null = null;
