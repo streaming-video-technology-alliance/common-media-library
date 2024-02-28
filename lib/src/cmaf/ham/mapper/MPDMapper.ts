@@ -5,14 +5,10 @@ import { IMapper } from './IMapper.js';
 import { mpdToHam } from '../../utils/dash/mpdToHam.js';
 import { xmlToJson, jsonToXml } from '../../utils/xmlUtils.js';
 import { hamToMPD } from '../../utils/dash/hamToMPD.js';
-import { getMetadata } from '../../utils/manifestUtils.js';
+import { addMetadataToDASH, getMetadata } from '../../utils/manifestUtils.js';
 
 export class MPDMapper implements IMapper {
 	private manifest: Manifest | undefined;
-
-	public MPDMapper(manifest: Manifest) {
-		this.manifest = manifest;
-	}
 
 	getManifestMetadata(): JSON | undefined {
 		return getMetadata(this.manifest);
@@ -20,6 +16,7 @@ export class MPDMapper implements IMapper {
 
 	toHam(manifest: Manifest): Presentation[] {
 		let dashManifest: DashManifest | undefined;
+		this.manifest = manifest;
 		xmlToJson(
 			manifest.manifest,
 			(result: DashManifest) => (dashManifest = result),
@@ -28,6 +25,7 @@ export class MPDMapper implements IMapper {
 		if (!dashManifest) {
 			return [];
 		}
+		addMetadataToDASH(dashManifest, manifest);
 
 		const presentations = mpdToHam(dashManifest);
 		return presentations;

@@ -7,16 +7,13 @@ import { getMetadata } from '../../utils/manifestUtils.js';
 export class HLSMapper implements IMapper {
 	private manifest: Manifest | undefined;
 
-	public HLSMapper(manifest: Manifest) {
-		this.manifest = manifest;
-	}
-
 	getManifestMetadata(): JSON | undefined {
 		return getMetadata(this.manifest);
 	}
 
 	toHam(manifest: Manifest): Presentation[] {
 		const presentations = m3u8ToHam(manifest);
+		this.manifest = manifest;
 		return presentations;
 	}
 
