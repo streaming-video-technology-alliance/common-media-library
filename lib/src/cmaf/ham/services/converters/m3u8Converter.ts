@@ -1,5 +1,5 @@
-import { HLSMapper } from '../../mapper/HLSMapper';
-import { MapperContext } from '../../mapper/MapperContext';
+import { HLSMapper } from '../../mapper/HLSMapper.js';
+import { MapperContext } from '../../mapper/MapperContext.js';
 import { Presentation } from '../../types/model';
 
 /**

@@ -1,5 +1,5 @@
-import { MPDMapper } from '../../mapper/MPDMapper';
-import { MapperContext } from '../../mapper/MapperContext';
+import { MPDMapper } from '../../mapper/MPDMapper.js';
+import { MapperContext } from '../../mapper/MapperContext.js';
 import { Presentation } from '../../types/model';
 
 /**

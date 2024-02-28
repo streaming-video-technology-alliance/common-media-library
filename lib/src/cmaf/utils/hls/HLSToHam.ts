@@ -1,4 +1,4 @@
-import { parseM3u8 } from '../hls/m3u8';
+import { parseM3u8 } from '../hls/m3u8.js';
 import { uuid } from '../../../utils.js';
 import {
 	AudioTrack,
