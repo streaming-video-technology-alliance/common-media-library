@@ -294,8 +294,13 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 // @public (undocumented)
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
-// @public (undocumented)
-export function hamToMpd(ham: Presentation): Promise<string | null>;
+// Warning: (ae-forgotten-export) The symbol "Manifest" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function hamToM3U8(presentation: Presentation[]): Manifest;
+
+// @public
+export function hamToMPD(presentation: Presentation[]): Manifest;
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -305,14 +310,11 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
-// @public (undocumented)
-export function iso8601DurationToNumber(isoDuration: string): number;
+// @public
+export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
-// @public (undocumented)
-export function mpdToHam(manifest: string): Promise<Presentation | null>;
-
-// @public (undocumented)
-export function parseM3u8(text: string): any;
+// @public
+export function mpdToHam(manifest: string): Presentation[];
 
 // Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
 //

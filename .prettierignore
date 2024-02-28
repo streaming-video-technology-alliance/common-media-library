@@ -2,6 +2,7 @@ node_modules
 dev
 docs
 lib/dist
+lib/src/cmaf/manifest-samples/**
 *.md
 .github
 .eslintrc.json
@@ -12,3 +13,5 @@ lib/dist
 .tsconfig.json
 .package.json
 .package-lock.json
+*.m3u8
+*.mpd

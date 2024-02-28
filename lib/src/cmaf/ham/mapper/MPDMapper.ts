@@ -2,36 +2,43 @@ import { DashManifest } from '../../utils/dash/DashManifest.js';
 import { Manifest } from '../../utils/types/index.js';
 import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
-import { mapMpdToHam } from '../../utils/dash/formatter.js';
+import { mpdToHam } from '../../utils/dash/mpdToHam.js';
 import { xmlToJson, jsonToXml } from '../../utils/xmlUtils.js';
-import { mapHamToMpd } from '../../utils/dash/mpdMapper.js';
+import { hamToMPD } from '../../utils/dash/hamToMPD.js';
+import { addMetadataToDASH, getMetadata } from '../../utils/manifestUtils.js';
 
 export class MPDMapper implements IMapper {
-	//TODO : Handle SegmentTemplate and SegmentList
+	private manifest: Manifest | undefined;
+
+	getManifestMetadata(): JSON | undefined {
+		return getMetadata(this.manifest);
+	}
 
 	toHam(manifest: Manifest): Presentation[] {
 		let dashManifest: DashManifest | undefined;
+		this.manifest = manifest;
 		xmlToJson(
-			manifest.main,
+			manifest.manifest,
 			(result: DashManifest) => (dashManifest = result),
 		);
 
 		if (!dashManifest) {
 			return [];
 		}
+		addMetadataToDASH(dashManifest, manifest);
 
-		const presentations = mapMpdToHam(dashManifest);
+		const presentations = mpdToHam(dashManifest);
 		return presentations;
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		const jsonMpd = mapHamToMpd(presentation);
+		const jsonMpd = hamToMPD(presentation);
 
 		if (!jsonMpd) {
-			return { main: '', playlists: [], type: 'mpd' };
+			return { manifest: '', ancillaryManifests: [], type: 'mpd' };
 		}
 
 		const mpd = jsonToXml(jsonMpd);
-		return { main: mpd, playlists: [], type: 'mpd' };
+		return { manifest: mpd, ancillaryManifests: [], type: 'mpd' };
 	}
 }

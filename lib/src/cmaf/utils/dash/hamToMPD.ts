@@ -67,7 +67,7 @@ function selectionToAdaptationSet(
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+function hamToMPD(hamManifests: Presentation[]): DashManifest {
 	const periods = hamManifests.map((hamManifest) => {
 		return {
 			$: {
@@ -87,4 +87,4 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	};
 }
 
-export { mapHamToMpd };
+export { hamToMPD };
