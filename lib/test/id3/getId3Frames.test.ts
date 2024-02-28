@@ -8,7 +8,7 @@ import {
 	generateId3,
 	generateId3Frame,
 } from '../structuredfield/util/id3Generator.js';
-import { toArrayBuffer } from '../../src/id3/util/decodeId3ImageFrame.js';
+import { toArrayBuffer } from '../../src/id3/util/toArrayBuffer.js';
 
 describe('getId3Frames', () => {
 	it('no valid data produces empty output', () => {
