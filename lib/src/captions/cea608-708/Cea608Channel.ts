@@ -1,9 +1,3 @@
-import { CaptionScreen } from './CaptionScreen.js';
-import { CaptionsLogger } from './CaptionsLogger.js';
-import { Row } from './Row.js';
-import { NR_ROWS, VerboseLevel } from './utilities/constants.js';
-import { CaptionModes, PACData, PenStyles } from './utilities/types.js';
-
 /**
  *
  * This code was ported from the dash.js project at:
@@ -41,6 +35,12 @@ import { CaptionModes, PACData, PenStyles } from './utilities/types.js';
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
+import { CaptionScreen } from './CaptionScreen.js';
+import { CaptionsLogger } from './CaptionsLogger.js';
+import { Row } from './Row.js';
+import { NR_ROWS, VerboseLevel } from './utilities/constants.js';
+import { CaptionModes, PACData, PenStyles } from './utilities/types.js';
 
 export class Cea608Channel {
 	chNr: number;
