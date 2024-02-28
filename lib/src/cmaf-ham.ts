@@ -13,4 +13,8 @@ export {
 	mpdToHam,
 	hamToMPD,
 } from './cmaf/ham/services/converters/mpdConverter.js';
+export {
+	m3u8ToHam,
+	hamToM3U8,
+} from './cmaf/ham/services/converters/m3u8Converter.js';
 export { iso8601DurationToNumber } from './cmaf/utils/utils.js';
