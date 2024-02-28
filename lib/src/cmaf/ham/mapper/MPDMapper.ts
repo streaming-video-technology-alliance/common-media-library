@@ -39,6 +39,6 @@ export class MPDMapper implements IMapper {
 		}
 
 		const mpd = jsonToXml(jsonMpd);
-		return { manifest: mpd, anciallaryManifests: [], type: 'mpd' };
+		return { manifest: mpd, ancillaryManifests: [], type: 'mpd' };
 	}
 }
