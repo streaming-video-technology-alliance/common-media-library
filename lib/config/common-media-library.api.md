@@ -294,9 +294,6 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 // @public (undocumented)
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
-// @public (undocumented)
-export function hamToMpd(ham: Presentation): Promise<string | null>;
-
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
@@ -309,7 +306,10 @@ export function isId3TimestampFrame(frame: Id3Frame): boolean;
 export function iso8601DurationToNumber(isoDuration: string): number;
 
 // @public (undocumented)
-export function mpdToHam(manifest: string): Promise<Presentation | null>;
+export const mapMpd: {
+    toHam: (rawManifest: string) => Presentation[];
+    fromHam: (presentations: Presentation[]) => MPDManifest;
+};
 
 // @public (undocumented)
 export function parseM3u8(text: string): any;
@@ -453,5 +453,9 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/cmaf/ham/mapper/mapMpd.ts:8:46 - (ae-forgotten-export) The symbol "MPDManifest" needs to be exported by the entry point index.d.ts
 
 ```

@@ -1,24 +1,22 @@
-import { MPD } from '../../utils/dash/DashManifest.js';
+import { MPDManifest } from '../types/DashManifest.js';
 import { Manifest } from '../../utils/types/index.js';
 import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
-import { mapMpdToHam } from '../../utils/dash/formatter.js';
-import { xmlToJson, jsonToXml } from '../../utils/xmlUtils.js';
-import { mapHamToMpd } from '../../utils/dash/mpdMapper.js';
+import { mapMpdToHam } from './mpd/mapMpdToHam.js';
+import { jsonToXml, xmlToJson } from '../../utils/xmlUtils.js';
+import { mapHamToMpd } from './mpd/mapHamToMpd.js';
 
 export class MPDMapper implements IMapper {
 	//TODO : Handle SegmentTemplate and SegmentList
 
 	toHam(manifest: Manifest): Presentation[] {
-		let dashManifest: MPD | undefined;
-		xmlToJson(manifest.main, (result: MPD) => (dashManifest = result));
+		const dashManifest: MPDManifest | undefined = xmlToJson(manifest.main);
 
 		if (!dashManifest) {
 			return [];
 		}
 
-		const presentations = mapMpdToHam(dashManifest);
-		return presentations;
+		return mapMpdToHam(dashManifest);
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {

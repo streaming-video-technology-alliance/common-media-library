@@ -1,9 +1,10 @@
 import {
 	AdaptationSet,
-	MPD,
+	MPDManifest,
+	Period,
 	Representation,
 	SegmentTemplate,
-} from './DashManifest';
+} from '../../types/DashManifest';
 import {
 	AudioTrack,
 	Presentation,
@@ -13,14 +14,42 @@ import {
 	TextTrack,
 	Track,
 	VideoTrack,
-} from '../../ham/types/model/index.js';
-import { iso8601DurationToNumber } from '../utils.js';
+} from '../../types/model';
+import { iso8601DurationToNumber } from '../../../utils/utils.js';
 
-function getContentType(adaptationSet: AdaptationSet): string {
+function getContentType(
+	adaptationSet: AdaptationSet,
+	representation?: Representation,
+): string {
+	if (!adaptationSet) {
+		throw new Error('Error: AdaptationSet is undefined');
+	}
 	if (adaptationSet.$.contentType) {
 		return adaptationSet.$.contentType;
 	}
-	return adaptationSet.ContentComponent![0].$.contentType;
+	if (adaptationSet.ContentComponent?.at(0)) {
+		return adaptationSet.ContentComponent.at(0)!.$.contentType;
+	}
+	if (representation?.$.mimeType) {
+		const type = representation.$.mimeType.split('/')[0];
+		if (type === 'audio' || type === 'video' || type === 'text') {
+			return type;
+		}
+		if (type === 'application') {
+			return 'text';
+		}
+	}
+	if (adaptationSet.$.maxHeight) {
+		return 'video';
+	}
+	const adaptationRef =
+		adaptationSet.$.id ??
+		`group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`;
+	console.info(
+		`Could not find contentType from adaptationSet ${adaptationRef}`,
+	);
+	console.info('Using "text" as default contentType');
+	return 'text';
 }
 
 function getGroup(adaptationSet: AdaptationSet): string {
@@ -33,7 +62,10 @@ function createTrack(
 	duration: number,
 	segments: Segment[],
 ): AudioTrack | VideoTrack | TextTrack {
-	const type = getContentType(adaptationSet);
+	if (!adaptationSet) {
+		throw new Error('Error: AdaptationSet is undefined');
+	}
+	const type = getContentType(adaptationSet, representation);
 	if (type === 'video') {
 		return {
 			bandwidth: +representation.$.bandwidth,
@@ -54,7 +86,7 @@ function createTrack(
 		return {
 			bandwidth: +representation.$.bandwidth,
 			channels: +(
-				adaptationSet.AudioChannelConfiguration![0].$.value ?? 0
+				adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ?? 0
 			),
 			codec: adaptationSet.$.codecs,
 			duration: duration,
@@ -89,7 +121,7 @@ function getUrlFromTemplate(
 			return representation.$.id;
 		}
 		console.log(
-			`Unknown property on representation ${representation.$.id}`,
+			`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`,
 		);
 		return match;
 	});
@@ -130,20 +162,22 @@ function mpdSegmentsToHamSegments(
 	}
 }
 
-function mapMpdToHam(mpd: MPD): Presentation[] {
-	const presentations: Presentation[] = mpd.Period.map((period) => {
+function mapMpdToHam(mpd: MPDManifest): Presentation[] {
+	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
 		const presentationId: string = 'presentation-id'; // todo: handle id
 
 		const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
-		period.AdaptationSet.map((adaptationSet) => {
+		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
 			const tracks: Track[] = adaptationSet.Representation.map(
-				(representation) => {
-					const segments = mpdSegmentsToHamSegments(
+				(representation: Representation) => {
+					const segmentTemplate: SegmentTemplate | undefined =
+						adaptationSet.SegmentTemplate?.at(0);
+					const segments: Segment[] = mpdSegmentsToHamSegments(
 						representation,
 						duration,
-						adaptationSet.SegmentTemplate![0],
+						segmentTemplate,
 					);
 
 					return createTrack(
@@ -173,8 +207,6 @@ function mapMpdToHam(mpd: MPD): Presentation[] {
 
 		return { id: presentationId, selectionSets } as Presentation;
 	});
-
-	return presentations;
 }
 
 export { mapMpdToHam };

@@ -1,17 +1,17 @@
 import {
 	AdaptationSet,
-	MPD,
+	MPDManifest,
 	Representation,
 	SegmentBase,
-} from './DashManifest.js';
+} from '../../types/DashManifest.js';
 import {
 	Presentation,
 	Segment,
 	SelectionSet,
 	Track,
 	VideoTrack,
-} from '../../ham/types/model/index.js';
-import { parseDurationMpd } from '../utils.js';
+} from '../../types/model';
+import { parseDurationMpd } from '../../../utils/utils.js';
 
 // TODO: This only maps to SegmentBase, it may need to handle all Segment types
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
@@ -68,7 +68,7 @@ function selectionToAdaptationSet(
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): MPD {
+function mapHamToMpd(hamManifests: Presentation[]): MPDManifest {
 	const periods = hamManifests.map((hamManifest) => {
 		return {
 			$: {
@@ -82,7 +82,9 @@ function mapHamToMpd(hamManifests: Presentation[]): MPD {
 	});
 
 	return {
-		Period: periods,
+		MPD: {
+			Period: periods,
+		},
 	};
 }
 

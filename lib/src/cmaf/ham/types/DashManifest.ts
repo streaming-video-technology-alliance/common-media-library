@@ -117,20 +117,22 @@ type Period = {
 	AdaptationSet: AdaptationSet[];
 };
 
-type MPD = {
-	$?: {
-		maxSegmentDuration?: string;
-		mediaPresentationDuration: string;
-		minBufferTime: string;
-		profiles: string;
-		type: string;
-		xmlns: string;
+type MPDManifest = {
+	MPD: {
+		$?: {
+			maxSegmentDuration?: string;
+			mediaPresentationDuration: string;
+			minBufferTime: string;
+			profiles: string;
+			type: string;
+			xmlns: string;
+		};
+		Period: Period[];
 	};
-	Period: Period[];
 };
 
 export type {
-	MPD,
+	MPDManifest,
 	Period,
 	AdaptationSet,
 	Representation,
