@@ -35,10 +35,10 @@ export class MPDMapper implements IMapper {
 		const jsonMpd = hamToMPD(presentation);
 
 		if (!jsonMpd) {
-			return { manifest: '', anciallaryManifests: [], type: 'mpd' };
+			return { manifest: '', ancillaryManifests: [], type: 'mpd' };
 		}
 
 		const mpd = jsonToXml(jsonMpd);
-		return { manifest: mpd, anciallaryManifests: [], type: 'mpd' };
+		return { manifest: mpd, ancillaryManifests: [], type: 'mpd' };
 	}
 }

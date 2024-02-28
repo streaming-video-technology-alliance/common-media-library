@@ -1,4 +1,4 @@
-import { mpdToHam, hamToMpd, Presentation } from '@svta/common-media-library';
+import { mpdToHam, hamToMPD, Presentation } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { dash1 } from './data/dash1.js';
@@ -14,7 +14,7 @@ describe('mpd2ham', async () => {
 
 describe('ham2mpd', async () => {
 	const presentation = jsonHam1 as Presentation;
-	const convertedMpd = await hamToMpd(presentation);
+	const convertedMpd = await hamToMPD([presentation]);
 
 	// FIXME: this test throws an error because the strings have different spaces and indentation
 	it.skip('converts ham1 to dash1', () => {

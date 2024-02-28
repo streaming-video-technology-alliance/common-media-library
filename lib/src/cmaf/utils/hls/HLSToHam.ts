@@ -21,8 +21,8 @@ function m3u8ToHam(manifest: Manifest) {
 	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
 	const audioSwitchingSets: SwitchingSet[] = [];
 	const selectionSets: SelectionSet[] = [];
-	const manifestPlaylists = manifest.anciallaryManifests
-		? manifest.anciallaryManifests
+	const manifestPlaylists = manifest.ancillaryManifests
+		? manifest.ancillaryManifests
 		: [];
 	let currentPlaylist = 0;
 

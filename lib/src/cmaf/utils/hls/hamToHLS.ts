@@ -41,7 +41,7 @@ function hamToM3U8(presentation: Presentation[]): Manifest {
 	});
 	return {
 		manifest: mainManifest,
-		anciallaryManifests: playlists,
+		ancillaryManifests: playlists,
 		type: 'm3u8',
 	};
 }
