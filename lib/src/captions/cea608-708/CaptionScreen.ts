@@ -1,8 +1,3 @@
-import { CaptionsLogger } from './CaptionsLogger.js';
-import { Row } from './Row.js';
-import { NR_ROWS, VerboseLevel } from './utilities/constants.js';
-import { PACData, PenStyles } from './utilities/types.js';
-
 /**
  *
  * This code was ported from the dash.js project at:
@@ -40,6 +35,11 @@ import { PACData, PenStyles } from './utilities/types.js';
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
+import { CaptionsLogger } from './CaptionsLogger.js';
+import { Row } from './Row.js';
+import { NR_ROWS, VerboseLevel } from './utilities/constants.js';
+import { PACData, PenStyles } from './utilities/types.js';
 
 /**
  * Keep a CEA-608 screen of 32x15 styled characters

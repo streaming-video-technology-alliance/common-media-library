@@ -1,5 +1,3 @@
-import { PenState } from './PenState.js';
-
 /**
  *
  * This code was ported from the dash.js project at:
@@ -37,6 +35,8 @@ import { PenState } from './PenState.js';
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
+import { PenState } from './PenState.js';
 
 /**
  * Unicode character with styling and background.

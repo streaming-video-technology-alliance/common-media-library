@@ -1,5 +1,3 @@
-import { PenStyles } from './utilities/types.js';
-
 /**
  *
  * This code was ported from the dash.js project at:
@@ -37,6 +35,8 @@ import { PenStyles } from './utilities/types.js';
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
+import { PenStyles } from './utilities/types.js';
   
 export class PenState {
 	public foreground: string = 'white';
@@ -45,7 +45,7 @@ export class PenState {
 	public background: string = 'black';
 	public flash: boolean = false;
   
-	reset() {
+	reset() : void {
 		this.foreground = 'white';
 		this.underline = false;
 		this.italics = false;
@@ -53,7 +53,7 @@ export class PenState {
 		this.flash = false;
 	}
   
-	setStyles(styles: Partial<PenStyles>) {
+	setStyles(styles: Partial<PenStyles>) : void {
 		const attribs = [
 			'foreground',
 			'underline',
@@ -69,7 +69,7 @@ export class PenState {
 		}
 	}
   
-	isDefault() {
+	isDefault() : boolean {
 		return (
 			this.foreground === 'white' &&
         !this.underline &&
@@ -79,7 +79,7 @@ export class PenState {
 		);
 	}
   
-	equals(other: PenState) {
+	equals(other: PenState) : boolean {
 		return (
 			this.foreground === other.foreground &&
         this.underline === other.underline &&
@@ -89,7 +89,7 @@ export class PenState {
 		);
 	}
   
-	copy(newPenState: PenState) {
+	copy(newPenState: PenState) : void {
 		this.foreground = newPenState.foreground;
 		this.underline = newPenState.underline;
 		this.italics = newPenState.italics;
@@ -112,4 +112,3 @@ export class PenState {
 		);
 	}
 }
-  
