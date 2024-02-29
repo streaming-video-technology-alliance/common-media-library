@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.6.3] - 2024-03-01
 
 ### Added
+
 - Unit tests for ID3 feature helper functions [#74](https://github.com/streaming-video-technology-alliance/common-media-library/pull/74)
 - ID3 APIC frame decode functionality, and it's respective unit tests [#77](https://github.com/streaming-video-technology-alliance/common-media-library/issues/77)
 
