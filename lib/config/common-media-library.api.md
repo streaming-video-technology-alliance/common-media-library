@@ -313,11 +313,10 @@ export function isId3TimestampFrame(frame: Id3Frame): boolean;
 // @public
 export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
+// Warning: (ae-forgotten-export) The symbol "mapMpdType" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export const mapMpd: {
-    toHam: (rawManifest: string) => Presentation[];
-    fromHam: (presentations: Presentation[]) => MPDManifest;
-};
+export const mapMpd: mapMpdType;
 
 // @public
 export function mpdToHam(manifest: string): Presentation[];
@@ -461,9 +460,5 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/cmaf/ham/mapper/mapMpd.ts:8:46 - (ae-forgotten-export) The symbol "MPDManifest" needs to be exported by the entry point index.d.ts
 
 ```

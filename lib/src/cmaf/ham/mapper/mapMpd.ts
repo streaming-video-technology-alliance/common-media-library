@@ -4,7 +4,12 @@ import { MPDManifest } from '../types/DashManifest.js';
 import { hamToMpd } from './mpd/hamToMpd.js';
 import { xmlToJson } from '../../utils/xmlUtils.js';
 
-const mapMpd = {
+type mapMpdType = {
+	toHam: (rawManifest: string) => Presentation[];
+	fromHam: (presentations: Presentation[]) => MPDManifest;
+};
+
+const mapMpd: mapMpdType = {
 	toHam: (rawManifest: string): Presentation[] => {
 		const dashManifest: MPDManifest | undefined = xmlToJson(rawManifest);
 
