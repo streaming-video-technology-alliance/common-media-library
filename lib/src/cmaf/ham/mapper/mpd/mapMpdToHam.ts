@@ -1,11 +1,12 @@
-import {
+import { iso8601DurationToNumber } from '../../../utils/utils.js';
+import type {
 	AdaptationSet,
-	MPDManifest,
+	DashManifest,
 	Period,
 	Representation,
 	SegmentTemplate,
 } from '../../types/DashManifest';
-import {
+import type {
 	AudioTrack,
 	Presentation,
 	Segment,
@@ -15,7 +16,6 @@ import {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import { iso8601DurationToNumber } from '../../../utils/utils.js';
 
 function getContentType(
 	adaptationSet: AdaptationSet,
@@ -174,7 +174,7 @@ function mpdSegmentsToHamSegments(
 	}
 }
 
-function mpdToHam(mpd: MPDManifest): Presentation[] {
+function mapMpdToHam(mpd: DashManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
 		const presentationId: string = `presentation-id-${duration}`; // todo: handle id
@@ -224,4 +224,4 @@ function mpdToHam(mpd: MPDManifest): Presentation[] {
 	});
 }
 
-export { mpdToHam };
+export { mapMpdToHam };

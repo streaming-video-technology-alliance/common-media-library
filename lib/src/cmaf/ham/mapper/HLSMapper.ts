@@ -1,9 +1,9 @@
 import { mapHamToHls } from './hls/mapHamToHls.js';
 import { mapHlsToHam } from './hls/mapHlsToHam.js';
-import { Manifest } from '../../utils/types/index.js';
-import { Presentation } from '../types/model/index.js';
-import { IMapper } from './IMapper.js';
 import { getMetadata } from '../../utils/manifestUtils.js';
+import { IMapper } from './IMapper.js';
+import type { Manifest } from '../../utils/types';
+import type { Presentation } from '../types/model';
 
 export class HLSMapper implements IMapper {
 	private manifest: Manifest | undefined;

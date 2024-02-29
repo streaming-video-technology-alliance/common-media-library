@@ -117,7 +117,7 @@ type Period = {
 	AdaptationSet: AdaptationSet[];
 };
 
-type MPDManifest = {
+type DashManifest = {
 	MPD: {
 		$?: {
 			maxSegmentDuration?: string;
@@ -132,7 +132,7 @@ type MPDManifest = {
 };
 
 export type {
-	MPDManifest,
+	DashManifest,
 	Period,
 	AdaptationSet,
 	Representation,

@@ -1,11 +1,11 @@
-import { MPDManifest } from '../types/DashManifest.js';
-import { Manifest } from '../../utils/types/index.js';
-import { Presentation } from '../types/model/index.js';
-import { IMapper } from './IMapper.js';
-import { mpdToHam } from './mpd/mpdToHam.js';
+import { mapMpdToHam } from './mpd/mapMpdToHam.js';
 import { jsonToXml, xmlToJson } from '../../utils/xmlUtils.js';
 import { mapHamToMpd } from './mpd/mapHamToMpd.js';
 import { addMetadataToDASH, getMetadata } from '../../utils/manifestUtils.js';
+import { IMapper } from './IMapper.js';
+import type { DashManifest } from '../types/DashManifest';
+import type { Manifest } from '../../utils/types';
+import type { Presentation } from '../types/model';
 
 export class MPDMapper implements IMapper {
 	private manifest: Manifest | undefined;
@@ -15,7 +15,7 @@ export class MPDMapper implements IMapper {
 	}
 
 	toHam(manifest: Manifest): Presentation[] {
-		const dashManifest: MPDManifest | undefined = xmlToJson(
+		const dashManifest: DashManifest | undefined = xmlToJson(
 			manifest.manifest,
 		);
 
@@ -24,7 +24,7 @@ export class MPDMapper implements IMapper {
 		}
 		addMetadataToDASH(dashManifest, manifest);
 
-		return mpdToHam(dashManifest);
+		return mapMpdToHam(dashManifest);
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {

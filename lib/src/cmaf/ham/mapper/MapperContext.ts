@@ -1,6 +1,6 @@
-import { Manifest } from '../../utils/types/index.js';
-import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
+import type { Manifest } from '../../utils/types';
+import type { Presentation } from '../types/model';
 
 export class MapperContext {
 	private strategy!: IMapper;

@@ -1,5 +1,6 @@
-import { Manifest } from './types/index.js';
-import { MPDManifest } from '../ham/types/DashManifest';
+import type { Manifest } from './types';
+import type { DashManifest } from '../ham/types/DashManifest';
+
 export function getMetadata(manifest: Manifest | undefined): JSON | undefined {
 	const metadata: Map<string, string> | undefined = manifest?.metaData;
 	return JSON.parse(JSON.stringify(metadata));
@@ -24,7 +25,7 @@ export function addMetadataToHLS(
 }
 
 export function addMetadataToDASH(
-	dashManifest: MPDManifest,
+	dashManifest: DashManifest,
 	manifest: Manifest,
 ): Manifest {
 	if (manifest.metaData === undefined) {

@@ -1,9 +1,9 @@
-import {
+import type {
 	Presentation,
 	SelectionSet,
 	SwitchingSet,
 	Track,
-} from '../types/model/index.js';
+} from '../types/model';
 
 function getTracksFromSwitchingSet(
 	switchingSet: SwitchingSet,

@@ -1,10 +1,10 @@
-import {
+import type {
 	AdaptationSet,
-	MPDManifest,
+	DashManifest,
 	Representation,
 	SegmentBase,
-} from '../../types/DashManifest.js';
-import {
+} from '../../types/DashManifest';
+import type {
 	Presentation,
 	Segment,
 	SelectionSet,
@@ -68,7 +68,7 @@ function selectionToAdaptationSet(
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): MPDManifest {
+function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	const periods = hamManifests.map((hamManifest) => {
 		return {
 			$: {

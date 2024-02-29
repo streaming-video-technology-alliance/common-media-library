@@ -1,11 +1,11 @@
-import {
+import os from 'os';
+import type {
 	AudioTrack,
-	TextTrack,
 	Presentation,
+	TextTrack,
 	VideoTrack,
 } from '../../types/model';
-import { Manifest } from '../../../utils/types';
-import os from 'os';
+import type { Manifest } from '../../../utils/types';
 
 function mapHamToHls(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.

@@ -1,13 +1,13 @@
 import { Builder, parseString } from 'xml2js';
-import { MPDManifest } from '../ham/types/DashManifest.js';
+import type { DashManifest } from '../ham/types/DashManifest.js';
 
-function xmlToJson(raw: string): MPDManifest | undefined {
-	let parsed: MPDManifest | undefined;
-	parseString(raw, (err: Error | null, result: MPDManifest) => {
+function xmlToJson(raw: string): DashManifest | undefined {
+	let parsed: DashManifest | undefined;
+	parseString(raw, (err: Error | null, result: DashManifest) => {
 		if (err) {
 			throw new Error(err.message);
 		}
-		parsed = result as MPDManifest;
+		parsed = result as DashManifest;
 	});
 	return parsed;
 }

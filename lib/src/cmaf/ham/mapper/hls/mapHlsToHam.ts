@@ -1,6 +1,7 @@
 import { parseM3u8 } from '../../../utils/hls/m3u8.js';
 import { uuid } from '../../../../utils.js';
-import {
+import { addMetadataToHLS } from '../../../utils/manifestUtils.js';
+import type {
 	AudioTrack,
 	Segment,
 	SelectionSet,
@@ -9,9 +10,8 @@ import {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import { addMetadataToHLS } from '../../../utils/manifestUtils.js';
-import { Manifest } from '../../../utils/types';
-import { PlayList } from '../../types/HlsManifest.js';
+import type { Manifest } from '../../../utils/types';
+import type { PlayList } from '../../types/HlsManifest';
 
 function mapHlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseM3u8(manifest.manifest);
