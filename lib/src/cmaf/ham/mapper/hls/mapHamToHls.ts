@@ -7,7 +7,7 @@ import {
 import { Manifest } from '../../../utils/types';
 import os from 'os';
 
-function hamToHls(presentation: Presentation[]): Manifest {
+function mapHamToHls(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.
 	const newline = os.EOL;
 	let mainManifest = `#EXT3M3U ${newline} #EXT-X-VERSION:${version} ${newline}`;
@@ -84,4 +84,4 @@ function _generateTextManifestPiece(textTrack: TextTrack) {
 	return { manifestToConcat, playlist };
 }
 
-export { hamToHls };
+export { mapHamToHls };

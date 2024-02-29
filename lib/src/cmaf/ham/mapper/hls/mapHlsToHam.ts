@@ -13,7 +13,7 @@ import { addMetadataToHLS } from '../../../utils/manifestUtils.js';
 import { Manifest } from '../../../utils/types';
 import { PlayList } from '../../types/HlsManifest.js';
 
-function hlsToHam(manifest: Manifest) {
+function mapHlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseM3u8(manifest.manifest);
 	manifest = addMetadataToHLS(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
@@ -161,4 +161,4 @@ function _formatSegments(segments: any[]) {
 	return formattedSegments;
 }
 
-export { hlsToHam };
+export { mapHlsToHam };

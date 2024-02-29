@@ -1,5 +1,5 @@
-import { hamToHls } from './hls/hamToHls.js';
-import { hlsToHam } from './hls/hlsToHam.js';
+import { mapHamToHls } from './hls/mapHamToHls.js';
+import { mapHlsToHam } from './hls/mapHlsToHam.js';
 import { Manifest } from '../../utils/types/index.js';
 import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
@@ -13,12 +13,12 @@ export class HLSMapper implements IMapper {
 	}
 
 	toHam(manifest: Manifest): Presentation[] {
-		const presentations = hlsToHam(manifest);
+		const presentations = mapHlsToHam(manifest);
 		this.manifest = manifest;
 		return presentations;
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		return hamToHls(presentation);
+		return mapHamToHls(presentation);
 	}
 }
