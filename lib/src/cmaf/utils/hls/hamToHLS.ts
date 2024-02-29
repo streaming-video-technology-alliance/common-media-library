@@ -61,7 +61,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 
 function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const newline = os.EOL;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=${audioTrack.id},NAME=${audioTrack.id},LANGUAGE=${audioTrack.language} ,URI=${audioTrack.name} ${newline}`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}" ${newline}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
 			return `#EXTINF:${segment.duration},\n${segment.url}`;
