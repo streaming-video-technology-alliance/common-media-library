@@ -213,7 +213,6 @@ export class CaptionScreen {
 		topRow.clear();
 		this.rows.splice(this.currRow, 0, topRow);
 		this.logger.log(VerboseLevel.INFO, 'Rolling up');
-		// this.logger.log(VerboseLevel.TEXT, this.get_display_text())
 	}
 
 	/**
