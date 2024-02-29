@@ -1,7 +1,7 @@
 import { Presentation } from '../types/model/index.js';
-import { mapMpdToHam } from './mpd/mapMpdToHam.js';
+import { mpdToHam } from './mpd/mpdToHam.js';
 import { MPDManifest } from '../types/DashManifest.js';
-import { mapHamToMpd } from './mpd/mapHamToMpd.js';
+import { hamToMpd } from './mpd/hamToMpd.js';
 import { xmlToJson } from '../../utils/xmlUtils.js';
 
 const mapMpd = {
@@ -12,10 +12,10 @@ const mapMpd = {
 			return [];
 		}
 
-		return mapMpdToHam(dashManifest);
+		return mpdToHam(dashManifest);
 	},
 	fromHam: (presentations: Presentation[]): MPDManifest =>
-		mapHamToMpd(presentations),
+		hamToMpd(presentations),
 };
 
 export { mapMpd };

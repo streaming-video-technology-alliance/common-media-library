@@ -1,0 +1,383 @@
+[
+	{
+		"id": "presentation-id",
+		"selectionSets": [
+			{
+				"id": "1",
+				"switchingSets": [
+					{
+						"tracks": [
+							{
+								"bandwidth": 386437,
+								"codec": "avc1.64001f",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 288,
+								"id": "1",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 96,
+										"url": "1/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 512
+							},
+							{
+								"bandwidth": 761570,
+								"codec": "avc1.64001f",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 360,
+								"id": "2",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 96,
+										"url": "2/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 640
+							},
+							{
+								"bandwidth": 1117074,
+								"codec": "avc1.640028",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 480,
+								"id": "3",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 96,
+										"url": "3/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 852
+							},
+							{
+								"bandwidth": 1941893,
+								"codec": "avc1.640032",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 720,
+								"id": "4",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 96,
+										"url": "4/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 1280
+							},
+							{
+								"bandwidth": 2723012,
+								"codec": "avc1.640033",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 1080,
+								"id": "5",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 96,
+										"url": "5/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 1920
+							},
+							{
+								"bandwidth": 4021190,
+								"codec": "avc1.640034",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 1440,
+								"id": "6",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 96,
+										"url": "6/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 2560
+							},
+							{
+								"bandwidth": 5134121,
+								"codec": "avc1.640034",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 2160,
+								"id": "7",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 96,
+										"url": "7/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 3840
+							}
+						]
+					},
+					{
+						"tracks": [
+							{
+								"bandwidth": 395735,
+								"codec": "hev1.2.4.L63.90",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 288,
+								"id": "8",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 4799983,
+										"url": "8/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 512
+							},
+							{
+								"bandwidth": 689212,
+								"codec": "hev1.2.4.L63.90",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 360,
+								"id": "9",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 4799983,
+										"url": "9/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 640
+							},
+							{
+								"bandwidth": 885518,
+								"codec": "hev1.2.4.L90.90",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 480,
+								"id": "10",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 4799983,
+										"url": "10/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 852
+							},
+							{
+								"bandwidth": 1474186,
+								"codec": "hev1.2.4.L93.90",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 720,
+								"id": "11",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 4799983,
+										"url": "11/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 1280
+							},
+							{
+								"bandwidth": 1967542,
+								"codec": "hev1.2.4.L120.90",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 1080,
+								"id": "12",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 4799983,
+										"url": "12/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 1920
+							},
+							{
+								"bandwidth": 2954309,
+								"codec": "hev1.2.4.L150.90",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 1440,
+								"id": "13",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 4799983,
+										"url": "13/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 2560
+							},
+							{
+								"bandwidth": 4424584,
+								"codec": "hev1.2.4.L150.90",
+								"duration": 734,
+								"frameRate": 0,
+								"height": 2160,
+								"id": "14",
+								"language": "und",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 4799983,
+										"url": "14/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								],
+								"width": 3840
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "2",
+				"switchingSets": [
+					{
+						"tracks": [
+							{
+								"bandwidth": 131351,
+								"channels": 0,
+								"duration": 734,
+								"id": "15",
+								"language": "en",
+								"sampleRate": 0,
+								"segments": [
+									{
+										"duration": 95232,
+										"url": "15/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "3",
+				"switchingSets": [
+					{
+						"tracks": [
+							{
+								"bandwidth": 428,
+								"duration": 734,
+								"id": "18",
+								"language": "en",
+								"segments": [
+									{
+										"duration": 4000,
+										"url": "18/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								]
+							}
+						]
+					},
+					{
+						"tracks": [
+							{
+								"bandwidth": 1095,
+								"duration": 734,
+								"id": "19",
+								"language": "en",
+								"segments": [
+									{
+										"duration": 4000,
+										"url": "19/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								]
+							}
+						]
+					},
+					{
+						"tracks": [
+							{
+								"bandwidth": 430,
+								"duration": 734,
+								"id": "26",
+								"language": "es",
+								"segments": [
+									{
+										"duration": 4000,
+										"url": "26/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								]
+							}
+						]
+					},
+					{
+						"tracks": [
+							{
+								"bandwidth": 1102,
+								"duration": 734,
+								"id": "27",
+								"language": "es",
+								"segments": [
+									{
+										"duration": 4000,
+										"url": "27/$Number%04d$.m4s",
+										"byteRange": ""
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+]

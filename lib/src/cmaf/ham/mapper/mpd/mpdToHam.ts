@@ -162,7 +162,7 @@ function mpdSegmentsToHamSegments(
 	}
 }
 
-function mapMpdToHam(mpd: MPDManifest): Presentation[] {
+function mpdToHam(mpd: MPDManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
 		const presentationId: string = 'presentation-id'; // todo: handle id
@@ -209,4 +209,4 @@ function mapMpdToHam(mpd: MPDManifest): Presentation[] {
 	});
 }
 
-export { mapMpdToHam };
+export { mpdToHam };

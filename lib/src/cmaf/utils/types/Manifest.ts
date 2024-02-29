@@ -1,7 +1,10 @@
+type Format = 'm3u8' | 'mpd';
+
 type Manifest = {
-	main: string;
-	playlists?: string[];
-	type: 'm3u8' | 'mpd';
+	manifest: string;
+	ancillaryManifests?: Manifest[];
+	type: Format;
+	metaData?: Map<string, string>;
 };
 
 export type { Manifest };

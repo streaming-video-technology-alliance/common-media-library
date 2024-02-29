@@ -1,0 +1,58 @@
+[
+	{
+		"id": "presentation-id",
+		"selectionSets": [
+			{
+				"id": "video",
+				"switchingSets": [
+					{
+						"tracks": [
+							{
+								"bandwidth": 72000,
+								"codec": "avc1.42c01e",
+								"duration": 31.296,
+								"frameRate": 0,
+								"height": 480,
+								"id": "testStream01bbbVideo72000",
+								"par": "16:9",
+								"sar": "",
+								"segments": [
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/video/72000/seg_init.mp4",
+										"byteRange": ""
+									}
+								],
+								"width": 854
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "audio",
+				"switchingSets": [
+					{
+						"tracks": [
+							{
+								"bandwidth": 72000,
+								"channels": 0,
+								"duration": 31.296,
+								"id": "testStream01bbbAudio72000",
+								"language": "en",
+								"sampleRate": 0,
+								"segments": [
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/audio/72000/seg_init.mp4",
+										"byteRange": ""
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+]

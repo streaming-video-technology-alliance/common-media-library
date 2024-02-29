@@ -68,7 +68,7 @@ function selectionToAdaptationSet(
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): MPDManifest {
+function hamToMpd(hamManifests: Presentation[]): MPDManifest {
 	const periods = hamManifests.map((hamManifest) => {
 		return {
 			$: {
@@ -88,4 +88,4 @@ function mapHamToMpd(hamManifests: Presentation[]): MPDManifest {
 	};
 }
 
-export { mapHamToMpd };
+export { hamToMpd };
