@@ -7,7 +7,7 @@ import { createId3 } from './data/createId3.js';
 import {
 	generateId3,
 	generateId3Frame,
-} from '../utils/id3Generator.js';
+} from '../utils/id3/util/id3Generator.js';
 import { toArrayBuffer } from '../../src/id3/util/toArrayBuffer.js';
 
 describe('getId3Frames', () => {
