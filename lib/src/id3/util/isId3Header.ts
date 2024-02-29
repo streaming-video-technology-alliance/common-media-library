@@ -45,6 +45,5 @@ export function isId3Header(data: Uint8Array, offset: number): boolean {
 			}
 		}
 	}
-
 	return false;
 }
