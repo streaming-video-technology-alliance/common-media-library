@@ -3,6 +3,7 @@ import { RawId3Frame } from './RawFrame.js';
 import { decodeId3PrivFrame } from './decodeId3PrivFrame.js';
 import { decodeId3TextFrame } from './decodeId3TextFrame.js';
 import { decodeId3UrlFrame } from './decodeId3UrlFrame.js';
+import { decodeId3ImageFrame } from './decodeId3ImageFrame.js';
 
 /**
  * Decode an ID3 frame.
@@ -21,6 +22,10 @@ export function decodeId3Frame(frame: RawId3Frame): Id3Frame | undefined {
 	}
 	else if (frame.type[0] === 'W') {
 		return decodeId3UrlFrame(frame);
+	}
+
+	else if (frame.type === 'APIC') {
+		return decodeId3ImageFrame(frame);
 	}
 
 	return decodeId3TextFrame(frame);
