@@ -1,3 +1,5 @@
+import { isArrayBufferView } from 'util/types';
+
 export function toUint8(
 	data: BufferSource,
 	offset: number = 0,
@@ -10,7 +12,7 @@ function view<T extends ArrayBufferView>(
 	data: BufferSource,
 	offset: number,
 	length: number,
-	Type: { new (buffer: ArrayBuffer, byteOffset: number, length: number): T }
+	Type: { new(buffer: ArrayBuffer, byteOffset: number, length: number): T }
 ): T {
 	const buffer = unsafeGetArrayBuffer(data);
 	let bytesPerElement: any = 1;
@@ -35,8 +37,4 @@ function unsafeGetArrayBuffer(view: BufferSource) {
 	else {
 		return view.buffer;
 	}
-}
-
-function isArrayBufferView(obj: any): obj is ArrayBufferView {
-	return obj && obj.buffer instanceof ArrayBuffer && obj.byteLength !== undefined && obj.byteOffset !== undefined;
 }
