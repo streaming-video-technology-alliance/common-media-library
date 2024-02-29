@@ -1,11 +1,12 @@
 [
 	{
-		"id": "presentation-id",
+		"id": "presentation-id-734",
 		"selectionSets": [
 			{
 				"id": "1",
 				"switchingSets": [
 					{
+						"id": "1",
 						"tracks": [
 							{
 								"bandwidth": 386437,
@@ -17,13 +18,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 96,
-										"url": "1/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 512
 							},
 							{
@@ -36,13 +33,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 96,
-										"url": "2/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 640
 							},
 							{
@@ -55,13 +48,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 96,
-										"url": "3/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 852
 							},
 							{
@@ -74,13 +63,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 96,
-										"url": "4/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 1280
 							},
 							{
@@ -93,13 +78,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 96,
-										"url": "5/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 1920
 							},
 							{
@@ -112,13 +93,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 96,
-										"url": "6/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 2560
 							},
 							{
@@ -131,18 +108,15 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 96,
-										"url": "7/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 3840
 							}
 						]
 					},
 					{
+						"id": "1",
 						"tracks": [
 							{
 								"bandwidth": 395735,
@@ -154,13 +128,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 4799983,
-										"url": "8/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 512
 							},
 							{
@@ -173,13 +143,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 4799983,
-										"url": "9/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 640
 							},
 							{
@@ -192,13 +158,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 4799983,
-										"url": "10/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 852
 							},
 							{
@@ -211,13 +173,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 4799983,
-										"url": "11/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 1280
 							},
 							{
@@ -230,13 +188,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 4799983,
-										"url": "12/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 1920
 							},
 							{
@@ -249,13 +203,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 4799983,
-										"url": "13/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 2560
 							},
 							{
@@ -268,13 +218,9 @@
 								"language": "und",
 								"par": "16:9",
 								"sar": "",
-								"segments": [
-									{
-										"duration": 4799983,
-										"url": "14/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								],
+								"scanType": "",
+								"segments": [],
+								"type": "video",
 								"width": 3840
 							}
 						]
@@ -285,21 +231,18 @@
 				"id": "2",
 				"switchingSets": [
 					{
+						"id": "2",
 						"tracks": [
 							{
 								"bandwidth": 131351,
 								"channels": 0,
+								"codec": "",
 								"duration": 734,
 								"id": "15",
 								"language": "en",
 								"sampleRate": 0,
-								"segments": [
-									{
-										"duration": 95232,
-										"url": "15/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								]
+								"segments": [],
+								"type": "audio"
 							}
 						]
 					}
@@ -309,70 +252,58 @@
 				"id": "3",
 				"switchingSets": [
 					{
+						"id": "3",
 						"tracks": [
 							{
 								"bandwidth": 428,
+								"codec": "",
 								"duration": 734,
 								"id": "18",
 								"language": "en",
-								"segments": [
-									{
-										"duration": 4000,
-										"url": "18/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								]
+								"segments": [],
+								"type": "text"
 							}
 						]
 					},
 					{
+						"id": "3",
 						"tracks": [
 							{
 								"bandwidth": 1095,
+								"codec": "",
 								"duration": 734,
 								"id": "19",
 								"language": "en",
-								"segments": [
-									{
-										"duration": 4000,
-										"url": "19/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								]
+								"segments": [],
+								"type": "text"
 							}
 						]
 					},
 					{
+						"id": "3",
 						"tracks": [
 							{
 								"bandwidth": 430,
+								"codec": "",
 								"duration": 734,
 								"id": "26",
 								"language": "es",
-								"segments": [
-									{
-										"duration": 4000,
-										"url": "26/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								]
+								"segments": [],
+								"type": "text"
 							}
 						]
 					},
 					{
+						"id": "3",
 						"tracks": [
 							{
 								"bandwidth": 1102,
+								"codec": "",
 								"duration": 734,
 								"id": "27",
 								"language": "es",
-								"segments": [
-									{
-										"duration": 4000,
-										"url": "27/$Number%04d$.m4s",
-										"byteRange": ""
-									}
-								]
+								"segments": [],
+								"type": "text"
 							}
 						]
 					}

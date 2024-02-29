@@ -45,7 +45,7 @@ function getContentType(
 	const adaptationRef =
 		adaptationSet.$.id ??
 		`group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`;
-	console.info(
+	console.error(
 		`Could not find contentType from adaptationSet ${adaptationRef}`,
 	);
 	console.info('Using "text" as default contentType');
@@ -68,44 +68,44 @@ function createTrack(
 	const type = getContentType(adaptationSet, representation);
 	if (type === 'video') {
 		return {
-			bandwidth: +representation.$.bandwidth,
-			codec: representation.$.codecs,
-			duration: duration,
+			bandwidth: +(representation.$.bandwidth ?? 0),
+			codec: representation.$.codecs ?? '',
+			duration,
 			frameRate: 0, // TODO: add frameRate
 			height: +(representation.$.height ?? 0),
-			id: representation.$.id,
-			language: adaptationSet.$.lang,
+			id: representation.$.id ?? '',
+			language: adaptationSet.$.lang ?? '',
 			par: adaptationSet.$.par ?? '',
 			sar: adaptationSet.$.sar ?? '',
-			scanType: representation.$.scanType,
-			segments: segments,
-			type: adaptationSet.$.contentType,
+			scanType: representation.$.scanType ?? '',
+			segments,
+			type,
 			width: +(representation.$.width ?? 0),
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
-			bandwidth: +representation.$.bandwidth,
+			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: +(
 				adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ?? 0
 			),
-			codec: adaptationSet.$.codecs,
-			duration: duration,
-			id: representation.$.id,
-			language: adaptationSet.$.lang,
+			codec: adaptationSet.$.codecs ?? '',
+			duration,
+			id: representation.$.id ?? '',
+			language: adaptationSet.$.lang ?? '',
 			sampleRate: +(adaptationSet.$.audioSamplingRate ?? 0),
-			segments: segments,
-			type: adaptationSet.$.contentType,
+			segments,
+			type,
 		} as AudioTrack;
 	} else {
 		// if (type === 'text')
 		return {
-			bandwidth: +representation.$.bandwidth,
-			codec: adaptationSet.$.codecs,
-			duration: duration,
-			id: representation.$.id,
-			language: adaptationSet.$.lang,
-			segments: segments,
-			type: adaptationSet.$.contentType,
+			bandwidth: +(representation.$.bandwidth ?? 0),
+			codec: adaptationSet.$.codecs ?? '',
+			duration,
+			id: representation.$.id ?? '',
+			language: adaptationSet.$.lang ?? '',
+			segments,
+			type,
 		} as TextTrack;
 	}
 }
@@ -113,12 +113,16 @@ function createTrack(
 function getUrlFromTemplate(
 	representation: Representation,
 	segmentTemplate: SegmentTemplate,
+	segmentId: number,
 ): string {
 	const regex = /\$(.*?)\$/g;
 	return segmentTemplate.$.media.replace(regex, (match: any) => {
 		// TODO: This may have a better way to do it for all the cases
 		if (match === '$RepresentationID$') {
 			return representation.$.id;
+		}
+		if (match.contains('Number')) {
+			return segmentId;
 		}
 		console.log(
 			`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`,
@@ -149,13 +153,21 @@ function mpdSegmentsToHamSegments(
 			} as Segment;
 		});
 	} else if (segmentTemplate) {
-		return [
-			{
+		// TODO: Double check the number of segments, this equation may be wrong
+		// segments = total duration / (segment duration * timescale)
+		const numberOfSegments =
+			(duration / +(segmentTemplate.$.duration ?? 1)) *
+			+(segmentTemplate.$.timescale ?? 1);
+		const init = +(segmentTemplate.$.initialization ?? 0);
+		const segments: Segment[] = [];
+		for (let id = init; id < numberOfSegments + init; id++) {
+			segments.push({
 				duration: +(segmentTemplate.$.duration ?? 0),
-				url: getUrlFromTemplate(representation, segmentTemplate),
+				url: getUrlFromTemplate(representation, segmentTemplate, id),
 				byteRange: '', // TODO: Complete this value
-			} as Segment,
-		];
+			} as Segment);
+		}
+		return segments;
 	} else {
 		console.error(`Representation ${representation.$.id} has no segments`);
 		return [] as Segment[];
@@ -165,7 +177,7 @@ function mpdSegmentsToHamSegments(
 function mpdToHam(mpd: MPDManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
-		const presentationId: string = 'presentation-id'; // todo: handle id
+		const presentationId: string = `presentation-id-${duration}`; // todo: handle id
 
 		const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
@@ -198,7 +210,10 @@ function mpdToHam(mpd: MPDManifest): Presentation[] {
 			}
 
 			selectionSetGroups[group].switchingSets.push({
-				id: adaptationSet.$.id,
+				id:
+					adaptationSet.$.id ??
+					adaptationSet.ContentComponent?.at(0)?.$.id ??
+					group,
 				tracks,
 			} as SwitchingSet);
 		});

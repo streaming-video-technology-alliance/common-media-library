@@ -1,11 +1,12 @@
 [
 	{
-		"id": "presentation-id",
+		"id": "presentation-id-31.296",
 		"selectionSets": [
 			{
 				"id": "video",
 				"switchingSets": [
 					{
+						"id": "1",
 						"tracks": [
 							{
 								"bandwidth": 72000,
@@ -14,8 +15,10 @@
 								"frameRate": 0,
 								"height": 480,
 								"id": "testStream01bbbVideo72000",
+								"language": "",
 								"par": "16:9",
 								"sar": "",
+								"scanType": "",
 								"segments": [
 									{
 										"duration": 10000,
@@ -23,6 +26,7 @@
 										"byteRange": ""
 									}
 								],
+								"type": "video",
 								"width": 854
 							}
 						]
@@ -33,10 +37,12 @@
 				"id": "audio",
 				"switchingSets": [
 					{
+						"id": "2",
 						"tracks": [
 							{
 								"bandwidth": 72000,
 								"channels": 0,
+								"codec": "",
 								"duration": 31.296,
 								"id": "testStream01bbbAudio72000",
 								"language": "en",
@@ -47,7 +53,8 @@
 										"url": "testStream01bbb/audio/72000/seg_init.mp4",
 										"byteRange": ""
 									}
-								]
+								],
+								"type": "audio"
 							}
 						]
 					}

@@ -300,7 +300,7 @@ export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?
 export function hamToM3U8(presentation: Presentation[]): Manifest;
 
 // @public
-export function hamToMPD(presentation: Presentation[]): Manifest;
+export function hamToMpd(presentation: Presentation[]): Manifest;
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -312,11 +312,6 @@ export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
 // @public
 export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
-
-// Warning: (ae-forgotten-export) The symbol "mapMpdType" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export const mapMpd: mapMpdType;
 
 // @public
 export function mpdToHam(manifest: string): Presentation[];

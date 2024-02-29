@@ -10,10 +10,9 @@ export * from './cmaf/ham/services/getTracks.js';
 export * from './cmaf/ham/services/validateTracks.js';
 export {
 	mpdToHam,
-	hamToMPD,
+	hamToMpd,
 } from './cmaf/ham/services/converters/mpdConverter.js';
 export {
 	m3u8ToHam,
 	hamToM3U8,
 } from './cmaf/ham/services/converters/m3u8Converter.js';
-export { mapMpd } from './cmaf/ham/mapper/mapMpd.js';

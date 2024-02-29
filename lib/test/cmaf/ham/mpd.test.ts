@@ -1,4 +1,4 @@
-import { mapMpd, Presentation } from '@svta/common-media-library';
+import { mpdToHam, hamToMpd, Presentation } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import jsonHam0 from './data/ham-samples/ham0.json' assert { type: 'json' };
@@ -13,11 +13,11 @@ import { mpdSample3 } from './data/dash-samples/mpdSample3.js';
 import { mpdSample4 } from './data/dash-samples/mpdSample4.js';
 
 describe('mpd2ham', () => {
-	const convertedHam0 = mapMpd.toHam(mpdSample0);
-	const convertedHam1 = mapMpd.toHam(mpdSample1);
-	const convertedHam2 = mapMpd.toHam(mpdSample2);
-	const convertedHam3 = mapMpd.toHam(mpdSample3);
-	const convertedHam4 = mapMpd.toHam(mpdSample4);
+	const convertedHam0 = mpdToHam(mpdSample0);
+	const convertedHam1 = mpdToHam(mpdSample1);
+	const convertedHam2 = mpdToHam(mpdSample2);
+	const convertedHam3 = mpdToHam(mpdSample3);
+	const convertedHam4 = mpdToHam(mpdSample4);
 
 	it('converts dash1 to ham1', () => {
 		deepEqual(convertedHam0, jsonHam0);
@@ -42,7 +42,7 @@ describe('mpd2ham', () => {
 
 describe('ham2mpd', async () => {
 	const presentation = jsonHam0[0] as Presentation;
-	const convertedMpd = await mapMpd.fromHam([presentation]);
+	const convertedMpd = hamToMpd([presentation]);
 
 	// FIXME: the xml is missing some of the original metadata
 	it.skip('converts ham1 to dash1', () => {

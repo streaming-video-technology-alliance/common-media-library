@@ -4,7 +4,7 @@ import { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 import { mpdToHam } from './mpd/mpdToHam.js';
 import { jsonToXml, xmlToJson } from '../../utils/xmlUtils.js';
-import { hamToMpd } from './mpd/hamToMpd.js';
+import { mapHamToMpd } from './mpd/mapHamToMpd.js';
 import { addMetadataToDASH, getMetadata } from '../../utils/manifestUtils.js';
 
 export class MPDMapper implements IMapper {
@@ -28,7 +28,7 @@ export class MPDMapper implements IMapper {
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		const jsonMpd = hamToMpd(presentation);
+		const jsonMpd = mapHamToMpd(presentation);
 
 		if (!jsonMpd) {
 			return { manifest: '', ancillaryManifests: [], type: 'mpd' };
