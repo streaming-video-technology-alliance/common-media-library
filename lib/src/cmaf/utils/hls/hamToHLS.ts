@@ -51,10 +51,10 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS=${videoTrack.codec},RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
-			return `#EXTINF:${segment.duration},${newline}${segment.url}`;
+			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}${playlist}`;
+	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI=${videoTrack.urlInititalization},BYTERANGE="${videoTrack.byteRange}${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
@@ -64,10 +64,10 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}"${newline}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
-			return `#EXTINF:${segment.duration},\n${segment.url}`;
+			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${audioTrack.duration}\n${playlist}`;
+	playlist = `#EXT-X-TARGETDURATION:${audioTrack.duration}\n#EXT-X-MAP:URI=${audioTrack.urlInititalization},BYTERANGE="${audioTrack.byteRange}${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
