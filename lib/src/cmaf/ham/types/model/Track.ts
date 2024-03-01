@@ -9,6 +9,8 @@ type Track = Ham & {
 	duration: number;
 	language: string;
 	bandwidth: number;
+	byteRange?: string;
+	urlInititalization?: string;
 	segments: Segment[];
 };
 

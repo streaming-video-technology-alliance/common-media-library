@@ -113,6 +113,10 @@ function m3u8ToHam(manifest: Manifest) {
 			width: playlist.attributes.RESOLUTION.width,
 			height: playlist.attributes.RESOLUTION.height,
 		};
+		const { map } = parsedHlsManifest;
+		const { byteRange, uri } = map;
+		//where is map attribute?
+		console.log(parsedHlsManifest);
 		tracks.push({
 			id: uuid(),
 			type: 'VIDEO',
@@ -128,6 +132,8 @@ function m3u8ToHam(manifest: Manifest) {
 			par: '',
 			sar: '',
 			scanType: '',
+			byteRange: `${byteRange.length}@${byteRange.offset}`,
+			urlInititalization: uri,
 		} as VideoTrack);
 
 		switchingSetVideos.push({
