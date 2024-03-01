@@ -118,7 +118,6 @@ function m3u8ToHam(manifest: Manifest) {
 		};
 		const { map } = parsedHlsManifest.segments[0];
 		const { byterange, uri } = map;
-		//where is map attribute?
 		tracks.push({
 			id: uuid(),
 			type: 'VIDEO',
