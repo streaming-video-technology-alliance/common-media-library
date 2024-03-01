@@ -37,7 +37,6 @@ function m3u8ToHam(manifest: Manifest) {
 		const segments: Segment[] = _formatSegments(audioParsed?.segments);
 		const targetDuration = audioParsed?.targetDuration;
 		const { map } = audioParsed.segments[0];
-		console.log(audioParsed.segments[0]);
 		// TODO: retrieve channels, samplerate, bandwidth and codec
 		audioTracks.push({
 			id: audio,
