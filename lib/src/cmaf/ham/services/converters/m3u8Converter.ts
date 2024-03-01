@@ -34,4 +34,5 @@ function hamToM3U8(presentation: Presentation[]) {
 	return mapperContext.getManifestFormat(presentation);
 }
 
+
 export { m3u8ToHam, hamToM3U8 };
