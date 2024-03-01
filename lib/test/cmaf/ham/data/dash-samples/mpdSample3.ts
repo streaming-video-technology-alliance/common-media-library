@@ -168,5 +168,4 @@ export const mpdSample3: string = `<?xml version="1.0" encoding="utf-8"?>
     </AdaptationSet>
   </Period>
 </MPD>
-<!-- Created with Unified Streaming Platform(version=1.9.4) -->
-`;
+<!-- Created with Unified Streaming Platform(version=1.9.4) -->`;

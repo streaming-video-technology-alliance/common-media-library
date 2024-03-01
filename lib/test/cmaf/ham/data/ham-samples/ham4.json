@@ -9,10 +9,11 @@
 						"id": "video",
 						"tracks": [
 							{
+								"name": "video",
 								"bandwidth": 980104,
 								"codec": "avc1.4d401f",
 								"duration": 250,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "1",
 								"language": "und",
@@ -650,10 +651,11 @@
 								"width": 1280
 							},
 							{
+								"name": "video",
 								"bandwidth": 1950145,
 								"codec": "avc1.4d401f",
 								"duration": 250,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "2",
 								"language": "und",
@@ -1291,10 +1293,11 @@
 								"width": 1280
 							},
 							{
+								"name": "video",
 								"bandwidth": 3893089,
 								"codec": "avc1.4d401f",
 								"duration": 250,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "3",
 								"language": "und",
@@ -1942,6 +1945,7 @@
 						"id": "text",
 						"tracks": [
 							{
+								"name": "audio",
 								"bandwidth": 33434,
 								"channels": 2,
 								"codec": "mp4a.40.29",
@@ -2604,10 +2608,11 @@
 						"id": "video",
 						"tracks": [
 							{
+								"name": "video",
 								"bandwidth": 980104,
 								"codec": "avc1.4d401f",
 								"duration": 344,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "1",
 								"language": "und",
@@ -3480,10 +3485,11 @@
 								"width": 1280
 							},
 							{
+								"name": "video",
 								"bandwidth": 1950145,
 								"codec": "avc1.4d401f",
 								"duration": 344,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "2",
 								"language": "und",
@@ -4356,10 +4362,11 @@
 								"width": 1280
 							},
 							{
+								"name": "video",
 								"bandwidth": 3893089,
 								"codec": "avc1.4d401f",
 								"duration": 344,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "3",
 								"language": "und",
@@ -5242,6 +5249,7 @@
 						"id": "text",
 						"tracks": [
 							{
+								"name": "audio",
 								"bandwidth": 33434,
 								"channels": 2,
 								"codec": "mp4a.40.29",

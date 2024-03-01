@@ -89,7 +89,6 @@ type AdaptationSet = {
 		group?: string;
 		id?: string;
 		lang?: string;
-		frameRate?: string;
 		maxBandwidth?: string;
 		maxFrameRate?: string;
 		maxHeight?: string;

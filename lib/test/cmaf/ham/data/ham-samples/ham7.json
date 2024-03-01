@@ -20,7 +20,7 @@
 								"segments": [
 									{
 										"duration": 734,
-										"url": "tears-of-steel-aac-64k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
 										"byteRange": "704-2211"
 									}
 								],
@@ -38,7 +38,7 @@
 								"segments": [
 									{
 										"duration": 734,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "704-2211"
 									}
 								],
@@ -69,7 +69,7 @@
 								"segments": [
 									{
 										"duration": 734,
-										"url": "tears-of-steel-hev1-1100k.cmfv",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
 										"byteRange": "2901-4036"
 									}
 								],
@@ -91,7 +91,7 @@
 								"segments": [
 									{
 										"duration": 734,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
 										"byteRange": "2901-4036"
 									}
 								],
@@ -113,7 +113,7 @@
 								"segments": [
 									{
 										"duration": 734,
-										"url": "tears-of-steel-hev1-2200k.cmfv",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
 										"byteRange": "2901-4036"
 									}
 								],
@@ -140,7 +140,7 @@
 								"segments": [
 									{
 										"duration": 734,
-										"url": "tears-of-steel-en.cmft",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-en.cmft",
 										"byteRange": "607-1778"
 									}
 								],
@@ -161,7 +161,7 @@
 								"segments": [
 									{
 										"duration": 734,
-										"url": "tears-of-steel-es.cmft",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-es.cmft",
 										"byteRange": "607-1778"
 									}
 								],

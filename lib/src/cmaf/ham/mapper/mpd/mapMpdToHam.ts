@@ -28,7 +28,9 @@ function getContentType(
 		return adaptationSet.ContentComponent.at(0)!.$.contentType;
 	}
 	if (adaptationSet.$.mimeType || representation?.$.mimeType) {
-		const type = adaptationSet.$.mimeType?.split('/')[0] || representation?.$.mimeType?.split('/')[0];
+		const type =
+			adaptationSet.$.mimeType?.split('/')[0] ||
+			representation?.$.mimeType?.split('/')[0];
 		if (type === 'audio' || type === 'video' || type === 'text') {
 			return type;
 		}
@@ -94,9 +96,7 @@ function getFrameRate(
 	representation: Representation,
 ): string {
 	const frameRate: string =
-		representation.$.frameRate ??
-		adaptationSet.$.frameRate ??
-		'';
+		representation.$.frameRate ?? adaptationSet.$.frameRate ?? '';
 	if (!frameRate) {
 		console.error(
 			`Representation ${representation.$.id} has no frame rate`,
@@ -135,7 +135,7 @@ function getNumberOfSegments(
 	// segments = total duration / (segment duration * timescale)
 	return Math.round(
 		(duration * +(segmentTemplate.$.timescale ?? 1)) /
-		+(segmentTemplate.$.duration ?? 1),
+			+(segmentTemplate.$.duration ?? 1),
 	);
 }
 
