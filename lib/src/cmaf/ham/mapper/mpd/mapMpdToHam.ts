@@ -53,6 +53,21 @@ function getGroup(adaptationSet: AdaptationSet): string {
 	return adaptationSet.$.group ?? getContentType(adaptationSet);
 }
 
+function getChannels(
+	adaptationSet: AdaptationSet,
+	representation: Representation,
+): number {
+	const channels: number = +(
+		adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ??
+		representation.AudioChannelConfiguration?.at(0)?.$.value ??
+		0
+	);
+	if (!channels) {
+		console.error(`Representation ${representation.$.id} has no channels`);
+	}
+	return channels;
+}
+
 function getCodec(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
@@ -79,6 +94,17 @@ function getFrameRate(
 		);
 	}
 	return frameRate;
+}
+
+function getLanguage(adaptationSet: AdaptationSet): string {
+	let language = adaptationSet.$.lang;
+	if (!language) {
+		console.info(
+			`AdaptationSet ${adaptationSet.$.id} has no lang, using "und" as default`,
+		);
+		language = 'und';
+	}
+	return language;
 }
 
 function getSar(
@@ -122,7 +148,7 @@ function createTrack(
 			frameRate: getFrameRate(adaptationSet, representation),
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
-			language: adaptationSet.$.lang ?? '',
+			language: getLanguage(adaptationSet),
 			par: adaptationSet.$.par ?? '',
 			sar: getSar(adaptationSet, representation),
 			scanType: representation.$.scanType ?? '',
@@ -133,13 +159,11 @@ function createTrack(
 	} else if (type === 'audio') {
 		return {
 			bandwidth: +(representation.$.bandwidth ?? 0),
-			channels: +(
-				adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ?? 0
-			),
+			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
 			duration,
 			id: representation.$.id ?? '',
-			language: adaptationSet.$.lang ?? '',
+			language: getLanguage(adaptationSet),
 			sampleRate: +(adaptationSet.$.audioSamplingRate ?? 0),
 			segments,
 			type,
@@ -151,7 +175,7 @@ function createTrack(
 			codec: getCodec(adaptationSet, representation),
 			duration,
 			id: representation.$.id ?? '',
-			language: adaptationSet.$.lang ?? '',
+			language: getLanguage(adaptationSet),
 			segments,
 			type,
 		} as TextTrack;

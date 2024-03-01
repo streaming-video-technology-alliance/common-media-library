@@ -15,7 +15,7 @@
 								"frameRate": 24,
 								"height": 720,
 								"id": "1",
-								"language": "",
+								"language": "und",
 								"par": "16:9",
 								"sar": "1:1",
 								"scanType": "",
@@ -656,7 +656,7 @@
 								"frameRate": 24,
 								"height": 720,
 								"id": "2",
-								"language": "",
+								"language": "und",
 								"par": "16:9",
 								"sar": "1:1",
 								"scanType": "",
@@ -1297,7 +1297,7 @@
 								"frameRate": 24,
 								"height": 720,
 								"id": "3",
-								"language": "",
+								"language": "und",
 								"par": "16:9",
 								"sar": "1:1",
 								"scanType": "",
@@ -1943,11 +1943,11 @@
 						"tracks": [
 							{
 								"bandwidth": 33434,
-								"channels": 0,
+								"channels": 2,
 								"codec": "mp4a.40.29",
 								"duration": 250,
 								"id": "4",
-								"language": "",
+								"language": "und",
 								"sampleRate": 0,
 								"segments": [
 									{
@@ -2610,7 +2610,7 @@
 								"frameRate": 24,
 								"height": 720,
 								"id": "1",
-								"language": "",
+								"language": "und",
 								"par": "16:9",
 								"sar": "1:1",
 								"scanType": "",
@@ -3486,7 +3486,7 @@
 								"frameRate": 24,
 								"height": 720,
 								"id": "2",
-								"language": "",
+								"language": "und",
 								"par": "16:9",
 								"sar": "1:1",
 								"scanType": "",
@@ -4362,7 +4362,7 @@
 								"frameRate": 24,
 								"height": 720,
 								"id": "3",
-								"language": "",
+								"language": "und",
 								"par": "16:9",
 								"sar": "1:1",
 								"scanType": "",
@@ -5243,11 +5243,11 @@
 						"tracks": [
 							{
 								"bandwidth": 33434,
-								"channels": 0,
+								"channels": 2,
 								"codec": "mp4a.40.29",
 								"duration": 344,
 								"id": "4",
-								"language": "",
+								"language": "und",
 								"sampleRate": 0,
 								"segments": [
 									{

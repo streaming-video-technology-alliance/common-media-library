@@ -13129,7 +13129,7 @@
 						"tracks": [
 							{
 								"bandwidth": 131351,
-								"channels": 0,
+								"channels": 2,
 								"codec": "mp4a.40.29",
 								"duration": 734,
 								"id": "15",
