@@ -50,7 +50,7 @@ function m3u8ToHam(manifest: Manifest) {
 			sampleRate: 0,
 			channels: 0,
 			byteRange: `${map.byterange.length}@${map.byterange.offset}`,
-			urlInititalization: map.uri,
+			urlInitialization: map.uri,
 		} as AudioTrack);
 		audioSwitchingSets.push({
 			id: audio,
@@ -135,7 +135,7 @@ function m3u8ToHam(manifest: Manifest) {
 			sar: '',
 			scanType: '',
 			byteRange: `${byterange.length}@${byterange.offset}`,
-			urlInititalization: uri,
+			urlInitialization: uri,
 		} as VideoTrack);
 
 		switchingSetVideos.push({
