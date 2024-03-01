@@ -54,7 +54,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI=${videoTrack.urlInititalization},BYTERANGE="${videoTrack.byteRange}${newline}${playlist}`;
+	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI=${videoTrack.urlInititalization},BYTERANGE="${videoTrack.byteRange}"${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
@@ -67,7 +67,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${audioTrack.duration}\n#EXT-X-MAP:URI=${audioTrack.urlInititalization},BYTERANGE="${audioTrack.byteRange}${newline}${playlist}`;
+	playlist = `#EXT-X-TARGETDURATION:${audioTrack.duration}\n#EXT-X-MAP:URI="${audioTrack.urlInititalization}",BYTERANGE="${audioTrack.byteRange}"${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
