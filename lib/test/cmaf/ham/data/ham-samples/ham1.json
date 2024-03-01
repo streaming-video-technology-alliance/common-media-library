@@ -9,10 +9,11 @@
 						"id": "1",
 						"tracks": [
 							{
+								"name": "video",
 								"bandwidth": 72000,
 								"codec": "avc1.42c01e",
 								"duration": 31.296,
-								"frameRate": 37,
+								"frameRate": "37",
 								"height": 480,
 								"id": "testStream01bbbVideo72000",
 								"language": "und",
@@ -22,7 +23,17 @@
 								"segments": [
 									{
 										"duration": 10000,
-										"url": "testStream01bbb/video/72000/seg_init.mp4",
+										"url": "testStream01bbb/video/72000/segment_0.m4s",
+										"byteRange": ""
+									},
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/video/72000/segment_10417.m4s",
+										"byteRange": ""
+									},
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/video/72000/segment_20833.m4s",
 										"byteRange": ""
 									}
 								],
@@ -40,6 +51,7 @@
 						"id": "2",
 						"tracks": [
 							{
+								"name": "audio",
 								"bandwidth": 72000,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -50,7 +62,17 @@
 								"segments": [
 									{
 										"duration": 10000,
-										"url": "testStream01bbb/audio/72000/seg_init.mp4",
+										"url": "testStream01bbb/audio/72000/segment_0.m4s",
+										"byteRange": ""
+									},
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/audio/72000/segment_10432.m4s",
+										"byteRange": ""
+									},
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/audio/72000/segment_20864.m4s",
 										"byteRange": ""
 									}
 								],

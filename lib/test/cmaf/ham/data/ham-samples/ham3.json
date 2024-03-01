@@ -9,6 +9,7 @@
 						"id": "1",
 						"tracks": [
 							{
+								"name": "audio",
 								"bandwidth": 64349,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -26,6 +27,7 @@
 								"type": "audio"
 							},
 							{
+								"name": "audio",
 								"bandwidth": 128407,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -53,10 +55,11 @@
 						"id": "12",
 						"tracks": [
 							{
+								"name": "video",
 								"bandwidth": 1032000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 750,
 								"id": "video_eng=1032000",
 								"language": "en",
@@ -74,10 +77,11 @@
 								"width": 1680
 							},
 							{
+								"name": "video",
 								"bandwidth": 1250000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 1150,
 								"id": "video_eng=1250000",
 								"language": "en",
@@ -95,10 +99,11 @@
 								"width": 2576
 							},
 							{
+								"name": "video",
 								"bandwidth": 1600000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 1500,
 								"id": "video_eng=1600000",
 								"language": "en",
@@ -126,6 +131,7 @@
 						"id": "2",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -146,6 +152,7 @@
 						"id": "4",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,

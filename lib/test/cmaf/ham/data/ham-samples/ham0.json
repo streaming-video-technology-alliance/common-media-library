@@ -9,6 +9,7 @@
 						"id": "1",
 						"tracks": [
 							{
+								"name": "audio",
 								"bandwidth": 64349,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -26,6 +27,7 @@
 								"type": "audio"
 							},
 							{
+								"name": "audio",
 								"bandwidth": 128407,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -53,10 +55,11 @@
 						"id": "12",
 						"tracks": [
 							{
+								"name": "video",
 								"bandwidth": 405000,
 								"codec": "avc1.64001F",
 								"duration": 734,
-								"frameRate": 0,
+								"frameRate": "",
 								"height": 100,
 								"id": "video_eng=405000",
 								"language": "en",
@@ -74,10 +77,11 @@
 								"width": 224
 							},
 							{
+								"name": "video",
 								"bandwidth": 759000,
 								"codec": "avc1.64001F",
 								"duration": 734,
-								"frameRate": 0,
+								"frameRate": "",
 								"height": 200,
 								"id": "video_eng=759000",
 								"language": "en",
@@ -95,10 +99,11 @@
 								"width": 448
 							},
 							{
+								"name": "video",
 								"bandwidth": 1026000,
 								"codec": "avc1.64001F",
 								"duration": 734,
-								"frameRate": 0,
+								"frameRate": "",
 								"height": 350,
 								"id": "video_eng=1026000",
 								"language": "en",
@@ -116,10 +121,11 @@
 								"width": 784
 							},
 							{
+								"name": "video",
 								"bandwidth": 1501000,
 								"codec": "avc1.640028",
 								"duration": 734,
-								"frameRate": 0,
+								"frameRate": "",
 								"height": 750,
 								"id": "video_eng=1501000",
 								"language": "en",
@@ -137,10 +143,11 @@
 								"width": 1680
 							},
 							{
+								"name": "video",
 								"bandwidth": 2205000,
 								"codec": "avc1.640028",
 								"duration": 734,
-								"frameRate": 0,
+								"frameRate": "",
 								"height": 750,
 								"id": "video_eng=2205000",
 								"language": "en",
@@ -168,6 +175,7 @@
 						"id": "2",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -188,6 +196,7 @@
 						"id": "3",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -208,6 +217,7 @@
 						"id": "4",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -228,6 +238,7 @@
 						"id": "5",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -248,6 +259,7 @@
 						"id": "6",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -268,6 +280,7 @@
 						"id": "7",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -288,6 +301,7 @@
 						"id": "8",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -308,6 +322,7 @@
 						"id": "9",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -328,6 +343,7 @@
 						"id": "10",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -348,6 +364,7 @@
 						"id": "11",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,

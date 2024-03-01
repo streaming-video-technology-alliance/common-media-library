@@ -9,10 +9,11 @@
 						"id": "1",
 						"tracks": [
 							{
+								"name": "video",
 								"bandwidth": 386437,
 								"codec": "avc1.64001f",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 288,
 								"id": "1",
 								"language": "und",
@@ -945,10 +946,11 @@
 								"width": 512
 							},
 							{
+								"name": "video",
 								"bandwidth": 761570,
 								"codec": "avc1.64001f",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 360,
 								"id": "2",
 								"language": "und",
@@ -1881,10 +1883,11 @@
 								"width": 640
 							},
 							{
+								"name": "video",
 								"bandwidth": 1117074,
 								"codec": "avc1.640028",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 480,
 								"id": "3",
 								"language": "und",
@@ -2817,10 +2820,11 @@
 								"width": 852
 							},
 							{
+								"name": "video",
 								"bandwidth": 1941893,
 								"codec": "avc1.640032",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "4",
 								"language": "und",
@@ -3753,10 +3757,11 @@
 								"width": 1280
 							},
 							{
+								"name": "video",
 								"bandwidth": 2723012,
 								"codec": "avc1.640033",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 1080,
 								"id": "5",
 								"language": "und",
@@ -4689,10 +4694,11 @@
 								"width": 1920
 							},
 							{
+								"name": "video",
 								"bandwidth": 4021190,
 								"codec": "avc1.640034",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 1440,
 								"id": "6",
 								"language": "und",
@@ -5625,10 +5631,11 @@
 								"width": 2560
 							},
 							{
+								"name": "video",
 								"bandwidth": 5134121,
 								"codec": "avc1.640034",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 2160,
 								"id": "7",
 								"language": "und",
@@ -6566,10 +6573,11 @@
 						"id": "1",
 						"tracks": [
 							{
+								"name": "video",
 								"bandwidth": 395735,
 								"codec": "hev1.2.4.L63.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 288,
 								"id": "8",
 								"language": "und",
@@ -7502,10 +7510,11 @@
 								"width": 512
 							},
 							{
+								"name": "video",
 								"bandwidth": 689212,
 								"codec": "hev1.2.4.L63.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 360,
 								"id": "9",
 								"language": "und",
@@ -8438,10 +8447,11 @@
 								"width": 640
 							},
 							{
+								"name": "video",
 								"bandwidth": 885518,
 								"codec": "hev1.2.4.L90.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 480,
 								"id": "10",
 								"language": "und",
@@ -9374,10 +9384,11 @@
 								"width": 852
 							},
 							{
+								"name": "video",
 								"bandwidth": 1474186,
 								"codec": "hev1.2.4.L93.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 720,
 								"id": "11",
 								"language": "und",
@@ -10310,10 +10321,11 @@
 								"width": 1280
 							},
 							{
+								"name": "video",
 								"bandwidth": 1967542,
 								"codec": "hev1.2.4.L120.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 1080,
 								"id": "12",
 								"language": "und",
@@ -11246,10 +11258,11 @@
 								"width": 1920
 							},
 							{
+								"name": "video",
 								"bandwidth": 2954309,
 								"codec": "hev1.2.4.L150.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 1440,
 								"id": "13",
 								"language": "und",
@@ -12182,10 +12195,11 @@
 								"width": 2560
 							},
 							{
+								"name": "video",
 								"bandwidth": 4424584,
 								"codec": "hev1.2.4.L150.90",
 								"duration": 734,
-								"frameRate": 24,
+								"frameRate": "24",
 								"height": 2160,
 								"id": "14",
 								"language": "und",
@@ -13128,6 +13142,7 @@
 						"id": "2",
 						"tracks": [
 							{
+								"name": "audio",
 								"bandwidth": 131351,
 								"channels": 2,
 								"codec": "mp4a.40.29",
@@ -14075,6 +14090,7 @@
 						"id": "3",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 428,
 								"codec": "wvtt",
 								"duration": 734,
@@ -15010,6 +15026,7 @@
 						"id": "3",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1095,
 								"codec": "stpp",
 								"duration": 734,
@@ -15945,6 +15962,7 @@
 						"id": "3",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 430,
 								"codec": "wvtt",
 								"duration": 734,
@@ -16880,6 +16898,7 @@
 						"id": "3",
 						"tracks": [
 							{
+								"name": "text",
 								"bandwidth": 1102,
 								"codec": "stpp",
 								"duration": 734,
