@@ -5,11 +5,10 @@ import {
 	VideoTrack,
 } from '../../ham/types/model';
 import { Manifest } from '../types';
-import os from 'os';
 
 function hamToM3U8(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.
-	const newline = os.EOL;
+	const newline = `\n`;
 	let mainManifest = `#EXTM3U${newline}#EXT-X-VERSION:${version}${newline}`;
 	const playlists: Manifest[] = [];
 	presentation.map((pres) => {
@@ -47,7 +46,7 @@ function hamToM3U8(presentation: Presentation[]): Manifest {
 }
 
 function _generateVideoManifestPiece(videoTrack: VideoTrack) {
-	const newline = os.EOL;
+	const newline = `\n`;
 	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
@@ -60,7 +59,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 }
 
 function _generateAudioManifestPiece(audioTrack: AudioTrack) {
-	const newline = os.EOL;
+	const newline = `\n`;
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}"${newline}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
@@ -73,7 +72,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 }
 
 function _generateTextManifestPiece(textTrack: TextTrack) {
-	const newline = os.EOL;
+	const newline = `\n`;
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name}${newline}`;
 	const playlist = textTrack.segments
 		.map((segment) => {
