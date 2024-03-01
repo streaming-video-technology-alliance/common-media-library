@@ -6,11 +6,13 @@ import jsonHam1 from './data/ham-samples/ham1.json' assert { type: 'json' };
 import jsonHam2 from './data/ham-samples/ham2.json' assert { type: 'json' };
 import jsonHam3 from './data/ham-samples/ham3.json' assert { type: 'json' };
 import jsonHam4 from './data/ham-samples/ham4.json' assert { type: 'json' };
+import jsonHam5 from './data/ham-samples/ham5.json' assert { type: 'json' };
 import { mpdSample0 } from './data/dash-samples/mpdSample0.js';
 import { mpdSample1 } from './data/dash-samples/mpdSample1.js';
 import { mpdSample2 } from './data/dash-samples/mpdSample2.js';
 import { mpdSample3 } from './data/dash-samples/mpdSample3.js';
 import { mpdSample4 } from './data/dash-samples/mpdSample4.js';
+import { mpdSample5 } from './data/dash-samples/mpdSample5.js';
 
 describe('mpd2ham', () => {
 	it('converts dash1 to ham1', () => {
@@ -37,14 +39,19 @@ describe('mpd2ham', () => {
 		const convertedHam4 = mpdToHam(mpdSample4);
 		deepEqual(convertedHam4, jsonHam4);
 	});
+
+	it('converts mpdSample5 to HAM', () => {
+		const convertedHam5 = mpdToHam(mpdSample5);
+		deepEqual(convertedHam5, jsonHam5);
+	});
 });
 
 describe('ham2mpd', async () => {
-	const presentation = jsonHam0[0] as Presentation;
+	const presentation = jsonHam5[0] as Presentation;
 	const convertedMpd = hamToMpd([presentation]);
 
 	// FIXME: the xml is missing some of the original metadata
 	it.skip('converts ham1 to dash1', () => {
-		deepEqual(convertedMpd, mpdSample0);
+		deepEqual(convertedMpd, mpdSample5);
 	});
 });

@@ -3,6 +3,7 @@ import type {
 	DashManifest,
 	Representation,
 	SegmentBase,
+	SegmentList,
 } from '../../types/DashManifest';
 import type {
 	Presentation,
@@ -12,6 +13,7 @@ import type {
 	VideoTrack,
 } from '../../types/model';
 import { parseDurationMpd } from '../../../utils/utils.js';
+
 
 // TODO: This only maps to SegmentBase, it may need to handle all Segment types
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
@@ -23,6 +25,23 @@ function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
 			Initialization: [{ $: { range: segment.byteRange } }],
 		} as SegmentBase;
 	});
+}
+
+function SegmentToSegmentList(track: Track): SegmentList {
+	return {
+		$: {
+			duration: track.duration.toString(),
+			timescale: '24',
+		},
+		Initialization: [{ $: {} }],
+		SegmentURL: track.segments.map((segment) => {
+			return {
+				$: {
+					media: segment.url,
+				},
+			};
+		}),
+	} as SegmentList;
 }
 
 function trackToRepresentation(tracks: Track[]): Representation[] {
@@ -45,6 +64,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 				bandwidth: track.bandwidth.toString(),
 			},
 			SegmentBase: baseSegmentToSegment(track.segments),
+			SegmentList: [SegmentToSegmentList(track)],
 		};
 	});
 }

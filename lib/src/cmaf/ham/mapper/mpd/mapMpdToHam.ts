@@ -79,6 +79,16 @@ function getCodec(
 	return codec;
 }
 
+function getDuration(
+	representation: Representation,
+): number {
+	const duration: string =
+		representation.SegmentList?.at(0)?.$.duration ??
+		representation.SegmentTemplate?.at(0)?.$.duration ??
+		'';
+	return +duration;
+}
+
 function getFrameRate(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
@@ -144,7 +154,7 @@ function createTrack(
 			name: type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
-			duration,
+			duration: getDuration(representation) || duration,
 			frameRate: getFrameRate(adaptationSet, representation),
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
@@ -162,7 +172,7 @@ function createTrack(
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
-			duration,
+			duration: getDuration(representation) || duration,
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
 			sampleRate: +(adaptationSet.$.audioSamplingRate ?? 0),

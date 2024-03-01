@@ -86,7 +86,6 @@ type AdaptationSet = {
 		audioSamplingRate?: string;
 		codecs?: string;
 		contentType?: string;
-		frameRate?: string;
 		group?: string;
 		id?: string;
 		lang?: string;
@@ -109,6 +108,7 @@ type AdaptationSet = {
 	Role?: Role[];
 	Representation: Representation[];
 	SegmentTemplate?: SegmentTemplate[];
+	SegmentList?: SegmentList[];
 };
 
 type Period = {
