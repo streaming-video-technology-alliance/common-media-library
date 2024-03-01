@@ -450,7 +450,7 @@ export function validateTracks(tracks: Track[]): TrackValidity;
 export type VideoTrack = Track & {
     width: number;
     height: number;
-    frameRate: number;
+    frameRate: string;
     par: string;
     sar: string;
     scanType: string;

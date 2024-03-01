@@ -27,8 +27,8 @@ function getContentType(
 	if (adaptationSet.ContentComponent?.at(0)) {
 		return adaptationSet.ContentComponent.at(0)!.$.contentType;
 	}
-	if (representation?.$.mimeType) {
-		const type = representation.$.mimeType.split('/')[0];
+	if (adaptationSet.$.mimeType || representation?.$.mimeType) {
+		const type = adaptationSet.$.mimeType?.split('/')[0] || representation?.$.mimeType?.split('/')[0];
 		if (type === 'audio' || type === 'video' || type === 'text') {
 			return type;
 		}
@@ -82,12 +82,11 @@ function getCodec(
 function getFrameRate(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
-): number {
-	const frameRate: number = +(
+): string {
+	const frameRate: string =
 		representation.$.frameRate ??
 		adaptationSet.$.frameRate ??
-		0
-	);
+		'';
 	if (!frameRate) {
 		console.error(
 			`Representation ${representation.$.id} has no frame rate`,
@@ -126,7 +125,7 @@ function getNumberOfSegments(
 	// segments = total duration / (segment duration * timescale)
 	return Math.round(
 		(duration * +(segmentTemplate.$.timescale ?? 1)) /
-			+(segmentTemplate.$.duration ?? 1),
+		+(segmentTemplate.$.duration ?? 1),
 	);
 }
 
@@ -142,6 +141,7 @@ function createTrack(
 	const type = getContentType(adaptationSet, representation);
 	if (type === 'video') {
 		return {
+			name: type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration,
@@ -158,6 +158,7 @@ function createTrack(
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
+			name: type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
@@ -171,6 +172,7 @@ function createTrack(
 	} else {
 		// if (type === 'text')
 		return {
+			name: type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration,
@@ -217,13 +219,25 @@ function getSegments(
 			} as Segment;
 		});
 	} else if (representation.SegmentList) {
-		return representation.SegmentList.map((segment) => {
-			return {
-				duration: +(segment.$.duration ?? 0),
-				url: segment.Initialization[0].$.sourceURL ?? '',
-				byteRange: '', // TODO: Complete this value
-			} as Segment;
+		const segments: Segment[] = [];
+		representation.SegmentList.map((segment) => {
+			if (segment.SegmentURL) {
+				return segment.SegmentURL.forEach((segmentURL) => {
+					segments.push({
+						duration: +(segment.$.duration ?? 0),
+						url: segmentURL.$.media ?? '',
+						byteRange: '', // TODO: Complete this value
+					} as Segment);
+				});
+			} else {
+				segments.push({
+					duration: +(segment.$.duration ?? 0),
+					url: segment.Initialization[0].$.sourceURL ?? '',
+					byteRange: '', // TODO: Complete this value
+				} as Segment);
+			}
 		});
+		return segments;
 	} else if (segmentTemplate) {
 		const numberOfSegments = getNumberOfSegments(segmentTemplate, duration);
 		const init = +(segmentTemplate.$.startNumber ?? 0);
