@@ -64,6 +64,7 @@ type Representation = {
 	BaseURL?: string[];
 	SegmentBase?: SegmentBase[];
 	SegmentList?: SegmentList[];
+	SegmentTemplate?: SegmentTemplate[];
 };
 
 type ContentComponent = {
@@ -85,6 +86,7 @@ type AdaptationSet = {
 		audioSamplingRate?: string;
 		codecs?: string;
 		contentType?: string;
+		frameRate?: string;
 		group?: string;
 		id?: string;
 		lang?: string;

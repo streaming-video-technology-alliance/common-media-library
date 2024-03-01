@@ -21,9 +21,6 @@ function getContentType(
 	adaptationSet: AdaptationSet,
 	representation?: Representation,
 ): string {
-	if (!adaptationSet) {
-		throw new Error('Error: AdaptationSet is undefined');
-	}
 	if (adaptationSet.$.contentType) {
 		return adaptationSet.$.contentType;
 	}
@@ -56,6 +53,57 @@ function getGroup(adaptationSet: AdaptationSet): string {
 	return adaptationSet.$.group ?? getContentType(adaptationSet);
 }
 
+function getCodec(
+	adaptationSet: AdaptationSet,
+	representation: Representation,
+): string {
+	const codec = representation.$.codecs ?? adaptationSet.$.codecs ?? '';
+	if (!codec) {
+		console.error(`Representation ${representation.$.id} has no codecs`);
+	}
+	return codec;
+}
+
+function getFrameRate(
+	adaptationSet: AdaptationSet,
+	representation: Representation,
+): number {
+	const frameRate: number = +(
+		representation.$.frameRate ??
+		adaptationSet.$.frameRate ??
+		0
+	);
+	if (!frameRate) {
+		console.error(
+			`Representation ${representation.$.id} has no frame rate`,
+		);
+	}
+	return frameRate;
+}
+
+function getSar(
+	adaptationSet: AdaptationSet,
+	representation: Representation,
+): string {
+	const sar: string = representation.$.sar ?? adaptationSet.$.sar ?? '';
+	if (!sar) {
+		console.error(`Representation ${representation.$.id} has no sar`);
+	}
+	return sar;
+}
+
+function getNumberOfSegments(
+	segmentTemplate: SegmentTemplate,
+	duration: number,
+): number {
+	// TODO: Double check the number of segments, this equation may be wrong
+	// segments = total duration / (segment duration * timescale)
+	return Math.round(
+		(duration * +(segmentTemplate.$.timescale ?? 1)) /
+			+(segmentTemplate.$.duration ?? 1),
+	);
+}
+
 function createTrack(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
@@ -69,14 +117,14 @@ function createTrack(
 	if (type === 'video') {
 		return {
 			bandwidth: +(representation.$.bandwidth ?? 0),
-			codec: representation.$.codecs ?? '',
+			codec: getCodec(adaptationSet, representation),
 			duration,
-			frameRate: 0, // TODO: add frameRate
+			frameRate: getFrameRate(adaptationSet, representation),
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
 			language: adaptationSet.$.lang ?? '',
 			par: adaptationSet.$.par ?? '',
-			sar: adaptationSet.$.sar ?? '',
+			sar: getSar(adaptationSet, representation),
 			scanType: representation.$.scanType ?? '',
 			segments,
 			type,
@@ -88,7 +136,7 @@ function createTrack(
 			channels: +(
 				adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ?? 0
 			),
-			codec: adaptationSet.$.codecs ?? '',
+			codec: getCodec(adaptationSet, representation),
 			duration,
 			id: representation.$.id ?? '',
 			language: adaptationSet.$.lang ?? '',
@@ -100,7 +148,7 @@ function createTrack(
 		// if (type === 'text')
 		return {
 			bandwidth: +(representation.$.bandwidth ?? 0),
-			codec: adaptationSet.$.codecs ?? '',
+			codec: getCodec(adaptationSet, representation),
 			duration,
 			id: representation.$.id ?? '',
 			language: adaptationSet.$.lang ?? '',
@@ -115,23 +163,23 @@ function getUrlFromTemplate(
 	segmentTemplate: SegmentTemplate,
 	segmentId: number,
 ): string {
-	const regex = /\$(.*?)\$/g;
-	return segmentTemplate.$.media.replace(regex, (match: any) => {
+	const regexTemplate = /\$(.*?)\$/g;
+	return segmentTemplate.$.media.replace(regexTemplate, (match: any) => {
 		// TODO: This may have a better way to do it for all the cases
 		if (match === '$RepresentationID$') {
 			return representation.$.id;
 		}
-		if (match.contains('Number')) {
+		if (match.includes('Number')) {
 			return segmentId;
 		}
-		console.log(
+		console.error(
 			`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`,
 		);
 		return match;
 	});
 }
 
-function mpdSegmentsToHamSegments(
+function getSegments(
 	representation: Representation,
 	duration: number,
 	segmentTemplate?: SegmentTemplate,
@@ -153,12 +201,8 @@ function mpdSegmentsToHamSegments(
 			} as Segment;
 		});
 	} else if (segmentTemplate) {
-		// TODO: Double check the number of segments, this equation may be wrong
-		// segments = total duration / (segment duration * timescale)
-		const numberOfSegments =
-			(duration / +(segmentTemplate.$.duration ?? 1)) *
-			+(segmentTemplate.$.timescale ?? 1);
-		const init = +(segmentTemplate.$.initialization ?? 0);
+		const numberOfSegments = getNumberOfSegments(segmentTemplate, duration);
+		const init = +(segmentTemplate.$.startNumber ?? 0);
 		const segments: Segment[] = [];
 		for (let id = init; id < numberOfSegments + init; id++) {
 			segments.push({
@@ -185,8 +229,9 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 			const tracks: Track[] = adaptationSet.Representation.map(
 				(representation: Representation) => {
 					const segmentTemplate: SegmentTemplate | undefined =
-						adaptationSet.SegmentTemplate?.at(0);
-					const segments: Segment[] = mpdSegmentsToHamSegments(
+						adaptationSet.SegmentTemplate?.at(0) ??
+						representation.SegmentTemplate?.at(0);
+					const segments: Segment[] = getSegments(
 						representation,
 						duration,
 						segmentTemplate,

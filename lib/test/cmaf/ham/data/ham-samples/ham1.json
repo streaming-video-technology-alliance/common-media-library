@@ -12,12 +12,12 @@
 								"bandwidth": 72000,
 								"codec": "avc1.42c01e",
 								"duration": 31.296,
-								"frameRate": 0,
+								"frameRate": 37,
 								"height": 480,
 								"id": "testStream01bbbVideo72000",
 								"language": "",
 								"par": "16:9",
-								"sar": "",
+								"sar": "1:1",
 								"scanType": "",
 								"segments": [
 									{
@@ -42,7 +42,7 @@
 							{
 								"bandwidth": 72000,
 								"channels": 0,
-								"codec": "",
+								"codec": "mp4a.40.2",
 								"duration": 31.296,
 								"id": "testStream01bbbAudio72000",
 								"language": "en",
