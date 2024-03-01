@@ -10,7 +10,7 @@ import os from 'os';
 function hamToM3U8(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.
 	const newline = os.EOL;
-	let mainManifest = `##EXTM3U${newline}#EXT-X-VERSION:${version}${newline}`;
+	let mainManifest = `#EXTM3U${newline}#EXT-X-VERSION:${version}${newline}`;
 	const playlists: Manifest[] = [];
 	presentation.map((pres) => {
 		const selectionSets = pres.selectionSets;
@@ -48,13 +48,13 @@ function hamToM3U8(presentation: Presentation[]): Manifest {
 
 function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 	const newline = os.EOL;
-	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS=${videoTrack.codec},RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
+	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
 			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI=${videoTrack.urlInititalization},BYTERANGE="${videoTrack.byteRange}"${newline}${playlist}`;
+	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI="${videoTrack.urlInititalization}",BYTERANGE="${videoTrack.byteRange}"${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
