@@ -18,9 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-
-## [0.6.3] - 2024-03-01
-
 ### Added
 - CEA608/708 parser [#75](https://github.com/streaming-video-technology-alliance/common-media-library/pull/75)
 
@@ -189,11 +186,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 [Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.4...HEAD  
 [0.6.4]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.3...v0.6.4  
 =======
 [Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.3...HEAD  
 >>>>>>> 2c2206b (release/0.6.3 (#80))
+=======
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.4...HEAD  
+[0.6.4]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.3...v0.6.4  
+>>>>>>> ec00da1 (chore: update version to 0.6.4)
 [0.6.3]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.2...v0.6.3  
 [0.6.2]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.1...v0.6.2  
 [0.6.1]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.0...v0.6.1  
