@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.4] - 2024-03-04
 
+### Fixed
+-  Resolve module import error on id3 feature [#83](https://github.com/streaming-video-technology-alliance/common-media-library/issues/83)
+
 
 ## [0.6.3] - 2024-03-01
 
