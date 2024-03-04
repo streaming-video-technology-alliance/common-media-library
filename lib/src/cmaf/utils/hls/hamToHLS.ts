@@ -50,10 +50,15 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
-			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
+			const byteRange =
+				segment.byteRange != undefined
+					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
+					: '';
+			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",BYTERANGE="${videoTrack.byteRange}"${newline}${playlist}`;
+	const videoByteRange = videoTrack.byteRange != undefined ? `#EXT-X-BYTERANGE:${videoTrack.byteRange}${newline}` : '';
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
@@ -63,10 +68,15 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}"${newline}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
-			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
+			const byteRange =
+				segment.byteRange != undefined
+					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
+					: '';
+			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${audioTrack.duration}\n#EXT-X-MAP:URI="${audioTrack.urlInitialization}",BYTERANGE="${audioTrack.byteRange}"${newline}${playlist}`;
+	const videoByteRange = audioTrack.byteRange != undefined ? `#EXT-X-BYTERANGE:${audioTrack.byteRange}${newline}` : '';
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}\n#EXT-X-MAP:URI="${audioTrack.urlInitialization}",${videoByteRange}"${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
@@ -74,11 +84,12 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 function _generateTextManifestPiece(textTrack: TextTrack) {
 	const newline = `\n`;
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name}${newline}`;
-	const playlist = textTrack.segments
+	let playlist = textTrack.segments
 		.map((segment) => {
 			return `#EXTINF:${segment.duration},\n${segment.url}`;
 		})
 		.join(newline);
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${textTrack.duration}${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }

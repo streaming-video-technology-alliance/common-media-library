@@ -36,7 +36,11 @@ function m3u8ToHam(manifest: Manifest) {
 		);
 		const segments: Segment[] = _formatSegments(audioParsed?.segments);
 		const targetDuration = audioParsed?.targetDuration;
-		const { map } = audioParsed.segments[0];
+		const map = audioParsed.segments[0]?.map;
+		const byteRange =
+			map && map.byterange
+				? `${map.byterange.length}@${map.byterange.offset}`
+				: undefined;
 		// TODO: retrieve channels, samplerate, bandwidth and codec
 		audioTracks.push({
 			id: audio,
@@ -49,8 +53,8 @@ function m3u8ToHam(manifest: Manifest) {
 			segments: segments,
 			sampleRate: 0,
 			channels: 0,
-			byteRange: `${map.byterange.length}@${map.byterange.offset}`,
-			urlInitialization: map.uri,
+			byteRange: byteRange,
+			urlInitialization: map && map.uri ? map.uri : undefined,
 		} as AudioTrack);
 		audioSwitchingSets.push({
 			id: audio,
@@ -116,8 +120,9 @@ function m3u8ToHam(manifest: Manifest) {
 			width: playlist.attributes.RESOLUTION.width,
 			height: playlist.attributes.RESOLUTION.height,
 		};
-		const { map } = parsedHlsManifest.segments[0];
-		const { byterange, uri } = map;
+		const map = parsedHlsManifest.segments[0]?.map;
+		const byterange = map && map.byterange ? map.byterange : undefined;
+		const uri = map && map.uri ? map.uri : undefined;
 		tracks.push({
 			id: uuid(),
 			type: 'VIDEO',
@@ -133,7 +138,9 @@ function m3u8ToHam(manifest: Manifest) {
 			par: '',
 			sar: '',
 			scanType: '',
-			byteRange: `${byterange.length}@${byterange.offset}`,
+			byteRange: byterange
+				? `${byterange.length}@${byterange.offset}`
+				: undefined,
 			urlInitialization: uri,
 		} as VideoTrack);
 
@@ -162,7 +169,7 @@ function _formatSegments(segments: any[]) {
 		formattedSegments.push({
 			duration: duration,
 			url: uri,
-			byteRange: `${length}@${offset}`,
+			byteRange: length ? `${length}@${offset}` : undefined,
 		} as Segment);
 	});
 
