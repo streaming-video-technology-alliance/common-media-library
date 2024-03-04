@@ -4,6 +4,7 @@ import type {
 	Representation,
 	SegmentBase,
 	SegmentList,
+	SegmentURL,
 } from '../../types/DashManifest';
 import type {
 	Presentation,
@@ -17,31 +18,48 @@ import { parseDurationMpd } from '../../../utils/utils.js';
 
 // TODO: This only maps to SegmentBase, it may need to handle all Segment types
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
-	return hamSegments.map((segment) => {
-		return {
-			$: {
-				indexRange: segment.byteRange,
-			},
-			Initialization: [{ $: { range: segment.byteRange } }],
-		} as SegmentBase;
+	const segments: SegmentBase[] = [];
+	hamSegments.forEach((segment) => {
+		if (segment.byteRange) {
+			segments.push({
+				$: {
+					indexRange: segment.byteRange,
+				},
+				Initialization: [{ $: { range: segment.byteRange } }],
+			} as SegmentBase);
+		}
 	});
+
+	return segments;
 }
 
-function SegmentToSegmentList(track: Track): SegmentList {
-	return {
-		$: {
-			duration: track.duration.toString(),
-			timescale: '24',
-		},
-		Initialization: [{ $: {} }],
-		SegmentURL: track.segments.map((segment) => {
-			return {
+function SegmentToSegmentList(track: Track): SegmentList[] {
+	const segmentList: SegmentList[] = [];
+	const segmentURLs: SegmentURL[] = [];
+	track.segments.forEach((segment, index) => {
+		if (index > 0) {
+			segmentURLs.push({
 				$: {
 					media: segment.url,
 				},
-			};
-		}),
-	} as SegmentList;
+			});
+		}
+	});
+
+	if (!track.segments.at(0)?.byteRange) {
+		segmentList.push(
+			{
+				$: {
+					duration: track.duration.toString(),
+					timescale: '24',
+				},
+				Initialization: [{ $: { sourceURL: track.segments.at(0)?.url } }],
+				SegmentURL: segmentURLs,
+			} as SegmentList,
+		);
+	};
+
+	return segmentList;
 }
 
 function trackToRepresentation(tracks: Track[]): Representation[] {
@@ -64,7 +82,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 				bandwidth: track.bandwidth.toString(),
 			},
 			SegmentBase: baseSegmentToSegment(track.segments),
-			SegmentList: [SegmentToSegmentList(track)],
+			SegmentList: SegmentToSegmentList(track),
 		};
 	});
 }
@@ -79,6 +97,8 @@ function selectionToAdaptationSet(
 					id: switchingSet.id,
 					group: selectionSet.id,
 					contentType: switchingSet.tracks[0].type,
+					mimeType: switchingSet.tracks[0].name,
+					frameRate: (switchingSet.tracks[0] as VideoTrack).frameRate,
 					lang: switchingSet.tracks[0].language,
 					codecs: switchingSet.tracks[0].codec,
 				},

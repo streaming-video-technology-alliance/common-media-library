@@ -94,6 +94,7 @@ type AdaptationSet = {
 		maxHeight?: string;
 		maxWidth?: string;
 		mimeType?: string;
+		frameRate?: string;
 		minBandwidth?: string;
 		par?: string;
 		sar?: string;
@@ -138,6 +139,7 @@ export type {
 	Period,
 	AdaptationSet,
 	Representation,
+	SegmentURL,
 	SegmentBase,
 	SegmentList,
 	SegmentTemplate,

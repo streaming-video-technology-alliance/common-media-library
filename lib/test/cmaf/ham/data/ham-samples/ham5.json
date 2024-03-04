@@ -1,6 +1,6 @@
 [
     {
-        "id": "presentation-id-50",
+        "id": "presentation-id-900000",
         "selectionSets": [
             {
                 "id": "video",
@@ -9,7 +9,7 @@
                         "id": "video",
                         "tracks": [
                             {
-                                "name": "video",
+                                "name": "video/mp4",
                                 "bandwidth": 2000000,
                                 "codec": "avc1.640028",
                                 "duration": 900000,
@@ -21,6 +21,11 @@
                                 "sar": "",
                                 "scanType": "",
                                 "segments": [
+                                    {
+                                        "duration": 900000,
+                                        "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv",
+                                        "byteRange": ""
+                                    },
                                     {
                                         "duration": 900000,
                                         "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000001.cmfv",
@@ -61,15 +66,20 @@
                         "id": "audio",
                         "tracks": [
                             {
-                                "name": "audio",
+                                "name": "audio/mp4",
                                 "bandwidth": 96000,
-                                "channels": 2,
+                                "channels": 0,
                                 "codec": "mp4a.40.2",
                                 "duration": 900000,
                                 "id": "2",
                                 "language": "und",
                                 "sampleRate": 0,
                                 "segments": [
+                                    {
+                                        "duration": 900000,
+                                        "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa",
+                                        "byteRange": ""
+                                    },
                                     {
                                         "duration": 900000,
                                         "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000001.cmfa",

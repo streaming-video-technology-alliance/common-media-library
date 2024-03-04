@@ -135,7 +135,7 @@ function getNumberOfSegments(
 	// segments = total duration / (segment duration * timescale)
 	return Math.round(
 		(duration * +(segmentTemplate.$.timescale ?? 1)) /
-			+(segmentTemplate.$.duration ?? 1),
+		+(segmentTemplate.$.duration ?? 1),
 	);
 }
 
@@ -151,7 +151,7 @@ function createTrack(
 	const type = getContentType(adaptationSet, representation);
 	if (type === 'video') {
 		return {
-			name: type,
+			name: adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getDuration(representation) || duration,
@@ -168,7 +168,7 @@ function createTrack(
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
-			name: type,
+			name: adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
@@ -231,6 +231,11 @@ function getSegments(
 	} else if (representation.SegmentList) {
 		const segments: Segment[] = [];
 		representation.SegmentList.map((segment) => {
+			segments.push({
+				duration: +(segment.$.duration ?? 0),
+				url: segment.Initialization[0].$.sourceURL ?? '',
+				byteRange: '', // TODO: Complete this value
+			} as Segment);
 			if (segment.SegmentURL) {
 				return segment.SegmentURL.forEach((segmentURL) => {
 					segments.push({
@@ -239,13 +244,7 @@ function getSegments(
 						byteRange: '', // TODO: Complete this value
 					} as Segment);
 				});
-			} else {
-				segments.push({
-					duration: +(segment.$.duration ?? 0),
-					url: segment.Initialization[0].$.sourceURL ?? '',
-					byteRange: '', // TODO: Complete this value
-				} as Segment);
-			}
+			};
 		});
 		return segments;
 	} else if (segmentTemplate) {
