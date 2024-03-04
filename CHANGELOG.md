@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CEA608/708 parser [#75](https://github.com/streaming-video-technology-alliance/common-media-library/pull/75)
 
 
+## [0.6.4] - 2024-03-04
+
+
 ## [0.6.3] - 2024-03-01
 
 ### Added
@@ -179,7 +182,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap project [#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2)
 
 
-[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.3...HEAD  
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.4...HEAD  
+[0.6.4]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.3...v0.6.4  
 [0.6.3]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.2...v0.6.3  
 [0.6.2]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.1...v0.6.2  
 [0.6.1]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.0...v0.6.1  
