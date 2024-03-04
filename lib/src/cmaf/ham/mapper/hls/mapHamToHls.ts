@@ -1,16 +1,15 @@
-import os from 'os';
-import type {
+import { Manifest } from '../../../utils/types';
+import {
 	AudioTrack,
-	Presentation,
 	TextTrack,
+	Presentation,
 	VideoTrack,
 } from '../../types/model';
-import type { Manifest } from '../../../utils/types';
 
 function mapHamToHls(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.
-	const newline = os.EOL;
-	let mainManifest = `#EXT3M3U ${newline} #EXT-X-VERSION:${version} ${newline}`;
+	const newline = `\n`;
+	let mainManifest = `#EXTM3U${newline}#EXT-X-VERSION:${version}${newline}`;
 	const playlists: Manifest[] = [];
 	presentation.map((pres) => {
 		const selectionSets = pres.selectionSets;
@@ -47,34 +46,34 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 }
 
 function _generateVideoManifestPiece(videoTrack: VideoTrack) {
-	const newline = os.EOL;
-	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS=${videoTrack.codec},RESOLUTION=${videoTrack.width}x${videoTrack.height}  ${newline} ${videoTrack.name} ${newline}`;
+	const newline = `\n`;
+	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
-			return `#EXTINF:${segment.duration}, ${newline} ${segment.url}`;
+			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration} ${newline} ${playlist}`;
+	playlist = `#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",BYTERANGE="${videoTrack.byteRange}"${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
 
 function _generateAudioManifestPiece(audioTrack: AudioTrack) {
-	const newline = os.EOL;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=${audioTrack.id},NAME=${audioTrack.id},LANGUAGE=${audioTrack.language} ,URI=${audioTrack.name} ${newline}`;
+	const newline = `\n`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}"${newline}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
-			return `#EXTINF:${segment.duration},\n${segment.url}`;
+			return `#EXTINF:${segment.duration},${newline}#EXT-X-BYTERANGE:${segment.byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXT-X-TARGETDURATION:${audioTrack.duration}\n${playlist}`;
+	playlist = `#EXT-X-TARGETDURATION:${audioTrack.duration}\n#EXT-X-MAP:URI="${audioTrack.urlInitialization}",BYTERANGE="${audioTrack.byteRange}"${newline}${playlist}`;
 
 	return { manifestToConcat, playlist };
 }
 
 function _generateTextManifestPiece(textTrack: TextTrack) {
-	const newline = os.EOL;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name} ${newline}`;
+	const newline = `\n`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name}${newline}`;
 	const playlist = textTrack.segments
 		.map((segment) => {
 			return `#EXTINF:${segment.duration},\n${segment.url}`;
