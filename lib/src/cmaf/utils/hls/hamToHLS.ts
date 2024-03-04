@@ -18,17 +18,17 @@ function hamToM3U8(presentation: Presentation[]): Manifest {
 			switchingSets.map((switchingSet) => {
 				const tracks = switchingSet.tracks;
 				tracks.map((track) => {
-					if (track.type === 'VIDEO') {
+					if (track.type.toLowerCase() === 'VIDEO') {
 						const { manifestToConcat, playlist } =
 							_generateVideoManifestPiece(track as VideoTrack);
 						mainManifest += manifestToConcat;
 						playlists.push({ manifest: playlist, type: 'm3u8' });
-					} else if (track.type === 'AUDIO') {
+					} else if (track.type.toLowerCase() === 'AUDIO') {
 						const { manifestToConcat, playlist } =
 							_generateAudioManifestPiece(track as AudioTrack);
 						mainManifest += manifestToConcat;
 						playlists.push({ manifest: playlist, type: 'm3u8' });
-					} else if (track.type === 'TEXT') {
+					} else if (track.type.toLowerCase() === 'TEXT') {
 						const { manifestToConcat, playlist } =
 							_generateTextManifestPiece(track as TextTrack);
 						mainManifest += manifestToConcat;
