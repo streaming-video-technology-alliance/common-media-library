@@ -1,4 +1,3 @@
-import { iso8601DurationToNumber } from '../../../utils/utils.js';
 import type {
 	AdaptationSet,
 	DashManifest,
@@ -16,130 +15,24 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model';
+import { iso8601DurationToNumber } from '../../../utils/utils.js';
+import {
+	getChannels,
+	getCodec,
+	getContentType,
+	getDuration,
+	getFrameRate,
+	getGroup,
+	getLanguage,
+	getName,
+	getNumberOfSegments,
+	getPresentationId,
+	getSampleRate,
+	getSar,
+	getUrlFromTemplate,
+} from './mpdMapperUtils.js';
 
-function getContentType(
-	adaptationSet: AdaptationSet,
-	representation?: Representation,
-): string {
-	if (adaptationSet.$.contentType) {
-		return adaptationSet.$.contentType;
-	}
-	if (adaptationSet.ContentComponent?.at(0)) {
-		return adaptationSet.ContentComponent.at(0)!.$.contentType;
-	}
-	if (adaptationSet.$.mimeType || representation?.$.mimeType) {
-		const type =
-			adaptationSet.$.mimeType?.split('/')[0] ||
-			representation?.$.mimeType?.split('/')[0];
-		if (type === 'audio' || type === 'video' || type === 'text') {
-			return type;
-		}
-		if (type === 'application') {
-			return 'text';
-		}
-	}
-	if (adaptationSet.$.maxHeight) {
-		return 'video';
-	}
-	const adaptationRef =
-		adaptationSet.$.id ??
-		`group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`;
-	console.error(
-		`Could not find contentType from adaptationSet ${adaptationRef}`,
-	);
-	console.info('Using "text" as default contentType');
-	return 'text';
-}
-
-function getGroup(adaptationSet: AdaptationSet): string {
-	return adaptationSet.$.group ?? getContentType(adaptationSet);
-}
-
-function getChannels(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-): number {
-	const channels: number = +(
-		adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ??
-		representation.AudioChannelConfiguration?.at(0)?.$.value ??
-		0
-	);
-	if (!channels) {
-		console.error(`Representation ${representation.$.id} has no channels`);
-	}
-	return channels;
-}
-
-function getCodec(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-): string {
-	const codec = representation.$.codecs ?? adaptationSet.$.codecs ?? '';
-	if (!codec) {
-		console.error(`Representation ${representation.$.id} has no codecs`);
-	}
-	return codec;
-}
-
-function getDuration(
-	representation: Representation,
-): number {
-	const duration: string =
-		representation.SegmentList?.at(0)?.$.duration ??
-		representation.SegmentTemplate?.at(0)?.$.duration ??
-		'';
-	return +duration;
-}
-
-function getFrameRate(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-): string {
-	const frameRate: string =
-		representation.$.frameRate ?? adaptationSet.$.frameRate ?? '';
-	if (!frameRate) {
-		console.error(
-			`Representation ${representation.$.id} has no frame rate`,
-		);
-	}
-	return frameRate;
-}
-
-function getLanguage(adaptationSet: AdaptationSet): string {
-	let language = adaptationSet.$.lang;
-	if (!language) {
-		console.info(
-			`AdaptationSet ${adaptationSet.$.id} has no lang, using "und" as default`,
-		);
-		language = 'und';
-	}
-	return language;
-}
-
-function getSar(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-): string {
-	const sar: string = representation.$.sar ?? adaptationSet.$.sar ?? '';
-	if (!sar) {
-		console.error(`Representation ${representation.$.id} has no sar`);
-	}
-	return sar;
-}
-
-function getNumberOfSegments(
-	segmentTemplate: SegmentTemplate,
-	duration: number,
-): number {
-	// TODO: Double check the number of segments, this equation may be wrong
-	// segments = total duration / (segment duration * timescale)
-	return Math.round(
-		(duration * +(segmentTemplate.$.timescale ?? 1)) /
-		+(segmentTemplate.$.duration ?? 1),
-	);
-}
-
-function createTrack(
+function mapTracks(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
 	duration: number,
@@ -151,7 +44,7 @@ function createTrack(
 	const type = getContentType(adaptationSet, representation);
 	if (type === 'video') {
 		return {
-			name: adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type,
+			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getDuration(representation) || duration,
@@ -168,14 +61,14 @@ function createTrack(
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
-			name: adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type,
+			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
 			duration: getDuration(representation) || duration,
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
-			sampleRate: +(adaptationSet.$.audioSamplingRate ?? 0),
+			sampleRate: getSampleRate(adaptationSet, representation),
 			segments,
 			type,
 		} as AudioTrack;
@@ -194,28 +87,7 @@ function createTrack(
 	}
 }
 
-function getUrlFromTemplate(
-	representation: Representation,
-	segmentTemplate: SegmentTemplate,
-	segmentId: number,
-): string {
-	const regexTemplate = /\$(.*?)\$/g;
-	return segmentTemplate.$.media.replace(regexTemplate, (match: any) => {
-		// TODO: This may have a better way to do it for all the cases
-		if (match === '$RepresentationID$') {
-			return representation.$.id;
-		}
-		if (match.includes('Number')) {
-			return segmentId;
-		}
-		console.error(
-			`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`,
-		);
-		return match;
-	});
-}
-
-function getSegments(
+function mapSegments(
 	representation: Representation,
 	duration: number,
 	segmentTemplate?: SegmentTemplate,
@@ -244,7 +116,7 @@ function getSegments(
 						byteRange: '', // TODO: Complete this value
 					} as Segment);
 				});
-			};
+			}
 		});
 		return segments;
 	} else if (segmentTemplate) {
@@ -268,7 +140,7 @@ function getSegments(
 function mapMpdToHam(mpd: DashManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
-		const presentationId: string = `presentation-id-${duration}`; // todo: handle id
+		const presentationId: string = getPresentationId(period, duration);
 
 		const selectionSetGroups: { [group: string]: SelectionSet } = {};
 
@@ -278,13 +150,13 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 					const segmentTemplate: SegmentTemplate | undefined =
 						adaptationSet.SegmentTemplate?.at(0) ??
 						representation.SegmentTemplate?.at(0);
-					const segments: Segment[] = getSegments(
+					const segments: Segment[] = mapSegments(
 						representation,
 						duration,
 						segmentTemplate,
 					);
 
-					return createTrack(
+					return mapTracks(
 						representation,
 						adaptationSet,
 						duration,

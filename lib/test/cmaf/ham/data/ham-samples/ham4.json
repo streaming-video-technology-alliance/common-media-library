@@ -1,6 +1,6 @@
 [
 	{
-		"id": "presentation-id-250",
+		"id": "0",
 		"selectionSets": [
 			{
 				"id": "video",
@@ -9,10 +9,10 @@
 						"id": "video",
 						"tracks": [
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 980104,
 								"codec": "avc1.4d401f",
-								"duration": 250,
+								"duration": 24576,
 								"frameRate": "24",
 								"height": 720,
 								"id": "1",
@@ -651,10 +651,10 @@
 								"width": 1280
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1950145,
 								"codec": "avc1.4d401f",
-								"duration": 250,
+								"duration": 24576,
 								"frameRate": "24",
 								"height": 720,
 								"id": "2",
@@ -1293,10 +1293,10 @@
 								"width": 1280
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 3893089,
 								"codec": "avc1.4d401f",
-								"duration": 250,
+								"duration": 24576,
 								"frameRate": "24",
 								"height": 720,
 								"id": "3",
@@ -1945,14 +1945,14 @@
 						"id": "text",
 						"tracks": [
 							{
-								"name": "audio",
+								"name": "audio/mp4",
 								"bandwidth": 33434,
 								"channels": 2,
 								"codec": "mp4a.40.29",
-								"duration": 250,
+								"duration": 94175,
 								"id": "4",
 								"language": "und",
-								"sampleRate": 0,
+								"sampleRate": 48000,
 								"segments": [
 									{
 										"duration": 94175,
@@ -2599,7 +2599,7 @@
 		]
 	},
 	{
-		"id": "presentation-id-344",
+		"id": "1",
 		"selectionSets": [
 			{
 				"id": "video",
@@ -2608,10 +2608,10 @@
 						"id": "video",
 						"tracks": [
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 980104,
 								"codec": "avc1.4d401f",
-								"duration": 344,
+								"duration": 24576,
 								"frameRate": "24",
 								"height": 720,
 								"id": "1",
@@ -3485,10 +3485,10 @@
 								"width": 1280
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1950145,
 								"codec": "avc1.4d401f",
-								"duration": 344,
+								"duration": 24576,
 								"frameRate": "24",
 								"height": 720,
 								"id": "2",
@@ -4362,10 +4362,10 @@
 								"width": 1280
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 3893089,
 								"codec": "avc1.4d401f",
-								"duration": 344,
+								"duration": 24576,
 								"frameRate": "24",
 								"height": 720,
 								"id": "3",
@@ -5249,14 +5249,14 @@
 						"id": "text",
 						"tracks": [
 							{
-								"name": "audio",
+								"name": "audio/mp4",
 								"bandwidth": 33434,
 								"channels": 2,
 								"codec": "mp4a.40.29",
-								"duration": 344,
+								"duration": 94175,
 								"id": "4",
 								"language": "und",
-								"sampleRate": 0,
+								"sampleRate": 48000,
 								"segments": [
 									{
 										"duration": 94175,

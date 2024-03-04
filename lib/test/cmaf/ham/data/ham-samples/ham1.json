@@ -1,6 +1,6 @@
 [
 	{
-		"id": "presentation-id-31.296",
+		"id": "evo-dash",
 		"selectionSets": [
 			{
 				"id": "video",
@@ -9,10 +9,10 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 72000,
 								"codec": "avc1.42c01e",
-								"duration": 31.296,
+								"duration": 10000,
 								"frameRate": "37",
 								"height": 480,
 								"id": "testStream01bbbVideo72000",
@@ -21,6 +21,11 @@
 								"sar": "1:1",
 								"scanType": "",
 								"segments": [
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/video/72000/seg_init.mp4",
+										"byteRange": ""
+									},
 									{
 										"duration": 10000,
 										"url": "testStream01bbb/video/72000/segment_0.m4s",
@@ -51,15 +56,20 @@
 						"id": "2",
 						"tracks": [
 							{
-								"name": "audio",
+								"name": "audio/mp4",
 								"bandwidth": 72000,
 								"channels": 2,
 								"codec": "mp4a.40.2",
-								"duration": 31.296,
+								"duration": 10000,
 								"id": "testStream01bbbAudio72000",
 								"language": "en",
-								"sampleRate": 0,
+								"sampleRate": 48000,
 								"segments": [
+									{
+										"duration": 10000,
+										"url": "testStream01bbb/audio/72000/seg_init.mp4",
+										"byteRange": ""
+									},
 									{
 										"duration": 10000,
 										"url": "testStream01bbb/audio/72000/segment_0.m4s",

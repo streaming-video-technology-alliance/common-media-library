@@ -86,6 +86,7 @@ type AdaptationSet = {
 		audioSamplingRate?: string;
 		codecs?: string;
 		contentType?: string;
+		frameRate?: string;
 		group?: string;
 		id?: string;
 		lang?: string;
@@ -94,7 +95,6 @@ type AdaptationSet = {
 		maxHeight?: string;
 		maxWidth?: string;
 		mimeType?: string;
-		frameRate?: string;
 		minBandwidth?: string;
 		par?: string;
 		sar?: string;
@@ -124,11 +124,11 @@ type DashManifest = {
 	MPD: {
 		$?: {
 			maxSegmentDuration?: string;
-			mediaPresentationDuration: string;
-			minBufferTime: string;
-			profiles: string;
-			type: string;
-			xmlns: string;
+			mediaPresentationDuration?: string;
+			minBufferTime?: string;
+			profiles?: string;
+			type?: string;
+			xmlns?: string;
 		};
 		Period: Period[];
 	};
@@ -138,6 +138,7 @@ export type {
 	DashManifest,
 	Period,
 	AdaptationSet,
+	AudioChannelConfiguration,
 	Representation,
 	SegmentURL,
 	SegmentBase,

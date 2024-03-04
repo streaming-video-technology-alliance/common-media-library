@@ -430,7 +430,7 @@ export type Track = Ham & {
     language: string;
     bandwidth: number;
     byteRange?: string;
-    urlInititalization?: string;
+    urlInitialization?: string;
     segments: Segment[];
 };
 

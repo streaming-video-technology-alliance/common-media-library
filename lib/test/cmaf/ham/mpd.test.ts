@@ -68,19 +68,18 @@ describe('mpd2ham', () => {
 });
 
 describe('ham2mpd', async () => {
-
 	// FIXME: the xml is missing some of the original metadata
 	it.skip('converts ham1 to dash1', () => {
-		const presentation = jsonHam1[0] as Presentation;
-		const convertedMpd = hamToMpd([presentation]);
+		const presentations = jsonHam1 as Presentation[];
+		const convertedMpd = hamToMpd(presentations);
 		deepEqual(convertedMpd.manifest, mpdSample1);
 		equal(convertedMpd.type, 'mpd');
 		equal(convertedMpd.ancillaryManifests, []);
 	});
 
 	it.skip('converts ham5 to dash5', () => {
-		const presentation = jsonHam5[0] as Presentation;
-		const convertedMpd = hamToMpd([presentation]);
+		const presentations = jsonHam5 as Presentation[];
+		const convertedMpd = hamToMpd(presentations);
 		deepEqual(convertedMpd.manifest, mpdSample5);
 		equal(convertedMpd.type, 'mpd');
 		equal(convertedMpd.ancillaryManifests, []);

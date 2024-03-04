@@ -9,7 +9,7 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "audio",
+								"name": "audio/mp4",
 								"bandwidth": 64349,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -27,7 +27,7 @@
 								"type": "audio"
 							},
 							{
-								"name": "audio",
+								"name": "audio/mp4",
 								"bandwidth": 128407,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -55,7 +55,7 @@
 						"id": "12",
 						"tracks": [
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1032000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
@@ -77,7 +77,7 @@
 								"width": 1680
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1250000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
@@ -99,7 +99,7 @@
 								"width": 2576
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1600000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,

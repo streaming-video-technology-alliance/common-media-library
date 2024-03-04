@@ -9,7 +9,7 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 386437,
 								"codec": "avc1.64001f",
 								"duration": 734,
@@ -946,7 +946,7 @@
 								"width": 512
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 761570,
 								"codec": "avc1.64001f",
 								"duration": 734,
@@ -1883,7 +1883,7 @@
 								"width": 640
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1117074,
 								"codec": "avc1.640028",
 								"duration": 734,
@@ -2820,7 +2820,7 @@
 								"width": 852
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1941893,
 								"codec": "avc1.640032",
 								"duration": 734,
@@ -3757,7 +3757,7 @@
 								"width": 1280
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 2723012,
 								"codec": "avc1.640033",
 								"duration": 734,
@@ -4694,7 +4694,7 @@
 								"width": 1920
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 4021190,
 								"codec": "avc1.640034",
 								"duration": 734,
@@ -5631,7 +5631,7 @@
 								"width": 2560
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 5134121,
 								"codec": "avc1.640034",
 								"duration": 734,
@@ -6573,7 +6573,7 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 395735,
 								"codec": "hev1.2.4.L63.90",
 								"duration": 734,
@@ -7510,7 +7510,7 @@
 								"width": 512
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 689212,
 								"codec": "hev1.2.4.L63.90",
 								"duration": 734,
@@ -8447,7 +8447,7 @@
 								"width": 640
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 885518,
 								"codec": "hev1.2.4.L90.90",
 								"duration": 734,
@@ -9384,7 +9384,7 @@
 								"width": 852
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1474186,
 								"codec": "hev1.2.4.L93.90",
 								"duration": 734,
@@ -10321,7 +10321,7 @@
 								"width": 1280
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 1967542,
 								"codec": "hev1.2.4.L120.90",
 								"duration": 734,
@@ -11258,7 +11258,7 @@
 								"width": 1920
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 2954309,
 								"codec": "hev1.2.4.L150.90",
 								"duration": 734,
@@ -12195,7 +12195,7 @@
 								"width": 2560
 							},
 							{
-								"name": "video",
+								"name": "video/mp4",
 								"bandwidth": 4424584,
 								"codec": "hev1.2.4.L150.90",
 								"duration": 734,
@@ -13142,14 +13142,14 @@
 						"id": "2",
 						"tracks": [
 							{
-								"name": "audio",
+								"name": "audio/mp4",
 								"bandwidth": 131351,
 								"channels": 2,
 								"codec": "mp4a.40.29",
 								"duration": 734,
 								"id": "15",
 								"language": "en",
-								"sampleRate": 0,
+								"sampleRate": 48000,
 								"segments": [
 									{
 										"duration": 95232,
