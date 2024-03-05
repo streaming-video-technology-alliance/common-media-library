@@ -24,7 +24,7 @@ type TextTrack = Track;
 type VideoTrack = Track & {
 	width: number;
 	height: number;
-	frameRate: number;
+	frameRate: string;
 	par: string;
 	sar: string;
 	scanType: string;

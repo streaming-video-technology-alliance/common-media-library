@@ -1,16 +1,15 @@
 import { Builder, parseString } from 'xml2js';
-import { DashManifest } from './dash/DashManifest.js';
+import type { DashManifest } from '../ham/types/DashManifest.js';
 
-function xmlToJson(
-	raw: string,
-	replace: (manifest: DashManifest) => void,
-): void {
-	return parseString(raw, (err: Error | null, result: DashManifest) => {
+function xmlToJson(raw: string): DashManifest | undefined {
+	let parsed: DashManifest | undefined;
+	parseString(raw, (err: Error | null, result: DashManifest) => {
 		if (err) {
 			throw new Error(err.message);
 		}
-		replace(result);
+		parsed = result as DashManifest;
 	});
+	return parsed;
 }
 
 function jsonToXml(json: object): string {

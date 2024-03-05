@@ -1,12 +1,12 @@
+import { Manifest } from '../../../utils/types';
 import {
 	AudioTrack,
 	TextTrack,
 	Presentation,
 	VideoTrack,
-} from '../../ham/types/model';
-import { Manifest } from '../types';
+} from '../../types/model';
 
-function hamToM3U8(presentation: Presentation[]): Manifest {
+function mapHamToHls(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.
 	const newline = `\n`;
 	let mainManifest = `#EXTM3U${newline}#EXT-X-VERSION:${version}${newline}`;
@@ -83,4 +83,4 @@ function _generateTextManifestPiece(textTrack: TextTrack) {
 	return { manifestToConcat, playlist };
 }
 
-export { hamToM3U8 };
+export { mapHamToHls };

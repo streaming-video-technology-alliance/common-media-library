@@ -300,7 +300,7 @@ export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?
 export function hamToM3U8(presentation: Presentation[]): Manifest;
 
 // @public
-export function hamToMPD(presentation: Presentation[]): Manifest;
+export function hamToMpd(presentation: Presentation[]): Manifest;
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -430,7 +430,7 @@ export type Track = Ham & {
     language: string;
     bandwidth: number;
     byteRange?: string;
-    urlInititalization?: string;
+    urlInitialization?: string;
     segments: Segment[];
 };
 
@@ -452,7 +452,7 @@ export function validateTracks(tracks: Track[]): TrackValidity;
 export type VideoTrack = Track & {
     width: number;
     height: number;
-    frameRate: number;
+    frameRate: string;
     par: string;
     sar: string;
     scanType: string;

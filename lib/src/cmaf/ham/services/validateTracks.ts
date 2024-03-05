@@ -1,4 +1,4 @@
-import type { Track } from '../types/model/index.js';
+import type { Track } from '../types/model';
 
 type TrackValidity = {
 	status: boolean;

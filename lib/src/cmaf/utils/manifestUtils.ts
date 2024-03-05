@@ -1,5 +1,6 @@
-import { DashManifest } from './dash/DashManifest.js';
-import { Manifest } from './types/index.js';
+import type { Manifest } from './types';
+import type { DashManifest } from '../ham/types/DashManifest';
+
 export function getMetadata(manifest: Manifest | undefined): JSON | undefined {
 	const metadata: Map<string, string> | undefined = manifest?.metaData;
 	return JSON.parse(JSON.stringify(metadata));
@@ -30,11 +31,11 @@ export function addMetadataToDASH(
 	if (manifest.metaData === undefined) {
 		manifest.metaData = new Map<string, string>();
 	}
-	if (dashManifest?.$ && dashManifest.$.profiles !== undefined) {
-		manifest.metaData.set('profiles', dashManifest.$.profiles);
+	if (dashManifest.MPD.$ && dashManifest.MPD.$.profiles !== undefined) {
+		manifest.metaData.set('profiles', dashManifest.MPD.$.profiles);
 	}
-	if (dashManifest?.$ && dashManifest.$.type !== undefined) {
-		manifest.metaData.set('type', dashManifest.$.type);
+	if (dashManifest.MPD.$ && dashManifest.MPD.$.type !== undefined) {
+		manifest.metaData.set('type', dashManifest.MPD.$.type);
 	}
 	return manifest;
 }

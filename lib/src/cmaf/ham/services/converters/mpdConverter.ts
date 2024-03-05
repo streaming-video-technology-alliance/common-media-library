@@ -1,6 +1,7 @@
 import { MPDMapper } from '../../mapper/MPDMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
-import { Presentation } from '../../types/model';
+import type { Presentation } from '../../types/model';
+import type { Manifest } from '../../../utils/types';
 
 /**
  * Convert mpd manifest into a ham object.
@@ -8,8 +9,8 @@ import { Presentation } from '../../types/model';
  * @param manifest -  Manifest mpd.
  */
 
-function mpdToHam(manifest: string) {
-	const mapperContext = MapperContext.getInstance();
+function mpdToHam(manifest: string): Presentation[] {
+	const mapperContext: MapperContext = MapperContext.getInstance();
 	mapperContext.setStrategy(new MPDMapper());
 	return mapperContext.getHamFormat({ manifest, type: 'mpd' });
 }
@@ -19,10 +20,10 @@ function mpdToHam(manifest: string) {
  *
  * @param presentation - Ham object. List of presentations.
  */
-function hamToMPD(presentation: Presentation[]) {
-	const mapperContext = MapperContext.getInstance();
+function hamToMpd(presentation: Presentation[]): Manifest {
+	const mapperContext: MapperContext = MapperContext.getInstance();
 	mapperContext.setStrategy(new MPDMapper());
 	return mapperContext.getManifestFormat(presentation);
 }
 
-export { mpdToHam, hamToMPD };
+export { mpdToHam, hamToMpd };
