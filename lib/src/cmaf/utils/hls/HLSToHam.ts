@@ -54,7 +54,7 @@ function m3u8ToHam(manifest: Manifest) {
 			sampleRate: 0,
 			channels: 0,
 			byteRange: byteRange,
-			urlInitialization: map && map.uri ? map.uri : undefined,
+			urlInitialization: map?.uri,
 		} as AudioTrack);
 		audioSwitchingSets.push({
 			id: audio,
@@ -121,8 +121,8 @@ function m3u8ToHam(manifest: Manifest) {
 			height: playlist.attributes.RESOLUTION.height,
 		};
 		const map = parsedHlsManifest.segments[0]?.map;
-		const byterange = map && map.byterange ? map.byterange : undefined;
-		const uri = map && map.uri ? map.uri : undefined;
+		const byterange = map?.byterange;
+		const uri = map?.uri;
 		tracks.push({
 			id: uuid(),
 			type: 'VIDEO',
