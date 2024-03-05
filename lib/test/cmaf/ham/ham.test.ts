@@ -1,10 +1,10 @@
 import {
+	getTracksFromSelectionSet,
 	SelectionSet,
 	validateTracks,
-	getTracksFromSelectionSet,
 } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
-import { describe, it, beforeEach } from 'node:test';
+import { beforeEach, describe, it } from 'node:test';
 import jsonSelectionSet1 from './data/selectionSet1.json' assert { type: 'json' };
 
 describe('ham validation', () => {

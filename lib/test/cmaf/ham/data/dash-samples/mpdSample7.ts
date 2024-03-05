@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+export const mpdSample7: string = `<?xml version="1.0" encoding="utf-8"?>
 <MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xmlns="urn:mpeg:dash:schema:mpd:2011"
      xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
@@ -63,4 +63,4 @@
       </Representation>
     </AdaptationSet>
   </Period>
-</MPD>
+</MPD>`;

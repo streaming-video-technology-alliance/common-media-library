@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+export const mpdSample8: string = `<?xml version="1.0" encoding="utf-8"?>
 <!--Single content continuing at the period boundary.-->
 <MPD xmlns="urn:mpeg:dash:schema:mpd:2011" minBufferTime="PT1.500000S" type="static" mediaPresentationDuration="PT0H9M54.00S" profiles="urn:mpeg:dash:profile:isoff-live:2011,http://dashif.org/guidelines/dash264" xmlns:xlink="http://www.w3.org/1999/xlink">
   <Period id="0" duration="PT250S">
@@ -39,4 +39,4 @@
       </Representation>
     </AdaptationSet>
   </Period>
-</MPD>
+</MPD>`;
