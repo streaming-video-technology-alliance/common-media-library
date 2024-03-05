@@ -18,17 +18,17 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 			switchingSets.map((switchingSet) => {
 				const tracks = switchingSet.tracks;
 				tracks.map((track) => {
-					if (track.type.toLowerCase() === 'VIDEO') {
+					if (track.type.toLowerCase() === 'video') {
 						const { manifestToConcat, playlist } =
 							_generateVideoManifestPiece(track as VideoTrack);
 						mainManifest += manifestToConcat;
 						playlists.push({ manifest: playlist, type: 'm3u8' });
-					} else if (track.type.toLowerCase() === 'AUDIO') {
+					} else if (track.type.toLowerCase() === 'audio') {
 						const { manifestToConcat, playlist } =
 							_generateAudioManifestPiece(track as AudioTrack);
 						mainManifest += manifestToConcat;
 						playlists.push({ manifest: playlist, type: 'm3u8' });
-					} else if (track.type.toLowerCase() === 'TEXT') {
+					} else if (track.type.toLowerCase() === 'text') {
 						const { manifestToConcat, playlist } =
 							_generateTextManifestPiece(track as TextTrack);
 						mainManifest += manifestToConcat;
