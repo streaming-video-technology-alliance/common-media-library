@@ -6,6 +6,7 @@
  * @beta
  */
 export type * from './cmaf/ham/types/model/index.js';
+export type * from './cmaf/ham/types/index.js';
 export * from './cmaf/ham/services/getTracks.js';
 export * from './cmaf/ham/services/validateTracks.js';
 export {

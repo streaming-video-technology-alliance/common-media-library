@@ -1,7 +1,7 @@
 import { MPDMapper } from '../../mapper/MPDMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
 import type { Presentation } from '../../types/model';
-import type { Manifest } from '../../../utils/types';
+import type { Manifest } from '../../types';
 
 /**
  * Convert mpd manifest into a ham object.

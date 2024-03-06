@@ -7,7 +7,7 @@ import type {
 	SegmentBase,
 	SegmentList,
 	SegmentURL,
-} from '../../types/DashManifest';
+} from '../../types';
 import type {
 	AudioTrack,
 	Presentation,

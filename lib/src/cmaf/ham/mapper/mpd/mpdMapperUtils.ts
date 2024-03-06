@@ -3,7 +3,7 @@ import type {
 	Period,
 	Representation,
 	SegmentTemplate,
-} from '../../types/DashManifest';
+} from '../../types';
 
 function getChannels(
 	adaptationSet: AdaptationSet,

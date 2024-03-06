@@ -1,5 +1,5 @@
 import type { Presentation } from '../types/model';
-import type { Manifest } from '../../utils/types';
+import type { Manifest } from '../types';
 
 export interface IMapper {
 	toHam(manifest: Manifest): Presentation[];

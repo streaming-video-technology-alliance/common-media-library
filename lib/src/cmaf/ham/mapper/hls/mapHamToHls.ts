@@ -1,4 +1,4 @@
-import { Manifest } from '../../../utils/types';
+import { Manifest } from '../../types';
 import {
 	AudioTrack,
 	TextTrack,

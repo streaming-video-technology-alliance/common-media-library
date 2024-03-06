@@ -10,8 +10,7 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import type { Manifest } from '../../../utils/types';
-import type { PlayList } from '../../types/HlsManifest';
+import type { Manifest, PlayList } from '../../types';
 
 function mapHlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseM3u8(manifest.manifest);
