@@ -19,6 +19,177 @@ export function base64encode(binary: Uint8Array): string;
 // @beta
 export function canParseId3(data: Uint8Array, offset: number): boolean;
 
+// @public
+export class CaptionScreen {
+    constructor(logger: CaptionsLogger);
+    // (undocumented)
+    backSpace(): void;
+    // (undocumented)
+    clearToEndOfRow(): void;
+    // (undocumented)
+    copy(other: CaptionScreen): void;
+    // (undocumented)
+    currRow: number;
+    // (undocumented)
+    equals(other: CaptionScreen): boolean;
+    getDisplayText(asOneRow?: boolean): string;
+    // (undocumented)
+    getTextAndFormat(): Row[];
+    insertChar(char: number): void;
+    // (undocumented)
+    isEmpty(): boolean;
+    // (undocumented)
+    lastOutputScreen: CaptionScreen | null;
+    // (undocumented)
+    logger: CaptionsLogger;
+    // (undocumented)
+    moveCursor(relPos: number): void;
+    // (undocumented)
+    nrRollUpRows: number | null;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    rollUp(): void;
+    // (undocumented)
+    rows: Row[];
+    setBkgData(bkgData: Partial<PenStyles>): void;
+    // (undocumented)
+    setCursor(absPos: number): void;
+    // Warning: (ae-forgotten-export) The symbol "PACData" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    setPAC(pacData: PACData): void;
+    // Warning: (ae-forgotten-export) The symbol "PenStyles" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    setPen(styles: Partial<PenStyles>): void;
+    // (undocumented)
+    setRollUpRows(nrRows: number | null): void;
+}
+
+// @public
+export class CaptionsLogger {
+    // (undocumented)
+    log(severity: VerboseLevel, msg: string | (() => string)): void;
+    // (undocumented)
+    time: number | null;
+    // Warning: (ae-forgotten-export) The symbol "VerboseLevel" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    verboseLevel: VerboseLevel;
+}
+
+// @public
+export class Cea608Channel {
+    constructor(channelNumber: number, outputFilter: any,
+    logger: CaptionsLogger);
+    // (undocumented)
+    ccAOF(): void;
+    // (undocumented)
+    ccAON(): void;
+    // (undocumented)
+    ccBS(): void;
+    // (undocumented)
+    ccCR(): void;
+    // (undocumented)
+    ccDER(): void;
+    // (undocumented)
+    ccEDM(): void;
+    // (undocumented)
+    ccENM(): void;
+    // (undocumented)
+    ccEOC(): void;
+    // (undocumented)
+    ccFON(): void;
+    // (undocumented)
+    ccMIDROW(secondByte: number): void;
+    // (undocumented)
+    ccRCL(): void;
+    // (undocumented)
+    ccRDC(): void;
+    // (undocumented)
+    ccRTD(): void;
+    // (undocumented)
+    ccRU(nrRows: number | null): void;
+    // (undocumented)
+    ccTO(nrCols: number): void;
+    // (undocumented)
+    ccTR(): void;
+    // (undocumented)
+    chNr: number;
+    // (undocumented)
+    cueSplitAtTime(t: number): void;
+    // (undocumented)
+    cueStartTime: number | null;
+    // (undocumented)
+    currRollUpRow: Row;
+    // (undocumented)
+    displayedMemory: CaptionScreen;
+    // (undocumented)
+    getHandler(): any;
+    // (undocumented)
+    insertChars(chars: number[]): void;
+    // (undocumented)
+    lastOutputScreen: CaptionScreen;
+    // (undocumented)
+    logger: CaptionsLogger;
+    // Warning: (ae-forgotten-export) The symbol "CaptionModes" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    mode: CaptionModes;
+    // (undocumented)
+    nonDisplayedMemory: CaptionScreen;
+    // (undocumented)
+    outputDataUpdate(dispatch?: boolean): void;
+    // (undocumented)
+    outputFilter: any;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setBkgData(bkgData: Partial<PenStyles>): void;
+    // (undocumented)
+    setHandler(newHandler: any): void;
+    // (undocumented)
+    setMode(newMode: CaptionModes): void;
+    // (undocumented)
+    setPAC(pacData: PACData): void;
+    // (undocumented)
+    verbose: number;
+    // (undocumented)
+    writeScreen: CaptionScreen;
+}
+
+// @public
+export class Cea608Parser {
+    // Warning: (ae-forgotten-export) The symbol "SupportedField" needs to be exported by the entry point index.d.ts
+    constructor(field: SupportedField, out1: any, out2: any);
+    addData(time: number | null, byteList: number[]): void;
+    // (undocumented)
+    channels: Array<Cea608Channel | null>;
+    // Warning: (ae-forgotten-export) The symbol "CmdHistory" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    cmdHistory: CmdHistory;
+    cueSplitAtTime(t: number): void;
+    // Warning: (ae-forgotten-export) The symbol "Channels" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    currentChannel: Channels;
+    // (undocumented)
+    getHandler(channel: number): any;
+    interpretPAC(row: number, byte: number): PACData;
+    // (undocumented)
+    logger: CaptionsLogger;
+    parseBackgroundAttributes(a: number, b: number): boolean;
+    parseChars(a: number, b: number): number[] | null;
+    parseCmd(a: number, b: number): boolean;
+    parseMidrow(a: number, b: number): boolean;
+    parsePAC(a: number, b: number): boolean;
+    reset(): void;
+    // (undocumented)
+    setHandler(channel: number, newHandler: any): void;
+}
+
 // @beta
 export interface Cmcd {
     [index: CmcdCustomKey]: CmcdValue;
@@ -287,6 +458,32 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
+// @public
+export class PenState {
+    // (undocumented)
+    background: string;
+    // (undocumented)
+    copy(newPenState: PenState): void;
+    // (undocumented)
+    equals(other: PenState): boolean;
+    // (undocumented)
+    flash: boolean;
+    // (undocumented)
+    foreground: string;
+    // (undocumented)
+    isDefault(): boolean;
+    // (undocumented)
+    italics: boolean;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setStyles(styles: Partial<PenStyles>): void;
+    // (undocumented)
+    toString(): string;
+    // (undocumented)
+    underline: boolean;
+}
+
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
@@ -309,6 +506,40 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
+
+// @public
+export class Row {
+    constructor(logger: CaptionsLogger);
+    backSpace(): void;
+    // (undocumented)
+    chars: StyledUnicodeChar[];
+    // (undocumented)
+    clear(): void;
+    // (undocumented)
+    clearFromPos(startPos: number): void;
+    // (undocumented)
+    clearToEndOfRow(): void;
+    // (undocumented)
+    copy(other: Row): void;
+    // (undocumented)
+    cueStartTime: number | null;
+    // (undocumented)
+    currPenState: PenState;
+    // (undocumented)
+    equals(other: Row): boolean;
+    // (undocumented)
+    getTextString(): string;
+    // (undocumented)
+    insertChar(byte: number): void;
+    // (undocumented)
+    isEmpty(): boolean;
+    moveCursor(relPos: number): void;
+    // (undocumented)
+    pos: number;
+    setCursor(absPos: number): void;
+    // (undocumented)
+    setPenStyles(styles: Partial<PenStyles>): void;
+}
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
@@ -352,6 +583,26 @@ export class SfToken {
     constructor(description: string);
     // (undocumented)
     description: string;
+}
+
+// @public
+export class StyledUnicodeChar {
+    // (undocumented)
+    copy(newChar: StyledUnicodeChar): void;
+    // (undocumented)
+    equals(other: StyledUnicodeChar): boolean;
+    // (undocumented)
+    isEmpty(): boolean;
+    // (undocumented)
+    penState: PenState;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setChar(uchar: string, newPenState: PenState): void;
+    // (undocumented)
+    setPenState(newPenState: PenState): void;
+    // (undocumented)
+    uchar: string;
 }
 
 // @beta
