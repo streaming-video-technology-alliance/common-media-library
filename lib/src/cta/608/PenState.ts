@@ -36,24 +36,24 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { PenStyles } from './utilities/types.js';
-  
+import { PenStyles } from "./PenStyles.js";
+
 export class PenState {
 	public foreground: string = 'white';
 	public underline: boolean = false;
 	public italics: boolean = false;
 	public background: string = 'black';
 	public flash: boolean = false;
-  
-	reset() : void {
+
+	reset(): void {
 		this.foreground = 'white';
 		this.underline = false;
 		this.italics = false;
 		this.background = 'black';
 		this.flash = false;
 	}
-  
-	setStyles(styles: Partial<PenStyles>) : void {
+
+	setStyles(styles: Partial<PenStyles>): void {
 		const attribs = [
 			'foreground',
 			'underline',
@@ -68,47 +68,47 @@ export class PenState {
 			}
 		}
 	}
-  
-	isDefault() : boolean {
+
+	isDefault(): boolean {
 		return (
 			this.foreground === 'white' &&
-        !this.underline &&
-        !this.italics &&
-        this.background === 'black' &&
-        !this.flash
+			!this.underline &&
+			!this.italics &&
+			this.background === 'black' &&
+			!this.flash
 		);
 	}
-  
-	equals(other: PenState) : boolean {
+
+	equals(other: PenState): boolean {
 		return (
 			this.foreground === other.foreground &&
-        this.underline === other.underline &&
-        this.italics === other.italics &&
-        this.background === other.background &&
-        this.flash === other.flash
+			this.underline === other.underline &&
+			this.italics === other.italics &&
+			this.background === other.background &&
+			this.flash === other.flash
 		);
 	}
-  
-	copy(newPenState: PenState) : void {
+
+	copy(newPenState: PenState): void {
 		this.foreground = newPenState.foreground;
 		this.underline = newPenState.underline;
 		this.italics = newPenState.italics;
 		this.background = newPenState.background;
 		this.flash = newPenState.flash;
 	}
-  
+
 	toString(): string {
 		return (
 			'color=' +
-        this.foreground +
-        ', underline=' +
-        this.underline +
-        ', italics=' +
-        this.italics +
-        ', background=' +
-        this.background +
-        ', flash=' +
-        this.flash
+			this.foreground +
+			', underline=' +
+			this.underline +
+			', italics=' +
+			this.italics +
+			', background=' +
+			this.background +
+			', flash=' +
+			this.flash
 		);
 	}
 }

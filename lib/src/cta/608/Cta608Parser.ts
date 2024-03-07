@@ -37,13 +37,26 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.js';
-import { Cea608Channel } from './Cea608Channel.js';
-import { VerboseLevel, rowsLowCh1, rowsLowCh2, rowsHighCh1, rowsHighCh2, backgroundColors } from './utilities/constants.js';
-import { Channels, CmdHistory, SupportedField, PACData, PenStyles } from './utilities/types.js';
-import { numArrayToHexArray, getCharForByte, createCmdHistory, hasCmdRepeated, setLastCmd } from './utilities/utils.js';
+import { Channels } from "./Channels.js";
+import type { CmdHistory } from './CmdHistory.js';
+import { Cta608Channel } from './Cta608Channel.js';
+import { PACData } from "./PACData.js";
+import { PenStyles } from "./PenStyles.js";
+import { SupportedField } from "./SupportedField.js";
+import { VerboseLevel } from "./utils/VerboseLevel.js";
+import { backgroundColors } from "./utils/backgroundColors.js";
+import { createCmdHistory } from './utils/createCmdHistory.js';
+import { getCharForByte } from "./utils/getCharForByte.js";
+import { hasCmdRepeated } from "./utils/hasCmdRepeated.js";
+import { numArrayToHexArray } from "./utils/numArrayToHexArray.js";
+import { rowsHighCh1 } from "./utils/rowsHighCh1.js";
+import { rowsHighCh2 } from "./utils/rowsHighCh2.js";
+import { rowsLowCh1 } from "./utils/rowsLowCh1.js";
+import { rowsLowCh2 } from "./utils/rowsLowCh2.js";
+import { setLastCmd } from "./utils/setLastCmd.js";
 
-class Cea608Parser {
-	channels: Array<Cea608Channel | null>;
+export class Cta608Parser {
+	channels: Array<Cta608Channel | null>;
 	currentChannel: Channels = 0;
 	cmdHistory: CmdHistory = createCmdHistory();
 	logger: CaptionsLogger;
@@ -52,22 +65,22 @@ class Cea608Parser {
 		const logger = (this.logger = new CaptionsLogger());
 		this.channels = [
 			null,
-			new Cea608Channel(field, out1, logger),
-			new Cea608Channel(field + 1, out2, logger),
+			new Cta608Channel(field, out1, logger),
+			new Cta608Channel(field + 1, out2, logger),
 		];
 	}
 
 	getHandler(channel: number) {
-		return (this.channels[channel] as Cea608Channel).getHandler();
+		return (this.channels[channel] as Cta608Channel).getHandler();
 	}
 
 	setHandler(channel: number, newHandler: any) {
-		(this.channels[channel] as Cea608Channel).setHandler(newHandler);
+		(this.channels[channel] as Cta608Channel).setHandler(newHandler);
 	}
 
 	/**
-   * Add data for time t in forms of list of bytes (unsigned ints). The bytes are treated as pairs.
-   */
+	 * Add data for time t in forms of list of bytes (unsigned ints). The bytes are treated as pairs.
+	 */
 	addData(time: number | null, byteList: number[]) {
 		let cmdFound: boolean;
 		let a: number;
@@ -86,10 +99,10 @@ class Cea608Parser {
 				this.logger.log(
 					VerboseLevel.DATA,
 					'[' +
-            numArrayToHexArray([byteList[i], byteList[i + 1]]) +
-            '] -> (' +
-            numArrayToHexArray([a, b]) +
-            ')',
+					numArrayToHexArray([byteList[i], byteList[i + 1]]) +
+					'] -> (' +
+					numArrayToHexArray([a, b]) +
+					')',
 				);
 			}
 			cmdFound = this.parseCmd(a, b);
@@ -111,7 +124,7 @@ class Cea608Parser {
 				if (charsFound) {
 					const currChNr = this.currentChannel;
 					if (currChNr && currChNr > 0) {
-						const channel = this.channels[currChNr] as Cea608Channel;
+						const channel = this.channels[currChNr] as Cta608Channel;
 						channel.insertChars(charsFound);
 					}
 					else {
@@ -126,24 +139,24 @@ class Cea608Parser {
 				this.logger.log(
 					VerboseLevel.WARNING,
 					"Couldn't parse cleaned data " +
-            numArrayToHexArray([a, b]) +
-            ' orig: ' +
-            numArrayToHexArray([byteList[i], byteList[i + 1]]),
+					numArrayToHexArray([a, b]) +
+					' orig: ' +
+					numArrayToHexArray([byteList[i], byteList[i + 1]]),
 				);
 			}
 		}
 	}
 
 	/**
-   * Parse Command.
-   * @returns True if a command was found
-   */
+	 * Parse Command.
+	 * @returns True if a command was found
+	 */
 	parseCmd(a: number, b: number): boolean {
 		const { cmdHistory } = this;
 		const cond1 =
-      (a === 0x14 || a === 0x1c || a === 0x15 || a === 0x1d) &&
-      b >= 0x20 &&
-      b <= 0x2f;
+			(a === 0x14 || a === 0x1c || a === 0x15 || a === 0x1d) &&
+			b >= 0x20 &&
+			b <= 0x2f;
 		const cond2 = (a === 0x17 || a === 0x1f) && b >= 0x21 && b <= 0x23;
 		if (!(cond1 || cond2)) {
 			return false;
@@ -159,7 +172,7 @@ class Cea608Parser {
 		}
 
 		const chNr = a === 0x14 || a === 0x15 || a === 0x17 ? 1 : 2;
-		const channel = this.channels[chNr] as Cea608Channel;
+		const channel = this.channels[chNr] as Cta608Channel;
 
 		if (a === 0x14 || a === 0x15 || a === 0x1c || a === 0x1d) {
 			if (b === 0x20) {
@@ -221,8 +234,8 @@ class Cea608Parser {
 	}
 
 	/**
-   * Parse midrow styling command
-   */
+	 * Parse midrow styling command
+	 */
 	parseMidrow(a: number, b: number): boolean {
 		let chNr: number = 0;
 
@@ -256,17 +269,17 @@ class Cea608Parser {
 	}
 
 	/**
-   * Parse Preable Access Codes (Table 53).
-   * @returns A Boolean that tells if PAC found
-   */
+	 * Parse Preable Access Codes (Table 53).
+	 * @returns A Boolean that tells if PAC found
+	 */
 	parsePAC(a: number, b: number): boolean {
 		let row: number;
 		const cmdHistory = this.cmdHistory;
 
 		const case1 =
-      ((a >= 0x11 && a <= 0x17) || (a >= 0x19 && a <= 0x1f)) &&
-      b >= 0x40 &&
-      b <= 0x7f;
+			((a >= 0x11 && a <= 0x17) || (a >= 0x19 && a <= 0x1f)) &&
+			b >= 0x40 &&
+			b <= 0x7f;
 		const case2 = (a === 0x10 || a === 0x18) && b >= 0x40 && b <= 0x5f;
 		if (!(case1 || case2)) {
 			return false;
@@ -297,9 +310,9 @@ class Cea608Parser {
 	}
 
 	/**
-   * Interpret the second byte of the pac, and return the information.
-   * @returns pacData with style parameters
-   */
+	 * Interpret the second byte of the pac, and return the information.
+	 * @returns pacData with style parameters
+	 */
 	interpretPAC(row: number, byte: number): PACData {
 		let pacIndex;
 		const pacData: PACData = {
@@ -341,9 +354,9 @@ class Cea608Parser {
 	}
 
 	/**
-   * Parse characters.
-   * @returns An array with 1 to 2 codes corresponding to chars, if found. null otherwise.
-   */
+	 * Parse characters.
+	 * @returns An array with 1 to 2 codes corresponding to chars, if found. null otherwise.
+	 */
 	parseChars(a: number, b: number): number[] | null {
 		let channelNr: Channels;
 		let charCodes: number[] | null = null;
@@ -373,9 +386,9 @@ class Cea608Parser {
 			this.logger.log(
 				VerboseLevel.INFO,
 				"Special char '" +
-          getCharForByte(oneCode) +
-          "' in channel " +
-          channelNr,
+				getCharForByte(oneCode) +
+				"' in channel " +
+				channelNr,
 			);
 			charCodes = [oneCode];
 		}
@@ -394,9 +407,9 @@ class Cea608Parser {
 	}
 
 	/**
-   * Parse extended background attributes as well as new foreground color black.
-   * @returns True if background attributes are found
-   */
+	 * Parse extended background attributes as well as new foreground color black.
+	 * @returns True if background attributes are found
+	 */
 	parseBackgroundAttributes(a: number, b: number): boolean {
 		const case1 = (a === 0x10 || a === 0x18) && b >= 0x20 && b <= 0x2f;
 		const case2 = (a === 0x17 || a === 0x1f) && b >= 0x2d && b <= 0x2f;
@@ -422,15 +435,15 @@ class Cea608Parser {
 			}
 		}
 		const chNr: Channels = a <= 0x17 ? 1 : 2;
-		const channel: Cea608Channel = this.channels[chNr] as Cea608Channel;
+		const channel: Cta608Channel = this.channels[chNr] as Cta608Channel;
 		channel.setBkgData(bkgData);
 		setLastCmd(a, b, this.cmdHistory);
 		return true;
 	}
 
 	/**
-   * Reset state of parser and its channels.
-   */
+	 * Reset state of parser and its channels.
+	 */
 	reset() {
 		for (let i = 0; i < Object.keys(this.channels).length; i++) {
 			const channel = this.channels[i];
@@ -442,8 +455,8 @@ class Cea608Parser {
 	}
 
 	/**
-   * Trigger the generation of a cue, and the start of a new one if displayScreens are not empty.
-   */
+	 * Trigger the generation of a cue, and the start of a new one if displayScreens are not empty.
+	 */
 	cueSplitAtTime(t: number) {
 		for (let i = 0; i < this.channels.length; i++) {
 			const channel = this.channels[i];
@@ -453,5 +466,3 @@ class Cea608Parser {
 		}
 	}
 }
-
-export default Cea608Parser;

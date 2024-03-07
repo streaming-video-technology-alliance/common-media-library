@@ -36,13 +36,16 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { CaptionModes } from "./CaptionModes.js";
 import { CaptionScreen } from './CaptionScreen.js';
 import { CaptionsLogger } from './CaptionsLogger.js';
+import { PACData } from "./PACData.js";
+import { PenStyles } from "./PenStyles.js";
 import { Row } from './Row.js';
-import { NR_ROWS, VerboseLevel } from './utilities/constants.js';
-import { CaptionModes, PACData, PenStyles } from './utilities/types.js';
+import { NR_ROWS } from "./utils/NR_ROWS.js";
+import { VerboseLevel } from "./utils/VerboseLevel.js";
 
-export class Cea608Channel {
+export class Cta608Channel {
 	chNr: number;
 	outputFilter: any;
 	mode: CaptionModes;
@@ -129,7 +132,7 @@ export class Cea608Channel {
 		}
 
 		const screen =
-      this.writeScreen === this.displayedMemory ? 'DISP' : 'NON_DISP';
+			this.writeScreen === this.displayedMemory ? 'DISP' : 'NON_DISP';
 		this.logger.log(
 			VerboseLevel.INFO,
 			() => screen + ': ' + this.writeScreen.getDisplayText(true),
@@ -290,9 +293,9 @@ export class Cea608Channel {
 			else {
 				if (!this.displayedMemory.equals(this.lastOutputScreen)) {
 					this.outputFilter.newCue(
-            this.cueStartTime!,
-            time,
-            this.lastOutputScreen,
+						this.cueStartTime!,
+						time,
+						this.lastOutputScreen,
 					);
 					if (dispatch && this.outputFilter.dispatchCue) {
 						this.outputFilter.dispatchCue();

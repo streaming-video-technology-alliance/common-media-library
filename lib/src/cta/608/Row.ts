@@ -38,10 +38,11 @@
 
 import { CaptionsLogger } from './CaptionsLogger.js';
 import { PenState } from './PenState.js';
+import { PenStyles } from "./PenStyles.js";
 import { StyledUnicodeChar } from './StyledUnicodeChar.js';
-import { NR_COLS, VerboseLevel } from './utilities/constants.js';
-import { PenStyles } from './utilities/types.js';
-import { getCharForByte } from './utilities/utils.js';
+import { NR_COLS } from "./utils/NR_COLS.js";
+import { VerboseLevel } from "./utils/VerboseLevel.js";
+import { getCharForByte } from "./utils/getCharForByte.js";
 
 /**
  * CEA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
@@ -88,8 +89,8 @@ export class Row {
 	}
 
 	/**
-   *  Set the cursor to a valid column.
-   */
+	 *  Set the cursor to a valid column.
+	 */
 	setCursor(absPos: number): void {
 		if (this.pos !== absPos) {
 			this.pos = absPos;
@@ -112,9 +113,9 @@ export class Row {
 	}
 
 	/**
-   * Move the cursor relative to current position.
-   */
-	moveCursor(relPos: number) : void {
+	 * Move the cursor relative to current position.
+	 */
+	moveCursor(relPos: number): void {
 		const newPos = this.pos + relPos;
 		if (relPos > 1) {
 			for (let i = this.pos + 1; i < newPos + 1; i++) {
@@ -125,8 +126,8 @@ export class Row {
 	}
 
 	/**
-   * Backspace, move one step back and clear character.
-   */
+	 * Backspace, move one step back and clear character.
+	 */
 	backSpace(): void {
 		this.moveCursor(-1);
 		this.chars[this.pos].setChar(' ', this.currPenState);
@@ -143,12 +144,12 @@ export class Row {
 				VerboseLevel.ERROR,
 				() =>
 					'Cannot insert ' +
-          byte.toString(16) +
-          ' (' +
-          char +
-          ') at position ' +
-          this.pos +
-          '. Skipping it!',
+					byte.toString(16) +
+					' (' +
+					char +
+					') at position ' +
+					this.pos +
+					'. Skipping it!',
 			);
 			return;
 		}
