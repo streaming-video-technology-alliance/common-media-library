@@ -36,12 +36,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { VerboseLevel } from './utilities/constants.js';
+import { VerboseLevel } from "./utils/VerboseLevel.js";
 
 export class CaptionsLogger {
 	public time: number | null = null;
 	public verboseLevel: VerboseLevel = VerboseLevel.ERROR;
-    
+
 	log(severity: VerboseLevel, msg: string | (() => string)): void {
 		if (this.verboseLevel >= severity) {
 			const m: string = typeof msg === 'function' ? msg() : msg;
