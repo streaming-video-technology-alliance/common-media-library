@@ -37,9 +37,11 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.js';
+import { PACData } from "./PACData.js";
+import { PenStyles } from "./PenStyles.js";
 import { Row } from './Row.js';
-import { NR_ROWS, VerboseLevel } from './utilities/constants.js';
-import { PACData, PenStyles } from './utilities/types.js';
+import { NR_ROWS } from "./utils/NR_ROWS.js";
+import { VerboseLevel } from "./utils/VerboseLevel.js";
 
 /**
  * Keep a CEA-608 screen of 32x15 styled characters
@@ -105,8 +107,8 @@ export class CaptionScreen {
 	}
 
 	/**
-   * Insert a character (without styling) in the current row.
-   */
+	 * Insert a character (without styling) in the current row.
+	 */
 	insertChar(char: number) {
 		const row = this.rows[this.currRow];
 		row.insertChar(char);
@@ -183,8 +185,8 @@ export class CaptionScreen {
 	}
 
 	/**
-   * Set background/extra foreground, but first do back_space, and then insert space (backwards compatibility).
-   */
+	 * Set background/extra foreground, but first do back_space, and then insert space (backwards compatibility).
+	 */
 	setBkgData(bkgData: Partial<PenStyles>) {
 		this.logger.log(
 			VerboseLevel.INFO,
@@ -216,8 +218,8 @@ export class CaptionScreen {
 	}
 
 	/**
-   * Get all non-empty rows with as unicode text.
-   */
+	 * Get all non-empty rows with as unicode text.
+	 */
 	getDisplayText(asOneRow?: boolean) {
 		asOneRow = asOneRow || false;
 		const displayText: string[] = [];
