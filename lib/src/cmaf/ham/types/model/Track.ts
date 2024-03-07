@@ -1,6 +1,14 @@
 import { Segment } from './Segment.js';
 import { Ham } from './Ham';
 
+/**
+ * CMAF-HAM Track type
+ * Used as a base for the audio, video and text tracks
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type Track = Ham & {
 	id: string;
 	type: string;
@@ -14,13 +22,34 @@ type Track = Ham & {
 	segments: Segment[];
 };
 
+/**
+ * CMAF-HAM Audio Track type
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type AudioTrack = Track & {
 	sampleRate: number;
 	channels: number;
 };
 
+/**
+ * CMAF-HAM Text Track type
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type TextTrack = Track;
 
+/**
+ * CMAF-HAM Video Track type
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type VideoTrack = Track & {
 	width: number;
 	height: number;

@@ -4,7 +4,7 @@
 
 ```ts
 
-// @public (undocumented)
+// @beta
 export type AdaptationSet = {
     $: {
         audioSamplingRate?: string;
@@ -41,7 +41,7 @@ export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, o
 // @beta
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @public (undocumented)
+// @beta
 export type AudioChannelConfiguration = {
     $: {
         schemeIdUri: string;
@@ -49,7 +49,7 @@ export type AudioChannelConfiguration = {
     };
 };
 
-// @public (undocumented)
+// @beta
 export type AudioTrack = Track & {
     sampleRate: number;
     channels: number;
@@ -258,7 +258,7 @@ export interface CommonMediaResponse {
     url?: string;
 }
 
-// @public (undocumented)
+// @beta
 export type DashManifest = {
     MPD: {
         $?: {
@@ -339,19 +339,19 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 // @beta
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
-// @public (undocumented)
+// @beta
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
 
-// @public (undocumented)
+// @beta
 export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?: (track: Track) => boolean): Track[];
 
-// @public (undocumented)
+// @beta
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
-// @public
+// @beta
 export function hamToM3U8(presentation: Presentation[]): Manifest;
 
-// @public
+// @beta
 export function hamToMpd(presentation: Presentation[]): Manifest;
 
 // @beta
@@ -362,17 +362,17 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
-// @public (undocumented)
+// @beta
 export type m3u8 = {
     playlists: PlayList[];
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
 };
 
-// @public
+// @beta
 export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
-// @public (undocumented)
+// @beta
 export type Manifest = {
     manifest: string;
     ancillaryManifests?: Manifest[];
@@ -391,10 +391,10 @@ export type MediaGroups = {
     };
 };
 
-// @public
+// @beta
 export function mpdToHam(manifest: string): Presentation[];
 
-// @public (undocumented)
+// @beta
 export type Period = {
     $: {
         duration: string;
@@ -404,7 +404,7 @@ export type Period = {
     AdaptationSet: AdaptationSet[];
 };
 
-// @public (undocumented)
+// @beta
 export type PlayList = {
     uri: string;
     attributes: {
@@ -420,12 +420,12 @@ export type PlayList = {
 
 // Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
 //
-// @public (undocumented)
+// @beta
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
 };
 
-// @public (undocumented)
+// @beta
 export type Representation = {
     $: {
         audioSamplingRate?: string;
@@ -470,14 +470,14 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 // @beta
 export function roundToEven(value: number, precision: number): number;
 
-// @public (undocumented)
+// @beta
 export type Segment = {
     duration: number;
     url: string;
     byteRange: string;
 };
 
-// @public (undocumented)
+// @beta
 export type SegmentBase = {
     $: {
         indexRange: string;
@@ -492,7 +492,7 @@ export type SegmentHls = {
     duration: number;
 };
 
-// @public (undocumented)
+// @beta
 export type SegmentList = {
     $: {
         duration: string;
@@ -502,7 +502,7 @@ export type SegmentList = {
     SegmentURL?: SegmentURL[];
 };
 
-// @public (undocumented)
+// @beta
 export type SegmentTemplate = {
     $: {
         duration: string;
@@ -520,7 +520,7 @@ export type SegmentURL = {
     };
 };
 
-// @public (undocumented)
+// @beta
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
 };
@@ -569,12 +569,12 @@ export class SfToken {
     description: string;
 }
 
-// @public (undocumented)
+// @beta
 export type SwitchingSet = Ham & {
     tracks: Track[];
 };
 
-// @public (undocumented)
+// @beta
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
@@ -587,7 +587,7 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @public (undocumented)
+// @beta
 export type Track = Ham & {
     id: string;
     type: string;
@@ -611,11 +611,12 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 export function uuid(): string;
 
 // Warning: (ae-forgotten-export) The symbol "TrackValidity" needs to be exported by the entry point index.d.ts
+// Warning: (ae-incompatible-release-tags) The symbol "validateTracks" is marked as @public, but its signature references "Track" which is marked as @beta
 //
 // @public (undocumented)
 export function validateTracks(tracks: Track[]): TrackValidity;
 
-// @public (undocumented)
+// @beta
 export type VideoTrack = Track & {
     width: number;
     height: number;
@@ -627,9 +628,9 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/cmaf/ham/types/DashManifest.ts:20:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/DashManifest.ts:107:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/DashManifest.ts:108:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/Manifest.ts:6:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:27:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:150:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:151:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
 
 ```

@@ -1,3 +1,10 @@
+/**
+ * HLS Playlist
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type PlayList = {
 	uri: string;
 	attributes: {
@@ -25,6 +32,13 @@ type SegmentHls = {
 	duration: number;
 };
 
+/**
+ * HLS manifest
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type m3u8 = {
 	playlists: PlayList[];
 	mediaGroups: MediaGroups;

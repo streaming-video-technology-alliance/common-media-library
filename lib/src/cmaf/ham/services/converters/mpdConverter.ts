@@ -7,6 +7,12 @@ import type { Manifest } from '../../types';
  * Convert mpd manifest into a ham object.
  *
  * @param manifest -  Manifest mpd.
+ *
+ * @returns Presentation[]
+ *
+ * @group CMAF
+ *
+ * @beta
  */
 
 function mpdToHam(manifest: string): Presentation[] {
@@ -19,6 +25,12 @@ function mpdToHam(manifest: string): Presentation[] {
  * Convert mpd manifest into a ham object.
  *
  * @param presentation - Ham object. List of presentations.
+ *
+ * @returns Manifest
+ *
+ * @group CMAF
+ *
+ * @beta
  */
 function hamToMpd(presentation: Presentation[]): Manifest {
 	const mapperContext: MapperContext = MapperContext.getInstance();

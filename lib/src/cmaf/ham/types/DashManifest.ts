@@ -11,6 +11,13 @@ type Initialization = {
 	};
 };
 
+/**
+ * DASH Segment Base
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type SegmentBase = {
 	$: {
 		indexRange: string;
@@ -20,6 +27,13 @@ type SegmentBase = {
 	Initialization: Initialization[];
 };
 
+/**
+ * DASH Segment List
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type SegmentList = {
 	$: {
 		duration: string;
@@ -29,6 +43,14 @@ type SegmentList = {
 	SegmentURL?: SegmentURL[];
 };
 
+/**
+ * DASH Segment template
+ * It is used as a template to create the actual templates
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type SegmentTemplate = {
 	$: {
 		duration: string;
@@ -39,6 +61,13 @@ type SegmentTemplate = {
 	};
 };
 
+/**
+ * DASH Audio Channel Configuration
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type AudioChannelConfiguration = {
 	$: {
 		schemeIdUri: string;
@@ -46,6 +75,13 @@ type AudioChannelConfiguration = {
 	};
 };
 
+/**
+ * DASH Representation
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type Representation = {
 	$: {
 		audioSamplingRate?: string;
@@ -81,6 +117,13 @@ type Role = {
 	};
 };
 
+/**
+ * DASH Adaptation Set
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type AdaptationSet = {
 	$: {
 		audioSamplingRate?: string;
@@ -111,6 +154,13 @@ type AdaptationSet = {
 	SegmentList?: SegmentList[];
 };
 
+/**
+ * DASH Period
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type Period = {
 	$: {
 		duration: string;
@@ -120,6 +170,13 @@ type Period = {
 	AdaptationSet: AdaptationSet[];
 };
 
+/**
+ * Json representation of the DASH Manifest
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 type DashManifest = {
 	MPD: {
 		$?: {

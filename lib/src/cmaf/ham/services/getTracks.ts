@@ -5,6 +5,18 @@ import type {
 	Track,
 } from '../types/model';
 
+/**
+ * Get a list of Tracks contained on a SwitchingSet
+ *
+ * @param switchingSet - SwitchingSet object from HAM
+ * @param predicate - Filtering function
+ *
+ * @returns Track[]
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 function getTracksFromSwitchingSet(
 	switchingSet: SwitchingSet,
 	predicate?: (track: Track) => boolean,
@@ -13,6 +25,18 @@ function getTracksFromSwitchingSet(
 	return predicate ? tracks.filter(predicate) : tracks;
 }
 
+/**
+ * Get a list of Tracks contained on a SelectionSet
+ *
+ * @param selectionSet - SelectionSet object from HAM
+ * @param predicate - Filtering function
+ *
+ * @returns Track[]
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 function getTracksFromSelectionSet(
 	selectionSet: SelectionSet,
 	predicate?: (track: Track) => boolean,
@@ -23,6 +47,18 @@ function getTracksFromSelectionSet(
 	return predicate ? tracks.filter(predicate) : tracks;
 }
 
+/**
+ * Get a list of Tracks contained on a Presentation
+ *
+ * @param presentation - Presentation object from HAM
+ * @param predicate - Filtering function
+ *
+ * @returns Track[]
+ *
+ * @group CMAF
+ *
+ * @beta
+ */
 function getTracksFromPresentation(
 	presentation: Presentation,
 	predicate?: (track: Track) => boolean,
