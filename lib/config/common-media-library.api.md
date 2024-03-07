@@ -4,11 +4,50 @@
 
 ```ts
 
+// @public (undocumented)
+export type AdaptationSet = {
+    $: {
+        audioSamplingRate?: string;
+        codecs?: string;
+        contentType?: string;
+        frameRate?: string;
+        group?: string;
+        id?: string;
+        lang?: string;
+        maxBandwidth?: string;
+        maxFrameRate?: string;
+        maxHeight?: string;
+        maxWidth?: string;
+        mimeType?: string;
+        minBandwidth?: string;
+        par?: string;
+        sar?: string;
+        segmentAlignment: string;
+        startWithSAP?: string;
+        subsegmentAlignment?: string;
+        subsegmentStartsWithSAP?: string;
+    };
+    AudioChannelConfiguration?: AudioChannelConfiguration[];
+    ContentComponent?: ContentComponent[];
+    Role?: Role[];
+    Representation: Representation[];
+    SegmentTemplate?: SegmentTemplate[];
+    SegmentList?: SegmentList[];
+};
+
 // @beta
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string>;
 
 // @beta
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @public (undocumented)
+export type AudioChannelConfiguration = {
+    $: {
+        schemeIdUri: string;
+        value: string;
+    };
+};
 
 // @public (undocumented)
 export type AudioTrack = Track & {
@@ -219,6 +258,21 @@ export interface CommonMediaResponse {
     url?: string;
 }
 
+// @public (undocumented)
+export type DashManifest = {
+    MPD: {
+        $?: {
+            maxSegmentDuration?: string;
+            mediaPresentationDuration?: string;
+            minBufferTime?: string;
+            profiles?: string;
+            type?: string;
+            xmlns?: string;
+        };
+        Period: Period[];
+    };
+};
+
 // @beta
 export function decodeCmcd(cmcd: string): Cmcd;
 
@@ -294,8 +348,6 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 // @public (undocumented)
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
-// Warning: (ae-forgotten-export) The symbol "Manifest" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function hamToM3U8(presentation: Presentation[]): Manifest;
 
@@ -310,17 +362,89 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
+// @public (undocumented)
+export type m3u8 = {
+    playlists: PlayList[];
+    mediaGroups: MediaGroups;
+    segments: SegmentHls[];
+};
+
 // @public
 export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
+// @public (undocumented)
+export type Manifest = {
+    manifest: string;
+    ancillaryManifests?: Manifest[];
+    type: Format;
+    metaData?: Map<string, string>;
+};
+
+// @public (undocumented)
+export type MediaGroups = {
+    AUDIO: {
+        [key: string]: {
+            [key: string]: {
+                language: string;
+            };
+        };
+    };
+};
+
 // @public
 export function mpdToHam(manifest: string): Presentation[];
+
+// @public (undocumented)
+export type Period = {
+    $: {
+        duration: string;
+        id?: string;
+        start?: string;
+    };
+    AdaptationSet: AdaptationSet[];
+};
+
+// @public (undocumented)
+export type PlayList = {
+    uri: string;
+    attributes: {
+        FRAME_RATE: number;
+        CODECS: string;
+        BANDWIDTH: number;
+        RESOLUTION: {
+            width: number;
+            height: number;
+        };
+    };
+};
 
 // Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
+};
+
+// @public (undocumented)
+export type Representation = {
+    $: {
+        audioSamplingRate?: string;
+        bandwidth: string;
+        codecs?: string;
+        frameRate?: string;
+        height?: string;
+        id: string;
+        mimeType?: string;
+        sar?: string;
+        scanType?: string;
+        startWithSAP?: string;
+        width?: string;
+    };
+    AudioChannelConfiguration?: AudioChannelConfiguration[];
+    BaseURL?: string[];
+    SegmentBase?: SegmentBase[];
+    SegmentList?: SegmentList[];
+    SegmentTemplate?: SegmentTemplate[];
 };
 
 // @beta
@@ -351,6 +475,49 @@ export type Segment = {
     duration: number;
     url: string;
     byteRange: string;
+};
+
+// @public (undocumented)
+export type SegmentBase = {
+    $: {
+        indexRange: string;
+        indexRangeExact: string;
+        timescale: string;
+    };
+    Initialization: Initialization[];
+};
+
+// @public (undocumented)
+export type SegmentHls = {
+    duration: number;
+};
+
+// @public (undocumented)
+export type SegmentList = {
+    $: {
+        duration: string;
+        timescale: string;
+    };
+    Initialization: Initialization[];
+    SegmentURL?: SegmentURL[];
+};
+
+// @public (undocumented)
+export type SegmentTemplate = {
+    $: {
+        duration: string;
+        initialization: string;
+        media: string;
+        startNumber: string;
+        timescale: string;
+    };
+};
+
+// @public (undocumented)
+export type SegmentURL = {
+    $: {
+        media?: string;
+    };
 };
 
 // @public (undocumented)
@@ -457,5 +624,12 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/cmaf/ham/types/DashManifest.ts:20:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:107:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:108:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/Manifest.ts:6:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
 
 ```

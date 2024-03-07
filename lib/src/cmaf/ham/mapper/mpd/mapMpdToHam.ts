@@ -4,7 +4,7 @@ import type {
 	Period,
 	Representation,
 	SegmentTemplate,
-} from '../../types/DashManifest';
+} from '../../types';
 import type {
 	AudioTrack,
 	Presentation,
