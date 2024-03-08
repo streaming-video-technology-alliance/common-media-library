@@ -6,7 +6,7 @@ import { Ham } from './Ham.js';
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type Presentation = Ham & {
 	selectionSets: SelectionSet[];

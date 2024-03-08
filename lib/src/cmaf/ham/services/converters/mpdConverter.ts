@@ -12,7 +12,7 @@ import type { Manifest } from '../../types';
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 
 function mpdToHam(manifest: string): Presentation[] {
@@ -30,7 +30,7 @@ function mpdToHam(manifest: string): Presentation[] {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 function hamToMpd(presentation: Presentation[]): Manifest {
 	const mapperContext: MapperContext = MapperContext.getInstance();

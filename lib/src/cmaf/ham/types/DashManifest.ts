@@ -16,7 +16,7 @@ type Initialization = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type SegmentBase = {
 	$: {
@@ -32,7 +32,7 @@ type SegmentBase = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type SegmentList = {
 	$: {
@@ -49,7 +49,7 @@ type SegmentList = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type SegmentTemplate = {
 	$: {
@@ -66,7 +66,7 @@ type SegmentTemplate = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type AudioChannelConfiguration = {
 	$: {
@@ -80,7 +80,7 @@ type AudioChannelConfiguration = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type Representation = {
 	$: {
@@ -122,7 +122,7 @@ type Role = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type AdaptationSet = {
 	$: {
@@ -159,7 +159,7 @@ type AdaptationSet = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type Period = {
 	$: {
@@ -175,7 +175,7 @@ type Period = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type DashManifest = {
 	MPD: {

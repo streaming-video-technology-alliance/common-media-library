@@ -7,7 +7,7 @@ import { Ham } from './Ham';
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type Track = Ham & {
 	id: string;
@@ -27,7 +27,7 @@ type Track = Ham & {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type AudioTrack = Track & {
 	sampleRate: number;
@@ -39,7 +39,7 @@ type AudioTrack = Track & {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type TextTrack = Track;
 
@@ -48,7 +48,7 @@ type TextTrack = Track;
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type VideoTrack = Track & {
 	width: number;

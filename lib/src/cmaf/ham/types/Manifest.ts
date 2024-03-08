@@ -5,7 +5,7 @@ type Format = 'm3u8' | 'mpd';
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type Manifest = {
 	manifest: string;

@@ -4,7 +4,7 @@
 
 ```ts
 
-// @beta
+// @alpha
 export type AdaptationSet = {
     $: {
         audioSamplingRate?: string;
@@ -41,7 +41,7 @@ export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, o
 // @beta
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @beta
+// @alpha
 export type AudioChannelConfiguration = {
     $: {
         schemeIdUri: string;
@@ -49,7 +49,7 @@ export type AudioChannelConfiguration = {
     };
 };
 
-// @beta
+// @alpha
 export type AudioTrack = Track & {
     sampleRate: number;
     channels: number;
@@ -258,7 +258,7 @@ export interface CommonMediaResponse {
     url?: string;
 }
 
-// @beta
+// @alpha
 export type DashManifest = {
     MPD: {
         $?: {
@@ -340,21 +340,6 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @beta
-export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
-
-// @beta
-export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?: (track: Track) => boolean): Track[];
-
-// @beta
-export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
-
-// @beta
-export function hamToM3U8(presentation: Presentation[]): Manifest;
-
-// @beta
-export function hamToMpd(presentation: Presentation[]): Manifest;
-
-// @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
@@ -362,17 +347,14 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
-// @beta
+// @alpha
 export type m3u8 = {
     playlists: PlayList[];
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
 };
 
-// @beta
-export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
-
-// @beta
+// @alpha
 export type Manifest = {
     manifest: string;
     ancillaryManifests?: Manifest[];
@@ -391,10 +373,7 @@ export type MediaGroups = {
     };
 };
 
-// @beta
-export function mpdToHam(manifest: string): Presentation[];
-
-// @beta
+// @alpha
 export type Period = {
     $: {
         duration: string;
@@ -404,7 +383,7 @@ export type Period = {
     AdaptationSet: AdaptationSet[];
 };
 
-// @beta
+// @alpha
 export type PlayList = {
     uri: string;
     attributes: {
@@ -420,12 +399,12 @@ export type PlayList = {
 
 // Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
 //
-// @beta
+// @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
 };
 
-// @beta
+// @alpha
 export type Representation = {
     $: {
         audioSamplingRate?: string;
@@ -470,14 +449,14 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 // @beta
 export function roundToEven(value: number, precision: number): number;
 
-// @beta
+// @alpha
 export type Segment = {
     duration: number;
     url: string;
     byteRange: string;
 };
 
-// @beta
+// @alpha
 export type SegmentBase = {
     $: {
         indexRange: string;
@@ -492,7 +471,7 @@ export type SegmentHls = {
     duration: number;
 };
 
-// @beta
+// @alpha
 export type SegmentList = {
     $: {
         duration: string;
@@ -502,7 +481,7 @@ export type SegmentList = {
     SegmentURL?: SegmentURL[];
 };
 
-// @beta
+// @alpha
 export type SegmentTemplate = {
     $: {
         duration: string;
@@ -520,7 +499,7 @@ export type SegmentURL = {
     };
 };
 
-// @beta
+// @alpha
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
 };
@@ -569,12 +548,12 @@ export class SfToken {
     description: string;
 }
 
-// @beta
+// @alpha
 export type SwitchingSet = Ham & {
     tracks: Track[];
 };
 
-// @beta
+// @alpha
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
@@ -587,7 +566,7 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @beta
+// @alpha
 export type Track = Ham & {
     id: string;
     type: string;
@@ -610,13 +589,7 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 // @beta
 export function uuid(): string;
 
-// Warning: (ae-forgotten-export) The symbol "TrackValidity" needs to be exported by the entry point index.d.ts
-// Warning: (ae-incompatible-release-tags) The symbol "validateTracks" is marked as @public, but its signature references "Track" which is marked as @beta
-//
-// @public (undocumented)
-export function validateTracks(tracks: Track[]): TrackValidity;
-
-// @beta
+// @alpha
 export type VideoTrack = Track & {
     width: number;
     height: number;

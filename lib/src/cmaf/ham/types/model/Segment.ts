@@ -3,7 +3,7 @@
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type Segment = {
 	duration: number;

@@ -3,7 +3,7 @@
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type PlayList = {
 	uri: string;
@@ -37,7 +37,7 @@ type SegmentHls = {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 type m3u8 = {
 	playlists: PlayList[];

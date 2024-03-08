@@ -12,7 +12,7 @@ import type { Presentation } from '../../types/model';
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 
 function m3u8ToHam(manifest: string, ancillaryManifests: string[]) {
@@ -37,7 +37,7 @@ function m3u8ToHam(manifest: string, ancillaryManifests: string[]) {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 
 function hamToM3U8(presentation: Presentation[]) {

@@ -15,7 +15,7 @@ import type {
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 function getTracksFromSwitchingSet(
 	switchingSet: SwitchingSet,
@@ -35,7 +35,7 @@ function getTracksFromSwitchingSet(
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 function getTracksFromSelectionSet(
 	selectionSet: SelectionSet,
@@ -57,7 +57,7 @@ function getTracksFromSelectionSet(
  *
  * @group CMAF
  *
- * @beta
+ * @alpha
  */
 function getTracksFromPresentation(
 	presentation: Presentation,
