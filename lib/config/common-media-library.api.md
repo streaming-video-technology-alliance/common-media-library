@@ -339,6 +339,21 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 // @beta
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
+// @alpha
+export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
+
+// @alpha
+export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?: (track: Track) => boolean): Track[];
+
+// @alpha
+export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
+
+// @alpha
+export function hamToM3U8(presentation: Presentation[]): Manifest;
+
+// @alpha
+export function hamToMpd(presentation: Presentation[]): Manifest;
+
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
@@ -353,6 +368,9 @@ export type m3u8 = {
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
 };
+
+// @alpha
+export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @alpha
 export type Manifest = {
@@ -372,6 +390,9 @@ export type MediaGroups = {
         };
     };
 };
+
+// @alpha
+export function mpdToHam(manifest: string): Presentation[];
 
 // @alpha
 export type Period = {
@@ -588,6 +609,12 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 
 // @beta
 export function uuid(): string;
+
+// Warning: (ae-forgotten-export) The symbol "TrackValidity" needs to be exported by the entry point index.d.ts
+// Warning: (ae-incompatible-release-tags) The symbol "validateTracks" is marked as @public, but its signature references "Track" which is marked as @alpha
+//
+// @public (undocumented)
+export function validateTracks(tracks: Track[]): TrackValidity;
 
 // @alpha
 export type VideoTrack = Track & {
