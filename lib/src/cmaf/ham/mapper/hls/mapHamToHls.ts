@@ -62,7 +62,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 		videoTrack.byteRange != undefined
 			? `#EXT-X-BYTERANGE:${videoTrack.byteRange}${newline}`
 			: '';
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}`;
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
@@ -84,7 +84,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 		audioTrack.byteRange != undefined
 			? `#EXT-X-BYTERANGE:${audioTrack.byteRange}${newline}`
 			: '';
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${audioTrack.urlInitialization}",${videoByteRange}"${newline}${playlist}`;
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${audioTrack.urlInitialization}",${videoByteRange}"${newline}${playlist}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
@@ -98,7 +98,7 @@ function _generateTextManifestPiece(textTrack: TextTrack) {
 			return `#EXTINF:${segment.duration},\n${segment.url}`;
 		})
 		.join(newline);
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${textTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}${playlist}`;
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${textTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}${playlist}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
