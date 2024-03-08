@@ -1,18 +1,19 @@
-import { parseM3u8 } from '../../../utils/hls/m3u8.js';
-import { uuid } from '../../../../utils.js';
-import { addMetadataToHLS } from '../../../utils/manifestUtils.js';
-import type {
+import { parseM3u8 } from '../hls/m3u8.js';
+import { uuid } from '../../../utils.js';
+import {
 	AudioTrack,
+	TextTrack,
 	Segment,
 	SelectionSet,
 	SwitchingSet,
-	TextTrack,
 	Track,
 	VideoTrack,
-} from '../../types/model';
-import type { Manifest, PlayList } from '../../types';
+} from '../../ham/types/model';
+import { addMetadataToHLS } from '../manifestUtils.js';
+import { PlayList } from '../../ham/types/HlsManifest.js';
+import { Manifest } from '../../ham/types/';
 
-function mapHlsToHam(manifest: Manifest) {
+function m3u8ToHam(manifest: Manifest) {
 	const mainManifestParsed = parseM3u8(manifest.manifest);
 	manifest = addMetadataToHLS(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
@@ -154,7 +155,8 @@ function mapHlsToHam(manifest: Manifest) {
 		switchingSets: switchingSetVideos,
 	} as SelectionSet);
 
-	return [{ id: uuid(), selectionSets: selectionSets }];
+	const presentations = [{ id: uuid(), selectionSets: selectionSets }];
+	return presentations;
 }
 
 function _formatSegments(segments: any[]) {
@@ -174,4 +176,4 @@ function _formatSegments(segments: any[]) {
 	return formattedSegments;
 }
 
-export { mapHlsToHam };
+export { m3u8ToHam };
