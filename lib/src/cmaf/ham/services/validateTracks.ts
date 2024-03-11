@@ -1,5 +1,13 @@
 import type { Track } from '../types/model';
 
+/**
+ * CMAF-HAM Track Validity type
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
+
 type TrackValidity = {
 	status: boolean;
 	description: {
