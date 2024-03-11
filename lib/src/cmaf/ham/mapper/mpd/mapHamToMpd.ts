@@ -106,7 +106,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 				{
 					$: {
 						schemeIdUri: '',
-						value: audioTrack.sampleRate.toString() ?? '',
+						value: audioTrack.channels.toString() ?? '',
 					},
 				} as AudioChannelConfiguration,
 			];

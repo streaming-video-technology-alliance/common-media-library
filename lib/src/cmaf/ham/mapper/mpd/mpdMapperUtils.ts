@@ -4,6 +4,7 @@ import type {
 	Representation,
 	SegmentTemplate,
 } from '../../types';
+import { Segment } from '../../types/model';
 
 function getChannels(
 	adaptationSet: AdaptationSet,
@@ -65,14 +66,14 @@ function getContentType(
 	return 'text';
 }
 
-function getDuration(representation: Representation): number {
-	const duration: number = +(
-		representation.SegmentList?.at(0)?.$.duration ??
-		representation.SegmentTemplate?.at(0)?.$.duration ??
-		0
-	);
-	console.error(`Representation ${representation.$.id} has no duration`);
-	return duration;
+function calculateDuration(
+	duration: string | undefined,
+	timescale: string | undefined,
+): number {
+	if (!duration || !timescale) {
+		return 1;
+	}
+	return +(duration ?? 1) / +(timescale ?? 1);
 }
 
 function getFrameRate(
@@ -117,10 +118,13 @@ function getNumberOfSegments(
 	duration: number,
 ): number {
 	// TODO: Double check the number of segments, this equation may be wrong
-	// segments = total duration / (segment duration * timescale)
+	// segments = total duration / (segment duration / timescale)
 	return Math.round(
-		(duration * +(segmentTemplate.$.timescale ?? 1)) /
-			+(segmentTemplate.$.duration ?? 1),
+		duration /
+			calculateDuration(
+				segmentTemplate.$.duration,
+				segmentTemplate.$.timescale,
+			),
 	);
 }
 
@@ -156,6 +160,13 @@ function getSar(
 	return sar;
 }
 
+function getTrackDuration(segments: Segment[]): number {
+	// return segments.length * segments[0].duration;
+	return segments.reduce((acc: number, segment: Segment) => {
+		return acc + segment.duration;
+	}, 0);
+}
+
 function getUrlFromTemplate(
 	representation: Representation,
 	segmentTemplate: SegmentTemplate,
@@ -178,10 +189,10 @@ function getUrlFromTemplate(
 }
 
 export {
+	calculateDuration,
 	getChannels,
 	getCodec,
 	getContentType,
-	getDuration,
 	getFrameRate,
 	getGroup,
 	getLanguage,
@@ -190,5 +201,6 @@ export {
 	getPresentationId,
 	getSampleRate,
 	getSar,
+	getTrackDuration,
 	getUrlFromTemplate,
 };

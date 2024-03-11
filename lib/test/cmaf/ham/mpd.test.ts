@@ -89,3 +89,11 @@ describe('ham2mpd', async () => {
 		equal(convertedMpd.ancillaryManifests, []);
 	});
 });
+
+describe('mpd to ham to mpd', async () => {
+	it('converts ham5 to dash5 to ham5 again', () => {
+		const convertedHam = cmafHam.mpdToHam(mpdSample5);
+		const convertedMpd = cmafHam.hamToMpd(convertedHam);
+		deepEqual(convertedMpd.manifest, mpdSample5);
+	});
+});
