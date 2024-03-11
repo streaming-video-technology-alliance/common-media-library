@@ -9,6 +9,17 @@ type TrackValidity = {
 	tracksWithErrors: string[];
 };
 
+/**
+ * Validate a list of tracks
+ *
+ * @param tracks - List of tracks
+ *
+ * @returns TrackValidity
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
 function validateTracks(tracks: Track[]): TrackValidity {
 	if (!tracks?.length) {
 		return {
