@@ -137,8 +137,7 @@ function getNumberOfSegments(
 	segmentTemplate: SegmentTemplate,
 	duration: number,
 ): number {
-	// TODO: Double check the number of segments, this equation may be wrong
-	// segments = total duration / (segment duration / timescale)
+	// FIXME: This equation may be wrong
 	return Math.round(
 		duration /
 			calculateDuration(
