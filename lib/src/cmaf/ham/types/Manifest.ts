@@ -1,7 +1,7 @@
 type Format = 'm3u8' | 'mpd';
 
 /**
- * Manifest object returned by the conversion to CMAF-HAM
+ * Manifest object received as an input by the conversion to HAM object
  *
  * @group CMAF
  *
