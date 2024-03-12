@@ -59,7 +59,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 		})
 		.join(newline);
 	const videoByteRange =
-		videoTrack.byteRange != undefined
+		videoTrack.byteRange
 			? `#EXT-X-BYTERANGE:${videoTrack.byteRange}${newline}`
 			: '';
 	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}#EXT-X-ENDLIST`;
