@@ -7,6 +7,12 @@ import type { Presentation } from '../../types/model';
  *
  * @param manifest - Main manifest.
  * @param ancillaryManifests - Ancillary Manifests . Must be in order, first audio, subtitle and video.
+ *
+ * @returns Presentation[]
+ *
+ * @group CMAF
+ *
+ * @alpha
  */
 
 function m3u8ToHam(manifest: string, ancillaryManifests: string[]) {
@@ -26,6 +32,12 @@ function m3u8ToHam(manifest: string, ancillaryManifests: string[]) {
  * Convert ham object into a hls manifest.
  *
  * @param presentation - Ham object. List of presentations.
+ *
+ * @returns Manifest
+ *
+ * @group CMAF
+ *
+ * @alpha
  */
 
 function hamToM3U8(presentation: Presentation[]) {
