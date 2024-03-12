@@ -66,6 +66,15 @@ function getContentType(
 	return 'text';
 }
 
+/**
+ * Calculates the duration of a segment
+ *
+ * segmentDuration = duration / timescale
+ *
+ * @param duration
+ * @param timescale
+ * @returns Segment duration
+ */
 function calculateDuration(
 	duration: string | undefined,
 	timescale: string | undefined,
@@ -113,6 +122,17 @@ function getName(
 	return adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type;
 }
 
+/**
+ * Calculates the number of segments that a track has to use SegmentTemplate.
+ *
+ * Equation used:
+ * segments = total duration / (segment duration / timescale)
+ * **This equation might be wrong, please double-check it**
+ *
+ * @param segmentTemplate
+ * @param duration
+ * @returns Number of segments
+ */
 function getNumberOfSegments(
 	segmentTemplate: SegmentTemplate,
 	duration: number,
@@ -160,8 +180,18 @@ function getSar(
 	return sar;
 }
 
+/**
+ * Get the duration from a track.
+ *
+ * This is calculated using the sum of the duration of all the segments from the
+ * track.
+ *
+ * An alternative to this could be number of segments * duration of a segment.
+ *
+ * @param segments
+ * @returns Duration of the track
+ */
 function getTrackDuration(segments: Segment[]): number {
-	// return segments.length * segments[0].duration;
 	return segments.reduce((acc: number, segment: Segment) => {
 		return acc + segment.duration;
 	}, 0);
@@ -174,7 +204,6 @@ function getUrlFromTemplate(
 ): string {
 	const regexTemplate = /\$(.*?)\$/g;
 	return segmentTemplate.$.media.replace(regexTemplate, (match: any) => {
-		// TODO: This may have a better way to do it for all the cases
 		if (match === '$RepresentationID$') {
 			return representation.$.id;
 		}
