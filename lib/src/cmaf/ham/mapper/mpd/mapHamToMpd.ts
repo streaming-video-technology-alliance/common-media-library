@@ -11,7 +11,6 @@ import type {
 import type {
 	AudioTrack,
 	Presentation,
-	Segment,
 	SelectionSet,
 	TextTrack,
 	Track,
@@ -19,6 +18,19 @@ import type {
 } from '../../types/model';
 import { parseDurationMpd } from '../../../utils/utils.js';
 
+/**
+ * This function tries to recreate the timescale value.
+ *
+ * This value is not stored on the ham object, so it is not possible (for now)
+ * to get the original one.
+ *
+ * Just the audio tracks have this value stored on the `sampleRate` key.
+ *
+ * **The value returned by this function is most likely wrong**
+ *
+ * @param track Track to get the timescale from
+ * @returns string
+ */
 function getTimescale(track: Track): string {
 	if (track.type === 'audio') {
 		const audioTrack = track as AudioTrack;
@@ -37,17 +49,26 @@ function getTimescale(track: Track): string {
 	return '24';
 }
 
-function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
+function baseSegmentToSegment(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = [];
-	hamSegments.forEach((segment) => {
+	track.segments.forEach((segment) => {
+		let newSegment: SegmentBase | undefined;
 		if (segment.byteRange) {
 			const initRange = +segment.byteRange.split('-')[0] - 1;
-			segments.push({
+			newSegment = {
 				$: {
 					indexRange: segment.byteRange,
 				},
 				Initialization: [{ $: { range: `0-${initRange}` } }],
-			} as SegmentBase);
+			} as SegmentBase;
+		}
+		if (newSegment && track.type === 'audio') {
+			// All segments should have timescale, but for now, just the audio ones store this value
+			const audioTrack = track as AudioTrack;
+			newSegment.$.timescale = audioTrack.sampleRate.toString() ?? '';
+		}
+		if (newSegment) {
+			segments.push(newSegment);
 		}
 	});
 
@@ -87,7 +108,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 				id: track.id,
 				bandwidth: track.bandwidth.toString(),
 			},
-			SegmentBase: baseSegmentToSegment(track.segments),
+			SegmentBase: baseSegmentToSegment(track),
 			SegmentList: segmentToSegmentList(track),
 		} as Representation;
 		if (track.type === 'video') {
@@ -102,6 +123,11 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 		}
 		if (track.type === 'audio') {
 			const audioTrack = track as AudioTrack;
+			representation.$ = {
+				...representation.$,
+				audioSamplingRate: audioTrack.sampleRate.toString(),
+				codecs: audioTrack.codec,
+			};
 			representation.AudioChannelConfiguration = [
 				{
 					$: {
