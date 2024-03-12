@@ -1,5 +1,13 @@
 import type { Track } from '../types/model';
 
+/**
+ * CMAF-HAM Track Validity type
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
+
 type TrackValidity = {
 	status: boolean;
 	description: {
@@ -9,6 +17,17 @@ type TrackValidity = {
 	tracksWithErrors: string[];
 };
 
+/**
+ * Validate a list of tracks
+ *
+ * @param tracks - List of tracks
+ *
+ * @returns TrackValidity
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
 function validateTracks(tracks: Track[]): TrackValidity {
 	if (!tracks?.length) {
 		return {

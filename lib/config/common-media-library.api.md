@@ -611,9 +611,8 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 export function uuid(): string;
 
 // Warning: (ae-forgotten-export) The symbol "TrackValidity" needs to be exported by the entry point index.d.ts
-// Warning: (ae-incompatible-release-tags) The symbol "validateTracks" is marked as @public, but its signature references "Track" which is marked as @alpha
 //
-// @public (undocumented)
+// @alpha
 export function validateTracks(tracks: Track[]): TrackValidity;
 
 // @alpha
