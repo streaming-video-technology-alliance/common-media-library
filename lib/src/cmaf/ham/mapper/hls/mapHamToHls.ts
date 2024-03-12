@@ -58,10 +58,9 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	const videoByteRange =
-		videoTrack.byteRange
-			? `#EXT-X-BYTERANGE:${videoTrack.byteRange}${newline}`
-			: '';
+	const videoByteRange = videoTrack.byteRange
+		? `#EXT-X-BYTERANGE:${videoTrack.byteRange}${newline}`
+		: '';
 	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
@@ -80,10 +79,9 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
 		})
 		.join(newline);
-	const videoByteRange =
-		audioTrack.byteRange != undefined
-			? `#EXT-X-BYTERANGE:${audioTrack.byteRange}${newline}`
-			: '';
+	const videoByteRange = audioTrack.byteRange
+		? `#EXT-X-BYTERANGE:${audioTrack.byteRange}${newline}`
+		: '';
 	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${audioTrack.urlInitialization}",${videoByteRange}"${newline}${playlist}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
