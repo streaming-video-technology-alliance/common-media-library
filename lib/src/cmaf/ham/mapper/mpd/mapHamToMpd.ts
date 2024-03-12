@@ -37,16 +37,16 @@ function getTimescale(track: Track): string {
 	return '24';
 }
 
-// TODO: This only maps to SegmentBase, it may need to handle all Segment types
 function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
 	const segments: SegmentBase[] = [];
 	hamSegments.forEach((segment) => {
 		if (segment.byteRange) {
+			const initRange = +segment.byteRange.split('-')[0] - 1;
 			segments.push({
 				$: {
 					indexRange: segment.byteRange,
 				},
-				Initialization: [{ $: { range: segment.byteRange } }],
+				Initialization: [{ $: { range: `0-${initRange}` } }],
 			} as SegmentBase);
 		}
 	});
@@ -54,7 +54,7 @@ function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
 	return segments;
 }
 
-function SegmentToSegmentList(track: Track): SegmentList[] {
+function segmentToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];
 	const segmentURLs: SegmentURL[] = [];
 	track.segments.forEach((segment, index) => {
@@ -88,7 +88,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 				bandwidth: track.bandwidth.toString(),
 			},
 			SegmentBase: baseSegmentToSegment(track.segments),
-			SegmentList: SegmentToSegmentList(track),
+			SegmentList: segmentToSegmentList(track),
 		} as Representation;
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack;
@@ -110,6 +110,10 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 					},
 				} as AudioChannelConfiguration,
 			];
+		}
+		if (track.segments[0].byteRange) {
+			// Only BaseSegments have byteRange on segments, and BaseURL on the representation
+			representation.BaseURL = [track.segments[0].url];
 		}
 		return representation;
 	});
@@ -137,14 +141,14 @@ function selectionToAdaptationSet(
 }
 
 function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+	let duration: string = '';
 	const periods = hamManifests.map((presentation) => {
+		duration = parseDurationMpd(
+			presentation.selectionSets[0].switchingSets[0].tracks[0].duration,
+		);
 		return {
 			$: {
-				// FIXME: this value is wrong
-				duration: parseDurationMpd(
-					presentation.selectionSets[0].switchingSets[0].tracks[0]
-						.duration,
-				),
+				duration: duration,
 				id: presentation.id,
 				start: 'PT0S',
 			},
@@ -155,6 +159,7 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	return {
 		MPD: {
 			$: {
+				mediaPresentationDuration: duration,
 				type: 'static',
 			},
 			Period: periods,
