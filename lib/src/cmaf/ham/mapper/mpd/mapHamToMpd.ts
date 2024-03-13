@@ -11,6 +11,7 @@ import type {
 import type {
 	AudioTrack,
 	Presentation,
+	Segment,
 	SelectionSet,
 	Track,
 	VideoTrack,
@@ -46,12 +47,12 @@ function getTimescale(track: Track): number {
 	return 90000;
 }
 
-function baseSegmentToSegment(track: Track): SegmentBase[] {
+function trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = [];
-	track.segments.forEach((segment) => {
+	track.segments.forEach((segment: Segment) => {
 		let newSegment: SegmentBase | undefined;
 		if (segment.byteRange) {
-			const initRange = +segment.byteRange.split('-')[0] - 1;
+			const initRange: number = +segment.byteRange.split('-')[0] - 1;
 			newSegment = {
 				$: {
 					indexRange: segment.byteRange,
@@ -72,7 +73,7 @@ function baseSegmentToSegment(track: Track): SegmentBase[] {
 	return segments;
 }
 
-function segmentToSegmentList(track: Track): SegmentList[] {
+function trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];
 	const segmentURLs: SegmentURL[] = [];
 	track.segments.forEach((segment, index) => {
@@ -102,15 +103,15 @@ function segmentToSegmentList(track: Track): SegmentList[] {
 	return segmentList;
 }
 
-function trackToRepresentation(tracks: Track[]): Representation[] {
+function tracksToRepresentation(tracks: Track[]): Representation[] {
 	return tracks.map((track) => {
 		const representation: Representation = {
 			$: {
 				id: track.id,
 				bandwidth: track.bandwidth.toString(),
 			},
-			SegmentBase: baseSegmentToSegment(track),
-			SegmentList: segmentToSegmentList(track),
+			SegmentBase: trackToSegmentBase(track),
+			SegmentList: trackToSegmentList(track),
 		} as Representation;
 		if (track.name) {
 			representation.$.mimeType = track.name;
@@ -152,7 +153,7 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 	});
 }
 
-function selectionToAdaptationSet(
+function selectionSetsToAdaptationSet(
 	selectionsSets: SelectionSet[],
 ): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
@@ -167,27 +168,33 @@ function selectionToAdaptationSet(
 					lang: switchingSet.tracks[0].language,
 					codecs: switchingSet.tracks[0].codec,
 				},
-				Representation: trackToRepresentation(switchingSet.tracks),
+				Representation: tracksToRepresentation(switchingSet.tracks),
 			} as AdaptationSet;
 		});
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
-	let duration: string = '';
-	const periods = hamManifests.map((presentation) => {
-		duration = parseDurationMpd(
-			presentation.selectionSets[0].switchingSets[0].tracks[0].duration,
-		);
+function presentationsToPeriods(presentations: Presentation[]): Period[] {
+	return presentations.map((presentation: Presentation) => {
 		return {
 			$: {
-				duration: duration,
+				duration: parseDurationMpd(
+					presentation.selectionSets[0].switchingSets[0].tracks[0]
+						.duration,
+				),
 				id: presentation.id,
 				start: 'PT0S',
 			},
-			AdaptationSet: selectionToAdaptationSet(presentation.selectionSets),
+			AdaptationSet: selectionSetsToAdaptationSet(
+				presentation.selectionSets,
+			),
 		} as Period;
 	});
+}
+
+function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+	const periods: Period[] = presentationsToPeriods(hamManifests);
+	const duration: string = periods[0].$.duration;
 
 	return {
 		MPD: {
