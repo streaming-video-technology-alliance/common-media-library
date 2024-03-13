@@ -10,7 +10,12 @@ MediaInfoLib - v0.7.87
 
 For more info about this video, see https://github.com/Axinom/dash-test-vectors
 -->
-<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" minBufferTime="PT1.500S" type="static" mediaPresentationDuration="PT0H12M14.000S" maxSegmentDuration="PT0H0M4.000S" profiles="urn:mpeg:dash:profile:isoff-live:2011,http://dashif.org/guidelines/dash264">
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011"
+		minBufferTime="PT1.500S"
+		type="static"
+		mediaPresentationDuration="PT0H12M14.000S"
+		maxSegmentDuration="PT0H0M4.000S"
+		profiles="urn:mpeg:dash:profile:isoff-live:2011,http://dashif.org/guidelines/dash264">
     <Period duration="PT0H12M14.000S">
         <AdaptationSet segmentAlignment="true" group="1" maxWidth="3840" maxHeight="2160" maxFrameRate="24" par="16:9" lang="und">
             <Role schemeIdUri="urn:mpeg:dash:role:2011" value="main" />

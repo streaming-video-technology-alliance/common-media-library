@@ -13,48 +13,67 @@ import type {
 	Presentation,
 	Segment,
 	SelectionSet,
-	TextTrack,
 	Track,
 	VideoTrack,
 } from '../../types/model';
 import { parseDurationMpd } from '../../../utils/utils.js';
 
-function getTimescale(track: Track): string {
+/**
+ * This function tries to recreate the timescale value.
+ *
+ * This value is not stored on the ham object, so it is not possible (for now)
+ * to get the original one.
+ *
+ * Just the audio tracks have this value stored on the `sampleRate` key.
+ *
+ * Using 90000 as default for video since it is divisible by 24, 25 and 30
+ *
+ * Using 1000 as default for text
+ *
+ * @param track Track to get the timescale from
+ * @returns Timescale in numbers
+ */
+function getTimescale(track: Track): number {
 	if (track.type === 'audio') {
 		const audioTrack = track as AudioTrack;
-		return audioTrack.sampleRate.toString();
+		return audioTrack.sampleRate;
 	}
 	if (track.type === 'video') {
-		// Fixme: Sometimes this is correct, sometimes this is wrong
-		const videoTrack = track as VideoTrack;
-		return Math.round(videoTrack.duration / 10).toString();
+		return 90000;
 	}
 	if (track.type === 'text') {
-		// TODO: Most likely wrong
-		const textTrack = track as TextTrack;
-		return Math.round(textTrack.duration / 10).toString();
+		return 1000;
 	}
-	return '24';
+	return 90000;
 }
 
-// TODO: This only maps to SegmentBase, it may need to handle all Segment types
-function baseSegmentToSegment(hamSegments: Segment[]): SegmentBase[] {
+function trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = [];
-	hamSegments.forEach((segment) => {
+	track.segments.forEach((segment: Segment) => {
+		let newSegment: SegmentBase | undefined;
 		if (segment.byteRange) {
-			segments.push({
+			const initRange: number = +segment.byteRange.split('-')[0] - 1;
+			newSegment = {
 				$: {
 					indexRange: segment.byteRange,
 				},
-				Initialization: [{ $: { range: segment.byteRange } }],
-			} as SegmentBase);
+				Initialization: [{ $: { range: `0-${initRange}` } }],
+			} as SegmentBase;
+		}
+		if (newSegment && track.type === 'audio') {
+			// All segments should have timescale, but for now, just the audio ones store this value
+			const audioTrack = track as AudioTrack;
+			newSegment.$.timescale = audioTrack.sampleRate.toString() ?? '';
+		}
+		if (newSegment) {
+			segments.push(newSegment);
 		}
 	});
 
 	return segments;
 }
 
-function SegmentToSegmentList(track: Track): SegmentList[] {
+function trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];
 	const segmentURLs: SegmentURL[] = [];
 	track.segments.forEach((segment, index) => {
@@ -68,10 +87,14 @@ function SegmentToSegmentList(track: Track): SegmentList[] {
 	});
 
 	if (!track.segments.at(0)?.byteRange) {
+		const timescale = getTimescale(track);
 		segmentList.push({
 			$: {
-				duration: track.duration.toString(),
-				timescale: getTimescale(track),
+				duration: (
+					(track.duration * timescale) /
+					segmentURLs.length
+				).toString(),
+				timescale: timescale.toString(),
 			},
 			Initialization: [{ $: { sourceURL: track.segments.at(0)?.url } }],
 			SegmentURL: segmentURLs,
@@ -80,16 +103,19 @@ function SegmentToSegmentList(track: Track): SegmentList[] {
 	return segmentList;
 }
 
-function trackToRepresentation(tracks: Track[]): Representation[] {
+function tracksToRepresentation(tracks: Track[]): Representation[] {
 	return tracks.map((track) => {
 		const representation: Representation = {
 			$: {
 				id: track.id,
 				bandwidth: track.bandwidth.toString(),
 			},
-			SegmentBase: baseSegmentToSegment(track.segments),
-			SegmentList: SegmentToSegmentList(track),
+			SegmentBase: trackToSegmentBase(track),
+			SegmentList: trackToSegmentList(track),
 		} as Representation;
+		if (track.name) {
+			representation.$.mimeType = track.name;
+		}
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack;
 			representation.$ = {
@@ -97,25 +123,37 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 				width: videoTrack.width.toString(),
 				height: videoTrack.height.toString(),
 				codecs: videoTrack.codec,
-				scanType: videoTrack.scanType,
 			};
+			if (videoTrack.scanType) {
+				representation.$.scanType = videoTrack.scanType;
+			}
 		}
 		if (track.type === 'audio') {
 			const audioTrack = track as AudioTrack;
+			representation.$ = {
+				...representation.$,
+				audioSamplingRate: audioTrack.sampleRate.toString(),
+				codecs: audioTrack.codec,
+			};
 			representation.AudioChannelConfiguration = [
 				{
 					$: {
-						schemeIdUri: '',
-						value: audioTrack.sampleRate.toString() ?? '',
+						schemeIdUri:
+							'urn:mpeg:dash:23003:3:audio_channel_configuration:2011', // hardcoded value
+						value: audioTrack.channels.toString() ?? '',
 					},
 				} as AudioChannelConfiguration,
 			];
+		}
+		if (track.segments[0].byteRange) {
+			// Only BaseSegments have byteRange on segments, and BaseURL on the representation
+			representation.BaseURL = [track.segments[0].url];
 		}
 		return representation;
 	});
 }
 
-function selectionToAdaptationSet(
+function selectionSetsToAdaptationSet(
 	selectionsSets: SelectionSet[],
 ): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
@@ -130,17 +168,16 @@ function selectionToAdaptationSet(
 					lang: switchingSet.tracks[0].language,
 					codecs: switchingSet.tracks[0].codec,
 				},
-				Representation: trackToRepresentation(switchingSet.tracks),
+				Representation: tracksToRepresentation(switchingSet.tracks),
 			} as AdaptationSet;
 		});
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
-	const periods = hamManifests.map((presentation) => {
+function presentationsToPeriods(presentations: Presentation[]): Period[] {
+	return presentations.map((presentation: Presentation) => {
 		return {
 			$: {
-				// FIXME: this value is wrong
 				duration: parseDurationMpd(
 					presentation.selectionSets[0].switchingSets[0].tracks[0]
 						.duration,
@@ -148,13 +185,21 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 				id: presentation.id,
 				start: 'PT0S',
 			},
-			AdaptationSet: selectionToAdaptationSet(presentation.selectionSets),
+			AdaptationSet: selectionSetsToAdaptationSet(
+				presentation.selectionSets,
+			),
 		} as Period;
 	});
+}
+
+function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+	const periods: Period[] = presentationsToPeriods(hamManifests);
+	const duration: string = periods[0].$.duration;
 
 	return {
 		MPD: {
 			$: {
+				mediaPresentationDuration: duration,
 				type: 'static',
 			},
 			Period: periods,

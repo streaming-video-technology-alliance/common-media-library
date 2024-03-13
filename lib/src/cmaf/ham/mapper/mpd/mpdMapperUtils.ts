@@ -4,6 +4,7 @@ import type {
 	Representation,
 	SegmentTemplate,
 } from '../../types';
+import { Segment } from '../../types/model';
 
 function getChannels(
 	adaptationSet: AdaptationSet,
@@ -65,14 +66,23 @@ function getContentType(
 	return 'text';
 }
 
-function getDuration(representation: Representation): number {
-	const duration: number = +(
-		representation.SegmentList?.at(0)?.$.duration ??
-		representation.SegmentTemplate?.at(0)?.$.duration ??
-		0
-	);
-	console.error(`Representation ${representation.$.id} has no duration`);
-	return duration;
+/**
+ * Calculates the duration of a segment
+ *
+ * segmentDuration = duration / timescale
+ *
+ * @param duration
+ * @param timescale
+ * @returns Segment duration
+ */
+function calculateDuration(
+	duration: string | undefined,
+	timescale: string | undefined,
+): number {
+	if (!duration || !timescale) {
+		return 1;
+	}
+	return +(duration ?? 1) / +(timescale ?? 1);
 }
 
 function getFrameRate(
@@ -112,15 +122,28 @@ function getName(
 	return adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type;
 }
 
+/**
+ * Calculates the number of segments that a track has to use SegmentTemplate.
+ *
+ * Equation used:
+ * segments = total duration / (segment duration / timescale)
+ * **This equation might be wrong, please double-check it**
+ *
+ * @param segmentTemplate
+ * @param duration
+ * @returns Number of segments
+ */
 function getNumberOfSegments(
 	segmentTemplate: SegmentTemplate,
 	duration: number,
 ): number {
-	// TODO: Double check the number of segments, this equation may be wrong
-	// segments = total duration / (segment duration * timescale)
+	// FIXME: This equation may be wrong
 	return Math.round(
-		(duration * +(segmentTemplate.$.timescale ?? 1)) /
-			+(segmentTemplate.$.duration ?? 1),
+		duration /
+			calculateDuration(
+				segmentTemplate.$.duration,
+				segmentTemplate.$.timescale,
+			),
 	);
 }
 
@@ -156,6 +179,23 @@ function getSar(
 	return sar;
 }
 
+/**
+ * Get the duration from a track.
+ *
+ * This is calculated using the sum of the duration of all the segments from the
+ * track.
+ *
+ * An alternative to this could be number of segments * duration of a segment.
+ *
+ * @param segments
+ * @returns Duration of the track
+ */
+function getTrackDuration(segments: Segment[]): number {
+	return segments.reduce((acc: number, segment: Segment) => {
+		return acc + segment.duration;
+	}, 0);
+}
+
 function getUrlFromTemplate(
 	representation: Representation,
 	segmentTemplate: SegmentTemplate,
@@ -163,7 +203,6 @@ function getUrlFromTemplate(
 ): string {
 	const regexTemplate = /\$(.*?)\$/g;
 	return segmentTemplate.$.media.replace(regexTemplate, (match: any) => {
-		// TODO: This may have a better way to do it for all the cases
 		if (match === '$RepresentationID$') {
 			return representation.$.id;
 		}
@@ -178,10 +217,10 @@ function getUrlFromTemplate(
 }
 
 export {
+	calculateDuration,
 	getChannels,
 	getCodec,
 	getContentType,
-	getDuration,
 	getFrameRate,
 	getGroup,
 	getLanguage,
@@ -190,5 +229,6 @@ export {
 	getPresentationId,
 	getSampleRate,
 	getSar,
+	getTrackDuration,
 	getUrlFromTemplate,
 };

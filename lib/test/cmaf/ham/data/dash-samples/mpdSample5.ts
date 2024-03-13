@@ -1,5 +1,12 @@
 export const mpdSample5 = `<?xml version="1.0" encoding="UTF-8"?>
-<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:cenc="urn:mpeg:cenc:2013" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" type="static" minBufferTime="PT10S" profiles="urn:mpeg:dash:profile:isoff-main:2011" mediaPresentationDuration="PT50S">
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="urn:mpeg:dash:schema:mpd:2011"
+    xmlns:cenc="urn:mpeg:cenc:2013"
+    xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+    type="static"
+    minBufferTime="PT10S"
+    profiles="urn:mpeg:dash:profile:isoff-main:2011"
+    mediaPresentationDuration="PT50S">
   <Period start="PT0S" duration="PT50S" id="1">
     <AdaptationSet mimeType="video/mp4" frameRate="30/1" segmentAlignment="true" subsegmentAlignment="true" startWithSAP="1" subsegmentStartsWithSAP="1" bitstreamSwitching="false">
       <Representation id="1" width="1920" height="1080" bandwidth="2000000" codecs="avc1.640028">

@@ -17,10 +17,10 @@ import type {
 } from '../../types/model';
 import { iso8601DurationToNumber } from '../../../utils/utils.js';
 import {
+	calculateDuration,
 	getChannels,
 	getCodec,
 	getContentType,
-	getDuration,
 	getFrameRate,
 	getGroup,
 	getLanguage,
@@ -29,13 +29,13 @@ import {
 	getPresentationId,
 	getSampleRate,
 	getSar,
+	getTrackDuration,
 	getUrlFromTemplate,
 } from './mpdMapperUtils.js';
 
 function mapTracks(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
-	duration: number,
 	segments: Segment[],
 ): AudioTrack | VideoTrack | TextTrack {
 	if (!adaptationSet) {
@@ -47,7 +47,7 @@ function mapTracks(
 			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
-			duration: getDuration(representation) || duration,
+			duration: getTrackDuration(segments),
 			frameRate: getFrameRate(adaptationSet, representation),
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
@@ -65,7 +65,7 @@ function mapTracks(
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
-			duration: getDuration(representation) || duration,
+			duration: getTrackDuration(segments),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
 			sampleRate: getSampleRate(adaptationSet, representation),
@@ -78,7 +78,7 @@ function mapTracks(
 			name: type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
-			duration,
+			duration: getTrackDuration(segments),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
 			segments,
@@ -95,7 +95,7 @@ function mapSegments(
 	if (representation.SegmentBase) {
 		return representation.SegmentBase.map((segment) => {
 			return {
-				duration,
+				duration: duration,
 				url: representation.BaseURL![0] ?? '',
 				byteRange: segment.$.indexRange,
 			} as Segment;
@@ -104,14 +104,17 @@ function mapSegments(
 		const segments: Segment[] = [];
 		representation.SegmentList.map((segment) => {
 			segments.push({
-				duration: +(segment.$.duration ?? 0),
+				duration: 0, // TODO: Check if it is correct that the init segment has duration 0
 				url: segment.Initialization[0].$.sourceURL ?? '',
 				byteRange: '', // TODO: Complete this value
 			} as Segment);
 			if (segment.SegmentURL) {
 				return segment.SegmentURL.forEach((segmentURL) => {
 					segments.push({
-						duration: +(segment.$.duration ?? 0),
+						duration: calculateDuration(
+							segment.$.duration,
+							segment.$.timescale,
+						),
 						url: segmentURL.$.media ?? '',
 						byteRange: '', // TODO: Complete this value
 					} as Segment);
@@ -125,7 +128,10 @@ function mapSegments(
 		const segments: Segment[] = [];
 		for (let id = init; id < numberOfSegments + init; id++) {
 			segments.push({
-				duration: +(segmentTemplate.$.duration ?? 0),
+				duration: calculateDuration(
+					segmentTemplate.$.duration,
+					segmentTemplate.$.timescale,
+				),
 				url: getUrlFromTemplate(representation, segmentTemplate, id),
 				byteRange: '', // TODO: Complete this value
 			} as Segment);
@@ -156,12 +162,7 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 						segmentTemplate,
 					);
 
-					return mapTracks(
-						representation,
-						adaptationSet,
-						duration,
-						segments,
-					);
+					return mapTracks(representation, adaptationSet, segments);
 				},
 			);
 
