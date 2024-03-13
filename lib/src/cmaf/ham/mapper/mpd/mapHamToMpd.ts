@@ -12,7 +12,6 @@ import type {
 	AudioTrack,
 	Presentation,
 	SelectionSet,
-	TextTrack,
 	Track,
 	VideoTrack,
 } from '../../types/model';
@@ -26,27 +25,25 @@ import { parseDurationMpd } from '../../../utils/utils.js';
  *
  * Just the audio tracks have this value stored on the `sampleRate` key.
  *
- * **The value returned by this function is most likely wrong**
+ * Using 90000 as default for video since it is divisible by 24, 25 and 30
+ *
+ * Using 1000 as default for text
  *
  * @param track Track to get the timescale from
- * @returns string
+ * @returns Timescale in numbers
  */
-function getTimescale(track: Track): string {
+function getTimescale(track: Track): number {
 	if (track.type === 'audio') {
 		const audioTrack = track as AudioTrack;
-		return audioTrack.sampleRate.toString();
+		return audioTrack.sampleRate;
 	}
 	if (track.type === 'video') {
-		// Fixme: Sometimes this is correct, sometimes this is wrong
-		const videoTrack = track as VideoTrack;
-		return Math.round(videoTrack.duration / 10).toString();
+		return 90000;
 	}
 	if (track.type === 'text') {
-		// TODO: Most likely wrong
-		const textTrack = track as TextTrack;
-		return Math.round(textTrack.duration / 10).toString();
+		return 1000;
 	}
-	return '24';
+	return 90000;
 }
 
 function baseSegmentToSegment(track: Track): SegmentBase[] {
@@ -89,10 +86,14 @@ function segmentToSegmentList(track: Track): SegmentList[] {
 	});
 
 	if (!track.segments.at(0)?.byteRange) {
+		const timescale = getTimescale(track);
 		segmentList.push({
 			$: {
-				duration: track.duration.toString(),
-				timescale: getTimescale(track),
+				duration: (
+					(track.duration * timescale) /
+					segmentURLs.length
+				).toString(),
+				timescale: timescale.toString(),
 			},
 			Initialization: [{ $: { sourceURL: track.segments.at(0)?.url } }],
 			SegmentURL: segmentURLs,
@@ -111,6 +112,9 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 			SegmentBase: baseSegmentToSegment(track),
 			SegmentList: segmentToSegmentList(track),
 		} as Representation;
+		if (track.name) {
+			representation.$.mimeType = track.name;
+		}
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack;
 			representation.$ = {
@@ -118,8 +122,10 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 				width: videoTrack.width.toString(),
 				height: videoTrack.height.toString(),
 				codecs: videoTrack.codec,
-				scanType: videoTrack.scanType,
 			};
+			if (videoTrack.scanType) {
+				representation.$.scanType = videoTrack.scanType;
+			}
 		}
 		if (track.type === 'audio') {
 			const audioTrack = track as AudioTrack;
@@ -131,7 +137,8 @@ function trackToRepresentation(tracks: Track[]): Representation[] {
 			representation.AudioChannelConfiguration = [
 				{
 					$: {
-						schemeIdUri: '',
+						schemeIdUri:
+							'urn:mpeg:dash:23003:3:audio_channel_configuration:2011', // hardcoded value
 						value: audioTrack.channels.toString() ?? '',
 					},
 				} as AudioChannelConfiguration,
