@@ -16,7 +16,7 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import { parseDurationMpd } from '../../../utils/utils.js';
+import { numberToIso8601Duration } from '../../../utils/utils.js';
 
 /**
  * This function tries to recreate the timescale value.
@@ -178,7 +178,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	return presentations.map((presentation: Presentation) => {
 		return {
 			$: {
-				duration: parseDurationMpd(
+				duration: numberToIso8601Duration(
 					presentation.selectionSets[0].switchingSets[0].tracks[0]
 						.duration,
 				),

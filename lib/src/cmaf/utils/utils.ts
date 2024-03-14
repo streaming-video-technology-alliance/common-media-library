@@ -16,7 +16,7 @@ function iso8601DurationToNumber(isoDuration: string): number {
 	return duration;
 }
 
-function parseDurationMpd(duration: number): string {
+function numberToIso8601Duration(duration: number): string {
 	const hours = Math.floor(duration / 3600);
 	const minutes = Math.floor((duration % 3600) / 60);
 	const seconds = duration % 60;
@@ -28,4 +28,4 @@ function parseDurationMpd(duration: number): string {
 	return `PT${seconds}S`;
 }
 
-export { iso8601DurationToNumber, parseDurationMpd };
+export { iso8601DurationToNumber, numberToIso8601Duration };
