@@ -7,12 +7,12 @@ import {
 	getGroup,
 	getLanguage,
 	getName,
-	// getNumberOfSegments,
+	getNumberOfSegments,
 	getPresentationId,
-	// getSampleRate,
-	// getSar,
-	// getTrackDuration,
-	// getUrlFromTemplate,
+	getSampleRate,
+	getSar,
+	getTrackDuration,
+	getUrlFromTemplate,
 } from '../ham/mapper/mpd/utilsMpdToHam.js';
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
@@ -20,7 +20,7 @@ import {
 	AdaptationSet,
 	Period,
 	Representation,
-	// SegmentTemplate,
+	SegmentTemplate,
 } from '../ham/types';
 
 describe('calculateDuration', () => {
@@ -309,13 +309,16 @@ describe('getName', () => {
 	});
 });
 
-// describe('getNumberOfSegments', () => {
-// 	it('getNumberOfSegments', () => {
-// 		const res = getNumberOfSegments({} as SegmentTemplate, 0);
-// 		equal(res, 5);
-// 	});
-// });
-//
+describe('getNumberOfSegments', () => {
+	it('getNumberOfSegments', () => {
+		const res = getNumberOfSegments(
+			{ $: { duration: '100', timescale: '10' } } as SegmentTemplate,
+			50,
+		);
+		equal(res, 5);
+	});
+});
+
 describe('getPresentationId', () => {
 	it('returns period id if it exists', () => {
 		const res = getPresentationId({ $: { id: 'periodId' } } as Period, 5);
@@ -328,34 +331,111 @@ describe('getPresentationId', () => {
 	});
 });
 
-// describe('getSampleRate', () => {
-// 	it('getSampleRate', () => {
-// 		const res = getSampleRate({} as AdaptationSet, {} as Representation);
-// 		equal(res, 5);
-// 	});
-// });
-//
-// describe('getSar', () => {
-// 	it('getSar', () => {
-// 		const res = getSar({} as AdaptationSet, {} as Representation);
-// 		equal(res, 5);
-// 	});
-// });
-//
-// describe('getTrackDuration', () => {
-// 	it('getTrackDuration', () => {
-// 		const res = getTrackDuration([]);
-// 		equal(res, 5);
-// 	});
-// });
-//
-// describe('getUrlFromTemplate', () => {
-// 	it('getUrlFromTemplate', () => {
-// 		const res = getUrlFromTemplate(
-// 			{} as Representation,
-// 			{} as SegmentTemplate,
-// 			0,
-// 		);
-// 		equal(res, 5);
-// 	});
-// });
+describe('getSampleRate', () => {
+	it('returns audioSamplingRate from representation if it exists', () => {
+		const res = getSampleRate(
+			{ $: { audioSamplingRate: '48000' } } as AdaptationSet,
+			{ $: { audioSamplingRate: '41000' } } as Representation,
+		);
+		equal(res, 41000);
+	});
+
+	it('returns audioSamplingRate from adaptationSet if it exists and representation does not have audioSamplingRate', () => {
+		const res = getSampleRate(
+			{ $: { audioSamplingRate: '48000' } } as AdaptationSet,
+			{ $: {} } as Representation,
+		);
+		equal(res, 48000);
+	});
+
+	it('returns 0 if there is no audioSamplingRate', () => {
+		const res = getSampleRate(
+			{ $: {} } as AdaptationSet,
+			{ $: {} } as Representation,
+		);
+		equal(res, 0);
+	});
+});
+
+describe('getSar', () => {
+	it('returns sar from representation if it exists', () => {
+		const res = getSar(
+			{ $: { sar: '1:1' } } as AdaptationSet,
+			{ $: { sar: '2:2' } } as Representation,
+		);
+		equal(res, '2:2');
+	});
+
+	it('returns sar from adaptationSet if it exists and representation does not have sar', () => {
+		const res = getSar(
+			{ $: { sar: '1:1' } } as AdaptationSet,
+			{ $: {} } as Representation,
+		);
+		equal(res, '1:1');
+	});
+
+	it('returns empty string if there is no sar', () => {
+		const res = getSar(
+			{ $: {} } as AdaptationSet,
+			{ $: {} } as Representation,
+		);
+		equal(res, '');
+	});
+});
+
+describe('getTrackDuration', () => {
+	it('returns the summation of the durations of an array of segments', () => {
+		const res = getTrackDuration([
+			{ duration: 1, url: '', byteRange: '' },
+			{ duration: 2, url: '', byteRange: '' },
+			{ duration: 3, url: '', byteRange: '' },
+		]);
+		equal(res, 6);
+	});
+
+	it('returns the summation of the bigger durations of an array of segments', () => {
+		const res = getTrackDuration([
+			{ duration: 4, url: '', byteRange: '' },
+			{ duration: 5, url: '', byteRange: '' },
+			{ duration: 6, url: '', byteRange: '' },
+		]);
+		equal(res, 15);
+	});
+});
+
+describe('getUrlFromTemplate', () => {
+	it('replaces RepresentationID', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{
+				$: { media: 'representation: $RepresentationID$' },
+			} as SegmentTemplate,
+			3,
+		);
+		equal(res, 'representation: repId');
+	});
+
+	it('replaces Number', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{
+				$: {
+					media: 'representation: $RepresentationID$ and number: $Number_one$',
+				},
+			} as SegmentTemplate,
+			3,
+		);
+		equal(res, 'representation: repId and number: 3');
+	});
+
+	it('replaces both RepresentationID and Number', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{
+				$: { media: 'number: $Number_one$' },
+			} as SegmentTemplate,
+			3,
+		);
+		equal(res, 'number: 3');
+	});
+});

@@ -31,7 +31,7 @@ import {
 	getSar,
 	getTrackDuration,
 	getUrlFromTemplate,
-} from './mpdMapperUtils.js';
+} from './utilsMpdToHam.js';
 
 function mapTracks(
 	representation: Representation,
