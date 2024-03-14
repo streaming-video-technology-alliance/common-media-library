@@ -145,7 +145,7 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 				} as AudioChannelConfiguration,
 			];
 		}
-		if (track.segments[0].byteRange) {
+		if (track.segments[0]?.byteRange) {
 			// Only BaseSegments have byteRange on segments, and BaseURL on the representation
 			representation.BaseURL = [track.segments[0].url];
 		}

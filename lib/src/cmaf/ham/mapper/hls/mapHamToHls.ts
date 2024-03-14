@@ -59,7 +59,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 		})
 		.join(newline);
 	const videoByteRange = videoTrack.byteRange
-		? `#EXT-X-BYTERANGE:${videoTrack.byteRange}${newline}`
+		? `#EXT-X-BYTERANGE:${videoTrack.byteRange.replace('-', '@')}${newline}`
 		: '';
 	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}${newline}#EXT-X-ENDLIST`;
 
@@ -80,7 +80,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 		})
 		.join(newline);
 	const videoByteRange = audioTrack.byteRange
-		? `#EXT-X-BYTERANGE:${audioTrack.byteRange}${newline}`
+		? `#EXT-X-BYTERANGE:${audioTrack.byteRange.replace('-', '@')}${newline}`
 		: '';
 	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${audioTrack.urlInitialization}",${videoByteRange}"${newline}${playlist}${newline}#EXT-X-ENDLIST`;
 
