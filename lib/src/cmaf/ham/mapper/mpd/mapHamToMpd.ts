@@ -113,9 +113,7 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 			SegmentBase: trackToSegmentBase(track),
 			SegmentList: trackToSegmentList(track),
 		} as Representation;
-		if (track.name) {
-			representation.$.mimeType = track.name;
-		}
+		representation.$.mimeType = `${track.type}mp4`;
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack;
 			representation.$ = {
@@ -163,7 +161,7 @@ function selectionSetsToAdaptationSet(
 					id: switchingSet.id,
 					group: selectionSet.id,
 					contentType: switchingSet.tracks[0].type,
-					mimeType: switchingSet.tracks[0].name,
+					mimeType: `${switchingSet.tracks[0].type}mp4`,
 					frameRate: (switchingSet.tracks[0] as VideoTrack).frameRate,
 					lang: switchingSet.tracks[0].language,
 					codecs: switchingSet.tracks[0].codec,

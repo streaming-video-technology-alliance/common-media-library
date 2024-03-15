@@ -48,7 +48,10 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 	const newline = `\n`;
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
+	const trackFileName = videoTrack.fileName
+		? videoTrack.fileName
+		: `${videoTrack.id}.m3u8`;
+	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${trackFileName}${newline}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
 			const byteRange =
@@ -65,7 +68,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 		? `#EXT-X-BYTERANGE:${videoTrack.byteRange.replace('-', '@')}${newline}`
 		: '';
 
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization?.replaceAll(' ','%20')}",${videoByteRange}${newline}${playlist}${newline}#EXT-X-ENDLIST`;
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization?.replaceAll(' ', '%20')}",${videoByteRange}${newline}${playlist}${newline}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
@@ -73,7 +76,10 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const newline = `\n`;
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}"${newline}`;
+	const trackFileName = audioTrack.fileName
+		? audioTrack.fileName
+		: `${audioTrack.id}.m3u8`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",fileName="${audioTrack.id}",URI="${trackFileName}"${newline}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
 			const byteRange =
@@ -89,7 +95,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const videoByteRange = audioTrack.byteRange
 		? `#EXT-X-BYTERANGE:${audioTrack.byteRange.replace('-', '@')}${newline}`
 		: '';
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(' ','%20')}",${videoByteRange}"${newline}${playlist}${newline}#EXT-X-ENDLIST`;
+	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(' ', '%20')}",${videoByteRange}"${newline}${playlist}${newline}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
@@ -97,7 +103,10 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 function _generateTextManifestPiece(textTrack: TextTrack) {
 	const newline = `\n`;
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name}${newline}`;
+	const trackFileName = textTrack.fileName
+		? textTrack.fileName
+		: `${textTrack.id}.m3u8`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},fileName=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}${newline}`;
 	let playlist = textTrack.segments
 		.map((segment) => {
 			return `#EXTINF:${segment.duration},\n${segment.url}`;
