@@ -1,13 +1,10 @@
 import fs from 'fs';
-import { mpdToHam , hamToMpd } from './mpdConverter.js';
+import { mpdToHam, hamToMpd } from './mpdConverter.js';
 import { hamToM3U8 } from './m3u8Converter.js';
 
 //import samples from manifest-samples/dash-samples
 
-const dash1 = fs.readFileSync(
-	'./manifest-sample-1.mpd',
-	'utf8',
-);
+const dash1 = fs.readFileSync('./manifest-sample-4.mpd', 'utf8');
 const ham = mpdToHam(dash1);
 fs.writeFileSync('ham.json', JSON.stringify(ham));
 const dash = hamToMpd(ham);
