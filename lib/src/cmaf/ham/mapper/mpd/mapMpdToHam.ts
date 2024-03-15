@@ -142,6 +142,32 @@ function mapSegments(
 	}
 }
 
+function getInitializationUrl(
+	representation: Representation,
+	adaptationSet: AdaptationSet,
+) {
+	let initializationUrl: string | undefined;
+	if (representation.SegmentBase) {
+		initializationUrl =
+			representation.SegmentBase[0].Initialization[0].$.sourceURL;
+	} else if (representation.SegmentList) {
+		initializationUrl =
+			representation.SegmentList[0].Initialization[0].$.sourceURL;
+	}
+	if (adaptationSet.SegmentTemplate || representation.SegmentTemplate) {
+		initializationUrl =
+			adaptationSet.SegmentTemplate?.at(0)?.$.initialization ||
+			representation.SegmentTemplate?.at(0)?.$.initialization;
+		if (initializationUrl?.includes('$RepresentationID$')) {
+			initializationUrl = initializationUrl.replace(
+				'$RepresentationID$',
+				representation.$.id ?? '',
+			);
+		}
+	}
+	return initializationUrl;
+}
+
 function mapMpdToHam(mpd: DashManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
@@ -160,34 +186,11 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 						duration,
 						segmentTemplate,
 					);
-					let initializationUrl: string | undefined;
 
-					if (representation.SegmentBase) {
-						initializationUrl =
-							representation.SegmentBase[0].Initialization[0].$
-								.sourceURL;
-					}
-					if (representation.SegmentList) {
-						initializationUrl =
-							representation.SegmentList[0].Initialization[0].$
-								.sourceURL;
-					}
-					if (
-						adaptationSet.SegmentTemplate ||
-						representation.SegmentTemplate
-					) {
-						initializationUrl =
-							adaptationSet.SegmentTemplate?.at(0)?.$
-								.initialization ||
-							representation.SegmentTemplate?.at(0)?.$
-								.initialization;
-						if (initializationUrl?.includes('$RepresentationID$')) {
-							initializationUrl = initializationUrl.replace(
-								'$RepresentationID$',
-								representation.$.id ?? '',
-							);
-						}
-					}
+					const initializationUrl = getInitializationUrl(
+						representation,
+						adaptationSet,
+					);
 
 					return mapTracks(
 						representation,
