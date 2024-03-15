@@ -96,7 +96,7 @@ function trackToSegmentList(track: Track): SegmentList[] {
 				).toString(),
 				timescale: timescale.toString(),
 			},
-			Initialization: [{ $: { sourceURL: track.segments.at(0)?.url } }],
+			Initialization: [{ $: { sourceURL: track.urlInitialization } }],
 			SegmentURL: segmentURLs,
 		} as SegmentList);
 	}

@@ -4,13 +4,12 @@ import { hamToM3U8 } from './m3u8Converter.js';
 
 //import samples from manifest-samples/dash-samples
 
-const dash1 = fs.readFileSync('./manifest-sample-4.mpd', 'utf8');
+const dash1 = fs.readFileSync('./manifest-sample-2.mpd', 'utf8');
 const ham = mpdToHam(dash1);
 fs.writeFileSync('ham.json', JSON.stringify(ham));
 const dash = hamToMpd(ham);
 
 const m3u8 = hamToM3U8(ham);
-console.log(m3u8);
 fs.writeFileSync('main.m3u8', m3u8.manifest);
 fs.writeFileSync('main.mpd', dash.manifest);
 
