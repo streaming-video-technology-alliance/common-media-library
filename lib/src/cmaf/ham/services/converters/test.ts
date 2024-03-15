@@ -9,6 +9,7 @@ const dash1 = fs.readFileSync(
 	'utf8',
 );
 const ham = mpdToHam(dash1);
+fs.writeFileSync('ham.json', JSON.stringify(ham));
 const dash = hamToMpd(ham);
 
 const m3u8 = hamToM3U8(ham);

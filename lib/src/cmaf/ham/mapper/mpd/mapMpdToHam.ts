@@ -58,6 +58,7 @@ function mapTracks(
 			segments,
 			type,
 			width: +(representation.$.width ?? 0),
+			urlInitialization: segments[0].url,
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
@@ -71,6 +72,7 @@ function mapTracks(
 			sampleRate: getSampleRate(adaptationSet, representation),
 			segments,
 			type,
+			urlInitialization: segments[0].url,
 		} as AudioTrack;
 	} else {
 		// if (type === 'text')
@@ -83,6 +85,7 @@ function mapTracks(
 			language: getLanguage(adaptationSet),
 			segments,
 			type,
+			urlInitialization: segments[0].url,
 		} as TextTrack;
 	}
 }

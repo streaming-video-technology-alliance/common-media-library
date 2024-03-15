@@ -55,12 +55,16 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 				segment.byteRange != undefined && segment.byteRange != ''
 					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
 					: '';
-			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
+			const url = segment.url.includes(' ')
+				? segment.url.replaceAll(' ', '%20')
+				: segment.url;
+			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${url}`;
 		})
 		.join(newline);
 	const videoByteRange = videoTrack.byteRange
 		? `#EXT-X-BYTERANGE:${videoTrack.byteRange.replace('-', '@')}${newline}`
 		: '';
+
 	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}${newline}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
@@ -76,7 +80,11 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 				segment.byteRange != undefined && segment.byteRange != ''
 					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
 					: '';
-			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
+			//If there is a space in the uri, add %20 to the uri
+			const url = segment.url.includes(' ')
+				? segment.url.replaceAll(' ', '%20')
+				: segment.url;
+			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${url}`;
 		})
 		.join(newline);
 	const videoByteRange = audioTrack.byteRange
