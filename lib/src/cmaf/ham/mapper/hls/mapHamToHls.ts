@@ -80,7 +80,6 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 				segment.byteRange != undefined && segment.byteRange != ''
 					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
 					: '';
-			//If there is a space in the uri, add %20 to the uri
 			const url = segment.url.includes(' ')
 				? segment.url.replaceAll(' ', '%20')
 				: segment.url;
