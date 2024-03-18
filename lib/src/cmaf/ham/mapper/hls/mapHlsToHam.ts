@@ -43,7 +43,7 @@ function mapHlsToHam(manifest: Manifest) {
 		// TODO: retrieve channels, samplerate, bandwidth and codec
 		audioTracks.push({
 			id: audio,
-			type: 'AUDIO',
+			type: 'audio',
 			name: uri,
 			codec: '',
 			duration: targetDuration,
@@ -81,7 +81,7 @@ function mapHlsToHam(manifest: Manifest) {
 		const targetDuration = subtitleParsed?.targetDuration;
 		textTracks.push({
 			id: subtitle,
-			type: 'TEXT',
+			type: 'text',
 			name: uri,
 			codec: '',
 			duration: targetDuration,
@@ -124,7 +124,7 @@ function mapHlsToHam(manifest: Manifest) {
 		const uri = map?.uri;
 		tracks.push({
 			id: uuid(),
-			type: 'VIDEO',
+			type: 'video',
 			name: playlist.uri,
 			codec: CODECS,
 			duration: targetDuration,
