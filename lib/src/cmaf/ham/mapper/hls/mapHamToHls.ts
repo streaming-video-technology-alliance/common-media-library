@@ -107,7 +107,7 @@ function _generateTextManifestPiece(textTrack: TextTrack) {
 	const trackFileName = textTrack.fileName
 		? textTrack.fileName
 		: `${textTrack.id}.m3u8`;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}${NEW_LINE}`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language},URI= "${trackFileName}$"{NEW_LINE}`;
 	let playlist = textTrack.segments
 		.map((segment) => {
 			return `#EXTINF:${segment.duration},${NEW_LINE}${segment.url}`;
