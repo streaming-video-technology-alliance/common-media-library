@@ -87,7 +87,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	let playlist = audioTrack.segments
 		.map((segment) => {
 			const byteRange = segment.byteRange
-				? `#EXT-X-BYTERANGE:${segment.byteRange.replace('-', '@')}${NEW_LINE}`
+				? `#EXT-X-BYTERANGE:${segment.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}${NEW_LINE}`
 				: '';
 			const url = segment.url.replaceAll(
 				WHITE_SPACE,
