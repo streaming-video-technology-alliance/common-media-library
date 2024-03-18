@@ -83,7 +83,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	let playlist = audioTrack.segments
 		.map((segment) => {
 			const byteRange =
-				segment.byteRange != undefined && segment.byteRange != ''
+				segment.byteRange != undefined && !!segment.byteRange
 					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
 					: '';
 			const url = segment.url.includes(' ')
