@@ -5,10 +5,11 @@ import {
 	Presentation,
 	VideoTrack,
 } from '../../types/model';
-
-const WHITE_SPACE = ' ';
-const WHITE_SPACE_ENCODED = '%20';
-const NEW_LINE = '\n';
+import {
+	NEW_LINE,
+	WHITE_SPACE,
+	WHITE_SPACE_ENCODED,
+} from '../../../utils/constants.js';
 
 function mapHamToHls(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.
