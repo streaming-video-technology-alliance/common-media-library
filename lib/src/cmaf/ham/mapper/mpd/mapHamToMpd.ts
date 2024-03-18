@@ -161,7 +161,7 @@ function selectionSetsToAdaptationSet(
 					id: switchingSet.id,
 					group: selectionSet.id,
 					contentType: switchingSet.tracks[0].type,
-					mimeType: `${switchingSet.tracks[0].type}mp4`,
+					mimeType: `${switchingSet.tracks[0].type}/mp4`,
 					frameRate: (switchingSet.tracks[0] as VideoTrack).frameRate,
 					lang: switchingSet.tracks[0].language,
 					codecs: switchingSet.tracks[0].codec,
