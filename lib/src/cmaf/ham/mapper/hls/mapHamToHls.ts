@@ -57,10 +57,9 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${NEW_LINE}${trackFileName}${NEW_LINE}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
-			const byteRange =
-				segment.byteRange != undefined && segment.byteRange != ''
-					? `#EXT-X-BYTERANGE:${segment.byteRange}${NEW_LINE}`
-					: '';
+			const byteRange = segment.byteRange
+				? `#EXT-X-BYTERANGE:${segment.byteRange}${NEW_LINE}`
+				: '';
 			const url = segment.url.includes(WHITE_SPACE)
 				? segment.url.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)
 				: segment.url;
@@ -84,10 +83,9 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"${NEW_LINE}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
-			const byteRange =
-				segment.byteRange != undefined && !!segment.byteRange
-					? `#EXT-X-BYTERANGE:${segment.byteRange}${NEW_LINE}`
-					: '';
+			const byteRange = segment.byteRange
+				? `#EXT-X-BYTERANGE:${segment.byteRange}${NEW_LINE}`
+				: '';
 			const url = segment.url.includes(WHITE_SPACE)
 				? segment.url.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)
 				: segment.url;
