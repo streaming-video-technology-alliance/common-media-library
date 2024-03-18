@@ -53,9 +53,7 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 
 function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const trackFileName = videoTrack.fileName
-		? videoTrack.fileName
-		: `${videoTrack.id}.m3u8`;
+	const trackFileName = videoTrack.fileName ?? `${videoTrack.id}.m3u8`;
 	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${NEW_LINE}${trackFileName}${NEW_LINE}`;
 	let playlist = videoTrack.segments
 		.map((segment) => {
@@ -70,10 +68,11 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 			return `#EXTINF:${segment.duration},${NEW_LINE}${byteRange}${NEW_LINE}${url}`;
 		})
 		.join(NEW_LINE);
+	const firstSegmentByteRange = videoTrack.segments[0]?.byteRange;
 	const videoByteRange = videoTrack.byteRange
 		? `BYTERANGE:${videoTrack.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}${NEW_LINE}`
-		: videoTrack.segments[0].byteRange
-			? `BYTERANGE:0@${Number(videoTrack.segments[0].byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
+		: firstSegmentByteRange
+			? `BYTERANGE:0@${Number(firstSegmentByteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
 			: '';
 
 	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${videoTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${videoTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${videoByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
@@ -83,9 +82,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 
 function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const trackFileName = audioTrack.fileName
-		? audioTrack.fileName
-		: `${audioTrack.id}.m3u8`;
+	const trackFileName = audioTrack.fileName ?? `${audioTrack.id}.m3u8`;
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"${NEW_LINE}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
@@ -99,11 +96,13 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 			return `#EXTINF:${segment.duration},${NEW_LINE}${byteRange}${NEW_LINE}${url}`;
 		})
 		.join(NEW_LINE);
+	const firstSegmentByteRange = audioTrack.segments[0]?.byteRange;
 	const audioByteRange = audioTrack.byteRange
 		? `BYTERANGE:${audioTrack.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}${NEW_LINE}`
-		: audioTrack.segments[0].byteRange
-			? `BYTERANGE:0@${Number(audioTrack.segments[0].byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
+		: firstSegmentByteRange
+			? `BYTERANGE:0@${Number(firstSegmentByteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
 			: '';
+
 	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${audioTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${audioByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
@@ -111,9 +110,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 
 function _generateTextManifestPiece(textTrack: TextTrack) {
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const trackFileName = textTrack.fileName
-		? textTrack.fileName
-		: `${textTrack.id}.m3u8`;
+	const trackFileName = textTrack.fileName ?? `${textTrack.id}.m3u8`;
 	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language},URI= "${trackFileName}"${NEW_LINE}`;
 	let playlist = textTrack.segments
 		.map((segment) => {
