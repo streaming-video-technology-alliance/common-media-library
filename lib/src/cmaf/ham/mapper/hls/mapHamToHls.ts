@@ -81,7 +81,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	const trackFileName = audioTrack.fileName
 		? audioTrack.fileName
 		: `${audioTrack.id}.m3u8`;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",fileName="${audioTrack.id}",URI="${trackFileName}"${NEW_LINE}`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"${NEW_LINE}`;
 	let playlist = audioTrack.segments
 		.map((segment) => {
 			const byteRange =
@@ -107,7 +107,7 @@ function _generateTextManifestPiece(textTrack: TextTrack) {
 	const trackFileName = textTrack.fileName
 		? textTrack.fileName
 		: `${textTrack.id}.m3u8`;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},fileName=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}${NEW_LINE}`;
+	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}${NEW_LINE}`;
 	let playlist = textTrack.segments
 		.map((segment) => {
 			return `#EXTINF:${segment.duration},${NEW_LINE}${segment.url}`;
