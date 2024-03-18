@@ -113,7 +113,7 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 			SegmentBase: trackToSegmentBase(track),
 			SegmentList: trackToSegmentList(track),
 		} as Representation;
-		representation.$.mimeType = `${track.type}mp4`;
+		representation.$.mimeType = `${track.type}/mp4`; //Harcoded value
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack;
 			representation.$ = {
