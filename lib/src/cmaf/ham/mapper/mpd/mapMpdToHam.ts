@@ -148,8 +148,7 @@ function getInitializationUrl(
 ) {
 	let initializationUrl: string | undefined;
 	if (representation.SegmentBase) {
-		initializationUrl =
-			representation.SegmentBase[0].Initialization[0].$.sourceURL;
+		initializationUrl = representation.BaseURL![0] ?? '';
 	} else if (representation.SegmentList) {
 		initializationUrl =
 			representation.SegmentList[0].Initialization[0].$.sourceURL;

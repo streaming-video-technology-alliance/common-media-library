@@ -58,7 +58,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 	let playlist = videoTrack.segments
 		.map((segment) => {
 			const byteRange = segment.byteRange
-				? `#EXT-X-BYTERANGE:${segment.byteRange}${NEW_LINE}`
+				? `#EXT-X-BYTERANGE:${segment.byteRange.replace('-', '@')}${NEW_LINE}`
 				: '';
 			const url = segment.url.includes(WHITE_SPACE)
 				? segment.url.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)
@@ -67,8 +67,10 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 		})
 		.join(NEW_LINE);
 	const videoByteRange = videoTrack.byteRange
-		? `#EXT-X-BYTERANGE:${videoTrack.byteRange.replace('-', '@')}${NEW_LINE}`
-		: '';
+		? `BYTERANGE:${videoTrack.byteRange.replace('-', '@')}${NEW_LINE}`
+		: videoTrack.segments[0].byteRange
+			? `BYTERANGE:0@${Number(videoTrack.segments[0].byteRange.replace('-', '@').split('@')[0]) - 1}${NEW_LINE}`
+			: '';
 
 	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${videoTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${videoTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${videoByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
 
@@ -84,7 +86,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 	let playlist = audioTrack.segments
 		.map((segment) => {
 			const byteRange = segment.byteRange
-				? `#EXT-X-BYTERANGE:${segment.byteRange}${NEW_LINE}`
+				? `#EXT-X-BYTERANGE:${segment.byteRange.replace('-', '@')}${NEW_LINE}`
 				: '';
 			const url = segment.url.includes(WHITE_SPACE)
 				? segment.url.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)
@@ -92,10 +94,12 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 			return `#EXTINF:${segment.duration},${NEW_LINE}${byteRange}${NEW_LINE}${url}`;
 		})
 		.join(NEW_LINE);
-	const videoByteRange = audioTrack.byteRange
-		? `#EXT-X-BYTERANGE:${audioTrack.byteRange.replace('-', '@')}${NEW_LINE}`
-		: '';
-	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${audioTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(' ', '%20')}",${videoByteRange}"${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
+	const audioByteRange = audioTrack.byteRange
+		? `BYTERANGE:${audioTrack.byteRange.replace('-', '@')}${NEW_LINE}`
+		: audioTrack.segments[0].byteRange
+			? `BYTERANGE:0@${Number(audioTrack.segments[0].byteRange.replace('-', '@').split('@')[0]) - 1}${NEW_LINE}`
+			: '';
+	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${audioTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${audioByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
