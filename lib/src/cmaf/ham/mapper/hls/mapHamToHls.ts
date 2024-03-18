@@ -6,6 +6,9 @@ import {
 	VideoTrack,
 } from '../../types/model';
 
+const WHITE_SPACE = ' ';
+const WHITE_SPACE_ENCODED = '%20';
+
 function mapHamToHls(presentation: Presentation[]): Manifest {
 	const version = 0; //TODO : save version in the model.
 	const newline = `\n`;
@@ -58,8 +61,8 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 				segment.byteRange != undefined && segment.byteRange != ''
 					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
 					: '';
-			const url = segment.url.includes(' ')
-				? segment.url.replaceAll(' ', '%20')
+			const url = segment.url.includes(WHITE_SPACE)
+				? segment.url.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)
 				: segment.url;
 			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${url}`;
 		})
@@ -86,8 +89,8 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 				segment.byteRange != undefined && segment.byteRange != ''
 					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
 					: '';
-			const url = segment.url.includes(' ')
-				? segment.url.replaceAll(' ', '%20')
+			const url = segment.url.includes(WHITE_SPACE)
+				? segment.url.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)
 				: segment.url;
 			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${url}`;
 		})
