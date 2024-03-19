@@ -10,7 +10,7 @@ import {
 	VideoTrack,
 } from '../../ham/types/model';
 import { addMetadataToHLS } from '../manifestUtils.js';
-import { PlayList } from '../../ham/types/HlsManifest.js';
+import { PlayList } from '../../ham/types/mappers/HlsManifest.js';
 import { Manifest } from '../../ham/types/';
 
 function m3u8ToHam(manifest: Manifest) {

@@ -1,5 +1,5 @@
 import { Builder, parseString } from 'xml2js';
-import type { DashManifest } from '../ham/types/DashManifest.js';
+import type { DashManifest } from '../ham/types/mappers/DashManifest.js';
 
 function xmlToJson(raw: string): DashManifest | undefined {
 	let parsed: DashManifest | undefined;
