@@ -4,6 +4,16 @@ import { Ham } from './Ham';
 /**
  * CMAF-HAM Track type
  * Used as a base for the audio, video and text tracks
+ * @param id - The track id
+ * @param type - The track type (audio, video, text)
+ * @param name - The track name
+ * @param codec - The track codec
+ * @param duration - The track duration
+ * @param language - The track language
+ * @param bandwidth - The track bandwidth
+ * @param byteRange - The track byte range
+ * @param urlInitialization - The track initialization url
+ * @param segments - The track segments
  *
  * @group CMAF
  *
