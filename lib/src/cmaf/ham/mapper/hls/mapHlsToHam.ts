@@ -128,7 +128,7 @@ function mapHlsToHam(manifest: Manifest) {
 			name: playlist.uri,
 			codec: CODECS,
 			duration: targetDuration,
-			language: LANGUAGE,
+			language: LANGUAGE ?? 'und',
 			bandwidth: BANDWIDTH,
 			segments: segments,
 			width: resolution.width,

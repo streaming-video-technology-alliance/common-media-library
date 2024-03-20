@@ -1,39 +1,27 @@
 import { Manifest } from '../../types';
 import {
 	AudioTrack,
-	TextTrack,
 	Presentation,
+	Segment,
+	SelectionSet,
+	SwitchingSet,
+	TextTrack,
+	Track,
 	VideoTrack,
 } from '../../types/model';
 
-function mapHamToHls(presentation: Presentation[]): Manifest {
-	const version = 0; //TODO : save version in the model.
-	const newline = `\n`;
-	let mainManifest = `#EXTM3U${newline}#EXT-X-VERSION:${version}${newline}`;
+function mapHamToHls(presentations: Presentation[]): Manifest {
+	const version = 1; //TODO : save version in the model.
+	let mainManifest = `#EXTM3U\n#EXT-X-VERSION:${version}\n`;
 	const playlists: Manifest[] = [];
-	presentation.map((pres) => {
-		const selectionSets = pres.selectionSets;
-		selectionSets.map((selectionSet) => {
-			const switchingSets = selectionSet.switchingSets;
-			switchingSets.map((switchingSet) => {
-				const tracks = switchingSet.tracks;
-				tracks.map((track) => {
-					if (track.type.toLowerCase() === 'video') {
-						const { manifestToConcat, playlist } =
-							_generateVideoManifestPiece(track as VideoTrack);
-						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
-					} else if (track.type.toLowerCase() === 'audio') {
-						const { manifestToConcat, playlist } =
-							_generateAudioManifestPiece(track as AudioTrack);
-						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
-					} else if (track.type.toLowerCase() === 'text') {
-						const { manifestToConcat, playlist } =
-							_generateTextManifestPiece(track as TextTrack);
-						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
-					}
+	presentations.map((presentation: Presentation) => {
+		presentation.selectionSets.map((selectionSet: SelectionSet) => {
+			selectionSet.switchingSets.map((switchingSet: SwitchingSet) => {
+				switchingSet.tracks.map((track: Track) => {
+					const { manifestToConcat, playlist } =
+						generateManifestPlaylistPiece(track);
+					mainManifest += manifestToConcat;
+					playlists.push({ manifest: playlist, type: 'm3u8' });
 				});
 			});
 		});
@@ -45,58 +33,44 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 	};
 }
 
-function _generateVideoManifestPiece(videoTrack: VideoTrack) {
-	const newline = `\n`;
-	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${newline}${videoTrack.name}${newline}`;
-	let playlist = videoTrack.segments
-		.map((segment) => {
-			const byteRange =
-				segment.byteRange != undefined
-					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
-					: '';
-			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
+function getSegments(segments: Segment[]): string {
+	return segments
+		.map((segment: Segment): string => {
+			const byteRange: string = segment.byteRange
+				? `#EXT-X-BYTERANGE:${segment.byteRange}\n`
+				: '';
+			return `#EXTINF:${segment.duration},\n${byteRange}\n${segment.url}`;
 		})
-		.join(newline);
-	const videoByteRange = videoTrack.byteRange
-		? `#EXT-X-BYTERANGE:${videoTrack.byteRange}${newline}`
-		: '';
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${videoTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${videoByteRange}${newline}${playlist}#EXT-X-ENDLIST`;
-
-	return { manifestToConcat, playlist };
+		.join('\n');
 }
 
-function _generateAudioManifestPiece(audioTrack: AudioTrack) {
-	const newline = `\n`;
-	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}"${newline}`;
-	let playlist = audioTrack.segments
-		.map((segment) => {
-			const byteRange =
-				segment.byteRange != undefined
-					? `#EXT-X-BYTERANGE:${segment.byteRange}${newline}`
-					: '';
-			return `#EXTINF:${segment.duration},${newline}${byteRange}${newline}${segment.url}`;
-		})
-		.join(newline);
-	const videoByteRange = audioTrack.byteRange
-		? `#EXT-X-BYTERANGE:${audioTrack.byteRange}${newline}`
-		: '';
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${audioTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}#EXT-X-MAP:URI="${audioTrack.urlInitialization}",${videoByteRange}"${newline}${playlist}#EXT-X-ENDLIST`;
-
-	return { manifestToConcat, playlist };
+function getByterange(track: VideoTrack | AudioTrack): string {
+	return track.byteRange ? `#EXT-X-BYTERANGE:${track.byteRange}\n` : '';
 }
 
-function _generateTextManifestPiece(textTrack: TextTrack) {
-	const newline = `\n`;
+function generateManifestPlaylistPiece(track: Track): {
+	manifestToConcat: string;
+	playlist: string;
+} {
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name}${newline}`;
-	let playlist = textTrack.segments
-		.map((segment) => {
-			return `#EXTINF:${segment.duration},\n${segment.url}`;
-		})
-		.join(newline);
-	playlist = `#EXTM3U${newline}#EXT-X-TARGETDURATION:${textTrack.duration}${newline}#EXT-X-PLAYLIST-TYPE:VOD${newline}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${newline}${playlist}#EXT-X-ENDLIST`;
+
+	let manifestToConcat = '';
+	let playlist = `#EXTM3U\n#EXT-X-TARGETDURATION:${track.duration}\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n`;
+
+	if (track.type.toLowerCase() === 'video') {
+		const videoTrack = track as VideoTrack;
+		manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}\n${videoTrack.name}\n`;
+		playlist += `#EXT-X-MAP:URI="${videoTrack.urlInitialization}",${getByterange(videoTrack)}\n`;
+	} else if (track.type.toLowerCase() === 'audio') {
+		const audioTrack = track as AudioTrack;
+		manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${audioTrack.name}"\n`;
+		playlist += `#EXT-X-MAP:URI="${audioTrack.urlInitialization}",${getByterange(audioTrack)}\n`;
+	} else if (track.type.toLowerCase() === 'text') {
+		const textTrack = track as TextTrack;
+		manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${textTrack.name}\n`;
+	}
+
+	playlist += `${getSegments(track.segments)}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
