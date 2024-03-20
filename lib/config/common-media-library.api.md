@@ -474,7 +474,7 @@ export function roundToEven(value: number, precision: number): number;
 export type Segment = {
     duration: number;
     url: string;
-    byteRange: string;
+    byteRange?: string;
 };
 
 // @alpha
