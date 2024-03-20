@@ -79,7 +79,8 @@ function _audioGroupsToSwitchingSets(
 			map && map.byterange
 				? `${map.byterange.length}@${map.byterange.offset}`
 				: undefined;
-		// TODO: retrieve channels, samplerate, bandwidth and codec
+		// TODO: channels, sampleRate, bandwith and codec need to be
+		// updated with real values. Right now we are using simple hardcoded values.
 		audioTracks.push({
 			id: audio,
 			type: 'audio',
