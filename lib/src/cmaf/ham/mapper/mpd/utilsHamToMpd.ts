@@ -1,5 +1,8 @@
 import type { AudioTrack, Track } from '../../types/model';
 
+const VIDEO_SAMPLE_RATE = 90000;
+const TEXT_SAMPLE_RATE = 1000;
+
 /**
  * This function tries to recreate the timescale value.
  *
@@ -21,12 +24,12 @@ function getTimescale(track: Track): number {
 		return audioTrack.sampleRate;
 	}
 	if (track.type === 'video') {
-		return 90000;
+		return VIDEO_SAMPLE_RATE;
 	}
 	if (track.type === 'text') {
-		return 1000;
+		return TEXT_SAMPLE_RATE;
 	}
-	return 90000;
+	return VIDEO_SAMPLE_RATE;
 }
 
 export { getTimescale };
