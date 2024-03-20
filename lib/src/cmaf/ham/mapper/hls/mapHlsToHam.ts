@@ -18,22 +18,60 @@ function mapHlsToHam(manifest: Manifest) {
 	const playlists: PlayList[] = mainManifestParsed.playlists;
 	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
-	const audioSwitchingSets: SwitchingSet[] = [];
-	const selectionSets: SelectionSet[] = [];
 	const manifestPlaylists = manifest.ancillaryManifests
-		? manifest.ancillaryManifests
+		? [...manifest.ancillaryManifests]
 		: [];
-	let currentPlaylist = 0;
-	const audioCodec = 'mp4a.40.2';
+	const selectionSets: SelectionSet[] = [];
+
+	const audioSwitchingSets = _audioGroupsToSwitchingSets(
+		mediaGroupsAudio,
+		manifestPlaylists,
+	);
+	const subtitleSwitchingSets = _subtitleGroupsToSwitchingSets(
+		mediaGroupsSubtitles,
+		manifestPlaylists,
+	);
+	const videoSwitchingSets = _videoPlaylistsToSwitchingSets(
+		playlists,
+		manifestPlaylists,
+	);
+
+	if (audioSwitchingSets.length > 0) {
+		selectionSets.push({
+			id: uuid(),
+			switchingSets: audioSwitchingSets,
+		} as SelectionSet);
+	}
+
+	if (subtitleSwitchingSets.length > 0) {
+		selectionSets.push({
+			id: uuid(),
+			switchingSets: subtitleSwitchingSets,
+		} as SelectionSet);
+	}
+
+	if (videoSwitchingSets.length > 0) {
+		selectionSets.push({
+			id: uuid(),
+			switchingSets: videoSwitchingSets,
+		} as SelectionSet);
+	}
+
+	return [{ id: uuid(), selectionSets: selectionSets }];
+}
+
+function _audioGroupsToSwitchingSets(
+	mediaGroupsAudio: any,
+	manifestPlaylists: Manifest[],
+): SwitchingSet[] {
+	const audioSwitchingSets: SwitchingSet[] = [];
 
 	for (const audio in mediaGroupsAudio) {
 		const audioTracks: AudioTrack[] = [];
 		const attributes: any = mediaGroupsAudio[audio];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const audioParsed = parseM3u8(
-			manifestPlaylists[currentPlaylist++].manifest,
-		);
+		const audioParsed = parseM3u8(manifestPlaylists.shift()!.manifest);
 		const segments: Segment[] = _formatSegments(audioParsed?.segments);
 		const targetDuration = audioParsed?.targetDuration;
 		const map = audioParsed.segments[0]?.map;
@@ -46,7 +84,7 @@ function mapHlsToHam(manifest: Manifest) {
 			id: audio,
 			type: 'audio',
 			name: uri,
-			codec: audioCodec,
+			codec: 'mp4a.40.2',
 			duration: targetDuration * segments.length,
 			language: language,
 			bandwidth: 0,
@@ -62,22 +100,21 @@ function mapHlsToHam(manifest: Manifest) {
 		} as SwitchingSet);
 	}
 
-	selectionSets.push({
-		id: uuid(),
-		switchingSets: audioSwitchingSets,
-	} as SelectionSet);
+	return audioSwitchingSets;
+}
 
+function _subtitleGroupsToSwitchingSets(
+	mediaGroupsSubtitles: any,
+	manifestPlaylists: Manifest[],
+): SwitchingSet[] {
 	const subtitleSwitchingSets: SwitchingSet[] = [];
 
-	// Add selection set of type subtitles
 	for (const subtitle in mediaGroupsSubtitles) {
 		const attributes = mediaGroupsSubtitles[subtitle];
 		const textTracks: TextTrack[] = [];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const subtitleParsed = parseM3u8(
-			manifestPlaylists[currentPlaylist++].manifest,
-		);
+		const subtitleParsed = parseM3u8(manifestPlaylists.shift()!.manifest);
 		const segments: Segment[] = _formatSegments(subtitleParsed?.segments);
 		const targetDuration = subtitleParsed?.targetDuration;
 		textTracks.push({
@@ -96,19 +133,18 @@ function mapHlsToHam(manifest: Manifest) {
 		} as SwitchingSet);
 	}
 
-	if (subtitleSwitchingSets.length > 0) {
-		selectionSets.push({
-			id: uuid(),
-			switchingSets: subtitleSwitchingSets,
-		} as SelectionSet);
-	}
+	return subtitleSwitchingSets;
+}
 
-	//Add selection set of type video
+function _videoPlaylistsToSwitchingSets(
+	playlists: PlayList[],
+	manifestPlaylists: Manifest[],
+): SwitchingSet[] {
 	const switchingSetVideos: SwitchingSet[] = [];
 
 	playlists.map((playlist: any) => {
 		const parsedHlsManifest = parseM3u8(
-			manifestPlaylists[currentPlaylist++].manifest,
+			manifestPlaylists.shift()!.manifest,
 		);
 		const tracks: Track[] = [];
 		const segments: Segment[] = _formatSegments(
@@ -150,12 +186,7 @@ function mapHlsToHam(manifest: Manifest) {
 		} as SwitchingSet);
 	});
 
-	selectionSets.push({
-		id: uuid(),
-		switchingSets: switchingSetVideos,
-	} as SelectionSet);
-
-	return [{ id: uuid(), selectionSets: selectionSets }];
+	return switchingSetVideos;
 }
 
 function _formatSegments(segments: any[]) {
