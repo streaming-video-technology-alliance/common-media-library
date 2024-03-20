@@ -36,7 +36,7 @@ import { parseDurationMpd } from '../../../utils/utils.js';
 function getTimescale(track: Track): number {
 	if (track.type === 'audio') {
 		const audioTrack = track as AudioTrack;
-		return audioTrack.sampleRate;
+		return audioTrack.sampleRate !== 0 ? audioTrack.sampleRate : 48000;
 	}
 	if (track.type === 'video') {
 		return 90000;
@@ -76,14 +76,12 @@ function trackToSegmentBase(track: Track): SegmentBase[] {
 function trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];
 	const segmentURLs: SegmentURL[] = [];
-	track.segments.forEach((segment, index) => {
-		if (index > 0) {
-			segmentURLs.push({
-				$: {
-					media: segment.url,
-				},
-			});
-		}
+	track.segments.forEach((segment) => {
+		segmentURLs.push({
+			$: {
+				media: segment.url,
+			},
+		});
 	});
 
 	if (!track.segments.at(0)?.byteRange) {

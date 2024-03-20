@@ -24,6 +24,7 @@ function mapHlsToHam(manifest: Manifest) {
 		? manifest.ancillaryManifests
 		: [];
 	let currentPlaylist = 0;
+	const audioCodec = 'mp4a.40.2';
 
 	for (const audio in mediaGroupsAudio) {
 		const audioTracks: AudioTrack[] = [];
@@ -45,13 +46,13 @@ function mapHlsToHam(manifest: Manifest) {
 			id: audio,
 			type: 'audio',
 			name: uri,
-			codec: '',
-			duration: targetDuration,
+			codec: audioCodec,
+			duration: targetDuration * segments.length,
 			language: language,
 			bandwidth: 0,
 			segments: segments,
 			sampleRate: 0,
-			channels: 0,
+			channels: 2,
 			byteRange: byteRange,
 			urlInitialization: map?.uri,
 		} as AudioTrack);
@@ -84,7 +85,7 @@ function mapHlsToHam(manifest: Manifest) {
 			type: 'text',
 			name: uri,
 			codec: '',
-			duration: targetDuration,
+			duration: targetDuration * segments.length,
 			language: language,
 			bandwidth: 0,
 			segments: segments,
@@ -105,7 +106,7 @@ function mapHlsToHam(manifest: Manifest) {
 	//Add selection set of type video
 	const switchingSetVideos: SwitchingSet[] = [];
 
-	playlists.map(async (playlist: any) => {
+	playlists.map((playlist: any) => {
 		const parsedHlsManifest = parseM3u8(
 			manifestPlaylists[currentPlaylist++].manifest,
 		);
@@ -121,13 +122,13 @@ function mapHlsToHam(manifest: Manifest) {
 		};
 		const map = parsedHlsManifest.segments[0]?.map;
 		const byterange = map?.byterange;
-		const uri = map?.uri;
+		const codec = CODECS.split(',').at(0);
 		tracks.push({
 			id: uuid(),
 			type: 'video',
 			name: playlist.uri,
-			codec: CODECS,
-			duration: targetDuration,
+			codec,
+			duration: targetDuration * segments.length,
 			language: LANGUAGE,
 			bandwidth: BANDWIDTH,
 			segments: segments,
@@ -140,7 +141,7 @@ function mapHlsToHam(manifest: Manifest) {
 			byteRange: byterange
 				? `${byterange.length}@${byterange.offset}`
 				: undefined,
-			urlInitialization: uri,
+			urlInitialization: map?.uri,
 		} as VideoTrack);
 
 		switchingSetVideos.push({
@@ -159,7 +160,7 @@ function mapHlsToHam(manifest: Manifest) {
 
 function _formatSegments(segments: any[]) {
 	const formattedSegments: Segment[] = [];
-	segments.map(async (segment: any) => {
+	segments.map((segment: any) => {
 		const { duration, uri } = segment;
 		const { length, offset } = segment.byterange
 			? segment.byterange
