@@ -84,6 +84,8 @@ function _audioGroupsToSwitchingSets(
 			id: audio,
 			type: 'audio',
 			name: uri,
+			// Using codec mp4a.40.2 for now, we should retrieve it by finding
+			// the video playlist that is related to this audio group.
 			codec: 'mp4a.40.2',
 			duration: targetDuration * segments.length,
 			language: language,
@@ -158,6 +160,9 @@ function _videoPlaylistsToSwitchingSets(
 		};
 		const map = parsedHlsManifest.segments[0]?.map;
 		const byterange = map?.byterange;
+		// CODECS could be a comma separated value
+		// where it has video and audio codec. Using
+		// position zero for now. TODO: Get the correct video codec.
 		const codec = CODECS.split(',').at(0);
 		tracks.push({
 			id: uuid(),

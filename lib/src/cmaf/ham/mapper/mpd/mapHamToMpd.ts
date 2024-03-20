@@ -17,6 +17,11 @@ import type {
 	VideoTrack,
 } from '../../types/model';
 import { parseDurationMpd } from '../../../utils/utils.js';
+import {
+	TIMESCALE_1000,
+	TIMESCALE_48000,
+	TIMESCALE_90000,
+} from '../../../utils/constants.js';
 
 /**
  * This function tries to recreate the timescale value.
@@ -30,21 +35,23 @@ import { parseDurationMpd } from '../../../utils/utils.js';
  *
  * Using 1000 as default for text
  *
- * @param track Track to get the timescale from
+ * @param track - Track to get the timescale from
  * @returns Timescale in numbers
  */
 function getTimescale(track: Track): number {
 	if (track.type === 'audio') {
 		const audioTrack = track as AudioTrack;
-		return audioTrack.sampleRate !== 0 ? audioTrack.sampleRate : 48000;
+		return audioTrack.sampleRate !== 0
+			? audioTrack.sampleRate
+			: TIMESCALE_48000;
 	}
 	if (track.type === 'video') {
-		return 90000;
+		return TIMESCALE_90000;
 	}
 	if (track.type === 'text') {
-		return 1000;
+		return TIMESCALE_1000;
 	}
-	return 90000;
+	return TIMESCALE_90000;
 }
 
 function trackToSegmentBase(track: Track): SegmentBase[] {
