@@ -3,7 +3,10 @@ import type {
 	DashManifest,
 	Period,
 	Representation,
+	SegmentBase,
+	SegmentList,
 	SegmentTemplate,
+	SegmentURL,
 } from '../../types';
 import type {
 	AudioTrack,
@@ -91,51 +94,75 @@ function mapTracks(
 	}
 }
 
+function mapSegmentBase(
+	representation: Representation,
+	duration: number,
+): Segment[] {
+	return representation.SegmentBase!.map((segment: SegmentBase) => {
+		return {
+			duration: duration,
+			url: representation.BaseURL![0] ?? '',
+			byteRange: segment.$.indexRange,
+		} as Segment;
+	});
+}
+
+function mapSegmentList(representation: Representation): Segment[] {
+	const segments: Segment[] = [];
+	representation.SegmentList!.map((segment: SegmentList) => {
+		segments.push({
+			duration: 0, // TODO: Check if it is correct that the init segment has duration 0
+			url: segment.Initialization[0].$.sourceURL ?? '',
+		} as Segment);
+		if (segment.SegmentURL) {
+			return segment.SegmentURL.forEach((segmentURL: SegmentURL) => {
+				segments.push({
+					duration: calculateDuration(
+						segment.$.duration,
+						segment.$.timescale,
+					),
+					url: segmentURL.$.media ?? '',
+				} as Segment);
+			});
+		}
+	});
+	return segments;
+}
+
+function mapSegmentTemplate(
+	representation: Representation,
+	duration: number,
+	segmentTemplate: SegmentTemplate,
+): Segment[] {
+	const numberOfSegments: number = getNumberOfSegments(
+		segmentTemplate,
+		duration,
+	);
+	const init: number = +(segmentTemplate.$.startNumber ?? 0);
+	const segments: Segment[] = [];
+	for (let id = init; id < numberOfSegments + init; id++) {
+		segments.push({
+			duration: calculateDuration(
+				segmentTemplate.$.duration,
+				segmentTemplate.$.timescale,
+			),
+			url: getUrlFromTemplate(representation, segmentTemplate, id),
+		} as Segment);
+	}
+	return segments;
+}
+
 function mapSegments(
 	representation: Representation,
 	duration: number,
 	segmentTemplate?: SegmentTemplate,
 ): Segment[] {
 	if (representation.SegmentBase) {
-		return representation.SegmentBase.map((segment) => {
-			return {
-				duration: duration,
-				url: representation.BaseURL![0] ?? '',
-				byteRange: segment.$.indexRange,
-			} as Segment;
-		});
+		return mapSegmentBase(representation, duration);
 	} else if (representation.SegmentList) {
-		const segments: Segment[] = [];
-		representation.SegmentList.map((segment) => {
-			if (segment.SegmentURL) {
-				return segment.SegmentURL.forEach((segmentURL) => {
-					segments.push({
-						duration: calculateDuration(
-							segment.$.duration,
-							segment.$.timescale,
-						),
-						url: segmentURL.$.media ?? '',
-						byteRange: '', // TODO: Complete this value
-					} as Segment);
-				});
-			}
-		});
-		return segments;
+		return mapSegmentList(representation);
 	} else if (segmentTemplate) {
-		const numberOfSegments = getNumberOfSegments(segmentTemplate, duration);
-		const init = +(segmentTemplate.$.startNumber ?? 0);
-		const segments: Segment[] = [];
-		for (let id = init; id < numberOfSegments + init; id++) {
-			segments.push({
-				duration: calculateDuration(
-					segmentTemplate.$.duration,
-					segmentTemplate.$.timescale,
-				),
-				url: getUrlFromTemplate(representation, segmentTemplate, id),
-				byteRange: '', // TODO: Complete this value
-			} as Segment);
-		}
-		return segments;
+		return mapSegmentTemplate(representation, duration, segmentTemplate);
 	} else {
 		console.error(`Representation ${representation.$.id} has no segments`);
 		return [] as Segment[];
@@ -145,7 +172,7 @@ function mapSegments(
 function getInitializationUrl(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
-) {
+): string | undefined {
 	let initializationUrl: string | undefined;
 	if (representation.SegmentBase) {
 		initializationUrl = representation.BaseURL![0] ?? '';
@@ -186,16 +213,11 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 						segmentTemplate,
 					);
 
-					const initializationUrl = getInitializationUrl(
-						representation,
-						adaptationSet,
-					);
-
 					return mapTracks(
 						representation,
 						adaptationSet,
 						segments,
-						initializationUrl,
+						getInitializationUrl(representation, adaptationSet),
 					);
 				},
 			);
@@ -223,4 +245,12 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 	});
 }
 
-export { mapMpdToHam };
+export {
+	getInitializationUrl,
+	mapMpdToHam,
+	mapSegments,
+	mapSegmentTemplate,
+	mapSegmentList,
+	mapSegmentBase,
+	mapTracks,
+};
