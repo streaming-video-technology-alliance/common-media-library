@@ -96,7 +96,7 @@ function trackToSegmentList(track: Track): SegmentList[] {
 				).toString(),
 				timescale: timescale.toString(),
 			},
-			Initialization: [{ $: { sourceURL: track.segments.at(0)?.url } }],
+			Initialization: [{ $: { sourceURL: track.urlInitialization } }],
 			SegmentURL: segmentURLs,
 		} as SegmentList);
 	}
@@ -113,9 +113,7 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 			SegmentBase: trackToSegmentBase(track),
 			SegmentList: trackToSegmentList(track),
 		} as Representation;
-		if (track.name) {
-			representation.$.mimeType = track.name;
-		}
+		representation.$.mimeType = `${track.type}/mp4`; //Harcoded value
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack;
 			representation.$ = {
@@ -145,7 +143,7 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 				} as AudioChannelConfiguration,
 			];
 		}
-		if (track.segments[0].byteRange) {
+		if (track.segments[0]?.byteRange) {
 			// Only BaseSegments have byteRange on segments, and BaseURL on the representation
 			representation.BaseURL = [track.segments[0].url];
 		}
@@ -163,7 +161,7 @@ function selectionSetsToAdaptationSet(
 					id: switchingSet.id,
 					group: selectionSet.id,
 					contentType: switchingSet.tracks[0].type,
-					mimeType: switchingSet.tracks[0].name,
+					mimeType: `${switchingSet.tracks[0].type}/mp4`,
 					frameRate: (switchingSet.tracks[0] as VideoTrack).frameRate,
 					lang: switchingSet.tracks[0].language,
 					codecs: switchingSet.tracks[0].codec,

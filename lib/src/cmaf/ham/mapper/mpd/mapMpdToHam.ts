@@ -37,6 +37,7 @@ function mapTracks(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
 	segments: Segment[],
+	initializationUrl: string | undefined,
 ): AudioTrack | VideoTrack | TextTrack {
 	if (!adaptationSet) {
 		throw new Error('Error: AdaptationSet is undefined');
@@ -58,6 +59,7 @@ function mapTracks(
 			segments,
 			type,
 			width: +(representation.$.width ?? 0),
+			urlInitialization: initializationUrl,
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
@@ -71,6 +73,7 @@ function mapTracks(
 			sampleRate: getSampleRate(adaptationSet, representation),
 			segments,
 			type,
+			urlInitialization: initializationUrl,
 		} as AudioTrack;
 	} else {
 		// if (type === 'text')
@@ -83,6 +86,7 @@ function mapTracks(
 			language: getLanguage(adaptationSet),
 			segments,
 			type,
+			urlInitialization: initializationUrl,
 		} as TextTrack;
 	}
 }
@@ -103,11 +107,6 @@ function mapSegments(
 	} else if (representation.SegmentList) {
 		const segments: Segment[] = [];
 		representation.SegmentList.map((segment) => {
-			segments.push({
-				duration: 0, // TODO: Check if it is correct that the init segment has duration 0
-				url: segment.Initialization[0].$.sourceURL ?? '',
-				byteRange: '', // TODO: Complete this value
-			} as Segment);
 			if (segment.SegmentURL) {
 				return segment.SegmentURL.forEach((segmentURL) => {
 					segments.push({
@@ -143,6 +142,31 @@ function mapSegments(
 	}
 }
 
+function getInitializationUrl(
+	representation: Representation,
+	adaptationSet: AdaptationSet,
+) {
+	let initializationUrl: string | undefined;
+	if (representation.SegmentBase) {
+		initializationUrl = representation.BaseURL![0] ?? '';
+	} else if (representation.SegmentList) {
+		initializationUrl =
+			representation.SegmentList[0].Initialization[0].$.sourceURL;
+	}
+	if (adaptationSet.SegmentTemplate || representation.SegmentTemplate) {
+		initializationUrl =
+			adaptationSet.SegmentTemplate?.at(0)?.$.initialization ||
+			representation.SegmentTemplate?.at(0)?.$.initialization;
+		if (initializationUrl?.includes('$RepresentationID$')) {
+			initializationUrl = initializationUrl.replace(
+				'$RepresentationID$',
+				representation.$.id ?? '',
+			);
+		}
+	}
+	return initializationUrl;
+}
+
 function mapMpdToHam(mpd: DashManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
@@ -162,7 +186,17 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 						segmentTemplate,
 					);
 
-					return mapTracks(representation, adaptationSet, segments);
+					const initializationUrl = getInitializationUrl(
+						representation,
+						adaptationSet,
+					);
+
+					return mapTracks(
+						representation,
+						adaptationSet,
+						segments,
+						initializationUrl,
+					);
 				},
 			);
 
