@@ -40,6 +40,7 @@ function mapTracks(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
 	segments: Segment[],
+	initializationUrl: string | undefined,
 ): AudioTrack | VideoTrack | TextTrack {
 	if (!adaptationSet) {
 		throw new Error('Error: AdaptationSet is undefined');
@@ -61,6 +62,7 @@ function mapTracks(
 			segments,
 			type,
 			width: +(representation.$.width ?? 0),
+			urlInitialization: initializationUrl,
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
@@ -74,6 +76,7 @@ function mapTracks(
 			sampleRate: getSampleRate(adaptationSet, representation),
 			segments,
 			type,
+			urlInitialization: initializationUrl,
 		} as AudioTrack;
 	} else {
 		// if (type === 'text')
@@ -86,6 +89,7 @@ function mapTracks(
 			language: getLanguage(adaptationSet),
 			segments,
 			type,
+			urlInitialization: initializationUrl,
 		} as TextTrack;
 	}
 }
@@ -165,6 +169,31 @@ function mapSegments(
 	}
 }
 
+function getInitializationUrl(
+	representation: Representation,
+	adaptationSet: AdaptationSet,
+): string | undefined {
+	let initializationUrl: string | undefined;
+	if (representation.SegmentBase) {
+		initializationUrl = representation.BaseURL![0] ?? '';
+	} else if (representation.SegmentList) {
+		initializationUrl =
+			representation.SegmentList[0].Initialization[0].$.sourceURL;
+	}
+	if (adaptationSet.SegmentTemplate || representation.SegmentTemplate) {
+		initializationUrl =
+			adaptationSet.SegmentTemplate?.at(0)?.$.initialization ||
+			representation.SegmentTemplate?.at(0)?.$.initialization;
+		if (initializationUrl?.includes('$RepresentationID$')) {
+			initializationUrl = initializationUrl.replace(
+				'$RepresentationID$',
+				representation.$.id ?? '',
+			);
+		}
+	}
+	return initializationUrl;
+}
+
 function mapMpdToHam(mpd: DashManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
@@ -184,7 +213,12 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 						segmentTemplate,
 					);
 
-					return mapTracks(representation, adaptationSet, segments);
+					return mapTracks(
+						representation,
+						adaptationSet,
+						segments,
+						getInitializationUrl(representation, adaptationSet),
+					);
 				},
 			);
 
@@ -212,6 +246,7 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 }
 
 export {
+	getInitializationUrl,
 	mapMpdToHam,
 	mapSegments,
 	mapSegmentTemplate,
