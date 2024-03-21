@@ -71,7 +71,9 @@ function _audioGroupsToSwitchingSets(
 		const attributes: any = mediaGroupsAudio[audio];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const audioParsed = parseHlsManifest(manifestPlaylists.shift()!.manifest);
+		const audioParsed = parseHlsManifest(
+			manifestPlaylists.shift()!.manifest,
+		);
 		const segments: Segment[] = _formatSegments(audioParsed?.segments);
 		const targetDuration = audioParsed?.targetDuration;
 		const map = audioParsed.segments[0]?.map;
@@ -117,7 +119,9 @@ function _subtitleGroupsToSwitchingSets(
 		const textTracks: TextTrack[] = [];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const subtitleParsed = parseHlsManifest(manifestPlaylists.shift()!.manifest);
+		const subtitleParsed = parseHlsManifest(
+			manifestPlaylists.shift()!.manifest,
+		);
 		const segments: Segment[] = _formatSegments(subtitleParsed?.segments);
 		const targetDuration = subtitleParsed?.targetDuration;
 		textTracks.push({
