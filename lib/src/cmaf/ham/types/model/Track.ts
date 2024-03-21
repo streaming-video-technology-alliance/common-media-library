@@ -6,8 +6,16 @@ import { Ham } from './Ham';
  * Used as a base for the audio, video and text tracks
  *
  * @group CMAF
+ * id - Identifier of the track.
+ * type - Type of the track. Can be text, audio or video.
+ * name - Name of the track.
+ * codec - Codec of the track.
  * duration - Duration of the track in seconds
- * type - Name of the track. Can be text, audio or video
+ * language - Language of the track.
+ * bandwidth - Bandwidth of the track.
+ * byteRange - Byte range of the track.
+ * urlInitialization - URL of the initialization segment.
+ * segments - List of segments of the track.
  * @alpha
  */
 
