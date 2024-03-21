@@ -7,7 +7,7 @@ import { Segment, Ham } from './index.js';
  * @group CMAF
  * id - Identifier of the track.
  * type - Type of the track. Can be text, audio or video.
- * name - Name of the track.
+ * fileName - File name of the track.
  * codec - Codec of the track.
  * duration - Duration of the track in seconds
  * language - Language of the track.
@@ -21,7 +21,7 @@ import { Segment, Ham } from './index.js';
 type Track = Ham & {
 	id: string;
 	type: TrackType;
-	name: string;
+	fileName?: string;
 	codec: string;
 	duration: number;
 	language: string;

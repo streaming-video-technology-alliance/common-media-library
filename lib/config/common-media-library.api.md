@@ -600,7 +600,7 @@ export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 export type Track = Ham & {
     id: string;
     type: TrackType;
-    name: string;
+    fileName?: string;
     codec: string;
     duration: number;
     language: string;
