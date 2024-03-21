@@ -1,4 +1,4 @@
-import { HLSMapper } from '../../mapper/HLSMapper.js';
+import { HlsMapper } from '../../mapper/HLSMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
 import type { Presentation } from '../../types/model/index.js';
 
@@ -17,7 +17,7 @@ import type { Presentation } from '../../types/model/index.js';
 
 function hlsToHam(manifest: string, ancillaryManifests: string[]) {
 	const mapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new HLSMapper());
+	mapperContext.setStrategy(new HlsMapper());
 	return mapperContext.getHamFormat({
 		manifest,
 		ancillaryManifests: ancillaryManifests.map((ancillaryManifest) => ({
@@ -40,10 +40,10 @@ function hlsToHam(manifest: string, ancillaryManifests: string[]) {
  * @alpha
  */
 
-function hamTohls(presentation: Presentation[]) {
+function hamToHls(presentation: Presentation[]) {
 	const mapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new HLSMapper());
+	mapperContext.setStrategy(new HlsMapper());
 	return mapperContext.getManifestFormat(presentation);
 }
 
-export { hlsToHam, hamTohls };
+export { hlsToHam, hamToHls };

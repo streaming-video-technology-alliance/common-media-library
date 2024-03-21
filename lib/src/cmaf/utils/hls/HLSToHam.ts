@@ -1,4 +1,4 @@
-import { parseM3u8 } from '../hls/m3u8.js';
+import { parseHlsManifest } from './hlsParser.js';
 import { uuid } from '../../../utils.js';
 import {
 	AudioTrack,
@@ -8,13 +8,13 @@ import {
 	SwitchingSet,
 	Track,
 	VideoTrack,
-} from '../../ham/types/model';
+} from '../../ham/types/model/index.js';
 import { addMetadataToHLS } from '../manifestUtils.js';
 import { PlayList } from '../../ham/types/HlsManifest.js';
-import { Manifest } from '../../ham/types/';
+import { Manifest } from '../../ham/types/index.js';
 
 function m3u8ToHam(manifest: Manifest) {
-	const mainManifestParsed = parseM3u8(manifest.manifest);
+	const mainManifestParsed = parseHlsManifest(manifest.manifest);
 	manifest = addMetadataToHLS(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
 	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
@@ -31,7 +31,7 @@ function m3u8ToHam(manifest: Manifest) {
 		const attributes: any = mediaGroupsAudio[audio];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const audioParsed = parseM3u8(
+		const audioParsed = parseHlsManifest(
 			manifestPlaylists[currentPlaylist++].manifest,
 		);
 		const segments: Segment[] = _formatSegments(audioParsed?.segments);
@@ -75,7 +75,7 @@ function m3u8ToHam(manifest: Manifest) {
 		const textTracks: TextTrack[] = [];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const subtitleParsed = parseM3u8(
+		const subtitleParsed = parseHlsManifest(
 			manifestPlaylists[currentPlaylist++].manifest,
 		);
 		const segments: Segment[] = _formatSegments(subtitleParsed?.segments);
@@ -107,7 +107,7 @@ function m3u8ToHam(manifest: Manifest) {
 	const switchingSetVideos: SwitchingSet[] = [];
 
 	playlists.map(async (playlist: any) => {
-		const parsedHlsManifest = parseM3u8(
+		const parsedHlsManifest = parseHlsManifest(
 			manifestPlaylists[currentPlaylist++].manifest,
 		);
 		const tracks: Track[] = [];

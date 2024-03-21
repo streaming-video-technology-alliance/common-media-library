@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Parser } from 'm3u8-parser';
 
-export function parseM3u8(text: string) {
+export function parseHlsManifest(text: string) {
 	const parser = new Parser();
 
 	parser.push(text);

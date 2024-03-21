@@ -1,12 +1,12 @@
-import { MPDMapper } from '../../mapper/MPDMapper.js';
+import { MPDMapper } from '../../mapper/DashMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
-import type { Presentation } from '../../types/model';
-import type { Manifest } from '../../types';
+import type { Presentation } from '../../types/model/index.js';
+import type { Manifest } from '../../types/index.js';
 
 /**
- * Convert mpd manifest into a ham object.
+ * Convert dash manifest into a ham object.
  *
- * @param manifest -  Manifest mpd.
+ * @param manifest -  Manifest dash.
  *
  * @returns Presentation[]
  *
@@ -15,14 +15,14 @@ import type { Manifest } from '../../types';
  * @alpha
  */
 
-function mpdToHam(manifest: string): Presentation[] {
+function dashToHam(manifest: string): Presentation[] {
 	const mapperContext: MapperContext = MapperContext.getInstance();
 	mapperContext.setStrategy(new MPDMapper());
 	return mapperContext.getHamFormat({ manifest, type: 'mpd' });
 }
 
 /**
- * Convert mpd manifest into a ham object.
+ * Convert dash manifest into a ham object.
  *
  * @param presentation - Ham object. List of presentations.
  *
@@ -32,10 +32,10 @@ function mpdToHam(manifest: string): Presentation[] {
  *
  * @alpha
  */
-function hamToMpd(presentation: Presentation[]): Manifest {
+function hamToDash(presentation: Presentation[]): Manifest {
 	const mapperContext: MapperContext = MapperContext.getInstance();
 	mapperContext.setStrategy(new MPDMapper());
 	return mapperContext.getManifestFormat(presentation);
 }
 
-export { mpdToHam, hamToMpd };
+export { dashToHam, hamToDash };

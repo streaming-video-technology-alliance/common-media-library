@@ -3,8 +3,8 @@ import { jsonToXml, xmlToJson } from '../../utils/xmlUtils.js';
 import { mapHamToMpd } from './mpd/mapHamToMpd.js';
 import { addMetadataToDASH, getMetadata } from '../../utils/manifestUtils.js';
 import { IMapper } from './IMapper.js';
-import type { DashManifest, Manifest } from '../types';
-import type { Presentation } from '../types/model';
+import type { DashManifest, Manifest } from '../types/index.js';
+import type { Presentation } from '../types/model/index.js';
 
 export class MPDMapper implements IMapper {
 	private manifest: Manifest | undefined;
