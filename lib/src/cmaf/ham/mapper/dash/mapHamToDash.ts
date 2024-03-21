@@ -16,7 +16,7 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import { parseDurationMpd } from '../../../utils/utils.js';
+import { parseDurationDash } from '../../../utils/utils.js';
 import {
 	TIMESCALE_1000,
 	TIMESCALE_48000,
@@ -181,7 +181,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	return presentations.map((presentation: Presentation) => {
 		return {
 			$: {
-				duration: parseDurationMpd(
+				duration: parseDurationDash(
 					presentation.selectionSets[0].switchingSets[0].tracks[0]
 						.duration,
 				),
@@ -195,7 +195,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+function mapHamToDash(hamManifests: Presentation[]): DashManifest {
 	const periods: Period[] = presentationsToPeriods(hamManifests);
 	const duration: string = periods[0].$.duration;
 
@@ -210,4 +210,4 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	};
 }
 
-export { mapHamToMpd };
+export { mapHamToDash };

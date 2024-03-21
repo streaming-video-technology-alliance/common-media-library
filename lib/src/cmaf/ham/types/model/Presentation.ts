@@ -1,5 +1,4 @@
-import { SelectionSet } from './SelectionSet.js';
-import { Ham } from './Ham.js';
+import { SelectionSet, Ham } from './index.js';
 
 /**
  * CMAF-HAM Presentation type

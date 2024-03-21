@@ -1,6 +1,6 @@
-import { parseM3u8 } from '../../../utils/hls/m3u8.js';
+import { parseHlsManifest } from '../../../utils/hls/hlsParser.js';
 import { uuid } from '../../../../utils.js';
-import { addMetadataToHLS } from '../../../utils/manifestUtils.js';
+import { addMetadataToHls } from '../../../utils/manifestUtils.js';
 import type {
 	AudioTrack,
 	Segment,
@@ -13,8 +13,8 @@ import type {
 import type { Manifest, PlayList } from '../../types';
 
 function mapHlsToHam(manifest: Manifest) {
-	const mainManifestParsed = parseM3u8(manifest.manifest);
-	manifest = addMetadataToHLS(manifest, mainManifestParsed);
+	const mainManifestParsed = parseHlsManifest(manifest.manifest);
+	manifest = addMetadataToHls(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
 	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
@@ -71,7 +71,9 @@ function _audioGroupsToSwitchingSets(
 		const attributes: any = mediaGroupsAudio[audio];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const audioParsed = parseM3u8(manifestPlaylists.shift()!.manifest);
+		const audioParsed = parseHlsManifest(
+			manifestPlaylists.shift()!.manifest,
+		);
 		const segments: Segment[] = _formatSegments(audioParsed?.segments);
 		const targetDuration = audioParsed?.targetDuration;
 		const map = audioParsed.segments[0]?.map;
@@ -117,7 +119,9 @@ function _subtitleGroupsToSwitchingSets(
 		const textTracks: TextTrack[] = [];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const subtitleParsed = parseM3u8(manifestPlaylists.shift()!.manifest);
+		const subtitleParsed = parseHlsManifest(
+			manifestPlaylists.shift()!.manifest,
+		);
 		const segments: Segment[] = _formatSegments(subtitleParsed?.segments);
 		const targetDuration = subtitleParsed?.targetDuration;
 		textTracks.push({
@@ -146,7 +150,7 @@ function _videoPlaylistsToSwitchingSets(
 	const switchingSetVideos: SwitchingSet[] = [];
 
 	playlists.map((playlist: any) => {
-		const parsedHlsManifest = parseM3u8(
+		const parsedHlsManifest = parseHlsManifest(
 			manifestPlaylists.shift()!.manifest,
 		);
 		const tracks: Track[] = [];

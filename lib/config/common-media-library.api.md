@@ -35,6 +35,11 @@ export type AdaptationSet = {
     SegmentList?: SegmentList[];
 };
 
+// @alpha
+export type AlignedSwitchingSet = {
+    switchingSets: SwitchingSet[];
+};
+
 // @beta
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string>;
 
@@ -273,6 +278,9 @@ export type DashManifest = {
     };
 };
 
+// @alpha
+export function dashToHam(manifest: string): Presentation[];
+
 // @beta
 export function decodeCmcd(cmcd: string): Cmcd;
 
@@ -349,10 +357,25 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
 // @alpha
-export function hamToM3U8(presentation: Presentation[]): Manifest;
+export type Ham = {
+    id: string;
+};
 
 // @alpha
-export function hamToMpd(presentation: Presentation[]): Manifest;
+export function hamToDash(presentation: Presentation[]): Manifest;
+
+// @alpha
+export function hamToHls(presentation: Presentation[]): Manifest;
+
+// @alpha
+export type HlsManifest = {
+    playlists: PlayList[];
+    mediaGroups: MediaGroups;
+    segments: SegmentHls[];
+};
+
+// @alpha
+export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -363,16 +386,6 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
 // @alpha
-export type m3u8 = {
-    playlists: PlayList[];
-    mediaGroups: MediaGroups;
-    segments: SegmentHls[];
-};
-
-// @alpha
-export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
-
-// @alpha
 export type Manifest = {
     manifest: string;
     ancillaryManifests?: Manifest[];
@@ -380,7 +393,7 @@ export type Manifest = {
     metaData?: Map<string, string>;
 };
 
-// @public (undocumented)
+// @alpha
 export type MediaGroups = {
     AUDIO: {
         [key: string]: {
@@ -390,9 +403,6 @@ export type MediaGroups = {
         };
     };
 };
-
-// @alpha
-export function mpdToHam(manifest: string): Presentation[];
 
 // @alpha
 export type Period = {
@@ -418,8 +428,6 @@ export type PlayList = {
     };
 };
 
-// Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
-//
 // @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
@@ -487,7 +495,7 @@ export type SegmentBase = {
     Initialization: Initialization[];
 };
 
-// @public (undocumented)
+// @alpha
 export type SegmentHls = {
     duration: number;
 };
@@ -523,6 +531,7 @@ export type SegmentURL = {
 // @alpha
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
+    alignedSwitchingSets?: AlignedSwitchingSet[];
 };
 
 // @beta
@@ -590,7 +599,7 @@ export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @alpha
 export type Track = Ham & {
     id: string;
-    type: string;
+    type: TrackType;
     fileName?: string;
     codec: string;
     duration: number;
@@ -631,5 +640,6 @@ export type VideoTrack = Track & {
 // src/cmaf/ham/types/DashManifest.ts:150:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/DashManifest.ts:151:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:23:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
 
 ```
