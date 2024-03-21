@@ -53,10 +53,10 @@ type SegmentHls = {
  *
  * @alpha
  */
-type Hls = {
+type HlsManifest = {
 	playlists: PlayList[];
 	mediaGroups: MediaGroups;
 	segments: SegmentHls[];
 };
 
-export type { PlayList, MediaGroups, SegmentHls, Hls };
+export type { PlayList, MediaGroups, SegmentHls, HlsManifest };

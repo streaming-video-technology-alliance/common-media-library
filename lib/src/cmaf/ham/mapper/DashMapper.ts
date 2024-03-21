@@ -27,13 +27,13 @@ export class DashMapper implements IMapper {
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		const jsonMpd = mapHamToDash(presentation);
+		const jsonDash = mapHamToDash(presentation);
 
-		if (!jsonMpd) {
+		if (!jsonDash) {
 			return { manifest: '', ancillaryManifests: [], type: 'dash' };
 		}
 
-		const mpd = jsonToXml(jsonMpd);
+		const mpd = jsonToXml(jsonDash);
 		return { manifest: mpd, ancillaryManifests: [], type: 'dash' };
 	}
 }

@@ -368,7 +368,7 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 export function hamToHls(presentation: Presentation[]): Manifest;
 
 // @alpha
-export type Hls = {
+export type HlsManifest = {
     playlists: PlayList[];
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
