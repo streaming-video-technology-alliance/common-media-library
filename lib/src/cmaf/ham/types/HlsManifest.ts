@@ -1,4 +1,17 @@
 /**
+ * HLS manifest
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
+type HlsManifest = {
+	playlists: PlayList[];
+	mediaGroups: MediaGroups;
+	segments: SegmentHls[];
+};
+
+/**
  * HLS Playlist
  *
  * @group CMAF
@@ -46,17 +59,5 @@ type SegmentHls = {
 	duration: number;
 };
 
-/**
- * HLS manifest
- *
- * @group CMAF
- *
- * @alpha
- */
-type HlsManifest = {
-	playlists: PlayList[];
-	mediaGroups: MediaGroups;
-	segments: SegmentHls[];
-};
 
 export type { PlayList, MediaGroups, SegmentHls, HlsManifest };
