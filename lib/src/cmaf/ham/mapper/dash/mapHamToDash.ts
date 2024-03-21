@@ -16,7 +16,12 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import { parseDurationDash } from '../../../utils/utils.js';
+import { parseDurationMpd } from '../../../utils/utils.js';
+import {
+	TIMESCALE_1000,
+	TIMESCALE_48000,
+	TIMESCALE_90000,
+} from '../../../utils/constants.js';
 
 /**
  * This function tries to recreate the timescale value.
@@ -30,21 +35,23 @@ import { parseDurationDash } from '../../../utils/utils.js';
  *
  * Using 1000 as default for text
  *
- * @param track Track to get the timescale from
+ * @param track - Track to get the timescale from
  * @returns Timescale in numbers
  */
 function getTimescale(track: Track): number {
 	if (track.type === 'audio') {
 		const audioTrack = track as AudioTrack;
-		return audioTrack.sampleRate;
+		return audioTrack.sampleRate !== 0
+			? audioTrack.sampleRate
+			: TIMESCALE_48000;
 	}
 	if (track.type === 'video') {
-		return 90000;
+		return TIMESCALE_90000;
 	}
 	if (track.type === 'text') {
-		return 1000;
+		return TIMESCALE_1000;
 	}
-	return 90000;
+	return TIMESCALE_90000;
 }
 
 function trackToSegmentBase(track: Track): SegmentBase[] {
@@ -76,14 +83,12 @@ function trackToSegmentBase(track: Track): SegmentBase[] {
 function trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];
 	const segmentURLs: SegmentURL[] = [];
-	track.segments.forEach((segment, index) => {
-		if (index > 0) {
-			segmentURLs.push({
-				$: {
-					media: segment.url,
-				},
-			});
-		}
+	track.segments.forEach((segment) => {
+		segmentURLs.push({
+			$: {
+				media: segment.url,
+			},
+		});
 	});
 
 	if (!track.segments.at(0)?.byteRange) {
@@ -96,7 +101,7 @@ function trackToSegmentList(track: Track): SegmentList[] {
 				).toString(),
 				timescale: timescale.toString(),
 			},
-			Initialization: [{ $: { sourceURL: track.segments.at(0)?.url } }],
+			Initialization: [{ $: { sourceURL: track.urlInitialization } }],
 			SegmentURL: segmentURLs,
 		} as SegmentList);
 	}
@@ -113,9 +118,7 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 			SegmentBase: trackToSegmentBase(track),
 			SegmentList: trackToSegmentList(track),
 		} as Representation;
-		if (track.name) {
-			representation.$.mimeType = track.name;
-		}
+		representation.$.mimeType = `${track.type}/mp4`; //Harcoded value
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack;
 			representation.$ = {
@@ -145,7 +148,7 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 				} as AudioChannelConfiguration,
 			];
 		}
-		if (track.segments[0].byteRange) {
+		if (track.segments[0]?.byteRange) {
 			// Only BaseSegments have byteRange on segments, and BaseURL on the representation
 			representation.BaseURL = [track.segments[0].url];
 		}
@@ -163,7 +166,7 @@ function selectionSetsToAdaptationSet(
 					id: switchingSet.id,
 					group: selectionSet.id,
 					contentType: switchingSet.tracks[0].type,
-					mimeType: switchingSet.tracks[0].name,
+					mimeType: `${switchingSet.tracks[0].type}/mp4`,
 					frameRate: (switchingSet.tracks[0] as VideoTrack).frameRate,
 					lang: switchingSet.tracks[0].language,
 					codecs: switchingSet.tracks[0].codec,
@@ -178,7 +181,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	return presentations.map((presentation: Presentation) => {
 		return {
 			$: {
-				duration: parseDurationDash(
+				duration: parseDurationMpd(
 					presentation.selectionSets[0].switchingSets[0].tracks[0]
 						.duration,
 				),
@@ -192,7 +195,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	});
 }
 
-function mapHamToDash(hamManifests: Presentation[]): DashManifest {
+function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	const periods: Period[] = presentationsToPeriods(hamManifests);
 	const duration: string = periods[0].$.duration;
 
@@ -207,4 +210,4 @@ function mapHamToDash(hamManifests: Presentation[]): DashManifest {
 	};
 }
 
-export { mapHamToDash };
+export { mapHamToMpd };

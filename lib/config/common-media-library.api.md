@@ -357,6 +357,11 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
 // @alpha
+export type Ham = {
+    id: string;
+};
+
+// @alpha
 export function hamToDash(presentation: Presentation[]): Manifest;
 
 // @alpha
@@ -423,8 +428,6 @@ export type PlayList = {
     };
 };
 
-// Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
-//
 // @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
@@ -528,7 +531,7 @@ export type SegmentURL = {
 // @alpha
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
-    alignedSwitchingSets?: SwitchingSet[];
+    alignedSwitchingSets?: AlignedSwitchingSet[];
 };
 
 // @beta
@@ -637,6 +640,6 @@ export type VideoTrack = Track & {
 // src/cmaf/ham/types/DashManifest.ts:150:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/DashManifest.ts:151:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:24:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:23:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
 
 ```

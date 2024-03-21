@@ -1,5 +1,4 @@
-import { Segment } from './Segment.js';
-import { Ham } from './Ham';
+import { Segment, Ham } from './index.js';
 
 /**
  * CMAF-HAM Track type
