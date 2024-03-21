@@ -19,7 +19,6 @@ import { Segment, Ham } from './index.js';
  */
 
 type Track = Ham & {
-	id: string;
 	type: TrackType;
 	fileName?: string;
 	codec: string;
