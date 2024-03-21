@@ -358,7 +358,7 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 export function hamToHls(presentation: Presentation[]): Manifest;
 
 // @alpha
-export type hls = {
+export type Hls = {
     playlists: PlayList[];
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
@@ -590,7 +590,7 @@ export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @alpha
 export type Track = Ham & {
     id: string;
-    type: string;
+    type: TrackType;
     name: string;
     codec: string;
     duration: number;
@@ -631,5 +631,6 @@ export type VideoTrack = Track & {
 // src/cmaf/ham/types/DashManifest.ts:150:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/DashManifest.ts:151:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:16:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
 
 ```
