@@ -39,10 +39,10 @@ type SegmentHls = {
  *
  * @alpha
  */
-type hls = {
+type Hls = {
 	playlists: PlayList[];
 	mediaGroups: MediaGroups;
 	segments: SegmentHls[];
 };
 
-export type { PlayList, MediaGroups, SegmentHls, hls };
+export type { PlayList, MediaGroups, SegmentHls, Hls };

@@ -6,12 +6,14 @@ import { Ham } from './Ham';
  * Used as a base for the audio, video and text tracks
  *
  * @group CMAF
- *
+ * duration - Duration of the track in seconds
+ * type - Name of the track. Can be text, audio or video
  * @alpha
  */
+
 type Track = Ham & {
 	id: string;
-	type: string;
+	type: TrackType;
 	name: string;
 	codec: string;
 	duration: number;
@@ -58,5 +60,7 @@ type VideoTrack = Track & {
 	sar: string;
 	scanType: string;
 };
+
+type TrackType = 'audio' | 'video' | 'text';
 
 export type { Track, VideoTrack, AudioTrack, TextTrack };
