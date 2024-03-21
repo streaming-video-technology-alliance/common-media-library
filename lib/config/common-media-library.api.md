@@ -390,7 +390,7 @@ export type Manifest = {
     manifest: string;
     ancillaryManifests?: Manifest[];
     type: Format;
-    metaData?: Map<string, string>;
+    metadata?: Map<string, string>;
 };
 
 // @alpha
@@ -482,7 +482,7 @@ export function roundToEven(value: number, precision: number): number;
 export type Segment = {
     duration: number;
     url: string;
-    byteRange: string;
+    byteRange?: string;
 };
 
 // @alpha
@@ -598,7 +598,6 @@ export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @alpha
 export type Track = Ham & {
-    id: string;
     type: TrackType;
     fileName?: string;
     codec: string;
@@ -640,6 +639,6 @@ export type VideoTrack = Track & {
 // src/cmaf/ham/types/DashManifest.ts:150:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/DashManifest.ts:151:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:23:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:22:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
 
 ```
