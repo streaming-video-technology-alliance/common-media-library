@@ -1,4 +1,7 @@
-const representationBase = {
+import { AudioTrack } from '../ham/types/model';
+import { Representation, SegmentTemplate } from '../ham/types';
+
+const representationBase: Representation = {
 	$: {
 		id: 'audio_eng=64349',
 		bandwidth: '64349',
@@ -22,7 +25,7 @@ const representationBase = {
 	],
 };
 
-const representationList = {
+const representationList: Representation = {
 	$: {
 		bandwidth: '72000',
 		codecs: 'avc1.42c01e',
@@ -67,7 +70,7 @@ const representationList = {
 	],
 };
 
-const representationTemplate = {
+const representationTemplate: Representation = {
 	$: {
 		id: '1',
 		mimeType: 'video/mp4',
@@ -81,7 +84,7 @@ const representationTemplate = {
 	},
 };
 
-const segmentTemplate = {
+const segmentTemplate: SegmentTemplate = {
 	$: {
 		timescale: '24',
 		media: '$RepresentationID$/$Number%04d$.m4s',
@@ -93,10 +96,37 @@ const segmentTemplate = {
 
 const duration = 13;
 
+const audioTrack1: AudioTrack = {
+	id: 'default-audio-group',
+	type: 'AUDIO',
+	codec: '',
+	duration: 5,
+	language: 'en',
+	bandwidth: 0,
+	segments: [
+		{
+			duration: 4.011,
+			url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4',
+		},
+		{
+			duration: 3.989,
+			url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
+		},
+	],
+	sampleRate: 0,
+	channels: 0,
+	urlInitialization:
+		'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4',
+};
+
+const videoTrack1 = {};
+
 export {
 	representationBase,
 	representationList,
 	representationTemplate,
 	duration,
 	segmentTemplate,
+	audioTrack1,
+	videoTrack1,
 };
