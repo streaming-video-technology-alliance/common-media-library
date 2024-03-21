@@ -273,6 +273,9 @@ export type DashManifest = {
     };
 };
 
+// @alpha
+export function dashToHam(manifest: string): Presentation[];
+
 // @beta
 export function decodeCmcd(cmcd: string): Cmcd;
 
@@ -349,10 +352,13 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
 // @alpha
-export function hamToM3U8(presentation: Presentation[]): Manifest;
+export function hamToDash(presentation: Presentation[]): Manifest;
 
 // @alpha
-export function hamToMpd(presentation: Presentation[]): Manifest;
+export function hamToHls(presentation: Presentation[]): Manifest;
+
+// @alpha
+export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -368,9 +374,6 @@ export type m3u8 = {
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
 };
-
-// @alpha
-export function m3u8ToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @alpha
 export type Manifest = {
@@ -390,9 +393,6 @@ export type MediaGroups = {
         };
     };
 };
-
-// @alpha
-export function mpdToHam(manifest: string): Presentation[];
 
 // @alpha
 export type Period = {
