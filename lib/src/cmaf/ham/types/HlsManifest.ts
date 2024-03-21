@@ -18,6 +18,13 @@ type PlayList = {
 	};
 };
 
+/**
+ * HLS Media Groups
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
 type MediaGroups = {
 	AUDIO: {
 		[key: string]: {
@@ -28,6 +35,13 @@ type MediaGroups = {
 	};
 };
 
+/**
+ * HLS Segments
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
 type SegmentHls = {
 	duration: number;
 };
@@ -39,10 +53,10 @@ type SegmentHls = {
  *
  * @alpha
  */
-type m3u8 = {
+type HlsManifest = {
 	playlists: PlayList[];
 	mediaGroups: MediaGroups;
 	segments: SegmentHls[];
 };
 
-export type { PlayList, MediaGroups, SegmentHls, m3u8 };
+export type { PlayList, MediaGroups, SegmentHls, HlsManifest };

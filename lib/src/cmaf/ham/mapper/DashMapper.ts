@@ -1,12 +1,12 @@
-import { mapMpdToHam } from './mpd/mapMpdToHam.js';
+import { mapDashToHam } from './dash/mapDashToHam.js';
 import { jsonToXml, xmlToJson } from '../../utils/xmlUtils.js';
-import { mapHamToMpd } from './mpd/mapHamToMpd.js';
-import { addMetadataToDASH, getMetadata } from '../../utils/manifestUtils.js';
+import { mapHamToDash } from './dash/mapHamToDash.js';
+import { addMetadataToDash, getMetadata } from '../../utils/manifestUtils.js';
 import { IMapper } from './IMapper.js';
 import type { DashManifest, Manifest } from '../types';
 import type { Presentation } from '../types/model';
 
-export class MPDMapper implements IMapper {
+export class DashMapper implements IMapper {
 	private manifest: Manifest | undefined;
 
 	getManifestMetadata(): JSON | undefined {
@@ -21,19 +21,19 @@ export class MPDMapper implements IMapper {
 		if (!dashManifest) {
 			return [];
 		}
-		addMetadataToDASH(dashManifest, manifest);
+		addMetadataToDash(dashManifest, manifest);
 
-		return mapMpdToHam(dashManifest);
+		return mapDashToHam(dashManifest);
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		const jsonMpd = mapHamToMpd(presentation);
+		const jsonDash = mapHamToDash(presentation);
 
-		if (!jsonMpd) {
-			return { manifest: '', ancillaryManifests: [], type: 'mpd' };
+		if (!jsonDash) {
+			return { manifest: '', ancillaryManifests: [], type: 'dash' };
 		}
 
-		const mpd = jsonToXml(jsonMpd);
-		return { manifest: mpd, ancillaryManifests: [], type: 'mpd' };
+		const mpd = jsonToXml(jsonDash);
+		return { manifest: mpd, ancillaryManifests: [], type: 'dash' };
 	}
 }

@@ -2,10 +2,10 @@ import { mapHamToHls } from './hls/mapHamToHls.js';
 import { mapHlsToHam } from './hls/mapHlsToHam.js';
 import { getMetadata } from '../../utils/manifestUtils.js';
 import { IMapper } from './IMapper.js';
-import type { Manifest } from '../types';
-import type { Presentation } from '../types/model';
+import type { Manifest } from '../types/index.js';
+import type { Presentation } from '../types/model/index.js';
 
-export class HLSMapper implements IMapper {
+export class HlsMapper implements IMapper {
 	private manifest: Manifest | undefined;
 
 	getManifestMetadata(): JSON | undefined {
