@@ -383,7 +383,7 @@ export type Manifest = {
     metaData?: Map<string, string>;
 };
 
-// @public (undocumented)
+// @alpha
 export type MediaGroups = {
     AUDIO: {
         [key: string]: {
@@ -487,7 +487,7 @@ export type SegmentBase = {
     Initialization: Initialization[];
 };
 
-// @public (undocumented)
+// @alpha
 export type SegmentHls = {
     duration: number;
 };

@@ -18,6 +18,13 @@ type PlayList = {
 	};
 };
 
+/**
+ * HLS Media Groups
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
 type MediaGroups = {
 	AUDIO: {
 		[key: string]: {
@@ -28,6 +35,13 @@ type MediaGroups = {
 	};
 };
 
+/**
+ * HLS Segments
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
 type SegmentHls = {
 	duration: number;
 };
