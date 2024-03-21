@@ -10,7 +10,6 @@ import { Ham } from './Ham';
  * @alpha
  */
 type Track = Ham & {
-	id: string;
 	type: string;
 	fileName?: string;
 	codec: string;

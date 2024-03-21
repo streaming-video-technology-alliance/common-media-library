@@ -11,7 +11,7 @@ type Manifest = {
 	manifest: string;
 	ancillaryManifests?: Manifest[];
 	type: Format;
-	metaData?: Map<string, string>;
+	metadata?: Map<string, string>;
 };
 
 export type { Manifest };
