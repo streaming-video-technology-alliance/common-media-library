@@ -1,4 +1,4 @@
-import { HlsMapper } from '../../mapper/HlsMapper.js';
+import { HlsMapper } from '../../mapper/Mapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
 import type { Presentation } from '../../types/model/index.js';
 
