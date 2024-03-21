@@ -10,6 +10,7 @@ import { Ham } from './Ham.js';
  */
 type SelectionSet = Ham & {
 	switchingSets: SwitchingSet[];
+	alignedSwitchingSets?: SwitchingSet[];
 };
 
 export type { SelectionSet };

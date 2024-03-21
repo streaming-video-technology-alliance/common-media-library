@@ -35,6 +35,11 @@ export type AdaptationSet = {
     SegmentList?: SegmentList[];
 };
 
+// @alpha
+export type AlignedSwitchingSet = {
+    switchingSets: SwitchingSet[];
+};
+
 // @beta
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string>;
 
@@ -523,6 +528,7 @@ export type SegmentURL = {
 // @alpha
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
+    alignedSwitchingSets?: SwitchingSet[];
 };
 
 // @beta
