@@ -7,7 +7,7 @@ export function getMetadata(manifest: Manifest | undefined): JSON | undefined {
 
 //Add metadata to manifest.
 // In the future, if any other fields are wanted to be added, they can be added here.
-export function addMetadataToHLS(
+export function addMetadataToHls(
 	manifest: Manifest,
 	manifestParsed: any,
 ): Manifest {
@@ -23,7 +23,7 @@ export function addMetadataToHLS(
 	return manifest;
 }
 
-export function addMetadataToDASH(
+export function addMetadataToDash(
 	dashManifest: DashManifest,
 	manifest: Manifest,
 ): Manifest {

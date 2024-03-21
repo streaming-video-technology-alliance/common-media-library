@@ -192,7 +192,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+function mapHamToDash(hamManifests: Presentation[]): DashManifest {
 	const periods: Period[] = presentationsToPeriods(hamManifests);
 	const duration: string = periods[0].$.duration;
 
@@ -207,4 +207,4 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	};
 }
 
-export { mapHamToMpd };
+export { mapHamToDash };

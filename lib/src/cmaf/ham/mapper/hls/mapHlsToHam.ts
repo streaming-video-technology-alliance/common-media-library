@@ -1,6 +1,6 @@
 import { parseHlsManifest } from '../../../utils/hls/hlsParser.js';
 import { uuid } from '../../../../utils.js';
-import { addMetadataToHLS } from '../../../utils/manifestUtils.js';
+import { addMetadataToHls } from '../../../utils/manifestUtils.js';
 import type {
 	AudioTrack,
 	Segment,
@@ -14,7 +14,7 @@ import type { Manifest, PlayList } from '../../types';
 
 function mapHlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest);
-	manifest = addMetadataToHLS(manifest, mainManifestParsed);
+	manifest = addMetadataToHls(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
 	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;

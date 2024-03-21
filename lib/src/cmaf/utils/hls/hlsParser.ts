@@ -6,10 +6,10 @@ export function parseHlsManifest(text: string) {
 
 	parser.push(text);
 	parser.end();
-	const parsedM3u8 = parser.manifest;
-	if (!parsedM3u8) {
+	const parsedHlsManifest = parser.manifest;
+	if (!parsedHlsManifest) {
 		throw new Error();
 	}
 
-	return parsedM3u8;
+	return parsedHlsManifest;
 }

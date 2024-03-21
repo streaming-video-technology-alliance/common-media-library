@@ -1,4 +1,4 @@
-import { MPDMapper } from '../../mapper/DashMapper.js';
+import { DashMapper } from '../../mapper/DashMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
 import type { Presentation } from '../../types/model/index.js';
 import type { Manifest } from '../../types/index.js';
@@ -17,8 +17,8 @@ import type { Manifest } from '../../types/index.js';
 
 function dashToHam(manifest: string): Presentation[] {
 	const mapperContext: MapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new MPDMapper());
-	return mapperContext.getHamFormat({ manifest, type: 'mpd' });
+	mapperContext.setStrategy(new DashMapper());
+	return mapperContext.getHamFormat({ manifest, type: 'dash' });
 }
 
 /**
@@ -34,7 +34,7 @@ function dashToHam(manifest: string): Presentation[] {
  */
 function hamToDash(presentation: Presentation[]): Manifest {
 	const mapperContext: MapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new MPDMapper());
+	mapperContext.setStrategy(new DashMapper());
 	return mapperContext.getManifestFormat(presentation);
 }
 

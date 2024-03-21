@@ -358,6 +358,13 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 export function hamToHls(presentation: Presentation[]): Manifest;
 
 // @alpha
+export type hls = {
+    playlists: PlayList[];
+    mediaGroups: MediaGroups;
+    segments: SegmentHls[];
+};
+
+// @alpha
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
@@ -367,13 +374,6 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 //
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
-
-// @alpha
-export type m3u8 = {
-    playlists: PlayList[];
-    mediaGroups: MediaGroups;
-    segments: SegmentHls[];
-};
 
 // @alpha
 export type Manifest = {

@@ -22,9 +22,9 @@ function hlsToHam(manifest: string, ancillaryManifests: string[]) {
 		manifest,
 		ancillaryManifests: ancillaryManifests.map((ancillaryManifest) => ({
 			manifest: ancillaryManifest,
-			type: 'm3u8',
+			type: 'hls',
 		})),
-		type: 'm3u8',
+		type: 'hls',
 	});
 }
 

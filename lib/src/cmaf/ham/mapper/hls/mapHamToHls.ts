@@ -22,17 +22,17 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 						const { manifestToConcat, playlist } =
 							_generateVideoManifestPiece(track as VideoTrack);
 						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
+						playlists.push({ manifest: playlist, type: 'hls' });
 					} else if (track.type.toLowerCase() === 'audio') {
 						const { manifestToConcat, playlist } =
 							_generateAudioManifestPiece(track as AudioTrack);
 						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
+						playlists.push({ manifest: playlist, type: 'hls' });
 					} else if (track.type.toLowerCase() === 'text') {
 						const { manifestToConcat, playlist } =
 							_generateTextManifestPiece(track as TextTrack);
 						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
+						playlists.push({ manifest: playlist, type: 'hls' });
 					}
 				});
 			});
@@ -41,7 +41,7 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 	return {
 		manifest: mainManifest,
 		ancillaryManifests: playlists,
-		type: 'm3u8',
+		type: 'hls',
 	};
 }
 

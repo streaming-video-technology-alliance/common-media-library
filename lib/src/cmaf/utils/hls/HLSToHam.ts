@@ -9,13 +9,13 @@ import {
 	Track,
 	VideoTrack,
 } from '../../ham/types/model/index.js';
-import { addMetadataToHLS } from '../manifestUtils.js';
+import { addMetadataToHls } from '../manifestUtils.js';
 import { PlayList } from '../../ham/types/HlsManifest.js';
 import { Manifest } from '../../ham/types/index.js';
 
-function m3u8ToHam(manifest: Manifest) {
+function hlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest);
-	manifest = addMetadataToHLS(manifest, mainManifestParsed);
+	manifest = addMetadataToHls(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
 	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
@@ -176,4 +176,4 @@ function _formatSegments(segments: any[]) {
 	return formattedSegments;
 }
 
-export { m3u8ToHam };
+export { hlsToHam };

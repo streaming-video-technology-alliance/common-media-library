@@ -1,4 +1,4 @@
-type Format = 'm3u8' | 'mpd';
+type Format = 'hls' | 'dash';
 
 /**
  * Manifest object received as an input by the conversion to HAM object
