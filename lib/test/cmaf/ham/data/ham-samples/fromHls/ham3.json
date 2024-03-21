@@ -1,9 +1,9 @@
 [
 	{
-		"id": "f4d35ff4-9527-4133-bdb6-634e3bfd0a13",
+		"id": "39a0f468-d171-4798-b85e-8c75045763e2",
 		"selectionSets": [
 			{
-				"id": "3d031c39-0a65-4eff-9250-4ff8c783cc5d",
+				"id": "c6be6aa3-0318-4110-8bce-f0bfc7584755",
 				"switchingSets": [
 					{
 						"id": "default-audio-group",
@@ -11,7 +11,7 @@
 							{
 								"id": "default-audio-group",
 								"type": "AUDIO",
-								"name": "audio-eng-0128k-aac-2c.mp4.m3u8",
+								"fileName": "audio-eng-0128k-aac-2c.mp4.m3u8",
 								"codec": "",
 								"duration": 5,
 								"language": "en",
@@ -87,7 +87,7 @@
 				]
 			},
 			{
-				"id": "7808f8c7-0817-40a5-982f-65d9ec79f4ab",
+				"id": "a538d0ce-ea37-4d7e-8469-00cb91491a98",
 				"switchingSets": [
 					{
 						"id": "default-text-group",
@@ -95,7 +95,7 @@
 							{
 								"id": "default-text-group",
 								"type": "TEXT",
-								"name": "playlist_s-en.webvtt.m3u8",
+								"fileName": "playlist_s-en.webvtt.m3u8",
 								"codec": "",
 								"duration": 5,
 								"language": "en",
@@ -168,17 +168,18 @@
 				]
 			},
 			{
-				"id": "805a29d3-ba0c-42c4-a757-c23748ccef82",
+				"id": "c67a2cb7-cbe2-45c2-a470-daae0765cc09",
 				"switchingSets": [
 					{
-						"id": "ca359b99-8dec-404c-8683-a73603bdfd6d",
+						"id": "5726d25b-fc39-41ab-95b4-4653c4be2003",
 						"tracks": [
 							{
-								"id": "1757f48f-10ea-407d-8768-1d589c22995b",
+								"id": "d6b259b3-6198-4336-b0f3-3bf6d34b2d15",
 								"type": "VIDEO",
-								"name": "video-0576p-1400k-libx264.mp4.m3u8",
+								"fileName": "video-0576p-1400k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
+								"language": "und",
 								"bandwidth": 8062646,
 								"segments": [
 									{
@@ -255,14 +256,15 @@
 						]
 					},
 					{
-						"id": "ebd7c956-6f2a-4cda-a5e0-882b602d3ae6",
+						"id": "ab45daaf-a176-4183-bafc-f4c372160c9e",
 						"tracks": [
 							{
-								"id": "9f5e705a-a736-4b07-ba09-18c257fea916",
+								"id": "ef7ac7b1-d62b-4f6e-84d1-3e714491a9a1",
 								"type": "VIDEO",
-								"name": "video-0480p-1000k-libx264.mp4.m3u8",
+								"fileName": "video-0480p-1000k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
+								"language": "und",
 								"bandwidth": 6096050,
 								"segments": [
 									{
@@ -339,14 +341,15 @@
 						]
 					},
 					{
-						"id": "998db81c-b266-4386-a6fb-a01089fc90bb",
+						"id": "b65cc229-619a-40d1-9b76-642c7886c11b",
 						"tracks": [
 							{
-								"id": "6096f135-be3f-443d-a1f0-e872f988644c",
+								"id": "4f266067-799d-4a75-a47d-39d32a69e543",
 								"type": "VIDEO",
-								"name": "video-0360p-0750k-libx264.mp4.m3u8",
+								"fileName": "video-0360p-0750k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
+								"language": "und",
 								"bandwidth": 4005148,
 								"segments": [
 									{

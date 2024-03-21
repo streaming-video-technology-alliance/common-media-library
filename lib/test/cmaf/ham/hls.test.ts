@@ -35,7 +35,7 @@ describe('m3u8ToHam', () => {
 	});
 });
 
-describe.skip('hamTom3u8', () => {
+describe('hamTom3u8', () => {
 	// FIXME: the manifest is missing some of the original metadata
 	it('converts ham0 to m3u8', () => {
 		const presentations = ham0 as Presentation[];

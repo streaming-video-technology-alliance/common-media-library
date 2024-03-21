@@ -11,7 +11,7 @@ import {
 	jsonHam6,
 	jsonHam7,
 	jsonHam8,
-} from './data/ham-samples/index.js';
+} from './data/ham-samples/fromMpd/index.js';
 import {
 	mpdSample0,
 	mpdSample1,

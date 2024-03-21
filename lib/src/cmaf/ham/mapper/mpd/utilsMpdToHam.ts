@@ -114,14 +114,6 @@ function getLanguage(adaptationSet: AdaptationSet): string {
 	return language;
 }
 
-function getName(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-	type: string,
-): string {
-	return adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type;
-}
-
 /**
  * Calculates the number of segments that a track has to use SegmentTemplate.
  *
@@ -224,7 +216,6 @@ export {
 	getFrameRate,
 	getGroup,
 	getLanguage,
-	getName,
 	getNumberOfSegments,
 	getPresentationId,
 	getSampleRate,

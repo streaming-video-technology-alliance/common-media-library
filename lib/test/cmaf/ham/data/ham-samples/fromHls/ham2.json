@@ -1,9 +1,9 @@
 [
 	{
-		"id": "43e29af7-435f-4435-8c3e-b0b4f3e94df3",
+		"id": "c02c6439-eb13-4aaa-8871-f5be7da22675",
 		"selectionSets": [
 			{
-				"id": "f7535c21-0356-4601-b3b6-c58c957fe4df",
+				"id": "04124192-b424-4243-94b6-806b328dfc6f",
 				"switchingSets": [
 					{
 						"id": "audio-aacl-64",
@@ -11,7 +11,7 @@
 							{
 								"id": "audio-aacl-64",
 								"type": "AUDIO",
-								"name": "tears-of-steel-aac-64k.m3u8",
+								"fileName": "tears-of-steel-aac-64k.m3u8",
 								"codec": "",
 								"duration": 6,
 								"language": "en",
@@ -646,7 +646,7 @@
 							{
 								"id": "audio-aacl-128",
 								"type": "AUDIO",
-								"name": "audio-aac-128k.m3u8",
+								"fileName": "audio-aac-128k.m3u8",
 								"codec": "",
 								"duration": 8,
 								"language": "en",
@@ -1123,7 +1123,7 @@
 				]
 			},
 			{
-				"id": "7f2b6652-cdd9-4b9e-a4fc-ea3cb4f28f4c",
+				"id": "f795105c-4289-41d5-a66a-d4e448237c61",
 				"switchingSets": []
 			}
 		]

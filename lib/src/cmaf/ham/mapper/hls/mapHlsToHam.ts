@@ -7,57 +7,47 @@ import type {
 	SelectionSet,
 	SwitchingSet,
 	TextTrack,
-	Track,
 	VideoTrack,
 } from '../../types/model';
-import type { Manifest, PlayList } from '../../types';
+import type { Manifest } from '../../types';
 
+// TODO: remove uuid
 function mapHlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseM3u8(manifest.manifest);
 	manifest = addMetadataToHLS(manifest, mainManifestParsed);
-	const playlists: PlayList[] = mainManifestParsed.playlists;
-	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
-	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
-	const audioSwitchingSets: SwitchingSet[] = [];
 	const selectionSets: SelectionSet[] = [];
-	const manifestPlaylists = manifest.ancillaryManifests
-		? manifest.ancillaryManifests
-		: [];
+	const manifestPlaylists = manifest.ancillaryManifests ?? [];
 	let currentPlaylist = 0;
 
+	const audioSwitchingSets: SwitchingSet[] = [];
+
+	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	for (const audio in mediaGroupsAudio) {
-		const audioTracks: AudioTrack[] = [];
 		const attributes: any = mediaGroupsAudio[audio];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
 		const audioParsed = parseM3u8(
 			manifestPlaylists[currentPlaylist++].manifest,
 		);
-		const segments: Segment[] = _formatSegments(audioParsed?.segments);
-		const targetDuration = audioParsed?.targetDuration;
 		const map = audioParsed.segments[0]?.map;
-		const byteRange =
-			map && map.byterange
-				? `${map.byterange.length}@${map.byterange.offset}`
-				: undefined;
 		// TODO: retrieve channels, samplerate, bandwidth and codec
-		audioTracks.push({
+		const audioTrack = {
 			id: audio,
 			type: 'AUDIO',
-			name: uri,
+			fileName: uri,
 			codec: '',
-			duration: targetDuration,
+			duration: audioParsed?.targetDuration,
 			language: language,
 			bandwidth: 0,
-			segments: segments,
+			segments: _formatSegments(audioParsed?.segments),
 			sampleRate: 0,
 			channels: 0,
-			byteRange: byteRange,
+			byteRange: getByterange(map),
 			urlInitialization: map?.uri,
-		} as AudioTrack);
+		} as AudioTrack;
 		audioSwitchingSets.push({
 			id: audio,
-			tracks: audioTracks,
+			tracks: [audioTrack],
 		} as SwitchingSet);
 	}
 
@@ -69,29 +59,27 @@ function mapHlsToHam(manifest: Manifest) {
 	const subtitleSwitchingSets: SwitchingSet[] = [];
 
 	// Add selection set of type subtitles
+	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
 	for (const subtitle in mediaGroupsSubtitles) {
 		const attributes = mediaGroupsSubtitles[subtitle];
-		const textTracks: TextTrack[] = [];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
 		const subtitleParsed = parseM3u8(
 			manifestPlaylists[currentPlaylist++].manifest,
 		);
-		const segments: Segment[] = _formatSegments(subtitleParsed?.segments);
-		const targetDuration = subtitleParsed?.targetDuration;
-		textTracks.push({
+		const textTrack = {
 			id: subtitle,
 			type: 'TEXT',
-			name: uri,
+			fileName: uri,
 			codec: '',
-			duration: targetDuration,
+			duration: subtitleParsed?.targetDuration,
 			language: language,
 			bandwidth: 0,
-			segments: segments,
-		} as TextTrack);
+			segments: _formatSegments(subtitleParsed?.segments),
+		} as TextTrack;
 		subtitleSwitchingSets.push({
 			id: subtitle,
-			tracks: textTracks,
+			tracks: [textTrack],
 		} as SwitchingSet);
 	}
 
@@ -105,47 +93,37 @@ function mapHlsToHam(manifest: Manifest) {
 	//Add selection set of type video
 	const switchingSetVideos: SwitchingSet[] = [];
 
-	playlists.map(async (playlist: any) => {
+	mainManifestParsed.playlists.map((playlist: any) => {
 		const parsedHlsManifest = parseM3u8(
 			manifestPlaylists[currentPlaylist++].manifest,
 		);
-		const tracks: Track[] = [];
 		const segments: Segment[] = _formatSegments(
 			parsedHlsManifest?.segments,
 		);
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
-		const targetDuration = parsedHlsManifest?.targetDuration;
-		const resolution = {
-			width: playlist.attributes.RESOLUTION.width,
-			height: playlist.attributes.RESOLUTION.height,
-		};
 		const map = parsedHlsManifest.segments[0]?.map;
-		const byterange = map?.byterange;
-		const uri = map?.uri;
-		tracks.push({
+		const videoTrack = {
 			id: uuid(),
 			type: 'VIDEO',
-			name: playlist.uri,
+			fileName: playlist.uri,
 			codec: CODECS,
-			duration: targetDuration,
+			duration: parsedHlsManifest?.targetDuration,
 			language: LANGUAGE ?? 'und',
 			bandwidth: BANDWIDTH,
 			segments: segments,
-			width: resolution.width,
-			height: resolution.height,
+			width: playlist.attributes.RESOLUTION.width,
+			height: playlist.attributes.RESOLUTION.height,
 			frameRate: playlist.attributes['FRAME-RATE'],
 			par: '',
 			sar: '',
 			scanType: '',
-			byteRange: byterange
-				? `${byterange.length}@${byterange.offset}`
-				: undefined,
-			urlInitialization: uri,
-		} as VideoTrack);
+			byteRange: getByterange(map),
+			urlInitialization: map?.uri,
+		} as VideoTrack;
 
 		switchingSetVideos.push({
 			id: uuid(),
-			tracks: tracks,
+			tracks: [videoTrack],
 		} as SwitchingSet);
 	});
 
@@ -157,17 +135,19 @@ function mapHlsToHam(manifest: Manifest) {
 	return [{ id: uuid(), selectionSets: selectionSets }];
 }
 
-function _formatSegments(segments: any[]) {
+function getByterange(element: any): string | undefined {
+	return element.byteRange
+		? `${element.byterange.length}@${element.byterange.offset}`
+		: undefined;
+}
+
+function _formatSegments(segments: any[]): Segment[] {
 	const formattedSegments: Segment[] = [];
-	segments.map(async (segment: any) => {
-		const { duration, uri } = segment;
-		const { length, offset } = segment.byterange
-			? segment.byterange
-			: { length: 0, offset: 0 };
+	segments.map((segment: any) => {
 		formattedSegments.push({
-			duration: duration,
-			url: uri,
-			byteRange: length ? `${length}@${offset}` : undefined,
+			duration: segment.duration,
+			url: segment.uri,
+			byteRange: getByterange(segment),
 		} as Segment);
 	});
 

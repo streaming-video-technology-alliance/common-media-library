@@ -6,7 +6,6 @@ import {
 	getFrameRate,
 	getGroup,
 	getLanguage,
-	getName,
 	getNumberOfSegments,
 	getPresentationId,
 	getSampleRate,
@@ -277,35 +276,6 @@ describe('getLanguage', () => {
 	it('returns und as language if lang does not exist', () => {
 		const res = getLanguage({ $: {} } as AdaptationSet);
 		equal(res, 'und');
-	});
-});
-
-describe('getName', () => {
-	it('returns mimeType from adaptationSet if it exists', () => {
-		const res = getName(
-			{ $: { mimeType: 'audio' } } as AdaptationSet,
-			{ $: {} } as Representation,
-			'video',
-		);
-		equal(res, 'audio');
-	});
-
-	it('returns mimeType from representation if it exists and adaptationSet has no mimeType', () => {
-		const res = getName(
-			{ $: {} } as AdaptationSet,
-			{ $: { mimeType: 'audio' } } as Representation,
-			'video',
-		);
-		equal(res, 'audio');
-	});
-
-	it('returns type if adaptationSet and representation have no mimeType', () => {
-		const res = getName(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-			'video',
-		);
-		equal(res, 'video');
 	});
 });
 

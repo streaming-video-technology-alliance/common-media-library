@@ -1,9 +1,9 @@
 [
 	{
-		"id": "28cb3cbc-ef0c-4acf-8c80-f69d8ef43cf3",
+		"id": "85dc1d08-1504-4ec0-b117-0551bce59bcb",
 		"selectionSets": [
 			{
-				"id": "d2ec6a70-64ef-4c07-b181-0853d0c0c0d8",
+				"id": "28bda681-2a4f-47cb-b7fb-b5ca6777525c",
 				"switchingSets": [
 					{
 						"id": "audio-aacl-64",
@@ -11,7 +11,7 @@
 							{
 								"id": "audio-aacl-64",
 								"type": "AUDIO",
-								"name": "tears-of-steel-aac-64k.m3u8",
+								"fileName": "tears-of-steel-aac-64k.m3u8",
 								"codec": "",
 								"duration": 6,
 								"language": "en",
@@ -646,7 +646,7 @@
 							{
 								"id": "audio-aacl-128",
 								"type": "AUDIO",
-								"name": "tears-of-steel-aac-128k.m3u8",
+								"fileName": "tears-of-steel-aac-128k.m3u8",
 								"codec": "",
 								"duration": 6,
 								"language": "en",
@@ -1278,17 +1278,18 @@
 				]
 			},
 			{
-				"id": "5498c0cb-f42e-4c41-93d4-d31a4db6378d",
+				"id": "e745150d-d6cf-418e-9181-492a702f6611",
 				"switchingSets": [
 					{
-						"id": "f6ffa97d-410c-4d70-ab67-42156c152f2c",
+						"id": "f62ec294-c380-4fd2-b1cc-c73161c4809d",
 						"tracks": [
 							{
-								"id": "f93341e3-1bcd-4be7-9b95-4eb1567d0589",
+								"id": "afcb245d-2f79-4ae9-b28d-16c94baec156",
 								"type": "VIDEO",
-								"name": "tears-of-steel-avc1-400k.m3u8",
+								"fileName": "tears-of-steel-avc1-400k.m3u8",
 								"codec": "avc1.64001F,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 1354000,
 								"segments": [
 									{
@@ -1763,14 +1764,15 @@
 						]
 					},
 					{
-						"id": "db939e24-3297-4d72-8f89-0069fb4ec64a",
+						"id": "a8034586-db1d-4380-bcfd-87028619e7d1",
 						"tracks": [
 							{
-								"id": "51a9cb02-6169-4f52-9a3e-b9fbc2882c72",
+								"id": "b9630aca-f991-47a6-b635-eed96d3b31c2",
 								"type": "VIDEO",
-								"name": "tears-of-steel-avc1-750k.m3u8",
+								"fileName": "tears-of-steel-avc1-750k.m3u8",
 								"codec": "avc1.64001F,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 2867000,
 								"segments": [
 									{
@@ -2245,14 +2247,15 @@
 						]
 					},
 					{
-						"id": "46908f0e-95be-4c5a-bb41-0d44a51d661c",
+						"id": "48ea32c4-77cc-425b-aca6-f6e6d07862af",
 						"tracks": [
 							{
-								"id": "3bde2504-6da0-4051-835e-b44004383831",
+								"id": "37a704ad-3a26-4e46-8905-8c6135788314",
 								"type": "VIDEO",
-								"name": "tears-of-steel-avc1-1000k.m3u8",
+								"fileName": "tears-of-steel-avc1-1000k.m3u8",
 								"codec": "avc1.64001F,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 4486000,
 								"segments": [
 									{
@@ -2727,14 +2730,15 @@
 						]
 					},
 					{
-						"id": "c165f422-2ca4-44ee-93b3-c9a7b76739d0",
+						"id": "0ebc537c-6e01-4040-bffa-00a2a711c905",
 						"tracks": [
 							{
-								"id": "72f6303a-9db9-430a-b1b4-8fa84eff6b5f",
+								"id": "e90334d2-51eb-422d-ad64-f86edfb2d3c2",
 								"type": "VIDEO",
-								"name": "tears-of-steel-avc1-1500k.m3u8",
+								"fileName": "tears-of-steel-avc1-1500k.m3u8",
 								"codec": "avc1.640028,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 9413000,
 								"segments": [
 									{
@@ -3209,14 +3213,15 @@
 						]
 					},
 					{
-						"id": "4f71957a-cd42-40cb-bb7c-bacc43279f6f",
+						"id": "782684a8-bf0d-4a0f-96b9-91f4c886b7d1",
 						"tracks": [
 							{
-								"id": "2c2613d4-e2fc-40c2-bcd6-e9db29e9a3ae",
+								"id": "6def8ad8-ef4e-41b4-8b84-3e8d82d36e9d",
 								"type": "VIDEO",
-								"name": "tears-of-steel-avc1-2200k.m3u8",
+								"fileName": "tears-of-steel-avc1-2200k.m3u8",
 								"codec": "avc1.640028,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 12173000,
 								"segments": [
 									{
@@ -3691,14 +3696,15 @@
 						]
 					},
 					{
-						"id": "0cb7cdd7-3d57-4cf7-b9c2-0322b98f3db2",
+						"id": "9c1bee21-2f22-4ce2-ae04-ca08bb17a724",
 						"tracks": [
 							{
-								"id": "85420c03-b73a-4632-ad45-aa1a6fa4b061",
+								"id": "0b9a696d-3957-46d4-84cb-4d0ca8558cf9",
 								"type": "VIDEO",
-								"name": "tears-of-steel-hev1-1100k.m3u8",
+								"fileName": "tears-of-steel-hev1-1100k.m3u8",
 								"codec": "hev1.1.6.H150.90,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 3760000,
 								"segments": [
 									{
@@ -4174,14 +4180,15 @@
 						]
 					},
 					{
-						"id": "a68e7054-aef2-4988-9da6-bd14cb6d2d85",
+						"id": "15d19d78-1f19-41b2-a560-abe8e439fe83",
 						"tracks": [
 							{
-								"id": "1a0b684a-a3bd-4e64-ab7d-4e3663e40c29",
+								"id": "a3948f6e-21d3-46b7-b397-1bb40bf320c3",
 								"type": "VIDEO",
-								"name": "tears-of-steel-hev1-1500k.m3u8",
+								"fileName": "tears-of-steel-hev1-1500k.m3u8",
 								"codec": "hev1.1.6.H150.90,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 5186000,
 								"segments": [
 									{
@@ -4657,14 +4664,15 @@
 						]
 					},
 					{
-						"id": "607d9226-0d34-4223-b5d6-d01b62aed428",
+						"id": "fb38c0b0-480a-47db-9c04-7abb4bee5a48",
 						"tracks": [
 							{
-								"id": "9b350fac-22c8-4566-ad2b-3e15f7489f3d",
+								"id": "0a2cdb81-6b24-4256-a107-9710501d8ad9",
 								"type": "VIDEO",
-								"name": "tears-of-steel-hev1-2200k.m3u8",
+								"fileName": "tears-of-steel-hev1-2200k.m3u8",
 								"codec": "hev1.1.6.H150.90,mp4a.40.2",
 								"duration": 8,
+								"language": "und",
 								"bandwidth": 7145000,
 								"segments": [
 									{

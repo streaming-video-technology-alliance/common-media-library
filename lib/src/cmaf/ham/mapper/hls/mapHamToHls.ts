@@ -8,7 +8,7 @@ import {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import { getPlaylistData, getSegments } from './utilsHamToHls';
+import { getPlaylistData, getSegments } from './utilsHamToHls.js';
 
 function generateManifestPlaylistPiece(track: Track): {
 	manifestToConcat: string;
@@ -22,15 +22,15 @@ function generateManifestPlaylistPiece(track: Track): {
 
 	if (track.type.toLowerCase() === 'video') {
 		const videoTrack = track as VideoTrack;
-		manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}\n${trackFileName}\n`;
+		manifestToConcat += `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}\n${trackFileName}\n`;
 		playlist += getPlaylistData(videoTrack);
 	} else if (track.type.toLowerCase() === 'audio') {
 		const audioTrack = track as AudioTrack;
-		manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"\n`;
+		manifestToConcat += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"\n`;
 		playlist += getPlaylistData(audioTrack);
 	} else if (track.type.toLowerCase() === 'text') {
 		const textTrack = track as TextTrack;
-		manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}\n`;
+		manifestToConcat += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}\n`;
 	}
 
 	playlist += `${getSegments(track.segments)}#EXT-X-ENDLIST`;
@@ -40,7 +40,7 @@ function generateManifestPlaylistPiece(track: Track): {
 
 function mapHamToHls(presentations: Presentation[]): Manifest {
 	const version = 1; //TODO : save version in the model.
-	let mainManifest = `#EXTM3U\n#EXT-X-VERSION:${version}\n`;
+	let mainManifest = `#EXTM3U\n#EXT-X-VERSION:${version}\n\n`;
 	const playlists: Manifest[] = [];
 	presentations.map((presentation: Presentation) => {
 		presentation.selectionSets.map((selectionSet: SelectionSet) => {
@@ -61,4 +61,4 @@ function mapHamToHls(presentations: Presentation[]): Manifest {
 	};
 }
 
-export { mapHamToHls };
+export { mapHamToHls, generateManifestPlaylistPiece };

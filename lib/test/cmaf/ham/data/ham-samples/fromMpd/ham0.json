@@ -9,7 +9,6 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "audio/mp4",
 								"bandwidth": 64349,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -24,10 +23,10 @@
 										"byteRange": "704-2211"
 									}
 								],
-								"type": "audio"
+								"type": "audio",
+								"urlInitialization": "tears-of-steel-aac-64k.cmfa"
 							},
 							{
-								"name": "audio/mp4",
 								"bandwidth": 128407,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -42,7 +41,8 @@
 										"byteRange": "704-2211"
 									}
 								],
-								"type": "audio"
+								"type": "audio",
+								"urlInitialization": "tears-of-steel-aac-128k.cmfa"
 							}
 						]
 					}
@@ -55,7 +55,6 @@
 						"id": "12",
 						"tracks": [
 							{
-								"name": "video/mp4",
 								"bandwidth": 405000,
 								"codec": "avc1.64001F",
 								"duration": 734,
@@ -74,10 +73,10 @@
 									}
 								],
 								"type": "video",
-								"width": 224
+								"width": 224,
+								"urlInitialization": "tears-of-steel-avc1-400k.cmfv"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 759000,
 								"codec": "avc1.64001F",
 								"duration": 734,
@@ -96,10 +95,10 @@
 									}
 								],
 								"type": "video",
-								"width": 448
+								"width": 448,
+								"urlInitialization": "tears-of-steel-avc1-750k.cmfv"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 1026000,
 								"codec": "avc1.64001F",
 								"duration": 734,
@@ -118,10 +117,10 @@
 									}
 								],
 								"type": "video",
-								"width": 784
+								"width": 784,
+								"urlInitialization": "tears-of-steel-avc1-1000k.cmfv"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 1501000,
 								"codec": "avc1.640028",
 								"duration": 734,
@@ -140,10 +139,10 @@
 									}
 								],
 								"type": "video",
-								"width": 1680
+								"width": 1680,
+								"urlInitialization": "tears-of-steel-avc1-1500k.cmfv"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 2205000,
 								"codec": "avc1.640028",
 								"duration": 734,
@@ -162,7 +161,8 @@
 									}
 								],
 								"type": "video",
-								"width": 1680
+								"width": 1680,
+								"urlInitialization": "tears-of-steel-avc1-2200k.cmfv"
 							}
 						]
 					}
@@ -175,7 +175,6 @@
 						"id": "2",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -188,7 +187,8 @@
 										"byteRange": "607-1778"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-en.cmft"
 							}
 						]
 					},
@@ -196,7 +196,6 @@
 						"id": "3",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -209,7 +208,8 @@
 										"byteRange": "607-1778"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-de.cmft"
 							}
 						]
 					},
@@ -217,7 +217,6 @@
 						"id": "4",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -230,7 +229,8 @@
 										"byteRange": "607-1778"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-es.cmft"
 							}
 						]
 					},
@@ -238,7 +238,6 @@
 						"id": "5",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -251,7 +250,8 @@
 										"byteRange": "607-1778"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-fr.cmft"
 							}
 						]
 					},
@@ -259,7 +259,6 @@
 						"id": "6",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -272,7 +271,8 @@
 										"byteRange": "607-1778"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-nl.cmft"
 							}
 						]
 					},
@@ -280,7 +280,6 @@
 						"id": "7",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -293,7 +292,8 @@
 										"byteRange": "625-1796"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-pt-br.cmft"
 							}
 						]
 					},
@@ -301,7 +301,6 @@
 						"id": "8",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -314,7 +313,8 @@
 										"byteRange": "625-1796"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-pt-pt.cmft"
 							}
 						]
 					},
@@ -322,7 +322,6 @@
 						"id": "9",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -335,7 +334,8 @@
 										"byteRange": "607-1778"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-ru.cmft"
 							}
 						]
 					},
@@ -343,7 +343,6 @@
 						"id": "10",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -356,7 +355,8 @@
 										"byteRange": "607-1778"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-zh.cmft"
 							}
 						]
 					},
@@ -364,7 +364,6 @@
 						"id": "11",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1000,
 								"codec": "wvtt",
 								"duration": 734,
@@ -377,7 +376,8 @@
 										"byteRange": "627-1798"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "tears-of-steel-zh-hans.cmft"
 							}
 						]
 					}

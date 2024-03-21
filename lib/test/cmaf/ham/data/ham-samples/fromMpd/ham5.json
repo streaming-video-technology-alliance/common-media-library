@@ -9,7 +9,6 @@
 						"id": "video",
 						"tracks": [
 							{
-								"name": "video/mp4",
 								"bandwidth": 2000000,
 								"codec": "avc1.640028",
 								"duration": 50,
@@ -47,7 +46,8 @@
 									}
 								],
 								"type": "video",
-								"width": 1920
+								"width": 1920,
+								"urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv"
 							}
 						]
 					}
@@ -60,7 +60,6 @@
 						"id": "audio",
 						"tracks": [
 							{
-								"name": "audio/mp4",
 								"bandwidth": 96000,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -94,7 +93,8 @@
 										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000005.cmfa"
 									}
 								],
-								"type": "audio"
+								"type": "audio",
+								"urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa"
 							}
 						]
 					}

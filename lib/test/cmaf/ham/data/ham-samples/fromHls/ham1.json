@@ -1,9 +1,9 @@
 [
 	{
-		"id": "9a8f83ca-b311-4690-bee5-14858834f2f0",
+		"id": "439892af-bfe9-4360-81ac-04c79e691ba2",
 		"selectionSets": [
 			{
-				"id": "61ccac0c-909c-46bb-aa9e-051604ad6330",
+				"id": "9cf57e25-39ce-456c-aed5-1a610e252dfa",
 				"switchingSets": [
 					{
 						"id": "default-audio-group",
@@ -11,7 +11,7 @@
 							{
 								"id": "default-audio-group",
 								"type": "AUDIO",
-								"name": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_a-eng-0128k-aac-2c.mp4.m3u8",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_a-eng-0128k-aac-2c.mp4.m3u8",
 								"codec": "",
 								"duration": 5,
 								"language": "en",
@@ -403,15 +403,15 @@
 				]
 			},
 			{
-				"id": "a699ddfb-1381-4e0a-9db2-e8f5388ac430",
+				"id": "350a1cff-b968-4ca0-857d-0383de001258",
 				"switchingSets": [
 					{
-						"id": "2b84ea04-ad7a-4f0e-9dc9-28c006ba6954",
+						"id": "38bd4f6f-0f89-43d7-8dc2-1f889b09a933",
 						"tracks": [
 							{
-								"id": "6edf0229-7319-4740-895b-644859a93a6c",
+								"id": "6e9a7008-aaa8-4579-a2b3-ed22017ea890",
 								"type": "VIDEO",
-								"name": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0144p-0100k-libx264.mp4.m3u8",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0144p-0100k-libx264.mp4.m3u8",
 								"codec": "avc1.42c01e,mp4a.40.2",
 								"duration": 5,
 								"language": "und",
@@ -804,12 +804,12 @@
 						]
 					},
 					{
-						"id": "deaf59f0-649f-444e-a5ae-6800867d1f29",
+						"id": "9d2bb293-e1e2-40aa-8aa3-e497107b152d",
 						"tracks": [
 							{
-								"id": "49e8c5a8-c8a5-4048-a0c7-7413d2269b21",
+								"id": "6ac55857-2668-4936-bfc8-5f6f4b1ee4b6",
 								"type": "VIDEO",
-								"name": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0240p-0400k-libx264.mp4.m3u8",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0240p-0400k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
 								"language": "und",
@@ -1202,12 +1202,12 @@
 						]
 					},
 					{
-						"id": "d0aa5495-bfbc-4572-85e7-7925087a4d3f",
+						"id": "1dec4730-a693-4f57-b12c-7b73d659920f",
 						"tracks": [
 							{
-								"id": "3da3b7e8-d0b2-4f51-a8eb-4fdfaa280ea9",
+								"id": "91d3de6a-394d-4e6c-978a-487df73acd53",
 								"type": "VIDEO",
-								"name": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0576p-1400k-libx264.mp4.m3u8",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0576p-1400k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
 								"language": "und",
@@ -1600,12 +1600,12 @@
 						]
 					},
 					{
-						"id": "ff1f654c-e2e7-419a-9f16-2b74d7b06fdc",
+						"id": "21c0ed88-9b71-40f3-b5a2-a52ae9f20a42",
 						"tracks": [
 							{
-								"id": "c9665770-68d3-4ead-a4d2-16b41df675bd",
+								"id": "8f8afd7a-6a06-4b15-b5b1-a43bd1253731",
 								"type": "VIDEO",
-								"name": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0720p-2500k-libx264.mp4.m3u8",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0720p-2500k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
 								"language": "und",
@@ -1998,12 +1998,12 @@
 						]
 					},
 					{
-						"id": "f75b28d8-9e4d-4a3a-be39-b0455a6f3165",
+						"id": "1931460b-ed4e-4aa2-851d-d363294c616c",
 						"tracks": [
 							{
-								"id": "7d2f9837-8360-44e3-b885-562ab5d906fd",
+								"id": "afdb729d-2bb9-4b38-ab2f-2f5fac29eb93",
 								"type": "VIDEO",
-								"name": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0480p-1000k-libx264.mp4.m3u8",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0480p-1000k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
 								"language": "und",
@@ -2396,12 +2396,12 @@
 						]
 					},
 					{
-						"id": "f7a0c66d-2395-4741-bcee-d229c0a3c0d9",
+						"id": "cbc47cec-239f-4ce3-a1a1-d8258c49b4a1",
 						"tracks": [
 							{
-								"id": "8f368417-460c-4a9f-9b08-3a2124a62a6b",
+								"id": "b0593a71-5033-4d5f-b53a-23a7bb7494dc",
 								"type": "VIDEO",
-								"name": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0360p-0750k-libx264.mp4.m3u8",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0360p-0750k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f,mp4a.40.2",
 								"duration": 5,
 								"language": "und",

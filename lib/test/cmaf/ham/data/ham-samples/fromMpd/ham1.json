@@ -9,7 +9,6 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "video/mp4",
 								"bandwidth": 72000,
 								"codec": "avc1.42c01e",
 								"duration": 30,
@@ -39,7 +38,8 @@
 									}
 								],
 								"type": "video",
-								"width": 854
+								"width": 854,
+								"urlInitialization": "testStream01bbb/video/72000/seg_init.mp4"
 							}
 						]
 					}
@@ -52,7 +52,6 @@
 						"id": "2",
 						"tracks": [
 							{
-								"name": "audio/mp4",
 								"bandwidth": 72000,
 								"channels": 2,
 								"codec": "mp4a.40.2",
@@ -78,7 +77,8 @@
 										"url": "testStream01bbb/audio/72000/segment_20864.m4s"
 									}
 								],
-								"type": "audio"
+								"type": "audio",
+								"urlInitialization": "testStream01bbb/audio/72000/seg_init.mp4"
 							}
 						]
 					}
