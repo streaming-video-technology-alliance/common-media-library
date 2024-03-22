@@ -1,4 +1,4 @@
-import { getTimescale } from '../ham/mapper/mpd/utilsHamToMpd.js';
+import { getTimescale } from '../ham/mapper/dash/utilsHamToDash.js';
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
 import { AudioTrack, Track } from '../ham/types/model';

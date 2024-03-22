@@ -5,7 +5,7 @@ import {
 	mapSegmentList,
 	mapSegments,
 	mapSegmentTemplate,
-} from '../ham/mapper/mpd/mapMpdToHam.js';
+} from '../ham/mapper/dash/mapDashToHam.js';
 import {
 	duration,
 	representationBase,

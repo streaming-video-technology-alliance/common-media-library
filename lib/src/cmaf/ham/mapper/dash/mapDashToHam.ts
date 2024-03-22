@@ -194,8 +194,8 @@ function getInitializationUrl(
 	return initializationUrl;
 }
 
-function mapDashToHam(mpd: DashManifest): Presentation[] {
-	return mpd.MPD.Period.map((period: Period) => {
+function mapDashToHam(dash: DashManifest): Presentation[] {
+	return dash.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
 		const presentationId: string = getPresentationId(period, duration);
 
