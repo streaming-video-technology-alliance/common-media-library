@@ -57,9 +57,9 @@ function _getTimescale(track: Track): number {
 function _getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
 	if (track.type === 'video') {
-		frameRate = `${(track as VideoTrack).frameRateNum}`;
-		frameRate = (track as VideoTrack).frameRateDen
-			? `${frameRate}/${(track as VideoTrack).frameRateDen}`
+		frameRate = `${(track as VideoTrack).frameRate.frameRateNumerator}`;
+		frameRate = (track as VideoTrack).frameRate.frameRateDenominator
+			? `${frameRate}/${(track as VideoTrack).frameRate.frameRateDenominator}`
 			: frameRate;
 	}
 

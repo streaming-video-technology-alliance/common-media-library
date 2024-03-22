@@ -180,7 +180,9 @@ function _videoPlaylistsToSwitchingSets(
 			segments: segments,
 			width: resolution.width,
 			height: resolution.height,
-			frameRateNum: playlist.attributes['FRAME-RATE'],
+			frameRate: {
+				frameRateNumerator: playlist.attributes['FRAME-RATE'],
+			},
 			par: '',
 			sar: '',
 			scanType: '',

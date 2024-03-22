@@ -32,7 +32,12 @@ import {
 	getTrackDuration,
 	getUrlFromTemplate,
 } from './dashMapperUtils.js';
-import { FRAME_RATE_NUMERATOR_30 } from '../../../utils/constants.js';
+import {
+	DENOMINATOR,
+	FRAME_RATE_NUMERATOR_30,
+	FRAME_RATE_SEPARATOR,
+	NOMINATOR,
+} from '../../../utils/constants.js';
 
 function mapTracks(
 	representation: Representation,
@@ -44,19 +49,25 @@ function mapTracks(
 		throw new Error('Error: AdaptationSet is undefined');
 	}
 	const type = getContentType(adaptationSet, representation);
-	const frameRate = getFrameRate(adaptationSet, representation).split('/');
-	const frameRateNum = parseInt(frameRate.at(0) ?? '');
-	const frameRateDen = parseInt(frameRate.at(1) ?? '');
+	const frameRate = getFrameRate(adaptationSet, representation).split(
+		FRAME_RATE_SEPARATOR,
+	);
+	const frameRateNumerator = parseInt(frameRate.at(NOMINATOR) ?? '');
+	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
 	if (type === 'video') {
 		return {
 			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),
-			frameRateNum: isNaN(frameRateNum)
-				? FRAME_RATE_NUMERATOR_30
-				: frameRateNum,
-			frameRateDen: isNaN(frameRateNum) ? undefined : frameRateDen,
+			frameRate: {
+				frameRateNumerator: isNaN(frameRateNumerator)
+					? FRAME_RATE_NUMERATOR_30
+					: frameRateNumerator,
+				frameRateDenominator: isNaN(frameRateDenominator)
+					? undefined
+					: frameRateDenominator,
+			},
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),

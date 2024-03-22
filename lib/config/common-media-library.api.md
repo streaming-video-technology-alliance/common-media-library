@@ -627,8 +627,7 @@ export function validateTracks(tracks: Track[]): TrackValidity;
 export type VideoTrack = Track & {
     width: number;
     height: number;
-    frameRateNum: number;
-    frameRateDen?: number;
+    frameRate: FrameRate;
     par: string;
     sar: string;
     scanType: string;
@@ -641,5 +640,6 @@ export type VideoTrack = Track & {
 // src/cmaf/ham/types/DashManifest.ts:151:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/model/Track.ts:22:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:69:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```
