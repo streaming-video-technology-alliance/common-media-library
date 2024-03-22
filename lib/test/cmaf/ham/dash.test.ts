@@ -24,7 +24,7 @@ import {
 	mpdSample8,
 } from './data/dash-samples/index.js';
 
-describe('dashToHam', () => {
+describe('dashToham', () => {
 	it('converts dash1 to ham1', () => {
 		const convertedHam0 = cmafHam.dashToHam(mpdSample0);
 		deepEqual(convertedHam0, jsonHam0);
@@ -71,47 +71,47 @@ describe('dashToHam', () => {
 	});
 });
 
-describe('ham2mpd', async () => {
+describe('ham2dash', async () => {
 	// FIXME: the xml is missing some of the original metadata
 	it.skip('converts ham1 to dash1', () => {
 		const presentations = jsonHam1 as Presentation[];
-		const convertedMpd = cmafHam.hamToDash(presentations);
-		deepEqual(convertedMpd.manifest, mpdSample1);
-		equal(convertedMpd.type, 'mpd');
-		equal(convertedMpd.ancillaryManifests, []);
+		const converteddash = cmafHam.hamToDash(presentations);
+		deepEqual(converteddash.manifest, mpdSample1);
+		equal(converteddash.type, 'mpd');
+		equal(converteddash.ancillaryManifests, []);
 	});
 
 	it.skip('converts ham5 to dash5', () => {
 		const presentations = jsonHam5 as Presentation[];
-		const convertedMpd = cmafHam.hamToDash(presentations);
-		deepEqual(convertedMpd.manifest, mpdSample5);
-		equal(convertedMpd.type, 'mpd');
-		equal(convertedMpd.ancillaryManifests, []);
+		const convertedDash = cmafHam.hamToDash(presentations);
+		deepEqual(convertedDash.manifest, mpdSample5);
+		equal(convertedDash.type, 'mpd');
+		equal(convertedDash.ancillaryManifests, []);
 	});
 });
 
-describe.skip('mpd to ham to mpd', async () => {
+describe.skip('dash to ham to dash', async () => {
 	it('converts ham5 to dash5 to ham5 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample5);
-		const convertedMpd = cmafHam.hamToDash(convertedHam);
-		deepEqual(convertedMpd.manifest, mpdSample5);
+		const convertedDash = cmafHam.hamToDash(convertedHam);
+		deepEqual(convertedDash.manifest, mpdSample5);
 	});
 
 	it('converts ham6 to dash6 to ham6 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample6);
-		const convertedMpd = cmafHam.hamToDash(convertedHam);
-		deepEqual(convertedMpd.manifest, mpdSample6);
+		const convertedDash = cmafHam.hamToDash(convertedHam);
+		deepEqual(convertedDash.manifest, mpdSample6);
 	});
 
 	it('converts ham7 to dash7 to ham7 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample7);
-		const convertedMpd = cmafHam.hamToDash(convertedHam);
-		deepEqual(convertedMpd.manifest, mpdSample7);
+		const convertedDash = cmafHam.hamToDash(convertedHam);
+		deepEqual(convertedDash.manifest, mpdSample7);
 	});
 
 	it('converts ham8 to dash8 to ham8 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample8);
-		const convertedMpd = cmafHam.hamToDash(convertedHam);
-		deepEqual(convertedMpd.manifest, mpdSample8);
+		const convertedDash = cmafHam.hamToDash(convertedHam);
+		deepEqual(convertedDash.manifest, mpdSample8);
 	});
 });

@@ -1,7 +1,8 @@
 import type { AudioTrack, Track } from '../../types/model';
-
-const VIDEO_SAMPLE_RATE = 90000;
-const TEXT_SAMPLE_RATE = 1000;
+import {
+	TEXT_SAMPLE_RATE,
+	VIDEO_SAMPLE_RATE,
+} from '../../../utils/constants.js';
 
 /**
  * This function tries to recreate the timescale value.
@@ -10,10 +11,6 @@ const TEXT_SAMPLE_RATE = 1000;
  * to get the original one.
  *
  * Just the audio tracks have this value stored on the `sampleRate` key.
- *
- * Using 90000 as default for video since it is divisible by 24, 25 and 30
- *
- * Using 1000 as default for text
  *
  * @param track Track to get the timescale from
  * @returns Timescale in numbers
