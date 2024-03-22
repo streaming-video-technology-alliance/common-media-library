@@ -39,7 +39,7 @@ import {
 	DENOMINATOR,
 	FRAME_RATE_NUMERATOR_30,
 	FRAME_RATE_SEPARATOR,
-	NOMINATOR,
+	NUMERATOR,
 } from '../../../utils/constants.js';
 
 function mapTracks(
@@ -55,7 +55,7 @@ function mapTracks(
 	const frameRate = getFrameRate(adaptationSet, representation).split(
 		FRAME_RATE_SEPARATOR,
 	);
-	const frameRateNumerator = parseInt(frameRate.at(NOMINATOR) ?? '');
+	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '');
 	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
 	if (type === 'video') {
 		return {

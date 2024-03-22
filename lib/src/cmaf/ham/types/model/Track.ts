@@ -51,11 +51,6 @@ type AudioTrack = Track & {
  */
 type TextTrack = Track;
 
-type FrameRate = {
-	frameRateNumerator: number;
-	frameRateDenominator?: number;
-};
-
 /**
  * CMAF-HAM Video Track type
  *
@@ -70,6 +65,11 @@ type VideoTrack = Track & {
 	par: string;
 	sar: string;
 	scanType: string;
+};
+
+type FrameRate = {
+	frameRateNumerator: number;
+	frameRateDenominator?: number;
 };
 
 type TrackType = 'audio' | 'video' | 'text';
