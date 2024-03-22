@@ -1,13 +1,15 @@
-# CMAF HAM LIBRARY #
+# CMAF HAM LIBRARY 
 
-## Overview
+## Overview 
 
 
-Features
+## Features 
 
-Usage
-Here's a basic example of how to use CMAF HAM
-```
+## Usage 
+
+Here's a basic example of how to use CMAF HAM library.
+
+```typescript
 
 import {
   hamToHls,
@@ -44,7 +46,6 @@ function parseFromDash(input: string) {
   const hlsManifest = hamToHls(hamObject);
   //Convert ham object to dash manifest.
   const dashManifest = hamToDash(hamObject);
-
 }
 
 function parseFromHls(main: string, playlists: string[]) {
@@ -54,23 +55,22 @@ function parseFromHls(main: string, playlists: string[]) {
   const hlsManifest = hamToHls(hamObject);
   //Convert ham object to dash.
   const dashManifest = hamToDash(hamObject);
-
 }
 ```
 
-Documentation
+## Documentation
+
 For detailed documentation, including API reference and usage examples, please refer to the official documentation.
 
 
+## Contribution
 
-Contribution
 Contributions are welcome! If you encounter any bugs, have feature requests, or want to contribute code improvements, feel free to open an issue or submit a pull request.
 
-License
+## License
+
 This library is licensed under the Apache 2.0 License. You are free to use, modify, and distribute it for both commercial and non-commercial purposes. See the LICENSE file for details.
 
-Acknowledgments
-Special thanks to [list of contributors or acknowledgments].
 
 
 
