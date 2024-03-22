@@ -1,6 +1,6 @@
-import { parseM3u8 } from '../../../utils/hls/m3u8.js';
+import { parseHlsManifest } from '../../../utils/hls/hlsParser.js';
 import { uuid } from '../../../../utils.js';
-import { addMetadataToHLS } from '../../../utils/manifestUtils.js';
+import { addMetadataToHls } from '../../../utils/manifestUtils.js';
 import type {
 	AudioTrack,
 	Segment,
@@ -13,25 +13,66 @@ import type {
 import type { Manifest, PlayList } from '../../types';
 
 function mapHlsToHam(manifest: Manifest) {
-	const mainManifestParsed = parseM3u8(manifest.manifest);
-	manifest = addMetadataToHLS(manifest, mainManifestParsed);
+	const mainManifestParsed = parseHlsManifest(manifest.manifest);
+	manifest = addMetadataToHls(manifest, mainManifestParsed);
 	const playlists: PlayList[] = mainManifestParsed.playlists;
 	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
-	const audioSwitchingSets: SwitchingSet[] = [];
-	const selectionSets: SelectionSet[] = [];
 	const manifestPlaylists = manifest.ancillaryManifests
-		? manifest.ancillaryManifests
+		? [...manifest.ancillaryManifests]
 		: [];
-	let currentPlaylist = 0;
+	const selectionSets: SelectionSet[] = [];
+
+	const audioSwitchingSets = _audioGroupsToSwitchingSets(
+		mediaGroupsAudio,
+		manifestPlaylists,
+	);
+	const subtitleSwitchingSets = _subtitleGroupsToSwitchingSets(
+		mediaGroupsSubtitles,
+		manifestPlaylists,
+	);
+	const videoSwitchingSets = _videoPlaylistsToSwitchingSets(
+		playlists,
+		manifestPlaylists,
+	);
+
+	if (audioSwitchingSets.length > 0) {
+		selectionSets.push({
+			id: uuid(),
+			switchingSets: audioSwitchingSets,
+		} as SelectionSet);
+	}
+
+	if (subtitleSwitchingSets.length > 0) {
+		selectionSets.push({
+			id: uuid(),
+			switchingSets: subtitleSwitchingSets,
+		} as SelectionSet);
+	}
+
+	if (videoSwitchingSets.length > 0) {
+		selectionSets.push({
+			id: uuid(),
+			switchingSets: videoSwitchingSets,
+		} as SelectionSet);
+	}
+
+	return [{ id: uuid(), selectionSets: selectionSets }];
+}
+
+function _audioGroupsToSwitchingSets(
+	mediaGroupsAudio: any,
+	manifestPlaylists: Manifest[],
+): SwitchingSet[] {
+	const audioSwitchingSets: SwitchingSet[] = [];
 
 	for (const audio in mediaGroupsAudio) {
 		const audioTracks: AudioTrack[] = [];
 		const attributes: any = mediaGroupsAudio[audio];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const audioParsed = parseM3u8(
-			manifestPlaylists[currentPlaylist++].manifest,
+		const audioParsed = parseHlsManifest(
+			manifestPlaylists.shift()!.manifest,
 		);
 		const segments: Segment[] = _formatSegments(audioParsed?.segments);
 		const targetDuration = audioParsed?.targetDuration;
@@ -40,18 +81,21 @@ function mapHlsToHam(manifest: Manifest) {
 			map && map.byterange
 				? `${map.byterange.length}@${map.byterange.offset}`
 				: undefined;
-		// TODO: retrieve channels, samplerate, bandwidth and codec
+		// TODO: channels, sampleRate, bandwith and codec need to be
+		// updated with real values. Right now we are using simple hardcoded values.
 		audioTracks.push({
 			id: audio,
-			type: 'AUDIO',
+			type: 'audio',
 			name: uri,
-			codec: '',
-			duration: targetDuration,
+			// Using codec mp4a.40.2 for now, we should retrieve it by finding
+			// the video playlist that is related to this audio group.
+			codec: 'mp4a.40.2',
+			duration: targetDuration * segments.length,
 			language: language,
 			bandwidth: 0,
 			segments: segments,
 			sampleRate: 0,
-			channels: 0,
+			channels: 2,
 			byteRange: byteRange,
 			urlInitialization: map?.uri,
 		} as AudioTrack);
@@ -61,30 +105,31 @@ function mapHlsToHam(manifest: Manifest) {
 		} as SwitchingSet);
 	}
 
-	selectionSets.push({
-		id: uuid(),
-		switchingSets: audioSwitchingSets,
-	} as SelectionSet);
+	return audioSwitchingSets;
+}
 
+function _subtitleGroupsToSwitchingSets(
+	mediaGroupsSubtitles: any,
+	manifestPlaylists: Manifest[],
+): SwitchingSet[] {
 	const subtitleSwitchingSets: SwitchingSet[] = [];
 
-	// Add selection set of type subtitles
 	for (const subtitle in mediaGroupsSubtitles) {
 		const attributes = mediaGroupsSubtitles[subtitle];
 		const textTracks: TextTrack[] = [];
 		const keys = Object.keys(attributes);
 		const { language, uri } = attributes[keys[0]];
-		const subtitleParsed = parseM3u8(
-			manifestPlaylists[currentPlaylist++].manifest,
+		const subtitleParsed = parseHlsManifest(
+			manifestPlaylists.shift()!.manifest,
 		);
 		const segments: Segment[] = _formatSegments(subtitleParsed?.segments);
 		const targetDuration = subtitleParsed?.targetDuration;
 		textTracks.push({
 			id: subtitle,
-			type: 'TEXT',
+			type: 'text',
 			name: uri,
 			codec: '',
-			duration: targetDuration,
+			duration: targetDuration * segments.length,
 			language: language,
 			bandwidth: 0,
 			segments: segments,
@@ -95,19 +140,18 @@ function mapHlsToHam(manifest: Manifest) {
 		} as SwitchingSet);
 	}
 
-	if (subtitleSwitchingSets.length > 0) {
-		selectionSets.push({
-			id: uuid(),
-			switchingSets: subtitleSwitchingSets,
-		} as SelectionSet);
-	}
+	return subtitleSwitchingSets;
+}
 
-	//Add selection set of type video
+function _videoPlaylistsToSwitchingSets(
+	playlists: PlayList[],
+	manifestPlaylists: Manifest[],
+): SwitchingSet[] {
 	const switchingSetVideos: SwitchingSet[] = [];
 
-	playlists.map(async (playlist: any) => {
-		const parsedHlsManifest = parseM3u8(
-			manifestPlaylists[currentPlaylist++].manifest,
+	playlists.map((playlist: any) => {
+		const parsedHlsManifest = parseHlsManifest(
+			manifestPlaylists.shift()!.manifest,
 		);
 		const tracks: Track[] = [];
 		const segments: Segment[] = _formatSegments(
@@ -121,13 +165,16 @@ function mapHlsToHam(manifest: Manifest) {
 		};
 		const map = parsedHlsManifest.segments[0]?.map;
 		const byterange = map?.byterange;
-		const uri = map?.uri;
+		// CODECS could be a comma separated value
+		// where it has video and audio codec. Using
+		// position zero for now. TODO: Get the correct video codec.
+		const codec = CODECS.split(',').at(0);
 		tracks.push({
 			id: uuid(),
-			type: 'VIDEO',
+			type: 'video',
 			name: playlist.uri,
-			codec: CODECS,
-			duration: targetDuration,
+			codec,
+			duration: targetDuration * segments.length,
 			language: LANGUAGE,
 			bandwidth: BANDWIDTH,
 			segments: segments,
@@ -140,7 +187,7 @@ function mapHlsToHam(manifest: Manifest) {
 			byteRange: byterange
 				? `${byterange.length}@${byterange.offset}`
 				: undefined,
-			urlInitialization: uri,
+			urlInitialization: map?.uri,
 		} as VideoTrack);
 
 		switchingSetVideos.push({
@@ -149,17 +196,12 @@ function mapHlsToHam(manifest: Manifest) {
 		} as SwitchingSet);
 	});
 
-	selectionSets.push({
-		id: uuid(),
-		switchingSets: switchingSetVideos,
-	} as SelectionSet);
-
-	return [{ id: uuid(), selectionSets: selectionSets }];
+	return switchingSetVideos;
 }
 
 function _formatSegments(segments: any[]) {
 	const formattedSegments: Segment[] = [];
-	segments.map(async (segment: any) => {
+	segments.map((segment: any) => {
 		const { duration, uri } = segment;
 		const { length, offset } = segment.byterange
 			? segment.byterange

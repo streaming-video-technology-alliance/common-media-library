@@ -1,6 +1,6 @@
-import { HLSMapper } from '../../mapper/HLSMapper.js';
+import { HlsMapper } from '../../mapper/HlsMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
-import type { Presentation } from '../../types/model';
+import type { Presentation } from '../../types/model/index.js';
 
 /**
  * Convert hls manifest into a ham object.
@@ -15,16 +15,16 @@ import type { Presentation } from '../../types/model';
  * @alpha
  */
 
-function m3u8ToHam(manifest: string, ancillaryManifests: string[]) {
+function hlsToHam(manifest: string, ancillaryManifests: string[]) {
 	const mapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new HLSMapper());
+	mapperContext.setStrategy(new HlsMapper());
 	return mapperContext.getHamFormat({
 		manifest,
 		ancillaryManifests: ancillaryManifests.map((ancillaryManifest) => ({
 			manifest: ancillaryManifest,
-			type: 'm3u8',
+			type: 'hls',
 		})),
-		type: 'm3u8',
+		type: 'hls',
 	});
 }
 
@@ -40,10 +40,10 @@ function m3u8ToHam(manifest: string, ancillaryManifests: string[]) {
  * @alpha
  */
 
-function hamToM3U8(presentation: Presentation[]) {
+function hamToHls(presentation: Presentation[]) {
 	const mapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new HLSMapper());
+	mapperContext.setStrategy(new HlsMapper());
 	return mapperContext.getManifestFormat(presentation);
 }
 
-export { m3u8ToHam, hamToM3U8 };
+export { hlsToHam, hamToHls };

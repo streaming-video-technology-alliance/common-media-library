@@ -28,17 +28,17 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 						const { manifestToConcat, playlist } =
 							_generateVideoManifestPiece(track as VideoTrack);
 						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
+						playlists.push({ manifest: playlist, type: 'hls' });
 					} else if (track.type.toLowerCase() === 'audio') {
 						const { manifestToConcat, playlist } =
 							_generateAudioManifestPiece(track as AudioTrack);
 						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
+						playlists.push({ manifest: playlist, type: 'hls' });
 					} else if (track.type.toLowerCase() === 'text') {
 						const { manifestToConcat, playlist } =
 							_generateTextManifestPiece(track as TextTrack);
 						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'm3u8' });
+						playlists.push({ manifest: playlist, type: 'hls' });
 					}
 				});
 			});
@@ -47,7 +47,7 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 	return {
 		manifest: mainManifest,
 		ancillaryManifests: playlists,
-		type: 'm3u8',
+		type: 'hls',
 	};
 }
 
@@ -75,7 +75,7 @@ function _generateVideoManifestPiece(videoTrack: VideoTrack) {
 			? `BYTERANGE:0@${Number(firstSegmentByteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
 			: '';
 
-	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${videoTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${videoTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${videoByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
+	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${videoTrack.duration / videoTrack.segments?.length}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${videoTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${videoByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
@@ -103,7 +103,7 @@ function _generateAudioManifestPiece(audioTrack: AudioTrack) {
 			? `BYTERANGE:0@${Number(firstSegmentByteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
 			: '';
 
-	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${audioTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${audioByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
+	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${audioTrack.duration / audioTrack.segments?.length}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${audioByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }
@@ -117,7 +117,7 @@ function _generateTextManifestPiece(textTrack: TextTrack) {
 			return `#EXTINF:${segment.duration},${NEW_LINE}${segment.url}`;
 		})
 		.join(NEW_LINE);
-	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${textTrack.duration}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
+	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${textTrack.duration / textTrack.segments?.length}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
 
 	return { manifestToConcat, playlist };
 }

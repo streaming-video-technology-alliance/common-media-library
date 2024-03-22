@@ -1,4 +1,4 @@
-type Format = 'm3u8' | 'mpd';
+type Format = 'hls' | 'dash';
 
 /**
  * Manifest object received as an input by the conversion to HAM object
@@ -11,7 +11,7 @@ type Manifest = {
 	manifest: string;
 	ancillaryManifests?: Manifest[];
 	type: Format;
-	metaData?: Map<string, string>;
+	metadata?: Map<string, string>;
 };
 
 export type { Manifest };

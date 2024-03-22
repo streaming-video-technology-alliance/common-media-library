@@ -3,7 +3,7 @@
 ## Generated with https://github.com/google/shaka-packager version v2.3.0-5bf8ad5-release
 #EXT-X-TARGETDURATION:5
 #EXT-X-PLAYLIST-TYPE:VOD
-#EXT-X-MAP:URI="v-0720p-2500k-libx264-init.mp4"
+#EXT-X-MAP:URI="https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-init.mp4"
 #EXTINF:4.000,
 https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s1.mp4
 #EXTINF:4.000,
