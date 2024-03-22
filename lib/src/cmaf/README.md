@@ -28,20 +28,6 @@ import {
   validateTracks,
 } from "@svta/common-media-library";
 
-// Validate tracks in a presentation
-const validateTracks = (presentation: Presentation) => {
-  const tracks = getTracksFromPresentation(presentation);
-  const validation = validateTracks(tracks);
-
-  console.log("At least one segment: ", validation.atLeastOneSegment);
-  console.log("All tracks have the same duration: ", validation.sameDuration);
-
-  if (validation.tracksWithErrors.length > 0) {
-    console.log("Track IDs without segments: ", validation.tracksWithErrors);
-  }
-  
-  return validation;
-};
 
 // Parse from DASH format
 const parseFromDash = (input: string) => {
