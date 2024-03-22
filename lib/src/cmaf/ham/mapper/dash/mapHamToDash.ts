@@ -16,43 +16,8 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model';
-import { parseDurationDash } from '../../../utils/utils.js';
-import {
-	TIMESCALE_1000,
-	TIMESCALE_48000,
-	TIMESCALE_90000,
-} from '../../../utils/constants.js';
-
-/**
- * This function tries to recreate the timescale value.
- *
- * This value is not stored on the ham object, so it is not possible (for now)
- * to get the original one.
- *
- * Just the audio tracks have this value stored on the `sampleRate` key.
- *
- * Using 90000 as default for video since it is divisible by 24, 25 and 30
- *
- * Using 1000 as default for text
- *
- * @param track - Track to get the timescale from
- * @returns Timescale in numbers
- */
-function _getTimescale(track: Track): number {
-	if (track.type === 'audio') {
-		const audioTrack = track as AudioTrack;
-		return audioTrack.sampleRate !== 0
-			? audioTrack.sampleRate
-			: TIMESCALE_48000;
-	}
-	if (track.type === 'video') {
-		return TIMESCALE_90000;
-	}
-	if (track.type === 'text') {
-		return TIMESCALE_1000;
-	}
-	return TIMESCALE_90000;
-}
+import { numberToIso8601Duration } from '../../../utils/utils.js';
+import { getTimescale } from './utilsHamToDash.js';
 
 function _getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
@@ -104,7 +69,7 @@ function _trackToSegmentList(track: Track): SegmentList[] {
 	});
 
 	if (!track.segments.at(0)?.byteRange) {
-		const timescale = _getTimescale(track);
+		const timescale = getTimescale(track);
 		segmentList.push({
 			$: {
 				duration: (
@@ -194,7 +159,7 @@ function _presentationsToPeriods(presentations: Presentation[]): Period[] {
 	return presentations.map((presentation: Presentation) => {
 		return {
 			$: {
-				duration: parseDurationDash(
+				duration: numberToIso8601Duration(
 					presentation.selectionSets[0].switchingSets[0].tracks[0]
 						.duration,
 				),

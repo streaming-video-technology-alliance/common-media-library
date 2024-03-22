@@ -23,23 +23,19 @@
 								"segments": [
 									{
 										"duration": 0,
-										"url": "testStream01bbb/video/72000/seg_init.mp4",
-										"byteRange": ""
+										"url": "testStream01bbb/video/72000/seg_init.mp4"
 									},
 									{
 										"duration": 10,
-										"url": "testStream01bbb/video/72000/segment_0.m4s",
-										"byteRange": ""
+										"url": "testStream01bbb/video/72000/segment_0.m4s"
 									},
 									{
 										"duration": 10,
-										"url": "testStream01bbb/video/72000/segment_10417.m4s",
-										"byteRange": ""
+										"url": "testStream01bbb/video/72000/segment_10417.m4s"
 									},
 									{
 										"duration": 10,
-										"url": "testStream01bbb/video/72000/segment_20833.m4s",
-										"byteRange": ""
+										"url": "testStream01bbb/video/72000/segment_20833.m4s"
 									}
 								],
 								"type": "video",
@@ -67,23 +63,19 @@
 								"segments": [
 									{
 										"duration": 0,
-										"url": "testStream01bbb/audio/72000/seg_init.mp4",
-										"byteRange": ""
+										"url": "testStream01bbb/audio/72000/seg_init.mp4"
 									},
 									{
 										"duration": 10,
-										"url": "testStream01bbb/audio/72000/segment_0.m4s",
-										"byteRange": ""
+										"url": "testStream01bbb/audio/72000/segment_0.m4s"
 									},
 									{
 										"duration": 10,
-										"url": "testStream01bbb/audio/72000/segment_10432.m4s",
-										"byteRange": ""
+										"url": "testStream01bbb/audio/72000/segment_10432.m4s"
 									},
 									{
 										"duration": 10,
-										"url": "testStream01bbb/audio/72000/segment_20864.m4s",
-										"byteRange": ""
+										"url": "testStream01bbb/audio/72000/segment_20864.m4s"
 									}
 								],
 								"type": "audio"
