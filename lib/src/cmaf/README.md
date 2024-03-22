@@ -2,75 +2,68 @@
 
 ## Overview 
 
-HLS and DASH are currently the two most popular video streaming technologies. Due to this, there are some challenges such as converting HLS to DASH (and vice versa), manipulating manifests as well as the need to programmatically understand the structure of these manifests.
+HLS and DASH stand as the predominant video streaming technologies currently. Consequently, users often encounter challenges such as converting between HLS and DASH, manipulating manifests, and programmatically understanding manifest structures.
 
-
-Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) was created with the goal of simplifying content delivery by defining a universal format based on ISOBMFF. This standard also describes the [Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf), a framework that illustrates how CMAF segments and fragments can be used in real-world streaming applications. This library was based on this model.
-
+The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) addresses these challenges by defining a universal format based on ISOBMFF. Additionally, it introduces the Hypothetical Application Model, a framework illustrating the practical usage of CMAF segments and fragments in streaming applications. This library is inspired by the principles outlined in the CMAF standard and the [Hypothetical Application Model] ([Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf)).
 
 ## Features 
 
-* Basic on-demand [HLS] ↔ [DASH] manifest conversion. This includes hls to ham, ham to hls, dash to ham and ham to dash.
-* Basic Media Presentation querying.
-* Track validation.
+* Fundamental on-demand conversion between [HLS] and [DASH] manifests, covering transformations such as HLS to HAM, HAM to HLS, DASH to HAM, and HAM to DASH.
+* Elementary Media Presentation querying functionality.
+* Validation of tracks for enhanced integrity assurance.
 
 ## Usage 
 
-Here's a basic example of how to use CMAF HAM library.
+Here's a sample demonstration illustrating how to utilize the features of the CMAF HAM library in TypeScript:
+
 
 ```typescript
-
 import {
   hamToHls,
-  hamToDash
+  hamToDash,
   hlsToHam,
   dashToHam,
   Presentation,
-  Manifest,
   getTracksFromPresentation,
   validateTracks,
 } from "@svta/common-media-library";
 
+// Validate tracks in a presentation
+const validateTracks = (presentation: Presentation) => {
+  const tracks = getTracksFromPresentation(presentation);
+  const validation = validateTracks(tracks);
 
-function checkTracksValidity(presentation: Presentation) {
-  const validation = validateTracks(getTracksFromPresentation(presentation));
-  console.log(
-    "At least one segment: ",
-    validation.description.atLeastOneSegment
-  );
-  console.log(
-    "All the tracks have the same duration: ",
-    validation.description.sameDuration
-  );
-  validation.tracksWithErrors.length > 0 &&
+  console.log("At least one segment: ", validation.atLeastOneSegment);
+  console.log("All tracks have the same duration: ", validation.sameDuration);
+
+  if (validation.tracksWithErrors.length > 0) {
     console.log("Track IDs without segments: ", validation.tracksWithErrors);
-  console.log("######### INPUT TRACKS VALIDATION ENDED ########\n");
+  }
+  
   return validation;
-}
+};
 
-function parseFromDash(input: string) {
-  //Convert input to ham object.
-  const hamObject = mpdToHam(input); 
-  //Convert ham object to hls manifest.
-  const hlsManifest = hamToHls(hamObject);
-  //Convert ham object to dash manifest.
-  const dashManifest = hamToDash(hamObject);
-}
+// Parse from DASH format
+const parseFromDash = (input: string) => {
+  const hamObj = mpdToHam(input); // Convert input to HAM object
+  const hlsManifest = hamToHls(hamObj); // Convert HAM object to HLS manifest
+  const dashManifest = hamToDash(hamObj); // Convert HAM object to DASH manifest
+};
 
-function parseFromHls(main: string, playlists: string[]) {
-  // Convert hls to ham object.
-  const hamObject = hlsToHam(mainManifest, ancillaryManifests);
-  //Convert ham object to hls.
-  const hlsManifest = hamToHls(hamObject);
-  //Convert ham object to dash.
-  const dashManifest = hamToDash(hamObject);
-}
+// Parse from HLS format
+const parseFromHls = (main: string, playlists: string[]) => {
+  const hamObj = hlsToHam(main, playlists); // Convert HLS to HAM object
+  const hlsManifest = hamToHls(hamObj); // Convert HAM object to HLS manifest
+  const dashManifest = hamToDash(hamObj); // Convert HAM object to DASH manifest
+};
+
 ```
+
+This example showcases how to leverage functionalities such as manifest conversion, presentation querying, and track validation offered by the CMAF HAM library in TypeScript.
 
 ## Documentation
 
-For detailed documentation, including API reference and usage examples, please refer to the official documentation.
-
+For detailed documentation, including API reference and usage examples, please refer to the API documentation.
 
 ## Contribution
 
