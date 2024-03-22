@@ -61,7 +61,8 @@ type TextTrack = Track;
 type VideoTrack = Track & {
 	width: number;
 	height: number;
-	frameRate: string;
+	frameRateNum: number;
+	frameRateDen?: number;
 	par: string;
 	sar: string;
 	scanType: string;

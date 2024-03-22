@@ -32,6 +32,7 @@ import {
 	getTrackDuration,
 	getUrlFromTemplate,
 } from './dashMapperUtils.js';
+import { FRAME_RATE_NUMERATOR_30 } from '../../../utils/constants.js';
 
 function mapTracks(
 	representation: Representation,
@@ -43,13 +44,19 @@ function mapTracks(
 		throw new Error('Error: AdaptationSet is undefined');
 	}
 	const type = getContentType(adaptationSet, representation);
+	const frameRate = getFrameRate(adaptationSet, representation).split('/');
+	const frameRateNum = parseInt(frameRate.at(0) ?? '');
+	const frameRateDen = parseInt(frameRate.at(1) ?? '');
 	if (type === 'video') {
 		return {
 			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),
-			frameRate: getFrameRate(adaptationSet, representation),
+			frameRateNum: isNaN(frameRateNum)
+				? FRAME_RATE_NUMERATOR_30
+				: frameRateNum,
+			frameRateDen: isNaN(frameRateNum) ? undefined : frameRateDen,
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
