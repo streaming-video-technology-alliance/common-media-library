@@ -49,7 +49,7 @@ function mapHamToHls(presentations: Presentation[]): Manifest {
 					const { manifestToConcat, playlist } =
 						generateManifestPlaylistPiece(track);
 					mainManifest += manifestToConcat;
-					playlists.push({ manifest: playlist, type: 'm3u8' });
+					playlists.push({ manifest: playlist, type: 'hls' });
 				});
 			});
 		});
@@ -57,7 +57,7 @@ function mapHamToHls(presentations: Presentation[]): Manifest {
 	return {
 		manifest: mainManifest,
 		ancillaryManifests: playlists,
-		type: 'm3u8',
+		type: 'hls',
 	};
 }
 

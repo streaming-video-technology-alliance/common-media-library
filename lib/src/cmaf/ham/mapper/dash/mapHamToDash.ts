@@ -48,14 +48,12 @@ function trackToSegmentBase(track: Track): SegmentBase[] {
 function trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];
 	const segmentURLs: SegmentURL[] = [];
-	track.segments.forEach((segment, index) => {
-		if (index > 0) {
-			segmentURLs.push({
-				$: {
-					media: segment.url,
-				},
-			});
-		}
+	track.segments.forEach((segment) => {
+		segmentURLs.push({
+			$: {
+				media: segment.url,
+			},
+		});
 	});
 
 	if (!track.segments.at(0)?.byteRange) {
@@ -162,7 +160,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	});
 }
 
-function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
+function mapHamToDash(hamManifests: Presentation[]): DashManifest {
 	const periods: Period[] = presentationsToPeriods(hamManifests);
 	const duration: string = periods[0].$.duration;
 
@@ -177,4 +175,4 @@ function mapHamToMpd(hamManifests: Presentation[]): DashManifest {
 	};
 }
 
-export { mapHamToMpd };
+export { mapHamToDash };

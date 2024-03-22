@@ -190,7 +190,7 @@ function getInitializationUrl(
 	return initializationUrl;
 }
 
-function mapMpdToHam(mpd: DashManifest): Presentation[] {
+function mapDashToHam(mpd: DashManifest): Presentation[] {
 	return mpd.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
 		const presentationId: string = getPresentationId(period, duration);
@@ -243,7 +243,7 @@ function mapMpdToHam(mpd: DashManifest): Presentation[] {
 
 export {
 	getInitializationUrl,
-	mapMpdToHam,
+	mapDashToHam,
 	mapSegments,
 	mapSegmentTemplate,
 	mapSegmentList,
