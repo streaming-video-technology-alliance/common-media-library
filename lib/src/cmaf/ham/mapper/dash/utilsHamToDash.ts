@@ -12,10 +12,6 @@ import {
  *
  * Just the audio tracks have this value stored on the `sampleRate` key.
  *
- * Using VIDEO_SAMPLE_RATE as default for video since it is divisible by 24, 25 and 30
- *
- * Using TEXT_SAMPLE_RATE as default for text
- *
  * @param track Track to get the timescale from
  * @returns Timescale in numbers
  */

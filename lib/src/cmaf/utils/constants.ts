@@ -2,7 +2,9 @@
 export const TIMESCALE_90000 = 90000;
 export const TIMESCALE_48000 = 48000;
 export const TIMESCALE_1000 = 1000;
+// Using 90000 as default for video since it is divisible by 24, 25 and 30
 export const VIDEO_SAMPLE_RATE = 90000;
+// Using 1000 as default for text
 export const TEXT_SAMPLE_RATE = 1000;
 
 // Manifest parser constants
