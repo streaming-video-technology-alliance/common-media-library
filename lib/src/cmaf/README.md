@@ -1,10 +1,10 @@
-# CMAF HAM LIBRARY 
+# CMAF HAM 
 
 ## Overview 
 
 HLS and DASH stand as the predominant video streaming technologies currently. Consequently, users often encounter challenges such as converting between HLS and DASH, manipulating manifests, and programmatically understanding manifest structures.
 
-The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) addresses these challenges by defining a universal format based on ISOBMFF. Additionally, it introduces the Hypothetical Application Model, a framework illustrating the practical usage of CMAF segments and fragments in streaming applications. This library is inspired by the principles outlined in the CMAF standard and the [Hypothetical Application Model] ([Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf)).
+The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) addresses these challenges by defining a universal format based on ISOBMFF. Additionally, it introduces the Hypothetical Application Model, a framework illustrating the practical usage of CMAF segments and fragments in streaming applications. This project is inspired by the principles outlined in the CMAF standard and the [Hypothetical Application Model] ([Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf)).
 
 ## Features 
 
@@ -14,7 +14,7 @@ The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19
 
 ## Usage 
 
-Here's a sample demonstration illustrating how to utilize the features of the CMAF HAM library in TypeScript:
+Here's a sample demonstration illustrating how to utilize the features of the CMAF HAM module in TypeScript:
 
 
 ```typescript
