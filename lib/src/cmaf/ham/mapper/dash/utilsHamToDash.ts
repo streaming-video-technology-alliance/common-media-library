@@ -1,4 +1,4 @@
-import type { AudioTrack, Track } from '../../types/model';
+import type { AudioTrack, Track, VideoTrack } from '../../types/model';
 import {
 	TEXT_SAMPLE_RATE,
 	TIMESCALE_48000,
@@ -13,7 +13,7 @@ import {
  *
  * Just the audio tracks have this value stored on the `sampleRate` key.
  *
- * @param track Track to get the timescale from
+ * @param track - Track to get the timescale from
  * @returns Timescale in numbers
  */
 function getTimescale(track: Track): number {
@@ -32,4 +32,16 @@ function getTimescale(track: Track): number {
 	return VIDEO_SAMPLE_RATE;
 }
 
-export { getTimescale };
+function getFrameRate(track: Track): string | undefined {
+	let frameRate: string | undefined = undefined;
+	if (track.type === 'video') {
+		frameRate = `${(track as VideoTrack).frameRate.frameRateNumerator}`;
+		frameRate = (track as VideoTrack).frameRate.frameRateDenominator
+			? `${frameRate}/${(track as VideoTrack).frameRate.frameRateDenominator}`
+			: frameRate;
+	}
+
+	return frameRate;
+}
+
+export { getTimescale, getFrameRate };
