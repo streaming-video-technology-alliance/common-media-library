@@ -2,8 +2,17 @@
 
 ## Overview 
 
+HLS and DASH are currently the two most popular video streaming technologies. Due to this, there are some challenges such as converting HLS to DASH (and vice versa), manipulating manifests as well as the need to programmatically understand the structure of these manifests.
+
+
+Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) was created with the goal of simplifying content delivery by defining a universal format based on ISOBMFF. This standard also describes the [Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf), a framework that illustrates how CMAF segments and fragments can be used in real-world streaming applications. This library was based on this model.
+
 
 ## Features 
+
+* Basic on-demand [HLS] ↔ [DASH] manifest conversion. This includes hls to ham, ham to hls, dash to ham and ham to dash.
+* Basic Media Presentation querying.
+* Track validation.
 
 ## Usage 
 
@@ -70,7 +79,3 @@ Contributions are welcome! If you encounter any bugs, have feature requests, or 
 ## License
 
 This library is licensed under the Apache 2.0 License. You are free to use, modify, and distribute it for both commercial and non-commercial purposes. See the LICENSE file for details.
-
-
-
-
