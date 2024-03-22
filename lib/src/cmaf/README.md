@@ -1,18 +1,19 @@
-CMAF HAM LIBRARY
+# CMAF HAM LIBRARY #
 
-Overview
+## Overview
 
 
 Features
 
 Usage
-Here's a basic example of how to use [Library Name]:
+Here's a basic example of how to use CMAF HAM
+```
 
 import {
   hamToHls,
   hamToDash
   hlsToHam,
-  mpdToHam,
+  dashToHam,
   Presentation,
   Manifest,
   getTracksFromPresentation,
@@ -36,27 +37,26 @@ function checkTracksValidity(presentation: Presentation) {
   return validation;
 }
 
-
 function parseFromDash(input: string) {
-  // Convert the input to HAM Object.
-  const presentations = mpdToHam(input);
-  const hlsManifest = hamToHls(presentations);
-  const dashManifest = hamToDash(presentations);
-
-}
-
-function fromM3u8ToHam(main: string, playlists: string[]) {
-  // Convert m3u8 to ham object
-  const hamObject = m3u8ToHam(mainManifest, ancillaryManifests);
-  console.log("M3U8 has been converted to ham object.");
-
-  //Convert ham object to m3u8
-  const hlsManifest = hamToM3U8(hamObject);
-  console.log("m3u8 object has been created.");
-
+  //Convert input to ham object.
+  const hamObject = mpdToHam(input); 
+  //Convert ham object to hls manifest.
+  const hlsManifest = hamToHls(hamObject);
+  //Convert ham object to dash manifest.
   const dashManifest = hamToDash(hamObject);
 
 }
+
+function parseFromHls(main: string, playlists: string[]) {
+  // Convert hls to ham object.
+  const hamObject = hlsToHam(mainManifest, ancillaryManifests);
+  //Convert ham object to hls.
+  const hlsManifest = hamToHls(hamObject);
+  //Convert ham object to dash.
+  const dashManifest = hamToDash(hamObject);
+
+}
+```
 
 Documentation
 For detailed documentation, including API reference and usage examples, please refer to the official documentation.
