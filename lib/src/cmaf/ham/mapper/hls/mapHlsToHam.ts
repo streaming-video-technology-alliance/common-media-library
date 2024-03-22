@@ -9,25 +9,27 @@ import type {
 	TextTrack,
 	VideoTrack,
 } from '../../types/model';
-import type { Manifest } from '../../types';
+import type { Manifest, PlayList } from '../../types';
 
 // TODO: remove uuid
 function mapHlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest);
 	manifest = addMetadataToHls(manifest, mainManifestParsed);
 	const selectionSets: SelectionSet[] = [];
-	const manifestPlaylists = [...manifest.ancillaryManifests] ?? [];
+	const manifestPlaylists = manifest.ancillaryManifests
+		? [...manifest.ancillaryManifests]
+		: [];
 
 	const audioSwitchingSets = _audioGroupsToSwitchingSets(
-		mediaGroupsAudio,
+		mainManifestParsed.mediaGroups?.AUDIO,
 		manifestPlaylists,
 	);
 	const subtitleSwitchingSets = _subtitleGroupsToSwitchingSets(
-		mediaGroupsSubtitles,
+		mainManifestParsed.mediaGroups?.SUBTITLES,
 		manifestPlaylists,
 	);
 	const videoSwitchingSets = _videoPlaylistsToSwitchingSets(
-		playlists,
+		mainManifestParsed.playlists,
 		manifestPlaylists,
 	);
 
@@ -61,7 +63,6 @@ function _audioGroupsToSwitchingSets(
 ): SwitchingSet[] {
 	const audioSwitchingSets: SwitchingSet[] = [];
 
-	const mediaGroupsAudio = mainManifestParsed.mediaGroups?.AUDIO;
 	for (const audio in mediaGroupsAudio) {
 		const attributes: any = mediaGroupsAudio[audio];
 		const keys = Object.keys(attributes);
@@ -70,6 +71,8 @@ function _audioGroupsToSwitchingSets(
 			manifestPlaylists.shift()!.manifest,
 		);
 		const map = audioParsed.segments[0]?.map;
+		const segments = _formatSegments(audioParsed?.segments);
+
 		// TODO: channels, sampleRate, bandwith and codec need to be
 		// updated with real values. Right now we are using simple hardcoded values.
 		const audioTrack = {
@@ -82,7 +85,7 @@ function _audioGroupsToSwitchingSets(
 			duration: audioParsed?.targetDuration * segments.length,
 			language: language,
 			bandwidth: 0,
-			segments: _formatSegments(audioParsed?.segments),
+			segments: segments,
 			sampleRate: 0,
 			channels: 2,
 			byteRange: getByterange(map),
@@ -104,7 +107,6 @@ function _subtitleGroupsToSwitchingSets(
 	const subtitleSwitchingSets: SwitchingSet[] = [];
 
 	// Add selection set of type subtitles
-	const mediaGroupsSubtitles = mainManifestParsed.mediaGroups?.SUBTITLES;
 	for (const subtitle in mediaGroupsSubtitles) {
 		const attributes = mediaGroupsSubtitles[subtitle];
 		const keys = Object.keys(attributes);
@@ -112,6 +114,8 @@ function _subtitleGroupsToSwitchingSets(
 		const subtitleParsed = parseHlsManifest(
 			manifestPlaylists.shift()!.manifest,
 		);
+		const segments = _formatSegments(subtitleParsed?.segments);
+
 		const textTrack = {
 			id: subtitle,
 			type: 'text',
@@ -120,7 +124,7 @@ function _subtitleGroupsToSwitchingSets(
 			duration: subtitleParsed?.targetDuration * segments.length,
 			language: language,
 			bandwidth: 0,
-			segments: _formatSegments(subtitleParsed?.segments),
+			segments: segments,
 		} as TextTrack;
 		subtitleSwitchingSets.push({
 			id: subtitle,
