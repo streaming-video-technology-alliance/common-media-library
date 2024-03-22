@@ -17,7 +17,7 @@ import type {
 	VideoTrack,
 } from '../../types/model';
 import { numberToIso8601Duration } from '../../../utils/utils.js';
-import { getTimescale } from './utilsHamToMpd.js';
+import { getTimescale } from './utilsHamToDash.js';
 
 function trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = [];

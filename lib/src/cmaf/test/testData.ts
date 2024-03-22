@@ -98,7 +98,7 @@ const duration = 13;
 
 const audioTrack1: AudioTrack = {
 	id: 'default-audio-group',
-	type: 'AUDIO',
+	type: 'audio',
 	codec: '',
 	duration: 5,
 	language: 'en',

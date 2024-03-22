@@ -6,7 +6,7 @@ import {
 } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
-import { jsonHam0 } from './data/ham-samples/fromMpd/index.js';
+import { jsonHam0 } from './data/ham-samples/fromDash/index.js';
 
 describe('ham validation', () => {
 	let selectionSet: SelectionSet;

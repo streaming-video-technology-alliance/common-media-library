@@ -12,7 +12,7 @@ import {
 	getSar,
 	getTrackDuration,
 	getUrlFromTemplate,
-} from '../ham/mapper/mpd/utilsMpdToHam.js';
+} from '../ham/mapper/dash/utilsDashToHam.js';
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
 import {

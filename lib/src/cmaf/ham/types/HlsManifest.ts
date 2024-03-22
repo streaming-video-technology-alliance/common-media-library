@@ -59,5 +59,4 @@ type SegmentHls = {
 	duration: number;
 };
 
-
 export type { PlayList, MediaGroups, SegmentHls, HlsManifest };

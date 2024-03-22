@@ -33,7 +33,7 @@ import {
 	getSar,
 	getTrackDuration,
 	getUrlFromTemplate,
-} from './utilsMpdToHam.js';
+} from './utilsDashToHam.js';
 
 function mapTracks(
 	representation: Representation,
