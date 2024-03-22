@@ -13,7 +13,7 @@ export class HlsMapper implements IMapper {
 	}
 
 	toHam(manifest: Manifest): Presentation[] {
-		const presentations = mapHlsToHam(manifest);
+		const presentations: Presentation[] = mapHlsToHam(manifest);
 		this.manifest = manifest;
 		return presentations;
 	}

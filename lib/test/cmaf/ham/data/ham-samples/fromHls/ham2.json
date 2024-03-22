@@ -1,19 +1,19 @@
 [
 	{
-		"id": "c02c6439-eb13-4aaa-8871-f5be7da22675",
+		"id": "0",
 		"selectionSets": [
 			{
-				"id": "04124192-b424-4243-94b6-806b328dfc6f",
+				"id": "0",
 				"switchingSets": [
 					{
 						"id": "audio-aacl-64",
 						"tracks": [
 							{
 								"id": "audio-aacl-64",
-								"type": "AUDIO",
+								"type": "audio",
 								"fileName": "tears-of-steel-aac-64k.m3u8",
-								"codec": "",
-								"duration": 6,
+								"codec": "mp4a.40.2",
+								"duration": 738,
 								"language": "en",
 								"bandwidth": 0,
 								"segments": [
@@ -634,7 +634,7 @@
 									}
 								],
 								"sampleRate": 0,
-								"channels": 0,
+								"channels": 2,
 								"byteRange": "704@0",
 								"urlInitialization": "tears-of-steel-aac-128k.cmfa"
 							}
@@ -645,10 +645,10 @@
 						"tracks": [
 							{
 								"id": "audio-aacl-128",
-								"type": "AUDIO",
+								"type": "audio",
 								"fileName": "audio-aac-128k.m3u8",
-								"codec": "",
-								"duration": 8,
+								"codec": "mp4a.40.2",
+								"duration": 736,
 								"language": "en",
 								"bandwidth": 0,
 								"segments": [
@@ -1114,7 +1114,7 @@
 									}
 								],
 								"sampleRate": 0,
-								"channels": 0,
+								"channels": 2,
 								"byteRange": "2901@0",
 								"urlInitialization": "tears-of-steel-hev1-1500k.cmfv"
 							}
@@ -1123,8 +1123,135 @@
 				]
 			},
 			{
-				"id": "f795105c-4289-41d5-a66a-d4e448237c61",
-				"switchingSets": []
+				"id": "1",
+				"switchingSets": [
+					{
+						"id": "video-0",
+						"tracks": [
+							{
+								"id": "video-0",
+								"type": "video",
+								"fileName": "tears-of-steel-hev1-1100k.m3u8",
+								"codec": "hev1.1.6.H150.90",
+								"duration": null,
+								"language": "und",
+								"bandwidth": 3761000,
+								"segments": [],
+								"width": 1680,
+								"height": 750,
+								"frameRate": 24,
+								"par": "",
+								"sar": "",
+								"scanType": ""
+							}
+						]
+					},
+					{
+						"id": "video-1",
+						"tracks": [
+							{
+								"id": "video-1",
+								"type": "video",
+								"fileName": "video-hev1-1500k.m3u8",
+								"codec": "hev1.1.6.H150.90",
+								"duration": null,
+								"language": "und",
+								"bandwidth": 5187000,
+								"segments": [],
+								"width": 2576,
+								"height": 1150,
+								"frameRate": 24,
+								"par": "",
+								"sar": "",
+								"scanType": ""
+							}
+						]
+					},
+					{
+						"id": "video-2",
+						"tracks": [
+							{
+								"id": "video-2",
+								"type": "video",
+								"fileName": "tears-of-steel-hev1-2200k.m3u8",
+								"codec": "hev1.1.6.H150.90",
+								"duration": null,
+								"language": "und",
+								"bandwidth": 7146000,
+								"segments": [],
+								"width": 3360,
+								"height": 1500,
+								"frameRate": 24,
+								"par": "",
+								"sar": "",
+								"scanType": ""
+							}
+						]
+					},
+					{
+						"id": "video-3",
+						"tracks": [
+							{
+								"id": "video-3",
+								"type": "video",
+								"fileName": "tears-of-steel-hev1-1100k.m3u8",
+								"codec": "hev1.1.6.H150.90",
+								"duration": null,
+								"language": "und",
+								"bandwidth": 3825000,
+								"segments": [],
+								"width": 1680,
+								"height": 750,
+								"frameRate": 24,
+								"par": "",
+								"sar": "",
+								"scanType": ""
+							}
+						]
+					},
+					{
+						"id": "video-4",
+						"tracks": [
+							{
+								"id": "video-4",
+								"type": "video",
+								"fileName": "video-hev1-1500k.m3u8",
+								"codec": "hev1.1.6.H150.90",
+								"duration": null,
+								"language": "und",
+								"bandwidth": 5251000,
+								"segments": [],
+								"width": 2576,
+								"height": 1150,
+								"frameRate": 24,
+								"par": "",
+								"sar": "",
+								"scanType": ""
+							}
+						]
+					},
+					{
+						"id": "video-5",
+						"tracks": [
+							{
+								"id": "video-5",
+								"type": "video",
+								"fileName": "tears-of-steel-hev1-2200k.m3u8",
+								"codec": "hev1.1.6.H150.90",
+								"duration": null,
+								"language": "und",
+								"bandwidth": 7210000,
+								"segments": [],
+								"width": 3360,
+								"height": 1500,
+								"frameRate": 24,
+								"par": "",
+								"sar": "",
+								"scanType": ""
+							}
+						]
+					}
+				]
 			}
 		]
 	}
