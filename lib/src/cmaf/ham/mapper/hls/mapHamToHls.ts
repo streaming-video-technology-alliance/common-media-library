@@ -10,10 +10,12 @@ import {
 } from '../../types/model';
 import { getPlaylistData, getSegments } from './utilsHamToHls.js';
 
-function generateManifestPlaylistPiece(track: Track): {
+type ManifestPlaylistPiece = {
 	manifestToConcat: string;
 	playlist: string;
-} {
+};
+
+function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPiece {
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
 	const trackFileName = track.fileName ?? `${track.id}.m3u8`;
 

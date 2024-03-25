@@ -1,5 +1,3 @@
-import { parseHlsManifest } from '../../../utils/hls/hlsParser.js';
-import { addMetadataToHls } from '../../../utils/manifestUtils.js';
 import {
 	AudioTrack,
 	Presentation,
@@ -10,8 +8,15 @@ import {
 	VideoTrack,
 } from '../../types/model';
 import type { Manifest, PlayList } from '../../types';
+import { addMetadataToHls } from '../../../utils/manifestUtils.js';
+import { parseHlsManifest } from '../../../utils/hls/hlsParser.js';
+import {
+	_formatSegments,
+	getByterange,
+	getCodec,
+	getDuration,
+} from './utilsHlsToHam.js';
 
-// TODO: remove uuid
 function mapHlsToHam(manifest: Manifest): Presentation[] {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest);
 	const manifestHls = addMetadataToHls(manifest, mainManifestParsed);
@@ -81,10 +86,8 @@ function _audioGroupsToSwitchingSets(
 			id: audio,
 			type: 'audio',
 			fileName: uri,
-			// Using codec mp4a.40.2 for now, we should retrieve it by finding
-			// the video playlist that is related to this audio group.
-			codec: 'mp4a.40.2',
-			duration: audioParsed?.targetDuration * segments.length,
+			codec: getCodec('audio'),
+			duration: getDuration(audioParsed, segments),
 			language: language,
 			bandwidth: 0,
 			segments: segments,
@@ -122,8 +125,8 @@ function _subtitleGroupsToSwitchingSets(
 			id: subtitle,
 			type: 'text',
 			fileName: uri,
-			codec: '',
-			duration: subtitleParsed?.targetDuration * segments.length,
+			codec: getCodec('text'),
+			duration: getDuration(subtitleParsed, segments),
 			language: language,
 			bandwidth: 0,
 			segments: segments,
@@ -153,16 +156,13 @@ function _videoPlaylistsToSwitchingSets(
 			parsedHlsManifest?.segments,
 		);
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
-		const map = parsedHlsManifest?.segments?.indexOf(0)?.map;
+		const map = parsedHlsManifest?.segments?.at(0)?.map;
 		const videoTrack = {
 			id: `video-${videoTrackId++}`,
 			type: 'video',
 			fileName: playlist.uri,
-			// CODECS could be a comma separated value
-			// where it has video and audio codec. Using
-			// position zero for now. TODO: Get the correct video codec.
-			codec: CODECS.split(',').at(0),
-			duration: parsedHlsManifest?.targetDuration * segments.length,
+			codec: getCodec('video', CODECS),
+			duration: getDuration(parsedHlsManifest, segments),
 			language: LANGUAGE ?? 'und',
 			bandwidth: BANDWIDTH,
 			segments: segments,
@@ -183,25 +183,6 @@ function _videoPlaylistsToSwitchingSets(
 	});
 
 	return switchingSetVideos;
-}
-
-function getByterange(byteRange: {
-	length: string;
-	offset: string;
-}): string | undefined {
-	return byteRange ? `${byteRange.length}@${byteRange.offset}` : undefined;
-}
-
-function _formatSegments(segments: any[]): Segment[] {
-	return (
-		segments?.map((segment: any) => {
-			return {
-				duration: segment.duration,
-				url: segment.uri,
-				byteRange: getByterange(segment?.byterange),
-			} as Segment;
-		}) ?? []
-	);
 }
 
 export { mapHlsToHam };

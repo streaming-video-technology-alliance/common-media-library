@@ -30,21 +30,22 @@ describe('getByterange', () => {
 });
 
 describe('getPlaylistData', () => {
-	it('returns sampleRate if track is audio', () => {
+	it('returns playlist data', () => {
 		const res = getPlaylistData(audioTrack1);
 		equal(
 			res,
-			'#EXT-X-MAP:URI="https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4",\n',
+			'#EXT-X-MAP:URI="https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4",BYTERANGE:0@122\n',
 		);
 	});
 });
 
 describe('getSegments', () => {
-	it('returns sampleRate if track is audio', () => {
+	it('returns segments from track segments', () => {
 		const res = getSegments(audioTrack1.segments);
 		equal(
 			res,
 			'#EXTINF:4.011,\n' +
+				'#EXT-X-BYTERANGE:123@456\n' +
 				'\n' +
 				'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4\n' +
 				'#EXTINF:3.989,\n' +
@@ -55,11 +56,16 @@ describe('getSegments', () => {
 });
 
 describe('getUrlInitialization', () => {
-	it('returns sampleRate if track is audio', () => {
+	it('returns url initialization', () => {
 		const res = getUrlInitialization(audioTrack1);
 		equal(
 			res,
 			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4',
 		);
+	});
+
+	it('returns empty string if track has no urlInitialization', () => {
+		const res = getUrlInitialization({} as AudioTrack);
+		equal(res, '');
 	});
 });

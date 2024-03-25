@@ -66,6 +66,12 @@ export function base64decode(str: string): Uint8Array;
 // @beta
 export function base64encode(binary: Uint8Array): string;
 
+// @public (undocumented)
+export type Byterange = {
+    length: number;
+    offset: number;
+};
+
 // @beta
 export function canParseId3(data: Uint8Array, offset: number): boolean;
 
@@ -402,6 +408,13 @@ export type MediaGroups = {
             };
         };
     };
+    SUBTITLES: {
+        [key: string]: {
+            [key: string]: {
+                language: string;
+            };
+        };
+    };
 };
 
 // @alpha
@@ -497,7 +510,15 @@ export type SegmentBase = {
 
 // @alpha
 export type SegmentHls = {
+    title?: string;
     duration: number;
+    byterange?: Byterange;
+    url?: string;
+    timeline?: number;
+    map?: {
+        uri: string;
+        byterange: Byterange;
+    };
 };
 
 // @alpha
