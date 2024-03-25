@@ -15,3 +15,4 @@ export const AT_SEPARATOR = '@'; //In Hls it is used to separate the start and e
 export const FRAME_RATE_SEPARATOR = '/';
 export const NOMINATOR = 0;
 export const DENOMINATOR = 1;
+export const ZERO = 0;

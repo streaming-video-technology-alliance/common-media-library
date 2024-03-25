@@ -18,6 +18,7 @@ import type {
 } from '../../types/model';
 import { parseDurationDash } from '../../../utils/utils.js';
 import {
+	ZERO,
 	TIMESCALE_1000,
 	TIMESCALE_48000,
 	TIMESCALE_90000,
@@ -56,11 +57,13 @@ function _getTimescale(track: Track): number {
 
 function _getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
+	const videoTrack = track as VideoTrack;
 	if (track.type === 'video') {
-		frameRate = `${(track as VideoTrack).frameRate.frameRateNumerator}`;
-		frameRate = (track as VideoTrack).frameRate.frameRateDenominator
-			? `${frameRate}/${(track as VideoTrack).frameRate.frameRateDenominator}`
-			: frameRate;
+		frameRate = `${videoTrack.frameRate.frameRateNumerator}`;
+		frameRate =
+			videoTrack.frameRate.frameRateDenominator !== ZERO
+				? `${frameRate}/${videoTrack.frameRate.frameRateDenominator}`
+				: frameRate;
 	}
 
 	return frameRate;
