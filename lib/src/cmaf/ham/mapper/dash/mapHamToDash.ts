@@ -18,8 +18,23 @@ import type {
 } from '../../types/model';
 import { numberToIso8601Duration } from '../../../utils/utils.js';
 import { getTimescale } from './utilsHamToDash.js';
+import { ZERO } from '../../../utils/constants.js';
 
-function trackToSegmentBase(track: Track): SegmentBase[] {
+function _getFrameRate(track: Track): string | undefined {
+	let frameRate: string | undefined = undefined;
+	const videoTrack = track as VideoTrack;
+	if (track.type === 'video') {
+		frameRate = `${videoTrack.frameRate.frameRateNumerator}`;
+		frameRate =
+			videoTrack.frameRate.frameRateDenominator !== ZERO
+				? `${frameRate}/${videoTrack.frameRate.frameRateDenominator}`
+				: frameRate;
+	}
+
+	return frameRate;
+}
+
+function _trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = [];
 	track.segments.forEach((segment: Segment) => {
 		let newSegment: SegmentBase | undefined;
@@ -45,7 +60,7 @@ function trackToSegmentBase(track: Track): SegmentBase[] {
 	return segments;
 }
 
-function trackToSegmentList(track: Track): SegmentList[] {
+function _trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];
 	const segmentURLs: SegmentURL[] = [];
 	track.segments.forEach((segment) => {
@@ -73,15 +88,15 @@ function trackToSegmentList(track: Track): SegmentList[] {
 	return segmentList;
 }
 
-function tracksToRepresentation(tracks: Track[]): Representation[] {
+function _tracksToRepresentation(tracks: Track[]): Representation[] {
 	return tracks.map((track) => {
 		const representation: Representation = {
 			$: {
 				id: track.id,
 				bandwidth: track.bandwidth.toString(),
 			},
-			SegmentBase: trackToSegmentBase(track),
-			SegmentList: trackToSegmentList(track),
+			SegmentBase: _trackToSegmentBase(track),
+			SegmentList: _trackToSegmentList(track),
 		} as Representation;
 		representation.$.mimeType = `${track.type}/mp4`; //Harcoded value
 		if (track.type === 'video') {
@@ -121,28 +136,29 @@ function tracksToRepresentation(tracks: Track[]): Representation[] {
 	});
 }
 
-function selectionSetsToAdaptationSet(
+function _selectionSetsToAdaptationSet(
 	selectionsSets: SelectionSet[],
 ): AdaptationSet[] {
 	return selectionsSets.flatMap((selectionSet) => {
 		return selectionSet.switchingSets.map((switchingSet) => {
+			const track = switchingSet.tracks[0];
 			return {
 				$: {
 					id: switchingSet.id,
 					group: selectionSet.id,
-					contentType: switchingSet.tracks[0].type,
-					mimeType: `${switchingSet.tracks[0].type}/mp4`,
-					frameRate: (switchingSet.tracks[0] as VideoTrack).frameRate,
-					lang: switchingSet.tracks[0].language,
-					codecs: switchingSet.tracks[0].codec,
+					contentType: track.type,
+					mimeType: `${track.type}/mp4`,
+					frameRate: _getFrameRate(track),
+					lang: track.language,
+					codecs: track.codec,
 				},
-				Representation: tracksToRepresentation(switchingSet.tracks),
+				Representation: _tracksToRepresentation(switchingSet.tracks),
 			} as AdaptationSet;
 		});
 	});
 }
 
-function presentationsToPeriods(presentations: Presentation[]): Period[] {
+function _presentationsToPeriods(presentations: Presentation[]): Period[] {
 	return presentations.map((presentation: Presentation) => {
 		return {
 			$: {
@@ -153,7 +169,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 				id: presentation.id,
 				start: 'PT0S',
 			},
-			AdaptationSet: selectionSetsToAdaptationSet(
+			AdaptationSet: _selectionSetsToAdaptationSet(
 				presentation.selectionSets,
 			),
 		} as Period;
@@ -161,7 +177,7 @@ function presentationsToPeriods(presentations: Presentation[]): Period[] {
 }
 
 function mapHamToDash(hamManifests: Presentation[]): DashManifest {
-	const periods: Period[] = presentationsToPeriods(hamManifests);
+	const periods: Period[] = _presentationsToPeriods(hamManifests);
 	const duration: string = periods[0].$.duration;
 
 	return {

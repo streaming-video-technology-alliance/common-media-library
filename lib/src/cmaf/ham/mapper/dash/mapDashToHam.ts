@@ -35,6 +35,13 @@ import {
 	getTrackDuration,
 	getUrlFromTemplate,
 } from './utilsDashToHam.js';
+import {
+	DENOMINATOR,
+	FRAME_RATE_NUMERATOR_30,
+	FRAME_RATE_SEPARATOR,
+	ZERO,
+	NUMERATOR,
+} from '../../../utils/constants.js';
 
 function mapTracks(
 	representation: Representation,
@@ -46,13 +53,25 @@ function mapTracks(
 		throw new Error('Error: AdaptationSet is undefined');
 	}
 	const type = getContentType(adaptationSet, representation);
+	const frameRate = getFrameRate(adaptationSet, representation).split(
+		FRAME_RATE_SEPARATOR,
+	);
+	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '');
+	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
 	if (type === 'video') {
 		return {
 			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),
-			frameRate: getFrameRate(adaptationSet, representation),
+			frameRate: {
+				frameRateNumerator: isNaN(frameRateNumerator)
+					? FRAME_RATE_NUMERATOR_30
+					: frameRateNumerator,
+				frameRateDenominator: isNaN(frameRateDenominator)
+					? ZERO
+					: frameRateDenominator,
+			},
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
