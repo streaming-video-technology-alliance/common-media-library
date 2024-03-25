@@ -618,10 +618,31 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 // @beta
 export function uuid(): string;
 
-// Warning: (ae-forgotten-export) The symbol "TrackValidity" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Validation" needs to be exported by the entry point index.d.ts
 //
 // @alpha
-export function validateTracks(tracks: Track[]): TrackValidity;
+export function validatePresentation(presentation: Presentation): Validation;
+
+// @alpha
+export function validateSegments(segments: Segment[], trackId?: string): Validation;
+
+// @alpha
+export function validateSelectionSet(selectionSet: SelectionSet, presentationId?: string): Validation;
+
+// @alpha
+export function validateSelectionSets(selectionSets: SelectionSet[], presentationId?: string): Validation;
+
+// @alpha
+export function validateSwitchingSet(switchingSet: SwitchingSet, selectionSetId?: string): Validation;
+
+// @alpha
+export function validateSwitchingSets(switchingSets: SwitchingSet[], selectionSetId?: string): Validation;
+
+// @alpha
+export function validateTrack(track: Track, switchingSetId?: string): Validation;
+
+// @alpha
+export function validateTracks(tracks: Track[], switchingSetId?: string): Validation;
 
 // @alpha
 export type VideoTrack = Track & {
