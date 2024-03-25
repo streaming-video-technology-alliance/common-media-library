@@ -39,6 +39,7 @@ import {
 	DENOMINATOR,
 	FRAME_RATE_NUMERATOR_30,
 	FRAME_RATE_SEPARATOR,
+	ZERO,
 	NUMERATOR,
 } from '../../../utils/constants.js';
 
@@ -119,7 +120,7 @@ function mapTracks(
 					? FRAME_RATE_NUMERATOR_30
 					: frameRateNumerator,
 				frameRateDenominator: isNaN(frameRateDenominator)
-					? undefined
+					? ZERO
 					: frameRateDenominator,
 			},
 			height: +(representation.$.height ?? 0),

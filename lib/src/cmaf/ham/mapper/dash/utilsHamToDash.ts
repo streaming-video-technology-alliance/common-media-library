@@ -3,6 +3,7 @@ import {
 	TEXT_SAMPLE_RATE,
 	TIMESCALE_48000,
 	VIDEO_SAMPLE_RATE,
+	ZERO,
 } from '../../../utils/constants.js';
 
 /**
@@ -34,11 +35,13 @@ function getTimescale(track: Track): number {
 
 function getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
+	const videoTrack = track as VideoTrack;
 	if (track.type === 'video') {
-		frameRate = `${(track as VideoTrack).frameRate.frameRateNumerator}`;
-		frameRate = (track as VideoTrack).frameRate.frameRateDenominator
-			? `${frameRate}/${(track as VideoTrack).frameRate.frameRateDenominator}`
-			: frameRate;
+		frameRate = `${videoTrack.frameRate.frameRateNumerator}`;
+		frameRate =
+			videoTrack.frameRate.frameRateDenominator !== ZERO
+				? `${frameRate}/${videoTrack.frameRate.frameRateDenominator}`
+				: frameRate;
 	}
 
 	return frameRate;
