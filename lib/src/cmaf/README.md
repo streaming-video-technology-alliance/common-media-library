@@ -10,7 +10,6 @@ The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19
 
 * Fundamental on-demand conversion between [HLS] and [DASH] manifests, covering transformations such as HLS to HAM, HAM to HLS, DASH to HAM, and HAM to DASH.
 * Elementary Media Presentation querying functionality.
-* Validation of tracks for enhanced integrity assurance.
 
 ## Usage 
 
@@ -23,9 +22,6 @@ import {
   hamToDash,
   hlsToHam,
   dashToHam,
-  Presentation,
-  getTracksFromPresentation,
-  validateTracks,
 } from "@svta/common-media-library";
 
 
