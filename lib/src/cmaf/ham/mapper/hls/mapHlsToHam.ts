@@ -168,7 +168,9 @@ function _videoPlaylistsToSwitchingSets(
 			segments: segments,
 			width: playlist.attributes.RESOLUTION.width,
 			height: playlist.attributes.RESOLUTION.height,
-			frameRate: playlist.attributes['FRAME-RATE'],
+			frameRate: {
+				frameRateNumerator: playlist.attributes['FRAME-RATE'],
+			},
 			par: '',
 			sar: '',
 			scanType: '',

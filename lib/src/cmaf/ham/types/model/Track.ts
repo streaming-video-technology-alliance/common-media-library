@@ -61,10 +61,15 @@ type TextTrack = Track;
 type VideoTrack = Track & {
 	width: number;
 	height: number;
-	frameRate: string;
+	frameRate: FrameRate;
 	par: string;
 	sar: string;
 	scanType: string;
+};
+
+type FrameRate = {
+	frameRateNumerator: number;
+	frameRateDenominator?: number;
 };
 
 type TrackType = 'audio' | 'video' | 'text';
