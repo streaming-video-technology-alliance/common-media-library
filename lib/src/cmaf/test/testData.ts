@@ -1,4 +1,3 @@
-import { AudioTrack } from '../ham/types/model';
 import { Representation, SegmentTemplate } from '../ham/types';
 
 const representationBase: Representation = {
@@ -96,37 +95,10 @@ const segmentTemplate: SegmentTemplate = {
 
 const duration = 13;
 
-const audioTrack1: AudioTrack = {
-	id: 'default-audio-group',
-	type: 'audio',
-	codec: '',
-	duration: 5,
-	language: 'en',
-	bandwidth: 0,
-	segments: [
-		{
-			duration: 4.011,
-			url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4',
-		},
-		{
-			duration: 3.989,
-			url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
-		},
-	],
-	sampleRate: 0,
-	channels: 0,
-	urlInitialization:
-		'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4',
-};
-
-const videoTrack1 = {};
-
 export {
 	representationBase,
 	representationList,
 	representationTemplate,
 	duration,
 	segmentTemplate,
-	audioTrack1,
-	videoTrack1,
 };

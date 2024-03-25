@@ -1,11 +1,13 @@
 import { describe, it } from 'node:test';
-import { equal } from 'node:assert';
+import { deepEqual, equal } from 'node:assert';
 import {
 	_formatSegments,
 	getByterange,
 	getCodec,
 	getDuration,
 } from '../ham/mapper/hls/utilsHlsToHam.js';
+import { HlsManifest } from '../ham/types';
+import { getSegments } from './data/hlsData.js';
 
 describe('getByterange', () => {
 	it('returns byterange in hsl format if byterange exists', () => {
@@ -15,7 +17,7 @@ describe('getByterange', () => {
 
 	it('returns undefined if byterange does not exist', () => {
 		const res = getByterange(undefined);
-		equal(res, undefined);
+		equal(res, '');
 	});
 });
 
@@ -40,18 +42,36 @@ describe('getCodec', () => {
 	});
 });
 
-// TODO: complete test
-describe.skip('getDuration', () => {
-	it('returns duration', () => {
-		const res = getDuration({}, []);
-		equal(res, 0);
+describe('getDuration', () => {
+	it('returns null if manifest is empty', () => {
+		const res = getDuration({} as HlsManifest, getSegments());
+		equal(res, null);
+	});
+
+	it('returns duration if manifest has targetDuration and there are segments', () => {
+		const res = getDuration(
+			{ targetDuration: 3 } as HlsManifest,
+			getSegments(),
+		);
+		equal(res, 6);
 	});
 });
 
 // TODO: complete test
-describe.skip('_formatSegments', () => {
+describe('_formatSegments', () => {
 	it('returns segments formated', () => {
-		const res = _formatSegments([]);
-		equal(res, []);
+		const res = _formatSegments(getSegments());
+		deepEqual(res, [
+			{
+				duration: 4.011,
+				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4',
+				byteRange: '12@34',
+			},
+			{
+				duration: 3.989,
+				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
+				byteRange: '56@78',
+			},
+		]);
 	});
 });

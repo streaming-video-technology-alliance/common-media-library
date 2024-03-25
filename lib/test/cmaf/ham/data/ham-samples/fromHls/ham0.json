@@ -1757,7 +1757,9 @@
 								"height": 100,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "761@0",
+								"urlInitialization": "tears-of-steel-avc1-400k.cmfv"
 							}
 						]
 					},
@@ -2238,7 +2240,9 @@
 								"height": 200,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "760@0",
+								"urlInitialization": "tears-of-steel-avc1-750k.cmfv"
 							}
 						]
 					},
@@ -2719,7 +2723,9 @@
 								"height": 350,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "761@0",
+								"urlInitialization": "tears-of-steel-avc1-1000k.cmfv"
 							}
 						]
 					},
@@ -3200,7 +3206,9 @@
 								"height": 750,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "762@0",
+								"urlInitialization": "tears-of-steel-avc1-1500k.cmfv"
 							}
 						]
 					},
@@ -3681,7 +3689,9 @@
 								"height": 750,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "762@0",
+								"urlInitialization": "tears-of-steel-avc1-2200k.cmfv"
 							}
 						]
 					},
@@ -4163,7 +4173,9 @@
 								"frameRate": 24,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "2901@0",
+								"urlInitialization": "tears-of-steel-hev1-1100k.cmfv"
 							}
 						]
 					},
@@ -4645,7 +4657,9 @@
 								"frameRate": 24,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "2901@0",
+								"urlInitialization": "tears-of-steel-hev1-1500k.cmfv"
 							}
 						]
 					},
@@ -5127,7 +5141,9 @@
 								"frameRate": 24,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "2901@0",
+								"urlInitialization": "tears-of-steel-hev1-2200k.cmfv"
 							}
 						]
 					},

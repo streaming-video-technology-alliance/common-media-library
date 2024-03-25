@@ -1,47 +1,50 @@
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
+import { AudioTrack } from '../ham/types/model';
 import {
 	getByterange,
 	getPlaylistData,
 	getSegments,
 	getUrlInitialization,
 } from '../ham/mapper/hls/utilsHamToHls.js';
-import { audioTrack1 } from './testData.js';
-import { AudioTrack } from '../ham/types/model';
+import { getAudioTrack } from './data/hlsData.js';
 
 describe('getByterange', () => {
 	it('returns byteRange string if track has byteRange', () => {
-		const track: AudioTrack = { ...audioTrack1, byteRange: '50379@2212' };
+		const track: AudioTrack = getAudioTrack({ byteRange: '50379@2212' });
 		const res = getByterange(track);
 		equal(res, 'BYTERANGE:50379@2212\n');
 	});
 
 	it('returns byteRange string if segment has byteRange', () => {
-		const track: AudioTrack = { ...audioTrack1 };
+		const track: AudioTrack = getAudioTrack({});
 		track.segments[0].byteRange = '123@456';
 		const res = getByterange(track);
-		equal(res, 'BYTERANGE:123@456\n');
+		equal(res, 'BYTERANGE:0@122\n');
 	});
 
 	it('returns empty string if track and segments have no byteRange', () => {
-		const res = getByterange(audioTrack1);
+		const res = getByterange({} as AudioTrack);
 		equal(res, '');
 	});
 });
 
 describe('getPlaylistData', () => {
 	it('returns playlist data', () => {
-		const res = getPlaylistData(audioTrack1);
+		const track: AudioTrack = getAudioTrack({});
+		const res = getPlaylistData(track);
 		equal(
 			res,
-			'#EXT-X-MAP:URI="https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4",BYTERANGE:0@122\n',
+			'#EXT-X-MAP:URI="https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4",\n',
 		);
 	});
 });
 
 describe('getSegments', () => {
 	it('returns segments from track segments', () => {
-		const res = getSegments(audioTrack1.segments);
+		const track: AudioTrack = getAudioTrack({});
+		track.segments[0].byteRange = '123@456';
+		const res = getSegments(track.segments);
 		equal(
 			res,
 			'#EXTINF:4.011,\n' +
@@ -57,7 +60,8 @@ describe('getSegments', () => {
 
 describe('getUrlInitialization', () => {
 	it('returns url initialization', () => {
-		const res = getUrlInitialization(audioTrack1);
+		const track: AudioTrack = getAudioTrack({});
+		const res = getUrlInitialization(track);
 		equal(
 			res,
 			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4',

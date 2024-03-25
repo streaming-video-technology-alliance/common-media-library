@@ -9,8 +9,8 @@ import {
 function getByterange(track: VideoTrack | AudioTrack): string {
 	if (track.byteRange) {
 		return `BYTERANGE:${track.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}\n`;
-	} else if (track.segments[0]?.byteRange) {
-		return `BYTERANGE:0@${Number(track.segments[0]?.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}\n`;
+	} else if (track.segments?.at(0)?.byteRange) {
+		return `BYTERANGE:0@${Number(track.segments.at(0)?.byteRange?.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}\n`;
 	}
 	return '';
 }

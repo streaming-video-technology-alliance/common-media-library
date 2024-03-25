@@ -1,14 +1,14 @@
 import { Segment } from '../../types/model';
-import { Byterange } from '../../types';
+import { Byterange, HlsManifest, SegmentHls } from '../../types';
 
 /**
  * Get byterange from HLS Manifest
  *
  * @param byteRange
  */
-function getByterange(byteRange: Byterange | undefined): string {
+function getByterange(byteRange: Byterange | undefined): string | undefined {
 	if (!byteRange) {
-		return '';
+		return undefined;
 	}
 	return `${byteRange.length}@${byteRange.offset}`;
 }
@@ -30,15 +30,18 @@ function getCodec(type: string, codecs?: string): string {
 	}
 }
 
-function getDuration(parsed: any | undefined, segments: any[]): number {
-	if (!parsed) {
-		console.error('Could not calculate duration, object is undefined.');
-		return 0;
+function getDuration(
+	manifest: HlsManifest,
+	segments: SegmentHls[],
+): number | null {
+	if (!manifest?.targetDuration) {
+		console.error('Could not calculate duration, manifest is undefined.');
+		return null;
 	}
-	return parsed?.targetDuration * segments.length;
+	return manifest?.targetDuration * segments.length;
 }
 
-function _formatSegments(segments: any[]): Segment[] {
+function _formatSegments(segments: SegmentHls[]): Segment[] {
 	return (
 		segments?.map((segment: any) => {
 			return {

@@ -798,7 +798,8 @@
 								"height": 144,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-init.mp4"
 							}
 						]
 					},
@@ -1195,7 +1196,8 @@
 								"height": 240,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-init.mp4"
 							}
 						]
 					},
@@ -1592,7 +1594,8 @@
 								"height": 576,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-init.mp4"
 							}
 						]
 					},
@@ -1989,7 +1992,8 @@
 								"height": 720,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-init.mp4"
 							}
 						]
 					},
@@ -2386,7 +2390,8 @@
 								"height": 480,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-init.mp4"
 							}
 						]
 					},
@@ -2783,7 +2788,8 @@
 								"height": 360,
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-init.mp4"
 							}
 						]
 					}

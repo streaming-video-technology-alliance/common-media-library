@@ -55,7 +55,7 @@ type SegmentHls = {
 	title?: string;
 	duration: number;
 	byterange?: Byterange;
-	url?: string;
+	uri?: string;
 	timeline?: number;
 	map?: {
 		uri: string;
@@ -74,6 +74,7 @@ type HlsManifest = {
 	playlists: PlayList[];
 	mediaGroups: MediaGroups;
 	segments: SegmentHls[];
+	targetDuration?: number;
 };
 
 export type { Byterange, PlayList, MediaGroups, SegmentHls, HlsManifest };
