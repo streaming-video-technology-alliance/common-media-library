@@ -60,6 +60,7 @@ function validatePresentation(presentation: Presentation): Validation {
  *
  * @param selectionSets - List of SelectionSet from cmaf ham model
  * @param presentationId - Optional: parent presentation id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
@@ -91,6 +92,7 @@ function validateSelectionSets(
  *
  * @param selectionSet - SelectionSet from cmaf ham model
  * @param presentationId - Optional: parent presentation id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
@@ -134,6 +136,7 @@ function validateSelectionSet(
  *
  * @param switchingSets - List of SwitchingSets from cmaf ham model
  * @param selectionSetId - Optional: parent selection set id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
@@ -165,6 +168,7 @@ function validateSwitchingSets(
  *
  * @param switchingSet - SwitchingSet from cmaf ham model
  * @param selectionSetId - Optional: parent selection set id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
@@ -204,6 +208,7 @@ function validateSwitchingSet(
  *
  * @param tracks - List of Track from cmaf ham model
  * @param switchingSetId - Optional: parent switching set id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
@@ -248,6 +253,7 @@ function validateTracks(
  *
  * @param track - Track from cmaf ham model
  * @param switchingSetId - Optional: parent switching set id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
@@ -306,6 +312,7 @@ function validateTrack(
  *
  * @param segments - List of Segment from cmaf ham model
  * @param trackId - Optional: parent track id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
@@ -325,7 +332,7 @@ function validateSegments(
 	};
 
 	segments.forEach((segment: Segment) => {
-		validateSegment(segment, trackId, prevValidation);
+		validateSegment(segment, trackId, validation);
 	});
 
 	return validation;
@@ -336,6 +343,7 @@ function validateSegments(
  *
  * @param segment - Segment from cmaf ham model
  * @param trackId - Optional: parent track id
+ * @param prevValidation - Optional: validation object from parent previous validate method call
  *
  * @returns Validation
  *
