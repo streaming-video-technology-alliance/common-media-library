@@ -1,5 +1,5 @@
 import { mapDashToHam } from './dash/mapDashToHam.js';
-import { jsonToXml, xmlToJson } from '../../utils/xmlUtils.js';
+import { xmlToJson } from '../../utils/xmlUtils.js';
 import { mapHamToDash } from './dash/mapHamToDash.js';
 import { addMetadataToDash, getMetadata } from '../../utils/manifestUtils.js';
 import { IMapper } from './IMapper.js';
@@ -27,13 +27,7 @@ export class DashMapper implements IMapper {
 	}
 
 	toManifest(presentation: Presentation[]): Manifest {
-		const jsonDash = mapHamToDash(presentation);
-
-		if (!jsonDash) {
-			return { manifest: '', ancillaryManifests: [], type: 'dash' };
-		}
-
-		const mpd = jsonToXml(jsonDash);
-		return { manifest: mpd, ancillaryManifests: [], type: 'dash' };
+		const manifest = mapHamToDash(presentation);
+		return { manifest, ancillaryManifests: [], type: 'dash' };
 	}
 }

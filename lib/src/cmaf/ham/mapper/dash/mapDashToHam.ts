@@ -43,6 +43,57 @@ import {
 	NUMERATOR,
 } from '../../../utils/constants.js';
 
+function mapDashToHam(dash: DashManifest): Presentation[] {
+	return dash.MPD.Period.map((period: Period) => {
+		const duration: number = iso8601DurationToNumber(period.$.duration);
+		const presentationId: string = getPresentationId(period, duration);
+
+		const selectionSetGroups: { [group: string]: SelectionSet } = {};
+
+		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
+			const tracks: Track[] = adaptationSet.Representation.map(
+				(representation: Representation) => {
+					const segmentTemplate: SegmentTemplate | undefined =
+						adaptationSet.SegmentTemplate?.at(0) ??
+						representation.SegmentTemplate?.at(0);
+					const segments: Segment[] = mapSegments(
+						representation,
+						duration,
+						segmentTemplate,
+					);
+
+					return mapTracks(
+						representation,
+						adaptationSet,
+						segments,
+						getInitializationUrl(representation, adaptationSet),
+					);
+				},
+			);
+
+			const group: string = getGroup(adaptationSet);
+			if (!selectionSetGroups[group]) {
+				selectionSetGroups[group] = {
+					id: group,
+					switchingSets: [],
+				} as SelectionSet;
+			}
+
+			selectionSetGroups[group].switchingSets.push({
+				id:
+					adaptationSet.$.id ??
+					adaptationSet.ContentComponent?.at(0)?.$.id ??
+					group,
+				tracks,
+			} as SwitchingSet);
+		});
+
+		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups);
+
+		return { id: presentationId, selectionSets } as Presentation;
+	});
+}
+
 function mapTracks(
 	representation: Representation,
 	adaptationSet: AdaptationSet,
@@ -129,10 +180,6 @@ function mapSegmentBase(
 function mapSegmentList(representation: Representation): Segment[] {
 	const segments: Segment[] = [];
 	representation.SegmentList!.map((segment: SegmentList) => {
-		segments.push({
-			duration: 0, // TODO: Check if it is correct that the init segment has duration 0
-			url: segment.Initialization[0].$.sourceURL ?? '',
-		} as Segment);
 		if (segment.SegmentURL) {
 			return segment.SegmentURL.forEach((segmentURL: SegmentURL) => {
 				segments.push({
@@ -211,57 +258,6 @@ function getInitializationUrl(
 		}
 	}
 	return initializationUrl;
-}
-
-function mapDashToHam(dash: DashManifest): Presentation[] {
-	return dash.MPD.Period.map((period: Period) => {
-		const duration: number = iso8601DurationToNumber(period.$.duration);
-		const presentationId: string = getPresentationId(period, duration);
-
-		const selectionSetGroups: { [group: string]: SelectionSet } = {};
-
-		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
-			const tracks: Track[] = adaptationSet.Representation.map(
-				(representation: Representation) => {
-					const segmentTemplate: SegmentTemplate | undefined =
-						adaptationSet.SegmentTemplate?.at(0) ??
-						representation.SegmentTemplate?.at(0);
-					const segments: Segment[] = mapSegments(
-						representation,
-						duration,
-						segmentTemplate,
-					);
-
-					return mapTracks(
-						representation,
-						adaptationSet,
-						segments,
-						getInitializationUrl(representation, adaptationSet),
-					);
-				},
-			);
-
-			const group: string = getGroup(adaptationSet);
-			if (!selectionSetGroups[group]) {
-				selectionSetGroups[group] = {
-					id: group,
-					switchingSets: [],
-				} as SelectionSet;
-			}
-
-			selectionSetGroups[group].switchingSets.push({
-				id:
-					adaptationSet.$.id ??
-					adaptationSet.ContentComponent?.at(0)?.$.id ??
-					group,
-				tracks,
-			} as SwitchingSet);
-		});
-
-		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups);
-
-		return { id: presentationId, selectionSets } as Presentation;
-	});
 }
 
 export {
