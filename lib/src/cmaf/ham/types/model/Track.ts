@@ -1,18 +1,26 @@
-import { Segment } from './Segment.js';
-import { Ham } from './Ham';
+import { Segment, Ham } from './index.js';
 
 /**
  * CMAF-HAM Track type
  * Used as a base for the audio, video and text tracks
  *
  * @group CMAF
- *
+ * id - Identifier of the track.
+ * type - Type of the track. Can be text, audio or video.
+ * fileName - File name of the track.
+ * codec - Codec of the track.
+ * duration - Duration of the track in seconds
+ * language - Language of the track.
+ * bandwidth - Bandwidth of the track.
+ * byteRange - Byte range of the track.
+ * urlInitialization - URL of the initialization segment.
+ * segments - List of segments of the track.
  * @alpha
  */
+
 type Track = Ham & {
-	id: string;
-	type: string;
-	name: string;
+	type: TrackType;
+	fileName?: string;
 	codec: string;
 	duration: number;
 	language: string;
@@ -53,10 +61,17 @@ type TextTrack = Track;
 type VideoTrack = Track & {
 	width: number;
 	height: number;
-	frameRate: string;
+	frameRate: FrameRate;
 	par: string;
 	sar: string;
 	scanType: string;
 };
+
+type FrameRate = {
+	frameRateNumerator: number;
+	frameRateDenominator?: number;
+};
+
+type TrackType = 'audio' | 'video' | 'text';
 
 export type { Track, VideoTrack, AudioTrack, TextTrack };

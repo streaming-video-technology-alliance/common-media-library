@@ -1,4 +1,17 @@
 /**
+ * HLS manifest
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
+type HlsManifest = {
+	playlists: PlayList[];
+	mediaGroups: MediaGroups;
+	segments: SegmentHls[];
+};
+
+/**
  * HLS Playlist
  *
  * @group CMAF
@@ -18,6 +31,13 @@ type PlayList = {
 	};
 };
 
+/**
+ * HLS Media Groups
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
 type MediaGroups = {
 	AUDIO: {
 		[key: string]: {
@@ -28,21 +48,16 @@ type MediaGroups = {
 	};
 };
 
-type SegmentHls = {
-	duration: number;
-};
-
 /**
- * HLS manifest
+ * HLS Segments
  *
  * @group CMAF
  *
  * @alpha
  */
-type m3u8 = {
-	playlists: PlayList[];
-	mediaGroups: MediaGroups;
-	segments: SegmentHls[];
+type SegmentHls = {
+	duration: number;
 };
 
-export type { PlayList, MediaGroups, SegmentHls, m3u8 };
+
+export type { PlayList, MediaGroups, SegmentHls, HlsManifest };
