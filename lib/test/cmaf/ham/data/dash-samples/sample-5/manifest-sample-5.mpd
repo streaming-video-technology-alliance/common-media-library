@@ -1,4 +1,4 @@
-export const mpdSample1: string = `<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <MPD
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011"
@@ -32,4 +32,4 @@ minBufferTime="PT10S">
             </Representation>
         </AdaptationSet>
     </Period>
-</MPD>`;
+</MPD>
