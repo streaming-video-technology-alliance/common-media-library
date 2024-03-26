@@ -26,19 +26,18 @@ import {
 } from "@svta/common-media-library";
 
 
-// Parse from DASH format
-const parseFromDash = (input: string) => {
-  const hamObj = mpdToHam(input); // Convert input to HAM object
-  const hlsManifest = hamToHls(hamObj); // Convert HAM object to HLS manifest
-  const dashManifest = hamToDash(hamObj); // Convert HAM object to DASH manifest
-};
+function parseFromDash(dashManifest: string) {
+  const hamObject = mpdToHam(dashManifest); // Convert input to HAM object
+  const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
+  const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
+}
 
-// Parse from HLS format
-const parseFromHls = (main: string, playlists: string[]) => {
-  const hamObj = hlsToHam(main, playlists); // Convert HLS to HAM object
-  const hlsManifest = hamToHls(hamObj); // Convert HAM object to HLS manifest
-  const dashManifest = hamToDash(hamObj); // Convert HAM object to DASH manifest
-};
+function parseFromHls(mainHlsManifest: string, playListHlsManifests: string[]) {
+  const hamObject = hlsToHam(mainHlsManifest, playListHlsManifests); // Convert HLS to HAM object
+  const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
+  const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
+}
+
 
 ```
 
