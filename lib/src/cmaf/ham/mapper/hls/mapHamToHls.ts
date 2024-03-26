@@ -11,7 +11,7 @@ import {
 import { getPlaylistData, getSegments } from './utilsHamToHls.js';
 
 type ManifestPlaylistPiece = {
-	manifestToConcat: string;
+	mainRef: string;
 	playlist: string;
 };
 
@@ -19,25 +19,25 @@ function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPiece {
 	const mediaSequence = 0; //TODO : save mediaSequence in the model.
 	const trackFileName = track.fileName ?? `${track.id}.m3u8`;
 
-	let manifestToConcat = '';
+	let mainRef = '';
 	let playlist = `#EXTM3U\n#EXT-X-TARGETDURATION:${track.duration}\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n`;
 
 	if (track.type.toLowerCase() === 'video') {
 		const videoTrack = track as VideoTrack;
-		manifestToConcat += `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}\n${trackFileName}\n`;
+		mainRef += `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}\n${trackFileName}\n`;
 		playlist += getPlaylistData(videoTrack);
 	} else if (track.type.toLowerCase() === 'audio') {
 		const audioTrack = track as AudioTrack;
-		manifestToConcat += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"\n`;
+		mainRef += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"\n`;
 		playlist += getPlaylistData(audioTrack);
 	} else if (track.type.toLowerCase() === 'text') {
 		const textTrack = track as TextTrack;
-		manifestToConcat += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}\n`;
+		mainRef += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}\n`;
 	}
 
 	playlist += `${getSegments(track.segments)}#EXT-X-ENDLIST`;
 
-	return { manifestToConcat, playlist };
+	return { mainRef, playlist };
 }
 
 function mapHamToHls(presentations: Presentation[]): Manifest {
@@ -48,9 +48,9 @@ function mapHamToHls(presentations: Presentation[]): Manifest {
 		presentation.selectionSets.map((selectionSet: SelectionSet) => {
 			selectionSet.switchingSets.map((switchingSet: SwitchingSet) => {
 				switchingSet.tracks.map((track: Track) => {
-					const { manifestToConcat, playlist } =
+					const { mainRef, playlist } =
 						generateManifestPlaylistPiece(track);
-					mainManifest += manifestToConcat;
+					mainManifest += mainRef;
 					playlists.push({ manifest: playlist, type: 'hls' });
 				});
 			});

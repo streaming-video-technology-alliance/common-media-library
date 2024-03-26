@@ -11,7 +11,7 @@ import type { Manifest, PlayList } from '../../types';
 import { addMetadataToHls } from '../../../utils/manifestUtils.js';
 import { parseHlsManifest } from '../../../utils/hls/hlsParser.js';
 import {
-	_formatSegments,
+	formatSegments,
 	getByterange,
 	getCodec,
 	getDuration,
@@ -61,7 +61,11 @@ function mapHlsToHam(manifest: Manifest): Presentation[] {
 		} as SelectionSet);
 	}
 
-	return [{ id: '0', selectionSets: selectionSets }];
+	let presentationId = 0;
+
+	return [
+		{ id: (presentationId++).toString(), selectionSets: selectionSets },
+	];
 }
 
 function _audioGroupsToSwitchingSets(
@@ -78,7 +82,7 @@ function _audioGroupsToSwitchingSets(
 			manifestPlaylists.shift()?.manifest,
 		);
 		const map = audioParsed?.segments[0]?.map;
-		const segments = _formatSegments(audioParsed?.segments);
+		const segments = formatSegments(audioParsed?.segments);
 
 		// TODO: channels, sampleRate, bandwith and codec need to be
 		// updated with real values. Right now we are using simple hardcoded values.
@@ -119,7 +123,7 @@ function _subtitleGroupsToSwitchingSets(
 		const subtitleParsed = parseHlsManifest(
 			manifestPlaylists.shift()?.manifest,
 		);
-		const segments = _formatSegments(subtitleParsed?.segments);
+		const segments = formatSegments(subtitleParsed?.segments);
 
 		const textTrack = {
 			id: subtitle,
@@ -152,9 +156,7 @@ function _videoPlaylistsToSwitchingSets(
 		const parsedHlsManifest = parseHlsManifest(
 			manifestPlaylists.shift()?.manifest,
 		);
-		const segments: Segment[] = _formatSegments(
-			parsedHlsManifest?.segments,
-		);
+		const segments: Segment[] = formatSegments(parsedHlsManifest?.segments);
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 		const map = parsedHlsManifest?.segments?.at(0)?.map;
 		const videoTrack = {

@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import { deepEqual, equal } from 'node:assert';
 import {
-	_formatSegments,
+	formatSegments,
 	getByterange,
 	getCodec,
 	getDuration,
@@ -17,7 +17,7 @@ describe('getByterange', () => {
 
 	it('returns undefined if byterange does not exist', () => {
 		const res = getByterange(undefined);
-		equal(res, '');
+		equal(res, undefined);
 	});
 });
 
@@ -57,10 +57,9 @@ describe('getDuration', () => {
 	});
 });
 
-// TODO: complete test
-describe('_formatSegments', () => {
+describe('formatSegments', () => {
 	it('returns segments formated', () => {
-		const res = _formatSegments(getSegments());
+		const res = formatSegments(getSegments());
 		deepEqual(res, [
 			{
 				duration: 4.011,
@@ -73,5 +72,10 @@ describe('_formatSegments', () => {
 				byteRange: '56@78',
 			},
 		]);
+	});
+
+	it('returns empty array if segments is empty', () => {
+		const res = formatSegments([]);
+		deepEqual(res, []);
 	});
 });

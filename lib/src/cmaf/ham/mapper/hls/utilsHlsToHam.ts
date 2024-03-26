@@ -41,7 +41,7 @@ function getDuration(
 	return manifest?.targetDuration * segments.length;
 }
 
-function _formatSegments(segments: SegmentHls[]): Segment[] {
+function formatSegments(segments: SegmentHls[]): Segment[] {
 	return (
 		segments?.map((segment: any) => {
 			return {
@@ -53,4 +53,4 @@ function _formatSegments(segments: SegmentHls[]): Segment[] {
 	);
 }
 
-export { getByterange, getCodec, getDuration, _formatSegments };
+export { getByterange, getCodec, getDuration, formatSegments };
