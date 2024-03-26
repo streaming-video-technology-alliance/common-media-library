@@ -13,7 +13,8 @@ The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19
 
 ## Usage 
 
-Here's a sample demonstration illustrating how to utilize the features of the CMAF HAM module in TypeScript:
+Here's a simple demonstration illustrating how to use the features of the CMAF HAM module in TypeScript:
+
 
 
 ```typescript
