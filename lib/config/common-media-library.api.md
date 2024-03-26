@@ -624,25 +624,25 @@ export function uuid(): string;
 export function validatePresentation(presentation: Presentation): Validation;
 
 // @alpha
-export function validateSegments(segments: Segment[], trackId?: string): Validation;
+export function validateSegments(segments: Segment[], trackId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
-export function validateSelectionSet(selectionSet: SelectionSet, presentationId?: string): Validation;
+export function validateSelectionSet(selectionSet: SelectionSet, presentationId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
-export function validateSelectionSets(selectionSets: SelectionSet[], presentationId?: string): Validation;
+export function validateSelectionSets(selectionSets: SelectionSet[], presentationId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
-export function validateSwitchingSet(switchingSet: SwitchingSet, selectionSetId?: string): Validation;
+export function validateSwitchingSet(switchingSet: SwitchingSet, selectionSetId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
-export function validateSwitchingSets(switchingSets: SwitchingSet[], selectionSetId?: string): Validation;
+export function validateSwitchingSets(switchingSets: SwitchingSet[], selectionSetId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
-export function validateTrack(track: Track, switchingSetId?: string): Validation;
+export function validateTrack(track: Track, switchingSetId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
-export function validateTracks(tracks: Track[], switchingSetId?: string): Validation;
+export function validateTracks(tracks: Track[], switchingSetId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
 export type VideoTrack = Track & {

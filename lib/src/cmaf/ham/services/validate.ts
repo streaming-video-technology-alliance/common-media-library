@@ -9,7 +9,7 @@ import {
 	Segment,
 } from '../types/model';
 
-// TODO: Track and Segment validation are so simple for the PoC. The method should validate more deeper and connecting the things 
+// TODO: Track and Segment validation are so simple for the PoC. The method should validate more deeper and connecting the things
 // in the model like durations, urls, frame rate, etc.
 
 /**
@@ -42,16 +42,13 @@ function validatePresentation(presentation: Presentation): Validation {
 
 	if (!presentation.id) {
 		validation.status = false;
-		validation.errorMessages?.push('Presentation id is undefined');
+		validation.errorMessages.push('Presentation id is undefined');
 	}
 
-	const selectionSetsValidation = validateSelectionSets(
+	validateSelectionSets(
 		presentation.selectionSets,
 		presentation.id,
-	);
-	validation.status = validation.status && selectionSetsValidation.status;
-	validation.errorMessages = validation.errorMessages.concat(
-		selectionSetsValidation.errorMessages,
+		validation,
 	);
 
 	return validation;
@@ -74,15 +71,15 @@ function validatePresentation(presentation: Presentation): Validation {
 function validateSelectionSets(
 	selectionSets: SelectionSet[],
 	presentationId?: string,
+	prevValidation?: Validation,
 ): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 
 	selectionSets.forEach((selectionSet: SelectionSet) => {
-		const val = validateSelectionSet(selectionSet, presentationId);
-		validation.status = validation.status && val.status;
-		validation.errorMessages = validation.errorMessages.concat(
-			val.errorMessages,
-		);
+		validateSelectionSet(selectionSet, presentationId, validation);
 	});
 
 	return validation;
@@ -105,26 +102,27 @@ function validateSelectionSets(
 function validateSelectionSet(
 	selectionSet: SelectionSet,
 	presentationId?: string,
+	prevValidation?: Validation,
 ): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = presentationId
 		? ` in the presentation with id = ${presentationId}`
 		: '.';
 
 	if (!selectionSet.id) {
 		validation.status = false;
-		validation.errorMessages?.push(
+		validation.errorMessages.push(
 			`SelectionSet id is undefined${moreInformation}`,
 		);
 	}
 
-	const switchingSetsValidation = validateSwitchingSets(
+	validateSwitchingSets(
 		selectionSet.switchingSets,
 		selectionSet.id,
-	);
-	validation.status = validation.status && switchingSetsValidation.status;
-	validation.errorMessages = validation.errorMessages.concat(
-		switchingSetsValidation.errorMessages,
+		validation,
 	);
 
 	return validation;
@@ -147,15 +145,15 @@ function validateSelectionSet(
 function validateSwitchingSets(
 	switchingSets: SwitchingSet[],
 	selectionSetId?: string,
+	prevValidation?: Validation,
 ): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 
 	switchingSets.forEach((switchingSet: SwitchingSet) => {
-		const val = validateSwitchingSet(switchingSet, selectionSetId);
-		validation.status = validation.status && val.status;
-		validation.errorMessages = validation.errorMessages.concat(
-			val.errorMessages,
-		);
+		validateSwitchingSet(switchingSet, selectionSetId, validation);
 	});
 
 	return validation;
@@ -178,27 +176,24 @@ function validateSwitchingSets(
 function validateSwitchingSet(
 	switchingSet: SwitchingSet,
 	selectionSetId?: string,
+	prevValidation?: Validation,
 ): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = selectionSetId
 		? ` in the selection set with id = ${selectionSetId}`
 		: '.';
 
 	if (!switchingSet.id) {
 		validation.status = false;
-		validation.errorMessages?.push(
+		validation.errorMessages.push(
 			`SwitchingSet id is undefined${moreInformation}`,
 		);
 	}
 
-	const tracksValidation = validateTracks(
-		switchingSet.tracks,
-		switchingSet.id,
-	);
-	validation.status = validation.status && tracksValidation.status;
-	validation.errorMessages = validation.errorMessages.concat(
-		tracksValidation.errorMessages,
-	);
+	validateTracks(switchingSet.tracks, switchingSet.id, validation);
 
 	return validation;
 }
@@ -217,8 +212,15 @@ function validateSwitchingSet(
  * @alpha
  *
  */
-function validateTracks(tracks: Track[], switchingSetId?: string): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+function validateTracks(
+	tracks: Track[],
+	switchingSetId?: string,
+	prevValidation?: Validation,
+): Validation {
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.';
@@ -234,11 +236,7 @@ function validateTracks(tracks: Track[], switchingSetId?: string): Validation {
 				`All the tracks must have the same duration${moreInformation}`,
 			);
 		}
-		const val = validateTrack(track, switchingSetId);
-		validation.status = validation.status && val.status;
-		validation.errorMessages = validation.errorMessages.concat(
-			val.errorMessages,
-		);
+		validateTrack(track, switchingSetId, validation);
 	});
 
 	return validation;
@@ -258,39 +256,47 @@ function validateTracks(tracks: Track[], switchingSetId?: string): Validation {
  * @alpha
  *
  */
-function validateTrack(track: Track, switchingSetId?: string): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+function validateTrack(
+	track: Track,
+	switchingSetId?: string,
+	prevValidation?: Validation,
+): Validation {
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.';
 
 	if (!track.id) {
 		validation.status = false;
-		validation.errorMessages?.push(
+		validation.errorMessages.push(
 			`Track id is undefined${moreInformation}`,
 		);
 	}
 
-	let val: Validation;
 	switch (track.type) {
 		case 'video':
-			val = _validateVideoTrack(track as VideoTrack, switchingSetId);
+			_validateVideoTrack(
+				track as VideoTrack,
+				switchingSetId,
+				validation,
+			);
 			break;
 		case 'audio':
-			val = _validateAudioTrack(track as AudioTrack, switchingSetId);
+			_validateAudioTrack(
+				track as AudioTrack,
+				switchingSetId,
+				validation,
+			);
 			break;
 		case 'text':
-			val = _validateTextTrack(track as TextTrack, switchingSetId);
+			_validateTextTrack(track as TextTrack, switchingSetId, validation);
 			break;
 	}
 
-	const segmentsValidation = validateSegments(track.segments, track.id);
-	validation.status =
-		validation.status && val.status && segmentsValidation.status;
-	validation.errorMessages = validation.errorMessages.concat(
-		val.errorMessages,
-		segmentsValidation.errorMessages,
-	);
+	validateSegments(track.segments, track.id, validation);
 
 	return validation;
 }
@@ -308,15 +314,18 @@ function validateTrack(track: Track, switchingSetId?: string): Validation {
  * @alpha
  *
  */
-function validateSegments(segments: Segment[], trackId?: string): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+function validateSegments(
+	segments: Segment[],
+	trackId?: string,
+	prevValidation?: Validation,
+): Validation {
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 
 	segments.forEach((segment: Segment) => {
-		const val = validateSegment(segment, trackId);
-		validation.status = validation.status && val.status;
-		validation.errorMessages = validation.errorMessages.concat(
-			val.errorMessages,
-		);
+		validateSegment(segment, trackId, prevValidation);
 	});
 
 	return validation;
@@ -335,8 +344,15 @@ function validateSegments(segments: Segment[], trackId?: string): Validation {
  * @alpha
  *
  */
-function validateSegment(segment: Segment, trackId?: string): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+function validateSegment(
+	segment: Segment,
+	trackId?: string,
+	prevValidation?: Validation,
+): Validation {
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = trackId
 		? ` in the track with id = ${trackId}`
 		: '.';
@@ -361,8 +377,12 @@ function validateSegment(segment: Segment, trackId?: string): Validation {
 function _validateVideoTrack(
 	videoTrack: VideoTrack,
 	switchingSetId?: string,
+	prevValidation?: Validation,
 ): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.';
@@ -380,8 +400,12 @@ function _validateVideoTrack(
 function _validateAudioTrack(
 	audioTrack: AudioTrack,
 	switchingSetId?: string,
+	prevValidation?: Validation,
 ): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.';
@@ -399,8 +423,12 @@ function _validateAudioTrack(
 function _validateTextTrack(
 	textTrack: TextTrack,
 	switchingSetId?: string,
+	prevValidation?: Validation,
 ): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = prevValidation ?? {
+		status: true,
+		errorMessages: [],
+	};
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.';
