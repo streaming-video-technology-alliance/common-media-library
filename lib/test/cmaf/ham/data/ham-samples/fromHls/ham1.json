@@ -1,0 +1,2800 @@
+[
+	{
+		"id": "0",
+		"selectionSets": [
+			{
+				"id": "0",
+				"switchingSets": [
+					{
+						"id": "default-audio-group",
+						"tracks": [
+							{
+								"id": "default-audio-group",
+								"type": "audio",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_a-eng-0128k-aac-2c.mp4.m3u8",
+								"codec": "mp4a.40.2",
+								"duration": 470,
+								"language": "en",
+								"bandwidth": 0,
+								"segments": [
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s1.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s2.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s3.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s4.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s5.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s6.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s7.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s8.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s9.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s10.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s11.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s12.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s13.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s14.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s15.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s16.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s17.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s18.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s19.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s20.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s21.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s22.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s23.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s24.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s25.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s26.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s27.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s28.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s29.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s30.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s31.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s32.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s33.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s34.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s35.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s36.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s37.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s38.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s39.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s40.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s41.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s42.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s43.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s44.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s45.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s46.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s47.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s48.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s49.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s50.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s51.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s52.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s53.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s54.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s55.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s56.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s57.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s58.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s59.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s60.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s61.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s62.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s63.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s64.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s65.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s66.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s67.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s68.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s69.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s70.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s71.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s72.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s73.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s74.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s75.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s76.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s77.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s78.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s79.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s80.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s81.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s82.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s83.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s84.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s85.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s86.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s87.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s88.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s89.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s90.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s91.mp4"
+									},
+									{
+										"duration": 3.989,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s92.mp4"
+									},
+									{
+										"duration": 4.011,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s93.mp4"
+									},
+									{
+										"duration": 0.341,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-s94.mp4"
+									}
+								],
+								"sampleRate": 0,
+								"channels": 2,
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-init.mp4"
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "1",
+				"switchingSets": [
+					{
+						"id": "video-0",
+						"tracks": [
+							{
+								"id": "video-0",
+								"type": "video",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0144p-0100k-libx264.mp4.m3u8",
+								"codec": "avc1.42c01e",
+								"duration": 470,
+								"language": "und",
+								"bandwidth": 255636,
+								"segments": [
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s1.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s2.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s3.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s4.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s5.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s6.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s7.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s8.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s9.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s10.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s11.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s12.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s13.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s14.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s15.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s16.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s17.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s18.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s19.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s20.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s21.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s22.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s23.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s24.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s25.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s26.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s27.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s28.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s29.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s30.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s31.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s32.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s33.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s34.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s35.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s36.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s37.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s38.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s39.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s40.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s41.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s42.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s43.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s44.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s45.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s46.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s47.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s48.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s49.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s50.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s51.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s52.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s53.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s54.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s55.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s56.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s57.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s58.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s59.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s60.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s61.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s62.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s63.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s64.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s65.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s66.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s67.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s68.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s69.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s70.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s71.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s72.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s73.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s74.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s75.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s76.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s77.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s78.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s79.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s80.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s81.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s82.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s83.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s84.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s85.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s86.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s87.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s88.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s89.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s90.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s91.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s92.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s93.mp4"
+									},
+									{
+										"duration": 0.333,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-s94.mp4"
+									}
+								],
+								"width": 250,
+								"height": 144,
+								"par": "",
+								"sar": "",
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0144p-0100k-libx264-init.mp4"
+							}
+						]
+					},
+					{
+						"id": "video-1",
+						"tracks": [
+							{
+								"id": "video-1",
+								"type": "video",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0240p-0400k-libx264.mp4.m3u8",
+								"codec": "avc1.4d401f",
+								"duration": 470,
+								"language": "und",
+								"bandwidth": 543932,
+								"segments": [
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s1.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s2.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s3.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s4.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s5.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s6.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s7.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s8.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s9.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s10.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s11.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s12.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s13.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s14.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s15.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s16.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s17.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s18.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s19.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s20.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s21.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s22.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s23.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s24.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s25.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s26.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s27.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s28.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s29.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s30.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s31.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s32.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s33.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s34.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s35.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s36.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s37.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s38.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s39.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s40.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s41.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s42.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s43.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s44.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s45.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s46.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s47.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s48.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s49.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s50.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s51.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s52.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s53.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s54.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s55.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s56.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s57.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s58.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s59.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s60.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s61.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s62.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s63.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s64.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s65.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s66.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s67.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s68.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s69.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s70.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s71.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s72.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s73.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s74.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s75.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s76.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s77.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s78.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s79.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s80.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s81.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s82.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s83.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s84.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s85.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s86.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s87.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s88.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s89.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s90.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s91.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s92.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s93.mp4"
+									},
+									{
+										"duration": 0.333,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-s94.mp4"
+									}
+								],
+								"width": 418,
+								"height": 240,
+								"par": "",
+								"sar": "",
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0240p-0400k-libx264-init.mp4"
+							}
+						]
+					},
+					{
+						"id": "video-2",
+						"tracks": [
+							{
+								"id": "video-2",
+								"type": "video",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0576p-1400k-libx264.mp4.m3u8",
+								"codec": "avc1.4d401f",
+								"duration": 470,
+								"language": "und",
+								"bandwidth": 1599186,
+								"segments": [
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s1.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s2.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s3.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s4.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s5.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s6.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s7.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s8.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s9.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s10.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s11.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s12.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s13.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s14.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s15.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s16.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s17.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s18.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s19.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s20.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s21.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s22.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s23.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s24.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s25.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s26.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s27.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s28.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s29.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s30.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s31.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s32.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s33.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s34.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s35.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s36.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s37.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s38.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s39.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s40.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s41.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s42.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s43.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s44.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s45.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s46.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s47.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s48.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s49.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s50.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s51.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s52.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s53.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s54.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s55.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s56.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s57.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s58.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s59.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s60.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s61.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s62.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s63.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s64.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s65.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s66.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s67.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s68.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s69.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s70.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s71.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s72.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s73.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s74.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s75.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s76.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s77.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s78.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s79.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s80.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s81.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s82.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s83.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s84.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s85.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s86.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s87.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s88.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s89.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s90.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s91.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s92.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s93.mp4"
+									},
+									{
+										"duration": 0.333,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-s94.mp4"
+									}
+								],
+								"width": 1002,
+								"height": 576,
+								"par": "",
+								"sar": "",
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0360p-0750k-libx264-init.mp4"
+							}
+						]
+					},
+					{
+						"id": "video-3",
+						"tracks": [
+							{
+								"id": "video-3",
+								"type": "video",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0720p-2500k-libx264.mp4.m3u8",
+								"codec": "avc1.4d401f",
+								"duration": 470,
+								"language": "und",
+								"bandwidth": 2778640,
+								"segments": [
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s1.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s2.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s3.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s4.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s5.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s6.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s7.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s8.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s9.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s10.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s11.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s12.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s13.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s14.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s15.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s16.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s17.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s18.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s19.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s20.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s21.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s22.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s23.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s24.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s25.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s26.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s27.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s28.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s29.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s30.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s31.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s32.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s33.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s34.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s35.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s36.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s37.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s38.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s39.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s40.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s41.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s42.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s43.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s44.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s45.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s46.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s47.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s48.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s49.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s50.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s51.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s52.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s53.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s54.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s55.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s56.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s57.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s58.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s59.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s60.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s61.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s62.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s63.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s64.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s65.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s66.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s67.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s68.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s69.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s70.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s71.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s72.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s73.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s74.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s75.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s76.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s77.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s78.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s79.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s80.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s81.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s82.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s83.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s84.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s85.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s86.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s87.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s88.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s89.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s90.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s91.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s92.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s93.mp4"
+									},
+									{
+										"duration": 0.333,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-s94.mp4"
+									}
+								],
+								"width": 1252,
+								"height": 720,
+								"par": "",
+								"sar": "",
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0480p-1000k-libx264-init.mp4"
+							}
+						]
+					},
+					{
+						"id": "video-4",
+						"tracks": [
+							{
+								"id": "video-4",
+								"type": "video",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0480p-1000k-libx264.mp4.m3u8",
+								"codec": "avc1.4d401f",
+								"duration": 470,
+								"language": "und",
+								"bandwidth": 1184460,
+								"segments": [
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s1.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s2.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s3.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s4.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s5.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s6.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s7.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s8.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s9.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s10.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s11.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s12.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s13.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s14.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s15.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s16.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s17.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s18.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s19.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s20.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s21.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s22.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s23.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s24.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s25.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s26.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s27.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s28.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s29.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s30.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s31.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s32.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s33.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s34.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s35.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s36.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s37.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s38.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s39.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s40.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s41.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s42.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s43.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s44.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s45.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s46.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s47.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s48.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s49.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s50.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s51.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s52.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s53.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s54.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s55.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s56.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s57.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s58.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s59.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s60.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s61.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s62.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s63.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s64.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s65.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s66.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s67.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s68.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s69.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s70.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s71.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s72.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s73.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s74.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s75.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s76.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s77.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s78.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s79.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s80.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s81.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s82.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s83.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s84.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s85.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s86.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s87.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s88.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s89.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s90.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s91.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s92.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s93.mp4"
+									},
+									{
+										"duration": 0.333,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-s94.mp4"
+									}
+								],
+								"width": 834,
+								"height": 480,
+								"par": "",
+								"sar": "",
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0576p-1400k-libx264-init.mp4"
+							}
+						]
+					},
+					{
+						"id": "video-5",
+						"tracks": [
+							{
+								"id": "video-5",
+								"type": "video",
+								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0360p-0750k-libx264.mp4.m3u8",
+								"codec": "avc1.4d401f",
+								"duration": 470,
+								"language": "und",
+								"bandwidth": 909696,
+								"segments": [
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s1.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s2.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s3.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s4.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s5.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s6.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s7.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s8.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s9.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s10.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s11.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s12.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s13.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s14.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s15.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s16.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s17.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s18.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s19.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s20.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s21.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s22.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s23.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s24.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s25.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s26.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s27.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s28.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s29.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s30.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s31.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s32.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s33.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s34.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s35.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s36.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s37.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s38.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s39.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s40.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s41.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s42.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s43.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s44.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s45.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s46.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s47.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s48.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s49.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s50.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s51.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s52.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s53.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s54.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s55.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s56.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s57.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s58.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s59.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s60.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s61.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s62.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s63.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s64.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s65.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s66.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s67.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s68.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s69.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s70.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s71.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s72.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s73.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s74.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s75.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s76.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s77.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s78.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s79.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s80.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s81.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s82.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s83.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s84.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s85.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s86.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s87.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s88.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s89.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s90.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s91.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s92.mp4"
+									},
+									{
+										"duration": 4,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s93.mp4"
+									},
+									{
+										"duration": 0.333,
+										"url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-s94.mp4"
+									}
+								],
+								"width": 626,
+								"height": 360,
+								"par": "",
+								"sar": "",
+								"scanType": "",
+								"urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-init.mp4"
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+]

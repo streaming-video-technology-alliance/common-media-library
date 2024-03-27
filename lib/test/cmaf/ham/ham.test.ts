@@ -2,15 +2,16 @@ import {
 	getTracksFromSelectionSet,
 	SelectionSet,
 	validateTracks,
+	Presentation,
 } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
-import jsonSelectionSet1 from './data/selectionSet1.json' assert { type: 'json' };
+import { jsonHam0 } from './data/ham-samples/fromDash/index.js';
 
 describe('ham validation', () => {
 	let selectionSet: SelectionSet;
 	beforeEach(() => {
-		selectionSet = jsonSelectionSet1 as unknown as SelectionSet;
+		selectionSet = (jsonHam0 as Presentation[])[0].selectionSets[0];
 	});
 
 	it('returns false track list is empty', () => {

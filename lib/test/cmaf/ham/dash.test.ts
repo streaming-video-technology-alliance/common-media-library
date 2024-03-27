@@ -11,7 +11,7 @@ import {
 	jsonHam6,
 	jsonHam7,
 	jsonHam8,
-} from './data/ham-samples/index.js';
+} from './data/ham-samples/fromDash/index.js';
 import {
 	mpdSample0,
 	mpdSample1,
@@ -24,7 +24,7 @@ import {
 	mpdSample8,
 } from './data/dash-samples/index.js';
 
-describe('dash2ham', () => {
+describe('dashToham', () => {
 	it('converts dash1 to ham1', () => {
 		const convertedHam0 = cmafHam.dashToHam(mpdSample0);
 		deepEqual(convertedHam0, jsonHam0);
