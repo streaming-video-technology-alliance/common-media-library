@@ -1,0 +1,286 @@
+#EXTM3U
+#EXT-X-VERSION:6
+## Created with Unified Streaming Platform(version=1.9.4)
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-TARGETDURATION:8
+#EXT-X-MAP:URI="https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv",BYTERANGE="762@0"
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:105315@1898
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:12105186@107213
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1048914@12212399
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:997293@13261313
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:928518@14258606
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2111138@15187124
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1701649@17298262
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:962380@18999911
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:463335@19962291
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2109502@20425626
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2032831@22535128
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2086250@24567959
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1811131@26654209
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2661924@28465340
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2046817@31127264
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2409728@33174081
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1701294@35583809
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1617627@37285103
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2097961@38902730
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2698788@41000691
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2595494@43699479
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2201020@46294973
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2269544@48495993
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:3130224@50765537
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1998435@53895761
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2471186@55894196
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:3777285@58365382
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:4075483@62142667
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1464170@66218150
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2015151@67682320
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1468487@69697471
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1951973@71165958
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2680204@73117931
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2571656@75798135
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1860511@78369791
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1799976@80230302
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2195506@82030278
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2061633@84225784
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1970565@86287417
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1177719@88257982
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1240103@89435701
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2168595@90675804
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1958311@92844399
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2107379@94802710
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1650470@96910089
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1481115@98560559
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2194235@100041674
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2728982@102235909
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1961300@104964891
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1570592@106926191
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1957814@108496783
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2219645@110454597
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:3765662@112674242
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2099911@116439904
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:3359454@118539815
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2271052@121899269
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1772104@124170321
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2437476@125942425
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:4756551@128379901
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:4117885@133136452
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2088023@137254337
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2607027@139342360
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2808826@141949387
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1596526@144758213
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1517197@146354739
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2558393@147871936
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1016956@150430329
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1663260@151447285
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1526225@153110545
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1262149@154636770
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1487914@155898919
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:3504787@157386833
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2627443@160891620
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2575826@163519063
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:4329431@166094889
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:3622472@170424320
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2954173@174046792
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2436182@177000965
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1543368@179437147
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1176239@180980515
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1563407@182156754
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1799681@183720161
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2255098@185519842
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2195125@187774940
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2222305@189970065
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2100707@192192370
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2009166@194293077
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1005297@196302243
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:832229@197307540
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2255109@198139769
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1647846@200394878
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXTINF:6, no desc
+#EXT-X-BYTERANGE:424839@202042724
+https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-avc1-2200k.cmfv
+#EXT-X-ENDLIST
+#USP-X-MEDIA:BANDWIDTH=12106000,AVERAGE-BANDWIDTH=2207000,TYPE=VIDEO,GROUP-ID="video-avc1-2205",LANGUAGE="en",NAME="English",AUTOSELECT=YES,CODECS="avc1.640028",RESOLUTION=1680x750,VIDEO-RANGE=SDR
