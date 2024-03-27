@@ -8,10 +8,6 @@ const expectedSegmentBase = [
 
 const expectedSegmentList = [
 	{
-		duration: 0,
-		url: 'testStream01bbb/video/72000/seg_init.mp4',
-	},
-	{
 		duration: 10,
 		url: 'testStream01bbb/video/72000/segment_0.m4s',
 	},

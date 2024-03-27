@@ -52,20 +52,17 @@ function mapDashToHam(dash: DashManifest): Presentation[] {
 		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
 			const tracks: Track[] = adaptationSet.Representation.map(
 				(representation: Representation) => {
-					const segmentTemplate: SegmentTemplate | undefined =
-						adaptationSet.SegmentTemplate?.at(0) ??
-						representation.SegmentTemplate?.at(0);
 					const segments: Segment[] = mapSegments(
+						adaptationSet,
 						representation,
 						duration,
-						segmentTemplate,
 					);
 
 					return mapTracks(
-						representation,
 						adaptationSet,
+						representation,
 						segments,
-						getInitializationUrl(representation, adaptationSet),
+						getInitializationUrl(adaptationSet, representation),
 					);
 				},
 			);
@@ -94,8 +91,8 @@ function mapDashToHam(dash: DashManifest): Presentation[] {
 }
 
 function mapTracks(
-	representation: Representation,
 	adaptationSet: AdaptationSet,
+	representation: Representation,
 	segments: Segment[],
 	initializationUrl: string | undefined,
 ): AudioTrack | VideoTrack | TextTrack {
@@ -173,9 +170,9 @@ function mapSegmentBase(
 	});
 }
 
-function mapSegmentList(representation: Representation): Segment[] {
+function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 	const segments: Segment[] = [];
-	representation.SegmentList!.map((segment: SegmentList) => {
+	segmentList.map((segment: SegmentList) => {
 		if (segment.SegmentURL) {
 			return segment.SegmentURL.forEach((segmentURL: SegmentURL) => {
 				segments.push({
@@ -215,14 +212,19 @@ function mapSegmentTemplate(
 }
 
 function mapSegments(
+	adaptationSet: AdaptationSet,
 	representation: Representation,
 	duration: number,
-	segmentTemplate?: SegmentTemplate,
 ): Segment[] {
+	const segmentTemplate: SegmentTemplate | undefined =
+		adaptationSet.SegmentTemplate?.at(0) ??
+		representation.SegmentTemplate?.at(0);
+	const segmentList: SegmentList[] | undefined =
+		adaptationSet.SegmentList ?? representation.SegmentList;
 	if (representation.SegmentBase) {
 		return mapSegmentBase(representation, duration);
-	} else if (representation.SegmentList) {
-		return mapSegmentList(representation);
+	} else if (segmentList) {
+		return mapSegmentList(segmentList);
 	} else if (segmentTemplate) {
 		return mapSegmentTemplate(representation, duration, segmentTemplate);
 	} else {
@@ -232,15 +234,16 @@ function mapSegments(
 }
 
 function getInitializationUrl(
-	representation: Representation,
 	adaptationSet: AdaptationSet,
+	representation: Representation,
 ): string | undefined {
 	let initializationUrl: string | undefined;
 	if (representation.SegmentBase) {
 		initializationUrl = representation.BaseURL![0] ?? '';
-	} else if (representation.SegmentList) {
+	} else if (adaptationSet.SegmentList || representation.SegmentList) {
 		initializationUrl =
-			representation.SegmentList[0].Initialization[0].$.sourceURL;
+			representation.SegmentList?.at(0)?.Initialization[0].$.sourceURL ||
+			adaptationSet.SegmentList?.at(0)?.Initialization[0].$.sourceURL;
 	}
 	if (adaptationSet.SegmentTemplate || representation.SegmentTemplate) {
 		initializationUrl =
