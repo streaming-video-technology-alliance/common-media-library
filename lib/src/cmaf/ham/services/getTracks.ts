@@ -3,7 +3,7 @@ import type {
 	SelectionSet,
 	SwitchingSet,
 	Track,
-} from '../types/model';
+} from '../types/model/index.js';
 
 /**
  * Get a list of Tracks contained on a SwitchingSet

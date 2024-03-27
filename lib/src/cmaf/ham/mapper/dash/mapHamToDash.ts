@@ -15,7 +15,7 @@ import type {
 	SelectionSet,
 	Track,
 	VideoTrack,
-} from '../../types/model';
+} from '../../types/model/index.js';
 import { numberToIso8601Duration } from '../../../utils/utils.js';
 import { getFrameRate, getTimescale } from './utilsHamToDash.js';
 import { jsonToXml } from '../../../utils/xmlUtils.js';

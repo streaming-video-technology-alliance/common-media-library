@@ -6,7 +6,7 @@ import {
 	SwitchingSet,
 	TextTrack,
 	VideoTrack,
-} from '../../types/model';
+} from '../../types/model/index.js';
 import type { Manifest, PlayList } from '../../types';
 import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.js';
 import { addMetadataToHls } from '../../../utils/manifestUtils.js';

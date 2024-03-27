@@ -29,7 +29,7 @@ describe('map segments', () => {
 
 	describe('mapSegmentList', () => {
 		it('maps SegmentList to Segment[]', () => {
-			const res = mapSegmentList(representationList.SegmentList);
+			const res = mapSegmentList(representationList.SegmentList ?? []);
 			deepEqual(res, expectedSegmentList);
 		});
 	});

@@ -1,5 +1,5 @@
 import type { Manifest } from '../types';
-import type { Presentation } from '../types/model';
+import type { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 import { mapHamToHls } from './hls/mapHamToHls.js';
 import { mapHlsToHam } from './hls/mapHlsToHam.js';

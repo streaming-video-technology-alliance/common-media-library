@@ -1,4 +1,4 @@
-import { Segment } from '../../types/model';
+import { Segment } from '../../types/model/index.js';
 import { Byterange, HlsManifest, SegmentHls } from '../../types';
 
 /**

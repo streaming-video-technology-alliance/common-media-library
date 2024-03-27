@@ -7,7 +7,7 @@ import {
 	VideoTrack,
 	TextTrack,
 	Segment,
-} from '../types/model';
+} from '../types/model/index.js';
 
 // TODO: Track and Segment validation are so simple for the PoC. The method should validate more deeper and connecting the things
 // in the model like durations, urls, frame rate, etc.

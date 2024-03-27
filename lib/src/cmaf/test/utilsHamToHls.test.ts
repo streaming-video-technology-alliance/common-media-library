@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
-import { AudioTrack } from '../ham/types/model';
+import { AudioTrack } from '../ham/types/model/index.js';
 import {
 	getByterange,
 	getPlaylistData,

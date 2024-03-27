@@ -1,4 +1,4 @@
-import type { AudioTrack, Track, VideoTrack } from '../../types/model';
+import type { AudioTrack, Track, VideoTrack } from '../../types/model/index.js';
 import {
 	FRAME_RATE_NUMERATOR_30,
 	TEXT_SAMPLE_RATE,

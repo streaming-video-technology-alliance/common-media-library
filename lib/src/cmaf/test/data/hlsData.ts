@@ -1,4 +1,4 @@
-import { AudioTrack } from '../../ham/types/model';
+import { AudioTrack } from '../../ham/types/model/index.js';
 import { SegmentHls } from '../../ham/types';
 
 function getAudioTrack({
