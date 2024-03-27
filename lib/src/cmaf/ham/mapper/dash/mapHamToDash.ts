@@ -64,11 +64,11 @@ function _selectionSetsToAdaptationSet(
 				$: {
 					id: switchingSet.id,
 					group: selectionSet.id,
-					contentType: track.type,
-					mimeType: `${track.type}/mp4`,
+					contentType: track?.type,
+					mimeType: `${track?.type}/mp4`,
 					frameRate: getFrameRate(track),
-					lang: track.language,
-					codecs: track.codec,
+					lang: track?.language,
+					codecs: track?.codec,
 				},
 				Representation: _tracksToRepresentation(switchingSet.tracks),
 			} as AdaptationSet;

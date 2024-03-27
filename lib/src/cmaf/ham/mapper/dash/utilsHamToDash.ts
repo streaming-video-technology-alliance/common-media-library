@@ -19,16 +19,16 @@ import {
  * @returns Timescale in numbers
  */
 function getTimescale(track: Track): number {
-	if (track.type === 'audio') {
+	if (track?.type === 'audio') {
 		const audioTrack = track as AudioTrack;
 		return audioTrack.sampleRate !== 0
 			? audioTrack.sampleRate
 			: TIMESCALE_48000;
 	}
-	if (track.type === 'video') {
+	if (track?.type === 'video') {
 		return VIDEO_SAMPLE_RATE;
 	}
-	if (track.type === 'text') {
+	if (track?.type === 'text') {
 		return TEXT_SAMPLE_RATE;
 	}
 	return VIDEO_SAMPLE_RATE;
@@ -36,7 +36,7 @@ function getTimescale(track: Track): number {
 
 function getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
-	if (track.type === 'video') {
+	if (track?.type === 'video') {
 		const videoTrack = track as VideoTrack;
 		frameRate = `${videoTrack.frameRate.frameRateNumerator ?? FRAME_RATE_NUMERATOR_30}`;
 		frameRate =
