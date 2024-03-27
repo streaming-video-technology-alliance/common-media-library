@@ -1,6 +1,6 @@
 import { DashMapper } from '../../mapper/DashMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
-import type { Presentation } from '../../types/model';
+import type { Presentation } from '../../types/model/index.js';
 import type { Manifest } from '../../types';
 
 /**

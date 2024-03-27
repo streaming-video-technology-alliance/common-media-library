@@ -7,7 +7,7 @@ import {
 	TextTrack,
 	Track,
 	VideoTrack,
-} from '../../types/model';
+} from '../../types/model/index.js';
 import { getPlaylistData, getSegments } from './utilsHamToHls.js';
 
 type ManifestPlaylistPiece = {

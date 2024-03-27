@@ -1,4 +1,4 @@
-import { AudioTrack, Segment, VideoTrack } from '../../types/model';
+import { AudioTrack, Segment, VideoTrack } from '../../types/model/index.js';
 import {
 	AT_SEPARATOR,
 	HYPHEN_MINUS_SEPARATOR,

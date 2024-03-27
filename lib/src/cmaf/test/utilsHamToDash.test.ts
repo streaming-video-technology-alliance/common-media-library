@@ -1,7 +1,7 @@
 import { getTimescale } from '../ham/mapper/dash/utilsHamToDash.js';
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
-import { AudioTrack, Track } from '../ham/types/model';
+import { AudioTrack, Track } from '../ham/types/model/index.js';
 
 describe('getTimescale', () => {
 	it('returns sampleRate if track is audio', () => {

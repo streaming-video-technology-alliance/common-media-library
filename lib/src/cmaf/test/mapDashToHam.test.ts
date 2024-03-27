@@ -29,7 +29,7 @@ describe('map segments', () => {
 
 	describe('mapSegmentList', () => {
 		it('maps SegmentList to Segment[]', () => {
-			const res = mapSegmentList(representationList);
+			const res = mapSegmentList(representationList.SegmentList ?? []);
 			deepEqual(res, expectedSegmentList);
 		});
 	});
@@ -47,20 +47,41 @@ describe('map segments', () => {
 
 	describe('mapSegments', () => {
 		it('returns segments from SegmentBase', () => {
-			const res = mapSegments(representationBase, duration, undefined);
+			const adaptationSet = {
+				$: { segmentAlignment: '' },
+				Representation: [representationBase],
+			};
+			const res = mapSegments(
+				adaptationSet,
+				representationBase,
+				duration,
+			);
 			deepEqual(res, expectedSegmentBase);
 		});
 
 		it('returns segments from SegmentList', () => {
-			const res = mapSegments(representationList, duration, undefined);
+			const adaptationSet = {
+				$: { segmentAlignment: '' },
+				Representation: [representationList],
+			};
+			const res = mapSegments(
+				adaptationSet,
+				representationList,
+				duration,
+			);
 			deepEqual(res, expectedSegmentList);
 		});
 
 		it('returns segments from SegmentTemplate', () => {
+			const adaptationSet = {
+				$: { segmentAlignment: '' },
+				Representation: [representationTemplate],
+				SegmentTemplate: [segmentTemplate],
+			};
 			const res = mapSegments(
+				adaptationSet,
 				representationTemplate,
 				duration,
-				segmentTemplate,
 			);
 			deepEqual(res, expectedSegmentTemplate);
 		});

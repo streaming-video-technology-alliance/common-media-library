@@ -4,7 +4,7 @@ import type {
 	Representation,
 	SegmentTemplate,
 } from '../../types';
-import { Segment } from '../../types/model';
+import { Segment } from '../../types/model/index.js';
 
 function getChannels(
 	adaptationSet: AdaptationSet,
