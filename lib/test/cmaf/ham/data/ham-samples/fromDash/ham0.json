@@ -58,7 +58,10 @@
 								"bandwidth": 405000,
 								"codec": "avc1.64001F",
 								"duration": 734,
-								"frameRate": "",
+								"frameRate": {
+									"frameRateNumerator": 30,
+									"frameRateDenominator": 0
+								},
 								"height": 100,
 								"id": "video_eng=405000",
 								"language": "en",
@@ -80,7 +83,10 @@
 								"bandwidth": 759000,
 								"codec": "avc1.64001F",
 								"duration": 734,
-								"frameRate": "",
+								"frameRate": {
+									"frameRateNumerator": 30,
+									"frameRateDenominator": 0
+								},
 								"height": 200,
 								"id": "video_eng=759000",
 								"language": "en",
@@ -102,7 +108,10 @@
 								"bandwidth": 1026000,
 								"codec": "avc1.64001F",
 								"duration": 734,
-								"frameRate": "",
+								"frameRate": {
+									"frameRateNumerator": 30,
+									"frameRateDenominator": 0
+								},
 								"height": 350,
 								"id": "video_eng=1026000",
 								"language": "en",
@@ -124,7 +133,10 @@
 								"bandwidth": 1501000,
 								"codec": "avc1.640028",
 								"duration": 734,
-								"frameRate": "",
+								"frameRate": {
+									"frameRateNumerator": 30,
+									"frameRateDenominator": 0
+								},
 								"height": 750,
 								"id": "video_eng=1501000",
 								"language": "en",
@@ -146,7 +158,10 @@
 								"bandwidth": 2205000,
 								"codec": "avc1.640028",
 								"duration": 734,
-								"frameRate": "",
+								"frameRate": {
+									"frameRateNumerator": 30,
+									"frameRateDenominator": 0
+								},
 								"height": 750,
 								"id": "video_eng=2205000",
 								"language": "en",

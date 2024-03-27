@@ -6,12 +6,19 @@ import type { Manifest } from '../../types';
 /**
  * Convert dash manifest into a ham object.
  *
- * @param manifest -  Manifest dash.
+ * @example
+ * Example on how to import the cmaf module and convert the dash `manifest`
+ * into the ham manifest.
+ * ```ts
+ * import cmaf from '@svta/common-media-library/cmaf-ham';
  *
- * @returns Presentation[]
+ * const manifest = cmaf.dashToHam(dashManifest);
+ * ```
+ *
+ * @param manifest - String of the XML Dash manifest.
+ * @returns List of presentations from ham.
  *
  * @group CMAF
- *
  * @alpha
  */
 
@@ -22,14 +29,21 @@ function dashToHam(manifest: string): Presentation[] {
 }
 
 /**
- * Convert dash manifest into a ham object.
+ * Convert HAM object into Dash Manifest.
  *
- * @param presentation - Ham object. List of presentations.
+ * @example
+ * Example on how to import the cmaf module and convert the ham `presentations`
+ * array into the dash manifest.
+ * ```ts
+ * import cmaf from '@svta/common-media-library/cmaf-ham';
  *
- * @returns Manifest
+ * const manifest = cmaf.hamToDash(presentations);
+ * ```
+ *
+ * @param presentation - List of presentations from ham.
+ * @returns Manifest object containing the Dash manifest as string.
  *
  * @group CMAF
- *
  * @alpha
  */
 function hamToDash(presentation: Presentation[]): Manifest {
