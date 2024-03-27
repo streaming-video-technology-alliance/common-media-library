@@ -9,7 +9,6 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "video/mp4",
 								"bandwidth": 386437,
 								"codec": "avc1.64001f",
 								"duration": 736,
@@ -759,10 +758,10 @@
 									}
 								],
 								"type": "video",
-								"width": 512
+								"width": 512,
+								"urlInitialization": "1/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 761570,
 								"codec": "avc1.64001f",
 								"duration": 736,
@@ -1512,10 +1511,10 @@
 									}
 								],
 								"type": "video",
-								"width": 640
+								"width": 640,
+								"urlInitialization": "2/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 1117074,
 								"codec": "avc1.640028",
 								"duration": 736,
@@ -2265,10 +2264,10 @@
 									}
 								],
 								"type": "video",
-								"width": 852
+								"width": 852,
+								"urlInitialization": "3/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 1941893,
 								"codec": "avc1.640032",
 								"duration": 736,
@@ -3018,10 +3017,10 @@
 									}
 								],
 								"type": "video",
-								"width": 1280
+								"width": 1280,
+								"urlInitialization": "4/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 2723012,
 								"codec": "avc1.640033",
 								"duration": 736,
@@ -3771,10 +3770,10 @@
 									}
 								],
 								"type": "video",
-								"width": 1920
+								"width": 1920,
+								"urlInitialization": "5/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 4021190,
 								"codec": "avc1.640034",
 								"duration": 736,
@@ -4524,10 +4523,10 @@
 									}
 								],
 								"type": "video",
-								"width": 2560
+								"width": 2560,
+								"urlInitialization": "6/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 5134121,
 								"codec": "avc1.640034",
 								"duration": 736,
@@ -5277,7 +5276,8 @@
 									}
 								],
 								"type": "video",
-								"width": 3840
+								"width": 3840,
+								"urlInitialization": "7/init.mp4"
 							}
 						]
 					},
@@ -5285,7 +5285,6 @@
 						"id": "1",
 						"tracks": [
 							{
-								"name": "video/mp4",
 								"bandwidth": 395735,
 								"codec": "hev1.2.4.L63.90",
 								"duration": 735.9973933333309,
@@ -6035,10 +6034,10 @@
 									}
 								],
 								"type": "video",
-								"width": 512
+								"width": 512,
+								"urlInitialization": "8/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 689212,
 								"codec": "hev1.2.4.L63.90",
 								"duration": 735.9973933333309,
@@ -6788,10 +6787,10 @@
 									}
 								],
 								"type": "video",
-								"width": 640
+								"width": 640,
+								"urlInitialization": "9/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 885518,
 								"codec": "hev1.2.4.L90.90",
 								"duration": 735.9973933333309,
@@ -7541,10 +7540,10 @@
 									}
 								],
 								"type": "video",
-								"width": 852
+								"width": 852,
+								"urlInitialization": "10/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 1474186,
 								"codec": "hev1.2.4.L93.90",
 								"duration": 735.9973933333309,
@@ -8294,10 +8293,10 @@
 									}
 								],
 								"type": "video",
-								"width": 1280
+								"width": 1280,
+								"urlInitialization": "11/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 1967542,
 								"codec": "hev1.2.4.L120.90",
 								"duration": 735.9973933333309,
@@ -9047,10 +9046,10 @@
 									}
 								],
 								"type": "video",
-								"width": 1920
+								"width": 1920,
+								"urlInitialization": "12/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 2954309,
 								"codec": "hev1.2.4.L150.90",
 								"duration": 735.9973933333309,
@@ -9800,10 +9799,10 @@
 									}
 								],
 								"type": "video",
-								"width": 2560
+								"width": 2560,
+								"urlInitialization": "13/init.mp4"
 							},
 							{
-								"name": "video/mp4",
 								"bandwidth": 4424584,
 								"codec": "hev1.2.4.L150.90",
 								"duration": 735.9973933333309,
@@ -10553,7 +10552,8 @@
 									}
 								],
 								"type": "video",
-								"width": 3840
+								"width": 3840,
+								"urlInitialization": "14/init.mp4"
 							}
 						]
 					}
@@ -10566,7 +10566,6 @@
 						"id": "2",
 						"tracks": [
 							{
-								"name": "audio/mp4",
 								"bandwidth": 131351,
 								"channels": 2,
 								"codec": "mp4a.40.29",
@@ -11316,7 +11315,8 @@
 										"url": "15/185.m4s"
 									}
 								],
-								"type": "audio"
+								"type": "audio",
+								"urlInitialization": "15/init.mp4"
 							}
 						]
 					}
@@ -11329,7 +11329,6 @@
 						"id": "3",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 428,
 								"codec": "wvtt",
 								"duration": 736,
@@ -12073,7 +12072,8 @@
 										"url": "18/184.m4s"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "18/init.mp4"
 							}
 						]
 					},
@@ -12081,7 +12081,6 @@
 						"id": "3",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1095,
 								"codec": "stpp",
 								"duration": 736,
@@ -12825,7 +12824,8 @@
 										"url": "19/184.m4s"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "19/init.mp4"
 							}
 						]
 					},
@@ -12833,7 +12833,6 @@
 						"id": "3",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 430,
 								"codec": "wvtt",
 								"duration": 736,
@@ -13577,7 +13576,8 @@
 										"url": "26/184.m4s"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "26/init.mp4"
 							}
 						]
 					},
@@ -13585,7 +13585,6 @@
 						"id": "3",
 						"tracks": [
 							{
-								"name": "text",
 								"bandwidth": 1102,
 								"codec": "stpp",
 								"duration": 736,
@@ -14329,7 +14328,8 @@
 										"url": "27/184.m4s"
 									}
 								],
-								"type": "text"
+								"type": "text",
+								"urlInitialization": "27/init.mp4"
 							}
 						]
 					}

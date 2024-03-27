@@ -1,9 +1,9 @@
+import type { Manifest } from '../types';
+import type { Presentation } from '../types/model';
+import { IMapper } from './IMapper.js';
 import { mapHamToHls } from './hls/mapHamToHls.js';
 import { mapHlsToHam } from './hls/mapHlsToHam.js';
 import { getMetadata } from '../../utils/manifestUtils.js';
-import { IMapper } from './IMapper.js';
-import type { Manifest } from '../types/index.js';
-import type { Presentation } from '../types/model/index.js';
 
 export class HlsMapper implements IMapper {
 	private manifest: Manifest | undefined;
@@ -13,7 +13,7 @@ export class HlsMapper implements IMapper {
 	}
 
 	toHam(manifest: Manifest): Presentation[] {
-		const presentations = mapHlsToHam(manifest);
+		const presentations: Presentation[] = mapHlsToHam(manifest);
 		this.manifest = manifest;
 		return presentations;
 	}

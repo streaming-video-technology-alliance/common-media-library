@@ -1,4 +1,6 @@
-const representationBase = {
+import { Representation, SegmentTemplate } from '../ham/types';
+
+const representationBase: Representation = {
 	$: {
 		id: 'audio_eng=64349',
 		bandwidth: '64349',
@@ -22,7 +24,7 @@ const representationBase = {
 	],
 };
 
-const representationList = {
+const representationList: Representation = {
 	$: {
 		bandwidth: '72000',
 		codecs: 'avc1.42c01e',
@@ -67,7 +69,7 @@ const representationList = {
 	],
 };
 
-const representationTemplate = {
+const representationTemplate: Representation = {
 	$: {
 		id: '1',
 		mimeType: 'video/mp4',
@@ -81,7 +83,7 @@ const representationTemplate = {
 	},
 };
 
-const segmentTemplate = {
+const segmentTemplate: SegmentTemplate = {
 	$: {
 		timescale: '24',
 		media: '$RepresentationID$/$Number%04d$.m4s',
