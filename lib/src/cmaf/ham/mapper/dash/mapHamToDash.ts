@@ -91,6 +91,7 @@ function _tracksToRepresentation(tracks: Track[]): Representation[] {
 			const videoTrack = track as VideoTrack;
 			representation.$ = {
 				...representation.$,
+				frameRate: getFrameRate(track),
 				width: videoTrack.width.toString(),
 				height: videoTrack.height.toString(),
 				codecs: videoTrack.codec,
