@@ -198,6 +198,12 @@ function getUrlFromTemplate(
 		if (match === '$RepresentationID$') {
 			return representation.$.id;
 		}
+		/**
+		 * Number with 4 digits e.g: 0001
+		 */
+		if (match.includes('Number%04d')) {
+			return segmentId.toString().padStart(4, '0');
+		}
 		if (match.includes('Number')) {
 			return segmentId;
 		}
