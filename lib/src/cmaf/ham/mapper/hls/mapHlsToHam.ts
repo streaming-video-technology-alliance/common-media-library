@@ -8,6 +8,7 @@ import {
 	VideoTrack,
 } from '../../types/model';
 import type { Manifest, PlayList } from '../../types';
+import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.js';
 import { addMetadataToHls } from '../../../utils/manifestUtils.js';
 import { parseHlsManifest } from '../../../utils/hls/hlsParser.js';
 import {
@@ -73,38 +74,42 @@ function _audioGroupsToSwitchingSets(
 	manifestPlaylists: Manifest[],
 ): SwitchingSet[] {
 	const audioSwitchingSets: SwitchingSet[] = [];
+	const audioTracks: AudioTrack[] = [];
 
-	for (const audio in mediaGroupsAudio) {
-		const attributes: any = mediaGroupsAudio[audio];
-		const keys = Object.keys(attributes);
-		const { language, uri } = attributes[keys[0]];
-		const audioParsed = parseHlsManifest(
-			manifestPlaylists.shift()?.manifest,
-		);
-		const map = audioParsed?.segments[0]?.map;
-		const segments = formatSegments(audioParsed?.segments);
+	for (const audioEncodings in mediaGroupsAudio) {
+		const encodings = mediaGroupsAudio[audioEncodings];
+		for (const audio in encodings) {
+			const attributes: any = encodings[audio];
+			const { language, uri } = attributes;
+			const audioParsed = parseHlsManifest(
+				manifestPlaylists.shift()?.manifest,
+			);
+			const map = audioParsed?.segments[0]?.map;
+			const segments = formatSegments(audioParsed?.segments);
 
-		// TODO: channels, sampleRate, bandwith and codec need to be
-		// updated with real values. Right now we are using simple hardcoded values.
-		const audioTrack = {
-			id: audio,
-			type: 'audio',
-			fileName: uri,
-			codec: getCodec('audio'),
-			duration: getDuration(audioParsed, segments),
-			language: language,
-			bandwidth: 0,
-			segments: segments,
-			sampleRate: 0,
-			channels: 2,
-			byteRange: getByterange(map?.byterange),
-			urlInitialization: map?.uri,
-		} as AudioTrack;
-		audioSwitchingSets.push({
-			id: audio,
-			tracks: [audioTrack],
-		} as SwitchingSet);
+			// TODO: channels, sampleRate, bandwith and codec need to be
+			// updated with real values. Right now we are using simple hardcoded values.
+			audioTracks.push({
+				id: audio,
+				type: 'audio',
+				fileName: uri,
+				codec: getCodec('audio'),
+				duration: getDuration(audioParsed, segments),
+				language: language,
+				bandwidth: 0,
+				segments: segments,
+				sampleRate: 0,
+				channels: 2,
+				byteRange: getByterange(map?.byterange),
+				urlInitialization: map?.uri,
+			} as AudioTrack);
+		}
 	}
+
+	audioSwitchingSets.push({
+		id: 'audio',
+		tracks: audioTracks,
+	} as SwitchingSet);
 
 	return audioSwitchingSets;
 }
@@ -114,32 +119,36 @@ function _subtitleGroupsToSwitchingSets(
 	manifestPlaylists: Manifest[],
 ): SwitchingSet[] {
 	const subtitleSwitchingSets: SwitchingSet[] = [];
+	const textTracks: TextTrack[] = [];
 
 	// Add selection set of type subtitles
-	for (const subtitle in mediaGroupsSubtitles) {
-		const attributes = mediaGroupsSubtitles[subtitle];
-		const keys = Object.keys(attributes);
-		const { language, uri } = attributes[keys[0]];
-		const subtitleParsed = parseHlsManifest(
-			manifestPlaylists.shift()?.manifest,
-		);
-		const segments = formatSegments(subtitleParsed?.segments);
+	for (const subtitleEncodings in mediaGroupsSubtitles) {
+		const encodings = mediaGroupsSubtitles[subtitleEncodings];
+		for (const subtitle in encodings) {
+			const attributes = encodings[subtitle];
+			const { language, uri } = attributes;
+			const subtitleParsed = parseHlsManifest(
+				manifestPlaylists.shift()?.manifest,
+			);
+			const segments = formatSegments(subtitleParsed?.segments);
 
-		const textTrack = {
-			id: subtitle,
-			type: 'text',
-			fileName: uri,
-			codec: getCodec('text'),
-			duration: getDuration(subtitleParsed, segments),
-			language: language,
-			bandwidth: 0,
-			segments: segments,
-		} as TextTrack;
-		subtitleSwitchingSets.push({
-			id: subtitle,
-			tracks: [textTrack],
-		} as SwitchingSet);
+			textTracks.push({
+				id: subtitle,
+				type: 'text',
+				fileName: uri,
+				codec: getCodec('text'),
+				duration: getDuration(subtitleParsed, segments),
+				language: language,
+				bandwidth: 0,
+				segments: segments,
+			} as TextTrack);
+		}
 	}
+
+	subtitleSwitchingSets.push({
+		id: 'text',
+		tracks: textTracks,
+	} as SwitchingSet);
 
 	return subtitleSwitchingSets;
 }
@@ -149,8 +158,8 @@ function _videoPlaylistsToSwitchingSets(
 	manifestPlaylists: Manifest[],
 ): SwitchingSet[] {
 	const switchingSetVideos: SwitchingSet[] = [];
+	const videoTracks: VideoTrack[] = [];
 	let videoTrackId = 0;
-	let videoSwitchingSetId = 0;
 
 	playlists.map((playlist: any) => {
 		const parsedHlsManifest = parseHlsManifest(
@@ -159,7 +168,7 @@ function _videoPlaylistsToSwitchingSets(
 		const segments: Segment[] = formatSegments(parsedHlsManifest?.segments);
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 		const map = parsedHlsManifest?.segments?.at(0)?.map;
-		const videoTrack = {
+		videoTracks.push({
 			id: `video-${videoTrackId++}`,
 			type: 'video',
 			fileName: playlist.uri,
@@ -171,20 +180,23 @@ function _videoPlaylistsToSwitchingSets(
 			width: playlist.attributes.RESOLUTION.width,
 			height: playlist.attributes.RESOLUTION.height,
 			frameRate: {
-				frameRateNumerator: playlist.attributes['FRAME-RATE'],
+				frameRateNumerator:
+					playlist.attributes['FRAME-RATE'] ??
+					FRAME_RATE_NUMERATOR_30,
+				frameRateDenominator: ZERO,
 			},
 			par: '',
 			sar: '',
 			scanType: '',
 			byteRange: getByterange(map?.byterange),
 			urlInitialization: map?.uri,
-		} as VideoTrack;
-
-		switchingSetVideos.push({
-			id: `video-${videoSwitchingSetId++}`,
-			tracks: [videoTrack],
-		} as SwitchingSet);
+		} as VideoTrack);
 	});
+
+	switchingSetVideos.push({
+		id: `video`,
+		tracks: videoTracks,
+	} as SwitchingSet);
 
 	return switchingSetVideos;
 }

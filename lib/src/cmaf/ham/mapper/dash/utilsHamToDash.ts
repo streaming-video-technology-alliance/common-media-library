@@ -1,5 +1,6 @@
 import type { AudioTrack, Track, VideoTrack } from '../../types/model';
 import {
+	FRAME_RATE_NUMERATOR_30,
 	TEXT_SAMPLE_RATE,
 	TIMESCALE_48000,
 	VIDEO_SAMPLE_RATE,
@@ -37,7 +38,7 @@ function getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
 	const videoTrack = track as VideoTrack;
 	if (track.type === 'video') {
-		frameRate = `${videoTrack.frameRate.frameRateNumerator}`;
+		frameRate = `${videoTrack.frameRate.frameRateNumerator ?? FRAME_RATE_NUMERATOR_30}`;
 		frameRate =
 			videoTrack.frameRate.frameRateDenominator !== ZERO
 				? `${frameRate}/${videoTrack.frameRate.frameRateDenominator}`
