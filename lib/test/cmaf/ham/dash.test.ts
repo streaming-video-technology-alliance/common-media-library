@@ -90,26 +90,26 @@ describe.skip('ham2dash', async () => {
 	});
 });
 
-describe.skip('dash to ham to dash', async () => {
-	it('converts ham5 to dash5 to ham5 again', () => {
+describe('dash to ham to dash', async () => {
+	it('converts ham1 to dash1 to ham1 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample1);
 		const convertedDash = cmafHam.hamToDash(convertedHam);
 		deepEqual(convertedDash.manifest, mpdSample1);
 	});
 
-	it('converts ham6 to dash6 to ham6 again', () => {
+	it('converts ham2 to dash2 to ham2 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample2);
 		const convertedDash = cmafHam.hamToDash(convertedHam);
 		deepEqual(convertedDash.manifest, mpdSample2);
 	});
 
-	it('converts ham7 to dash7 to ham7 again', () => {
+	it('converts ham3 to dash3 to ham3 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample3);
 		const convertedDash = cmafHam.hamToDash(convertedHam);
 		deepEqual(convertedDash.manifest, mpdSample3);
 	});
 
-	it('converts ham8 to dash8 to ham8 again', () => {
+	it('converts ham4 to dash4 to ham4 again', () => {
 		const convertedHam = cmafHam.dashToHam(mpdSample4);
 		const convertedDash = cmafHam.hamToDash(convertedHam);
 		deepEqual(convertedDash.manifest, mpdSample4);
