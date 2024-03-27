@@ -626,10 +626,31 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 // @beta
 export function uuid(): string;
 
-// Warning: (ae-forgotten-export) The symbol "TrackValidity" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Validation" needs to be exported by the entry point index.d.ts
 //
 // @alpha
-export function validateTracks(tracks: Track[]): TrackValidity;
+export function validatePresentation(presentation: Presentation): Validation;
+
+// @alpha
+export function validateSegments(segments: Segment[], trackId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSelectionSet(selectionSet: SelectionSet, presentationId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSelectionSets(selectionSets: SelectionSet[], presentationId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSwitchingSet(switchingSet: SwitchingSet, selectionSetId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSwitchingSets(switchingSets: SwitchingSet[], selectionSetId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateTrack(track: Track, switchingSetId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateTracks(tracks: Track[], switchingSetId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
 export type VideoTrack = Track & {
@@ -643,10 +664,10 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/cmaf/ham/types/DashManifest.ts:39:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/DashManifest.ts:158:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/DashManifest.ts:159:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:38:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:156:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:157:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:65:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:61:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

@@ -12,7 +12,10 @@
 								"bandwidth": 72000,
 								"codec": "avc1.42c01e",
 								"duration": 30,
-								"frameRate": "37",
+								"frameRate": {
+									"frameRateNumerator": 37,
+									"frameRateDenominator": 0
+								},
 								"height": 480,
 								"id": "testStream01bbbVideo72000",
 								"language": "und",
@@ -20,10 +23,6 @@
 								"sar": "1:1",
 								"scanType": "",
 								"segments": [
-									{
-										"duration": 0,
-										"url": "testStream01bbb/video/72000/seg_init.mp4"
-									},
 									{
 										"duration": 10,
 										"url": "testStream01bbb/video/72000/segment_0.m4s"
@@ -60,10 +59,6 @@
 								"language": "en",
 								"sampleRate": 48000,
 								"segments": [
-									{
-										"duration": 0,
-										"url": "testStream01bbb/audio/72000/seg_init.mp4"
-									},
 									{
 										"duration": 10,
 										"url": "testStream01bbb/audio/72000/segment_0.m4s"

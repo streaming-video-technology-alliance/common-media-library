@@ -12,7 +12,10 @@
 								"bandwidth": 980104,
 								"codec": "avc1.4d401f",
 								"duration": 250,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 720,
 								"id": "1",
 								"language": "und",
@@ -529,7 +532,10 @@
 								"bandwidth": 1950145,
 								"codec": "avc1.4d401f",
 								"duration": 250,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 720,
 								"id": "2",
 								"language": "und",
@@ -1046,7 +1052,10 @@
 								"bandwidth": 3893089,
 								"codec": "avc1.4d401f",
 								"duration": 250,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 720,
 								"id": "3",
 								"language": "und",
@@ -2109,7 +2118,10 @@
 								"bandwidth": 980104,
 								"codec": "avc1.4d401f",
 								"duration": 344,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 720,
 								"id": "1",
 								"language": "und",
@@ -2814,7 +2826,10 @@
 								"bandwidth": 1950145,
 								"codec": "avc1.4d401f",
 								"duration": 344,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 720,
 								"id": "2",
 								"language": "und",
@@ -3519,7 +3534,10 @@
 								"bandwidth": 3893089,
 								"codec": "avc1.4d401f",
 								"duration": 344,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 720,
 								"id": "3",
 								"language": "und",

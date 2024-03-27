@@ -58,7 +58,10 @@
 								"bandwidth": 1032000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 750,
 								"id": "video_eng=1032000",
 								"language": "en",
@@ -80,7 +83,10 @@
 								"bandwidth": 1250000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 1150,
 								"id": "video_eng=1250000",
 								"language": "en",
@@ -102,7 +108,10 @@
 								"bandwidth": 1600000,
 								"codec": "hev1.1.6.H150.90",
 								"duration": 734,
-								"frameRate": "24",
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"height": 1500,
 								"id": "video_eng=1600000",
 								"language": "en",

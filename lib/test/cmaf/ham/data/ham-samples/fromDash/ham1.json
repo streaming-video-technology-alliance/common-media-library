@@ -12,7 +12,10 @@
 								"bandwidth": 2000000,
 								"codec": "avc1.640028",
 								"duration": 50,
-								"frameRate": "30/1",
+								"frameRate": {
+									"frameRateNumerator": 30,
+									"frameRateDenominator": 1
+								},
 								"height": 1080,
 								"id": "1",
 								"language": "und",
@@ -20,10 +23,6 @@
 								"sar": "",
 								"scanType": "",
 								"segments": [
-									{
-										"duration": 0,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv"
-									},
 									{
 										"duration": 10,
 										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000001.cmfv"
@@ -68,10 +67,6 @@
 								"language": "und",
 								"sampleRate": 48000,
 								"segments": [
-									{
-										"duration": 0,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa"
-									},
 									{
 										"duration": 18.75,
 										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000001.cmfa"
