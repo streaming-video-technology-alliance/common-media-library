@@ -1,17 +1,4 @@
 /**
- * HLS manifest
- *
- * @group CMAF
- *
- * @alpha
- */
-type HlsManifest = {
-	playlists: PlayList[];
-	mediaGroups: MediaGroups;
-	segments: SegmentHls[];
-};
-
-/**
  * HLS Playlist
  *
  * @group CMAF
@@ -46,7 +33,16 @@ type MediaGroups = {
 			};
 		};
 	};
+	SUBTITLES: {
+		[key: string]: {
+			[key: string]: {
+				language: string;
+			};
+		};
+	};
 };
+
+type Byterange = { length: number; offset: number };
 
 /**
  * HLS Segments
@@ -56,8 +52,29 @@ type MediaGroups = {
  * @alpha
  */
 type SegmentHls = {
+	title?: string;
 	duration: number;
+	byterange?: Byterange;
+	uri?: string;
+	timeline?: number;
+	map?: {
+		uri: string;
+		byterange: Byterange;
+	};
 };
 
+/**
+ * HLS manifest
+ *
+ * @group CMAF
+ *
+ * @alpha
+ */
+type HlsManifest = {
+	playlists: PlayList[];
+	mediaGroups: MediaGroups;
+	segments: SegmentHls[];
+	targetDuration?: number;
+};
 
-export type { PlayList, MediaGroups, SegmentHls, HlsManifest };
+export type { Byterange, PlayList, MediaGroups, SegmentHls, HlsManifest };

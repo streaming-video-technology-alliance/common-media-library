@@ -27,7 +27,6 @@ import {
 	getFrameRate,
 	getGroup,
 	getLanguage,
-	getName,
 	getNumberOfSegments,
 	getPresentationId,
 	getSampleRate,
@@ -111,7 +110,6 @@ function mapTracks(
 	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
 	if (type === 'video') {
 		return {
-			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),
@@ -136,7 +134,6 @@ function mapTracks(
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
-			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
@@ -151,7 +148,6 @@ function mapTracks(
 	} else {
 		// if (type === 'text')
 		return {
-			name: type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),

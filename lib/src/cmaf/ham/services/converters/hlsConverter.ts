@@ -1,6 +1,6 @@
 import { HlsMapper } from '../../mapper/HlsMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
-import type { Presentation } from '../../types/model/index.js';
+import type { Presentation } from '../../types/model';
 
 /**
  * Convert hls manifest into a ham object.

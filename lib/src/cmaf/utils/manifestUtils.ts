@@ -11,13 +11,13 @@ export function addMetadataToHls(
 	manifest: Manifest,
 	manifestParsed: any,
 ): Manifest {
-	if (manifest.metadata === undefined) {
+	if (!manifest.metadata) {
 		manifest.metadata = new Map<string, string>();
 	}
-	if (manifestParsed.version! == undefined) {
+	if (!manifestParsed.version) {
 		manifest.metadata.set('version', manifestParsed.version);
 	}
-	if (manifestParsed.mediaSequence! == undefined) {
+	if (!manifestParsed.mediaSequence) {
 		manifest.metadata.set('mediaSequence', manifestParsed.mediaSequence);
 	}
 	return manifest;
@@ -27,13 +27,13 @@ export function addMetadataToDash(
 	dashManifest: DashManifest,
 	manifest: Manifest,
 ): Manifest {
-	if (manifest.metadata === undefined) {
+	if (!manifest.metadata) {
 		manifest.metadata = new Map<string, string>();
 	}
-	if (dashManifest.MPD.$ && dashManifest.MPD.$.profiles !== undefined) {
+	if (dashManifest.MPD.$ && dashManifest.MPD.$.profiles) {
 		manifest.metadata.set('profiles', dashManifest.MPD.$.profiles);
 	}
-	if (dashManifest.MPD.$ && dashManifest.MPD.$.type !== undefined) {
+	if (dashManifest.MPD.$ && dashManifest.MPD.$.type) {
 		manifest.metadata.set('type', dashManifest.MPD.$.type);
 	}
 	return manifest;
