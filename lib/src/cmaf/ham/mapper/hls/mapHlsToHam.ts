@@ -119,7 +119,7 @@ function _subtitleGroupsToSwitchingSets(
 	manifestPlaylists: Manifest[],
 ): SwitchingSet[] {
 	const subtitleSwitchingSets: SwitchingSet[] = [];
-	const subtitleTracks: TextTrack[] = [];
+	const textTracks: TextTrack[] = [];
 
 	// Add selection set of type subtitles
 	for (const subtitleEncodings in mediaGroupsSubtitles) {
@@ -132,7 +132,7 @@ function _subtitleGroupsToSwitchingSets(
 			);
 			const segments = formatSegments(subtitleParsed?.segments);
 
-			subtitleTracks.push({
+			textTracks.push({
 				id: subtitle,
 				type: 'text',
 				fileName: uri,
@@ -146,8 +146,8 @@ function _subtitleGroupsToSwitchingSets(
 	}
 
 	subtitleSwitchingSets.push({
-		id: 'subtitle',
-		tracks: subtitleTracks,
+		id: 'text',
+		tracks: textTracks,
 	} as SwitchingSet);
 
 	return subtitleSwitchingSets;
