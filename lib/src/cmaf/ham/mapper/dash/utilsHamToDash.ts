@@ -36,8 +36,8 @@ function getTimescale(track: Track): number {
 
 function getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
-	const videoTrack = track as VideoTrack;
 	if (track.type === 'video') {
+		const videoTrack = track as VideoTrack;
 		frameRate = `${videoTrack.frameRate.frameRateNumerator ?? FRAME_RATE_NUMERATOR_30}`;
 		frameRate =
 			videoTrack.frameRate.frameRateDenominator !== ZERO
