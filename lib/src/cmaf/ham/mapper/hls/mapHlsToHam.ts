@@ -11,6 +11,7 @@ import type {
 	VideoTrack,
 } from '../../types/model';
 import type { Manifest, PlayList } from '../../types';
+import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.js';
 
 function mapHlsToHam(manifest: Manifest) {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest);
@@ -181,7 +182,10 @@ function _videoPlaylistsToSwitchingSets(
 			width: resolution.width,
 			height: resolution.height,
 			frameRate: {
-				frameRateNumerator: playlist.attributes['FRAME-RATE'],
+				frameRateNumerator:
+					playlist.attributes['FRAME-RATE'] ??
+					FRAME_RATE_NUMERATOR_30,
+				frameRateDenominator: ZERO,
 			},
 			par: '',
 			sar: '',
