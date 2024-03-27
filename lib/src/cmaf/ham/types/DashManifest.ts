@@ -1,9 +1,21 @@
+/**
+ * DASH Segment URL
+ *
+ * @group CMAF
+ * @alpha
+ */
 type SegmentURL = {
 	$: {
 		media?: string;
 	};
 };
 
+/**
+ * DASH Initialization
+ *
+ * @group CMAF
+ * @alpha
+ */
 type Initialization = {
 	$: {
 		range?: string;
@@ -15,7 +27,6 @@ type Initialization = {
  * DASH Segment Base
  *
  * @group CMAF
- *
  * @alpha
  */
 type SegmentBase = {
@@ -31,7 +42,6 @@ type SegmentBase = {
  * DASH Segment List
  *
  * @group CMAF
- *
  * @alpha
  */
 type SegmentList = {
@@ -48,7 +58,6 @@ type SegmentList = {
  * It is used as a template to create the actual templates
  *
  * @group CMAF
- *
  * @alpha
  */
 type SegmentTemplate = {
@@ -65,7 +74,6 @@ type SegmentTemplate = {
  * DASH Audio Channel Configuration
  *
  * @group CMAF
- *
  * @alpha
  */
 type AudioChannelConfiguration = {
@@ -79,7 +87,6 @@ type AudioChannelConfiguration = {
  * DASH Representation
  *
  * @group CMAF
- *
  * @alpha
  */
 type Representation = {
@@ -121,7 +128,6 @@ type Role = {
  * DASH Adaptation Set
  *
  * @group CMAF
- *
  * @alpha
  */
 type AdaptationSet = {
@@ -158,7 +164,6 @@ type AdaptationSet = {
  * DASH Period
  *
  * @group CMAF
- *
  * @alpha
  */
 type Period = {
@@ -174,7 +179,6 @@ type Period = {
  * Json representation of the DASH Manifest
  *
  * @group CMAF
- *
  * @alpha
  */
 type DashManifest = {

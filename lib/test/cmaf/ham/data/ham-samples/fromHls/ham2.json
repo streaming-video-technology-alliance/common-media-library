@@ -6,10 +6,10 @@
 				"id": "0",
 				"switchingSets": [
 					{
-						"id": "audio-aacl-64",
+						"id": "audio",
 						"tracks": [
 							{
-								"id": "audio-aacl-64",
+								"id": "English",
 								"type": "audio",
 								"fileName": "tears-of-steel-aac-64k.m3u8",
 								"codec": "mp4a.40.2",
@@ -637,14 +637,9 @@
 								"channels": 2,
 								"byteRange": "704@0",
 								"urlInitialization": "tears-of-steel-aac-128k.cmfa"
-							}
-						]
-					},
-					{
-						"id": "audio-aacl-128",
-						"tracks": [
+							},
 							{
-								"id": "audio-aacl-128",
+								"id": "English",
 								"type": "audio",
 								"fileName": "audio-aac-128k.m3u8",
 								"codec": "mp4a.40.2",
@@ -1126,7 +1121,16 @@
 				"id": "1",
 				"switchingSets": [
 					{
-						"id": "video-0",
+						"id": "text",
+						"tracks": []
+					}
+				]
+			},
+			{
+				"id": "2",
+				"switchingSets": [
+					{
+						"id": "video",
 						"tracks": [
 							{
 								"id": "video-0",
@@ -1139,16 +1143,14 @@
 								"segments": [],
 								"width": 1680,
 								"height": 750,
-								"frameRate": 24,
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"par": "",
 								"sar": "",
 								"scanType": ""
-							}
-						]
-					},
-					{
-						"id": "video-1",
-						"tracks": [
+							},
 							{
 								"id": "video-1",
 								"type": "video",
@@ -1160,16 +1162,14 @@
 								"segments": [],
 								"width": 2576,
 								"height": 1150,
-								"frameRate": 24,
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"par": "",
 								"sar": "",
 								"scanType": ""
-							}
-						]
-					},
-					{
-						"id": "video-2",
-						"tracks": [
+							},
 							{
 								"id": "video-2",
 								"type": "video",
@@ -1181,16 +1181,14 @@
 								"segments": [],
 								"width": 3360,
 								"height": 1500,
-								"frameRate": 24,
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"par": "",
 								"sar": "",
 								"scanType": ""
-							}
-						]
-					},
-					{
-						"id": "video-3",
-						"tracks": [
+							},
 							{
 								"id": "video-3",
 								"type": "video",
@@ -1202,16 +1200,14 @@
 								"segments": [],
 								"width": 1680,
 								"height": 750,
-								"frameRate": 24,
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"par": "",
 								"sar": "",
 								"scanType": ""
-							}
-						]
-					},
-					{
-						"id": "video-4",
-						"tracks": [
+							},
 							{
 								"id": "video-4",
 								"type": "video",
@@ -1223,16 +1219,14 @@
 								"segments": [],
 								"width": 2576,
 								"height": 1150,
-								"frameRate": 24,
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"par": "",
 								"sar": "",
 								"scanType": ""
-							}
-						]
-					},
-					{
-						"id": "video-5",
-						"tracks": [
+							},
 							{
 								"id": "video-5",
 								"type": "video",
@@ -1244,7 +1238,10 @@
 								"segments": [],
 								"width": 3360,
 								"height": 1500,
-								"frameRate": 24,
+								"frameRate": {
+									"frameRateNumerator": 24,
+									"frameRateDenominator": 0
+								},
 								"par": "",
 								"sar": "",
 								"scanType": ""

@@ -54,6 +54,8 @@ export type AudioChannelConfiguration = {
     };
 };
 
+// Warning: (ae-forgotten-export) The symbol "Track" needs to be exported by the entry point index.d.ts
+//
 // @alpha
 export type AudioTrack = Track & {
     sampleRate: number;
@@ -363,11 +365,6 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
 // @alpha
-export type Ham = {
-    id: string;
-};
-
-// @alpha
 export function hamToDash(presentation: Presentation[]): Manifest;
 
 // @alpha
@@ -442,6 +439,8 @@ export type PlayList = {
     };
 };
 
+// Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
+//
 // @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
@@ -543,7 +542,7 @@ export type SegmentTemplate = {
     };
 };
 
-// @public (undocumented)
+// @alpha
 export type SegmentURL = {
     $: {
         media?: string;
@@ -618,19 +617,6 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @alpha
-export type Track = Ham & {
-    type: TrackType;
-    fileName?: string;
-    codec: string;
-    duration: number;
-    language: string;
-    bandwidth: number;
-    byteRange?: string;
-    urlInitialization?: string;
-    segments: Segment[];
-};
-
 // @beta
 export function urlToRelativePath(url: string, base: string): string;
 
@@ -678,11 +664,10 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/cmaf/ham/types/DashManifest.ts:27:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/DashManifest.ts:150:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/DashManifest.ts:151:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:38:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:156:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/DashManifest.ts:157:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:22:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:64:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:61:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

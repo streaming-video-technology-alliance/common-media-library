@@ -1,4 +1,4 @@
-export const mpdSample2: string = `<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 Version information:
 Axinom.MediaProcessing v3.0.0 targeting General Purpose Media Format specification v7
@@ -64,4 +64,4 @@ For more info about this video, see https://github.com/Axinom/dash-test-vectors
 			<Representation id="27" mimeType="application/mp4" codecs="stpp" startWithSAP="1" bandwidth="1102"></Representation>
 		</AdaptationSet>
 	</Period>
-</MPD>`;
+</MPD>
