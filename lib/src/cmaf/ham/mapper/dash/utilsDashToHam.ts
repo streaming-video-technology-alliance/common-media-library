@@ -4,7 +4,14 @@ import type {
 	Representation,
 	SegmentTemplate,
 } from '../../types';
-import { Segment } from '../../types/model/index.js';
+import { FrameRate, Segment } from '../../types/model';
+import {
+	DENOMINATOR,
+	FRAME_RATE_NUMERATOR_30,
+	FRAME_RATE_SEPARATOR,
+	NUMERATOR,
+	ZERO,
+} from '../../../utils/constants.js';
 
 function getChannels(
 	adaptationSet: AdaptationSet,
@@ -85,18 +92,40 @@ function calculateDuration(
 	return +(duration ?? 1) / +(timescale ?? 1);
 }
 
+/**
+ * @internal
+ *
+ * Get the frame rate from a dash manifest.
+ *
+ * This functions assumes the adaptationSet and representation set are type video
+ *
+ * @param adaptationSet - To try to get the frameRate from
+ * @param representation - To try to get the frameRate from
+ * @returns object containing numerator and denominator
+ */
 function getFrameRate(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
-): string {
-	const frameRate: string =
+): FrameRate {
+	const frameRateDash: string =
 		representation.$.frameRate ?? adaptationSet.$.frameRate ?? '';
-	if (!frameRate) {
+	if (!frameRateDash) {
 		console.error(
 			`Representation ${representation.$.id} has no frame rate`,
 		);
 	}
-	return frameRate;
+	const frameRate = frameRateDash.split(FRAME_RATE_SEPARATOR);
+	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '');
+	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
+
+	return {
+		frameRateNumerator: isNaN(frameRateNumerator)
+			? FRAME_RATE_NUMERATOR_30
+			: frameRateNumerator,
+		frameRateDenominator: isNaN(frameRateDenominator)
+			? ZERO
+			: frameRateDenominator,
+	} as FrameRate;
 }
 
 function getGroup(adaptationSet: AdaptationSet): string {

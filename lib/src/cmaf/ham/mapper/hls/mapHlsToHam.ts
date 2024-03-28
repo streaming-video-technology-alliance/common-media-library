@@ -89,6 +89,7 @@ function _audioGroupsToSwitchingSets(
 
 			// TODO: channels, sampleRate, bandwith and codec need to be
 			// updated with real values. Right now we are using simple hardcoded values.
+			const byteRange = getByterange(map?.byterange);
 			audioTracks.push({
 				id: audio,
 				type: 'audio',
@@ -100,7 +101,7 @@ function _audioGroupsToSwitchingSets(
 				segments: segments,
 				sampleRate: 0,
 				channels: 2,
-				byteRange: getByterange(map?.byterange),
+				...(byteRange && { byteRange }),
 				urlInitialization: map?.uri,
 			} as AudioTrack);
 		}
@@ -168,6 +169,7 @@ function _videoPlaylistsToSwitchingSets(
 		const segments: Segment[] = formatSegments(parsedHlsManifest?.segments);
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 		const map = parsedHlsManifest?.segments?.at(0)?.map;
+		const byteRange = getByterange(map?.byterange);
 		videoTracks.push({
 			id: `video-${videoTrackId++}`,
 			type: 'video',
@@ -188,7 +190,7 @@ function _videoPlaylistsToSwitchingSets(
 			par: '',
 			sar: '',
 			scanType: '',
-			byteRange: getByterange(map?.byterange),
+			...(byteRange && { byteRange }),
 			urlInitialization: map?.uri,
 		} as VideoTrack);
 	});

@@ -12,9 +12,9 @@ import { Byterange, HlsManifest, SegmentHls } from '../../types';
  * @group CMAF
  * @alpha
  */
-function getByterange(byteRange: Byterange | undefined): string | undefined {
+function getByterange(byteRange: Byterange | undefined): string {
 	if (!byteRange) {
-		return undefined;
+		return '';
 	}
 	return `${byteRange.length}@${byteRange.offset}`;
 }
@@ -86,11 +86,12 @@ function getDuration(
  */
 function formatSegments(segments: SegmentHls[]): Segment[] {
 	return (
-		segments?.map((segment: any) => {
+		segments?.map((segment: SegmentHls) => {
+			const byteRange = getByterange(segment?.byterange);
 			return {
 				duration: segment.duration,
 				url: segment.uri,
-				byteRange: getByterange(segment?.byterange),
+				...(byteRange && { byteRange }),
 			} as Segment;
 		}) ?? []
 	);

@@ -64,6 +64,11 @@ type VideoTrack = Track & {
 	scanType: string;
 };
 
+/**
+ * @internal
+ *
+ * Video Frame Rate
+ */
 type FrameRate = {
 	frameRateNumerator: number;
 	frameRateDenominator?: number;
@@ -71,4 +76,4 @@ type FrameRate = {
 
 type TrackType = 'audio' | 'video' | 'text';
 
-export type { Track, VideoTrack, AudioTrack, TextTrack };
+export type { Track, VideoTrack, AudioTrack, TextTrack, FrameRate };

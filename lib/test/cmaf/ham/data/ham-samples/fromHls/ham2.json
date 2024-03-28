@@ -19,1099 +19,1254 @@
 								"segments": [
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "50379@2212"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49413@52591"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49545@102004"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49389@151549"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49856@200938"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49634@250794"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49501@300428"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49600@349929"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49777@399529"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49475@449306"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49563@498781"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49330@548344"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49590@597674"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49607@647264"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49417@696871"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49492@746288"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49718@795780"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49597@845498"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49405@895095"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49429@944500"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49627@993929"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49522@1043556"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49523@1093078"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49564@1142601"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49744@1192165"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49439@1241909"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49528@1291348"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49560@1340876"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49654@1390436"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49476@1440090"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49624@1489566"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49476@1539190"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49772@1588666"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49508@1638438"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49542@1687946"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49418@1737488"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49698@1786906"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49541@1836604"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49442@1886145"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49626@1935587"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49625@1985213"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49616@2034838"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49501@2084454"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49523@2133955"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49576@2183478"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49633@2233054"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49362@2282687"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49510@2332049"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49715@2381559"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49605@2431274"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49728@2480879"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49450@2530607"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49705@2580057"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49521@2629762"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49484@2679283"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49547@2728767"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49684@2778314"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49574@2827998"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49585@2877572"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49618@2927157"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49667@2976775"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49612@3026442"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49468@3076054"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49507@3125522"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49756@3175029"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49543@3224785"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49511@3274328"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49438@3323839"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49755@3373277"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49482@3423032"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49511@3472514"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49417@3522025"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49683@3571442"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49485@3621125"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49648@3670610"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49294@3720258"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49663@3769552"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49573@3819215"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49540@3868788"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49488@3918328"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49733@3967816"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49429@4017549"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49521@4066978"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49445@4116499"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49784@4165944"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49465@4215728"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49485@4265193"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49579@4314678"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49589@4364257"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49485@4413846"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49551@4463331"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49404@4512882"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49616@4562286"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49525@4611902"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49476@4661427"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49632@4710903"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49484@4760535"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49446@4810019"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49555@4859465"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49519@4909020"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49803@4958539"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49531@5008342"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49489@5057873"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49491@5107362"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49702@5156853"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49657@5206555"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49428@5256212"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49466@5305640"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49622@5355106"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49427@5404728"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49400@5454155"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49466@5503555"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49644@5553021"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49512@5602665"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49568@5652177"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49522@5701745"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49666@5751267"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49550@5800933"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49406@5850483"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49456@5899889"
+									},
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49594@5949345"
+									},
+									{
+										"duration": 5.994666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "49725@5998939"
+									},
+									{
+										"duration": 1.947,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+										"byteRange": "8547@6048664"
+									}
+								],
+								"sampleRate": 0,
+								"channels": 2,
+								"byteRange": "704@0",
+								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa"
+							},
+							{
+								"id": "English",
+								"type": "audio",
+								"fileName": "tears-of-steel-aac-128k.m3u8",
+								"codec": "mp4a.40.2",
+								"duration": 738,
+								"language": "en",
+								"bandwidth": 0,
+								"segments": [
+									{
+										"duration": 6.016,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98504@2212"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97639@100716"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97638@198355"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97437@295993"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98362@393430"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97881@491792"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97241@589673"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97760@686914"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98123@784674"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97403@882797"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97831@980200"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97226@1078031"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97804@1175257"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97546@1273061"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97384@1370607"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97562@1467991"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98016@1565553"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97699@1663569"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97654@1761268"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97396@1858922"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97785@1956318"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97686@2054103"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97600@2151789"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97578@2249389"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98015@2346967"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97664@2444982"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97738@2542646"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97744@2640384"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97976@2738128"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97453@2836104"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97889@2933557"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97800@3031446"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98028@3129246"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97602@3227274"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97539@3324876"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97404@3422415"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98071@3519819"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97488@3617890"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97552@3715378"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97882@3812930"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97782@3910812"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98046@4008594"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97366@4106640"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97490@4204006"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97536@4301496"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98137@4399032"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97218@4497169"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97449@4594387"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98069@4691836"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97583@4789905"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97871@4887488"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97401@4985359"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97863@5082760"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97759@5180623"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97668@5278382"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97758@5376050"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98330@5473808"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97283@5572138"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97652@5669421"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97767@5767073"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97982@5864840"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97479@5962822"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97437@6060301"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97490@6157738"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98087@6255228"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97813@6353315"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97566@6451128"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97405@6548694"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98016@6646099"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97500@6744115"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97475@6841615"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97322@6939090"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97916@7036412"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97481@7134328"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97836@7231809"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97141@7329645"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97857@7426786"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97570@7524643"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97607@7622213"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97452@7719820"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97877@7817272"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97435@7915149"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97526@8012584"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97596@8110110"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98228@8207706"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97407@8305934"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97244@8403341"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97312@8500585"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98060@8597897"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97430@8695957"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97529@8793387"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97519@8890916"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97731@8988435"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97508@9086166"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97502@9183674"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98057@9281176"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97548@9379233"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97317@9476781"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97731@9574098"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97703@9671829"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98091@9769532"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97517@9867623"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97843@9965140"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97424@10062983"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97851@10160407"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97898@10258258"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97384@10356156"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97371@10453540"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97762@10550911"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97361@10648673"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97327@10746034"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97445@10843361"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98226@10940806"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97239@11039032"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "98084@11136271"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97678@11234355"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97814@11332033"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97460@11429847"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97190@11527307"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97405@11624497"
 									},
 									{
 										"duration": 6.016,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "97758@11721902"
 									},
 									{
 										"duration": 5.994666,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "96111@11819660"
 									},
 									{
 										"duration": 1.947,
-										"url": "tears-of-steel-aac-128k.cmfa",
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
 										"byteRange": "18421@11915771"
 									}
 								],
 								"sampleRate": 0,
 								"channels": 2,
 								"byteRange": "704@0",
-								"urlInitialization": "tears-of-steel-aac-128k.cmfa"
-							},
-							{
-								"id": "English",
-								"type": "audio",
-								"fileName": "audio-aac-128k.m3u8",
-								"codec": "mp4a.40.2",
-								"duration": 736,
-								"language": "en",
-								"bandwidth": 0,
-								"segments": [
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "54043@4037"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1470128@58080"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "597594@1528208"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "656570@2125802"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "574479@2782372"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1555340@3356851"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1494325@4912191"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "610136@6406516"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "183858@7016652"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "813067@7200510"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "608050@8013577"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "735353@8621627"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "487055@9356980"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "836222@9844035"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "511151@10680257"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "809575@11191408"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "457452@12000983"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "307186@12458435"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "517090@12765621"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "584503@13282711"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "915173@13867214"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "611939@14782387"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "592339@15394326"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "955821@15986665"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "693066@16942486"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "949270@17635552"
-									},
-									{
-										"duration": 7.916666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1806336@18584822"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2500143@20391158"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "800875@22891301"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1117547@23692176"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "661553@24809723"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "891500@25471276"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1567455@26362776"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1598496@27930231"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1281190@29528727"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1051038@30809917"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1203909@31860955"
-									},
-									{
-										"duration": 7.916666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1171598@33064864"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1124972@34236462"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "449171@35361434"
-									},
-									{
-										"duration": 7.916666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "432363@35810605"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "818470@36242968"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "771149@37061438"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "793860@37832587"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "540589@38626447"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "431356@39167036"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "714238@39598392"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "994506@40312630"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "650641@41307136"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "437573@41957777"
-									},
-									{
-										"duration": 7.916666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "560892@42395350"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "602248@42956242"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1432276@43558490"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "734494@44990766"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1381238@45725260"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1066845@47106498"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "710845@48173343"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1007917@48884188"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2579547@49892105"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2941677@52471652"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1319467@55413329"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1770548@56732796"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2168059@58503344"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1064103@60671403"
-									},
-									{
-										"duration": 7.916666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "918839@61735506"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1711610@62654345"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "513903@64365955"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "931114@64879858"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "630017@65810972"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "508481@66440989"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "572648@66949470"
-									},
-									{
-										"duration": 7.916666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1758534@67522118"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1211070@69280652"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1833731@70491722"
-									},
-									{
-										"duration": 8.083333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "4900522@72325453"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "5145294@77225975"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "4383038@82371269"
-									},
-									{
-										"duration": 8.041666,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "3639212@86754307"
-									},
-									{
-										"duration": 7.958333,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2423910@90393519"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1111147@92817429"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1491735@93928576"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1760558@95420311"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2845968@97180869"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2785919@100026837"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2833458@102812756"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2823378@105646214"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2722917@108469592"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1237297@111192509"
-									},
-									{
-										"duration": 8.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "501731@112429806"
-									},
-									{
-										"duration": 7.875,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "1099221@112931537"
-									},
-									{
-										"duration": 8,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "586394@114030758"
-									},
-									{
-										"duration": 6.125,
-										"url": "tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "163363@114617152"
-									}
-								],
-								"sampleRate": 0,
-								"channels": 2,
-								"byteRange": "2901@0",
-								"urlInitialization": "tears-of-steel-hev1-1500k.cmfv"
+								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa"
 							}
 						]
 					}
@@ -1137,10 +1292,471 @@
 								"type": "video",
 								"fileName": "tears-of-steel-hev1-1100k.m3u8",
 								"codec": "hev1.1.6.H150.90",
-								"duration": null,
+								"duration": 736,
 								"language": "und",
 								"bandwidth": 3761000,
-								"segments": [],
+								"segments": [
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "40135@4037"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1232488@44172"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "504668@1276660"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "577782@1781328"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "506323@2359110"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1348550@2865433"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1228050@4213983"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "500500@5442033"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "156092@5942533"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "733534@6098625"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "494978@6832159"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "611369@7327137"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "403131@7938506"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "697524@8341637"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "411131@9039161"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "674855@9450292"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "369705@10125147"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "244393@10494852"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "414889@10739245"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "513868@11154134"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "710349@11668002"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "526491@12378351"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "497378@12904842"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "885302@13402220"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "573314@14287522"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "794296@14860836"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1441737@15655132"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2078163@17096869"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "673990@19175032"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "920237@19849022"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "559957@20769259"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "743103@21329216"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1338539@22072319"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1402645@23410858"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1028501@24813503"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "914359@25842004"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1027043@26756363"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1008100@27783406"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "871739@28791506"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "356539@29663245"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "340018@30019784"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "658398@30359802"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "627561@31018200"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "663508@31645761"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "449405@32309269"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "352171@32758674"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "590288@33110845"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "789734@33701133"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "521553@34490867"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "356043@35012420"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "472008@35368463"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "504094@35840471"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1175935@36344565"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "587205@37520500"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1115453@38107705"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "844753@39223158"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "557262@40067911"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "858513@40625173"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2057296@41483686"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2502556@43540982"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1075556@46043538"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1369967@47119094"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1742135@48489061"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "925148@50231196"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "858313@51156344"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1403670@52014657"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "416965@53418327"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "750322@53835292"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "560275@54585614"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "411179@55145889"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "493940@55557068"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1460252@56051008"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1073974@57511260"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1445438@58585234"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "3539237@60030672"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "3711325@63569909"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "3276172@67281234"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2713068@70557406"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1674775@73270474"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "908406@74945249"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1274710@75853655"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1546408@77128365"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2629102@78674773"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2554416@81303875"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2624573@83858291"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2606573@86482864"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "2491974@89089437"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "1105783@91581411"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "428344@92687194"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "999022@93115538"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "549454@94114560"
+									},
+									{
+										"duration": 6.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+										"byteRange": "146351@94664014"
+									}
+								],
 								"width": 1680,
 								"height": 750,
 								"frameRate": {
@@ -1149,17 +1765,480 @@
 								},
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "2901@0",
+								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv"
 							},
 							{
 								"id": "video-1",
 								"type": "video",
-								"fileName": "video-hev1-1500k.m3u8",
+								"fileName": "tears-of-steel-hev1-1500k.m3u8",
 								"codec": "hev1.1.6.H150.90",
-								"duration": null,
+								"duration": 736,
 								"language": "und",
 								"bandwidth": 5187000,
-								"segments": [],
+								"segments": [
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "54043@4037"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1470128@58080"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "597594@1528208"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "656570@2125802"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "574479@2782372"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1555340@3356851"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1494325@4912191"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "610136@6406516"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "183858@7016652"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "813067@7200510"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "608050@8013577"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "735353@8621627"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "487055@9356980"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "836222@9844035"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "511151@10680257"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "809575@11191408"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "457452@12000983"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "307186@12458435"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "517090@12765621"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "584503@13282711"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "915173@13867214"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "611939@14782387"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "592339@15394326"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "955821@15986665"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "693066@16942486"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "949270@17635552"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1806336@18584822"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2500143@20391158"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "800875@22891301"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1117547@23692176"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "661553@24809723"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "891500@25471276"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1567455@26362776"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1598496@27930231"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1281190@29528727"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1051038@30809917"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1203909@31860955"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1171598@33064864"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1124972@34236462"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "449171@35361434"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "432363@35810605"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "818470@36242968"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "771149@37061438"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "793860@37832587"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "540589@38626447"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "431356@39167036"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "714238@39598392"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "994506@40312630"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "650641@41307136"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "437573@41957777"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "560892@42395350"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "602248@42956242"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1432276@43558490"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "734494@44990766"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1381238@45725260"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1066845@47106498"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "710845@48173343"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1007917@48884188"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2579547@49892105"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2941677@52471652"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1319467@55413329"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1770548@56732796"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2168059@58503344"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1064103@60671403"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "918839@61735506"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1711610@62654345"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "513903@64365955"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "931114@64879858"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "630017@65810972"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "508481@66440989"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "572648@66949470"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1758534@67522118"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1211070@69280652"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1833731@70491722"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "4900522@72325453"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "5145294@77225975"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "4383038@82371269"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "3639212@86754307"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2423910@90393519"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1111147@92817429"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1491735@93928576"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1760558@95420311"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2845968@97180869"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2785919@100026837"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2833458@102812756"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2823378@105646214"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "2722917@108469592"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1237297@111192509"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "501731@112429806"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "1099221@112931537"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "586394@114030758"
+									},
+									{
+										"duration": 6.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+										"byteRange": "163363@114617152"
+									}
+								],
 								"width": 2576,
 								"height": 1150,
 								"frameRate": {
@@ -1168,17 +2247,480 @@
 								},
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "2901@0",
+								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv"
 							},
 							{
 								"id": "video-2",
 								"type": "video",
 								"fileName": "tears-of-steel-hev1-2200k.m3u8",
 								"codec": "hev1.1.6.H150.90",
-								"duration": null,
+								"duration": 736,
 								"language": "und",
 								"bandwidth": 7146000,
-								"segments": [],
+								"segments": [
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "71216@4037"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1876527@75253"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "763529@1951780"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "818762@2715309"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "712564@3534071"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1943926@4246635"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1868823@6190561"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "776167@8059384"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "230352@8835551"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "994835@9065903"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "785874@10060738"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "949691@10846612"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "629014@11796303"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1060355@12425317"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "679113@13485672"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1038762@14164785"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "600905@15203547"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "406502@15804452"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "674009@16210954"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "756106@16884963"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1226561@17641069"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "794570@18867630"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "768281@19662200"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1199069@20430481"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "890241@21629550"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1212626@22519791"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "2356165@23732417"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3182372@26088582"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1020908@29270954"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1458268@30291862"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "859756@31750130"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1149534@32609886"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1987767@33759420"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1987061@35747187"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1979919@37734248"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1346200@39714167"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1520006@41060367"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1467743@42580373"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1477179@44048116"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "602015@45525295"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "570446@46127310"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1064336@46697756"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1001221@47762092"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1019922@48763313"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "698417@49783235"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "564555@50481652"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "906564@51046207"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1297566@51952771"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "852955@53250337"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "578198@54103292"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "720652@54681490"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "774582@55402142"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1823083@56176724"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "945909@57999807"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1734823@58945716"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1369127@60680539"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "944733@62049666"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1293259@62994399"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3407192@64287658"
+									},
+									{
+										"duration": 7.958333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3544590@67694850"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1746512@71239440"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "2308760@72985952"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "2760981@75294712"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1324436@78055693"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1112394@79380129"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "2188036@80492523"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "675893@82680559"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1189262@83356452"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "798722@84545714"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "665705@85344436"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "725833@86010141"
+									},
+									{
+										"duration": 7.916666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "2246870@86735974"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1518251@88982844"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "2482553@90501095"
+									},
+									{
+										"duration": 8.083333,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "6903809@92983648"
+									},
+									{
+										"duration": 8.041666,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "7114013@99887457"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "6059050@107001470"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "4872596@113060520"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3414339@117933116"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1356657@121347455"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1782558@122704112"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "2125466@124486670"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3241497@126612136"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3139785@129853633"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3227748@132993418"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3215030@136221166"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "3081497@139436196"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1436026@142517693"
+									},
+									{
+										"duration": 8.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "651166@143953719"
+									},
+									{
+										"duration": 7.875,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "1384744@144604885"
+									},
+									{
+										"duration": 8,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "743407@145989629"
+									},
+									{
+										"duration": 6.125,
+										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+										"byteRange": "206613@146733036"
+									}
+								],
 								"width": 3360,
 								"height": 1500,
 								"frameRate": {
@@ -1187,7 +2729,9 @@
 								},
 								"par": "",
 								"sar": "",
-								"scanType": ""
+								"scanType": "",
+								"byteRange": "2901@0",
+								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv"
 							},
 							{
 								"id": "video-3",
@@ -1211,7 +2755,7 @@
 							{
 								"id": "video-4",
 								"type": "video",
-								"fileName": "video-hev1-1500k.m3u8",
+								"fileName": "tears-of-steel-hev1-1500k.m3u8",
 								"codec": "hev1.1.6.H150.90",
 								"duration": null,
 								"language": "und",

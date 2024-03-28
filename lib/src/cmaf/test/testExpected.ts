@@ -24,15 +24,15 @@ const expectedSegmentList = [
 const expectedSegmentTemplate = [
 	{
 		duration: 4,
-		url: '1/1.m4s',
+		url: '1/0001.m4s',
 	},
 	{
 		duration: 4,
-		url: '1/2.m4s',
+		url: '1/0002.m4s',
 	},
 	{
 		duration: 4,
-		url: '1/3.m4s',
+		url: '1/0003.m4s',
 	},
 ];
 

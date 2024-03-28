@@ -14,7 +14,7 @@ import {
 	getUrlFromTemplate,
 } from '../ham/mapper/dash/utilsDashToHam.js';
 import { describe, it } from 'node:test';
-import { equal } from 'node:assert';
+import { deepEqual, equal } from 'node:assert';
 import {
 	AdaptationSet,
 	Period,
@@ -231,7 +231,21 @@ describe('getFrameRate', () => {
 			{ $: { frameRate: '24' } } as AdaptationSet,
 			{ $: { frameRate: '30' } } as Representation,
 		);
-		equal(res, '30');
+		deepEqual(res, {
+			frameRateNumerator: 30,
+			frameRateDenominator: 0,
+		});
+	});
+
+	it('returns frameRate with denominator from representation if it exists', () => {
+		const res = getFrameRate(
+			{ $: { frameRate: '24/3' } } as AdaptationSet,
+			{ $: { frameRate: '30/2' } } as Representation,
+		);
+		deepEqual(res, {
+			frameRateNumerator: 30,
+			frameRateDenominator: 2,
+		});
 	});
 
 	it('returns frameRate from adaptationSet if it exists and representation does not have frameRate', () => {
@@ -239,15 +253,21 @@ describe('getFrameRate', () => {
 			{ $: { frameRate: '24' } } as AdaptationSet,
 			{ $: {} } as Representation,
 		);
-		equal(res, '24');
+		deepEqual(res, {
+			frameRateNumerator: 24,
+			frameRateDenominator: 0,
+		});
 	});
 
-	it('returns empty string if there is no frameRate', () => {
+	it('returns default frame rate if there is no frameRate', () => {
 		const res = getFrameRate(
 			{ $: {} } as AdaptationSet,
 			{ $: {} } as Representation,
 		);
-		equal(res, '');
+		deepEqual(res, {
+			frameRateNumerator: 30,
+			frameRateDenominator: 0,
+		});
 	});
 });
 

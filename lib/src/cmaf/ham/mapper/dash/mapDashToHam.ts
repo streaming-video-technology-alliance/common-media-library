@@ -34,13 +34,6 @@ import {
 	getTrackDuration,
 	getUrlFromTemplate,
 } from './utilsDashToHam.js';
-import {
-	DENOMINATOR,
-	FRAME_RATE_NUMERATOR_30,
-	FRAME_RATE_SEPARATOR,
-	ZERO,
-	NUMERATOR,
-} from '../../../utils/constants.js';
 
 function mapDashToHam(dash: DashManifest): Presentation[] {
 	return dash.MPD.Period.map((period: Period) => {
@@ -100,24 +93,12 @@ function mapTracks(
 		throw new Error('Error: AdaptationSet is undefined');
 	}
 	const type = getContentType(adaptationSet, representation);
-	const frameRate = getFrameRate(adaptationSet, representation).split(
-		FRAME_RATE_SEPARATOR,
-	);
-	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '');
-	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
 	if (type === 'video') {
 		return {
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),
-			frameRate: {
-				frameRateNumerator: isNaN(frameRateNumerator)
-					? FRAME_RATE_NUMERATOR_30
-					: frameRateNumerator,
-				frameRateDenominator: isNaN(frameRateDenominator)
-					? ZERO
-					: frameRateDenominator,
-			},
+			frameRate: getFrameRate(adaptationSet, representation),
 			height: +(representation.$.height ?? 0),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
@@ -163,7 +144,7 @@ function mapSegmentBase(
 ): Segment[] {
 	return representation.SegmentBase!.map((segment: SegmentBase) => {
 		return {
-			duration: duration,
+			duration,
 			url: representation.BaseURL![0] ?? '',
 			byteRange: segment.$.indexRange,
 		} as Segment;

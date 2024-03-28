@@ -15,9 +15,9 @@ describe('getByterange', () => {
 		equal(res, '123@456');
 	});
 
-	it('returns undefined if byterange does not exist', () => {
+	it('returns empty string if byterange does not exist', () => {
 		const res = getByterange(undefined);
-		equal(res, undefined);
+		equal(res, '');
 	});
 });
 
