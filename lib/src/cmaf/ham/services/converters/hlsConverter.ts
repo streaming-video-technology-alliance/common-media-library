@@ -1,4 +1,4 @@
-import { Manifest } from '../../types';
+import { Manifest } from '../../types/index.js';
 import type { Presentation } from '../../types/model/index.js';
 import { HlsMapper } from '../../mapper/HlsMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';

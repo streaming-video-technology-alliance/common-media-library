@@ -1,7 +1,7 @@
 import { DashMapper } from '../../mapper/DashMapper.js';
 import { MapperContext } from '../../mapper/MapperContext.js';
 import type { Presentation } from '../../types/model/index.js';
-import type { Manifest } from '../../types';
+import type { Manifest } from '../../types/index.js';
 
 /**
  * Convert dash manifest into a ham object.
