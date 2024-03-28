@@ -102,7 +102,7 @@ function _audioGroupsToSwitchingSets(
 				sampleRate: 0,
 				channels: 2,
 				...(byteRange && { byteRange }),
-				urlInitialization: map?.uri,
+				...(map?.uri && { urlInitialization: map?.uri }),
 			} as AudioTrack);
 		}
 	}
@@ -191,7 +191,7 @@ function _videoPlaylistsToSwitchingSets(
 			sar: '',
 			scanType: '',
 			...(byteRange && { byteRange }),
-			urlInitialization: map?.uri,
+			...(map?.uri && { urlInitialization: map?.uri }),
 		} as VideoTrack);
 	});
 

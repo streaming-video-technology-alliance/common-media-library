@@ -1,5 +1,5 @@
 import { describe, it } from 'node:test';
-import { deepEqual, equal } from 'node:assert';
+import { deepStrictEqual, equal } from 'node:assert';
 import {
 	formatSegments,
 	getByterange,
@@ -60,7 +60,7 @@ describe('getDuration', () => {
 describe('formatSegments', () => {
 	it('returns segments formated', () => {
 		const res = formatSegments(getSegments());
-		deepEqual(res, [
+		deepStrictEqual(res, [
 			{
 				duration: 4.011,
 				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4',
@@ -76,6 +76,6 @@ describe('formatSegments', () => {
 
 	it('returns empty array if segments is empty', () => {
 		const res = formatSegments([]);
-		deepEqual(res, []);
+		deepStrictEqual(res, []);
 	});
 });

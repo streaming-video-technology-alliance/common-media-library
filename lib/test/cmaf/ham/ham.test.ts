@@ -4,7 +4,7 @@ import {
 	validateTracks,
 	Presentation,
 } from '@svta/common-media-library';
-import { deepEqual } from 'node:assert';
+import { deepStrictEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 import { jsonHam0 } from './data/ham-samples/fromDash/index.js';
 
@@ -16,7 +16,7 @@ describe('ham validation', () => {
 
 	it('returns true when track list is empty', () => {
 		const valid = validateTracks([]);
-		deepEqual(valid, {
+		deepStrictEqual(valid, {
 			status: true,
 			errorMessages: [],
 		});
@@ -25,7 +25,7 @@ describe('ham validation', () => {
 	it('returns true when all tracks are valid', () => {
 		// Fixme: valid is undefined
 		const valid = validateTracks(getTracksFromSelectionSet(selectionSet));
-		deepEqual(valid, {
+		deepStrictEqual(valid, {
 			status: true,
 			errorMessages: [],
 		});
@@ -38,7 +38,7 @@ describe('ham validation', () => {
 
 		const valid = validateTracks(getTracksFromSelectionSet(selectionSet));
 		selectionSet.switchingSets[0].tracks[1].duration = originalDuration;
-		deepEqual(valid, {
+		deepStrictEqual(valid, {
 			status: false,
 			errorMessages: ['All the tracks must have the same duration.'],
 		});
@@ -52,7 +52,7 @@ describe('ham validation', () => {
 
 		const valid = validateTracks(getTracksFromSelectionSet(selectionSet));
 		selectionSet.switchingSets[0].tracks[1].segments = originalSegments;
-		deepEqual(valid, {
+		deepStrictEqual(valid, {
 			status: false,
 			description: { sameDuration: true, atLeastOneSegment: false },
 			tracksWithErrors: ['video_eng=759000'],

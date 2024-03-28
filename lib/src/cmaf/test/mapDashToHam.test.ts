@@ -1,5 +1,5 @@
 import { describe, it } from 'node:test';
-import { deepEqual } from 'node:assert';
+import { deepStrictEqual } from 'node:assert';
 import {
 	mapSegmentBase,
 	mapSegmentList,
@@ -23,14 +23,14 @@ describe('map segments', () => {
 	describe('mapSegmentBase', () => {
 		it('maps SegmentBase to Segment[]', () => {
 			const res = mapSegmentBase(representationBase, duration);
-			deepEqual(res, expectedSegmentBase);
+			deepStrictEqual(res, expectedSegmentBase);
 		});
 	});
 
 	describe('mapSegmentList', () => {
 		it('maps SegmentList to Segment[]', () => {
 			const res = mapSegmentList(representationList.SegmentList ?? []);
-			deepEqual(res, expectedSegmentList);
+			deepStrictEqual(res, expectedSegmentList);
 		});
 	});
 
@@ -41,7 +41,7 @@ describe('map segments', () => {
 				duration,
 				segmentTemplate,
 			);
-			deepEqual(res, expectedSegmentTemplate);
+			deepStrictEqual(res, expectedSegmentTemplate);
 		});
 	});
 
@@ -56,7 +56,7 @@ describe('map segments', () => {
 				representationBase,
 				duration,
 			);
-			deepEqual(res, expectedSegmentBase);
+			deepStrictEqual(res, expectedSegmentBase);
 		});
 
 		it('returns segments from SegmentList', () => {
@@ -69,7 +69,7 @@ describe('map segments', () => {
 				representationList,
 				duration,
 			);
-			deepEqual(res, expectedSegmentList);
+			deepStrictEqual(res, expectedSegmentList);
 		});
 
 		it('returns segments from SegmentTemplate', () => {
@@ -83,7 +83,7 @@ describe('map segments', () => {
 				representationTemplate,
 				duration,
 			);
-			deepEqual(res, expectedSegmentTemplate);
+			deepStrictEqual(res, expectedSegmentTemplate);
 		});
 	});
 });

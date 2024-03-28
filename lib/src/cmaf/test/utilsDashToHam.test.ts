@@ -14,7 +14,7 @@ import {
 	getUrlFromTemplate,
 } from '../ham/mapper/dash/utilsDashToHam.js';
 import { describe, it } from 'node:test';
-import { deepEqual, equal } from 'node:assert';
+import { deepStrictEqual, equal } from 'node:assert';
 import {
 	AdaptationSet,
 	Period,
@@ -231,7 +231,7 @@ describe('getFrameRate', () => {
 			{ $: { frameRate: '24' } } as AdaptationSet,
 			{ $: { frameRate: '30' } } as Representation,
 		);
-		deepEqual(res, {
+		deepStrictEqual(res, {
 			frameRateNumerator: 30,
 			frameRateDenominator: 0,
 		});
@@ -242,7 +242,7 @@ describe('getFrameRate', () => {
 			{ $: { frameRate: '24/3' } } as AdaptationSet,
 			{ $: { frameRate: '30/2' } } as Representation,
 		);
-		deepEqual(res, {
+		deepStrictEqual(res, {
 			frameRateNumerator: 30,
 			frameRateDenominator: 2,
 		});
@@ -253,7 +253,7 @@ describe('getFrameRate', () => {
 			{ $: { frameRate: '24' } } as AdaptationSet,
 			{ $: {} } as Representation,
 		);
-		deepEqual(res, {
+		deepStrictEqual(res, {
 			frameRateNumerator: 24,
 			frameRateDenominator: 0,
 		});
@@ -264,7 +264,7 @@ describe('getFrameRate', () => {
 			{ $: {} } as AdaptationSet,
 			{ $: {} } as Representation,
 		);
-		deepEqual(res, {
+		deepStrictEqual(res, {
 			frameRateNumerator: 30,
 			frameRateDenominator: 0,
 		});
