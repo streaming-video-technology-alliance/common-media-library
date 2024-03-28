@@ -1,5 +1,5 @@
 import { Builder, parseString } from 'xml2js';
-import type { DashManifest } from '../ham/types';
+import type { DashManifest } from '../ham/types/mappers/DashManifest.js';
 
 /**
  * @internal
