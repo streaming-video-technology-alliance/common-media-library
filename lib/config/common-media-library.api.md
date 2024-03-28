@@ -668,6 +668,6 @@ export type VideoTrack = Track & {
 // src/cmaf/ham/types/DashManifest.ts:156:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/DashManifest.ts:157:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:61:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:63:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```
