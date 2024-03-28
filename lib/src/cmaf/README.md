@@ -31,7 +31,7 @@ const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifes
 import {
   hamToDash,
   hamToHls,
-  hlsToHam,
+  dashToHam,
 } from "@svta/common-media-library";
 
 const hamObject = dashToHam(mainDashManifest); // Convert DASH to HAM object
