@@ -17,7 +17,7 @@ import type {
 	TextTrack,
 	Track,
 	VideoTrack,
-} from '../../types/model';
+} from '../../types/model/index.js';
 import { iso8601DurationToNumber } from '../../../utils/utils.js';
 import {
 	calculateDuration,
@@ -27,7 +27,6 @@ import {
 	getFrameRate,
 	getGroup,
 	getLanguage,
-	getName,
 	getNumberOfSegments,
 	getPresentationId,
 	getSampleRate,
@@ -43,9 +42,57 @@ import {
 	NUMERATOR,
 } from '../../../utils/constants.js';
 
+function mapDashToHam(dash: DashManifest): Presentation[] {
+	return dash.MPD.Period.map((period: Period) => {
+		const duration: number = iso8601DurationToNumber(period.$.duration);
+		const presentationId: string = getPresentationId(period, duration);
+
+		const selectionSetGroups: { [group: string]: SelectionSet } = {};
+
+		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
+			const tracks: Track[] = adaptationSet.Representation.map(
+				(representation: Representation) => {
+					const segments: Segment[] = mapSegments(
+						adaptationSet,
+						representation,
+						duration,
+					);
+
+					return mapTracks(
+						adaptationSet,
+						representation,
+						segments,
+						getInitializationUrl(adaptationSet, representation),
+					);
+				},
+			);
+
+			const group: string = getGroup(adaptationSet);
+			if (!selectionSetGroups[group]) {
+				selectionSetGroups[group] = {
+					id: group,
+					switchingSets: [],
+				} as SelectionSet;
+			}
+
+			selectionSetGroups[group].switchingSets.push({
+				id:
+					adaptationSet.$.id ??
+					adaptationSet.ContentComponent?.at(0)?.$.id ??
+					group,
+				tracks,
+			} as SwitchingSet);
+		});
+
+		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups);
+
+		return { id: presentationId, selectionSets } as Presentation;
+	});
+}
+
 function mapTracks(
-	representation: Representation,
 	adaptationSet: AdaptationSet,
+	representation: Representation,
 	segments: Segment[],
 	initializationUrl: string | undefined,
 ): AudioTrack | VideoTrack | TextTrack {
@@ -60,7 +107,6 @@ function mapTracks(
 	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
 	if (type === 'video') {
 		return {
-			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),
@@ -85,7 +131,6 @@ function mapTracks(
 		} as VideoTrack;
 	} else if (type === 'audio') {
 		return {
-			name: getName(adaptationSet, representation, type),
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
 			codec: getCodec(adaptationSet, representation),
@@ -100,7 +145,6 @@ function mapTracks(
 	} else {
 		// if (type === 'text')
 		return {
-			name: type,
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			codec: getCodec(adaptationSet, representation),
 			duration: getTrackDuration(segments),
@@ -126,13 +170,9 @@ function mapSegmentBase(
 	});
 }
 
-function mapSegmentList(representation: Representation): Segment[] {
+function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 	const segments: Segment[] = [];
-	representation.SegmentList!.map((segment: SegmentList) => {
-		segments.push({
-			duration: 0, // TODO: Check if it is correct that the init segment has duration 0
-			url: segment.Initialization[0].$.sourceURL ?? '',
-		} as Segment);
+	segmentList.map((segment: SegmentList) => {
 		if (segment.SegmentURL) {
 			return segment.SegmentURL.forEach((segmentURL: SegmentURL) => {
 				segments.push({
@@ -172,14 +212,19 @@ function mapSegmentTemplate(
 }
 
 function mapSegments(
+	adaptationSet: AdaptationSet,
 	representation: Representation,
 	duration: number,
-	segmentTemplate?: SegmentTemplate,
 ): Segment[] {
+	const segmentTemplate: SegmentTemplate | undefined =
+		adaptationSet.SegmentTemplate?.at(0) ??
+		representation.SegmentTemplate?.at(0);
+	const segmentList: SegmentList[] | undefined =
+		adaptationSet.SegmentList ?? representation.SegmentList;
 	if (representation.SegmentBase) {
 		return mapSegmentBase(representation, duration);
-	} else if (representation.SegmentList) {
-		return mapSegmentList(representation);
+	} else if (segmentList) {
+		return mapSegmentList(segmentList);
 	} else if (segmentTemplate) {
 		return mapSegmentTemplate(representation, duration, segmentTemplate);
 	} else {
@@ -189,15 +234,16 @@ function mapSegments(
 }
 
 function getInitializationUrl(
-	representation: Representation,
 	adaptationSet: AdaptationSet,
+	representation: Representation,
 ): string | undefined {
 	let initializationUrl: string | undefined;
 	if (representation.SegmentBase) {
 		initializationUrl = representation.BaseURL![0] ?? '';
-	} else if (representation.SegmentList) {
+	} else if (adaptationSet.SegmentList || representation.SegmentList) {
 		initializationUrl =
-			representation.SegmentList[0].Initialization[0].$.sourceURL;
+			representation.SegmentList?.at(0)?.Initialization[0].$.sourceURL ||
+			adaptationSet.SegmentList?.at(0)?.Initialization[0].$.sourceURL;
 	}
 	if (adaptationSet.SegmentTemplate || representation.SegmentTemplate) {
 		initializationUrl =
@@ -211,57 +257,6 @@ function getInitializationUrl(
 		}
 	}
 	return initializationUrl;
-}
-
-function mapDashToHam(dash: DashManifest): Presentation[] {
-	return dash.MPD.Period.map((period: Period) => {
-		const duration: number = iso8601DurationToNumber(period.$.duration);
-		const presentationId: string = getPresentationId(period, duration);
-
-		const selectionSetGroups: { [group: string]: SelectionSet } = {};
-
-		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
-			const tracks: Track[] = adaptationSet.Representation.map(
-				(representation: Representation) => {
-					const segmentTemplate: SegmentTemplate | undefined =
-						adaptationSet.SegmentTemplate?.at(0) ??
-						representation.SegmentTemplate?.at(0);
-					const segments: Segment[] = mapSegments(
-						representation,
-						duration,
-						segmentTemplate,
-					);
-
-					return mapTracks(
-						representation,
-						adaptationSet,
-						segments,
-						getInitializationUrl(representation, adaptationSet),
-					);
-				},
-			);
-
-			const group: string = getGroup(adaptationSet);
-			if (!selectionSetGroups[group]) {
-				selectionSetGroups[group] = {
-					id: group,
-					switchingSets: [],
-				} as SelectionSet;
-			}
-
-			selectionSetGroups[group].switchingSets.push({
-				id:
-					adaptationSet.$.id ??
-					adaptationSet.ContentComponent?.at(0)?.$.id ??
-					group,
-				tracks,
-			} as SwitchingSet);
-		});
-
-		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups);
-
-		return { id: presentationId, selectionSets } as Presentation;
-	});
 }
 
 export {

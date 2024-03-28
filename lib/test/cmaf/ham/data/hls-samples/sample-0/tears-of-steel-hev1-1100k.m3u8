@@ -1,0 +1,286 @@
+#EXTM3U
+#EXT-X-VERSION:6
+## Created with Unified Streaming Platform(version=1.9.4)
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-TARGETDURATION:8
+#EXT-X-MAP:URI="tears-of-steel-hev1-1100k.cmfv",BYTERANGE="2901@0"
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:40135@4037
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:1232488@44172
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:504668@1276660
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:577782@1781328
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:506323@2359110
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:1348550@2865433
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:1228050@4213983
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:500500@5442033
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:156092@5942533
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:733534@6098625
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:494978@6832159
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:611369@7327137
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:403131@7938506
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:697524@8341637
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:411131@9039161
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:674855@9450292
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:369705@10125147
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:244393@10494852
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:414889@10739245
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:513868@11154134
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:710349@11668002
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:526491@12378351
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:497378@12904842
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:885302@13402220
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:573314@14287522
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:794296@14860836
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.916666, no desc
+#EXT-X-BYTERANGE:1441737@15655132
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2078163@17096869
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:673990@19175032
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:920237@19849022
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:559957@20769259
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:743103@21329216
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1338539@22072319
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:1402645@23410858
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1028501@24813503
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:914359@25842004
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:1027043@26756363
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.916666, no desc
+#EXT-X-BYTERANGE:1008100@27783406
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:871739@28791506
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:356539@29663245
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.916666, no desc
+#EXT-X-BYTERANGE:340018@30019784
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:658398@30359802
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:627561@31018200
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:663508@31645761
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:449405@32309269
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:352171@32758674
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:590288@33110845
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:789734@33701133
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:521553@34490867
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:356043@35012420
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.916666, no desc
+#EXT-X-BYTERANGE:472008@35368463
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:504094@35840471
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:1175935@36344565
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:587205@37520500
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:1115453@38107705
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:844753@39223158
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:557262@40067911
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:858513@40625173
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2057296@41483686
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2502556@43540982
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:1075556@46043538
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:1369967@47119094
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1742135@48489061
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:925148@50231196
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.916666, no desc
+#EXT-X-BYTERANGE:858313@51156344
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:1403670@52014657
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:416965@53418327
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:750322@53835292
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:560275@54585614
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:411179@55145889
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:493940@55557068
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.916666, no desc
+#EXT-X-BYTERANGE:1460252@56051008
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1073974@57511260
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1445438@58585234
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.083333, no desc
+#EXT-X-BYTERANGE:3539237@60030672
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:3711325@63569909
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:3276172@67281234
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.041666, no desc
+#EXT-X-BYTERANGE:2713068@70557406
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.958333, no desc
+#EXT-X-BYTERANGE:1674775@73270474
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:908406@74945249
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1274710@75853655
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1546408@77128365
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2629102@78674773
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2554416@81303875
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2624573@83858291
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2606573@86482864
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:2491974@89089437
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:1105783@91581411
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8.125, no desc
+#EXT-X-BYTERANGE:428344@92687194
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:7.875, no desc
+#EXT-X-BYTERANGE:999022@93115538
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:8, no desc
+#EXT-X-BYTERANGE:549454@94114560
+tears-of-steel-hev1-1100k.cmfv
+#EXTINF:6.125, no desc
+#EXT-X-BYTERANGE:146351@94664014
+tears-of-steel-hev1-1100k.cmfv
+#EXT-X-ENDLIST
+#USP-X-MEDIA:BANDWIDTH=3693000,AVERAGE-BANDWIDTH=1034000,TYPE=VIDEO,GROUP-ID="video-hev1-1032",LANGUAGE="en",NAME="English",AUTOSELECT=YES,CODECS="hev1.1.6.H150.90",RESOLUTION=1680x750,FRAME-RATE=24,VIDEO-RANGE=SDR

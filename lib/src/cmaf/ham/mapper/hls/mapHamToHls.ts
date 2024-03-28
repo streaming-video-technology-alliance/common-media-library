@@ -1,45 +1,57 @@
 import { Manifest } from '../../types';
 import {
 	AudioTrack,
-	TextTrack,
 	Presentation,
+	SelectionSet,
+	SwitchingSet,
+	TextTrack,
+	Track,
 	VideoTrack,
-} from '../../types/model';
-import {
-	NEW_LINE,
-	WHITE_SPACE,
-	WHITE_SPACE_ENCODED,
-	AT_SEPARATOR,
-	HYPHEN_MINUS_SEPARATOR,
-} from '../../../utils/constants.js';
+} from '../../types/model/index.js';
+import { getPlaylistData, getSegments } from './utilsHamToHls.js';
 
-function mapHamToHls(presentation: Presentation[]): Manifest {
-	const version = 0; //TODO : save version in the model.
-	let mainManifest = `#EXTM3U${NEW_LINE}#EXT-X-VERSION:${version}${NEW_LINE}`;
+type ManifestPlaylistPiece = {
+	mainRef: string;
+	playlist: string;
+};
+
+function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPiece {
+	const mediaSequence = 0; //TODO : save mediaSequence in the model.
+	const trackFileName = track.fileName ?? `${track.id}.m3u8`;
+
+	let mainRef = '';
+	let playlist = `#EXTM3U\n#EXT-X-TARGETDURATION:${track.duration}\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n`;
+
+	if (track.type.toLowerCase() === 'video') {
+		const videoTrack = track as VideoTrack;
+		mainRef += `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}\n${trackFileName}\n`;
+		playlist += getPlaylistData(videoTrack);
+	} else if (track.type.toLowerCase() === 'audio') {
+		const audioTrack = track as AudioTrack;
+		mainRef += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"\n`;
+		playlist += getPlaylistData(audioTrack);
+	} else if (track.type.toLowerCase() === 'text') {
+		const textTrack = track as TextTrack;
+		mainRef += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}\n`;
+	}
+
+	playlist += `${getSegments(track.segments)}#EXT-X-ENDLIST`;
+
+	return { mainRef, playlist };
+}
+
+function mapHamToHls(presentations: Presentation[]): Manifest {
+	const version = 1; //TODO : save version in the model.
+	let mainManifest = `#EXTM3U\n#EXT-X-VERSION:${version}\n\n`;
 	const playlists: Manifest[] = [];
-	presentation.map((pres) => {
-		const selectionSets = pres.selectionSets;
-		selectionSets.map((selectionSet) => {
-			const switchingSets = selectionSet.switchingSets;
-			switchingSets.map((switchingSet) => {
-				const tracks = switchingSet.tracks;
-				tracks.map((track) => {
-					if (track.type.toLowerCase() === 'video') {
-						const { manifestToConcat, playlist } =
-							_generateVideoManifestPiece(track as VideoTrack);
-						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'hls' });
-					} else if (track.type.toLowerCase() === 'audio') {
-						const { manifestToConcat, playlist } =
-							_generateAudioManifestPiece(track as AudioTrack);
-						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'hls' });
-					} else if (track.type.toLowerCase() === 'text') {
-						const { manifestToConcat, playlist } =
-							_generateTextManifestPiece(track as TextTrack);
-						mainManifest += manifestToConcat;
-						playlists.push({ manifest: playlist, type: 'hls' });
-					}
+	presentations.map((presentation: Presentation) => {
+		presentation.selectionSets.map((selectionSet: SelectionSet) => {
+			selectionSet.switchingSets.map((switchingSet: SwitchingSet) => {
+				switchingSet.tracks.map((track: Track) => {
+					const { mainRef, playlist } =
+						generateManifestPlaylistPiece(track);
+					mainManifest += mainRef;
+					playlists.push({ manifest: playlist, type: 'hls' });
 				});
 			});
 		});
@@ -51,75 +63,4 @@ function mapHamToHls(presentation: Presentation[]): Manifest {
 	};
 }
 
-function _generateVideoManifestPiece(videoTrack: VideoTrack) {
-	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const trackFileName = videoTrack.fileName ?? `${videoTrack.id}.m3u8`;
-	const manifestToConcat = `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codec}",RESOLUTION=${videoTrack.width}x${videoTrack.height}${NEW_LINE}${trackFileName}${NEW_LINE}`;
-	let playlist = videoTrack.segments
-		.map((segment) => {
-			const byteRange = segment.byteRange
-				? `#EXT-X-BYTERANGE:${segment.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}${NEW_LINE}`
-				: '';
-			const url = segment.url.replaceAll(
-				WHITE_SPACE,
-				WHITE_SPACE_ENCODED,
-			);
-			segment.url;
-			return `#EXTINF:${segment.duration},${NEW_LINE}${byteRange}${NEW_LINE}${url}`;
-		})
-		.join(NEW_LINE);
-	const firstSegmentByteRange = videoTrack.segments[0]?.byteRange;
-	const videoByteRange = videoTrack.byteRange
-		? `BYTERANGE:${videoTrack.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}${NEW_LINE}`
-		: firstSegmentByteRange
-			? `BYTERANGE:0@${Number(firstSegmentByteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
-			: '';
-
-	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${videoTrack.duration / videoTrack.segments?.length}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${videoTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${videoByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
-
-	return { manifestToConcat, playlist };
-}
-
-function _generateAudioManifestPiece(audioTrack: AudioTrack) {
-	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const trackFileName = audioTrack.fileName ?? `${audioTrack.id}.m3u8`;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"${NEW_LINE}`;
-	let playlist = audioTrack.segments
-		.map((segment) => {
-			const byteRange = segment.byteRange
-				? `#EXT-X-BYTERANGE:${segment.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}${NEW_LINE}`
-				: '';
-			const url = segment.url.replaceAll(
-				WHITE_SPACE,
-				WHITE_SPACE_ENCODED,
-			);
-			return `#EXTINF:${segment.duration},${NEW_LINE}${byteRange}${NEW_LINE}${url}`;
-		})
-		.join(NEW_LINE);
-	const firstSegmentByteRange = audioTrack.segments[0]?.byteRange;
-	const audioByteRange = audioTrack.byteRange
-		? `BYTERANGE:${audioTrack.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}${NEW_LINE}`
-		: firstSegmentByteRange
-			? `BYTERANGE:0@${Number(firstSegmentByteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}${NEW_LINE}`
-			: '';
-
-	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${audioTrack.duration / audioTrack.segments?.length}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}#EXT-X-MAP:URI="${audioTrack.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)}",${audioByteRange}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
-
-	return { manifestToConcat, playlist };
-}
-
-function _generateTextManifestPiece(textTrack: TextTrack) {
-	const mediaSequence = 0; //TODO : save mediaSequence in the model.
-	const trackFileName = textTrack.fileName ?? `${textTrack.id}.m3u8`;
-	const manifestToConcat = `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language},URI= "${trackFileName}"${NEW_LINE}`;
-	let playlist = textTrack.segments
-		.map((segment) => {
-			return `#EXTINF:${segment.duration},${NEW_LINE}${segment.url}`;
-		})
-		.join(NEW_LINE);
-	playlist = `#EXTM3U${NEW_LINE}#EXT-X-TARGETDURATION:${textTrack.duration / textTrack.segments?.length}${NEW_LINE}#EXT-X-PLAYLIST-TYPE:VOD${NEW_LINE}#EXT-X-MEDIA-SEQUENCE:${mediaSequence}${NEW_LINE}${playlist}${NEW_LINE}#EXT-X-ENDLIST`;
-
-	return { manifestToConcat, playlist };
-}
-
-export { mapHamToHls };
+export { mapHamToHls, generateManifestPlaylistPiece };

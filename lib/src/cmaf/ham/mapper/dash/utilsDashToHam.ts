@@ -4,7 +4,7 @@ import type {
 	Representation,
 	SegmentTemplate,
 } from '../../types';
-import { Segment } from '../../types/model';
+import { Segment } from '../../types/model/index.js';
 
 function getChannels(
 	adaptationSet: AdaptationSet,
@@ -114,14 +114,6 @@ function getLanguage(adaptationSet: AdaptationSet): string {
 	return language;
 }
 
-function getName(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-	type: string,
-): string {
-	return adaptationSet.$.mimeType ?? representation?.$.mimeType ?? type;
-}
-
 /**
  * Calculates the number of segments that a track has to use SegmentTemplate.
  *
@@ -206,6 +198,12 @@ function getUrlFromTemplate(
 		if (match === '$RepresentationID$') {
 			return representation.$.id;
 		}
+		/**
+		 * Number with 4 digits e.g: 0001
+		 */
+		if (match.includes('Number%04d')) {
+			return segmentId.toString().padStart(4, '0');
+		}
 		if (match.includes('Number')) {
 			return segmentId;
 		}
@@ -224,7 +222,6 @@ export {
 	getFrameRate,
 	getGroup,
 	getLanguage,
-	getName,
 	getNumberOfSegments,
 	getPresentationId,
 	getSampleRate,
