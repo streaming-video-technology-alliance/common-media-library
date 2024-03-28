@@ -20,24 +20,23 @@ Here's a simple demonstration illustrating how to use the features of the CMAF H
 ```typescript
 import {
   hamToHls,
-  hamToDash,
   hlsToHam,
-  dashToHam,
 } from "@svta/common-media-library";
 
+const hamObject = hlsToHam(mainHlsManifest, playListHlsManifests); // Convert HLS to HAM object
+const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
+const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
+```
 
-function parseFromDash(dashManifest: string) {
-  const hamObject = mpdToHam(dashManifest); // Convert input to HAM object
-  const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
-  const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
-}
+```typescript
+import {
+  hamToHls,
+  hlsToHam,
+} from "@svta/common-media-library";
 
-function parseFromHls(mainHlsManifest: string, playListHlsManifests: string[]) {
-  const hamObject = hlsToHam(mainHlsManifest, playListHlsManifests); // Convert HLS to HAM object
-  const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
-  const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
-}
-
+const hamObject = hlsToHam(mainHlsManifest, playListHlsManifests); // Convert HLS to HAM object
+const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
+const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
 
 ```
 
