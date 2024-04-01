@@ -166,7 +166,8 @@ function getGroup(adaptationSet: AdaptationSet): string {
  * @internal
  *
  * Get the initialization url. It can be present on AdaptationSet or Representation.
- * Url initialization is present of segments.
+ *
+ * Url initialization is present on segments.
  *
  * @param adaptationSet - AdaptationSet to try to get the initialization url from.
  * @param representation - Representation to try to get the initialization url from.
@@ -260,7 +261,7 @@ function getPresentationId(period: Period, duration: number): string {
 /**
  * @internal
  *
- * Get the sample rate of
+ * Get sample rate (audio)
  *
  * @param adaptationSet - AdaptationSet to try to get the sampleRate from
  * @param representation - Representation to try to get the sampleRate from

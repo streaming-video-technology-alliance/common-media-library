@@ -30,6 +30,18 @@ type Validation = {
  * Validations:
  * - Presentation has id
  *
+ * @example
+ * ```ts
+ * import cmaf, { Presentation } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const presentation: Presentation = ...;
+ *
+ * const validation = cmaf.validatePresentation(presentation);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
+ *
  * @param presentation - Presentation from cmaf ham model
  * @returns Validation
  *
@@ -57,6 +69,18 @@ function validatePresentation(presentation: Presentation): Validation {
 /**
  * Validate a list of selection set.
  * It validates in cascade, calling each child validation method.
+ *
+ * @example
+ * ```ts
+ * import cmaf, { SelectionSet } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const selectionSets: SelectionSet[] = ...;
+ *
+ * const validation = cmaf.validateSelectionSets(selectionSets);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
  *
  * @param selectionSets - List of SelectionSet from cmaf ham model
  * @param presentationId - Optional: parent presentation id
@@ -90,6 +114,18 @@ function validateSelectionSets(
  *
  * Validations:
  * - SelectionSet has id
+ *
+ * @example
+ * ```ts
+ * import cmaf, { SelectionSet } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const selectionSet: SelectionSet = ...;
+ *
+ * const validation = cmaf.validateSelectionSet(selectionSet);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
  *
  * @param selectionSet - SelectionSet from cmaf ham model
  * @param presentationId - Optional: parent presentation id
@@ -133,6 +169,18 @@ function validateSelectionSet(
  * Validate a list of switching set.
  * It validates in cascade, calling each child validation method.
  *
+ * @example
+ * ```ts
+ * import cmaf, { SwitchingSet } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const switchingSets: SwitchingSet[] = ...;
+ *
+ * const validation = cmaf.validateSwitchingSets(switchingSets);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
+ *
  * @param switchingSets - List of SwitchingSets from cmaf ham model
  * @param selectionSetId - Optional: parent selection set id
  * @param prevValidation - Optional: validation object from parent previous validate method call
@@ -165,6 +213,18 @@ function validateSwitchingSets(
  *
  * Validations:
  * - SwitchingSet has id
+ *
+ * @example
+ * ```ts
+ * import cmaf, { SwitchingSet } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const switchingSet: SwitchingSet = ...;
+ *
+ * const validation = cmaf.validateSwitchingSet(switchingSet);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
  *
  * @param switchingSet - SwitchingSet from cmaf ham model
  * @param selectionSetId - Optional: parent selection set id
@@ -203,6 +263,18 @@ function validateSwitchingSet(
 /**
  * Validate a list of tracks.
  * It validates in cascade, calling each child validation method.
+ *
+ * @example
+ * ```ts
+ * import cmaf, { Track } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const tracks: Track[] = ...;
+ *
+ * const validation = cmaf.validateTracks(tracks);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
  *
  * @param tracks - List of Track from cmaf ham model
  * @param switchingSetId - Optional: parent switching set id
@@ -250,6 +322,18 @@ function validateTracks(
  * Validations:
  * - track has id
  * - calls specific audio, video and text validations
+ *
+ * @example
+ * ```ts
+ * import cmaf, { Track } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const track: Track = ...;
+ *
+ * const validation = cmaf.validateTrack(track);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
  *
  * @param track - Track from cmaf ham model
  * @param switchingSetId - Optional: parent switching set id
@@ -308,6 +392,18 @@ function validateTrack(
 /**
  * Validate a list of segments.
  *
+ * @example
+ * ```ts
+ * import cmaf, { Segment } from '@svta/common-media-library/cmaf-ham';
+ * ...
+ *
+ * // const segments: Segment[] = ...;
+ *
+ * const validation = cmaf.validateSegments(segments);
+ * ```
+ *
+ * Example output: `{ status: true|false, errorMessages: [...] }`
+ *
  * @param segments - List of Segment from cmaf ham model
  * @param trackId - Optional: parent track id
  * @param prevValidation - Optional: validation object from parent previous validate method call
@@ -335,6 +431,9 @@ function validateSegments(
 }
 
 /**
+ *
+ * @internal
+ *
  * Validate a segment.
  *
  * Validations:
