@@ -16,7 +16,6 @@ import {
  * CMAF-HAM Validation type
  *
  * @group CMAF
- *
  * @alpha
  */
 type Validation = {
@@ -28,12 +27,13 @@ type Validation = {
  * Validate a presentation.
  * It validates in cascade, calling each child validation method.
  *
- * @param presentation - Presentation from cmaf ham model
+ * Validations:
+ * - Presentation has id
  *
+ * @param presentation - Presentation from cmaf ham model
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -61,11 +61,9 @@ function validatePresentation(presentation: Presentation): Validation {
  * @param selectionSets - List of SelectionSet from cmaf ham model
  * @param presentationId - Optional: parent presentation id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -90,14 +88,15 @@ function validateSelectionSets(
  * Validate a selection set.
  * It validates in cascade, calling each child validation method.
  *
+ * Validations:
+ * - SelectionSet has id
+ *
  * @param selectionSet - SelectionSet from cmaf ham model
  * @param presentationId - Optional: parent presentation id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -137,11 +136,9 @@ function validateSelectionSet(
  * @param switchingSets - List of SwitchingSets from cmaf ham model
  * @param selectionSetId - Optional: parent selection set id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -166,14 +163,15 @@ function validateSwitchingSets(
  * Validate a switching set.
  * It validates in cascade, calling each child validation method.
  *
+ * Validations:
+ * - SwitchingSet has id
+ *
  * @param switchingSet - SwitchingSet from cmaf ham model
  * @param selectionSetId - Optional: parent selection set id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -209,11 +207,9 @@ function validateSwitchingSet(
  * @param tracks - List of Track from cmaf ham model
  * @param switchingSetId - Optional: parent switching set id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -251,14 +247,16 @@ function validateTracks(
  * Validate a track.
  * It validates in cascade, calling each child validation method.
  *
+ * Validations:
+ * - track has id
+ * - calls specific audio, video and text validations
+ *
  * @param track - Track from cmaf ham model
  * @param switchingSetId - Optional: parent switching set id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -313,11 +311,9 @@ function validateTrack(
  * @param segments - List of Segment from cmaf ham model
  * @param trackId - Optional: parent track id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -341,14 +337,16 @@ function validateSegments(
 /**
  * Validate a segment.
  *
+ * Validations:
+ * - segment has duration
+ * - segment has url
+ *
  * @param segment - Segment from cmaf ham model
  * @param trackId - Optional: parent track id
  * @param prevValidation - Optional: validation object from parent previous validate method call
- *
  * @returns Validation
  *
  * @group CMAF
- *
  * @alpha
  *
  */
@@ -382,6 +380,20 @@ function validateSegment(
 	return validation;
 }
 
+/**
+ * @internal
+ *
+ * Validate video Track
+ *
+ * Validations:
+ * - track has codec
+ *
+ * @param videoTrack - Video track to validate
+ * @param switchingSetId - id from the switching set containing the track. Only used for logs.
+ * @param prevValidation -
+ * @returns Validation object
+ * @see Validation
+ */
 function _validateVideoTrack(
 	videoTrack: VideoTrack,
 	switchingSetId?: string,
@@ -405,6 +417,20 @@ function _validateVideoTrack(
 	return validation;
 }
 
+/**
+ * @internal
+ *
+ * Validate Audio Track
+ *
+ * Validations:
+ * - track has codec
+ *
+ * @param audioTrack - Audio track to validate
+ * @param switchingSetId - id from the switching set containing the track. Only used for logs.
+ * @param prevValidation -
+ * @returns Validation object
+ * @see Validation
+ */
 function _validateAudioTrack(
 	audioTrack: AudioTrack,
 	switchingSetId?: string,
@@ -428,6 +454,20 @@ function _validateAudioTrack(
 	return validation;
 }
 
+/**
+ * @internal
+ *
+ * Validate Text Track
+ *
+ * Validations:
+ * - track has language
+ *
+ * @param textTrack - Text track to validate
+ * @param switchingSetId - id from the switching set containing the track. Only used for logs.
+ * @param prevValidation -
+ * @returns Validation object
+ * @see Validation
+ */
 function _validateTextTrack(
 	textTrack: TextTrack,
 	switchingSetId?: string,
