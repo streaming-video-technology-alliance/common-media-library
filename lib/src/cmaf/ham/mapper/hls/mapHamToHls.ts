@@ -32,7 +32,7 @@ function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPiece {
 		playlist += getPlaylistData(audioTrack);
 	} else if (track.type.toLowerCase() === 'text') {
 		const textTrack = track as TextTrack;
-		mainRef += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=${textTrack.id},NAME=${textTrack.id},LANGUAGE=${textTrack.language} URI= ${trackFileName}\n`;
+		mainRef += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="${textTrack.id}",NAME="${textTrack.id}",LANGUAGE="${textTrack.language}",URI="${trackFileName}"\n`;
 	}
 
 	playlist += `${getSegments(track.segments)}#EXT-X-ENDLIST`;
@@ -51,7 +51,13 @@ function mapHamToHls(presentations: Presentation[]): Manifest {
 					const { mainRef, playlist } =
 						generateManifestPlaylistPiece(track);
 					mainManifest += mainRef;
-					playlists.push({ manifest: playlist, type: 'hls' });
+					const manifestFileName =
+						track.fileName ?? `${track.id}.m3u8`;
+					playlists.push({
+						manifest: playlist,
+						type: 'hls',
+						fileName: manifestFileName,
+					});
 				});
 			});
 		});

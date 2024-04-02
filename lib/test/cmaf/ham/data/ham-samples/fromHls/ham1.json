@@ -11,7 +11,7 @@
 							{
 								"id": "stream_0",
 								"type": "audio",
-								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_a-eng-0128k-aac-2c.mp4.m3u8",
+								"fileName": "playlist_a-eng-0128k-aac-2c.mp4.m3u8",
 								"codec": "mp4a.40.2",
 								"duration": 470,
 								"language": "en",
@@ -420,7 +420,7 @@
 							{
 								"id": "video-0",
 								"type": "video",
-								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0144p-0100k-libx264.mp4.m3u8",
+								"fileName": "playlist_v-0144p-0100k-libx264.mp4.m3u8",
 								"codec": "avc1.42c01e",
 								"duration": 470,
 								"language": "und",
@@ -817,7 +817,7 @@
 							{
 								"id": "video-1",
 								"type": "video",
-								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0240p-0400k-libx264.mp4.m3u8",
+								"fileName": "playlist_v-0240p-0400k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f",
 								"duration": 470,
 								"language": "und",
@@ -1214,7 +1214,7 @@
 							{
 								"id": "video-2",
 								"type": "video",
-								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0576p-1400k-libx264.mp4.m3u8",
+								"fileName": "playlist_v-0576p-1400k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f",
 								"duration": 470,
 								"language": "und",
@@ -1611,7 +1611,7 @@
 							{
 								"id": "video-3",
 								"type": "video",
-								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0720p-2500k-libx264.mp4.m3u8",
+								"fileName": "playlist_v-0720p-2500k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f",
 								"duration": 470,
 								"language": "und",
@@ -2008,7 +2008,7 @@
 							{
 								"id": "video-4",
 								"type": "video",
-								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0480p-1000k-libx264.mp4.m3u8",
+								"fileName": "playlist_v-0480p-1000k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f",
 								"duration": 470,
 								"language": "und",
@@ -2405,7 +2405,7 @@
 							{
 								"id": "video-5",
 								"type": "video",
-								"fileName": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/playlist_v-0360p-0750k-libx264.mp4.m3u8",
+								"fileName": "playlist_v-0360p-0750k-libx264.mp4.m3u8",
 								"codec": "avc1.4d401f",
 								"duration": 470,
 								"language": "und",

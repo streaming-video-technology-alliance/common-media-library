@@ -8,6 +8,7 @@ type Format = 'hls' | 'dash';
  */
 type Manifest = {
 	manifest: string;
+	fileName?: string;
 	ancillaryManifests?: Manifest[];
 	type: Format;
 	metadata?: Map<string, string>;
