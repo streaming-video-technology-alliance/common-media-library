@@ -36,6 +36,14 @@ import {
 	getUrlFromTemplate,
 } from './utilsDashToHam.js';
 
+/**
+ * @internal
+ *
+ * Main function to map dash to ham.
+ *
+ * @param dash - Dash manifest to map
+ * @returns List of presentations in ham
+ */
 function mapDashToHam(dash: DashManifest): Presentation[] {
 	return dash.MPD.Period.map((period: Period) => {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
@@ -84,6 +92,17 @@ function mapDashToHam(dash: DashManifest): Presentation[] {
 	});
 }
 
+/**
+ * @internal
+ *
+ * Map dash components to ham tracks.
+ *
+ * @param adaptationSet - AdaptationSet of the dash manifest
+ * @param representation - Representation of the dash manifest
+ * @param segments - Segments from the representation of the dash manifest
+ * @param initializationUrl - Initialization url from the track
+ * @returns AudioTrack, VideoTrack or TextTrack depending on the type
+ */
 function mapTracks(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
@@ -139,6 +158,15 @@ function mapTracks(
 	}
 }
 
+/**
+ * @internal
+ *
+ * Maps SegmentBase from dash to Segment list from ham
+ *
+ * @param representation - Representation to get the SegmentBase from
+ * @param duration - Duration of the segment
+ * @returns list of ham segments
+ */
 function mapSegmentBase(
 	representation: Representation,
 	duration: number,
@@ -152,6 +180,14 @@ function mapSegmentBase(
 	});
 }
 
+/**
+ * @internal
+ *
+ * Maps SegmentList from dash to Segment list from ham
+ *
+ * @param segmentList - SegmentList list from dash
+ * @returns list of ham segments
+ */
 function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 	const segments: Segment[] = [];
 	segmentList.map((segment: SegmentList) => {
@@ -170,6 +206,16 @@ function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 	return segments;
 }
 
+/**
+ * @internal
+ *
+ * Maps SegmentTemplate from dash to Segment list from ham
+ *
+ * @param representation - Representation to generate the urls
+ * @param duration - Duration of the segments
+ * @param segmentTemplate - SegmentTemplate to get the properties from
+ * @returns list of ham segments
+ */
 function mapSegmentTemplate(
 	representation: Representation,
 	duration: number,
@@ -193,6 +239,21 @@ function mapSegmentTemplate(
 	return segments;
 }
 
+/**
+ * @internal
+ *
+ * Maps dash segments to ham segment.
+ *
+ * Checks the type of dash segments used to map them accordingly.
+ * @see mapSegmentBase
+ * @see mapSegmentList
+ * @see mapSegmentTemplate
+ *
+ * @param adaptationSet - AdaptationSet to get the segments from
+ * @param representation - Representation to get the segments from
+ * @param duration - Duration of the segments
+ * @returns list of ham segments
+ */
 function mapSegments(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
