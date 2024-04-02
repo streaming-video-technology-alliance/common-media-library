@@ -55,6 +55,7 @@ type SegmentList = {
 
 /**
  * DASH Segment template
+ *
  * It is used as a template to create the actual templates
  *
  * @group CMAF

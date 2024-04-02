@@ -18,8 +18,8 @@ import {
  *
  * Get the channels value (audio). It can be present on adaptationSet or representation.
  *
- * @param adaptationSet - AdaptationSet to try to get the channels from.
- * @param representation - Representation to try to get the channels from.
+ * @param adaptationSet - AdaptationSet to try to get the channels from
+ * @param representation - Representation to try to get the channels from
  * @returns Channels value
  */
 function getChannels(
@@ -42,8 +42,8 @@ function getChannels(
  *
  * Get the codec value (video and audio). It can be present on adaptationSet or representation.
  *
- * @param adaptationSet - AdaptationSet to try to get the codec from.
- * @param representation - Representation to try to get the codec from.
+ * @param adaptationSet - AdaptationSet to try to get the codec from
+ * @param representation - Representation to try to get the codec from
  * @returns Content codec
  */
 function getCodec(
@@ -63,8 +63,8 @@ function getCodec(
  * Get the type of the content. It can be obtained directly from AdaptationSet/Representation
  * or can be inferred with the existing properties.
  *
- * @param adaptationSet - AdaptationSet to get the type from.
- * @param representation - Representation to get the type from.
+ * @param adaptationSet - AdaptationSet to get the type from
+ * @param representation - Representation to get the type from
  * @returns type of the content
  */
 function getContentType(
@@ -169,8 +169,8 @@ function getGroup(adaptationSet: AdaptationSet): string {
  *
  * Url initialization is present on segments.
  *
- * @param adaptationSet - AdaptationSet to try to get the initialization url from.
- * @param representation - Representation to try to get the initialization url from.
+ * @param adaptationSet - AdaptationSet to try to get the initialization url from
+ * @param representation - Representation to try to get the initialization url from
  */
 function getInitializationUrl(
 	adaptationSet: AdaptationSet,
@@ -250,7 +250,7 @@ function getNumberOfSegments(
  * Generates a presentation id. It uses the period id as default or creates one
  * if none is present.
  *
- * @param period - Period to try to get the id from.
+ * @param period - Period to try to get the id from
  * @param duration - Duration of the content
  * @returns Presentation id
  */
@@ -307,7 +307,7 @@ function getSar(
 /**
  * @internal
  *
- * Get the duration from a track.
+ * Calculate the duration of a track.
  *
  * This is calculated using the sum of the duration of all the segments from the
  * track.
@@ -335,7 +335,7 @@ function getTrackDuration(segments: Segment[]): number {
  * @param representation - Representation of the template
  * @param segmentTemplate - Segment template
  * @param segmentId - Segment id
- * @returns url from the segment template.
+ * @returns url from the segment template
  */
 function getUrlFromTemplate(
 	representation: Representation,

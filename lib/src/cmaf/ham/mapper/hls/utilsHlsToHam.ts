@@ -7,7 +7,7 @@ import { Byterange, HlsManifest, SegmentHls } from '../../types';
  * Get byterange from HLS Manifest
  *
  * @param byteRange - Byterange object containning length and offset
- * @returns string containing the byterange. If byterange is undefined, it returns undefined.
+ * @returns string containing the byterange. If byterange is undefined, it returns undefined
  *
  * @group CMAF
  * @alpha
@@ -24,8 +24,8 @@ function getByterange(byteRange: Byterange | undefined): string {
  *
  * Get the codec for a type of content.
  *
- * @param type - Type of the content to get the codecs for
- * @param codecs - String containing multiple codecs separated with commas.
+ * @param type - Type of the content to get the codecs from
+ * @param codecs - String containing multiple codecs separated with commas
  * @returns string containing codec
  *
  * @group CMAF

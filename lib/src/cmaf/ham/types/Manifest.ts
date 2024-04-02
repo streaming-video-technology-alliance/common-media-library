@@ -4,7 +4,6 @@ type Format = 'hls' | 'dash';
  * Manifest object received as an input by the conversion to HAM object
  *
  * @group CMAF
- *
  * @alpha
  */
 type Manifest = {

@@ -10,11 +10,9 @@ import type {
  *
  * @param switchingSet - SwitchingSet object from HAM
  * @param predicate - Filtering function
- *
  * @returns Track[]
  *
  * @group CMAF
- *
  * @alpha
  */
 function getTracksFromSwitchingSet(
@@ -30,11 +28,9 @@ function getTracksFromSwitchingSet(
  *
  * @param selectionSet - SelectionSet object from HAM
  * @param predicate - Filtering function
- *
  * @returns Track[]
  *
  * @group CMAF
- *
  * @alpha
  */
 function getTracksFromSelectionSet(
@@ -52,11 +48,9 @@ function getTracksFromSelectionSet(
  *
  * @param presentation - Presentation object from HAM
  * @param predicate - Filtering function
- *
  * @returns Track[]
  *
  * @group CMAF
- *
  * @alpha
  */
 function getTracksFromPresentation(
