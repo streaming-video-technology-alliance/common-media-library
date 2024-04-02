@@ -67,8 +67,8 @@
 		"postbuild": "api-extractor run --local",
 		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
 		"build:cjs": "tsc --module commonjs --outDir dist/cjs",
-		"test": "node --no-warnings --loader ts-node/esm --test ./test/cmaf/ham/hls.test.ts",
-		"test:unit": "node --no-warnings --loader ts-node/esm --test ./src/cmaf/test/mapDashToHam.test.ts",
+		"test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
+		"test:unit": "node --no-warnings --loader ts-node/esm --test ./src/**/test/*.test.ts",
 		"prepublishOnly": "npm run build"
 	}
 }
