@@ -52,10 +52,7 @@ function mapHamToHls(presentations: Presentation[]): Manifest {
 						generateManifestPlaylistPiece(track);
 					mainManifest += mainRef;
 					const manifestFileName =
-						track.fileName?.includes('http') ||
-						track.fileName?.includes('https')
-							? `${track.id}.m3u8`
-							: track.fileName ?? `${track.id}.m3u8`;
+						track.fileName ?? `${track.id}.m3u8`;
 					playlists.push({
 						manifest: playlist,
 						type: 'hls',
