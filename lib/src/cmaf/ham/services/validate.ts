@@ -321,7 +321,7 @@ function validateTracks(
  *
  * Validations:
  * - track has id
- * - calls specific audio, video and text validations
+ * - Invokes specific audio, video and text validations
  *
  * @example
  * ```ts
