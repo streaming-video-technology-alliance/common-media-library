@@ -161,7 +161,7 @@ function mapTracks(
 /**
  * @internal
  *
- * Maps SegmentBase from dash to Segment list from ham
+ * Maps SegmentBase from dash to Segment list from ham.
  *
  * @param representation - Representation to get the SegmentBase from
  * @param duration - Duration of the segment
@@ -183,7 +183,7 @@ function mapSegmentBase(
 /**
  * @internal
  *
- * Maps SegmentList from dash to Segment list from ham
+ * Maps SegmentList from dash to Segment list from ham.
  *
  * @param segmentList - SegmentList list from dash
  * @returns list of ham segments
@@ -209,7 +209,7 @@ function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 /**
  * @internal
  *
- * Maps SegmentTemplate from dash to Segment list from ham
+ * Maps SegmentTemplate from dash to Segment list from ham.
  *
  * @param representation - Representation to generate the urls
  * @param duration - Duration of the segments

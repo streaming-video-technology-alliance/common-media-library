@@ -15,9 +15,9 @@ import { MapperContext } from '../../mapper/MapperContext.js';
  * const manifest = cmaf.hlsToHam(hlsManifest);
  * ```
  *
- * @param manifest - String of the Main manifest.
- * @param ancillaryManifests - Ancillary Manifests . Must be in order, first audio, subtitle and video.
- * @returns List of presentations from ham.
+ * @param manifest - String of the Main manifest
+ * @param ancillaryManifests - Ancillary Manifests . Must be in order, first audio, subtitle and video
+ * @returns List of presentations from ham
  *
  * @group CMAF
  * @alpha
@@ -50,8 +50,8 @@ function hlsToHam(
  * const manifest = cmaf.hamToHls(presentations);
  * ```
  *
- * @param presentation - List of presentations from ham.
- * @returns Manifest object containing the Hls manifest as string and its playlists.
+ * @param presentation - List of presentations from ham
+ * @returns Manifest object containing the Hls manifest as string and its playlists
  *
  * @group CMAF
  * @alpha

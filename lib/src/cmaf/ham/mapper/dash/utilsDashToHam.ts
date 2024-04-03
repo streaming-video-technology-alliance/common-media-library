@@ -104,7 +104,7 @@ function getContentType(
 /**
  * @internal
  *
- * Calculates the duration of a segment
+ * Calculates the duration of a segment.
  *
  * segmentDuration = duration / timescale
  *
@@ -224,6 +224,7 @@ function getLanguage(adaptationSet: AdaptationSet): string {
  *
  * Equation used:
  * segments = total duration / (segment duration / timescale)
+ *
  * **This equation might be wrong, please double-check it**
  *
  * @param segmentTemplate - SegmentTemplate object
@@ -261,7 +262,7 @@ function getPresentationId(period: Period, duration: number): string {
 /**
  * @internal
  *
- * Get sample rate (audio)
+ * Get sample rate (audio).
  *
  * @param adaptationSet - AdaptationSet to try to get the sampleRate from
  * @param representation - Representation to try to get the sampleRate from
@@ -329,8 +330,8 @@ function getTrackDuration(segments: Segment[]): number {
  * Create the url from a segment template.
  *
  * Searches for substrings with the format `$value$` and replaces it with the correct value.
- * - RepresentationID: id of the representation.
- * - Number: id of the segment. `%0Xd` defines the number `X` of digits it needs to have.
+ * - RepresentationID: id of the representation
+ * - Number: id of the segment. `%0Xd` defines the number `X` of digits it needs to have
  *
  * @param representation - Representation of the template
  * @param segmentTemplate - Segment template
