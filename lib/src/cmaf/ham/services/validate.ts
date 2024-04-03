@@ -488,7 +488,7 @@ function validateSegment(
  * - track has codec
  *
  * @param videoTrack - Video track to validate
- * @param switchingSetId - Optional: id from the switching set containing the track. Only used for logs.
+ * @param switchingSetId - Optional: id from the switching set containing the track (Only used for logs)
  * @param prevValidation - Optional: validation object from parent previous validate method call
  * @returns Validation object
  * @see Validation
@@ -525,7 +525,7 @@ function _validateVideoTrack(
  * - track has codec
  *
  * @param audioTrack - Audio track to validate
- * @param switchingSetId - Optional: id from the switching set containing the track. Only used for logs.
+ * @param switchingSetId - Optional: id from the switching set containing the track (Only used for logs)
  * @param prevValidation - Optional: validation object from parent previous validate method call
  * @returns Validation object
  * @see Validation
@@ -562,7 +562,7 @@ function _validateAudioTrack(
  * - track has language
  *
  * @param textTrack - Text track to validate
- * @param switchingSetId - Optional: id from the switching set containing the track. Only used for logs.
+ * @param switchingSetId - Optional: id from the switching set containing the track (Only used for logs)
  * @param prevValidation - Optional: validation object from parent previous validate method call
  * @returns Validation object
  * @see Validation
