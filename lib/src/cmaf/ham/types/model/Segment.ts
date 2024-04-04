@@ -2,7 +2,6 @@
  * CMAF-HAM Segment type
  *
  * @group CMAF
- *
  * @alpha
  */
 type Segment = {

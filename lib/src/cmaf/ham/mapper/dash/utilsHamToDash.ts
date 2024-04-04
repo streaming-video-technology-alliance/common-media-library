@@ -8,6 +8,8 @@ import {
 } from '../../../utils/constants.js';
 
 /**
+ * @internal
+ *
  * This function tries to recreate the timescale value.
  *
  * This value is not stored on the ham object, so it is not possible (for now)
@@ -34,6 +36,16 @@ function getTimescale(track: Track): number {
 	return VIDEO_SAMPLE_RATE;
 }
 
+/**
+ * @internal
+ *
+ * Get the framerate from a track.
+ *
+ * If frameRate numerator is not present, it uses 30 as default.
+ *
+ * @param track - to get the framerate from
+ * @returns frame rate as a string formatted as `numerator/denominator`
+ */
 function getFrameRate(track: Track): string | undefined {
 	let frameRate: string | undefined = undefined;
 	if (track?.type === 'video') {

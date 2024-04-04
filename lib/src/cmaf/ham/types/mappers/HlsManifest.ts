@@ -2,7 +2,6 @@
  * HLS Playlist
  *
  * @group CMAF
- *
  * @alpha
  */
 type PlayList = {
@@ -22,7 +21,6 @@ type PlayList = {
  * HLS Media Groups
  *
  * @group CMAF
- *
  * @alpha
  */
 type MediaGroups = {
@@ -48,7 +46,6 @@ type Byterange = { length: number; offset: number };
  * HLS Segments
  *
  * @group CMAF
- *
  * @alpha
  */
 type SegmentHls = {
@@ -67,7 +64,6 @@ type SegmentHls = {
  * HLS manifest
  *
  * @group CMAF
- *
  * @alpha
  */
 type HlsManifest = {

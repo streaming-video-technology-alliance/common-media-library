@@ -15,8 +15,8 @@ import type { Manifest } from '../../types/index.js';
  * const manifest = cmaf.dashToHam(dashManifest);
  * ```
  *
- * @param manifest - String of the XML Dash manifest.
- * @returns List of presentations from ham.
+ * @param manifest - String of the XML Dash manifest
+ * @returns List of presentations from ham
  *
  * @group CMAF
  * @alpha
@@ -40,8 +40,8 @@ function dashToHam(manifest: string): Presentation[] {
  * const manifest = cmaf.hamToDash(presentations);
  * ```
  *
- * @param presentation - List of presentations from ham.
- * @returns Manifest object containing the Dash manifest as string.
+ * @param presentation - List of presentations from ham
+ * @returns Manifest object containing the Dash manifest as string
  *
  * @group CMAF
  * @alpha
