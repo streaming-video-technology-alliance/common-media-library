@@ -20,7 +20,7 @@ function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPiece {
 	const trackFileName = track.fileName ?? `${track.id}.m3u8`;
 
 	let mainRef = '';
-	let playlist = `#EXTM3U\n#EXT-X-TARGETDURATION:${track.duration}\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n`;
+	let playlist = `#EXTM3U\n#EXT-X-TARGETDURATION:${track.duration / track.segments.length}\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n`;
 
 	if (track.type.toLowerCase() === 'video') {
 		const videoTrack = track as VideoTrack;
