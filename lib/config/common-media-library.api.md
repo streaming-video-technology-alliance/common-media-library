@@ -19,6 +19,41 @@ export function base64encode(binary: Uint8Array): string;
 // @beta
 export function canParseId3(data: Uint8Array, offset: number): boolean;
 
+// @public
+export class CaptionScreen {
+    // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
+    constructor(logger: CaptionsLogger);
+    // (undocumented)
+    backSpace(): void;
+    // (undocumented)
+    clearToEndOfRow(): void;
+    // (undocumented)
+    copy(other: CaptionScreen): void;
+    // (undocumented)
+    equals(other: CaptionScreen): boolean;
+    getDisplayText(asOneRow?: boolean): string;
+    // (undocumented)
+    getTextAndFormat(): Row[];
+    insertChar(char: number): void;
+    // (undocumented)
+    isEmpty(): boolean;
+    // (undocumented)
+    moveCursor(relPos: number): void;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    rollUp(): void;
+    setBkgData(bkgData: Partial<PenStyles>): void;
+    // (undocumented)
+    setCursor(absPos: number): void;
+    // (undocumented)
+    setPAC(pacData: PACData): void;
+    // (undocumented)
+    setPen(styles: Partial<PenStyles>): void;
+    // (undocumented)
+    setRollUpRows(nrRows: number | null): void;
+}
+
 // @beta
 export interface Cmcd {
     [index: CmcdCustomKey]: CmcdValue;
@@ -31,12 +66,12 @@ export interface Cmcd {
     mtp?: number;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
+    ot?: CmcdObjectType;
     pr?: number;
     rtp?: number;
-    sf?: CmStreamingFormat;
+    sf?: CmcdStreamingFormat;
     sid?: string;
-    st?: CmStreamType;
+    st?: CmcdStreamType;
     su?: boolean;
     tb?: number;
     v?: number;
@@ -49,7 +84,7 @@ export const CMCD_PARAM = "CMCD";
 export const CMCD_V1 = 1;
 
 // @beta
-export type CmcdCustomKey = CmCustomKey;
+export type CmcdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmcdEncodeOptions {
@@ -87,13 +122,7 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 export type CmcdKey = keyof Cmcd;
 
 // @beta
-export type CmcdValue = CmValue;
-
-// @beta
-export type CmCustomKey = `${string}-${string}`;
-
-// @beta
-enum CmObjectType {
+export enum CmcdObjectType {
     AUDIO = "a",
     CAPTION = "c",
     INIT = "i",
@@ -104,8 +133,28 @@ enum CmObjectType {
     TIMED_TEXT = "tt",
     VIDEO = "v"
 }
-export { CmObjectType as CmcdObjectType }
-export { CmObjectType as CmsdObjectType }
+
+// @beta
+export enum CmcdStreamingFormat {
+    DASH = "d",
+    HLS = "h",
+    OTHER = "o",
+    SMOOTH = "s"
+}
+
+// @beta
+export enum CmcdStreamType {
+    LIVE = "l",
+    VOD = "v"
+}
+
+// @beta
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-internal-missing-underscore) The name "CmCustomKey" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export type CmCustomKey = `${string}-${string}`;
 
 // @beta
 export const CMSD_DYNAMIC = "CMSD-Dynamic";
@@ -117,7 +166,7 @@ export const CMSD_STATIC = "CMSD-Static";
 export const CMSD_V1 = 1;
 
 // @beta
-export type CmsdCustomKey = CmCustomKey;
+export type CmsdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmsdDynamic {
@@ -147,6 +196,19 @@ export enum CmsdHeaderField {
 }
 
 // @beta
+export enum CmsdObjectType {
+    AUDIO = "a",
+    CAPTION = "c",
+    INIT = "i",
+    KEY = "k",
+    MANIFEST = "m",
+    MUXED = "av",
+    OTHER = "o",
+    TIMED_TEXT = "tt",
+    VIDEO = "v"
+}
+
+// @beta
 export interface CmsdStatic {
     [index: CmsdCustomKey]: CmsdValue;
     at?: number;
@@ -156,35 +218,36 @@ export interface CmsdStatic {
     n?: string;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
-    sf?: CmStreamingFormat;
-    st?: CmStreamType;
+    ot?: CmsdObjectType;
+    sf?: CmsdStreamingFormat;
+    st?: CmsdStreamType;
     su?: boolean;
     v?: number;
 }
 
 // @beta
-export type CmsdValue = CmValue;
-
-// @beta
-enum CmStreamingFormat {
+export enum CmsdStreamingFormat {
     DASH = "d",
     HLS = "h",
     OTHER = "o",
     SMOOTH = "s"
 }
-export { CmStreamingFormat as CmcdStreamingFormat }
-export { CmStreamingFormat as CmsdStreamingFormat }
 
 // @beta
-enum CmStreamType {
+export enum CmsdStreamType {
     LIVE = "l",
     VOD = "v"
 }
-export { CmStreamType as CmcdStreamType }
-export { CmStreamType as CmsdStreamType }
 
 // @beta
+export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "CmValue" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
 
 // @beta
@@ -211,6 +274,24 @@ export interface CommonMediaResponse {
     statusText?: string;
     type?: string;
     url?: string;
+}
+
+// @beta
+export class Cta608Parser {
+    constructor(field: SupportedField, out1: any, out2: any);
+    addData(time: number | null, byteList: number[]): void;
+    cueSplitAtTime(t: number): void;
+    reset(): void;
+}
+
+// @public (undocumented)
+export interface CueHandler {
+    // (undocumented)
+    dispatchCue?(): void;
+    // (undocumented)
+    newCue(startTime: number, endTime: number, screen: CaptionScreen): void;
+    // (undocumented)
+    reset?(): void;
 }
 
 // @beta
@@ -262,6 +343,12 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 // @beta
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
+// @public (undocumented)
+export function extractCta608Data(raw: DataView, cea608Range: Array<number>): Array<Array<number>>;
+
+// @public (undocumented)
+export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
+
 // @beta
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
 
@@ -287,6 +374,53 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
+// @public (undocumented)
+export interface PACData {
+    // (undocumented)
+    color: string | null;
+    // (undocumented)
+    indent: number | null;
+    // (undocumented)
+    italics: boolean;
+    // (undocumented)
+    row: number;
+    // (undocumented)
+    underline: boolean;
+}
+
+// @public (undocumented)
+export class PenState {
+    // (undocumented)
+    background: string;
+    // (undocumented)
+    copy(newPenState: PenState): void;
+    // (undocumented)
+    equals(other: PenState): boolean;
+    // (undocumented)
+    flash: boolean;
+    // (undocumented)
+    foreground: string;
+    // (undocumented)
+    isDefault(): boolean;
+    // (undocumented)
+    italics: boolean;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setStyles(styles: Partial<PenStyles>): void;
+    // (undocumented)
+    underline: boolean;
+}
+
+// @public (undocumented)
+export type PenStyles = {
+    foreground: string | null;
+    underline: boolean;
+    italics: boolean;
+    background: string;
+    flash: boolean;
+};
+
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
@@ -309,6 +443,36 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
+
+// @public
+export class Row {
+    constructor(logger: CaptionsLogger);
+    backSpace(): void;
+    // (undocumented)
+    chars: StyledUnicodeChar[];
+    // (undocumented)
+    clear(): void;
+    // (undocumented)
+    clearFromPos(startPos: number): void;
+    // (undocumented)
+    clearToEndOfRow(): void;
+    // (undocumented)
+    copy(other: Row): void;
+    // (undocumented)
+    cueStartTime: number | null;
+    // (undocumented)
+    equals(other: Row): boolean;
+    // (undocumented)
+    getTextString(): string;
+    // (undocumented)
+    insertChar(byte: number): void;
+    // (undocumented)
+    isEmpty(): boolean;
+    moveCursor(relPos: number): void;
+    setCursor(absPos: number): void;
+    // (undocumented)
+    setPenStyles(styles: Partial<PenStyles>): void;
+}
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
@@ -353,6 +517,29 @@ export class SfToken {
     // (undocumented)
     description: string;
 }
+
+// @public
+export class StyledUnicodeChar {
+    // (undocumented)
+    copy(newChar: StyledUnicodeChar): void;
+    // (undocumented)
+    equals(other: StyledUnicodeChar): boolean;
+    // (undocumented)
+    isEmpty(): boolean;
+    // (undocumented)
+    penState: PenState;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setChar(uchar: string, newPenState: PenState): void;
+    // (undocumented)
+    setPenState(newPenState: PenState): void;
+    // (undocumented)
+    uchar: string;
+}
+
+// @public (undocumented)
+export type SupportedField = 1 | 3;
 
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};
