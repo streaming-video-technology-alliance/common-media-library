@@ -1,15 +1,15 @@
-import { CaptionScreen, CaptionsLogger, Cea608Channel } from '@svta/common-media-library';
+import { CaptionScreen, CaptionsLogger, Cta608Channel } from '@svta/common-media-library';
 import { deepEqual, equal } from 'node:assert';
-import { describe, it, beforeEach } from 'node:test';
+import { beforeEach, describe, it } from 'node:test';
 
 describe('Cea608Channel Tests', () => {
 	const channelNumber = 1;
 	const outputFilter = { OutputFilter: 'myOutputFilter' };
 	const captionsLogger = new CaptionsLogger();
-	let channel: Cea608Channel;
+	let channel: Cta608Channel;
 
 	beforeEach(() => {
-		channel = new Cea608Channel(channelNumber, outputFilter, captionsLogger);
+		channel = new Cta608Channel(channelNumber, outputFilter, captionsLogger);
 	});
 
 	it('Create channel correctly', () => {

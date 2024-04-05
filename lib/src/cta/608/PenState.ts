@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { PenStyles } from "./PenStyles.js";
+import { PenStyles } from './PenStyles.js';
 
 export class PenState {
 	public foreground: string = 'white';
@@ -95,20 +95,5 @@ export class PenState {
 		this.italics = newPenState.italics;
 		this.background = newPenState.background;
 		this.flash = newPenState.flash;
-	}
-
-	toString(): string {
-		return (
-			'color=' +
-			this.foreground +
-			', underline=' +
-			this.underline +
-			', italics=' +
-			this.italics +
-			', background=' +
-			this.background +
-			', flash=' +
-			this.flash
-		);
 	}
 }

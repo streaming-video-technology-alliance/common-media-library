@@ -38,11 +38,11 @@
 
 import { CaptionsLogger } from './CaptionsLogger.js';
 import { PenState } from './PenState.js';
-import { PenStyles } from "./PenStyles.js";
+import { PenStyles } from './PenStyles.js';
 import { StyledUnicodeChar } from './StyledUnicodeChar.js';
-import { NR_COLS } from "./utils/NR_COLS.js";
-import { VerboseLevel } from "./utils/VerboseLevel.js";
-import { getCharForByte } from "./utils/getCharForByte.js";
+import { NR_COLS } from './utils/NR_COLS.js';
+import { VerboseLevel } from './utils/VerboseLevel.js';
+import { getCharForByte } from './utils/getCharForByte.js';
 
 /**
  * CEA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
@@ -50,8 +50,8 @@ import { getCharForByte } from "./utils/getCharForByte.js";
  */
 export class Row {
 	public chars: StyledUnicodeChar[] = [];
-	public pos: number = 0;
-	public currPenState: PenState = new PenState();
+	private pos: number = 0;
+	private currPenState: PenState = new PenState();
 	public cueStartTime: number | null = null;
 	private logger: CaptionsLogger;
 

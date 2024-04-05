@@ -17,7 +17,7 @@ describe('PenState Tests', () => {
 		penState.italics = true;
 		penState.background = 'white';
 		penState.flash = true;
-	
+
 		notDeepEqual(defaultPenState, penState);
 
 		penState.reset();
@@ -88,12 +88,6 @@ describe('PenState Tests', () => {
 
 		penState.copy(auxPenState);
 		equal(penState.equals(auxPenState), true);
-	});
-
-	it('toString function', () => {
-		const penStateString = penState.toString();
-		const penStateStringExpected = 'color=white, underline=false, italics=false, background=black, flash=false';
-		equal(penStateString, penStateStringExpected);
 	});
 
 });

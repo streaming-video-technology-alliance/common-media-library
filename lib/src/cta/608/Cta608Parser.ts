@@ -37,29 +37,35 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.js';
-import { Channels } from "./Channels.js";
+import { Channels } from './Channels.js';
 import type { CmdHistory } from './CmdHistory.js';
 import { Cta608Channel } from './Cta608Channel.js';
-import { PACData } from "./PACData.js";
-import { PenStyles } from "./PenStyles.js";
-import { SupportedField } from "./SupportedField.js";
-import { VerboseLevel } from "./utils/VerboseLevel.js";
-import { backgroundColors } from "./utils/backgroundColors.js";
+import { PACData } from './PACData.js';
+import { PenStyles } from './PenStyles.js';
+import { SupportedField } from './SupportedField.js';
+import { VerboseLevel } from './utils/VerboseLevel.js';
+import { backgroundColors } from './utils/backgroundColors.js';
 import { createCmdHistory } from './utils/createCmdHistory.js';
-import { getCharForByte } from "./utils/getCharForByte.js";
-import { hasCmdRepeated } from "./utils/hasCmdRepeated.js";
-import { numArrayToHexArray } from "./utils/numArrayToHexArray.js";
-import { rowsHighCh1 } from "./utils/rowsHighCh1.js";
-import { rowsHighCh2 } from "./utils/rowsHighCh2.js";
-import { rowsLowCh1 } from "./utils/rowsLowCh1.js";
-import { rowsLowCh2 } from "./utils/rowsLowCh2.js";
-import { setLastCmd } from "./utils/setLastCmd.js";
+import { getCharForByte } from './utils/getCharForByte.js';
+import { hasCmdRepeated } from './utils/hasCmdRepeated.js';
+import { numArrayToHexArray } from './utils/numArrayToHexArray.js';
+import { rowsHighCh1 } from './utils/rowsHighCh1.js';
+import { rowsHighCh2 } from './utils/rowsHighCh2.js';
+import { rowsLowCh1 } from './utils/rowsLowCh1.js';
+import { rowsLowCh2 } from './utils/rowsLowCh2.js';
+import { setLastCmd } from './utils/setLastCmd.js';
 
+/**
+ * CEA-608 caption parser.
+ *
+ * @group CTA-608
+ * @beta
+ */
 export class Cta608Parser {
-	channels: Array<Cta608Channel | null>;
-	currentChannel: Channels = 0;
-	cmdHistory: CmdHistory = createCmdHistory();
-	logger: CaptionsLogger;
+	private channels: Array<Cta608Channel | null>;
+	private currentChannel: Channels = 0;
+	private cmdHistory: CmdHistory = createCmdHistory();
+	private logger: CaptionsLogger;
 
 	constructor(field: SupportedField, out1: any, out2: any) {
 		const logger = (this.logger = new CaptionsLogger());
@@ -70,18 +76,13 @@ export class Cta608Parser {
 		];
 	}
 
-	getHandler(channel: number) {
-		return (this.channels[channel] as Cta608Channel).getHandler();
-	}
-
-	setHandler(channel: number, newHandler: any) {
-		(this.channels[channel] as Cta608Channel).setHandler(newHandler);
-	}
-
 	/**
 	 * Add data for time t in forms of list of bytes (unsigned ints). The bytes are treated as pairs.
+	 *
+	 * @param time - The time in milliseconds
+	 * @param byteList - The list of bytes
 	 */
-	addData(time: number | null, byteList: number[]) {
+	addData(time: number | null, byteList: number[]): void {
 		let cmdFound: boolean;
 		let a: number;
 		let b: number;
@@ -121,7 +122,7 @@ export class Cta608Parser {
 
 			if (!cmdFound) {
 				charsFound = this.parseChars(a, b);
-				if (charsFound) {
+				if (charsFound.length) {
 					const currChNr = this.currentChannel;
 					if (currChNr && currChNr > 0) {
 						const channel = this.channels[currChNr] as Cta608Channel;
@@ -149,9 +150,12 @@ export class Cta608Parser {
 
 	/**
 	 * Parse Command.
+	 *
+	 * @param a - The first byte
+	 * @param b - The second byte
 	 * @returns True if a command was found
 	 */
-	parseCmd(a: number, b: number): boolean {
+	private parseCmd(a: number, b: number): boolean {
 		const { cmdHistory } = this;
 		const cond1 =
 			(a === 0x14 || a === 0x1c || a === 0x15 || a === 0x1d) &&
@@ -235,8 +239,12 @@ export class Cta608Parser {
 
 	/**
 	 * Parse midrow styling command
+	 *
+	 * @param a - The first byte
+	 * @param b - The second byte
+	 * @returns `true` if midrow styling command was found
 	 */
-	parseMidrow(a: number, b: number): boolean {
+	private parseMidrow(a: number, b: number): boolean {
 		let chNr: number = 0;
 
 		if ((a === 0x11 || a === 0x19) && b >= 0x20 && b <= 0x2f) {
@@ -270,9 +278,12 @@ export class Cta608Parser {
 
 	/**
 	 * Parse Preable Access Codes (Table 53).
+	 *
+	 * @param a - The first byte
+	 * @param b - The second byte
 	 * @returns A Boolean that tells if PAC found
 	 */
-	parsePAC(a: number, b: number): boolean {
+	private parsePAC(a: number, b: number): boolean {
 		let row: number;
 		const cmdHistory = this.cmdHistory;
 
@@ -311,9 +322,12 @@ export class Cta608Parser {
 
 	/**
 	 * Interpret the second byte of the pac, and return the information.
+	 *
+	 * @param row - The row number
+	 * @param byte - The second byte
 	 * @returns pacData with style parameters
 	 */
-	interpretPAC(row: number, byte: number): PACData {
+	private interpretPAC(row: number, byte: number): PACData {
 		let pacIndex;
 		const pacData: PACData = {
 			color: null,
@@ -355,11 +369,14 @@ export class Cta608Parser {
 
 	/**
 	 * Parse characters.
+	 *
+	 * @param a - The first byte
+	 * @param b - The second byte
 	 * @returns An array with 1 to 2 codes corresponding to chars, if found. null otherwise.
 	 */
-	parseChars(a: number, b: number): number[] | null {
+	private parseChars(a: number, b: number): number[] {
 		let channelNr: Channels;
-		let charCodes: number[] | null = null;
+		let charCodes: number[] = [];
 		let charCode1: number | null = null;
 
 		if (a >= 0x19) {
@@ -408,9 +425,12 @@ export class Cta608Parser {
 
 	/**
 	 * Parse extended background attributes as well as new foreground color black.
+	 *
+	 * @param a - The first byte
+	 * @param b - The second byte
 	 * @returns True if background attributes are found
 	 */
-	parseBackgroundAttributes(a: number, b: number): boolean {
+	private parseBackgroundAttributes(a: number, b: number): boolean {
 		const case1 = (a === 0x10 || a === 0x18) && b >= 0x20 && b <= 0x2f;
 		const case2 = (a === 0x17 || a === 0x1f) && b >= 0x2d && b <= 0x2f;
 		if (!(case1 || case2)) {
@@ -444,7 +464,7 @@ export class Cta608Parser {
 	/**
 	 * Reset state of parser and its channels.
 	 */
-	reset() {
+	reset(): void {
 		for (let i = 0; i < Object.keys(this.channels).length; i++) {
 			const channel = this.channels[i];
 			if (channel) {
@@ -457,7 +477,7 @@ export class Cta608Parser {
 	/**
 	 * Trigger the generation of a cue, and the start of a new one if displayScreens are not empty.
 	 */
-	cueSplitAtTime(t: number) {
+	cueSplitAtTime(t: number): void {
 		for (let i = 0; i < this.channels.length; i++) {
 			const channel = this.channels[i];
 			if (channel) {
