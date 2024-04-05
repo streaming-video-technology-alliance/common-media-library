@@ -10,7 +10,7 @@ function view<T extends ArrayBufferView>(
 	data: BufferSource,
 	offset: number,
 	length: number,
-	Type: { new (buffer: ArrayBuffer, byteOffset: number, length: number): T }
+	Type: { new(buffer: ArrayBuffer, byteOffset: number, length: number): T }
 ): T {
 	const buffer = unsafeGetArrayBuffer(data);
 	let bytesPerElement: any = 1;

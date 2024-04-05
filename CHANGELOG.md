@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- CEA608/708 parser [#75](https://github.com/streaming-video-technology-alliance/common-media-library/pull/75)
+
 
 ## [0.6.4] - 2024-03-04
 
