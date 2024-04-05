@@ -1,21 +1,13 @@
-import { Cea608Parser } from '@svta/common-media-library';
+import { Cta608Parser, PACData } from '@svta/common-media-library';
 import { deepEqual, equal } from 'node:assert';
-import { describe, it, beforeEach, mock } from 'node:test';
-
-interface PACData {
-    row: number;
-    indent: number | null;
-    color: string | null;
-    underline: boolean;
-    italics: boolean;
-  }
+import { beforeEach, describe, it, mock } from 'node:test';
 
 describe('Cea608Parser Tests', () => {
 
-	let parser: Cea608Parser;
+	let parser: Cta608Parser;
 
 	beforeEach(() => {
-		parser = new Cea608Parser(1, null, null);
+		parser = new Cta608Parser(1, null, null);
 	});
 
 	it('adds data correctly, parseCmd', () => {
@@ -29,7 +21,7 @@ describe('Cea608Parser Tests', () => {
 		const parseChars = mock.method(parser, 'parseChars');
 
 		parser.addData(time, byteList);
-        
+
 		equal(parseMidrow.mock.calls.length, 0);
 		equal(parsePAC.mock.calls.length, 0);
 		equal(parseBackgroundAttributes.mock.calls.length, 0);
@@ -47,7 +39,7 @@ describe('Cea608Parser Tests', () => {
 		const parseChars = mock.method(parser, 'parseChars');
 
 		parser.addData(time, byteList);
-        
+
 		equal(parseCmd.mock.calls.length, 1);
 		equal(parsePAC.mock.calls.length, 0);
 		equal(parseBackgroundAttributes.mock.calls.length, 0);
@@ -65,7 +57,7 @@ describe('Cea608Parser Tests', () => {
 		const parseChars = mock.method(parser, 'parseChars');
 
 		parser.addData(time, byteList);
-        
+
 		equal(parseCmd.mock.calls.length, 1);
 		equal(parseMidrow.mock.calls.length, 1);
 		equal(parsePAC.mock.calls.length, 1);
@@ -84,7 +76,7 @@ describe('Cea608Parser Tests', () => {
 		const parseChars = mock.method(parser, 'parseChars');
 
 		parser.addData(time, byteList);
-        
+
 		equal(parseCmd.mock.calls.length, 1);
 		equal(parseMidrow.mock.calls.length, 1);
 		equal(parsePAC.mock.calls.length, 1);
@@ -103,7 +95,7 @@ describe('Cea608Parser Tests', () => {
 		const parseChars = mock.method(parser, 'parseChars', () => true);
 
 		parser.addData(time, byteList);
-        
+
 		equal(parseCmd.mock.calls.length, 1);
 		equal(parseMidrow.mock.calls.length, 1);
 		equal(parsePAC.mock.calls.length, 1);
@@ -128,7 +120,7 @@ describe('Cea608Parser Tests', () => {
 			underline: false,
 			row: row,
 		};
-        
+
 		deepEqual(parser.interpretPAC(row, byteToChangeIndent), defaultPacData);
 	});
 
@@ -143,7 +135,7 @@ describe('Cea608Parser Tests', () => {
 			underline: true,
 			row: row,
 		};
-        
+
 		deepEqual(parser.interpretPAC(row, byteToUnderlineStyles), pacDataUnderline);
 	});
 });

@@ -21,6 +21,7 @@ export function canParseId3(data: Uint8Array, offset: number): boolean;
 
 // @public
 export class CaptionScreen {
+    // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
     constructor(logger: CaptionsLogger);
     // (undocumented)
     backSpace(): void;
@@ -28,8 +29,6 @@ export class CaptionScreen {
     clearToEndOfRow(): void;
     // (undocumented)
     copy(other: CaptionScreen): void;
-    // (undocumented)
-    currRow: number;
     // (undocumented)
     equals(other: CaptionScreen): boolean;
     getDisplayText(asOneRow?: boolean): string;
@@ -39,155 +38,20 @@ export class CaptionScreen {
     // (undocumented)
     isEmpty(): boolean;
     // (undocumented)
-    lastOutputScreen: CaptionScreen | null;
-    // (undocumented)
-    logger: CaptionsLogger;
-    // (undocumented)
     moveCursor(relPos: number): void;
-    // (undocumented)
-    nrRollUpRows: number | null;
     // (undocumented)
     reset(): void;
     // (undocumented)
     rollUp(): void;
-    // (undocumented)
-    rows: Row[];
     setBkgData(bkgData: Partial<PenStyles>): void;
     // (undocumented)
     setCursor(absPos: number): void;
-    // Warning: (ae-forgotten-export) The symbol "PACData" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     setPAC(pacData: PACData): void;
-    // Warning: (ae-forgotten-export) The symbol "PenStyles" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     setPen(styles: Partial<PenStyles>): void;
     // (undocumented)
     setRollUpRows(nrRows: number | null): void;
-}
-
-// @public
-export class CaptionsLogger {
-    // (undocumented)
-    log(severity: VerboseLevel, msg: string | (() => string)): void;
-    // (undocumented)
-    time: number | null;
-    // Warning: (ae-forgotten-export) The symbol "VerboseLevel" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    verboseLevel: VerboseLevel;
-}
-
-// @public
-export class Cea608Channel {
-    constructor(channelNumber: number, outputFilter: any,
-    logger: CaptionsLogger);
-    // (undocumented)
-    ccAOF(): void;
-    // (undocumented)
-    ccAON(): void;
-    // (undocumented)
-    ccBS(): void;
-    // (undocumented)
-    ccCR(): void;
-    // (undocumented)
-    ccDER(): void;
-    // (undocumented)
-    ccEDM(): void;
-    // (undocumented)
-    ccENM(): void;
-    // (undocumented)
-    ccEOC(): void;
-    // (undocumented)
-    ccFON(): void;
-    // (undocumented)
-    ccMIDROW(secondByte: number): void;
-    // (undocumented)
-    ccRCL(): void;
-    // (undocumented)
-    ccRDC(): void;
-    // (undocumented)
-    ccRTD(): void;
-    // (undocumented)
-    ccRU(nrRows: number | null): void;
-    // (undocumented)
-    ccTO(nrCols: number): void;
-    // (undocumented)
-    ccTR(): void;
-    // (undocumented)
-    chNr: number;
-    // (undocumented)
-    cueSplitAtTime(t: number): void;
-    // (undocumented)
-    cueStartTime: number | null;
-    // (undocumented)
-    currRollUpRow: Row;
-    // (undocumented)
-    displayedMemory: CaptionScreen;
-    // (undocumented)
-    getHandler(): any;
-    // (undocumented)
-    insertChars(chars: number[]): void;
-    // (undocumented)
-    lastOutputScreen: CaptionScreen;
-    // (undocumented)
-    logger: CaptionsLogger;
-    // Warning: (ae-forgotten-export) The symbol "CaptionModes" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    mode: CaptionModes;
-    // (undocumented)
-    nonDisplayedMemory: CaptionScreen;
-    // (undocumented)
-    outputDataUpdate(dispatch?: boolean): void;
-    // (undocumented)
-    outputFilter: any;
-    // (undocumented)
-    reset(): void;
-    // (undocumented)
-    setBkgData(bkgData: Partial<PenStyles>): void;
-    // (undocumented)
-    setHandler(newHandler: any): void;
-    // (undocumented)
-    setMode(newMode: CaptionModes): void;
-    // (undocumented)
-    setPAC(pacData: PACData): void;
-    // (undocumented)
-    verbose: number;
-    // (undocumented)
-    writeScreen: CaptionScreen;
-}
-
-// @public
-export class Cea608Parser {
-    // Warning: (ae-forgotten-export) The symbol "SupportedField" needs to be exported by the entry point index.d.ts
-    constructor(field: SupportedField, out1: any, out2: any);
-    addData(time: number | null, byteList: number[]): void;
-    // (undocumented)
-    channels: Array<Cea608Channel | null>;
-    // Warning: (ae-forgotten-export) The symbol "CmdHistory" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    cmdHistory: CmdHistory;
-    cueSplitAtTime(t: number): void;
-    // Warning: (ae-forgotten-export) The symbol "Channels" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    currentChannel: Channels;
-    // (undocumented)
-    getHandler(channel: number): any;
-    interpretPAC(row: number, byte: number): PACData;
-    // (undocumented)
-    logger: CaptionsLogger;
-    parseBackgroundAttributes(a: number, b: number): boolean;
-    parseChars(a: number, b: number): number[] | null;
-    parseCmd(a: number, b: number): boolean;
-    parseMidrow(a: number, b: number): boolean;
-    parsePAC(a: number, b: number): boolean;
-    reset(): void;
-    // (undocumented)
-    setHandler(channel: number, newHandler: any): void;
 }
 
 // @beta
@@ -202,12 +66,12 @@ export interface Cmcd {
     mtp?: number;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
+    ot?: CmcdObjectType;
     pr?: number;
     rtp?: number;
-    sf?: CmStreamingFormat;
+    sf?: CmcdStreamingFormat;
     sid?: string;
-    st?: CmStreamType;
+    st?: CmcdStreamType;
     su?: boolean;
     tb?: number;
     v?: number;
@@ -220,7 +84,7 @@ export const CMCD_PARAM = "CMCD";
 export const CMCD_V1 = 1;
 
 // @beta
-export type CmcdCustomKey = CmCustomKey;
+export type CmcdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmcdEncodeOptions {
@@ -258,13 +122,7 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 export type CmcdKey = keyof Cmcd;
 
 // @beta
-export type CmcdValue = CmValue;
-
-// @beta
-export type CmCustomKey = `${string}-${string}`;
-
-// @beta
-enum CmObjectType {
+export enum CmcdObjectType {
     AUDIO = "a",
     CAPTION = "c",
     INIT = "i",
@@ -275,8 +133,28 @@ enum CmObjectType {
     TIMED_TEXT = "tt",
     VIDEO = "v"
 }
-export { CmObjectType as CmcdObjectType }
-export { CmObjectType as CmsdObjectType }
+
+// @beta
+export enum CmcdStreamingFormat {
+    DASH = "d",
+    HLS = "h",
+    OTHER = "o",
+    SMOOTH = "s"
+}
+
+// @beta
+export enum CmcdStreamType {
+    LIVE = "l",
+    VOD = "v"
+}
+
+// @beta
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-internal-missing-underscore) The name "CmCustomKey" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export type CmCustomKey = `${string}-${string}`;
 
 // @beta
 export const CMSD_DYNAMIC = "CMSD-Dynamic";
@@ -288,7 +166,7 @@ export const CMSD_STATIC = "CMSD-Static";
 export const CMSD_V1 = 1;
 
 // @beta
-export type CmsdCustomKey = CmCustomKey;
+export type CmsdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmsdDynamic {
@@ -318,6 +196,19 @@ export enum CmsdHeaderField {
 }
 
 // @beta
+export enum CmsdObjectType {
+    AUDIO = "a",
+    CAPTION = "c",
+    INIT = "i",
+    KEY = "k",
+    MANIFEST = "m",
+    MUXED = "av",
+    OTHER = "o",
+    TIMED_TEXT = "tt",
+    VIDEO = "v"
+}
+
+// @beta
 export interface CmsdStatic {
     [index: CmsdCustomKey]: CmsdValue;
     at?: number;
@@ -327,35 +218,36 @@ export interface CmsdStatic {
     n?: string;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
-    sf?: CmStreamingFormat;
-    st?: CmStreamType;
+    ot?: CmsdObjectType;
+    sf?: CmsdStreamingFormat;
+    st?: CmsdStreamType;
     su?: boolean;
     v?: number;
 }
 
 // @beta
-export type CmsdValue = CmValue;
-
-// @beta
-enum CmStreamingFormat {
+export enum CmsdStreamingFormat {
     DASH = "d",
     HLS = "h",
     OTHER = "o",
     SMOOTH = "s"
 }
-export { CmStreamingFormat as CmcdStreamingFormat }
-export { CmStreamingFormat as CmsdStreamingFormat }
 
 // @beta
-enum CmStreamType {
+export enum CmsdStreamType {
     LIVE = "l",
     VOD = "v"
 }
-export { CmStreamType as CmcdStreamType }
-export { CmStreamType as CmsdStreamType }
 
 // @beta
+export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "CmValue" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
 
 // @beta
@@ -382,6 +274,24 @@ export interface CommonMediaResponse {
     statusText?: string;
     type?: string;
     url?: string;
+}
+
+// @beta
+export class Cta608Parser {
+    constructor(field: SupportedField, out1: any, out2: any);
+    addData(time: number | null, byteList: number[]): void;
+    cueSplitAtTime(t: number): void;
+    reset(): void;
+}
+
+// @public (undocumented)
+export interface CueHandler {
+    // (undocumented)
+    dispatchCue?(): void;
+    // (undocumented)
+    newCue(startTime: number, endTime: number, screen: CaptionScreen): void;
+    // (undocumented)
+    reset?(): void;
 }
 
 // @beta
@@ -433,6 +343,12 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 // @beta
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
+// @public (undocumented)
+export function extractCta608Data(raw: DataView, cea608Range: Array<number>): Array<Array<number>>;
+
+// @public (undocumented)
+export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
+
 // @beta
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
 
@@ -458,7 +374,21 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
-// @public
+// @public (undocumented)
+export interface PACData {
+    // (undocumented)
+    color: string | null;
+    // (undocumented)
+    indent: number | null;
+    // (undocumented)
+    italics: boolean;
+    // (undocumented)
+    row: number;
+    // (undocumented)
+    underline: boolean;
+}
+
+// @public (undocumented)
 export class PenState {
     // (undocumented)
     background: string;
@@ -479,10 +409,17 @@ export class PenState {
     // (undocumented)
     setStyles(styles: Partial<PenStyles>): void;
     // (undocumented)
-    toString(): string;
-    // (undocumented)
     underline: boolean;
 }
+
+// @public (undocumented)
+export type PenStyles = {
+    foreground: string | null;
+    underline: boolean;
+    italics: boolean;
+    background: string;
+    flash: boolean;
+};
 
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
@@ -524,8 +461,6 @@ export class Row {
     // (undocumented)
     cueStartTime: number | null;
     // (undocumented)
-    currPenState: PenState;
-    // (undocumented)
     equals(other: Row): boolean;
     // (undocumented)
     getTextString(): string;
@@ -534,8 +469,6 @@ export class Row {
     // (undocumented)
     isEmpty(): boolean;
     moveCursor(relPos: number): void;
-    // (undocumented)
-    pos: number;
     setCursor(absPos: number): void;
     // (undocumented)
     setPenStyles(styles: Partial<PenStyles>): void;
@@ -604,6 +537,9 @@ export class StyledUnicodeChar {
     // (undocumented)
     uchar: string;
 }
+
+// @public (undocumented)
+export type SupportedField = 1 | 3;
 
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};

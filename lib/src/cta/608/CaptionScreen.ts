@@ -37,22 +37,22 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.js';
-import { PACData } from "./PACData.js";
-import { PenStyles } from "./PenStyles.js";
+import { PACData } from './PACData.js';
+import { PenStyles } from './PenStyles.js';
 import { Row } from './Row.js';
-import { NR_ROWS } from "./utils/NR_ROWS.js";
-import { VerboseLevel } from "./utils/VerboseLevel.js";
+import { NR_ROWS } from './utils/NR_ROWS.js';
+import { VerboseLevel } from './utils/VerboseLevel.js';
 
 /**
  * Keep a CEA-608 screen of 32x15 styled characters
  * @constructor
  */
 export class CaptionScreen {
-	rows: Row[] = [];
-	currRow: number = NR_ROWS - 1;
-	nrRollUpRows: number | null = null;
-	lastOutputScreen: CaptionScreen | null = null;
-	logger: CaptionsLogger;
+	private rows: Row[] = [];
+	private currRow: number = NR_ROWS - 1;
+	private nrRollUpRows: number | null = null;
+	private lastOutputScreen: CaptionScreen | null = null;
+	private logger: CaptionsLogger;
 
 	constructor(logger: CaptionsLogger) {
 		for (let i = 0; i < NR_ROWS; i++) {
@@ -61,7 +61,7 @@ export class CaptionScreen {
 		this.logger = logger;
 	}
 
-	reset() {
+	reset(): void {
 		for (let i = 0; i < NR_ROWS; i++) {
 			this.rows[i].clear();
 		}
@@ -79,7 +79,7 @@ export class CaptionScreen {
 		return equal;
 	}
 
-	copy(other: CaptionScreen) {
+	copy(other: CaptionScreen): void {
 		for (let i = 0; i < NR_ROWS; i++) {
 			this.rows[i].copy(other.rows[i]);
 		}
@@ -96,12 +96,12 @@ export class CaptionScreen {
 		return empty;
 	}
 
-	backSpace() {
+	backSpace(): void {
 		const row = this.rows[this.currRow];
 		row.backSpace();
 	}
 
-	clearToEndOfRow() {
+	clearToEndOfRow(): void {
 		const row = this.rows[this.currRow];
 		row.clearToEndOfRow();
 	}
@@ -109,28 +109,28 @@ export class CaptionScreen {
 	/**
 	 * Insert a character (without styling) in the current row.
 	 */
-	insertChar(char: number) {
+	insertChar(char: number): void {
 		const row = this.rows[this.currRow];
 		row.insertChar(char);
 	}
 
-	setPen(styles: Partial<PenStyles>) {
+	setPen(styles: Partial<PenStyles>): void {
 		const row = this.rows[this.currRow];
 		row.setPenStyles(styles);
 	}
 
-	moveCursor(relPos: number) {
+	moveCursor(relPos: number): void {
 		const row = this.rows[this.currRow];
 		row.moveCursor(relPos);
 	}
 
-	setCursor(absPos: number) {
+	setCursor(absPos: number): void {
 		this.logger.log(VerboseLevel.INFO, 'setCursor: ' + absPos);
 		const row = this.rows[this.currRow];
 		row.setCursor(absPos);
 	}
 
-	setPAC(pacData: PACData) {
+	setPAC(pacData: PACData): void {
 		this.logger.log(
 			VerboseLevel.INFO,
 			() => 'pacData = ' + JSON.stringify(pacData),
@@ -187,7 +187,7 @@ export class CaptionScreen {
 	/**
 	 * Set background/extra foreground, but first do back_space, and then insert space (backwards compatibility).
 	 */
-	setBkgData(bkgData: Partial<PenStyles>) {
+	setBkgData(bkgData: Partial<PenStyles>): void {
 		this.logger.log(
 			VerboseLevel.INFO,
 			() => 'bkgData = ' + JSON.stringify(bkgData),
@@ -197,11 +197,11 @@ export class CaptionScreen {
 		this.insertChar(0x20); // Space
 	}
 
-	setRollUpRows(nrRows: number | null) {
+	setRollUpRows(nrRows: number | null): void {
 		this.nrRollUpRows = nrRows;
 	}
 
-	rollUp() {
+	rollUp(): void {
 		if (this.nrRollUpRows === null) {
 			this.logger.log(
 				VerboseLevel.DEBUG,
@@ -220,7 +220,7 @@ export class CaptionScreen {
 	/**
 	 * Get all non-empty rows with as unicode text.
 	 */
-	getDisplayText(asOneRow?: boolean) {
+	getDisplayText(asOneRow?: boolean): string {
 		asOneRow = asOneRow || false;
 		const displayText: string[] = [];
 		let text = '';
@@ -248,7 +248,7 @@ export class CaptionScreen {
 		return text;
 	}
 
-	getTextAndFormat() {
+	getTextAndFormat(): Row[] {
 		return this.rows;
 	}
 }
