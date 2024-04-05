@@ -36,45 +36,42 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CaptionModes } from "./CaptionModes.js";
+import { CaptionModes } from './CaptionModes.js';
 import { CaptionScreen } from './CaptionScreen.js';
 import { CaptionsLogger } from './CaptionsLogger.js';
-import { PACData } from "./PACData.js";
-import { PenStyles } from "./PenStyles.js";
-import { Row } from './Row.js';
-import { NR_ROWS } from "./utils/NR_ROWS.js";
-import { VerboseLevel } from "./utils/VerboseLevel.js";
+import type { CueHandler } from './CueHandler.js';
+import { PACData } from './PACData.js';
+import { PenStyles } from './PenStyles.js';
+import { VerboseLevel } from './utils/VerboseLevel.js';
 
 export class Cta608Channel {
-	chNr: number;
-	outputFilter: any;
-	mode: CaptionModes;
-	verbose: number;
-	displayedMemory: CaptionScreen;
-	nonDisplayedMemory: CaptionScreen;
-	lastOutputScreen: CaptionScreen;
-	currRollUpRow: Row;
-	writeScreen: CaptionScreen;
-	cueStartTime: number | null;
-	logger: CaptionsLogger;
+	private chNr: number;
+	private outputFilter: CueHandler;
+	private mode: CaptionModes;
+	private displayedMemory: CaptionScreen;
+	private nonDisplayedMemory: CaptionScreen;
+	private lastOutputScreen: CaptionScreen;
+	private writeScreen: CaptionScreen;
+	private cueStartTime: number | null;
+	private logger: CaptionsLogger;
 
 	constructor(
 		channelNumber: number,
-		outputFilter: any,
+		outputFilter: CueHandler,
 		logger: CaptionsLogger,
 	) {
 		this.chNr = channelNumber;
 		this.outputFilter = outputFilter;
 		this.mode = null;
-		this.verbose = 0;
 		this.displayedMemory = new CaptionScreen(logger);
 		this.nonDisplayedMemory = new CaptionScreen(logger);
 		this.lastOutputScreen = new CaptionScreen(logger);
-		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1];
 		this.writeScreen = this.displayedMemory;
 		this.mode = null;
 		this.cueStartTime = null; // Keeps track of where a cue started.
 		this.logger = logger;
+
+		this.logger.log(VerboseLevel.INFO, 'new Cea608Channel(' + this.chNr + ')');
 	}
 
 	reset() {
@@ -83,18 +80,9 @@ export class Cta608Channel {
 		this.nonDisplayedMemory.reset();
 		this.lastOutputScreen.reset();
 		this.outputFilter?.reset?.();
-		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1];
 		this.writeScreen = this.displayedMemory;
 		this.mode = null;
 		this.cueStartTime = null;
-	}
-
-	getHandler(): any {
-		return this.outputFilter;
-	}
-
-	setHandler(newHandler: any) {
-		this.outputFilter = newHandler;
 	}
 
 	setPAC(pacData: PACData) {
@@ -120,8 +108,8 @@ export class Cta608Channel {
 			this.writeScreen.reset();
 		}
 		if (this.mode !== 'MODE_ROLL-UP') {
-			this.displayedMemory.nrRollUpRows = null;
-			this.nonDisplayedMemory.nrRollUpRows = null;
+			this.displayedMemory.setRollUpRows(null);
+			this.nonDisplayedMemory.setRollUpRows(null);
 		}
 		this.mode = newMode;
 	}

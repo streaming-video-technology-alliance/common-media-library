@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { VerboseLevel } from "./utils/VerboseLevel.js";
+import { VerboseLevel } from './utils/VerboseLevel.js';
 
 export class CaptionsLogger {
 	public time: number | null = null;
