@@ -11,18 +11,20 @@ on:
         description: "An id to append to the version. Defaults to the current timestamp"
         type: string
         required: false
-      
+
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  PKG_VERSION: ""
+  BUILD_ID: ""
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       id-token: write
-    
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -39,20 +41,20 @@ jobs:
 
       - name: Test
         run: npm test
-      
+
       - name: Get Version
-        run: echo "version=`node -p "require('./package').version"`" >> $GITHUB_ENV
+        run: echo "PKG_VERSION=`node -p "require('./package').version"`" >> $GITHUB_ENV
 
       - name: Get Time
         if: github.event.inputs.id == ''
-        run: echo "id=`date +%s`" >> $GITHUB_ENV
+        run: echo "BUILD_ID=`date +%s`" >> $GITHUB_ENV
 
       - name: Get ID
         if: github.event.inputs.id != ''
-        run: echo "id=${{ github.event.inputs.id }}" >> $GITHUB_ENV
+        run: echo "BUILD_ID=${{ github.event.inputs.id }}" >> $GITHUB_ENV
 
       - name: Generate Version
-        run: npm version ${{ env.version }}-${{ github.event.inputs.tag }}.${{ env.id }} --no-git-tag-version
+        run: npm version ${{ env.PKG_VERSION }}-${{ github.event.inputs.tag }}.${{ env.BUILD_ID }} --no-git-tag-version
 
       - name: Publish Tag
         run: npm run pub --tag ${{ github.event.inputs.tag }}

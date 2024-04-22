@@ -19,6 +19,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.6.4] - 2024-03-04
+
+### Fixed
+-  Resolve module import error on id3 feature [#83](https://github.com/streaming-video-technology-alliance/common-media-library/issues/83)
+
+
+## [0.6.3] - 2024-03-01
+
+### Added
+- Unit tests for ID3 feature helper functions [#74](https://github.com/streaming-video-technology-alliance/common-media-library/pull/74)
+- ID3 APIC frame decode functionality, and it's respective unit tests [#77](https://github.com/streaming-video-technology-alliance/common-media-library/issues/77)
+
+
 ## [0.6.2] - 2023-01-18
 
 ### Fixed
@@ -169,7 +182,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap project [#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2)
 
 
-[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.2...HEAD  
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.4...HEAD  
+[0.6.4]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.3...v0.6.4  
+[0.6.3]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.2...v0.6.3  
 [0.6.2]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.1...v0.6.2  
 [0.6.1]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.0...v0.6.1  
 [0.6.0]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.5.1...v0.6.0  

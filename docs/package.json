@@ -1,7 +1,7 @@
 {
 	"name": "@svta/common-media-library-docs",
 	"private": true,
-	"version": "0.6.2",
+	"version": "0.6.4",
 	"license": "Apache-2.0",
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -16,8 +16,5 @@
 	"scripts": {
 		"build": "typedoc",
 		"start": "npm run build && npx -y http-server dist --cors -p 8080"
-	},
-	"devDependencies": {
-		"typedoc": "0.25.2"
 	}
 }

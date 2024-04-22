@@ -1,10 +1,7 @@
 /**
  * Common Media Object Type
  *
- * @group CMCD
- * @group CMSD
- *
- * @beta
+ * @internal
  */
 export enum CmObjectType {
 	/**
