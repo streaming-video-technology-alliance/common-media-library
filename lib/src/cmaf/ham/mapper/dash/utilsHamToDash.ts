@@ -5,7 +5,7 @@ import {
 	TIMESCALE_48000,
 	VIDEO_SAMPLE_RATE,
 	ZERO,
-} from '../../../utils/constants.js';
+} from '../../utils/constants.js';
 
 /**
  * @internal

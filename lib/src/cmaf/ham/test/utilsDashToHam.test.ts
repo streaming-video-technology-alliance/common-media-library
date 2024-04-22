@@ -12,7 +12,7 @@ import {
 	getSar,
 	getTrackDuration,
 	getUrlFromTemplate,
-} from '../ham/mapper/dash/utilsDashToHam.js';
+} from '../mapper/dash/utilsDashToHam.js';
 import { describe, it } from 'node:test';
 import { deepStrictEqual, equal } from 'node:assert';
 import {
@@ -20,7 +20,7 @@ import {
 	Period,
 	Representation,
 	SegmentTemplate,
-} from '../ham/types';
+} from '../types';
 
 describe('calculateDuration', () => {
 	it('returns 1 when duration is 1 and timescale is 1', () => {

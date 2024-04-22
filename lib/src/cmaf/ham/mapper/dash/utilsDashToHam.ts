@@ -11,7 +11,7 @@ import {
 	FRAME_RATE_SEPARATOR,
 	NUMERATOR,
 	ZERO,
-} from '../../../utils/constants.js';
+} from '../../utils/constants.js';
 
 /**
  * @internal

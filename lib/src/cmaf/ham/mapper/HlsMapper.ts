@@ -3,7 +3,7 @@ import type { Presentation } from '../types/model/index.js';
 import { IMapper } from './IMapper.js';
 import { mapHamToHls } from './hls/mapHamToHls.js';
 import { mapHlsToHam } from './hls/mapHlsToHam.js';
-import { getMetadata } from '../../utils/manifestUtils.js';
+import { getMetadata } from '../utils/manifestUtils.js';
 
 export class HlsMapper implements IMapper {
 	private manifest: Manifest | undefined;

@@ -20,4 +20,4 @@ export * from './cmaf/ham/services/getTracks.js';
 export * from './cmaf/ham/services/validate.js';
 export * from './cmaf/ham/services/converters/dashConverter.js';
 export * from './cmaf/ham/services/converters/hlsConverter.js';
-export * as default from './cmaf/index.js';
+export * as default from './cmaf/ham/index.js';

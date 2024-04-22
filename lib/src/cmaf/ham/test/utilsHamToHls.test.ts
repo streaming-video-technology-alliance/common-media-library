@@ -1,12 +1,12 @@
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
-import { AudioTrack } from '../ham/types/model/index.js';
+import { AudioTrack } from '../types/model/index.js';
 import {
 	getByterange,
 	getPlaylistData,
 	getSegments,
 	getUrlInitialization,
-} from '../ham/mapper/hls/utilsHamToHls.js';
+} from '../mapper/hls/utilsHamToHls.js';
 import { getAudioTrack } from './data/hlsData.js';
 
 describe('getByterange', () => {

@@ -1,4 +1,4 @@
-import { Representation, SegmentTemplate } from '../ham/types';
+import { Representation, SegmentTemplate } from '../types';
 
 const representationBase: Representation = {
 	$: {

@@ -89,12 +89,12 @@ export interface Cmcd {
     mtp?: number;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
+    ot?: CmcdObjectType;
     pr?: number;
     rtp?: number;
-    sf?: CmStreamingFormat;
+    sf?: CmcdStreamingFormat;
     sid?: string;
-    st?: CmStreamType;
+    st?: CmcdStreamType;
     su?: boolean;
     tb?: number;
     v?: number;
@@ -107,7 +107,7 @@ export const CMCD_PARAM = "CMCD";
 export const CMCD_V1 = 1;
 
 // @beta
-export type CmcdCustomKey = CmCustomKey;
+export type CmcdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmcdEncodeOptions {
@@ -145,13 +145,7 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 export type CmcdKey = keyof Cmcd;
 
 // @beta
-export type CmcdValue = CmValue;
-
-// @beta
-export type CmCustomKey = `${string}-${string}`;
-
-// @beta
-enum CmObjectType {
+export enum CmcdObjectType {
     AUDIO = "a",
     CAPTION = "c",
     INIT = "i",
@@ -162,8 +156,28 @@ enum CmObjectType {
     TIMED_TEXT = "tt",
     VIDEO = "v"
 }
-export { CmObjectType as CmcdObjectType }
-export { CmObjectType as CmsdObjectType }
+
+// @beta
+export enum CmcdStreamingFormat {
+    DASH = "d",
+    HLS = "h",
+    OTHER = "o",
+    SMOOTH = "s"
+}
+
+// @beta
+export enum CmcdStreamType {
+    LIVE = "l",
+    VOD = "v"
+}
+
+// @beta
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-internal-missing-underscore) The name "CmCustomKey" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export type CmCustomKey = `${string}-${string}`;
 
 // @beta
 export const CMSD_DYNAMIC = "CMSD-Dynamic";
@@ -175,7 +189,7 @@ export const CMSD_STATIC = "CMSD-Static";
 export const CMSD_V1 = 1;
 
 // @beta
-export type CmsdCustomKey = CmCustomKey;
+export type CmsdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmsdDynamic {
@@ -205,6 +219,19 @@ export enum CmsdHeaderField {
 }
 
 // @beta
+export enum CmsdObjectType {
+    AUDIO = "a",
+    CAPTION = "c",
+    INIT = "i",
+    KEY = "k",
+    MANIFEST = "m",
+    MUXED = "av",
+    OTHER = "o",
+    TIMED_TEXT = "tt",
+    VIDEO = "v"
+}
+
+// @beta
 export interface CmsdStatic {
     [index: CmsdCustomKey]: CmsdValue;
     at?: number;
@@ -214,35 +241,36 @@ export interface CmsdStatic {
     n?: string;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
-    sf?: CmStreamingFormat;
-    st?: CmStreamType;
+    ot?: CmsdObjectType;
+    sf?: CmsdStreamingFormat;
+    st?: CmsdStreamType;
     su?: boolean;
     v?: number;
 }
 
 // @beta
-export type CmsdValue = CmValue;
-
-// @beta
-enum CmStreamingFormat {
+export enum CmsdStreamingFormat {
     DASH = "d",
     HLS = "h",
     OTHER = "o",
     SMOOTH = "s"
 }
-export { CmStreamingFormat as CmcdStreamingFormat }
-export { CmStreamingFormat as CmsdStreamingFormat }
 
 // @beta
-enum CmStreamType {
+export enum CmsdStreamType {
     LIVE = "l",
     VOD = "v"
 }
-export { CmStreamType as CmcdStreamType }
-export { CmStreamType as CmsdStreamType }
 
 // @beta
+export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "CmValue" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
 
 // @beta
@@ -665,10 +693,10 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/cmaf/ham/types/Manifest.ts:14:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/mappers/DashManifest.ts:38:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mappers/DashManifest.ts:156:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mappers/DashManifest.ts:157:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mappers/DashManifest.ts:157:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mappers/DashManifest.ts:158:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
 // src/cmaf/ham/types/model/Track.ts:63:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

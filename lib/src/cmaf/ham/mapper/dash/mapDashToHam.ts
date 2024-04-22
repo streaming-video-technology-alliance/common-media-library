@@ -18,7 +18,7 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model/index.js';
-import { iso8601DurationToNumber } from '../../../utils/utils.js';
+import { iso8601DurationToNumber } from '../../utils/utils.js';
 import {
 	calculateDuration,
 	getChannels,

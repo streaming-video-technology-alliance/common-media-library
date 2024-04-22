@@ -1,7 +1,7 @@
 import { mapDashToHam } from './dash/mapDashToHam.js';
-import { xmlToJson } from '../../utils/xmlUtils.js';
+import { xmlToJson } from '../utils/xmlUtils.js';
 import { mapHamToDash } from './dash/mapHamToDash.js';
-import { addMetadataToDash, getMetadata } from '../../utils/manifestUtils.js';
+import { addMetadataToDash, getMetadata } from '../utils/manifestUtils.js';
 import { IMapper } from './IMapper.js';
 import type { DashManifest, Manifest } from '../types';
 import type { Presentation } from '../types/model/index.js';

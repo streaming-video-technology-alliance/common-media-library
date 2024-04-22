@@ -1,4 +1,4 @@
-import type { DashManifest, Manifest } from '../ham/types';
+import type { DashManifest, Manifest } from '../types';
 
 export function getMetadata(manifest: Manifest | undefined): JSON | undefined {
 	const metadata: Map<string, string> | undefined = manifest?.metadata;

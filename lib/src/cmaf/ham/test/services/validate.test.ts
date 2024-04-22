@@ -3,7 +3,7 @@ import {
 	validatePresentation,
 	validateSegments,
 	validateTrack,
-} from '../../../cmaf-ham.js';
+} from '../../../../cmaf-ham.js';
 import {
 	audioTrack,
 	invalidAudioTrack,

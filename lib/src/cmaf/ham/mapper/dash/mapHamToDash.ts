@@ -16,9 +16,9 @@ import type {
 	Track,
 	VideoTrack,
 } from '../../types/model/index.js';
-import { numberToIso8601Duration } from '../../../utils/utils.js';
+import { numberToIso8601Duration } from '../../utils/utils.js';
 import { getFrameRate, getTimescale } from './utilsHamToDash.js';
-import { jsonToXml } from '../../../utils/xmlUtils.js';
+import { jsonToXml } from '../../utils/xmlUtils.js';
 
 function mapHamToDash(hamManifests: Presentation[]): string {
 	const periods: Period[] = _presentationsToPeriods(hamManifests);

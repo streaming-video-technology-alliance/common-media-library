@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Parser } from 'm3u8-parser';
-import { HlsManifest } from '../../ham/types';
+import { HlsManifest } from '../../types';
 
 export function parseHlsManifest(text: string | undefined): HlsManifest {
 	if (!text) {
