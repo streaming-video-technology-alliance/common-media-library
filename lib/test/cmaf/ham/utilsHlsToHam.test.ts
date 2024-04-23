@@ -5,8 +5,8 @@ import {
 	getByterange,
 	getCodec,
 	getDuration,
-} from '../mapper/hls/utilsHlsToHam.js';
-import { HlsManifest } from '../types';
+} from '../../../src/cmaf/ham/mapper/hls/utilsHlsToHam.js';
+import { HlsManifest } from '../../../src/cmaf/ham/types';
 import { getSegments } from './data/hlsData.js';
 
 describe('getByterange', () => {

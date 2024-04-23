@@ -3,7 +3,7 @@ import { equal } from 'node:assert';
 import {
 	iso8601DurationToNumber,
 	numberToIso8601Duration,
-} from '../utils/utils.js';
+} from '@svta/common-media-library/cmaf/ham/utils/utils';
 
 describe('iso8601DurationToNumber', () => {
 	it('converts PT5S to 5', () => {

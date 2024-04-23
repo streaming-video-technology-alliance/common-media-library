@@ -1,5 +1,5 @@
-import { AudioTrack } from '../../../ham/types/model/index.js';
-import { SegmentHls } from '../../../ham/types';
+import { AudioTrack } from '../../../../src/cmaf/ham/types/model/index.js';
+import { SegmentHls } from '../../../../src/cmaf/ham/types/index.js';
 
 function getAudioTrack({
 	byteRange = '',

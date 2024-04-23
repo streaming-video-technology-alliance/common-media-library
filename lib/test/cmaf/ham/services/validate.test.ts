@@ -3,7 +3,7 @@ import {
 	validatePresentation,
 	validateSegments,
 	validateTrack,
-} from '../../../../cmaf-ham.js';
+} from '@svta/common-media-library/cmaf-ham';
 import {
 	audioTrack,
 	invalidAudioTrack,

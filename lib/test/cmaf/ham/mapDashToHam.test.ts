@@ -5,7 +5,7 @@ import {
 	mapSegmentList,
 	mapSegments,
 	mapSegmentTemplate,
-} from '../mapper/dash/mapDashToHam.js';
+} from '../../../src/cmaf/ham/mapper/dash/mapDashToHam.js';
 import {
 	duration,
 	representationBase,

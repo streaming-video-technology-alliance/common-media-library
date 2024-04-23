@@ -3,7 +3,7 @@ import {
 	Presentation,
 	Segment,
 	VideoTrack,
-} from '../../../../cmaf-ham.js';
+} from '../../../../src/cmaf-ham.js';
 
 export const videoSegments: Segment[] = [
 	{

@@ -1,4 +1,4 @@
-import { Representation, SegmentTemplate } from '../types';
+import { Representation, SegmentTemplate } from '../../../src/cmaf/ham/types';
 
 const representationBase: Representation = {
 	$: {
