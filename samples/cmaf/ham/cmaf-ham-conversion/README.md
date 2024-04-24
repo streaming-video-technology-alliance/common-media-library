@@ -13,6 +13,19 @@ When you run this project using the command `npm run dev`, different versions of
    * `main.m3u8`: A the multivariant playlist of the HLS version of the content. 
    * `main.mpd`: The MPD of the DASH version of the content. 
 
+## Play the output in a Web Player
+After executing the script, use the command `npm run serve` to launch a web server with CORS enabled to serve the created manifests. By default it will run in [`http://localhost:3000/`](http://localhost:3000/)
+
+Steps to play the HLS content:
+1. Run `npm run serve`
+2. Open the [hls.js demo page](https://hlsjs.video-dev.org/demo/)
+3. Load the URL `http://localhost:3000/<sample>/<path>/main.m3u8`
+
+Steps to play the DASH content:
+1. Run `npm run serve`
+2. Open the [dash.js test page](https://reference.dashif.org/dash.js/nightly/samples/dash-if-reference-player/index.html)
+3. Load the URL `http://localhost:3000/<sample>/<path>/main.mpd`
+
 ## Samples
 The folder `input` has 3 CMAF HLS and 4 CMAF DASH manifests samples ready to use with the CMAF-Ham library. 
 
