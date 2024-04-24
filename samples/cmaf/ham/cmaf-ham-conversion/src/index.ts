@@ -4,6 +4,7 @@ import {
 	hamToDash,
 	hlsToHam,
 	dashToHam,
+	validatePresentation,
 } from '@svta/common-media-library/cmaf-ham';
 import { listM3U8Files, listDirectories, listMPDFiles } from './utils.js';
 
@@ -45,6 +46,13 @@ function manifestToAllFormats(
 	if (!fs.existsSync(outputPath)) {
 		fs.mkdirSync(outputPath, { recursive: true });
 	}
+
+	// Run validations and save them to a file
+	const validations = ham.map(validatePresentation);
+	fs.writeFileSync(
+		`${outputPath}/validations.json`,
+		JSON.stringify(validations),
+	);
 
 	// Save HAM object
 	fs.writeFileSync(`${outputPath}/ham.json`, JSON.stringify(ham));
