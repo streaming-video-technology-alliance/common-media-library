@@ -12,7 +12,7 @@ When you run this project using the command `npm run dev`, different versions of
 ## Samples
 The folder `input` has 3 CMAF HLS and 4 CMAF DASH manifests samples ready to use with the CMAF-Ham library. 
 
-| Sample content | Caracteristics |
+| Sample content | Characteristics |
 | -  | - |
 | DASH sample-1 | CMAF, VOD, 1 Period, 1 video track , 1 audio track , SegmentList MPD |
 | DASH sample-2 | CMAF, VOD, 1 Period, 7 video tracks h264, 7 video tracks h265, 1 audio track, 4 text tracks, SegmentTemplate MPD |
