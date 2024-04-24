@@ -41,7 +41,7 @@ function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPiece {
 }
 
 function mapHamToHls(presentations: Presentation[]): Manifest {
-	const version = 1; //TODO : save version in the model.
+	const version = 7; //TODO Add a way to change the version. For now version 7 is hardcoded as it is the first version of HLS with CMAF support
 	let mainManifest = `#EXTM3U\n#EXT-X-VERSION:${version}\n\n`;
 	const playlists: Manifest[] = [];
 	presentations.map((presentation: Presentation) => {
