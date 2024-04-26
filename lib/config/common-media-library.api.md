@@ -19,10 +19,10 @@ export function base64encode(binary: Uint8Array): string;
 // @beta
 export function canParseId3(data: Uint8Array, offset: number): boolean;
 
-// @public
+// @beta
 export class CaptionScreen {
     // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
-    constructor(logger: CaptionsLogger);
+    constructor(logger?: CaptionsLogger);
     // (undocumented)
     backSpace(): void;
     // (undocumented)
@@ -157,10 +157,10 @@ export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | 
 export type CmCustomKey = `${string}-${string}`;
 
 // @beta
-export const CMSD_DYNAMIC = "CMSD-Dynamic";
+export const CMSD_DYNAMIC: string;
 
 // @beta
-export const CMSD_STATIC = "CMSD-Static";
+export const CMSD_STATIC: string;
 
 // @beta
 export const CMSD_V1 = 1;
@@ -277,6 +277,59 @@ export interface CommonMediaResponse {
 }
 
 // @beta
+export class Cta608Channel {
+    constructor(channelNumber: number, outputFilter: CueHandler, logger?: CaptionsLogger);
+    // (undocumented)
+    ccAOF(): void;
+    // (undocumented)
+    ccAON(): void;
+    // (undocumented)
+    ccBS(): void;
+    // (undocumented)
+    ccCR(): void;
+    // (undocumented)
+    ccDER(): void;
+    // (undocumented)
+    ccEDM(): void;
+    // (undocumented)
+    ccENM(): void;
+    // (undocumented)
+    ccEOC(): void;
+    // (undocumented)
+    ccFON(): void;
+    // (undocumented)
+    ccMIDROW(secondByte: number): void;
+    // (undocumented)
+    ccRCL(): void;
+    // (undocumented)
+    ccRDC(): void;
+    // (undocumented)
+    ccRTD(): void;
+    // (undocumented)
+    ccRU(nrRows: number | null): void;
+    // (undocumented)
+    ccTO(nrCols: number): void;
+    // (undocumented)
+    ccTR(): void;
+    // (undocumented)
+    cueSplitAtTime(t: number): void;
+    // (undocumented)
+    insertChars(chars: number[]): void;
+    // (undocumented)
+    outputDataUpdate(dispatch?: boolean): void;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setBkgData(bkgData: Partial<PenStyles>): void;
+    // Warning: (ae-forgotten-export) The symbol "CaptionModes" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    setMode(newMode: CaptionModes): void;
+    // (undocumented)
+    setPAC(pacData: PACData): void;
+}
+
+// @beta
 export class Cta608Parser {
     constructor(field: SupportedField, out1: any, out2: any);
     addData(time: number | null, byteList: number[]): void;
@@ -284,7 +337,7 @@ export class Cta608Parser {
     reset(): void;
 }
 
-// @public (undocumented)
+// @beta
 export interface CueHandler {
     // (undocumented)
     dispatchCue?(): void;
@@ -343,10 +396,10 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 // @beta
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
-// @public (undocumented)
-export function extractCta608Data(raw: DataView, cea608Range: Array<number>): Array<Array<number>>;
+// @beta
+export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
 
-// @public (undocumented)
+// @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
 
 // @beta
@@ -374,7 +427,7 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
-// @public (undocumented)
+// @beta
 export interface PACData {
     // (undocumented)
     color: string | null;
@@ -388,7 +441,7 @@ export interface PACData {
     underline: boolean;
 }
 
-// @public (undocumented)
+// @beta
 export class PenState {
     // (undocumented)
     background: string;
@@ -412,7 +465,7 @@ export class PenState {
     underline: boolean;
 }
 
-// @public (undocumented)
+// @beta
 export type PenStyles = {
     foreground: string | null;
     underline: boolean;
@@ -444,9 +497,9 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 // @beta
 export function roundToEven(value: number, precision: number): number;
 
-// @public
+// @beta
 export class Row {
-    constructor(logger: CaptionsLogger);
+    constructor(logger?: CaptionsLogger);
     backSpace(): void;
     // (undocumented)
     chars: StyledUnicodeChar[];
@@ -518,7 +571,7 @@ export class SfToken {
     description: string;
 }
 
-// @public
+// @beta
 export class StyledUnicodeChar {
     // (undocumented)
     copy(newChar: StyledUnicodeChar): void;
@@ -538,11 +591,11 @@ export class StyledUnicodeChar {
     uchar: string;
 }
 
-// @public (undocumented)
+// @beta
 export type SupportedField = 1 | 3;
 
 // @beta
-export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};
+export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
 // @beta
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
