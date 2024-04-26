@@ -40,31 +40,32 @@ import { PenState } from './PenState.js';
 
 /**
  * Unicode character with styling and background.
- * @constructor
+ *
+ * @beta
  */
 export class StyledUnicodeChar {
 	uchar: string = ' ';
 	penState: PenState = new PenState();
 
-	reset() {
+	reset(): void {
 		this.uchar = ' ';
 		this.penState.reset();
 	}
 
-	setChar(uchar: string, newPenState: PenState) {
+	setChar(uchar: string, newPenState: PenState): void {
 		this.uchar = uchar;
 		this.penState.copy(newPenState);
 	}
 
-	setPenState(newPenState: PenState) {
+	setPenState(newPenState: PenState): void {
 		this.penState.copy(newPenState);
 	}
 
-	equals(other: StyledUnicodeChar) {
+	equals(other: StyledUnicodeChar): boolean {
 		return this.uchar === other.uchar && this.penState.equals(other.penState);
 	}
 
-	copy(newChar: StyledUnicodeChar) {
+	copy(newChar: StyledUnicodeChar): void {
 		this.uchar = newChar.uchar;
 		this.penState.copy(newChar.penState);
 	}

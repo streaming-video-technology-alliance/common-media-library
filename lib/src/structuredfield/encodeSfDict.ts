@@ -13,6 +13,6 @@ import { serializeDict } from './serialize/serializeDict.js';
  *
  * @beta
  */
-export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions) {
+export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string {
 	return serializeDict(value, options);
 }

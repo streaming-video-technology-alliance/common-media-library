@@ -1,6 +1,14 @@
-
-export function extractCta608Data(raw: DataView, cea608Range: Array<number>): Array<Array<number>> {
-	let pos = cea608Range[0];
+/**
+ * Extract CTA-608 data from a DataView
+ *
+ * @param raw - The DataView to extract the data from
+ * @param cta608Range - The range of the CTA-608 data
+ * @returns The extracted CTA-608 data
+ *
+ * @beta
+ */
+export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>> {
+	let pos = cta608Range[0];
 	const fieldData: number[][] = [[], []];
 
 	pos += 8; // Skip the identifier up to userDataTypeCode

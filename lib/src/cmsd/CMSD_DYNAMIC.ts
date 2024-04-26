@@ -5,4 +5,4 @@
  *
  * @beta
  */
-export const CMSD_DYNAMIC = 'CMSD-Dynamic';
+export const CMSD_DYNAMIC: string = 'CMSD-Dynamic';

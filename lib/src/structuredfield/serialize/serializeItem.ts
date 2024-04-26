@@ -17,7 +17,7 @@ import { serializeParams } from './serializeParams.js';
 //     Section 4.1.1.2 with item_parameters to output.
 //
 // 4.  Return output.
-export function serializeItem(value: SfItem | SfBareItem) {
+export function serializeItem(value: SfItem | SfBareItem): string {
 	if (value instanceof SfItem) {
 		return `${serializeBareItem(value.value)}${serializeParams(value.params)}`;
 	}

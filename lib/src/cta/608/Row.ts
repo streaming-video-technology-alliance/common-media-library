@@ -45,8 +45,9 @@ import { VerboseLevel } from './utils/VerboseLevel.js';
 import { getCharForByte } from './utils/getCharForByte.js';
 
 /**
- * CEA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
- * @constructor
+ * CTA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
+ *
+ * @beta
  */
 export class Row {
 	public chars: StyledUnicodeChar[] = [];

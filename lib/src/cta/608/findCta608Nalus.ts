@@ -1,10 +1,19 @@
-
+/**
+ * Find CTA-608 NAL units in a video stream
+ *
+ * @param raw - The DataView to extract the data from
+ * @param startPos - The start position of the data
+ * @param size - The size of the data
+ * @returns The extracted CTA-608 NAL units
+ *
+ * @beta
+ */
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>> {
 	let nalSize = 0, cursor = startPos, nalType = 0;
-	const cea608NaluRanges = [];
+	const cta608NaluRanges = [];
 
 	// Check SEI data according to ANSI-SCTE 128
-	const isCEA608SEI = function (payloadType: number, payloadSize: number, raw: DataView, pos: number) {
+	const isCTA608SEI = function (payloadType: number, payloadSize: number, raw: DataView, pos: number) {
 		if (payloadType !== 4 || payloadSize < 8) {
 			return null;
 		}
@@ -39,14 +48,14 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 					payloadSize += b;
 					pos++;
 				}
-				if (isCEA608SEI(payloadType, payloadSize, raw, pos)) {
-					//console.log("CEA608 SEI " + time + " " + payloadSize);
-					cea608NaluRanges.push([pos, payloadSize]);
+				if (isCTA608SEI(payloadType, payloadSize, raw, pos)) {
+					//console.log("CTA608 SEI " + time + " " + payloadSize);
+					cta608NaluRanges.push([pos, payloadSize]);
 				}
 				pos += payloadSize;
 			}
 		}
 		cursor += nalSize + 4;
 	}
-	return cea608NaluRanges;
+	return cta608NaluRanges;
 }
