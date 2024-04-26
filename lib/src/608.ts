@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 export { CaptionScreen } from './cta/608/CaptionScreen.js';
+export { Cta608Channel } from './cta/608/Cta608Channel.js';
 export { Cta608Parser } from './cta/608/Cta608Parser.js';
 export type { CueHandler } from './cta/608/CueHandler.js';
 export type { PACData } from './cta/608/PACData.js';

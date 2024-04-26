@@ -44,6 +44,11 @@ import { PACData } from './PACData.js';
 import { PenStyles } from './PenStyles.js';
 import { VerboseLevel } from './utils/VerboseLevel.js';
 
+/**
+ * CTA-608 Channel
+ *
+ * @beta
+ */
 export class Cta608Channel {
 	private chNr: number;
 	private outputFilter: CueHandler;
@@ -58,7 +63,7 @@ export class Cta608Channel {
 	constructor(
 		channelNumber: number,
 		outputFilter: CueHandler,
-		logger: CaptionsLogger,
+		logger: CaptionsLogger = new CaptionsLogger(),
 	) {
 		this.chNr = channelNumber;
 		this.outputFilter = outputFilter;

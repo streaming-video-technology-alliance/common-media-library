@@ -1,16 +1,15 @@
-import { Row, CaptionsLogger } from '@svta/common-media-library';
+import { Row } from '@svta/common-media-library/608';
 import { deepEqual, equal, notDeepEqual } from 'node:assert';
-import { describe, it, beforeEach } from 'node:test';
+import { beforeEach, describe, it } from 'node:test';
 
 describe('Row Tests', () => {
 	const minCursorPosition = 0;
 	const maxCursorPosition = 100;
 
-	const logger = new CaptionsLogger();
-	let row: Row;
+	let row: any;
 
 	beforeEach(() => {
-		row = new Row(logger);
+		row = new Row();
 	});
 
 	it('should initialize with empty characters and default state', () => {
@@ -21,7 +20,7 @@ describe('Row Tests', () => {
 	});
 
 	it('equals method', () => {
-		const defaultRow = new Row(logger);
+		const defaultRow = new Row();
 		deepEqual(row, defaultRow);
 
 		row.pos = 1;
@@ -30,23 +29,23 @@ describe('Row Tests', () => {
 	});
 
 	it('copy method', () => {
-		const newRow = new Row(logger);
+		const newRow = new Row();
 
 		row.chars[0].setChar('A', row.currPenState);
 		row.chars[1].setChar('B', row.currPenState);
 		row.chars[2].setChar('C', row.currPenState);
-      
+
 		newRow.copy(row);
-      
+
 		for (let i = 0; i < newRow.chars.length; i++) {
 			equal(newRow.chars[i].equals(row.chars[i]), true);
 		}
-      
+
 	});
 
 	it('isEmpty method', () => {
 		equal(row.isEmpty(), true);
-      
+
 		row.chars[0].setChar('A', row.currPenState);
 		equal(row.isEmpty(), false);
 	});

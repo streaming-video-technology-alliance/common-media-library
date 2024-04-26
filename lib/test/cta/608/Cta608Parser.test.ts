@@ -1,10 +1,10 @@
-import { Cta608Parser, PACData } from '@svta/common-media-library';
+import { Cta608Parser, PACData } from '@svta/common-media-library/608';
 import { deepEqual, equal } from 'node:assert';
 import { beforeEach, describe, it, mock } from 'node:test';
 
 describe('Cea608Parser Tests', () => {
 
-	let parser: Cta608Parser;
+	let parser: any;
 
 	beforeEach(() => {
 		parser = new Cta608Parser(1, null, null);

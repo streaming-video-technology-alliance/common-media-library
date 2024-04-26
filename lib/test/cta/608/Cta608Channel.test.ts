@@ -1,15 +1,15 @@
-import { CaptionScreen, CaptionsLogger, Cta608Channel } from '@svta/common-media-library';
+import { CaptionScreen, Cta608Channel, CueHandler } from '@svta/common-media-library/608';
 import { deepEqual, equal } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 
 describe('Cea608Channel Tests', () => {
 	const channelNumber = 1;
-	const outputFilter = { OutputFilter: 'myOutputFilter' };
-	const captionsLogger = new CaptionsLogger();
-	let channel: Cta608Channel;
+	const outputFilter = {} as CueHandler;
+
+	let channel: any;
 
 	beforeEach(() => {
-		channel = new Cta608Channel(channelNumber, outputFilter, captionsLogger);
+		channel = new Cta608Channel(channelNumber, outputFilter);
 	});
 
 	it('Create channel correctly', () => {
@@ -18,14 +18,13 @@ describe('Cea608Channel Tests', () => {
 		equal(channel.outputFilter, outputFilter);
 		equal(channel.mode, null);
 		equal(channel.verbose, 0);
-		deepEqual(channel.displayedMemory, new CaptionScreen(captionsLogger));
-		deepEqual(channel.nonDisplayedMemory, new CaptionScreen(captionsLogger));
-		deepEqual(channel.lastOutputScreen, new CaptionScreen(captionsLogger));
+		deepEqual(channel.displayedMemory, new CaptionScreen());
+		deepEqual(channel.nonDisplayedMemory, new CaptionScreen());
+		deepEqual(channel.lastOutputScreen, new CaptionScreen());
 		deepEqual(channel.currRollUpRow, channel.displayedMemory.rows[NR_ROWS - 1]);
 		deepEqual(channel.writeScreen, channel.displayedMemory);
 		equal(channel.mode, null);
 		equal(channel.cueStartTime, null);
-		deepEqual(channel.logger, captionsLogger);
 	});
 
 	it('getHandler correctly', () => {

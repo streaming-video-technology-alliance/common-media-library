@@ -55,7 +55,7 @@ export class CaptionScreen {
 	private lastOutputScreen: CaptionScreen | null = null;
 	private logger: CaptionsLogger;
 
-	constructor(logger: CaptionsLogger) {
+	constructor(logger: CaptionsLogger = new CaptionsLogger()) {
 		for (let i = 0; i < NR_ROWS; i++) {
 			this.rows.push(new Row(logger));
 		}
