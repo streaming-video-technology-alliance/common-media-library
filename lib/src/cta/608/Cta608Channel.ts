@@ -74,7 +74,7 @@ export class Cta608Channel {
 		this.logger.log(VerboseLevel.INFO, 'new Cea608Channel(' + this.chNr + ')');
 	}
 
-	reset() {
+	reset(): void {
 		this.mode = null;
 		this.displayedMemory.reset();
 		this.nonDisplayedMemory.reset();
@@ -85,15 +85,15 @@ export class Cta608Channel {
 		this.cueStartTime = null;
 	}
 
-	setPAC(pacData: PACData) {
+	setPAC(pacData: PACData): void {
 		this.writeScreen.setPAC(pacData);
 	}
 
-	setBkgData(bkgData: Partial<PenStyles>) {
+	setBkgData(bkgData: Partial<PenStyles>): void {
 		this.writeScreen.setBkgData(bkgData);
 	}
 
-	setMode(newMode: CaptionModes) {
+	setMode(newMode: CaptionModes): void {
 		if (newMode === this.mode) {
 			return;
 		}
@@ -114,7 +114,7 @@ export class Cta608Channel {
 		this.mode = newMode;
 	}
 
-	insertChars(chars: number[]) {
+	insertChars(chars: number[]): void {
 		for (let i = 0; i < chars.length; i++) {
 			this.writeScreen.insertChar(chars[i]);
 		}
@@ -134,13 +134,13 @@ export class Cta608Channel {
 		}
 	}
 
-	ccRCL() {
+	ccRCL(): void {
 		// Resume Caption Loading (switch mode to Pop On)
 		this.logger.log(VerboseLevel.INFO, 'RCL - Resume Caption Loading');
 		this.setMode('MODE_POP-ON');
 	}
 
-	ccBS() {
+	ccBS(): void {
 		// BackSpace
 		this.logger.log(VerboseLevel.INFO, 'BS - BackSpace');
 		if (this.mode === 'MODE_TEXT') {
@@ -153,22 +153,22 @@ export class Cta608Channel {
 		}
 	}
 
-	ccAOF() {
+	ccAOF(): void {
 		// Reserved (formerly Alarm Off)
 	}
 
-	ccAON() {
+	ccAON(): void {
 		// Reserved (formerly Alarm On)
 	}
 
-	ccDER() {
+	ccDER(): void {
 		// Delete to End of Row
 		this.logger.log(VerboseLevel.INFO, 'DER- Delete to End of Row');
 		this.writeScreen.clearToEndOfRow();
 		this.outputDataUpdate();
 	}
 
-	ccRU(nrRows: number | null) {
+	ccRU(nrRows: number | null): void {
 		// Roll-Up Captions-2,3,or 4 Rows
 		this.logger.log(VerboseLevel.INFO, 'RU(' + nrRows + ') - Roll Up');
 		this.writeScreen = this.displayedMemory;
@@ -176,51 +176,51 @@ export class Cta608Channel {
 		this.writeScreen.setRollUpRows(nrRows);
 	}
 
-	ccFON() {
+	ccFON(): void {
 		// Flash On
 		this.logger.log(VerboseLevel.INFO, 'FON - Flash On');
 		this.writeScreen.setPen({ flash: true });
 	}
 
-	ccRDC() {
+	ccRDC(): void {
 		// Resume Direct Captioning (switch mode to PaintOn)
 		this.logger.log(VerboseLevel.INFO, 'RDC - Resume Direct Captioning');
 		this.setMode('MODE_PAINT-ON');
 	}
 
-	ccTR() {
+	ccTR(): void {
 		// Text Restart in text mode (not supported, however)
 		this.logger.log(VerboseLevel.INFO, 'TR');
 		this.setMode('MODE_TEXT');
 	}
 
-	ccRTD() {
+	ccRTD(): void {
 		// Resume Text Display in Text mode (not supported, however)
 		this.logger.log(VerboseLevel.INFO, 'RTD');
 		this.setMode('MODE_TEXT');
 	}
 
-	ccEDM() {
+	ccEDM(): void {
 		// Erase Displayed Memory
 		this.logger.log(VerboseLevel.INFO, 'EDM - Erase Displayed Memory');
 		this.displayedMemory.reset();
 		this.outputDataUpdate(true);
 	}
 
-	ccCR() {
+	ccCR(): void {
 		// Carriage Return
 		this.logger.log(VerboseLevel.INFO, 'CR - Carriage Return');
 		this.writeScreen.rollUp();
 		this.outputDataUpdate(true);
 	}
 
-	ccENM() {
+	ccENM(): void {
 		// Erase Non-Displayed Memory
 		this.logger.log(VerboseLevel.INFO, 'ENM - Erase Non-displayed Memory');
 		this.nonDisplayedMemory.reset();
 	}
 
-	ccEOC() {
+	ccEOC(): void {
 		// End of Caption (Flip Memories)
 		this.logger.log(VerboseLevel.INFO, 'EOC - End Of Caption');
 		if (this.mode === 'MODE_POP-ON') {
@@ -236,13 +236,13 @@ export class Cta608Channel {
 		this.outputDataUpdate(true);
 	}
 
-	ccTO(nrCols: number) {
+	ccTO(nrCols: number): void {
 		// Tab Offset 1,2, or 3 columns
 		this.logger.log(VerboseLevel.INFO, 'TO(' + nrCols + ') - Tab Offset');
 		this.writeScreen.moveCursor(nrCols);
 	}
 
-	ccMIDROW(secondByte: number) {
+	ccMIDROW(secondByte: number): void {
 		// Parse MIDROW command
 		const styles: Partial<PenStyles> = { flash: false };
 		styles.underline = secondByte % 2 === 1;
@@ -267,7 +267,7 @@ export class Cta608Channel {
 		this.writeScreen.setPen(styles);
 	}
 
-	outputDataUpdate(dispatch: boolean = false) {
+	outputDataUpdate(dispatch: boolean = false): void {
 		const time = this.logger.time;
 		if (time === null) {
 			return;
@@ -296,7 +296,7 @@ export class Cta608Channel {
 		}
 	}
 
-	cueSplitAtTime(t: number) {
+	cueSplitAtTime(t: number): void {
 		if (this.outputFilter) {
 			if (!this.displayedMemory.isEmpty()) {
 				if (this.outputFilter.newCue) {

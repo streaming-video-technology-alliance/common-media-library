@@ -25,7 +25,7 @@ import { serializeKey } from './serializeKey.js';
 //             (Section 4.1.3.1) with param_value to output.
 //
 // 3.  Return output.
-export function serializeParams(params?: Record<string, any>) {
+export function serializeParams(params?: Record<string, any>): string {
 	if (params == null) {
 		return '';
 	}

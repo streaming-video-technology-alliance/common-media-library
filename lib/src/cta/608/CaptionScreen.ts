@@ -44,8 +44,9 @@ import { NR_ROWS } from './utils/NR_ROWS.js';
 import { VerboseLevel } from './utils/VerboseLevel.js';
 
 /**
- * Keep a CEA-608 screen of 32x15 styled characters
- * @constructor
+ * Keep a CTA-608 screen of 32x15 styled characters
+ *
+ * @beta
  */
 export class CaptionScreen {
 	private rows: Row[] = [];

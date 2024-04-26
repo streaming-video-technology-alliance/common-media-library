@@ -38,6 +38,11 @@
 
 import { PenStyles } from './PenStyles.js';
 
+/**
+ * Pen state.
+ *
+ * @beta
+ */
 export class PenState {
 	public foreground: string = 'white';
 	public underline: boolean = false;
