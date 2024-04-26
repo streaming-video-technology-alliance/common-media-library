@@ -1,4 +1,4 @@
-import { PenState } from '@svta/common-media-library';
+import { PenState } from '@svta/common-media-library/608';
 import { deepEqual, equal, notDeepEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 

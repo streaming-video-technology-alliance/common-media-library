@@ -1,22 +1,21 @@
-import { CaptionScreen, CaptionsLogger, Row } from '@svta/common-media-library';
+import { CaptionScreen, Row } from '@svta/common-media-library/608';
 import { deepEqual, equal } from 'node:assert';
-import { describe, it, beforeEach, mock } from 'node:test';
+import { beforeEach, describe, it, mock } from 'node:test';
 
 describe('CaptionScreen Tests', () => {
 	const NR_ROWS = 15;
-	const captionsLogger = new CaptionsLogger();
-	let captionScreen: CaptionScreen;
+
+	let captionScreen: any;
 
 	beforeEach(() => {
-		captionScreen = new CaptionScreen(captionsLogger);
+		captionScreen = new CaptionScreen();
 	});
 
 	it('Create CaptionScreen correctly', () => {
 		equal(captionScreen.rows.length, NR_ROWS);
 		for (let i = 0; i < NR_ROWS; i++) {
-			deepEqual(captionScreen.rows[i], new Row(captionsLogger));
+			deepEqual(captionScreen.rows[i], new Row());
 		}
-		deepEqual(captionScreen.logger, captionsLogger);
 	});
 
 	it('getDisplayText correctly', () => {

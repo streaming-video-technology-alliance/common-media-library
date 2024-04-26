@@ -51,12 +51,13 @@ import { getCharForByte } from './utils/getCharForByte.js';
  */
 export class Row {
 	public chars: StyledUnicodeChar[] = [];
+	public cueStartTime: number | null = null;
+
 	private pos: number = 0;
 	private currPenState: PenState = new PenState();
-	public cueStartTime: number | null = null;
 	private logger: CaptionsLogger;
 
-	constructor(logger: CaptionsLogger) {
+	constructor(logger: CaptionsLogger = new CaptionsLogger()) {
 		for (let i = 0; i < NR_COLS; i++) {
 			this.chars.push(new StyledUnicodeChar());
 		}
