@@ -68,7 +68,6 @@
 		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
 		"build:cjs": "tsc --module commonjs --outDir dist/cjs",
 		"test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
-		"test:unit": "node --no-warnings --loader ts-node/esm --test ./src/**/test/*.test.ts",
 		"prepublishOnly": "npm run build"
 	}
 }
