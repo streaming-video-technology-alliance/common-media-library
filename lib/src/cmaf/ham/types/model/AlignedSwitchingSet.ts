@@ -6,8 +6,6 @@ import { SwitchingSet } from './SwitchingSet.js';
  * @group CMAF
  * @alpha
  */
-type AlignedSwitchingSet = {
+export type AlignedSwitchingSet = {
 	switchingSets: SwitchingSet[];
 };
-
-export type { AlignedSwitchingSet };

@@ -8,9 +8,7 @@ import { SwitchingSet } from './SwitchingSet.js';
  * @group CMAF
  * @alpha
  */
-type SelectionSet = Ham & {
+export type SelectionSet = Ham & {
 	switchingSets: SwitchingSet[];
 	alignedSwitchingSets?: AlignedSwitchingSet[];
 };
-
-export type { SelectionSet };

@@ -1,3 +1,4 @@
+import { FrameRate } from './FrameRate.js';
 import type { Track } from './Track.js';
 
 /**
@@ -13,7 +14,7 @@ import type { Track } from './Track.js';
  * @group CMAF
  * @alpha
  */
-type VideoTrack = Track & {
+export type VideoTrack = Track & {
 	width: number;
 	height: number;
 	frameRate: FrameRate;
@@ -21,21 +22,3 @@ type VideoTrack = Track & {
 	sar: string;
 	scanType: string;
 };
-
-/**
- * @internal
- *
- * Video Frame Rate
- * Used to express the framerate as numerator and denominator.
- *
- * frameRateNumerator - Numerator.
- * frameRateDenominator - Denominator.
- *  
- * @group CMAF
-*/
-type FrameRate = {
-	frameRateNumerator: number;
-	frameRateDenominator?: number;
-};
-
-export type { VideoTrack, FrameRate };

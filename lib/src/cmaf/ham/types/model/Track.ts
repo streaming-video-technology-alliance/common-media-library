@@ -1,5 +1,6 @@
 import type { Ham } from './Ham.js';
 import type { Segment } from './Segment.js';
+import { TrackType } from './TrackType.js';
 
 /**
  * CMAF-HAM Track type
@@ -31,12 +32,3 @@ export type Track = Ham & {
 	urlInitialization?: string;
 	segments: Segment[];
 };
-
-/**
- * CMAF-HAM TrackType type
- * This can be 'audio' or 'video' or 'text'
- * 
- * @group CMAF
- * @alpha
- */
-type TrackType = 'audio' | 'video' | 'text';
