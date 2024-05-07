@@ -9,10 +9,7 @@
         "serve": "serve --cors ./dist"
     },
     "dependencies": {
-        "@svta/common-media-library": "*",
-        "fs": "^0.0.1-security",
-        "ts-node": "^10.9.2",
-        "tsc": "^2.0.4"
+        "@svta/common-media-library": "*"
     },
     "author": "",
     "license": "ISC",
