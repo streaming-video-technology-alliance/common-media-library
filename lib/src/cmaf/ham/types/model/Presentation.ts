@@ -9,8 +9,6 @@ import { SelectionSet } from './SelectionSet.js';
  * @group CMAF
  * @alpha
  */
-type Presentation = Ham & {
+export type Presentation = Ham & {
 	selectionSets: SelectionSet[];
 };
-
-export type { Presentation };

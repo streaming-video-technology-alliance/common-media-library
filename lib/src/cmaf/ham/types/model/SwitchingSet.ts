@@ -7,8 +7,6 @@ import { Track } from './Track.js';
  * @group CMAF
  * @alpha
  */
-type SwitchingSet = Ham & {
+export type SwitchingSet = Ham & {
 	tracks: Track[];
 };
-
-export type { SwitchingSet };

@@ -6,8 +6,6 @@
  * @group CMAF
  * @alpha
  */
-type Ham = {
+export type Ham = {
 	id: string;
 };
-
-export type { Ham };
