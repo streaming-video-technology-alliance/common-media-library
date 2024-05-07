@@ -29,7 +29,6 @@ export { getTracksFromSwitchingSet } from './cmaf/ham/services/getters/getTracks
 
 export { validatePresentation } from './cmaf/ham/services/validators/validatePresentation.js';
 export { validateSegment } from './cmaf/ham/services/validators/validateSegment.js';
-
 export { validateSegments } from './cmaf/ham/services/validators/validateSegments.js';
 export { validateSelectionSet } from './cmaf/ham/services/validators/validateSelectionSet.js';
 export { validateSelectionSets } from './cmaf/ham/services/validators/validateSelectionSets.js';
