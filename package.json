@@ -45,7 +45,8 @@
 	"workspaces": [
 		"lib",
 		"docs",
-		"dev"
+		"dev",
+		"samples/*"
 	],
 	"devDependencies": {
 		"@microsoft/api-extractor": "7.40.1",
