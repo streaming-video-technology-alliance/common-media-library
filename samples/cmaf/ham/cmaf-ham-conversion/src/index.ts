@@ -11,10 +11,10 @@ import { listM3U8Files, listDirectories, listMPDFiles } from './utils.js';
 const FILE_ENCODING = 'utf8';
 
 const INPUT_PATH_HLS = `./input/hls/`;
-const OUTPUT_PATH_HLS = `./output/hls/`;
+const OUTPUT_PATH_HLS = `./dist/hls/`;
 
 const SAMPLES_PATH_DASH = `./input/dash/`;
-const OUTPUT_PATH_DASH = `./output/dash/`;
+const OUTPUT_PATH_DASH = `./dist/dash/`;
 
 /**
  * This function converts a given manifest file (along with optional playlists for HLS)

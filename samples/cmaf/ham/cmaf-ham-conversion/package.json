@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "dev": "node --loader ts-node/esm src/index.ts",
-        "serve": "serve --cors ./output"
+        "serve": "serve --cors ./dist"
     },
     "dependencies": {
         "@svta/common-media-library": "file:../../../../../../lib/",

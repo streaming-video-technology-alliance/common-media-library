@@ -7,7 +7,7 @@ When you run this project using the command `npm run dev`, different versions of
 ## Steps to run the script
 1. Execute `npm i`
 2. Execute `npm run dev`
-3. Verify that a new folder called `output/` is created with the output files created using the CMAF-Ham library. In each subfolder you will find:
+3. Verify that a new folder called `dist/` is created with the output files created using the CMAF-Ham library. In each subfolder you will find:
    * `ham.json`: A JSON export of the Ham object.
    * `validations.json`: A JSON file containing the results of the validation for each presentation of the content.
    * `main.m3u8`: A the multivariant playlist of the HLS version of the content. 
