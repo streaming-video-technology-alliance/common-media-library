@@ -1,4 +1,5 @@
-import { Segment, Ham } from './index.js';
+import type { Ham } from './Ham.js';
+import type { Segment } from './Segment.js';
 
 /**
  * CMAF-HAM Track type
@@ -16,7 +17,7 @@ import { Segment, Ham } from './index.js';
  * @alpha
  */
 
-type Track = Ham & {
+export type Track = Ham & {
 	/** Track type */
 	type: TrackType;
 	fileName?: string;
@@ -30,52 +31,4 @@ type Track = Ham & {
 	segments: Segment[];
 };
 
-
-
-/**
- * CMAF-HAM Audio Track type
- *
- * @group CMAF
- * @alpha
- */
-type AudioTrack = Track & {
-	sampleRate: number;
-	channels: number;
-};
-
-/**
- * CMAF-HAM Text Track type
- *
- * @group CMAF
- * @alpha
- */
-type TextTrack = Track;
-
-/**
- * CMAF-HAM Video Track type
- *
- * @group CMAF
- * @alpha
- */
-type VideoTrack = Track & {
-	width: number;
-	height: number;
-	frameRate: FrameRate;
-	par: string;
-	sar: string;
-	scanType: string;
-};
-
-/**
- * @internal
- *
- * Video Frame Rate
- */
-type FrameRate = {
-	frameRateNumerator: number;
-	frameRateDenominator?: number;
-};
-
 type TrackType = 'audio' | 'video' | 'text';
-
-export type { Track, VideoTrack, AudioTrack, TextTrack, FrameRate };

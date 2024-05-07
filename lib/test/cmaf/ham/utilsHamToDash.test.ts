@@ -1,7 +1,9 @@
-import { getTimescale } from '../../../src/cmaf/ham/mapper/dash/utilsHamToDash.js';
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
-import { AudioTrack, Track } from '../../../src/cmaf/ham/types/model/index.js';
+
+import type { Track, AudioTrack } from '@svta/common-media-library/cmaf-ham';
+
+import { getTimescale } from '../../../src/cmaf/ham/mapper/dash/mapHamToDash/utils/getTimescale.js';
 
 describe('getTimescale', () => {
 	it('returns sampleRate if track is audio', () => {

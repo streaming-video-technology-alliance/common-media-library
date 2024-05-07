@@ -1,11 +1,11 @@
 import { describe, it } from 'node:test';
 import { deepStrictEqual } from 'node:assert';
-import {
-	mapSegmentBase,
-	mapSegmentList,
-	mapSegments,
-	mapSegmentTemplate,
-} from '../../../src/cmaf/ham/mapper/dash/mapDashToHam.js';
+
+import { mapSegmentBase } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentBase.js';
+import { mapSegmentList } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentList.js';
+import { mapSegments } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegments.js';
+import { mapSegmentTemplate } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentTemplate.js';
+
 import {
 	duration,
 	representationBase,

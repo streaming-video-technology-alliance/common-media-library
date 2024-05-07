@@ -1,5 +1,5 @@
-import { AudioTrack } from '../../../../src/cmaf/ham/types/model/index.js';
-import { SegmentHls } from '../../../../src/cmaf/ham/types/index.js';
+import type { AudioTrack } from '@svta/common-media-library/cmaf-ham';
+import type { SegmentHls } from '../../../../src/cmaf/ham/types/mapper/hls/SegmentHls.js';
 
 function getAudioTrack({
 	byteRange = '',

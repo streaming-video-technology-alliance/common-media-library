@@ -1,9 +1,9 @@
-import {
+import type {
 	AudioTrack,
 	Presentation,
 	Segment,
 	VideoTrack,
-} from '../../../../src/cmaf-ham.js';
+} from '@svta/common-media-library/cmaf-ham';
 
 export const videoSegments: Segment[] = [
 	{

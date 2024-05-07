@@ -1,15 +1,15 @@
 import cmafHam, { Presentation } from '@svta/common-media-library/cmaf-ham';
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { ham1, ham2, ham3 } from './data/ham-samples/fromHls/index.js';
-import {
-	hlsMain1,
-	hlsMain2,
-	hlsMain3,
-	hlsPlaylist1,
-	hlsPlaylist2,
-	hlsPlaylist3,
-} from './data/hls-samples/index.js';
+
+import { hlsMain1,hlsPlaylist1 } from './data/hls-samples/sample-1/hlsSample1.js';
+import { hlsMain2,hlsPlaylist2 } from './data/hls-samples/sample-2/hlsSample2.js';
+import { hlsMain3,hlsPlaylist3 } from './data/hls-samples/sample-3/hlsSample3.js';
+
+import ham1 from './data/ham-samples/fromHls/ham1.json' assert { type: 'json' };
+import ham2 from './data/ham-samples/fromHls/ham2.json' assert { type: 'json' };
+import ham3 from './data/ham-samples/fromHls/ham3.json' assert { type: 'json' };
+
 
 describe('hlsToHam', () => {
 	it('converts hls1 to ham1', () => {

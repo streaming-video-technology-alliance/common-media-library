@@ -1,26 +1,24 @@
-import {
-	calculateDuration,
-	getChannels,
-	getCodec,
-	getContentType,
-	getFrameRate,
-	getGroup,
-	getLanguage,
-	getNumberOfSegments,
-	getPresentationId,
-	getSampleRate,
-	getSar,
-	getTrackDuration,
-	getUrlFromTemplate,
-} from '../../../src/cmaf/ham/mapper/dash/utilsDashToHam.js';
 import { describe, it } from 'node:test';
 import { deepStrictEqual, equal } from 'node:assert';
-import {
-	AdaptationSet,
-	Period,
-	Representation,
-	SegmentTemplate,
-} from '../../../src/cmaf/ham/types/index.js';
+
+import type { AdaptationSet } from '../../../src/cmaf/ham/types/mapper/dash/AdaptationSet.js';
+import type { Period } from '../../../src/cmaf/ham/types/mapper/dash/Period.js';
+import type { Representation } from '../../../src/cmaf/ham/types/mapper/dash/Representation.js';
+import type { SegmentTemplate } from '../../../src/cmaf/ham/types/mapper/dash/SegmentTemplate.js';
+
+import { calculateDuration } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/calculateDuration.js';
+import { getChannels } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getChannels.js';
+import { getCodec } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getCodec.js';
+import { getContentType } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getContentType.js';
+import { getFrameRate } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getFrameRate.js';
+import { getGroup } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getGroup.js';
+import { getLanguage } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getLanguage.js';
+import { getNumberOfSegments } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getNumberOfSegments.js';
+import { getPresentationId } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getPresentationId.js';
+import { getSampleRate } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getSampleRate.js';
+import { getSar } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getSar.js';
+import { getTrackDuration } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getTrackDuration.js';
+import { getUrlFromTemplate } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/utils/getUrlFromTemplate.js';
 
 describe('calculateDuration', () => {
 	it('returns 1 when duration is 1 and timescale is 1', () => {

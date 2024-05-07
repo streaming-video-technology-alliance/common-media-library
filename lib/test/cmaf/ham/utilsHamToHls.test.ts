@@ -1,12 +1,13 @@
 import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
+
 import { AudioTrack } from '@svta/common-media-library/cmaf-ham';
-import {
-	getByterange,
-	getPlaylistData,
-	getSegments,
-	getUrlInitialization,
-} from '../../../src/cmaf/ham/mapper/hls/utilsHamToHls.js';
+
+import { getByterange } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getByterange.js';
+import { getPlaylistData } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getPlaylistData.js';
+import { getSegments } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getSegments.js';
+import { getUrlInitialization } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getUrlInitialization.js';
+
 import { getAudioTrack } from './data/hlsData.js';
 
 describe('getByterange', () => {

@@ -1,28 +1,27 @@
 import cmafHam, { Presentation } from '@svta/common-media-library/cmaf-ham';
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import {
-	jsonHam0,
-	jsonHam1,
-	jsonHam2,
-	jsonHam3,
-	jsonHam4,
-	jsonHam5,
-	jsonHam6,
-	jsonHam7,
-	jsonHam8,
-} from './data/ham-samples/fromDash/index.js';
-import {
-	dashSample0,
-	dashSample1,
-	dashSample2,
-	dashSample3,
-	dashSample4,
-	dashSample5,
-	dashSample6,
-	dashSample7,
-	dashSample8,
-} from './data/dash-samples/index.js';
+
+import jsonHam0 from './data/ham-samples/fromDash/ham0.json' assert { type: 'json' };
+import jsonHam1 from './data/ham-samples/fromDash/ham1.json' assert { type: 'json' };
+import jsonHam2 from './data/ham-samples/fromDash/ham2.json' assert { type: 'json' };
+import jsonHam3 from './data/ham-samples/fromDash/ham3.json' assert { type: 'json' };
+import jsonHam4 from './data/ham-samples/fromDash/ham4.json' assert { type: 'json' };
+import jsonHam5 from './data/ham-samples/fromDash/ham5.json' assert { type: 'json' };
+import jsonHam6 from './data/ham-samples/fromDash/ham6.json' assert { type: 'json' };
+import jsonHam7 from './data/ham-samples/fromDash/ham7.json' assert { type: 'json' };
+import jsonHam8 from './data/ham-samples/fromDash/ham8.json' assert { type: 'json' };
+
+import { dashSample as dashSample0 } from './data/dash-samples/sample-0/sample.js';
+import { dashSample as dashSample1 } from './data/dash-samples/sample-1/sample.js';
+import { dashSample as dashSample2 } from './data/dash-samples/sample-2/sample.js';
+import { dashSample as dashSample3 } from './data/dash-samples/sample-3/sample.js';
+import { dashSample as dashSample4 } from './data/dash-samples/sample-4/sample.js';
+import { dashSample as dashSample5 } from './data/dash-samples/sample-5/sample.js';
+import { dashSample as dashSample6 } from './data/dash-samples/sample-6/sample.js';
+import { dashSample as dashSample7 } from './data/dash-samples/sample-7/sample.js';
+import { dashSample as dashSample8 } from './data/dash-samples/sample-8/sample.js';
+
 import { dashFromHam1 } from './data/dash-samples/fromHam/dashFromHam1.js';
 import { dashFromHam2 } from './data/dash-samples/fromHam/dashFromHam2.js';
 import { dashFromHam3 } from './data/dash-samples/fromHam/dashFromHam3.js';

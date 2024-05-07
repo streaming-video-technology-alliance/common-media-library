@@ -5,37 +5,6 @@
 ```ts
 
 // @alpha
-export type AdaptationSet = {
-    $: {
-        audioSamplingRate?: string;
-        codecs?: string;
-        contentType?: string;
-        frameRate?: string;
-        group?: string;
-        id?: string;
-        lang?: string;
-        maxBandwidth?: string;
-        maxFrameRate?: string;
-        maxHeight?: string;
-        maxWidth?: string;
-        mimeType?: string;
-        minBandwidth?: string;
-        par?: string;
-        sar?: string;
-        segmentAlignment: string;
-        startWithSAP?: string;
-        subsegmentAlignment?: string;
-        subsegmentStartsWithSAP?: string;
-    };
-    AudioChannelConfiguration?: AudioChannelConfiguration[];
-    ContentComponent?: ContentComponent[];
-    Role?: Role[];
-    Representation: Representation[];
-    SegmentTemplate?: SegmentTemplate[];
-    SegmentList?: SegmentList[];
-};
-
-// @alpha
 export type AlignedSwitchingSet = {
     switchingSets: SwitchingSet[];
 };
@@ -47,16 +16,6 @@ export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, o
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @alpha
-export type AudioChannelConfiguration = {
-    $: {
-        schemeIdUri: string;
-        value: string;
-    };
-};
-
-// Warning: (ae-forgotten-export) The symbol "Track" needs to be exported by the entry point index.d.ts
-//
-// @alpha
 export type AudioTrack = Track & {
     sampleRate: number;
     channels: number;
@@ -67,12 +26,6 @@ export function base64decode(str: string): Uint8Array;
 
 // @beta
 export function base64encode(binary: Uint8Array): string;
-
-// @public (undocumented)
-export type Byterange = {
-    length: number;
-    offset: number;
-};
 
 // @beta
 export function canParseId3(data: Uint8Array, offset: number): boolean;
@@ -300,21 +253,6 @@ export interface CommonMediaResponse {
 }
 
 // @alpha
-export type DashManifest = {
-    MPD: {
-        $?: {
-            maxSegmentDuration?: string;
-            mediaPresentationDuration?: string;
-            minBufferTime?: string;
-            profiles?: string;
-            type?: string;
-            xmlns?: string;
-        };
-        Period: Period[];
-    };
-};
-
-// @alpha
 export function dashToHam(manifest: string): Presentation[];
 
 // @beta
@@ -399,14 +337,6 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 export function hamToHls(presentation: Presentation[]): Manifest;
 
 // @alpha
-export type HlsManifest = {
-    playlists: PlayList[];
-    mediaGroups: MediaGroups;
-    segments: SegmentHls[];
-    targetDuration?: number;
-};
-
-// @alpha
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
@@ -422,50 +352,8 @@ export type Manifest = {
     manifest: string;
     fileName?: string;
     ancillaryManifests?: Manifest[];
-    type: Format;
+    type: ManifestFormat;
     metadata?: Map<string, string>;
-};
-
-// @alpha
-export type MediaGroups = {
-    AUDIO: {
-        [key: string]: {
-            [key: string]: {
-                language: string;
-            };
-        };
-    };
-    SUBTITLES: {
-        [key: string]: {
-            [key: string]: {
-                language: string;
-            };
-        };
-    };
-};
-
-// @alpha
-export type Period = {
-    $: {
-        duration: string;
-        id?: string;
-        start?: string;
-    };
-    AdaptationSet: AdaptationSet[];
-};
-
-// @alpha
-export type PlayList = {
-    uri: string;
-    attributes: {
-        FRAME_RATE: number;
-        CODECS: string;
-        BANDWIDTH: number;
-        RESOLUTION: {
-            width: number;
-            height: number;
-        };
-    };
 };
 
 // Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
@@ -473,28 +361,6 @@ export type PlayList = {
 // @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
-};
-
-// @alpha
-export type Representation = {
-    $: {
-        audioSamplingRate?: string;
-        bandwidth: string;
-        codecs?: string;
-        frameRate?: string;
-        height?: string;
-        id: string;
-        mimeType?: string;
-        sar?: string;
-        scanType?: string;
-        startWithSAP?: string;
-        width?: string;
-    };
-    AudioChannelConfiguration?: AudioChannelConfiguration[];
-    BaseURL?: string[];
-    SegmentBase?: SegmentBase[];
-    SegmentList?: SegmentList[];
-    SegmentTemplate?: SegmentTemplate[];
 };
 
 // @beta
@@ -525,57 +391,6 @@ export type Segment = {
     duration: number;
     url: string;
     byteRange?: string;
-};
-
-// @alpha
-export type SegmentBase = {
-    $: {
-        indexRange: string;
-        indexRangeExact: string;
-        timescale: string;
-    };
-    Initialization: Initialization[];
-};
-
-// @alpha
-export type SegmentHls = {
-    title?: string;
-    duration: number;
-    byterange?: Byterange;
-    uri?: string;
-    timeline?: number;
-    map?: {
-        uri: string;
-        byterange: Byterange;
-    };
-};
-
-// @alpha
-export type SegmentList = {
-    $: {
-        duration: string;
-        timescale: string;
-    };
-    Initialization: Initialization[];
-    SegmentURL?: SegmentURL[];
-};
-
-// @alpha
-export type SegmentTemplate = {
-    $: {
-        duration: string;
-        initialization: string;
-        media: string;
-        startNumber: string;
-        timescale: string;
-    };
-};
-
-// @alpha
-export type SegmentURL = {
-    $: {
-        media?: string;
-    };
 };
 
 // @alpha
@@ -646,6 +461,19 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
+// @alpha
+export type Track = Ham & {
+    type: TrackType;
+    fileName?: string;
+    codec: string;
+    duration: number;
+    language: string;
+    bandwidth: number;
+    byteRange?: string;
+    urlInitialization?: string;
+    segments: Segment[];
+};
+
 // @beta
 export function urlToRelativePath(url: string, base: string): string;
 
@@ -655,10 +483,11 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 // @beta
 export function uuid(): string;
 
-// Warning: (ae-forgotten-export) The symbol "Validation" needs to be exported by the entry point index.d.ts
-//
 // @alpha
 export function validatePresentation(presentation: Presentation): Validation;
+
+// @alpha
+export function validateSegment(segment: Segment, trackId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
 export function validateSegments(segments: Segment[], trackId?: string, prevValidation?: Validation): Validation;
@@ -682,6 +511,14 @@ export function validateTrack(track: Track, switchingSetId?: string, prevValidat
 export function validateTracks(tracks: Track[], switchingSetId?: string, prevValidation?: Validation): Validation;
 
 // @alpha
+export type Validation = {
+    status: boolean;
+    errorMessages: string[];
+};
+
+// Warning: (ae-incompatible-release-tags) The symbol "VideoTrack" is marked as @public, but its signature references "Track" which is marked as @alpha
+//
+// @public (undocumented)
 export type VideoTrack = Track & {
     width: number;
     height: number;
@@ -693,10 +530,8 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/cmaf/ham/types/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "Format" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mappers/DashManifest.ts:38:2 - (ae-forgotten-export) The symbol "Initialization" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mappers/DashManifest.ts:157:2 - (ae-forgotten-export) The symbol "ContentComponent" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mappers/DashManifest.ts:158:2 - (ae-forgotten-export) The symbol "Role" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:63:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/manifest/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "ManifestFormat" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:22:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/VideoTrack.ts:6:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

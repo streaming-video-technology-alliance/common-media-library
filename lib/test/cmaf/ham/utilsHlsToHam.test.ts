@@ -1,12 +1,12 @@
 import { describe, it } from 'node:test';
 import { deepStrictEqual, equal } from 'node:assert';
-import {
-	formatSegments,
-	getByterange,
-	getCodec,
-	getDuration,
-} from '../../../src/cmaf/ham/mapper/hls/utilsHlsToHam.js';
-import { HlsManifest } from '../../../src/cmaf/ham/types';
+
+import { formatSegments } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/utils/formatSegments.js';
+import { getByterange } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/utils/getByterange.js';
+import { getCodec } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/utils/getCodec.js';
+import { getDuration } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/utils/getDuration.js';
+import { HlsManifest } from '../../../src/cmaf/ham/types/mapper/hls/HlsManifest.js';
+
 import { getSegments } from './data/hlsData.js';
 
 describe('getByterange', () => {

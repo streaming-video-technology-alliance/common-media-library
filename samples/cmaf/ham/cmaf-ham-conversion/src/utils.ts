@@ -21,7 +21,8 @@ export function listM3U8Files(directory: string): {
 		if (path.extname(file) === '.m3u8') {
 			if (file === 'manifest.m3u8' || file === 'main.m3u8') {
 				manifest = path.join(directory, file);
-			} else {
+			}
+			else {
 				playlists.push(path.join(directory, file));
 			}
 		}
