@@ -516,9 +516,7 @@ export type Validation = {
     errorMessages: string[];
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "VideoTrack" is marked as @public, but its signature references "Track" which is marked as @alpha
-//
-// @public (undocumented)
+// @alpha
 export type VideoTrack = Track & {
     width: number;
     height: number;
@@ -531,7 +529,7 @@ export type VideoTrack = Track & {
 // Warnings were encountered during analysis:
 //
 // src/cmaf/ham/types/manifest/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "ManifestFormat" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:22:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/VideoTrack.ts:6:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:23:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/VideoTrack.ts:19:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

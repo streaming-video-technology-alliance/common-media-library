@@ -2,9 +2,6 @@ import type { Segment } from '../../types/model/Segment.js';
 import type { Validation } from '../../types/Validation.js';
 
 /**
- *
- * @internal
- *
  * Validate a segment.
  *
  * Validations:
@@ -18,7 +15,6 @@ import type { Validation } from '../../types/Validation.js';
  *
  * @group CMAF
  * @alpha
- *
  */
 export function validateSegment(
 	segment: Segment,

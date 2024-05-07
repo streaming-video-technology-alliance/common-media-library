@@ -3,7 +3,9 @@ import { SelectionSet } from './SelectionSet.js';
 
 /**
  * CMAF-HAM Presentation type
- *
+ * 
+ * selectionSets - List of SelectionSets
+ * 
  * @group CMAF
  * @alpha
  */

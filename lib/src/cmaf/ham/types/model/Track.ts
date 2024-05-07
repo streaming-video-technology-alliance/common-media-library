@@ -4,7 +4,8 @@ import type { Segment } from './Segment.js';
 /**
  * CMAF-HAM Track type
  * Used as a base for the audio, video and text tracks
- *
+ * 
+ * type - The TrackType
  * fileName - File name of the track.
  * codec - Codec of the track.
  * duration - Duration of the track in seconds
@@ -31,4 +32,11 @@ export type Track = Ham & {
 	segments: Segment[];
 };
 
+/**
+ * CMAF-HAM TrackType type
+ * This can be 'audio' or 'video' or 'text'
+ * 
+ * @group CMAF
+ * @alpha
+ */
 type TrackType = 'audio' | 'video' | 'text';
