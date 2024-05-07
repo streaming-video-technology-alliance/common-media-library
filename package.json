@@ -28,9 +28,6 @@
 	"scripts": {
 		"format": "npm run lint -- --fix",
 		"lint": "eslint . --ext .js,.ts",
-		"prettier": "prettier",
-		"prettier:check": "prettier . --ext .js,.ts --check",
-		"prettier:fix": "npm run prettier -- --write",
 		"build": "npm run build -ws --if-present",
 		"pretest": "npm run build && npm run lint",
 		"test": "npm test -ws --if-present",
