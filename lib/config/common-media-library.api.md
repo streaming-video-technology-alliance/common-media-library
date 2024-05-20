@@ -4,11 +4,22 @@
 
 ```ts
 
+// @alpha
+export type AlignedSwitchingSet = {
+    switchingSets: SwitchingSet[];
+};
+
 // @beta
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string>;
 
 // @beta
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @alpha
+export type AudioTrack = Track & {
+    sampleRate: number;
+    channels: number;
+};
 
 // @beta
 export function base64decode(str: string): Uint8Array;
@@ -31,12 +42,12 @@ export interface Cmcd {
     mtp?: number;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
+    ot?: CmcdObjectType;
     pr?: number;
     rtp?: number;
-    sf?: CmStreamingFormat;
+    sf?: CmcdStreamingFormat;
     sid?: string;
-    st?: CmStreamType;
+    st?: CmcdStreamType;
     su?: boolean;
     tb?: number;
     v?: number;
@@ -49,7 +60,7 @@ export const CMCD_PARAM = "CMCD";
 export const CMCD_V1 = 1;
 
 // @beta
-export type CmcdCustomKey = CmCustomKey;
+export type CmcdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmcdEncodeOptions {
@@ -87,13 +98,7 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 export type CmcdKey = keyof Cmcd;
 
 // @beta
-export type CmcdValue = CmValue;
-
-// @beta
-export type CmCustomKey = `${string}-${string}`;
-
-// @beta
-enum CmObjectType {
+export enum CmcdObjectType {
     AUDIO = "a",
     CAPTION = "c",
     INIT = "i",
@@ -104,8 +109,28 @@ enum CmObjectType {
     TIMED_TEXT = "tt",
     VIDEO = "v"
 }
-export { CmObjectType as CmcdObjectType }
-export { CmObjectType as CmsdObjectType }
+
+// @beta
+export enum CmcdStreamingFormat {
+    DASH = "d",
+    HLS = "h",
+    OTHER = "o",
+    SMOOTH = "s"
+}
+
+// @beta
+export enum CmcdStreamType {
+    LIVE = "l",
+    VOD = "v"
+}
+
+// @beta
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-internal-missing-underscore) The name "CmCustomKey" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export type CmCustomKey = `${string}-${string}`;
 
 // @beta
 export const CMSD_DYNAMIC = "CMSD-Dynamic";
@@ -117,7 +142,7 @@ export const CMSD_STATIC = "CMSD-Static";
 export const CMSD_V1 = 1;
 
 // @beta
-export type CmsdCustomKey = CmCustomKey;
+export type CmsdCustomKey = `${string}-${string}`;
 
 // @beta
 export interface CmsdDynamic {
@@ -147,6 +172,19 @@ export enum CmsdHeaderField {
 }
 
 // @beta
+export enum CmsdObjectType {
+    AUDIO = "a",
+    CAPTION = "c",
+    INIT = "i",
+    KEY = "k",
+    MANIFEST = "m",
+    MUXED = "av",
+    OTHER = "o",
+    TIMED_TEXT = "tt",
+    VIDEO = "v"
+}
+
+// @beta
 export interface CmsdStatic {
     [index: CmsdCustomKey]: CmsdValue;
     at?: number;
@@ -156,35 +194,36 @@ export interface CmsdStatic {
     n?: string;
     nor?: string;
     nrr?: string;
-    ot?: CmObjectType;
-    sf?: CmStreamingFormat;
-    st?: CmStreamType;
+    ot?: CmsdObjectType;
+    sf?: CmsdStreamingFormat;
+    st?: CmsdStreamType;
     su?: boolean;
     v?: number;
 }
 
 // @beta
-export type CmsdValue = CmValue;
-
-// @beta
-enum CmStreamingFormat {
+export enum CmsdStreamingFormat {
     DASH = "d",
     HLS = "h",
     OTHER = "o",
     SMOOTH = "s"
 }
-export { CmStreamingFormat as CmcdStreamingFormat }
-export { CmStreamingFormat as CmsdStreamingFormat }
 
 // @beta
-enum CmStreamType {
+export enum CmsdStreamType {
     LIVE = "l",
     VOD = "v"
 }
-export { CmStreamType as CmcdStreamType }
-export { CmStreamType as CmsdStreamType }
 
 // @beta
+export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
+
+// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "CmStreamType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "CmValue" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
 
 // @beta
@@ -212,6 +251,9 @@ export interface CommonMediaResponse {
     type?: string;
     url?: string;
 }
+
+// @alpha
+export function dashToHam(manifest: string): Presentation[];
 
 // @beta
 export function decodeCmcd(cmcd: string): Cmcd;
@@ -279,6 +321,24 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 // @beta
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
+// @alpha
+export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
+
+// @alpha
+export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?: (track: Track) => boolean): Track[];
+
+// @alpha
+export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
+
+// @alpha
+export function hamToDash(presentation: Presentation[]): Manifest;
+
+// @alpha
+export function hamToHls(presentation: Presentation[]): Manifest;
+
+// @alpha
+export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
+
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
@@ -286,6 +346,22 @@ export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 //
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
+
+// @alpha
+export type Manifest = {
+    manifest: string;
+    fileName?: string;
+    ancillaryManifests?: Manifest[];
+    type: ManifestFormat;
+    metadata?: Map<string, string>;
+};
+
+// Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
+//
+// @alpha
+export type Presentation = Ham & {
+    selectionSets: SelectionSet[];
+};
 
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
@@ -309,6 +385,19 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
+
+// @alpha
+export type Segment = {
+    duration: number;
+    url: string;
+    byteRange?: string;
+};
+
+// @alpha
+export type SelectionSet = Ham & {
+    switchingSets: SwitchingSet[];
+    alignedSwitchingSets?: AlignedSwitchingSet[];
+};
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
@@ -354,6 +443,15 @@ export class SfToken {
     description: string;
 }
 
+// @alpha
+export type SwitchingSet = Ham & {
+    tracks: Track[];
+};
+
+// @alpha
+type TextTrack_2 = Track;
+export { TextTrack_2 as TextTrack }
+
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};
 
@@ -363,6 +461,19 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
+// @alpha
+export type Track = Ham & {
+    type: TrackType;
+    fileName?: string;
+    codec: string;
+    duration: number;
+    language: string;
+    bandwidth: number;
+    byteRange?: string;
+    urlInitialization?: string;
+    segments: Segment[];
+};
+
 // @beta
 export function urlToRelativePath(url: string, base: string): string;
 
@@ -371,5 +482,54 @@ export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 
 // @beta
 export function uuid(): string;
+
+// @alpha
+export function validatePresentation(presentation: Presentation): Validation;
+
+// @alpha
+export function validateSegment(segment: Segment, trackId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSegments(segments: Segment[], trackId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSelectionSet(selectionSet: SelectionSet, presentationId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSelectionSets(selectionSets: SelectionSet[], presentationId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSwitchingSet(switchingSet: SwitchingSet, selectionSetId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateSwitchingSets(switchingSets: SwitchingSet[], selectionSetId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateTrack(track: Track, switchingSetId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export function validateTracks(tracks: Track[], switchingSetId?: string, prevValidation?: Validation): Validation;
+
+// @alpha
+export type Validation = {
+    status: boolean;
+    errorMessages: string[];
+};
+
+// @alpha
+export type VideoTrack = Track & {
+    width: number;
+    height: number;
+    frameRate: FrameRate;
+    par: string;
+    sar: string;
+    scanType: string;
+};
+
+// Warnings were encountered during analysis:
+//
+// src/cmaf/ham/types/manifest/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "ManifestFormat" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/Track.ts:23:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/model/VideoTrack.ts:19:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

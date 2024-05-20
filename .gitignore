@@ -2,4 +2,5 @@ node_modules/
 dist
 temp
 .vscode
+.idea
 RELEASE.md
