@@ -31,8 +31,10 @@ export function base64encode(binary: Uint8Array): string;
 export function canParseId3(data: Uint8Array, offset: number): boolean;
 
 // @beta
+export type CaptionModes = 'MODE_ROLL-UP' | 'MODE_POP-ON' | 'MODE_PAINT-ON' | 'MODE_TEXT' | null;
+
+// @beta
 export class CaptionScreen {
-    // Warning: (ae-forgotten-export) The symbol "CaptionsLogger" needs to be exported by the entry point index.d.ts
     constructor(logger?: CaptionsLogger);
     // (undocumented)
     backSpace(): void;
@@ -63,6 +65,16 @@ export class CaptionScreen {
     setPen(styles: Partial<PenStyles>): void;
     // (undocumented)
     setRollUpRows(nrRows: number | null): void;
+}
+
+// @beta
+export class CaptionsLogger {
+    // (undocumented)
+    log(severity: VerboseLevel, msg: string | (() => string)): void;
+    // (undocumented)
+    time: number | null;
+    // (undocumented)
+    verboseLevel: VerboseLevel;
 }
 
 // @beta
@@ -144,28 +156,6 @@ export enum CmcdObjectType {
     TIMED_TEXT = "tt",
     VIDEO = "v"
 }
-
-// @beta
-export enum CmcdStreamingFormat {
-    DASH = "d",
-    HLS = "h",
-    OTHER = "o",
-    SMOOTH = "s"
-}
-
-// @beta
-export enum CmcdStreamType {
-    LIVE = "l",
-    VOD = "v"
-}
-
-// @beta
-export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
-
-// Warning: (ae-internal-missing-underscore) The name "CmCustomKey" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export type CmCustomKey = `${string}-${string}`;
 
 // @beta
 export enum CmcdStreamingFormat {
@@ -309,9 +299,6 @@ export interface CommonMediaResponse {
     url?: string;
 }
 
-// @alpha
-export function dashToHam(manifest: string): Presentation[];
-
 // @beta
 export class Cta608Channel {
     constructor(channelNumber: number, outputFilter: CueHandler, logger?: CaptionsLogger);
@@ -357,8 +344,6 @@ export class Cta608Channel {
     reset(): void;
     // (undocumented)
     setBkgData(bkgData: Partial<PenStyles>): void;
-    // Warning: (ae-forgotten-export) The symbol "CaptionModes" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     setMode(newMode: CaptionModes): void;
     // (undocumented)
@@ -382,6 +367,9 @@ export interface CueHandler {
     // (undocumented)
     reset?(): void;
 }
+
+// @alpha
+export function dashToHam(manifest: string): Presentation[];
 
 // @beta
 export function decodeCmcd(cmcd: string): Cmcd;
@@ -438,6 +426,12 @@ export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Ar
 // @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
 
+// @alpha
+export type FrameRate = {
+    frameRateNumerator: number;
+    frameRateDenominator?: number;
+};
+
 // @beta
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
 
@@ -465,6 +459,11 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
 // @alpha
+export type Ham = {
+    id: string;
+};
+
+// @alpha
 export function hamToDash(presentation: Presentation[]): Manifest;
 
 // @alpha
@@ -490,12 +489,8 @@ export type Manifest = {
     metadata?: Map<string, string>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
-//
 // @alpha
-export type Presentation = Ham & {
-    selectionSets: SelectionSet[];
-};
+export type ManifestFormat = 'hls' | 'dash';
 
 // @beta
 export interface PACData {
@@ -544,6 +539,11 @@ export type PenStyles = {
     flash: boolean;
 };
 
+// @alpha
+export type Presentation = Ham & {
+    selectionSets: SelectionSet[];
+};
+
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
@@ -566,19 +566,6 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
-
-// @alpha
-export type Segment = {
-    duration: number;
-    url: string;
-    byteRange?: string;
-};
-
-// @alpha
-export type SelectionSet = Ham & {
-    switchingSets: SwitchingSet[];
-    alignedSwitchingSets?: AlignedSwitchingSet[];
-};
 
 // @beta
 export class Row {
@@ -609,6 +596,44 @@ export class Row {
     // (undocumented)
     setPenStyles(styles: Partial<PenStyles>): void;
 }
+
+// @beta
+export class SccParser {
+    constructor(processor: any, field?: number | any);
+    // (undocumented)
+    field: number | any;
+    // (undocumented)
+    getField(): any;
+    // (undocumented)
+    getHeaderStatus(): boolean;
+    // (undocumented)
+    getLinesParsed(): number;
+    // (undocumented)
+    hasHeader: boolean;
+    // (undocumented)
+    nrLinesParsed: number;
+    // (undocumented)
+    parse(text: string): void;
+    // (undocumented)
+    parseDataLine(line: string): [number, number[]] | null;
+    // (undocumented)
+    processor: any;
+    // (undocumented)
+    timeConverter(smpteTs: string): number;
+}
+
+// @alpha
+export type Segment = {
+    duration: number;
+    url: string;
+    byteRange?: string;
+};
+
+// @alpha
+export type SelectionSet = Ham & {
+    switchingSets: SwitchingSet[];
+    alignedSwitchingSets?: AlignedSwitchingSet[];
+};
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
@@ -654,15 +679,6 @@ export class SfToken {
     description: string;
 }
 
-// @alpha
-export type SwitchingSet = Ham & {
-    tracks: Track[];
-};
-
-// @alpha
-type TextTrack_2 = Track;
-export { TextTrack_2 as TextTrack }
-
 // @beta
 export class StyledUnicodeChar {
     // (undocumented)
@@ -686,6 +702,15 @@ export class StyledUnicodeChar {
 // @beta
 export type SupportedField = 1 | 3;
 
+// @alpha
+export type SwitchingSet = Ham & {
+    tracks: Track[];
+};
+
+// @alpha
+type TextTrack_2 = Track;
+export { TextTrack_2 as TextTrack }
+
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
@@ -707,6 +732,9 @@ export type Track = Ham & {
     urlInitialization?: string;
     segments: Segment[];
 };
+
+// @alpha
+export type TrackType = 'audio' | 'video' | 'text';
 
 // @beta
 export function urlToRelativePath(url: string, base: string): string;
@@ -750,6 +778,22 @@ export type Validation = {
     errorMessages: string[];
 };
 
+// @beta
+export const enum VerboseLevel {
+    // (undocumented)
+    DATA = 3,
+    // (undocumented)
+    DEBUG = 3,
+    // (undocumented)
+    ERROR = 0,
+    // (undocumented)
+    INFO = 2,
+    // (undocumented)
+    TEXT = 1,
+    // (undocumented)
+    WARNING = 2
+}
+
 // @alpha
 export type VideoTrack = Track & {
     width: number;
@@ -759,11 +803,5 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/cmaf/ham/types/manifest/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "ManifestFormat" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:23:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/VideoTrack.ts:19:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

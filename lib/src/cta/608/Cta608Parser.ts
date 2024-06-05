@@ -43,7 +43,7 @@ import { Cta608Channel } from './Cta608Channel.js';
 import { PACData } from './PACData.js';
 import { PenStyles } from './PenStyles.js';
 import { SupportedField } from './SupportedField.js';
-import { VerboseLevel } from './utils/VerboseLevel.js';
+import { VerboseLevel } from './VerboseLevel.js';
 import { backgroundColors } from './utils/backgroundColors.js';
 import { createCmdHistory } from './utils/createCmdHistory.js';
 import { getCharForByte } from './utils/getCharForByte.js';
@@ -185,7 +185,7 @@ export class Cta608Parser {
 	 * @returns True if a command was found
 	 */
 	private parseCmd(a: number, b: number): boolean {
-		
+
 		const cond1 =
 			(a === 0x14 || a === 0x1c || a === 0x15 || a === 0x1d) &&
 			b >= 0x20 &&
@@ -252,7 +252,7 @@ export class Cta608Parser {
 			// a == 0x17 || a == 0x1F
 			channel.ccTO(b - 0x20);
 		}
-		
+
 		this.currentChannel = chNr;
 		return true;
 	}

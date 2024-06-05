@@ -41,11 +41,12 @@ import { PACData } from './PACData.js';
 import { PenStyles } from './PenStyles.js';
 import { Row } from './Row.js';
 import { NR_ROWS } from './utils/NR_ROWS.js';
-import { VerboseLevel } from './utils/VerboseLevel.js';
+import { VerboseLevel } from './VerboseLevel.js';
 
 /**
  * Keep a CTA-608 screen of 32x15 styled characters
  *
+ * @group CTA-608
  * @beta
  */
 export class CaptionScreen {

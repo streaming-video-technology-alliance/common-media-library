@@ -6,6 +6,7 @@
  * @param size - The size of the data
  * @returns The extracted CTA-608 NAL units
  *
+ * @group CTA-608
  * @beta
  */
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>> {

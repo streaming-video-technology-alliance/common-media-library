@@ -12,6 +12,7 @@ import {
  * @param sampleSize - The size of the sample in bytes
  * @returns fieldData array containing field 1 and field 2 data arrays
  *
+ * @group CTA-608
  * @beta
  */
 export function extractCta608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {
@@ -19,8 +20,8 @@ export function extractCta608DataFromSample(raw: DataView, startPos: number, sam
 	let nalType: number = 0;
 	const fieldData: number[][] = [[], []];
 
-	for (let cursor = startPos; cursor < startPos + sampleSize - 5; cursor++) {  
-		nalSize = raw.getUint32(cursor); 
+	for (let cursor = startPos; cursor < startPos + sampleSize - 5; cursor++) {
+		nalSize = raw.getUint32(cursor);
 		nalType = raw.getUint8(cursor + 4) & 0x1F;
 
 		// Make sure that we don't go out of bounds
@@ -30,7 +31,7 @@ export function extractCta608DataFromSample(raw: DataView, startPos: number, sam
 
 		// Only process Supplemental Enhancement Information (SEI) NAL units
 		if (isSeiNalUnitType(nalType)) {
-			if (cursor + 5 + nalSize <= raw.byteLength) { 
+			if (cursor + 5 + nalSize <= raw.byteLength) {
 				const seiData = getSeiData(raw, cursor + 5, cursor + 5 + nalSize);
 				parseCta608DataFromSei(seiData, fieldData);
 			}

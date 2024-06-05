@@ -1,4 +1,3 @@
-
 export const numArrayToHexArray = function (numArray: number[]): string[] {
 	const hexArray: string[] = [];
 	for (let j = 0; j < numArray.length; j++) {

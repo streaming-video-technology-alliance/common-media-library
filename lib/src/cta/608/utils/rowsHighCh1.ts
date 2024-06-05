@@ -1,4 +1,3 @@
-
 export const rowsHighCh1: { [key: number]: number; } = {
 	17: 2,
 	18: 4,

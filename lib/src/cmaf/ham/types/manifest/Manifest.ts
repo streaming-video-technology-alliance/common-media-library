@@ -1,4 +1,4 @@
-type ManifestFormat = 'hls' | 'dash';
+import type { ManifestFormat } from './ManifestFormat.js';
 
 /**
  * Manifest object received as an input by the conversion to HAM object

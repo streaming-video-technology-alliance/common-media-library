@@ -40,13 +40,14 @@ import { CaptionsLogger } from './CaptionsLogger.js';
 import { PenState } from './PenState.js';
 import { PenStyles } from './PenStyles.js';
 import { StyledUnicodeChar } from './StyledUnicodeChar.js';
+import { VerboseLevel } from './VerboseLevel.js';
 import { NR_COLS } from './utils/NR_COLS.js';
-import { VerboseLevel } from './utils/VerboseLevel.js';
 import { getCharForByte } from './utils/getCharForByte.js';
 
 /**
  * CTA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
  *
+ * @group CTA-608
  * @beta
  */
 export class Row {

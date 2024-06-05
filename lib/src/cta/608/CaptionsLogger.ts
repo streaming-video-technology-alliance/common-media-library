@@ -36,8 +36,14 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { VerboseLevel } from './utils/VerboseLevel.js';
+import { VerboseLevel } from './VerboseLevel.js';
 
+/**
+ * CaptionsLogger. To be removed in the future.
+ *
+ * @group CTA-608
+ * @beta
+ */
 export class CaptionsLogger {
 	public time: number | null = null;
 	public verboseLevel: VerboseLevel = VerboseLevel.ERROR;

@@ -1,4 +1,3 @@
-
 export const backgroundColors: string[] = [
 	'white',
 	'green',

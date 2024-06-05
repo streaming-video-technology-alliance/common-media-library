@@ -42,11 +42,12 @@ import { CaptionsLogger } from './CaptionsLogger.js';
 import type { CueHandler } from './CueHandler.js';
 import { PACData } from './PACData.js';
 import { PenStyles } from './PenStyles.js';
-import { VerboseLevel } from './utils/VerboseLevel.js';
+import { VerboseLevel } from './VerboseLevel.js';
 
 /**
  * CTA-608 Channel
  *
+ * @group CTA-608
  * @beta
  */
 export class Cta608Channel {

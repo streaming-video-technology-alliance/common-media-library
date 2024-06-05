@@ -1,4 +1,3 @@
-
 export const rowsLowCh2: { [key: number]: number; } = {
 	25: 1,
 	26: 3,

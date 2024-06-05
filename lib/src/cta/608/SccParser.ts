@@ -28,34 +28,48 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-function SccParser(processor: any, field: number | any = 1) {
-	let hasHeader = false;
-	let nrLinesParsed = 0;
 
-	function parse(text: string): void {
+/**
+ * SCC Parser
+ *
+ * @group CTA-608
+ * @beta
+ */
+export class SccParser {
+	hasHeader: boolean = false;
+	nrLinesParsed: number = 0;
+	processor: any;
+	field: number | any;
+
+	constructor(processor: any, field: number | any = 1) {
+		this.processor = processor;
+		this.field = field;
+	}
+
+	parse(text: string): void {
 		const lines = text.split(/\r?\n/);
-		nrLinesParsed = 0;
+		this.nrLinesParsed = 0;
 
 		if (lines[0] === 'Scenarist_SCC V1.0') {
-			hasHeader = true;
-			nrLinesParsed++;
+			this.hasHeader = true;
+			this.nrLinesParsed++;
 		}
 
 		for (let l = 1; l < lines.length; l += 2) {
 			if (lines[l] !== '') {
 				break;  // Every second line should be empty
 			}
-			nrLinesParsed++;
-			const lineData = parseDataLine(lines[l + 1]);
+			this.nrLinesParsed++;
+			const lineData = this.parseDataLine(lines[l + 1]);
 			if (lineData === null) {
 				break;
 			}
-			nrLinesParsed++;
-			processor.addData(lineData[0], lineData[1]);
+			this.nrLinesParsed++;
+			this.processor.addData(lineData[0], lineData[1]);
 		}
 	}
 
-	function parseDataLine(line: string): [number, number[]] | null {
+	parseDataLine(line: string): [number, number[]] | null {
 		if (!line) {
 			return null;
 		}
@@ -71,11 +85,11 @@ function SccParser(processor: any, field: number | any = 1) {
 			ceaData.push(a, b);
 		}
 
-		const time = timeConverter(timeData);
+		const time = this.timeConverter(timeData);
 		return [time, ceaData];
 	}
 
-	function timeConverter(smpteTs: string): number {
+	timeConverter(smpteTs: string): number {
 		const parts = smpteTs.split(':');
 		if (parts.length === 3) {
 			const lastParts = parts[2].split(';');
@@ -86,24 +100,15 @@ function SccParser(processor: any, field: number | any = 1) {
 		return 0;  // in case if format is incorrect
 	}
 
-	function getHeaderStatus() {
-		return hasHeader;
+	getHeaderStatus() {
+		return this.hasHeader;
 	}
 
-	function getField() {
-		return field;
+	getField() {
+		return this.field;
 	}
 
-	function getLinesParsed() {
-		return nrLinesParsed;
+	getLinesParsed() {
+		return this.nrLinesParsed;
 	}
-    
-	return {
-		parse,
-		getHeaderStatus,
-		getField,
-		getLinesParsed,
-	};
 }
-
-export { SccParser };

@@ -41,6 +41,7 @@ import { PenStyles } from './PenStyles.js';
 /**
  * Pen state.
  *
+ * @group CTA-608
  * @beta
  */
 export class PenState {
