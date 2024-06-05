@@ -19,6 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.7.0] - 2024-06-05
+
+### Added
+- Add CMAF-Ham types, mappers and services to convert and manipulate VOD HLS and VOD DASH manifests.
+- Add cmaf-ham-converter sample to showcase the CMAF-Ham functions.
+- Implement CEA 608/708 parser [#62](https://github.com/streaming-video-technology-alliance/common-media-library/issues/62)
+
+### Fix
+- Integrate outstanding 608 PR [#88](https://github.com/streaming-video-technology-alliance/common-media-library/issues/88)
+
+
 ## [0.6.4] - 2024-03-04
 
 ### Fixed
@@ -182,7 +193,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap project [#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2)
 
 
-[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.4...HEAD  
+[Unreleased]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.0...HEAD  
+[0.7.0]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.4...v0.7.0  
 [0.6.4]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.3...v0.6.4  
 [0.6.3]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.2...v0.6.3  
 [0.6.2]\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.6.1...v0.6.2  

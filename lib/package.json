@@ -1,6 +1,6 @@
 {
 	"name": "@svta/common-media-library",
-	"version": "0.6.4",
+	"version": "0.7.0",
 	"license": "Apache-2.0",
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -60,7 +60,10 @@
 		"Structured Field Values",
 		"ID3",
 		"Common Media Request",
-		"Common Media Response"
+		"Common Media Response",
+		"CTA-608",
+		"CEA-608",
+		"EIA-608"
 	],
 	"scripts": {
 		"build": "npm run build:esm && npm run build:cjs",

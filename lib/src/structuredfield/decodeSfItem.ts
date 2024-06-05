@@ -1,4 +1,5 @@
 import { SfDecodeOptions } from './SfDecodeOptions.js';
+import type { SfItem } from './SfItem.js';
 import { parseError } from './parse/parseError.js';
 import { parseItem } from './parse/parseItem.js';
 import { ITEM } from './utils/ITEM.js';
@@ -34,7 +35,7 @@ import { ITEM } from './utils/ITEM.js';
  *
  * @beta
  */
-export function decodeSfItem(input: string, options?: SfDecodeOptions) {
+export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem {
 	try {
 		const { src, value } = parseItem(input.trim(), options);
 		if (src !== '') {

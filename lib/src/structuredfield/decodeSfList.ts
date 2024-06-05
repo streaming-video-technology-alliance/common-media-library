@@ -1,4 +1,5 @@
 import { SfDecodeOptions } from './SfDecodeOptions.js';
+import type { SfMember } from './SfMember.js';
 import { parseError } from './parse/parseError.js';
 import { parseList } from './parse/parseList.js';
 import { LIST } from './utils/LIST.js';
@@ -13,7 +14,7 @@ import { LIST } from './utils/LIST.js';
  *
  * @beta
  */
-export function decodeSfList(input: string, options?: SfDecodeOptions) {
+export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember[] {
 	try {
 		const { src, value } = parseList(input.trim(), options);
 		if (src !== '') {

@@ -15,7 +15,7 @@ import { encodeCmcd } from './encodeCmcd.js';
  *
  * @beta
  */
-export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
+export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
 		return '';
 	}

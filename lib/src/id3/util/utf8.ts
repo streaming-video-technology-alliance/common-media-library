@@ -2,7 +2,7 @@ export function toUint8(
 	data: BufferSource,
 	offset: number = 0,
 	length: number = Infinity
-) {
+): Uint8Array {
 	return view(data, offset, length, Uint8Array);
 }
 
@@ -10,7 +10,7 @@ function view<T extends ArrayBufferView>(
 	data: BufferSource,
 	offset: number,
 	length: number,
-	Type: { new (buffer: ArrayBuffer, byteOffset: number, length: number): T }
+	Type: { new(buffer: ArrayBuffer, byteOffset: number, length: number): T }
 ): T {
 	const buffer = unsafeGetArrayBuffer(data);
 	let bytesPerElement: any = 1;

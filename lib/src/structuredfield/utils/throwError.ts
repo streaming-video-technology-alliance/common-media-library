@@ -14,6 +14,6 @@ function format(value: any) {
 	return String(value);
 }
 
-export function throwError(action: string, src: any, type: string, cause?: any) {
+export function throwError(action: string, src: any, type: string, cause?: any): Error {
 	return new Error(`failed to ${action} "${format(src)}" as ${type}`, { cause });
 }

@@ -20,7 +20,7 @@ import { serializeError } from './serializeError.js';
 // 5.  Append input_key to output.
 //
 // 6.  Return output.
-export function serializeKey(value: string) {
+export function serializeKey(value: string): string {
 	if (/^[a-z*][a-z0-9\-_.*]*$/.test(value) === false) {
 		throw serializeError(value, KEY);
 	}
