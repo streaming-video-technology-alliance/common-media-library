@@ -66,6 +66,7 @@ export class Cta608Parser {
 	private currentChannel: Channels = 0;
 	private cmdHistory: CmdHistory = createCmdHistory();
 	private logger: CaptionsLogger;
+	private lastTime: number | null = null;
 
 	constructor(field: SupportedField, out1: any, out2: any) {
 		const logger = (this.logger = new CaptionsLogger());
@@ -83,6 +84,7 @@ export class Cta608Parser {
 	 * @param byteList - The list of bytes
 	 */
 	addData(time: number | null, byteList: number[]): void {
+		this.lastTime = time;
 		this.logger.time = time;
 
 		for (let i = 0; i < byteList.length; i += 2) {
@@ -90,6 +92,11 @@ export class Cta608Parser {
 			const b = byteList[i + 1] & 0x7f;
 			let cmdFound: boolean = false;
 			let charsFound: number[] | null = null;
+
+			if (this.lastTime !== null) {
+				time = this.lastTime + 0.5 * i * 1001 / 30000;
+				this.logger.time = time;
+			}
 
 			if (a === 0 && b === 0) {
 				continue;
