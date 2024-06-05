@@ -40,7 +40,8 @@
 		"**/dist",
 		"**/node_modules",
 		"**/docs",
-		"**/dev"
+		"**/dev",
+		"**/samples"
 	],
 	"ts-node": {
 		"esm": true
