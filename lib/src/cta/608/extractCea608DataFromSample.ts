@@ -15,19 +15,29 @@ import {
  * @beta
  */
 export function extractCea608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {
-	let nalSize = 0;
-	let nalType = 0;
+	let nalSize: number = 0;
+	let nalType: number = 0;
 	const fieldData: number[][] = [[], []];
 
-	for (let cursor = startPos; cursor < startPos + sampleSize - 5; cursor += nalSize + 4) {
-		nalSize = raw.getUint32(cursor, true);
+	for (let cursor = startPos; cursor < startPos + sampleSize - 5; cursor++) {  
+		nalSize = raw.getUint32(cursor); 
 		nalType = raw.getUint8(cursor + 4) & 0x1F;
+
+		// Make sure that we don't go out of bounds
+		if (cursor + 5 + nalSize > startPos + sampleSize) {
+			break;
+		}
 
 		// Only process Supplemental Enhancement Information (SEI) NAL units
 		if (isSeiNalUnitType(nalType)) {
-			const seiData = getSeiData(raw, cursor + 5, cursor + nalSize + 4);
-			parseCea608DataFromSei(seiData, fieldData);
+			if (cursor + 5 + nalSize <= raw.byteLength) { 
+				const seiData = getSeiData(raw, cursor + 5, cursor + 5 + nalSize);
+				parseCea608DataFromSei(seiData, fieldData);
+			}
 		}
+
+		// Jump to the next NAL unit
+		cursor += nalSize + 3;
 	}
 	return fieldData;
 }
