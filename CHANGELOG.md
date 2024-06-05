@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.0] - 2024-06-05
 
+### Added
+- Add CMAF-Ham types, mappers and services to convert and manipulate VOD HLS and VOD DASH manifests.
+- Add cmaf-ham-converter sample to showcase the CMAF-Ham functions.
+
 
 ## [0.6.4] - 2024-03-04
 
