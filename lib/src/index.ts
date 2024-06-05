@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 export * from './608.js';
+export * from './cmaf-ham.js';
 export * from './cmcd.js';
 export * from './cmsd.js';
 export type * from './cta.js';
