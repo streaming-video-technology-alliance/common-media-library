@@ -18,15 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.7.0] - 2024-06-05
+
 ### Added
 - Implement CEA 608/708 parser [#62](https://github.com/streaming-video-technology-alliance/common-media-library/issues/62)
+
+### Fix
 - Integrate outstanding 608 PR [#88](https://github.com/streaming-video-technology-alliance/common-media-library/issues/88)
-
-
-## [0.7.0] - 2024-06-05
-
-
-## [0.7.0] - 2024-06-05
 
 
 ## [0.6.4] - 2024-03-04
