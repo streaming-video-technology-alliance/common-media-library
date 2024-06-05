@@ -5,9 +5,11 @@ This project aims to demonstrate and explore the functionalities of the CMAF-Ham
 When you run this project using the command `npm run dev`, different versions of the content in the `input/` folder will be created using the CMAF-Ham library. It's worth noting that it is possible to add new content to the `input` folder to transform between formats.
 
 ## Steps to run the script
-1. Execute `npm i`
-2. Execute `npm run dev`
-3. Verify that a new folder called `dist/` is created with the output files created using the CMAF-Ham library. In each subfolder you will find:
+1. Open a terminal in the **root folder** of the **common-media-library** project.
+2. Run `npm ci` and then `npm run build`.
+3. Go the cmaf-ham-conversion sample using `cd samples/cmaf-ham-conversion`.
+4. Execute `npm run dev`.
+5. Verify that a new folder called `dist/` is created with the output files created using the CMAF-Ham library. In each subfolder you will find:
    * `ham.json`: A JSON export of the Ham object.
    * `validations.json`: A JSON file containing the results of the validation for each presentation of the content.
    * `main.m3u8`: A the multivariant playlist of the HLS version of the content. 
