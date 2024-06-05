@@ -3,7 +3,8 @@ export function getSeiData(raw: DataView, startPos: number, endPos: number): Dat
 
 	for (let cursor = startPos; cursor < endPos; cursor++) {
 		if (cursor + 2 < endPos && raw.getUint8(cursor) === 0x00 && raw.getUint8(cursor + 1) === 0x00 && raw.getUint8(cursor + 2) === 0x03) {
-			data.push(0x00, 0x00);
+			data.push(0x00);
+			data.push(0x00);
 			cursor += 2;
 		} 
 		else {
@@ -20,11 +21,26 @@ export function isCea608Sei(payloadType: number, payloadSize: number, sei: DataV
 	}
 
 	const countryCode = sei.getUint8(pos);
-	const providerCode = sei.getUint16(pos + 1, true);
-	const userIdentifier = sei.getUint32(pos + 3, true);
-	const userDataTypeCode = sei.getUint8(pos + 7);
+	if (countryCode !== 0xB5) {
+		return false;
+	}
 
-	return countryCode === 0xB5 && providerCode === 0x0031 && userIdentifier === 0x47413934 && userDataTypeCode === 0x03;
+	const providerCode = sei.getUint16(pos + 1);
+	if (providerCode !== 0x0031) {
+		return false;
+	}
+
+	const userIdentifier = sei.getUint32(pos + 3);
+	if (userIdentifier !== 0x47413934) {
+		return false;
+	}
+
+	const userDataTypeCode = sei.getUint8(pos + 7);
+	if (userDataTypeCode !== 0x03) {
+		return false;
+	}
+
+	return true;
 }
 
 export function isCCType(type: number): boolean {
