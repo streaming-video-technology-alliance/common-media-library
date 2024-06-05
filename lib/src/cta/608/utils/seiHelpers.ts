@@ -55,7 +55,7 @@ export function isSeiNalUnitType(unitType: number): boolean {
 	return unitType === 0x06;
 }
 
-export function parseCea608DataFromSei(sei: DataView, fieldData: number[][]): void {
+export function parseCta608DataFromSei(sei: DataView, fieldData: number[][]): void {
 	let cursor = 0;
 	while (cursor < sei.byteLength) {
 		let payloadType = 0;
