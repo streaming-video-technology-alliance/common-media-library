@@ -31,6 +31,53 @@ export function base64encode(binary: Uint8Array): string;
 export function canParseId3(data: Uint8Array, offset: number): boolean;
 
 // @beta
+export type CaptionModes = 'MODE_ROLL-UP' | 'MODE_POP-ON' | 'MODE_PAINT-ON' | 'MODE_TEXT' | null;
+
+// @beta
+export class CaptionScreen {
+    constructor(logger?: CaptionsLogger);
+    // (undocumented)
+    backSpace(): void;
+    // (undocumented)
+    clearToEndOfRow(): void;
+    // (undocumented)
+    copy(other: CaptionScreen): void;
+    // (undocumented)
+    equals(other: CaptionScreen): boolean;
+    getDisplayText(asOneRow?: boolean): string;
+    // (undocumented)
+    getTextAndFormat(): Row[];
+    insertChar(char: number): void;
+    // (undocumented)
+    isEmpty(): boolean;
+    // (undocumented)
+    moveCursor(relPos: number): void;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    rollUp(): void;
+    setBkgData(bkgData: Partial<PenStyles>): void;
+    // (undocumented)
+    setCursor(absPos: number): void;
+    // (undocumented)
+    setPAC(pacData: PACData): void;
+    // (undocumented)
+    setPen(styles: Partial<PenStyles>): void;
+    // (undocumented)
+    setRollUpRows(nrRows: number | null): void;
+}
+
+// @beta
+export class CaptionsLogger {
+    // (undocumented)
+    log(severity: VerboseLevel, msg: string | (() => string)): void;
+    // (undocumented)
+    time: number | null;
+    // (undocumented)
+    verboseLevel: VerboseLevel;
+}
+
+// @beta
 export interface Cmcd {
     [index: CmcdCustomKey]: CmcdValue;
     bl?: number;
@@ -133,10 +180,10 @@ export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | 
 export type CmCustomKey = `${string}-${string}`;
 
 // @beta
-export const CMSD_DYNAMIC = "CMSD-Dynamic";
+export const CMSD_DYNAMIC: string;
 
 // @beta
-export const CMSD_STATIC = "CMSD-Static";
+export const CMSD_STATIC: string;
 
 // @beta
 export const CMSD_V1 = 1;
@@ -252,6 +299,75 @@ export interface CommonMediaResponse {
     url?: string;
 }
 
+// @beta
+export class Cta608Channel {
+    constructor(channelNumber: number, outputFilter: CueHandler, logger?: CaptionsLogger);
+    // (undocumented)
+    ccAOF(): void;
+    // (undocumented)
+    ccAON(): void;
+    // (undocumented)
+    ccBS(): void;
+    // (undocumented)
+    ccCR(): void;
+    // (undocumented)
+    ccDER(): void;
+    // (undocumented)
+    ccEDM(): void;
+    // (undocumented)
+    ccENM(): void;
+    // (undocumented)
+    ccEOC(): void;
+    // (undocumented)
+    ccFON(): void;
+    // (undocumented)
+    ccMIDROW(secondByte: number): void;
+    // (undocumented)
+    ccRCL(): void;
+    // (undocumented)
+    ccRDC(): void;
+    // (undocumented)
+    ccRTD(): void;
+    // (undocumented)
+    ccRU(nrRows: number | null): void;
+    // (undocumented)
+    ccTO(nrCols: number): void;
+    // (undocumented)
+    ccTR(): void;
+    // (undocumented)
+    cueSplitAtTime(t: number): void;
+    // (undocumented)
+    insertChars(chars: number[]): void;
+    // (undocumented)
+    outputDataUpdate(dispatch?: boolean): void;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setBkgData(bkgData: Partial<PenStyles>): void;
+    // (undocumented)
+    setMode(newMode: CaptionModes): void;
+    // (undocumented)
+    setPAC(pacData: PACData): void;
+}
+
+// @beta
+export class Cta608Parser {
+    constructor(field: SupportedField, out1: any, out2: any);
+    addData(time: number | null, byteList: number[]): void;
+    cueSplitAtTime(t: number): void;
+    reset(): void;
+}
+
+// @beta
+export interface CueHandler {
+    // (undocumented)
+    dispatchCue?(): void;
+    // (undocumented)
+    newCue(startTime: number, endTime: number, screen: CaptionScreen): void;
+    // (undocumented)
+    reset?(): void;
+}
+
 // @alpha
 export function dashToHam(manifest: string): Presentation[];
 
@@ -305,6 +421,18 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // @beta
+export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
+
+// @beta
+export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
+
+// @alpha
+export type FrameRate = {
+    frameRateNumerator: number;
+    frameRateDenominator?: number;
+};
+
+// @beta
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
 
 // @beta
@@ -329,6 +457,11 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 
 // @alpha
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
+
+// @alpha
+export type Ham = {
+    id: string;
+};
 
 // @alpha
 export function hamToDash(presentation: Presentation[]): Manifest;
@@ -356,8 +489,56 @@ export type Manifest = {
     metadata?: Map<string, string>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "Ham" needs to be exported by the entry point index.d.ts
-//
+// @alpha
+export type ManifestFormat = 'hls' | 'dash';
+
+// @beta
+export interface PACData {
+    // (undocumented)
+    color: string | null;
+    // (undocumented)
+    indent: number | null;
+    // (undocumented)
+    italics: boolean;
+    // (undocumented)
+    row: number;
+    // (undocumented)
+    underline: boolean;
+}
+
+// @beta
+export class PenState {
+    // (undocumented)
+    background: string;
+    // (undocumented)
+    copy(newPenState: PenState): void;
+    // (undocumented)
+    equals(other: PenState): boolean;
+    // (undocumented)
+    flash: boolean;
+    // (undocumented)
+    foreground: string;
+    // (undocumented)
+    isDefault(): boolean;
+    // (undocumented)
+    italics: boolean;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setStyles(styles: Partial<PenStyles>): void;
+    // (undocumented)
+    underline: boolean;
+}
+
+// @beta
+export type PenStyles = {
+    foreground: string | null;
+    underline: boolean;
+    italics: boolean;
+    background: string;
+    flash: boolean;
+};
+
 // @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
@@ -385,6 +566,61 @@ export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<Com
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
+
+// @beta
+export class Row {
+    constructor(logger?: CaptionsLogger);
+    backSpace(): void;
+    // (undocumented)
+    chars: StyledUnicodeChar[];
+    // (undocumented)
+    clear(): void;
+    // (undocumented)
+    clearFromPos(startPos: number): void;
+    // (undocumented)
+    clearToEndOfRow(): void;
+    // (undocumented)
+    copy(other: Row): void;
+    // (undocumented)
+    cueStartTime: number | null;
+    // (undocumented)
+    equals(other: Row): boolean;
+    // (undocumented)
+    getTextString(): string;
+    // (undocumented)
+    insertChar(byte: number): void;
+    // (undocumented)
+    isEmpty(): boolean;
+    moveCursor(relPos: number): void;
+    setCursor(absPos: number): void;
+    // (undocumented)
+    setPenStyles(styles: Partial<PenStyles>): void;
+}
+
+// @beta
+export class SccParser {
+    constructor(processor: any, field?: number | any);
+    // (undocumented)
+    field: number | any;
+    // (undocumented)
+    getField(): any;
+    // (undocumented)
+    getHeaderStatus(): boolean;
+    // (undocumented)
+    getLinesParsed(): number;
+    // (undocumented)
+    hasHeader: boolean;
+    // (undocumented)
+    nrLinesParsed: number;
+    // (undocumented)
+    parse(text: string): void;
+    // (undocumented)
+    parseDataLine(line: string): [number, number[]] | null;
+    // (undocumented)
+    processor: any;
+    // (undocumented)
+    timeConverter(smpteTs: string): number;
+}
 
 // @alpha
 export type Segment = {
@@ -443,6 +679,29 @@ export class SfToken {
     description: string;
 }
 
+// @beta
+export class StyledUnicodeChar {
+    // (undocumented)
+    copy(newChar: StyledUnicodeChar): void;
+    // (undocumented)
+    equals(other: StyledUnicodeChar): boolean;
+    // (undocumented)
+    isEmpty(): boolean;
+    // (undocumented)
+    penState: PenState;
+    // (undocumented)
+    reset(): void;
+    // (undocumented)
+    setChar(uchar: string, newPenState: PenState): void;
+    // (undocumented)
+    setPenState(newPenState: PenState): void;
+    // (undocumented)
+    uchar: string;
+}
+
+// @beta
+export type SupportedField = 1 | 3;
+
 // @alpha
 export type SwitchingSet = Ham & {
     tracks: Track[];
@@ -453,7 +712,7 @@ type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
 // @beta
-export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): {};
+export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
 // @beta
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
@@ -473,6 +732,9 @@ export type Track = Ham & {
     urlInitialization?: string;
     segments: Segment[];
 };
+
+// @alpha
+export type TrackType = 'audio' | 'video' | 'text';
 
 // @beta
 export function urlToRelativePath(url: string, base: string): string;
@@ -516,6 +778,22 @@ export type Validation = {
     errorMessages: string[];
 };
 
+// @beta
+export const enum VerboseLevel {
+    // (undocumented)
+    DATA = 3,
+    // (undocumented)
+    DEBUG = 3,
+    // (undocumented)
+    ERROR = 0,
+    // (undocumented)
+    INFO = 2,
+    // (undocumented)
+    TEXT = 1,
+    // (undocumented)
+    WARNING = 2
+}
+
 // @alpha
 export type VideoTrack = Track & {
     width: number;
@@ -525,11 +803,5 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/cmaf/ham/types/manifest/Manifest.ts:13:2 - (ae-forgotten-export) The symbol "ManifestFormat" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/Track.ts:23:2 - (ae-forgotten-export) The symbol "TrackType" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/model/VideoTrack.ts:19:2 - (ae-forgotten-export) The symbol "FrameRate" needs to be exported by the entry point index.d.ts
 
 ```

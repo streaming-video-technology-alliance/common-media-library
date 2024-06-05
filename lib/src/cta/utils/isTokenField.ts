@@ -7,5 +7,6 @@
  *
  * @internal
  */
-export const isTokenField = (key: string) =>
-	key === 'ot' || key === 'sf' || key === 'st';
+export function isTokenField(key: string): boolean {
+	return key === 'ot' || key === 'sf' || key === 'st';
+}

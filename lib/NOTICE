@@ -1,8 +1,11 @@
 Streaming Video Technology Alliance Common Media Library
 Copyright (c) 2023 Streaming Video Technology Alliance
 
-The src/id3.ts implementation in this project is derived 
-from the hls.js library (https://github.com/video-dev/hls.js/) 
+The src/id3.ts implementation in this project is derived
+from the hls.js library (https://github.com/video-dev/hls.js/)
 
-The src/structuredfield.ts implementation in this project is derived 
-from the structured-field-values library (https://github.com/Jxck/structured-field-values) 
+The src/structuredfield.ts implementation in this project is derived
+from the structured-field-values library (https://github.com/Jxck/structured-field-values)
+
+The src/608.ts implementation in this project is derived
+from the hls.js library (https://github.com/video-dev/hls.js/) and dash.js library (https://github.com/Dash-Industry-Forum/dash.js/)

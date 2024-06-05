@@ -9,7 +9,7 @@
  *
  * @beta
  */
-export function urlToRelativePath(url: string, base: string) {
+export function urlToRelativePath(url: string, base: string): string {
 	const to = new URL(url);
 	const from = new URL(base);
 
