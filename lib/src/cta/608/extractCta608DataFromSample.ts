@@ -1,7 +1,7 @@
 import {
 	getSeiData,
 	isSeiNalUnitType,
-	parseCea608DataFromSei,
+	parseCta608DataFromSei,
 } from './utils/seiHelpers.js';
 
 /**
@@ -14,7 +14,7 @@ import {
  *
  * @beta
  */
-export function extractCea608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {
+export function extractCta608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {
 	let nalSize: number = 0;
 	let nalType: number = 0;
 	const fieldData: number[][] = [[], []];
@@ -32,7 +32,7 @@ export function extractCea608DataFromSample(raw: DataView, startPos: number, sam
 		if (isSeiNalUnitType(nalType)) {
 			if (cursor + 5 + nalSize <= raw.byteLength) { 
 				const seiData = getSeiData(raw, cursor + 5, cursor + 5 + nalSize);
-				parseCea608DataFromSei(seiData, fieldData);
+				parseCta608DataFromSei(seiData, fieldData);
 			}
 		}
 
