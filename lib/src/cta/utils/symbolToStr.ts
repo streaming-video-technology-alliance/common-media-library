@@ -9,6 +9,6 @@ import { SfToken } from '../../structuredfield/SfToken.js';
  *
  * @internal
  */
-export function symbolToStr(symbol: symbol | SfToken) {
+export function symbolToStr(symbol: symbol | SfToken): string {
 	return symbol.description || symbol.toString().slice(7, -1);
 }

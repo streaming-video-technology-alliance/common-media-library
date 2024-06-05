@@ -8,6 +8,6 @@
  *
  * @beta
  */
-export function base64encode(binary: Uint8Array) {
+export function base64encode(binary: Uint8Array): string {
 	return btoa(String.fromCharCode(...binary));
 }

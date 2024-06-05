@@ -5,7 +5,7 @@ import { SfToken } from '../../structuredfield/SfToken.js';
 import { CmsdEncodeOptions } from '../CmsdEncodeOptions.js';
 import { CmsdStatic } from '../CmsdStatic.js';
 
-export function processCmsd(obj: CmsdStatic, options?: CmsdEncodeOptions) {
+export function processCmsd(obj: CmsdStatic, options?: CmsdEncodeOptions): CmsdStatic {
 	const results: CmsdStatic = {};
 
 	if (obj == null || typeof obj !== 'object') {

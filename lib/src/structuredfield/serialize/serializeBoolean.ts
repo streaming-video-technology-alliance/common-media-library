@@ -17,7 +17,7 @@ import { serializeError } from './serializeError.js';
 // 5.  If input_boolean is false, append "0" to output.
 //
 // 6.  Return output.
-export function serializeBoolean(value: boolean) {
+export function serializeBoolean(value: boolean): string {
 	if (typeof value !== 'boolean') {
 		throw serializeError(value, BOOLEAN);
 	}

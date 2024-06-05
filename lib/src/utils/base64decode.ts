@@ -8,6 +8,6 @@
  *
  * @beta
  */
-export function base64decode(str: string) {
+export function base64decode(str: string): Uint8Array {
 	return new Uint8Array([...atob(str)].map((a) => a.charCodeAt(0)));
 }

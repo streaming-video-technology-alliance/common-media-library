@@ -16,7 +16,7 @@ import { processCmcd } from './utils/processCmcd.js';
  *
  * @beta
  */
-export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions) {
+export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string {
 	const data = processCmcd(cmcd, options);
 
 	return JSON.stringify(data, (_, value) => typeof value === 'symbol' || value instanceof SfToken ? symbolToStr(value) : value);
