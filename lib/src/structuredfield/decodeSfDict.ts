@@ -1,4 +1,5 @@
 import { SfDecodeOptions } from './SfDecodeOptions.js';
+import type { SfDictionary } from './SfDictionary.js';
 import { parseDict } from './parse/parseDict.js';
 import { parseError } from './parse/parseError.js';
 import { DICT } from './utils/DICT.js';
@@ -13,7 +14,7 @@ import { DICT } from './utils/DICT.js';
  *
  * @beta
  */
-export function decodeSfDict(input: string, options?: SfDecodeOptions) {
+export function decodeSfDict(input: string, options?: SfDecodeOptions): SfDictionary {
 	try {
 		const { src, value } = parseDict(input.trim(), options);
 		if (src !== '') {

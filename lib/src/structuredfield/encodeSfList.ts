@@ -14,6 +14,6 @@ import { serializeList } from './serialize/serializeList.js';
  *
  * @beta
  */
-export function encodeSfList(value: SfMember[], options?: SfEncodeOptions) {
+export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string {
 	return serializeList(value, options);
 }

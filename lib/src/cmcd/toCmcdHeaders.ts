@@ -17,9 +17,11 @@ import { encodeCmcd } from './encodeCmcd.js';
  *
  * @beta
  */
-export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
+export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}): Record<CmcdHeaderField, string> {
+	const result = {} as Record<CmcdHeaderField, string>;
+
 	if (!cmcd) {
-		return {};
+		return result;
 	}
 
 	const entries = Object.entries(cmcd);
@@ -37,5 +39,5 @@ export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
 		.reduce((acc, [field, value]) => {
 			acc[field as CmcdHeaderField] = encodeCmcd(value, options);
 			return acc;
-		}, {} as Record<CmcdHeaderField, string>);
+		}, result);
 }

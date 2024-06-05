@@ -15,7 +15,7 @@ import { processCmcd } from './utils/processCmcd.js';
  *
  * @beta
  */
-export function encodeCmcd(cmcd: Cmcd, options: CmcdEncodeOptions = {}) {
+export function encodeCmcd(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
 		return '';
 	}
