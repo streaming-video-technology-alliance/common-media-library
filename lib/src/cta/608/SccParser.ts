@@ -33,7 +33,7 @@ function SccParser(processor: any, field: number | any = 1) {
 	let nrLinesParsed = 0;
 
 	function parse(text: string): void {
-	  const lines = text.split(/\r?\n/);
+		const lines = text.split(/\r?\n/);
 		nrLinesParsed = 0;
 
 		if (lines[0] === 'Scenarist_SCC V1.0') {
