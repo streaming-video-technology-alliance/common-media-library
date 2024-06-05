@@ -83,41 +83,62 @@ export class Cta608Parser {
 	 * @param byteList - The list of bytes
 	 */
 	addData(time: number | null, byteList: number[]): void {
-		let cmdFound: boolean;
-		let a: number;
-		let b: number;
-		let charsFound: number[] | boolean | null = false;
-
 		this.logger.time = time;
 
 		for (let i = 0; i < byteList.length; i += 2) {
-			a = byteList[i] & 0x7f;
-			b = byteList[i + 1] & 0x7f;
+			const a = byteList[i] & 0x7f;
+			const b = byteList[i + 1] & 0x7f;
+			let cmdFound: boolean = false;
+			let charsFound: number[] | null = null;
+
 			if (a === 0 && b === 0) {
 				continue;
 			}
 			else {
 				this.logger.log(
 					VerboseLevel.DATA,
-					'[' +
-					numArrayToHexArray([byteList[i], byteList[i + 1]]) +
-					'] -> (' +
-					numArrayToHexArray([a, b]) +
-					')',
+					() =>
+						'[' +
+						numArrayToHexArray([byteList[i], byteList[i + 1]]) +
+						'] -> (' +
+						numArrayToHexArray([a, b]) +
+						')',
 				);
 			}
-			cmdFound = this.parseCmd(a, b);
 
-			if (!cmdFound) {
-				cmdFound = this.parseMidrow(a, b);
+			const cmdHistory = this.cmdHistory;
+			const isControlCode = a >= 0x10 && a <= 0x1f;
+			if (isControlCode) {
+				// Skip redundant control codes
+				if (hasCmdRepeated(a, b, cmdHistory)) {
+					setLastCmd(null, null, cmdHistory);
+					this.logger.log(
+						VerboseLevel.DEBUG,
+						() =>
+							'Repeated command (' +
+							numArrayToHexArray([a, b]) +
+							') is dropped',
+					);
+					continue;
+				}
+				setLastCmd(a, b, this.cmdHistory);
+
+				cmdFound = this.parseCmd(a, b);
+
+				if (!cmdFound) {
+					cmdFound = this.parseMidrow(a, b);
+				}
+
+				if (!cmdFound) {
+					cmdFound = this.parsePAC(a, b);
+				}
+
+				if (!cmdFound) {
+					cmdFound = this.parseBackgroundAttributes(a, b);
+				}
 			}
-
-			if (!cmdFound) {
-				cmdFound = this.parsePAC(a, b);
-			}
-
-			if (!cmdFound) {
-				cmdFound = this.parseBackgroundAttributes(a, b);
+			else {
+				setLastCmd(null, null, cmdHistory);
 			}
 
 			if (!cmdFound) {
@@ -139,10 +160,11 @@ export class Cta608Parser {
 			if (!cmdFound && !charsFound) {
 				this.logger.log(
 					VerboseLevel.WARNING,
-					"Couldn't parse cleaned data " +
-					numArrayToHexArray([a, b]) +
-					' orig: ' +
-					numArrayToHexArray([byteList[i], byteList[i + 1]]),
+					() =>
+						"Couldn't parse cleaned data " +
+						numArrayToHexArray([a, b]) +
+						' orig: ' +
+						numArrayToHexArray([byteList[i], byteList[i + 1]]),
 				);
 			}
 		}
@@ -156,7 +178,7 @@ export class Cta608Parser {
 	 * @returns True if a command was found
 	 */
 	private parseCmd(a: number, b: number): boolean {
-		const { cmdHistory } = this;
+		
 		const cond1 =
 			(a === 0x14 || a === 0x1c || a === 0x15 || a === 0x1d) &&
 			b >= 0x20 &&
@@ -164,15 +186,6 @@ export class Cta608Parser {
 		const cond2 = (a === 0x17 || a === 0x1f) && b >= 0x21 && b <= 0x23;
 		if (!(cond1 || cond2)) {
 			return false;
-		}
-
-		if (hasCmdRepeated(a, b, cmdHistory)) {
-			setLastCmd(null, null, cmdHistory);
-			this.logger.log(
-				VerboseLevel.DEBUG,
-				'Repeated command (' + numArrayToHexArray([a, b]) + ') is dropped',
-			);
-			return true;
 		}
 
 		const chNr = a === 0x14 || a === 0x15 || a === 0x17 ? 1 : 2;
@@ -232,7 +245,7 @@ export class Cta608Parser {
 			// a == 0x17 || a == 0x1F
 			channel.ccTO(b - 0x20);
 		}
-		setLastCmd(a, b, cmdHistory);
+		
 		this.currentChannel = chNr;
 		return true;
 	}
@@ -269,7 +282,7 @@ export class Cta608Parser {
 			channel.ccMIDROW(b);
 			this.logger.log(
 				VerboseLevel.DEBUG,
-				'MIDROW (' + numArrayToHexArray([a, b]) + ')',
+				() => 'MIDROW (' + numArrayToHexArray([a, b]) + ')',
 			);
 			return true;
 		}
@@ -285,7 +298,6 @@ export class Cta608Parser {
 	 */
 	private parsePAC(a: number, b: number): boolean {
 		let row: number;
-		const cmdHistory = this.cmdHistory;
 
 		const case1 =
 			((a >= 0x11 && a <= 0x17) || (a >= 0x19 && a <= 0x1f)) &&
@@ -294,11 +306,6 @@ export class Cta608Parser {
 		const case2 = (a === 0x10 || a === 0x18) && b >= 0x40 && b <= 0x5f;
 		if (!(case1 || case2)) {
 			return false;
-		}
-
-		if (hasCmdRepeated(a, b, cmdHistory)) {
-			setLastCmd(null, null, cmdHistory);
-			return true; // Repeated commands are dropped (once)
 		}
 
 		const chNr: Channels = a <= 0x17 ? 1 : 2;
@@ -315,7 +322,6 @@ export class Cta608Parser {
 			return false;
 		}
 		channel.setPAC(this.interpretPAC(row, b));
-		setLastCmd(a, b, cmdHistory);
 		this.currentChannel = chNr;
 		return true;
 	}
@@ -389,7 +395,7 @@ export class Cta608Parser {
 		}
 		if (charCode1 >= 0x11 && charCode1 <= 0x13) {
 			// Special character
-			let oneCode;
+			let oneCode: number;
 			if (charCode1 === 0x11) {
 				oneCode = b + 0x50;
 			}
@@ -402,10 +408,11 @@ export class Cta608Parser {
 
 			this.logger.log(
 				VerboseLevel.INFO,
-				"Special char '" +
-				getCharForByte(oneCode) +
-				"' in channel " +
-				channelNr,
+				() =>
+					"Special char '" +
+					getCharForByte(oneCode) +
+					"' in channel " +
+					channelNr,
 			);
 			charCodes = [oneCode];
 		}
@@ -413,12 +420,10 @@ export class Cta608Parser {
 			charCodes = b === 0 ? [a] : [a, b];
 		}
 		if (charCodes) {
-			const hexCodes = numArrayToHexArray(charCodes);
 			this.logger.log(
 				VerboseLevel.DEBUG,
-				'Char codes =  ' + hexCodes.join(','),
+				() => 'Char codes =  ' + numArrayToHexArray(charCodes).join(','),
 			);
-			setLastCmd(a, b, this.cmdHistory);
 		}
 		return charCodes;
 	}
@@ -457,7 +462,6 @@ export class Cta608Parser {
 		const chNr: Channels = a <= 0x17 ? 1 : 2;
 		const channel: Cta608Channel = this.channels[chNr] as Cta608Channel;
 		channel.setBkgData(bkgData);
-		setLastCmd(a, b, this.cmdHistory);
 		return true;
 	}
 
@@ -471,7 +475,7 @@ export class Cta608Parser {
 				channel.reset();
 			}
 		}
-		this.cmdHistory = createCmdHistory();
+		setLastCmd(null, null, this.cmdHistory);
 	}
 
 	/**
