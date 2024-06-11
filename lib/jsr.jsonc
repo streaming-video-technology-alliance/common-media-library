@@ -1,5 +1,10 @@
 {
 	"name": "@svta/common-media-library",
 	"version": "0.7.0",
-	"exports": "./src/index.ts"
+	"exports": "./src/index.ts",
+	"publish": {
+		"exclude": [
+			"src/test"
+		]
+	}
 }
