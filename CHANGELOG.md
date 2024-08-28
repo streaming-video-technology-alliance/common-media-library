@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.2] - 2024-06-21
 
+### Fix
+- Cannot import library in jest tests [#98](https://github.com/streaming-video-technology-alliance/common-media-library/issues/98)
 
 ## [0.7.1] - 2024-06-21
 

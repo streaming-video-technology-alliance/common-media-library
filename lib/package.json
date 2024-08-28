@@ -68,7 +68,7 @@
 	"scripts": {
 		"build": "npm run build:esm && npm run build:cjs",
 		"postbuild": "api-extractor run --local",
-		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
+		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.mts",
 		"build:cjs": "tsc --module commonjs --outDir dist/cjs",
 		"test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
 		"prepublishOnly": "npm run build"
