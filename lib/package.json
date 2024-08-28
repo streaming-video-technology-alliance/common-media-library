@@ -1,6 +1,6 @@
 {
 	"name": "@svta/common-media-library",
-	"version": "0.7.1",
+	"version": "0.7.2",
 	"license": "Apache-2.0",
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -68,7 +68,7 @@
 	"scripts": {
 		"build": "npm run build:esm && npm run build:cjs",
 		"postbuild": "api-extractor run --local",
-		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.ts",
+		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.mts",
 		"build:cjs": "tsc --module commonjs --outDir dist/cjs",
 		"test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
 		"prepublishOnly": "npm run build"
