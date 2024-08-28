@@ -1,7 +1,7 @@
 {
 	"name": "@svta/common-media-library-dev",
 	"private": true,
-	"version": "0.7.1",
+	"version": "0.7.2",
 	"license": "Apache-2.0",
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -17,6 +17,6 @@
 		"start": "wds --node-resolve --open --watch"
 	},
 	"devDependencies": {
-		"@web/dev-server": "0.4.3"
+		"@web/dev-server": "0.4.6"
 	}
 }
