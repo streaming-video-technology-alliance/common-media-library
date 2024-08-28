@@ -33,9 +33,9 @@
 		"start": "npm start -w dev",
 		"pub": "npm publish -w lib --provenance --access public",
 		"exec": "node --no-warnings --loader ts-node/esm",
-		"ver": "npm run exec scripts/version.ts",
+		"ver": "npm run exec scripts/version.mts",
 		"docs": "npm start -w docs",
-		"notes": "npm run exec scripts/createReleaseNotes.ts",
+		"notes": "npm run exec scripts/createReleaseNotes.mts",
 		"typecheck": "tsc --noEmit"
 	},
 	"workspaces": [
