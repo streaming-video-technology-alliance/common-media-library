@@ -18,9 +18,9 @@ test('encodeSfItem', () => {
 	assert.deepStrictEqual(encodeSfItem(new SfItem(new Date(1659578233000))), `@1659578233`);
 
 	// @ts-expect-error
-	assert.throws(() => encodeSfItem(function () { }), /failed to serialize "function \(\) \{ \}" as Bare Item/);
+	assert.throws(() => encodeSfItem(function () { }), /failed to serialize "function\(\)\{\}" as Bare Item/);
 	// @ts-expect-error
-	assert.throws(() => encodeSfItem(() => { }), /failed to serialize "\(\) => \{ \}" as Bare Item/);
+	assert.throws(() => encodeSfItem(() => { }), /failed to serialize "\(\)=>\{\}" as Bare Item/);
 	// @ts-expect-error
 	assert.throws(() => encodeSfItem(999n), /failed to serialize "999" as Bare Item/);
 	// @ts-expect-error
