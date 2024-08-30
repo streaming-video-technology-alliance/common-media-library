@@ -1,8 +1,7 @@
 {
 	"name": "@svta/common-media-library",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"license": "Apache-2.0",
-	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
 	"repository": {
@@ -25,19 +24,19 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"require": "./dist/cjs/index.js",
 			"import": "./dist/index.js",
+			"require": "./dist/cjs/index.js",
 			"default": "./dist/index.js"
 		},
 		"./*.js": {
-			"require": "./dist/cjs/*.js",
 			"import": "./dist/*.js",
+			"require": "./dist/cjs/*.js",
 			"default": "./dist/*.js"
 		},
 		"./*": {
 			"types": "./dist/*.d.ts",
-			"require": "./dist/cjs/*.js",
 			"import": "./dist/*.js",
+			"require": "./dist/cjs/*.js",
 			"default": "./dist/*.js"
 		}
 	},
@@ -68,9 +67,9 @@
 	"scripts": {
 		"build": "npm run build:esm && npm run build:cjs",
 		"postbuild": "api-extractor run --local",
-		"build:esm": "node --no-warnings --loader ts-node/esm ../scripts/build.mts",
+		"build:esm": "tsx ../scripts/build.mts",
 		"build:cjs": "tsc --module commonjs --outDir dist/cjs",
-		"test": "node --no-warnings --loader ts-node/esm --test ./test/**/*.test.ts",
+		"test": "tsx --test ./test/**/*.test.ts",
 		"prepublishOnly": "npm run build"
 	},
 	"dependencies": {

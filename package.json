@@ -1,6 +1,6 @@
 {
 	"name": "@svta/common-media-library-workspace",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
@@ -32,10 +32,9 @@
 		"test": "npm test -ws --if-present",
 		"start": "npm start -w dev",
 		"pub": "npm publish -w lib --provenance --access public",
-		"exec": "node --no-warnings --loader ts-node/esm",
-		"ver": "npm run exec scripts/version.mts",
+		"ver": "tsx scripts/version.mts",
 		"docs": "npm start -w docs",
-		"notes": "npm run exec scripts/createReleaseNotes.mts",
+		"notes": "tsx scripts/createReleaseNotes.mts",
 		"typecheck": "tsc --noEmit"
 	},
 	"workspaces": [
@@ -53,8 +52,8 @@
 		"eslint-plugin-tsdoc": "0.2.17",
 		"glob": "10.3.10",
 		"hi-base32": "0.5.1",
-		"ts-node": "10.9.2",
 		"tslib": "2.6.2",
+		"tsx": "^4.19.0",
 		"typedoc": "0.25.8",
 		"typescript": "5.3.3"
 	}
