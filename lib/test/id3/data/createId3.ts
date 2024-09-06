@@ -12,7 +12,7 @@ function createId3Size(size: number) {
 	];
 }
 
-export function createId3(type: string, data: Uint8Array) {
+export function createId3(type: string, data: Uint8Array): Uint8Array {
 	return new Uint8Array([
 		////////////
 		// Header //

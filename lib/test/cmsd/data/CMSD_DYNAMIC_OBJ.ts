@@ -1,6 +1,6 @@
 import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
 
-export const CMSD_DYNAMIC_OBJ = [
+export const CMSD_DYNAMIC_OBJ: SfItem[] = [
 	new SfItem('CDNB-3ak1', {
 		etp: 96,
 		rtt: 8,
