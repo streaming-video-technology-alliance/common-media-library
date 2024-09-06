@@ -2,7 +2,7 @@ import { Glob } from 'glob';
 import { readFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 
-export async function removeBlankFiles(folder: string = 'dist') {
+export async function removeBlankFiles(folder: string = 'dist'): Promise<any> {
 	const files = new Glob(path.join(folder, '**/*.{js,cjs}'), {});
 
 	const pending: Promise<any>[] = [];

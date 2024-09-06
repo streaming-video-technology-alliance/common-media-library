@@ -3,7 +3,7 @@ import { toUint8 } from '../../../../src/id3/util/utf8.js';
 export function generateId3(
 	frames: Uint8Array,
 	extendedHeader: boolean = false
-) {
+): Uint8Array {
 	let result = concat(
 		stringToInts('ID3'),
 		new Uint8Array([
@@ -56,7 +56,7 @@ export function generateId3(
 	return result;
 }
 
-export function generateId3Frame(type: string, value: Uint8Array) {
+export function generateId3Frame(type: string, value: Uint8Array): Uint8Array {
 	const result = concat(
 		stringToInts(type),
 		new Uint8Array([
@@ -95,7 +95,7 @@ function concat(...varArgs: BufferSource[]) {
 		const value = varArgs[i];
 		if (value instanceof Uint8Array) {
 			result.set(value, offset);
-		} 
+		}
 		else {
 			result.set(toUint8(value), offset);
 		}
