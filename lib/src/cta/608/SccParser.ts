@@ -100,15 +100,15 @@ export class SccParser {
 		return 0;  // in case if format is incorrect
 	}
 
-	getHeaderStatus() {
+	getHeaderStatus(): boolean {
 		return this.hasHeader;
 	}
 
-	getField() {
+	getField(): number | any {
 		return this.field;
 	}
 
-	getLinesParsed() {
+	getLinesParsed(): number {
 		return this.nrLinesParsed;
 	}
 }

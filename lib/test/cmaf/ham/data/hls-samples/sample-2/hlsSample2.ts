@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 
-const hlsMain2 = readFileSync(
+const hlsMain2: string = readFileSync(
 	'./main.m3u8',
 	'utf8',
 );
@@ -30,6 +30,6 @@ const hev1_2200k = readFileSync(
 	'utf8',
 );
 
-const hlsPlaylist2 = [aac_64k, aac_128k, hev1_1100k, hev1_1500k, hev1_2200k];
+const hlsPlaylist2: string[] = [aac_64k, aac_128k, hev1_1100k, hev1_1500k, hev1_2200k];
 
 export { hlsMain2, hlsPlaylist2 };

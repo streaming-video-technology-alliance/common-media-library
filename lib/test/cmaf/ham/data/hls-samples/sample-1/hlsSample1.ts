@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 
-const hlsMain1 = readFileSync(
+const hlsMain1: string = readFileSync(
 	'./main.m3u8',
 	'utf8',
 );
@@ -40,7 +40,7 @@ const mp4_720p = readFileSync(
 	'utf8',
 );
 
-const hlsPlaylist1 = [
+const hlsPlaylist1: string[] = [
 	aac_100k,
 	mp4_144p,
 	mp4_240p,

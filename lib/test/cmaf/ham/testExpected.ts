@@ -1,4 +1,6 @@
-const expectedSegmentBase = [
+import type { Segment } from '@svta/common-media-library/cmaf-ham';
+
+const expectedSegmentBase: Segment[] = [
 	{
 		duration: 13,
 		url: 'tears-of-steel-aac-64k.cmfa',
@@ -6,7 +8,7 @@ const expectedSegmentBase = [
 	},
 ];
 
-const expectedSegmentList = [
+const expectedSegmentList: Segment[] = [
 	{
 		duration: 10,
 		url: 'testStream01bbb/video/72000/segment_0.m4s',
@@ -21,7 +23,7 @@ const expectedSegmentList = [
 	},
 ];
 
-const expectedSegmentTemplate = [
+const expectedSegmentTemplate: Segment[] = [
 	{
 		duration: 4,
 		url: '1/0001.m4s',

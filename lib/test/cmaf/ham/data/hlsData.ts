@@ -1,6 +1,15 @@
 import type { AudioTrack } from '@svta/common-media-library/cmaf-ham';
 import type { SegmentHls } from '../../../../src/cmaf/ham/types/mapper/hls/SegmentHls.js';
 
+export type AudioTrackInfo = {
+	byteRange?: string;
+	codec?: string;
+	duration?: number;
+	id?: string;
+	language?: string;
+	urlInitialization?: string;
+}
+
 function getAudioTrack({
 	byteRange = '',
 	codec = '',
@@ -8,7 +17,7 @@ function getAudioTrack({
 	id = 'default-audio-group',
 	language = 'en',
 	urlInitialization = 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4',
-}): AudioTrack {
+}: AudioTrackInfo): AudioTrack {
 	return {
 		id: id,
 		type: 'audio',

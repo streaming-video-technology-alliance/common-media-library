@@ -1,8 +1,8 @@
-import { getId3Frames } from '@svta/common-media-library';
+import { getId3Frames, type Id3Frame } from '@svta/common-media-library';
 import { strToCodes } from '../../utils/strToCodes.js';
 import { createId3 } from './createId3.js';
 
-export const PTS = createId3('PRIV', new Uint8Array([
+export const PTS: Uint8Array = createId3('PRIV', new Uint8Array([
 	...strToCodes('com.apple.streaming.transportStreamTimestamp'),
 	0x00,
 
@@ -10,4 +10,4 @@ export const PTS = createId3('PRIV', new Uint8Array([
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ]));
 
-export const PTS_FRAME = getId3Frames(PTS)[0];
+export const PTS_FRAME: Id3Frame = getId3Frames(PTS)[0];

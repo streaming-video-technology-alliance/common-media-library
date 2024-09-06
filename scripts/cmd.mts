@@ -1,6 +1,6 @@
 import { spawn, SpawnOptionsWithoutStdio } from 'node:child_process';
 
-export function cmd(cmd: string, args?: string[], options?: SpawnOptionsWithoutStdio) {
+export function cmd(cmd: string, args?: string[], options?: SpawnOptionsWithoutStdio): Promise<void> {
 	const opts = Object.assign({
 		cwd: process.cwd(),
 		env: process.env,
