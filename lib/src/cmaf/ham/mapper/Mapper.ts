@@ -1,7 +1,7 @@
-import type { Presentation } from '../types/model/Presentation.js';
 import type { Manifest } from '../types/manifest/Manifest.js';
+import type { Presentation } from '../types/model/Presentation.js';
 
-export type IMapper = {
+export type Mapper = {
 	toHam(manifest: Manifest): Presentation[];
 
 	toManifest(presentation: Presentation[]): Manifest;
