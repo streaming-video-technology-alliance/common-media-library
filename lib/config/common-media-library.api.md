@@ -101,10 +101,10 @@ export type Cmcd = {
 };
 
 // @beta
-export const CMCD_PARAM = "CMCD";
+export const CMCD_PARAM: "CMCD";
 
 // @beta
-export const CMCD_V1 = 1;
+export const CMCD_V1: 1;
 
 // @beta
 export type CmcdCustomKey = `${string}-${string}`;
@@ -118,11 +118,14 @@ export type CmcdEncodeOptions = {
 };
 
 // @beta
-export enum CmcdEncoding {
-    HEADERS = "headers",
-    JSON = "json",
-    QUERY = "query"
-}
+export const CmcdEncoding: {
+    readonly JSON: typeof CMCD_JSON;
+    readonly QUERY: typeof CMCD_QUERY;
+    readonly HEADERS: typeof CMCD_HEADERS;
+};
+
+// @beta
+export type CmcdEncoding = typeof CmcdEncoding[keyof typeof CmcdEncoding];
 
 // @beta
 export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
@@ -131,12 +134,15 @@ export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => s
 export const CmcdFormatters: Record<string, CmcdFormatter>;
 
 // @beta
-export enum CmcdHeaderField {
-    OBJECT = "CMCD-Object",
-    REQUEST = "CMCD-Request",
-    SESSION = "CMCD-Session",
-    STATUS = "CMCD-Status"
-}
+export const CmcdHeaderField: {
+    readonly OBJECT: typeof CMCD_OBJECT;
+    readonly REQUEST: typeof CMCD_REQUEST;
+    readonly SESSION: typeof CMCD_SESSION;
+    readonly STATUS: typeof CMCD_STATUS;
+};
+
+// @beta
+export type CmcdHeaderField = typeof CmcdHeaderField[keyof typeof CmcdHeaderField];
 
 // @beta
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
@@ -145,31 +151,40 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 export type CmcdKey = keyof Cmcd;
 
 // @beta
-export enum CmcdObjectType {
-    AUDIO = "a",
-    CAPTION = "c",
-    INIT = "i",
-    KEY = "k",
-    MANIFEST = "m",
-    MUXED = "av",
-    OTHER = "o",
-    TIMED_TEXT = "tt",
-    VIDEO = "v"
-}
+export const CmcdObjectType: {
+    readonly MANIFEST: "m";
+    readonly AUDIO: "a";
+    readonly VIDEO: "v";
+    readonly MUXED: "av";
+    readonly INIT: "i";
+    readonly CAPTION: "c";
+    readonly TIMED_TEXT: "tt";
+    readonly KEY: "k";
+    readonly OTHER: "o";
+};
 
 // @beta
-export enum CmcdStreamingFormat {
-    DASH = "d",
-    HLS = "h",
-    OTHER = "o",
-    SMOOTH = "s"
-}
+export type CmcdObjectType = typeof CmcdObjectType[keyof typeof CmcdObjectType];
 
 // @beta
-export enum CmcdStreamType {
-    LIVE = "l",
-    VOD = "v"
-}
+export const CmcdStreamingFormat: {
+    readonly DASH: "d";
+    readonly HLS: "h";
+    readonly SMOOTH: "s";
+    readonly OTHER: "o";
+};
+
+// @beta
+export type CmcdStreamingFormat = typeof CmcdStreamingFormat[keyof typeof CmcdStreamingFormat];
+
+// @beta
+export const CmcdStreamType: {
+    readonly VOD: "v";
+    readonly LIVE: "l";
+};
+
+// @beta
+export type CmcdStreamType = typeof CmcdStreamType[keyof typeof CmcdStreamType];
 
 // @beta
 export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
@@ -180,13 +195,13 @@ export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | 
 export type CmCustomKey = `${string}-${string}`;
 
 // @beta
-export const CMSD_DYNAMIC: string;
+export const CMSD_DYNAMIC: "CMSD-Dynamic";
 
 // @beta
-export const CMSD_STATIC: string;
+export const CMSD_STATIC: "CMSD-Static";
 
 // @beta
-export const CMSD_V1 = 1;
+export const CMSD_V1: 1;
 
 // @beta
 export type CmsdCustomKey = `${string}-${string}`;
@@ -213,23 +228,29 @@ export type CmsdEncodeOptions = {
 };
 
 // @beta
-export enum CmsdHeaderField {
-    DYNAMIC = "CMSD-Dynamic",
-    STATIC = "CMSD-Static"
-}
+export const CmsdHeaderField: {
+    readonly STATIC: typeof CMSD_STATIC;
+    readonly DYNAMIC: typeof CMSD_DYNAMIC;
+};
 
 // @beta
-export enum CmsdObjectType {
-    AUDIO = "a",
-    CAPTION = "c",
-    INIT = "i",
-    KEY = "k",
-    MANIFEST = "m",
-    MUXED = "av",
-    OTHER = "o",
-    TIMED_TEXT = "tt",
-    VIDEO = "v"
-}
+export type CmsdHeaderField = typeof CmsdHeaderField[keyof typeof CmsdHeaderField];
+
+// @beta
+export const CmsdObjectType: {
+    readonly MANIFEST: "m";
+    readonly AUDIO: "a";
+    readonly VIDEO: "v";
+    readonly MUXED: "av";
+    readonly INIT: "i";
+    readonly CAPTION: "c";
+    readonly TIMED_TEXT: "tt";
+    readonly KEY: "k";
+    readonly OTHER: "o";
+};
+
+// @beta
+export type CmsdObjectType = typeof CmsdObjectType[keyof typeof CmsdObjectType];
 
 // @beta
 export type CmsdStatic = {
@@ -249,18 +270,24 @@ export type CmsdStatic = {
 };
 
 // @beta
-export enum CmsdStreamingFormat {
-    DASH = "d",
-    HLS = "h",
-    OTHER = "o",
-    SMOOTH = "s"
-}
+export const CmsdStreamingFormat: {
+    readonly DASH: "d";
+    readonly HLS: "h";
+    readonly SMOOTH: "s";
+    readonly OTHER: "o";
+};
 
 // @beta
-export enum CmsdStreamType {
-    LIVE = "l",
-    VOD = "v"
-}
+export type CmsdStreamingFormat = typeof CmsdStreamingFormat[keyof typeof CmsdStreamingFormat];
+
+// @beta
+export const CmsdStreamType: {
+    readonly VOD: "v";
+    readonly LIVE: "l";
+};
+
+// @beta
+export type CmsdStreamType = typeof CmsdStreamType[keyof typeof CmsdStreamType];
 
 // @beta
 export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
@@ -766,20 +793,17 @@ export type Validation = {
 };
 
 // @beta
-export const enum VerboseLevel {
-    // (undocumented)
-    DATA = 3,
-    // (undocumented)
-    DEBUG = 3,
-    // (undocumented)
-    ERROR = 0,
-    // (undocumented)
-    INFO = 2,
-    // (undocumented)
-    TEXT = 1,
-    // (undocumented)
-    WARNING = 2
-}
+export const VerboseLevel: {
+    readonly ERROR: 0;
+    readonly TEXT: 1;
+    readonly WARNING: 2;
+    readonly INFO: 2;
+    readonly DEBUG: 3;
+    readonly DATA: 3;
+};
+
+// @beta
+export type VerboseLevel = typeof VerboseLevel[keyof typeof VerboseLevel];
 
 // @alpha
 export type VideoTrack = Track & {
@@ -790,5 +814,15 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/cmcd/CmcdEncoding.ts:17:2 - (ae-forgotten-export) The symbol "CMCD_JSON" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:22:2 - (ae-forgotten-export) The symbol "CMCD_QUERY" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:27:2 - (ae-forgotten-export) The symbol "CMCD_HEADERS" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdHeaderField.ts:17:2 - (ae-forgotten-export) The symbol "CMCD_OBJECT" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdHeaderField.ts:22:2 - (ae-forgotten-export) The symbol "CMCD_REQUEST" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdHeaderField.ts:27:2 - (ae-forgotten-export) The symbol "CMCD_SESSION" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdHeaderField.ts:32:2 - (ae-forgotten-export) The symbol "CMCD_STATUS" needs to be exported by the entry point index.d.ts
 
 ```

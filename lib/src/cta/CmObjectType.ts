@@ -3,49 +3,57 @@
  *
  * @internal
  */
-export enum CmObjectType {
+export const CmObjectType = {
 	/**
 	 * text file, such as a manifest or playlist
 	 */
-	MANIFEST = 'm',
+	MANIFEST: 'm',
 
 	/**
 	 * audio only
 	 */
-	AUDIO = 'a',
+	AUDIO: 'a',
 
 	/**
 	 * video only
 	 */
-	VIDEO = 'v',
+	VIDEO: 'v',
 
 	/**
 	 * muxed audio and video
 	 */
-	MUXED = 'av',
+	MUXED: 'av',
 
 	/**
 	 * init segment
 	 */
-	INIT = 'i',
+	INIT: 'i',
 
 	/**
 	 * caption or subtitle
 	 */
-	CAPTION = 'c',
+	CAPTION: 'c',
 
 	/**
 	 * ISOBMFF timed text track
 	 */
-	TIMED_TEXT = 'tt',
+	TIMED_TEXT: 'tt',
 
 	/**
 	 * cryptographic key, license or certificate.
 	 */
-	KEY = 'k',
+	KEY: 'k',
 
 	/**
 	 * other
 	 */
-	OTHER = 'o',
-}
+	OTHER: 'o',
+} as const;
+
+/**
+ * Common Media Object Type
+ *
+ * @see {@link CmcdEncoding}
+ * @internal
+ */
+export type CmObjectType = typeof CmObjectType[keyof typeof CmObjectType];

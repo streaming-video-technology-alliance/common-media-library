@@ -5,25 +5,34 @@
  *
  * @beta
  */
-export enum CmsdStreamingFormat {
+export const CmsdStreamingFormat = {
 	/**
 	 * MPEG DASH
 	 */
-	DASH = 'd',
+	DASH: 'd',
 
 	/**
 	 * HTTP Live Streaming (HLS)
 	 */
-	HLS = 'h',
+	HLS: 'h',
 
 	/**
 	 * Smooth Streaming
 	 */
-	SMOOTH = 's',
+	SMOOTH: 's',
 
 	/**
 	 * Other
 	 */
-	OTHER = 'o',
-}
+	OTHER: 'o',
+} as const;
 
+/**
+ * Common Media Server Data Streaming Format
+ *
+ * @group CMSD
+ * @see {@link CmsdStreamingFormat}
+ *
+ * @beta
+ */
+export type CmsdStreamingFormat = typeof CmsdStreamingFormat[keyof typeof CmsdStreamingFormat];
