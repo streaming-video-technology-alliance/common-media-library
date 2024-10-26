@@ -8,5 +8,6 @@ Please describe the changes:
 		- Update "Thanks" section of the `README.md`.
 
 ## Requirements Checklist
+- [ ] All commits have DCO sign-off from the author
 - [ ] Unit Tests updated or fixed
 - [ ] Docs/guides updated
