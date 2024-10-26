@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Replace Typescript enums with constants [#103](https://github.com/streaming-video-technology-alliance/common-media-library/issues/103)
+
 
 ## [0.7.3] - 2024-08-30
 

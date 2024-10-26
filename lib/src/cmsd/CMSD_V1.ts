@@ -5,4 +5,4 @@
  *
  * @beta
  */
-export const CMSD_V1 = 1;
+export const CMSD_V1 = 1 as const;
