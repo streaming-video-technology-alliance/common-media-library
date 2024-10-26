@@ -1,39 +1,17 @@
-/**
- * Common Media Client Data Streaming Format
- *
- * @group CMCD
- *
- * @beta
- */
-export const CmcdStreamingFormat = {
-	/**
-	 * MPEG DASH
-	 */
-	DASH: 'd',
-
-	/**
-	 * HTTP Live Streaming (HLS)
-	 */
-	HLS: 'h',
-
-	/**
-	 * Smooth Streaming
-	 */
-	SMOOTH: 's',
-
-	/**
-	 * Other
-	 */
-	OTHER: 'o',
-} as const;
+import { CmStreamingFormat } from "../cta/CmStreamingFormat";
 
 /**
  * Common Media Client Data Streaming Format
  *
  * @group CMCD
  *
- * @see {@link CmcdStreamingFormat}
+ * @enum
  *
  * @beta
  */
-export type CmcdStreamingFormat = typeof CmcdStreamingFormat[keyof typeof CmcdStreamingFormat];
+export const CmcdStreamingFormat = CmStreamingFormat;
+
+/**
+ * @internal
+ */
+export type CmcdStreamingFormat = CmStreamingFormat

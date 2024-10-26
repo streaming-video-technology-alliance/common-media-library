@@ -8,6 +8,8 @@ import { CMCD_STATUS } from './CMCD_STATUS.js';
  *
  * @group CMCD
  *
+ * @enum
+ *
  * @beta
  */
 export const CmcdHeaderField = {
@@ -33,12 +35,6 @@ export const CmcdHeaderField = {
 } as const;
 
 /**
- * CMCD header fields.
- *
- * @group CMCD
- *
- * @see {@link CmcdHeaderField}
- *
- * @beta
+ * @internal
  */
 export type CmcdHeaderField = typeof CmcdHeaderField[keyof typeof CmcdHeaderField];
