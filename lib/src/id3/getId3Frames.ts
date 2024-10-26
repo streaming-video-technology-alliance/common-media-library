@@ -1,5 +1,5 @@
-import { Id3Frame } from './Id3Frame.js';
-import { RawId3Frame } from './util/RawFrame.js';
+import type { Id3Frame } from './Id3Frame.js';
+import type { RawId3Frame } from './util/RawFrame.js';
 import { decodeId3Frame } from './util/decodeId3Frame.js';
 import { getId3FrameData } from './util/getId3FrameData.js';
 import { isId3Footer } from './util/isId3Footer.js';

@@ -1,4 +1,5 @@
-import { Cta608Parser, PACData } from '@svta/common-media-library/608';
+import type { PACData } from '@svta/common-media-library/608';
+import { Cta608Parser } from '@svta/common-media-library/608';
 import { deepEqual, equal } from 'node:assert';
 import { beforeEach, describe, it, mock } from 'node:test';
 

@@ -1,5 +1,5 @@
-import { Cmcd } from './Cmcd.js';
-import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { toCmcdQuery } from './toCmcdQuery.js';
 
 const REGEX = /CMCD=[^&#]+/;

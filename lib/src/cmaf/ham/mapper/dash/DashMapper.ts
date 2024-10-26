@@ -9,7 +9,7 @@ import { xmlToJson } from '../../utils/dash/xmlToJson.js';
 import { getMetadata } from '../../utils/manifest/getMetadata.js';
 import { addMetadataToDash } from '../../utils/manifest/addMetadataToDash.js';
 
-import { IMapper } from '../IMapper.js';
+import type { IMapper } from '../IMapper.js';
 
 export class DashMapper implements IMapper {
 	private manifest: Manifest | undefined;

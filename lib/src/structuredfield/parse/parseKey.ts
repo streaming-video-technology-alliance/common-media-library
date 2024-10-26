@@ -1,5 +1,6 @@
 import { KEY } from '../utils/KEY.js';
-import { ParsedValue, parsedValue } from './ParsedValue.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.3.3.  Parsing a Key

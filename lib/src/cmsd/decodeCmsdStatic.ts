@@ -1,6 +1,6 @@
 import { symbolToStr } from '../cta/utils/symbolToStr.js';
 import { decodeSfDict } from '../structuredfield/decodeSfDict.js';
-import { CmsdStatic } from './CmsdStatic.js';
+import type { CmsdStatic } from './CmsdStatic.js';
 
 /**
  * Decode a CMSD Static dict string to an object.

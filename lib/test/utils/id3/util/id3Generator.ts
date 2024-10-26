@@ -2,7 +2,7 @@ import { toUint8 } from '../../../../src/id3/util/utf8.js';
 
 export function generateId3(
 	frames: Uint8Array,
-	extendedHeader: boolean = false
+	extendedHeader: boolean = false,
 ): Uint8Array {
 	let result = concat(
 		stringToInts('ID3'),
@@ -26,7 +26,7 @@ export function generateId3(
 			0x00,
 			0x02, // size of padding
 		]),
-		frames
+		frames,
 	);
 	if (!extendedHeader) {
 		result = concat(
@@ -40,7 +40,7 @@ export function generateId3(
 				0x00,
 				0x00, // size. set later
 			]),
-			frames
+			frames,
 		);
 	}
 
@@ -67,7 +67,7 @@ export function generateId3Frame(type: string, value: Uint8Array): Uint8Array {
 			0xe0,
 			0x00, // flags
 		]),
-		value
+		value,
 	);
 
 	// set the size

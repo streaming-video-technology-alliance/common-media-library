@@ -15,11 +15,11 @@ describe('isId3Footer', () => {
 	]);
 	const mockID3FooterMissingLeadingByte = mockID3Footer.slice(
 		LEADING_BYTE_SIZE,
-		mockID3Footer.length
+		mockID3Footer.length,
 	);
 	const mockID3FooterMissingTrailingByte = mockID3Footer.slice(
 		0,
-		mockID3Footer.length - TRAILING_BYTE_SIZE
+		mockID3Footer.length - TRAILING_BYTE_SIZE,
 	);
 
 	it('Properly parses ID3 Footers', () => {

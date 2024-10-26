@@ -1,4 +1,5 @@
-import { CmcdHeaderField, CmcdHeadersMap, toCmcdHeaders } from '@svta/common-media-library';
+import type { CmcdHeadersMap } from '@svta/common-media-library';
+import { CmcdHeaderField, toCmcdHeaders } from '@svta/common-media-library';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_HEADERS } from './data/CMCD_HEADERS.js';

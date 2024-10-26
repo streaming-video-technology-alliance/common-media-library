@@ -1,5 +1,5 @@
-import { Id3Frame } from '../Id3Frame.js';
-import { RawId3Frame } from './RawFrame.js';
+import type { Id3Frame } from '../Id3Frame.js';
+import type { RawId3Frame } from './RawFrame.js';
 import { decodeId3PrivFrame } from './decodeId3PrivFrame.js';
 import { decodeId3TextFrame } from './decodeId3TextFrame.js';
 import { decodeId3UrlFrame } from './decodeId3UrlFrame.js';

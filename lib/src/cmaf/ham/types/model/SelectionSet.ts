@@ -1,6 +1,6 @@
-import { Ham } from './Ham.js';
-import { AlignedSwitchingSet } from './AlignedSwitchingSet.js';
-import { SwitchingSet } from './SwitchingSet.js';
+import type { Ham } from './Ham.js';
+import type { AlignedSwitchingSet } from './AlignedSwitchingSet.js';
+import type { SwitchingSet } from './SwitchingSet.js';
 
 /**
  * CMAF-HAM SelectionSet type

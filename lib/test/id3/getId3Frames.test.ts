@@ -56,7 +56,7 @@ describe('getId3Frames', () => {
 	it('parses PRIV frames', () => {
 		const id3 = createId3(
 			'PRIV',
-			new Uint8Array([...INFO_BYTES, 0x00, ...DATA_BYTES])
+			new Uint8Array([...INFO_BYTES, 0x00, ...DATA_BYTES]),
 		);
 		deepEqual(getId3Frames(id3), [
 			{
@@ -70,7 +70,7 @@ describe('getId3Frames', () => {
 	it('parses TXXX frames', () => {
 		const id3 = createId3(
 			'TXXX',
-			new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES])
+			new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES]),
 		);
 		deepEqual(getId3Frames(id3), [
 			{
@@ -84,7 +84,7 @@ describe('getId3Frames', () => {
 	it('parses WXXX frames', () => {
 		const id3 = createId3(
 			'WXXX',
-			new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES])
+			new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES]),
 		);
 		deepEqual(getId3Frames(id3), [
 			{

@@ -1,6 +1,7 @@
 import { base64decode } from '../../utils/base64decode.js';
 import { BYTES } from '../utils/BYTES.js';
-import { ParsedValue, parsedValue } from './ParsedValue.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.7.  Parsing a Byte Sequence

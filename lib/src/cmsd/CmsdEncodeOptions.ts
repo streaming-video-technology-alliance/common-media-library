@@ -5,7 +5,7 @@
  *
  * @beta
  */
-export interface CmsdEncodeOptions {
+export type CmsdEncodeOptions = {
 	/**
 	 * Use Symbol to represent token values
 	 *

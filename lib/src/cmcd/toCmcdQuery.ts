@@ -1,6 +1,6 @@
 import { CMCD_PARAM } from './CMCD_PARAM.js';
-import { Cmcd } from './Cmcd.js';
-import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { encodeCmcd } from './encodeCmcd.js';
 
 /**

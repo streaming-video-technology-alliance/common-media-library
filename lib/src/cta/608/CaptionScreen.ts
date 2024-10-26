@@ -37,8 +37,8 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.js';
-import { PACData } from './PACData.js';
-import { PenStyles } from './PenStyles.js';
+import type { PACData } from './PACData.js';
+import type { PenStyles } from './PenStyles.js';
 import { Row } from './Row.js';
 import { NR_ROWS } from './utils/NR_ROWS.js';
 import { VerboseLevel } from './VerboseLevel.js';

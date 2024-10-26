@@ -1,5 +1,5 @@
-import { Representation } from '../../../src/cmaf/ham/types/mapper/dash/Representation.js';
-import { SegmentTemplate } from '../../../src/cmaf/ham/types/mapper/dash/SegmentTemplate.js';
+import type { Representation } from '../../../src/cmaf/ham/types/mapper/dash/Representation.js';
+import type { SegmentTemplate } from '../../../src/cmaf/ham/types/mapper/dash/SegmentTemplate.js';
 
 const representationBase: Representation = {
 	$: {

@@ -1,8 +1,8 @@
-import { Cmcd } from './Cmcd.js';
-import { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { CmcdHeaderField } from './CmcdHeaderField.js';
 import { CmcdHeaderMap } from './CmcdHeaderMap.js';
-import { CmcdKey } from './CmcdKey.js';
+import type { CmcdKey } from './CmcdKey.js';
 import { encodeCmcd } from './encodeCmcd.js';
 
 /**

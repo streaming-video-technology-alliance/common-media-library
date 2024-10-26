@@ -1,8 +1,8 @@
-import { CmsdCustomKey } from './CmsdCustomKey.js';
-import { CmsdObjectType } from './CmsdObjectType.js';
-import { CmsdStreamType } from './CmsdStreamType.js';
-import { CmsdStreamingFormat } from './CmsdStreamingFormat.js';
-import { CmsdValue } from './CmsdValue.js';
+import type { CmsdCustomKey } from './CmsdCustomKey.js';
+import type { CmsdObjectType } from './CmsdObjectType.js';
+import type { CmsdStreamType } from './CmsdStreamType.js';
+import type { CmsdStreamingFormat } from './CmsdStreamingFormat.js';
+import type { CmsdValue } from './CmsdValue.js';
 
 /**
  * Common Media Server Data (CMSD) static response header fields.
@@ -13,7 +13,7 @@ import { CmsdValue } from './CmsdValue.js';
  *
  * @beta
  */
-export interface CmsdStatic {
+export type CmsdStatic = {
 
 	/**
 	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision

@@ -1,8 +1,9 @@
-import { SfDecodeOptions } from '../SfDecodeOptions.js';
-import { SfInnerList } from '../SfInnerList.js';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import type { SfInnerList } from '../SfInnerList.js';
 import { SfItem } from '../SfItem.js';
 import { INNER } from '../utils/INNER.js';
-import { ParsedValue, parsedValue } from './ParsedValue.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseItem } from './parseItem.js';
 import { parseParameters } from './parseParameters.js';
