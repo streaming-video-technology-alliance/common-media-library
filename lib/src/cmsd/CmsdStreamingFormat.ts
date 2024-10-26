@@ -3,6 +3,8 @@
  *
  * @group CMSD
  *
+ * @enum
+ *
  * @beta
  */
 export const CmsdStreamingFormat = {
@@ -28,11 +30,6 @@ export const CmsdStreamingFormat = {
 } as const;
 
 /**
- * Common Media Server Data Streaming Format
- *
- * @group CMSD
- * @see {@link CmsdStreamingFormat}
- *
- * @beta
+ * @internal
  */
 export type CmsdStreamingFormat = typeof CmsdStreamingFormat[keyof typeof CmsdStreamingFormat];
