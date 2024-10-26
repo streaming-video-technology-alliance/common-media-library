@@ -3,6 +3,8 @@
  *
  * @group CMSD
  *
+ * @enum
+ *
  * @beta
  */
 export const CmsdStreamType = {
@@ -18,11 +20,6 @@ export const CmsdStreamType = {
 } as const;
 
 /**
- * Common Media Server Data Stream Type
- *
- * @group CMSD
- * @see {@link CmsdStreamType}
- *
- * @beta
+ * @internal
  */
 export type CmsdStreamType = typeof CmsdStreamType[keyof typeof CmsdStreamType];

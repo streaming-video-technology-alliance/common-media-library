@@ -6,6 +6,8 @@ import { CMSD_STATIC } from './CMSD_STATIC.js';
  *
  * @group CMSD
  *
+ * @enum
+ *
  * @beta
  */
 export const CmsdHeaderField = {
@@ -23,12 +25,6 @@ export const CmsdHeaderField = {
 } as const;
 
 /**
- * CMSD header fields.
- *
- * @group CMSD
- *
- * @see {@link CmsdHeaderField}
- *
- * @beta
+ * @internal
  */
 export type CmsdHeaderField = typeof CmsdHeaderField[keyof typeof CmsdHeaderField];

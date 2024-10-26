@@ -2,6 +2,9 @@
  * Logging levels for the CTA-608 parser.
  *
  * @group CTA-608
+ *
+ * @enum
+ *
  * @beta
  */
 export const VerboseLevel = {
@@ -14,10 +17,6 @@ export const VerboseLevel = {
 } as const;
 
 /**
- * Logging levels for the CTA-608 parser.
- *
- * @group CTA-608
- * @see {@link VerboseLevel}
- * @beta
+ * @internal
  */
 export type VerboseLevel = typeof VerboseLevel[keyof typeof VerboseLevel];

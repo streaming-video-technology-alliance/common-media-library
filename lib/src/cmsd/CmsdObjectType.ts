@@ -3,6 +3,8 @@
  *
  * @group CMSD
  *
+ * @enum
+ *
  * @beta
  */
 export const CmsdObjectType = {
@@ -53,11 +55,6 @@ export const CmsdObjectType = {
 } as const;
 
 /**
- * Common Media Server Data Object Type
- *
- * @group CMSD
- * @see {@link CmsdObjectType}
- *
- * @beta
+ * @internal
  */
 export type CmsdObjectType = typeof CmsdObjectType[keyof typeof CmsdObjectType];

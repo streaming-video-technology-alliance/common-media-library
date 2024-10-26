@@ -1,29 +1,17 @@
-/**
- * Common Media Client Data Stream Type
- *
- * @group CMCD
- *
- * @beta
- */
-export const CmcdStreamType = {
-	/**
-	 *  All segments are available – e.g., VOD
-	 */
-	VOD: 'v',
-
-	/**
-	 * Segments become available over time – e.g., LIVE
-	 */
-	LIVE: 'l',
-} as const;
+import { CmStreamType } from "../cta/CmStreamType";
 
 /**
  * Common Media Client Data Stream Type
  *
  * @group CMCD
  *
- * @see {@link CmcdStreamType}
+ * @enum
  *
  * @beta
  */
-export type CmcdStreamType = typeof CmcdStreamType[keyof typeof CmcdStreamType];
+export const CmcdStreamType = CmStreamType;
+
+/**
+ * @internal
+ */
+export type CmcdStreamType = CmStreamType;

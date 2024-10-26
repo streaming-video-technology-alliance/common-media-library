@@ -7,7 +7,8 @@ import { CMCD_QUERY } from './CMCD_QUERY';
  *
  * @group CMCD
  *
- * @readonly
+ * @enum
+ *
  * @beta
  */
 export const CmcdEncoding = {
@@ -29,12 +30,6 @@ export const CmcdEncoding = {
 } as const;
 
 /**
- * CMCD encoding types.
- *
- * @group CMCD
- *
- * @see {@link CmcdEncoding}
- *
- * @beta
+ * @internal
  */
 export type CmcdEncoding = typeof CmcdEncoding[keyof typeof CmcdEncoding];
