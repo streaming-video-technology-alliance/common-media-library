@@ -29,7 +29,7 @@ test('parseInnerList', () => {
 				new Date(1659578233 * 1000),
 			]),
 		], src: ``,
-	}
+	},
 	);
 	assert.throws(() => parseInnerList(`[1 2 3)`), /failed to parse "\[1 2 3\)" as Inner List/);
 	assert.throws(() => parseInnerList(`(1 2 3]`), /failed to parse "\]" as Inner List/);

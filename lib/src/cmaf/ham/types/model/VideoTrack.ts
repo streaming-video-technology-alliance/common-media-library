@@ -1,4 +1,4 @@
-import { FrameRate } from './FrameRate.js';
+import type { FrameRate } from './FrameRate.js';
 import type { Track } from './Track.js';
 
 /**

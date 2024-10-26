@@ -37,12 +37,12 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.js';
-import { Channels } from './Channels.js';
+import type { Channels } from './Channels.js';
 import type { CmdHistory } from './CmdHistory.js';
 import { Cta608Channel } from './Cta608Channel.js';
-import { PACData } from './PACData.js';
-import { PenStyles } from './PenStyles.js';
-import { SupportedField } from './SupportedField.js';
+import type { PACData } from './PACData.js';
+import type { PenStyles } from './PenStyles.js';
+import type { SupportedField } from './SupportedField.js';
 import { VerboseLevel } from './VerboseLevel.js';
 import { backgroundColors } from './utils/backgroundColors.js';
 import { createCmdHistory } from './utils/createCmdHistory.js';

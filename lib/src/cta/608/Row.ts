@@ -38,7 +38,7 @@
 
 import { CaptionsLogger } from './CaptionsLogger.js';
 import { PenState } from './PenState.js';
-import { PenStyles } from './PenStyles.js';
+import type { PenStyles } from './PenStyles.js';
 import { StyledUnicodeChar } from './StyledUnicodeChar.js';
 import { VerboseLevel } from './VerboseLevel.js';
 import { NR_COLS } from './utils/NR_COLS.js';

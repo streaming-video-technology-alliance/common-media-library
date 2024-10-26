@@ -1,4 +1,4 @@
-import { SfInnerList } from '../SfInnerList.js';
+import type { SfInnerList } from '../SfInnerList.js';
 import { serializeItem } from './serializeItem.js';
 import { serializeParams } from './serializeParams.js';
 

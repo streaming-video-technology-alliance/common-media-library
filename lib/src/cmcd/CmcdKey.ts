@@ -1,4 +1,4 @@
-import { Cmcd } from './Cmcd.js';
+import type { Cmcd } from './Cmcd.js';
 
 /**
  * A CMCD key.

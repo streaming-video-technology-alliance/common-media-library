@@ -1,6 +1,6 @@
-import { SfEncodeOptions } from '../SfEncodeOptions.js';
+import type { SfEncodeOptions } from '../SfEncodeOptions.js';
 import { SfItem } from '../SfItem.js';
-import { SfMember } from '../SfMember.js';
+import type { SfMember } from '../SfMember.js';
 import { LIST } from '../utils/LIST.js';
 import { serializeError } from './serializeError.js';
 import { serializeInnerList } from './serializeInnerList.js';

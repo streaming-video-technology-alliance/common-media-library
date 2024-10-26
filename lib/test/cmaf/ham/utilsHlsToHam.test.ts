@@ -5,7 +5,7 @@ import { formatSegments } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/uti
 import { getByterange } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/utils/getByterange.js';
 import { getCodec } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/utils/getCodec.js';
 import { getDuration } from '../../../src/cmaf/ham/mapper/hls/mapHlsToHam/utils/getDuration.js';
-import { HlsManifest } from '../../../src/cmaf/ham/types/mapper/hls/HlsManifest.js';
+import type { HlsManifest } from '../../../src/cmaf/ham/types/mapper/hls/HlsManifest.js';
 
 import { getSegments } from './data/hlsData.js';
 

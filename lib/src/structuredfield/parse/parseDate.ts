@@ -1,5 +1,6 @@
 import { DATE } from '../utils/DATE.js';
-import { ParsedValue, parsedValue } from './ParsedValue.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.js';
 

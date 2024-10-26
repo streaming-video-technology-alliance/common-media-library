@@ -13,7 +13,7 @@ describe('parseList', () => {
 					new SfItem(`bar`),
 					new SfItem(`It was the best of times.`),
 				], src: ``,
-			}
+			},
 		);
 	});
 
@@ -25,7 +25,7 @@ describe('parseList', () => {
 					new SfItem(Symbol.for(`foo`)),
 					new SfItem(Symbol.for(`bar`)),
 				], src: ``,
-			}
+			},
 		);
 	});
 
@@ -42,7 +42,7 @@ describe('parseList', () => {
 					new SfItem(new Uint8Array([1, 2, 3])),
 					new SfItem(new Date(1659578233 * 1000)),
 				], src: ``,
-			}
+			},
 		);
 	});
 
@@ -56,7 +56,7 @@ describe('parseList', () => {
 					new SfItem(['bat', 'one']),
 					new SfItem([]),
 				], src: ``,
-			}
+			},
 		);
 	});
 

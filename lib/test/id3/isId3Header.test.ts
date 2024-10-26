@@ -15,11 +15,11 @@ describe('isId3Header', () => {
 	]);
 	const mockID3HeaderMissingLeadingByte = mockID3Header.slice(
 		LEADING_BYTE_SIZE,
-		mockID3Header.length
+		mockID3Header.length,
 	);
 	const mockID3HeaderMissingTrailingByte = mockID3Header.slice(
 		0,
-		mockID3Header.length - TRAILING_BYTE_SIZE
+		mockID3Header.length - TRAILING_BYTE_SIZE,
 	);
 
 	it('Properly parses ID3 Headers', () => {

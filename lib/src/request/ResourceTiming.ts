@@ -5,7 +5,7 @@
  *
  * @beta
  */
-export interface ResourceTiming {
+export type ResourceTiming = {
 	// The timestamp for the time a resource fetch started.
 	startTime: number
 

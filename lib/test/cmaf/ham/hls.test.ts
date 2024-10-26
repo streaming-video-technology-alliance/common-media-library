@@ -1,4 +1,5 @@
-import cmafHam, { Presentation } from '@svta/common-media-library/cmaf-ham';
+import type { Presentation } from '@svta/common-media-library/cmaf-ham';
+import cmafHam from '@svta/common-media-library/cmaf-ham';
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

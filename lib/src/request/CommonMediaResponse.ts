@@ -1,5 +1,5 @@
-import { CommonMediaRequest } from './CommonMediaRequest.js';
-import { ResourceTiming } from './ResourceTiming.js';
+import type { CommonMediaRequest } from './CommonMediaRequest.js';
+import type { ResourceTiming } from './ResourceTiming.js';
 
 /**
  * Common response API.
@@ -9,7 +9,7 @@ import { ResourceTiming } from './ResourceTiming.js';
  * @beta
  */
 
-export interface CommonMediaResponse {
+export type CommonMediaResponse = {
 	/**
 	 * The origin request.
 	 */

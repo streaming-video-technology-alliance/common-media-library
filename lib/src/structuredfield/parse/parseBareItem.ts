@@ -1,7 +1,7 @@
-import { SfBareItem } from '../SfBareItem.js';
-import { SfDecodeOptions } from '../SfDecodeOptions.js';
+import type { SfBareItem } from '../SfBareItem.js';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
 import { BARE_ITEM } from '../utils/BARE_ITEM.js';
-import { ParsedValue } from './ParsedValue.js';
+import type { ParsedValue } from './ParsedValue.js';
 import { parseBoolean } from './parseBoolean.js';
 import { parseByteSequence } from './parseByteSequence.js';
 import { parseDate } from './parseDate.js';

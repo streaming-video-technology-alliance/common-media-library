@@ -1,6 +1,6 @@
-import { CmcdFormatter } from './CmcdFormatter.js';
-import { CmcdHeadersMap } from './CmcdHeadersMap.js';
-import { CmcdKey } from './CmcdKey.js';
+import type { CmcdFormatter } from './CmcdFormatter.js';
+import type { CmcdHeadersMap } from './CmcdHeadersMap.js';
+import type { CmcdKey } from './CmcdKey.js';
 
 /**
  * Options for encoding CMCD values.
@@ -9,7 +9,7 @@ import { CmcdKey } from './CmcdKey.js';
  *
  * @beta
  */
-export interface CmcdEncodeOptions {
+export type CmcdEncodeOptions = {
 	/**
 	 * A map of CMCD keys to custom formatters.
 	 */

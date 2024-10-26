@@ -17,7 +17,7 @@ describe('encodeSfDict', () => {
 				b: 20,
 				c: 30,
 			}),
-			`a=10, b=20, c=30`
+			`a=10, b=20, c=30`,
 		);
 		assert.deepStrictEqual(
 			encodeSfDict(new Map([
@@ -25,7 +25,7 @@ describe('encodeSfDict', () => {
 				['b', 20],
 				['c', 30],
 			])),
-			`a=10, b=20, c=30`
+			`a=10, b=20, c=30`,
 		);
 		assert.deepStrictEqual(
 			encodeSfDict({
@@ -35,7 +35,7 @@ describe('encodeSfDict', () => {
 				d: Symbol.for('y'),
 				e: new Uint8Array([1, 2, 3]),
 			}),
-			`a=1, b=?0, c="x", d=y, e=:AQID:`
+			`a=1, b=?0, c="x", d=y, e=:AQID:`,
 		);
 		assert.deepStrictEqual(
 			encodeSfDict({
@@ -45,7 +45,7 @@ describe('encodeSfDict', () => {
 				d: new SfItem(Symbol.for('y')),
 				e: new SfItem(new Uint8Array([1, 2, 3])),
 			}),
-			`a=1, b=?0, c="x", d=y, e=:AQID:`
+			`a=1, b=?0, c="x", d=y, e=:AQID:`,
 		);
 		assert.deepStrictEqual(
 			encodeSfDict(new Map([
@@ -55,7 +55,7 @@ describe('encodeSfDict', () => {
 				['d', new SfItem(Symbol.for('y'))],
 				['e', new SfItem(new Uint8Array([1, 2, 3]))],
 			])),
-			`a=1, b=?0, c="x", d=y, e=:AQID:`
+			`a=1, b=?0, c="x", d=y, e=:AQID:`,
 		);
 	});
 
@@ -65,7 +65,7 @@ describe('encodeSfDict', () => {
 				['a', new SfItem(Symbol.for('b'))],
 				['c', new SfItem(new SfToken('d'))],
 			])),
-			`a=b, c=d`
+			`a=b, c=d`,
 		);
 	});
 
