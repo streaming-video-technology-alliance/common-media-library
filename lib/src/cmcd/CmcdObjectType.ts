@@ -5,49 +5,60 @@
  *
  * @beta
  */
-export enum CmcdObjectType {
+export const CmcdObjectType = {
 	/**
 	 * text file, such as a manifest or playlist
 	 */
-	MANIFEST = 'm',
+	MANIFEST: 'm',
 
 	/**
 	 * audio only
 	 */
-	AUDIO = 'a',
+	AUDIO: 'a',
 
 	/**
 	 * video only
 	 */
-	VIDEO = 'v',
+	VIDEO: 'v',
 
 	/**
 	 * muxed audio and video
 	 */
-	MUXED = 'av',
+	MUXED: 'av',
 
 	/**
 	 * init segment
 	 */
-	INIT = 'i',
+	INIT: 'i',
 
 	/**
 	 * caption or subtitle
 	 */
-	CAPTION = 'c',
+	CAPTION: 'c',
 
 	/**
 	 * ISOBMFF timed text track
 	 */
-	TIMED_TEXT = 'tt',
+	TIMED_TEXT: 'tt',
 
 	/**
 	 * cryptographic key, license or certificate.
 	 */
-	KEY = 'k',
+	KEY: 'k',
 
 	/**
 	 * other
 	 */
-	OTHER = 'o',
-}
+	OTHER: 'o',
+} as const;
+
+/**
+ * Common Media Client Data Object Type
+ *
+ * @group CMCD
+ *
+ * @see {@link CmcdObjectType}
+ *
+ * @beta
+ */
+export type CmcdObjectType = typeof CmcdObjectType[keyof typeof CmcdObjectType];

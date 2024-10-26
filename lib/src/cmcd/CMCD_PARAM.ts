@@ -5,4 +5,4 @@
  *
  * @beta
  */
-export const CMCD_PARAM = 'CMCD';
+export const CMCD_PARAM = 'CMCD' as const;
