@@ -1,3 +1,5 @@
+import type { ValueOf } from '../utils/ValueOf';
+
 /**
  * Common Media Streaming Format
  *
@@ -31,4 +33,4 @@ export const CmStreamingFormat = {
  * @see {@link CmcdEncoding}
  * @internal
  */
-export type CmStreamingFormat = typeof CmStreamingFormat[keyof typeof CmStreamingFormat];
+export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;
