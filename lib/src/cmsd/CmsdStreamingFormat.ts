@@ -30,6 +30,6 @@ export const CmsdStreamingFormat = {
 } as const;
 
 /**
- * @internal
+ * @beta
  */
 export type CmsdStreamingFormat = typeof CmsdStreamingFormat[keyof typeof CmsdStreamingFormat];

@@ -9,9 +9,9 @@ import { CmObjectType } from '../cta/CmObjectType';
  *
  * @enum
  */
-export const CmcdObjectType = CmObjectType;
+export const CmcdObjectType = CmObjectType as typeof CmObjectType;
 
 /**
- * @internal
+ * @beta
  */
 export type CmcdObjectType = CmObjectType;

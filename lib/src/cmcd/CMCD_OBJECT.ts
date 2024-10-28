@@ -5,4 +5,4 @@
  *
  * @beta
  */
-export const CMCD_OBJECT = 'CMCD-Object' as const;
+export const CMCD_OBJECT = 'CMCD-Object';

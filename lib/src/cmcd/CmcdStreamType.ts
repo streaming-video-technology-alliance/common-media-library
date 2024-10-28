@@ -9,9 +9,9 @@ import { CmStreamType } from '../cta/CmStreamType';
  *
  * @beta
  */
-export const CmcdStreamType = CmStreamType;
+export const CmcdStreamType = CmStreamType as typeof CmStreamType;
 
 /**
- * @internal
+ * @beta
  */
 export type CmcdStreamType = CmStreamType;
