@@ -1,3 +1,4 @@
+import type { ValueOf } from '../utils/ValueOf.js';
 import { CMCD_OBJECT } from './CMCD_OBJECT.js';
 import { CMCD_REQUEST } from './CMCD_REQUEST.js';
 import { CMCD_SESSION } from './CMCD_SESSION.js';
@@ -37,4 +38,4 @@ export const CmcdHeaderField = {
 /**
  * @beta
  */
-export type CmcdHeaderField = typeof CmcdHeaderField[keyof typeof CmcdHeaderField];
+export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;

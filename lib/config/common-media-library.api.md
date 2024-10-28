@@ -133,8 +133,10 @@ export const CmcdEncoding: {
     readonly HEADERS: typeof CMCD_HEADERS;
 };
 
+// Warning: (ae-forgotten-export) The symbol "ValueOf" needs to be exported by the entry point index.d.ts
+//
 // @beta (undocumented)
-export type CmcdEncoding = typeof CmcdEncoding[keyof typeof CmcdEncoding];
+export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
 // @beta
 export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
@@ -151,7 +153,7 @@ export const CmcdHeaderField: {
 };
 
 // @beta (undocumented)
-export type CmcdHeaderField = typeof CmcdHeaderField[keyof typeof CmcdHeaderField];
+export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
 // @beta
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
@@ -231,25 +233,13 @@ export const CmsdHeaderField: {
 };
 
 // @beta (undocumented)
-export type CmsdHeaderField = typeof CmsdHeaderField[keyof typeof CmsdHeaderField];
+export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;
 
-// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmsdObjectType" because one of its declarations is marked as @internal
-//
 // @beta
-export const CmsdObjectType: {
-    readonly MANIFEST: "m";
-    readonly AUDIO: "a";
-    readonly VIDEO: "v";
-    readonly MUXED: "av";
-    readonly INIT: "i";
-    readonly CAPTION: "c";
-    readonly TIMED_TEXT: "tt";
-    readonly KEY: "k";
-    readonly OTHER: "o";
-};
+export const CmsdObjectType: typeof CmObjectType;
 
-// @internal (undocumented)
-export type CmsdObjectType = typeof CmsdObjectType[keyof typeof CmsdObjectType];
+// @beta (undocumented)
+export type CmsdObjectType = CmObjectType;
 
 // @beta
 export type CmsdStatic = {
@@ -269,24 +259,16 @@ export type CmsdStatic = {
 };
 
 // @beta
-export const CmsdStreamingFormat: {
-    readonly DASH: "d";
-    readonly HLS: "h";
-    readonly SMOOTH: "s";
-    readonly OTHER: "o";
-};
+export const CmsdStreamingFormat: typeof CmStreamingFormat;
 
 // @beta (undocumented)
-export type CmsdStreamingFormat = typeof CmsdStreamingFormat[keyof typeof CmsdStreamingFormat];
+export type CmsdStreamingFormat = CmStreamingFormat;
 
 // @beta
-export const CmsdStreamType: {
-    readonly VOD: "v";
-    readonly LIVE: "l";
-};
+export const CmsdStreamType: typeof CmStreamType;
 
 // @beta (undocumented)
-export type CmsdStreamType = typeof CmsdStreamType[keyof typeof CmsdStreamType];
+export type CmsdStreamType = CmStreamType;
 
 // @beta
 export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
@@ -788,8 +770,6 @@ export type Validation = {
     errorMessages: string[];
 };
 
-// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "VerboseLevel" because one of its declarations is marked as @internal
-//
 // @beta
 export const VerboseLevel: {
     readonly ERROR: 0;
@@ -800,8 +780,8 @@ export const VerboseLevel: {
     readonly DATA: 3;
 };
 
-// @internal (undocumented)
-export type VerboseLevel = typeof VerboseLevel[keyof typeof VerboseLevel];
+// @beta (undocumented)
+export type VerboseLevel = ValueOf<typeof VerboseLevel>;
 
 // @alpha
 export type VideoTrack = Track & {
@@ -815,8 +795,8 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/cmcd/CmcdEncoding.ts:18:2 - (ae-forgotten-export) The symbol "CMCD_JSON" needs to be exported by the entry point index.d.ts
-// src/cmcd/CmcdEncoding.ts:23:2 - (ae-forgotten-export) The symbol "CMCD_QUERY" needs to be exported by the entry point index.d.ts
-// src/cmcd/CmcdEncoding.ts:28:2 - (ae-forgotten-export) The symbol "CMCD_HEADERS" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:19:2 - (ae-forgotten-export) The symbol "CMCD_JSON" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:24:2 - (ae-forgotten-export) The symbol "CMCD_QUERY" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:29:2 - (ae-forgotten-export) The symbol "CMCD_HEADERS" needs to be exported by the entry point index.d.ts
 
 ```

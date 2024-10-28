@@ -1,3 +1,4 @@
+import type { ValueOf } from '../utils/ValueOf';
 import { CMCD_HEADERS } from './CMCD_HEADERS';
 import { CMCD_JSON } from './CMCD_JSON';
 import { CMCD_QUERY } from './CMCD_QUERY';
@@ -32,4 +33,4 @@ export const CmcdEncoding = {
 /**
  * @beta
  */
-export type CmcdEncoding = typeof CmcdEncoding[keyof typeof CmcdEncoding];
+export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;

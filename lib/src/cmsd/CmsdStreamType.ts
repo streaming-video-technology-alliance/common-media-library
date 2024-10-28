@@ -1,3 +1,5 @@
+import { CmStreamType } from '../cta/CmStreamType.js';
+
 /**
  * Common Media Server Data Stream Type
  *
@@ -7,19 +9,9 @@
  *
  * @beta
  */
-export const CmsdStreamType = {
-	/**
-	 *  All segments are available – e.g., VOD
-	 */
-	VOD: 'v',
-
-	/**
-	 * Segments become available over time – e.g., LIVE
-	 */
-	LIVE: 'l',
-} as const;
+export const CmsdStreamType = CmStreamType as typeof CmStreamType;
 
 /**
  * @beta
  */
-export type CmsdStreamType = typeof CmsdStreamType[keyof typeof CmsdStreamType];
+export type CmsdStreamType = CmStreamType;
