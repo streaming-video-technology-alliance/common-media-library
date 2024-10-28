@@ -1,4 +1,4 @@
-import { RawId3Frame } from './RawFrame.js';
+import type { RawId3Frame } from './RawFrame.js';
 import { readId3Size } from './readId3Size.js';
 
 /**

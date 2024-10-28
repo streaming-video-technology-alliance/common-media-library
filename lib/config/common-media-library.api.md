@@ -78,27 +78,27 @@ export class CaptionsLogger {
 }
 
 // @beta
-export interface Cmcd {
+export type Cmcd = {
     [index: CmcdCustomKey]: CmcdValue;
-    bl?: number;
     br?: number;
-    bs?: boolean;
-    cid?: string;
     d?: number;
+    ot?: CmcdObjectType;
+    tb?: number;
+    bl?: number;
     dl?: number;
     mtp?: number;
     nor?: string;
     nrr?: string;
-    ot?: CmcdObjectType;
+    su?: boolean;
+    cid?: string;
     pr?: number;
-    rtp?: number;
     sf?: CmcdStreamingFormat;
     sid?: string;
     st?: CmcdStreamType;
-    su?: boolean;
-    tb?: number;
     v?: number;
-}
+    bs?: boolean;
+    rtp?: number;
+};
 
 // @beta
 export const CMCD_PARAM = "CMCD";
@@ -110,12 +110,12 @@ export const CMCD_V1 = 1;
 export type CmcdCustomKey = `${string}-${string}`;
 
 // @beta
-export interface CmcdEncodeOptions {
-    baseUrl?: string;
+export type CmcdEncodeOptions = {
+    formatters?: Record<CmcdKey, CmcdFormatter>;
     customHeaderMap?: CmcdHeadersMap;
     filter?: (key: CmcdKey) => boolean;
-    formatters?: Record<CmcdKey, CmcdFormatter>;
-}
+    baseUrl?: string;
+};
 
 // @beta
 export enum CmcdEncoding {
@@ -192,25 +192,25 @@ export const CMSD_V1 = 1;
 export type CmsdCustomKey = `${string}-${string}`;
 
 // @beta
-export interface CmsdDynamic {
-    params: CmsdDynamicParams;
+export type CmsdDynamic = {
     value: string;
-}
+    params: CmsdDynamicParams;
+};
 
 // @beta
-export interface CmsdDynamicParams {
+export type CmsdDynamicParams = {
     [index: CmsdCustomKey]: CmsdValue;
     du?: boolean;
     etp?: number;
     mb?: number;
     rd?: number;
     rtt?: number;
-}
+};
 
 // @beta
-export interface CmsdEncodeOptions {
+export type CmsdEncodeOptions = {
     useSymbol?: boolean;
-}
+};
 
 // @beta
 export enum CmsdHeaderField {
@@ -232,7 +232,7 @@ export enum CmsdObjectType {
 }
 
 // @beta
-export interface CmsdStatic {
+export type CmsdStatic = {
     [index: CmsdCustomKey]: CmsdValue;
     at?: number;
     br?: number;
@@ -246,7 +246,7 @@ export interface CmsdStatic {
     st?: CmsdStreamType;
     su?: boolean;
     v?: number;
-}
+};
 
 // @beta
 export enum CmsdStreamingFormat {
@@ -274,30 +274,30 @@ export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | 
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
 
 // @beta
-export interface CommonMediaRequest {
-    cmcd?: Cmcd;
-    credentials?: RequestCredentials;
-    customData?: any;
-    headers?: Record<string, string>;
-    method: string;
-    mode?: RequestMode;
-    responseType?: string;
-    timeout?: number;
+export type CommonMediaRequest = {
     url: string;
-}
+    method: string;
+    responseType?: string;
+    headers?: Record<string, string>;
+    credentials?: RequestCredentials;
+    mode?: RequestMode;
+    timeout?: number;
+    cmcd?: Cmcd;
+    customData?: any;
+};
 
 // @beta
-export interface CommonMediaResponse {
-    data?: any;
-    headers?: Record<string, string>;
-    redirected?: boolean;
+export type CommonMediaResponse = {
     request: CommonMediaRequest;
-    resourceTiming: ResourceTiming;
+    url?: string;
+    redirected?: boolean;
     status?: number;
     statusText?: string;
     type?: string;
-    url?: string;
-}
+    headers?: Record<string, string>;
+    data?: any;
+    resourceTiming: ResourceTiming;
+};
 
 // @beta
 export class Cta608Channel {
@@ -359,14 +359,11 @@ export class Cta608Parser {
 }
 
 // @beta
-export interface CueHandler {
-    // (undocumented)
-    dispatchCue?(): void;
-    // (undocumented)
+export type CueHandler = {
     newCue(startTime: number, endTime: number, screen: CaptionScreen): void;
-    // (undocumented)
     reset?(): void;
-}
+    dispatchCue?(): void;
+};
 
 // @alpha
 export function dashToHam(manifest: string): Presentation[];
@@ -493,18 +490,13 @@ export type Manifest = {
 export type ManifestFormat = 'hls' | 'dash';
 
 // @beta
-export interface PACData {
-    // (undocumented)
-    color: string | null;
-    // (undocumented)
-    indent: number | null;
-    // (undocumented)
-    italics: boolean;
-    // (undocumented)
+export type PACData = {
     row: number;
-    // (undocumented)
+    indent: number | null;
+    color: string | null;
     underline: boolean;
-}
+    italics: boolean;
+};
 
 // @beta
 export class PenState {
@@ -548,18 +540,13 @@ export type Presentation = Ham & {
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
 // @beta
-export interface ResourceTiming {
-    // (undocumented)
-    duration?: number;
-    // (undocumented)
-    encodedBodySize: number;
-    // (undocumented)
-    responseEnd?: number;
-    // (undocumented)
-    responseStart?: number;
-    // (undocumented)
+export type ResourceTiming = {
     startTime: number;
-}
+    encodedBodySize: number;
+    responseStart?: number;
+    responseEnd?: number;
+    duration?: number;
+};
 
 // @beta
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
@@ -603,7 +590,7 @@ export class SccParser {
     // (undocumented)
     field: number | any;
     // (undocumented)
-    getField(): any;
+    getField(): number | any;
     // (undocumented)
     getHeaderStatus(): boolean;
     // (undocumented)

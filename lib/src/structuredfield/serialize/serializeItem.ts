@@ -1,4 +1,4 @@
-import { SfBareItem } from '../SfBareItem.js';
+import type { SfBareItem } from '../SfBareItem.js';
 import { SfItem } from '../SfItem.js';
 import { serializeBareItem } from './serializeBareItem.js';
 import { serializeParams } from './serializeParams.js';

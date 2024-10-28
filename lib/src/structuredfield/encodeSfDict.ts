@@ -1,4 +1,4 @@
-import { SfEncodeOptions } from './SfEncodeOptions.js';
+import type { SfEncodeOptions } from './SfEncodeOptions.js';
 import { serializeDict } from './serialize/serializeDict.js';
 
 /**

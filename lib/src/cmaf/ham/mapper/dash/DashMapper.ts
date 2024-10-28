@@ -6,12 +6,12 @@ import { mapDashToHam } from './mapDashToHam/mapDashToHam.js';
 import { mapHamToDash } from './mapHamToDash/mapHamToDash.js';
 
 import { xmlToJson } from '../../utils/dash/xmlToJson.js';
-import { getMetadata } from '../../utils/manifest/getMetadata.js';
 import { addMetadataToDash } from '../../utils/manifest/addMetadataToDash.js';
+import { getMetadata } from '../../utils/manifest/getMetadata.js';
 
-import { IMapper } from '../IMapper.js';
+import type { Mapper } from '../Mapper.js';
 
-export class DashMapper implements IMapper {
+export class DashMapper implements Mapper {
 	private manifest: Manifest | undefined;
 
 	getManifestMetadata(): JSON | undefined {

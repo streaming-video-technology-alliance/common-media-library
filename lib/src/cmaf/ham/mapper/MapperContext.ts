@@ -1,13 +1,13 @@
 import type { Manifest } from '../types/manifest/Manifest.js';
 import type { Presentation } from '../types/model/Presentation.js';
 
-import { IMapper } from './IMapper.js';
+import type { Mapper } from './Mapper.js';
 
 export class MapperContext {
-	private strategy!: IMapper;
+	private strategy!: Mapper;
 	private static instance: MapperContext;
 
-	private constructor() {}
+	private constructor() { }
 
 	public static getInstance(): MapperContext {
 		if (!MapperContext.instance) {
@@ -17,7 +17,7 @@ export class MapperContext {
 		return MapperContext.instance;
 	}
 
-	public setStrategy(strategy: IMapper): void {
+	public setStrategy(strategy: Mapper): void {
 		this.strategy = strategy;
 	}
 

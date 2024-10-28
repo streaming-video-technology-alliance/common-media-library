@@ -6,7 +6,7 @@ import type { CaptionScreen } from './CaptionScreen';
  * @group CTA-608
  * @beta
  */
-export interface CueHandler {
+export type CueHandler = {
 	newCue(startTime: number, endTime: number, screen: CaptionScreen): void;
 	reset?(): void;
 	dispatchCue?(): void;

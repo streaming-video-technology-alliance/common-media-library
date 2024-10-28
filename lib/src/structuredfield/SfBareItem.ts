@@ -1,4 +1,4 @@
-import { SfToken } from './SfToken';
+import type { SfToken } from './SfToken';
 
 /**
  * A type to represent structured field bare items.

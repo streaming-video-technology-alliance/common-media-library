@@ -6,9 +6,9 @@ import { mapHlsToHam } from './mapHlsToHam/mapHlsToHam.js';
 
 import { getMetadata } from '../../utils/manifest/getMetadata.js';
 
-import { IMapper } from '../IMapper.js';
+import type { Mapper } from '../Mapper.js';
 
-export class HlsMapper implements IMapper {
+export class HlsMapper implements Mapper {
 	private manifest: Manifest | undefined;
 
 	getManifestMetadata(): any | undefined {

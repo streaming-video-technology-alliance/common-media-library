@@ -1,4 +1,4 @@
-import { SfEncodeOptions } from '../SfEncodeOptions.js';
+import type { SfEncodeOptions } from '../SfEncodeOptions.js';
 import { SfItem } from '../SfItem.js';
 import { DICT } from '../utils/DICT.js';
 import { serializeError } from './serializeError.js';

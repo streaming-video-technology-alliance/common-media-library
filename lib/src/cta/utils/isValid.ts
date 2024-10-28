@@ -1,4 +1,4 @@
-import { CmValue } from '../CmValue.js';
+import type { CmValue } from '../CmValue.js';
 
 /**
  * Checks if the given value is valid

@@ -1,5 +1,5 @@
-import { CmsdCustomKey } from './CmsdCustomKey.js';
-import { CmsdValue } from './CmsdValue.js';
+import type { CmsdCustomKey } from './CmsdCustomKey.js';
+import type { CmsdValue } from './CmsdValue.js';
 
 /**
  * Common Media Server Data (CMSD) dynamic response header field parameters.
@@ -10,7 +10,7 @@ import { CmsdValue } from './CmsdValue.js';
  *
  * @beta
  */
-export interface CmsdDynamicParams {
+export type CmsdDynamicParams = {
 	/**
 	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
 	 * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.

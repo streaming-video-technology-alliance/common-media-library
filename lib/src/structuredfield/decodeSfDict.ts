@@ -1,4 +1,4 @@
-import { SfDecodeOptions } from './SfDecodeOptions.js';
+import type { SfDecodeOptions } from './SfDecodeOptions.js';
 import type { SfDictionary } from './SfDictionary.js';
 import { parseDict } from './parse/parseDict.js';
 import { parseError } from './parse/parseError.js';

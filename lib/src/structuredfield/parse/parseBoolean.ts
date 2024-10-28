@@ -1,5 +1,6 @@
 import { BOOLEAN } from '../utils/BOOLEAN.js';
-import { ParsedValue, parsedValue } from './ParsedValue.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 
 // 4.2.8.  Parsing a Boolean

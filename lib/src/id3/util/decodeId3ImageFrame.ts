@@ -1,10 +1,10 @@
-import { DecodedId3Frame } from '../DecodedId3Frame.js';
-import { RawId3Frame } from './RawFrame.js';
+import type { DecodedId3Frame } from '../DecodedId3Frame.js';
+import type { RawId3Frame } from './RawFrame.js';
 import { toUint8 } from './utf8.js';
 import { toArrayBuffer } from './toArrayBuffer.js';
 import { utf8ArrayToStr } from '../../utils.js'; 
 
-interface MetadataFrame {
+type MetadataFrame = {
 	key: string;
 	description: string;
 	data: string | ArrayBuffer;
@@ -13,7 +13,7 @@ interface MetadataFrame {
 }
 
 export function decodeId3ImageFrame(
-	frame: RawId3Frame
+	frame: RawId3Frame,
 ): DecodedId3Frame<string | ArrayBuffer> | undefined {
 	const metadataFrame: MetadataFrame = {
 		key: frame.type,
@@ -46,18 +46,18 @@ export function decodeId3ImageFrame(
 		return undefined;
 	}
 	const description = utf8ArrayToStr(
-		toUint8(frame.data, 3 + mimeTypeEndIndex, descriptionEndIndex)
+		toUint8(frame.data, 3 + mimeTypeEndIndex, descriptionEndIndex),
 	);
 
 	let data;
 	if (mimeType === '-->') {
 		data = utf8ArrayToStr(
-			toUint8(frame.data, 4 + mimeTypeEndIndex + descriptionEndIndex)
+			toUint8(frame.data, 4 + mimeTypeEndIndex + descriptionEndIndex),
 		);
 	} 
 	else {
 		data = toArrayBuffer(
-			frame.data.subarray(4 + mimeTypeEndIndex + descriptionEndIndex)
+			frame.data.subarray(4 + mimeTypeEndIndex + descriptionEndIndex),
 		);
 	}
 

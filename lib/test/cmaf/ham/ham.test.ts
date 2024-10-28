@@ -1,11 +1,12 @@
 import { deepStrictEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 
+import type {
+	SelectionSet,
+	Presentation } from '@svta/common-media-library';
 import {
 	getTracksFromSelectionSet,
-	SelectionSet,
 	validateTracks,
-	Presentation,
 } from '@svta/common-media-library';
 
 import jsonHam0 from './data/ham-samples/fromDash/ham0.json' assert { type: 'json' };
