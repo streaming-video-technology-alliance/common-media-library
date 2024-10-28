@@ -101,19 +101,19 @@ export type Cmcd = {
 };
 
 // @beta
-export const CMCD_OBJECT = "CMCD-Object";
+export const CMCD_OBJECT: "CMCD-Object";
 
 // @beta
-export const CMCD_PARAM = "CMCD";
+export const CMCD_PARAM: "CMCD";
 
 // @beta
-export const CMCD_REQUEST = "CMCD-Request";
+export const CMCD_REQUEST: "CMCD-Request";
 
 // @beta
-export const CMCD_SESSION = "CMCD-Session";
+export const CMCD_SESSION: "CMCD-Session";
 
 // @beta
-export const CMCD_STATUS = "CMCD-Status";
+export const CMCD_STATUS: "CMCD-Status";
 
 // @beta
 export type CmcdCustomKey = `${string}-${string}`;
@@ -126,6 +126,8 @@ export type CmcdEncodeOptions = {
     baseUrl?: string;
 };
 
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmcdEncoding" because one of its declarations is marked as @internal
+//
 // @beta
 export const CmcdEncoding: {
     readonly JSON: typeof CMCD_JSON;
@@ -133,10 +135,8 @@ export const CmcdEncoding: {
     readonly HEADERS: typeof CMCD_HEADERS;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ValueOf" needs to be exported by the entry point index.d.ts
-//
-// @beta (undocumented)
-export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
+// @internal (undocumented)
+export type CmcdEncoding = typeof CmcdEncoding[keyof typeof CmcdEncoding];
 
 // @beta
 export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
@@ -144,6 +144,8 @@ export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => s
 // @beta
 export const CmcdFormatters: Record<string, CmcdFormatter>;
 
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmcdHeaderField" because one of its declarations is marked as @internal
+//
 // @beta
 export const CmcdHeaderField: {
     readonly OBJECT: typeof CMCD_OBJECT;
@@ -152,8 +154,8 @@ export const CmcdHeaderField: {
     readonly STATUS: typeof CMCD_STATUS;
 };
 
-// @beta (undocumented)
-export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
+// @internal (undocumented)
+export type CmcdHeaderField = typeof CmcdHeaderField[keyof typeof CmcdHeaderField];
 
 // @beta
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
@@ -161,28 +163,52 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 // @beta
 export type CmcdKey = keyof Cmcd;
 
-// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmcdObjectType" because one of its declarations is marked as @internal
 //
 // @beta
-export const CmcdObjectType: typeof CmObjectType;
+export const CmcdObjectType: {
+    readonly MANIFEST: "m";
+    readonly AUDIO: "a";
+    readonly VIDEO: "v";
+    readonly MUXED: "av";
+    readonly INIT: "i";
+    readonly CAPTION: "c";
+    readonly TIMED_TEXT: "tt";
+    readonly KEY: "k";
+    readonly OTHER: "o";
+};
 
-// @beta (undocumented)
+// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
+//
+// @internal (undocumented)
 export type CmcdObjectType = CmObjectType;
+
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmcdStreamingFormat" because one of its declarations is marked as @internal
+//
+// @beta
+export const CmcdStreamingFormat: {
+    readonly DASH: "d";
+    readonly HLS: "h";
+    readonly SMOOTH: "s";
+    readonly OTHER: "o";
+};
 
 // Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
 //
-// @beta
-export const CmcdStreamingFormat: typeof CmStreamingFormat;
-
-// @beta (undocumented)
+// @internal (undocumented)
 export type CmcdStreamingFormat = CmStreamingFormat;
+
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmcdStreamType" because one of its declarations is marked as @internal
+//
+// @beta
+export const CmcdStreamType: {
+    readonly VOD: "v";
+    readonly LIVE: "l";
+};
 
 // Warning: (ae-forgotten-export) The symbol "CmStreamType" needs to be exported by the entry point index.d.ts
 //
-// @beta
-export const CmcdStreamType: typeof CmStreamType;
-
-// @beta (undocumented)
+// @internal (undocumented)
 export type CmcdStreamType = CmStreamType;
 
 // @beta
@@ -194,13 +220,13 @@ export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | 
 export type CmCustomKey = `${string}-${string}`;
 
 // @beta
-export const CMSD_DYNAMIC = "CMSD-Dynamic";
+export const CMSD_DYNAMIC: "CMSD-Dynamic";
 
 // @beta
-export const CMSD_STATIC = "CMSD-Static";
+export const CMSD_STATIC: "CMSD-Static";
 
 // @beta
-export const CMSD_V1 = 1;
+export const CMSD_V1: 1;
 
 // @beta
 export type CmsdCustomKey = `${string}-${string}`;
@@ -226,20 +252,34 @@ export type CmsdEncodeOptions = {
     useSymbol?: boolean;
 };
 
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmsdHeaderField" because one of its declarations is marked as @internal
+//
 // @beta
 export const CmsdHeaderField: {
     readonly STATIC: typeof CMSD_STATIC;
     readonly DYNAMIC: typeof CMSD_DYNAMIC;
 };
 
-// @beta (undocumented)
-export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;
+// @internal (undocumented)
+export type CmsdHeaderField = typeof CmsdHeaderField[keyof typeof CmsdHeaderField];
 
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmsdObjectType" because one of its declarations is marked as @internal
+//
 // @beta
-export const CmsdObjectType: typeof CmObjectType;
+export const CmsdObjectType: {
+    readonly MANIFEST: "m";
+    readonly AUDIO: "a";
+    readonly VIDEO: "v";
+    readonly MUXED: "av";
+    readonly INIT: "i";
+    readonly CAPTION: "c";
+    readonly TIMED_TEXT: "tt";
+    readonly KEY: "k";
+    readonly OTHER: "o";
+};
 
-// @beta (undocumented)
-export type CmsdObjectType = CmObjectType;
+// @internal (undocumented)
+export type CmsdObjectType = typeof CmsdObjectType[keyof typeof CmsdObjectType];
 
 // @beta
 export type CmsdStatic = {
@@ -258,17 +298,29 @@ export type CmsdStatic = {
     v?: number;
 };
 
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmsdStreamingFormat" because one of its declarations is marked as @internal
+//
 // @beta
-export const CmsdStreamingFormat: typeof CmStreamingFormat;
+export const CmsdStreamingFormat: {
+    readonly DASH: "d";
+    readonly HLS: "h";
+    readonly SMOOTH: "s";
+    readonly OTHER: "o";
+};
 
-// @beta (undocumented)
-export type CmsdStreamingFormat = CmStreamingFormat;
+// @internal (undocumented)
+export type CmsdStreamingFormat = typeof CmsdStreamingFormat[keyof typeof CmsdStreamingFormat];
 
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmsdStreamType" because one of its declarations is marked as @internal
+//
 // @beta
-export const CmsdStreamType: typeof CmStreamType;
+export const CmsdStreamType: {
+    readonly VOD: "v";
+    readonly LIVE: "l";
+};
 
-// @beta (undocumented)
-export type CmsdStreamType = CmStreamType;
+// @internal (undocumented)
+export type CmsdStreamType = typeof CmsdStreamType[keyof typeof CmsdStreamType];
 
 // @beta
 export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
@@ -371,6 +423,21 @@ export type CueHandler = {
 };
 
 // @alpha
+export type DashManifest = {
+    MPD: {
+        $?: {
+            maxSegmentDuration?: string;
+            mediaPresentationDuration?: string;
+            minBufferTime?: string;
+            profiles?: string;
+            type?: string;
+            xmlns?: string;
+        };
+        Period: Period[];
+    };
+};
+
+// @alpha
 export function dashToHam(manifest: string): Presentation[];
 
 // @beta
@@ -470,6 +537,14 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 
 // @alpha
 export function hamToHls(presentation: Presentation[]): Manifest;
+
+// @alpha
+export type HlsManifest = {
+    playlists: PlayList[];
+    mediaGroups: MediaGroups;
+    segments: SegmentHls[];
+    targetDuration?: number;
+};
 
 // @alpha
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
@@ -627,6 +702,24 @@ export type SelectionSet = Ham & {
     alignedSwitchingSets?: AlignedSwitchingSet[];
 };
 
+// Warning: (ae-forgotten-export) The symbol "DashParser" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "setDashParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setDashParser(parser: DashParser): void;
+
+// Warning: (ae-forgotten-export) The symbol "DashSerializer" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "setDashSerializer" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setDashSerializer(serializer: DashSerializer): void;
+
+// Warning: (ae-forgotten-export) The symbol "HlsParser" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "setHlsParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setHlsParser(parser: HlsParser): void;
+
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
 
@@ -770,6 +863,8 @@ export type Validation = {
     errorMessages: string[];
 };
 
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "VerboseLevel" because one of its declarations is marked as @internal
+//
 // @beta
 export const VerboseLevel: {
     readonly ERROR: 0;
@@ -780,8 +875,8 @@ export const VerboseLevel: {
     readonly DATA: 3;
 };
 
-// @beta (undocumented)
-export type VerboseLevel = ValueOf<typeof VerboseLevel>;
+// @internal (undocumented)
+export type VerboseLevel = typeof VerboseLevel[keyof typeof VerboseLevel];
 
 // @alpha
 export type VideoTrack = Track & {
@@ -795,8 +890,12 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/cmcd/CmcdEncoding.ts:19:2 - (ae-forgotten-export) The symbol "CMCD_JSON" needs to be exported by the entry point index.d.ts
-// src/cmcd/CmcdEncoding.ts:24:2 - (ae-forgotten-export) The symbol "CMCD_QUERY" needs to be exported by the entry point index.d.ts
-// src/cmcd/CmcdEncoding.ts:29:2 - (ae-forgotten-export) The symbol "CMCD_HEADERS" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/dash/DashManifest.ts:19:3 - (ae-forgotten-export) The symbol "Period" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:12:2 - (ae-forgotten-export) The symbol "PlayList" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:13:2 - (ae-forgotten-export) The symbol "MediaGroups" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:14:2 - (ae-forgotten-export) The symbol "SegmentHls" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:18:2 - (ae-forgotten-export) The symbol "CMCD_JSON" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:23:2 - (ae-forgotten-export) The symbol "CMCD_QUERY" needs to be exported by the entry point index.d.ts
+// src/cmcd/CmcdEncoding.ts:28:2 - (ae-forgotten-export) The symbol "CMCD_HEADERS" needs to be exported by the entry point index.d.ts
 
 ```

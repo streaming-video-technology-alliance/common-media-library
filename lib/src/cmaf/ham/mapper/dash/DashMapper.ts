@@ -5,7 +5,7 @@ import type { Presentation } from '../../types/model/Presentation.js';
 import { mapDashToHam } from './mapDashToHam/mapDashToHam.js';
 import { mapHamToDash } from './mapHamToDash/mapHamToDash.js';
 
-import { xmlToJson } from '../../utils/dash/xmlToJson.js';
+import { parseDashManifest } from '../../utils/dash/parseDashManifest.js';
 import { addMetadataToDash } from '../../utils/manifest/addMetadataToDash.js';
 import { getMetadata } from '../../utils/manifest/getMetadata.js';
 
@@ -19,7 +19,7 @@ export class DashMapper implements Mapper {
 	}
 
 	toHam(manifest: Manifest): Presentation[] {
-		const dashManifest: DashManifest | undefined = xmlToJson(
+		const dashManifest: DashManifest | undefined = parseDashManifest(
 			manifest.manifest,
 		);
 
