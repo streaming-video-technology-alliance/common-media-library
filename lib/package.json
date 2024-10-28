@@ -71,10 +71,5 @@
 		"build:cjs": "tsc --module commonjs --outDir dist/cjs",
 		"test": "tsx --test ./test/**/*.test.ts",
 		"prepublishOnly": "npm run build"
-	},
-	"dependencies": {
-		"@types/xml2js": "0.4.14",
-		"m3u8-parser": "7.1.0",
-		"xml2js": "0.6.2"
 	}
 }

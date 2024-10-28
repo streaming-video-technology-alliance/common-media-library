@@ -5,7 +5,7 @@ import type { Period } from '../../../types/mapper/dash/Period.js';
 
 import { presentationsToPeriods } from './presentationsToPeriods.js';
 
-import { jsonToXml } from '../../../utils/dash/jsonToXml.js';
+import { serializeDashManifest } from '../../../utils/dash/serializeDashManifest.js';
 
 export function mapHamToDash(hamManifests: Presentation[]): string {
 	const periods: Period[] = presentationsToPeriods(hamManifests);
@@ -20,5 +20,5 @@ export function mapHamToDash(hamManifests: Presentation[]): string {
 		},
 	};
 
-	return jsonToXml(manifest);
+	return serializeDashManifest(manifest);
 }
