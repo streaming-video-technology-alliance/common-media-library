@@ -235,8 +235,6 @@ export const CmsdHeaderField: {
 // @beta (undocumented)
 export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;
 
-// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "CmsdObjectType" because one of its declarations is marked as @internal
-//
 // @beta
 export const CmsdObjectType: typeof CmObjectType;
 
@@ -813,8 +811,6 @@ export type Validation = {
     errorMessages: string[];
 };
 
-// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "VerboseLevel" because one of its declarations is marked as @internal
-//
 // @beta
 export const VerboseLevel: {
     readonly ERROR: 0;
