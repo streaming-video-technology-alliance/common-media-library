@@ -41,3 +41,6 @@ import { appendCmcdQuery, CmcdObjectType } from '@svta/common-media-library/cmcd
 
 ## Documentation
 API docs can be found [here](https://streaming-video-technology-alliance.github.io/common-media-library/).
+
+## Thanks
+This project builds upon the work of the open source community. Special thanks to the maintainers of [hls.js](https://github.com/video-dev/hls.js/), [dash.js](https://github.com/dash-industry-forum/dash.js/), [shaka-player](https://github.com/shaka-project/shaka-player), and [structured-field-values](https://github.com/Jxck/structured-field-values) as well as organizations like the [Streaming Video Technology Alliance](https://www.svta.org/), [DASH Industry Forum](https://dashif.org/), and the [CTA WAVE Project](https://www.cta.tech/Resources/Standards/WAVE-Project).
