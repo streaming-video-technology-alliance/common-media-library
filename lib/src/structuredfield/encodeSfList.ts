@@ -1,5 +1,5 @@
-import { SfEncodeOptions } from './SfEncodeOptions.js';
-import { SfMember } from './SfMember.js';
+import type { SfEncodeOptions } from './SfEncodeOptions.js';
+import type { SfMember } from './SfMember.js';
 import { serializeList } from './serialize/serializeList.js';
 
 /**

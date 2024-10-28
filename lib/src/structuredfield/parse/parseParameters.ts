@@ -1,6 +1,7 @@
-import { SfDecodeOptions } from '../SfDecodeOptions.js';
-import { SfParameters } from '../SfParameters.js';
-import { ParsedValue, parsedValue } from './ParsedValue.js';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import type { SfParameters } from '../SfParameters.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
 import { parseBareItem } from './parseBareItem.js';
 import { parseKey } from './parseKey.js';
 

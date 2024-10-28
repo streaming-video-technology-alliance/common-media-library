@@ -1,5 +1,5 @@
 import { CmsdObjectType } from '@svta/common-media-library/cmsd/CmsdObjectType';
-import { CmsdStatic } from '@svta/common-media-library/cmsd/CmsdStatic';
+import type { CmsdStatic } from '@svta/common-media-library/cmsd/CmsdStatic';
 import { CmsdStreamingFormat } from '@svta/common-media-library/cmsd/CmsdStreamingFormat';
 import { CmsdStreamType } from '@svta/common-media-library/cmsd/CmsdStreamType';
 

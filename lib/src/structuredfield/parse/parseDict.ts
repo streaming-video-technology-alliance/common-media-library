@@ -1,9 +1,10 @@
-import { SfDecodeOptions } from '../SfDecodeOptions.js';
-import { SfDictionary } from '../SfDictionary.js';
-import { SfInnerList } from '../SfInnerList.js';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import type { SfDictionary } from '../SfDictionary.js';
+import type { SfInnerList } from '../SfInnerList.js';
 import { SfItem } from '../SfItem.js';
 import { DICT } from '../utils/DICT.js';
-import { ParsedValue, parsedValue } from './ParsedValue.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
 import { parseError } from './parseError.js';
 import { parseItemOrInnerList } from './parseItemOrInnerList.js';
 import { parseKey } from './parseKey.js';

@@ -5,7 +5,7 @@ import { parseDict } from '../../src/structuredfield/parse/parseDict.js';
 
 test('parseDictionary', () => {
 	assert.deepStrictEqual(parseDict(
-		`int=1, dec=1.23, token=a, str="a", bool=?1, bin=:AQID:, date=@1659578233`
+		`int=1, dec=1.23, token=a, str="a", bool=?1, bin=:AQID:, date=@1659578233`,
 	), {
 		value: {
 			'int': new SfItem(1),

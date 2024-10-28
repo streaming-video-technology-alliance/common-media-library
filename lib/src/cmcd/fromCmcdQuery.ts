@@ -1,4 +1,4 @@
-import { Cmcd } from './Cmcd.js';
+import type { Cmcd } from './Cmcd.js';
 import { CMCD_PARAM } from './CMCD_PARAM.js';
 import { decodeCmcd } from './decodeCmcd.js';
 

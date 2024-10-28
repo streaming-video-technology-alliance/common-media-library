@@ -1,5 +1,5 @@
 import { symbolToStr } from '../../cta/utils/symbolToStr.js';
-import { SfToken } from '../SfToken.js';
+import type { SfToken } from '../SfToken.js';
 import { TOKEN } from '../utils/TOKEN.js';
 import { serializeError } from './serializeError.js';
 

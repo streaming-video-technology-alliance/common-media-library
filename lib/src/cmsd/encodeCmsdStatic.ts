@@ -1,6 +1,6 @@
 import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
-import { CmsdEncodeOptions } from './CmsdEncodeOptions.js';
-import { CmsdStatic } from './CmsdStatic.js';
+import type { CmsdEncodeOptions } from './CmsdEncodeOptions.js';
+import type { CmsdStatic } from './CmsdStatic.js';
 import { processCmsd } from './utils/processCmsd.js';
 
 /**

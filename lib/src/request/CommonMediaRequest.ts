@@ -1,4 +1,4 @@
-import { Cmcd } from '../cmcd/Cmcd.js';
+import type { Cmcd } from '../cmcd/Cmcd.js';
 
 /**
  * Common request API.
@@ -7,7 +7,7 @@ import { Cmcd } from '../cmcd/Cmcd.js';
  *
  * @beta
  */
-export interface CommonMediaRequest {
+export type CommonMediaRequest = {
 
 	/**
 	 * The URL of the request.

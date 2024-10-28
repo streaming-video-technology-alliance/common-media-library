@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Parser } from 'm3u8-parser';
-import { HlsManifest } from '../../types/mapper/hls/HlsManifest.js';
+import type { HlsManifest } from '../../types/mapper/hls/HlsManifest.js';
 
 export function parseHlsManifest(text: string | undefined): HlsManifest {
 	if (!text) {
