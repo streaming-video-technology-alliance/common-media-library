@@ -9,9 +9,9 @@ import { CmStreamingFormat } from '../cta/CmStreamingFormat';
  *
  * @beta
  */
-export const CmcdStreamingFormat = CmStreamingFormat;
+export const CmcdStreamingFormat = CmStreamingFormat as typeof CmStreamingFormat;
 
 /**
- * @internal
+ * @beta
  */
 export type CmcdStreamingFormat = CmStreamingFormat

@@ -1,1 +1,1 @@
-export const CMCD_QUERY = 'query' as const;
+export const CMCD_QUERY = 'query';

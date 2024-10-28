@@ -35,6 +35,6 @@ export const CmcdHeaderField = {
 } as const;
 
 /**
- * @internal
+ * @beta
  */
 export type CmcdHeaderField = typeof CmcdHeaderField[keyof typeof CmcdHeaderField];

@@ -1,1 +1,1 @@
-export const CMCD_HEADERS = 'headers' as const;
+export const CMCD_HEADERS = 'headers';
