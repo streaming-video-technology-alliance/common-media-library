@@ -194,13 +194,13 @@ export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | 
 export type CmCustomKey = `${string}-${string}`;
 
 // @beta
-export const CMSD_DYNAMIC: "CMSD-Dynamic";
+export const CMSD_DYNAMIC = "CMSD-Dynamic";
 
 // @beta
-export const CMSD_STATIC: "CMSD-Static";
+export const CMSD_STATIC = "CMSD-Static";
 
 // @beta
-export const CMSD_V1: 1;
+export const CMSD_V1 = 1;
 
 // @beta
 export type CmsdCustomKey = `${string}-${string}`;
