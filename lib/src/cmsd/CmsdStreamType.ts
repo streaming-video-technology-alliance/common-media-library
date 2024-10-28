@@ -20,6 +20,6 @@ export const CmsdStreamType = {
 } as const;
 
 /**
- * @internal
+ * @beta
  */
 export type CmsdStreamType = typeof CmsdStreamType[keyof typeof CmsdStreamType];

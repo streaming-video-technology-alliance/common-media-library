@@ -1,1 +1,1 @@
-export const CMCD_JSON = 'json' as const;
+export const CMCD_JSON = 'json';

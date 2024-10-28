@@ -30,6 +30,6 @@ export const CmcdEncoding = {
 } as const;
 
 /**
- * @internal
+ * @beta
  */
 export type CmcdEncoding = typeof CmcdEncoding[keyof typeof CmcdEncoding];

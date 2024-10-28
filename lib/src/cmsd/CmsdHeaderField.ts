@@ -25,6 +25,6 @@ export const CmsdHeaderField = {
 } as const;
 
 /**
- * @internal
+ * @beta
  */
 export type CmsdHeaderField = typeof CmsdHeaderField[keyof typeof CmsdHeaderField];
