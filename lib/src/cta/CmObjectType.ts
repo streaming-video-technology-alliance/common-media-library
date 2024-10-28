@@ -1,3 +1,5 @@
+import type { ValueOf } from '../utils/ValueOf';
+
 /**
  * Common Media Object Type
  *
@@ -56,4 +58,4 @@ export const CmObjectType = {
  * @see {@link CmcdEncoding}
  * @internal
  */
-export type CmObjectType = typeof CmObjectType[keyof typeof CmObjectType];
+export type CmObjectType = ValueOf<typeof CmObjectType>;

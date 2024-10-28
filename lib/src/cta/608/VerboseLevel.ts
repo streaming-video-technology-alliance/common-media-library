@@ -1,3 +1,5 @@
+import type { ValueOf } from '../../utils/ValueOf';
+
 /**
  * Logging levels for the CTA-608 parser.
  *
@@ -17,6 +19,6 @@ export const VerboseLevel = {
 } as const;
 
 /**
- * @internal
+ * @beta
  */
-export type VerboseLevel = typeof VerboseLevel[keyof typeof VerboseLevel];
+export type VerboseLevel = ValueOf<typeof VerboseLevel>;

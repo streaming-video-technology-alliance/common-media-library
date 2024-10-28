@@ -1,3 +1,4 @@
+import type { ValueOf } from '../utils/ValueOf.js';
 import { CMSD_DYNAMIC } from './CMSD_DYNAMIC.js';
 import { CMSD_STATIC } from './CMSD_STATIC.js';
 
@@ -27,4 +28,4 @@ export const CmsdHeaderField = {
 /**
  * @beta
  */
-export type CmsdHeaderField = typeof CmsdHeaderField[keyof typeof CmsdHeaderField];
+export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;
