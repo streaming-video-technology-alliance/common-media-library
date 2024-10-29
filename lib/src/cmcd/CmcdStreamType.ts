@@ -1,18 +1,17 @@
+import { CmStreamType } from '../cta/CmStreamType.js';
+
 /**
  * Common Media Client Data Stream Type
  *
  * @group CMCD
  *
+ * @enum
+ *
  * @beta
  */
-export enum CmcdStreamType {
-	/**
-	 *  All segments are available – e.g., VOD
-	 */
-	VOD = 'v',
+export const CmcdStreamType = CmStreamType as typeof CmStreamType;
 
-	/**
-	 * Segments become available over time – e.g., LIVE
-	 */
-	LIVE = 'l',
-}
+/**
+ * @beta
+ */
+export type CmcdStreamType = CmStreamType;

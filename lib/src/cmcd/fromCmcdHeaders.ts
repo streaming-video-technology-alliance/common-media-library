@@ -2,6 +2,8 @@ import type { Cmcd } from './Cmcd.js';
 import { CmcdHeaderMap } from './CmcdHeaderMap.js';
 import { decodeCmcd } from './decodeCmcd.js';
 
+const keys = Object.keys(CmcdHeaderMap);
+
 /**
  * Decode CMCD data from request headers.
  *
@@ -14,8 +16,6 @@ import { decodeCmcd } from './decodeCmcd.js';
  * @beta
  */
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd {
-	const keys = Object.keys(CmcdHeaderMap);
-
 	if (!(headers instanceof Headers)) {
 		headers = new Headers(headers);
 	}

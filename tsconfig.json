@@ -9,6 +9,8 @@
 		"importHelpers": true,
 		"incremental": true,
 		"inlineSources": true,
+		// TODO: Uncomment when microsoft/rushstack#4805 is resolved
+		// "isolatedDeclarations": true,
 		"isolatedModules": true,
 		"lib": [
 			"DOM",

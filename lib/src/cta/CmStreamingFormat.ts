@@ -1,26 +1,36 @@
+import type { ValueOf } from '../utils/ValueOf.js';
+
 /**
  * Common Media Streaming Format
  *
  * @internal
  */
-export enum CmStreamingFormat {
+export const CmStreamingFormat = {
 	/**
 	 * MPEG DASH
 	 */
-	DASH = 'd',
+	DASH: 'd',
 
 	/**
 	 * HTTP Live Streaming (HLS)
 	 */
-	HLS = 'h',
+	HLS: 'h',
 
 	/**
 	 * Smooth Streaming
 	 */
-	SMOOTH = 's',
+	SMOOTH: 's',
 
 	/**
 	 * Other
 	 */
-	OTHER = 'o',
-}
+	OTHER: 'o',
+} as const;
+
+/**
+ * Common Media Streaming Format
+ *
+ * @see {@link CmcdEncoding}
+ * @internal
+ */
+export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;

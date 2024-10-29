@@ -101,7 +101,28 @@ export type Cmcd = {
 };
 
 // @beta
+export const CMCD_HEADERS = "headers";
+
+// @beta
+export const CMCD_JSON = "json";
+
+// @beta
+export const CMCD_OBJECT = "CMCD-Object";
+
+// @beta
 export const CMCD_PARAM = "CMCD";
+
+// @beta
+export const CMCD_QUERY = "query";
+
+// @beta
+export const CMCD_REQUEST = "CMCD-Request";
+
+// @beta
+export const CMCD_SESSION = "CMCD-Session";
+
+// @beta
+export const CMCD_STATUS = "CMCD-Status";
 
 // @beta
 export const CMCD_V1 = 1;
@@ -118,11 +139,16 @@ export type CmcdEncodeOptions = {
 };
 
 // @beta
-export enum CmcdEncoding {
-    HEADERS = "headers",
-    JSON = "json",
-    QUERY = "query"
-}
+export const CmcdEncoding: {
+    readonly JSON: typeof CMCD_JSON;
+    readonly QUERY: typeof CMCD_QUERY;
+    readonly HEADERS: typeof CMCD_HEADERS;
+};
+
+// Warning: (ae-forgotten-export) The symbol "ValueOf" needs to be exported by the entry point index.d.ts
+//
+// @beta (undocumented)
+export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
 // @beta
 export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
@@ -131,12 +157,15 @@ export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => s
 export const CmcdFormatters: Record<string, CmcdFormatter>;
 
 // @beta
-export enum CmcdHeaderField {
-    OBJECT = "CMCD-Object",
-    REQUEST = "CMCD-Request",
-    SESSION = "CMCD-Session",
-    STATUS = "CMCD-Status"
-}
+export const CmcdHeaderField: {
+    readonly OBJECT: typeof CMCD_OBJECT;
+    readonly REQUEST: typeof CMCD_REQUEST;
+    readonly SESSION: typeof CMCD_SESSION;
+    readonly STATUS: typeof CMCD_STATUS;
+};
+
+// @beta (undocumented)
+export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
 // @beta
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
@@ -144,32 +173,29 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 // @beta
 export type CmcdKey = keyof Cmcd;
 
+// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export enum CmcdObjectType {
-    AUDIO = "a",
-    CAPTION = "c",
-    INIT = "i",
-    KEY = "k",
-    MANIFEST = "m",
-    MUXED = "av",
-    OTHER = "o",
-    TIMED_TEXT = "tt",
-    VIDEO = "v"
-}
+export const CmcdObjectType: typeof CmObjectType;
 
-// @beta
-export enum CmcdStreamingFormat {
-    DASH = "d",
-    HLS = "h",
-    OTHER = "o",
-    SMOOTH = "s"
-}
+// @beta (undocumented)
+export type CmcdObjectType = CmObjectType;
 
+// Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export enum CmcdStreamType {
-    LIVE = "l",
-    VOD = "v"
-}
+export const CmcdStreamingFormat: typeof CmStreamingFormat;
+
+// @beta (undocumented)
+export type CmcdStreamingFormat = CmStreamingFormat;
+
+// Warning: (ae-forgotten-export) The symbol "CmStreamType" needs to be exported by the entry point index.d.ts
+//
+// @beta
+export const CmcdStreamType: typeof CmStreamType;
+
+// @beta (undocumented)
+export type CmcdStreamType = CmStreamType;
 
 // @beta
 export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
@@ -180,10 +206,10 @@ export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | 
 export type CmCustomKey = `${string}-${string}`;
 
 // @beta
-export const CMSD_DYNAMIC: string;
+export const CMSD_DYNAMIC = "CMSD-Dynamic";
 
 // @beta
-export const CMSD_STATIC: string;
+export const CMSD_STATIC = "CMSD-Static";
 
 // @beta
 export const CMSD_V1 = 1;
@@ -213,23 +239,19 @@ export type CmsdEncodeOptions = {
 };
 
 // @beta
-export enum CmsdHeaderField {
-    DYNAMIC = "CMSD-Dynamic",
-    STATIC = "CMSD-Static"
-}
+export const CmsdHeaderField: {
+    readonly STATIC: typeof CMSD_STATIC;
+    readonly DYNAMIC: typeof CMSD_DYNAMIC;
+};
+
+// @beta (undocumented)
+export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;
 
 // @beta
-export enum CmsdObjectType {
-    AUDIO = "a",
-    CAPTION = "c",
-    INIT = "i",
-    KEY = "k",
-    MANIFEST = "m",
-    MUXED = "av",
-    OTHER = "o",
-    TIMED_TEXT = "tt",
-    VIDEO = "v"
-}
+export const CmsdObjectType: typeof CmObjectType;
+
+// @beta (undocumented)
+export type CmsdObjectType = CmObjectType;
 
 // @beta
 export type CmsdStatic = {
@@ -249,25 +271,20 @@ export type CmsdStatic = {
 };
 
 // @beta
-export enum CmsdStreamingFormat {
-    DASH = "d",
-    HLS = "h",
-    OTHER = "o",
-    SMOOTH = "s"
-}
+export const CmsdStreamingFormat: typeof CmStreamingFormat;
+
+// @beta (undocumented)
+export type CmsdStreamingFormat = CmStreamingFormat;
 
 // @beta
-export enum CmsdStreamType {
-    LIVE = "l",
-    VOD = "v"
-}
+export const CmsdStreamType: typeof CmStreamType;
+
+// @beta (undocumented)
+export type CmsdStreamType = CmStreamType;
 
 // @beta
 export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
 
-// Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "CmStreamType" needs to be exported by the entry point index.d.ts
 // Warning: (ae-internal-missing-underscore) The name "CmValue" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -766,20 +783,17 @@ export type Validation = {
 };
 
 // @beta
-export const enum VerboseLevel {
-    // (undocumented)
-    DATA = 3,
-    // (undocumented)
-    DEBUG = 3,
-    // (undocumented)
-    ERROR = 0,
-    // (undocumented)
-    INFO = 2,
-    // (undocumented)
-    TEXT = 1,
-    // (undocumented)
-    WARNING = 2
-}
+export const VerboseLevel: {
+    readonly ERROR: 0;
+    readonly TEXT: 1;
+    readonly WARNING: 2;
+    readonly INFO: 2;
+    readonly DEBUG: 3;
+    readonly DATA: 3;
+};
+
+// @beta (undocumented)
+export type VerboseLevel = ValueOf<typeof VerboseLevel>;
 
 // @alpha
 export type VideoTrack = Track & {
