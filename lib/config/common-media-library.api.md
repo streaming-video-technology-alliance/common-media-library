@@ -101,10 +101,19 @@ export type Cmcd = {
 };
 
 // @beta
+export const CMCD_HEADERS = "headers";
+
+// @beta
+export const CMCD_JSON = "json";
+
+// @beta
 export const CMCD_OBJECT = "CMCD-Object";
 
 // @beta
 export const CMCD_PARAM = "CMCD";
+
+// @beta
+export const CMCD_QUERY = "query";
 
 // @beta
 export const CMCD_REQUEST = "CMCD-Request";
@@ -114,6 +123,9 @@ export const CMCD_SESSION = "CMCD-Session";
 
 // @beta
 export const CMCD_STATUS = "CMCD-Status";
+
+// @beta
+export const CMCD_V1 = 1;
 
 // @beta
 export type CmcdCustomKey = `${string}-${string}`;
@@ -833,15 +845,5 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/cmaf/ham/types/mapper/dash/DashManifest.ts:19:3 - (ae-forgotten-export) The symbol "Period" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:12:2 - (ae-forgotten-export) The symbol "PlayList" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:13:2 - (ae-forgotten-export) The symbol "MediaGroups" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:14:2 - (ae-forgotten-export) The symbol "SegmentHls" needs to be exported by the entry point index.d.ts
-// src/cmcd/CmcdEncoding.ts:19:2 - (ae-forgotten-export) The symbol "CMCD_JSON" needs to be exported by the entry point index.d.ts
-// src/cmcd/CmcdEncoding.ts:24:2 - (ae-forgotten-export) The symbol "CMCD_QUERY" needs to be exported by the entry point index.d.ts
-// src/cmcd/CmcdEncoding.ts:29:2 - (ae-forgotten-export) The symbol "CMCD_HEADERS" needs to be exported by the entry point index.d.ts
 
 ```
