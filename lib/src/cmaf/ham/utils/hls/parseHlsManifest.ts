@@ -1,21 +1,28 @@
-// @ts-ignore
-import { Parser } from 'm3u8-parser';
 import type { HlsManifest } from '../../types/mapper/hls/HlsManifest.js';
 
-export function parseHlsManifest(text: string | undefined): HlsManifest {
+export type HlsParser = (text: string) => HlsManifest;
+
+let hlsParser: HlsParser;
+
+/**
+ * @internal
+ */
+export function setHlsParser(parser: HlsParser): void {
+	hlsParser = parser;
+}
+
+/**
+ * @internal
+ */
+export function getHlsParser(): HlsParser {
+	return hlsParser;
+}
+
+export function parseHlsManifest(text?: string): HlsManifest {
 	if (!text) {
 		console.error("Can't parse empty HLS Manifest");
 		return {} as HlsManifest;
 	}
 
-	const parser = new Parser();
-
-	parser.push(text);
-	parser.end();
-	const parsedHlsManifest = parser.manifest;
-	if (!parsedHlsManifest) {
-		throw new Error();
-	}
-
-	return parsedHlsManifest;
+	return hlsParser(text);
 }

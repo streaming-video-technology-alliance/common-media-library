@@ -383,6 +383,21 @@ export type CueHandler = {
 };
 
 // @alpha
+export type DashManifest = {
+    MPD: {
+        $?: {
+            maxSegmentDuration?: string;
+            mediaPresentationDuration?: string;
+            minBufferTime?: string;
+            profiles?: string;
+            type?: string;
+            xmlns?: string;
+        };
+        Period: Period[];
+    };
+};
+
+// @alpha
 export function dashToHam(manifest: string): Presentation[];
 
 // @beta
@@ -482,6 +497,14 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 
 // @alpha
 export function hamToHls(presentation: Presentation[]): Manifest;
+
+// @alpha
+export type HlsManifest = {
+    playlists: PlayList[];
+    mediaGroups: MediaGroups;
+    segments: SegmentHls[];
+    targetDuration?: number;
+};
 
 // @alpha
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
@@ -638,6 +661,24 @@ export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
     alignedSwitchingSets?: AlignedSwitchingSet[];
 };
+
+// Warning: (ae-forgotten-export) The symbol "DashParser" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "setDashParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setDashParser(parser: DashParser): void;
+
+// Warning: (ae-forgotten-export) The symbol "DashSerializer" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "setDashSerializer" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setDashSerializer(serializer: DashSerializer): void;
+
+// Warning: (ae-forgotten-export) The symbol "HlsParser" needs to be exported by the entry point index.d.ts
+// Warning: (ae-internal-missing-underscore) The name "setHlsParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setHlsParser(parser: HlsParser): void;
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
@@ -804,5 +845,12 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/cmaf/ham/types/mapper/dash/DashManifest.ts:19:3 - (ae-forgotten-export) The symbol "Period" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:12:2 - (ae-forgotten-export) The symbol "PlayList" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:13:2 - (ae-forgotten-export) The symbol "MediaGroups" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:14:2 - (ae-forgotten-export) The symbol "SegmentHls" needs to be exported by the entry point index.d.ts
 
 ```
