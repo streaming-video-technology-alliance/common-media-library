@@ -18,9 +18,15 @@ export type { Track } from './cmaf/ham/types/model/Track.js';
 export type { TrackType } from './cmaf/ham/types/model/TrackType.js';
 export type { VideoTrack } from './cmaf/ham/types/model/VideoTrack.js';
 
-export type { Validation } from './cmaf/ham/types/Validation.js';
 export type { Manifest } from './cmaf/ham/types/manifest/Manifest.js';
 export type { ManifestFormat } from './cmaf/ham/types/manifest/ManifestFormat.js';
+export type { DashManifest } from './cmaf/ham/types/mapper/dash/DashManifest.js';
+export type { HlsManifest } from './cmaf/ham/types/mapper/hls/HlsManifest.js';
+export type { Validation } from './cmaf/ham/types/Validation.js';
+
+export { setDashParser } from './cmaf/ham/utils/dash/parseDashManifest.js';
+export { setDashSerializer } from './cmaf/ham/utils/dash/serializeDashManifest.js';
+export { setHlsParser } from './cmaf/ham/utils/hls/parseHlsManifest.js';
 
 export { dashToHam } from './cmaf/ham/services/converters/dashToHam.js';
 export { hamToDash } from './cmaf/ham/services/converters/hamToDash.js';

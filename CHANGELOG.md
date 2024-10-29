@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Replace Typescript enums with constants [#103](https://github.com/streaming-video-technology-alliance/common-media-library/issues/103)
+- Remove CMAF HAM dependencies [#119](https://github.com/streaming-video-technology-alliance/common-media-library/issues/119)
 
 
 ## [0.7.3] - 2024-08-30
