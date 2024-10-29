@@ -1,12 +1,18 @@
-import fs from 'fs';
 import {
-	hamToHls,
-	hamToDash,
-	hlsToHam,
 	dashToHam,
+	hamToDash,
+	hamToHls,
+	hlsToHam,
+	setDashParser,
+	setDashSerializer,
+	setHlsParser,
 	validatePresentation,
+	type DashManifest,
 } from '@svta/common-media-library/cmaf-ham';
-import { listM3U8Files, listDirectories, listMPDFiles } from './utils.js';
+import fs from 'fs';
+import { Parser } from 'm3u8-parser';
+import { Builder, parseString } from 'xml2js';
+import { listDirectories, listM3U8Files, listMPDFiles } from './utils.js';
 
 const FILE_ENCODING = 'utf8';
 
@@ -15,6 +21,35 @@ const OUTPUT_PATH_HLS = `./dist/hls/`;
 
 const SAMPLES_PATH_DASH = `./input/dash/`;
 const OUTPUT_PATH_DASH = `./dist/dash/`;
+
+setHlsParser((text: string) => {
+	const parser = new Parser();
+
+	parser.push(text);
+	parser.end();
+	const parsedHlsManifest = parser.manifest;
+	if (!parsedHlsManifest) {
+		throw new Error();
+	}
+
+	return parsedHlsManifest;
+});
+
+setDashParser((raw: string) => {
+	let parsed: DashManifest | undefined;
+	parseString(raw, (err: Error | null, result: DashManifest) => {
+		if (err) {
+			throw new Error(err.message);
+		}
+		parsed = result as DashManifest;
+	});
+	return parsed;
+});
+
+setDashSerializer((manifest: DashManifest) => {
+	const builder = new Builder();
+	return builder.buildObject(manifest);
+});
 
 /**
  * This function converts a given manifest file (along with optional playlists for HLS)
