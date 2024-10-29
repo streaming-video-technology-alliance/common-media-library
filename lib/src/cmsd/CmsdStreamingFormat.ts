@@ -1,29 +1,17 @@
+import { CmStreamingFormat } from '../cta/CmStreamingFormat.js';
+
 /**
  * Common Media Server Data Streaming Format
  *
  * @group CMSD
  *
+ * @enum
+ *
  * @beta
  */
-export enum CmsdStreamingFormat {
-	/**
-	 * MPEG DASH
-	 */
-	DASH = 'd',
+export const CmsdStreamingFormat = CmStreamingFormat as typeof CmStreamingFormat;;
 
-	/**
-	 * HTTP Live Streaming (HLS)
-	 */
-	HLS = 'h',
-
-	/**
-	 * Smooth Streaming
-	 */
-	SMOOTH = 's',
-
-	/**
-	 * Other
-	 */
-	OTHER = 'o',
-}
-
+/**
+ * @beta
+ */
+export type CmsdStreamingFormat = CmStreamingFormat;

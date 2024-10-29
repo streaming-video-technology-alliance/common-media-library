@@ -3,6 +3,7 @@ import js from '@eslint/js';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import tsdoc from 'eslint-plugin-tsdoc';
+import typescriptEnum from 'eslint-plugin-typescript-enum';
 import globals from 'globals';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,10 +21,12 @@ export default [{
 }, ...compat.extends(
 	'eslint:recommended',
 	'plugin:@typescript-eslint/recommended',
+	'plugin:typescript-enum/recommended',
 ), {
 	plugins: {
 		'@typescript-eslint': typescriptEslint,
 		tsdoc,
+		'typescript-enum': typescriptEnum,
 	},
 
 	files: ['**/*.js', '**/*.ts'],
