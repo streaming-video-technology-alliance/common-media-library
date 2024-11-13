@@ -1,0 +1,38 @@
+<html>
+
+<head></head>
+
+<body>
+	<video width="480" height="270" controls></video>
+	<script type="module">
+		import { createBoxIterator, findBoxByType, filterBoxesByType, parseBoxes, ftyp, mvhd, sidx, styp } from '../lib/src/isobmff.ts';
+
+		// const url = 'https://vod-gcs-cedexis-dev.cbsaavideo.com/CBS_Production_Entertainment_VMS/2024/05/03/2334117955659/15104_cmaf/PARAMOUNT_Spongebob_Movie_The_Sponge_On_The_Run_36369_FTR_R_15102_110.mp4';
+		const url = '../lib/test/isobmff/fixtures/test_frag.mp4';
+		const response = await fetch(url, {
+			// headers: {
+			// 	Range: 'bytes=0-11908',
+			// },
+		});
+		const arrayBuffer = await response.arrayBuffer();
+		const config = { parsers: { ftyp, styp, mvhd, sidx }, recursive: true };
+
+		console.time('parseBoxes');
+		const parsed = parseBoxes(arrayBuffer, config);
+		console.timeEnd('parseBoxes');
+		console.log(parsed);
+
+		console.time('findBox');
+		const box = findBoxByType('stsd', arrayBuffer, config)
+		console.timeEnd('findBox');
+		console.log(box);
+
+		console.time('filterBoxes');
+		const boxes = filterBoxesByType('mfhd', arrayBuffer, config);
+		console.timeEnd('filterBoxes');
+		console.log(boxes.length);
+	</script>
+
+</body>
+
+</html>
