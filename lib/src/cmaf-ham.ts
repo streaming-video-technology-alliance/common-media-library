@@ -20,8 +20,23 @@ export type { VideoTrack } from './cmaf/ham/types/model/VideoTrack.js';
 
 export type { Manifest } from './cmaf/ham/types/manifest/Manifest.js';
 export type { ManifestFormat } from './cmaf/ham/types/manifest/ManifestFormat.js';
+export type { AdaptationSet } from './cmaf/ham/types/mapper/dash/AdaptationSet.js';
+export type { AudioChannelConfiguration } from './cmaf/ham/types/mapper/dash/AudioChannelConfiguration.js';
+export type { ContentComponent } from './cmaf/ham/types/mapper/dash/ContentComponent.js';
 export type { DashManifest } from './cmaf/ham/types/mapper/dash/DashManifest.js';
+export type { Initialization } from './cmaf/ham/types/mapper/dash/Initialization.js';
+export type { Period } from './cmaf/ham/types/mapper/dash/Period.js';
+export type { Representation } from './cmaf/ham/types/mapper/dash/Representation.js';
+export type { Role } from './cmaf/ham/types/mapper/dash/Role.js';
+export type { SegmentBase } from './cmaf/ham/types/mapper/dash/SegmentBase.js';
+export type { SegmentList } from './cmaf/ham/types/mapper/dash/SegmentList.js';
+export type { SegmentTemplate } from './cmaf/ham/types/mapper/dash/SegmentTemplate.js';
+export type { SegmentURL } from './cmaf/ham/types/mapper/dash/SegmentUrl.js';
+export type { Byterange } from './cmaf/ham/types/mapper/hls/Byterange.js';
 export type { HlsManifest } from './cmaf/ham/types/mapper/hls/HlsManifest.js';
+export type { MediaGroups } from './cmaf/ham/types/mapper/hls/MediaGroups.js';
+export type { PlayList } from './cmaf/ham/types/mapper/hls/Playlist.js';
+export type { SegmentHls } from './cmaf/ham/types/mapper/hls/SegmentHls.js';
 export type { Validation } from './cmaf/ham/types/Validation.js';
 
 export { setDashParser } from './cmaf/ham/utils/dash/parseDashManifest.js';

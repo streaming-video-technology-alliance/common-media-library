@@ -1,9 +1,5 @@
 import type { IsoView } from '../IsoView.js';
 
-export type DataBox = {
-	data: Uint8Array;
-}
-
 /**
  * ISO/IEC 14496-12:2012 - 8.1.1 Media Data Box
  *
@@ -11,7 +7,9 @@ export type DataBox = {
  *
  * @beta
  */
-export type MediaDataBox = DataBox;
+export type MediaDataBox = {
+	data: Uint8Array;
+};
 
 /**
  * Parse a MediaDataBox from an IsoView

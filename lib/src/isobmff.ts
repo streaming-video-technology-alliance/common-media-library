@@ -1,3 +1,4 @@
+export * from './isobmff/Box.js';
 export * from './isobmff/BoxFilter.js';
 export * from './isobmff/BoxParser.js';
 export * from './isobmff/BoxParserMap.js';
@@ -12,8 +13,12 @@ export * from './isobmff/filterBoxes.js';
 export * from './isobmff/filterBoxesByType.js';
 export * from './isobmff/findBox.js';
 export * from './isobmff/findBoxByType.js';
+export * from './isobmff/FullBox.js';
 export * from './isobmff/IsoData.js';
 export * from './isobmff/IsoView.js';
 export * from './isobmff/IsoViewConfig.js';
 export * from './isobmff/parseBoxes.js';
 export * from './isobmff/parsers.js';
+export * from './isobmff/readers/ISOFieldTypeMap.js';
+export * from './isobmff/TypeBox.js';
+

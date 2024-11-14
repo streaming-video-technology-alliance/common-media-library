@@ -5,6 +5,37 @@
 ```ts
 
 // @alpha
+export type AdaptationSet = {
+    $: {
+        audioSamplingRate?: string;
+        codecs?: string;
+        contentType?: string;
+        frameRate?: string;
+        group?: string;
+        id?: string;
+        lang?: string;
+        maxBandwidth?: string;
+        maxFrameRate?: string;
+        maxHeight?: string;
+        maxWidth?: string;
+        mimeType?: string;
+        minBandwidth?: string;
+        par?: string;
+        sar?: string;
+        segmentAlignment: string;
+        startWithSAP?: string;
+        subsegmentAlignment?: string;
+        subsegmentStartsWithSAP?: string;
+    };
+    AudioChannelConfiguration?: AudioChannelConfiguration[];
+    ContentComponent?: ContentComponent[];
+    Role?: Role[];
+    Representation: Representation[];
+    SegmentTemplate?: SegmentTemplate[];
+    SegmentList?: SegmentList[];
+};
+
+// @alpha
 export type AlignedSwitchingSet = {
     switchingSets: SwitchingSet[];
 };
@@ -15,6 +46,33 @@ export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, o
 // @beta
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
+// @beta
+export function ardi(view: IsoView): AudioRenderingIndicationBox;
+
+// @alpha
+export type AudioChannelConfiguration = {
+    $: {
+        schemeIdUri: string;
+        value: string;
+    };
+};
+
+// @beta
+export type AudioRenderingIndicationBox = FullBox & {
+    audioRenderingIndication: number;
+};
+
+// @beta
+export type AudioSampleEntry = SampleEntry & {
+    reserved2: number[];
+    channelcount: number;
+    samplesize: number;
+    preDefined: number;
+    reserved3: number;
+    samplerate: number;
+    esds: Uint8Array;
+};
+
 // @alpha
 export type AudioTrack = Track & {
     sampleRate: number;
@@ -22,10 +80,44 @@ export type AudioTrack = Track & {
 };
 
 // @beta
+export function avc1(view: IsoView): VisualSampleEntry;
+
+// @beta
+export const avc2: BoxParser<VisualSampleEntry>;
+
+// @beta
+export const avc3: BoxParser<VisualSampleEntry>;
+
+// @beta
+export const avc4: BoxParser<VisualSampleEntry>;
+
+// @beta
 export function base64decode(str: string): Uint8Array;
 
 // @beta
 export function base64encode(binary: Uint8Array): string;
+
+// @beta
+export type Box<V = any> = {
+    type: string;
+    size: number;
+    value: V;
+};
+
+// @beta
+export type BoxFilter<T = any> = (box: Box<T>) => boolean;
+
+// @beta
+export type BoxParser<V = any> = (view: IsoView, config?: IsoViewConfig) => V;
+
+// @beta
+export type BoxParserMap = Record<string, BoxParser>;
+
+// @alpha
+export type Byterange = {
+    length: number;
+    offset: number;
+};
 
 // @beta
 export function canParseId3(data: Uint8Array, offset: number): boolean;
@@ -317,6 +409,29 @@ export type CommonMediaResponse = {
 };
 
 // @beta
+export type CompositionTimeToSampleBox = FullBox & {
+    entryCount: number;
+    entries: CompositionTimeToSampleEntry[];
+};
+
+// @beta
+export type CompositionTimeToSampleEntry = {
+    sampleCount: number;
+    sampleOffset: number;
+};
+
+// @alpha (undocumented)
+export type ContentComponent = {
+    $: {
+        contentType: string;
+        id: string;
+    };
+};
+
+// @beta
+export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
+
+// @beta
 export class Cta608Channel {
     constructor(channelNumber: number, outputFilter: CueHandler, logger?: CaptionsLogger);
     // (undocumented)
@@ -376,6 +491,9 @@ export class Cta608Parser {
 }
 
 // @beta
+export function ctts(view: IsoView): CompositionTimeToSampleBox;
+
+// @beta
 export type CueHandler = {
     newCue(startTime: number, endTime: number, screen: CaptionScreen): void;
     reset?(): void;
@@ -399,6 +517,15 @@ export type DashManifest = {
 
 // @alpha
 export function dashToHam(manifest: string): Presentation[];
+
+// @beta
+export const DATA = "data";
+
+// @beta
+export type DataReferenceBox = FullBox & {
+    entryCount: number;
+    entries: Box[];
+};
 
 // @beta
 export function decodeCmcd(cmcd: string): Cmcd;
@@ -426,6 +553,35 @@ export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem;
 export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember[];
 
 // @beta
+export function dref(view: IsoView): DataReferenceBox;
+
+// @beta
+export type EditListBox = FullBox & {
+    entryCount: number;
+    entries: EditListEntry[];
+};
+
+// @beta
+export type EditListEntry = {
+    segmentDuration: number;
+    mediaTime: number;
+    mediaRateInteger: number;
+    mediaRateFraction: number;
+};
+
+// @beta
+export function elng(view: IsoView): ExtendedLanguageBox;
+
+// @beta
+export function elst(view: IsoView): EditListBox;
+
+// @beta
+export function emsg(view: IsoView): EventMessageBox;
+
+// @beta
+export const enca: BoxParser<AudioSampleEntry>;
+
+// @beta
 export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
@@ -450,7 +606,42 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // @beta
+export const encv: BoxParser<VisualSampleEntry>;
+
+// @beta
+export type EventMessageBox = FullBox & {
+    schemeIdUri: string;
+    value: string;
+    timescale: number;
+    presentationTime: number;
+    presentationTimeDelta: number;
+    eventDuration: number;
+    id: number;
+    messageData: Uint8Array;
+};
+
+// @beta
+export type ExtendedLanguageBox = FullBox & {
+    extendedLanguage: string;
+};
+
+// @beta
 export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
+
+// @beta
+export type FileTypeBox = TypeBox;
+
+// @beta
+export function filterBoxes<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T>[];
+
+// @beta
+export function filterBoxesByType<T = any>(type: string, raw: IsoData, config: IsoViewConfig): Box<T>[];
+
+// @beta
+export function findBox<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T> | null;
+
+// @beta
+export function findBoxByType<T = any>(type: string, raw: IsoData, config: IsoViewConfig): Box<T> | null;
 
 // @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
@@ -462,10 +653,30 @@ export type FrameRate = {
 };
 
 // @beta
+export function free(view: IsoView): FreeSpaceBox;
+
+// @beta
+export type FreeSpaceBox = {
+    data: Uint8Array;
+};
+
+// @beta
+export function frma(view: IsoView): OriginalFormatBox;
+
+// @beta
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
 
 // @beta
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
+
+// @beta
+export function ftyp(view: IsoView): FileTypeBox;
+
+// @beta
+export type FullBox = {
+    version: number;
+    flags: number;
+};
 
 // Warning: (ae-internal-missing-underscore) The name "getId3Data" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -498,6 +709,20 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 // @alpha
 export function hamToHls(presentation: Presentation[]): Manifest;
 
+// @beta
+export type HandlerReferenceBox = {
+    preDefined: number;
+    handlerType: string;
+    reserved: number[];
+    name: string;
+};
+
+// @beta
+export function hdlr(view: IsoView): HandlerReferenceBox;
+
+// @beta
+export const hev1: BoxParser<VisualSampleEntry>;
+
 // @alpha
 export type HlsManifest = {
     playlists: PlayList[];
@@ -510,12 +735,106 @@ export type HlsManifest = {
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
+export const hvc1: BoxParser<VisualSampleEntry>;
+
+// @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
+
+// @beta
+export type IdentifiedMediaDataBox = {
+    imdaIdentifier: number;
+    data: Uint8Array;
+};
+
+// @beta
+export function imda(view: IsoView): IdentifiedMediaDataBox;
+
+// @alpha
+export type Initialization = {
+    $: {
+        range?: string;
+        sourceURL?: string;
+    };
+};
+
+// @beta
+export const INT = "int";
 
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
+
+// @beta
+export type IsoData = ArrayBuffer | DataView | IsoView;
+
+// @beta
+export type ISOFieldTypeMap = {
+    uint: number;
+    int: number;
+    template: number;
+    string: string;
+    data: Uint8Array;
+    utf8: string;
+    utf8string: string;
+};
+
+// @beta
+export class IsoView {
+    // (undocumented)
+    [Symbol.iterator](): Generator<Box>;
+    constructor(raw: ArrayBuffer | DataView, config?: IsoViewConfig);
+    // (undocumented)
+    get bytesRemaining(): number;
+    // (undocumented)
+    get cursor(): number;
+    // (undocumented)
+    get done(): boolean;
+    // (undocumented)
+    readArray: <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number) => ISOFieldTypeMap[T][];
+    // (undocumented)
+    readBox: () => Box;
+    // (undocumented)
+    readBoxes: (length: number) => Box[];
+    // (undocumented)
+    readData: (size: number) => Uint8Array;
+    // (undocumented)
+    readEntries: <T>(length: number, map: () => T) => T[];
+    // (undocumented)
+    readFullBox: () => FullBox;
+    // (undocumented)
+    readInt: (size: number) => number;
+    // (undocumented)
+    readString: (size: number) => string;
+    // (undocumented)
+    readTemplate: (size: number) => number;
+    // (undocumented)
+    readUint: (size: number) => number;
+    // (undocumented)
+    readUtf8: (size: number) => string;
+    // (undocumented)
+    slice: (size: number) => IsoView;
+}
+
+// @beta
+export type IsoViewConfig = {
+    parsers: BoxParserMap;
+    recursive: boolean;
+};
+
+// @beta
+export function kind(view: IsoView): TrackKindBox;
+
+// @beta
+export type LabelBox = FullBox & {
+    isGroupLabel: boolean;
+    labelId: number;
+    langauge: string;
+    label: string;
+};
+
+// @beta
+export function labl(view: IsoView): LabelBox;
 
 // @alpha
 export type Manifest = {
@@ -530,6 +849,84 @@ export type Manifest = {
 export type ManifestFormat = 'hls' | 'dash';
 
 // @beta
+export function mdat(view: IsoView): MediaDataBox;
+
+// @beta
+export type MediaDataBox = {
+    data: Uint8Array;
+};
+
+// @alpha
+export type MediaGroups = {
+    AUDIO: {
+        [key: string]: {
+            [key: string]: {
+                language: string;
+            };
+        };
+    };
+    SUBTITLES: {
+        [key: string]: {
+            [key: string]: {
+                language: string;
+            };
+        };
+    };
+};
+
+// @beta
+export function mehd(view: IsoView): MovieExtendsHeaderBox;
+
+// @beta
+export function mfhd(view: IsoView): MovieFragmentHeaderBox;
+
+// @beta
+export function mfro(view: IsoView): MovieFragmentRandomAccessBox;
+
+// @beta
+export type MovieExtendsHeaderBox = FullBox & {
+    fragmentDuration: number;
+};
+
+// @beta
+export type MovieFragmentHeaderBox = FullBox & {
+    sequenceNumber: number;
+};
+
+// @beta
+export type MovieFragmentRandomAccessBox = FullBox & {
+    size: number;
+};
+
+// @beta
+export type MovieHeaderBox = {
+    version: number;
+    flags: number;
+    creationTime: number;
+    modificationTime: number;
+    timescale: number;
+    duration: number;
+    rate: number;
+    volume: number;
+    reserved1: number;
+    reserved2: number[];
+    matrix: number[];
+    preDefined: number[];
+    nextTrackId: number;
+};
+
+// @beta
+export function mp4a(view: IsoView): AudioSampleEntry;
+
+// @beta
+export function mvhd(view: IsoView): MovieHeaderBox;
+
+// @beta
+export type OriginalFormatBox = {
+    dataFormat: number;
+};
+
+// @beta
 export type PACData = {
     row: number;
     indent: number | null;
@@ -537,6 +934,12 @@ export type PACData = {
     underline: boolean;
     italics: boolean;
 };
+
+// @beta
+export function parseBoxes(raw: IsoData, config: IsoViewConfig): Box[];
+
+// @beta
+export function payl(view: IsoView): WebVTTCuePayloadBox;
 
 // @beta
 export class PenState {
@@ -572,8 +975,87 @@ export type PenStyles = {
 };
 
 // @alpha
+export type Period = {
+    $: {
+        duration: string;
+        id?: string;
+        start?: string;
+    };
+    AdaptationSet: AdaptationSet[];
+};
+
+// @alpha
+export type PlayList = {
+    uri: string;
+    attributes: {
+        FRAME_RATE: number;
+        CODECS: string;
+        BANDWIDTH: number;
+        RESOLUTION: {
+            width: number;
+            height: number;
+        };
+    };
+};
+
+// @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
+};
+
+// @beta
+export function prft(view: IsoView): ProducerReferenceTimeBox;
+
+// @beta
+export type ProducerReferenceTimeBox = FullBox & {
+    referenceTrackId: number;
+    ntpTimestampSec: number;
+    ntpTimestampFrac: number;
+    mediaTime: number;
+};
+
+// @beta
+export type ProtectionSystemSpecificHeaderBox = FullBox & {
+    systemID: number[];
+    dataSize: number;
+    data: number[];
+};
+
+// @beta
+export function pssh(view: IsoView): ProtectionSystemSpecificHeaderBox;
+
+// @beta
+export type Reference = {
+    reference: number;
+    subsegmentDuration: number;
+    sap: number;
+    referenceType: number;
+    referencedSize: number;
+    startsWithSap: number;
+    sapType: number;
+    sapDeltaTime: number;
+};
+
+// @alpha
+export type Representation = {
+    $: {
+        audioSamplingRate?: string;
+        bandwidth: string;
+        codecs?: string;
+        frameRate?: string;
+        height?: string;
+        id: string;
+        mimeType?: string;
+        sar?: string;
+        scanType?: string;
+        startWithSAP?: string;
+        width?: string;
+    };
+    AudioChannelConfiguration?: AudioChannelConfiguration[];
+    BaseURL?: string[];
+    SegmentBase?: SegmentBase[];
+    SegmentList?: SegmentList[];
+    SegmentTemplate?: SegmentTemplate[];
 };
 
 // @beta
@@ -590,6 +1072,14 @@ export type ResourceTiming = {
 
 // @beta
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
+
+// @alpha
+export type Role = {
+    $: {
+        schemeIdUri: string;
+        value: string;
+    };
+};
 
 // @beta
 export function roundToEven(value: number, precision: number): number;
@@ -625,6 +1115,17 @@ export class Row {
 }
 
 // @beta
+export type SampleDependencyTypeBox = FullBox & {
+    sampleDependencyTable: number[];
+};
+
+// @beta
+export type SampleEntry = {
+    reserved1: number[];
+    dataReferenceIndex: number;
+};
+
+// @beta
 export class SccParser {
     constructor(processor: any, field?: number | any);
     // (undocumented)
@@ -649,11 +1150,88 @@ export class SccParser {
     timeConverter(smpteTs: string): number;
 }
 
+// @beta
+export type SchemeTypeBox = FullBox & {
+    schemeType: number;
+    schemeVersion: number;
+    schemeUri?: string;
+};
+
+// @beta
+export function schm(view: IsoView): SchemeTypeBox;
+
+// @beta
+export function sdtp(view: IsoView): SampleDependencyTypeBox;
+
 // @alpha
 export type Segment = {
     duration: number;
     url: string;
     byteRange?: string;
+};
+
+// @alpha
+export type SegmentBase = {
+    $: {
+        indexRange: string;
+        indexRangeExact: string;
+        timescale: string;
+    };
+    Initialization: Initialization[];
+};
+
+// @alpha
+export type SegmentHls = {
+    title?: string;
+    duration: number;
+    byterange?: Byterange;
+    uri?: string;
+    timeline?: number;
+    map?: {
+        uri: string;
+        byterange: Byterange;
+    };
+};
+
+// @beta
+export type SegmentIndexBox = FullBox & {
+    referenceId: number;
+    timescale: number;
+    earliestPresentationTime: number;
+    firstOffset: number;
+    reserved: number;
+    references: Reference[];
+};
+
+// @alpha
+export type SegmentList = {
+    $: {
+        duration: string;
+        timescale: string;
+    };
+    Initialization: Initialization[];
+    SegmentURL?: SegmentURL[];
+};
+
+// @alpha
+export type SegmentTemplate = {
+    $: {
+        duration: string;
+        initialization: string;
+        media: string;
+        startNumber: string;
+        timescale: string;
+    };
+};
+
+// @beta
+export type SegmentTypeBox = TypeBox;
+
+// @alpha
+export type SegmentURL = {
+    $: {
+        media?: string;
+    };
 };
 
 // @alpha
@@ -725,6 +1303,27 @@ export class SfToken {
 }
 
 // @beta
+export function sidx(view: IsoView): SegmentIndexBox;
+
+// @beta
+export const skip: BoxParser<FreeSpaceBox>;
+
+// @beta
+export function smhd(view: IsoView): SoundMediaHeaderBox;
+
+// @beta
+export type SoundMediaHeaderBox = FullBox & {
+    balance: number;
+    reserved: number;
+};
+
+// @beta
+export const STRING = "string";
+
+// @beta
+export function sttg(view: IsoView): WebVTTSettingsBox;
+
+// @beta
 export class StyledUnicodeChar {
     // (undocumented)
     copy(newChar: StyledUnicodeChar): void;
@@ -745,6 +1344,9 @@ export class StyledUnicodeChar {
 }
 
 // @beta
+export const styp: BoxParser<SegmentTypeBox>;
+
+// @beta
 export type SupportedField = 1 | 3;
 
 // @alpha
@@ -752,9 +1354,24 @@ export type SwitchingSet = Ham & {
     tracks: Track[];
 };
 
+// @beta
+export const TEMPLATE = "template";
+
+// @beta
+export function tenc(view: IsoView): TrackEncryptionBox;
+
 // @alpha
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
+
+// @beta
+export function tfdt(view: IsoView): TrackFragmentDecodeTimeBox;
+
+// @beta
+export function tfhd(view: IsoView): TrackFragmentHeaderBox;
+
+// @beta
+export function tkhd(view: IsoView): TrackHeaderBox;
 
 // @beta
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
@@ -778,11 +1395,98 @@ export type Track = Ham & {
     segments: Segment[];
 };
 
+// @beta
+export type TrackEncryptionBox = FullBox & {
+    defaultIsEncrypted: number;
+    defaultIvSize: number;
+    defaultKid: number[];
+};
+
+// @beta
+export type TrackExtendsBox = FullBox & {
+    trackId: number;
+    defaultSampleDescriptionIndex: number;
+    defaultSampleDuration: number;
+    defaultSampleSize: number;
+    defaultSampleFlags: number;
+};
+
+// @beta
+export type TrackFragmentDecodeTimeBox = FullBox & {
+    baseMediaDecodeTime: number;
+};
+
+// @beta
+export type TrackFragmentHeaderBox = FullBox & {
+    trackId: number;
+    baseDataOffset?: number;
+    sampleDescriptionOffset?: number;
+    defaultSampleDuration?: number;
+    defaultSampleSize?: number;
+    defaultSampleFlags?: number;
+};
+
+// @beta
+export type TrackHeaderBox = FullBox & {
+    creationTime: number;
+    modificationTime: number;
+    trackId: number;
+    reserved1: number;
+    duration: number;
+    reserved2: number[];
+    layer: number;
+    alternateGroup: number;
+    volume: number;
+    reserved3: number;
+    matrix: number[];
+    width: number;
+    height: number;
+};
+
+// @beta
+export type TrackKindBox = FullBox & {
+    schemeUri: string;
+    value: string;
+};
+
 // @alpha
 export type TrackType = 'audio' | 'video' | 'text';
 
 // @beta
+export function trex(view: IsoView): TrackExtendsBox;
+
+// @beta
+export type TypeBox = {
+    majorBrand: string;
+    minorVersion: number;
+    compatibleBrands: string[];
+};
+
+// @beta
+export const UINT = "uint";
+
+// @beta
+export function url(view: IsoView): UrlBox;
+
+// @beta
+export type UrlBox = FullBox & {
+    location: string;
+};
+
+// @beta
 export function urlToRelativePath(url: string, base: string): string;
+
+// @beta
+export function urn(view: IsoView): UrnBox;
+
+// @beta
+export type UrnBox = FullBox & {
+    name: string;
+    location: string;
+};
+
+// @beta
+export const UTF8 = "utf8";
 
 // @beta
 export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
@@ -836,6 +1540,12 @@ export const VerboseLevel: {
 // @beta (undocumented)
 export type VerboseLevel = ValueOf<typeof VerboseLevel>;
 
+// @beta
+export type VideoMediaHeaderBox = FullBox & {
+    graphicsmode: number;
+    opcolor: number[];
+};
+
 // @alpha
 export type VideoTrack = Track & {
     width: number;
@@ -846,11 +1556,56 @@ export type VideoTrack = Track & {
     scanType: string;
 };
 
-// Warnings were encountered during analysis:
-//
-// src/cmaf/ham/types/mapper/dash/DashManifest.ts:19:3 - (ae-forgotten-export) The symbol "Period" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:12:2 - (ae-forgotten-export) The symbol "PlayList" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:13:2 - (ae-forgotten-export) The symbol "MediaGroups" needs to be exported by the entry point index.d.ts
-// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:14:2 - (ae-forgotten-export) The symbol "SegmentHls" needs to be exported by the entry point index.d.ts
+// @beta
+export type VisualSampleEntry = SampleEntry & {
+    preDefined1: number;
+    reserved2: number;
+    preDefined2: number[];
+    width: number;
+    height: number;
+    horizresolution: number;
+    vertresolution: number;
+    reserved3: number;
+    frameCount: number;
+    compressorName: number[];
+    depth: number;
+    preDefined3: number;
+    config: Uint8Array;
+};
+
+// @beta
+export function vlab(view: IsoView): WebVTTSourceLabelBox;
+
+// @beta
+export function vmhd(view: IsoView): VideoMediaHeaderBox;
+
+// @beta
+export function vttc(view: IsoView): WebVTTConfigurationBox;
+
+// @beta
+export function vtte(): WebVTTEmptySampleBox;
+
+// @beta
+export type WebVTTConfigurationBox = {
+    config: string;
+};
+
+// @beta
+export type WebVTTCuePayloadBox = {
+    cueText: string;
+};
+
+// @beta
+export type WebVTTEmptySampleBox = object;
+
+// @beta
+export type WebVTTSettingsBox = {
+    settings: string;
+};
+
+// @beta
+export type WebVTTSourceLabelBox = {
+    sourceLabel: string;
+};
 
 ```
