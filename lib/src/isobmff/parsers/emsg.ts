@@ -1,5 +1,5 @@
-import type { CursorView } from '../CursorView.js';
 import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
 export type EventMessageBox = FullBox & {
 	schemeIdUri: string,
@@ -13,7 +13,7 @@ export type EventMessageBox = FullBox & {
 }
 
 // ISO/IEC 23009-1:2014 - 5.10.3.3 Event Message Box
-export function emsg(view: CursorView): EventMessageBox {
+export function emsg(view: IsoView): EventMessageBox {
 	const { readUint, readString, readData } = view;
 
 	const result = { ...view.readFullBox() } as EventMessageBox;
