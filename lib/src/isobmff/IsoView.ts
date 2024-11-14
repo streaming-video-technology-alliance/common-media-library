@@ -160,13 +160,27 @@ export class IsoView {
 	};
 
 	readBoxes = (length: number): Box[] => {
-		const value: Box[] = [];
+		const result: Box[] = [];
 
-		for (let i = 0; i < length; i++) {
-			value.push(this.readBox());
+		for (const box of this) {
+			result.push(box);
+
+			if (result.length >= length) {
+				break;
+			}
 		}
 
-		return value;
+		return result;
+	};
+
+	readEntries = <T>(length: number, map: () => T): T[] => {
+		const result: T[] = [];
+
+		for (let i = 0; i < length; i++) {
+			result.push(map());
+		}
+
+		return result;
 	};
 
 	*[Symbol.iterator]() {
@@ -174,7 +188,7 @@ export class IsoView {
 
 		while (!this.done) {
 			const { size, type, value: bodyView } = this.readBox();
-			const parser = parsers[type];
+			const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
 
 			let value: any = bodyView;
 
