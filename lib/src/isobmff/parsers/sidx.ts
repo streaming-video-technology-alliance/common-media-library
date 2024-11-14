@@ -1,6 +1,6 @@
 import { range } from '../../utils/range.js';
-import type { CursorView } from '../CursorView.js';
 import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
 export type Reference = {
 	reference: number,
@@ -23,7 +23,7 @@ export type SegmentIndexBox = FullBox & {
 };
 
 // ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
-export function sidx(view: CursorView): SegmentIndexBox {
+export function sidx(view: IsoView): SegmentIndexBox {
 	const { readUint } = view;
 	const { version, flags } = view.readFullBox();
 	const v1 = version === 1;

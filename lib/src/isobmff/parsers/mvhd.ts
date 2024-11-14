@@ -1,4 +1,4 @@
-import type { CursorView } from '../CursorView.js';
+import type { IsoView } from '../IsoView.js';
 import { UINT } from '../fields/UINT.js';
 
 export type MovieHeaderBox = {
@@ -18,7 +18,7 @@ export type MovieHeaderBox = {
 };
 
 // ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
-export function mvhd(view: CursorView): MovieHeaderBox {
+export function mvhd(view: IsoView): MovieHeaderBox {
 	const { readUint, readTemplate, readArray } = view;
 
 	const { version, flags } = view.readFullBox();
