@@ -10,8 +10,6 @@ export type WebVTTEmptySampleBox = object;
 /**
  * Parse a WebVTT Empty Sample Box from an IsoView
  *
- * @param view - The IsoView to read data from
- *
  * @returns A parsed WebVTT Empty Sample Box
  *
  * @group ISOBMFF

@@ -18,6 +18,13 @@ import { readUint } from './readers/readUint.js';
 import { readUTF8String } from './readers/readUTF8String.js';
 import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js';
 
+/**
+ * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export class IsoView {
 	private dataView: DataView;
 	private offset: number;
