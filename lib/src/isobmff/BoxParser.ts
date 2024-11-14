@@ -1,5 +1,5 @@
 import type { Box } from './Box.js';
-import type { BoxParserMap } from './BoxParserMap.js';
-import type { CursorView } from './CursorView.js';
+import type { IsoView } from './IsoView.js';
+import type { IsoViewConfig } from './IsoViewConfig.js';
 
-export type BoxParser<V = any> = (view: CursorView, parsers?: BoxParserMap) => Box<V>;
+export type BoxParser<V = any> = (view: IsoView, config?: IsoViewConfig) => Box<V>;

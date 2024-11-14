@@ -1,22 +1,18 @@
 import type { Box } from './Box.js';
-import type { BoxParserConfig } from './BoxParserConfig.js';
 import { ContainerBoxes } from './ContainerBoxes.js';
-import { createCursorView } from './createCursorView.js';
-import { STRING } from './fields/STRING.js';
-import { UINT } from './fields/UINT.js';
-import type { RawBoxes } from './RawBoxes.js';
+import { createIsoView } from './createIsoView.js';
+import type { IsoData } from './IsoData.js';
+import type { IsoViewConfig } from './IsoViewConfig.js';
 
-export function parseBoxes(raw: RawBoxes, config: BoxParserConfig): Box[] {
+export function parseBoxes(raw: IsoData, config: IsoViewConfig): Box[] {
 	const { parsers = {} } = config;
-	const cursorView = createCursorView(raw);
+	const isoView = createIsoView(raw, config);
 	const boxes = [];
 
-	while (!cursorView.done) {
-		const size = cursorView.read(UINT, 4);
-		const type = cursorView.read(STRING, 4);
-		const bodyView = cursorView.slice(size - 8);
+	while (!isoView.done) {
+		const { size, type, value: bodyView } = isoView.readBox();
 		const parser = parsers[type];
-		const value = parser ? parser(bodyView, parsers) : ContainerBoxes.includes(type) ? parseBoxes(bodyView, config) : bodyView;
+		const value = parser ? parser(bodyView, config) : ContainerBoxes.includes(type) ? parseBoxes(bodyView, config) : bodyView;
 
 		boxes.push({
 			type,
