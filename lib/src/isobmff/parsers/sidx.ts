@@ -1,4 +1,3 @@
-import { range } from '../../utils/range.js';
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
@@ -35,7 +34,7 @@ export function sidx(view: IsoView): SegmentIndexBox {
 	const firstOffset = readUint(size);
 	const reserved = readUint(2);
 	const referenceCount = readUint(2);
-	const references = range(referenceCount).map<Reference>(() => {
+	const references = view.readEntries<Reference>(referenceCount, () => {
 		const entry = {} as any;
 
 		entry.reference = readUint(4);
