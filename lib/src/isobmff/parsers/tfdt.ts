@@ -1,11 +1,28 @@
-import type { FullBox } from '../FullBox';
-import type { IsoView } from '../IsoView';
+import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Decode Time
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type TrackFragmentDecodeTimeBox = FullBox & {
 	baseMediaDecodeTime: number;
 };
 
-// ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Decode Time
+/**
+ * Parse a TrackFragmentDecodeTimeBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed TrackFragmentDecodeTimeBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function tfdt(view: IsoView): TrackFragmentDecodeTimeBox {
 	const { version, flags } = view.readFullBox();
 

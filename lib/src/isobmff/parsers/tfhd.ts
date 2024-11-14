@@ -1,6 +1,13 @@
-import type { FullBox } from '../FullBox';
-import type { IsoView } from '../IsoView';
+import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type TrackFragmentHeaderBox = FullBox & {
 	trackId: number;
 	baseDataOffset?: number;
@@ -10,7 +17,17 @@ export type TrackFragmentHeaderBox = FullBox & {
 	defaultSampleFlags?: number;
 };
 
-// ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
+/**
+ * Parse a TrackFragmentHeaderBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed TrackFragmentHeaderBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function tfhd(view: IsoView): TrackFragmentHeaderBox {
 	const { version, flags } = view.readFullBox();
 

@@ -1,6 +1,13 @@
 import type { IsoView } from '../IsoView.js';
 import { UINT } from '../fields/UINT.js';
 
+/**
+ * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type MovieHeaderBox = {
 	version: number;
 	flags: number;
@@ -17,7 +24,17 @@ export type MovieHeaderBox = {
 	nextTrackId: number;
 };
 
-// ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
+/**
+ * Parse a Box from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function mvhd(view: IsoView): MovieHeaderBox {
 	const { readUint, readTemplate, readArray } = view;
 
