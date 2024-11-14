@@ -1,6 +1,6 @@
 import { range } from '../../utils/range.js';
-import type { CursorView } from '../CursorView.js';
 import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
 export type EditListEntry = {
 	segmentDuration: number;
@@ -15,7 +15,7 @@ export type EditListBox = FullBox & {
 }
 
 // ISO/IEC 14496-12:2012 - 8.6.6 Edit List Box
-export function elst(view: CursorView): EditListBox {
+export function elst(view: IsoView): EditListBox {
 	const { version, flags } = view.readFullBox();
 	const v1 = version === 1;
 	const size = v1 ? 8 : 4;
