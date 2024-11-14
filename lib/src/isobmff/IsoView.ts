@@ -183,7 +183,7 @@ export class IsoView {
 		return result;
 	};
 
-	*[Symbol.iterator]() {
+	*[Symbol.iterator](): Generator<Box> {
 		const { parsers = {}, recursive = false } = this.config;
 
 		while (!this.done) {

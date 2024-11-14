@@ -1,11 +1,28 @@
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 14496-12:202x - 12.2.8 Audio rendering indication box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type AudioRenderingIndicationBox = FullBox & {
 	audioRenderingIndication: number;
 }
 
-// ISO/IEC 14496-12:202x - 12.2.8 Audio rendering indication box
+/**
+ * Parse a AudioRenderingIndicationBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed AudioRenderingIndicationBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function ardi(view: IsoView): AudioRenderingIndicationBox {
 	return {
 		...view.readFullBox(),

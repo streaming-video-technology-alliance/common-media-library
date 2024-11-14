@@ -1,10 +1,27 @@
-import type { IsoView } from '../IsoView';
+import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 14496-30:2014 - WebVTT Configuration Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type WebVTTConfigurationBox = {
 	config: string;
 };
 
-// ISO/IEC 14496-30:2014 - WebVTT Configuration Box
+/**
+ * Parse a WebVTTConfigurationBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed WebVTTConfigurationBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function vttc(view: IsoView): WebVTTConfigurationBox {
 	return {
 		config: view.readUtf8(-1),

@@ -1,6 +1,13 @@
-import { UINT } from '../fields/UINT';
-import type { IsoView } from '../IsoView';
+import { UINT } from '../fields/UINT.js';
+import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type HandlerReferenceBox = {
 	preDefined: number;
 	handlerType: string;
@@ -8,7 +15,17 @@ export type HandlerReferenceBox = {
 	name: string;
 };
 
-// ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
+/**
+ * Parse a HandlerReferenceBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed HandlerReferenceBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function hdlr(view: IsoView): HandlerReferenceBox {
 	return {
 		...view.readFullBox(),
