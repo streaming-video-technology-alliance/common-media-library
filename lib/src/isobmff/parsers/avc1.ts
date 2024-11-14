@@ -24,21 +24,23 @@ export type VisualSampleEntry = SampleEntry & {
 
 // ISO/IEC 14496-15:2014 - avc1/2/3/4, hev1, hvc1, encv
 export function avc1(view: IsoView): VisualSampleEntry {
+	const { readArray, readUint, readInt, readTemplate, readData } = view;
+
 	return {
-		reserved1: view.readArray(UINT, 1, 6),
-		dataReferenceIndex: view.readUint(2),
-		preDefined1: view.readUint(2),
-		reserved2: view.readUint(2),
-		preDefined2: view.readArray(UINT, 4, 3),
-		width: view.readUint(2),
-		height: view.readUint(2),
-		horizresolution: view.readTemplate(4),
-		vertresolution: view.readTemplate(4),
-		reserved3: view.readUint(4),
-		frameCount: view.readUint(2),
-		compressorName: view.readArray(UINT, 1, 32),
-		depth: view.readUint(2),
-		preDefined3: view.readInt(2),
-		config: view.readData(-1),
+		reserved1: readArray(UINT, 1, 6),
+		dataReferenceIndex: readUint(2),
+		preDefined1: readUint(2),
+		reserved2: readUint(2),
+		preDefined2: readArray(UINT, 4, 3),
+		width: readUint(2),
+		height: readUint(2),
+		horizresolution: readTemplate(4),
+		vertresolution: readTemplate(4),
+		reserved3: readUint(4),
+		frameCount: readUint(2),
+		compressorName: readArray(UINT, 1, 32),
+		depth: readUint(2),
+		preDefined3: readInt(2),
+		config: readData(-1),
 	};
 };
