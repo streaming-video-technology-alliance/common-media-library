@@ -8,4 +8,3 @@ export * from './parsers/mvhd.js';
 export * from './parsers/pssh.js';
 export * from './parsers/sidx.js';
 export * from './parsers/styp.js';
-

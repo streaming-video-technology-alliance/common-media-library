@@ -1,11 +1,11 @@
 import type { Box } from './Box.js';
 import type { BoxFilter } from './BoxFilter.js';
-import type { BoxParserConfig } from './BoxParserConfig.js';
-import { createBoxIterator } from './createBoxIterator.js';
-import type { RawBoxes } from './RawBoxes.js';
+import { createIsoView } from './createIsoView.js';
+import type { IsoData } from './IsoData.js';
+import type { IsoViewConfig } from './IsoViewConfig.js';
 
-function filter<T = any>(raw: RawBoxes, config: BoxParserConfig, fn: BoxFilter, boxes: Box<T>[] = []): Box<T>[] {
-	for (const box of createBoxIterator(raw, config)) {
+function filter<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter, boxes: Box<T>[] = []): Box<T>[] {
+	for (const box of createIsoView(raw, config)) {
 		if (fn(box)) {
 			boxes.push(box);
 		}
@@ -29,6 +29,6 @@ function filter<T = any>(raw: RawBoxes, config: BoxParserConfig, fn: BoxFilter, 
  * @group ISOBMFF
  * @beta
  */
-export function filterBoxes<T = any>(raw: RawBoxes, config: BoxParserConfig, fn: BoxFilter): Box<T>[] {
+export function filterBoxes<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T>[] {
 	return filter(raw, config, fn);
 }

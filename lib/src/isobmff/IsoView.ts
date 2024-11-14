@@ -1,3 +1,5 @@
+import type { Box } from './Box.js';
+import { ContainerBoxes } from './ContainerBoxes.js';
 import { DATA } from './fields/DATA.js';
 import { INT } from './fields/INT.js';
 import { STRING } from './fields/STRING.js';
@@ -5,6 +7,7 @@ import { TEMPLATE } from './fields/TEMPLATE.js';
 import { UINT } from './fields/UINT.js';
 import { UTF8 } from './fields/UTF8.js';
 import type { FullBox } from './FullBox.js';
+import type { IsoViewConfig } from './IsoViewConfig.js';
 import type { ISOFieldTypeMap } from './readers/ISOFieldTypeMap.js';
 import { readData } from './readers/readData.js';
 import { readInt } from './readers/readInt.js';
@@ -15,13 +18,15 @@ import { readUint } from './readers/readUint.js';
 import { readUTF8String } from './readers/readUTF8String.js';
 import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js';
 
-export class CursorView {
+export class IsoView {
 	private dataView: DataView;
 	private offset: number;
+	private config: IsoViewConfig;
 
-	constructor(raw: ArrayBuffer | DataView) {
+	constructor(raw: ArrayBuffer | DataView, config?: IsoViewConfig) {
 		this.dataView = (raw instanceof ArrayBuffer) ? new DataView(raw) : raw;
 		this.offset = this.dataView.byteOffset;
+		this.config = config || { recursive: false, parsers: {} };
 	}
 
 	get cursor(): number {
@@ -36,10 +41,10 @@ export class CursorView {
 		return this.dataView.byteLength - this.cursor;
 	}
 
-	slice = (size: number): CursorView => {
+	slice = (size: number): IsoView => {
 		const dataView = new DataView(this.dataView.buffer, this.offset, size);
 		this.offset += size;
-		return new CursorView(dataView);
+		return new IsoView(dataView, this.config);
 	};
 
 	private read = <T extends keyof ISOFieldTypeMap>(type: T, size: number = 0): ISOFieldTypeMap[T] => {
@@ -141,4 +146,58 @@ export class CursorView {
 
 		return value as ISOFieldTypeMap[T][];
 	};
+
+	readBox = (): Box => {
+		const size = this.readUint(4);
+		const type = this.readString(4);
+		const value = this.slice(size - 8);
+
+		return {
+			size,
+			type,
+			value,
+		};
+	};
+
+	readBoxes = (length: number): Box[] => {
+		const value: Box[] = [];
+
+		for (let i = 0; i < length; i++) {
+			value.push(this.readBox());
+		}
+
+		return value;
+	};
+
+	*[Symbol.iterator]() {
+		const { parsers = {}, recursive = false } = this.config;
+
+		while (!this.done) {
+			const { size, type, value: bodyView } = this.readBox();
+			const parser = parsers[type];
+
+			let value: any = bodyView;
+
+			if (parser) {
+				value = parser(bodyView, this.config);
+			}
+			else if (ContainerBoxes.includes(type)) {
+				value = [];
+
+				for (const box of bodyView) {
+					if (recursive) {
+						yield box;
+					}
+
+					value.push(box);
+				}
+			}
+
+			yield {
+				type,
+				size,
+				value,
+			};
+		}
+	}
 }

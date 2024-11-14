@@ -1,6 +1,6 @@
 import type { BoxParserMap } from './BoxParserMap.js';
 
-export type BoxParserConfig = {
+export type IsoViewConfig = {
 	parsers: BoxParserMap;
 	recursive: boolean;
 };
