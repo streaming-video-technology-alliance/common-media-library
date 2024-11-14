@@ -1,6 +1,13 @@
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 23009-1:2014 - 5.10.3.3 Event Message Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type EventMessageBox = FullBox & {
 	schemeIdUri: string,
 	value: string,
@@ -12,7 +19,17 @@ export type EventMessageBox = FullBox & {
 	messageData: Uint8Array,
 }
 
-// ISO/IEC 23009-1:2014 - 5.10.3.3 Event Message Box
+/**
+ * Parse an EventMessageBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed EventMessageBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function emsg(view: IsoView): EventMessageBox {
 	const { readUint, readString, readData } = view;
 

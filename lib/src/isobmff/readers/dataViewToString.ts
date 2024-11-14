@@ -8,8 +8,8 @@ export function dataViewToString(dataView: DataView, encoding: string = 'utf-8')
 
 	if (encoding === 'utf-8') {
 		/* The following algorithm is essentially a rewrite of the UTF8.decode at
-    http://bannister.us/weblog/2007/simple-base64-encodedecode-javascript/
-    */
+		http://bannister.us/weblog/2007/simple-base64-encodedecode-javascript/
+		*/
 
 		while (i < dataView.byteLength) {
 			let c = dataView.getUint8(i++);

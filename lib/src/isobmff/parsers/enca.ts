@@ -1,4 +1,15 @@
-import { mp4a } from './mp4a';
+import type { BoxParser } from '../BoxParser.js';
+import { mp4a, type AudioSampleEntry } from './mp4a.js';
 
-// ISO/IEC 14496-12:2012 - 8.5.2.2 mp4a box (use AudioSampleEntry definition and naming)
-export const enca = mp4a;
+/**
+ * Parse an AudioSampleEntry from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed AudioSampleEntry
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
+export const enca: BoxParser<AudioSampleEntry> = mp4a;

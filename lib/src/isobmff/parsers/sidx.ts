@@ -1,6 +1,13 @@
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
+/**
+ * Segment index reference
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type Reference = {
 	reference: number,
 	subsegmentDuration: number,
@@ -12,6 +19,13 @@ export type Reference = {
 	sapDeltaTime: number,
 }
 
+/**
+ * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type SegmentIndexBox = FullBox & {
 	referenceId: number,
 	timescale: number,
@@ -21,7 +35,17 @@ export type SegmentIndexBox = FullBox & {
 	references: Reference[],
 };
 
-// ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
+/**
+ * Parse a SegmentIndexBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed SegmentIndexBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function sidx(view: IsoView): SegmentIndexBox {
 	const { readUint } = view;
 	const { version, flags } = view.readFullBox();

@@ -1,6 +1,13 @@
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 14496-12:202x - 8.10.5 Label box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type LabelBox = FullBox & {
 	isGroupLabel: boolean;
 	labelId: number;
@@ -8,7 +15,17 @@ export type LabelBox = FullBox & {
 	label: string;
 }
 
-// ISO/IEC 14496-12:202x - 8.10.5 Label box
+/**
+ * Parse a LabelBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed LabelBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function labl(view: IsoView): LabelBox {
 	const { version, flags } = view.readFullBox();
 

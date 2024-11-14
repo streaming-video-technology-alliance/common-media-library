@@ -1,7 +1,14 @@
-import { UINT } from '../fields/UINT';
-import type { IsoView } from '../IsoView';
-import type { SampleEntry } from './avc1';
+import { UINT } from '../fields/UINT.js';
+import type { IsoView } from '../IsoView.js';
+import type { SampleEntry } from './avc1.js';
 
+/**
+ * ISO/IEC 14496-12:2012 - 8.5.2.2 mp4a box (use AudioSampleEntry definition and naming)
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type AudioSampleEntry = SampleEntry & {
 	reserved2: number[];
 	channelcount: number;
@@ -12,7 +19,17 @@ export type AudioSampleEntry = SampleEntry & {
 	esds: Uint8Array;
 };
 
-// ISO/IEC 14496-12:2012 - 8.5.2.2 mp4a box (use AudioSampleEntry definition and naming)
+/**
+ * Parse an AudioSampleEntry from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed AudioSampleEntry
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function mp4a(view: IsoView): AudioSampleEntry {
 	const { readArray, readUint, readTemplate, readData } = view;
 

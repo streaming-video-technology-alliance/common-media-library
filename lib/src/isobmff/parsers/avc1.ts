@@ -1,11 +1,18 @@
-import { UINT } from '../fields/UINT';
-import type { IsoView } from '../IsoView';
+import { UINT } from '../fields/UINT.js';
+import type { IsoView } from '../IsoView.js';
 
 export type SampleEntry = {
 	reserved1: number[];
 	dataReferenceIndex: number;
 }
 
+/**
+ * ISO/IEC 14496-15:2014 - 12.1.3.1 avc1/2/3/4, hev1, hvc1, encv
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type VisualSampleEntry = SampleEntry & {
 	preDefined1: number;
 	reserved2: number;
@@ -22,7 +29,17 @@ export type VisualSampleEntry = SampleEntry & {
 	config: Uint8Array;
 }
 
-// ISO/IEC 14496-15:2014 - avc1/2/3/4, hev1, hvc1, encv
+/**
+ * Parse a VisualSampleEntryBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed VisualSampleEntryBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function avc1(view: IsoView): VisualSampleEntry {
 	const { readArray, readUint, readInt, readTemplate, readData } = view;
 

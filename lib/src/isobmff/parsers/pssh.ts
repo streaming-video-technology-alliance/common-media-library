@@ -2,14 +2,31 @@ import { UINT } from '../fields/UINT.js';
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 23001-7:2011 - 8.1 Protection System Specific Header Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
 	systemID: number[];
 	dataSize: number;
 	data: number[];
 }
 
-//ISO/IEC 23001-7:2011 - 8.1 Protection System Specific Header Box
-export function pssh(view: IsoView) {
+/**
+ * Parse a ProtectionSystemSpecificHeaderBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed ProtectionSystemSpecificHeaderBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
+export function pssh(view: IsoView): ProtectionSystemSpecificHeaderBox {
 	const { readUint, readArray } = view;
 	const { version, flags } = view.readFullBox();
 

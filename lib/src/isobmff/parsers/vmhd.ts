@@ -1,13 +1,30 @@
-import { UINT } from '../fields/UINT';
-import type { FullBox } from '../FullBox';
-import type { IsoView } from '../IsoView';
+import { UINT } from '../fields/UINT.js';
+import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
+/**
+ * ISO/IEC 14496-12:2012 - 8.4.5.2 Video Media Header Box
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type VideoMediaHeaderBox = FullBox & {
 	graphicsmode: number,
 	opcolor: number[],
 };
 
-// ISO/IEC 14496-12:2012 - 8.4.5.2 Video Media Header Box
+/**
+ * Parse a VideoMediaHeaderBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed VideoMediaHeaderBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function vmhd(view: IsoView): VideoMediaHeaderBox {
 	return {
 		...view.readFullBox(),
