@@ -4,14 +4,14 @@ import { createIsoView } from './createIsoView.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
 
-function filter<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter, boxes: Box<T>[] = []): Box<T>[] {
-	for (const box of createIsoView(raw, config)) {
+function filter<T = any>(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter, boxes: Box<T>[] = []): Box<T>[] {
+	for (const box of iterator) {
 		if (fn(box)) {
 			boxes.push(box);
 		}
 
-		if (box.value?.boxes) {
-			filter<T>(box.value, config, fn, boxes);
+		if (recursive && Array.isArray(box.value)) {
+			filter<T>(box.value, recursive, fn, boxes);
 		}
 	}
 
@@ -30,5 +30,5 @@ function filter<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter, box
  * @beta
  */
 export function filterBoxes<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T>[] {
-	return filter(raw, config, fn);
+	return filter(createIsoView(raw, { ...config, recursive: false }), !!config.recursive, fn);
 }

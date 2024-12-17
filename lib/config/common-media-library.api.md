@@ -553,6 +553,12 @@ export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem;
 export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember[];
 
 // @beta
+export type DecodingTimeToSampleBox = FullBox & {
+    entryCount: number;
+    entries: Sample[];
+};
+
+// @beta
 export function dref(view: IsoView): DataReferenceBox;
 
 // @beta
@@ -607,6 +613,11 @@ export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): stri
 
 // @beta
 export const encv: BoxParser<VisualSampleEntry>;
+
+// @beta
+export type Entity = {
+    entityId: number;
+};
 
 // @beta
 export type EventMessageBox = FullBox & {
@@ -735,7 +746,7 @@ export type HlsManifest = {
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
-export const hvc1: BoxParser<VisualSampleEntry>;
+export function hvc1(view: IsoView): VisualSampleEntry;
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -766,7 +777,7 @@ export const INT = "int";
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
 // @beta
-export type IsoData = ArrayBuffer | DataView | IsoView;
+export type IsoData = ArrayBuffer | DataView | IsoView | Uint8Array;
 
 // @beta
 export type ISOFieldTypeMap = {
@@ -783,7 +794,7 @@ export type ISOFieldTypeMap = {
 export class IsoView {
     // (undocumented)
     [Symbol.iterator](): Generator<Box>;
-    constructor(raw: ArrayBuffer | DataView, config?: IsoViewConfig);
+    constructor(raw: ArrayBuffer | DataView | Uint8Array, config?: IsoViewConfig);
     // (undocumented)
     get bytesRemaining(): number;
     // (undocumented)
@@ -811,15 +822,15 @@ export class IsoView {
     // (undocumented)
     readUint: (size: number) => number;
     // (undocumented)
-    readUtf8: (size: number) => string;
+    readUtf8: (size?: number) => string;
     // (undocumented)
     slice: (size: number) => IsoView;
 }
 
 // @beta
 export type IsoViewConfig = {
-    parsers: BoxParserMap;
-    recursive: boolean;
+    parsers?: BoxParserMap;
+    recursive?: boolean;
 };
 
 // @beta
@@ -876,6 +887,12 @@ export type MediaGroups = {
 
 // @beta
 export function mehd(view: IsoView): MovieExtendsHeaderBox;
+
+// @beta
+export function meta(view: IsoView): MetaBox;
+
+// @beta
+export type MetaBox = FullBox & Array<Box<any>[]>;
 
 // @beta
 export function mfhd(view: IsoView): MovieFragmentHeaderBox;
@@ -936,7 +953,7 @@ export type PACData = {
 };
 
 // @beta
-export function parseBoxes(raw: IsoData, config: IsoViewConfig): Box[];
+export function parseBoxes(raw: IsoData, config?: IsoViewConfig): Box[];
 
 // @beta
 export function payl(view: IsoView): WebVTTCuePayloadBox;
@@ -998,6 +1015,16 @@ export type PlayList = {
     };
 };
 
+// @beta
+export type PreselectionGroupBox = FullBox & Array<Box> & {
+    groupId: number;
+    numEntitiesInGroup: number;
+    entities: Entity[];
+    preselectionTag?: string;
+    selectionPriority?: number;
+    interleavingTag?: string;
+};
+
 // @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
@@ -1022,7 +1049,17 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 };
 
 // @beta
+export function prsl(view: IsoView): PreselectionGroupBox;
+
+// @beta
 export function pssh(view: IsoView): ProtectionSystemSpecificHeaderBox;
+
+// @beta
+type Range_2 = {
+    level: number;
+    rangeSize: number;
+};
+export { Range_2 as Range }
 
 // @beta
 export type Reference = {
@@ -1115,8 +1152,20 @@ export class Row {
 }
 
 // @beta
+export type Sample = {
+    sampleCount: number;
+    sampleDelta: number;
+};
+
+// @beta
 export type SampleDependencyTypeBox = FullBox & {
     sampleDependencyTable: number[];
+};
+
+// @beta
+export type SampleDescriptionBox = FullBox & {
+    entryCount: number;
+    entries: any[];
 };
 
 // @beta
@@ -1318,10 +1367,19 @@ export type SoundMediaHeaderBox = FullBox & {
 };
 
 // @beta
+export function ssix(view: IsoView): SubsegmentIndexBox;
+
+// @beta
 export const STRING = "string";
 
 // @beta
+export function stsd(view: IsoView): SampleDescriptionBox;
+
+// @beta
 export function sttg(view: IsoView): WebVTTSettingsBox;
+
+// @beta
+export function stts(view: IsoView): DecodingTimeToSampleBox;
 
 // @beta
 export class StyledUnicodeChar {
@@ -1345,6 +1403,42 @@ export class StyledUnicodeChar {
 
 // @beta
 export const styp: BoxParser<SegmentTypeBox>;
+
+// @beta
+export function subs(view: IsoView): SubSampleInformationBox;
+
+// @beta
+export type SubSample = {
+    subsampleSize: number;
+    subsamplePriority: number;
+    discardable: number;
+    codecSpecificParameters: number;
+};
+
+// @beta
+export type SubSampleEntry = {
+    sampleDelta: number;
+    subsampleCount: number;
+    subsamples: SubSample[];
+};
+
+// @beta
+export type SubSampleInformationBox = FullBox & {
+    entryCount: number;
+    entries: SubSampleEntry[];
+};
+
+// @beta
+export type Subsegment = {
+    rangesCount: number;
+    ranges: Range_2[];
+};
+
+// @beta
+export type SubsegmentIndexBox = FullBox & {
+    subsegmentCount: number;
+    subsegments: Subsegment[];
+};
 
 // @beta
 export type SupportedField = 1 | 3;
@@ -1580,7 +1674,7 @@ export function vlab(view: IsoView): WebVTTSourceLabelBox;
 export function vmhd(view: IsoView): VideoMediaHeaderBox;
 
 // @beta
-export function vttc(view: IsoView): WebVTTConfigurationBox;
+export function vttC(view: IsoView): WebVTTConfigurationBox;
 
 // @beta
 export function vtte(): WebVTTEmptySampleBox;

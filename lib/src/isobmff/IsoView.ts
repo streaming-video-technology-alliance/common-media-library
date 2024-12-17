@@ -20,6 +20,7 @@ import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js'
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
+ * It implements the iterator protocol, so it can be used in a for...of loop.
  *
  * @group ISOBMFF
  *
@@ -29,9 +30,10 @@ export class IsoView {
 	private dataView: DataView;
 	private offset: number;
 	private config: IsoViewConfig;
+	private truncated: boolean = false;
 
-	constructor(raw: ArrayBuffer | DataView, config?: IsoViewConfig) {
-		this.dataView = (raw instanceof ArrayBuffer) ? new DataView(raw) : raw;
+	constructor(raw: ArrayBuffer | DataView | Uint8Array, config?: IsoViewConfig) {
+		this.dataView = (raw instanceof ArrayBuffer) ? new DataView(raw) : (raw instanceof Uint8Array) ? new DataView(raw.buffer, raw.byteOffset, raw.byteLength) : raw;
 		this.offset = this.dataView.byteOffset;
 		this.config = config || { recursive: false, parsers: {} };
 	}
@@ -41,7 +43,7 @@ export class IsoView {
 	}
 
 	get done(): boolean {
-		return this.cursor >= this.dataView.byteLength;
+		return this.cursor >= this.dataView.byteLength || this.truncated;
 	}
 
 	get bytesRemaining(): number {
@@ -59,33 +61,29 @@ export class IsoView {
 		const { dataView, offset } = this;
 
 		let result: any;
-		let cursor = 0;
+		let cursor = size;
 
 		switch (type) {
 			case UINT:
 				result = readUint(dataView, offset, size);
-				cursor = size;
 				break;
 
 			case INT:
 				result = readInt(dataView, offset, size);
-				cursor = size;
 				break;
 
 			case TEMPLATE:
 				result = readTemplate(dataView, offset, size);
-				cursor = size;
 				break;
 
 			case STRING:
 				if (size === -1) {
 					result = readTerminatedString(dataView, offset);
-					size = result.length;
+					cursor = result.length;
 				}
 				else {
 					result = readString(dataView, offset, size);
 				}
-				cursor = size;
 				break;
 
 			case DATA:
@@ -101,7 +99,6 @@ export class IsoView {
 				else {
 					result = readUTF8String(dataView, offset);
 				}
-				cursor = size;
 				break;
 
 			default:
@@ -133,14 +130,14 @@ export class IsoView {
 		return this.read(DATA, size);
 	};
 
-	readUtf8 = (size: number): string => {
+	readUtf8 = (size?: number): string => {
 		return this.read(UTF8, size);
 	};
 
 	readFullBox = (): FullBox => {
 		return {
-			version: this.read(UINT, 1),
-			flags: this.read(UINT, 3),
+			version: this.readUint(1),
+			flags: this.readUint(3),
 		};
 	};
 
@@ -155,9 +152,25 @@ export class IsoView {
 	};
 
 	readBox = (): Box => {
-		const size = this.readUint(4);
-		const type = this.readString(4);
-		const value = this.slice(size - 8);
+		const { dataView, offset } = this;
+
+		// read box size and type without advancing the cursor in case the box is truncated
+		const size = readUint(dataView, offset, 4);
+		const type = readString(dataView, offset + 4, 4);
+
+		if (this.cursor + size > dataView.byteLength) {
+			this.truncated = true;
+
+			return {
+				size,
+				type,
+				value: new Error('Truncated box'),
+			};
+		}
+
+		this.offset += 8;
+		const viewSize = size - 8;
+		const value = (this.bytesRemaining < viewSize) ? null : this.slice(viewSize);
 
 		return {
 			size,
@@ -172,7 +185,7 @@ export class IsoView {
 		for (const box of this) {
 			result.push(box);
 
-			if (result.length >= length) {
+			if (length > 0 && result.length >= length) {
 				break;
 			}
 		}
@@ -192,18 +205,27 @@ export class IsoView {
 
 	*[Symbol.iterator](): Generator<Box> {
 		const { parsers = {}, recursive = false } = this.config;
+		const parse = (type: string, bodyView: IsoView) => {
+			const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
+
+			if (parser) {
+				return parser(bodyView, this.config);
+			}
+
+			return bodyView;
+		};
 
 		while (!this.done) {
 			const { size, type, value: bodyView } = this.readBox();
-			const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
 
-			let value: any = bodyView;
+			if (bodyView instanceof Error) {
+				return { size, type, value: bodyView };
+			};
 
-			if (parser) {
-				value = parser(bodyView, this.config);
-			}
-			else if (ContainerBoxes.includes(type)) {
-				value = [];
+			let value: any = parse(type, bodyView);
+
+			if (ContainerBoxes.includes(type)) {
+				value = Array.isArray(value) ? value : [];
 
 				for (const box of bodyView) {
 					if (recursive) {

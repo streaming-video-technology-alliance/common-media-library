@@ -3,19 +3,19 @@ export function readInt(dataView: DataView, offset: number, size: number): numbe
 	const cursor = offset - dataView.byteOffset;
 
 	switch (size) {
-		case 8:
+		case 1:
 			result = dataView.getInt8(cursor);
 			break;
 
-		case 16:
+		case 2:
 			result = dataView.getInt16(cursor);
 			break;
 
-		case 32:
+		case 4:
 			result = dataView.getInt32(cursor);
 			break;
 
-		case 64:
+		case 8:
 			// Warning: JavaScript cannot handle 64-bit integers natively.
 			// This will give unexpected results for integers >= 2^53
 			const s1 = dataView.getInt32(cursor);

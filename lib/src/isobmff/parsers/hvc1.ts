@@ -1,4 +1,4 @@
-import type { BoxParser } from '../BoxParser.js';
+import type { IsoView } from '../IsoView.js';
 import { avc1, type VisualSampleEntry } from './avc1.js';
 
 /**
@@ -12,4 +12,6 @@ import { avc1, type VisualSampleEntry } from './avc1.js';
  *
  * @beta
  */
-export const hvc1: BoxParser<VisualSampleEntry> = avc1;
+export function hvc1(view: IsoView): VisualSampleEntry {
+	return avc1(view);
+}

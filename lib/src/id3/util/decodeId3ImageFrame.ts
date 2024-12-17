@@ -1,8 +1,8 @@
+import { utf8ArrayToStr } from '../../utils.js';
 import type { DecodedId3Frame } from '../DecodedId3Frame.js';
 import type { RawId3Frame } from './RawFrame.js';
-import { toUint8 } from './utf8.js';
 import { toArrayBuffer } from './toArrayBuffer.js';
-import { utf8ArrayToStr } from '../../utils.js'; 
+import { toUint8 } from './utf8.js';
 
 type MetadataFrame = {
 	key: string;
@@ -54,7 +54,7 @@ export function decodeId3ImageFrame(
 		data = utf8ArrayToStr(
 			toUint8(frame.data, 4 + mimeTypeEndIndex + descriptionEndIndex),
 		);
-	} 
+	}
 	else {
 		data = toArrayBuffer(
 			frame.data.subarray(4 + mimeTypeEndIndex + descriptionEndIndex),

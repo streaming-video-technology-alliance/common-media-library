@@ -13,7 +13,7 @@ function createId3Size(size: number) {
 }
 
 export function createId3(type: string, data: Uint8Array): Uint8Array {
-	return new Uint8Array([
+	const id3 = new Uint8Array([
 		////////////
 		// Header //
 		////////////
@@ -46,4 +46,8 @@ export function createId3(type: string, data: Uint8Array): Uint8Array {
 		// Payload
 		...data,
 	]);
+
+	console.log('ID3_BYTES', id3);
+
+	return id3;
 }

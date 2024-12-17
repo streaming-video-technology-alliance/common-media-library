@@ -4,6 +4,24 @@ import { createIsoView } from './createIsoView.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
 
+function find(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter): Box | null {
+	for (const box of iterator) {
+		if (fn(box)) {
+			return box;
+		}
+
+		if (recursive && Array.isArray(box.value)) {
+			const result = find(box.value, recursive, fn);
+
+			if (result) {
+				return result;
+			}
+		}
+	}
+
+	return null;
+
+}
 /**
  * Find a box from an IsoView that matches a filter function
  *
@@ -18,11 +36,5 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  * @beta
  */
 export function findBox<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T> | null {
-	for (const box of createIsoView(raw, config)) {
-		if (fn(box)) {
-			return box;
-		}
-	}
-
-	return null;
+	return find(createIsoView(raw, { ...config, recursive: false }), !!config.recursive, fn);
 }
