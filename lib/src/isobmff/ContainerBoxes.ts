@@ -11,7 +11,6 @@ export const ContainerBoxes: string[] = [
 	'moof',
 	'moov',
 	'mvex',
-	// 'prsl',
 	'schi',
 	'sinf',
 	'stbl',
