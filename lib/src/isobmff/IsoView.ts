@@ -205,15 +205,6 @@ export class IsoView {
 
 	*[Symbol.iterator](): Generator<Box> {
 		const { parsers = {}, recursive = false } = this.config;
-		const parse = (type: string, bodyView: IsoView) => {
-			const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
-
-			if (parser) {
-				return parser(bodyView, this.config);
-			}
-
-			return bodyView;
-		};
 
 		while (!this.done) {
 			const { size, type, value: bodyView } = this.readBox();
@@ -222,10 +213,14 @@ export class IsoView {
 				return { size, type, value: bodyView };
 			};
 
-			let value: any = parse(type, bodyView);
+			let value: any = bodyView;
+			const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
 
-			if (ContainerBoxes.includes(type)) {
-				value = Array.isArray(value) ? value : [];
+			if (parser) {
+				value = parser(bodyView, this.config);
+			}
+			else if (ContainerBoxes.includes(type)) {
+				value = [];
 
 				for (const box of bodyView) {
 					if (recursive) {
