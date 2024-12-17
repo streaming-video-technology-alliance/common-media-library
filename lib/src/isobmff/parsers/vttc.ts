@@ -22,8 +22,8 @@ export type WebVTTConfigurationBox = {
  *
  * @beta
  */
-export function vttc(view: IsoView): WebVTTConfigurationBox {
+export function vttC(view: IsoView): WebVTTConfigurationBox {
 	return {
-		config: view.readUtf8(-1),
+		config: view.readUtf8(),
 	};
 };

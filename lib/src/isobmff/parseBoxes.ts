@@ -1,5 +1,4 @@
 import type { Box } from './Box.js';
-import { ContainerBoxes } from './ContainerBoxes.js';
 import { createIsoView } from './createIsoView.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
@@ -16,21 +15,11 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function parseBoxes(raw: IsoData, config: IsoViewConfig): Box[] {
-	const { parsers = {} } = config;
-	const isoView = createIsoView(raw, config);
+export function parseBoxes(raw: IsoData, config?: IsoViewConfig): Box[] {
 	const boxes = [];
 
-	while (!isoView.done) {
-		const { size, type, value: bodyView } = isoView.readBox();
-		const parser = parsers[type];
-		const value = parser ? parser(bodyView, config) : ContainerBoxes.includes(type) ? parseBoxes(bodyView, config) : bodyView;
-
-		boxes.push({
-			type,
-			size,
-			value,
-		});
+	for (const box of createIsoView(raw, config)) {
+		boxes.push(box);
 	}
 
 	return boxes;
