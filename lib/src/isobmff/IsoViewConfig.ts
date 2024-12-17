@@ -11,10 +11,10 @@ export type IsoViewConfig = {
 	/**
 	 * A map of box parsers to their box types
 	 */
-	parsers: BoxParserMap;
+	parsers?: BoxParserMap;
 
 	/**
 	 * Whether to parse boxes recursively
 	 */
-	recursive: boolean;
+	recursive?: boolean;
 };
