@@ -10,8 +10,8 @@ function find(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter): Box |
 			return box;
 		}
 
-		if (recursive && Array.isArray(box.value)) {
-			const result = find(box.value, recursive, fn);
+		if (recursive && Array.isArray(box.boxes)) {
+			const result = find(box.boxes, recursive, fn);
 
 			if (result) {
 				return result;
@@ -20,8 +20,8 @@ function find(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter): Box |
 	}
 
 	return null;
-
 }
+
 /**
  * Find a box from an IsoView that matches a filter function
  *
@@ -35,6 +35,6 @@ function find(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter): Box |
  *
  * @beta
  */
-export function findBox<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T> | null {
+export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box | null {
 	return find(createIsoView(raw, { ...config, recursive: false }), !!config.recursive, fn);
 }

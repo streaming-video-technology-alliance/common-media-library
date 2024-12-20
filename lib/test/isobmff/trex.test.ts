@@ -8,18 +8,18 @@ describe('trex box', function () {
 
 		assert.strictEqual(boxes[0].type, 'trex');
 		assert.strictEqual(boxes[0].size, 32);
-		assert.strictEqual(boxes[0].value.trackId, 1);
-		assert.strictEqual(boxes[0].value.defaultSampleDescriptionIndex, 1);
-		assert.strictEqual(boxes[0].value.defaultSampleDuration, 0);
-		assert.strictEqual(boxes[0].value.defaultSampleSize, 0);
-		assert.strictEqual(boxes[0].value.defaultSampleFlags, 0);
+		assert.strictEqual(boxes[0].trackId, 1);
+		assert.strictEqual(boxes[0].defaultSampleDescriptionIndex, 1);
+		assert.strictEqual(boxes[0].defaultSampleDuration, 0);
+		assert.strictEqual(boxes[0].defaultSampleSize, 0);
+		assert.strictEqual(boxes[0].defaultSampleFlags, 0);
 
 		assert.strictEqual(boxes[1].type, 'trex');
 		assert.strictEqual(boxes[1].size, 32);
-		assert.strictEqual(boxes[1].value.trackId, 2);
-		assert.strictEqual(boxes[1].value.defaultSampleDescriptionIndex, 1);
-		assert.strictEqual(boxes[1].value.defaultSampleDuration, 0);
-		assert.strictEqual(boxes[1].value.defaultSampleSize, 0);
-		assert.strictEqual(boxes[1].value.defaultSampleFlags, 0);
+		assert.strictEqual(boxes[1].trackId, 2);
+		assert.strictEqual(boxes[1].defaultSampleDescriptionIndex, 1);
+		assert.strictEqual(boxes[1].defaultSampleDuration, 0);
+		assert.strictEqual(boxes[1].defaultSampleSize, 0);
+		assert.strictEqual(boxes[1].defaultSampleFlags, 0);
 	});
 });

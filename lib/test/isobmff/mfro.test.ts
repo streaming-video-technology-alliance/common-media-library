@@ -7,6 +7,6 @@ describe('mfro box', function () {
 
 		assert.strictEqual(box.type, 'mfro');
 		assert.strictEqual(box.size, 16);
-		assert.strictEqual(box.value.size, 105);
+		assert.strictEqual(box.mfra_size, 105);
 	});
 });

@@ -7,4 +7,4 @@ import type { Box } from './Box.js';
  *
  * @beta
  */
-export type BoxFilter<T = any> = (box: Box<T>) => boolean;
+export type BoxFilter = (box: Box) => boolean;

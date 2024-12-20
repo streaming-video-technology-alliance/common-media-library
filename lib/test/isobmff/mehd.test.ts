@@ -7,6 +7,6 @@ describe('mehd box', function () {
 
 		assert.strictEqual(box.type, 'mehd');
 		assert.strictEqual(box.size, 16);
-		assert.strictEqual(box.value.fragmentDuration, 2047);
+		assert.strictEqual(box.fragmentDuration, 2047);
 	});
 });

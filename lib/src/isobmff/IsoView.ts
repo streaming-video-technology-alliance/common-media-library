@@ -18,6 +18,14 @@ import { readUint } from './readers/readUint.js';
 import { readUTF8String } from './readers/readUTF8String.js';
 import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js';
 
+type RawBox = {
+	type: string;
+	size: number;
+	largesize?: number;
+	usertype?: number[];
+	data: IsoView;
+}
+
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
  * It implements the iterator protocol, so it can be used in a for...of loop.
@@ -151,32 +159,39 @@ export class IsoView {
 		return value as ISOFieldTypeMap[T][];
 	};
 
-	readBox = (): Box => {
+	readBox = (): RawBox => {
 		const { dataView, offset } = this;
 
 		// read box size and type without advancing the cursor in case the box is truncated
-		const size = readUint(dataView, offset, 4);
-		const type = readString(dataView, offset + 4, 4);
+		let cursor = 0;
 
-		if (this.cursor + size > dataView.byteLength) {
-			this.truncated = true;
+		const box = {
+			size: readUint(dataView, offset, 4),
+			type: readString(dataView, offset + 4, 4),
+		} as RawBox;
 
-			return {
-				size,
-				type,
-				value: new Error('Truncated box'),
-			};
+		cursor += 8;
+
+		if (box.size === 1) {
+			box.largesize = readUint(dataView, offset + cursor, 8);
+			cursor += 8;
 		}
 
-		this.offset += 8;
-		const viewSize = size - 8;
-		const value = (this.bytesRemaining < viewSize) ? null : this.slice(viewSize);
+		const actualSize = box.largesize || box.size;
+		if (this.cursor + actualSize > dataView.byteLength) {
+			this.truncated = true;
+			throw new Error('Truncated box');
+		}
 
-		return {
-			size,
-			type,
-			value,
-		};
+		this.offset += cursor;
+		if (box.type === 'uuid') {
+			box.usertype = this.readArray('uint', 1, 16);
+		}
+
+		const viewSize = box.size === 0 ? this.bytesRemaining : actualSize - cursor;
+		box.data = this.slice(viewSize);
+
+		return box;
 	};
 
 	readBoxes = (length: number): Box[] => {
@@ -207,35 +222,33 @@ export class IsoView {
 		const { parsers = {}, recursive = false } = this.config;
 
 		while (!this.done) {
-			const { size, type, value: bodyView } = this.readBox();
+			try {
+				const { type, data, ...rest } = this.readBox();
+				const box = { type, ...rest } as Box;
+				const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
+				if (parser) {
+					Object.assign(box, parser(data, this.config));
+				}
 
-			if (bodyView instanceof Error) {
-				return { size, type, value: bodyView };
-			};
+				if (ContainerBoxes.includes(type)) {
+					const boxes = [];
 
-			let value: any = bodyView;
-			const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
+					for (const child of data) {
+						if (recursive) {
+							yield child;
+						}
 
-			if (parser) {
-				value = parser(bodyView, this.config);
-			}
-			else if (ContainerBoxes.includes(type)) {
-				value = [];
-
-				for (const box of bodyView) {
-					if (recursive) {
-						yield box;
+						boxes.push(child);
 					}
 
-					value.push(box);
+					box.boxes = boxes;
 				}
-			}
 
-			yield {
-				type,
-				size,
-				value,
-			};
+				yield box;
+			}
+			catch (error) {
+				break;
+			}
 		}
 	}
 }
