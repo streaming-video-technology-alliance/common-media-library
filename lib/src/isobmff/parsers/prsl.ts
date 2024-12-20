@@ -1,4 +1,3 @@
-import type { Box } from '../Box.js';
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
@@ -21,7 +20,7 @@ export type Entity = {
  *
  * @beta
  */
-export type PreselectionGroupBox = FullBox & Array<Box> & {
+export type PreselectionGroupBox = FullBox & {
 	/** Group ID */
 	groupId: number;
 
@@ -57,9 +56,8 @@ export function prsl(view: IsoView): PreselectionGroupBox {
 	const preselectionTag = flags & 0x1000 ? view.readUtf8(-1) : undefined;
 	const selectionPriority = flags & 0x2000 ? view.readUint(1) : undefined;
 	const interleavingTag = flags & 0x4000 ? view.readUtf8(-1) : undefined;
-	const boxes = view.readBoxes(-1);
 
-	return Object.assign(boxes, {
+	return {
 		version,
 		flags,
 		groupId,
@@ -68,5 +66,5 @@ export function prsl(view: IsoView): PreselectionGroupBox {
 		preselectionTag,
 		selectionPriority,
 		interleavingTag,
-	});
+	};
 }

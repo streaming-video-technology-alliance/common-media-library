@@ -9,7 +9,7 @@ import type { IsoView } from '../IsoView.js';
  * @beta
  */
 export type MovieFragmentRandomAccessBox = FullBox & {
-	size: number;
+	mfra_size: number;
 }
 
 /**
@@ -26,7 +26,7 @@ export type MovieFragmentRandomAccessBox = FullBox & {
 export function mfro(view: IsoView): MovieFragmentRandomAccessBox {
 	return {
 		...view.readFullBox(),
-		size: view.readUint(4),
+		mfra_size: view.readUint(4),
 	};
 };
 

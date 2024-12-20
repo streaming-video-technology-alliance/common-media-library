@@ -8,11 +8,11 @@ describe('stts box', function () {
 		assert.strictEqual(boxes.length, 1);
 
 		assert.strictEqual(box.type, 'stts');
-		assert.strictEqual(box.value.entryCount, 2);
-		assert.strictEqual(box.value.entries.length, 2);
-		assert.strictEqual(box.value.entries[0].sampleCount, 47);
-		assert.strictEqual(box.value.entries[0].sampleDelta, 1024);
-		assert.strictEqual(box.value.entries[1].sampleCount, 1);
-		assert.strictEqual(box.value.entries[1].sampleDelta, 896);
+		assert.strictEqual(box.entryCount, 2);
+		assert.strictEqual(box.entries.length, 2);
+		assert.strictEqual(box.entries[0].sampleCount, 47);
+		assert.strictEqual(box.entries[0].sampleDelta, 1024);
+		assert.strictEqual(box.entries[1].sampleCount, 1);
+		assert.strictEqual(box.entries[1].sampleDelta, 896);
 	});
 });

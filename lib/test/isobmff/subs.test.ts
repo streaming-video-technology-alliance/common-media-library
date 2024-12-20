@@ -7,7 +7,7 @@ describe('subs box', function () {
 		assert.strictEqual(boxes.length, 1);
 		assert.strictEqual(boxes[0].type, 'subs');
 
-		const { entries } = boxes[0].value;
+		const { entries } = boxes[0];
 		assert.strictEqual(entries.length, 1);
 
 		const entry = entries[0];

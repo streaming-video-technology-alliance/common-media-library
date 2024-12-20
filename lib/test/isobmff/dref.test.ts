@@ -7,12 +7,12 @@ describe('dref box', function () {
 
 		const box = boxes[0];
 		assert.strictEqual(box.type, 'dref');
-		assert.strictEqual(box.value.entries.length, 1);
+		assert.strictEqual(box.entries.length, 1);
 
-		const entry = box.value.entries[0];
+		const entry = box.entries[0];
 		assert.strictEqual(entry.type, 'url ');
-		assert.strictEqual(entry.value.version, 0);
-		assert.strictEqual(entry.value.flags, 1);
-		assert.strictEqual(entry.value.location, '');
+		assert.strictEqual(entry.version, 0);
+		assert.strictEqual(entry.flags, 1);
+		assert.strictEqual(entry.location, '');
 	});
 });

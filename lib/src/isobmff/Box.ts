@@ -5,8 +5,10 @@
  *
  * @beta
  */
-export type Box<V = any> = {
+export type Box<T = any> = T & {
 	type: string;
 	size: number;
-	value: V;
+	largesize?: number;
+	usertype?: number[];
+	boxes?: Box[];
 }
