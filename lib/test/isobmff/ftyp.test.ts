@@ -6,8 +6,8 @@ describe('ftyp box', function () {
 
 		assert.strictEqual(box.type, 'ftyp');
 		assert.strictEqual(box.size, 20);
-		assert.strictEqual(box.value.majorBrand, 'isom');
-		assert.strictEqual(box.value.minorVersion, 1);
-		assert.deepStrictEqual(box.value.compatibleBrands, ['isom']);
+		assert.strictEqual(box.majorBrand, 'isom');
+		assert.strictEqual(box.minorVersion, 1);
+		assert.deepStrictEqual(box.compatibleBrands, ['isom']);
 	});
 });

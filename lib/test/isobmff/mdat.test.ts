@@ -7,6 +7,6 @@ describe('mdat box', function () {
 
 		assert.strictEqual(box.type, 'mdat');
 		assert.strictEqual(box.size, 21530);
-		assert.strictEqual(box.value.data.byteLength, 21522);
+		assert.strictEqual(box.data.byteLength, 21522);
 	});
 });

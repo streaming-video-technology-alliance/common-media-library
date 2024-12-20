@@ -5,7 +5,7 @@ describe('kind box', function () {
 		const box = findBox<any>('SRMP_AC4.mp4', [kind, meta, prsl]);
 
 		assert.strictEqual(box.type, 'kind');
-		assert.strictEqual(box.value.schemeUri, 'urn:mpeg:dash:role:2011');
-		assert.strictEqual(box.value.value, 'main');
+		assert.strictEqual(box.schemeUri, 'urn:mpeg:dash:role:2011');
+		assert.strictEqual(box.value, 'main');
 	});
 });

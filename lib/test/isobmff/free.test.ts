@@ -6,6 +6,6 @@ describe('free box', () => {
 
 		assert.strictEqual(box.type, 'free');
 		assert.strictEqual(box.size, 59);
-		assert.strictEqual(box.value.data.length, 51);
+		assert.strictEqual(box.data.length, 51);
 	});
 });

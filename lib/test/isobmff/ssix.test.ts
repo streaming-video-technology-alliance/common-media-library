@@ -6,12 +6,12 @@ describe('ssix box', function () {
 
 		assert.strictEqual(box.type, 'ssix');
 		assert.strictEqual(box.size, 8124);
-		assert.strictEqual(box.value.subsegmentCount, 25);
-		assert.strictEqual(box.value.subsegments.length, 25);
+		assert.strictEqual(box.subsegmentCount, 25);
+		assert.strictEqual(box.subsegments.length, 25);
 
 		// Test one of the subsegments
-		assert.strictEqual(box.value.subsegments[0].rangesCount, 70);
-		assert.strictEqual(box.value.subsegments[0].ranges[45].level, 2);
-		assert.strictEqual(box.value.subsegments[0].ranges[45].rangeSize, 7312);
+		assert.strictEqual(box.subsegments[0].rangesCount, 70);
+		assert.strictEqual(box.subsegments[0].ranges[45].level, 2);
+		assert.strictEqual(box.subsegments[0].ranges[45].rangeSize, 7312);
 	});
 });

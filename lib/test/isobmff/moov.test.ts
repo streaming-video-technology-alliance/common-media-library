@@ -7,6 +7,6 @@ describe('moov box', function () {
 		assert.ok(box);
 		assert.strictEqual(box.type, 'moov');
 		assert.strictEqual(box.size, 1028);
-		assert.strictEqual(box.value.length, 2);
+		assert.strictEqual(box.boxes.length, 2);
 	});
 });

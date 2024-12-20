@@ -5,6 +5,6 @@ describe('smhd box', function () {
 		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', smhd);
 		assert.strictEqual(boxes.length, 1);
 		assert.strictEqual(boxes[0].type, 'smhd');
-		assert.strictEqual(boxes[0].value.balance, 0.0);
+		assert.strictEqual(boxes[0].balance, 0.0);
 	});
 });

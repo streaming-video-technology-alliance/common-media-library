@@ -5,6 +5,6 @@ describe('elng box', function () {
 		const box = findBox<any>('SRMP_AC4.mp4', [elng, meta, prsl]);
 
 		assert.strictEqual(box.type, 'elng');
-		assert.strictEqual(box.value.extendedLanguage.localeCompare('en'), 0);
+		assert.strictEqual(box.extendedLanguage.localeCompare('en'), 0);
 	});
 });

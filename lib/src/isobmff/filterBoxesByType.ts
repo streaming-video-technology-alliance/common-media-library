@@ -16,6 +16,6 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function filterBoxesByType<T = any>(type: string, raw: IsoData, config: IsoViewConfig): Box<T>[] {
+export function filterBoxesByType(type: string, raw: IsoData, config: IsoViewConfig): Box[] {
 	return filterBoxes(raw, config, box => box.type === type);
 }

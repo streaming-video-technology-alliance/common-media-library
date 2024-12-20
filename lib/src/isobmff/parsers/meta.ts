@@ -1,4 +1,3 @@
-import type { Box } from '../Box.js';
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
@@ -9,7 +8,7 @@ import type { IsoView } from '../IsoView.js';
  *
  * @beta
  */
-export type MetaBox = FullBox & Array<Box<any>[]>;
+export type MetaBox = FullBox;
 
 /**
  * Parse a MetaBox from an IsoView
@@ -23,10 +22,5 @@ export type MetaBox = FullBox & Array<Box<any>[]>;
  * @beta
  */
 export function meta(view: IsoView): MetaBox {
-	const { version, flags } = view.readFullBox();
-	const boxes = view.readBoxes(-1) as any;
-	boxes.version = version;
-	boxes.flags = flags;
-
-	return boxes as MetaBox;
+	return view.readFullBox();
 };

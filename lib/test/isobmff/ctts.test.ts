@@ -9,9 +9,9 @@ describe('ctts box', function () {
 
 		assert.strictEqual(box.type, 'ctts');
 
-		assert.strictEqual(box.value.entryCount, 5);
+		assert.strictEqual(box.entryCount, 5);
 
-		const { entries } = box.value;
+		const { entries } = box;
 		assert.strictEqual(entries.length, 5);
 		assert.strictEqual(entries[0].sampleCount, 1);
 		assert.strictEqual(entries[0].sampleOffset, 1024);
