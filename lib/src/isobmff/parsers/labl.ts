@@ -11,7 +11,7 @@ import type { IsoView } from '../IsoView.js';
 export type LabelBox = FullBox & {
 	isGroupLabel: boolean;
 	labelId: number;
-	langauge: string;
+	language: string;
 	label: string;
 }
 
@@ -34,7 +34,7 @@ export function labl(view: IsoView): LabelBox {
 		flags,
 		isGroupLabel: (flags & 0x1) !== 0,
 		labelId: view.readUint(2),
-		langauge: view.readUtf8(-1),
+		language: view.readUtf8(-1),
 		label: view.readUtf8(-1),
 	};
 }
