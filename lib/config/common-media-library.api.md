@@ -98,14 +98,16 @@ export function base64decode(str: string): Uint8Array;
 export function base64encode(binary: Uint8Array): string;
 
 // @beta
-export type Box<V = any> = {
+export type Box<T = any> = T & {
     type: string;
     size: number;
-    value: V;
+    largesize?: number;
+    usertype?: number[];
+    boxes?: Box[];
 };
 
 // @beta
-export type BoxFilter<T = any> = (box: Box<T>) => boolean;
+export type BoxFilter = (box: Box) => boolean;
 
 // @beta
 export type BoxParser<V = any> = (view: IsoView, config?: IsoViewConfig) => V;
@@ -643,16 +645,16 @@ export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Ar
 export type FileTypeBox = TypeBox;
 
 // @beta
-export function filterBoxes<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T>[];
+export function filterBoxes(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box[];
 
 // @beta
-export function filterBoxesByType<T = any>(type: string, raw: IsoData, config: IsoViewConfig): Box<T>[];
+export function filterBoxesByType(type: string, raw: IsoData, config: IsoViewConfig): Box[];
 
 // @beta
-export function findBox<T = any>(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box<T> | null;
+export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box | null;
 
 // @beta
-export function findBoxByType<T = any>(type: string, raw: IsoData, config: IsoViewConfig): Box<T> | null;
+export function findBoxByType(type: string, raw: IsoData, config: IsoViewConfig): Box | null;
 
 // @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
@@ -803,8 +805,10 @@ export class IsoView {
     get done(): boolean;
     // (undocumented)
     readArray: <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number) => ISOFieldTypeMap[T][];
+    // Warning: (ae-forgotten-export) The symbol "RawBox" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    readBox: () => Box;
+    readBox: () => RawBox;
     // (undocumented)
     readBoxes: (length: number) => Box[];
     // (undocumented)
@@ -892,7 +896,7 @@ export function mehd(view: IsoView): MovieExtendsHeaderBox;
 export function meta(view: IsoView): MetaBox;
 
 // @beta
-export type MetaBox = FullBox & Array<Box<any>[]>;
+export type MetaBox = FullBox;
 
 // @beta
 export function mfhd(view: IsoView): MovieFragmentHeaderBox;
@@ -912,7 +916,7 @@ export type MovieFragmentHeaderBox = FullBox & {
 
 // @beta
 export type MovieFragmentRandomAccessBox = FullBox & {
-    size: number;
+    mfra_size: number;
 };
 
 // @beta
@@ -1016,7 +1020,7 @@ export type PlayList = {
 };
 
 // @beta
-export type PreselectionGroupBox = FullBox & Array<Box> & {
+export type PreselectionGroupBox = FullBox & {
     groupId: number;
     numEntitiesInGroup: number;
     entities: Entity[];
