@@ -9,7 +9,7 @@
 	"exclude": [
 		"**/node_modules",
 		"**/dist",
-		"**/samples"		
+		"**/samples"
 	],
 	"include": [
 		"**/*.js"
