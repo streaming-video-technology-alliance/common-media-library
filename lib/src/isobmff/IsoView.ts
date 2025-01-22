@@ -87,7 +87,7 @@ export class IsoView {
 			case STRING:
 				if (size === -1) {
 					result = readTerminatedString(dataView, offset);
-					cursor = result.length;
+					cursor = result.length + 1;
 				}
 				else {
 					result = readString(dataView, offset, size);
