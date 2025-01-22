@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- ISO BMFF parser and utilities [#118](https://github.com/streaming-video-technology-alliance/common-media-library/issues/118)
+
 
 ## [0.7.4] - 2024-11-05
 

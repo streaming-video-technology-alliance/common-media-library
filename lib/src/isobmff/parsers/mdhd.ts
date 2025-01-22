@@ -28,7 +28,17 @@ export type MediaHeaderBox = FullBox & {
 	preDefined: number;
 }
 
-// ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
+/**
+ * Parse a MediaHeaderBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed MediaHeaderBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function mdhd(view: IsoView): MediaHeaderBox {
 	const { version, flags } = view.readFullBox();
 

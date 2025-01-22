@@ -18,7 +18,14 @@ import { readUint } from './readers/readUint.js';
 import { readUTF8String } from './readers/readUTF8String.js';
 import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js';
 
-type RawBox = {
+/**
+ * Raw ISO BMFF data box.
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
+export type RawBox = {
 	type: string;
 	size: number;
 	largesize?: number;
