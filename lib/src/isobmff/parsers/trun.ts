@@ -1,6 +1,13 @@
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
 
+/**
+ * Track run sample
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type TrackRunSample = {
 	sampleDuration?: number;
 	sampleSize?: number;
@@ -25,7 +32,17 @@ export type TrackRunBox = FullBox & {
 	samples: TrackRunSample[];
 };
 
-// ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box
+/**
+ * Parse a TrackRunBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed TrackRunBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function trun(view: IsoView): TrackRunBox {
 	const { version, flags } = view.readFullBox();
 	const sampleCount = view.readUint(4);

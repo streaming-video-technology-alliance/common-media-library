@@ -1,6 +1,13 @@
 import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView';
 
+/**
+ * Track fragment random access entry
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export type TrackFragmentRandomAccessEntry = {
 	time: number;
 	moofOffset: number;
@@ -26,7 +33,17 @@ export type TrackFragmentRandomAccessBox = FullBox & {
 	entries: TrackFragmentRandomAccessEntry[];
 };
 
-// ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
+/**
+ * Parse a TrackFragmentRandomAccessBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed TrackFragmentRandomAccessBox
+ *
+ * @group ISOBMFF
+ *
+ * @beta
+ */
 export function tfra(view: IsoView): TrackFragmentRandomAccessBox {
 	const { version, flags } = view.readFullBox();
 	const trackId = view.readUint(4);

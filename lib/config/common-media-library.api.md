@@ -555,9 +555,15 @@ export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem;
 export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember[];
 
 // @beta
+export type DecodingTimeSample = {
+    sampleCount: number;
+    sampleDelta: number;
+};
+
+// @beta
 export type DecodingTimeToSampleBox = FullBox & {
     entryCount: number;
-    entries: Sample[];
+    entries: DecodingTimeSample[];
 };
 
 // @beta
@@ -648,13 +654,13 @@ export type FileTypeBox = TypeBox;
 export function filterBoxes(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box[];
 
 // @beta
-export function filterBoxesByType(type: string, raw: IsoData, config: IsoViewConfig): Box[];
+export function filterBoxesByType(type: string, raw: IsoData, config?: IsoViewConfig): Box[];
 
 // @beta
 export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box | null;
 
 // @beta
-export function findBoxByType(type: string, raw: IsoData, config: IsoViewConfig): Box | null;
+export function findBoxByType(type: string, raw: IsoData, config?: IsoViewConfig): Box | null;
 
 // @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
@@ -805,8 +811,6 @@ export class IsoView {
     get done(): boolean;
     // (undocumented)
     readArray: <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number) => ISOFieldTypeMap[T][];
-    // Warning: (ae-forgotten-export) The symbol "RawBox" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     readBox: () => RawBox;
     // (undocumented)
@@ -844,7 +848,7 @@ export function kind(view: IsoView): TrackKindBox;
 export type LabelBox = FullBox & {
     isGroupLabel: boolean;
     labelId: number;
-    langauge: string;
+    language: string;
     label: string;
 };
 
@@ -867,6 +871,9 @@ export type ManifestFormat = 'hls' | 'dash';
 export function mdat(view: IsoView): MediaDataBox;
 
 // @beta
+export function mdhd(view: IsoView): MediaHeaderBox;
+
+// @beta
 export type MediaDataBox = {
     data: Uint8Array;
 };
@@ -887,6 +894,16 @@ export type MediaGroups = {
             };
         };
     };
+};
+
+// @beta
+export type MediaHeaderBox = FullBox & {
+    creationTime: number;
+    modificationTime: number;
+    timescale: number;
+    duration: number;
+    language: string;
+    preDefined: number;
 };
 
 // @beta
@@ -1066,6 +1083,15 @@ type Range_2 = {
 export { Range_2 as Range }
 
 // @beta
+export type RawBox = {
+    type: string;
+    size: number;
+    largesize?: number;
+    usertype?: number[];
+    data: IsoView;
+};
+
+// @beta
 export type Reference = {
     reference: number;
     subsegmentDuration: number;
@@ -1154,12 +1180,6 @@ export class Row {
     // (undocumented)
     setPenStyles(styles: Partial<PenStyles>): void;
 }
-
-// @beta
-export type Sample = {
-    sampleCount: number;
-    sampleDelta: number;
-};
 
 // @beta
 export type SampleDependencyTypeBox = FullBox & {
@@ -1374,10 +1394,16 @@ export type SoundMediaHeaderBox = FullBox & {
 export function ssix(view: IsoView): SubsegmentIndexBox;
 
 // @beta
+export function sthd(view: IsoView): SubtitleMediaHeaderBox;
+
+// @beta
 export const STRING = "string";
 
 // @beta
 export function stsd(view: IsoView): SampleDescriptionBox;
+
+// @beta
+export function stss(view: IsoView): SyncSampleBox;
 
 // @beta
 export function sttg(view: IsoView): WebVTTSettingsBox;
@@ -1445,11 +1471,25 @@ export type SubsegmentIndexBox = FullBox & {
 };
 
 // @beta
+export type SubtitleMediaHeaderBox = FullBox;
+
+// @beta
 export type SupportedField = 1 | 3;
 
 // @alpha
 export type SwitchingSet = Ham & {
     tracks: Track[];
+};
+
+// @beta
+export type SyncSample = {
+    sampleNumber: number;
+};
+
+// @beta
+export type SyncSampleBox = FullBox & {
+    entryCount: number;
+    entries: SyncSample[];
 };
 
 // @beta
@@ -1467,6 +1507,9 @@ export function tfdt(view: IsoView): TrackFragmentDecodeTimeBox;
 
 // @beta
 export function tfhd(view: IsoView): TrackFragmentHeaderBox;
+
+// @beta
+export function tfra(view: IsoView): TrackFragmentRandomAccessBox;
 
 // @beta
 export function tkhd(view: IsoView): TrackHeaderBox;
@@ -1525,6 +1568,26 @@ export type TrackFragmentHeaderBox = FullBox & {
 };
 
 // @beta
+export type TrackFragmentRandomAccessBox = FullBox & {
+    trackId: number;
+    reserved: number;
+    numberOfEntry: number;
+    lengthSizeOfTrafNum: number;
+    lengthSizeOfTrunNum: number;
+    lengthSizeOfSampleNum: number;
+    entries: TrackFragmentRandomAccessEntry[];
+};
+
+// @beta
+export type TrackFragmentRandomAccessEntry = {
+    time: number;
+    moofOffset: number;
+    trafNumber: number;
+    trunNumber: number;
+    sampleNumber: number;
+};
+
+// @beta
 export type TrackHeaderBox = FullBox & {
     creationTime: number;
     modificationTime: number;
@@ -1547,11 +1610,30 @@ export type TrackKindBox = FullBox & {
     value: string;
 };
 
+// @beta
+export type TrackRunBox = FullBox & {
+    sampleCount: number;
+    dataOffset?: number;
+    firstSampleFlags?: number;
+    samples: TrackRunSample[];
+};
+
+// @beta
+export type TrackRunSample = {
+    sampleDuration?: number;
+    sampleSize?: number;
+    sampleFlags?: number;
+    sampleCompositionTimeOffset?: number;
+};
+
 // @alpha
 export type TrackType = 'audio' | 'video' | 'text';
 
 // @beta
 export function trex(view: IsoView): TrackExtendsBox;
+
+// @beta
+export function trun(view: IsoView): TrackRunBox;
 
 // @beta
 export type TypeBox = {
