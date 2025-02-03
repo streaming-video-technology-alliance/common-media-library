@@ -93,7 +93,12 @@ export function parseXml(input: string, options: ParseOptions = {}): XmlChildren
 						// cdata
 						const cdataEndIndex = input.indexOf(']]>', pos);
 						if (cdataEndIndex == -1) {
-							throw new Error('CDATA not closed');
+							children.push(input.substr(pos + 9));
+							pos = length;
+						}
+						else {
+							children.push(input.substring(pos + 9, cdataEndIndex));
+							pos = cdataEndIndex + 3;
 						}
 
 						children.push(input.substring(pos + 9, cdataEndIndex));
