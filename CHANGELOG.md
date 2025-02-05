@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add XML parsing utils [#125](https://github.com/streaming-video-technology-alliance/common-media-library/issues/125)
+
 
 ## [0.7.4] - 2024-11-05
 

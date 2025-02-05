@@ -539,6 +539,9 @@ export type PACData = {
 };
 
 // @beta
+export function parseXml(input: string, options?: XmlParseOptions): XmlChildren;
+
+// @beta
 export class PenState {
     // (undocumented)
     background: string;
@@ -569,6 +572,11 @@ export type PenStyles = {
     italics: boolean;
     background: string;
     flash: boolean;
+};
+
+// @beta
+export type Pos = {
+    pos?: number;
 };
 
 // @alpha
@@ -782,6 +790,9 @@ export type Track = Ham & {
 export type TrackType = 'audio' | 'video' | 'text';
 
 // @beta
+export function unescapeHtml(text: string): string;
+
+// @beta
 export function urlToRelativePath(url: string, base: string): string;
 
 // @beta
@@ -844,6 +855,23 @@ export type VideoTrack = Track & {
     par: string;
     sar: string;
     scanType: string;
+};
+
+// @beta (undocumented)
+export type XmlChildren = Pos & (XmlNode | string)[];
+
+// @beta
+export type XmlNode = Pos & {
+    tagName: string;
+    attributes: Record<string, string>;
+    children: XmlChildren;
+};
+
+// @beta
+export type XmlParseOptions = {
+    pos?: number;
+    keepWhitespace?: boolean;
+    keepComments?: boolean;
 };
 
 // Warnings were encountered during analysis:

@@ -1,27 +1,64 @@
-type Pos = { pos?: number };
+import { unescapeHtml } from './unescapeHtml.js';
 
+/**
+ * Position
+ *
+ * @beta
+ */
+export type Pos = { pos?: number };
+
+/**
+ * XML node
+ *
+ * @beta
+ */
 export type XmlNode = Pos & {
 	tagName: string;
 	attributes: Record<string, string>;
 	children: XmlChildren;
 }
 
+/**
+ * @beta
+ */
 export type XmlChildren = Pos & (XmlNode | string)[];
 
-export type ParseOptions = {
+/**
+ * XML parsing options
+ *
+ * @beta
+ */
+export type XmlParseOptions = {
 	pos?: number;
 	keepWhitespace?: boolean;
 	keepComments?: boolean;
 }
 
 /**
- * parseXML / html into a DOM Object. with no validation and some failure tolerance
- * @param input - your XML to parse
- * @param options - all other options:
- * @return The parsed XML
+ * Parse XML into a JS object with no validation and some failure tolerance
+ *
+ * @param input - The input XML string
+ * @param options - Optional parsing options
+ * @returns The parsed XML
+ *
+ * @group Utils
+ *
+ * @beta
+ *
+ * @example
+ * ```ts
+ * import { parseXml } from '@svta/common-media-library/utils/parseXml';
+ *
+ * const obj = parseXml('<root><child>text</child></root>');
+ * console.log(obj[0].children[0].tagName);
+ * // -> "child"
+ * console.log(obj[0].children[0].children[0]);
+ * // -> "text"
+ * ```
  */
-export function parseXml(input: string, options: ParseOptions = {}): XmlChildren {
+export function parseXml(input: string, options: XmlParseOptions = {}): XmlChildren {
 	let pos = options.pos || 0;
+
 	const length = input.length;
 	const keepComments = !!options.keepComments;
 	const keepWhitespace = !!options.keepWhitespace;
@@ -100,9 +137,6 @@ export function parseXml(input: string, options: ParseOptions = {}): XmlChildren
 							children.push(input.substring(pos + 9, cdataEndIndex));
 							pos = cdataEndIndex + 3;
 						}
-
-						children.push(input.substring(pos + 9, cdataEndIndex));
-						pos = cdataEndIndex + 3;
 						continue;
 					}
 					else {
@@ -157,7 +191,8 @@ export function parseXml(input: string, options: ParseOptions = {}): XmlChildren
 		if (pos === -2) {
 			pos = length;
 		}
-		return input.slice(start, pos + 1);
+
+		return unescapeHtml(input.slice(start, pos + 1));
 	}
 
 	/**
