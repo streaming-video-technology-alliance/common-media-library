@@ -1,9 +1,13 @@
 {
-	"$schema": "https://typedoc.org/schema.json",
+	"$schema": "https://typedoc-plugin-markdown.org/schema.json",
 	"categorizeByGroup": true,
 	"cleanOutputDir": true,
 	"entryPoints": [
 		"../lib/src/index.ts"
+	],
+	"plugin": [
+		"typedoc-plugin-markdown",
+		"typedoc-vitepress-theme"
 	],
 	"excludeInternal": true,
 	"excludePrivate": true,
@@ -11,7 +15,10 @@
 	"navigation": {
 		"includeGroups": true
 	},
-	"out": "./dist",
+	"out": "./api",
 	"readme": "../lib/README.md",
-	"searchInComments": true
+	"searchInComments": true,
+	"parametersFormat": "htmlTable",
+	"useCodeBlocks": true,
+	"hidePageHeader": true,
 }

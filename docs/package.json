@@ -14,6 +14,16 @@
 	},
 	"scripts": {
 		"build": "typedoc",
-		"start": "npm run build && npx -y http-server dist --cors -p 8080"
+		"start": "npm run build && npx -y http-server dist --cors -p 8080",
+		"predocs": "typedoc",
+		"docs:dev": "typedoc && vitepress dev",
+		"docs:build": "vitepress build",
+		"docs:preview": "vitepress preview"
+	},
+	"devDependencies": {
+		"typedoc": "0.27.6",
+		"typedoc-plugin-markdown": "4.4.1",
+		"typedoc-vitepress-theme": "1.1.2",
+		"vitepress": "1.6.3"
 	}
 }

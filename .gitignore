@@ -4,3 +4,5 @@ temp
 .vscode
 .idea
 RELEASE.md
+*/.vitepress/cache
+docs/api
