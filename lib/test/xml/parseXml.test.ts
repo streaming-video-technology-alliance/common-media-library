@@ -5,7 +5,7 @@ import { describe, it } from 'node:test';
 
 describe('parseXml', () => {
 	it('parses DASH manifest', async () => {
-		const xml = await fs.readFile('./test/utils/fixtures/bbb_30fps.mpd', 'utf8');
+		const xml = await fs.readFile('./test/xml/fixtures/bbb_30fps.mpd', 'utf8');
 		const nodes = parseXml(xml);
 
 		equal(nodes.length, 1);
@@ -22,7 +22,7 @@ describe('parseXml', () => {
 	});
 
 	it('parses all node types', async () => {
-		const xml = await fs.readFile('./test/utils/fixtures/node_types.xml', 'utf8');
+		const xml = await fs.readFile('./test/xml/fixtures/node_types.xml', 'utf8');
 		const nodes = parseXml(xml);
 
 		equal(nodes.length, 2);

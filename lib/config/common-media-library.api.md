@@ -574,11 +574,6 @@ export type PenStyles = {
     flash: boolean;
 };
 
-// @beta
-export type Pos = {
-    pos?: number;
-};
-
 // @alpha
 export type Presentation = Ham & {
     selectionSets: SelectionSet[];
@@ -857,11 +852,11 @@ export type VideoTrack = Track & {
     scanType: string;
 };
 
-// @beta (undocumented)
-export type XmlChildren = Pos & (XmlNode | string)[];
+// @beta
+export type XmlChildren = (XmlNode | string)[];
 
 // @beta
-export type XmlNode = Pos & {
+export type XmlNode = {
     tagName: string;
     attributes: Record<string, string>;
     children: XmlChildren;

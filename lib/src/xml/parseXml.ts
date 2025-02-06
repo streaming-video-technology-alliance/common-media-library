@@ -1,38 +1,7 @@
-import { unescapeHtml } from './unescapeHtml.js';
-
-/**
- * Position
- *
- * @beta
- */
-export type Pos = { pos?: number };
-
-/**
- * XML node
- *
- * @beta
- */
-export type XmlNode = Pos & {
-	tagName: string;
-	attributes: Record<string, string>;
-	children: XmlChildren;
-}
-
-/**
- * @beta
- */
-export type XmlChildren = Pos & (XmlNode | string)[];
-
-/**
- * XML parsing options
- *
- * @beta
- */
-export type XmlParseOptions = {
-	pos?: number;
-	keepWhitespace?: boolean;
-	keepComments?: boolean;
-}
+import { unescapeHtml } from '../utils/unescapeHtml.js';
+import type { XmlChildren } from './XmlChildren.js';
+import type { XmlNode } from './XmlNode.js';
+import type { XmlParseOptions } from './XmlParseOptions.js';
 
 /**
  * Parse XML into a JS object with no validation and some failure tolerance
@@ -41,13 +10,13 @@ export type XmlParseOptions = {
  * @param options - Optional parsing options
  * @returns The parsed XML
  *
- * @group Utils
+ * @group XML
  *
  * @beta
  *
  * @example
  * ```ts
- * import { parseXml } from '@svta/common-media-library/utils/parseXml';
+ * import { parseXml } from '@svta/common-media-library/xml/parseXml.js';
  *
  * const obj = parseXml('<root><child>text</child></root>');
  * console.log(obj[0].children[0].tagName);
