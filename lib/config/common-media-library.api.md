@@ -546,6 +546,9 @@ export type DecodedId3Frame<T> = {
 };
 
 // @beta
+export function decodeIso8601Duration(isoDuration: string): number;
+
+// @beta
 export function decodeSfDict(input: string, options?: SfDecodeOptions): SfDictionary;
 
 // @beta
@@ -606,6 +609,9 @@ export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
 // @beta
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string;
+
+// @beta
+export function encodeIso8601Duration(duration: number): string;
 
 // @beta
 export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string;
