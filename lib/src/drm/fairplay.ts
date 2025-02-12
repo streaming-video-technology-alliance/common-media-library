@@ -15,26 +15,26 @@ import { base64decode } from '../utils/base64decode';
  * @beta
  */
 export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array {
-    if (typeof id === 'string') {
-        id = stringToArray(id);
-    }
-    const buffer = new ArrayBuffer(initData.byteLength + 4 + id.byteLength + 4 + cert.byteLength);
-    const dataView = new DataView(buffer);
-    let offset = 0;
+	if (typeof id === 'string') {
+		id = stringToArray(id);
+	}
+	const buffer = new ArrayBuffer(initData.byteLength + 4 + id.byteLength + 4 + cert.byteLength);
+	const dataView = new DataView(buffer);
+	let offset = 0;
 
-    new Uint8Array(buffer, offset, initData.byteLength).set(initData);
-    offset += initData.byteLength;
+	new Uint8Array(buffer, offset, initData.byteLength).set(initData);
+	offset += initData.byteLength;
 
-    dataView.setUint32(offset, id.byteLength, true);
-    offset += 4;
-    new Uint16Array(buffer, offset, id.length).set(id);
-    offset += id.byteLength;
+	dataView.setUint32(offset, id.byteLength, true);
+	offset += 4;
+	new Uint16Array(buffer, offset, id.length).set(id);
+	offset += id.byteLength;
 
-    dataView.setUint32(offset, cert.byteLength, true);
-    offset += 4;
-    new Uint8Array(buffer, offset, cert.byteLength).set(cert);
+	dataView.setUint32(offset, cert.byteLength, true);
+	offset += 4;
+	new Uint8Array(buffer, offset, cert.byteLength).set(cert);
 
-    return new Uint8Array(buffer);
+	return new Uint8Array(buffer);
 }
 
 /**
@@ -48,19 +48,19 @@ export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16
  * @beta
  */
 export function getLicenseServerUrl(initData: Uint16Array, drmConfig: { licenseUrl?: string }): string {
-    if (!isEmpty(drmConfig.licenseUrl) && drmConfig.licenseUrl?.startsWith('http')) {
-        return drmConfig.licenseUrl;
-    }
+	if (!isEmpty(drmConfig.licenseUrl) && drmConfig.licenseUrl?.startsWith('http')) {
+		return drmConfig.licenseUrl;
+	}
 
-    let initDataString = '';
-    for (let i = 0; i < initData.length; i++) {
-        if (initData[i] !== 0) { // Ignore null characters
-            initDataString += String.fromCharCode(initData[i]);
-        }
-    }
+	let initDataString = '';
+	for (let i = 0; i < initData.length; i++) {
+		if (initData[i] !== 0) { // Ignore null characters
+			initDataString += String.fromCharCode(initData[i]);
+		}
+	}
 
-    const match = initDataString.match(/skd:\/\/([^"\s]+)/);
-    return match ? `https://${match[1]}` : '';
+	const match = initDataString.match(/skd:\/\/([^"\s]+)/);
+	return match ? `https://${match[1]}` : '';
 }
 
 /**
@@ -73,9 +73,9 @@ export function getLicenseServerUrl(initData: Uint16Array, drmConfig: { licenseU
  * @beta
  */
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array {
-    return typeof response === 'string'
-        ? base64decode(response)
-        : new Uint8Array(response);
+	return typeof response === 'string'
+		? base64decode(response)
+		: new Uint8Array(response);
 }
 
 /**
@@ -90,8 +90,8 @@ export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Arra
  * @beta
  */
 export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam: string = 'ContentId'): string | null {
-    const obj = decodeQueryString(licenseServerUrl);
-    return obj[queryParam] || extractContentId(initData, queryParam);
+	const obj = decodeQueryString(licenseServerUrl);
+	return obj[queryParam] || extractContentId(initData, queryParam);
 }
 
 /**
@@ -105,15 +105,15 @@ export function getId(licenseServerUrl: string, initData: Uint16Array, queryPara
  * @beta
  */
 function extractContentId(initData: Uint16Array, queryParam: string = 'ContentId'): string | null {
-    const initDataString = new TextDecoder().decode(initData);
+	const initDataString = new TextDecoder().decode(initData);
 
-    // Try skd:// approach first
-    const skdMatch = initDataString.match(/skd:\/\/([^"\s]+)/);
-    if (skdMatch) {
-        return skdMatch[1];
-    }
+	// Try skd:// approach first
+	const skdMatch = initDataString.match(/skd:\/\/([^"\s]+)/);
+	if (skdMatch) {
+		return skdMatch[1];
+	}
 
-    // If not skd://, then try extracting from query params
-    const queryMatch = new RegExp(`${queryParam}=([^&\s]+)`).exec(initDataString);
-    return queryMatch ? queryMatch[1] : null;
+	// If not skd://, then try extracting from query params
+	const queryMatch = new RegExp(`${queryParam}=([^&\\s]+)`).exec(initDataString);
+	return queryMatch ? queryMatch[1] : null;
 }
