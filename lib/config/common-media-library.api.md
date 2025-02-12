@@ -577,6 +577,9 @@ export type Presentation = Ham & {
 };
 
 // @beta
+export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: number | null | undefined): string;
+
+// @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
 // @beta
