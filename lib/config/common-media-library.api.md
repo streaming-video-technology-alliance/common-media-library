@@ -546,6 +546,9 @@ export type DecodedId3Frame<T> = {
 };
 
 // @beta
+export function decodeIso8601Duration(isoDuration: string): number;
+
+// @beta
 export function decodeSfDict(input: string, options?: SfDecodeOptions): SfDictionary;
 
 // @beta
@@ -606,6 +609,9 @@ export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
 // @beta
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string;
+
+// @beta
+export function encodeIso8601Duration(duration: number): string;
 
 // @beta
 export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string;
@@ -1052,78 +1058,7 @@ export type Presentation = Ham & {
 };
 
 // @beta
-export function prft(view: IsoView): ProducerReferenceTimeBox;
-
-// @beta
-export type ProducerReferenceTimeBox = FullBox & {
-    referenceTrackId: number;
-    ntpTimestampSec: number;
-    ntpTimestampFrac: number;
-    mediaTime: number;
-};
-
-// @beta
-export type ProtectionSystemSpecificHeaderBox = FullBox & {
-    systemID: number[];
-    dataSize: number;
-    data: number[];
-};
-
-// @beta
-export function prsl(view: IsoView): PreselectionGroupBox;
-
-// @beta
-export function pssh(view: IsoView): ProtectionSystemSpecificHeaderBox;
-
-// @beta
-type Range_2 = {
-    level: number;
-    rangeSize: number;
-};
-export { Range_2 as Range }
-
-// @beta
-export type RawBox = {
-    type: string;
-    size: number;
-    largesize?: number;
-    usertype?: number[];
-    data: IsoView;
-};
-
-// @beta
-export type Reference = {
-    reference: number;
-    subsegmentDuration: number;
-    sap: number;
-    referenceType: number;
-    referencedSize: number;
-    startsWithSap: number;
-    sapType: number;
-    sapDeltaTime: number;
-};
-
-// @alpha
-export type Representation = {
-    $: {
-        audioSamplingRate?: string;
-        bandwidth: string;
-        codecs?: string;
-        frameRate?: string;
-        height?: string;
-        id: string;
-        mimeType?: string;
-        sar?: string;
-        scanType?: string;
-        startWithSAP?: string;
-        width?: string;
-    };
-    AudioChannelConfiguration?: AudioChannelConfiguration[];
-    BaseURL?: string[];
-    SegmentBase?: SegmentBase[];
-    SegmentList?: SegmentList[];
-    SegmentTemplate?: SegmentTemplate[];
-};
+export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: number | null | undefined): string;
 
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
