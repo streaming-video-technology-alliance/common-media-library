@@ -17,8 +17,8 @@ npm install @svta/common-media-library@${version}
 
 async function getChanges(version: string) {
 	const changeLog = await readFile('./CHANGELOG.md', 'utf8');
-	const logs = changeLog.split('\n\n\n');
-	const match = `## [${version}]`;
+	const logs = changeLog.split(/^## /m);
+	const match = `[${version}]`;
 	const log = logs.find(log => log.includes(match)) || '';
 	return log.split('\n\n').slice(1).join('\n\n');
 }

@@ -1052,6 +1052,7 @@ export type Presentation = Ham & {
 };
 
 // @beta
+<<<<<<< HEAD
 export function prft(view: IsoView): ProducerReferenceTimeBox;
 
 // @beta
@@ -1124,6 +1125,9 @@ export type Representation = {
     SegmentList?: SegmentList[];
     SegmentTemplate?: SegmentTemplate[];
 };
+=======
+export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: number | null | undefined): string;
+>>>>>>> 177e528 (feat: add utility for processing DASH segment template URIs (#130))
 
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
