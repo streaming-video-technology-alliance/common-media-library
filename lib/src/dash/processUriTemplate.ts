@@ -1,4 +1,4 @@
-const re = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]+)([diouxX]))?\$/g;
+const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]+)([diouxX]))?\$/g;
 
 /**
  * Process a URI template used in `SegmentTemplate` nodes.
@@ -37,7 +37,7 @@ export function processUriTemplate(
 	bandwidth: number | null | undefined,
 	time: number | null | undefined,
 ) {
-	const uri = uriTemplate.replace(re, (match, name, widthStr, format) => {
+	const uri = uriTemplate.replace(TOKENS, (match, name, widthStr, format) => {
 		let value: string | number | null | undefined;
 
 		switch (name) {
