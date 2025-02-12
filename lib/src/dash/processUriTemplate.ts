@@ -17,7 +17,6 @@ const re = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]+)([
  *
  * @example
  * ```ts
- * const uriTemplate = ;
  * const result = processUriTemplate(
  *   'http://example.com/$RepresentationID$/$Number$/$SubNumber$/$Bandwidth$/$Time%02d$/$$',
  *   'rep1',
