@@ -12,19 +12,19 @@ await cmd(`npm --no-git-tag-version --allow-same-version version ${ver}`);
 await cmd(`npm --no-git-tag-version --allow-same-version version ${ver} -ws`);
 
 // Update the CHANGELOG
-const sectionBreak = '\n\n\n';
 const changelog = await readFile('./CHANGELOG.md', 'utf8');
-const sections = changelog.split(sectionBreak);
-sections.splice(1, 0, `## [${ver}] - ????-??-??`);
+const sections = changelog.split(/^## /m);
+sections.splice(2, 0, `[${ver}] - ????-??-??\n\n`);
 
 const head = /\/v([0-9.]+)...HEAD/;
 const linkBreak = '\n';
 const last = sections.length - 1;
 const links = sections[last].split(linkBreak);
-const first = links[0];
-const previous = first.match(head)?.[1];
-links[0] = first.replace(head, `/v${ver}...HEAD`);
-links.splice(1, 0, `[${ver}]\\: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v${previous}...v${ver}  `);
+const index = links.findIndex((link) => head.test(link));
+const unreleased = links[index];
+const previous = unreleased.match(head)?.[1];
+links[index] = unreleased.replace(head, `/v${ver}...HEAD`);
+links.splice(index + 1, 0, `[${ver}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v${previous}...v${ver}`);
 sections[last] = links.join(linkBreak);
 
-await writeFile('./CHANGELOG.md', sections.join(sectionBreak));
+await writeFile('./CHANGELOG.md', sections.join('## '));
