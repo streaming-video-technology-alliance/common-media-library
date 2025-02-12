@@ -17,6 +17,7 @@ and this project adheres to
 
 - Updated `NOTICE` file to use Markdown formatting to preserve the text of
   included licenses.
+- Export ISO 8601 duration utilities.
 
 ### Fix
 
