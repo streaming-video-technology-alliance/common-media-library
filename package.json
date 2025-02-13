@@ -30,7 +30,7 @@
 		"build": "npm run build -ws --if-present",
 		"pretest": "npm run build && npm run lint",
 		"test": "npm test -ws --if-present",
-		"dev": "vite dev",
+		"start": "npm start -w dev",
 		"pub": "npm publish -w lib --provenance --access public",
 		"ver": "tsx scripts/version.mts",
 		"docs": "npm start -w docs",
