@@ -13,5 +13,8 @@
 	},
 	"out": "./dist",
 	"readme": "../lib/README.md",
-	"searchInComments": true
+	"searchInComments": true,
+	"jsDocCompatibility": {
+		"exampleTag": false
+	}
 }

@@ -14,3 +14,4 @@ export * from './iso8601.js';
 export type * from './request.js';
 export * from './structuredfield.js';
 export * from './utils.js';
+export * from './xml.js';
