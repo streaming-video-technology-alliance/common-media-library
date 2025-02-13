@@ -1,8 +1,23 @@
 import { processUriTemplate } from '@svta/common-media-library';
-import { equal } from 'node:assert';
+import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
 describe('processUriTemplate', () => {
+	it('provides a valid example', async () => {
+		//#region example
+		const result = processUriTemplate(
+			'http://example.com/$RepresentationID$/$Number$/$SubNumber$/$Bandwidth$/$Time%02d$/$$',
+			'rep1', // RepresentationID
+			1,      // Number
+			2,      // SubNumber
+			3,      // Bandwidth
+			4,      // Time
+		);
+
+		assert(result === 'http://example.com/rep1/1/2/3/04/$');
+		//#endregion example
+	});
+
 	it('handles a single RepresentationID identifier', () => {
 		equal(
 			processUriTemplate(

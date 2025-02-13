@@ -545,6 +545,9 @@ export type PACData = {
 };
 
 // @beta
+export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
+
+// @beta
 export class PenState {
     // (undocumented)
     background: string;
@@ -791,6 +794,9 @@ export type Track = Ham & {
 export type TrackType = 'audio' | 'video' | 'text';
 
 // @beta
+export function unescapeHtml(text: string): string;
+
+// @beta
 export function urlToRelativePath(url: string, base: string): string;
 
 // @beta
@@ -853,6 +859,21 @@ export type VideoTrack = Track & {
     par: string;
     sar: string;
     scanType: string;
+};
+
+// @beta
+export type XmlNode = {
+    nodeName: string;
+    nodeValue: string | null;
+    attributes: Record<string, string>;
+    childNodes: XmlNode[];
+};
+
+// @beta
+export type XmlParseOptions = {
+    pos?: number;
+    keepWhitespace?: boolean;
+    keepComments?: boolean;
 };
 
 // Warnings were encountered during analysis:

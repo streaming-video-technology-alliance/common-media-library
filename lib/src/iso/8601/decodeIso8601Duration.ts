@@ -16,11 +16,7 @@ const SECONDS_IN_MIN = 60;
  * @beta
  *
  * @example
- * ```ts
- * const result = decodeIso8601Duration('PT1H1M1S');
- * console.log(result);
- * // -> 3661
- * ```
+ * {@includeCode ../../../test/iso/8601/decodeIso8601Duration.test.ts#example}
  */
 export function decodeIso8601Duration(isoDuration: string): number {
 	const match = DURATION.exec(isoDuration);

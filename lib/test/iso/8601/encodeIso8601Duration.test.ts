@@ -1,8 +1,16 @@
 import { encodeIso8601Duration } from '@svta/common-media-library';
-import { equal } from 'node:assert';
+import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
 describe('encodeIso8601Duration', () => {
+	it('provides a valid example', async () => {
+		//#region example
+		const result = encodeIso8601Duration(3661);
+
+		assert(result === 'PT1H1M1S');
+		//#endregion example
+	});
+
 	it('encodes valid durations', () => {
 		equal(encodeIso8601Duration(0), 'PT0S');
 		equal(encodeIso8601Duration(60), 'PT1M0S');

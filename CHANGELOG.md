@@ -12,6 +12,8 @@ and this project adheres to
 
 - Add DASH Segment Template Utility
   ([#129](https://github.com/streaming-video-technology-alliance/common-media-library/issues/129))
+- Add XML parsing utils
+  [#125](https://github.com/streaming-video-technology-alliance/common-media-library/issues/125)
 
 ### Changed
 
