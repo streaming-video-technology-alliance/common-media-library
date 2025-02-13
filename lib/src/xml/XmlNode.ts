@@ -1,4 +1,3 @@
-import type { XmlChildren } from './XmlChildren';
 
 /**
  * XML node
@@ -8,7 +7,8 @@ import type { XmlChildren } from './XmlChildren';
  * @beta
  */
 export type XmlNode = {
-	tagName: string;
+	nodeName: string;
+	nodeValue: string | null;
 	attributes: Record<string, string>;
-	children: XmlChildren;
+	childNodes: XmlNode[];
 };

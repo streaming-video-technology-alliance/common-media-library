@@ -1,5 +1,4 @@
 import { unescapeHtml } from '../utils/unescapeHtml.js';
-import type { XmlChildren } from './XmlChildren.js';
 import type { XmlNode } from './XmlNode.js';
 import type { XmlParseOptions } from './XmlParseOptions.js';
 
@@ -25,7 +24,7 @@ import type { XmlParseOptions } from './XmlParseOptions.js';
  * // -> "text"
  * ```
  */
-export function parseXml(input: string, options: XmlParseOptions = {}): XmlChildren {
+export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode {
 	let pos = options.pos || 0;
 
 	const length = input.length;
@@ -46,10 +45,19 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlChild
 	const closeCornerBracketCC = ']'.charCodeAt(0);
 	const nameSpacer = '\r\n\t>/= ';
 
+	function createTextNode(value: string, nodeName = '#text'): XmlNode {
+		return {
+			nodeName,
+			nodeValue: value,
+			attributes: {},
+			childNodes: [],
+		};
+	}
+
 	/**
 	 * parsing a list of entries
 	 */
-	function parseChildren(tagName: string = ''): XmlChildren {
+	function parseChildren(tagName: string = ''): XmlNode[] {
 		const children: any[] = [];
 		while (input[pos]) {
 			if (input.charCodeAt(pos) == openBracketCC) {
@@ -88,7 +96,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlChild
 							pos = length;
 						}
 						if (keepComments) {
-							children.push(input.substring(startCommentPos, pos + 1));
+							children.push(createTextNode(input.substring(startCommentPos, pos + 1), '#comment'));
 						}
 					}
 					else if (
@@ -99,11 +107,11 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlChild
 						// cdata
 						const cdataEndIndex = input.indexOf(']]>', pos);
 						if (cdataEndIndex == -1) {
-							children.push(input.substr(pos + 9));
+							children.push(createTextNode(input.substr(pos + 9), '#cdata'));
 							pos = length;
 						}
 						else {
-							children.push(input.substring(pos + 9, cdataEndIndex));
+							children.push(createTextNode(input.substring(pos + 9, cdataEndIndex), '#cdata'));
 							pos = cdataEndIndex + 3;
 						}
 						continue;
@@ -122,7 +130,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlChild
 							}
 							pos++;
 						}
-						children.push(input.substring(startDoctype, pos));
+						children.push(createTextNode(input.substring(startDoctype, pos), '#doctype'));
 					}
 
 					pos++;
@@ -136,13 +144,13 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlChild
 				const text = parseText();
 				if (keepWhitespace) {
 					if (text.length > 0) {
-						children.push(text);
+						children.push(createTextNode(text));
 					}
 				}
 				else {
 					const trimmed = text.trim();
 					if (trimmed.length > 0) {
-						children.push(trimmed);
+						children.push(createTextNode(trimmed));
 					}
 				}
 				pos++;
@@ -217,23 +225,24 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlChild
 	 */
 	function parseNode(): XmlNode {
 		pos++;
-		const tagName = parseName();
+		const nodeName = parseName();
 		const attributes = parseAttributes();
 
-		let children: any[] = [];
+		let childNodes: any[] = [];
 
 		// optional parsing of children
 		const prev = input.charCodeAt(pos - 1);
 		pos++;
 
 		if (prev !== slashCC) {
-			children = parseChildren(tagName);
+			childNodes = parseChildren(nodeName);
 		}
 
 		return {
-			tagName,
+			nodeName,
+			nodeValue: null,
 			attributes,
-			children,
+			childNodes,
 		};
 	}
 
@@ -247,5 +256,10 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlChild
 		return input.slice(startpos, pos);
 	}
 
-	return parseChildren('');
+	return {
+		nodeName: '#document',
+		nodeValue: null,
+		childNodes: parseChildren(''),
+		attributes: {},
+	};
 }

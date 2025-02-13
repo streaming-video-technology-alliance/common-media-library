@@ -545,7 +545,7 @@ export type PACData = {
 };
 
 // @beta
-export function parseXml(input: string, options?: XmlParseOptions): XmlChildren;
+export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
 
 // @beta
 export class PenState {
@@ -862,13 +862,11 @@ export type VideoTrack = Track & {
 };
 
 // @beta
-export type XmlChildren = (XmlNode | string)[];
-
-// @beta
 export type XmlNode = {
-    tagName: string;
+    nodeName: string;
+    nodeValue: string | null;
     attributes: Record<string, string>;
-    children: XmlChildren;
+    childNodes: XmlNode[];
 };
 
 // @beta
