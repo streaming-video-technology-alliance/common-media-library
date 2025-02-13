@@ -18,9 +18,9 @@ import type { XmlParseOptions } from './XmlParseOptions.js';
  * import { parseXml } from '@svta/common-media-library/xml/parseXml.js';
  *
  * const obj = parseXml('<root><child>text</child></root>');
- * console.log(obj[0].children[0].tagName);
+ * console.log(obj[0].childNodes[0].nodeName);
  * // -> "child"
- * console.log(obj[0].children[0].children[0]);
+ * console.log(obj[0].childNodes[0].childNodes[0].nodeValue);
  * // -> "text"
  * ```
  */
