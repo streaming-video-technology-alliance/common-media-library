@@ -1,10 +1,18 @@
 import { decodeIso8601Duration } from '@svta/common-media-library';
-import { equal } from 'node:assert';
+import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
 const HUGE_NUMBER_STRING = new Array(500).join('7');
 
 describe('decodeIso8601Duration', () => {
+	it('provides a valid example', async () => {
+		//#region example
+		const result = decodeIso8601Duration('PT1H1M1S');
+
+		assert(result === 3661);
+		//#endregion example
+	});
+
 	it('parses valid durations', () => {
 		// No time.
 		equal(decodeIso8601Duration('P'), 0);

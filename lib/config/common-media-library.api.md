@@ -980,10 +980,14 @@ export type PACData = {
 };
 
 // @beta
+<<<<<<< HEAD
 export function parseBoxes(raw: IsoData, config?: IsoViewConfig): Box[];
 
 // @beta
 export function payl(view: IsoView): WebVTTCuePayloadBox;
+=======
+export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
+>>>>>>> 5867c08 (feat: add xml parsing utility function  (#126))
 
 // @beta
 export class PenState {
@@ -1639,6 +1643,7 @@ export type TrackRunSample = {
 export type TrackType = 'audio' | 'video' | 'text';
 
 // @beta
+<<<<<<< HEAD
 export function trex(view: IsoView): TrackExtendsBox;
 
 // @beta
@@ -1661,6 +1666,9 @@ export function url(view: IsoView): UrlBox;
 export type UrlBox = FullBox & {
     location: string;
 };
+=======
+export function unescapeHtml(text: string): string;
+>>>>>>> 5867c08 (feat: add xml parsing utility function  (#126))
 
 // @beta
 export function urlToRelativePath(url: string, base: string): string;
@@ -1746,6 +1754,7 @@ export type VideoTrack = Track & {
 };
 
 // @beta
+<<<<<<< HEAD
 export type VisualSampleEntry = SampleEntry & {
     preDefined1: number;
     reserved2: number;
@@ -1796,5 +1805,27 @@ export type WebVTTSettingsBox = {
 export type WebVTTSourceLabelBox = {
     sourceLabel: string;
 };
+=======
+export type XmlNode = {
+    nodeName: string;
+    nodeValue: string | null;
+    attributes: Record<string, string>;
+    childNodes: XmlNode[];
+};
+
+// @beta
+export type XmlParseOptions = {
+    pos?: number;
+    keepWhitespace?: boolean;
+    keepComments?: boolean;
+};
+
+// Warnings were encountered during analysis:
+//
+// src/cmaf/ham/types/mapper/dash/DashManifest.ts:19:3 - (ae-forgotten-export) The symbol "Period" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:12:2 - (ae-forgotten-export) The symbol "PlayList" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:13:2 - (ae-forgotten-export) The symbol "MediaGroups" needs to be exported by the entry point index.d.ts
+// src/cmaf/ham/types/mapper/hls/HlsManifest.ts:14:2 - (ae-forgotten-export) The symbol "SegmentHls" needs to be exported by the entry point index.d.ts
+>>>>>>> 5867c08 (feat: add xml parsing utility function  (#126))
 
 ```

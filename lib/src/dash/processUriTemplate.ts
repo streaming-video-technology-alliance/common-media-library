@@ -16,18 +16,7 @@ const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]
  * @beta
  *
  * @example
- * ```ts
- * const result = processUriTemplate(
- *   'http://example.com/$RepresentationID$/$Number$/$SubNumber$/$Bandwidth$/$Time%02d$/$$',
- *   'rep1',
- *   1,
- *   2,
- *   3,
- *   4,
- * );
- * console.log(result);
- * // -> 'http://example.com/rep1/1/2/3/04/$'
- * ```
+ * {@includeCode ../../test/dash/processUriTemplate.test.ts#example}
  */
 export function processUriTemplate(
 	uriTemplate: string,
