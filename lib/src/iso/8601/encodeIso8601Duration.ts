@@ -8,11 +8,7 @@
  * @beta
  *
  * @example
- * ```ts
- * const result = encodeIso8601Duration(3661);
- * console.log(result);
- * // -> 'PT1H1M1S'
- * ```
+ * {@includeCode ../../../test/iso/8601/encodeIso8601Duration.test.ts#example}
  */
 export function encodeIso8601Duration(duration: number): string {
 	if (!isFinite(duration)) {

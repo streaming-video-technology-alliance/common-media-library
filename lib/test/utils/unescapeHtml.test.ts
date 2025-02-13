@@ -1,8 +1,16 @@
 import { unescapeHtml } from '@svta/common-media-library';
-import { equal } from 'node:assert';
+import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
 describe('unescapeHtml', () => {
+	it('provides a valid example', async () => {
+		//#region example
+		const result = unescapeHtml('&quot;&lt;Hello&amp;World&gt;&quot;');
+
+		assert(result === `"<Hello&World>"`);
+		//#endregion example
+	});
+
 	it('handles special characters', () => {
 		equal(unescapeHtml('hello &amp; world'), 'hello & world');
 		equal(unescapeHtml(`&amp;,&lt;,&gt;,&quot;,&apos;,&nbsp;,&lrm;,&rlm;`), `&,<,>,",',\u{a0},\u{200e},\u{200f}`);

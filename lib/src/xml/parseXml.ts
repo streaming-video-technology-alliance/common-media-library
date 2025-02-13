@@ -14,15 +14,7 @@ import type { XmlParseOptions } from './XmlParseOptions.js';
  * @beta
  *
  * @example
- * ```ts
- * import { parseXml } from '@svta/common-media-library/xml/parseXml.js';
- *
- * const obj = parseXml('<root><child>text</child></root>');
- * console.log(obj[0].childNodes[0].nodeName);
- * // -> "child"
- * console.log(obj[0].childNodes[0].childNodes[0].nodeValue);
- * // -> "text"
- * ```
+ * {@includeCode ../../test/xml/parseXml.test.ts#example}
  */
 export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode {
 	let pos = options.pos || 0;

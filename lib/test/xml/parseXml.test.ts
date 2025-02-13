@@ -1,9 +1,19 @@
 import { parseXml } from '@svta/common-media-library';
-import { equal } from 'node:assert';
+import assert, { equal } from 'node:assert';
 import { promises as fs } from 'node:fs';
 import { describe, it } from 'node:test';
 
 describe('parseXml', () => {
+	it('provides a valid example', async () => {
+		//#region example
+		const obj = parseXml('<root><child>text</child></root>');
+
+		assert(obj.childNodes[0].nodeName === 'root');
+		assert(obj.childNodes[0].childNodes[0].nodeName === 'child');
+		assert(obj.childNodes[0].childNodes[0].childNodes[0].nodeValue === 'text');
+		//#endregion example
+	});
+
 	it('parses DASH manifest', async () => {
 		const xml = await fs.readFile('./test/xml/fixtures/bbb_30fps.mpd', 'utf8');
 		const doc = parseXml(xml);

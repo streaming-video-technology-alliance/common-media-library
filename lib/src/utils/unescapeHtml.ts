@@ -11,12 +11,7 @@ const escapedHtml = /&(?:amp|lt|gt|quot|apos|nbsp|lrm|rlm|#[xX]?[0-9a-fA-F]+);/g
  * @beta
  *
  * @example
- * ```ts
- * import { unescapeHtml } from '@svta/common-media-library/utils/unescapeHtml';
- *
- * console.log(unescapeHtml('Hello&nbsp;World'));
- * // -> "Hello World"
- * ```
+ * {@includeCode ../../test/utils/unescapeHtml.test.ts#example}
  */
 export function unescapeHtml(text: string): string {
 	if (text.indexOf('&') === -1) {
