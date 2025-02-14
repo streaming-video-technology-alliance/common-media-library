@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Fairplay Utilities [#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131)
+- FairPlay Utilities [#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131)
 
 ## [0.9.0] - 2025-02-21
 
