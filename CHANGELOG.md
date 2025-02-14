@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.0] - 2025-02-14
+
 ### Added
 
 - ISO BMFF parser and utilities
