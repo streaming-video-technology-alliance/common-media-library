@@ -1,4 +1,4 @@
-import { isEmpty } from '../utils/isEmpty';
+import { isEmpty } from '../utils/isEmpty.js';
 
 /**
  * Retrieves the FairPlay license server URL from InitData or DRM configuration.

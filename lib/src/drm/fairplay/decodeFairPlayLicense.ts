@@ -1,4 +1,4 @@
-import { base64decode } from '../../utils';
+import { base64decode } from '../../utils/base64Decode.js';
 
 /**
  * Decodes a FairPlay DRM license response.

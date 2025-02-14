@@ -1,4 +1,4 @@
-import { stringToArray } from '../utils/stringToArray';
+import { stringToArray } from '../utils/stringToArray.js';
 
 /**
  * Concatenates InitData, ID, and Certificate for FairPlay DRM.
