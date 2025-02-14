@@ -1,5 +1,5 @@
-import { extractContentId } from './extractContentId';
-import { decodeQueryString } from '../utils/decodeQueryString';
+import { extractContentId } from './extractContentId.js';
+import { decodeQueryString } from '../utils/decodeQueryString.js';
 
 /**
  * Extracts the content ID from the license server URL or InitData.
