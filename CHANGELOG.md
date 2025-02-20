@@ -9,12 +9,17 @@ and this project adheres to
 ## [Unreleased]
 
 ### Added
+- ISO BMFF parser and utilities 
+  ([#118](https://github.com/streaming-video-technology-alliance/common-media-library/issues/118))
+
+## [0.8.0] - 2025-02-14
+
+### Added
 
 - Add DASH Segment Template Utility
   ([#129](https://github.com/streaming-video-technology-alliance/common-media-library/issues/129))
 - Add XML parsing utils
-  [#125](https://github.com/streaming-video-technology-alliance/common-media-library/issues/125)
-- ISO BMFF parser and utilities [#118](https://github.com/streaming-video-technology-alliance/common-media-library/issues/118)
+  ([#125](https://github.com/streaming-video-technology-alliance/common-media-library/issues/125))
 
 ### Changed
 
@@ -260,7 +265,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.4...v0.8.0
 [0.7.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.1...v0.7.2
