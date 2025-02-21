@@ -453,7 +453,7 @@ SOFTWARE.
 The following implementation in this project is derived from the
 `codem-isoboxer` library (https://github.com/Dash-Industry-Forum/codem-isoboxer)
 
-- src/isobmff
+- src/iso/bmff/*
 
 ```
 Copyright (c) 2015 Hiro, Sjoerd Tieleman
