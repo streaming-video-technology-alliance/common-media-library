@@ -11,6 +11,7 @@ export type * from './cta.js';
 export * from './dash.js';
 export * from './id3.js';
 export * from './iso8601.js';
+export * from './isobmff.js';
 export type * from './request.js';
 export * from './structuredfield.js';
 export * from './utils.js';

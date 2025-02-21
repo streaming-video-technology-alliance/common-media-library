@@ -1,0 +1,13 @@
+import { assert, describe, findBoxByType, it } from './util/box';
+import { load } from './util/load';
+
+describe('find a box by type', function () {
+	it('find a box by type', function () {
+		// Sample 'ftyp' box (20 bytes)
+		const buffer = load('./captions.mp4');
+		const box = findBoxByType('mdat', buffer);
+
+		assert.strictEqual(box.type, 'mdat');
+		assert.strictEqual(box.size, 21530);
+	});
+});

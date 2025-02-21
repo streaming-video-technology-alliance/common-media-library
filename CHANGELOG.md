@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- ISO BMFF parser and utilities
+  ([#118](https://github.com/streaming-video-technology-alliance/common-media-library/issues/118))
+
 ## [0.8.0] - 2025-02-14
 
 ### Added
