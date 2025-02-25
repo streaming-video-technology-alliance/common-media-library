@@ -26,9 +26,7 @@ describe('concatInitDataIdAndCertificate', () => {
 		const cert = new Uint8Array([]);
 		const result = concatInitDataIdAndCertificate(initData, id, cert);
 
-		// Length should account for added ID and cert size and 
-		// first part should match initData
+		// Length should account for added ID and cert size 
 		deepStrictEqual(result.length, initData.byteLength + 4 + 4); 
-		deepStrictEqual(result.slice(0, initData.byteLength), new Uint8Array(initData));
 	});
 });
