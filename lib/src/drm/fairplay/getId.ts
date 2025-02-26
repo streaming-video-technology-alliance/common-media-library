@@ -1,5 +1,4 @@
 import { extractContentId } from './extractContentId.js';
-import { decodeQueryString } from '../utils/decodeQueryString.js';
 
 /**
  * Extracts the content ID from the license server URL or InitData.
@@ -14,6 +13,14 @@ import { decodeQueryString } from '../utils/decodeQueryString.js';
  */
 
 export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam: string = 'ContentId'): string | null {
-	const obj = decodeQueryString(licenseServerUrl);
-	return obj[queryParam] || extractContentId(initData, queryParam);
+	try {
+		const url = new URL(licenseServerUrl);
+		const params = new URLSearchParams(url.search);
+		return params.get(queryParam) || extractContentId(initData);
+	} 
+	catch {
+		// in case if URL parsing fails, 
+		// fallback to extracting from initData
+		return extractContentId(initData);
+	}
 }
