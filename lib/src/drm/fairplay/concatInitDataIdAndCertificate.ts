@@ -10,6 +10,9 @@ import { stringToArray } from '../utils/stringToArray.js';
  *
  * @group DRM
  * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/fairplay/concatInitDataIdAndCertificate.test.ts#example}
  */
 
 export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array {
