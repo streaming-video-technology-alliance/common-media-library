@@ -8,6 +8,9 @@ import { base64decode } from '../../utils/base64decode.js';
  *
  * @group DRM
  * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/fairplay/decodeFairPlayLicense.test.ts#example}
  */
 
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array {
