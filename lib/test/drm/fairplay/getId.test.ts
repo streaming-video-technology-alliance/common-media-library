@@ -5,11 +5,13 @@ import { describe, it } from 'node:test';
 
 describe('getId', () => {
 	it('extracts contentId from skd:// format', () => {
+		//#region example
 		const laUrl = 'https://common-media-library.com';
 		const initDataString = 'skd://common-media-library.com/asset1234';
 		const initData = convertUint8ToUint16(new TextEncoder().encode(initDataString));
 
 		strictEqual(getId(laUrl, initData), 'common-media-library.com/asset1234');
+		//#endregion example
 	});
 	
 	it('extracts query param when provided', () => {
