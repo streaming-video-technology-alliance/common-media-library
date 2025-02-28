@@ -14,11 +14,13 @@ const contentId = convertUint8ToUint16(new TextEncoder().encode('skd://svta.com/
 
 describe('concatInitDataIdAndCertificate', () => {
 	it('concatenates initData, id, and certificate correctly', () => {
+		//#region example
 		const result = concatInitDataIdAndCertificate(initData, contentId, appCertData);
 
 		// It should be 8-bit integer type and contain data
 		deepStrictEqual(result instanceof Uint8Array, true);
-		deepStrictEqual(result.length > 0, true); 
+		deepStrictEqual(result.length > 0, true);
+		//#endregion example 
 	});
 
 	it('handles empty certificate and id correctly', () => {
