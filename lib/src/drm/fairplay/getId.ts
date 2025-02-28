@@ -10,6 +10,9 @@ import { extractContentId } from './extractContentId.js';
  *
  * @group DRM
  * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/fairplay/getId.test.ts#example}
  */
 
 export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam: string = 'ContentId'): string | null {
