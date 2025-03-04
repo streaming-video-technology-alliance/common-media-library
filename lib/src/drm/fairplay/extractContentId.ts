@@ -7,10 +7,10 @@
  * @group DRM
  * @beta
  */
-export function extractContentId(initData: Uint16Array): string | null {
+export function extractContentId(initData: Uint16Array): string {
 	const initDataString = new TextDecoder().decode(initData);
 
 	// Try extracting skd:// content ID
 	const skdMatch = initDataString.match(/skd:\/\/([^"\s]+)/);
-	return skdMatch ? skdMatch[1] : null;
+	return skdMatch ? skdMatch[1] : '';
 }
