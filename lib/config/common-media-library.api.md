@@ -657,7 +657,7 @@ export type ExtendedLanguageBox = FullBox & {
 };
 
 // @beta
-export function extractContentId(initData: Uint16Array): string | null;
+export function extractContentId(initData: Uint16Array): string;
 
 // @beta
 export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
@@ -713,7 +713,7 @@ export type FullBox = {
 };
 
 // @beta
-export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam?: string): string | null;
+export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam?: string): string;
 
 // Warning: (ae-internal-missing-underscore) The name "getId3Data" should be prefixed with an underscore because the declaration is marked as @internal
 //
