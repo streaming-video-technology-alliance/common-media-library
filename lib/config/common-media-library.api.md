@@ -422,6 +422,9 @@ export type CompositionTimeToSampleEntry = {
     sampleOffset: number;
 };
 
+// @beta
+export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array;
+
 // @alpha (undocumented)
 export type ContentComponent = {
     $: {
@@ -546,6 +549,9 @@ export type DecodedId3Frame<T> = {
 };
 
 // @beta
+export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array;
+
+// @beta
 export function decodeIso8601Duration(isoDuration: string): number;
 
 // @beta
@@ -651,6 +657,9 @@ export type ExtendedLanguageBox = FullBox & {
 };
 
 // @beta
+export function extractContentId(initData: Uint16Array): string;
+
+// @beta
 export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
 
 // @beta
@@ -703,6 +712,9 @@ export type FullBox = {
     flags: number;
 };
 
+// @beta
+export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam?: string): string;
+
 // Warning: (ae-internal-missing-underscore) The name "getId3Data" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -713,6 +725,9 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 
 // @beta
 export function getId3Timestamp(data: Uint8Array): number | undefined;
+
+// @beta
+export function getLicenseServerUrl(initData: Uint16Array): string;
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
