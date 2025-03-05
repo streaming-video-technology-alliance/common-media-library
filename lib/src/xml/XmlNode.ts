@@ -11,4 +11,6 @@ export type XmlNode = {
 	nodeValue: string | null;
 	attributes: Record<string, string>;
 	childNodes: XmlNode[];
+	prefix?: string | null;
+	localName?: string;
 };

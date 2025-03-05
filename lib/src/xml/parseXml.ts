@@ -218,6 +218,15 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	function parseNode(): XmlNode {
 		pos++;
 		const nodeName = parseName();
+		let localName = nodeName;
+		let prefix = null;
+
+		const nsIndex = nodeName.indexOf(':');
+		if (nsIndex !== -1) {
+			prefix = nodeName.slice(0, nsIndex);
+			localName = nodeName.slice(nsIndex + 1);
+		}
+
 		const attributes = parseAttributes();
 
 		let childNodes: any[] = [];
@@ -235,6 +244,8 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 			nodeValue: null,
 			attributes,
 			childNodes,
+			prefix,
+			localName,
 		};
 	}
 
