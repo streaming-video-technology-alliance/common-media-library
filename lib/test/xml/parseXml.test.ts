@@ -9,7 +9,7 @@ describe('parseXml', () => {
 		const obj = parseXml(
 			`<root>
 				<child>text</child>
-				<ns:tag>text</ns:tag>
+				<ns:tag>content</ns:tag>
 			</root>`,
 		);
 		assert(obj.childNodes[0].nodeName === 'root');
