@@ -7,3 +7,4 @@ Please add entries to the bottom of the list in the following format:
 - @littlespex [Casey Occhialini, Paramount]
 - @dsparacio [Daniel Sparaico, Paramount]
 - @acbegen [Ali C. Begen, Comcast]
+- @willdharris [Will Harris, Paramount]
