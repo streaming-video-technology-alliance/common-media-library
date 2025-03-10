@@ -10,7 +10,10 @@ and this project adheres to
 
 ### Added
 
-- FairPlay Utilities [#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131)
+- FairPlay Utilities
+  ([#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131))
+- Add `prefix` and `localName` support to the XML types and utilities
+  ([#145](https://github.com/streaming-video-technology-alliance/common-media-library/issues/145))
 
 ## [0.9.0] - 2025-02-21
 

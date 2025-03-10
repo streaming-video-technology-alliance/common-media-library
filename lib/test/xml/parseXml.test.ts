@@ -6,11 +6,18 @@ import { describe, it } from 'node:test';
 describe('parseXml', () => {
 	it('provides a valid example', async () => {
 		//#region example
-		const obj = parseXml('<root><child>text</child></root>');
-
+		const obj = parseXml(
+			`<root>
+				<child>text</child>
+				<ns:tag>content</ns:tag>
+			</root>`,
+		);
 		assert(obj.childNodes[0].nodeName === 'root');
 		assert(obj.childNodes[0].childNodes[0].nodeName === 'child');
 		assert(obj.childNodes[0].childNodes[0].childNodes[0].nodeValue === 'text');
+		assert(obj.childNodes[0].childNodes[1].nodeName === 'ns:tag');
+		assert(obj.childNodes[0].childNodes[1].prefix === 'ns');
+		assert(obj.childNodes[0].childNodes[1].localName === 'tag');
 		//#endregion example
 	});
 
@@ -45,5 +52,10 @@ describe('parseXml', () => {
 
 		const htmlEntities = root.childNodes[1];
 		equal(htmlEntities.childNodes[0].nodeValue, `&,<,>,",',\u{a0},\u{200e},\u{200f}`);
+
+		const namespace = root.childNodes[2];
+		equal(namespace.nodeName, `tt:Text`);
+		equal(namespace.prefix, `tt`);
+		equal(namespace.localName, `Text`);
 	});
 });
