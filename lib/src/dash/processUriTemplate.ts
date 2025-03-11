@@ -25,7 +25,7 @@ export function processUriTemplate(
 	subNumber: number | null | undefined,
 	bandwidth: number | null | undefined,
 	time: number | null | undefined,
-) {
+): string {
 	const uri = uriTemplate.replace(TOKENS, (match, name, widthStr, format) => {
 		let value: string | number | null | undefined;
 

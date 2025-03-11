@@ -3,14 +3,14 @@
 		"allowSyntheticDefaultImports": true,
 		"declaration": true,
 		"declarationMap": true,
+		"erasableSyntaxOnly": true,
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": true,
 		"incremental": true,
 		"inlineSources": true,
-		// TODO: Uncomment when microsoft/rushstack#4805 is resolved
-		// "isolatedDeclarations": true,
+		"isolatedDeclarations": true,
 		"isolatedModules": true,
 		"lib": [
 			"DOM",
@@ -36,6 +36,7 @@
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"target": "ES2019",
+		"verbatimModuleSyntax": true,
 	},
 	"exclude": [
 		"**/dist",
