@@ -1,4 +1,4 @@
-import { spawn, SpawnOptionsWithoutStdio } from 'node:child_process';
+import { spawn, type SpawnOptionsWithoutStdio } from 'node:child_process';
 
 export function cmd(cmd: string, args?: string[], options?: SpawnOptionsWithoutStdio): Promise<void> {
 	const opts = Object.assign({
