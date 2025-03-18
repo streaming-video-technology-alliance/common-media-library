@@ -5,7 +5,7 @@
  * @group DRM
  * @public
  */
-export interface KeySystemAccess {
+export type KeySystemAccess = {
     keySystem: string;
     configuration: MediaKeySystemConfiguration;
 }
