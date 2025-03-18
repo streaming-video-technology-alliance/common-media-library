@@ -1,6 +1,6 @@
-import { CENC } from './CENC';
-import { KEYIDS } from './KEYIDS';
-import { WEBM } from './WEBM';
+import { CENC } from './CENC.js';
+import { KEYIDS } from './KEYIDS.js';
+import { WEBM } from './WEBM.js';
 
 /**
  * Initialization Data Type.
