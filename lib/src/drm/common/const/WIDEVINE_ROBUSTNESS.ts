@@ -1,8 +1,8 @@
-import { SW_SECURE_CRYPTO } from './SW_SECURE_CRYPTO';
-import { SW_SECURE_DECODE } from './SW_SECURE_DECODE';
-import { HW_SECURE_CRYPTO } from './HW_SECURE_CRYPTO';
-import { HW_SECURE_DECODE } from './HW_SECURE_DECODE';
-import { HW_SECURE_ALL } from './HW_SECURE_ALL';
+import { SW_SECURE_CRYPTO } from './SW_SECURE_CRYPTO.js';
+import { SW_SECURE_DECODE } from './SW_SECURE_DECODE.js';
+import { HW_SECURE_CRYPTO } from './HW_SECURE_CRYPTO.js';
+import { HW_SECURE_DECODE } from './HW_SECURE_DECODE.js';
+import { HW_SECURE_ALL } from './HW_SECURE_ALL.js';
 
 /**
  * Widevine Robustness.
