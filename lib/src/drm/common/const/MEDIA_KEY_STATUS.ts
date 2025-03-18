@@ -1,10 +1,10 @@
-import { USABLE } from './USABLE';
-import { EXPIRED } from './EXPIRED';
-import { RELEASED } from './RELEASED';
-import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED';
-import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED';
-import { STATUS_PENDING } from './STATUS_PENDING';
-import { INTERNAL_ERROR } from './INTERNAL_ERROR';
+import { USABLE } from './USABLE.js';
+import { EXPIRED } from './EXPIRED.js';
+import { RELEASED } from './RELEASED.js';
+import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED.js';
+import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.js';
+import { STATUS_PENDING } from './STATUS_PENDING.js';
+import { INTERNAL_ERROR } from './INTERNAL_ERROR.js';
 
 /**
  * Media Key Statuses.
