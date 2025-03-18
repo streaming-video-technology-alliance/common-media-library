@@ -1,11 +1,12 @@
-import { MediaCapability } from '../models/MediaCapability';
+import type { MediaCapability } from '../models/MediaCapability';
 
 /**
  * Represents the configuration options for requesting key system access.
  *
  * @group DRM
+ * @beta
  */
-export interface KeySystemConfiguration {
+export type KeySystemConfiguration = {
   initDataTypes?: string[];
   audioCapabilities?: MediaCapability[];
   videoCapabilities?: MediaCapability[];
@@ -13,3 +14,4 @@ export interface KeySystemConfiguration {
   persistentState?: 'required' | 'optional' | 'not-allowed';
   sessionTypes?: string[];
 }
+
