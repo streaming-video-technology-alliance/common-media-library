@@ -6,8 +6,9 @@
  *
  * @group DRM
  * @public
+ * @beta
  */
-export interface LicenseRequest {
+export type LicenseRequest = {
     /**
      * License server URL.
      */
@@ -49,3 +50,4 @@ export interface LicenseRequest {
      */
     data?: ArrayBuffer;
 }
+
