@@ -908,43 +908,29 @@ export type IsoViewConfig = {
 // @beta
 export const KEYIDS = "keyids";
 
-// @public
-export interface KeyMessage {
-    // (undocumented)
-    defaultUrl?: string;
-    // (undocumented)
-    message: ArrayBuffer;
-    // Warning: (ae-incompatible-release-tags) The symbol "messageType" is marked as @public, but its signature references "MEDIA_KEY_MESSAGE_TYPES" which is marked as @beta
-    //
-    // (undocumented)
-    messageType: (typeof MEDIA_KEY_MESSAGE_TYPES)[keyof typeof MEDIA_KEY_MESSAGE_TYPES];
-    // (undocumented)
+// @beta
+export type KeyMessage = {
     sessionId?: string;
-}
+    message: ArrayBuffer;
+    defaultUrl?: string;
+    messageType: (typeof MEDIA_KEY_MESSAGE_TYPES)[keyof typeof MEDIA_KEY_MESSAGE_TYPES];
+};
 
 // @public
-export interface KeySystemAccess {
-    // (undocumented)
-    configuration: MediaKeySystemConfiguration;
-    // (undocumented)
+export type KeySystemAccess = {
     keySystem: string;
-}
+    configuration: MediaKeySystemConfiguration;
+};
 
-// @public
-export interface KeySystemConfiguration {
-    // (undocumented)
-    audioCapabilities?: MediaCapability[];
-    // (undocumented)
-    distinctiveIdentifier?: 'required' | 'optional' | 'not-allowed';
-    // (undocumented)
+// @beta
+export type KeySystemConfiguration = {
     initDataTypes?: string[];
-    // (undocumented)
-    persistentState?: 'required' | 'optional' | 'not-allowed';
-    // (undocumented)
-    sessionTypes?: string[];
-    // (undocumented)
+    audioCapabilities?: MediaCapability[];
     videoCapabilities?: MediaCapability[];
-}
+    distinctiveIdentifier?: 'required' | 'optional' | 'not-allowed';
+    persistentState?: 'required' | 'optional' | 'not-allowed';
+    sessionTypes?: string[];
+};
 
 // @beta
 export function kind(view: IsoView): TrackKindBox;
@@ -970,16 +956,16 @@ export const LICENSE_RENEWAL = "license-renewal";
 export const LICENSE_REQUEST = "license-request";
 
 // @public
-export interface LicenseRequest {
-    data?: ArrayBuffer;
-    headers?: Record<string, string>;
-    messageType?: MediaKeyMessageType;
+export type LicenseRequest = {
+    url: string;
     method: 'GET' | 'POST';
     responseType: XMLHttpRequestResponseType;
-    sessionId?: string;
-    url: string;
+    headers?: Record<string, string>;
     withCredentials?: boolean;
-}
+    messageType?: MediaKeyMessageType;
+    sessionId?: string;
+    data?: ArrayBuffer;
+};
 
 // @alpha
 export type Manifest = {
@@ -1019,12 +1005,10 @@ export const MEDIA_KEY_STATUSES: {
 };
 
 // @public
-export interface MediaCapability {
-    // (undocumented)
+export type MediaCapability = {
     contentType: string;
-    // (undocumented)
     robustness: string;
-}
+};
 
 // @beta
 export type MediaDataBox = {
