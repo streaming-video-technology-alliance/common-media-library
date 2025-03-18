@@ -5,8 +5,9 @@
  *
  * @group DRM
  * @public
+ * @beta
  */
-export interface MediaCapability {
+export type MediaCapability = {
     contentType: string;
     robustness: string;
 }
