@@ -8,10 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.10.0] - 2025-03-10
+
 ### Added
 
-- FairPlay Utilities [#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131)
-- Widevine Utilities [#146](https://github.com/streaming-video-technology-alliance/common-media-library/issues/146)
+- FairPlay Utilities
+  ([#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131))
+- Add `prefix` and `localName` support to the XML types and utilities
+  ([#145](https://github.com/streaming-video-technology-alliance/common-media-library/issues/145))
+- Common DRM Models and Constants 
+  ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
 
 ## [0.9.0] - 2025-02-21
 
@@ -273,7 +279,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.4...v0.8.0
 [0.7.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.7.3...v0.7.4

@@ -1,5 +1,5 @@
-import { CENC } from './CENC';
-import { CBCS } from './CBCS';
+import { CENC } from './CENC.js';
+import { CBCS } from './CBCS.js';
 
 /**
  * Encryption schemes.
