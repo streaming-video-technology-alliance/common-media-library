@@ -710,9 +710,7 @@ export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box
 // @beta
 export function findBoxByType(type: string, raw: IsoData, config?: IsoViewConfig): Box | null;
 
-// Warning: (ae-incompatible-release-tags) The symbol "findCencContentProtection" is marked as @public, but its signature references "ContentProtection" which is marked as @beta
-//
-// @public
+// @beta
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
 
 // @beta
@@ -946,6 +944,7 @@ export type KeyMessage = {
 export type KeySystem = {
     uuid: string;
     schemeIdURI?: string;
+    systemString: string;
 };
 
 // @public
