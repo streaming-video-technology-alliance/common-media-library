@@ -10,7 +10,10 @@ import { parsePSSHList } from './parsePSSHList.js';
  * @returns The PSSH box ArrayBuffer corresponding to the given key system, or null if not found.
  *
  * @group DRM
- * @beta
+ * @beta	
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/common-encryption/getPSSHForKeySystem.test.ts#example}
  */
 export function getPSSHForKeySystem(
 	keySystem: KeySystem | null | undefined,
