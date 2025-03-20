@@ -5,6 +5,15 @@
  *
  * @beta
  */
+
+// common utils
+export * from './drm/common-encryption/findCencContentProtection.js';
+export * from './drm/common-encryption/getPSSHData.js';
+export * from './drm/common-encryption/getPSSHForKeySystem.js';
+export * from './drm/common-encryption/parsePSSHList.js';
+export * from './drm/common-encryption/parseInitDataFromContentProtection.js';
+export * from './drm/common-encryption/getLicenseServerUrlFromContentProtection.js';
+
 // fairplay utilities
 export * from './drm/fairplay/getId.js';
 export * from './drm/fairplay/getLicenseServerUrl.js';
@@ -18,6 +27,8 @@ export type { KeyMessage } from './drm/models/KeyMessage.js';
 export type { KeySystemAccess } from './drm/models/KeySystemAccess.js';
 export type { LicenseRequest } from './drm/models/LicenseRequest.js';
 export type { MediaCapability } from './drm/models/MediaCapability.js';
+export type { ContentProtection } from './drm/models/ContentProtection.js';
+export type { KeySystem } from './drm/models/KeySystem.js';
 
 // drm constants
 export * from './drm/common/const/CBCS.js';
