@@ -6,6 +6,9 @@
  *
  * @group DRM
  * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/common-encryption/getPSSHData.test.ts#example}
  */
 export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer {
 	const offset = 8; // Box size and type fields
