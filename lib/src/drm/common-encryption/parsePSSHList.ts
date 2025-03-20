@@ -9,6 +9,9 @@
  *
  * @group DRM
  * @beta
+ * 
+ * @example 
+ * {@includeCode ../../../test/drm/common-encryption/parsePSSHList.test.ts#example}
  */
 export function parsePSSHList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer> {
 	if (data === null || data === undefined) {
