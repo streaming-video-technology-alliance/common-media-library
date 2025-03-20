@@ -9,6 +9,10 @@ import { ENCRYPTION_SCHEME } from '../common/const/ENCRYPTION_SCHEME';
  * @returns The Common Encryption content protection element, or null if not found.
  *
  * @group DRM
+ * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/common-encryption/findCencContentProtection.test.ts#example}
  */
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null {
 	if (!cpArray) {
