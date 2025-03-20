@@ -10,6 +10,9 @@ import type { ContentProtection } from '../models/ContentProtection.js';
  *
  * @group DRM
  * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/common-encryption/parseInitDataFromContentProtection.test.ts#example}
  */
 export function parseInitDataFromContentProtection(
 	cpData: ContentProtection,
