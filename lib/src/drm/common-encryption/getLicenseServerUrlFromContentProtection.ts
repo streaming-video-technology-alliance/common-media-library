@@ -9,6 +9,9 @@ import type { ContentProtection } from '../models/ContentProtection';
  *
  * @group DRM
  * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/common-encryption/getLicenseServerUrlFromContentProtection.test.ts#example}
  */
 export function getLicenseServerUrlFromContentProtection(
 	contentProtectionElements: ContentProtection[],
