@@ -446,6 +446,18 @@ export type ContentComponent = {
 };
 
 // @beta
+export type ContentProtection = {
+    schemeIdUri?: string;
+    value?: string;
+    pssh?: {
+        __text: string;
+    };
+    laUrl?: {
+        __text: string;
+    };
+};
+
+// @beta
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
 
 // @beta
@@ -698,6 +710,11 @@ export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box
 // @beta
 export function findBoxByType(type: string, raw: IsoData, config?: IsoViewConfig): Box | null;
 
+// Warning: (ae-incompatible-release-tags) The symbol "findCencContentProtection" is marked as @public, but its signature references "ContentProtection" which is marked as @beta
+//
+// @public
+export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
+
 // @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
 
@@ -749,6 +766,15 @@ export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @beta
 export function getLicenseServerUrl(initData: Uint16Array): string;
+
+// @beta
+export function getLicenseServerUrlFromContentProtection(contentProtectionElements: ContentProtection[], schemeIdUri: string): string | null;
+
+// @beta
+export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
+
+// @beta
+export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
@@ -914,6 +940,12 @@ export type KeyMessage = {
     message: ArrayBuffer;
     defaultUrl?: string;
     messageType: (typeof MEDIA_KEY_MESSAGE_TYPES)[keyof typeof MEDIA_KEY_MESSAGE_TYPES];
+};
+
+// @beta
+export type KeySystem = {
+    uuid: string;
+    schemeIdURI?: string;
 };
 
 // @public
@@ -1118,6 +1150,14 @@ export type PACData = {
 
 // @beta
 export function parseBoxes(raw: IsoData, config?: IsoViewConfig): Box[];
+
+// @beta
+export function parseInitDataFromContentProtection(cpData: ContentProtection, BASE64: {
+    decodeArray: (input: string) => Uint8Array;
+}): ArrayBuffer | null;
+
+// @beta
+export function parsePSSHList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer>;
 
 // @beta
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
