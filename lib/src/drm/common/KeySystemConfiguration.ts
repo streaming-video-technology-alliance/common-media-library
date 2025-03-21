@@ -1,4 +1,4 @@
-import type { MediaCapability } from '../models/MediaCapability';
+import type { MediaCapability } from './MediaCapability';
 
 /**
  * Represents the configuration options for requesting key system access.
