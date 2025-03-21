@@ -48,7 +48,7 @@ export * from './drm/common/const/LICENSE_RELEASE.js';
 export * from './drm/common/const/LICENSE_RENEWAL.js';
 export * from './drm/common/const/LICENSE_REQUEST.js';
 export * from './drm/common/const/MEDIA_KEY_MESSAGE_TYPES.js';
-export * from './drm/common/const/MEDIA_KEY_STATUS.js';
+export * from './drm/common/const/MEDIA_KEY_STATUSES.js';
 export * from './drm/common/const/OUTPUT_DOWNSCALED.js';
 export * from './drm/common/const/OUTPUT_RESTRICTED.js';
 export * from './drm/common/const/PLAYREADY_KEY_SYSTEM.js';
