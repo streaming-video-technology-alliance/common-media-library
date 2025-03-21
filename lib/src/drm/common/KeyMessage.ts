@@ -1,4 +1,4 @@
-import type { MEDIA_KEY_MESSAGE_TYPES } from '../common/const/MEDIA_KEY_MESSAGE_TYPES';
+import type { MEDIA_KEY_MESSAGE_TYPES } from '../common/MEDIA_KEY_MESSAGE_TYPES';
 
 /**
  * Represents a DRM key message for license requests.
