@@ -10,6 +10,9 @@ import type { KeySystemConfiguration } from '../models/KeySystemConfiguration.js
  *
  * @group DRM
  * @beta
+ * 
+ * @example
+ * {@includeCode ../../../test/drm/key-system/createMediaKeySystemConfiguration.test.ts#example}
  */
 export function createMediaKeySystemConfiguration(
 	supportedAudio: MediaCapability[] | null,
