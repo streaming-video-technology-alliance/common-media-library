@@ -913,7 +913,7 @@ export type KeyMessage = {
     sessionId?: string;
     message: ArrayBuffer;
     defaultUrl?: string;
-    messageType: (typeof MEDIA_KEY_MESSAGE_TYPES)[keyof typeof MEDIA_KEY_MESSAGE_TYPES];
+    messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
 };
 
 // @public
