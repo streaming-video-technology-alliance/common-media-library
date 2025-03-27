@@ -6,6 +6,6 @@
  * @beta
  */
 export type ThroughputCalculation = {
-	addEntry: (bps: number, durationSeconds: number) => void;
+	addSample: (bps: number, durationSeconds: number) => void;
 	getEstimate: () => number;
 }
