@@ -18,6 +18,7 @@ and this project adheres to
   ([#145](https://github.com/streaming-video-technology-alliance/common-media-library/issues/145))
 - Common DRM Models and Constants 
   ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
+- Add EWMA throughput calculation ([#116](https://github.com/streaming-video-technology-alliance/common-media-library/issues/116))
 
 ## [0.9.0] - 2025-02-21
 
