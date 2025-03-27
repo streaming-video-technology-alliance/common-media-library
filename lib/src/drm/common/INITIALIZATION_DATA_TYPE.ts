@@ -14,5 +14,3 @@ export const INITIALIZATION_DATA_TYPE = {
 	KEYIDS: KEYIDS as typeof KEYIDS,
 	WEBM: WEBM as typeof WEBM,
 } as const;
-
-
