@@ -7,8 +7,8 @@ import type { ThroughputCalculation } from './ThroughputCalculation.js';
  * estimate (in bps) to decrease by half, when producing the new bandwidth
  * estimate.
  *
- * @returns {ThroughputCalculation} an object (ThroughputCalculation) that helps
- * compute an exponentially-weighted moving average.
+ * @returns an object (ThroughputCalculation) that helps compute an
+ * exponentially-weighted moving average.
  *
  * @group Throughput
  *
