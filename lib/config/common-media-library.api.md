@@ -172,6 +172,18 @@ export class CaptionsLogger {
 }
 
 // @beta
+export const CBCS = "cbcs";
+
+// @beta
+export const CENC = "cenc";
+
+// @beta
+export const CLEAR_KEY_SYSTEM = "org.w3.clearkey";
+
+// @beta
+export const CLEAR_KEY_UUID = "e2719d58-a985-b3c9-781a-b030af78d30e";
+
+// @beta
 export type Cmcd = {
     [index: CmcdCustomKey]: CmcdValue;
     br?: number;
@@ -632,6 +644,12 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // @beta
+export const ENCRYPTION_SCHEME: {
+    readonly CENC: typeof CENC;
+    readonly CBCS: typeof CBCS;
+};
+
+// @beta
 export const encv: BoxParser<VisualSampleEntry>;
 
 // @beta
@@ -650,6 +668,9 @@ export type EventMessageBox = FullBox & {
     id: number;
     messageData: Uint8Array;
 };
+
+// @beta
+export const EXPIRED = "expired";
 
 // @beta
 export type ExtendedLanguageBox = FullBox & {
@@ -778,6 +799,15 @@ export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presen
 export function hvc1(view: IsoView): VisualSampleEntry;
 
 // @beta
+export const HW_SECURE_ALL = "HW_SECURE_ALL";
+
+// @beta
+export const HW_SECURE_CRYPTO = "HW_SECURE_CRYPTO";
+
+// @beta
+export const HW_SECURE_DECODE = "HW_SECURE_DECODE";
+
+// @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
 // @beta
@@ -789,6 +819,9 @@ export type IdentifiedMediaDataBox = {
 // @beta
 export function imda(view: IsoView): IdentifiedMediaDataBox;
 
+// @beta
+export const INDIVIDUALIZATION_REQUEST = "individualization-request";
+
 // @alpha
 export type Initialization = {
     $: {
@@ -798,7 +831,17 @@ export type Initialization = {
 };
 
 // @beta
+export const INITIALIZATION_DATA_TYPE: {
+    readonly CENC: typeof CENC;
+    readonly KEYIDS: typeof KEYIDS;
+    readonly WEBM: typeof WEBM;
+};
+
+// @beta
 export const INT = "int";
+
+// @beta
+export const INTERNAL_ERROR = "internal-error";
 
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -863,6 +906,33 @@ export type IsoViewConfig = {
 };
 
 // @beta
+export const KEYIDS = "keyids";
+
+// @beta
+export type KeyMessage = {
+    sessionId?: string;
+    message: ArrayBuffer;
+    defaultUrl?: string;
+    messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
+};
+
+// @public
+export type KeySystemAccess = {
+    keySystem: string;
+    configuration: MediaKeySystemConfiguration;
+};
+
+// @beta
+export type KeySystemConfiguration = {
+    initDataTypes?: string[];
+    audioCapabilities?: MediaCapability[];
+    videoCapabilities?: MediaCapability[];
+    distinctiveIdentifier?: 'required' | 'optional' | 'not-allowed';
+    persistentState?: 'required' | 'optional' | 'not-allowed';
+    sessionTypes?: string[];
+};
+
+// @beta
 export function kind(view: IsoView): TrackKindBox;
 
 // @beta
@@ -875,6 +945,27 @@ export type LabelBox = FullBox & {
 
 // @beta
 export function labl(view: IsoView): LabelBox;
+
+// @beta
+export const LICENSE_RELEASE = "license-release";
+
+// @beta
+export const LICENSE_RENEWAL = "license-renewal";
+
+// @beta
+export const LICENSE_REQUEST = "license-request";
+
+// @public
+export type LicenseRequest = {
+    url: string;
+    method: 'GET' | 'POST';
+    responseType: XMLHttpRequestResponseType;
+    headers?: Record<string, string>;
+    withCredentials?: boolean;
+    messageType?: MediaKeyMessageType;
+    sessionId?: string;
+    data?: ArrayBuffer;
+};
 
 // @alpha
 export type Manifest = {
@@ -893,6 +984,31 @@ export function mdat(view: IsoView): MediaDataBox;
 
 // @beta
 export function mdhd(view: IsoView): MediaHeaderBox;
+
+// @beta
+export const MEDIA_KEY_MESSAGE_TYPES: {
+    readonly LICENSE_REQUEST: typeof LICENSE_REQUEST;
+    readonly LICENSE_RENEWAL: typeof LICENSE_RENEWAL;
+    readonly LICENSE_RELEASE: typeof LICENSE_RELEASE;
+    readonly INDIVIDUALIZATION_REQUEST: typeof INDIVIDUALIZATION_REQUEST;
+};
+
+// @beta
+export const MEDIA_KEY_STATUSES: {
+    readonly USABLE: typeof USABLE;
+    readonly EXPIRED: typeof EXPIRED;
+    readonly RELEASED: typeof RELEASED;
+    readonly OUTPUT_RESTRICTED: typeof OUTPUT_RESTRICTED;
+    readonly OUTPUT_DOWNSCALED: typeof OUTPUT_DOWNSCALED;
+    readonly STATUS_PENDING: typeof STATUS_PENDING;
+    readonly INTERNAL_ERROR: typeof INTERNAL_ERROR;
+};
+
+// @public
+export type MediaCapability = {
+    contentType: string;
+    robustness: string;
+};
 
 // @beta
 export type MediaDataBox = {
@@ -986,6 +1102,12 @@ export type OriginalFormatBox = {
 };
 
 // @beta
+export const OUTPUT_DOWNSCALED = "output-downscaled";
+
+// @beta
+export const OUTPUT_RESTRICTED = "output-restricted";
+
+// @beta
 export type PACData = {
     row: number;
     indent: number | null;
@@ -1061,6 +1183,15 @@ export type PlayList = {
 };
 
 // @beta
+export const PLAYREADY_KEY_SYSTEM = "com.microsoft.playready";
+
+// @beta
+export const PLAYREADY_RECOMMENDATION_KEY_SYSTEM = "com.microsoft.playready.recommendation";
+
+// @beta
+export const PLAYREADY_UUID = "9a04f079-9840-4286-ab92-e65be0885f95";
+
+// @beta
 export type PreselectionGroupBox = FullBox & {
     groupId: number;
     numEntitiesInGroup: number;
@@ -1129,6 +1260,9 @@ export type Reference = {
     sapType: number;
     sapDeltaTime: number;
 };
+
+// @beta
+export const RELEASED = "released";
 
 // @alpha
 export type Representation = {
@@ -1421,6 +1555,9 @@ export type SoundMediaHeaderBox = FullBox & {
 export function ssix(view: IsoView): SubsegmentIndexBox;
 
 // @beta
+export const STATUS_PENDING = "status-pending";
+
+// @beta
 export function sthd(view: IsoView): SubtitleMediaHeaderBox;
 
 // @beta
@@ -1502,6 +1639,12 @@ export type SubtitleMediaHeaderBox = FullBox;
 
 // @beta
 export type SupportedField = 1 | 3;
+
+// @beta
+export const SW_SECURE_CRYPTO = "SW_SECURE_CRYPTO";
+
+// @beta
+export const SW_SECURE_DECODE = "SW_SECURE_DECODE";
 
 // @alpha
 export type SwitchingSet = Ham & {
@@ -1696,6 +1839,9 @@ export type UrnBox = FullBox & {
 };
 
 // @beta
+export const USABLE = "usable";
+
+// @beta
 export const UTF8 = "utf8";
 
 // @beta
@@ -1796,6 +1942,12 @@ export function vttC(view: IsoView): WebVTTConfigurationBox;
 export function vtte(): WebVTTEmptySampleBox;
 
 // @beta
+export const W3C_CLEAR_KEY_UUID = "1077efec-c0b2-4d02-ace3-3c1e52e2fb4b";
+
+// @beta
+export const WEBM = "webm";
+
+// @beta
 export type WebVTTConfigurationBox = {
     config: string;
 };
@@ -1817,6 +1969,21 @@ export type WebVTTSettingsBox = {
 export type WebVTTSourceLabelBox = {
     sourceLabel: string;
 };
+
+// @beta
+export const WIDEVINE_KEY_SYSTEM = "com.widevine.alpha";
+
+// @beta
+export const WIDEVINE_ROBUSTNESS: {
+    readonly SW_SECURE_CRYPTO: typeof SW_SECURE_CRYPTO;
+    readonly SW_SECURE_DECODE: typeof SW_SECURE_DECODE;
+    readonly HW_SECURE_CRYPTO: typeof HW_SECURE_CRYPTO;
+    readonly HW_SECURE_DECODE: typeof HW_SECURE_DECODE;
+    readonly HW_SECURE_ALL: typeof HW_SECURE_ALL;
+};
+
+// @beta
+export const WIDEVINE_UUID = "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed";
 
 // @beta
 export type XmlNode = {
