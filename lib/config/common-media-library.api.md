@@ -446,7 +446,22 @@ export type ContentComponent = {
 };
 
 // @beta
+export type ContentProtection = {
+    schemeIdUri?: string;
+    value?: string;
+    pssh?: {
+        __text: string;
+    };
+    laUrl?: {
+        __text: string;
+    };
+};
+
+// @beta
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
+
+// @beta
+export function createMediaKeySystemConfiguration(supportedAudio: MediaCapability[] | null, supportedVideo: MediaCapability[] | null): KeySystemConfiguration;
 
 // @beta
 export class Cta608Channel {
@@ -699,6 +714,9 @@ export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box
 export function findBoxByType(type: string, raw: IsoData, config?: IsoViewConfig): Box | null;
 
 // @beta
+export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
+
+// @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
 
 // @alpha
@@ -748,7 +766,34 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @beta
+export function getLegacyKeySystemAccess(ksConfigurations: {
+    ks: KeySystem;
+    configs: KeySystemConfiguration[];
+}[]): KeySystemAccess | null;
+
+// @beta
 export function getLicenseServerUrl(initData: Uint16Array): string;
+
+// @beta
+export function getLicenseServerUrlFromContentProtection(contentProtectionElements: ContentProtection[], schemeIdUri: string): string | null;
+
+// @beta
+export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
+
+// @beta
+export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
+
+// @beta
+export function getStandardKeySystemAccess(ksConfigurations: {
+    ks: KeySystem;
+    configs: KeySystemConfiguration[];
+}[]): Promise<MediaKeySystemAccess | null>;
+
+// @beta
+export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
+    supportedAudio: MediaCapability[] | null;
+    supportedVideo: MediaCapability[] | null;
+} | null;
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
@@ -914,6 +959,13 @@ export type KeyMessage = {
     message: ArrayBuffer;
     defaultUrl?: string;
     messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
+};
+
+// @beta
+export type KeySystem = {
+    uuid: string;
+    schemeIdURI?: string;
+    systemString: string;
 };
 
 // @public
@@ -1091,6 +1143,9 @@ export type MovieHeaderBox = {
 };
 
 // @beta
+export const MP4_PROTECTION_SCHEME = "urn:mpeg:dash:mp4protection:2011";
+
+// @beta
 export function mp4a(view: IsoView): AudioSampleEntry;
 
 // @beta
@@ -1118,6 +1173,14 @@ export type PACData = {
 
 // @beta
 export function parseBoxes(raw: IsoData, config?: IsoViewConfig): Box[];
+
+// @beta
+export function parseInitDataFromContentProtection(cpData: ContentProtection, BASE64: {
+    decodeArray: (input: string) => Uint8Array;
+}): ArrayBuffer | null;
+
+// @beta
+export function parsePSSHList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer>;
 
 // @beta
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
