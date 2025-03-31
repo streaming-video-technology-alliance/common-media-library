@@ -8,11 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-### Changed
-
-- `CommonMediaRequest` / `CommonMediaResponse` Updates
-  ([#163](https://github.com/streaming-video-technology-alliance/common-media-library/issues/163))
-
 ## [0.10.0] - 2025-03-10
 
 ### Added
