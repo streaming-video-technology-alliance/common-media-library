@@ -21,7 +21,14 @@ export const ewmaFactory = (halfLife: number): ThroughputCalculation => {
 
 	let estimateBps = 0;
 	let totalDurationSeconds = 0;
-	const alpha = Math.exp(Math.log(0.5) / halfLife);
+	let alpha = Math.exp(Math.log(0.5) / halfLife);
+
+	const configure = (newHalfLife: number): void => {
+		if (newHalfLife <= 0) {
+			throw new Error('halfLife must be positive');
+		}
+		alpha = Math.exp(Math.log(0.5) / newHalfLife);
+	};
 
 	const addSample = (bps: number, durationSeconds: number): void => {
 		const adjAlpha = Math.pow(alpha, durationSeconds);
@@ -49,6 +56,7 @@ export const ewmaFactory = (halfLife: number): ThroughputCalculation => {
 		addSample,
 		getEstimate,
 		getTotalDuration,
+		configure,
 	};
 
 	return instance;
