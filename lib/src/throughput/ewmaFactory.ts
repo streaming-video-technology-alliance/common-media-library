@@ -41,9 +41,14 @@ export const ewmaFactory = (halfLife: number): ThroughputCalculation => {
 		return estimateBps / zeroFactor;
 	};
 
+	const getTotalDuration = (): number => {
+		return totalDurationSeconds;
+	};
+
 	const instance = {
 		addSample,
 		getEstimate,
+		getTotalDuration,
 	};
 
 	return instance;
