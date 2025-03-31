@@ -1,6 +1,5 @@
 import type { CommonMediaRequest } from './CommonMediaRequest.js';
 import type { ResourceTiming } from './ResourceTiming.js';
-import type { ResponseTypeMap } from './ResponseTypeMap.js';
 
 /**
  * Common response API.
@@ -10,49 +9,49 @@ import type { ResponseTypeMap } from './ResponseTypeMap.js';
  * @beta
  */
 
-export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = {
+export type CommonMediaResponse = {
 	/**
 	 * The origin request.
 	 */
-	request: R;
+	request: CommonMediaRequest
 
 	/**
 	 * The final URL obtained after any redirects.
 	 */
-	url?: string;
+	url?: string
 
 	/**
 	 * Indicates whether or not the request was redirected.
 	 */
-	redirected?: boolean;
+	redirected?: boolean
 
 	/**
 	 * The HTTP status code of the response.
 	 */
-	status?: number;
+	status?: number
 
 	/**
 	 * The status message corresponding to the HTTP status code.
 	 */
-	statusText?: string;
+	statusText?: string
 
 	/**
 	 * The type of the response.
 	 */
-	type?: string;
+	type?: string
 
 	/**
 	 * The response headers.
 	 */
-	headers?: Record<string, string>;
+	headers?: Record<string, string>
 
 	/**
 	 * The response data.
 	 */
-	data?: ResponseTypeMap<R['responseType']>;
+	data?: any
 
 	/**
 	 * The network timing of the request/response.
 	 */
-	resourceTiming?: ResourceTiming;
-};
+	resourceTiming: ResourceTiming
+}
