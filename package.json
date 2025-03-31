@@ -32,9 +32,9 @@
 		"test": "npm test -ws --if-present",
 		"start": "npm start -w dev",
 		"pub": "npm publish -w lib --provenance --access public",
-		"ver": "tsx scripts/version.mts",
+		"ver": "node scripts/version.mts",
 		"docs": "npm start -w docs",
-		"notes": "tsx scripts/createReleaseNotes.mts",
+		"notes": "node scripts/createReleaseNotes.mts",
 		"typecheck": "tsc --noEmit"
 	},
 	"workspaces": [
@@ -43,22 +43,28 @@
 		"dev",
 		"samples/*"
 	],
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=23.9.0",
+			"onFail": "error"
+		}
+	},
 	"devDependencies": {
-		"@eslint/eslintrc": "3.1.0",
-		"@eslint/js": "9.13.0",
-		"@microsoft/api-extractor": "7.47.11",
-		"@types/node": "22.8.0",
-		"@typescript-eslint/eslint-plugin": "8.11.0",
-		"@typescript-eslint/parser": "8.11.0",
-		"eslint": "9.13.0",
-		"eslint-plugin-tsdoc": "0.3.0",
+		"@eslint/eslintrc": "3.3.0",
+		"@eslint/js": "9.22.0",
+		"@microsoft/api-extractor": "7.52.0",
+		"@types/node": "22.13.10",
+		"@typescript-eslint/eslint-plugin": "8.26.1",
+		"@typescript-eslint/parser": "8.26.1",
+		"eslint": "9.22.0",
+		"eslint-plugin-tsdoc": "0.4.0",
 		"eslint-plugin-typescript-enum": "2.1.0",
-		"glob": "11.0.0",
-		"globals": "15.11.0",
+		"glob": "11.0.1",
+		"globals": "16.0.0",
 		"hi-base32": "0.5.1",
-		"tslib": "2.8.0",
-		"tsx": "4.19.1",
-		"typedoc": "0.27.7",
-		"typescript": "5.6.3"
+		"tslib": "2.8.1",
+		"typedoc": "0.27.9",
+		"typescript": "5.8.2"
 	}
 }
