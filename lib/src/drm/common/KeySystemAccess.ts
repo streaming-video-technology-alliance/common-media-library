@@ -6,6 +6,6 @@
  * @public
  */
 export type KeySystemAccess = {
-    keySystem: string;
-    configuration: MediaKeySystemConfiguration;
+	keySystem: string;
+	configuration: MediaKeySystemConfiguration;
 }

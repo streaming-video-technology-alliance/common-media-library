@@ -7,8 +7,8 @@ import type { MEDIA_KEY_MESSAGE_TYPES } from '../common/MEDIA_KEY_MESSAGE_TYPES'
  * @beta
  */
 export type KeyMessage = {
-  sessionId?: string;
-  message: ArrayBuffer;
-  defaultUrl?: string;
-  messageType: (typeof MEDIA_KEY_MESSAGE_TYPES)[keyof typeof MEDIA_KEY_MESSAGE_TYPES];
+	sessionId?: string;
+	message: ArrayBuffer;
+	defaultUrl?: string;
+	messageType: (typeof MEDIA_KEY_MESSAGE_TYPES)[keyof typeof MEDIA_KEY_MESSAGE_TYPES];
 }
