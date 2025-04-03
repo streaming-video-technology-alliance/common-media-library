@@ -10,7 +10,7 @@ import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.js
  * @group DRM
  * @beta
  */
-export async function getStandardKeySystemAccess(
+export async function getKeySystemAccess(
 	ksConfigurations: { ks: KeySystem; configs: KeySystemConfiguration[] }[],
 ): Promise<MediaKeySystemAccess | null> {
 	for (const { ks, configs } of ksConfigurations) {
