@@ -251,8 +251,6 @@ export const CmcdEncoding: {
     readonly HEADERS: typeof CMCD_HEADERS;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ValueOf" needs to be exported by the entry point index.d.ts
-//
 // @beta (undocumented)
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
@@ -399,8 +397,9 @@ export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string |
 // @beta
 export type CommonMediaRequest = {
     url: string;
-    method: string;
-    responseType?: string;
+    method?: string;
+    body?: BodyInit;
+    responseType?: RequestType;
     headers?: Record<string, string>;
     credentials?: RequestCredentials;
     mode?: RequestMode;
@@ -410,16 +409,16 @@ export type CommonMediaRequest = {
 };
 
 // @beta
-export type CommonMediaResponse = {
-    request: CommonMediaRequest;
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = {
+    request: R;
     url?: string;
     redirected?: boolean;
     status?: number;
     statusText?: string;
     type?: string;
     headers?: Record<string, string>;
-    data?: any;
-    resourceTiming: ResourceTiming;
+    data?: ResponseTypeMap<R['responseType']>;
+    resourceTiming?: ResourceTiming;
 };
 
 // @beta
@@ -452,6 +451,9 @@ export type ContentProtection = {
     pssh?: string;
     laUrl?: string;
 };
+
+// @beta
+export function convertUint8ToUint16(input: Uint8Array): Uint16Array;
 
 // @beta
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
@@ -1348,7 +1350,24 @@ export type Representation = {
 };
 
 // @beta
+export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResponse>;
+
+// @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
+
+// @beta
+export const RequestType: {
+    readonly TEXT: "text";
+    readonly JSON: "json";
+    readonly BLOB: "blob";
+    readonly ARRAY_BUFFER: "arrayBuffer";
+    readonly DOCUMENT: "document";
+};
+
+// Warning: (ae-incompatible-release-tags) The symbol "RequestType" is marked as @public, but its signature references "ValueOf" which is marked as @beta
+//
+// @public (undocumented)
+export type RequestType = ValueOf<typeof RequestType>;
 
 // @beta
 export type ResourceTiming = {
@@ -1361,6 +1380,9 @@ export type ResourceTiming = {
 
 // @beta
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
+
+// @beta
+export type ResponseTypeMap<T extends string | undefined> = T extends 'json' ? any : T extends 'text' ? string : T extends 'blob' ? Blob : T extends 'arraybuffer' ? ArrayBuffer : T extends 'document' ? XmlNode : unknown;
 
 // @alpha
 export type Role = {
@@ -1943,6 +1965,9 @@ export type Validation = {
     status: boolean;
     errorMessages: string[];
 };
+
+// @beta
+export type ValueOf<T> = T[keyof T];
 
 // @beta
 export const VerboseLevel: {
