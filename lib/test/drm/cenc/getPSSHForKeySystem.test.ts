@@ -1,4 +1,4 @@
-import { getPSSHForKeySystem } from '@svta/common-media-library/drm/cemc/getPSSHForKeySystem';
+import { getPSSHForKeySystem } from '@svta/common-media-library/drm/cenc/getPSSHForKeySystem';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox';

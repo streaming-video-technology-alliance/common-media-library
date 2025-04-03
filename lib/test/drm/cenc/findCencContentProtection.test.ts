@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import { strictEqual } from 'node:assert';
-import { findCencContentProtection } from '@svta/common-media-library/drm/cemc/findCencContentProtection';
+import { findCencContentProtection } from '@svta/common-media-library/drm/cenc/findCencContentProtection';
 import { MP4_PROTECTION_SCHEME } from '@svta/common-media-library/drm/common/MP4_PROTECTION_SCHEME';
 
 describe('findCencContentProtection', () => {

@@ -1,4 +1,4 @@
-import { getLicenseServerUrlFromContentProtection } from '@svta/common-media-library/drm/cemc/getLicenseServerUrlFromContentProtection';
+import { getLicenseServerUrlFromContentProtection } from '@svta/common-media-library/drm/cenc/getLicenseServerUrlFromContentProtection';
 import { beforeEach, describe, it } from 'node:test';
 import { strictEqual } from 'node:assert';
 

@@ -1,4 +1,4 @@
-import { getPSSHData } from '@svta/common-media-library/drm/cemc/getPSSHData';
+import { getPSSHData } from '@svta/common-media-library/drm/cenc/getPSSHData';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox';
