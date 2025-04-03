@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Core DRM Utilities - CommonEncryption, KeySystemUtils 
+  ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
+
 ## [0.10.0] - 2025-03-10
 
 ### Added
@@ -18,8 +23,6 @@ and this project adheres to
   ([#145](https://github.com/streaming-video-technology-alliance/common-media-library/issues/145))
 - Common DRM Models and Constants 
   ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
-- Core DRM Utilities - CommonEncryption, KeySystemUtils 
-  ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
 
 ## [0.9.0] - 2025-02-21
 
