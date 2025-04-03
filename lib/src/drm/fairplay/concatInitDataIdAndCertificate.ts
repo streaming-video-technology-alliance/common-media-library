@@ -1,4 +1,4 @@
-import { stringToArray } from '../common/utils/stringToArray.js';
+import { stringToUint16 } from '../../utils/stringToUint16.js';
 
 /**
  * Concatenates InitData, ID, and Certificate for FairPlay DRM.
@@ -17,7 +17,7 @@ import { stringToArray } from '../common/utils/stringToArray.js';
 
 export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array {
 	if (typeof id === 'string') {
-		id = stringToArray(id);
+		id = stringToUint16(id);
 	}
 	const buffer = new ArrayBuffer(initData.byteLength + 4 + id.byteLength + 4 + cert.byteLength);
 	const dataView = new DataView(buffer);
