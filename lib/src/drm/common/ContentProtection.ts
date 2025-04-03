@@ -7,10 +7,6 @@
 export type ContentProtection = {
   schemeIdUri?: string;
   value?: string;
-  pssh?: {
-    __text: string;
-  };
-  laUrl?: {
-    __text: string;
-  };
+  pssh?: string;
+  laUrl?: string;
 }; 
