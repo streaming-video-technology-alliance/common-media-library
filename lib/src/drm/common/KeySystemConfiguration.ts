@@ -7,11 +7,11 @@ import type { MediaCapability } from './MediaCapability';
  * @beta
  */
 export type KeySystemConfiguration = {
-  initDataTypes?: string[];
-  audioCapabilities?: MediaCapability[];
-  videoCapabilities?: MediaCapability[];
-  distinctiveIdentifier?: 'required' | 'optional' | 'not-allowed';
-  persistentState?: 'required' | 'optional' | 'not-allowed';
-  sessionTypes?: string[];
+	initDataTypes?: string[];
+	audioCapabilities?: MediaCapability[];
+	videoCapabilities?: MediaCapability[];
+	distinctiveIdentifier?: 'required' | 'optional' | 'not-allowed';
+	persistentState?: 'required' | 'optional' | 'not-allowed';
+	sessionTypes?: string[];
 }
 

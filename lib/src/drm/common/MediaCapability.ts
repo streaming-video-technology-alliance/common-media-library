@@ -8,6 +8,6 @@
  * @beta
  */
 export type MediaCapability = {
-    contentType: string;
-    robustness: string;
+	contentType: string;
+	robustness: string;
 }

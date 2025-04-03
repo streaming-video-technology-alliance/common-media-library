@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The format command no longer works
+  ([#166](https://github.com/streaming-video-technology-alliance/common-media-library/issues/166))
+
 ## [0.10.0] - 2025-03-10
 
 ### Added
@@ -16,7 +21,7 @@ and this project adheres to
   ([#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131))
 - Add `prefix` and `localName` support to the XML types and utilities
   ([#145](https://github.com/streaming-video-technology-alliance/common-media-library/issues/145))
-- Common DRM Models and Constants 
+- Common DRM Models and Constants
   ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
 
 ## [0.9.0] - 2025-02-21
