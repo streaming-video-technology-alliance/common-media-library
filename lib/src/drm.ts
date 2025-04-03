@@ -7,12 +7,12 @@
  */
 
 // common utils
-export * from './drm/cemc/findCencContentProtection.js';
-export * from './drm/cemc/getPSSHData.js';
-export * from './drm/cemc/getPSSHForKeySystem.js';
-export * from './drm/cemc/parsePSSHList.js';
-export * from './drm/cemc/parseInitDataFromContentProtection.js';
-export * from './drm/cemc/getLicenseServerUrlFromContentProtection.js';
+export * from './drm/cenc/findCencContentProtection.js';
+export * from './drm/cenc/getPSSHData.js';
+export * from './drm/cenc/getPSSHForKeySystem.js';
+export * from './drm/cenc/parsePSSHList.js';
+export * from './drm/cenc/parseInitDataFromContentProtection.js';
+export * from './drm/cenc/getLicenseServerUrlFromContentProtection.js';
 
 // key system utils
 export * from './drm/keysystem/getKeySystemAccess.js';
