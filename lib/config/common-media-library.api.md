@@ -789,9 +789,9 @@ export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, ini
 
 // @beta
 export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
-    supportedAudio: MediaCapability[] | null;
-    supportedVideo: MediaCapability[] | null;
-} | null;
+    supportedAudio: MediaCapability[];
+    supportedVideo: MediaCapability[];
+};
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
@@ -1645,6 +1645,9 @@ export function sthd(view: IsoView): SubtitleMediaHeaderBox;
 
 // @beta
 export const STRING = "string";
+
+// @public (undocumented)
+export function stringToUint16(str: string): Uint16Array;
 
 // @beta
 export function stsd(view: IsoView): SampleDescriptionBox;
