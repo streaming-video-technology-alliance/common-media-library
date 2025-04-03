@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- `CommonMediaRequest` / `CommonMediaResponse` Updates
+  ([#163](https://github.com/streaming-video-technology-alliance/common-media-library/issues/163))
+
 ### Fixed
 
 - The format command no longer works
