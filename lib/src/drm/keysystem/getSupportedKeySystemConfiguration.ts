@@ -20,7 +20,7 @@ export function getSupportedKeySystemConfiguration(
 	}
 
 	// legacy isTypeSupported from MediaKeys
-	const isTypeSupported = (window.MediaKeys as any)?.isTypeSupported;
+	const isTypeSupported = typeof MediaKeys !== 'undefined' &&  MediaKeys.isTypeSupported ? MediaKeys.isTypeSupported : (...args: any[]) => false;
 
 	for (const config of configs) {
 		let supportedAudio: MediaCapability[] | null = null;
