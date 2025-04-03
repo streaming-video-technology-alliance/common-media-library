@@ -5,6 +5,21 @@
  *
  * @beta
  */
+
+// common utils
+export * from './drm/cenc/findCencContentProtection.js';
+export * from './drm/cenc/getPSSHData.js';
+export * from './drm/cenc/getPSSHForKeySystem.js';
+export * from './drm/cenc/parsePSSHList.js';
+export * from './drm/cenc/parseInitDataFromContentProtection.js';
+export * from './drm/cenc/getLicenseServerUrlFromContentProtection.js';
+
+// key system utils
+export * from './drm/keysystem/getKeySystemAccess.js';
+export * from './drm/keysystem/getLegacyKeySystemAccess.js';
+export * from './drm/keysystem/getSupportedKeySystemConfiguration.js';
+export * from './drm/keysystem/createMediaKeySystemConfiguration.js';
+
 // fairplay utilities
 export * from './drm/fairplay/getId.js';
 export * from './drm/fairplay/getLicenseServerUrl.js';
@@ -18,6 +33,8 @@ export type { KeyMessage } from './drm/common/KeyMessage.js';
 export type { KeySystemAccess } from './drm/common/KeySystemAccess.js';
 export type { LicenseRequest } from './drm/common/LicenseRequest.js';
 export type { MediaCapability } from './drm/common/MediaCapability.js';
+export type { ContentProtection } from './drm/common/ContentProtection.js';
+export type { KeySystem } from './drm/common/KeySystem.js';
 
 // drm constants
 export * from './drm/common/CBCS.js';
@@ -38,6 +55,7 @@ export * from './drm/common/LICENSE_RENEWAL.js';
 export * from './drm/common/LICENSE_REQUEST.js';
 export * from './drm/common/MEDIA_KEY_MESSAGE_TYPES.js';
 export * from './drm/common/MEDIA_KEY_STATUS.js';
+export * from './drm/common/MP4_PROTECTION_SCHEME';
 export * from './drm/common/OUTPUT_DOWNSCALED.js';
 export * from './drm/common/OUTPUT_RESTRICTED.js';
 export * from './drm/common/PLAYREADY_KEY_SYSTEM.js';

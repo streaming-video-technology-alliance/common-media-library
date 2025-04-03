@@ -10,4 +10,5 @@
 export type MediaCapability = {
 	contentType: string;
 	robustness: string;
+	encryptionScheme?: 'cenc' | 'cbcs';
 }
