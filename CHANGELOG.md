@@ -25,7 +25,6 @@ and this project adheres to
 - The format command no longer works
   ([#166](https://github.com/streaming-video-technology-alliance/common-media-library/issues/166))
 
-
 ## [0.10.0] - 2025-03-10
 
 ### Added
