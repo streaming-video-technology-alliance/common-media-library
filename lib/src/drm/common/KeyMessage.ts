@@ -8,8 +8,8 @@ import type { ValueOf } from '../../utils/ValueOf';
  * @beta
  */
 export type KeyMessage = {
-  sessionId?: string;
-  message: ArrayBuffer;
-  defaultUrl?: string;
-  messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
+	sessionId?: string;
+	message: ArrayBuffer;
+	defaultUrl?: string;
+	messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
 }
