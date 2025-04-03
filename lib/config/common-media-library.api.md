@@ -878,6 +878,7 @@ export type Initialization = {
 // @beta
 export const INITIALIZATION_DATA_TYPE: {
     readonly CENC: typeof CENC;
+    readonly CBCS: typeof CBCS;
     readonly KEYIDS: typeof KEYIDS;
     readonly WEBM: typeof WEBM;
 };
@@ -1060,6 +1061,7 @@ export const MEDIA_KEY_STATUSES: {
 export type MediaCapability = {
     contentType: string;
     robustness: string;
+    encryptionScheme?: 'cenc' | 'cbcs';
 };
 
 // @beta
