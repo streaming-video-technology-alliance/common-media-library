@@ -251,8 +251,6 @@ export const CmcdEncoding: {
     readonly HEADERS: typeof CMCD_HEADERS;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ValueOf" needs to be exported by the entry point index.d.ts
-//
 // @beta (undocumented)
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
@@ -399,8 +397,9 @@ export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string |
 // @beta
 export type CommonMediaRequest = {
     url: string;
-    method: string;
-    responseType?: string;
+    method?: string;
+    body?: BodyInit;
+    responseType?: RequestType;
     headers?: Record<string, string>;
     credentials?: RequestCredentials;
     mode?: RequestMode;
@@ -410,16 +409,16 @@ export type CommonMediaRequest = {
 };
 
 // @beta
-export type CommonMediaResponse = {
-    request: CommonMediaRequest;
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = {
+    request: R;
     url?: string;
     redirected?: boolean;
     status?: number;
     statusText?: string;
     type?: string;
     headers?: Record<string, string>;
-    data?: any;
-    resourceTiming: ResourceTiming;
+    data?: ResponseTypeMap<R['responseType']>;
+    resourceTiming?: ResourceTiming;
 };
 
 // @beta
@@ -446,7 +445,21 @@ export type ContentComponent = {
 };
 
 // @beta
+export type ContentProtection = {
+    schemeIdUri?: string;
+    value?: string;
+    pssh?: string;
+    laUrl?: string;
+};
+
+// @beta
+export function convertUint8ToUint16(input: Uint8Array): Uint16Array;
+
+// @beta
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
+
+// @beta
+export function createMediaKeySystemConfiguration(supportedAudio: MediaCapability[] | null, supportedVideo: MediaCapability[] | null): KeySystemConfiguration;
 
 // @beta
 export class Cta608Channel {
@@ -699,6 +712,9 @@ export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box
 export function findBoxByType(type: string, raw: IsoData, config?: IsoViewConfig): Box | null;
 
 // @beta
+export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
+
+// @beta
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>>;
 
 // @alpha
@@ -748,7 +764,34 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @beta
+export function getKeySystemAccess(ksConfigurations: {
+    ks: KeySystem;
+    configs: KeySystemConfiguration[];
+}[]): Promise<MediaKeySystemAccess | null>;
+
+// @beta
+export function getLegacyKeySystemAccess(ksConfigurations: {
+    ks: KeySystem;
+    configs: KeySystemConfiguration[];
+}[]): KeySystemAccess | null;
+
+// @beta
 export function getLicenseServerUrl(initData: Uint16Array): string;
+
+// @beta
+export function getLicenseServerUrlFromContentProtection(contentProtectionElements: ContentProtection[], schemeIdUri: string): string | null;
+
+// @beta
+export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
+
+// @beta
+export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
+
+// @beta
+export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
+    supportedAudio: MediaCapability[];
+    supportedVideo: MediaCapability[];
+};
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
@@ -833,6 +876,7 @@ export type Initialization = {
 // @beta
 export const INITIALIZATION_DATA_TYPE: {
     readonly CENC: typeof CENC;
+    readonly CBCS: typeof CBCS;
     readonly KEYIDS: typeof KEYIDS;
     readonly WEBM: typeof WEBM;
 };
@@ -914,6 +958,13 @@ export type KeyMessage = {
     message: ArrayBuffer;
     defaultUrl?: string;
     messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
+};
+
+// @beta
+export type KeySystem = {
+    uuid: string;
+    schemeIdURI?: string;
+    systemString: string;
 };
 
 // @public
@@ -1008,6 +1059,7 @@ export const MEDIA_KEY_STATUSES: {
 export type MediaCapability = {
     contentType: string;
     robustness: string;
+    encryptionScheme?: 'cenc' | 'cbcs';
 };
 
 // @beta
@@ -1091,6 +1143,9 @@ export type MovieHeaderBox = {
 };
 
 // @beta
+export const MP4_PROTECTION_SCHEME = "urn:mpeg:dash:mp4protection:2011";
+
+// @beta
 export function mp4a(view: IsoView): AudioSampleEntry;
 
 // @beta
@@ -1118,6 +1173,14 @@ export type PACData = {
 
 // @beta
 export function parseBoxes(raw: IsoData, config?: IsoViewConfig): Box[];
+
+// @beta
+export function parseInitDataFromContentProtection(cpData: ContentProtection, BASE64: {
+    decodeArray: (input: string) => Uint8Array;
+}): ArrayBuffer | null;
+
+// @beta
+export function parsePSSHList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer>;
 
 // @beta
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
@@ -1287,7 +1350,24 @@ export type Representation = {
 };
 
 // @beta
+export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResponse>;
+
+// @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
+
+// @beta
+export const RequestType: {
+    readonly TEXT: "text";
+    readonly JSON: "json";
+    readonly BLOB: "blob";
+    readonly ARRAY_BUFFER: "arrayBuffer";
+    readonly DOCUMENT: "document";
+};
+
+// Warning: (ae-incompatible-release-tags) The symbol "RequestType" is marked as @public, but its signature references "ValueOf" which is marked as @beta
+//
+// @public (undocumented)
+export type RequestType = ValueOf<typeof RequestType>;
 
 // @beta
 export type ResourceTiming = {
@@ -1300,6 +1380,9 @@ export type ResourceTiming = {
 
 // @beta
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
+
+// @beta
+export type ResponseTypeMap<T extends string | undefined> = T extends 'json' ? any : T extends 'text' ? string : T extends 'blob' ? Blob : T extends 'arraybuffer' ? ArrayBuffer : T extends 'document' ? XmlNode : unknown;
 
 // @alpha
 export type Role = {
@@ -1562,6 +1645,9 @@ export function sthd(view: IsoView): SubtitleMediaHeaderBox;
 
 // @beta
 export const STRING = "string";
+
+// @public (undocumented)
+export function stringToUint16(str: string): Uint16Array;
 
 // @beta
 export function stsd(view: IsoView): SampleDescriptionBox;
@@ -1882,6 +1968,9 @@ export type Validation = {
     status: boolean;
     errorMessages: string[];
 };
+
+// @beta
+export type ValueOf<T> = T[keyof T];
 
 // @beta
 export const VerboseLevel: {

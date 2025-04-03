@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Common DRM Models and Constants 
+  ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
+- Core DRM Utilities - CommonEncryption, KeySystemUtils 
+  ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
+
 ### Changed
 
 - `CommonMediaRequest` / `CommonMediaResponse` Updates
