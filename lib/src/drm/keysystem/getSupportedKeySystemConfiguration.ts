@@ -53,7 +53,7 @@ export function getSupportedKeySystemConfiguration(
 // using MediaKeys.isTypeSuported and avoid using window
 function getLegacyIsTypeSupported() {
 	type LegacyMediaKeys = typeof MediaKeys & {
-	  isTypeSupported?: (keySystem: string, type: string) => boolean;
+		isTypeSupported?: (keySystem: string, type: string) => boolean;
 	};
 	const legacy = MediaKeys as LegacyMediaKeys;
 
