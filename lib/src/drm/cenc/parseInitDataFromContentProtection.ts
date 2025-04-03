@@ -12,7 +12,7 @@ import type { ContentProtection } from '../common/ContentProtection.js';
  * @beta
  * 
  * @example
- * {@includeCode ../../../test/drm/cemc/parseInitDataFromContentProtection.test.ts#example}
+ * {@includeCode ../../../test/drm/cenc/parseInitDataFromContentProtection.test.ts#example}
  */
 export function parseInitDataFromContentProtection(
 	cpData: ContentProtection,

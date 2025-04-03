@@ -11,7 +11,7 @@ import type { ContentProtection } from '../common/ContentProtection';
  * @beta
  * 
  * @example
- * {@includeCode ../../../test/drm/cemc/getLicenseServerUrlFromContentProtection.test.ts#example}
+ * {@includeCode ../../../test/drm/cenc/getLicenseServerUrlFromContentProtection.test.ts#example}
  */
 export function getLicenseServerUrlFromContentProtection(
 	contentProtectionElements: ContentProtection[],

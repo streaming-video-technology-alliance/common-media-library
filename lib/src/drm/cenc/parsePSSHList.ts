@@ -11,7 +11,7 @@
  * @beta
  * 
  * @example 
- * {@includeCode ../../../test/drm/cemc/parsePSSHList.test.ts#example}
+ * {@includeCode ../../../test/drm/cenc/parsePSSHList.test.ts#example}
  */
 export function parsePSSHList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer> {
 	if (data === null || data === undefined) {

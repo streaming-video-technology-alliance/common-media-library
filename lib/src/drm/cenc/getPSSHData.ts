@@ -8,7 +8,7 @@
  * @beta
  * 
  * @example
- * {@includeCode ../../../test/drm/cemc/getPSSHData.test.ts#example}
+ * {@includeCode ../../../test/drm/cenc/getPSSHData.test.ts#example}
  */
 export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer {
 	const offset = 8; // Box size and type fields

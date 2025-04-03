@@ -12,7 +12,7 @@ import { ENCRYPTION_SCHEME } from '../common/ENCRYPTION_SCHEME';
  * @beta
  * 
  * @example
- * {@includeCode ../../../test/drm/cemc/findCencContentProtection.test.ts#example}
+ * {@includeCode ../../../test/drm/cenc/findCencContentProtection.test.ts#example}
  */
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null {
 	if (!cpArray) {

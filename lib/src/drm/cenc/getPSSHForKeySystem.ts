@@ -13,7 +13,7 @@ import { parsePSSHList } from './parsePSSHList.js';
  * @beta	
  * 
  * @example
- * {@includeCode ../../../test/drm/cemc/getPSSHForKeySystem.test.ts#example}
+ * {@includeCode ../../../test/drm/cenc/getPSSHForKeySystem.test.ts#example}
  */
 export function getPSSHForKeySystem(
 	keySystem: KeySystem | null | undefined,
