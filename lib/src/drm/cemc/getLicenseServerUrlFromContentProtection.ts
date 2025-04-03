@@ -29,8 +29,8 @@ export function getLicenseServerUrlFromContentProtection(
 				return laUrl;
 			}
 
-			if (typeof laUrl === 'object' && laUrl.__text && typeof laUrl.__text === 'string') {
-				return laUrl.__text;
+			if (typeof laUrl === 'object' && laUrl && typeof laUrl === 'string') {
+				return laUrl;
 			}
 		}
 	}
