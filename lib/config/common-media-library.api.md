@@ -449,12 +449,8 @@ export type ContentComponent = {
 export type ContentProtection = {
     schemeIdUri?: string;
     value?: string;
-    pssh?: {
-        __text: string;
-    };
-    laUrl?: {
-        __text: string;
-    };
+    pssh?: string;
+    laUrl?: string;
 };
 
 // @beta
@@ -766,6 +762,12 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @beta
+export function getKeySystemAccess(ksConfigurations: {
+    ks: KeySystem;
+    configs: KeySystemConfiguration[];
+}[]): Promise<MediaKeySystemAccess | null>;
+
+// @beta
 export function getLegacyKeySystemAccess(ksConfigurations: {
     ks: KeySystem;
     configs: KeySystemConfiguration[];
@@ -782,12 +784,6 @@ export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
 
 // @beta
 export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
-
-// @beta
-export function getStandardKeySystemAccess(ksConfigurations: {
-    ks: KeySystem;
-    configs: KeySystemConfiguration[];
-}[]): Promise<MediaKeySystemAccess | null>;
 
 // @beta
 export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
