@@ -20,32 +20,19 @@ export function getSupportedKeySystemConfiguration(
 	}
 
 	// legacy isTypeSupported from MediaKeys
-	const isTypeSupported = typeof MediaKeys !== 'undefined' &&  MediaKeys.isTypeSupported ? MediaKeys.isTypeSupported : (...args: any[]) => false;
+	const isTypeSupported = getLegacyIsTypeSupported() ?? (() => false);
 
 	for (const config of configs) {
-		let supportedAudio: MediaCapability[] | null = null;
-		let supportedVideo: MediaCapability[] | null = null;
-
 		const audios = config.audioCapabilities || [];
 		const videos = config.videoCapabilities || [];
 
-		// Check audioCapabilities
-		if (audios.length > 0) {
-			supportedAudio = audios.filter((audio) =>
-				typeof isTypeSupported === 'function'
-					? isTypeSupported(keySystemString, audio.contentType)
-					: false,
-			);
-		}
+		const supportedAudio = audios.length > 0
+			? audios.filter(audio => isTypeSupported(keySystemString, audio.contentType))
+			: null;
 
-		// Check videoCapabilities
-		if (videos.length > 0) {
-			supportedVideo = videos.filter((video) =>
-				typeof isTypeSupported === 'function'
-					? isTypeSupported(keySystemString, video.contentType)
-					: false,
-			);
-		}
+		const supportedVideo = videos.length > 0
+			? videos.filter(video => isTypeSupported(keySystemString, video.contentType))
+			: null;
 
 		const hasAudio = supportedAudio && supportedAudio.length > 0;
 		const hasVideo = supportedVideo && supportedVideo.length > 0;
@@ -60,3 +47,16 @@ export function getSupportedKeySystemConfiguration(
 
 	return null;
 }
+
+// Helper func to determine if isTypeSupported is available
+// This is the only viable approach to avoid Type error from 
+// using MediaKeys.isTypeSuported and avoid using window
+function getLegacyIsTypeSupported() {
+	type LegacyMediaKeys = typeof MediaKeys & {
+	  isTypeSupported?: (keySystem: string, type: string) => boolean;
+	};
+	const legacy = MediaKeys as LegacyMediaKeys;
+
+	return legacy.isTypeSupported ?? null;
+}
+  
