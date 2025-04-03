@@ -15,7 +15,7 @@ export * from './drm/cemc/parseInitDataFromContentProtection.js';
 export * from './drm/cemc/getLicenseServerUrlFromContentProtection.js';
 
 // key system utils
-export * from './drm/keysystem/getStandardKeySystemAccess.js';
+export * from './drm/keysystem/getKeySystemAccess.js';
 export * from './drm/keysystem/getLegacyKeySystemAccess.js';
 export * from './drm/keysystem/getSupportedKeySystemConfiguration.js';
 export * from './drm/keysystem/createMediaKeySystemConfiguration.js';
