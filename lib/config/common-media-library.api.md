@@ -1006,7 +1006,7 @@ export const LICENSE_RENEWAL = "license-renewal";
 // @beta
 export const LICENSE_REQUEST = "license-request";
 
-// @public
+// @beta
 export type LicenseRequest = {
     url: string;
     method: 'GET' | 'POST';
@@ -1055,7 +1055,7 @@ export const MEDIA_KEY_STATUSES: {
     readonly INTERNAL_ERROR: typeof INTERNAL_ERROR;
 };
 
-// @public
+// @beta
 export type MediaCapability = {
     contentType: string;
     robustness: string;
@@ -1364,9 +1364,7 @@ export const RequestType: {
     readonly DOCUMENT: "document";
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "RequestType" is marked as @public, but its signature references "ValueOf" which is marked as @beta
-//
-// @public (undocumented)
+// @beta (undocumented)
 export type RequestType = ValueOf<typeof RequestType>;
 
 // @beta
@@ -1646,7 +1644,7 @@ export function sthd(view: IsoView): SubtitleMediaHeaderBox;
 // @beta
 export const STRING = "string";
 
-// @public (undocumented)
+// @beta
 export function stringToUint16(str: string): Uint16Array;
 
 // @beta

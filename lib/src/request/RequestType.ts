@@ -15,4 +15,7 @@ export const RequestType = {
 	DOCUMENT: 'document' as const,
 } as const;
 
+/**
+ * @beta
+ */
 export type RequestType = ValueOf<typeof RequestType>;
