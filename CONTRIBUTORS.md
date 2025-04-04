@@ -9,3 +9,4 @@ Please add entries to the bottom of the list in the following format:
 - @acbegen [Ali C. Begen, Comcast]
 - @agajassi [Agajan Jumakuliyev, Paramount]
 - @willdharris [Will Harris, Paramount]
+- @beraliv [Alexey Berezin, DAZN]
