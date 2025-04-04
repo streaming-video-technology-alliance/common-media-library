@@ -5,49 +5,49 @@
  * to a DRM license server.
  *
  * @group DRM
- * @public
+ *
  * @beta
  */
 export type LicenseRequest = {
 	/**
-     * License server URL.
-     */
+	* License server URL.
+	*/
 	url: string;
 
 	/**
-     * HTTP method 
-     */
+	* HTTP method
+	*/
 	method: 'GET' | 'POST';
 
 	/**
-     * The HTTP response type
-     */
+	* The HTTP response type
+	*/
 	responseType: XMLHttpRequestResponseType;
 
 	/**
-     * The HTP request headers
-     */
+	* The HTP request headers
+	*/
 	headers?: Record<string, string>;
 
 	/**
-     * Whether request is done using credentials (cross-site cookies)
-     */
+	* Whether request is done using credentials (cross-site cookies)
+	*/
 	withCredentials?: boolean;
 
 	/**
-     * The license request message type 
-     * (see https://www.w3.org/TR/encrypted-media/#dom-mediakeymessagetype)
-     */
+	* The license request message type
+	* (see https://www.w3.org/TR/encrypted-media/#dom-mediakeymessagetype)
+	*/
 	messageType?: MediaKeyMessageType;
 
 	/**
-     * The corresponding EME session ID
-     */
+	* The corresponding EME session ID
+	*/
 	sessionId?: string;
 
 	/**
-     * The license request data
-     */
+	* The license request data
+	*/
 	data?: ArrayBuffer;
 }
 

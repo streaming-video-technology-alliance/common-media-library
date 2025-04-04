@@ -10,6 +10,4 @@ export const PTS: Uint8Array = createId3('PRIV', new Uint8Array([
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ]));
 
-console.log('PTS', PTS);
-
 export const PTS_FRAME: Id3Frame = getId3Frames(PTS)[0];

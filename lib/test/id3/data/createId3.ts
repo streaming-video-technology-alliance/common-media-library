@@ -47,7 +47,5 @@ export function createId3(type: string, data: Uint8Array): Uint8Array {
 		...data,
 	]);
 
-	console.log('ID3_BYTES', id3);
-
 	return id3;
 }
