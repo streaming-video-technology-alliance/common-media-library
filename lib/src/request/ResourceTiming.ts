@@ -16,8 +16,5 @@ export type ResourceTiming = {
 	responseStart?: number
 
 	// The timestamp immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first.
-	responseEnd?: number
-
-	// The difference between the responseEnd and the startTime properties.
-	duration?: number
+	responseEnd: number
 }
