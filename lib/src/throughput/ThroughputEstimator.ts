@@ -1,4 +1,4 @@
-import { ResourceTiming } from '../request/ResourceTiming'
+import type { ResourceTiming } from '../request/ResourceTiming'
 
 /**
  * Throughput Estimator.
