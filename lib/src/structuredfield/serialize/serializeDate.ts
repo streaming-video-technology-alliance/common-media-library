@@ -1,4 +1,4 @@
-import { serializeInteger } from './serializeInteger.js';
+import { serializeInteger } from './serializeInteger.ts';
 
 // 4.1.10.  Serializing a Date
 //

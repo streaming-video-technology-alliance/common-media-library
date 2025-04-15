@@ -1,7 +1,7 @@
-import { symbolToStr } from '../../cta/utils/symbolToStr.js';
-import type { SfToken } from '../SfToken.js';
-import { TOKEN } from '../utils/TOKEN.js';
-import { serializeError } from './serializeError.js';
+import { symbolToStr } from '../../cta/utils/symbolToStr.ts';
+import type { SfToken } from '../SfToken.ts';
+import { TOKEN } from '../utils/TOKEN.ts';
+import { serializeError } from './serializeError.ts';
 
 // 4.1.7.  Serializing a Token
 //

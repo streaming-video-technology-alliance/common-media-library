@@ -1,7 +1,7 @@
-import { symbolToStr } from '../cta/utils/symbolToStr.js';
-import type { SfItem } from '../structuredfield/SfItem.js';
-import { decodeSfDict } from '../structuredfield/decodeSfDict.js';
-import type { Cmcd } from './Cmcd.js';
+import { symbolToStr } from '../cta/utils/symbolToStr.ts';
+import type { SfItem } from '../structuredfield/SfItem.ts';
+import { decodeSfDict } from '../structuredfield/decodeSfDict.ts';
+import type { Cmcd } from './Cmcd.ts';
 
 /**
  * Decode a CMCD string to an object.

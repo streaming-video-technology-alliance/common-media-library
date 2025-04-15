@@ -1,7 +1,7 @@
-import type { SfBareItem } from './SfBareItem.js';
-import { SfItem } from './SfItem.js';
-import type { SfParameters } from './SfParameters.js';
-import { serializeItem } from './serialize/serializeItem.js';
+import type { SfBareItem } from './SfBareItem.ts';
+import { SfItem } from './SfItem.ts';
+import type { SfParameters } from './SfParameters.ts';
+import { serializeItem } from './serialize/serializeItem.ts';
 
 /**
  * Encode a structured field item to a string

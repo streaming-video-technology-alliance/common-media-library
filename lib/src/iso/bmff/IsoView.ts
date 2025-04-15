@@ -1,22 +1,22 @@
-import type { Box } from './Box.js';
-import { ContainerBoxes } from './ContainerBoxes.js';
-import { DATA } from './fields/DATA.js';
-import { INT } from './fields/INT.js';
-import { STRING } from './fields/STRING.js';
-import { TEMPLATE } from './fields/TEMPLATE.js';
-import { UINT } from './fields/UINT.js';
-import { UTF8 } from './fields/UTF8.js';
-import type { FullBox } from './FullBox.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
-import type { ISOFieldTypeMap } from './readers/ISOFieldTypeMap.js';
-import { readData } from './readers/readData.js';
-import { readInt } from './readers/readInt.js';
-import { readString } from './readers/readString.js';
-import { readTemplate } from './readers/readTemplate.js';
-import { readTerminatedString } from './readers/readTerminatedString.js';
-import { readUint } from './readers/readUint.js';
-import { readUTF8String } from './readers/readUTF8String.js';
-import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js';
+import type { Box } from './Box.ts';
+import { ContainerBoxes } from './ContainerBoxes.ts';
+import { DATA } from './fields/DATA.ts';
+import { INT } from './fields/INT.ts';
+import { STRING } from './fields/STRING.ts';
+import { TEMPLATE } from './fields/TEMPLATE.ts';
+import { UINT } from './fields/UINT.ts';
+import { UTF8 } from './fields/UTF8.ts';
+import type { FullBox } from './FullBox.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { ISOFieldTypeMap } from './readers/ISOFieldTypeMap.ts';
+import { readData } from './readers/readData.ts';
+import { readInt } from './readers/readInt.ts';
+import { readString } from './readers/readString.ts';
+import { readTemplate } from './readers/readTemplate.ts';
+import { readTerminatedString } from './readers/readTerminatedString.ts';
+import { readUint } from './readers/readUint.ts';
+import { readUTF8String } from './readers/readUTF8String.ts';
+import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.ts';
 
 /**
  * Raw ISO BMFF data box.

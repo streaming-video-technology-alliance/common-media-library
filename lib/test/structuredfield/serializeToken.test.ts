@@ -1,6 +1,6 @@
+import { serializeToken } from '@svta/common-media-library/structuredfield/serialize/serializeToken';
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeToken } from '../../src/structuredfield/serialize/serializeToken.js';
 
 test('serializeToken', () => {
 	assert.deepStrictEqual(serializeToken(Symbol.for('token')), `token`);

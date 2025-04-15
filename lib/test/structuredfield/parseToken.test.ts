@@ -1,6 +1,6 @@
+import { parseToken } from '@svta/common-media-library/structuredfield/parse/parseToken';
 import assert from 'node:assert';
 import test from 'node:test';
-import { parseToken } from '../../src/structuredfield/parse/parseToken.js';
 
 test('parseToken', () => {
 	assert.deepStrictEqual(parseToken(`*foo123/456`), { value: Symbol.for(`*foo123/456`), src: `` });

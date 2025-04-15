@@ -1,11 +1,11 @@
-import type { Track } from '../../../../types/model/Track.js';
-import type { AudioTrack } from '../../../../types/model/AudioTrack.js';
+import type { Track } from '../../../../types/model/Track.ts';
+import type { AudioTrack } from '../../../../types/model/AudioTrack.ts';
 
 import {
 	TEXT_SAMPLE_RATE,
 	TIMESCALE_48000,
 	VIDEO_SAMPLE_RATE,
-} from '../../../../utils/constants.js';
+} from '../../../../utils/constants.ts';
 
 /**
  * @internal

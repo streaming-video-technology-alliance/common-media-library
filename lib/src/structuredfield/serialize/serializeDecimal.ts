@@ -1,6 +1,6 @@
-import { roundToEven } from '../../utils/roundToEven.js';
-import { DECIMAL } from '../utils/DECIMAL.js';
-import { serializeError } from './serializeError.js';
+import { roundToEven } from '../../utils/roundToEven.ts';
+import { DECIMAL } from '../utils/DECIMAL.ts';
+import { serializeError } from './serializeError.ts';
 
 // 4.1.5.  Serializing a Decimal
 //

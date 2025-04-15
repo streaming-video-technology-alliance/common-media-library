@@ -1,5 +1,5 @@
-import type { Manifest } from '../../types/manifest/Manifest.js';
-import type { DashManifest } from '../../types/mapper/dash/DashManifest.js';
+import type { Manifest } from '../../types/manifest/Manifest.ts';
+import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts';
 
 //Add metadata to manifest.
 //In the future, if any other fields are wanted to be added, they can be added here.

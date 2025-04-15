@@ -1,7 +1,7 @@
 import { utf8ArrayToStr } from '@svta/common-media-library';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { strToCodes } from './strToCodes.js';
+import { strToCodes } from './strToCodes.ts';
 
 describe('utf8ArrayToStr', () => {
 	it('produces string', () => {

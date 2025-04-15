@@ -5,8 +5,8 @@ import { encodeCmsdStatic } from '@svta/common-media-library/cmsd/encodeCmsdStat
 import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.js';
-import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.js';
+import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.ts';
+import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.ts';
 
 describe('encodeCmsdStatic', () => {
 	it('handles null value object', () => {

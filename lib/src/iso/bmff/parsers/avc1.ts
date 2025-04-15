@@ -1,5 +1,5 @@
-import { UINT } from '../fields/UINT.js';
-import type { IsoView } from '../IsoView.js';
+import { UINT } from '../fields/UINT.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 14496-12:2015 - 8.5.2.2 Sample Entry

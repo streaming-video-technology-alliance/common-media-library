@@ -1,4 +1,4 @@
-import type { CmdHistory } from '../CmdHistory.js';
+import type { CmdHistory } from '../CmdHistory.ts';
 
 export function setLastCmd(
 	a: number | null,

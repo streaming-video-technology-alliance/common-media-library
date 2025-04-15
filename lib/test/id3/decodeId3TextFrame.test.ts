@@ -1,7 +1,7 @@
+import type { Id3Frame } from '@svta/common-media-library/id3/Id3Frame';
+import { decodeId3TextFrame } from '@svta/common-media-library/id3/util/decodeId3TextFrame';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { decodeId3TextFrame } from '../../src/id3/util/decodeId3TextFrame.js';
-import type { Id3Frame } from '../../src/id3';
 
 describe('decodeId3TextFrame', () => {
 	it('should decode a TXXX frame', () => {

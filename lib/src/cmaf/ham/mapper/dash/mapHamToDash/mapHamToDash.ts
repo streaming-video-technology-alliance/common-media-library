@@ -1,11 +1,11 @@
-import type { Presentation } from '../../../types/model/Presentation.js';
+import type { Presentation } from '../../../types/model/Presentation.ts';
 
-import type { DashManifest } from '../../../types/mapper/dash/DashManifest.js';
-import type { Period } from '../../../types/mapper/dash/Period.js';
+import type { DashManifest } from '../../../types/mapper/dash/DashManifest.ts';
+import type { Period } from '../../../types/mapper/dash/Period.ts';
 
-import { presentationsToPeriods } from './presentationsToPeriods.js';
+import { presentationsToPeriods } from './presentationsToPeriods.ts';
 
-import { serializeDashManifest } from '../../../utils/dash/serializeDashManifest.js';
+import { serializeDashManifest } from '../../../utils/dash/serializeDashManifest.ts';
 
 export function mapHamToDash(hamManifests: Presentation[]): string {
 	const periods: Period[] = presentationsToPeriods(hamManifests);

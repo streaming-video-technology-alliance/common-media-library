@@ -1,9 +1,9 @@
-import type { Track } from '../../../types/model/Track.js';
+import type { Track } from '../../../types/model/Track.ts';
 
-import type { SegmentList } from '../../../types/mapper/dash/SegmentList.js';
-import type { SegmentURL } from '../../../types/mapper/dash/SegmentUrl.js';
+import type { SegmentList } from '../../../types/mapper/dash/SegmentList.ts';
+import type { SegmentURL } from '../../../types/mapper/dash/SegmentUrl.ts';
 
-import { getTimescale } from './utils/getTimescale.js';
+import { getTimescale } from './utils/getTimescale.ts';
 
 export function trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = [];

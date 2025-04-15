@@ -1,8 +1,8 @@
-import type { ValueOf } from '../utils/ValueOf.js';
-import { CMCD_OBJECT } from './CMCD_OBJECT.js';
-import { CMCD_REQUEST } from './CMCD_REQUEST.js';
-import { CMCD_SESSION } from './CMCD_SESSION.js';
-import { CMCD_STATUS } from './CMCD_STATUS.js';
+import type { ValueOf } from '../utils/ValueOf.ts';
+import { CMCD_OBJECT } from './CMCD_OBJECT.ts';
+import { CMCD_REQUEST } from './CMCD_REQUEST.ts';
+import { CMCD_SESSION } from './CMCD_SESSION.ts';
+import { CMCD_STATUS } from './CMCD_STATUS.ts';
 
 /**
  * CMCD header fields.

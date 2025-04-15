@@ -1,4 +1,4 @@
-import type { CommonMediaResponse } from './CommonMediaResponse.js';
+import type { CommonMediaResponse } from './CommonMediaResponse.ts';
 
 /**
  * Response interceptor API.

@@ -1,5 +1,5 @@
-import { strToCodes } from '../../utils/strToCodes.js';
-import { ID3_BYTES, ID3_VERSION_BYTES } from './ID3.js';
+import { strToCodes } from '../../utils/strToCodes.ts';
+import { ID3_BYTES, ID3_VERSION_BYTES } from './ID3.ts';
 
 function createId3Size(size: number) {
 	// size is stored as a sequence of four 7-bit integers with the

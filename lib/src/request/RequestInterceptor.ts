@@ -1,4 +1,4 @@
-import type { CommonMediaRequest } from './CommonMediaRequest.js';
+import type { CommonMediaRequest } from './CommonMediaRequest.ts';
 
 /**
  * Request interceptor API.

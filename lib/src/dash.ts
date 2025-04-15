@@ -1,1 +1,1 @@
-export { processUriTemplate } from './dash/processUriTemplate.js';
+export { processUriTemplate } from './dash/processUriTemplate.ts';

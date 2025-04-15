@@ -1,2 +1,2 @@
-export type { CmCustomKey } from './cta/CmCustomKey.js';
-export type { CmValue } from './cta/CmValue.js';
+export type { CmCustomKey } from './cta/CmCustomKey.ts';
+export type { CmValue } from './cta/CmValue.ts';

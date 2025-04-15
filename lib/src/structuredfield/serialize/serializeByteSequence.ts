@@ -1,6 +1,6 @@
-import { base64encode } from '../../utils/base64encode.js';
-import { BYTES } from '../utils/BYTES.js';
-import { serializeError } from './serializeError.js';
+import { base64encode } from '../../utils/base64encode.ts';
+import { BYTES } from '../utils/BYTES.ts';
+import { serializeError } from './serializeError.ts';
 
 // 4.1.8.  Serializing a Byte Sequence
 //

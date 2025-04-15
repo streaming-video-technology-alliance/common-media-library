@@ -1,9 +1,9 @@
-import type { CmValue } from '../../cta/CmValue.js';
-import { isTokenField } from '../../cta/utils/isTokenField.js';
-import { isValid } from '../../cta/utils/isValid.js';
-import { SfToken } from '../../structuredfield/SfToken.js';
-import type { CmsdEncodeOptions } from '../CmsdEncodeOptions.js';
-import type { CmsdStatic } from '../CmsdStatic.js';
+import type { CmValue } from '../../cta/CmValue.ts';
+import { isTokenField } from '../../cta/utils/isTokenField.ts';
+import { isValid } from '../../cta/utils/isValid.ts';
+import { SfToken } from '../../structuredfield/SfToken.ts';
+import type { CmsdEncodeOptions } from '../CmsdEncodeOptions.ts';
+import type { CmsdStatic } from '../CmsdStatic.ts';
 
 export function processCmsd(obj: CmsdStatic, options?: CmsdEncodeOptions): CmsdStatic {
 	const results: CmsdStatic = {};

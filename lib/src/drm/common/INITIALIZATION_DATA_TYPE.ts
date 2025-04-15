@@ -1,7 +1,7 @@
-import { CBCS } from './CBCS.js';
-import { CENC } from './CENC.js';
-import { KEYIDS } from './KEYIDS.js';
-import { WEBM } from './WEBM.js';
+import { CBCS } from './CBCS.ts';
+import { CENC } from './CENC.ts';
+import { KEYIDS } from './KEYIDS.ts';
+import { WEBM } from './WEBM.ts';
 
 /**
  * Initialization Data Type.

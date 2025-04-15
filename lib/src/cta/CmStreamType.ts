@@ -1,4 +1,4 @@
-import type { ValueOf } from '../utils/ValueOf.js';
+import type { ValueOf } from '../utils/ValueOf.ts';
 
 /**
  * Common Media Stream Type

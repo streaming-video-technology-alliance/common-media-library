@@ -1,7 +1,7 @@
 import { toCmcdJson } from '@svta/common-media-library';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMCD_INPUT } from './data/CMCD_INPUT.js';
+import { CMCD_INPUT } from './data/CMCD_INPUT.ts';
 
 describe('toCmcdJson', () => {
 	it('produces json', () => {

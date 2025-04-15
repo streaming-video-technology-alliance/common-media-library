@@ -2,8 +2,8 @@ import { encodeCmcd } from '@svta/common-media-library/cmcd/encodeCmcd';
 import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMCD_INPUT } from './data/CMCD_INPUT.js';
-import { CMCD_STRING } from './data/CMCD_STRING.js';
+import { CMCD_INPUT } from './data/CMCD_INPUT.ts';
+import { CMCD_STRING } from './data/CMCD_STRING.ts';
 
 describe('encodeCmcd', () => {
 	it('handles null data object', () => {

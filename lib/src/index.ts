@@ -3,17 +3,17 @@
  *
  * @packageDocumentation
  */
-export * from './608.js';
-export * from './cmaf-ham.js';
-export * from './cmcd.js';
-export * from './cmsd.js';
-export type * from './cta.js';
-export * from './dash.js';
-export * from './drm.js';
-export * from './id3.js';
-export * from './iso8601.js';
-export * from './isobmff.js';
-export type * from './request.js';
-export * from './structuredfield.js';
-export * from './utils.js';
-export * from './xml.js';
+export * from './608.ts';
+export * from './cmaf-ham.ts';
+export * from './cmcd.ts';
+export * from './cmsd.ts';
+export type * from './cta.ts';
+export * from './dash.ts';
+export * from './drm.ts';
+export * from './id3.ts';
+export * from './iso8601.ts';
+export * from './isobmff.ts';
+export type * from './request.ts';
+export * from './structuredfield.ts';
+export * from './utils.ts';
+export * from './xml.ts';
