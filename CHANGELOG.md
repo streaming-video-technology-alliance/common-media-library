@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added Throughput Calculation Interfaces ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
+
 ## [0.11.0] - 2025-04-03
 
 ### Added
@@ -16,7 +20,6 @@ and this project adheres to
   ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
 - Core DRM Utilities - CommonEncryption, KeySystemUtils
   ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
-- Added Throughput Calculation Interfaces ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
 
 ### Changed
 
