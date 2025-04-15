@@ -17,6 +17,7 @@ and this project adheres to
 - Core DRM Utilities - CommonEncryption, KeySystemUtils
   ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
 - Added Throughput Calculation Interfaces ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
+- Added EWMA Throughput Calculations ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
 
 ### Changed
 
