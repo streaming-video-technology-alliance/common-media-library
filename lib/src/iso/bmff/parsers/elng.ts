@@ -10,7 +10,7 @@ import type { IsoView } from '../IsoView.ts';
  */
 export type ExtendedLanguageBox = FullBox & {
 	extendedLanguage: string;
-}
+};
 
 /**
  * Parse a ExtendedLanguageBox from an IsoView

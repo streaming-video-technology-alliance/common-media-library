@@ -31,7 +31,7 @@ export type RawBox = {
 	largesize?: number;
 	usertype?: number[];
 	data: IsoView;
-}
+};
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.

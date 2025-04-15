@@ -13,7 +13,7 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 	systemID: number[];
 	dataSize: number;
 	data: number[];
-}
+};
 
 /**
  * Parse a ProtectionSystemSpecificHeaderBox from an IsoView

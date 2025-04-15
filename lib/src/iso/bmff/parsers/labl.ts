@@ -13,7 +13,7 @@ export type LabelBox = FullBox & {
 	labelId: number;
 	language: string;
 	label: string;
-}
+};
 
 /**
  * Parse a LabelBox from an IsoView

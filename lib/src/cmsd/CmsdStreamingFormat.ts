@@ -9,7 +9,7 @@ import { CmStreamingFormat } from '../cta/CmStreamingFormat.ts';
  *
  * @beta
  */
-export const CmsdStreamingFormat = CmStreamingFormat as typeof CmStreamingFormat;;
+export const CmsdStreamingFormat = CmStreamingFormat as typeof CmStreamingFormat;
 
 /**
  * @beta

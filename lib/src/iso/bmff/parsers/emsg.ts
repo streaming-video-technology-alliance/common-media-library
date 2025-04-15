@@ -17,7 +17,7 @@ export type EventMessageBox = FullBox & {
 	eventDuration: number,
 	id: number,
 	messageData: Uint8Array,
-}
+};
 
 /**
  * Parse an EventMessageBox from an IsoView

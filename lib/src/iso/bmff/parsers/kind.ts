@@ -11,7 +11,7 @@ import type { IsoView } from '../IsoView.ts';
 export type TrackKindBox = FullBox & {
 	schemeUri: string;
 	value: string;
-}
+};
 
 /**
  * Parse a TrackKinBox from an IsoView

@@ -7,4 +7,4 @@ export type Mapper = {
 	toManifest(presentation: Presentation[]): Manifest;
 
 	getManifestMetadata(): any | undefined;
-}
+};

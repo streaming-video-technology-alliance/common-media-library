@@ -9,7 +9,7 @@ import type { IsoView } from '../IsoView.ts';
  */
 export type OriginalFormatBox = {
 	dataFormat: number;
-}
+};
 
 /**
  * Parse an OriginalFormatBox from an IsoView

@@ -13,7 +13,7 @@ export type SubSample = {
 	subsamplePriority: number;
 	discardable: number;
 	codecSpecificParameters: number;
-}
+};
 
 /**
  * Sub sample entry

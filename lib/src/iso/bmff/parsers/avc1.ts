@@ -11,7 +11,7 @@ import type { IsoView } from '../IsoView.ts';
 export type SampleEntry = {
 	reserved1: number[];
 	dataReferenceIndex: number;
-}
+};
 
 /**
  * ISO/IEC 14496-15:2014 - 12.1.3.1 avc1/2/3/4, hev1, hvc1, encv
@@ -34,7 +34,7 @@ export type VisualSampleEntry = SampleEntry & {
 	depth: number;
 	preDefined3: number;
 	config: Uint8Array;
-}
+};
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView

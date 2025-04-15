@@ -13,7 +13,7 @@ export type EditListEntry = {
 	mediaTime: number;
 	mediaRateInteger: number;
 	mediaRateFraction: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.6.6 Edit List Box
@@ -25,7 +25,7 @@ export type EditListEntry = {
 export type EditListBox = FullBox & {
 	entryCount: number;
 	entries: EditListEntry[];
-}
+};
 
 /**
  * Parse a Box from an IsoView

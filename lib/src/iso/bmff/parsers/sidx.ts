@@ -17,7 +17,7 @@ export type Reference = {
 	startsWithSap: number,
 	sapType: number,
 	sapDeltaTime: number,
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box

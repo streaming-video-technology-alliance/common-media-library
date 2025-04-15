@@ -244,4 +244,4 @@ export type Cmcd = {
 	 * Integer kbps
 	 */
 	rtp?: number;
-}
+};

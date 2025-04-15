@@ -9,4 +9,4 @@ import type { CommonMediaRequest } from './CommonMediaRequest.ts';
  *
  * @beta
  */
-export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>
+export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;

@@ -14,7 +14,7 @@ export type TrackFragmentRandomAccessEntry = {
 	trafNumber: number;
 	trunNumber: number;
 	sampleNumber: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box

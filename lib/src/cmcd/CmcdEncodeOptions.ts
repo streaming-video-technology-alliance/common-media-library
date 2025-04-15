@@ -33,4 +33,4 @@ export type CmcdEncodeOptions = {
 	 * The base URL to use for relative URLs.
 	 */
 	baseUrl?: string;
-}
+};

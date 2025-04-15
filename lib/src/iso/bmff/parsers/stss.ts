@@ -10,7 +10,7 @@ import type { IsoView } from '../IsoView.ts';
  */
 export type SyncSample = {
 	sampleNumber: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2015 - 8.6.2 Sync Sample Box

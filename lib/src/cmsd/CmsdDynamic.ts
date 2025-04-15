@@ -19,4 +19,4 @@ export type CmsdDynamic = {
 	 * The CMSD dynamic parameters.
 	 */
 	params: CmsdDynamicParams
-}
+};

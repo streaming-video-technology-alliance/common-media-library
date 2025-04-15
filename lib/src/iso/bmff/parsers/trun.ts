@@ -13,7 +13,7 @@ export type TrackRunSample = {
 	sampleSize?: number;
 	sampleFlags?: number;
 	sampleCompositionTimeOffset?: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box

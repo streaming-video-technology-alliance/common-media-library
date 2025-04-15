@@ -165,4 +165,4 @@ export type CmsdStatic = {
 	 * Integer
 	 */
 	v?: number;
-}
+};

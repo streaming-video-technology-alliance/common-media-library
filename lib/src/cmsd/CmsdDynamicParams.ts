@@ -78,4 +78,4 @@ export type CmsdDynamicParams = {
 	 * Integer Kbps
 	 */
 	rtt?: number;
-}
+};

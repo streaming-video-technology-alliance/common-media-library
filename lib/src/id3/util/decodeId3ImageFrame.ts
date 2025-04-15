@@ -10,7 +10,7 @@ type MetadataFrame = {
 	data: string | ArrayBuffer;
 	mimeType: string | null;
 	pictureType: number | null;
-}
+};
 
 export function decodeId3ImageFrame(
 	frame: RawId3Frame,

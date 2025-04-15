@@ -20,7 +20,7 @@ export function parseInitDataFromContentProtection(
 ): ArrayBuffer | null {
 	if (cpData?.pssh && cpData.pssh) {
 		const cleanedText = cpData.pssh.replace(/\r?\n|\r/g, '').replace(/\s+/g, '');
-		return BASE64.decodeArray(cleanedText).buffer as ArrayBuffer;;
+		return BASE64.decodeArray(cleanedText).buffer as ArrayBuffer;
 	}
 
 	return null;

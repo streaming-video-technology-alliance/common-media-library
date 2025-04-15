@@ -10,7 +10,7 @@ import type { IsoView } from '../IsoView.ts';
  */
 export type AudioRenderingIndicationBox = FullBox & {
 	audioRenderingIndication: number;
-}
+};
 
 /**
  * Parse a AudioRenderingIndicationBox from an IsoView

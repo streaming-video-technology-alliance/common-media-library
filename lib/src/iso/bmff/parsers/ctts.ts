@@ -11,7 +11,7 @@ import type { IsoView } from '../IsoView.ts';
 export type CompositionTimeToSampleEntry = {
 	sampleCount: number;
 	sampleOffset: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.6.1.3 Composition Time To Sample Box

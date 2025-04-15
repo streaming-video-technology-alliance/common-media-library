@@ -26,7 +26,7 @@ export type MediaHeaderBox = FullBox & {
 
 	/** A 16-bit value that is reserved for use in other specifications. */
 	preDefined: number;
-}
+};
 
 /**
  * Parse a MediaHeaderBox from an IsoView

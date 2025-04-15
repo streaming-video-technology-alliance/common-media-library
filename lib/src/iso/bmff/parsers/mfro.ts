@@ -10,7 +10,7 @@ import type { IsoView } from '../IsoView.ts';
  */
 export type MovieFragmentRandomAccessBox = FullBox & {
 	mfra_size: number;
-}
+};
 
 /**
  * Parse a MovieFragmentRandomAccessBox from an IsoView

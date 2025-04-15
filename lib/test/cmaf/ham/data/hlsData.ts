@@ -8,7 +8,7 @@ export type AudioTrackInfo = {
 	id?: string;
 	language?: string;
 	urlInitialization?: string;
-}
+};
 
 function getAudioTrack({
 	byteRange = '',

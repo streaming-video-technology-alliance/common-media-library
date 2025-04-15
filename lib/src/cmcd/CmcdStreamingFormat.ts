@@ -14,4 +14,4 @@ export const CmcdStreamingFormat = CmStreamingFormat as typeof CmStreamingFormat
 /**
  * @beta
  */
-export type CmcdStreamingFormat = CmStreamingFormat
+export type CmcdStreamingFormat = CmStreamingFormat;

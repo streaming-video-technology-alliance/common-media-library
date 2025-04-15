@@ -20,4 +20,4 @@ export type ResourceTiming = {
 
 	// The difference between the responseEnd and the startTime properties.
 	duration?: number
-}
+};
