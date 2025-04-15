@@ -30,7 +30,7 @@ export class EwmaEstimator implements ThroughputEstimator {
 		// 1. If `sample.encodedBodySize` is NaN or Infinity, don't do anything
 		// TODO: hls.js
 		// 1. If `durationSeconds` is less than `this.minDelayMs_`, make it `this.minDelayMs_` (default is 50ms)
-		const durationSeconds = (sample.responseEnd - sample.startTime) / 1000
+		const durationSeconds = sample.duration / 1000
 		const bandwidthBps = sample.encodedBodySize * 8 / durationSeconds
 
 		this.slowEwma.sample(durationSeconds, bandwidthBps)
