@@ -15,5 +15,6 @@ export * from './iso8601.ts';
 export * from './isobmff.ts';
 export type * from './request.ts';
 export * from './structuredfield.ts';
+export * from './throughput.ts';
 export * from './utils.ts';
 export * from './xml.ts';
