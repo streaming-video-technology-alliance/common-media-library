@@ -1,6 +1,6 @@
-import { utf8ArrayToStr } from '../../utils/utf8ArrayToStr.js';
-import type { DecodedId3Frame } from '../DecodedId3Frame.js';
-import type { RawId3Frame } from './RawFrame.js';
+import { utf8ArrayToStr } from '../../utils/utf8ArrayToStr.ts';
+import type { DecodedId3Frame } from '../DecodedId3Frame.ts';
+import type { RawId3Frame } from './RawFrame.ts';
 
 /**
  * Decode a URL frame

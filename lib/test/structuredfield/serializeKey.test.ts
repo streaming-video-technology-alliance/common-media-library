@@ -1,6 +1,6 @@
+import { serializeKey } from '@svta/common-media-library/structuredfield/serialize/serializeKey';
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeKey } from '../../src/structuredfield/serialize/serializeKey.js';
 
 test('serializeKey', () => {
 	assert.deepStrictEqual(serializeKey(`a`), 'a');

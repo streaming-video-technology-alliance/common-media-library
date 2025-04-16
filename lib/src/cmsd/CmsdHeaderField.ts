@@ -1,6 +1,6 @@
-import type { ValueOf } from '../utils/ValueOf.js';
-import { CMSD_DYNAMIC } from './CMSD_DYNAMIC.js';
-import { CMSD_STATIC } from './CMSD_STATIC.js';
+import type { ValueOf } from '../utils/ValueOf.ts';
+import { CMSD_DYNAMIC } from './CMSD_DYNAMIC.ts';
+import { CMSD_STATIC } from './CMSD_STATIC.ts';
 
 /**
  * CMSD header fields.

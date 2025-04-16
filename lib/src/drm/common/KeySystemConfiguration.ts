@@ -13,5 +13,5 @@ export type KeySystemConfiguration = {
 	distinctiveIdentifier?: 'required' | 'optional' | 'not-allowed';
 	persistentState?: 'required' | 'optional' | 'not-allowed';
 	sessionTypes?: string[];
-}
+};
 

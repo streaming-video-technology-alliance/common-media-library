@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Ensure CML is compliant with the type annotations proposal 
+  ([#134](https://github.com/streaming-video-technology-alliance/common-media-library/issues/134))
+
 ## [0.11.0] - 2025-04-03
 
 ### Added

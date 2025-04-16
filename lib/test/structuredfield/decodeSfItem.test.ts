@@ -1,7 +1,7 @@
+import { decodeSfItem } from '@svta/common-media-library/structuredfield/decodeSfItem';
+import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
 import assert from 'node:assert';
 import test from 'node:test';
-import { SfItem } from '../../src/structuredfield/SfItem.js';
-import { decodeSfItem } from '../../src/structuredfield/decodeSfItem.js';
 
 test('decodeSfItem', () => {
 	assert.deepStrictEqual(decodeSfItem(`"a"`), new SfItem('a'));

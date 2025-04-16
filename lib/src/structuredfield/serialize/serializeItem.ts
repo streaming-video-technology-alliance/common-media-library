@@ -1,7 +1,7 @@
-import type { SfBareItem } from '../SfBareItem.js';
-import { SfItem } from '../SfItem.js';
-import { serializeBareItem } from './serializeBareItem.js';
-import { serializeParams } from './serializeParams.js';
+import type { SfBareItem } from '../SfBareItem.ts';
+import { SfItem } from '../SfItem.ts';
+import { serializeBareItem } from './serializeBareItem.ts';
+import { serializeParams } from './serializeParams.ts';
 
 // 4.1.3.  Serializing an Item
 //

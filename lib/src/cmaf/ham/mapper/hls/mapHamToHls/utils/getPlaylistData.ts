@@ -1,8 +1,8 @@
-import type { AudioTrack } from '../../../../types/model/AudioTrack.js';
-import type { VideoTrack } from '../../../../types/model/VideoTrack.js';
+import type { AudioTrack } from '../../../../types/model/AudioTrack.ts';
+import type { VideoTrack } from '../../../../types/model/VideoTrack.ts';
 
-import { getByterange } from './getByterange.js';
-import { getUrlInitialization } from './getUrlInitialization.js';
+import { getByterange } from './getByterange.ts';
+import { getUrlInitialization } from './getUrlInitialization.ts';
 
 /**
  * @internal

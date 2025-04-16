@@ -1,9 +1,9 @@
 import { encodeCmsdDynamic } from '@svta/common-media-library/cmsd/encodeCmsdDynamic';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.js';
-import { CMSD_DYNAMIC_OBJ } from './data/CMSD_DYNAMIC_OBJ.js';
-import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.js';
+import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.ts';
+import { CMSD_DYNAMIC_OBJ } from './data/CMSD_DYNAMIC_OBJ.ts';
+import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.ts';
 
 describe('encodeCmsdDynamic', () => {
 	it('handles null value object', () => {

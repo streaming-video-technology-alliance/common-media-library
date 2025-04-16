@@ -1,6 +1,6 @@
+import { parseParameters } from '@svta/common-media-library/structuredfield/parse/parseParameters';
 import assert from 'node:assert';
 import test from 'node:test';
-import { parseParameters } from '../../src/structuredfield/parse/parseParameters.js';
 
 test('parseParameters', () => {
 	assert.deepStrictEqual(parseParameters(`;a=0`), { value: { 'a': 0 }, src: `` });

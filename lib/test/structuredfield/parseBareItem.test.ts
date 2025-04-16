@@ -1,7 +1,7 @@
+import { parseBareItem } from '@svta/common-media-library/structuredfield/parse/parseBareItem';
+import { base64encode } from '@svta/common-media-library/utils/base64encode';
 import assert from 'node:assert';
 import test from 'node:test';
-import { parseBareItem } from '../../src/structuredfield/parse/parseBareItem.js';
-import { base64encode } from '../../src/utils/base64encode.js';
 
 test('parseBareItem', () => {
 	assert.deepStrictEqual(parseBareItem(`"string"`), { value: 'string', src: `` });

@@ -1,4 +1,4 @@
-import type { IsoView } from '../IsoView.js';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 14496-30:2014 - WebVTT Cue Settings Box.

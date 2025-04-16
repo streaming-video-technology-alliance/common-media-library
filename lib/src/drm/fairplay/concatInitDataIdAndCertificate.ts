@@ -1,4 +1,4 @@
-import { stringToUint16 } from '../../utils/stringToUint16.js';
+import { stringToUint16 } from '../../utils/stringToUint16.ts';
 
 /**
  * Concatenates InitData, ID, and Certificate for FairPlay DRM.

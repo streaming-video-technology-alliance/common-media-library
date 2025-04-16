@@ -1,4 +1,4 @@
-import { DECIMAL } from './DECIMAL.js';
-import { INTEGER } from './INTEGER.js';
+import { DECIMAL } from './DECIMAL.ts';
+import { INTEGER } from './INTEGER.ts';
 
 export const INTEGER_DECIMAL: string = `${INTEGER} or ${DECIMAL}`;

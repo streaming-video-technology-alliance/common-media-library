@@ -1,7 +1,7 @@
-import type { SwitchingSet } from '../../types/model/SwitchingSet.js';
-import type { Validation } from '../../types/Validation.js';
+import type { SwitchingSet } from '../../types/model/SwitchingSet.ts';
+import type { Validation } from '../../types/Validation.ts';
 
-import { validateTracks } from './validateTracks.js';
+import { validateTracks } from './validateTracks.ts';
 
 /**
  * Validate a switching set.

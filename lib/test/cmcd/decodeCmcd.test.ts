@@ -1,8 +1,8 @@
 import { decodeCmcd } from '@svta/common-media-library/cmcd/decodeCmcd';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.js';
-import { CMCD_STRING } from './data/CMCD_STRING.js';
+import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.ts';
+import { CMCD_STRING } from './data/CMCD_STRING.ts';
 
 describe('decodeCmcd', () => {
 	it('handles null data object', () => {

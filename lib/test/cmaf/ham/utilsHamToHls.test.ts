@@ -1,14 +1,14 @@
-import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
+import { describe, it } from 'node:test';
 
 import type { AudioTrack } from '@svta/common-media-library/cmaf-ham';
 
-import { getByterange } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getByterange.js';
-import { getPlaylistData } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getPlaylistData.js';
-import { getSegments } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getSegments.js';
-import { getUrlInitialization } from '../../../src/cmaf/ham/mapper/hls/mapHamToHls/utils/getUrlInitialization.js';
+import { getByterange } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getByterange.ts';
+import { getPlaylistData } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getPlaylistData.ts';
+import { getSegments } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getSegments.ts';
+import { getUrlInitialization } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getUrlInitialization.ts';
 
-import { getAudioTrack } from './data/hlsData.js';
+import { getAudioTrack } from './data/hlsData.ts';
 
 describe('getByterange', () => {
 	it('returns byteRange string if track has byteRange', () => {
@@ -49,12 +49,12 @@ describe('getSegments', () => {
 		equal(
 			res,
 			'#EXTINF:4.011,\n' +
-				'#EXT-X-BYTERANGE:123@456\n' +
-				'\n' +
-				'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4\n' +
-				'#EXTINF:3.989,\n' +
-				'\n' +
-				'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
+			'#EXT-X-BYTERANGE:123@456\n' +
+			'\n' +
+			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4\n' +
+			'#EXTINF:3.989,\n' +
+			'\n' +
+			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
 		);
 	});
 });

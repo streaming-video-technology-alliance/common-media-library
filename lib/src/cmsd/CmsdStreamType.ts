@@ -1,4 +1,4 @@
-import { CmStreamType } from '../cta/CmStreamType.js';
+import { CmStreamType } from '../cta/CmStreamType.ts';
 
 /**
  * Common Media Server Data Stream Type

@@ -1,8 +1,8 @@
+import { parseInnerList } from '@svta/common-media-library/structuredfield/parse/parseInnerList';
+import { parseList } from '@svta/common-media-library/structuredfield/parse/parseList';
+import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
 import assert from 'node:assert';
 import test from 'node:test';
-import { SfItem } from '../../src/structuredfield/SfItem.js';
-import { parseInnerList } from '../../src/structuredfield/parse/parseInnerList.js';
-import { parseList } from '../../src/structuredfield/parse/parseList.js';
 
 test('parseInnerList', () => {
 	assert.deepStrictEqual(parseInnerList(`( 1 2 3 )`), {

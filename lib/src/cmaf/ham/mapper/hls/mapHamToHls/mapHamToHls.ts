@@ -1,10 +1,10 @@
-import type { Manifest } from '../../../types/manifest/Manifest.js';
-import type { Presentation } from '../../../types/model/Presentation.js';
-import type { SelectionSet } from '../../../types/model/SelectionSet.js';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.js';
-import type { Track } from '../../../types/model/Track.js';
+import type { Manifest } from '../../../types/manifest/Manifest.ts';
+import type { Presentation } from '../../../types/model/Presentation.ts';
+import type { SelectionSet } from '../../../types/model/SelectionSet.ts';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
+import type { Track } from '../../../types/model/Track.ts';
 
-import { generateManifestPlaylistPiece } from './generateManifestPlaylistPiece.js';
+import { generateManifestPlaylistPiece } from './generateManifestPlaylistPiece.ts';
 
 export function mapHamToHls(presentations: Presentation[]): Manifest {
 	const version = 7; //TODO Add a way to change the version. For now version 7 is hardcoded as it is the first version of HLS with CMAF support

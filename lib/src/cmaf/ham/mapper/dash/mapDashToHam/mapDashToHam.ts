@@ -1,22 +1,22 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.js';
-import type { DashManifest } from '../../../types/mapper/dash/DashManifest.js';
-import type { Period } from '../../../types/mapper/dash/Period.js';
-import type { Representation } from '../../../types/mapper/dash/Representation.js';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
+import type { DashManifest } from '../../../types/mapper/dash/DashManifest.ts';
+import type { Period } from '../../../types/mapper/dash/Period.ts';
+import type { Representation } from '../../../types/mapper/dash/Representation.ts';
 
-import type { Presentation } from '../../../types/model/Presentation.js';
-import type { Segment } from '../../../types/model/Segment.js';
-import type { SelectionSet } from '../../../types/model/SelectionSet.js';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.js';
-import type { Track } from '../../../types/model/Track.js';
+import type { Presentation } from '../../../types/model/Presentation.ts';
+import type { Segment } from '../../../types/model/Segment.ts';
+import type { SelectionSet } from '../../../types/model/SelectionSet.ts';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
+import type { Track } from '../../../types/model/Track.ts';
 
-import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.js';
+import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts';
 
-import { getGroup } from './utils/getGroup.js';
-import { getInitializationUrl } from './utils/getInitializationUrl.js';
-import { getPresentationId } from './utils/getPresentationId.js';
+import { getGroup } from './utils/getGroup.ts';
+import { getInitializationUrl } from './utils/getInitializationUrl.ts';
+import { getPresentationId } from './utils/getPresentationId.ts';
 
-import { mapSegments } from './mapSegments.js';
-import { mapTracks } from './mapTracks.js';
+import { mapSegments } from './mapSegments.ts';
+import { mapTracks } from './mapTracks.ts';
 
 /**
  * @internal

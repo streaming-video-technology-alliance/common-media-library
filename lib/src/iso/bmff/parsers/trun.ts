@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Track run sample
@@ -13,7 +13,7 @@ export type TrackRunSample = {
 	sampleSize?: number;
 	sampleFlags?: number;
 	sampleCompositionTimeOffset?: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box

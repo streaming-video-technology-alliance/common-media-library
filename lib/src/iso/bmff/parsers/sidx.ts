@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Segment index reference
@@ -17,7 +17,7 @@ export type Reference = {
 	startsWithSap: number,
 	sapType: number,
 	sapDeltaTime: number,
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box

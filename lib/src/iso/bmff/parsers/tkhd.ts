@@ -1,7 +1,7 @@
-import { TEMPLATE } from '../fields/TEMPLATE.js';
-import { UINT } from '../fields/UINT.js';
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import { TEMPLATE } from '../fields/TEMPLATE.ts';
+import { UINT } from '../fields/UINT.ts';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.3.2 Track Header Box

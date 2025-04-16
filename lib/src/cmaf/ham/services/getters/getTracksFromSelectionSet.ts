@@ -1,7 +1,7 @@
-import type { SelectionSet } from '../../types/model/SelectionSet.js';
-import type { Track } from '../../types/model/Track.js';
+import type { SelectionSet } from '../../types/model/SelectionSet.ts';
+import type { Track } from '../../types/model/Track.ts';
 
-import { getTracksFromSwitchingSet } from './getTracksFromSwitchingSet.js';
+import { getTracksFromSwitchingSet } from './getTracksFromSwitchingSet.ts';
 
 /**
  * Get a list of Tracks contained on a SelectionSet

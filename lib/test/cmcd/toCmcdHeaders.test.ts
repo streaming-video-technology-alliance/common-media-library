@@ -1,9 +1,10 @@
 import type { CmcdHeadersMap } from '@svta/common-media-library';
-import { CmcdHeaderField, toCmcdHeaders } from '@svta/common-media-library';
+import { CmcdHeaderField } from '@svta/common-media-library/cmcd/CmcdHeaderField';
+import { toCmcdHeaders } from '@svta/common-media-library/cmcd/toCmcdHeaders';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMCD_HEADERS } from './data/CMCD_HEADERS.js';
-import { CMCD_INPUT } from './data/CMCD_INPUT.js';
+import { CMCD_HEADERS } from './data/CMCD_HEADERS.ts';
+import { CMCD_INPUT } from './data/CMCD_INPUT.ts';
 
 const customHeaderMap: CmcdHeadersMap = {
 	[CmcdHeaderField.OBJECT]: ['com.example-hello'],

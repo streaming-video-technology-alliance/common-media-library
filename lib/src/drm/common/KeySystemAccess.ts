@@ -8,4 +8,4 @@
 export type KeySystemAccess = {
 	keySystem: string;
 	configuration: MediaKeySystemConfiguration;
-}
+};
