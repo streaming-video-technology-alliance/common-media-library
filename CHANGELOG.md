@@ -10,14 +10,14 @@ and this project adheres to
 
 ### Added
 
-- Added Throughput Calculation Interfaces 
+- Added Throughput Calculation Interfaces
   ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
 - PlayReady DRM Utilities
   ([#172](https://github.com/streaming-video-technology-alliance/common-media-library/issues/172))
 
 ### Changed
 
-- Ensure CML is compliant with the type annotations proposal 
+- Ensure CML is compliant with the type annotations proposal
   ([#134](https://github.com/streaming-video-technology-alliance/common-media-library/issues/134))
 
 ## [0.11.0] - 2025-04-03
