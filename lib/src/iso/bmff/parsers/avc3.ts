@@ -1,5 +1,5 @@
-import type { BoxParser } from '../BoxParser.js';
-import { avc1, type VisualSampleEntry } from './avc1.js';
+import type { BoxParser } from '../BoxParser.ts';
+import { avc1, type VisualSampleEntry } from './avc1.ts';
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView

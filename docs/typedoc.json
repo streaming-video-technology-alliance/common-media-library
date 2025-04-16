@@ -8,13 +8,13 @@
 	"excludeInternal": true,
 	"excludePrivate": true,
 	"hideGenerator": true,
+	"jsDocCompatibility": {
+		"exampleTag": false
+	},
 	"navigation": {
 		"includeGroups": true
 	},
 	"out": "./dist",
 	"readme": "../lib/README.md",
-	"searchInComments": true,
-	"jsDocCompatibility": {
-		"exampleTag": false
-	}
+	"searchInComments": true
 }

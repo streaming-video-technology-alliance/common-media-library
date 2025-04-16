@@ -1,4 +1,4 @@
-import { toUint8 } from '../../../src/id3/util/utf8.js';
+import { toUint8 } from '@svta/common-media-library/id3/util/utf8';
 
 export function generateId3(
 	frames: Uint8Array,

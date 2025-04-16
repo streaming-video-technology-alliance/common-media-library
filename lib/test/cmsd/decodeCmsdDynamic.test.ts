@@ -1,9 +1,9 @@
 import { decodeCmsdDynamic } from '@svta/common-media-library/cmsd/decodeCmsdDynamic';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.js';
-import { CMSD_DYNAMIC_OBJ } from './data/CMSD_DYNAMIC_OBJ.js';
-import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.js';
+import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.ts';
+import { CMSD_DYNAMIC_OBJ } from './data/CMSD_DYNAMIC_OBJ.ts';
+import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.ts';
 
 describe('decodeCmsdDynamic', () => {
 	it('handles null data object', () => {

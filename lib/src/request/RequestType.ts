@@ -1,4 +1,4 @@
-import type { ValueOf } from '../utils/ValueOf.js';
+import type { ValueOf } from '../utils/ValueOf.ts';
 
 /**
  * The content type of the request.

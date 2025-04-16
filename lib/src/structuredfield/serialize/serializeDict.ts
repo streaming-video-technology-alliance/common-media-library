@@ -1,11 +1,11 @@
-import type { SfEncodeOptions } from '../SfEncodeOptions.js';
-import { SfItem } from '../SfItem.js';
-import { DICT } from '../utils/DICT.js';
-import { serializeError } from './serializeError.js';
-import { serializeInnerList } from './serializeInnerList.js';
-import { serializeItem } from './serializeItem.js';
-import { serializeKey } from './serializeKey.js';
-import { serializeParams } from './serializeParams.js';
+import type { SfEncodeOptions } from '../SfEncodeOptions.ts';
+import { SfItem } from '../SfItem.ts';
+import { DICT } from '../utils/DICT.ts';
+import { serializeError } from './serializeError.ts';
+import { serializeInnerList } from './serializeInnerList.ts';
+import { serializeItem } from './serializeItem.ts';
+import { serializeKey } from './serializeKey.ts';
+import { serializeParams } from './serializeParams.ts';
 
 // 4.1.2.  Serializing a Dictionary
 //

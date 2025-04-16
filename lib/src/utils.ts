@@ -3,13 +3,13 @@
  *
  * @packageDocumentation
  */
-export * from './utils/base64decode.js';
-export * from './utils/base64encode.js';
-export * from './utils/convertUint8ToUint16.js';
-export * from './utils/roundToEven.js';
-export * from './utils/stringToUint16.js';
-export * from './utils/unescapeHtml.js';
-export * from './utils/urlToRelativePath.js';
-export * from './utils/utf8ArrayToStr.js';
-export * from './utils/uuid.js';
-export type { ValueOf } from './utils/ValueOf.js';
+export * from './utils/base64decode.ts';
+export * from './utils/base64encode.ts';
+export * from './utils/convertUint8ToUint16.ts';
+export * from './utils/roundToEven.ts';
+export * from './utils/stringToUint16.ts';
+export * from './utils/unescapeHtml.ts';
+export * from './utils/urlToRelativePath.ts';
+export * from './utils/utf8ArrayToStr.ts';
+export * from './utils/uuid.ts';
+export type { ValueOf } from './utils/ValueOf.ts';

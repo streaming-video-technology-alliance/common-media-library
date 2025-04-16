@@ -1,6 +1,6 @@
+import { parseString } from '@svta/common-media-library/structuredfield/parse/parseString';
 import assert from 'node:assert';
 import test from 'node:test';
-import { parseString } from '../../src/structuredfield/parse/parseString.js';
 
 test('parseString', () => {
 	assert.deepStrictEqual(parseString(`"asdf"`), { value: `asdf`, src: `` });

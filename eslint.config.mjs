@@ -43,6 +43,7 @@ export default [
 			'@stylistic/key-spacing': ['error'],
 			'@stylistic/eol-last': ['error', 'always'],
 			'@stylistic/comma-dangle': ['error', 'always-multiline'],
+			'@stylistic/semi': ['error', 'always'],
 			'@stylistic/indent': ['error', 'tab', {
 				SwitchCase: 1,
 				MemberExpression: 1,

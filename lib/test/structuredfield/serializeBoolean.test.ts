@@ -1,6 +1,6 @@
+import { serializeBoolean } from '@svta/common-media-library/structuredfield/serialize/serializeBoolean';
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeBoolean } from '../../src/structuredfield/serialize/serializeBoolean.js';
 
 test('serializeBoolean', () => {
 	assert.deepStrictEqual(serializeBoolean(true), `?1`);

@@ -9,23 +9,23 @@ env:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       id-token: write
-    
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 23
           cache: 'npm'
           registry-url: "https://registry.npmjs.org"
           scope: "@svta"
 
       - name: Install
         run: npm ci
-        
+
       - name: Build Docs
         run: npm run build
 

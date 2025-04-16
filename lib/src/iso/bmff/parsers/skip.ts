@@ -1,5 +1,5 @@
-import type { BoxParser } from '../BoxParser.js';
-import { free, type FreeSpaceBox } from './free.js';
+import type { BoxParser } from '../BoxParser.ts';
+import { free, type FreeSpaceBox } from './free.ts';
 
 /**
  * Parse a FreeSpaceBox from an IsoView

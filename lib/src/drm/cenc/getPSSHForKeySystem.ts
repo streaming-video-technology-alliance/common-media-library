@@ -1,5 +1,5 @@
-import type { KeySystem } from '../common/KeySystem.js';
-import { parsePSSHList } from './parsePSSHList.js';
+import type { KeySystem } from '../common/KeySystem.ts';
+import { parsePSSHList } from './parsePSSHList.ts';
 
 /**
  * Returns the PSSH box associated with the given key system from the concatenated

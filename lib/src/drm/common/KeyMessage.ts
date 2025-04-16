@@ -12,4 +12,4 @@ export type KeyMessage = {
 	message: ArrayBuffer;
 	defaultUrl?: string;
 	messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
-}
+};

@@ -1,6 +1,6 @@
-import { UINT } from '../fields/UINT.js';
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import { UINT } from '../fields/UINT.ts';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 23001-7:2011 - 8.1 Protection System Specific Header Box
@@ -13,7 +13,7 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 	systemID: number[];
 	dataSize: number;
 	data: number[];
-}
+};
 
 /**
  * Parse a ProtectionSystemSpecificHeaderBox from an IsoView

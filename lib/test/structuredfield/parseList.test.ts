@@ -1,7 +1,7 @@
+import { parseList } from '@svta/common-media-library/structuredfield/parse/parseList';
+import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
-import { SfItem } from '../../src/structuredfield/SfItem.js';
-import { parseList } from '../../src/structuredfield/parse/parseList.js';
 
 describe('parseList', () => {
 	test('string list', () => {

@@ -49,5 +49,5 @@ export type LicenseRequest = {
 	* The license request data
 	*/
 	data?: ArrayBuffer;
-}
+};
 

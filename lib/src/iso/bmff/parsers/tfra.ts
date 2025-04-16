@@ -1,4 +1,4 @@
-import type { FullBox } from '../FullBox.js';
+import type { FullBox } from '../FullBox.ts';
 import type { IsoView } from '../IsoView';
 
 /**
@@ -14,7 +14,7 @@ export type TrackFragmentRandomAccessEntry = {
 	trafNumber: number;
 	trunNumber: number;
 	sampleNumber: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box

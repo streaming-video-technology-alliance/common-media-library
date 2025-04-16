@@ -1,6 +1,6 @@
-import type { BoxParser } from '../BoxParser.js';
-import { type TypeBox } from '../TypeBox.js';
-import { ftyp } from './ftyp.js';
+import type { BoxParser } from '../BoxParser.ts';
+import { type TypeBox } from '../TypeBox.ts';
+import { ftyp } from './ftyp.ts';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box

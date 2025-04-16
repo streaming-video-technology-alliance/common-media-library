@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 14496-12:202x - 8.10.4 Track kind box
@@ -11,7 +11,7 @@ import type { IsoView } from '../IsoView.js';
 export type TrackKindBox = FullBox & {
 	schemeUri: string;
 	value: string;
-}
+};
 
 /**
  * Parse a TrackKinBox from an IsoView

@@ -1,8 +1,8 @@
-import { DATE } from '../utils/DATE.js';
-import type { ParsedValue } from './ParsedValue.js';
-import { parsedValue } from './ParsedValue.js';
-import { parseError } from './parseError.js';
-import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.js';
+import { DATE } from '../utils/DATE.ts';
+import type { ParsedValue } from './ParsedValue.ts';
+import { parsedValue } from './ParsedValue.ts';
+import { parseError } from './parseError.ts';
+import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts';
 
 // 4.2.9.  Parsing a Date
 //

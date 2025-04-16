@@ -11,4 +11,4 @@ export type Box<T = any> = T & {
 	largesize?: number;
 	usertype?: number[];
 	boxes?: Box[];
-}
+};

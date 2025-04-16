@@ -1,5 +1,5 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.js';
-import type { Representation } from '../../../../types/mapper/dash/Representation.js';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
 
 /**
  * @internal

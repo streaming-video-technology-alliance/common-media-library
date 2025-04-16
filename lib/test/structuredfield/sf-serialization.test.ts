@@ -1,8 +1,8 @@
+import { encodeSfItem } from '@svta/common-media-library/structuredfield/encodeSfItem';
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
-import { encodeSfItem } from '../../src/structuredfield/encodeSfItem.js';
-import { formatItem } from './util/format.js';
-import { read } from './util/read.js';
+import { formatItem } from './util/format.ts';
+import { read } from './util/read.ts';
 
 describe('structured field serialization', async () => {
 	const suites = await Promise.all([

@@ -1,14 +1,14 @@
-import type { AudioTrack } from '../../../types/model/AudioTrack.js';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.js';
+import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
 
-import type { Manifest } from '../../../types/manifest/Manifest.js';
+import type { Manifest } from '../../../types/manifest/Manifest.ts';
 
-import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.js';
+import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts';
 
-import { getDuration } from './utils/getDuration.js';
-import { getCodec } from './utils/getCodec.js';
-import { getByterange } from './utils/getByterange.js';
-import { formatSegments } from './utils/formatSegments.js';
+import { getDuration } from './utils/getDuration.ts';
+import { getCodec } from './utils/getCodec.ts';
+import { getByterange } from './utils/getByterange.ts';
+import { formatSegments } from './utils/formatSegments.ts';
 
 /**
  * @internal

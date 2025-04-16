@@ -1,7 +1,7 @@
-import { CBCS } from './CBCS.js';
-import { CENC } from './CENC.js';
-import { KEYIDS } from './KEYIDS.js';
-import { WEBM } from './WEBM.js';
+import { CBCS } from './CBCS.ts';
+import { CENC } from './CENC.ts';
+import { KEYIDS } from './KEYIDS.ts';
+import { WEBM } from './WEBM.ts';
 
 /**
  * Initialization Data Type.
@@ -16,5 +16,3 @@ export const INITIALIZATION_DATA_TYPE = {
 	KEYIDS: KEYIDS as typeof KEYIDS,
 	WEBM: WEBM as typeof WEBM,
 } as const;
-
-

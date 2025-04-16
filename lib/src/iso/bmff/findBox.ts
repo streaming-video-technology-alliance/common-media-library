@@ -1,8 +1,8 @@
-import type { Box } from './Box.js';
-import type { BoxFilter } from './BoxFilter.js';
-import { createIsoView } from './createIsoView.js';
-import type { IsoData } from './IsoData.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
+import type { Box } from './Box.ts';
+import type { BoxFilter } from './BoxFilter.ts';
+import { createIsoView } from './createIsoView.ts';
+import type { IsoData } from './IsoData.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
 
 function find(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter): Box | null {
 	for (const box of iterator) {

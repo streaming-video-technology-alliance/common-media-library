@@ -1,5 +1,5 @@
-import type { IsoView } from '../IsoView.js';
-import { UINT } from '../fields/UINT.js';
+import type { IsoView } from '../IsoView.ts';
+import { UINT } from '../fields/UINT.ts';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box

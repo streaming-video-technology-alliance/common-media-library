@@ -1,8 +1,8 @@
-import { INTEGER_DECIMAL } from '../utils/INTEGER_DECIMAL.js';
-import { isInvalidInt } from '../utils/isInvalidInt.js';
-import type { ParsedValue } from './ParsedValue.js';
-import { parsedValue } from './ParsedValue.js';
-import { parseError } from './parseError.js';
+import { INTEGER_DECIMAL } from '../utils/INTEGER_DECIMAL.ts';
+import { isInvalidInt } from '../utils/isInvalidInt.ts';
+import type { ParsedValue } from './ParsedValue.ts';
+import { parsedValue } from './ParsedValue.ts';
+import { parseError } from './parseError.ts';
 
 // 4.2.4.  Parsing an Integer or Decimal
 //

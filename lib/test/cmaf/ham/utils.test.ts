@@ -1,8 +1,8 @@
-import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
+import { describe, it } from 'node:test';
 
-import { iso8601DurationToNumber } from '../../../src/cmaf/ham/utils/dash/iso8601DurationToNumber.js';
-import { numberToIso8601Duration } from '../../../src/cmaf/ham/utils/dash/numberToIso8601Duration.js';
+import { iso8601DurationToNumber } from '@svta/common-media-library/cmaf/ham/utils/dash/iso8601DurationToNumber.ts';
+import { numberToIso8601Duration } from '@svta/common-media-library/cmaf/ham/utils/dash/numberToIso8601Duration.ts';
 
 describe('iso8601DurationToNumber', () => {
 	it('converts PT5S to 5', () => {

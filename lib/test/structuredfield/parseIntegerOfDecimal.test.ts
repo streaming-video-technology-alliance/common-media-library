@@ -1,6 +1,6 @@
+import { parseIntegerOrDecimal } from '@svta/common-media-library/structuredfield/parse/parseIntegerOrDecimal';
 import assert from 'node:assert';
 import test from 'node:test';
-import { parseIntegerOrDecimal } from '../../src/structuredfield/parse/parseIntegerOrDecimal.js';
 
 test('parseIntegerOrDecimal', () => {
 	assert.deepStrictEqual(parseIntegerOrDecimal(`42`), { value: 42, src: `` });

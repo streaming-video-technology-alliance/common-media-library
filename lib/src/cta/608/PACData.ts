@@ -10,4 +10,4 @@ export type PACData = {
 	color: string | null;
 	underline: boolean;
 	italics: boolean;
-}
+};

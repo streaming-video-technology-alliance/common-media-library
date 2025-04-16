@@ -1,4 +1,4 @@
-import type { ResourceTiming } from '../request/ResourceTiming'
+import type { ResourceTiming } from '../request/ResourceTiming';
 
 /**
  * Throughput Estimator.
@@ -13,12 +13,12 @@ export type ThroughputEstimator = {
 	 *
 	 * @param sample - The timing sample to add
 	 */
-	sample(sample: ResourceTiming): void
+	sample(sample: ResourceTiming): void;
 
 	/**
 	 * Returns the current estimate of the throughput (in bytes per second)
 	 *
 	 * @returns The current estimate of the throughput
 	 */
-	getEstimate(): number
-}
+	getEstimate(): number;
+};

@@ -1,6 +1,6 @@
-import type { MediaGroups } from './MediaGroups.js';
-import type { PlayList } from './Playlist.js';
-import type { SegmentHls } from './SegmentHls.js';
+import type { MediaGroups } from './MediaGroups.ts';
+import type { PlayList } from './Playlist.ts';
+import type { SegmentHls } from './SegmentHls.ts';
 
 /**
  * HLS manifest

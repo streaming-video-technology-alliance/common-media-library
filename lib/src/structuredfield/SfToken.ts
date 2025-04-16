@@ -6,5 +6,9 @@
  * @beta
  */
 export class SfToken {
-	constructor(public description: string) { }
+	description: string;
+
+	constructor(description: string) {
+		this.description = description;
+	}
 }

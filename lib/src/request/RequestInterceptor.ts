@@ -1,4 +1,4 @@
-import type { CommonMediaRequest } from './CommonMediaRequest.js';
+import type { CommonMediaRequest } from './CommonMediaRequest.ts';
 
 /**
  * Request interceptor API.
@@ -9,4 +9,4 @@ import type { CommonMediaRequest } from './CommonMediaRequest.js';
  *
  * @beta
  */
-export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>
+export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
