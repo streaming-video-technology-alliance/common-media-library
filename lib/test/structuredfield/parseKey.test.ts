@@ -1,6 +1,6 @@
+import { parseKey } from '@svta/common-media-library/structuredfield/parse/parseKey';
 import assert from 'node:assert';
 import test from 'node:test';
-import { parseKey } from '../../src/structuredfield/parse/parseKey.js';
 
 test('parseKey', () => {
 	assert.deepStrictEqual(parseKey(`a123_-.*`), { value: `a123_-.*`, src: `` });

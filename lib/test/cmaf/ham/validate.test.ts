@@ -1,9 +1,10 @@
-import { describe, it } from 'node:test';
 import {
 	validatePresentation,
 	validateSegments,
 	validateTrack,
 } from '@svta/common-media-library/cmaf-ham';
+import { deepEqual, equal } from 'node:assert';
+import { describe, it } from 'node:test';
 import {
 	audioTrack,
 	invalidAudioTrack,
@@ -13,8 +14,7 @@ import {
 	presentation,
 	videoSegments,
 	videoTrack,
-} from './data/hamSamples.js';
-import { deepEqual, equal } from 'node:assert';
+} from './data/hamSamples.ts';
 
 describe('validatePresentation', () => {
 	it('it returns true when presentation is valid', () => {

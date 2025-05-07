@@ -1,8 +1,8 @@
 import { decodeCmsdStatic } from '@svta/common-media-library/cmsd/decodeCmsdStatic';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.js';
-import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.js';
+import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.ts';
+import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.ts';
 
 describe('decodeCmsdStatic', () => {
 	it('handles null data object', () => {

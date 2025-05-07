@@ -1,4 +1,4 @@
-import type { SfToken } from '../../structuredfield/SfToken.js';
+import type { SfToken } from '../../structuredfield/SfToken.ts';
 
 /**
  * Converts a symbol to a string.

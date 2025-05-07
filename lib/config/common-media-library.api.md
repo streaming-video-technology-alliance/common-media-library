@@ -1372,8 +1372,7 @@ export type ResourceTiming = {
     startTime: number;
     encodedBodySize: number;
     responseStart?: number;
-    responseEnd?: number;
-    duration?: number;
+    duration: number;
 };
 
 // @beta
@@ -1764,6 +1763,12 @@ export function tfhd(view: IsoView): TrackFragmentHeaderBox;
 
 // @beta
 export function tfra(view: IsoView): TrackFragmentRandomAccessBox;
+
+// @beta
+export type ThroughputEstimator = {
+    sample(sample: ResourceTiming): void;
+    getEstimate(): number;
+};
 
 // @beta
 export function tkhd(view: IsoView): TrackHeaderBox;

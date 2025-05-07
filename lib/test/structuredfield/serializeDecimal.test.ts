@@ -1,6 +1,6 @@
+import { serializeDecimal } from '@svta/common-media-library/structuredfield/serialize/serializeDecimal';
 import assert from 'node:assert';
 import test from 'node:test';
-import { serializeDecimal } from '../../src/structuredfield/serialize/serializeDecimal.js';
 
 test('serializeDecimal', () => {
 	assert.deepStrictEqual(serializeDecimal(0), '0.0');

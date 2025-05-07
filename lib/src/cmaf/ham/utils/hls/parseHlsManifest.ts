@@ -1,4 +1,4 @@
-import type { HlsManifest } from '../../types/mapper/hls/HlsManifest.js';
+import type { HlsManifest } from '../../types/mapper/hls/HlsManifest.ts';
 
 export type HlsParser = (text: string) => HlsManifest;
 

@@ -1,10 +1,10 @@
-import { describe, it } from 'node:test';
 import { deepStrictEqual } from 'node:assert';
+import { describe, it } from 'node:test';
 
-import { mapSegmentBase } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentBase.js';
-import { mapSegmentList } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentList.js';
-import { mapSegments } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegments.js';
-import { mapSegmentTemplate } from '../../../src/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentTemplate.js';
+import { mapSegmentBase } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentBase.ts';
+import { mapSegmentList } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentList.ts';
+import { mapSegments } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegments.ts';
+import { mapSegmentTemplate } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentTemplate.ts';
 
 import {
 	duration,
@@ -12,12 +12,12 @@ import {
 	representationList,
 	representationTemplate,
 	segmentTemplate,
-} from './testData.js';
+} from './testData.ts';
 import {
 	expectedSegmentBase,
 	expectedSegmentList,
 	expectedSegmentTemplate,
-} from './testExpected.js';
+} from './testExpected.ts';
 
 describe('map segments', () => {
 	describe('mapSegmentBase', () => {

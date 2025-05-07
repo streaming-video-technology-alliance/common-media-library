@@ -1,4 +1,4 @@
-import { CmStreamingFormat } from '../cta/CmStreamingFormat.js';
+import { CmStreamingFormat } from '../cta/CmStreamingFormat.ts';
 
 /**
  * Common Media Client Data Streaming Format
@@ -14,4 +14,4 @@ export const CmcdStreamingFormat = CmStreamingFormat as typeof CmStreamingFormat
 /**
  * @beta
  */
-export type CmcdStreamingFormat = CmStreamingFormat
+export type CmcdStreamingFormat = CmStreamingFormat;

@@ -1,8 +1,8 @@
+import { encodeSfDict } from '@svta/common-media-library/structuredfield/encodeSfDict';
+import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
+import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
-import { SfItem } from '../../src/structuredfield/SfItem.js';
-import { SfToken } from '../../src/structuredfield/SfToken.js';
-import { encodeSfDict } from '../../src/structuredfield/encodeSfDict.js';
 
 describe('encodeSfDict', () => {
 	it('handles empty objects', () => {

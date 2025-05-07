@@ -1,13 +1,13 @@
+import { decodeSfDict } from '@svta/common-media-library/structuredfield/decodeSfDict';
+import { decodeSfItem } from '@svta/common-media-library/structuredfield/decodeSfItem';
+import { decodeSfList } from '@svta/common-media-library/structuredfield/decodeSfList';
+import { encodeSfDict } from '@svta/common-media-library/structuredfield/encodeSfDict';
+import { encodeSfItem } from '@svta/common-media-library/structuredfield/encodeSfItem';
+import { encodeSfList } from '@svta/common-media-library/structuredfield/encodeSfList';
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
-import { decodeSfDict } from '../../src/structuredfield/decodeSfDict.js';
-import { decodeSfItem } from '../../src/structuredfield/decodeSfItem.js';
-import { decodeSfList } from '../../src/structuredfield/decodeSfList.js';
-import { encodeSfDict } from '../../src/structuredfield/encodeSfDict.js';
-import { encodeSfItem } from '../../src/structuredfield/encodeSfItem.js';
-import { encodeSfList } from '../../src/structuredfield/encodeSfList.js';
-import { formatDict, formatItem, formatList } from './util/format.js';
-import { read } from './util/read.js';
+import { formatDict, formatItem, formatList } from './util/format.ts';
+import { read } from './util/read.ts';
 
 describe('structured_field_tests', async () => {
 	const suites = await Promise.all([

@@ -1,6 +1,6 @@
+import { parseByteSequence } from '@svta/common-media-library/structuredfield/parse/parseByteSequence';
 import assert from 'node:assert';
 import test from 'node:test';
-import { parseByteSequence } from '../../src/structuredfield/parse/parseByteSequence.js';
 
 test('parseByteSequence', () => {
 	const value = Uint8Array.from([

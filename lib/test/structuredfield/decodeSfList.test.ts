@@ -1,7 +1,7 @@
+import { decodeSfList } from '@svta/common-media-library/structuredfield/decodeSfList';
+import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
-import { SfItem } from '../../src/structuredfield/SfItem.js';
-import { decodeSfList } from '../../src/structuredfield/decodeSfList.js';
 
 describe('decodeSfList', () => {
 	it('handles an empty string', () => {

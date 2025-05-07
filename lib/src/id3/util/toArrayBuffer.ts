@@ -12,11 +12,11 @@ type TypedArray =
 export function toArrayBuffer(view: ArrayBuffer | TypedArray): ArrayBuffer {
 	if (view instanceof ArrayBuffer) {
 		return view;
-	} 
+	}
 	else {
 		if (view.byteOffset == 0 && view.byteLength == view.buffer.byteLength) {
 			// This is a TypedArray over the whole buffer.
-			return view.buffer;
+			return view.buffer as ArrayBuffer;
 		}
 		// This is a 'view' on the buffer.  Create a new buffer that only contains
 		// the data.  Note that since this isn't an ArrayBuffer, the 'new' call

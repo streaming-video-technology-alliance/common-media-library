@@ -1,15 +1,15 @@
-import type { Manifest } from '../../types/manifest/Manifest.js';
-import type { DashManifest } from '../../types/mapper/dash/DashManifest.js';
-import type { Presentation } from '../../types/model/Presentation.js';
+import type { Manifest } from '../../types/manifest/Manifest.ts';
+import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts';
+import type { Presentation } from '../../types/model/Presentation.ts';
 
-import { mapDashToHam } from './mapDashToHam/mapDashToHam.js';
-import { mapHamToDash } from './mapHamToDash/mapHamToDash.js';
+import { mapDashToHam } from './mapDashToHam/mapDashToHam.ts';
+import { mapHamToDash } from './mapHamToDash/mapHamToDash.ts';
 
-import { parseDashManifest } from '../../utils/dash/parseDashManifest.js';
-import { addMetadataToDash } from '../../utils/manifest/addMetadataToDash.js';
-import { getMetadata } from '../../utils/manifest/getMetadata.js';
+import { parseDashManifest } from '../../utils/dash/parseDashManifest.ts';
+import { addMetadataToDash } from '../../utils/manifest/addMetadataToDash.ts';
+import { getMetadata } from '../../utils/manifest/getMetadata.ts';
 
-import type { Mapper } from '../Mapper.js';
+import type { Mapper } from '../Mapper.ts';
 
 export class DashMapper implements Mapper {
 	private manifest: Manifest | undefined;

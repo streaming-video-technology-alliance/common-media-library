@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.12.5 Scheme Type Box

@@ -1,5 +1,5 @@
-import type { Representation } from '../../../src/cmaf/ham/types/mapper/dash/Representation.js';
-import type { SegmentTemplate } from '../../../src/cmaf/ham/types/mapper/dash/SegmentTemplate.js';
+import type { Representation } from '@svta/common-media-library/cmaf/ham/types/mapper/dash/Representation.ts';
+import type { SegmentTemplate } from '@svta/common-media-library/cmaf/ham/types/mapper/dash/SegmentTemplate.ts';
 
 const representationBase: Representation = {
 	$: {
@@ -97,9 +97,8 @@ const segmentTemplate: SegmentTemplate = {
 const duration = 13;
 
 export {
-	representationBase,
+	duration, representationBase,
 	representationList,
-	representationTemplate,
-	duration,
-	segmentTemplate,
+	representationTemplate, segmentTemplate,
 };
+

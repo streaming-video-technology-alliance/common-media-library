@@ -1,8 +1,8 @@
-import type { DecodedId3Frame } from './DecodedId3Frame.js';
-import type { Id3Frame } from './Id3Frame.js';
-import { getId3Frames } from './getId3Frames.js';
-import { isId3TimestampFrame } from './isId3TimestampFrame.js';
-import { readId3Timestamp } from './util/readId3Timestamp.js';
+import type { DecodedId3Frame } from './DecodedId3Frame.ts';
+import type { Id3Frame } from './Id3Frame.ts';
+import { getId3Frames } from './getId3Frames.ts';
+import { isId3TimestampFrame } from './isId3TimestampFrame.ts';
+import { readId3Timestamp } from './util/readId3Timestamp.ts';
 
 /**
  * Searches for the Elementary Stream timestamp found in the ID3 data chunk

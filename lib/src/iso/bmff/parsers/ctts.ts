@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * A Composition Time To Sample Entry
@@ -11,7 +11,7 @@ import type { IsoView } from '../IsoView.js';
 export type CompositionTimeToSampleEntry = {
 	sampleCount: number;
 	sampleOffset: number;
-}
+};
 
 /**
  * ISO/IEC 14496-12:2012 - 8.6.1.3 Composition Time To Sample Box

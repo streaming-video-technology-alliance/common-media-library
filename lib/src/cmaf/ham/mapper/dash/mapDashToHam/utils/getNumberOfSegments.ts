@@ -1,5 +1,5 @@
-import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.js';
-import { calculateDuration } from './calculateDuration.js';
+import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.ts';
+import { calculateDuration } from './calculateDuration.ts';
 /**
  * @internal
  *

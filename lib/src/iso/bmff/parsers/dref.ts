@@ -1,6 +1,6 @@
-import type { Box } from '../Box.js';
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Box } from '../Box.ts';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box

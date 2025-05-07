@@ -1,4 +1,4 @@
-import type { ContentProtection } from '../common/ContentProtection.js';
+import type { ContentProtection } from '../common/ContentProtection.ts';
 
 /**
  * Parse a standard common encryption PSSH which contains a simple
@@ -20,7 +20,7 @@ export function parseInitDataFromContentProtection(
 ): ArrayBuffer | null {
 	if (cpData?.pssh && cpData.pssh) {
 		const cleanedText = cpData.pssh.replace(/\r?\n|\r/g, '').replace(/\s+/g, '');
-		return BASE64.decodeArray(cleanedText).buffer as ArrayBuffer;;
+		return BASE64.decodeArray(cleanedText).buffer as ArrayBuffer;
 	}
 
 	return null;

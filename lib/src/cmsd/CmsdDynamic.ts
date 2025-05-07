@@ -1,4 +1,4 @@
-import type { CmsdDynamicParams } from './CmsdDynamicParams.js';
+import type { CmsdDynamicParams } from './CmsdDynamicParams.ts';
 
 /**
  * Common Media Server Data (CMSD) dynamic response header fields.
@@ -19,4 +19,4 @@ export type CmsdDynamic = {
 	 * The CMSD dynamic parameters.
 	 */
 	params: CmsdDynamicParams
-}
+};

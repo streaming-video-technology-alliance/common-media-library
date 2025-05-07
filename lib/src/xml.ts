@@ -5,6 +5,6 @@
  * @packageDocumentation
  * @beta
  */
-export { parseXml } from './xml/parseXml.js';
-export type { XmlNode } from './xml/XmlNode.js';
-export type { XmlParseOptions } from './xml/XmlParseOptions.js';
+export { parseXml } from './xml/parseXml.ts';
+export type { XmlNode } from './xml/XmlNode.ts';
+export type { XmlParseOptions } from './xml/XmlParseOptions.ts';

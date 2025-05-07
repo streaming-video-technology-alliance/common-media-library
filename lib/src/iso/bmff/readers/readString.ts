@@ -1,4 +1,4 @@
-import { readUint } from './readUint.js';
+import { readUint } from './readUint.ts';
 
 export function readString(dataView: DataView, offset: number, length: number): string {
 	let str = '';

@@ -36,24 +36,24 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CaptionsLogger } from './CaptionsLogger.js';
-import type { Channels } from './Channels.js';
-import type { CmdHistory } from './CmdHistory.js';
-import { Cta608Channel } from './Cta608Channel.js';
-import type { PACData } from './PACData.js';
-import type { PenStyles } from './PenStyles.js';
-import type { SupportedField } from './SupportedField.js';
-import { VerboseLevel } from './VerboseLevel.js';
-import { backgroundColors } from './utils/backgroundColors.js';
-import { createCmdHistory } from './utils/createCmdHistory.js';
-import { getCharForByte } from './utils/getCharForByte.js';
-import { hasCmdRepeated } from './utils/hasCmdRepeated.js';
-import { numArrayToHexArray } from './utils/numArrayToHexArray.js';
-import { rowsHighCh1 } from './utils/rowsHighCh1.js';
-import { rowsHighCh2 } from './utils/rowsHighCh2.js';
-import { rowsLowCh1 } from './utils/rowsLowCh1.js';
-import { rowsLowCh2 } from './utils/rowsLowCh2.js';
-import { setLastCmd } from './utils/setLastCmd.js';
+import { CaptionsLogger } from './CaptionsLogger.ts';
+import type { Channels } from './Channels.ts';
+import type { CmdHistory } from './CmdHistory.ts';
+import { Cta608Channel } from './Cta608Channel.ts';
+import type { PACData } from './PACData.ts';
+import type { PenStyles } from './PenStyles.ts';
+import type { SupportedField } from './SupportedField.ts';
+import { VerboseLevel } from './VerboseLevel.ts';
+import { backgroundColors } from './utils/backgroundColors.ts';
+import { createCmdHistory } from './utils/createCmdHistory.ts';
+import { getCharForByte } from './utils/getCharForByte.ts';
+import { hasCmdRepeated } from './utils/hasCmdRepeated.ts';
+import { numArrayToHexArray } from './utils/numArrayToHexArray.ts';
+import { rowsHighCh1 } from './utils/rowsHighCh1.ts';
+import { rowsHighCh2 } from './utils/rowsHighCh2.ts';
+import { rowsLowCh1 } from './utils/rowsLowCh1.ts';
+import { rowsLowCh2 } from './utils/rowsLowCh2.ts';
+import { setLastCmd } from './utils/setLastCmd.ts';
 
 /**
  * CEA-608 caption parser.

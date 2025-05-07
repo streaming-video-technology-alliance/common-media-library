@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { FullBox } from '../FullBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
@@ -26,7 +26,7 @@ export type MediaHeaderBox = FullBox & {
 
 	/** A 16-bit value that is reserved for use in other specifications. */
 	preDefined: number;
-}
+};
 
 /**
  * Parse a MediaHeaderBox from an IsoView

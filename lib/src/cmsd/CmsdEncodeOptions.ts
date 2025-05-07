@@ -12,4 +12,4 @@ export type CmsdEncodeOptions = {
 	 * @defaultValue `true`
 	 */
 	useSymbol?: boolean;
-}
+};

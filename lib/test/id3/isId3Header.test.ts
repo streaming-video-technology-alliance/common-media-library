@@ -1,6 +1,6 @@
+import { isId3Header } from '@svta/common-media-library/id3/util/isId3Header';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { isId3Header } from '../../src/id3/util/isId3Header.js';
 
 const LEADING_BYTE_SIZE = 8;
 const TRAILING_BYTE_SIZE = 8;
