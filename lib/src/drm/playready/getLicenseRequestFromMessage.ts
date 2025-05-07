@@ -1,10 +1,9 @@
-import { base64decode } from '../../utils/base64decode';
-import { parseXml, type XmlNode } from '../../xml';
-import { CHALLENGE } from '../common/CHALLENGE';
-import type { ENCODING_UTF8 } from '../common/ENCODING_UTF8';
-import { ENCODING_UTF16 } from '../common/ENCODING_UTF16';
-import { LICENSE_ACQUISITION } from '../common/LICENSE_ACQUISITION';
-import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE';
+import { base64decode } from '../../utils/base64decode.ts';
+import { parseXml, getElementsByName as getElementsByName } from '../../xml.ts';
+import { CHALLENGE } from '../common/CHALLENGE.ts';
+import type { ENCODING_UTF8 } from '../common/ENCODING_UTF8.ts';
+import { ENCODING_UTF16 } from '../common/ENCODING_UTF16.ts';
+import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.ts';
 
 /**
  * Gets the PlayReady license request from the MediaKeyMessageEvent.
@@ -22,47 +21,34 @@ export function getLicenseRequestFromMessage(
 	encoding: typeof ENCODING_UTF8 | typeof ENCODING_UTF16 = ENCODING_UTF16,
 ): ArrayBuffer | null {
 
-	// If message format configured/defaulted to utf-16 AND number of bytes is odd,
-	// assume 'unwrapped' raw CDM message.
-	if (encoding === ENCODING_UTF16 && message && message.byteLength % 2 === 1) {
+	// If encoding is configured for UTF-16 and the number of bytes is odd,
+	// assume an 'unwrapped' raw CDM message.
+	if (encoding === ENCODING_UTF16 && message?.byteLength % 2 === 1) {
 		return message;
 	}
 
-	let licenseRequest: ArrayBuffer | null = null;
-	const buffer = encoding === ENCODING_UTF16 ? new Uint16Array(message) : new Uint8Array(message);
-	const msg = typeof TextDecoder !== 'undefined'
-		? new TextDecoder(encoding).decode(message)
-		: String.fromCharCode(...buffer);
+	const msg = (() => {
+		if (typeof TextDecoder !== 'undefined') {
+			return new TextDecoder(encoding).decode(message);
+		}
+		const buffer = encoding === ENCODING_UTF16 ? new Uint16Array(message) : new Uint8Array(message);
+		return String.fromCharCode(...buffer);
+	})();
+
 	const xml = parseXml(msg);
+	const playReadyKeyMessage = getElementsByName(xml, PLAYREADY_KEY_MESSAGE)[0];
 
-	const playReadyKeyMessage = xml.childNodes.find(
-		node => node.nodeName === PLAYREADY_KEY_MESSAGE,
-	);
-
-	if (playReadyKeyMessage) {
-		let currentNode: XmlNode | undefined = playReadyKeyMessage;
-		const targetNodes = [LICENSE_ACQUISITION, CHALLENGE];
-
-		for (const targetNode of targetNodes) {
-			currentNode = currentNode.childNodes.find(
-				node => node.nodeName === targetNode,
-			);
-			if (!currentNode) {
-				return null;
-			}
-		}
-
-		const challenge = currentNode.childNodes[0]?.nodeValue;
-		if (challenge) {
-			const decoded = base64decode(challenge);
-			licenseRequest = decoded.buffer as ArrayBuffer;
-		}
-	}
-	else {
-		// The message from the CDM is not a wrapped message as on IE11 and Edge,
-		// thus the message contains the direct the challenge itself.
+	if (!playReadyKeyMessage) {
+		// The message from the CDM is not wrapped and contains the direct challenge.
 		return message;
 	}
 
-	return licenseRequest;
+	const challengeNode = getElementsByName(playReadyKeyMessage, CHALLENGE)[0];
+	const challengeValue = challengeNode?.childNodes[0]?.nodeValue;
+
+	if (challengeValue) {
+		return base64decode(challengeValue).buffer as ArrayBuffer;
+	}
+
+	return message;
 }
