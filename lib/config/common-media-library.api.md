@@ -750,6 +750,9 @@ export type FullBox = {
 };
 
 // @beta
+export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
+
+// @beta
 export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam?: string): string;
 
 // Warning: (ae-internal-missing-underscore) The name "getId3Data" should be prefixed with an underscore because the declaration is marked as @internal
