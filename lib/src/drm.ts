@@ -31,6 +31,10 @@ export * from './drm/fairplay/getLicenseServerUrl.ts';
 export * from './drm/playready/getLicenseRequestFromMessage.ts';
 export * from './drm/playready/getRequestHeadersFromMessage.ts';
 
+// playready utilities
+export * from './drm/playready/getLicenseRequestFromMessage.ts';
+export * from './drm/playready/getRequestHeadersFromMessage.ts';
+
 // drm types
 export type { ContentProtection } from './drm/common/ContentProtection.ts';
 export type { KeyMessage } from './drm/common/KeyMessage.ts';
@@ -82,4 +86,3 @@ export * from './drm/common/WEBM.ts';
 export * from './drm/common/WIDEVINE_KEY_SYSTEM.ts';
 export * from './drm/common/WIDEVINE_UUID.ts';
 export * from './drm/common/WidevineRobustness.ts';
-
