@@ -12,6 +12,8 @@ and this project adheres to
 
 - Added Throughput Calculation Interfaces 
   ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
+- Add ID3 scheme ID URI 
+  ([#174](https://github.com/streaming-video-technology-alliance/common-media-library/pull/174))
 
 ### Changed
 
