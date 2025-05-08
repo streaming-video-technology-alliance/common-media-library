@@ -16,6 +16,8 @@ import { parseXml } from '../../xml/parseXml.ts';
  * @group DRM
  * @beta
  *
+ * @example
+ * {@includeCode ../../../test/drm/playready/getRequestHeadersFromMessage.test.ts#example}
  */
 export function getRequestHeadersFromMessage(
 	message: ArrayBuffer,

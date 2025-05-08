@@ -15,7 +15,9 @@ describe('getLicenseRequestFromMessage', () => {
 
 	it('finds the Challenge in the PlayReadyKeyMessage and returns the value as ArrayBuffer', () => {
 		const message = createUTF16Buffer(PLAYREADY_KEY_MESSAGE);
+		//#region example
 		const result = getLicenseRequestFromMessage(message);
 		deepStrictEqual(result, base64decode('1beR1c0').buffer as ArrayBuffer);
+		//#endregion example
 	});
 });

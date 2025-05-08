@@ -16,6 +16,8 @@ import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.ts';
  * @group DRM
  * @beta
  *
+ * @example
+ * {@includeCode ../../../test/drm/playready/getLicenseRequestFromMessage.test.ts#example}
  */
 export function getLicenseRequestFromMessage(
 	message: ArrayBuffer,

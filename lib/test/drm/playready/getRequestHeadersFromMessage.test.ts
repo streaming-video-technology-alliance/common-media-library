@@ -9,7 +9,9 @@ import { describe, it } from 'node:test';
 describe('getRequestHeadersFromMessage', () => {
 	it('returns request headers from the PlayReadyKeyMessage', () => {
 		const message = createUTF16Buffer(PLAYREADY_KEY_MESSAGE);
+		//#region example
 		const result = getRequestHeadersFromMessage(message);
 		deepStrictEqual(result, PLAYREADY_HEADERS);
+		//#endregion example
 	});
 });
