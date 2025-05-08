@@ -1,4 +1,4 @@
-import { utf8ArrayToStr } from '../../utils.ts';
+import { utf8ArrayToStr } from '../../utils/utf8ArrayToStr.ts';
 import type { DecodedId3Frame } from '../DecodedId3Frame.ts';
 import type { RawId3Frame } from './RawFrame.ts';
 import { toArrayBuffer } from './toArrayBuffer.ts';

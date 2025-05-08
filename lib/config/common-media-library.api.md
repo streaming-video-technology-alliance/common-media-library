@@ -657,10 +657,13 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // @beta
-export const ENCRYPTION_SCHEME: {
+export const EncryptionScheme: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
 };
+
+// @beta
+export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;
 
 // @beta
 export const encv: BoxParser<VisualSampleEntry>;
@@ -874,12 +877,15 @@ export type Initialization = {
 };
 
 // @beta
-export const INITIALIZATION_DATA_TYPE: {
+export const InitializationDataType: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
     readonly KEYIDS: typeof KEYIDS;
     readonly WEBM: typeof WEBM;
 };
+
+// @beta
+export type InitializationDataType = ValueOf<typeof InitializationDataType>;
 
 // @beta
 export const INT = "int";
@@ -957,7 +963,7 @@ export type KeyMessage = {
     sessionId?: string;
     message: ArrayBuffer;
     defaultUrl?: string;
-    messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
+    messageType: ValueOf<typeof MediaKeyMessageType_2>;
 };
 
 // @beta
@@ -1037,25 +1043,6 @@ export function mdat(view: IsoView): MediaDataBox;
 export function mdhd(view: IsoView): MediaHeaderBox;
 
 // @beta
-export const MEDIA_KEY_MESSAGE_TYPES: {
-    readonly LICENSE_REQUEST: typeof LICENSE_REQUEST;
-    readonly LICENSE_RENEWAL: typeof LICENSE_RENEWAL;
-    readonly LICENSE_RELEASE: typeof LICENSE_RELEASE;
-    readonly INDIVIDUALIZATION_REQUEST: typeof INDIVIDUALIZATION_REQUEST;
-};
-
-// @beta
-export const MEDIA_KEY_STATUSES: {
-    readonly USABLE: typeof USABLE;
-    readonly EXPIRED: typeof EXPIRED;
-    readonly RELEASED: typeof RELEASED;
-    readonly OUTPUT_RESTRICTED: typeof OUTPUT_RESTRICTED;
-    readonly OUTPUT_DOWNSCALED: typeof OUTPUT_DOWNSCALED;
-    readonly STATUS_PENDING: typeof STATUS_PENDING;
-    readonly INTERNAL_ERROR: typeof INTERNAL_ERROR;
-};
-
-// @beta
 export type MediaCapability = {
     contentType: string;
     robustness: string;
@@ -1094,6 +1081,33 @@ export type MediaHeaderBox = FullBox & {
     language: string;
     preDefined: number;
 };
+
+// @beta
+const MediaKeyMessageType_2: {
+    readonly LICENSE_REQUEST: typeof LICENSE_REQUEST;
+    readonly LICENSE_RENEWAL: typeof LICENSE_RENEWAL;
+    readonly LICENSE_RELEASE: typeof LICENSE_RELEASE;
+    readonly INDIVIDUALIZATION_REQUEST: typeof INDIVIDUALIZATION_REQUEST;
+};
+
+// @beta
+type MediaKeyMessageType_2 = ValueOf<typeof MediaKeyMessageType_2>;
+export { MediaKeyMessageType_2 as MediaKeyMessageType }
+
+// @beta
+const MediaKeyStatus_2: {
+    readonly USABLE: typeof USABLE;
+    readonly EXPIRED: typeof EXPIRED;
+    readonly RELEASED: typeof RELEASED;
+    readonly OUTPUT_RESTRICTED: typeof OUTPUT_RESTRICTED;
+    readonly OUTPUT_DOWNSCALED: typeof OUTPUT_DOWNSCALED;
+    readonly STATUS_PENDING: typeof STATUS_PENDING;
+    readonly INTERNAL_ERROR: typeof INTERNAL_ERROR;
+};
+
+// @beta
+type MediaKeyStatus_2 = ValueOf<typeof MediaKeyStatus_2>;
+export { MediaKeyStatus_2 as MediaKeyStatus }
 
 // @beta
 export function mehd(view: IsoView): MovieExtendsHeaderBox;
@@ -2066,7 +2080,10 @@ export type WebVTTSourceLabelBox = {
 export const WIDEVINE_KEY_SYSTEM = "com.widevine.alpha";
 
 // @beta
-export const WIDEVINE_ROBUSTNESS: {
+export const WIDEVINE_UUID = "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed";
+
+// @beta
+export const WidevineRobustness: {
     readonly SW_SECURE_CRYPTO: typeof SW_SECURE_CRYPTO;
     readonly SW_SECURE_DECODE: typeof SW_SECURE_DECODE;
     readonly HW_SECURE_CRYPTO: typeof HW_SECURE_CRYPTO;
@@ -2075,7 +2092,7 @@ export const WIDEVINE_ROBUSTNESS: {
 };
 
 // @beta
-export const WIDEVINE_UUID = "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed";
+export type WidevineRobustness = ValueOf<typeof WidevineRobustness>;
 
 // @beta
 export type XmlNode = {

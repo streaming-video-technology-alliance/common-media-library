@@ -1,5 +1,5 @@
-import type { MEDIA_KEY_MESSAGE_TYPES } from '../common/MEDIA_KEY_MESSAGE_TYPES';
-import type { ValueOf } from '../../utils/ValueOf';
+import type { ValueOf } from '../../utils/ValueOf.ts';
+import type { MediaKeyMessageType } from './MediaKeyMessageType.ts';
 
 /**
  * Represents a DRM key message for license requests.
@@ -11,5 +11,5 @@ export type KeyMessage = {
 	sessionId?: string;
 	message: ArrayBuffer;
 	defaultUrl?: string;
-	messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
+	messageType: ValueOf<typeof MediaKeyMessageType>;
 };
