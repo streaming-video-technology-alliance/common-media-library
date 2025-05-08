@@ -1,10 +1,11 @@
-import { CONTENT_TYPE } from '../common/CONTENT_TYPE.ts';
-import type { ENCODING_UTF8 } from '../common/ENCODING_UTF8.ts';
-import { ENCODING_UTF16 } from '../common/ENCODING_UTF16.ts';
-import { HTTP_HEADERS } from '../common/HTTP_HEADERS.ts';
-import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.ts';
+import { UTF_16 } from '../../utils/UTF_16.ts';
+import type { UTF_8 } from '../../utils/UTF_8.ts';
+import { arrayBufferToString } from '../../utils/arrayBufferToString.ts';
 import { getElementsByName } from '../../xml/getElementsByName.ts';
 import { parseXml } from '../../xml/parseXml.ts';
+import { CONTENT_TYPE } from '../common/CONTENT_TYPE.ts';
+import { HTTP_HEADERS } from '../common/HTTP_HEADERS.ts';
+import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.ts';
 
 /**
  * Gets the PlayReady license request headers from the MediaKeyMessageEvent.
@@ -21,24 +22,18 @@ import { parseXml } from '../../xml/parseXml.ts';
  */
 export function getRequestHeadersFromMessage(
 	message: ArrayBuffer,
-	encoding: typeof ENCODING_UTF8 | typeof ENCODING_UTF16 = ENCODING_UTF16,
+	encoding: typeof UTF_8 | typeof UTF_16 = UTF_16,
 ): Record<string, string> {
 	const headers: Record<string, string> = {};
 
 	// If message format configured/defaulted to utf-16 AND number of bytes is odd,
 	// assume 'unwrapped' raw CDM message.
-	if (encoding === ENCODING_UTF16 && message && message.byteLength % 2 === 1) {
+	if (encoding === UTF_16 && message && message.byteLength % 2 === 1) {
 		headers[CONTENT_TYPE] = TEXT_XML_UTF8;
 		return headers;
 	}
-	const msg = (() => {
-		if (typeof TextDecoder !== 'undefined') {
-			return new TextDecoder(encoding).decode(message);
-		}
-		const buffer = encoding === ENCODING_UTF16 ? new Uint16Array(message) : new Uint8Array(message);
-		return String.fromCharCode(...buffer);
-	})();
 
+	const msg = arrayBufferToString(message, encoding);
 	const xml = parseXml(msg);
 	const httpHeaders = getElementsByName(xml, HTTP_HEADERS)[0].childNodes;
 

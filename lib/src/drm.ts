@@ -46,6 +46,7 @@ export * from './drm/common/CENC.ts';
 export * from './drm/common/CHALLENGE.ts';
 export * from './drm/common/CLEAR_KEY_SYSTEM.ts';
 export * from './drm/common/CLEAR_KEY_UUID.ts';
+export * from './drm/common/CONTENT_TYPE.ts';
 export * from './drm/common/EncryptionScheme.ts';
 export * from './drm/common/EXPIRED.ts';
 export * from './drm/common/FAIRPLAY_KEY_SYSTEM.ts';

@@ -1,4 +1,21 @@
-export function dataViewToString(dataView: DataView, encoding: string = 'utf-8'): string {
+import type { Encoding } from './Encoding.ts';
+import { UTF_8 } from './UTF_8.ts';
+
+/**
+ * Converts a DataView to a string.
+ *
+ * @param dataView - The DataView to convert.
+ * @param encoding - The encoding to use.
+ * @returns The string representation of the DataView.
+ *
+ * @group Utils
+ *
+ * @beta
+ *
+ * @example
+ * {@includeCode ../../test/utils/dataViewToString.test.ts#example}
+ */
+export function dataViewToString(dataView: DataView, encoding: Encoding = UTF_8): string {
 	if (typeof TextDecoder !== 'undefined') {
 		return new TextDecoder(encoding).decode(dataView);
 	}
@@ -6,7 +23,7 @@ export function dataViewToString(dataView: DataView, encoding: string = 'utf-8')
 	const a: string[] = [];
 	let i = 0;
 
-	if (encoding === 'utf-8') {
+	if (encoding === UTF_8) {
 		/* The following algorithm is essentially a rewrite of the UTF8.decode at
 		http://bannister.us/weblog/2007/simple-base64-encodedecode-javascript/
 		*/
