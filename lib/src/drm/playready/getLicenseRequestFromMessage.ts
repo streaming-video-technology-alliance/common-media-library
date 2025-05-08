@@ -1,5 +1,6 @@
 import { base64decode } from '../../utils/base64decode.ts';
-import { parseXml, getElementsByName as getElementsByName } from '../../xml.ts';
+import { getElementsByName } from '../../xml/getElementsByName.ts';
+import { parseXml } from '../../xml/parseXml.ts';
 import { CHALLENGE } from '../common/CHALLENGE.ts';
 import type { ENCODING_UTF8 } from '../common/ENCODING_UTF8.ts';
 import { ENCODING_UTF16 } from '../common/ENCODING_UTF16.ts';
