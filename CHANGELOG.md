@@ -12,6 +12,8 @@ and this project adheres to
 
 - Added Throughput Calculation Interfaces 
   ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
+- Add type definitions for content steering entities
+  ([#176](https://github.com/streaming-video-technology-alliance/common-media-library/pull/176))
 
 ### Changed
 
