@@ -64,7 +64,6 @@
 		"glob": "11.0.1",
 		"globals": "16.0.0",
 		"hi-base32": "0.5.1",
-		"tslib": "2.8.1",
 		"typedoc": "0.28.2",
 		"typescript": "5.8.3"
 	}
