@@ -12,6 +12,8 @@ and this project adheres to
 
 - Added Throughput Calculation Interfaces 
   ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
+- PlayReady DRM Utilities
+  ([#172](https://github.com/streaming-video-technology-alliance/common-media-library/issues/172))
 
 ### Changed
 
