@@ -10,13 +10,18 @@ and this project adheres to
 
 ### Added
 
-- Added Throughput Calculation Interfaces 
+- Added Throughput Calculation Interfaces
   ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
 
 ### Changed
 
-- Ensure CML is compliant with the type annotations proposal 
+- Ensure CML is compliant with the type annotations proposal
   ([#134](https://github.com/streaming-video-technology-alliance/common-media-library/issues/134))
+
+### Fixed
+
+- TSLib imported in version 0.11.0's utils.js.
+  ([#177](https://github.com/streaming-video-technology-alliance/common-media-library/issues/177))
 
 ## [0.11.0] - 2025-04-03
 
