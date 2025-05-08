@@ -1,7 +1,7 @@
+import { dataViewToString } from '@svta/common-media-library/utils/dataViewToString';
+import { UTF_8 } from '@svta/common-media-library/utils/UTF_8';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { UTF_8 } from '../../src/text/UTF_8.ts';
-import { dataViewToString } from '../../src/utils/dataViewToString.ts';
 import { strToCodes } from './strToCodes.ts';
 
 describe('dataViewToString', () => {
