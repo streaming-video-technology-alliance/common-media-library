@@ -1,10 +1,11 @@
-import { USABLE } from './USABLE.ts';
+import type { ValueOf } from '../../utils/ValueOf.ts';
 import { EXPIRED } from './EXPIRED.ts';
-import { RELEASED } from './RELEASED.ts';
-import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED.ts';
-import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.ts';
-import { STATUS_PENDING } from './STATUS_PENDING.ts';
 import { INTERNAL_ERROR } from './INTERNAL_ERROR.ts';
+import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.ts';
+import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED.ts';
+import { RELEASED } from './RELEASED.ts';
+import { STATUS_PENDING } from './STATUS_PENDING.ts';
+import { USABLE } from './USABLE.ts';
 
 /**
  * Media Key Statuses.
@@ -13,7 +14,7 @@ import { INTERNAL_ERROR } from './INTERNAL_ERROR.ts';
  *
  * @beta
  */
-export const MEDIA_KEY_STATUSES = {
+export const MediaKeyStatus = {
 	USABLE: USABLE as typeof USABLE,
 	EXPIRED: EXPIRED as typeof EXPIRED,
 	RELEASED: RELEASED as typeof RELEASED,
@@ -22,3 +23,12 @@ export const MEDIA_KEY_STATUSES = {
 	STATUS_PENDING: STATUS_PENDING as typeof STATUS_PENDING,
 	INTERNAL_ERROR: INTERNAL_ERROR as typeof INTERNAL_ERROR,
 } as const;
+
+/**
+ * Media Key Statuses.
+ *
+ * @group DRM
+ *
+ * @beta
+ */
+export type MediaKeyStatus = ValueOf<typeof MediaKeyStatus>;

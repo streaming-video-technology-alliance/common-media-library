@@ -1,5 +1,6 @@
+import { CBCS } from '../common/CBCS.ts';
+import { CENC } from '../common/CENC.ts';
 import type { ContentProtection } from '../common/ContentProtection.ts';
-import { ENCRYPTION_SCHEME } from '../common/ENCRYPTION_SCHEME.ts';
 import { MP4_PROTECTION_SCHEME } from '../common/MP4_PROTECTION_SCHEME.ts';
 
 /**
@@ -23,8 +24,8 @@ export function findCencContentProtection(cpArray: ContentProtection[]): Content
 		if (
 			cp.schemeIdUri?.toLowerCase() === MP4_PROTECTION_SCHEME &&
 			cp.value &&
-			(cp.value.toLowerCase() === ENCRYPTION_SCHEME.CENC ||
-				cp.value.toLowerCase() === ENCRYPTION_SCHEME.CBCS)
+			(cp.value.toLowerCase() === CENC ||
+				cp.value.toLowerCase() === CBCS)
 		) {
 			return cp;
 		}
