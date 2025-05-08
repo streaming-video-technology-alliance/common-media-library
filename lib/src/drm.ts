@@ -47,8 +47,6 @@ export * from './drm/common/CHALLENGE.ts';
 export * from './drm/common/CLEAR_KEY_SYSTEM.ts';
 export * from './drm/common/CLEAR_KEY_UUID.ts';
 export * from './drm/common/CONTENT_TYPE.ts';
-export * from './drm/common/ENCODING_UTF8.ts';
-export * from './drm/common/ENCODING_UTF16.ts';
 export * from './drm/common/EncryptionScheme.ts';
 export * from './drm/common/EXPIRED.ts';
 export * from './drm/common/FAIRPLAY_KEY_SYSTEM.ts';
@@ -84,3 +82,6 @@ export * from './drm/common/WEBM.ts';
 export * from './drm/common/WIDEVINE_KEY_SYSTEM.ts';
 export * from './drm/common/WIDEVINE_UUID.ts';
 export * from './drm/common/WidevineRobustness.ts';
+export * from './text/UTF_16.ts';
+export * from './text/UTF_8.ts';
+

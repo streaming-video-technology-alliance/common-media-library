@@ -49,6 +49,11 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 // @beta
 export function ardi(view: IsoView): AudioRenderingIndicationBox;
 
+// Warning: (ae-forgotten-export) The symbol "Encoding" needs to be exported by the entry point index.d.ts
+//
+// @beta
+export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
+
 // @alpha
 export type AudioChannelConfiguration = {
     $: {
@@ -663,12 +668,6 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // @beta
-export const ENCODING_UTF16 = "utf-16";
-
-// @beta
-export const ENCODING_UTF8 = "utf-8";
-
-// @beta
 export const EncryptionScheme: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
@@ -797,7 +796,7 @@ export function getLegacyKeySystemAccess(ksConfigurations: {
 }[]): KeySystemAccess | null;
 
 // @beta
-export function getLicenseRequestFromMessage(message: ArrayBuffer, encoding?: typeof ENCODING_UTF8 | typeof ENCODING_UTF16): ArrayBuffer | null;
+export function getLicenseRequestFromMessage(message: ArrayBuffer, encoding?: Encoding): ArrayBuffer | null;
 
 // @beta
 export function getLicenseServerUrl(initData: Uint16Array): string;
@@ -812,7 +811,7 @@ export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
 export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
 
 // @beta
-export function getRequestHeadersFromMessage(message: ArrayBuffer, encoding?: typeof ENCODING_UTF8 | typeof ENCODING_UTF16): Record<string, string>;
+export function getRequestHeadersFromMessage(message: ArrayBuffer, encoding?: typeof UTF_8 | typeof UTF_16): Record<string, string>;
 
 // @beta
 export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
@@ -879,6 +878,9 @@ export const HW_SECURE_CRYPTO = "HW_SECURE_CRYPTO";
 
 // @beta
 export const HW_SECURE_DECODE = "HW_SECURE_DECODE";
+
+// @beta
+export const ID3_SCHEME_ID_URI = "https://aomedia.org/emsg/ID3";
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -1985,6 +1987,12 @@ export const UTF8 = "utf8";
 
 // @beta
 export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
+
+// @beta
+export const UTF_16 = "utf-16";
+
+// @beta
+export const UTF_8 = "utf-8";
 
 // @beta
 export function uuid(): string;

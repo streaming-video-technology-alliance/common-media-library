@@ -17,10 +17,12 @@ export function getElementsByName(node: XmlNode, name: string, found: XmlNode[] 
 	if (node.nodeName === name) {
 		found.push(node);
 	}
+
 	if (node.childNodes) {
 		for (const child of node.childNodes) {
 			getElementsByName(child, name, found);
 		}
 	}
+
 	return found;
 }

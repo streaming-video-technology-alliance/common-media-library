@@ -1,9 +1,10 @@
+import type { Encoding } from '../../utils/Encoding.ts';
+import { UTF_16 } from '../../utils/UTF_16.ts';
+import { arrayBufferToString } from '../../utils/arrayBufferToString.ts';
 import { base64decode } from '../../utils/base64decode.ts';
 import { getElementsByName } from '../../xml/getElementsByName.ts';
 import { parseXml } from '../../xml/parseXml.ts';
 import { CHALLENGE } from '../common/CHALLENGE.ts';
-import type { ENCODING_UTF8 } from '../common/ENCODING_UTF8.ts';
-import { ENCODING_UTF16 } from '../common/ENCODING_UTF16.ts';
 import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.ts';
 
 /**
@@ -21,23 +22,16 @@ import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.ts';
  */
 export function getLicenseRequestFromMessage(
 	message: ArrayBuffer,
-	encoding: typeof ENCODING_UTF8 | typeof ENCODING_UTF16 = ENCODING_UTF16,
-): ArrayBuffer | null {
+	encoding: Encoding = UTF_16,
+): ArrayBuffer {
 
 	// If encoding is configured for UTF-16 and the number of bytes is odd,
 	// assume an 'unwrapped' raw CDM message.
-	if (encoding === ENCODING_UTF16 && message?.byteLength % 2 === 1) {
+	if (encoding === UTF_16 && message?.byteLength % 2 === 1) {
 		return message;
 	}
 
-	const msg = (() => {
-		if (typeof TextDecoder !== 'undefined') {
-			return new TextDecoder(encoding).decode(message);
-		}
-		const buffer = encoding === ENCODING_UTF16 ? new Uint16Array(message) : new Uint8Array(message);
-		return String.fromCharCode(...buffer);
-	})();
-
+	const msg = arrayBufferToString(message, encoding);
 	const xml = parseXml(msg);
 	const playReadyKeyMessage = getElementsByName(xml, PLAYREADY_KEY_MESSAGE)[0];
 
