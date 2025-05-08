@@ -1,8 +1,8 @@
-import { arrayBufferToString } from '@svta/common-media-library';
+import { arrayBufferToString } from '@svta/common-media-library/utils/arrayBufferToString';
+import { UTF_16 } from '@svta/common-media-library/utils/UTF_16';
+import { UTF_8 } from '@svta/common-media-library/utils/UTF_8';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
-import { UTF_16 } from '../../src/text/UTF_16.ts';
-import { UTF_8 } from '../../src/text/UTF_8.ts';
 import { strToCodes } from './strToCodes.ts';
 
 describe('arrayBufferToString', () => {
