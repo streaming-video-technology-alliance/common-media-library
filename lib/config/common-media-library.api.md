@@ -49,6 +49,9 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 // @beta
 export function ardi(view: IsoView): AudioRenderingIndicationBox;
 
+// @beta
+export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
+
 // @alpha
 export type AudioChannelConfiguration = {
     $: {
@@ -176,6 +179,9 @@ export const CBCS = "cbcs";
 
 // @beta
 export const CENC = "cenc";
+
+// @beta
+export const CHALLENGE = "Challenge";
 
 // @beta
 export const CLEAR_KEY_SYSTEM = "org.w3.clearkey";
@@ -436,6 +442,9 @@ export type CompositionTimeToSampleEntry = {
 // @beta
 export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array;
 
+// @beta
+export const CONTENT_TYPE = "Content-Type";
+
 // @alpha (undocumented)
 export type ContentComponent = {
     $: {
@@ -558,6 +567,9 @@ export type DataReferenceBox = FullBox & {
 };
 
 // @beta
+export function dataViewToString(dataView: DataView, encoding?: Encoding): string;
+
+// @beta
 export function decodeCmcd(cmcd: string): Cmcd;
 
 // @beta
@@ -657,6 +669,15 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // @beta
+export const Encoding: {
+    readonly UTF8: typeof UTF_8;
+    readonly UTF16: typeof UTF_16;
+};
+
+// @beta
+export type Encoding = ValueOf<typeof Encoding>;
+
+// @beta
 export const EncryptionScheme: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
@@ -698,6 +719,9 @@ export function extractContentId(initData: Uint16Array): string;
 
 // @beta
 export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
+
+// @beta
+export const FAIRPLAY_KEY_SYSTEM = "com.apple.fps.1_0";
 
 // @beta
 export type FileTypeBox = TypeBox;
@@ -753,6 +777,9 @@ export type FullBox = {
 };
 
 // @beta
+export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
+
+// @beta
 export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam?: string): string;
 
 // Warning: (ae-internal-missing-underscore) The name "getId3Data" should be prefixed with an underscore because the declaration is marked as @internal
@@ -779,6 +806,9 @@ export function getLegacyKeySystemAccess(ksConfigurations: {
 }[]): KeySystemAccess | null;
 
 // @beta
+export function getLicenseRequestFromMessage(message: ArrayBuffer, encoding?: Encoding): ArrayBuffer;
+
+// @beta
 export function getLicenseServerUrl(initData: Uint16Array): string;
 
 // @beta
@@ -789,6 +819,9 @@ export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
 
 // @beta
 export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
+
+// @beta
+export function getRequestHeadersFromMessage(message: ArrayBuffer, encoding?: typeof UTF_8 | typeof UTF_16): Record<string, string>;
 
 // @beta
 export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
@@ -842,6 +875,9 @@ export type HlsManifest = {
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
+export const HTTP_HEADERS = "HttpHeaders";
+
+// @beta
 export function hvc1(view: IsoView): VisualSampleEntry;
 
 // @beta
@@ -852,6 +888,9 @@ export const HW_SECURE_CRYPTO = "HW_SECURE_CRYPTO";
 
 // @beta
 export const HW_SECURE_DECODE = "HW_SECURE_DECODE";
+
+// @beta
+export const ID3_SCHEME_ID_URI = "https://aomedia.org/emsg/ID3";
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -1002,6 +1041,9 @@ export type LabelBox = FullBox & {
 
 // @beta
 export function labl(view: IsoView): LabelBox;
+
+// @beta
+export const LICENSE_ACQUISITION = "LicenseAcquisition";
 
 // @beta
 export const LICENSE_RELEASE = "license-release";
@@ -1258,6 +1300,9 @@ export type PlayList = {
         };
     };
 };
+
+// @beta
+export const PLAYREADY_KEY_MESSAGE = "PlayReadyKeyMessage";
 
 // @beta
 export const PLAYREADY_KEY_SYSTEM = "com.microsoft.playready";
@@ -1765,6 +1810,9 @@ export const TEMPLATE = "template";
 // @beta
 export function tenc(view: IsoView): TrackEncryptionBox;
 
+// @beta
+export const TEXT_XML_UTF8 = "text/xml; charset=utf-8";
+
 // @alpha
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
@@ -1949,6 +1997,12 @@ export const UTF8 = "utf8";
 
 // @beta
 export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
+
+// @beta
+export const UTF_16 = "utf-16";
+
+// @beta
+export const UTF_8 = "utf-8";
 
 // @beta
 export function uuid(): string;
