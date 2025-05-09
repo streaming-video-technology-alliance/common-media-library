@@ -1,3 +1,8 @@
+/**
+ * A collection of tools for working with ISO Base Media File Format (ISOBMFF).
+ *
+ * @packageDocumentation
+ */
 export * from './iso/bmff/Box.ts';
 export * from './iso/bmff/BoxFilter.ts';
 export * from './iso/bmff/BoxParser.ts';
