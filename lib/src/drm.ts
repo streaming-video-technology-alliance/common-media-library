@@ -27,7 +27,6 @@ export * from './drm/fairplay/extractContentId.ts';
 export * from './drm/fairplay/getId.ts';
 export * from './drm/fairplay/getLicenseServerUrl.ts';
 
-
 // playready utilities
 export * from './drm/playready/getLicenseRequestFromMessage.ts';
 export * from './drm/playready/getRequestHeadersFromMessage.ts';
