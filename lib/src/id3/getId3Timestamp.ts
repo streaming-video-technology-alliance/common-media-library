@@ -1,5 +1,5 @@
-import type { DecodedId3Frame } from './DecodedId3Frame.ts';
-import type { Id3Frame } from './Id3Frame.ts';
+import type { DecodedId3Frame } from './DecodedId3Frame';
+import type { Id3Frame } from './Id3Frame';
 import { getId3Frames } from './getId3Frames.ts';
 import { isId3TimestampFrame } from './isId3TimestampFrame.ts';
 import { readId3Timestamp } from './util/readId3Timestamp.ts';

@@ -1,4 +1,4 @@
-import type { BoxParser } from '../BoxParser.ts';
+import type { BoxParser } from '../BoxParser';
 import { type TypeBox } from '../TypeBox.ts';
 import { ftyp } from './ftyp.ts';
 

@@ -1,5 +1,5 @@
 import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { IsoView } from '../IsoView';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box

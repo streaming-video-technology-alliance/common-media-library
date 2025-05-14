@@ -1,7 +1,7 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions';
 import { SfToken } from '../SfToken.ts';
 import { TOKEN } from '../utils/TOKEN.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 

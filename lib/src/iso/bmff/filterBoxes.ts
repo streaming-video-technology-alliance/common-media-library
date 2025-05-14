@@ -1,8 +1,8 @@
-import type { Box } from './Box.ts';
-import type { BoxFilter } from './BoxFilter.ts';
+import type { Box } from './Box';
+import type { BoxFilter } from './BoxFilter';
 import { createIsoView } from './createIsoView.ts';
-import type { IsoData } from './IsoData.ts';
-import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { IsoData } from './IsoData';
+import type { IsoViewConfig } from './IsoViewConfig';
 
 function filter(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter, boxes: Box[] = []): Box[] {
 	for (const box of iterator) {

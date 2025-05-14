@@ -1,6 +1,6 @@
 import { UINT } from '../fields/UINT.ts';
-import type { FullBox } from '../FullBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { FullBox } from '../FullBox';
+import type { IsoView } from '../IsoView';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.6.4.1 Sample Dependency Type box

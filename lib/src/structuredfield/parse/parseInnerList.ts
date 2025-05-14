@@ -1,8 +1,8 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfInnerList } from '../SfInnerList.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions';
+import type { SfInnerList } from '../SfInnerList';
 import { SfItem } from '../SfItem.ts';
 import { INNER } from '../utils/INNER.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 import { parseItem } from './parseItem.ts';

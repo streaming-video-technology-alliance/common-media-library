@@ -1,5 +1,5 @@
 import { decodeSfList } from '../structuredfield/decodeSfList.ts';
-import type { CmsdDynamic } from './CmsdDynamic.ts';
+import type { CmsdDynamic } from './CmsdDynamic';
 
 /**
  * Decode a CMSD dynamic string to an object.

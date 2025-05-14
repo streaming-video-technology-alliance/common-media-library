@@ -1,5 +1,5 @@
-import type { SfDecodeOptions } from './SfDecodeOptions.ts';
-import type { SfDictionary } from './SfDictionary.ts';
+import type { SfDecodeOptions } from './SfDecodeOptions';
+import type { SfDictionary } from './SfDictionary';
 import { parseDict } from './parse/parseDict.ts';
 import { parseError } from './parse/parseError.ts';
 import { DICT } from './utils/DICT.ts';

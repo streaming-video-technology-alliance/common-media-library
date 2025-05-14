@@ -37,8 +37,8 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.ts';
-import type { PACData } from './PACData.ts';
-import type { PenStyles } from './PenStyles.ts';
+import type { PACData } from './PACData';
+import type { PenStyles } from './PenStyles';
 import { Row } from './Row.ts';
 import { NR_ROWS } from './utils/NR_ROWS.ts';
 import { VerboseLevel } from './VerboseLevel.ts';

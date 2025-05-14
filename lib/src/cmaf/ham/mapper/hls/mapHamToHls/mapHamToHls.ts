@@ -1,8 +1,8 @@
-import type { Manifest } from '../../../types/manifest/Manifest.ts';
-import type { Presentation } from '../../../types/model/Presentation.ts';
-import type { SelectionSet } from '../../../types/model/SelectionSet.ts';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
-import type { Track } from '../../../types/model/Track.ts';
+import type { Manifest } from '../../../types/manifest/Manifest';
+import type { Presentation } from '../../../types/model/Presentation';
+import type { SelectionSet } from '../../../types/model/SelectionSet';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet';
+import type { Track } from '../../../types/model/Track';
 
 import { generateManifestPlaylistPiece } from './generateManifestPlaylistPiece.ts';
 

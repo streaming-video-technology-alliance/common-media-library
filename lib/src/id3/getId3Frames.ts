@@ -1,5 +1,5 @@
-import type { Id3Frame } from './Id3Frame.ts';
-import type { RawId3Frame } from './util/RawFrame.ts';
+import type { Id3Frame } from './Id3Frame';
+import type { RawId3Frame } from './util/RawFrame';
 import { decodeId3Frame } from './util/decodeId3Frame.ts';
 import { getId3FrameData } from './util/getId3FrameData.ts';
 import { isId3Footer } from './util/isId3Footer.ts';

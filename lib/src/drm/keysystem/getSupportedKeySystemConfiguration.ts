@@ -1,5 +1,5 @@
-import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.ts';
-import type { MediaCapability } from '../common/MediaCapability.ts';
+import type { KeySystemConfiguration } from '../common/KeySystemConfiguration';
+import type { MediaCapability } from '../common/MediaCapability';
 
 const isTypeSupported: (keySystem: string, type: string) => boolean | undefined = (typeof MediaKeys !== 'undefined' && typeof (MediaKeys as any).isTypeSupported === 'function') ? (MediaKeys as any).isTypeSupported : undefined;
 

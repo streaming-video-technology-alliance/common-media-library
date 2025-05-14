@@ -1,6 +1,6 @@
 import { encodeSfDict } from '../structuredfield/encodeSfDict.ts';
-import type { CmsdEncodeOptions } from './CmsdEncodeOptions.ts';
-import type { CmsdStatic } from './CmsdStatic.ts';
+import type { CmsdEncodeOptions } from './CmsdEncodeOptions';
+import type { CmsdStatic } from './CmsdStatic';
 import { processCmsd } from './utils/processCmsd.ts';
 
 /**

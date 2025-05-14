@@ -1,4 +1,4 @@
-import type { SfBareItem } from '../SfBareItem.ts';
+import type { SfBareItem } from '../SfBareItem';
 import { SfItem } from '../SfItem.ts';
 import { serializeBareItem } from './serializeBareItem.ts';
 import { serializeParams } from './serializeParams.ts';

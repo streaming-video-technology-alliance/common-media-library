@@ -1,7 +1,7 @@
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
-import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase.ts';
+import type { Representation } from '../../../types/mapper/dash/Representation';
+import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase';
 
-import type { Segment } from '../../../types/model/Segment.ts';
+import type { Segment } from '../../../types/model/Segment';
 
 /**
  * @internal

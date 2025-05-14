@@ -1,4 +1,4 @@
-import type { Box } from './Box.ts';
+import type { Box } from './Box';
 import { ContainerBoxes } from './ContainerBoxes.ts';
 import { DATA } from './fields/DATA.ts';
 import { INT } from './fields/INT.ts';
@@ -6,9 +6,9 @@ import { STRING } from './fields/STRING.ts';
 import { TEMPLATE } from './fields/TEMPLATE.ts';
 import { UINT } from './fields/UINT.ts';
 import { UTF8 } from './fields/UTF8.ts';
-import type { FullBox } from './FullBox.ts';
-import type { IsoViewConfig } from './IsoViewConfig.ts';
-import type { ISOFieldTypeMap } from './readers/ISOFieldTypeMap.ts';
+import type { FullBox } from './FullBox';
+import type { IsoViewConfig } from './IsoViewConfig';
+import type { ISOFieldTypeMap } from './readers/ISOFieldTypeMap';
 import { readData } from './readers/readData.ts';
 import { readInt } from './readers/readInt.ts';
 import { readString } from './readers/readString.ts';

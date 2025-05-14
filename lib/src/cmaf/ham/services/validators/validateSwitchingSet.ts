@@ -1,5 +1,5 @@
-import type { SwitchingSet } from '../../types/model/SwitchingSet.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { SwitchingSet } from '../../types/model/SwitchingSet';
+import type { Validation } from '../../types/Validation';
 
 import { validateTracks } from './validateTracks.ts';
 

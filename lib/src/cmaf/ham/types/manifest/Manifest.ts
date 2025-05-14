@@ -1,4 +1,4 @@
-import type { ManifestFormat } from './ManifestFormat.ts';
+import type { ManifestFormat } from './ManifestFormat';
 
 /**
  * Manifest object received as an input by the conversion to HAM object

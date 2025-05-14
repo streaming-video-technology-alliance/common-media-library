@@ -1,5 +1,5 @@
-import type { AudioTrack } from '../../../../types/model/AudioTrack.ts';
-import type { VideoTrack } from '../../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../../types/model/AudioTrack';
+import type { VideoTrack } from '../../../../types/model/VideoTrack';
 
 import { getByterange } from './getByterange.ts';
 import { getUrlInitialization } from './getUrlInitialization.ts';

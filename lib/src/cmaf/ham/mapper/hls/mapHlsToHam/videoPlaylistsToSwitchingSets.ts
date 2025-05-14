@@ -1,17 +1,17 @@
-import type { Segment } from '../../../types/model/Segment.ts';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { Segment } from '../../../types/model/Segment';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet';
+import type { VideoTrack } from '../../../types/model/VideoTrack';
 
-import type { Manifest } from '../../../types/manifest/Manifest.ts';
-import type { PlayList } from '../../../types/mapper/hls/Playlist.ts';
+import type { Manifest } from '../../../types/manifest/Manifest';
+import type { PlayList } from '../../../types/mapper/hls/Playlist';
 
 import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.ts';
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts';
 
-import { getDuration } from './utils/getDuration.ts';
-import { getCodec } from './utils/getCodec.ts';
-import { getByterange } from './utils/getByterange.ts';
 import { formatSegments } from './utils/formatSegments.ts';
+import { getByterange } from './utils/getByterange.ts';
+import { getCodec } from './utils/getCodec.ts';
+import { getDuration } from './utils/getDuration.ts';
 
 export function videoPlaylistsToSwitchingSets(
 	playlists: PlayList[],

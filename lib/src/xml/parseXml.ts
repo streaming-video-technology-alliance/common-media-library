@@ -1,6 +1,6 @@
 import { unescapeHtml } from '../utils/unescapeHtml.ts';
-import type { XmlNode } from './XmlNode.ts';
-import type { XmlParseOptions } from './XmlParseOptions.ts';
+import type { XmlNode } from './XmlNode';
+import type { XmlParseOptions } from './XmlParseOptions';
 
 /**
  * Parse XML into a JS object with no validation and some failure tolerance

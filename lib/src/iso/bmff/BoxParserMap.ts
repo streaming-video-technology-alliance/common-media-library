@@ -1,4 +1,4 @@
-import type { BoxParser } from './BoxParser.ts';
+import type { BoxParser } from './BoxParser';
 
 /**
  * A map of box parsers to their box types

@@ -1,6 +1,6 @@
 import { INTEGER_DECIMAL } from '../utils/INTEGER_DECIMAL.ts';
 import { isInvalidInt } from '../utils/isInvalidInt.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 

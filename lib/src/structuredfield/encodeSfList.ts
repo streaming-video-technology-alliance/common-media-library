@@ -1,5 +1,5 @@
-import type { SfEncodeOptions } from './SfEncodeOptions.ts';
-import type { SfMember } from './SfMember.ts';
+import type { SfEncodeOptions } from './SfEncodeOptions';
+import type { SfMember } from './SfMember';
 import { serializeList } from './serialize/serializeList.ts';
 
 /**

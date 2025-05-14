@@ -1,6 +1,6 @@
-import type { SfEncodeOptions } from '../SfEncodeOptions.ts';
+import type { SfEncodeOptions } from '../SfEncodeOptions';
 import { SfItem } from '../SfItem.ts';
-import type { SfMember } from '../SfMember.ts';
+import type { SfMember } from '../SfMember';
 import { LIST } from '../utils/LIST.ts';
 import { serializeError } from './serializeError.ts';
 import { serializeInnerList } from './serializeInnerList.ts';

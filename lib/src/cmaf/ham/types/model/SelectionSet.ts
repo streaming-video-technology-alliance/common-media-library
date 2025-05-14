@@ -1,6 +1,6 @@
-import type { Ham } from './Ham.ts';
-import type { AlignedSwitchingSet } from './AlignedSwitchingSet.ts';
-import type { SwitchingSet } from './SwitchingSet.ts';
+import type { AlignedSwitchingSet } from './AlignedSwitchingSet';
+import type { Ham } from './Ham';
+import type { SwitchingSet } from './SwitchingSet';
 
 /**
  * CMAF-HAM SelectionSet type

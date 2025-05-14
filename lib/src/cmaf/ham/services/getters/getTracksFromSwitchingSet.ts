@@ -1,5 +1,5 @@
-import type { SwitchingSet } from '../../types/model/SwitchingSet.ts';
-import type { Track } from '../../types/model/Track.ts';
+import type { SwitchingSet } from '../../types/model/SwitchingSet';
+import type { Track } from '../../types/model/Track';
 
 /**
  * Get a list of Tracks contained on a SwitchingSet

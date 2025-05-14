@@ -1,6 +1,6 @@
-import type { SfBareItem } from './SfBareItem.ts';
-import type { SfInnerList } from './SfInnerList.ts';
-import type { SfItem } from './SfItem.ts';
+import type { SfBareItem } from './SfBareItem';
+import type { SfInnerList } from './SfInnerList';
+import type { SfItem } from './SfItem';
 
 /**
  * A member of a structured field.

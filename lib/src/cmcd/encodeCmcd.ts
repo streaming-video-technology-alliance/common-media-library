@@ -1,6 +1,6 @@
 import { encodeSfDict } from '../structuredfield/encodeSfDict.ts';
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { Cmcd } from './Cmcd';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions';
 import { processCmcd } from './utils/processCmcd.ts';
 
 /**

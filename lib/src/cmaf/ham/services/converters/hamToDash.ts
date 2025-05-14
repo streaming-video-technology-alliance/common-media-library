@@ -1,5 +1,5 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
-import type { Manifest } from '../../types/manifest/Manifest.ts';
+import type { Manifest } from '../../types/manifest/Manifest';
+import type { Presentation } from '../../types/model/Presentation';
 
 import { DashMapper } from '../../mapper/dash/DashMapper.ts';
 import { MapperContext } from '../../mapper/MapperContext.ts';

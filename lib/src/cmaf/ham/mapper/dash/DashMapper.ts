@@ -1,6 +1,6 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts';
-import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts';
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Manifest } from '../../types/manifest/Manifest';
+import type { DashManifest } from '../../types/mapper/dash/DashManifest';
+import type { Presentation } from '../../types/model/Presentation';
 
 import { mapDashToHam } from './mapDashToHam/mapDashToHam.ts';
 import { mapHamToDash } from './mapHamToDash/mapHamToDash.ts';
@@ -9,7 +9,7 @@ import { parseDashManifest } from '../../utils/dash/parseDashManifest.ts';
 import { addMetadataToDash } from '../../utils/manifest/addMetadataToDash.ts';
 import { getMetadata } from '../../utils/manifest/getMetadata.ts';
 
-import type { Mapper } from '../Mapper.ts';
+import type { Mapper } from '../Mapper';
 
 export class DashMapper implements Mapper {
 	private manifest: Manifest | undefined;

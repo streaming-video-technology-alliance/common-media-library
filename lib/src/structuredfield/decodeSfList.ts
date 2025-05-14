@@ -1,5 +1,5 @@
-import type { SfDecodeOptions } from './SfDecodeOptions.ts';
-import type { SfMember } from './SfMember.ts';
+import type { SfDecodeOptions } from './SfDecodeOptions';
+import type { SfMember } from './SfMember';
 import { parseError } from './parse/parseError.ts';
 import { parseList } from './parse/parseList.ts';
 import { LIST } from './utils/LIST.ts';

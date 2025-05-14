@@ -1,11 +1,11 @@
 import { isTokenField } from '../../cta/utils/isTokenField.ts';
 import { isValid } from '../../cta/utils/isValid.ts';
 import { SfToken } from '../../structuredfield/SfToken.ts';
-import type { Cmcd } from '../Cmcd.ts';
-import type { CmcdEncodeOptions } from '../CmcdEncodeOptions.ts';
+import type { Cmcd } from '../Cmcd';
+import type { CmcdEncodeOptions } from '../CmcdEncodeOptions';
 import { CmcdFormatters } from '../CmcdFormatters.ts';
-import type { CmcdKey } from '../CmcdKey.ts';
-import type { CmcdValue } from '../CmcdValue.ts';
+import type { CmcdKey } from '../CmcdKey';
+import type { CmcdValue } from '../CmcdValue';
 
 /**
  * Internal CMCD processing function.

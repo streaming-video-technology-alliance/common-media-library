@@ -1,5 +1,5 @@
-import type { Track } from '../../types/model/Track.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { Track } from '../../types/model/Track';
+import type { Validation } from '../../types/Validation';
 
 import { validateTrack } from './validateTrack.ts';
 

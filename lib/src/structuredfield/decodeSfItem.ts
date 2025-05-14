@@ -1,5 +1,5 @@
-import type { SfDecodeOptions } from './SfDecodeOptions.ts';
-import type { SfItem } from './SfItem.ts';
+import type { SfDecodeOptions } from './SfDecodeOptions';
+import type { SfItem } from './SfItem';
 import { parseError } from './parse/parseError.ts';
 import { parseItem } from './parse/parseItem.ts';
 import { ITEM } from './utils/ITEM.ts';

@@ -1,4 +1,4 @@
-import type { Cmcd } from './Cmcd.ts';
+import type { Cmcd } from './Cmcd';
 import { CmcdHeaderMap } from './CmcdHeaderMap.ts';
 import { decodeCmcd } from './decodeCmcd.ts';
 

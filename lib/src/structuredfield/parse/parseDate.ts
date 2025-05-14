@@ -1,5 +1,5 @@
 import { DATE } from '../utils/DATE.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts';

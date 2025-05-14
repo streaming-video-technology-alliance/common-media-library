@@ -37,12 +37,12 @@
  */
 
 import { CaptionsLogger } from './CaptionsLogger.ts';
-import type { Channels } from './Channels.ts';
-import type { CmdHistory } from './CmdHistory.ts';
+import type { Channels } from './Channels';
+import type { CmdHistory } from './CmdHistory';
 import { Cta608Channel } from './Cta608Channel.ts';
-import type { PACData } from './PACData.ts';
-import type { PenStyles } from './PenStyles.ts';
-import type { SupportedField } from './SupportedField.ts';
+import type { PACData } from './PACData';
+import type { PenStyles } from './PenStyles';
+import type { SupportedField } from './SupportedField';
 import { VerboseLevel } from './VerboseLevel.ts';
 import { backgroundColors } from './utils/backgroundColors.ts';
 import { createCmdHistory } from './utils/createCmdHistory.ts';

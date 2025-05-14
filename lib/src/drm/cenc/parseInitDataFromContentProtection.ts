@@ -1,4 +1,4 @@
-import type { ContentProtection } from '../common/ContentProtection.ts';
+import type { ContentProtection } from '../common/ContentProtection';
 
 /**
  * Parse a standard common encryption PSSH which contains a simple
@@ -10,7 +10,7 @@ import type { ContentProtection } from '../common/ContentProtection.ts';
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
  * {@includeCode ../../../test/drm/cenc/parseInitDataFromContentProtection.test.ts#example}
  */

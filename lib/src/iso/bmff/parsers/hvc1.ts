@@ -1,4 +1,4 @@
-import type { IsoView } from '../IsoView.ts';
+import type { IsoView } from '../IsoView';
 import { avc1, type VisualSampleEntry } from './avc1.ts';
 
 /**

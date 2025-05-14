@@ -1,14 +1,14 @@
-import type { Presentation } from '../../../types/model/Presentation.ts';
-import type { SelectionSet } from '../../../types/model/SelectionSet.ts';
+import type { Presentation } from '../../../types/model/Presentation';
+import type { SelectionSet } from '../../../types/model/SelectionSet';
 
-import type { Manifest } from '../../../types/manifest/Manifest.ts';
+import type { Manifest } from '../../../types/manifest/Manifest';
 
 import { audioGroupsToSwitchingSets } from './audioGroupsToSwitchingSets.ts';
 import { subtitleGroupsToSwitchingSets } from './subtitleGroupsToSwitchingSets.ts';
 import { videoPlaylistsToSwitchingSets } from './videoPlaylistsToSwitchingSets.ts';
 
-import { addMetadataToHls } from '../../../utils/manifest/addMetadataToHls.ts';
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts';
+import { addMetadataToHls } from '../../../utils/manifest/addMetadataToHls.ts';
 
 export function mapHlsToHam(manifest: Manifest): Presentation[] {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest);

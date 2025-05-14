@@ -1,6 +1,6 @@
 
-import type { Period } from '../../../types/mapper/dash/Period.ts';
-import type { Presentation } from '../../../types/model/Presentation.ts';
+import type { Period } from '../../../types/mapper/dash/Period';
+import type { Presentation } from '../../../types/model/Presentation';
 
 import { selectionSetsToAdaptationSet } from './selectionSetsToAdaptationSet.ts';
 

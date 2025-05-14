@@ -1,10 +1,10 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet';
+import type { Representation } from '../../../types/mapper/dash/Representation';
 
-import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
-import type { Segment } from '../../../types/model/Segment.ts';
-import type { TextTrack } from '../../../types/model/TextTrack.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../types/model/AudioTrack';
+import type { Segment } from '../../../types/model/Segment';
+import type { TextTrack } from '../../../types/model/TextTrack';
+import type { VideoTrack } from '../../../types/model/VideoTrack';
 
 
 import { getChannels } from './utils/getChannels.ts';

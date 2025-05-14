@@ -1,4 +1,4 @@
-import type { Byterange } from '../../../../types/mapper/hls/Byterange.ts';
+import type { Byterange } from '../../../../types/mapper/hls/Byterange';
 
 /**
  * @internal

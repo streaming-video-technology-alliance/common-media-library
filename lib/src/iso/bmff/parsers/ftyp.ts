@@ -1,5 +1,5 @@
-import type { IsoView } from '../IsoView.ts';
-import type { TypeBox } from '../TypeBox.ts';
+import type { IsoView } from '../IsoView';
+import type { TypeBox } from '../TypeBox';
 import { STRING } from '../fields/STRING.ts';
 
 /**

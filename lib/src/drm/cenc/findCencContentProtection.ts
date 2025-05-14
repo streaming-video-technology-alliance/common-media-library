@@ -1,6 +1,6 @@
 import { CBCS } from '../common/CBCS.ts';
 import { CENC } from '../common/CENC.ts';
-import type { ContentProtection } from '../common/ContentProtection.ts';
+import type { ContentProtection } from '../common/ContentProtection';
 import { MP4_PROTECTION_SCHEME } from '../common/MP4_PROTECTION_SCHEME.ts';
 
 /**

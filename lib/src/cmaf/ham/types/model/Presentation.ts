@@ -1,11 +1,11 @@
-import type { Ham } from './Ham.ts';
-import type { SelectionSet } from './SelectionSet.ts';
+import type { Ham } from './Ham';
+import type { SelectionSet } from './SelectionSet';
 
 /**
  * CMAF-HAM Presentation type
- * 
+ *
  * selectionSets - List of SelectionSets
- * 
+ *
  * @group CMAF
  * @alpha
  */

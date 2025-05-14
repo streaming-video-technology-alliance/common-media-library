@@ -36,12 +36,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { CaptionModes } from './CaptionModes.ts';
+import type { CaptionModes } from './CaptionModes';
 import { CaptionScreen } from './CaptionScreen.ts';
 import { CaptionsLogger } from './CaptionsLogger.ts';
-import type { CueHandler } from './CueHandler.ts';
-import type { PACData } from './PACData.ts';
-import type { PenStyles } from './PenStyles.ts';
+import type { CueHandler } from './CueHandler';
+import type { PACData } from './PACData';
+import type { PenStyles } from './PenStyles';
 import { VerboseLevel } from './VerboseLevel.ts';
 
 /**
