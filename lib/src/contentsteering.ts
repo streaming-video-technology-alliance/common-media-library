@@ -10,6 +10,7 @@
  */
 export { DEFAULT_PATHWAY_PENALTY } from './contentsteering/DEFAULT_PATHWAY_PENALTY.ts';
 export { DEFAULT_TTL } from './contentsteering/DEFAULT_TTL.ts';
-export type { PathwayClone } from './contentsteering/PathwayClone.ts';
-export type { SteeringManifest } from './contentsteering/SteeringManifest.ts';
-export type { UriReplacement } from './contentsteering/UriReplacement.ts';
+export type { PathwayClone } from './contentsteering/PathwayClone';
+export type { SteeringManifest } from './contentsteering/SteeringManifest';
+export type { UriReplacement } from './contentsteering/UriReplacement';
+
