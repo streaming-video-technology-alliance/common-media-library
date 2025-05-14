@@ -14,7 +14,7 @@ export type SteeringManifest = {
 	VERSION: number;
 
 	/**
-	 * The time to live of the content steering manifest.
+	 * The time to live of the content steering manifest in seconds.
 	 */
 	TTL: number;
 
@@ -31,5 +31,5 @@ export type SteeringManifest = {
 	/**
 	 * The clones of the pathways.
 	 */
-	'PATHWAY-CLONES': PathwayClone[];
+	'PATHWAY-CLONES'?: PathwayClone[];
 };
