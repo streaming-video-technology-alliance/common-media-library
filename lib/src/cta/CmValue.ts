@@ -1,7 +1,7 @@
-import type { SfToken } from '../structuredfield/SfToken.ts';
-import type { CmObjectType } from './CmObjectType.ts';
-import type { CmStreamingFormat } from './CmStreamingFormat.ts';
-import type { CmStreamType } from './CmStreamType.ts';
+import type { SfToken } from '../structuredfield/SfToken';
+import type { CmObjectType } from './CmObjectType';
+import type { CmStreamingFormat } from './CmStreamingFormat';
+import type { CmStreamType } from './CmStreamType';
 
 /**
  * A common media value.

@@ -1,13 +1,13 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
-import type { DashManifest } from '../../../types/mapper/dash/DashManifest.ts';
-import type { Period } from '../../../types/mapper/dash/Period.ts';
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet';
+import type { DashManifest } from '../../../types/mapper/dash/DashManifest';
+import type { Period } from '../../../types/mapper/dash/Period';
+import type { Representation } from '../../../types/mapper/dash/Representation';
 
-import type { Presentation } from '../../../types/model/Presentation.ts';
-import type { Segment } from '../../../types/model/Segment.ts';
-import type { SelectionSet } from '../../../types/model/SelectionSet.ts';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
-import type { Track } from '../../../types/model/Track.ts';
+import type { Presentation } from '../../../types/model/Presentation';
+import type { Segment } from '../../../types/model/Segment';
+import type { SelectionSet } from '../../../types/model/SelectionSet';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet';
+import type { Track } from '../../../types/model/Track';
 
 import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts';
 

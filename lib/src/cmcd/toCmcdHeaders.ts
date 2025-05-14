@@ -1,8 +1,8 @@
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { Cmcd } from './Cmcd';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions';
 import { CmcdHeaderField } from './CmcdHeaderField.ts';
 import { CmcdHeaderMap } from './CmcdHeaderMap.ts';
-import type { CmcdKey } from './CmcdKey.ts';
+import type { CmcdKey } from './CmcdKey';
 import { encodeCmcd } from './encodeCmcd.ts';
 
 /**

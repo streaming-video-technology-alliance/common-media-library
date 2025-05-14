@@ -1,4 +1,4 @@
-import type { ValueOf } from '../utils/ValueOf.ts';
+import type { ValueOf } from '../utils/ValueOf';
 import { CMCD_HEADERS } from './CMCD_HEADERS.ts';
 import { CMCD_JSON } from './CMCD_JSON.ts';
 import { CMCD_QUERY } from './CMCD_QUERY.ts';

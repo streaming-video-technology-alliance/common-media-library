@@ -1,6 +1,6 @@
 import { SfItem } from '../structuredfield/SfItem.ts';
 import { encodeSfList } from '../structuredfield/encodeSfList.ts';
-import type { CmsdDynamic } from './CmsdDynamic.ts';
+import type { CmsdDynamic } from './CmsdDynamic';
 
 /**
  * Encode a list of CMSD Dynamic objects.

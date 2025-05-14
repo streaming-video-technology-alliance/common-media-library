@@ -1,7 +1,7 @@
-import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
-import type { TextTrack } from '../../../types/model/TextTrack.ts';
-import type { Track } from '../../../types/model/Track.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../types/model/AudioTrack';
+import type { TextTrack } from '../../../types/model/TextTrack';
+import type { Track } from '../../../types/model/Track';
+import type { VideoTrack } from '../../../types/model/VideoTrack';
 
 import { getPlaylistData } from './utils/getPlaylistData.ts';
 import { getSegments } from './utils/getSegments.ts';

@@ -1,9 +1,9 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
-import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate.ts';
-import type { SegmentList } from '../../../types/mapper/dash/SegmentList.ts';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet';
+import type { Representation } from '../../../types/mapper/dash/Representation';
+import type { SegmentList } from '../../../types/mapper/dash/SegmentList';
+import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate';
 
-import type { Segment } from '../../../types/model/Segment.ts';
+import type { Segment } from '../../../types/model/Segment';
 
 import { mapSegmentBase } from './mapSegmentBase.ts';
 import { mapSegmentList } from './mapSegmentList.ts';

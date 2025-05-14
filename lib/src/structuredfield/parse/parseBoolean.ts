@@ -1,5 +1,5 @@
 import { BOOLEAN } from '../utils/BOOLEAN.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 

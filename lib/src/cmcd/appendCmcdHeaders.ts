@@ -1,5 +1,5 @@
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { Cmcd } from './Cmcd';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions';
 import { toCmcdHeaders } from './toCmcdHeaders.ts';
 
 /**

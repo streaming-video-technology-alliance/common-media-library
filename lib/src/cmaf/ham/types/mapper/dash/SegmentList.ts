@@ -1,5 +1,5 @@
-import type { Initialization } from './Initialization.ts';
-import type { SegmentURL } from './SegmentUrl.ts';
+import type { Initialization } from './Initialization';
+import type { SegmentURL } from './SegmentUrl';
 
 /**
  * DASH Segment List

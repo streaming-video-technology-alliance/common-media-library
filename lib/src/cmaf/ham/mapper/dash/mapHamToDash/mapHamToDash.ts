@@ -1,7 +1,7 @@
-import type { Presentation } from '../../../types/model/Presentation.ts';
+import type { Presentation } from '../../../types/model/Presentation';
 
-import type { DashManifest } from '../../../types/mapper/dash/DashManifest.ts';
-import type { Period } from '../../../types/mapper/dash/Period.ts';
+import type { DashManifest } from '../../../types/mapper/dash/DashManifest';
+import type { Period } from '../../../types/mapper/dash/Period';
 
 import { presentationsToPeriods } from './presentationsToPeriods.ts';
 

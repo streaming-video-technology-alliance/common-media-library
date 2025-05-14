@@ -1,11 +1,11 @@
-import type { Ham } from './Ham.ts';
-import type { Segment } from './Segment.ts';
-import type { TrackType } from './TrackType.ts';
+import type { Ham } from './Ham';
+import type { Segment } from './Segment';
+import type { TrackType } from './TrackType';
 
 /**
  * CMAF-HAM Track type
  * Used as a base for the audio, video and text tracks
- * 
+ *
  * type - The TrackType
  * fileName - File name of the track.
  * codec - Codec of the track.

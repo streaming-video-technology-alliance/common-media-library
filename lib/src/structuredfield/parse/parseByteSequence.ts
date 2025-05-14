@@ -1,6 +1,6 @@
 import { base64decode } from '../../utils/base64decode.ts';
 import { BYTES } from '../utils/BYTES.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 

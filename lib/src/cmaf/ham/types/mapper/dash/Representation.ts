@@ -1,7 +1,7 @@
-import type { AudioChannelConfiguration } from './AudioChannelConfiguration.ts';
-import type { SegmentBase } from './SegmentBase.ts';
-import type { SegmentList } from './SegmentList.ts';
-import type { SegmentTemplate } from './SegmentTemplate.ts';
+import type { AudioChannelConfiguration } from './AudioChannelConfiguration';
+import type { SegmentBase } from './SegmentBase';
+import type { SegmentList } from './SegmentList';
+import type { SegmentTemplate } from './SegmentTemplate';
 
 /**
  * DASH Representation

@@ -1,6 +1,6 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions';
 import { SfItem } from '../SfItem.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseBareItem } from './parseBareItem.ts';
 import { parseParameters } from './parseParameters.ts';

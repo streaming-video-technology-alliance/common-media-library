@@ -1,4 +1,4 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Presentation } from '../../types/model/Presentation';
 
 import { HlsMapper } from '../../mapper/hls/HlsMapper.ts';
 import { MapperContext } from '../../mapper/MapperContext.ts';

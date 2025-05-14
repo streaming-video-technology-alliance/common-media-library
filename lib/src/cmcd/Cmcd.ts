@@ -1,8 +1,8 @@
-import type { CmcdCustomKey } from './CmcdCustomKey.ts';
-import type { CmcdObjectType } from './CmcdObjectType.ts';
-import type { CmcdStreamType } from './CmcdStreamType.ts';
-import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts';
-import type { CmcdValue } from './CmcdValue.ts';
+import type { CmcdCustomKey } from './CmcdCustomKey';
+import type { CmcdObjectType } from './CmcdObjectType';
+import type { CmcdStreamType } from './CmcdStreamType';
+import type { CmcdStreamingFormat } from './CmcdStreamingFormat';
+import type { CmcdValue } from './CmcdValue';
 
 /**
  * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.

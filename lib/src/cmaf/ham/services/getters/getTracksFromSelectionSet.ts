@@ -1,5 +1,5 @@
-import type { SelectionSet } from '../../types/model/SelectionSet.ts';
-import type { Track } from '../../types/model/Track.ts';
+import type { SelectionSet } from '../../types/model/SelectionSet';
+import type { Track } from '../../types/model/Track';
 
 import { getTracksFromSwitchingSet } from './getTracksFromSwitchingSet.ts';
 

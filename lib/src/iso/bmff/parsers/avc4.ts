@@ -1,4 +1,4 @@
-import type { BoxParser } from '../BoxParser.ts';
+import type { BoxParser } from '../BoxParser';
 import { avc1, type VisualSampleEntry } from './avc1.ts';
 
 /**

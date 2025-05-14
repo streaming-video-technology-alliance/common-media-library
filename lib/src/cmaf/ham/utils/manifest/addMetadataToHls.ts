@@ -1,4 +1,4 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts';
+import type { Manifest } from '../../types/manifest/Manifest';
 
 //Add metadata to manifest.
 //In the future, if any other fields are wanted to be added, they can be added here.

@@ -1,5 +1,5 @@
-import type { Ham } from './Ham.ts';
-import type { Track } from './Track.ts';
+import type { Ham } from './Ham';
+import type { Track } from './Track';
 
 /**
  * CMAF-HAM SwitchingSet type

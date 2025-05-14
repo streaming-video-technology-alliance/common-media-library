@@ -1,10 +1,10 @@
 
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
-import type { AudioChannelConfiguration } from '../../../types/mapper/dash/AudioChannelConfiguration.ts';
+import type { AudioChannelConfiguration } from '../../../types/mapper/dash/AudioChannelConfiguration';
+import type { Representation } from '../../../types/mapper/dash/Representation';
 
-import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
-import type { Track } from '../../../types/model/Track.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../types/model/AudioTrack';
+import type { Track } from '../../../types/model/Track';
+import type { VideoTrack } from '../../../types/model/VideoTrack';
 
 import { trackToSegmentBase } from './trackToSegmentBase.ts';
 import { trackToSegmentList } from './trackToSegmentList.ts';

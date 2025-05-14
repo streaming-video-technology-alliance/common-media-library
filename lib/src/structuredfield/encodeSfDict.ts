@@ -1,4 +1,4 @@
-import type { SfEncodeOptions } from './SfEncodeOptions.ts';
+import type { SfEncodeOptions } from './SfEncodeOptions';
 import { serializeDict } from './serialize/serializeDict.ts';
 
 /**

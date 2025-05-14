@@ -1,7 +1,7 @@
 import { symbolToStr } from '../cta/utils/symbolToStr.ts';
 import { SfToken } from '../structuredfield/SfToken.ts';
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { Cmcd } from './Cmcd';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions';
 import { processCmcd } from './utils/processCmcd.ts';
 
 /**

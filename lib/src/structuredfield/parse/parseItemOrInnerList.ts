@@ -1,7 +1,7 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfInnerList } from '../SfInnerList.ts';
-import type { SfItem } from '../SfItem.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions';
+import type { SfInnerList } from '../SfInnerList';
+import type { SfItem } from '../SfItem';
+import type { ParsedValue } from './ParsedValue';
 import { parseInnerList } from './parseInnerList.ts';
 import { parseItem } from './parseItem.ts';
 

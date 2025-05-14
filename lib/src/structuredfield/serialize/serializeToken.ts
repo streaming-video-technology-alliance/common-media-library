@@ -1,5 +1,5 @@
 import { symbolToStr } from '../../cta/utils/symbolToStr.ts';
-import type { SfToken } from '../SfToken.ts';
+import type { SfToken } from '../SfToken';
 import { TOKEN } from '../utils/TOKEN.ts';
 import { serializeError } from './serializeError.ts';
 

@@ -1,6 +1,6 @@
 import { utf8ArrayToStr } from '../../utils/utf8ArrayToStr.ts';
-import type { DecodedId3Frame } from '../DecodedId3Frame.ts';
-import type { RawId3Frame } from './RawFrame.ts';
+import type { DecodedId3Frame } from '../DecodedId3Frame';
+import type { RawId3Frame } from './RawFrame';
 import { toArrayBuffer } from './toArrayBuffer.ts';
 import { toUint8 } from './utf8.ts';
 

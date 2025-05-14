@@ -1,4 +1,4 @@
-import type { DecodedId3Frame } from './DecodedId3Frame.ts';
+import type { DecodedId3Frame } from './DecodedId3Frame';
 
 /**
  * ID3 frame.

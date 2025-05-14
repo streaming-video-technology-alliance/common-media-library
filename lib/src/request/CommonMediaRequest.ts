@@ -1,5 +1,5 @@
-import type { Cmcd } from '../cmcd/Cmcd.ts';
-import type { RequestType } from './RequestType.ts';
+import type { Cmcd } from '../cmcd/Cmcd';
+import type { RequestType } from './RequestType';
 
 /**
  * Common request API.

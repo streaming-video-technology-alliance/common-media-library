@@ -1,6 +1,6 @@
-import type { IsoData } from './IsoData.ts';
+import type { IsoData } from './IsoData';
 import { IsoView } from './IsoView.ts';
-import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { IsoViewConfig } from './IsoViewConfig';
 
 /**
  * Create an IsoView from a raw ISO data.

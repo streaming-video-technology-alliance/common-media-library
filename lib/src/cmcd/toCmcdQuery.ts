@@ -1,6 +1,6 @@
 import { CMCD_PARAM } from './CMCD_PARAM.ts';
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { Cmcd } from './Cmcd';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions';
 import { encodeCmcd } from './encodeCmcd.ts';
 
 /**

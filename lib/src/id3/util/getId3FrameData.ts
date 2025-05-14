@@ -1,4 +1,4 @@
-import type { RawId3Frame } from './RawFrame.ts';
+import type { RawId3Frame } from './RawFrame';
 import { readId3Size } from './readId3Size.ts';
 
 /**

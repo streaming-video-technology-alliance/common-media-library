@@ -1,9 +1,9 @@
-import type { Id3Frame } from '../Id3Frame.ts';
-import type { RawId3Frame } from './RawFrame.ts';
+import type { Id3Frame } from '../Id3Frame';
+import type { RawId3Frame } from './RawFrame';
+import { decodeId3ImageFrame } from './decodeId3ImageFrame.ts';
 import { decodeId3PrivFrame } from './decodeId3PrivFrame.ts';
 import { decodeId3TextFrame } from './decodeId3TextFrame.ts';
 import { decodeId3UrlFrame } from './decodeId3UrlFrame.ts';
-import { decodeId3ImageFrame } from './decodeId3ImageFrame.ts';
 
 /**
  * Decode an ID3 frame.

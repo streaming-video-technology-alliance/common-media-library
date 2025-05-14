@@ -1,7 +1,7 @@
-import type { SfBareItem } from '../SfBareItem.ts';
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
+import type { SfBareItem } from '../SfBareItem';
+import type { SfDecodeOptions } from '../SfDecodeOptions';
 import { BARE_ITEM } from '../utils/BARE_ITEM.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parseBoolean } from './parseBoolean.ts';
 import { parseByteSequence } from './parseByteSequence.ts';
 import { parseDate } from './parseDate.ts';

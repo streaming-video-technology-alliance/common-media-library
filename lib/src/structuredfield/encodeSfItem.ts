@@ -1,6 +1,6 @@
-import type { SfBareItem } from './SfBareItem.ts';
+import type { SfBareItem } from './SfBareItem';
 import { SfItem } from './SfItem.ts';
-import type { SfParameters } from './SfParameters.ts';
+import type { SfParameters } from './SfParameters';
 import { serializeItem } from './serialize/serializeItem.ts';
 
 /**

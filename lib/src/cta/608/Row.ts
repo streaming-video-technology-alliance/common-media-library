@@ -38,7 +38,7 @@
 
 import { CaptionsLogger } from './CaptionsLogger.ts';
 import { PenState } from './PenState.ts';
-import type { PenStyles } from './PenStyles.ts';
+import type { PenStyles } from './PenStyles';
 import { StyledUnicodeChar } from './StyledUnicodeChar.ts';
 import { VerboseLevel } from './VerboseLevel.ts';
 import { NR_COLS } from './utils/NR_COLS.ts';

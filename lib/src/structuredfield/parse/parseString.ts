@@ -1,6 +1,6 @@
 import { STRING } from '../utils/STRING.ts';
 import { STRING_REGEX } from '../utils/STRING_REGEX.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 

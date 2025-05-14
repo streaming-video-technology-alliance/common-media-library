@@ -1,5 +1,5 @@
-import type { FrameRate } from './FrameRate.ts';
-import type { Track } from './Track.ts';
+import type { FrameRate } from './FrameRate';
+import type { Track } from './Track';
 
 /**
  * CMAF-HAM Track type

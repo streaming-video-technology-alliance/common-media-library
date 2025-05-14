@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfDictionary } from '../SfDictionary.ts';
-import type { SfInnerList } from '../SfInnerList.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions';
+import type { SfDictionary } from '../SfDictionary';
+import type { SfInnerList } from '../SfInnerList';
 import { SfItem } from '../SfItem.ts';
 import { DICT } from '../utils/DICT.ts';
-import type { ParsedValue } from './ParsedValue.ts';
+import type { ParsedValue } from './ParsedValue';
 import { parsedValue } from './ParsedValue.ts';
 import { parseError } from './parseError.ts';
 import { parseItemOrInnerList } from './parseItemOrInnerList.ts';

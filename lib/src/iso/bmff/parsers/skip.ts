@@ -1,4 +1,4 @@
-import type { BoxParser } from '../BoxParser.ts';
+import type { BoxParser } from '../BoxParser';
 import { free, type FreeSpaceBox } from './free.ts';
 
 /**

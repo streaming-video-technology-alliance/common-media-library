@@ -1,7 +1,7 @@
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
-import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate.ts';
+import type { Representation } from '../../../types/mapper/dash/Representation';
+import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate';
 
-import type { Segment } from '../../../types/model/Segment.ts';
+import type { Segment } from '../../../types/model/Segment';
 
 import { calculateDuration } from './utils/calculateDuration.ts';
 import { getNumberOfSegments } from './utils/getNumberOfSegments.ts';

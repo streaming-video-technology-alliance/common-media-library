@@ -1,5 +1,5 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
-import type { Track } from '../../types/model/Track.ts';
+import type { Presentation } from '../../types/model/Presentation';
+import type { Track } from '../../types/model/Track';
 
 import { getTracksFromSelectionSet } from './getTracksFromSelectionSet.ts';
 

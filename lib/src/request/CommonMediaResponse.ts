@@ -1,6 +1,6 @@
-import type { CommonMediaRequest } from './CommonMediaRequest.ts';
-import type { ResourceTiming } from './ResourceTiming.ts';
-import type { ResponseTypeMap } from './ResponseTypeMap.ts';
+import type { CommonMediaRequest } from './CommonMediaRequest';
+import type { ResourceTiming } from './ResourceTiming';
+import type { ResponseTypeMap } from './ResponseTypeMap';
 
 /**
  * Common response API.

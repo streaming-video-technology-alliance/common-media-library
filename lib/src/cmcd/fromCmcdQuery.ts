@@ -1,4 +1,4 @@
-import type { Cmcd } from './Cmcd.ts';
+import type { Cmcd } from './Cmcd';
 import { CMCD_PARAM } from './CMCD_PARAM.ts';
 import { decodeCmcd } from './decodeCmcd.ts';
 

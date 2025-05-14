@@ -1,7 +1,7 @@
-import type { SegmentList } from '../../../types/mapper/dash/SegmentList.ts';
-import type { SegmentURL } from '../../../types/mapper/dash/SegmentUrl.ts';
+import type { SegmentList } from '../../../types/mapper/dash/SegmentList';
+import type { SegmentURL } from '../../../types/mapper/dash/SegmentUrl';
 
-import type { Segment } from '../../../types/model/Segment.ts';
+import type { Segment } from '../../../types/model/Segment';
 
 import { calculateDuration } from './utils/calculateDuration.ts';
 

@@ -1,5 +1,5 @@
-import type { Track } from '../../../../types/model/Track.ts';
-import type { VideoTrack } from '../../../../types/model/VideoTrack.ts';
+import type { Track } from '../../../../types/model/Track';
+import type { VideoTrack } from '../../../../types/model/VideoTrack';
 
 import {
 	FRAME_RATE_NUMERATOR_30,

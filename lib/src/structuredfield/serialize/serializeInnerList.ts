@@ -1,4 +1,4 @@
-import type { SfInnerList } from '../SfInnerList.ts';
+import type { SfInnerList } from '../SfInnerList';
 import { serializeItem } from './serializeItem.ts';
 import { serializeParams } from './serializeParams.ts';
 

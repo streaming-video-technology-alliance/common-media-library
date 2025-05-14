@@ -1,4 +1,4 @@
-import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts';
+import type { DashManifest } from '../../types/mapper/dash/DashManifest';
 
 export type DashParser = (raw: string) => DashManifest;
 

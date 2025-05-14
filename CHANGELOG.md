@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.12.1] - 2025-05-14
+
+### Fixed
+
+- TS Error: Import path cannot end with a '.ts' extension
+  ([#183](https://github.com/streaming-video-technology-alliance/common-media-library/issues/183))
+
 ## [0.12.0] - 2025-05-08
 
 ### Added
@@ -319,7 +326,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.9.0...v0.10.0

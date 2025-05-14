@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { FullBox } from '../FullBox';
+import type { IsoView } from '../IsoView';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.2 Movie Extends Header Box

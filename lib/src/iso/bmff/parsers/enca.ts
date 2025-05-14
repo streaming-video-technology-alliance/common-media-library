@@ -1,4 +1,4 @@
-import type { BoxParser } from '../BoxParser.ts';
+import type { BoxParser } from '../BoxParser';
 import { mp4a, type AudioSampleEntry } from './mp4a.ts';
 
 /**

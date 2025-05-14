@@ -1,7 +1,7 @@
-import type { Manifest } from '../types/manifest/Manifest.ts';
-import type { Presentation } from '../types/model/Presentation.ts';
+import type { Manifest } from '../types/manifest/Manifest';
+import type { Presentation } from '../types/model/Presentation';
 
-import type { Mapper } from './Mapper.ts';
+import type { Mapper } from './Mapper';
 
 export class MapperContext {
 	private strategy!: Mapper;

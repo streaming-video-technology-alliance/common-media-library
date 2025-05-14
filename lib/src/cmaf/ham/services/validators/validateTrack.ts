@@ -1,9 +1,9 @@
-import type { Track } from '../../types/model/Track.ts';
-import type { VideoTrack } from '../../types/model/VideoTrack.ts';
-import type { AudioTrack } from '../../types/model/AudioTrack.ts';
-import type { TextTrack } from '../../types/model/TextTrack.ts';
+import type { AudioTrack } from '../../types/model/AudioTrack';
+import type { TextTrack } from '../../types/model/TextTrack';
+import type { Track } from '../../types/model/Track';
+import type { VideoTrack } from '../../types/model/VideoTrack';
 
-import type { Validation } from '../../types/Validation.ts';
+import type { Validation } from '../../types/Validation';
 
 import { validateSegments } from './validateSegments.ts';
 

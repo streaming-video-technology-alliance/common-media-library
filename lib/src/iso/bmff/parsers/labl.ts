@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { FullBox } from '../FullBox';
+import type { IsoView } from '../IsoView';
 
 /**
  * ISO/IEC 14496-12:202x - 8.10.5 Label box

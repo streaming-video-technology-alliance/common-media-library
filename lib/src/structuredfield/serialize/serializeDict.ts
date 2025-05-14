@@ -1,4 +1,4 @@
-import type { SfEncodeOptions } from '../SfEncodeOptions.ts';
+import type { SfEncodeOptions } from '../SfEncodeOptions';
 import { SfItem } from '../SfItem.ts';
 import { DICT } from '../utils/DICT.ts';
 import { serializeError } from './serializeError.ts';

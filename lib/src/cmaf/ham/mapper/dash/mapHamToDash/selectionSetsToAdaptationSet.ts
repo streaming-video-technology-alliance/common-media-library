@@ -1,7 +1,7 @@
 
-import type { SelectionSet } from '../../../types/model/SelectionSet.ts';
+import type { SelectionSet } from '../../../types/model/SelectionSet';
 
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet';
 
 import { tracksToRepresentation } from './tracksToRepresentation.ts';
 

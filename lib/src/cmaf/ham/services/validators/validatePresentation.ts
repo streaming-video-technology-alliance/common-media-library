@@ -1,5 +1,5 @@
-import type { Validation } from '../../types/Validation.ts';
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Validation } from '../../types/Validation';
+import type { Presentation } from '../../types/model/Presentation';
 
 import { validateSelectionSets } from './validateSelectionSets.ts';
 
