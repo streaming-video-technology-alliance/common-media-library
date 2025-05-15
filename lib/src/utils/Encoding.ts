@@ -1,6 +1,6 @@
-import type { ValueOf } from '../utils/ValueOf.ts';
-import { UTF_16 } from './UTF_16.ts';
-import { UTF_8 } from './UTF_8.ts';
+import type { ValueOf } from '../utils/ValueOf.js';
+import { UTF_16 } from './UTF_16.js';
+import { UTF_8 } from './UTF_8.js';
 
 /**
  * Text encoding types.

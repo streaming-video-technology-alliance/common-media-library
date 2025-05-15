@@ -1,8 +1,8 @@
-import type { CmsdCustomKey } from './CmsdCustomKey';
-import type { CmsdObjectType } from './CmsdObjectType';
-import type { CmsdStreamType } from './CmsdStreamType';
-import type { CmsdStreamingFormat } from './CmsdStreamingFormat';
-import type { CmsdValue } from './CmsdValue';
+import type { CmsdCustomKey } from './CmsdCustomKey.js';
+import type { CmsdObjectType } from './CmsdObjectType.js';
+import type { CmsdStreamType } from './CmsdStreamType.js';
+import type { CmsdStreamingFormat } from './CmsdStreamingFormat.js';
+import type { CmsdValue } from './CmsdValue.js';
 
 /**
  * Common Media Server Data (CMSD) static response header fields.

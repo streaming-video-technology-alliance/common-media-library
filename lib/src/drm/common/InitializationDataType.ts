@@ -1,8 +1,8 @@
-import type { ValueOf } from '../../utils/ValueOf.ts';
-import { CBCS } from './CBCS.ts';
-import { CENC } from './CENC.ts';
-import { KEYIDS } from './KEYIDS.ts';
-import { WEBM } from './WEBM.ts';
+import type { ValueOf } from '../../utils/ValueOf.js';
+import { CBCS } from './CBCS.js';
+import { CENC } from './CENC.js';
+import { KEYIDS } from './KEYIDS.js';
+import { WEBM } from './WEBM.js';
 
 /**
  * Initialization Data Type.

@@ -1,10 +1,10 @@
 
-import type { Period } from '../../../types/mapper/dash/Period';
-import type { Presentation } from '../../../types/model/Presentation';
+import type { Period } from '../../../types/mapper/dash/Period.js';
+import type { Presentation } from '../../../types/model/Presentation.js';
 
-import { selectionSetsToAdaptationSet } from './selectionSetsToAdaptationSet.ts';
+import { selectionSetsToAdaptationSet } from './selectionSetsToAdaptationSet.js';
 
-import { numberToIso8601Duration } from '../../../utils/dash/numberToIso8601Duration.ts';
+import { numberToIso8601Duration } from '../../../utils/dash/numberToIso8601Duration.js';
 
 export function presentationsToPeriods(presentations: Presentation[]): Period[] {
 	return presentations.map((presentation: Presentation) => {

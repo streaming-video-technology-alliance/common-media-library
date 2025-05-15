@@ -1,4 +1,4 @@
-import type { DecodedId3Frame } from '../DecodedId3Frame';
+import type { DecodedId3Frame } from '../DecodedId3Frame.js';
 
 /**
  * Read a 33 bit timestamp from an ID3 frame.

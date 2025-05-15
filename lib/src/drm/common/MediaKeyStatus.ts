@@ -1,11 +1,11 @@
-import type { ValueOf } from '../../utils/ValueOf.ts';
-import { EXPIRED } from './EXPIRED.ts';
-import { INTERNAL_ERROR } from './INTERNAL_ERROR.ts';
-import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.ts';
-import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED.ts';
-import { RELEASED } from './RELEASED.ts';
-import { STATUS_PENDING } from './STATUS_PENDING.ts';
-import { USABLE } from './USABLE.ts';
+import type { ValueOf } from '../../utils/ValueOf.js';
+import { EXPIRED } from './EXPIRED.js';
+import { INTERNAL_ERROR } from './INTERNAL_ERROR.js';
+import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.js';
+import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED.js';
+import { RELEASED } from './RELEASED.js';
+import { STATUS_PENDING } from './STATUS_PENDING.js';
+import { USABLE } from './USABLE.js';
 
 /**
  * Media Key Statuses.

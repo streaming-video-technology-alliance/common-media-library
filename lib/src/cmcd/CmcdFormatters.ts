@@ -1,7 +1,7 @@
-import { urlToRelativePath } from '../utils/urlToRelativePath.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions';
-import type { CmcdFormatter } from './CmcdFormatter';
-import type { CmcdValue } from './CmcdValue';
+import { urlToRelativePath } from '../utils/urlToRelativePath.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { CmcdFormatter } from './CmcdFormatter.js';
+import type { CmcdValue } from './CmcdValue.js';
 
 const toRounded = (value: CmcdValue) => Math.round(value as number);
 const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions) => {

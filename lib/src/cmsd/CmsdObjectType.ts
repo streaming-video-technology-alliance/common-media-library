@@ -1,4 +1,4 @@
-import { CmObjectType } from '../cta/CmObjectType.ts';
+import { CmObjectType } from '../cta/CmObjectType.js';
 
 /**
  * Common Media Server Data Object Type

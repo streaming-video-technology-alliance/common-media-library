@@ -1,6 +1,6 @@
-import { STRING } from '../utils/STRING.ts';
-import { STRING_REGEX } from '../utils/STRING_REGEX.ts';
-import { serializeError } from './serializeError.ts';
+import { STRING } from '../utils/STRING.js';
+import { STRING_REGEX } from '../utils/STRING_REGEX.js';
+import { serializeError } from './serializeError.js';
 
 // 4.1.6.  Serializing a String
 //

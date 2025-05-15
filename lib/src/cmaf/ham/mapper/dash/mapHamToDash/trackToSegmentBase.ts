@@ -1,9 +1,9 @@
 
-import type { AudioTrack } from '../../../types/model/AudioTrack';
-import type { Segment } from '../../../types/model/Segment';
-import type { Track } from '../../../types/model/Track';
+import type { AudioTrack } from '../../../types/model/AudioTrack.js';
+import type { Segment } from '../../../types/model/Segment.js';
+import type { Track } from '../../../types/model/Track.js';
 
-import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase';
+import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase.js';
 
 export function trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = [];

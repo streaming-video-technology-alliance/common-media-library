@@ -1,5 +1,5 @@
-import { CmcdHeaderField } from './CmcdHeaderField.ts';
-import type { CmcdHeadersMap } from './CmcdHeadersMap';
+import { CmcdHeaderField } from './CmcdHeaderField.js';
+import type { CmcdHeadersMap } from './CmcdHeadersMap.js';
 
 /**
  * The map of CMCD header fields to official CMCD keys.

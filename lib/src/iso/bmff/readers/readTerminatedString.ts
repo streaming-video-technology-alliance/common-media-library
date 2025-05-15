@@ -1,4 +1,4 @@
-import { readUint } from './readUint.ts';
+import { readUint } from './readUint.js';
 
 export function readTerminatedString(dataView: DataView, offset: number): string {
 	let str = '';

@@ -1,5 +1,5 @@
-import type { Segment } from '../../types/model/Segment';
-import type { Validation } from '../../types/Validation';
+import type { Segment } from '../../types/model/Segment.js';
+import type { Validation } from '../../types/Validation.js';
 
 /**
  * Validate a segment.

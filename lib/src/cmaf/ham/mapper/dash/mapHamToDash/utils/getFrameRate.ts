@@ -1,5 +1,5 @@
-import type { Track } from '../../../../types/model/Track';
-import type { VideoTrack } from '../../../../types/model/VideoTrack';
+import type { Track } from '../../../../types/model/Track.js';
+import type { VideoTrack } from '../../../../types/model/VideoTrack.js';
 
 import {
 	FRAME_RATE_NUMERATOR_30,

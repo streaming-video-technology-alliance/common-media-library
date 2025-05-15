@@ -1,4 +1,4 @@
-import { CmStreamingFormat } from '../cta/CmStreamingFormat.ts';
+import { CmStreamingFormat } from '../cta/CmStreamingFormat.js';
 
 /**
  * Common Media Client Data Streaming Format

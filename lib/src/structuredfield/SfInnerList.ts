@@ -1,6 +1,6 @@
-import type { SfBareItem } from './SfBareItem';
-import type { SfItem } from './SfItem';
-import type { SfParameters } from './SfParameters';
+import type { SfBareItem } from './SfBareItem.js';
+import type { SfItem } from './SfItem.js';
+import type { SfParameters } from './SfParameters.js';
 
 /**
  * Structured Field Inner List

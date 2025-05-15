@@ -1,11 +1,11 @@
-import { isTokenField } from '../../cta/utils/isTokenField.ts';
-import { isValid } from '../../cta/utils/isValid.ts';
-import { SfToken } from '../../structuredfield/SfToken.ts';
-import type { Cmcd } from '../Cmcd';
-import type { CmcdEncodeOptions } from '../CmcdEncodeOptions';
-import { CmcdFormatters } from '../CmcdFormatters.ts';
-import type { CmcdKey } from '../CmcdKey';
-import type { CmcdValue } from '../CmcdValue';
+import { isTokenField } from '../../cta/utils/isTokenField.js';
+import { isValid } from '../../cta/utils/isValid.js';
+import { SfToken } from '../../structuredfield/SfToken.js';
+import type { Cmcd } from '../Cmcd.js';
+import type { CmcdEncodeOptions } from '../CmcdEncodeOptions.js';
+import { CmcdFormatters } from '../CmcdFormatters.js';
+import type { CmcdKey } from '../CmcdKey.js';
+import type { CmcdValue } from '../CmcdValue.js';
 
 /**
  * Internal CMCD processing function.

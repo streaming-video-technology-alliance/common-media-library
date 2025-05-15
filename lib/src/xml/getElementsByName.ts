@@ -1,4 +1,4 @@
-import type { XmlNode } from './XmlNode.ts';
+import type { XmlNode } from './XmlNode.js';
 
 /**
  * Recursively finds all elements by name within an XML structure.

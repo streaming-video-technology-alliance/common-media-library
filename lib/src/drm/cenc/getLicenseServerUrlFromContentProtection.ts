@@ -1,4 +1,4 @@
-import type { ContentProtection } from '../common/ContentProtection';
+import type { ContentProtection } from '../common/ContentProtection.js';
 
 /**
  * Extracts a license server URL from an array of ContentProtection elements.
@@ -9,7 +9,7 @@ import type { ContentProtection } from '../common/ContentProtection';
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
  * {@includeCode ../../../test/drm/cenc/getLicenseServerUrlFromContentProtection.test.ts#example}
  */

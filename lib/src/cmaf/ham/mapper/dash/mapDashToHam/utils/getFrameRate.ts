@@ -1,7 +1,7 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet';
-import type { Representation } from '../../../../types/mapper/dash/Representation';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.js';
+import type { Representation } from '../../../../types/mapper/dash/Representation.js';
 
-import type { FrameRate } from '../../../../types/model/FrameRate';
+import type { FrameRate } from '../../../../types/model/FrameRate.js';
 
 import {
 	DENOMINATOR,

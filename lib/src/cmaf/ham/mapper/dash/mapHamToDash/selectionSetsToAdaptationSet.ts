@@ -1,11 +1,11 @@
 
-import type { SelectionSet } from '../../../types/model/SelectionSet';
+import type { SelectionSet } from '../../../types/model/SelectionSet.js';
 
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.js';
 
-import { tracksToRepresentation } from './tracksToRepresentation.ts';
+import { tracksToRepresentation } from './tracksToRepresentation.js';
 
-import { getFrameRate } from './utils/getFrameRate.ts';
+import { getFrameRate } from './utils/getFrameRate.js';
 
 export function selectionSetsToAdaptationSet(
 	selectionsSets: SelectionSet[],

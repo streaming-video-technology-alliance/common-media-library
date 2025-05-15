@@ -1,6 +1,6 @@
-import type { SfBareItem } from './SfBareItem';
-import type { SfInnerList } from './SfInnerList';
-import type { SfItem } from './SfItem';
+import type { SfBareItem } from './SfBareItem.js';
+import type { SfInnerList } from './SfInnerList.js';
+import type { SfItem } from './SfItem.js';
 
 /**
  * A member of a structured field.

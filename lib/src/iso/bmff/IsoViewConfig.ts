@@ -1,4 +1,4 @@
-import type { BoxParserMap } from './BoxParserMap';
+import type { BoxParserMap } from './BoxParserMap.js';
 
 /**
  * ISO View configuration

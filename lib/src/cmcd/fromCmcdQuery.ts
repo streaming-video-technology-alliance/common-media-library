@@ -1,6 +1,6 @@
-import type { Cmcd } from './Cmcd';
-import { CMCD_PARAM } from './CMCD_PARAM.ts';
-import { decodeCmcd } from './decodeCmcd.ts';
+import type { Cmcd } from './Cmcd.js';
+import { CMCD_PARAM } from './CMCD_PARAM.js';
+import { decodeCmcd } from './decodeCmcd.js';
 
 /**
  * Decode CMCD data from a query string.

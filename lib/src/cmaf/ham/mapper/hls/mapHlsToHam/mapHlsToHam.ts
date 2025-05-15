@@ -1,14 +1,14 @@
-import type { Presentation } from '../../../types/model/Presentation';
-import type { SelectionSet } from '../../../types/model/SelectionSet';
+import type { Presentation } from '../../../types/model/Presentation.js';
+import type { SelectionSet } from '../../../types/model/SelectionSet.js';
 
-import type { Manifest } from '../../../types/manifest/Manifest';
+import type { Manifest } from '../../../types/manifest/Manifest.js';
 
-import { audioGroupsToSwitchingSets } from './audioGroupsToSwitchingSets.ts';
-import { subtitleGroupsToSwitchingSets } from './subtitleGroupsToSwitchingSets.ts';
-import { videoPlaylistsToSwitchingSets } from './videoPlaylistsToSwitchingSets.ts';
+import { audioGroupsToSwitchingSets } from './audioGroupsToSwitchingSets.js';
+import { subtitleGroupsToSwitchingSets } from './subtitleGroupsToSwitchingSets.js';
+import { videoPlaylistsToSwitchingSets } from './videoPlaylistsToSwitchingSets.js';
 
-import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts';
-import { addMetadataToHls } from '../../../utils/manifest/addMetadataToHls.ts';
+import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.js';
+import { addMetadataToHls } from '../../../utils/manifest/addMetadataToHls.js';
 
 export function mapHlsToHam(manifest: Manifest): Presentation[] {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest);

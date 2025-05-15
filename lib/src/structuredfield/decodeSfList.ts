@@ -1,8 +1,8 @@
-import type { SfDecodeOptions } from './SfDecodeOptions';
-import type { SfMember } from './SfMember';
-import { parseError } from './parse/parseError.ts';
-import { parseList } from './parse/parseList.ts';
-import { LIST } from './utils/LIST.ts';
+import type { SfDecodeOptions } from './SfDecodeOptions.js';
+import type { SfMember } from './SfMember.js';
+import { parseError } from './parse/parseError.js';
+import { parseList } from './parse/parseList.js';
+import { LIST } from './utils/LIST.js';
 
 /**
  * Decode a structured field string into a structured field list

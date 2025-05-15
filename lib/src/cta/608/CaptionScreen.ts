@@ -36,12 +36,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CaptionsLogger } from './CaptionsLogger.ts';
-import type { PACData } from './PACData';
-import type { PenStyles } from './PenStyles';
-import { Row } from './Row.ts';
-import { NR_ROWS } from './utils/NR_ROWS.ts';
-import { VerboseLevel } from './VerboseLevel.ts';
+import { CaptionsLogger } from './CaptionsLogger.js';
+import type { PACData } from './PACData.js';
+import type { PenStyles } from './PenStyles.js';
+import { Row } from './Row.js';
+import { NR_ROWS } from './utils/NR_ROWS.js';
+import { VerboseLevel } from './VerboseLevel.js';
 
 /**
  * Keep a CTA-608 screen of 32x15 styled characters

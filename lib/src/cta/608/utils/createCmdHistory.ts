@@ -1,4 +1,4 @@
-import type { CmdHistory } from '../CmdHistory';
+import type { CmdHistory } from '../CmdHistory.js';
 
 export function createCmdHistory(): CmdHistory {
 	return {

@@ -1,4 +1,4 @@
-import type { ContentProtection } from '../common/ContentProtection';
+import type { ContentProtection } from '../common/ContentProtection.js';
 
 /**
  * Parse a standard common encryption PSSH which contains a simple

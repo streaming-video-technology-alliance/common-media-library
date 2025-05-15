@@ -1,7 +1,7 @@
-import type { SfToken } from '../structuredfield/SfToken';
-import type { CmcdObjectType } from './CmcdObjectType';
-import type { CmcdStreamType } from './CmcdStreamType';
-import type { CmcdStreamingFormat } from './CmcdStreamingFormat';
+import type { SfToken } from '../structuredfield/SfToken.js';
+import type { CmcdObjectType } from './CmcdObjectType.js';
+import type { CmcdStreamType } from './CmcdStreamType.js';
+import type { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 
 /**
  * CMCD Value

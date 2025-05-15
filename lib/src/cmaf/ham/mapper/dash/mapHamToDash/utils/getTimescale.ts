@@ -1,5 +1,5 @@
-import type { AudioTrack } from '../../../../types/model/AudioTrack';
-import type { Track } from '../../../../types/model/Track';
+import type { AudioTrack } from '../../../../types/model/AudioTrack.js';
+import type { Track } from '../../../../types/model/Track.js';
 
 import {
 	TEXT_SAMPLE_RATE,

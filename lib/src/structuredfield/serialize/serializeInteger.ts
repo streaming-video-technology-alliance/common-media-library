@@ -1,6 +1,6 @@
-import { INTEGER } from '../utils/INTEGER.ts';
-import { isInvalidInt } from '../utils/isInvalidInt.ts';
-import { serializeError } from './serializeError.ts';
+import { INTEGER } from '../utils/INTEGER.js';
+import { isInvalidInt } from '../utils/isInvalidInt.js';
+import { serializeError } from './serializeError.js';
 
 // 4.1.4.  Serializing an Integer
 //

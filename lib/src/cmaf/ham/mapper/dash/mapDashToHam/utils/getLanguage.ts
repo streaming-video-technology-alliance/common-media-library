@@ -1,4 +1,4 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.js';
 
 /**
  * @internal
