@@ -204,7 +204,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 					pos--;
 				}
 
-				attributes[name] = value;
+				attributes[name] = unescapeHtml(value);
 			}
 			pos++;
 		}
