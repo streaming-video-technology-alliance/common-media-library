@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The `parseXml` function does not decode HTML entities in attribute values
+  ([#187](https://github.com/streaming-video-technology-alliance/common-media-library/issues/187))
+
 ## [0.12.2] - 2025-05-15
 
 ### Fixed

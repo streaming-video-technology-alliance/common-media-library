@@ -52,6 +52,7 @@ describe('parseXml', () => {
 
 		const htmlEntities = root.childNodes[1];
 		equal(htmlEntities.childNodes[0].nodeValue, `&,<,>,",',\u{a0},\u{200e},\u{200f}`);
+		equal(htmlEntities.attributes['test'], `&,<,>,",',\u{a0},\u{200e},\u{200f}`);
 
 		const namespace = root.childNodes[2];
 		equal(namespace.nodeName, `tt:Text`);
