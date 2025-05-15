@@ -21,7 +21,7 @@ type CmcdData = Record<string, string | number | boolean>;
 *
 * @param cmcdData - The CMCD data object.
 *
-* @returns Updated list of keys v1 keys.
+* @returns Updated list of v1 keys.
 *
 * @group CMCD
 *
