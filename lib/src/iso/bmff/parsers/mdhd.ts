@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox';
-import type { IsoView } from '../IsoView';
+import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box

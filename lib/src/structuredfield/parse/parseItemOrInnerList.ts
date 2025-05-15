@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions';
-import type { SfInnerList } from '../SfInnerList';
-import type { SfItem } from '../SfItem';
-import type { ParsedValue } from './ParsedValue';
-import { parseInnerList } from './parseInnerList.ts';
-import { parseItem } from './parseItem.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import type { SfInnerList } from '../SfInnerList.js';
+import type { SfItem } from '../SfItem.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parseInnerList } from './parseInnerList.js';
+import { parseItem } from './parseItem.js';
 
 // 4.2.1.1.  Parsing an Item or Inner List
 //

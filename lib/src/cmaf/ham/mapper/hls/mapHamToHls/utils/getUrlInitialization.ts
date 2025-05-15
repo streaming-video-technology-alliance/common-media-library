@@ -1,10 +1,10 @@
-import type { AudioTrack } from '../../../../types/model/AudioTrack';
-import type { VideoTrack } from '../../../../types/model/VideoTrack';
+import type { AudioTrack } from '../../../../types/model/AudioTrack.js';
+import type { VideoTrack } from '../../../../types/model/VideoTrack.js';
 
 import {
 	WHITE_SPACE,
 	WHITE_SPACE_ENCODED,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.js';
 
 /**
  * @internal

@@ -1,4 +1,4 @@
-import type { Period } from '../../../../types/mapper/dash/Period';
+import type { Period } from '../../../../types/mapper/dash/Period.js';
 
 /**
  * @internal

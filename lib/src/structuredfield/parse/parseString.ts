@@ -1,8 +1,8 @@
-import { STRING } from '../utils/STRING.ts';
-import { STRING_REGEX } from '../utils/STRING_REGEX.ts';
-import type { ParsedValue } from './ParsedValue';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import { STRING } from '../utils/STRING.js';
+import { STRING_REGEX } from '../utils/STRING_REGEX.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
+import { parseError } from './parseError.js';
 
 // 4.2.5.  Parsing a String
 //

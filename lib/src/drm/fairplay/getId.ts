@@ -1,4 +1,4 @@
-import { extractContentId } from './extractContentId.ts';
+import { extractContentId } from './extractContentId.js';
 
 /**
  * Extracts the content ID from the license server URL or InitData.
@@ -10,7 +10,7 @@ import { extractContentId } from './extractContentId.ts';
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
  * {@includeCode ../../../test/drm/fairplay/getId.test.ts#example}
  */
@@ -20,9 +20,9 @@ export function getId(licenseServerUrl: string, initData: Uint16Array, queryPara
 		const url = new URL(licenseServerUrl);
 		const params = new URLSearchParams(url.search);
 		return params.get(queryParam) || extractContentId(initData);
-	} 
+	}
 	catch {
-		// in case if URL parsing fails, 
+		// in case if URL parsing fails,
 		// fallback to extracting from initData
 		return extractContentId(initData);
 	}

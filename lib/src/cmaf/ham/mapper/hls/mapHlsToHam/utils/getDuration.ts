@@ -1,5 +1,5 @@
-import type { HlsManifest } from '../../../../types/mapper/hls/HlsManifest';
-import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls';
+import type { HlsManifest } from '../../../../types/mapper/hls/HlsManifest.js';
+import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.js';
 
 /**
  * @internal

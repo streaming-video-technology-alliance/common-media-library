@@ -1,7 +1,7 @@
-import { encodeSfDict } from '../structuredfield/encodeSfDict.ts';
-import type { CmsdEncodeOptions } from './CmsdEncodeOptions';
-import type { CmsdStatic } from './CmsdStatic';
-import { processCmsd } from './utils/processCmsd.ts';
+import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
+import type { CmsdEncodeOptions } from './CmsdEncodeOptions.js';
+import type { CmsdStatic } from './CmsdStatic.js';
+import { processCmsd } from './utils/processCmsd.js';
 
 /**
  * Encode a CMSD Static object.

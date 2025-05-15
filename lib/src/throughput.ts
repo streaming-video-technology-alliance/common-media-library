@@ -1,1 +1,1 @@
-export type { ThroughputEstimator } from './throughput/ThroughputEstimator.ts';
+export type { ThroughputEstimator } from './throughput/ThroughputEstimator.js';

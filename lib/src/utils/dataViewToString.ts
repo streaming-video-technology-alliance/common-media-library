@@ -1,5 +1,5 @@
-import type { Encoding } from './Encoding.ts';
-import { UTF_8 } from './UTF_8.ts';
+import type { Encoding } from './Encoding.js';
+import { UTF_8 } from './UTF_8.js';
 
 /**
  * Converts a DataView to a string.

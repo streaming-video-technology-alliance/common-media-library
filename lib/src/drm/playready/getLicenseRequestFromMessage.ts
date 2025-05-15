@@ -1,11 +1,11 @@
-import type { Encoding } from '../../utils/Encoding.ts';
-import { UTF_16 } from '../../utils/UTF_16.ts';
-import { arrayBufferToString } from '../../utils/arrayBufferToString.ts';
-import { base64decode } from '../../utils/base64decode.ts';
-import { getElementsByName } from '../../xml/getElementsByName.ts';
-import { parseXml } from '../../xml/parseXml.ts';
-import { CHALLENGE } from '../common/CHALLENGE.ts';
-import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.ts';
+import type { Encoding } from '../../utils/Encoding.js';
+import { UTF_16 } from '../../utils/UTF_16.js';
+import { arrayBufferToString } from '../../utils/arrayBufferToString.js';
+import { base64decode } from '../../utils/base64decode.js';
+import { getElementsByName } from '../../xml/getElementsByName.js';
+import { parseXml } from '../../xml/parseXml.js';
+import { CHALLENGE } from '../common/CHALLENGE.js';
+import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.js';
 
 /**
  * Gets the PlayReady license request from the MediaKeyMessageEvent.

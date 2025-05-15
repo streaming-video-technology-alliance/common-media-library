@@ -1,9 +1,9 @@
-import type { AudioChannelConfiguration } from './AudioChannelConfiguration';
-import type { ContentComponent } from './ContentComponent';
-import type { Representation } from './Representation';
-import type { Role } from './Role';
-import type { SegmentList } from './SegmentList';
-import type { SegmentTemplate } from './SegmentTemplate';
+import type { AudioChannelConfiguration } from './AudioChannelConfiguration.js';
+import type { ContentComponent } from './ContentComponent.js';
+import type { Representation } from './Representation.js';
+import type { Role } from './Role.js';
+import type { SegmentList } from './SegmentList.js';
+import type { SegmentTemplate } from './SegmentTemplate.js';
 
 /**
  * DASH Adaptation Set

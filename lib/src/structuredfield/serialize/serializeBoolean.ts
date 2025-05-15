@@ -1,5 +1,5 @@
-import { BOOLEAN } from '../utils/BOOLEAN.ts';
-import { serializeError } from './serializeError.ts';
+import { BOOLEAN } from '../utils/BOOLEAN.js';
+import { serializeError } from './serializeError.js';
 
 // 4.1.9.  Serializing a Boolean
 //

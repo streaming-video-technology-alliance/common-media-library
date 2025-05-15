@@ -1,5 +1,5 @@
-import type { ValueOf } from '../../utils/ValueOf.ts';
-import type { MediaKeyMessageType } from './MediaKeyMessageType.ts';
+import type { ValueOf } from '../../utils/ValueOf.js';
+import type { MediaKeyMessageType } from './MediaKeyMessageType.js';
 
 /**
  * Represents a DRM key message for license requests.

@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { VerboseLevel } from './VerboseLevel.ts';
+import { VerboseLevel } from './VerboseLevel.js';
 
 /**
  * CaptionsLogger. To be removed in the future.

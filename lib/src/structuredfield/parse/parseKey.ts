@@ -1,7 +1,7 @@
-import { KEY } from '../utils/KEY.ts';
-import type { ParsedValue } from './ParsedValue';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import { KEY } from '../utils/KEY.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
+import { parseError } from './parseError.js';
 
 // 4.2.3.3.  Parsing a Key
 //

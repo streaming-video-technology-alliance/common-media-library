@@ -1,9 +1,9 @@
-import type { ValueOf } from '../../utils/ValueOf.ts';
-import { HW_SECURE_ALL } from './HW_SECURE_ALL.ts';
-import { HW_SECURE_CRYPTO } from './HW_SECURE_CRYPTO.ts';
-import { HW_SECURE_DECODE } from './HW_SECURE_DECODE.ts';
-import { SW_SECURE_CRYPTO } from './SW_SECURE_CRYPTO.ts';
-import { SW_SECURE_DECODE } from './SW_SECURE_DECODE.ts';
+import type { ValueOf } from '../../utils/ValueOf.js';
+import { HW_SECURE_ALL } from './HW_SECURE_ALL.js';
+import { HW_SECURE_CRYPTO } from './HW_SECURE_CRYPTO.js';
+import { HW_SECURE_DECODE } from './HW_SECURE_DECODE.js';
+import { SW_SECURE_CRYPTO } from './SW_SECURE_CRYPTO.js';
+import { SW_SECURE_DECODE } from './SW_SECURE_DECODE.js';
 
 /**
  * Widevine Robustness.

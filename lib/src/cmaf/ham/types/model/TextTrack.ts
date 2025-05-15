@@ -1,4 +1,4 @@
-import type { Track } from './Track';
+import type { Track } from './Track.js';
 
 /**
  * CMAF-HAM Text Track type

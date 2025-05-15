@@ -1,11 +1,11 @@
-import type { Representation } from '../../../types/mapper/dash/Representation';
-import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate';
+import type { Representation } from '../../../types/mapper/dash/Representation.js';
+import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate.js';
 
-import type { Segment } from '../../../types/model/Segment';
+import type { Segment } from '../../../types/model/Segment.js';
 
-import { calculateDuration } from './utils/calculateDuration.ts';
-import { getNumberOfSegments } from './utils/getNumberOfSegments.ts';
-import { getUrlFromTemplate } from './utils/getUrlFromTemplate.ts';
+import { calculateDuration } from './utils/calculateDuration.js';
+import { getNumberOfSegments } from './utils/getNumberOfSegments.js';
+import { getUrlFromTemplate } from './utils/getUrlFromTemplate.js';
 
 /**
  * @internal

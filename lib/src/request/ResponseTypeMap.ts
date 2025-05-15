@@ -1,4 +1,4 @@
-import type { XmlNode } from '../xml/XmlNode';
+import type { XmlNode } from '../xml/XmlNode.js';
 
 /**
  * The a request's `responseType` to the corresponding data type.

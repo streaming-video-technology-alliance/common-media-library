@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions';
-import type { SfParameters } from '../SfParameters';
-import type { ParsedValue } from './ParsedValue';
-import { parsedValue } from './ParsedValue.ts';
-import { parseBareItem } from './parseBareItem.ts';
-import { parseKey } from './parseKey.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import type { SfParameters } from '../SfParameters.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
+import { parseBareItem } from './parseBareItem.js';
+import { parseKey } from './parseKey.js';
 
 // 4.2.3.2.  Parsing Parameters
 //

@@ -1,5 +1,5 @@
-import type { Cmcd } from '../cmcd/Cmcd';
-import type { RequestType } from './RequestType';
+import type { Cmcd } from '../cmcd/Cmcd.js';
+import type { RequestType } from './RequestType.js';
 
 /**
  * Common request API.

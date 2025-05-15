@@ -1,6 +1,6 @@
-import type { Ham } from './Ham';
-import type { Segment } from './Segment';
-import type { TrackType } from './TrackType';
+import type { Ham } from './Ham.js';
+import type { Segment } from './Segment.js';
+import type { TrackType } from './TrackType.js';
 
 /**
  * CMAF-HAM Track type

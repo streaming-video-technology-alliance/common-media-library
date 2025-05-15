@@ -1,5 +1,5 @@
-import type { KeySystemConfiguration } from '../common/KeySystemConfiguration';
-import type { MediaCapability } from '../common/MediaCapability';
+import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.js';
+import type { MediaCapability } from '../common/MediaCapability.js';
 
 /**
  * Creates a valid KeySystemConfiguration from supported audio and video capabilities.

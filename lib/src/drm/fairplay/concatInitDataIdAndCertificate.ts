@@ -1,4 +1,4 @@
-import { stringToUint16 } from '../../utils/stringToUint16.ts';
+import { stringToUint16 } from '../../utils/stringToUint16.js';
 
 /**
  * Concatenates InitData, ID, and Certificate for FairPlay DRM.
@@ -10,7 +10,7 @@ import { stringToUint16 } from '../../utils/stringToUint16.ts';
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
  * {@includeCode ../../../test/drm/fairplay/concatInitDataIdAndCertificate.test.ts#example}
  */
