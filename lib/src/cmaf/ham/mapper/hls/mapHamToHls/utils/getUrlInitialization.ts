@@ -4,7 +4,7 @@ import type { VideoTrack } from '../../../../types/model/VideoTrack.js';
 import {
 	WHITE_SPACE,
 	WHITE_SPACE_ENCODED,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.js';
 
 /**
  * @internal

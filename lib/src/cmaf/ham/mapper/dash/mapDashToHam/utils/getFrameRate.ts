@@ -9,7 +9,7 @@ import {
 	FRAME_RATE_SEPARATOR,
 	NUMERATOR,
 	ZERO,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.js';
 
 /**
  * @internal

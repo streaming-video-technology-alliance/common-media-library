@@ -3,20 +3,20 @@
  *
  * @packageDocumentation
  */
-export { CMSD_DYNAMIC } from './cmsd/CMSD_DYNAMIC.ts';
-export { CMSD_STATIC } from './cmsd/CMSD_STATIC.ts';
-export { CMSD_V1 } from './cmsd/CMSD_V1.ts';
-export type { CmsdCustomKey } from './cmsd/CmsdCustomKey.ts';
-export type { CmsdDynamic } from './cmsd/CmsdDynamic.ts';
-export type { CmsdDynamicParams } from './cmsd/CmsdDynamicParams.ts';
-export type { CmsdEncodeOptions } from './cmsd/CmsdEncodeOptions.ts';
-export { CmsdHeaderField } from './cmsd/CmsdHeaderField.ts';
-export { CmsdObjectType } from './cmsd/CmsdObjectType.ts';
-export type { CmsdStatic } from './cmsd/CmsdStatic.ts';
-export { CmsdStreamType } from './cmsd/CmsdStreamType.ts';
-export { CmsdStreamingFormat } from './cmsd/CmsdStreamingFormat.ts';
-export type { CmsdValue } from './cmsd/CmsdValue.ts';
-export { decodeCmsdDynamic } from './cmsd/decodeCmsdDynamic.ts';
-export { decodeCmsdStatic } from './cmsd/decodeCmsdStatic.ts';
-export { encodeCmsdDynamic } from './cmsd/encodeCmsdDynamic.ts';
-export { encodeCmsdStatic } from './cmsd/encodeCmsdStatic.ts';
+export { CMSD_DYNAMIC } from './cmsd/CMSD_DYNAMIC.js';
+export { CMSD_STATIC } from './cmsd/CMSD_STATIC.js';
+export { CMSD_V1 } from './cmsd/CMSD_V1.js';
+export type { CmsdCustomKey } from './cmsd/CmsdCustomKey.js';
+export type { CmsdDynamic } from './cmsd/CmsdDynamic.js';
+export type { CmsdDynamicParams } from './cmsd/CmsdDynamicParams.js';
+export type { CmsdEncodeOptions } from './cmsd/CmsdEncodeOptions.js';
+export { CmsdHeaderField } from './cmsd/CmsdHeaderField.js';
+export { CmsdObjectType } from './cmsd/CmsdObjectType.js';
+export type { CmsdStatic } from './cmsd/CmsdStatic.js';
+export { CmsdStreamingFormat } from './cmsd/CmsdStreamingFormat.js';
+export { CmsdStreamType } from './cmsd/CmsdStreamType.js';
+export type { CmsdValue } from './cmsd/CmsdValue.js';
+export { decodeCmsdDynamic } from './cmsd/decodeCmsdDynamic.js';
+export { decodeCmsdStatic } from './cmsd/decodeCmsdStatic.js';
+export { encodeCmsdDynamic } from './cmsd/encodeCmsdDynamic.js';
+export { encodeCmsdStatic } from './cmsd/encodeCmsdStatic.js';

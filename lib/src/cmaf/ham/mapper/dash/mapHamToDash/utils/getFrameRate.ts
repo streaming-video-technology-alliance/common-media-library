@@ -4,7 +4,7 @@ import type { VideoTrack } from '../../../../types/model/VideoTrack.js';
 import {
 	FRAME_RATE_NUMERATOR_30,
 	ZERO,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.js';
 
 
 /**

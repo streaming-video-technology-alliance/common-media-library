@@ -5,7 +5,7 @@ import {
 	HYPHEN_MINUS_SEPARATOR,
 	WHITE_SPACE,
 	WHITE_SPACE_ENCODED,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.js';
 
 /**
  * @internal
