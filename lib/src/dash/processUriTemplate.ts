@@ -8,7 +8,7 @@ const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]
  * @param number - Number.
  * @param subNumber - Sub-number.
  * @param bandwidth - Bandwidth.
- * @param time - Time.
+ * @param time - Time. If the value is larger than MAX_SAFE_INTEGER, it should be provided as a string.
  *
  * @returns Processed URI template.
  *
@@ -50,7 +50,11 @@ export function processUriTemplate(
 				break;
 
 			case 'Time':
-				value = (typeof time === 'number') ? Math.round(time) : time;
+				if (typeof time === 'string') {
+					return time;
+				}
+
+				value = time ? Math.round(time) : time;
 				break;
 
 			default:
