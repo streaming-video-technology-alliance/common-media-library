@@ -1332,7 +1332,7 @@ export type Presentation = Ham & {
 export function prft(view: IsoView): ProducerReferenceTimeBox;
 
 // @beta
-export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: number | null | undefined): string;
+export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: string | number | null | undefined): string;
 
 // @beta
 export type ProducerReferenceTimeBox = FullBox & {
