@@ -24,7 +24,7 @@ export function processUriTemplate(
 	number: number | null | undefined,
 	subNumber: number | null | undefined,
 	bandwidth: number | null | undefined,
-	time: number | null | undefined,
+	time: string | number | null | undefined,
 ): string {
 	const uri = uriTemplate.replace(TOKENS, (match, name, widthStr, format) => {
 		let value: string | number | null | undefined;
@@ -50,7 +50,7 @@ export function processUriTemplate(
 				break;
 
 			case 'Time':
-				value = time ? Math.round(time) : time;
+				value = (typeof time === 'number') ? Math.round(time) : time;
 				break;
 
 			default:
