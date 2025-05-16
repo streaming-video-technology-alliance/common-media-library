@@ -8,7 +8,7 @@ const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]
  * @param number - Number.
  * @param subNumber - Sub-number.
  * @param bandwidth - Bandwidth.
- * @param time - Time. If the value is larger than MAX_SAFE_INTEGER, it should be provided as a string.
+ * @param time - Time. Should be passed as a number unless the value is larger than `MAX_SAFE_INTEGER`, it should be provided as a string. If the value is a string all format tags will be ignored.
  *
  * @returns Processed URI template.
  *
