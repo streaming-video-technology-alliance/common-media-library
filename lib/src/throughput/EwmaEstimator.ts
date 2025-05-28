@@ -1,11 +1,7 @@
 import type { ResourceTiming } from '../request/ResourceTiming'
 import { Ewma } from './Ewma';
+import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions';
 import type { ThroughputEstimator } from './ThroughputEstimator'
-
-type EwmaEstimatorOptions = {
-	fastHalfLife: number;
-	slowHalfLife: number;
-}
 
 /**
  * Exponential Weighted Moving Average (EWMA) throughput estimator based on 2 half-lives
