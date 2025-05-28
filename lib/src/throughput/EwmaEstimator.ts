@@ -1,7 +1,7 @@
-import type { ResourceTiming } from '../request/ResourceTiming.ts';
-import { Ewma } from './Ewma.ts';
-import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions.ts';
-import type { ThroughputEstimator } from './ThroughputEstimator.ts';
+import type { ResourceTiming } from '../request/ResourceTiming.js';
+import { Ewma } from './Ewma.js';
+import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions.js';
+import type { ThroughputEstimator } from './ThroughputEstimator.js';
 
 /**
  * Exponential Weighted Moving Average (EWMA) throughput estimator based on 2 half-lives

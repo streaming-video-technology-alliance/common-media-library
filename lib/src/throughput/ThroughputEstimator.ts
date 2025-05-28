@@ -1,4 +1,4 @@
-import type { ResourceTiming } from '../request/ResourceTiming.ts';
+import type { ResourceTiming } from '../request/ResourceTiming.js';
 
 /**
  * Throughput Estimator.

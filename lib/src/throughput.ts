@@ -1,3 +1,3 @@
-export type { ThroughputEstimator } from './throughput/ThroughputEstimator.ts';
-export { Ewma } from './throughput/Ewma.ts';
-export { EwmaEstimator } from './throughput/EwmaEstimator.ts';
+export type { ThroughputEstimator } from './throughput/ThroughputEstimator.js';
+export { Ewma } from './throughput/Ewma.js';
+export { EwmaEstimator } from './throughput/EwmaEstimator.js';
