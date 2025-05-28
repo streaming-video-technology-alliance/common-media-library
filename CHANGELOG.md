@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added EWMA Throughput Calculations ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
+
 ## [0.12.4] - 2025-05-16
 
 ### Fixed
@@ -65,8 +69,6 @@ and this project adheres to
   ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
 - Core DRM Utilities - CommonEncryption, KeySystemUtils
   ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
-- Added Throughput Calculation Interfaces ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
-- Added EWMA Throughput Calculations ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
 
 ### Changed
 
