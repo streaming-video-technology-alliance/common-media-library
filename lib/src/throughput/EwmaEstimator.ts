@@ -1,7 +1,7 @@
-import type { ResourceTiming } from '../request/ResourceTiming'
+import type { ResourceTiming } from '../request/ResourceTiming';
 import { Ewma } from './Ewma';
 import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions';
-import type { ThroughputEstimator } from './ThroughputEstimator'
+import type { ThroughputEstimator } from './ThroughputEstimator';
 
 /**
  * Exponential Weighted Moving Average (EWMA) throughput estimator based on 2 half-lives
@@ -11,12 +11,12 @@ import type { ThroughputEstimator } from './ThroughputEstimator'
  * @beta
  */
 export class EwmaEstimator implements ThroughputEstimator {
-	private fastEwma: Ewma
-	private slowEwma: Ewma
+	private fastEwma: Ewma;
+	private slowEwma: Ewma;
 
 	public constructor(options: EwmaEstimatorOptions) {
-		this.slowEwma = new Ewma(options.slowHalfLife)
-		this.fastEwma = new Ewma(options.fastHalfLife)
+		this.slowEwma = new Ewma(options.slowHalfLife);
+		this.fastEwma = new Ewma(options.fastHalfLife);
 	}
 
 	public sample(sample: ResourceTiming): void {
@@ -26,11 +26,11 @@ export class EwmaEstimator implements ThroughputEstimator {
 		// 1. If `sample.encodedBodySize` is NaN or Infinity, don't do anything
 		// TODO: hls.js
 		// 1. If `durationSeconds` is less than `this.minDelayMs_`, make it `this.minDelayMs_` (default is 50ms)
-		const durationSeconds = sample.duration / 1000
-		const bandwidthBps = sample.encodedBodySize * 8 / durationSeconds
+		const durationSeconds = sample.duration / 1000;
+		const bandwidthBps = sample.encodedBodySize * 8 / durationSeconds;
 
-		this.slowEwma.sample(durationSeconds, bandwidthBps)
-		this.fastEwma.sample(durationSeconds, bandwidthBps)
+		this.slowEwma.sample(durationSeconds, bandwidthBps);
+		this.fastEwma.sample(durationSeconds, bandwidthBps);
 	}
 
 	public getEstimate(): number {
@@ -44,7 +44,7 @@ export class EwmaEstimator implements ThroughputEstimator {
 		// TODO: hls.js
 		// 1. Returns `defaultEstimate` for this.totalDuration < `this.minDuration`
 		// 1.1. Returns `config.abrEwmaDefaultEstimate` (default: 500 kbps)
-		return Math.min(this.fastEwma.getEstimate(), this.slowEwma.getEstimate())
+		return Math.min(this.fastEwma.getEstimate(), this.slowEwma.getEstimate());
 	}
 
 	public canEstimate(): boolean {
