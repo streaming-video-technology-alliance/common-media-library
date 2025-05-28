@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.ts';
-import type { IsoView } from '../IsoView';
+import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
 /**
  * Track fragment random access entry

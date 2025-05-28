@@ -1,7 +1,7 @@
-import type { Track } from '../../types/model/Track.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { Track } from '../../types/model/Track.js';
+import type { Validation } from '../../types/Validation.js';
 
-import { validateTrack } from './validateTrack.ts';
+import { validateTrack } from './validateTrack.js';
 
 /**
  * Validate a list of tracks.

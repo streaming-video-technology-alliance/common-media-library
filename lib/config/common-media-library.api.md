@@ -49,6 +49,9 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 // @beta
 export function ardi(view: IsoView): AudioRenderingIndicationBox;
 
+// @beta
+export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
+
 // @alpha
 export type AudioChannelConfiguration = {
     $: {
@@ -176,6 +179,9 @@ export const CBCS = "cbcs";
 
 // @beta
 export const CENC = "cenc";
+
+// @beta
+export const CHALLENGE = "Challenge";
 
 // @beta
 export const CLEAR_KEY_SYSTEM = "org.w3.clearkey";
@@ -436,6 +442,9 @@ export type CompositionTimeToSampleEntry = {
 // @beta
 export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array;
 
+// @beta
+export const CONTENT_TYPE = "Content-Type";
+
 // @alpha (undocumented)
 export type ContentComponent = {
     $: {
@@ -558,6 +567,9 @@ export type DataReferenceBox = FullBox & {
 };
 
 // @beta
+export function dataViewToString(dataView: DataView, encoding?: Encoding): string;
+
+// @beta
 export function decodeCmcd(cmcd: string): Cmcd;
 
 // @beta
@@ -657,10 +669,22 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // @beta
-export const ENCRYPTION_SCHEME: {
+export const Encoding: {
+    readonly UTF8: typeof UTF_8;
+    readonly UTF16: typeof UTF_16;
+};
+
+// @beta
+export type Encoding = ValueOf<typeof Encoding>;
+
+// @beta
+export const EncryptionScheme: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
 };
+
+// @beta
+export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;
 
 // @beta
 export const encv: BoxParser<VisualSampleEntry>;
@@ -695,6 +719,9 @@ export function extractContentId(initData: Uint16Array): string;
 
 // @beta
 export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
+
+// @beta
+export const FAIRPLAY_KEY_SYSTEM = "com.apple.fps.1_0";
 
 // @beta
 export type FileTypeBox = TypeBox;
@@ -750,6 +777,9 @@ export type FullBox = {
 };
 
 // @beta
+export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
+
+// @beta
 export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam?: string): string;
 
 // Warning: (ae-internal-missing-underscore) The name "getId3Data" should be prefixed with an underscore because the declaration is marked as @internal
@@ -776,6 +806,9 @@ export function getLegacyKeySystemAccess(ksConfigurations: {
 }[]): KeySystemAccess | null;
 
 // @beta
+export function getLicenseRequestFromMessage(message: ArrayBuffer, encoding?: Encoding): ArrayBuffer;
+
+// @beta
 export function getLicenseServerUrl(initData: Uint16Array): string;
 
 // @beta
@@ -786,6 +819,9 @@ export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
 
 // @beta
 export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
+
+// @beta
+export function getRequestHeadersFromMessage(message: ArrayBuffer, encoding?: typeof UTF_8 | typeof UTF_16): Record<string, string>;
 
 // @beta
 export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
@@ -839,6 +875,9 @@ export type HlsManifest = {
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @beta
+export const HTTP_HEADERS = "HttpHeaders";
+
+// @beta
 export function hvc1(view: IsoView): VisualSampleEntry;
 
 // @beta
@@ -849,6 +888,9 @@ export const HW_SECURE_CRYPTO = "HW_SECURE_CRYPTO";
 
 // @beta
 export const HW_SECURE_DECODE = "HW_SECURE_DECODE";
+
+// @beta
+export const ID3_SCHEME_ID_URI = "https://aomedia.org/emsg/ID3";
 
 // @beta
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
@@ -874,12 +916,15 @@ export type Initialization = {
 };
 
 // @beta
-export const INITIALIZATION_DATA_TYPE: {
+export const InitializationDataType: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
     readonly KEYIDS: typeof KEYIDS;
     readonly WEBM: typeof WEBM;
 };
+
+// @beta
+export type InitializationDataType = ValueOf<typeof InitializationDataType>;
 
 // @beta
 export const INT = "int";
@@ -957,7 +1002,7 @@ export type KeyMessage = {
     sessionId?: string;
     message: ArrayBuffer;
     defaultUrl?: string;
-    messageType: ValueOf<typeof MEDIA_KEY_MESSAGE_TYPES>;
+    messageType: ValueOf<typeof MediaKeyMessageType_2>;
 };
 
 // @beta
@@ -996,6 +1041,9 @@ export type LabelBox = FullBox & {
 
 // @beta
 export function labl(view: IsoView): LabelBox;
+
+// @beta
+export const LICENSE_ACQUISITION = "LicenseAcquisition";
 
 // @beta
 export const LICENSE_RELEASE = "license-release";
@@ -1037,25 +1085,6 @@ export function mdat(view: IsoView): MediaDataBox;
 export function mdhd(view: IsoView): MediaHeaderBox;
 
 // @beta
-export const MEDIA_KEY_MESSAGE_TYPES: {
-    readonly LICENSE_REQUEST: typeof LICENSE_REQUEST;
-    readonly LICENSE_RENEWAL: typeof LICENSE_RENEWAL;
-    readonly LICENSE_RELEASE: typeof LICENSE_RELEASE;
-    readonly INDIVIDUALIZATION_REQUEST: typeof INDIVIDUALIZATION_REQUEST;
-};
-
-// @beta
-export const MEDIA_KEY_STATUSES: {
-    readonly USABLE: typeof USABLE;
-    readonly EXPIRED: typeof EXPIRED;
-    readonly RELEASED: typeof RELEASED;
-    readonly OUTPUT_RESTRICTED: typeof OUTPUT_RESTRICTED;
-    readonly OUTPUT_DOWNSCALED: typeof OUTPUT_DOWNSCALED;
-    readonly STATUS_PENDING: typeof STATUS_PENDING;
-    readonly INTERNAL_ERROR: typeof INTERNAL_ERROR;
-};
-
-// @beta
 export type MediaCapability = {
     contentType: string;
     robustness: string;
@@ -1094,6 +1123,33 @@ export type MediaHeaderBox = FullBox & {
     language: string;
     preDefined: number;
 };
+
+// @beta
+const MediaKeyMessageType_2: {
+    readonly LICENSE_REQUEST: typeof LICENSE_REQUEST;
+    readonly LICENSE_RENEWAL: typeof LICENSE_RENEWAL;
+    readonly LICENSE_RELEASE: typeof LICENSE_RELEASE;
+    readonly INDIVIDUALIZATION_REQUEST: typeof INDIVIDUALIZATION_REQUEST;
+};
+
+// @beta
+type MediaKeyMessageType_2 = ValueOf<typeof MediaKeyMessageType_2>;
+export { MediaKeyMessageType_2 as MediaKeyMessageType }
+
+// @beta
+const MediaKeyStatus_2: {
+    readonly USABLE: typeof USABLE;
+    readonly EXPIRED: typeof EXPIRED;
+    readonly RELEASED: typeof RELEASED;
+    readonly OUTPUT_RESTRICTED: typeof OUTPUT_RESTRICTED;
+    readonly OUTPUT_DOWNSCALED: typeof OUTPUT_DOWNSCALED;
+    readonly STATUS_PENDING: typeof STATUS_PENDING;
+    readonly INTERNAL_ERROR: typeof INTERNAL_ERROR;
+};
+
+// @beta
+type MediaKeyStatus_2 = ValueOf<typeof MediaKeyStatus_2>;
+export { MediaKeyStatus_2 as MediaKeyStatus }
 
 // @beta
 export function mehd(view: IsoView): MovieExtendsHeaderBox;
@@ -1246,6 +1302,9 @@ export type PlayList = {
 };
 
 // @beta
+export const PLAYREADY_KEY_MESSAGE = "PlayReadyKeyMessage";
+
+// @beta
 export const PLAYREADY_KEY_SYSTEM = "com.microsoft.playready";
 
 // @beta
@@ -1273,7 +1332,7 @@ export type Presentation = Ham & {
 export function prft(view: IsoView): ProducerReferenceTimeBox;
 
 // @beta
-export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: number | null | undefined): string;
+export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: string | number | null | undefined): string;
 
 // @beta
 export type ProducerReferenceTimeBox = FullBox & {
@@ -1751,6 +1810,9 @@ export const TEMPLATE = "template";
 // @beta
 export function tenc(view: IsoView): TrackEncryptionBox;
 
+// @beta
+export const TEXT_XML_UTF8 = "text/xml; charset=utf-8";
+
 // @alpha
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
@@ -1937,6 +1999,12 @@ export const UTF8 = "utf8";
 export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 
 // @beta
+export const UTF_16 = "utf-16";
+
+// @beta
+export const UTF_8 = "utf-8";
+
+// @beta
 export function uuid(): string;
 
 // @alpha
@@ -2066,7 +2134,10 @@ export type WebVTTSourceLabelBox = {
 export const WIDEVINE_KEY_SYSTEM = "com.widevine.alpha";
 
 // @beta
-export const WIDEVINE_ROBUSTNESS: {
+export const WIDEVINE_UUID = "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed";
+
+// @beta
+export const WidevineRobustness: {
     readonly SW_SECURE_CRYPTO: typeof SW_SECURE_CRYPTO;
     readonly SW_SECURE_DECODE: typeof SW_SECURE_DECODE;
     readonly HW_SECURE_CRYPTO: typeof HW_SECURE_CRYPTO;
@@ -2075,7 +2146,7 @@ export const WIDEVINE_ROBUSTNESS: {
 };
 
 // @beta
-export const WIDEVINE_UUID = "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed";
+export type WidevineRobustness = ValueOf<typeof WidevineRobustness>;
 
 // @beta
 export type XmlNode = {

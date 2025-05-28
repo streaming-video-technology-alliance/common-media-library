@@ -1,8 +1,8 @@
-import type { SfDecodeOptions } from './SfDecodeOptions.ts';
-import type { SfItem } from './SfItem.ts';
-import { parseError } from './parse/parseError.ts';
-import { parseItem } from './parse/parseItem.ts';
-import { ITEM } from './utils/ITEM.ts';
+import type { SfDecodeOptions } from './SfDecodeOptions.js';
+import type { SfItem } from './SfItem.js';
+import { parseError } from './parse/parseError.js';
+import { parseItem } from './parse/parseItem.js';
+import { ITEM } from './utils/ITEM.js';
 
 // 4.2.  Parsing Structured Fields
 //

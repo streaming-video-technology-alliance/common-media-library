@@ -1,10 +1,10 @@
-import type { Id3Frame } from './Id3Frame.ts';
-import type { RawId3Frame } from './util/RawFrame.ts';
-import { decodeId3Frame } from './util/decodeId3Frame.ts';
-import { getId3FrameData } from './util/getId3FrameData.ts';
-import { isId3Footer } from './util/isId3Footer.ts';
-import { isId3Header } from './util/isId3Header.ts';
-import { readId3Size } from './util/readId3Size.ts';
+import type { Id3Frame } from './Id3Frame.js';
+import type { RawId3Frame } from './util/RawFrame.js';
+import { decodeId3Frame } from './util/decodeId3Frame.js';
+import { getId3FrameData } from './util/getId3FrameData.js';
+import { isId3Footer } from './util/isId3Footer.js';
+import { isId3Header } from './util/isId3Header.js';
+import { readId3Size } from './util/readId3Size.js';
 
 const HEADER_FOOTER_SIZE = 10;
 const FRAME_SIZE = 10;

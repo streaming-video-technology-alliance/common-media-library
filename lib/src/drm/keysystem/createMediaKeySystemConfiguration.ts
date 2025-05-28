@@ -1,5 +1,5 @@
-import type { MediaCapability } from '../common/MediaCapability.ts';
-import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.ts';
+import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.js';
+import type { MediaCapability } from '../common/MediaCapability.js';
 
 /**
  * Creates a valid KeySystemConfiguration from supported audio and video capabilities.
@@ -10,7 +10,7 @@ import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.ts
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
  * {@includeCode ../../../test/drm/keysystem/createMediaKeySystemConfiguration.test.ts#example}
  */
@@ -28,7 +28,7 @@ export function createMediaKeySystemConfiguration(
 		config.videoCapabilities = supportedVideo;
 	}
 
-	// default values 
+	// default values
 	config.distinctiveIdentifier = 'optional';
 	config.persistentState = 'optional';
 	config.sessionTypes = ['temporary'];

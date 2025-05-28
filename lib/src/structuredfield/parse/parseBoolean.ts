@@ -1,7 +1,7 @@
-import { BOOLEAN } from '../utils/BOOLEAN.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import { BOOLEAN } from '../utils/BOOLEAN.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
+import { parseError } from './parseError.js';
 
 // 4.2.8.  Parsing a Boolean
 //

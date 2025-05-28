@@ -1,4 +1,4 @@
-import type { Id3Frame } from './Id3Frame.ts';
+import type { Id3Frame } from './Id3Frame.js';
 
 /**
  * Returns true if the ID3 frame is an Elementary Stream timestamp frame

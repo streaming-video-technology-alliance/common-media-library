@@ -1,7 +1,7 @@
-import type { Segment } from '../../../../types/model/Segment.ts';
-import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.ts';
+import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.js';
+import type { Segment } from '../../../../types/model/Segment.js';
 
-import { getByterange } from './getByterange.ts';
+import { getByterange } from './getByterange.js';
 
 /**
  * @internal

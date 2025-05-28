@@ -1,8 +1,8 @@
-import { symbolToStr } from '../cta/utils/symbolToStr.ts';
-import { SfToken } from '../structuredfield/SfToken.ts';
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import { processCmcd } from './utils/processCmcd.ts';
+import { symbolToStr } from '../cta/utils/symbolToStr.js';
+import { SfToken } from '../structuredfield/SfToken.js';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import { processCmcd } from './utils/processCmcd.js';
 
 /**
  * Convert a CMCD data object to JSON.

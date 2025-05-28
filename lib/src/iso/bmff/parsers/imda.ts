@@ -1,4 +1,4 @@
-import type { IsoView } from '../IsoView.ts';
+import type { IsoView } from '../IsoView.js';
 
 /**
  * ISO/IEC 14496-12:2012 - 9.1.4.1 Identified media data box

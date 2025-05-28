@@ -1,6 +1,6 @@
-import type { Cmcd } from './Cmcd.ts';
-import { CmcdHeaderMap } from './CmcdHeaderMap.ts';
-import { decodeCmcd } from './decodeCmcd.ts';
+import type { Cmcd } from './Cmcd.js';
+import { CmcdHeaderMap } from './CmcdHeaderMap.js';
+import { decodeCmcd } from './decodeCmcd.js';
 
 const keys = Object.keys(CmcdHeaderMap);
 

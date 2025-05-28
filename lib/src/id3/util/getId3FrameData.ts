@@ -1,5 +1,5 @@
-import type { RawId3Frame } from './RawFrame.ts';
-import { readId3Size } from './readId3Size.ts';
+import type { RawId3Frame } from './RawFrame.js';
+import { readId3Size } from './readId3Size.js';
 
 /**
  * Returns the data of an ID3 frame.

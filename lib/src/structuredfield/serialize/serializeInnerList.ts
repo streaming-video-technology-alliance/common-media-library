@@ -1,6 +1,6 @@
-import type { SfInnerList } from '../SfInnerList.ts';
-import { serializeItem } from './serializeItem.ts';
-import { serializeParams } from './serializeParams.ts';
+import type { SfInnerList } from '../SfInnerList.js';
+import { serializeItem } from './serializeItem.js';
+import { serializeParams } from './serializeParams.js';
 
 // 4.1.1.1.  Serializing an Inner List
 //

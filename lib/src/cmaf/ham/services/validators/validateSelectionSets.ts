@@ -1,7 +1,7 @@
-import type { SelectionSet } from '../../types/model/SelectionSet.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { SelectionSet } from '../../types/model/SelectionSet.js';
+import type { Validation } from '../../types/Validation.js';
 
-import { validateSelectionSet } from './validateSelectionSet.ts';
+import { validateSelectionSet } from './validateSelectionSet.js';
 
 /**
  * Validate a list of selection set.

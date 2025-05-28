@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import { SfToken } from '../SfToken.ts';
-import { TOKEN } from '../utils/TOKEN.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import { SfToken } from '../SfToken.js';
+import { TOKEN } from '../utils/TOKEN.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
+import { parseError } from './parseError.js';
 
 // 4.2.6.  Parsing a Token
 //

@@ -1,8 +1,8 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
-import type { Manifest } from '../../types/manifest/Manifest.ts';
+import type { Manifest } from '../../types/manifest/Manifest.js';
+import type { Presentation } from '../../types/model/Presentation.js';
 
-import { DashMapper } from '../../mapper/dash/DashMapper.ts';
-import { MapperContext } from '../../mapper/MapperContext.ts';
+import { DashMapper } from '../../mapper/dash/DashMapper.js';
+import { MapperContext } from '../../mapper/MapperContext.js';
 
 /**
  * Convert HAM object into Dash Manifest.

@@ -1,5 +1,5 @@
-import type { BoxParser } from '../BoxParser.ts';
-import { mp4a, type AudioSampleEntry } from './mp4a.ts';
+import type { BoxParser } from '../BoxParser.js';
+import { mp4a, type AudioSampleEntry } from './mp4a.js';
 
 /**
  * Parse an AudioSampleEntry from an IsoView

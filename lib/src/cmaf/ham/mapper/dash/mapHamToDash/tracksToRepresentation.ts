@@ -1,15 +1,15 @@
 
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
-import type { AudioChannelConfiguration } from '../../../types/mapper/dash/AudioChannelConfiguration.ts';
+import type { AudioChannelConfiguration } from '../../../types/mapper/dash/AudioChannelConfiguration.js';
+import type { Representation } from '../../../types/mapper/dash/Representation.js';
 
-import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
-import type { Track } from '../../../types/model/Track.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../types/model/AudioTrack.js';
+import type { Track } from '../../../types/model/Track.js';
+import type { VideoTrack } from '../../../types/model/VideoTrack.js';
 
-import { trackToSegmentBase } from './trackToSegmentBase.ts';
-import { trackToSegmentList } from './trackToSegmentList.ts';
+import { trackToSegmentBase } from './trackToSegmentBase.js';
+import { trackToSegmentList } from './trackToSegmentList.js';
 
-import { getFrameRate } from './utils/getFrameRate.ts';
+import { getFrameRate } from './utils/getFrameRate.js';
 
 export function tracksToRepresentation(tracks: Track[]): Representation[] {
 	return tracks.map((track) => {

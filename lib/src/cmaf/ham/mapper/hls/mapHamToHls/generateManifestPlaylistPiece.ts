@@ -1,10 +1,10 @@
-import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
-import type { TextTrack } from '../../../types/model/TextTrack.ts';
-import type { Track } from '../../../types/model/Track.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../types/model/AudioTrack.js';
+import type { TextTrack } from '../../../types/model/TextTrack.js';
+import type { Track } from '../../../types/model/Track.js';
+import type { VideoTrack } from '../../../types/model/VideoTrack.js';
 
-import { getPlaylistData } from './utils/getPlaylistData.ts';
-import { getSegments } from './utils/getSegments.ts';
+import { getPlaylistData } from './utils/getPlaylistData.js';
+import { getSegments } from './utils/getSegments.js';
 
 type ManifestPlaylistPiece = {
 	mainRef: string;

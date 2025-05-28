@@ -1,7 +1,7 @@
-import type { Box } from './Box.ts';
-import { filterBoxes } from './filterBoxes.ts';
-import type { IsoData } from './IsoData.ts';
-import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { Box } from './Box.js';
+import { filterBoxes } from './filterBoxes.js';
+import type { IsoData } from './IsoData.js';
+import type { IsoViewConfig } from './IsoViewConfig.js';
 
 /**
  * Filter boxes by type from an IsoView

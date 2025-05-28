@@ -1,7 +1,7 @@
-import type { Box } from './Box.ts';
-import { findBox } from './findBox.ts';
-import type { IsoData } from './IsoData.ts';
-import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { Box } from './Box.js';
+import { findBox } from './findBox.js';
+import type { IsoData } from './IsoData.js';
+import type { IsoViewConfig } from './IsoViewConfig.js';
 
 /**
  * Find a box from an IsoView that matches a given type

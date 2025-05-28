@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { PenState } from './PenState.ts';
+import { PenState } from './PenState.js';
 
 /**
  * Unicode character with styling and background.

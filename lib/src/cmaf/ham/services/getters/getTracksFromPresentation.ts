@@ -1,7 +1,7 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
-import type { Track } from '../../types/model/Track.ts';
+import type { Presentation } from '../../types/model/Presentation.js';
+import type { Track } from '../../types/model/Track.js';
 
-import { getTracksFromSelectionSet } from './getTracksFromSelectionSet.ts';
+import { getTracksFromSelectionSet } from './getTracksFromSelectionSet.js';
 
 /**
  * Get a list of Tracks contained on a Presentation

@@ -1,4 +1,4 @@
-import type { ValueOf } from '../../utils/ValueOf.ts';
+import type { ValueOf } from '../../utils/ValueOf.js';
 
 /**
  * Logging levels for the CTA-608 parser.

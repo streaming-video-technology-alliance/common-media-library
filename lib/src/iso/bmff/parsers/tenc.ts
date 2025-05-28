@@ -1,6 +1,6 @@
-import { UINT } from '../fields/UINT.ts';
-import type { FullBox } from '../FullBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import { UINT } from '../fields/UINT.js';
+import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
 /**
  * ISO/IEC 23001-7:2011 - 8.2 Track Encryption Box

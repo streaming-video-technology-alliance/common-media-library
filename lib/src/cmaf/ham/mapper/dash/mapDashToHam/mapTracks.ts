@@ -1,20 +1,20 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.js';
+import type { Representation } from '../../../types/mapper/dash/Representation.js';
 
-import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
-import type { Segment } from '../../../types/model/Segment.ts';
-import type { TextTrack } from '../../../types/model/TextTrack.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../types/model/AudioTrack.js';
+import type { Segment } from '../../../types/model/Segment.js';
+import type { TextTrack } from '../../../types/model/TextTrack.js';
+import type { VideoTrack } from '../../../types/model/VideoTrack.js';
 
 
-import { getChannels } from './utils/getChannels.ts';
-import { getCodec } from './utils/getCodec.ts';
-import { getContentType } from './utils/getContentType.ts';
-import { getFrameRate } from './utils/getFrameRate.ts';
-import { getLanguage } from './utils/getLanguage.ts';
-import { getSampleRate } from './utils/getSampleRate.ts';
-import { getSar } from './utils/getSar.ts';
-import { getTrackDuration } from './utils/getTrackDuration.ts';
+import { getChannels } from './utils/getChannels.js';
+import { getCodec } from './utils/getCodec.js';
+import { getContentType } from './utils/getContentType.js';
+import { getFrameRate } from './utils/getFrameRate.js';
+import { getLanguage } from './utils/getLanguage.js';
+import { getSampleRate } from './utils/getSampleRate.js';
+import { getSar } from './utils/getSar.js';
+import { getTrackDuration } from './utils/getTrackDuration.js';
 
 /**
  * @internal

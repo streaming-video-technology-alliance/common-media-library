@@ -1,6 +1,6 @@
-import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
-import type { SampleEntry } from './avc1.ts';
+import { UINT } from '../fields/UINT.js';
+import type { IsoView } from '../IsoView.js';
+import type { SampleEntry } from './avc1.js';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.5.2.2 mp4a box (use AudioSampleEntry definition and naming)

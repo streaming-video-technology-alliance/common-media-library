@@ -1,5 +1,5 @@
-import type { IsoView } from '../IsoView.ts';
-import { avc1, type VisualSampleEntry } from './avc1.ts';
+import type { IsoView } from '../IsoView.js';
+import { avc1, type VisualSampleEntry } from './avc1.js';
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView

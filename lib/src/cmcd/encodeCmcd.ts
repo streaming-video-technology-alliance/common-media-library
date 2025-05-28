@@ -1,7 +1,7 @@
-import { encodeSfDict } from '../structuredfield/encodeSfDict.ts';
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import { processCmcd } from './utils/processCmcd.ts';
+import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import { processCmcd } from './utils/processCmcd.js';
 
 /**
  * Encode a CMCD object to a string.

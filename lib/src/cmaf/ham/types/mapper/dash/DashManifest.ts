@@ -1,4 +1,4 @@
-import type { Period } from './Period.ts';
+import type { Period } from './Period.js';
 
 /**
  * Json representation of the DASH Manifest

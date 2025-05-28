@@ -1,5 +1,5 @@
-import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.ts';
-import { calculateDuration } from './calculateDuration.ts';
+import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.js';
+import { calculateDuration } from './calculateDuration.js';
 /**
  * @internal
  *
@@ -21,9 +21,9 @@ export function getNumberOfSegments(
 	// FIXME: This equation may be wrong
 	return Math.round(
 		duration /
-			calculateDuration(
-				segmentTemplate.$.duration,
-				segmentTemplate.$.timescale,
-			),
+		calculateDuration(
+			segmentTemplate.$.duration,
+			segmentTemplate.$.timescale,
+		),
 	);
 }

@@ -1,5 +1,5 @@
-import type { KeySystem } from '../common/KeySystem.ts';
-import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.ts';
+import type { KeySystem } from '../common/KeySystem.js';
+import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.js';
 
 /**
  * Attempts to get key system access using requestMediaKeySystemAccess from EME.

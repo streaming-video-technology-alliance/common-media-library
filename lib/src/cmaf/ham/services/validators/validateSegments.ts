@@ -1,7 +1,7 @@
-import type { Segment } from '../../types/model/Segment.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { Segment } from '../../types/model/Segment.js';
+import type { Validation } from '../../types/Validation.js';
 
-import { validateSegment } from './validateSegment.ts';
+import { validateSegment } from './validateSegment.js';
 
 /**
  * Validate a list of segments.

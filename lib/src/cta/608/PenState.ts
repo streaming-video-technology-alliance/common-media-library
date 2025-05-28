@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PenStyles } from './PenStyles.ts';
+import type { PenStyles } from './PenStyles.js';
 
 /**
  * Pen state.

@@ -1,14 +1,14 @@
-import type { SfBareItem } from '../SfBareItem.ts';
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import { BARE_ITEM } from '../utils/BARE_ITEM.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parseBoolean } from './parseBoolean.ts';
-import { parseByteSequence } from './parseByteSequence.ts';
-import { parseDate } from './parseDate.ts';
-import { parseError } from './parseError.ts';
-import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts';
-import { parseString } from './parseString.ts';
-import { parseToken } from './parseToken.ts';
+import type { SfBareItem } from '../SfBareItem.js';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import { BARE_ITEM } from '../utils/BARE_ITEM.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parseBoolean } from './parseBoolean.js';
+import { parseByteSequence } from './parseByteSequence.js';
+import { parseDate } from './parseDate.js';
+import { parseError } from './parseError.js';
+import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.js';
+import { parseString } from './parseString.js';
+import { parseToken } from './parseToken.js';
 
 // 4.2.3.1.  Parsing a Bare Item
 //

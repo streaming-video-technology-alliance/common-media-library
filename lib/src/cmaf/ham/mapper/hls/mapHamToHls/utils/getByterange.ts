@@ -1,10 +1,10 @@
-import type { AudioTrack } from '../../../../types/model/AudioTrack.ts';
-import type { VideoTrack } from '../../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../../types/model/AudioTrack.js';
+import type { VideoTrack } from '../../../../types/model/VideoTrack.js';
 
 import {
 	AT_SEPARATOR,
 	HYPHEN_MINUS_SEPARATOR,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.js';
 
 /**
  * @internal

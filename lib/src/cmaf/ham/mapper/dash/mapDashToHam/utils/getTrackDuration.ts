@@ -1,4 +1,4 @@
-import type { Segment } from '../../../../types/model/Segment.ts';
+import type { Segment } from '../../../../types/model/Segment.js';
 
 /**
  * @internal

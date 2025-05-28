@@ -1,5 +1,5 @@
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import type { CmcdValue } from './CmcdValue.ts';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { CmcdValue } from './CmcdValue.js';
 
 /**
  * A formatter for CMCD values.

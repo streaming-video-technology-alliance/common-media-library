@@ -36,13 +36,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CaptionsLogger } from './CaptionsLogger.ts';
-import { PenState } from './PenState.ts';
-import type { PenStyles } from './PenStyles.ts';
-import { StyledUnicodeChar } from './StyledUnicodeChar.ts';
-import { VerboseLevel } from './VerboseLevel.ts';
-import { NR_COLS } from './utils/NR_COLS.ts';
-import { getCharForByte } from './utils/getCharForByte.ts';
+import { CaptionsLogger } from './CaptionsLogger.js';
+import { PenState } from './PenState.js';
+import type { PenStyles } from './PenStyles.js';
+import { StyledUnicodeChar } from './StyledUnicodeChar.js';
+import { VerboseLevel } from './VerboseLevel.js';
+import { NR_COLS } from './utils/NR_COLS.js';
+import { getCharForByte } from './utils/getCharForByte.js';
 
 /**
  * CTA-608 row consisting of NR_COLS instances of StyledUnicodeChar.

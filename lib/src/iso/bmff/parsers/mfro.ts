@@ -1,5 +1,5 @@
-import type { FullBox } from '../FullBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { FullBox } from '../FullBox.js';
+import type { IsoView } from '../IsoView.js';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.11 Movie Fragment Random Access Box

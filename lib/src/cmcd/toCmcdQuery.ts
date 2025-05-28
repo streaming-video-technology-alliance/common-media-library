@@ -1,7 +1,7 @@
-import { CMCD_PARAM } from './CMCD_PARAM.ts';
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import { encodeCmcd } from './encodeCmcd.ts';
+import { CMCD_PARAM } from './CMCD_PARAM.js';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import { encodeCmcd } from './encodeCmcd.js';
 
 /**
  * Convert a CMCD data object to a query arg.

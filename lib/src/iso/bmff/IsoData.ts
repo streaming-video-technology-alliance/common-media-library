@@ -1,4 +1,4 @@
-import type { IsoView } from './IsoView.ts';
+import type { IsoView } from './IsoView.js';
 
 /**
  * ISO data

@@ -1,4 +1,4 @@
-import type { DashManifest } from '../../types/mapper/dash/DashManifest';
+import type { DashManifest } from '../../types/mapper/dash/DashManifest.js';
 
 export type DashSerializer = (json: DashManifest) => string;
 

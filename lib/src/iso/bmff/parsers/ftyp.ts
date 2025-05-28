@@ -1,6 +1,6 @@
-import type { IsoView } from '../IsoView.ts';
-import type { TypeBox } from '../TypeBox.ts';
-import { STRING } from '../fields/STRING.ts';
+import type { IsoView } from '../IsoView.js';
+import type { TypeBox } from '../TypeBox.js';
+import { STRING } from '../fields/STRING.js';
 
 /**
  * ISO/IEC 14496-12:2012 - 4.3 File Type Box

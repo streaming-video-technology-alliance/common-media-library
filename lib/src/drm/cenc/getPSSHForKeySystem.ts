@@ -1,5 +1,5 @@
-import type { KeySystem } from '../common/KeySystem.ts';
-import { parsePSSHList } from './parsePSSHList.ts';
+import type { KeySystem } from '../common/KeySystem.js';
+import { parsePSSHList } from './parsePSSHList.js';
 
 /**
  * Returns the PSSH box associated with the given key system from the concatenated
@@ -10,8 +10,8 @@ import { parsePSSHList } from './parsePSSHList.ts';
  * @returns The PSSH box ArrayBuffer corresponding to the given key system, or null if not found.
  *
  * @group DRM
- * @beta	
- * 
+ * @beta
+ *
  * @example
  * {@includeCode ../../../test/drm/cenc/getPSSHForKeySystem.test.ts#example}
  */

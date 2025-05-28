@@ -1,7 +1,7 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.js';
+import type { Representation } from '../../../../types/mapper/dash/Representation.js';
 
-import type { FrameRate } from '../../../../types/model/FrameRate.ts';
+import type { FrameRate } from '../../../../types/model/FrameRate.js';
 
 import {
 	DENOMINATOR,
@@ -9,7 +9,7 @@ import {
 	FRAME_RATE_SEPARATOR,
 	NUMERATOR,
 	ZERO,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.js';
 
 /**
  * @internal

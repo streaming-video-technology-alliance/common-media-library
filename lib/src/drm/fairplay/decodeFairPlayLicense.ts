@@ -1,4 +1,4 @@
-import { base64decode } from '../../utils/base64decode.ts';
+import { base64decode } from '../../utils/base64decode.js';
 
 /**
  * Decodes a FairPlay DRM license response.
@@ -8,7 +8,7 @@ import { base64decode } from '../../utils/base64decode.ts';
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
  * {@includeCode ../../../test/drm/fairplay/decodeFairPlayLicense.test.ts#example}
  */

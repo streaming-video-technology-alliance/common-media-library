@@ -1,12 +1,12 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts';
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Manifest } from '../../types/manifest/Manifest.js';
+import type { Presentation } from '../../types/model/Presentation.js';
 
-import { mapHamToHls } from './mapHamToHls/mapHamToHls.ts';
-import { mapHlsToHam } from './mapHlsToHam/mapHlsToHam.ts';
+import { mapHamToHls } from './mapHamToHls/mapHamToHls.js';
+import { mapHlsToHam } from './mapHlsToHam/mapHlsToHam.js';
 
-import { getMetadata } from '../../utils/manifest/getMetadata.ts';
+import { getMetadata } from '../../utils/manifest/getMetadata.js';
 
-import type { Mapper } from '../Mapper.ts';
+import type { Mapper } from '../Mapper.js';
 
 export class HlsMapper implements Mapper {
 	private manifest: Manifest | undefined;
