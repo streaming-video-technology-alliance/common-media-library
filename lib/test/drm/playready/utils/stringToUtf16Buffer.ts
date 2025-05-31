@@ -1,4 +1,4 @@
-import { stringToUint16 } from '@svta/common-media-library/utils/stringToUint16.ts';
+import { stringToUint16 } from '@svta/common-media-library/utils/stringToUint16.js';
 
 /**
  * Creates a UTF-16 encoded ArrayBuffer from a string.

@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 
 export const dashSample: string = readFileSync(
-	'./manifest.mpd',
+	new URL('./manifest.mpd', import.meta.url),
 	'utf8',
 );

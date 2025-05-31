@@ -1,4 +1,4 @@
-import { assert, describe, elng, findBox, it, meta, prsl } from './util/box';
+import { assert, describe, elng, findBox, it, meta, prsl } from './util/box.ts';
 
 describe('elng box', function () {
 	it('should correctly parse the box from sample data', function () {

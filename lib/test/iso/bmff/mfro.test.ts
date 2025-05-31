@@ -1,5 +1,5 @@
 import { mfro } from '@svta/common-media-library';
-import { assert, describe, findBox, it } from './util/box';
+import { assert, describe, findBox, it } from './util/box.ts';
 
 describe('mfro box', function () {
 	it('should correctly parse the box', function () {

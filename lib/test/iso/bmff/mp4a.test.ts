@@ -1,4 +1,4 @@
-import { assert, describe, filterBoxes, it, mp4a, stsd } from './util/box';
+import { assert, describe, filterBoxes, it, mp4a, stsd } from './util/box.ts';
 
 describe('mp4a box', function () {
 	it('should correctly parse the box', function () {

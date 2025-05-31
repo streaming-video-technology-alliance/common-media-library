@@ -8,6 +8,7 @@ import {
 	setHlsParser,
 	validatePresentation,
 	type DashManifest,
+	type HlsManifest,
 } from '@svta/common-media-library/cmaf-ham';
 import fs from 'fs';
 import { Parser } from 'm3u8-parser';
@@ -27,12 +28,12 @@ setHlsParser((text: string) => {
 
 	parser.push(text);
 	parser.end();
-	const parsedHlsManifest = parser.manifest;
+	const parsedHlsManifest = parser.manifest as any;
 	if (!parsedHlsManifest) {
 		throw new Error();
 	}
 
-	return parsedHlsManifest;
+	return parsedHlsManifest as HlsManifest;
 });
 
 setDashParser((raw: string) => {

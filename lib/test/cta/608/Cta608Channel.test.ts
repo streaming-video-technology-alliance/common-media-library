@@ -7,7 +7,7 @@ describe('Cea608Channel Tests', () => {
 	const channelNumber = 1;
 	const outputFilter = {} as CueHandler;
 
-	let channel: any;
+	let channel: Cta608Channel;
 
 	beforeEach(() => {
 		channel = new Cta608Channel(channelNumber, outputFilter);
@@ -18,7 +18,6 @@ describe('Cea608Channel Tests', () => {
 		equal(channel.chNr, channelNumber);
 		equal(channel.outputFilter, outputFilter);
 		equal(channel.mode, null);
-		equal(channel.verbose, 0);
 		deepEqual(channel.displayedMemory, new CaptionScreen());
 		deepEqual(channel.nonDisplayedMemory, new CaptionScreen());
 		deepEqual(channel.lastOutputScreen, new CaptionScreen());
@@ -35,7 +34,7 @@ describe('Cea608Channel Tests', () => {
 	it('setHandler correctly', () => {
 		deepEqual(channel.outputFilter, outputFilter);
 		const newHandler = { OutputFilter: 'myOutputFilterAux' };
-		channel.setHandler(newHandler);
+		channel.setHandler(newHandler as any);
 		deepEqual(channel.outputFilter, newHandler);
 	});
 

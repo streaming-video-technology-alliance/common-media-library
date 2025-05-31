@@ -1,7 +1,7 @@
 import { findBoxByType, type Box, type BoxParser } from '@svta/common-media-library';
 import assert from 'node:assert';
-import { createParsers } from './createParsers';
-import { load } from './load';
+import { createParsers } from './createParsers.ts';
+import { load } from './load.ts';
 
 export function findBox<T>(file: string, boxParsers: BoxParser<T> | BoxParser<T>[]): Box<T> {
 	const { name, parsers } = createParsers(boxParsers);

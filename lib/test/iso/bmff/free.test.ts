@@ -1,4 +1,4 @@
-import { assert, describe, free, it, parseBox } from './util/box';
+import { assert, describe, free, it, parseBox } from './util/box.ts';
 
 describe('free box', () => {
 	it('should correctly parse the box', () => {

@@ -1,5 +1,5 @@
-import { assert, describe, filterBoxesByType, it } from './util/box';
-import { load } from './util/load';
+import { assert, describe, filterBoxesByType, it } from './util/box.ts';
+import { load } from './util/load.ts';
 
 describe('filter boxes by type', function () {
 	it('filter boxes by type', function () {

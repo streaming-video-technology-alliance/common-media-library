@@ -1,15 +1,14 @@
-import { getPSSHForKeySystem } from '@svta/common-media-library/drm/cenc/getPSSHForKeySystem';
+import { getPSSHForKeySystem, WIDEVINE_KEY_SYSTEM } from '@svta/common-media-library/drm';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { samplePsshBox } from '../common/samplePsshBox';
-import { WIDEVINE_KEY_SYSTEM } from '../../../src/drm/common/WIDEVINE_KEY_SYSTEM';
+import { samplePsshBox } from '../common/samplePsshBox.ts';
 
 describe('getPSSHForKeySystem', () => {
 	// sample keySystem UUID. It matches the systemId in the
 	// samplePsshBox in the common folder.
 	const keySystem: { uuid: string, systemString: string } = {
-		uuid: '1077efec-c0b2-4d02-ace3-3c1e52e2fb4b', 
-		systemString: WIDEVINE_KEY_SYSTEM, 
+		uuid: '1077efec-c0b2-4d02-ace3-3c1e52e2fb4b',
+		systemString: WIDEVINE_KEY_SYSTEM,
 	};
 
 	it('should return the correct PSSH box for the given key system', () => {
@@ -23,8 +22,10 @@ describe('getPSSHForKeySystem', () => {
 
 	it('should return null if key system does not match', () => {
 		const initData = new Uint8Array(samplePsshBox).buffer;
-		const result = getPSSHForKeySystem({ uuid: '00000000-0000-0000-0000-000000000000', 
-			systemString: WIDEVINE_KEY_SYSTEM }, initData);
+		const result = getPSSHForKeySystem({
+			uuid: '00000000-0000-0000-0000-000000000000',
+			systemString: WIDEVINE_KEY_SYSTEM,
+		}, initData);
 
 		strictEqual(result, null);
 	});

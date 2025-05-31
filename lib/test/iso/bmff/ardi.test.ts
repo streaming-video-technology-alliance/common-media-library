@@ -1,4 +1,4 @@
-import { ardi, assert, describe, findBox, it, meta, prsl } from './util/box';
+import { ardi, assert, describe, findBox, it, meta, prsl } from './util/box.ts';
 describe('ardi box', function () {
 	it('should correctly parse the box from sample data', function () {
 		const box = findBox<any>('SRMP_AC4.mp4', [ardi, prsl, meta]);

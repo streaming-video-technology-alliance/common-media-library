@@ -1,32 +1,32 @@
 import { readFileSync } from 'fs';
 
 const hlsMain2: string = readFileSync(
-	'./main.m3u8',
+	new URL('./main.m3u8', import.meta.url),
 	'utf8',
 );
 
 const aac_64k = readFileSync(
-	'./tears-of-steel-aac-64k.m3u8',
+	new URL('./tears-of-steel-aac-64k.m3u8', import.meta.url),
 	'utf8',
 );
 
 const aac_128k = readFileSync(
-	'./tears-of-steel-aac-128k.m3u8',
+	new URL('./tears-of-steel-aac-128k.m3u8', import.meta.url),
 	'utf8',
 );
 
 const hev1_1100k = readFileSync(
-	'./tears-of-steel-hev1-1100k.m3u8',
+	new URL('./tears-of-steel-hev1-1100k.m3u8', import.meta.url),
 	'utf8',
 );
 
 const hev1_1500k = readFileSync(
-	'./tears-of-steel-hev1-1500k.m3u8',
+	new URL('./tears-of-steel-hev1-1500k.m3u8', import.meta.url),
 	'utf8',
 );
 
 const hev1_2200k = readFileSync(
-	'./tears-of-steel-hev1-2200k.m3u8',
+	new URL('./tears-of-steel-hev1-2200k.m3u8', import.meta.url),
 	'utf8',
 );
 

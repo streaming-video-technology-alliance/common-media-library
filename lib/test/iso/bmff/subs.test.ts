@@ -1,4 +1,4 @@
-import { assert, describe, filterBoxes, it, subs } from './util/box';
+import { assert, describe, filterBoxes, it, subs } from './util/box.ts';
 
 describe('subs box', function () {
 	it('should correctly parse the box from sample data', function () {

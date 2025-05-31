@@ -1,4 +1,4 @@
-import { assert, describe, elst, findBox, it } from './util/box';
+import { assert, describe, elst, findBox, it } from './util/box.ts';
 
 describe('elst box', function () {
 	it('should correctly parse the box', function () {

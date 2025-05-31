@@ -1,4 +1,4 @@
-import { assert, describe, filterBoxes, it, meta, prsl } from './util/box';
+import { assert, describe, filterBoxes, it, meta, prsl } from './util/box.ts';
 
 describe('prsl box', function () {
 	it('should correctly parse the prsl box from sample data', function () {

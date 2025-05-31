@@ -1,4 +1,4 @@
-import { assert, describe, it, parseBox, ssix } from './util/box';
+import { assert, describe, it, parseBox, ssix } from './util/box.ts';
 
 describe('ssix box', function () {
 	it('should correctly parse the box', function () {

@@ -1,4 +1,4 @@
-import { assert, describe, findBox, it, mdat, parseBoxes } from './util/box';
+import { assert, describe, findBox, it, mdat, parseBoxes } from './util/box.ts';
 
 describe('vttc box', function () {
 	it('should correctly parse the box from sample data', function () {

@@ -69,7 +69,7 @@
 		"postbuild": "api-extractor run --local",
 		"build:esm": "node ../scripts/build.mts",
 		"build:cjs": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist/cjs",
-		"test": "node --test ./test/**/*.test.ts",
+		"test": "node --no-warnings --test **/*.test.ts",
 		"prepublishOnly": "npm run build"
 	}
 }

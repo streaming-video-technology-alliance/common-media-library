@@ -1,7 +1,7 @@
-import { parsePSSHList } from '@svta/common-media-library/drm/cenc/parsePSSHList';
-import { strictEqual, deepStrictEqual } from 'node:assert';
+import { parsePSSHList } from '@svta/common-media-library/drm';
+import { deepStrictEqual, strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { samplePsshBox } from '../common/samplePsshBox';
+import { samplePsshBox } from '../common/samplePsshBox.ts';
 
 describe('parsePSSHList', () => {
 	it('should return an object with the correct UUID and PSSH box', () => {
@@ -23,4 +23,4 @@ describe('parsePSSHList', () => {
 		deepStrictEqual(parsePSSHList(null), {});
 		deepStrictEqual(parsePSSHList(undefined), {});
 	});
-}); 
+});
