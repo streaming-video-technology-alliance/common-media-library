@@ -4,7 +4,7 @@ import { Builder, parseString } from 'xml2js';
 
 setDashParser((raw: string) => {
 	// `parsed` is populated by the synchronous `parseString` callback
-	// so we need to explicitlytell Typescript that it is not undefined.
+	// so we need to explicitly tell Typescript that it is not undefined.
 	let parsed!: DashManifest;
 
 	parseString(raw, (err: Error | null, result: DashManifest) => {
