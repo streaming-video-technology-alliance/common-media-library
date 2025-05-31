@@ -8,9 +8,9 @@ import { hlsMain1, hlsPlaylist1 } from './data/hls-samples/sample-1/hlsSample1.t
 import { hlsMain2, hlsPlaylist2 } from './data/hls-samples/sample-2/hlsSample2.ts';
 import { hlsMain3, hlsPlaylist3 } from './data/hls-samples/sample-3/hlsSample3.ts';
 
-import ham1 from './data/ham-samples/fromHls/ham1.json' assert { type: 'json' };
-import ham2 from './data/ham-samples/fromHls/ham2.json' assert { type: 'json' };
-import ham3 from './data/ham-samples/fromHls/ham3.json' assert { type: 'json' };
+import ham1 from './data/ham-samples/fromHls/ham1.json' with { type: 'json' };
+import ham2 from './data/ham-samples/fromHls/ham2.json' with { type: 'json' };
+import ham3 from './data/ham-samples/fromHls/ham3.json' with { type: 'json' };
 
 
 describe('hlsToHam', () => {

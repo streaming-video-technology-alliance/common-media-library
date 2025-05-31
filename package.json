@@ -43,6 +43,9 @@
 		"dev",
 		"samples/*"
 	],
+	"engines": {
+		"node": ">=20"
+	},
 	"devEngines": {
 		"runtime": {
 			"name": "node",

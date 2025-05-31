@@ -4,15 +4,15 @@ import type { Presentation } from '@svta/common-media-library/cmaf/ham/types/mod
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import jsonHam0 from './data/ham-samples/fromDash/ham0.json' assert { type: 'json' };
-import jsonHam1 from './data/ham-samples/fromDash/ham1.json' assert { type: 'json' };
-import jsonHam2 from './data/ham-samples/fromDash/ham2.json' assert { type: 'json' };
-import jsonHam3 from './data/ham-samples/fromDash/ham3.json' assert { type: 'json' };
-import jsonHam4 from './data/ham-samples/fromDash/ham4.json' assert { type: 'json' };
-import jsonHam5 from './data/ham-samples/fromDash/ham5.json' assert { type: 'json' };
-import jsonHam6 from './data/ham-samples/fromDash/ham6.json' assert { type: 'json' };
-import jsonHam7 from './data/ham-samples/fromDash/ham7.json' assert { type: 'json' };
-import jsonHam8 from './data/ham-samples/fromDash/ham8.json' assert { type: 'json' };
+import jsonHam0 from './data/ham-samples/fromDash/ham0.json' with { type: 'json' };
+import jsonHam1 from './data/ham-samples/fromDash/ham1.json' with { type: 'json' };
+import jsonHam2 from './data/ham-samples/fromDash/ham2.json' with { type: 'json' };
+import jsonHam3 from './data/ham-samples/fromDash/ham3.json' with { type: 'json' };
+import jsonHam4 from './data/ham-samples/fromDash/ham4.json' with { type: 'json' };
+import jsonHam5 from './data/ham-samples/fromDash/ham5.json' with { type: 'json' };
+import jsonHam6 from './data/ham-samples/fromDash/ham6.json' with { type: 'json' };
+import jsonHam7 from './data/ham-samples/fromDash/ham7.json' with { type: 'json' };
+import jsonHam8 from './data/ham-samples/fromDash/ham8.json' with { type: 'json' };
 
 import { dashSample as dashSample0 } from './data/dash-samples/sample-0/sample.ts';
 import { dashSample as dashSample1 } from './data/dash-samples/sample-1/sample.ts';

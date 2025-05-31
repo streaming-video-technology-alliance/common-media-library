@@ -1,4 +1,4 @@
-import { assert, describe, filterBoxes, it, vmhd } from './util/box';
+import { assert, describe, filterBoxes, it, vmhd } from './util/box.ts';
 
 describe('vmhd box', function () {
 	it('should correctly parse the box from sample data', function () {

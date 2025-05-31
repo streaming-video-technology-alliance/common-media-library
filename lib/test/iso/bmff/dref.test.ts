@@ -1,4 +1,4 @@
-import { assert, describe, dref, filterBoxes, it, url } from './util/box';
+import { assert, describe, dref, filterBoxes, it, url } from './util/box.ts';
 
 describe('dref box', function () {
 	it('should correctly parse the box from sample data', function () {

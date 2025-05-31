@@ -1,7 +1,7 @@
-import { getPSSHData } from '@svta/common-media-library/drm/cenc/getPSSHData';
+import { getPSSHData } from '@svta/common-media-library/drm';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { samplePsshBox } from '../common/samplePsshBox';
+import { samplePsshBox } from '../common/samplePsshBox.ts';
 
 describe('getPSSHData', () => {
 	it('should extract the data portion of the PSSH box', () => {
