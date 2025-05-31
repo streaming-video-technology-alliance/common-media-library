@@ -2,6 +2,12 @@ name: Pull Request CI
 
 on:
   pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - opened
+      - reopened
+      - synchronize
 
 jobs:
   pull_request_ci:
@@ -18,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 23
-          cache: 'npm'
+          cache: "npm"
           registry-url: "https://npm.pkg.github.com"
           scope: "@svta"
 
