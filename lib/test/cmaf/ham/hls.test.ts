@@ -1,3 +1,5 @@
+import './init.ts';
+
 import { hamToHls } from '@svta/common-media-library/cmaf/ham/services/converters/hamToHls';
 import { hlsToHam } from '@svta/common-media-library/cmaf/ham/services/converters/hlsToHam';
 import type { Presentation } from '@svta/common-media-library/cmaf/ham/types/model/Presentation';

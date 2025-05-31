@@ -1,3 +1,5 @@
+import './init.ts';
+
 import { dashToHam } from '@svta/common-media-library/cmaf/ham/services/converters/dashToHam';
 import { hamToDash } from '@svta/common-media-library/cmaf/ham/services/converters/hamToDash';
 import type { Presentation } from '@svta/common-media-library/cmaf/ham/types/model/Presentation';
