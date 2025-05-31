@@ -50,7 +50,7 @@ import { VerboseLevel } from './VerboseLevel.js';
  * @beta
  */
 export class CaptionScreen {
-	private rows: Row[] = [];
+	rows: Row[] = [];
 	private currRow: number = NR_ROWS - 1;
 	private nrRollUpRows: number | null = null;
 	private lastOutputScreen: CaptionScreen | null = null;
