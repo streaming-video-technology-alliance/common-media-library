@@ -3,14 +3,18 @@ import { Parser } from 'm3u8-parser';
 import { Builder, parseString } from 'xml2js';
 
 setDashParser((raw: string) => {
-	let parsed: DashManifest;
+	// `parsed` is populated by the synchronous `parseString` callback
+	// so we need to explicitlytell Typescript that it is not undefined.
+	let parsed!: DashManifest;
+
 	parseString(raw, (err: Error | null, result: DashManifest) => {
 		if (err) {
 			throw new Error(err.message);
 		}
-		parsed = result as DashManifest;
+
+		parsed = result;
 	});
-	// @ts-ignore
+
 	return parsed;
 });
 
@@ -19,6 +23,10 @@ setHlsParser((text: string) => {
 
 	parser.push(text);
 	parser.end();
+
+	// This force cast, and the one in the return statement, are necessary
+	// because Typescript cannot reconcile the `Manifest` and `HlsManifest`
+	// types, even though they are the overlap.
 	const parsedHlsManifest = parser.manifest as any;
 	if (!parsedHlsManifest) {
 		throw new Error();
@@ -26,7 +34,6 @@ setHlsParser((text: string) => {
 
 	return parsedHlsManifest as HlsManifest;
 });
-
 
 setDashSerializer((manifest: DashManifest) => {
 	const builder = new Builder();
