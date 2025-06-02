@@ -1,5 +1,5 @@
 import { mdat } from '@svta/common-media-library';
-import { assert, describe, it, parseBox } from './util/box';
+import { assert, describe, it, parseBox } from './util/box.ts';
 
 describe('mdat box', function () {
 	it('should correctly parse the mdat box', function () {

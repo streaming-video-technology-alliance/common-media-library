@@ -1,4 +1,4 @@
-import { assert, describe, ftyp, it, parseBoxes } from './util/box';
+import { assert, describe, ftyp, it, parseBoxes } from './util/box.ts';
 
 describe('parseBoxes', function () {
 	it('should parse a buffer', function () {

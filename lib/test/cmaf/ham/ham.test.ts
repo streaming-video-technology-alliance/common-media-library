@@ -2,14 +2,15 @@ import { deepStrictEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 
 import type {
+	Presentation,
 	SelectionSet,
-	Presentation } from '@svta/common-media-library';
+} from '@svta/common-media-library';
 import {
 	getTracksFromSelectionSet,
 	validateTracks,
 } from '@svta/common-media-library';
 
-import jsonHam0 from './data/ham-samples/fromDash/ham0.json' assert { type: 'json' };
+import jsonHam0 from './data/ham-samples/fromDash/ham0.json' with { type: 'json' };
 
 describe('ham validation', () => {
 	let selectionSet: SelectionSet;

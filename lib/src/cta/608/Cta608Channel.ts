@@ -42,7 +42,9 @@ import { CaptionsLogger } from './CaptionsLogger.js';
 import type { CueHandler } from './CueHandler.js';
 import type { PACData } from './PACData.js';
 import type { PenStyles } from './PenStyles.js';
+import type { Row } from './Row.js';
 import { VerboseLevel } from './VerboseLevel.js';
+import { NR_ROWS } from './utils/NR_ROWS.js';
 
 /**
  * CTA-608 Channel
@@ -51,14 +53,16 @@ import { VerboseLevel } from './VerboseLevel.js';
  * @beta
  */
 export class Cta608Channel {
-	private chNr: number;
-	private outputFilter: CueHandler;
-	private mode: CaptionModes;
-	private displayedMemory: CaptionScreen;
-	private nonDisplayedMemory: CaptionScreen;
-	private lastOutputScreen: CaptionScreen;
-	private writeScreen: CaptionScreen;
-	private cueStartTime: number | null;
+	chNr: number;
+	outputFilter: CueHandler;
+	mode: CaptionModes;
+	displayedMemory: CaptionScreen;
+	nonDisplayedMemory: CaptionScreen;
+	lastOutputScreen: CaptionScreen;
+	currRollUpRow: Row;
+	writeScreen: CaptionScreen;
+	cueStartTime: number | null;
+
 	private logger: CaptionsLogger;
 
 	constructor(
@@ -72,6 +76,7 @@ export class Cta608Channel {
 		this.displayedMemory = new CaptionScreen(logger);
 		this.nonDisplayedMemory = new CaptionScreen(logger);
 		this.lastOutputScreen = new CaptionScreen(logger);
+		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1];
 		this.writeScreen = this.displayedMemory;
 		this.mode = null;
 		this.cueStartTime = null; // Keeps track of where a cue started.
@@ -86,9 +91,18 @@ export class Cta608Channel {
 		this.nonDisplayedMemory.reset();
 		this.lastOutputScreen.reset();
 		this.outputFilter?.reset?.();
+		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1];
 		this.writeScreen = this.displayedMemory;
 		this.mode = null;
 		this.cueStartTime = null;
+	}
+
+	getHandler(): CueHandler {
+		return this.outputFilter;
+	}
+
+	setHandler(outputFilter: CueHandler): void {
+		this.outputFilter = outputFilter;
 	}
 
 	setPAC(pacData: PACData): void {

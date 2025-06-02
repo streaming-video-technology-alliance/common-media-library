@@ -1,4 +1,4 @@
-import { assert, describe, filterBoxes, hvc1, it, stsd } from './util/box';
+import { assert, describe, filterBoxes, hvc1, it, stsd } from './util/box.ts';
 
 describe('hvc1 box', function () {
 	it('should correctly parse the box', function () {

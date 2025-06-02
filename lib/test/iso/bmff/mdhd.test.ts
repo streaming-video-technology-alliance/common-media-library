@@ -1,4 +1,4 @@
-import { assert, describe, findBox, it, mdhd, type MediaHeaderBox } from './util/box';
+import { assert, describe, findBox, it, mdhd, type MediaHeaderBox } from './util/box.ts';
 
 describe('mdhd box', function () {
 	it('should correctly parse the box from sample data', function () {

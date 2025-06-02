@@ -1,5 +1,5 @@
-import { assert, describe, findBoxByType, it } from './util/box';
-import { load } from './util/load';
+import { assert, describe, findBoxByType, it } from './util/box.ts';
+import { load } from './util/load.ts';
 
 describe('find a box by type', function () {
 	it('find a box by type', function () {

@@ -1,5 +1,6 @@
 import { ftyp } from '@svta/common-media-library';
-import { assert, describe, it, parseBox } from './util/box';
+import { assert, describe, it, parseBox } from './util/box.ts';
+
 describe('ftyp box', function () {
 	it('should correctly parse the box', function () {
 		const box = parseBox('captions.mp4', ftyp, 0);

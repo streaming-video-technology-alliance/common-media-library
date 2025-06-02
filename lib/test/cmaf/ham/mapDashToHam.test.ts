@@ -1,10 +1,10 @@
 import { deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { mapSegmentBase } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentBase.ts';
-import { mapSegmentList } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentList.ts';
-import { mapSegments } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegments.ts';
-import { mapSegmentTemplate } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentTemplate.ts';
+import { mapSegmentBase } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentBase.js';
+import { mapSegmentList } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentList.js';
+import { mapSegments } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegments.js';
+import { mapSegmentTemplate } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/mapSegmentTemplate.js';
 
 import {
 	duration,
