@@ -1,4 +1,4 @@
-import { type ContentProtection, getLicenseServerUrlFromContentProtection } from '@svta/common-media-library/drm';
+import { type ContentProtection, getLicenseServerUrlFromContentProtection } from '@svta/common-media-library/drm.js';
 import { strictEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 
@@ -16,7 +16,7 @@ describe('getLicenseServerUrlFromContentProtection', () => {
 	});
 
 	//#region example
-	it('should return license server URL for dashif prefix', () => {
+	it('should return license server URL', () => {
 		const result = getLicenseServerUrlFromContentProtection(contentProtection, schemeIdUri);
 		strictEqual(result, 'license-server-url');
 	});
@@ -37,17 +37,5 @@ describe('getLicenseServerUrlFromContentProtection', () => {
 		delete contentProtection[0].laUrl;
 		const result = getLicenseServerUrlFromContentProtection(contentProtection, schemeIdUri);
 		strictEqual(result, null);
-	});
-
-	it('should return license server URL for clearkey prefix', () => {
-		// contentProtection[0].laUrl.__prefix = 'clearkey';
-		const result = getLicenseServerUrlFromContentProtection(contentProtection, schemeIdUri);
-		strictEqual(result, 'license-server-url');
-	});
-
-	it('should return license server URL for ck prefix', () => {
-		// contentProtection[0].laUrl.__prefix = 'ck';
-		const result = getLicenseServerUrlFromContentProtection(contentProtection, schemeIdUri);
-		strictEqual(result, 'license-server-url');
 	});
 });

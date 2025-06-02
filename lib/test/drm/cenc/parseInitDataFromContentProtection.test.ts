@@ -1,4 +1,4 @@
-import { parseInitDataFromContentProtection } from '@svta/common-media-library/drm/cenc/parseInitDataFromContentProtection';
+import { parseInitDataFromContentProtection } from '@svta/common-media-library/drm/cenc/parseInitDataFromContentProtection.js';
 import { strictEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 

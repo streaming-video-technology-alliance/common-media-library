@@ -1,7 +1,7 @@
-import { describe, it } from 'node:test';
+import { findCencContentProtection } from '@svta/common-media-library/drm/cenc/findCencContentProtection.js';
+import { MP4_PROTECTION_SCHEME } from '@svta/common-media-library/drm/common/MP4_PROTECTION_SCHEME.js';
 import { strictEqual } from 'node:assert';
-import { findCencContentProtection } from '@svta/common-media-library/drm/cenc/findCencContentProtection';
-import { MP4_PROTECTION_SCHEME } from '@svta/common-media-library/drm/common/MP4_PROTECTION_SCHEME';
+import { describe, it } from 'node:test';
 
 describe('findCencContentProtection', () => {
 
@@ -55,7 +55,7 @@ describe('findCencContentProtection', () => {
 
 	it('should be case-insensitive for schemeIdUri and value', () => {
 		const matchingCP = {
-			schemeIdUri: MP4_PROTECTION_SCHEME.toUpperCase(), 
+			schemeIdUri: MP4_PROTECTION_SCHEME.toUpperCase(),
 			value: 'CENC', // uppercase value
 		};
 

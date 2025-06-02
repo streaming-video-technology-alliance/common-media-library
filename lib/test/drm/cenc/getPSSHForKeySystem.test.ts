@@ -1,4 +1,4 @@
-import { getPSSHForKeySystem, WIDEVINE_KEY_SYSTEM } from '@svta/common-media-library/drm';
+import { getPSSHForKeySystem, WIDEVINE_KEY_SYSTEM } from '@svta/common-media-library/drm.js';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox.ts';
