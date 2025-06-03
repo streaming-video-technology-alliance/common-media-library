@@ -249,4 +249,14 @@ describe('processUriTemplate', () => {
 			'/000b4_B4_180_264.mp4',
 		);
 	});
+
+	it('handles Times bigger than MAX_SAFE_INTEGER', () => {
+		equal(
+			processUriTemplate(
+				'/example/$Time$.mp4',
+				null, null, null, null, '17472959488675333',
+			),
+			'/example/17472959488675333.mp4',
+		);
+	});
 });

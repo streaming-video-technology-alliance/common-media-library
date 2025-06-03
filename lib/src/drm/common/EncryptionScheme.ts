@@ -1,6 +1,6 @@
-import type { ValueOf } from '../../utils/ValueOf.ts';
-import { CBCS } from './CBCS.ts';
-import { CENC } from './CENC.ts';
+import type { ValueOf } from '../../utils/ValueOf.js';
+import { CBCS } from './CBCS.js';
+import { CENC } from './CENC.js';
 
 /**
  * Encryption schemes.

@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions';
-import { SfItem } from '../SfItem.ts';
-import type { ParsedValue } from './ParsedValue';
-import { parsedValue } from './ParsedValue.ts';
-import { parseBareItem } from './parseBareItem.ts';
-import { parseParameters } from './parseParameters.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import { SfItem } from '../SfItem.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
+import { parseBareItem } from './parseBareItem.js';
+import { parseParameters } from './parseParameters.js';
 
 // 4.2.3.  Parsing an Item
 //

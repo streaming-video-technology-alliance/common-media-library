@@ -1,10 +1,10 @@
-import type { SfEncodeOptions } from '../SfEncodeOptions';
-import { SfItem } from '../SfItem.ts';
-import type { SfMember } from '../SfMember';
-import { LIST } from '../utils/LIST.ts';
-import { serializeError } from './serializeError.ts';
-import { serializeInnerList } from './serializeInnerList.ts';
-import { serializeItem } from './serializeItem.ts';
+import type { SfEncodeOptions } from '../SfEncodeOptions.js';
+import { SfItem } from '../SfItem.js';
+import type { SfMember } from '../SfMember.js';
+import { LIST } from '../utils/LIST.js';
+import { serializeError } from './serializeError.js';
+import { serializeInnerList } from './serializeInnerList.js';
+import { serializeItem } from './serializeItem.js';
 
 // 4.1.1.  Serializing a List
 //

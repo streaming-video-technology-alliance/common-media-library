@@ -1,6 +1,6 @@
 {
 	"name": "@svta/common-media-library-workspace",
-	"version": "0.12.1",
+	"version": "0.12.4",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
@@ -43,6 +43,9 @@
 		"dev",
 		"samples/*"
 	],
+	"engines": {
+		"node": ">=20"
+	},
 	"devEngines": {
 		"runtime": {
 			"name": "node",
@@ -55,6 +58,7 @@
 		"@eslint/js": "9.24.0",
 		"@microsoft/api-extractor": "7.52.3",
 		"@stylistic/eslint-plugin": "4.2.0",
+		"@types/m3u8-parser": "7.2.2",
 		"@types/node": "22.14.1",
 		"@typescript-eslint/eslint-plugin": "8.30.1",
 		"@typescript-eslint/parser": "8.30.1",
@@ -64,7 +68,9 @@
 		"glob": "11.0.1",
 		"globals": "16.0.0",
 		"hi-base32": "0.5.1",
+		"m3u8-parser": "7.2.0",
 		"typedoc": "0.28.2",
-		"typescript": "5.8.3"
+		"typescript": "5.8.3",
+		"xml2js": "0.6.2"
 	}
 }

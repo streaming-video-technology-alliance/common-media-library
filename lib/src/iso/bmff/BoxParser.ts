@@ -1,5 +1,5 @@
-import type { IsoView } from './IsoView';
-import type { IsoViewConfig } from './IsoViewConfig';
+import type { IsoView } from './IsoView.js';
+import type { IsoViewConfig } from './IsoViewConfig.js';
 
 /**
  * Box parser

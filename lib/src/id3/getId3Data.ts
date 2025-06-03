@@ -1,6 +1,6 @@
-import { isId3Footer } from './util/isId3Footer.ts';
-import { isId3Header } from './util/isId3Header.ts';
-import { readId3Size } from './util/readId3Size.ts';
+import { isId3Footer } from './util/isId3Footer.js';
+import { isId3Header } from './util/isId3Header.js';
+import { readId3Size } from './util/readId3Size.js';
 
 /**
  * Returns any adjacent ID3 tags found in data starting at offset, as one block of data

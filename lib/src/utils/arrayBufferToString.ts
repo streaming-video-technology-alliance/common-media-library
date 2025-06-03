@@ -1,5 +1,5 @@
-import type { Encoding } from './Encoding.ts';
-import { UTF_16 } from './UTF_16.ts';
+import type { Encoding } from './Encoding.js';
+import { UTF_16 } from './UTF_16.js';
 
 /**
  * Converts an ArrayBuffer to a string.

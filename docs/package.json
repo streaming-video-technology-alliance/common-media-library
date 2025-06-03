@@ -1,7 +1,7 @@
 {
 	"name": "@svta/common-media-library-docs",
 	"private": true,
-	"version": "0.12.1",
+	"version": "0.12.4",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",

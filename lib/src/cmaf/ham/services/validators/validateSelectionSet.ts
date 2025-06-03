@@ -1,7 +1,7 @@
-import type { SelectionSet } from '../../types/model/SelectionSet';
-import type { Validation } from '../../types/Validation';
+import type { SelectionSet } from '../../types/model/SelectionSet.js';
+import type { Validation } from '../../types/Validation.js';
 
-import { validateSwitchingSets } from './validateSwitchingSets.ts';
+import { validateSwitchingSets } from './validateSwitchingSets.js';
 
 
 /**

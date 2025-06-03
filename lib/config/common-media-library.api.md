@@ -153,6 +153,8 @@ export class CaptionScreen {
     reset(): void;
     // (undocumented)
     rollUp(): void;
+    // (undocumented)
+    rows: Row[];
     setBkgData(bkgData: Partial<PenStyles>): void;
     // (undocumented)
     setCursor(absPos: number): void;
@@ -506,19 +508,41 @@ export class Cta608Channel {
     // (undocumented)
     ccTR(): void;
     // (undocumented)
+    chNr: number;
+    // (undocumented)
     cueSplitAtTime(t: number): void;
+    // (undocumented)
+    cueStartTime: number | null;
+    // (undocumented)
+    currRollUpRow: Row;
+    // (undocumented)
+    displayedMemory: CaptionScreen;
+    // (undocumented)
+    getHandler(): CueHandler;
     // (undocumented)
     insertChars(chars: number[]): void;
     // (undocumented)
+    lastOutputScreen: CaptionScreen;
+    // (undocumented)
+    mode: CaptionModes;
+    // (undocumented)
+    nonDisplayedMemory: CaptionScreen;
+    // (undocumented)
     outputDataUpdate(dispatch?: boolean): void;
+    // (undocumented)
+    outputFilter: CueHandler;
     // (undocumented)
     reset(): void;
     // (undocumented)
     setBkgData(bkgData: Partial<PenStyles>): void;
     // (undocumented)
+    setHandler(outputFilter: CueHandler): void;
+    // (undocumented)
     setMode(newMode: CaptionModes): void;
     // (undocumented)
     setPAC(pacData: PACData): void;
+    // (undocumented)
+    writeScreen: CaptionScreen;
 }
 
 // @beta
@@ -1332,7 +1356,7 @@ export type Presentation = Ham & {
 export function prft(view: IsoView): ProducerReferenceTimeBox;
 
 // @beta
-export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: number | null | undefined): string;
+export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: string | number | null | undefined): string;
 
 // @beta
 export type ProducerReferenceTimeBox = FullBox & {

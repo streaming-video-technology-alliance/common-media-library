@@ -1,13 +1,13 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet';
-import type { Representation } from '../../../types/mapper/dash/Representation';
-import type { SegmentList } from '../../../types/mapper/dash/SegmentList';
-import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.js';
+import type { Representation } from '../../../types/mapper/dash/Representation.js';
+import type { SegmentList } from '../../../types/mapper/dash/SegmentList.js';
+import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate.js';
 
-import type { Segment } from '../../../types/model/Segment';
+import type { Segment } from '../../../types/model/Segment.js';
 
-import { mapSegmentBase } from './mapSegmentBase.ts';
-import { mapSegmentList } from './mapSegmentList.ts';
-import { mapSegmentTemplate } from './mapSegmentTemplate.ts';
+import { mapSegmentBase } from './mapSegmentBase.js';
+import { mapSegmentList } from './mapSegmentList.js';
+import { mapSegmentTemplate } from './mapSegmentTemplate.js';
 
 /**
  * @internal

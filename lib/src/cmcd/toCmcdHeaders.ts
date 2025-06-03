@@ -1,9 +1,9 @@
-import type { Cmcd } from './Cmcd';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions';
-import { CmcdHeaderField } from './CmcdHeaderField.ts';
-import { CmcdHeaderMap } from './CmcdHeaderMap.ts';
-import type { CmcdKey } from './CmcdKey';
-import { encodeCmcd } from './encodeCmcd.ts';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import { CmcdHeaderField } from './CmcdHeaderField.js';
+import { CmcdHeaderMap } from './CmcdHeaderMap.js';
+import type { CmcdKey } from './CmcdKey.js';
+import { encodeCmcd } from './encodeCmcd.js';
 
 /**
  * Convert a CMCD data object to request headers

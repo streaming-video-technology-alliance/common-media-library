@@ -1,6 +1,6 @@
-import { parseInitDataFromContentProtection } from '@svta/common-media-library/drm/cenc/parseInitDataFromContentProtection';
-import { beforeEach, describe, it } from 'node:test';
+import { parseInitDataFromContentProtection } from '@svta/common-media-library/drm/cenc/parseInitDataFromContentProtection.js';
 import { strictEqual } from 'node:assert';
+import { beforeEach, describe, it } from 'node:test';
 
 describe('parseInitDataFromContentProtection', () => {
 	let cpData: any;
@@ -18,9 +18,7 @@ describe('parseInitDataFromContentProtection', () => {
 
 	beforeEach(() => {
 		cpData = {
-			pssh: {
-				__text: 'AAAANHBzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAABQIARABGgZlbHV2aW8iBmVsdXZpbw==',
-			},
+			pssh: 'AAAANHBzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAABQIARABGgZlbHV2aW8iBmVsdXZpbw==',
 			value: 'Widevine',
 			schemeIdUri: 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
 			KID: null,
@@ -34,7 +32,7 @@ describe('parseInitDataFromContentProtection', () => {
 
 	it('should return base64 decoded buffer if init data is available', () => {
 		//#region example
-		const expected = base64Decode(cpData.pssh.__text);
+		const expected = base64Decode(cpData.pssh);
 		const result = parseInitDataFromContentProtection(cpData, BASE64);
 
 		strictEqual(result?.byteLength, expected.byteLength);
@@ -42,24 +40,24 @@ describe('parseInitDataFromContentProtection', () => {
 	});
 
 	it('should remove newlines and return base64 decoded buffer', () => {
-		cpData.pssh.__text = '\n' + cpData.pssh.__text + '\n';
-		const expected = base64Decode(cpData.pssh.__text.replace(/\s+/g, ''));
+		cpData.pssh = '\n' + cpData.pssh + '\n';
+		const expected = base64Decode(cpData.pssh.replace(/\s+/g, ''));
 		const result = parseInitDataFromContentProtection(cpData, BASE64);
 
 		strictEqual(result?.byteLength, expected.byteLength);
 	});
 
 	it('should remove whitespaces and return base64 decoded buffer', () => {
-		cpData.pssh.__text = cpData.pssh.__text.slice(0, 20) + '   ' + cpData.pssh.__text.slice(20);
-		const expected = base64Decode(cpData.pssh.__text.replace(/\s+/g, ''));
+		cpData.pssh = cpData.pssh.slice(0, 20) + '   ' + cpData.pssh.slice(20);
+		const expected = base64Decode(cpData.pssh.replace(/\s+/g, ''));
 		const result = parseInitDataFromContentProtection(cpData, BASE64);
 
 		strictEqual(result?.byteLength, expected.byteLength);
 	});
 
 	it('should remove whitespaces and newlines and return base64 decoded buffer', () => {
-		cpData.pssh.__text = '\n\n' + cpData.pssh.__text.slice(0, 20) + '   ' + cpData.pssh.__text.slice(20) + '\n\n';
-		const expected = base64Decode(cpData.pssh.__text.replace(/\s+/g, ''));
+		cpData.pssh = '\n\n' + cpData.pssh.slice(0, 20) + '   ' + cpData.pssh.slice(20) + '\n\n';
+		const expected = base64Decode(cpData.pssh.replace(/\s+/g, ''));
 		const result = parseInitDataFromContentProtection(cpData, BASE64);
 
 		strictEqual(result?.byteLength, expected.byteLength);

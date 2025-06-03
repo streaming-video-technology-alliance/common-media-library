@@ -8,7 +8,7 @@ const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]
  * @param number - Number.
  * @param subNumber - Sub-number.
  * @param bandwidth - Bandwidth.
- * @param time - Time.
+ * @param time - Time. Should be passed as a number unless the value is larger than `MAX_SAFE_INTEGER`, then it should be provided as a string. If the value is a string all format tags will be ignored.
  *
  * @returns Processed URI template.
  *
@@ -24,7 +24,7 @@ export function processUriTemplate(
 	number: number | null | undefined,
 	subNumber: number | null | undefined,
 	bandwidth: number | null | undefined,
-	time: number | null | undefined,
+	time: string | number | null | undefined,
 ): string {
 	const uri = uriTemplate.replace(TOKENS, (match, name, widthStr, format) => {
 		let value: string | number | null | undefined;
@@ -50,6 +50,10 @@ export function processUriTemplate(
 				break;
 
 			case 'Time':
+				if (typeof time === 'string') {
+					return time;
+				}
+
 				value = time ? Math.round(time) : time;
 				break;
 

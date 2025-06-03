@@ -1,5 +1,5 @@
-import { serializeBareItem } from './serializeBareItem.ts';
-import { serializeKey } from './serializeKey.ts';
+import { serializeBareItem } from './serializeBareItem.js';
+import { serializeKey } from './serializeKey.js';
 
 // 4.1.1.2.  Serializing Parameters
 //

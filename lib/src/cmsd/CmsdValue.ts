@@ -1,7 +1,7 @@
-import type { SfToken } from '../structuredfield/SfToken';
-import type { CmsdObjectType } from './CmsdObjectType';
-import type { CmsdStreamType } from './CmsdStreamType';
-import type { CmsdStreamingFormat } from './CmsdStreamingFormat';
+import type { SfToken } from '../structuredfield/SfToken.js';
+import type { CmsdObjectType } from './CmsdObjectType.js';
+import type { CmsdStreamType } from './CmsdStreamType.js';
+import type { CmsdStreamingFormat } from './CmsdStreamingFormat.js';
 
 /**
  * CMSD Value

@@ -1,6 +1,6 @@
 {
 	"name": "@svta/common-media-library",
-	"version": "0.12.1",
+	"version": "0.12.4",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
@@ -69,7 +69,7 @@
 		"postbuild": "api-extractor run --local",
 		"build:esm": "node ../scripts/build.mts",
 		"build:cjs": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist/cjs",
-		"test": "node --test ./test/**/*.test.ts",
+		"test": "node --no-warnings --test **/*.test.ts",
 		"prepublishOnly": "npm run build"
 	}
 }

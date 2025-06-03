@@ -1,5 +1,5 @@
-import type { SfBareItem } from './SfBareItem';
-import type { SfParameters } from './SfParameters';
+import type { SfBareItem } from './SfBareItem.js';
+import type { SfParameters } from './SfParameters.js';
 
 /**
  * Structured Field Item

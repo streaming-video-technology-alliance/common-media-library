@@ -1,8 +1,8 @@
-import type { SfDecodeOptions } from './SfDecodeOptions';
-import type { SfDictionary } from './SfDictionary';
-import { parseDict } from './parse/parseDict.ts';
-import { parseError } from './parse/parseError.ts';
-import { DICT } from './utils/DICT.ts';
+import type { SfDecodeOptions } from './SfDecodeOptions.js';
+import type { SfDictionary } from './SfDictionary.js';
+import { parseDict } from './parse/parseDict.js';
+import { parseError } from './parse/parseError.js';
+import { DICT } from './utils/DICT.js';
 
 /**
  * Decode a structured field string into a structured field dictionary

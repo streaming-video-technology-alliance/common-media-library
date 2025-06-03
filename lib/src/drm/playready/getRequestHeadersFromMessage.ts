@@ -1,11 +1,11 @@
-import { UTF_16 } from '../../utils/UTF_16.ts';
-import type { UTF_8 } from '../../utils/UTF_8.ts';
-import { arrayBufferToString } from '../../utils/arrayBufferToString.ts';
-import { getElementsByName } from '../../xml/getElementsByName.ts';
-import { parseXml } from '../../xml/parseXml.ts';
-import { CONTENT_TYPE } from '../common/CONTENT_TYPE.ts';
-import { HTTP_HEADERS } from '../common/HTTP_HEADERS.ts';
-import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.ts';
+import { UTF_16 } from '../../utils/UTF_16.js';
+import type { UTF_8 } from '../../utils/UTF_8.js';
+import { arrayBufferToString } from '../../utils/arrayBufferToString.js';
+import { getElementsByName } from '../../xml/getElementsByName.js';
+import { parseXml } from '../../xml/parseXml.js';
+import { CONTENT_TYPE } from '../common/CONTENT_TYPE.js';
+import { HTTP_HEADERS } from '../common/HTTP_HEADERS.js';
+import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.js';
 
 /**
  * Gets the PlayReady license request headers from the MediaKeyMessageEvent.

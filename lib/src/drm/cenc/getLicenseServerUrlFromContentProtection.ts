@@ -1,4 +1,4 @@
-import type { ContentProtection } from '../common/ContentProtection';
+import type { ContentProtection } from '../common/ContentProtection.js';
 
 /**
  * Extracts a license server URL from an array of ContentProtection elements.
@@ -9,7 +9,7 @@ import type { ContentProtection } from '../common/ContentProtection';
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
  * {@includeCode ../../../test/drm/cenc/getLicenseServerUrlFromContentProtection.test.ts#example}
  */
@@ -17,23 +17,5 @@ export function getLicenseServerUrlFromContentProtection(
 	contentProtectionElements: ContentProtection[],
 	schemeIdUri: string,
 ): string | null {
-	if (!Array.isArray(contentProtectionElements)) {
-		return null;
-	}
-
-	for (const cp of contentProtectionElements) {
-		if (cp.schemeIdUri === schemeIdUri) {
-			const laUrl = cp.laUrl;
-
-			if (laUrl && typeof laUrl === 'string') {
-				return laUrl;
-			}
-
-			if (typeof laUrl === 'object' && laUrl && typeof laUrl === 'string') {
-				return laUrl;
-			}
-		}
-	}
-
-	return null;
+	return contentProtectionElements.find(cp => cp.schemeIdUri === schemeIdUri)?.laUrl || null;
 }

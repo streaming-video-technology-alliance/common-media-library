@@ -1,14 +1,14 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions';
-import type { SfDictionary } from '../SfDictionary';
-import type { SfInnerList } from '../SfInnerList';
-import { SfItem } from '../SfItem.ts';
-import { DICT } from '../utils/DICT.ts';
-import type { ParsedValue } from './ParsedValue';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
-import { parseItemOrInnerList } from './parseItemOrInnerList.ts';
-import { parseKey } from './parseKey.ts';
-import { parseParameters } from './parseParameters.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.js';
+import type { SfDictionary } from '../SfDictionary.js';
+import type { SfInnerList } from '../SfInnerList.js';
+import { SfItem } from '../SfItem.js';
+import { DICT } from '../utils/DICT.js';
+import type { ParsedValue } from './ParsedValue.js';
+import { parsedValue } from './ParsedValue.js';
+import { parseError } from './parseError.js';
+import { parseItemOrInnerList } from './parseItemOrInnerList.js';
+import { parseKey } from './parseKey.js';
+import { parseParameters } from './parseParameters.js';
 
 // 4.2.2.  Parsing a Dictionary
 //

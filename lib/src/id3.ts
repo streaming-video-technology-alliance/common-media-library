@@ -7,11 +7,11 @@
  *
  * @packageDocumentation
  */
-export { canParseId3 } from './id3/canParseId3.ts';
-export type { DecodedId3Frame } from './id3/DecodedId3Frame.ts';
-export { getId3Data } from './id3/getId3Data.ts';
-export { getId3Frames } from './id3/getId3Frames.ts';
-export { getId3Timestamp } from './id3/getId3Timestamp.ts';
-export { ID3_SCHEME_ID_URI } from './id3/ID3_SCHEME_ID_URI.ts';
-export type { Id3Frame } from './id3/Id3Frame.ts';
-export { isId3TimestampFrame } from './id3/isId3TimestampFrame.ts';
+export { canParseId3 } from './id3/canParseId3.js';
+export type { DecodedId3Frame } from './id3/DecodedId3Frame.js';
+export { getId3Data } from './id3/getId3Data.js';
+export { getId3Frames } from './id3/getId3Frames.js';
+export { getId3Timestamp } from './id3/getId3Timestamp.js';
+export { ID3_SCHEME_ID_URI } from './id3/ID3_SCHEME_ID_URI.js';
+export type { Id3Frame } from './id3/Id3Frame.js';
+export { isId3TimestampFrame } from './id3/isId3TimestampFrame.js';

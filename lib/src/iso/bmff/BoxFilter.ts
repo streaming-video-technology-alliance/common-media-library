@@ -1,4 +1,4 @@
-import type { Box } from './Box';
+import type { Box } from './Box.js';
 
 /**
  * BoxFilter

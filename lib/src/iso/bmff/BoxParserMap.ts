@@ -1,4 +1,4 @@
-import type { BoxParser } from './BoxParser';
+import type { BoxParser } from './BoxParser.js';
 
 /**
  * A map of box parsers to their box types

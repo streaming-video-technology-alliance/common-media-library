@@ -1,4 +1,4 @@
-import { readUint } from './readUint.ts';
+import { readUint } from './readUint.js';
 
 export function readTemplate(dataView: DataView, offset: number, size: number): number {
 	const half = size / 2;

@@ -1,6 +1,6 @@
-import { unescapeHtml } from '../utils/unescapeHtml.ts';
-import type { XmlNode } from './XmlNode';
-import type { XmlParseOptions } from './XmlParseOptions';
+import { unescapeHtml } from '../utils/unescapeHtml.js';
+import type { XmlNode } from './XmlNode.js';
+import type { XmlParseOptions } from './XmlParseOptions.js';
 
 /**
  * Parse XML into a JS object with no validation and some failure tolerance
@@ -204,7 +204,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 					pos--;
 				}
 
-				attributes[name] = value;
+				attributes[name] = unescapeHtml(value);
 			}
 			pos++;
 		}

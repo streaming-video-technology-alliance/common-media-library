@@ -1,5 +1,5 @@
-import { isId3Header } from './util/isId3Header.ts';
-import { readId3Size } from './util/readId3Size.ts';
+import { isId3Header } from './util/isId3Header.js';
+import { readId3Size } from './util/readId3Size.js';
 
 /**
  * Checks if the given data contains an ID3 tag.

@@ -8,6 +8,27 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.12.4] - 2025-05-16
+
+### Fixed
+
+- `processUriTemplate` cannot correctly resolve time values larger than MAX_SAFE_INTEGER
+  ([#190](https://github.com/streaming-video-technology-alliance/common-media-library/issues/190))
+
+## [0.12.3] - 2025-05-15
+
+### Fixed
+
+- The `parseXml` function does not decode HTML entities in attribute values
+  ([#187](https://github.com/streaming-video-technology-alliance/common-media-library/issues/187))
+
+## [0.12.2] - 2025-05-15
+
+### Fixed
+
+- Additional fixes for TS Error: Import path cannot end with a '.ts' extension
+  ([#183](https://github.com/streaming-video-technology-alliance/common-media-library/issues/183))
+
 ## [0.12.1] - 2025-05-14
 
 ### Fixed
@@ -326,7 +347,10 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.4...HEAD
+[0.12.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.3...v0.12.4
+[0.12.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.2...v0.12.3
+[0.12.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.10.0...v0.11.0
