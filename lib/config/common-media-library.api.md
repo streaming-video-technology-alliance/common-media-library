@@ -1263,6 +1263,9 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 export function parsePSSHList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer>;
 
 // @beta
+export function parseWebVtt(text: string, options?: WebVttParserOptions): WebVttParseResult;
+
+// @beta
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
 
 // @beta
@@ -1868,6 +1871,12 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
+// @beta
+export function toVttCue(cue: WebVttCue): VTTCue;
+
+// @beta
+export function toVttRegion(region: WebVttRegion): VTTRegion;
+
 // @alpha
 export type Track = Ham & {
     type: TrackType;
@@ -2137,12 +2146,80 @@ export type WebVTTConfigurationBox = {
 };
 
 // @beta
+export type WebVttCue = {
+    id: string;
+    startTime: number;
+    endTime: number;
+    pauseOnExit: boolean;
+    text: string;
+    align: AlignSetting;
+    region: WebVttRegion | null;
+    vertical: DirectionSetting;
+    snapToLines: boolean;
+    line: LineAndPositionSetting;
+    lineAlign: LineAlignSetting;
+    position: LineAndPositionSetting;
+    positionAlign: PositionAlignSetting;
+    size: number;
+};
+
+// @beta
+export type WebVttCueFactory = () => WebVttCue;
+
+// @beta
 export type WebVTTCuePayloadBox = {
     cueText: string;
 };
 
 // @beta
 export type WebVTTEmptySampleBox = object;
+
+// @beta
+export class WebVttParser {
+    constructor(options?: WebVttParserOptions);
+    flush(): WebVttParser;
+    oncue: ((cue: WebVttCue) => void) | undefined;
+    onflush: (() => void) | undefined;
+    onparsingerror: ((error: WebVttParsingError) => void) | undefined;
+    onregion: ((region: WebVttRegion) => void) | undefined;
+    onstyle: ((style: string) => void) | undefined;
+    ontimestampmap: ((timestampMap: any) => void) | undefined;
+    parse(data?: string, reuseCue?: boolean): WebVttParser;
+}
+
+// @beta
+export type WebVttParseResult = {
+    cues: WebVttCue[];
+    regions: WebVttRegion[];
+    styles: string[];
+    errors: WebVttParsingError[];
+};
+
+// @beta
+export type WebVttParserOptions = {
+    createCue?: WebVttCueFactory;
+    createRegion?: WebVttRegionFactory;
+};
+
+// @beta
+export class WebVttParsingError extends Error {
+    constructor(message: string);
+}
+
+// @beta
+export type WebVttRegion = {
+    id: string;
+    width: number;
+    lines: number;
+    regionAnchorX: number;
+    regionAnchorY: number;
+    viewportAnchorX: number;
+    viewportAnchorY: number;
+    scroll: ScrollSetting;
+};
+
+// @beta
+export type WebVttRegionFactory = () => WebVttRegion;
 
 // @beta
 export type WebVTTSettingsBox = {

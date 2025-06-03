@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- VTT Parsing Utilities
+  ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
+
 ## [0.12.4] - 2025-05-16
 
 ### Fixed

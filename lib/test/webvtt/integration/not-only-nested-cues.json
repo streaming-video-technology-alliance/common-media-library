@@ -1,0 +1,37 @@
+{
+  "cues": [
+    {
+      "align": "center",
+      "endTime": 60,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 0,
+      "text": "The First Minute",
+      "vertical": ""
+    },
+    {
+      "align": "center",
+      "endTime": 90,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 30,
+      "text": "The Final Minute",
+      "vertical": ""
+    }
+  ],
+  "regions": []
+}
