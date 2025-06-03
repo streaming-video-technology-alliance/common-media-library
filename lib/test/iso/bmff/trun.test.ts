@@ -1,4 +1,4 @@
-import { assert, describe, findBox, it, trun, type TrackRunBox } from './util/box';
+import { assert, describe, findBox, it, trun, type TrackRunBox } from './util/box.ts';
 
 describe('trun box', function () {
 	it('should correctly parse the box from sample data', function () {

@@ -1,4 +1,4 @@
-import { assert, describe, findBox, it, kind, meta, prsl } from './util/box';
+import { assert, describe, findBox, it, kind, meta, prsl } from './util/box.ts';
 
 describe('kind box', function () {
 	it('should correctly parse the box from sample data', function () {

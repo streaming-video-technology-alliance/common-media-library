@@ -1,4 +1,4 @@
-import { assert, describe, it, parseContainer } from './util/box';
+import { assert, describe, it, parseContainer } from './util/box.ts';
 
 describe('moov box', function () {
 	it('should correctly parse the box', function () {

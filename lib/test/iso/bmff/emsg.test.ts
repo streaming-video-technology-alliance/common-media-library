@@ -1,4 +1,4 @@
-import { assert, describe, emsg, findBox, it, type EventMessageBox } from './util/box';
+import { assert, describe, emsg, findBox, it, type EventMessageBox } from './util/box.ts';
 
 describe('emsg box', function () {
 	it('should correctly parse the box from sample data', function () {
