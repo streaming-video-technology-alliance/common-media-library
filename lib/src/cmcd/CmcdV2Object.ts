@@ -4,6 +4,34 @@ import type { CmcdStreamingFormat } from './CmcdStreamingFormat';
 import type { CmcdStreamType } from './CmcdStreamType';
 import type { CmcdPlayerState } from './CmcdPlayerState';
 
+export const CMCD_V2_COMMON_AVAILABLE_KEYS = [
+	'br', 
+	'ab', 
+	'bl', 
+	'tbl', 
+	'bs', 
+	'cdn', 
+	'cid', 
+	'ltc', 
+	'mtp', 
+	'pr', 
+	'sf', 
+	'sid', 
+	'bg', 
+	'sta', 
+	'st', 
+	'ts', 
+	'tpb', 
+	'tb', 
+	'lb', 
+	'tab', 
+	'lab', 
+	'pt', 
+	'ec', 
+	'msd', 
+	'v',
+] as const;
+
 /**
  * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.
  *
