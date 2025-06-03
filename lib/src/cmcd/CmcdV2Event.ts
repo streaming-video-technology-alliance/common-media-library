@@ -1,6 +1,6 @@
 import type { CmcdReportingEvent } from './CmcdReportingEvent';
 
-export const CMCD_V2_EVENT_MODE_AVAILABLE_KEYS = [
+export const CMCD_V2_EVENT_MODE_KEYS = [
 	'e',
 ] as const;
 

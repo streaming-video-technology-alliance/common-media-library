@@ -1,6 +1,6 @@
 import type { CmcdObjectType } from './CmcdObjectType';
 
-export const CMCD_V2_REQUEST_MODE_AVAILABLE_KEYS = [
+export const CMCD_V2_REQUEST_MODE_KEYS = [
 	'd', 
 	'dl', 
 	'nor', 

@@ -4,7 +4,7 @@ import type { CmcdStreamingFormat } from './CmcdStreamingFormat';
 import type { CmcdStreamType } from './CmcdStreamType';
 import type { CmcdPlayerState } from './CmcdPlayerState';
 
-export const CMCD_V2_COMMON_AVAILABLE_KEYS = [
+export const CMCD_V2_COMMON_KEYS = [
 	'br', 
 	'ab', 
 	'bl', 
