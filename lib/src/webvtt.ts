@@ -12,6 +12,7 @@ export { toVttRegion } from './webvtt/toVttRegion.js';
 export { WebVttParser } from './webvtt/WebVttParser.js';
 export { WebVttParsingError } from './webvtt/WebVttParsingError.js';
 
+export type { TimestampMap } from './webvtt/TimestampMap.js';
 export type { WebVttCue } from './webvtt/WebVttCue.js';
 export type { WebVttCueFactory } from './webvtt/WebVttCueFactory.js';
 export type { WebVttParseResult } from './webvtt/WebVttParseResult.js';

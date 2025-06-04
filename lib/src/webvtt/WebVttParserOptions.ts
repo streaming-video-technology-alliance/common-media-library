@@ -10,6 +10,15 @@ import type { WebVttRegionFactory } from './WebVttRegionFactory';
  */
 export type WebVttParserOptions = {
 	/**
+	 * Whether to use DOM VTTCue and VTTRegion or generic objects. If `createCue`
+	 * or `createRegion` are provided, they will be used instead of the default
+	 * factory functions.
+	 *
+	 * @default true
+	 */
+	useDomTypes?: boolean;
+
+	/**
 	 * A factory for creating WebVttCue objects.
 	 *
 	 * By default the parser will create DOM VTTCue objects for each cue.

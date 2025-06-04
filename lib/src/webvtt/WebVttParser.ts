@@ -3,6 +3,7 @@ import { parseOptions } from './parse/parseOptions.js';
 import { parseTimeStamp } from './parse/parseTimestamp.js';
 import { Settings } from './parse/Settings.js';
 import { WebVttParserState } from './parse/WebVttParserState.js';
+import type { TimestampMap } from './TimestampMap.js';
 import type { WebVttCue } from './WebVttCue.js';
 import type { WebVttCueFactory } from './WebVttCueFactory.js';
 import type { WebVttParserOptions } from './WebVttParserOptions.js';
@@ -11,6 +12,9 @@ import type { WebVttRegion } from './WebVttRegion.js';
 import type { WebVttRegionFactory } from './WebVttRegionFactory.js';
 
 const BAD_SIGNATURE = 'Malformed WebVTT signature.';
+const defaultFactory = <T>(): T => ({} as T);
+const createCue = (): WebVttCue => new VTTCue(0, 0, '');
+const createRegion = (): WebVttRegion => new VTTRegion();
 
 /**
  * A WebVTT parser.
@@ -21,6 +25,8 @@ const BAD_SIGNATURE = 'Malformed WebVTT signature.';
  *
  * @example
  * {@includeCode ../../test/webvtt/WebVttParser.test.ts#example}
+ *
+ * @see {@link https://www.w3.org/TR/webvtt1/ | WebVTT Specification}
  */
 export class WebVttParser {
 	private state: WebVttParserState;
@@ -35,41 +41,42 @@ export class WebVttParser {
 	/**
 	 * A callback function that is called when a parsing error occurs.
 	 */
-	onparsingerror: ((error: WebVttParsingError) => void) | undefined;
+	onparsingerror?: (error: WebVttParsingError) => void;
 
 	/**
 	 * A callback function that is called when a region is parsed.
 	 */
-	onregion: ((region: WebVttRegion) => void) | undefined;
+	onregion?: (region: WebVttRegion) => void;
 
 	/**
 	 * A callback function that is called when a timestamp map is parsed.
 	 */
-	ontimestampmap: ((timestampMap: any) => void) | undefined;
+	ontimestampmap?: (timestampMap: TimestampMap) => void;
 
 	/**
 	 * A callback function that is called when a cue is parsed.
 	 */
-	oncue: ((cue: WebVttCue) => void) | undefined;
+	oncue?: (cue: WebVttCue) => void;
 
 	/**
 	 * A callback function that is called when a style is parsed.
 	 */
-	onstyle: ((style: string) => void) | undefined;
+	onstyle?: (style: string) => void;
 
 	/**
 	 * A callback function that is called when the parser is flushed.
 	 */
-	onflush: (() => void) | undefined;
+	onflush?: () => void;
 
 	/**
 	 * Create a new WebVTT parser.
 	 *
 	 * @param options - The options to use for the parser.
 	 */
-	constructor(options?: WebVttParserOptions) {
-		this.createCue = options?.createCue || (() => new VTTCue(0, 0, ''));
-		this.createRegion = options?.createRegion || (() => new VTTRegion());
+	constructor(options: WebVttParserOptions = {}) {
+		const useDomTypes = options.useDomTypes ?? true;
+		this.createCue = options.createCue || useDomTypes ? createCue : defaultFactory<WebVttCue>;
+		this.createRegion = options.createRegion || useDomTypes ? createRegion : defaultFactory<WebVttRegion>;
 
 		this.state = WebVttParserState.INITIAL;
 		this.buffer = '';
@@ -146,7 +153,7 @@ export class WebVttParser {
 			}
 		};
 
-		// 5.1 WebVTT file parsing.
+		// 6.1 WebVTT file parsing.
 		try {
 			let line!: string;
 

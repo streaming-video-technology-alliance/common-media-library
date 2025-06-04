@@ -2178,12 +2178,13 @@ export type WebVTTEmptySampleBox = object;
 export class WebVttParser {
     constructor(options?: WebVttParserOptions);
     flush(): WebVttParser;
-    oncue: ((cue: WebVttCue) => void) | undefined;
-    onflush: (() => void) | undefined;
-    onparsingerror: ((error: WebVttParsingError) => void) | undefined;
-    onregion: ((region: WebVttRegion) => void) | undefined;
-    onstyle: ((style: string) => void) | undefined;
-    ontimestampmap: ((timestampMap: any) => void) | undefined;
+    oncue?: (cue: WebVttCue) => void;
+    onflush?: () => void;
+    onparsingerror?: (error: WebVttParsingError) => void;
+    onregion?: (region: WebVttRegion) => void;
+    onstyle?: (style: string) => void;
+    // Warning: (ae-forgotten-export) The symbol "TimestampMap" needs to be exported by the entry point index.d.ts
+    ontimestampmap?: (timestampMap: TimestampMap) => void;
     parse(data?: string, reuseCue?: boolean): WebVttParser;
 }
 
@@ -2197,6 +2198,7 @@ export type WebVttParseResult = {
 
 // @beta
 export type WebVttParserOptions = {
+    useDomTypes?: boolean;
     createCue?: WebVttCueFactory;
     createRegion?: WebVttRegionFactory;
 };
