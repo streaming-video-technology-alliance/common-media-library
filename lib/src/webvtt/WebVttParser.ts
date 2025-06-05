@@ -13,8 +13,8 @@ import type { WebVttRegionFactory } from './WebVttRegionFactory.js';
 
 const BAD_SIGNATURE = 'Malformed WebVTT signature.';
 const defaultFactory = <T>(): T => ({} as T);
-const createCue = (): WebVttCue => new VTTCue(0, 0, '');
-const createRegion = (): WebVttRegion => new VTTRegion();
+const createCue = (): WebVttCue => typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : {} as WebVttCue;
+const createRegion = (): WebVttRegion => typeof VTTRegion !== 'undefined' ? new VTTRegion() : {} as WebVttRegion;
 
 /**
  * A WebVTT parser.

@@ -11,6 +11,7 @@ export * from './utils/dataViewToString.js';
 export * from './utils/Encoding.js';
 export * from './utils/roundToEven.js';
 export * from './utils/stringToUint16.js';
+export type { TypedResult } from './utils/TypedResult.js';
 export * from './utils/unescapeHtml.js';
 export * from './utils/urlToRelativePath.js';
 export * from './utils/utf8ArrayToStr.js';

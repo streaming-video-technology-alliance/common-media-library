@@ -1860,6 +1860,12 @@ export type ThroughputEstimator = {
 };
 
 // @beta
+export type TimestampMap = {
+    MPEGTS: number;
+    LOCAL: number;
+};
+
+// @beta
 export function tkhd(view: IsoView): TrackHeaderBox;
 
 // @beta
@@ -1994,6 +2000,12 @@ export type TypeBox = {
     majorBrand: string;
     minorVersion: number;
     compatibleBrands: string[];
+};
+
+// @beta
+export type TypedResult<T, D> = {
+    type: T;
+    data: D;
 };
 
 // @beta
@@ -2172,7 +2184,13 @@ export type WebVTTCuePayloadBox = {
 };
 
 // @beta
+export type WebVttCueResult = TypedResult<'cue', WebVttCue>;
+
+// @beta
 export type WebVTTEmptySampleBox = object;
+
+// @beta
+export type WebVttErrorResult = TypedResult<'error', WebVttParsingError>;
 
 // @beta
 export class WebVttParser {
@@ -2183,7 +2201,6 @@ export class WebVttParser {
     onparsingerror?: (error: WebVttParsingError) => void;
     onregion?: (region: WebVttRegion) => void;
     onstyle?: (style: string) => void;
-    // Warning: (ae-forgotten-export) The symbol "TimestampMap" needs to be exported by the entry point index.d.ts
     ontimestampmap?: (timestampMap: TimestampMap) => void;
     parse(data?: string, reuseCue?: boolean): WebVttParser;
 }
@@ -2224,6 +2241,24 @@ export type WebVttRegion = {
 export type WebVttRegionFactory = () => WebVttRegion;
 
 // @beta
+export type WebVttRegionResult = TypedResult<'region', WebVttRegion>;
+
+// @beta
+export type WebVttResult = WebVttCueResult | WebVttRegionResult | WebVttTimestampMapResult | WebVttStyleResult | WebVttErrorResult;
+
+// @beta
+export const WebVttResultType: {
+    readonly CUE: "cue";
+    readonly REGION: "region";
+    readonly TIMESTAMP_MAP: "timestampmap";
+    readonly STYLE: "style";
+    readonly ERROR: "error";
+};
+
+// @beta (undocumented)
+export type WebVttResultType = ValueOf<typeof WebVttResultType>;
+
+// @beta
 export type WebVTTSettingsBox = {
     settings: string;
 };
@@ -2232,6 +2267,24 @@ export type WebVTTSettingsBox = {
 export type WebVTTSourceLabelBox = {
     sourceLabel: string;
 };
+
+// @beta
+export type WebVttStyleResult = TypedResult<'style', string>;
+
+// @beta
+export type WebVttTimestampMapResult = TypedResult<'timestampmap', TimestampMap>;
+
+// @beta
+export class WebVttTransformer {
+    constructor();
+    flush(controller: TransformStreamDefaultController<WebVttResult>): void;
+    transform(chunk: string, controller: TransformStreamDefaultController<WebVttResult>): void;
+}
+
+// @beta
+export class WebVttTransformStream extends TransformStream<string, WebVttResult> {
+    constructor(writableStrategy?: QueuingStrategy<string>, readableStrategy?: QueuingStrategy<WebVttResult>);
+}
 
 // @beta
 export const WIDEVINE_KEY_SYSTEM = "com.widevine.alpha";
