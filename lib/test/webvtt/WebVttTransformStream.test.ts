@@ -16,7 +16,7 @@ function fetch(path: string): Promise<{ body: ReadableStream<any> }> {
 describe('WebVttTransformStream examples', () => {
 	it('provides a valid example', async () => {
 		//#region example
-		const response = await fetch('./test/webvtt/regions/region.vtt');
+		const response = await fetch('./test/webvtt/test.vtt');
 		const stream = response.body
 			.pipeThrough(new TextDecoderStream())
 			.pipeThrough(new WebVttTransformStream());
@@ -27,8 +27,8 @@ describe('WebVttTransformStream examples', () => {
 			results.push(result);
 		}
 
-		equal(results.length, 11);
 		equal(results.filter(result => result.type === WebVttResultType.CUE).length, 7);
+		equal(results.filter(result => result.type === WebVttResultType.TIMESTAMP_MAP).length, 1);
 		equal(results.filter(result => result.type === WebVttResultType.REGION).length, 2);
 		equal(results.filter(result => result.type === WebVttResultType.STYLE).length, 2);
 		equal(results.filter(result => result.type === WebVttResultType.ERROR).length, 0);

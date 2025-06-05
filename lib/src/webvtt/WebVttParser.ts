@@ -166,7 +166,7 @@ export class WebVttParser {
 				line = collectNextLine();
 
 				// Remove the UTF-8 BOM if it exists.
-				if (line.charCodeAt(0) === 65279) {
+				if (line.charCodeAt(0) === 0xFEFF) {
 					line = line.slice(1);
 				}
 
