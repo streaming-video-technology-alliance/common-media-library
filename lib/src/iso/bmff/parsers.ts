@@ -16,6 +16,7 @@ export * from './parsers/ftyp.js';
 export * from './parsers/hdlr.js';
 export * from './parsers/hev1.js';
 export * from './parsers/hvc1.js';
+export * from './parsers/iden.js';
 export * from './parsers/imda.js';
 export * from './parsers/kind.js';
 export * from './parsers/labl.js';

@@ -10,6 +10,8 @@ and this project adheres to
 
 ### Added
 
+- Add ISO BMFF `iden` box parser
+  ([#197](https://github.com/streaming-video-technology-alliance/common-media-library/issues/197))
 - Added EWMA Throughput Calculations ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
 
 ## [0.12.4] - 2025-05-16

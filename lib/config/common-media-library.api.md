@@ -920,6 +920,9 @@ export const ID3_SCHEME_ID_URI = "https://aomedia.org/emsg/ID3";
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
 // @beta
+export function iden(view: IsoView): WebVTTCueIdBox;
+
+// @beta
 export type IdentifiedMediaDataBox = {
     imdaIdentifier: number;
     data: Uint8Array;
@@ -2134,6 +2137,11 @@ export const WEBM = "webm";
 // @beta
 export type WebVTTConfigurationBox = {
     config: string;
+};
+
+// @beta
+export type WebVTTCueIdBox = {
+    cueId: string;
 };
 
 // @beta
