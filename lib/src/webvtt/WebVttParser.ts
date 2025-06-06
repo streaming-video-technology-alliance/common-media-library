@@ -1,3 +1,5 @@
+import { createWebVttCue } from './createWebVttCue.js';
+import { createWebVttRegion } from './createWebVttRegion.js';
 import { parseCue } from './parse/parseCue.js';
 import { parseOptions } from './parse/parseOptions.js';
 import { parseTimeStamp } from './parse/parseTimestamp.js';
@@ -12,9 +14,8 @@ import type { WebVttRegion } from './WebVttRegion.js';
 import type { WebVttRegionFactory } from './WebVttRegionFactory.js';
 
 const BAD_SIGNATURE = 'Malformed WebVTT signature.';
-const defaultFactory = <T>(): T => ({} as T);
-const createCue = (): WebVttCue => typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : {} as WebVttCue;
-const createRegion = (): WebVttRegion => typeof VTTRegion !== 'undefined' ? new VTTRegion() : {} as WebVttRegion;
+const createCue = (): WebVttCue => typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : createWebVttCue();
+const createRegion = (): WebVttRegion => typeof VTTRegion !== 'undefined' ? new VTTRegion() : createWebVttRegion();
 
 /**
  * A WebVTT parser.
@@ -75,8 +76,8 @@ export class WebVttParser {
 	 */
 	constructor(options: WebVttParserOptions = {}) {
 		const useDomTypes = options.useDomTypes ?? true;
-		this.createCue = options.createCue || useDomTypes ? createCue : defaultFactory<WebVttCue>;
-		this.createRegion = options.createRegion || useDomTypes ? createRegion : defaultFactory<WebVttRegion>;
+		this.createCue = options.createCue || useDomTypes ? createCue : createWebVttCue;
+		this.createRegion = options.createRegion || useDomTypes ? createRegion : createWebVttRegion;
 
 		this.state = WebVttParserState.INITIAL;
 		this.buffer = '';
@@ -335,24 +336,8 @@ export class WebVttParser {
 
 						sawCue = true;
 
-						const cue = this.createCue();
-
-						cue.id = '';
-						cue.startTime = 0;
-						cue.endTime = 0;
-						cue.region = null;
-						cue.snapToLines = true;
-						cue.line = 'auto';
-						cue.lineAlign = 'start';
-						cue.position = 'auto';
-						cue.positionAlign = 'auto';
-						cue.size = 100;
-						cue.align = 'center';
-						cue.vertical = '';
-						cue.pauseOnExit = false;
-						cue.text = '';
-
-						this.cue = cue;
+						this.cue = this.createCue();
+						this.cue.text ??= '';
 
 						this.state = WebVttParserState.CUE;
 						// 30-39 - Check if this line contains an optional identifier or timing data.

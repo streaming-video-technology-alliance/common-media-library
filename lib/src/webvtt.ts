@@ -6,6 +6,8 @@
  *
  * @packageDocumentation
  */
+export { createWebVttCue } from './webvtt/createWebVttCue.js';
+export { createWebVttRegion } from './webvtt/createWebVttRegion.js';
 export { parseWebVtt } from './webvtt/parseWebVtt.js';
 export { toVttCue } from './webvtt/toVttCue.js';
 export { toVttRegion } from './webvtt/toVttRegion.js';

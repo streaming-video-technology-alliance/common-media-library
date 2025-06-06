@@ -473,6 +473,12 @@ export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
 export function createMediaKeySystemConfiguration(supportedAudio: MediaCapability[] | null, supportedVideo: MediaCapability[] | null): KeySystemConfiguration;
 
 // @beta
+export function createWebVttCue(): WebVttCue;
+
+// @beta
+export function createWebVttRegion(): WebVttRegion;
+
+// @beta
 export class Cta608Channel {
     constructor(channelNumber: number, outputFilter: CueHandler, logger?: CaptionsLogger);
     // (undocumented)
