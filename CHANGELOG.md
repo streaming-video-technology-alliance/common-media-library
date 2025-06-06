@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add ISO BMFF `iden` box parser
+  ([#197](https://github.com/streaming-video-technology-alliance/common-media-library/issues/197))
+
 ## [0.12.4] - 2025-05-16
 
 ### Fixed
