@@ -10,6 +10,8 @@ and this project adheres to
 
 ### Added
 
+- Add ISO BMFF `iden` box parser
+  ([#197](https://github.com/streaming-video-technology-alliance/common-media-library/issues/197))
 - VTT Parsing Utilities
   ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
 
