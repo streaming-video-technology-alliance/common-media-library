@@ -47,24 +47,47 @@ export class IsoView {
 	private config: IsoViewConfig;
 	private truncated: boolean = false;
 
+	/**
+	 * Creates a new IsoView instance. Similar to DataView, but with additional
+	 * methods for reading ISO BMFF data. It implements the iterator protocol,
+	 * so it can be used in a for...of loop.
+	 *
+	 * @param raw - The raw data to view.
+	 * @param config - The configuration for the IsoView.
+	 */
 	constructor(raw: ArrayBuffer | DataView | Uint8Array, config?: IsoViewConfig) {
 		this.dataView = (raw instanceof ArrayBuffer) ? new DataView(raw) : (raw instanceof Uint8Array) ? new DataView(raw.buffer, raw.byteOffset, raw.byteLength) : raw;
 		this.offset = this.dataView.byteOffset;
 		this.config = config || { recursive: false, parsers: {} };
 	}
 
+	/**
+	 * The current byteoffset in the data view.
+	 */
 	get cursor(): number {
 		return this.offset - this.dataView.byteOffset;
 	}
 
+	/**
+	 * Whether the end of the data view has been reached.
+	 */
 	get done(): boolean {
 		return this.cursor >= this.dataView.byteLength || this.truncated;
 	}
 
+	/**
+	 * The number of bytes remaining in the data view.
+	 */
 	get bytesRemaining(): number {
 		return this.dataView.byteLength - this.cursor;
 	}
 
+	/**
+	 * Creates a new IsoView instance with a slice of the current data view.
+	 *
+	 * @param size - The size of the slice.
+	 * @returns A new IsoView instance.
+	 */
 	slice = (size: number): IsoView => {
 		const dataView = new DataView(this.dataView.buffer, this.offset, size);
 		this.offset += size;
@@ -125,30 +148,71 @@ export class IsoView {
 		return result;
 	};
 
+	/**
+	 * Reads a unsigned integer from the data view.
+	 *
+	 * @param size - The size of the integer in bytes.
+	 * @returns The unsigned integer.
+	 */
 	readUint = (size: number): number => {
 		return this.read(UINT, size);
 	};
 
+	/**
+	 * Reads a signed integer from the data view.
+	 *
+	 * @param size - The size of the integer in bytes.
+	 * @returns The signed integer.
+	 */
 	readInt = (size: number): number => {
 		return this.read(INT, size);
 	};
 
+	/**
+	 * Reads a string from the data view.
+	 *
+	 * @param size - The size of the string in bytes.
+	 * @returns The string.
+	 */
 	readString = (size: number): string => {
 		return this.read(STRING, size);
 	};
 
+	/**
+	 * Reads a template from the data view.
+	 *
+	 * @param size - The size of the template in bytes.
+	 * @returns The template.
+	 */
 	readTemplate = (size: number): number => {
 		return this.read(TEMPLATE, size);
 	};
 
+	/**
+	 * Reads a byte array from the data view.
+	 *
+	 * @param size - The size of the data in bytes.
+	 * @returns The data.
+	 */
 	readData = (size: number): Uint8Array => {
 		return this.read(DATA, size);
 	};
 
+	/**
+	 * Reads a UTF-8 string from the data view.
+	 *
+	 * @param size - The size of the string in bytes.
+	 * @returns The UTF-8 string.
+	 */
 	readUtf8 = (size?: number): string => {
 		return this.read(UTF8, size);
 	};
 
+	/**
+	 * Reads a full box from the data view.
+	 *
+	 * @returns The full box.
+	 */
 	readFullBox = (): FullBox => {
 		return {
 			version: this.readUint(1),
@@ -156,6 +220,14 @@ export class IsoView {
 		};
 	};
 
+	/**
+	 * Reads an array of values from the data view.
+	 *
+	 * @param type - The type of the values.
+	 * @param size - The size of the values in bytes.
+	 * @param length - The number of values to read.
+	 * @returns The array of values.
+	 */
 	readArray = <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number): ISOFieldTypeMap[T][] => {
 		const value = [];
 
@@ -166,6 +238,11 @@ export class IsoView {
 		return value as ISOFieldTypeMap[T][];
 	};
 
+	/**
+	 * Reads a raw box from the data view.
+	 *
+	 * @returns The box.
+	 */
 	readBox = (): RawBox => {
 		const { dataView, offset } = this;
 
@@ -201,6 +278,12 @@ export class IsoView {
 		return box;
 	};
 
+	/**
+	 * Reads a number of boxes from the data view.
+	 *
+	 * @param length - The number of boxes to read.
+	 * @returns The boxes.
+	 */
 	readBoxes = (length: number): Box[] => {
 		const result: Box[] = [];
 
@@ -215,6 +298,13 @@ export class IsoView {
 		return result;
 	};
 
+	/**
+	 * Reads a number of entries from the data view.
+	 *
+	 * @param length - The number of entries to read.
+	 * @param map - The function to map the entries.
+	 * @returns The entries.
+	 */
 	readEntries = <T>(length: number, map: () => T): T[] => {
 		const result: T[] = [];
 
@@ -225,6 +315,11 @@ export class IsoView {
 		return result;
 	};
 
+	/**
+	 * Iterates over the boxes in the data view.
+	 *
+	 * @returns A generator of boxes.
+	 */
 	*[Symbol.iterator](): Generator<Box> {
 		const { parsers = {}, recursive = false } = this.config;
 

@@ -6,7 +6,7 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
 /**
  * Filter boxes by type from an IsoView
  *
- * @param type - The type of boxes to filter
+ * @param type - The type(s) of boxes to filter
  * @param raw - The raw ISO data
  * @param config - The configuration for the IsoView
  *
@@ -16,6 +16,10 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function filterBoxesByType(type: string, raw: IsoData, config: IsoViewConfig = {}): Box[] {
-	return filterBoxes(raw, config, box => box.type === type);
+export function filterBoxesByType(type: string | string[], raw: IsoData, config: IsoViewConfig = {}): Box[] {
+	if (!Array.isArray(type)) {
+		type = [type];
+	}
+
+	return filterBoxes(raw, config, box => type.includes(box.type));
 }
