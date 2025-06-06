@@ -232,9 +232,14 @@ export class IsoView {
 			try {
 				const { type, data, ...rest } = this.readBox();
 				const box = { type, ...rest } as Box;
+				const isContainer = ContainerBoxes.includes(type);
 				const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
+
 				if (parser) {
 					Object.assign(box, parser(data, this.config));
+				}
+				else if (!isContainer) {
+					box.data = data;
 				}
 
 				if (ContainerBoxes.includes(type)) {
