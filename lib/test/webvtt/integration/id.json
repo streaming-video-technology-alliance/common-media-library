@@ -1,0 +1,73 @@
+{
+  "cues": [
+    {
+      "align": "center",
+      "endTime": 2,
+      "id": "1",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 1,
+      "text": "This",
+      "vertical": ""
+    },
+    {
+      "align": "center",
+      "endTime": 3,
+      "id": "Random",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 2,
+      "text": "Is",
+      "vertical": ""
+    },
+    {
+      "align": "center",
+      "endTime": 4,
+      "id": "12*AS& Over ...",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 3,
+      "text": "A",
+      "vertical": ""
+    },
+    {
+      "align": "center",
+      "endTime": 7,
+      "id": "ja88120 aa",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 6,
+      "text": "And stuff?",
+      "vertical": ""
+    }
+  ],
+  "regions": [],
+  "styles": [],
+  "errors": [
+    "WebVttParsingError: Malformed time stamp.-->"
+  ]
+}
