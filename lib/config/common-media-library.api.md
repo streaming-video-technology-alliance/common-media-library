@@ -2415,6 +2415,11 @@ export type WebVTTCueIdBox = {
 };
 
 // @beta
+export type WebVTTCueIdBox = {
+    cueId: string;
+};
+
+// @beta
 export type WebVTTCuePayloadBox = {
 	cueText: string;
 };
