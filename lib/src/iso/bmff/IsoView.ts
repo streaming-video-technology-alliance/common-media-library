@@ -1,5 +1,5 @@
 import type { Box } from './Box.js';
-import { ContainerBoxes } from './ContainerBoxes.js';
+import { CONTAINERS } from './CONTAINERS.js';
 import { DATA } from './fields/DATA.js';
 import { INT } from './fields/INT.js';
 import { STRING } from './fields/STRING.js';
@@ -327,7 +327,7 @@ export class IsoView {
 			try {
 				const { type, data, ...rest } = this.readBox();
 				const box = { type, ...rest } as Box;
-				const isContainer = ContainerBoxes.includes(type);
+				const isContainer = CONTAINERS.includes(type);
 				const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
@@ -337,7 +337,7 @@ export class IsoView {
 					box.data = data;
 				}
 
-				if (ContainerBoxes.includes(type)) {
+				if (CONTAINERS.includes(type)) {
 					const boxes = [];
 
 					for (const child of data) {

@@ -35,6 +35,11 @@ function find(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter): Box |
  *
  * @beta
  */
-export function findBox(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box | null {
-	return find(createIsoView(raw, { ...config, recursive: false }), !!config.recursive, fn);
+export function findBox(raw: IsoData | Iterable<Box>, fn: BoxFilter, config?: IsoViewConfig): Box | null {
+	const recursive = config?.recursive ?? true;
+	if (raw instanceof DataView || raw instanceof Uint8Array || raw instanceof ArrayBuffer) {
+		raw = createIsoView(raw, config);
+	}
+
+	return find(raw, recursive, fn);
 }

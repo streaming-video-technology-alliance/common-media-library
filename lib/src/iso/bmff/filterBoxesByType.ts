@@ -16,10 +16,10 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function filterBoxesByType(type: string | string[], raw: IsoData, config: IsoViewConfig = {}): Box[] {
+export function filterBoxesByType(raw: IsoData, type: string | string[], config: IsoViewConfig = {}): Box[] {
 	if (!Array.isArray(type)) {
 		type = [type];
 	}
 
-	return filterBoxes(raw, config, box => type.includes(box.type));
+	return filterBoxes(raw, box => type.includes(box.type), config);
 }

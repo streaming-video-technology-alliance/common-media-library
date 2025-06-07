@@ -1,4 +1,3 @@
-import type { IsoView } from './IsoView.js';
 
 /**
  * ISO data
@@ -7,4 +6,4 @@ import type { IsoView } from './IsoView.js';
  *
  * @beta
  */
-export type IsoData = ArrayBuffer | DataView | IsoView | Uint8Array;
+export type IsoData = ArrayBuffer | DataView | Uint8Array;

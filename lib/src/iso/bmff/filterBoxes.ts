@@ -4,14 +4,14 @@ import { createIsoView } from './createIsoView.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
 
-function filter(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter, boxes: Box[] = []): Box[] {
+function filter(iterator: Iterable<Box>, fn: BoxFilter, recursive: boolean, boxes: Box[]): Box[] {
 	for (const box of iterator) {
 		if (fn(box)) {
 			boxes.push(box);
 		}
 
 		if (recursive && Array.isArray(box.boxes)) {
-			filter(box.boxes, recursive, fn, boxes);
+			filter(box.boxes, fn, recursive, boxes);
 		}
 	}
 
@@ -29,6 +29,11 @@ function filter(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter, boxe
  * @group ISOBMFF
  * @beta
  */
-export function filterBoxes(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box[] {
-	return filter(createIsoView(raw, { ...config, recursive: false }), !!config.recursive, fn);
+export function filterBoxes(raw: IsoData | Iterable<Box>, fn: BoxFilter, config?: IsoViewConfig): Box[] {
+	if (raw instanceof DataView || raw instanceof Uint8Array || raw instanceof ArrayBuffer) {
+		raw = createIsoView(raw, config);
+	}
+
+	const recursive = config?.recursive ?? true;
+	return filter(raw, fn, recursive, []);
 }

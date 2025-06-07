@@ -16,6 +16,6 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function findBoxByType(type: string, raw: IsoData, config: IsoViewConfig = {}): Box | null {
-	return findBox(raw, config, box => box.type === type);
+export function findBoxByType(raw: IsoData, type: string, config: IsoViewConfig = {}): Box | null {
+	return findBox(raw, box => box.type === type, config);
 }
