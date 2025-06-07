@@ -17,6 +17,7 @@ and this project adheres to
 - VTT Parsing Utilities
   ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
 - Added Harmonic Mean Throughput Estimator ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
+- Added Arithmetic Mean Throughput Estimator ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
 
 ## [0.12.4] - 2025-05-16
 
