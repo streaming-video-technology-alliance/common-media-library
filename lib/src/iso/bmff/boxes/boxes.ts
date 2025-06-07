@@ -15,14 +15,14 @@ export type Box = {
 	usertype?: number[];
 };
 
-export type ContainerBox<T> = Box & {
+export type ContainerBox<T> = {
 	boxes: Array<T>;
 };
 
 /**
  * Full Box Type (has version and flags)
  */
-export type FullBox = Box & {
+export type FullBox = {
 	version: number;
 	flags: number;
 };
@@ -34,7 +34,7 @@ export type FullBox = Box & {
 /**
  * File Type Box - 'ftyp'
  */
-export type FileTypeBox = Box & {
+export type FileTypeBox = {
 	type: 'ftyp';
 	majorBrand: string;
 	minorVersion: number;
@@ -97,7 +97,7 @@ export type TrackReferenceBox = ContainerBox<TrackReferenceTypeBox> & {
 /**
  * Track Reference Type Box
  */
-export type TrackReferenceTypeBox = Box & {
+export type TrackReferenceTypeBox = {
 	trackIds: number[];
 };
 
@@ -245,7 +245,7 @@ export type SampleDescriptionBox = FullBox & {
 /**
  * Sample Entry base type
  */
-export type SampleEntry = Box & {
+export type SampleEntry = {
 	dataReferenceIndex: number;
 };
 
@@ -557,14 +557,14 @@ export type TrackExtendsBox = FullBox & {
 /**
  * Protection Scheme Information Box - 'sinf' - Container
  */
-export type ProtectionSchemeInformationBox = ContainerBox<OriginalFormatBox | IPMPInfoBox | SchemeTypeBox | SchemeInformationBox> & {
+export type ProtectionSchemeInformationBox = ContainerBox<OriginalFormatBox | IpmpInfoBox | SchemeTypeBox | SchemeInformationBox> & {
 	type: 'sinf';
 };
 
 /**
  * Original Format Box - 'frma'
  */
-export type OriginalFormatBox = Box & {
+export type OriginalFormatBox = {
 	type: 'frma';
 	dataFormat: string;
 };
@@ -572,7 +572,7 @@ export type OriginalFormatBox = Box & {
 /**
  * IPMP Info Box - 'imif'
  */
-export type IPMPInfoBox = FullBox & {
+export type IpmpInfoBox = FullBox & {
 	type: 'imif';
 	ipmpDescr: any[];
 };
@@ -743,7 +743,7 @@ export type ItemReferenceBox = ContainerBox<SingleItemTypeReferenceBox> & {
 /**
  * Single Item Type Reference Box
  */
-export type SingleItemTypeReferenceBox = Box & {
+export type SingleItemTypeReferenceBox = {
 	fromItemId: number;
 	referenceCount: number;
 	toItemId: number[];
@@ -756,7 +756,7 @@ export type SingleItemTypeReferenceBox = Box & {
 /**
  * Media Data Box - 'mdat'
  */
-export type MediaDataBox = Box & {
+export type MediaDataBox = {
 	type: 'mdat';
 	data: Uint8Array;
 };
@@ -764,7 +764,7 @@ export type MediaDataBox = Box & {
 /**
  * Free Space Box - 'free' or 'skip'
  */
-export type FreeSpaceBox = Box & {
+export type FreeSpaceBox = {
 	type: 'free' | 'skip';
 	data: Uint8Array;
 };
@@ -779,7 +779,7 @@ export type UserDataBox = ContainerBox<Box> & {
 /**
  * Segment Type Box - 'styp'
  */
-export type SegmentTypeBox = Box & {
+export type SegmentTypeBox = {
 	type: 'styp';
 	majorBrand: string;
 	minorVersion: number;
@@ -857,87 +857,86 @@ export type EventMessageBox = FullBox & {
 // ============================
 
 /**
- * All possible ISO BMFF Box types
- */
-export type AllBoxTypes =
-	| ContainerBoxTypes
-	| FileTypeBox
-	| MovieHeaderBox
-	| TrackHeaderBox
-	| EditListBox
-	| MediaHeaderBox
-	| HandlerReferenceBox
-	| VideoMediaHeaderBox
-	| SoundMediaHeaderBox
-	| HintMediaHeaderBox
-	| NullMediaHeaderBox
-	| DataReferenceBox
-	| DataEntryUrlBox
-	| DataEntryUrnBox
-	| SampleDescriptionBox
-	| VisualSampleEntry
-	| AudioSampleEntry
-	| DecodingTimeToSampleBox
-	| CompositionTimeToSampleBox
-	| SampleToChunkBox
-	| SampleSizeBox
-	| CompactSampleSizeBox
-	| ChunkOffsetBox
-	| ChunkLargeOffsetBox
-	| SyncSampleBox
-	| ShadowSyncSampleBox
-	| DegradationPriorityBox
-	| SampleDependencyTypeBox
-	| SampleToGroupBox
-	| SampleGroupDescriptionBox
-	| MovieFragmentHeaderBox
-	| TrackFragmentHeaderBox
-	| TrackFragmentBaseMediaDecodeTimeBox
-	| TrackFragmentRunBox
-	| TrackFragmentRandomAccessBox
-	| MovieFragmentRandomAccessOffsetBox
-	| MovieExtendsHeaderBox
-	| TrackExtendsBox
-	| OriginalFormatBox
-	| IPMPInfoBox
-	| SchemeTypeBox
-	| TrackEncryptionBox
-	| ProtectionSystemSpecificHeaderBox
-	| SampleEncryptionBox
-	| SampleAuxiliaryInformationSizesBox
-	| SampleAuxiliaryInformationOffsetsBox
-	| PrimaryItemBox
-	| ItemLocationBox
-	| ItemInfoEntry
-	| SingleItemTypeReferenceBox
-	| MediaDataBox
-	| FreeSpaceBox
-	| SegmentTypeBox
-	| SegmentIndexBox
-	| SubsegmentIndexBox
-	| ProducerReferenceTimeBox
-	| EventMessageBox;
-
-/**
  * Container boxes that can contain other boxes
  */
-export type ContainerBoxTypes =
-	| MovieBox
-	| TrackBox
-	| TrackReferenceBox
+export type ContainerBoxes =
+	| DataInformationBox
 	| EditBox
+	| ItemInfoBox
+	| ItemProtectionBox
+	| ItemReferenceBox
 	| MediaBox
 	| MediaInformationBox
-	| DataInformationBox
-	| SampleTableBox
-	| MovieFragmentBox
-	| TrackFragmentBox
-	| MovieFragmentRandomAccessBox
-	| MovieExtendsBox
-	| ProtectionSchemeInformationBox
-	| SchemeInformationBox
 	| MetaBox
-	| ItemProtectionBox
-	| ItemInfoBox
-	| ItemReferenceBox
+	| MovieBox
+	| MovieExtendsBox
+	| MovieFragmentBox
+	| MovieFragmentRandomAccessBox
+	| ProtectionSchemeInformationBox
+	| SampleTableBox
+	| SchemeInformationBox
+	| TrackBox
+	| TrackFragmentBox
+	| TrackReferenceBox
 	| UserDataBox;
+
+/**
+ * All possible ISO BMFF Box types
+ */
+export type IsoBox = Box & ContainerBoxes
+	| AudioSampleEntry
+	| ChunkLargeOffsetBox
+	| ChunkOffsetBox
+	| CompactSampleSizeBox
+	| CompositionTimeToSampleBox
+	| DataEntryUrlBox
+	| DataEntryUrnBox
+	| DataReferenceBox
+	| DecodingTimeToSampleBox
+	| DegradationPriorityBox
+	| EditListBox
+	| EventMessageBox
+	| FileTypeBox
+	| FreeSpaceBox
+	| HandlerReferenceBox
+	| HintMediaHeaderBox
+	| IpmpInfoBox
+	| ItemInfoEntry
+	| ItemLocationBox
+	| MediaDataBox
+	| MediaHeaderBox
+	| MovieExtendsHeaderBox
+	| MovieFragmentHeaderBox
+	| MovieFragmentRandomAccessOffsetBox
+	| MovieHeaderBox
+	| NullMediaHeaderBox
+	| OriginalFormatBox
+	| PrimaryItemBox
+	| ProducerReferenceTimeBox
+	| ProtectionSystemSpecificHeaderBox
+	| SampleAuxiliaryInformationOffsetsBox
+	| SampleAuxiliaryInformationSizesBox
+	| SampleDependencyTypeBox
+	| SampleDescriptionBox
+	| SampleEncryptionBox
+	| SampleGroupDescriptionBox
+	| SampleSizeBox
+	| SampleToChunkBox
+	| SampleToGroupBox
+	| SchemeTypeBox
+	| SegmentIndexBox
+	| SegmentTypeBox
+	| ShadowSyncSampleBox
+	| SingleItemTypeReferenceBox
+	| SoundMediaHeaderBox
+	| SubsegmentIndexBox
+	| SyncSampleBox
+	| TrackEncryptionBox
+	| TrackExtendsBox
+	| TrackFragmentBaseMediaDecodeTimeBox
+	| TrackFragmentHeaderBox
+	| TrackFragmentRandomAccessBox
+	| TrackFragmentRunBox
+	| TrackHeaderBox
+	| VideoMediaHeaderBox
+	| VisualSampleEntry;
