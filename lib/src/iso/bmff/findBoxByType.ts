@@ -1,5 +1,5 @@
-import type { AnyBox } from './boxes/AnyBox.js';
 import type { Box } from './boxes/Box.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 import { findBox } from './findBox.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
@@ -17,7 +17,7 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function findBoxByType<T extends Box = AnyBox>(raw: IsoData, type: string, config: IsoViewConfig = {}): T | null {
+export function findBoxByType<T extends Box = IsoBmffBox>(raw: IsoData, type: string, config: IsoViewConfig = {}): T | null {
 	return findBox<T>(raw, box => box.type === type, config);
 }
 

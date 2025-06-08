@@ -1,18 +1,18 @@
-import type { AnyBox } from './boxes/AnyBox.js';
 import type { Box } from './boxes/Box.js';
 import type { ContainerBox } from './boxes/ContainerBox.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 import type { BoxFilter } from './BoxFilter.js';
 import { createIsoView } from './createIsoView.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
 
-function find<T extends Box = AnyBox>(iterator: Iterable<AnyBox>, recursive: boolean, fn: BoxFilter): T | null {
+function find<T extends Box = IsoBmffBox>(iterator: Iterable<IsoBmffBox>, recursive: boolean, fn: BoxFilter): T | null {
 	for (const box of iterator) {
 		if (fn(box)) {
 			return box as T;
 		}
 
-		const { boxes } = box as ContainerBox<AnyBox>;
+		const { boxes } = box as ContainerBox<IsoBmffBox>;
 		if (recursive && Array.isArray(boxes)) {
 			const result = find(boxes, recursive, fn);
 
@@ -38,7 +38,7 @@ function find<T extends Box = AnyBox>(iterator: Iterable<AnyBox>, recursive: boo
  *
  * @beta
  */
-export function findBox<T extends Box = AnyBox>(raw: IsoData | Iterable<AnyBox>, fn: BoxFilter, config?: IsoViewConfig): T | null {
+export function findBox<T extends Box = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter, config?: IsoViewConfig): T | null {
 	const recursive = config?.recursive ?? true;
 	if (raw instanceof DataView || raw instanceof Uint8Array || raw instanceof ArrayBuffer) {
 		raw = createIsoView(raw, { ...config, recursive: false });

@@ -1,5 +1,4 @@
 // Box types used by ISO BMFF parsers
-export type { AnyBox } from './boxes/AnyBox.js';
 export type { AudioRenderingIndicationBox } from './boxes/AudioRenderingIndicationBox.js';
 export type { AudioSampleEntryBox } from './boxes/AudioSampleEntryBox.js';
 export type { Box } from './boxes/Box.js';
@@ -26,6 +25,7 @@ export type { HandlerReferenceBox } from './boxes/HandlerReferenceBox.js';
 export type { HintMediaHeaderBox } from './boxes/HintMediaHeaderBox.js';
 export type { IdentifiedMediaDataBox } from './boxes/IdentifiedMediaDataBox.js';
 export type { IpmpInfoBox } from './boxes/IpmpInfoBox.js';
+export type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 export type { IsoBox } from './boxes/IsoBox.js';
 export type { IsoContainerBox } from './boxes/IsoContainerBox.js';
 export type { ItemExtent } from './boxes/ItemExtent.js';

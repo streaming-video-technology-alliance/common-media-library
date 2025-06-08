@@ -2,10 +2,10 @@ import type { IsoBox } from './IsoBox.js';
 import type { IsoContainerBox } from './IsoContainerBox.js';
 
 /**
- * AnyBox
+ * Utility type for all ISO BMFF boxes
  *
  * @group ISOBMFF
  *
  * @beta
  */
-export type AnyBox = IsoBox | IsoContainerBox;
+export type IsoBmffBox = IsoBox | IsoContainerBox;

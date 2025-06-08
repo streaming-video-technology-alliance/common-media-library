@@ -41,9 +41,6 @@ export type AlignedSwitchingSet = {
 };
 
 // @beta
-export type AnyBox = IsoBox | IsoContainerBox;
-
-// @beta
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string>;
 
 // @beta
@@ -123,7 +120,7 @@ export type Box = {
 };
 
 // @beta
-export type BoxFilter = (box: AnyBox) => boolean;
+export type BoxFilter = (box: IsoBmffBox) => boolean;
 
 // @beta
 export type BoxParser<V = IsoBox> = (view: IsoView, config?: IsoViewConfig) => Fields<V>;
@@ -866,16 +863,16 @@ export type Fields<T> = Omit<T, Exclude<keyof Box, 'data'> | 'boxes'>;
 export type FileTypeBox = TypeBox<'ftyp'>;
 
 // @beta
-export function filterBoxes<T extends Box = AnyBox>(raw: IsoData | Iterable<AnyBox>, fn: BoxFilter, config?: IsoViewConfig): T[];
+export function filterBoxes<T extends Box = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter, config?: IsoViewConfig): T[];
 
 // @beta
-export function filterBoxesByType<T extends Box = AnyBox>(raw: IsoData, type: string | string[], config?: IsoViewConfig): T[];
+export function filterBoxesByType<T extends Box = IsoBmffBox>(raw: IsoData, type: string | string[], config?: IsoViewConfig): T[];
 
 // @beta
-export function findBox<T extends Box = AnyBox>(raw: IsoData | Iterable<AnyBox>, fn: BoxFilter, config?: IsoViewConfig): T | null;
+export function findBox<T extends Box = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter, config?: IsoViewConfig): T | null;
 
 // @beta
-export function findBoxByType<T extends Box = AnyBox>(raw: IsoData, type: string, config?: IsoViewConfig): T | null;
+export function findBoxByType<T extends Box = IsoBmffBox>(raw: IsoData, type: string, config?: IsoViewConfig): T | null;
 
 // @beta
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
@@ -1106,6 +1103,9 @@ export type IpmpInfoBox = FullBox & {
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
 
 // @beta
+export type IsoBmffBox = IsoBox | IsoContainerBox;
+
+// @beta
 export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox | ChunkLargeOffsetBox | ChunkOffsetBox | CompactSampleSizeBox | CompositionTimeToSampleBox | DataEntryUrlBox | DataEntryUrnBox | DataReferenceBox | DecodingTimeToSampleBox | DegradationPriorityBox | EditListBox | EventMessageBox | ExtendedLanguageBox | FileTypeBox | FreeSpaceBox | HandlerReferenceBox | HintMediaHeaderBox | IdentifiedMediaDataBox | IpmpInfoBox | ItemInfoEntry | ItemLocationBox | LabelBox | MediaDataBox | MediaHeaderBox | MovieExtendsHeaderBox | MovieFragmentHeaderBox | MovieFragmentRandomAccessOffsetBox | MovieHeaderBox | NullMediaHeaderBox | OriginalFormatBox | PrimaryItemBox | PreselectionGroupBox | ProducerReferenceTimeBox | ProtectionSystemSpecificHeaderBox | SampleAuxiliaryInformationOffsetsBox | SampleAuxiliaryInformationSizesBox | SampleDependencyTypeBox | SampleDescriptionBox | SampleEncryptionBox | SampleGroupDescriptionBox | SampleSizeBox | SampleToChunkBox | SampleToGroupBox | SchemeTypeBox | SegmentIndexBox | SegmentTypeBox | ShadowSyncSampleBox | SingleItemTypeReferenceBox | SoundMediaHeaderBox | SubsampleInformationBox | SubsegmentIndexBox | SubtitleMediaHeaderBox | SyncSampleBox | TrackEncryptionBox | TrackExtendsBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentHeaderBox | TrackFragmentRandomAccessBox | TrackFragmentRunBox | TrackHeaderBox | TrackKindBox | TrackRunBox | UrlBox | UrnBox | VideoMediaHeaderBox | VisualSampleEntryBox | WebVttConfigurationBox | WebVttCueIdBox | WebVttCuePayloadBox | WebVttEmptySampleBox | WebVttSettingsBox | WebVttSourceLabelBox;
 
 // @beta
@@ -1127,14 +1127,14 @@ export type ISOFieldTypeMap = {
 
 // @beta
 export class IsoView {
-    [Symbol.iterator](): Generator<AnyBox>;
+    [Symbol.iterator](): Generator<IsoBmffBox>;
     constructor(raw: ArrayBuffer | DataView | Uint8Array, config?: IsoViewConfig);
     get bytesRemaining(): number;
     get cursor(): number;
     get done(): boolean;
     readArray: <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number) => ISOFieldTypeMap[T][];
     readBox: () => RawBox;
-    readBoxes: <T = AnyBox>(length: number) => T[];
+    readBoxes: <T = IsoBmffBox>(length: number) => T[];
     readData: (size: number) => Uint8Array;
     readEntries: <T>(length: number, map: () => T) => T[];
     readFullBox: () => Fields<FullBox>;
@@ -1484,7 +1484,7 @@ export type PACData = {
 };
 
 // @beta
-export function parseBoxes(raw: IsoData, config?: IsoViewConfig): AnyBox[];
+export function parseBoxes(raw: IsoData, config?: IsoViewConfig): IsoBmffBox[];
 
 // @beta
 export function parseInitDataFromContentProtection(cpData: ContentProtection, BASE64: {

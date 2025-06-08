@@ -1,7 +1,7 @@
-import type { AnyBox } from './boxes/AnyBox.js';
 import type { ContainerBox } from './boxes/ContainerBox.js';
 import type { Fields } from './boxes/Fields.js';
 import type { FullBox } from './boxes/FullBox.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 import { CONTAINERS } from './CONTAINERS.js';
 import { DATA } from './fields/DATA.js';
 import { INT } from './fields/INT.js';
@@ -286,7 +286,7 @@ export class IsoView {
 	 * @param length - The number of boxes to read.
 	 * @returns The boxes.
 	 */
-	readBoxes = <T = AnyBox>(length: number): T[] => {
+	readBoxes = <T = IsoBmffBox>(length: number): T[] => {
 		const result: T[] = [];
 
 		for (const box of this) {
@@ -322,13 +322,13 @@ export class IsoView {
 	 *
 	 * @returns A generator of boxes.
 	 */
-	*[Symbol.iterator](): Generator<AnyBox> {
+	*[Symbol.iterator](): Generator<IsoBmffBox> {
 		const { parsers = {}, recursive = false } = this.config;
 
 		while (!this.done) {
 			try {
 				const { type, data, ...rest } = this.readBox();
-				const box = { type, ...rest } as AnyBox;
+				const box = { type, ...rest } as IsoBmffBox;
 				const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
@@ -348,7 +348,7 @@ export class IsoView {
 						boxes.push(child);
 					}
 
-					(box as ContainerBox<AnyBox>).boxes = boxes;
+					(box as ContainerBox<IsoBmffBox>).boxes = boxes;
 				}
 
 				yield box;

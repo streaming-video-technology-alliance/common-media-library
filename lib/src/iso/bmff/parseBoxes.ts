@@ -1,4 +1,4 @@
-import type { AnyBox } from './boxes/AnyBox.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 import { createIsoView } from './createIsoView.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
@@ -15,7 +15,7 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function parseBoxes(raw: IsoData, config?: IsoViewConfig): AnyBox[] {
+export function parseBoxes(raw: IsoData, config?: IsoViewConfig): IsoBmffBox[] {
 	const boxes = [];
 
 	for (const box of createIsoView(raw, config)) {
