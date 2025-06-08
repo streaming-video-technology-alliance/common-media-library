@@ -7,7 +7,7 @@ import type { Box } from './Box.js';
  *
  * @beta
  */
-export type FreeSpaceBox<T = 'free'> = Box & {
+export type FreeSpaceBox<T extends 'free' | 'skip' = 'free'> = Box & {
 	type: T;
 	data: Uint8Array;
 };

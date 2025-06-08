@@ -1,4 +1,5 @@
-import type { BoxParser } from '../BoxParser.js';
+import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.js';
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.js';
 import { free } from './free.js';
 
@@ -13,4 +14,6 @@ import { free } from './free.js';
  *
  * @beta
  */
-export const skip: BoxParser<FreeSpaceBox<'skip'>> = free;
+export function skip(view: IsoView): Fields<FreeSpaceBox<'skip'>> {
+	return free(view);
+};
