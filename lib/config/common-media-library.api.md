@@ -75,7 +75,7 @@ export type AudioRenderingIndicationBox = FullBox & {
 };
 
 // @beta
-export type AudioSampleEntryBox<T = 'mp4a' | 'enca'> = SampleEntryBox & {
+export type AudioSampleEntryBox<T extends 'mp4a' | 'enca' = 'mp4a' | 'enca'> = SampleEntryBox & {
     type: T;
     reserved2: number[];
     channelcount: number;
@@ -890,7 +890,7 @@ export type FrameRate = {
 export function free(view: IsoView): Fields<FreeSpaceBox>;
 
 // @beta
-export type FreeSpaceBox<T = 'free'> = Box & {
+export type FreeSpaceBox<T extends 'free' | 'skip' = 'free'> = Box & {
     type: T;
     data: Uint8Array;
 };
@@ -2058,7 +2058,7 @@ export type SingleItemTypeReferenceBox = Box & {
 };
 
 // @beta
-export const skip: BoxParser<FreeSpaceBox<'skip'>>;
+export function skip(view: IsoView): Fields<FreeSpaceBox<'skip'>>;
 
 // @beta
 export function smhd(view: IsoView): Fields<SoundMediaHeaderBox>;
@@ -2529,7 +2529,7 @@ export type VideoTrack = Track & {
 };
 
 // @beta
-export type VisualSampleEntryBox<T = 'avc1' | 'hev1' | 'hvc1' | 'encv'> = SampleEntryBox & {
+export type VisualSampleEntryBox<T extends 'avc1' | 'avc2' | 'avc3' | 'avc4' | 'hev1' | 'hvc1' | 'encv' = 'avc1' | 'avc2' | 'avc3' | 'avc4' | 'hev1' | 'hvc1' | 'encv'> = SampleEntryBox & {
     type: T;
     preDefined1: number;
     reserved2: number;

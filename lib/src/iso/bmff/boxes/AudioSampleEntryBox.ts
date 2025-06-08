@@ -7,7 +7,7 @@ import type { SampleEntryBox } from './SampleEntryBox.js';
  *
  * @beta
  */
-export type AudioSampleEntryBox<T = 'mp4a' | 'enca'> = SampleEntryBox & {
+export type AudioSampleEntryBox<T extends 'mp4a' | 'enca' = 'mp4a' | 'enca'> = SampleEntryBox & {
 	type: T;
 	reserved2: number[];
 	channelcount: number;
