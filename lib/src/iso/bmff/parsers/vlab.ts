@@ -1,15 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-30:2014 - WebVTT Source Label Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type WebVTTSourceLabelBox = {
-	sourceLabel: string;
-};
 
 /**
  * Parse a WebVTTSourceLabelBox from an IsoView
@@ -22,7 +13,7 @@ export type WebVTTSourceLabelBox = {
  *
  * @beta
  */
-export function vlab(view: IsoView): WebVTTSourceLabelBox {
+export function vlab(view: IsoView): Fields<WebVttSourceLabelBox> {
 	return {
 		sourceLabel: view.readUtf8(-1),
 	};

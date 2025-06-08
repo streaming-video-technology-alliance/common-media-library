@@ -1,15 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { MediaDataBox } from '../boxes/MediaDataBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.1.1 Media Data Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type MediaDataBox = {
-	data: Uint8Array;
-};
 
 /**
  * Parse a MediaDataBox from an IsoView
@@ -22,7 +13,7 @@ export type MediaDataBox = {
  *
  * @beta
  */
-export function mdat(view: IsoView): MediaDataBox {
+export function mdat(view: IsoView): Fields<MediaDataBox> {
 	return {
 		data: view.readData(-1),
 	};

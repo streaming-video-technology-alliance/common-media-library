@@ -1,19 +1,7 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.js';
 import { UINT } from '../fields/UINT.js';
-import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 23001-7:2011 - 8.2 Track Encryption Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type TrackEncryptionBox = FullBox & {
-	defaultIsEncrypted: number;
-	defaultIvSize: number;
-	defaultKid: number[];
-};
 
 /**
  * Parse a TrackEncryptionBox from an IsoView
@@ -26,7 +14,7 @@ export type TrackEncryptionBox = FullBox & {
  *
  * @beta
  */
-export function tenc(view: IsoView): TrackEncryptionBox {
+export function tenc(view: IsoView): Fields<TrackEncryptionBox> {
 	return {
 		...view.readFullBox(),
 		defaultIsEncrypted: view.readUint(3),

@@ -1,39 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { SegmentIndexBox, SegmentIndexReference } from '../boxes/SegmentIndexBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * Segment index reference
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type Reference = {
-	reference: number,
-	subsegmentDuration: number,
-	sap: number,
-	referenceType: number,
-	referencedSize: number,
-	startsWithSap: number,
-	sapType: number,
-	sapDeltaTime: number,
-};
-
-/**
- * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SegmentIndexBox = FullBox & {
-	referenceId: number,
-	timescale: number,
-	earliestPresentationTime: number,
-	firstOffset: number,
-	reserved: number,
-	references: Reference[],
-};
 
 /**
  * Parse a SegmentIndexBox from an IsoView
@@ -46,7 +13,7 @@ export type SegmentIndexBox = FullBox & {
  *
  * @beta
  */
-export function sidx(view: IsoView): SegmentIndexBox {
+export function sidx(view: IsoView): Fields<SegmentIndexBox> {
 	const { readUint } = view;
 	const { version, flags } = view.readFullBox();
 	const v1 = version === 1;
@@ -58,7 +25,7 @@ export function sidx(view: IsoView): SegmentIndexBox {
 	const firstOffset = readUint(size);
 	const reserved = readUint(2);
 	const referenceCount = readUint(2);
-	const references = view.readEntries<Reference>(referenceCount, () => {
+	const references = view.readEntries<SegmentIndexReference>(referenceCount, () => {
 		const entry = {} as any;
 
 		entry.reference = readUint(4);

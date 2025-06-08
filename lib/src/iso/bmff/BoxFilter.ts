@@ -1,4 +1,4 @@
-import type { Box } from './Box.js';
+import type { AnyBox } from './boxes/AnyBox.js';
 
 /**
  * BoxFilter
@@ -7,4 +7,4 @@ import type { Box } from './Box.js';
  *
  * @beta
  */
-export type BoxFilter = (box: Box) => boolean;
+export type BoxFilter = (box: AnyBox) => boolean;

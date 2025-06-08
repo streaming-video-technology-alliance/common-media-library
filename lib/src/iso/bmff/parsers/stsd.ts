@@ -1,17 +1,7 @@
-import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.5.2 Sample Description Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SampleDescriptionBox = FullBox & {
-	entryCount: number,
-	entries: any[],
-};
+import type { Fields } from '../boxes/Fields.js';
+import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.js';
+import type { SampleEntryBox } from '../boxes/SampleEntryBox.js';
 
 /**
  * Parse a SampleDescriptionBox from an IsoView
@@ -24,7 +14,7 @@ export type SampleDescriptionBox = FullBox & {
  *
  * @beta
  */
-export function stsd(view: IsoView): SampleDescriptionBox {
+export function stsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoView): Fields<SampleDescriptionBox<E>> {
 	const { version, flags } = view.readFullBox();
 	const entryCount = view.readUint(4);
 
@@ -32,6 +22,6 @@ export function stsd(view: IsoView): SampleDescriptionBox {
 		version,
 		flags,
 		entryCount,
-		entries: view.readBoxes(entryCount),
+		entries: view.readBoxes<E>(entryCount),
 	};
 };

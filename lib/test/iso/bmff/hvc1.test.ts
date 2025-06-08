@@ -1,8 +1,12 @@
-import { assert, describe, filterBoxes, hvc1, it, stsd } from './util/box.ts';
+import { assert, describe, filterBoxes, hvc1, it, stsd, type SampleDescriptionBox, type VisualSampleEntryBox } from './util/box.ts';
 
 describe('hvc1 box', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes<any>('hvc1_init.mp4', [stsd, hvc1]);
+		const container = filterBoxes<
+			SampleDescriptionBox<VisualSampleEntryBox> | VisualSampleEntryBox
+		>('hvc1_init.mp4', [stsd, hvc1]);
+
+		assert.strictEqual(container[0].type, 'stsd');
 		const box = container[0].entries[0];
 
 		assert.strictEqual(box.type, 'hvc1');

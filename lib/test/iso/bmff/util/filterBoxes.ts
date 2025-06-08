@@ -1,8 +1,8 @@
-import { filterBoxesByType, type Box, type BoxParser } from '@svta/common-media-library';
+import { filterBoxesByType, type AnyBox, type Box, type BoxParser } from '@svta/common-media-library';
 import { createParsers } from './createParsers.ts';
 import { load } from './load.ts';
 
-export function filterBoxes<T>(file: string, boxParsers: BoxParser<T> | BoxParser<T>[]): Box<T>[] {
+export function filterBoxes<T extends Box = AnyBox>(file: string, boxParsers: BoxParser<T> | BoxParser<T>[]): T[] {
 	const { name, parsers } = createParsers(boxParsers);
-	return filterBoxesByType(name, load(file), { parsers, recursive: true });
+	return filterBoxesByType<T>(load(file), name, { parsers });
 }

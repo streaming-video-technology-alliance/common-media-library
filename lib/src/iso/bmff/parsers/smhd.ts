@@ -1,17 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.4.5.3 Sound Media Header Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SoundMediaHeaderBox = FullBox & {
-	balance: number;
-	reserved: number;
-};
 
 /**
  * Parse a SoundMediaHeaderBox from an IsoView
@@ -24,7 +13,7 @@ export type SoundMediaHeaderBox = FullBox & {
  *
  * @beta
  */
-export function smhd(view: IsoView): SoundMediaHeaderBox {
+export function smhd(view: IsoView): Fields<SoundMediaHeaderBox> {
 	return {
 		...view.readFullBox(),
 		balance: view.readUint(2),

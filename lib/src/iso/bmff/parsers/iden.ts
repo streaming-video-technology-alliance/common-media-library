@@ -1,15 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-30:2014 - WebVTT Cue Id Box.
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type WebVTTCueIdBox = {
-	cueId: string;
-};
 
 /**
  * Parse a WebVTTCueIdBox from an IsoView
@@ -22,7 +13,7 @@ export type WebVTTCueIdBox = {
  *
  * @beta
  */
-export function iden(view: IsoView): WebVTTCueIdBox {
+export function iden(view: IsoView): Fields<WebVttCueIdBox> {
 	return {
 		cueId: view.readUtf8(-1),
 	};
