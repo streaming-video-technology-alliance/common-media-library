@@ -53,6 +53,14 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 export function ardi(view: IsoView): Fields<AudioRenderingIndicationBox>;
 
 // @beta
+export class ArithmeticMeanEstimator implements ThroughputEstimator {
+    // (undocumented)
+    getEstimate(): number;
+    // (undocumented)
+    sample(sample: ResourceTiming): void;
+}
+
+// @beta
 export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
 
 // @alpha
@@ -989,6 +997,14 @@ export type HandlerReferenceBox = FullBox & {
     reserved: number[];
     name: string;
 };
+
+// @beta
+export class HarmonicMeanEstimator implements ThroughputEstimator {
+    // (undocumented)
+    getEstimate(): number;
+    // (undocumented)
+    sample(sample: ResourceTiming): void;
+}
 
 // @beta
 export function hdlr(view: IsoView): Fields<HandlerReferenceBox>;
