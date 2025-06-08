@@ -17,6 +17,11 @@ and this project adheres to
 - VTT Parsing Utilities
   ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
 
+### Fixed
+
+- The ISO BMFF utilities are not properly typed
+  ([#202](https://github.com/streaming-video-technology-alliance/common-media-library/issues/202))
+
 ## [0.12.4] - 2025-05-16
 
 ### Fixed
