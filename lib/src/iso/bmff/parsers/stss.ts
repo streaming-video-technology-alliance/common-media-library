@@ -1,5 +1,6 @@
 import type { Fields } from '../boxes/Fields.js';
-import type { SyncSample, SyncSampleBox } from '../boxes/SyncSampleBox.js';
+import type { SyncSample } from '../boxes/SyncSample.js';
+import type { SyncSampleBox } from '../boxes/SyncSampleBox.js';
 import type { IsoView } from '../IsoView.js';
 
 /**

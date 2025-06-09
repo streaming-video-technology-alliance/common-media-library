@@ -1,5 +1,6 @@
+import type { Entity } from '../boxes/Entity.js';
 import type { Fields } from '../boxes/Fields.js';
-import type { Entity, PreselectionGroupBox } from '../boxes/PreselectionGroupBox.js';
+import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.js';
 import type { IsoView } from '../IsoView.js';
 
 /**

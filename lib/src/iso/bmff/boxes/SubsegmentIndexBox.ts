@@ -1,28 +1,5 @@
 import type { FullBox } from './FullBox.js';
-
-/**
- * Subsegment range
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type Range = {
-	level: number;
-	rangeSize: number;
-};
-
-/**
- * Subsegment
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type Subsegment = {
-	rangesCount: number;
-	ranges: Range[];
-};
+import type { Subsegment } from './Subsegment.js';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box

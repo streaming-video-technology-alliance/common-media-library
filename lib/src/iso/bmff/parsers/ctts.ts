@@ -1,4 +1,5 @@
-import type { CompositionTimeToSampleBox, CompositionTimeToSampleEntry } from '../boxes/CompositionTimeToSampleBox.js';
+import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.js';
+import type { CompositionTimeToSampleEntry } from '../boxes/CompositionTimeToSampleEntry.js';
 import type { Fields } from '../boxes/Fields.js';
 import type { IsoView } from '../IsoView.js';
 

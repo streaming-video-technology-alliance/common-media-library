@@ -1,28 +1,5 @@
+import type { EncryptedSample } from './EncryptedSample.js';
 import type { FullBox } from './FullBox.js';
-
-/**
- * Subsample Encryption
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SubsampleEncryption = {
-	bytesOfClearData: number;
-	bytesOfProtectedData: number;
-};
-
-/**
- * Encrypted Sample
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type EncryptedSample = {
-	initializationVector?: Uint8Array;
-	subsampleEncryption?: SubsampleEncryption[];
-};
 
 /**
  * Sample Encryption Box - 'senc'

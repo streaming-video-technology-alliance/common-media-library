@@ -1,5 +1,6 @@
 import type { Fields } from '../boxes/Fields.js';
-import type { SegmentIndexBox, SegmentIndexReference } from '../boxes/SegmentIndexBox.js';
+import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.js';
+import type { SegmentIndexReference } from '../boxes/SegmentIndexReference.js';
 import type { IsoView } from '../IsoView.js';
 
 /**

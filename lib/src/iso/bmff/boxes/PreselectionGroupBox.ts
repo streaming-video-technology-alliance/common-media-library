@@ -1,16 +1,5 @@
+import type { Entity } from './Entity.js';
 import type { FullBox } from './FullBox.js';
-
-/**
- * Entity
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type Entity = {
-	/** Entity ID */
-	entityId: number;
-};
 
 /**
  * ISO/IEC 14496-12:202x - 8.18.4.1 Preselection group box

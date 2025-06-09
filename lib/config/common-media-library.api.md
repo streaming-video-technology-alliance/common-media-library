@@ -1629,13 +1629,6 @@ export function prsl(view: IsoView): Fields<PreselectionGroupBox>;
 export function pssh(view: IsoView): Fields<ProtectionSystemSpecificHeaderBox>;
 
 // @beta
-type Range_2 = {
-    level: number;
-    rangeSize: number;
-};
-export { Range_2 as Range }
-
-// @beta
 export type RawBox = {
     type: string;
     size: number;
@@ -2154,7 +2147,7 @@ export type SubsampleInformationBox = FullBox & {
 // @beta
 export type Subsegment = {
     rangesCount: number;
-    ranges: Range_2[];
+    ranges: SubsegmentRange[];
 };
 
 // @beta
@@ -2744,5 +2737,9 @@ export type XmlParseOptions = {
     keepWhitespace?: boolean;
     keepComments?: boolean;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/iso/bmff/boxes/Subsegment.ts:12:2 - (ae-forgotten-export) The symbol "SubsegmentRange" needs to be exported by the entry point index.d.ts
 
 ```

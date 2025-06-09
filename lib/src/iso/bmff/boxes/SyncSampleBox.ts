@@ -1,15 +1,5 @@
 import type { FullBox } from './FullBox.js';
-
-/**
- * Sync sample
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SyncSample = {
-	sampleNumber: number;
-};
+import type { SyncSample } from './SyncSample.js';
 
 /**
  * ISO/IEC 14496-12:2015 - 8.6.2 Sync Sample Box

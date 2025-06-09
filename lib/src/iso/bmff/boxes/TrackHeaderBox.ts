@@ -1,4 +1,5 @@
 import type { FullBox } from './FullBox.js';
+
 /**
  * ISO/IEC 14496-12:2012 - 8.3.2 Track Header Box
  *

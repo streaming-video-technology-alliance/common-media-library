@@ -1,4 +1,5 @@
-import type { EditListBox, EditListEntry } from '../boxes/EditListBox.js';
+import type { EditListBox } from '../boxes/EditListBox.js';
+import type { EditListEntry } from '../boxes/EditListEntry.js';
 import type { Fields } from '../boxes/Fields.js';
 import type { IsoView } from '../IsoView.js';
 
