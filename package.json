@@ -22,7 +22,14 @@
 		"Structured Field Values",
 		"ID3",
 		"Common Media Request",
-		"Common Media Response"
+		"Common Media Response",
+		"CTA 608",
+		"CEA 608",
+		"ISO BMFF",
+		"WebVTT",
+		"VTT",
+		"DASH",
+		"DRM"
 	],
 	"scripts": {
 		"format": "npm run lint -- --fix",
