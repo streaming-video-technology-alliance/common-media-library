@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.13.0] - 2025-06-09
+
 ### Added
 
 - Add ISO BMFF `iden` box parser
@@ -363,7 +365,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.4...v0.13.0
 [0.12.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.1...v0.12.2
