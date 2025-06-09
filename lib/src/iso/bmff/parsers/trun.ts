@@ -1,36 +1,7 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { TrackRunBox } from '../boxes/TrackRunBox.js';
+import type { TrackRunSample } from '../boxes/TrackRunSample.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * Track run sample
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type TrackRunSample = {
-	sampleDuration?: number;
-	sampleSize?: number;
-	sampleFlags?: number;
-	sampleCompositionTimeOffset?: number;
-};
-
-/**
- * ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box
- *
- * Note: the 'trun' box has a direct relation to the 'tfhd' box for defaults.
- * These defaults are not set explicitly here, but are left to resolve for the user.
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type TrackRunBox = FullBox & {
-	sampleCount: number;
-	dataOffset?: number;
-	firstSampleFlags?: number;
-	samples: TrackRunSample[];
-};
 
 /**
  * Parse a TrackRunBox from an IsoView
@@ -43,7 +14,7 @@ export type TrackRunBox = FullBox & {
  *
  * @beta
  */
-export function trun(view: IsoView): TrackRunBox {
+export function trun(view: IsoView): Fields<TrackRunBox> {
 	const { version, flags } = view.readFullBox();
 	const sampleCount = view.readUint(4);
 	let dataOffset: number | undefined;

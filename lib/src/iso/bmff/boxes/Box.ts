@@ -1,14 +1,16 @@
+import type { IsoView } from '../IsoView.js';
+
 /**
- * Box
+ * Base Box Type
  *
  * @group ISOBMFF
  *
  * @beta
  */
-export type Box<T = any> = T & {
+export type Box = {
 	type: string;
 	size: number;
+	view: IsoView;
 	largesize?: number;
 	usertype?: number[];
-	boxes?: Box[];
 };

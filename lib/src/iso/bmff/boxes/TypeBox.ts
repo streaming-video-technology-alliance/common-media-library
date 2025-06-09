@@ -1,11 +1,14 @@
+import type { Box } from './Box.js';
+
 /**
- * TypeBox
+ * Utility TypeBox
  *
  * @group ISOBMFF
  *
  * @beta
  */
-export type TypeBox = {
+export type TypeBox<T> = Box & {
+	type: T;
 	majorBrand: string;
 	minorVersion: number;
 	compatibleBrands: string[];

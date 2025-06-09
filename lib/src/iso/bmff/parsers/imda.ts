@@ -1,16 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 9.1.4.1 Identified media data box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type IdentifiedMediaDataBox = {
-	imdaIdentifier: number;
-	data: Uint8Array;
-};
 
 /**
  * Parse a IdentifiedMediaDataBox from an IsoView
@@ -23,7 +13,7 @@ export type IdentifiedMediaDataBox = {
  *
  * @beta
  */
-export function imda(view: IsoView): IdentifiedMediaDataBox {
+export function imda(view: IsoView): Fields<IdentifiedMediaDataBox> {
 	return {
 		imdaIdentifier: view.readUint(4),
 		data: view.readData(-1),

@@ -1,3 +1,5 @@
+import type { Fields } from './boxes/Fields.js';
+import type { IsoBox } from './boxes/IsoBox.js';
 import type { IsoView } from './IsoView.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
 
@@ -8,4 +10,4 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export type BoxParser<V = any> = (view: IsoView, config?: IsoViewConfig) => V;
+export type BoxParser<V = IsoBox> = (view: IsoView, config?: IsoViewConfig) => Fields<V>;

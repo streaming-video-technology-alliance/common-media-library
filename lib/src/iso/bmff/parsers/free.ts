@@ -1,15 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.1.2 Free Space Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type FreeSpaceBox = {
-	data: Uint8Array;
-};
 
 /**
  * Parse a Box from an IsoView
@@ -22,7 +13,7 @@ export type FreeSpaceBox = {
  *
  * @beta
  */
-export function free(view: IsoView): FreeSpaceBox {
+export function free(view: IsoView): Fields<FreeSpaceBox> {
 	return {
 		data: view.readData(-1),
 	};

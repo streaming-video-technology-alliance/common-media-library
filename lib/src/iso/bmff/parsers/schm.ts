@@ -1,18 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.12.5 Scheme Type Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SchemeTypeBox = FullBox & {
-	schemeType: number;
-	schemeVersion: number;
-	schemeUri?: string;
-};
 
 /**
  * Parse a SchemeTypeBox from an IsoView
@@ -25,7 +13,7 @@ export type SchemeTypeBox = FullBox & {
  *
  * @beta
  */
-export function schm(view: IsoView): SchemeTypeBox {
+export function schm(view: IsoView): Fields<SchemeTypeBox> {
 	const { version, flags } = view.readFullBox();
 
 	return {

@@ -19,6 +19,11 @@ and this project adheres to
 - Added Harmonic Mean Throughput Estimator ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
 - Added Arithmetic Mean Throughput Estimator ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
 
+### Fixed
+
+- The ISO BMFF utilities are not properly typed
+  ([#202](https://github.com/streaming-video-technology-alliance/common-media-library/issues/202))
+
 ## [0.12.4] - 2025-05-16
 
 ### Fixed

@@ -1,15 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-30:2014 - WebVTT Cue Settings Box.
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type WebVTTSettingsBox = {
-	settings: string;
-};
 
 /**
  * Parse a WebVTTSettingsBox from an IsoView
@@ -22,7 +13,7 @@ export type WebVTTSettingsBox = {
  *
  * @beta
  */
-export function sttg(view: IsoView): WebVTTSettingsBox {
+export function sttg(view: IsoView): Fields<WebVttSettingsBox> {
 	return {
 		settings: view.readUtf8(-1),
 	};

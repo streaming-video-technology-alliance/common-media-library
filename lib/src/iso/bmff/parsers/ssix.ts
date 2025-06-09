@@ -1,41 +1,6 @@
-import type { FullBox } from '../FullBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * Subsegment range
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type Range = {
-	level: number;
-	rangeSize: number;
-};
-
-/**
- * Subsegment
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type Subsegment = {
-	rangesCount: number;
-	ranges: Range[];
-};
-
-/**
- * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SubsegmentIndexBox = FullBox & {
-	subsegmentCount: number;
-	subsegments: Subsegment[];
-};
+import type { Fields } from '../boxes/Fields.js';
+import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.js';
 
 /**
  * Parse a SubsegmentIndexBox from an IsoView
@@ -48,7 +13,7 @@ export type SubsegmentIndexBox = FullBox & {
  *
  * @beta
  */
-export function ssix(view: IsoView): SubsegmentIndexBox {
+export function ssix(view: IsoView): Fields<SubsegmentIndexBox> {
 	const { version, flags } = view.readFullBox();
 	const subsegmentCount = view.readUint(4);
 	const subsegments = view.readEntries(subsegmentCount, () => {

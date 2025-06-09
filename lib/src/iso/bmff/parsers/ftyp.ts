@@ -1,15 +1,7 @@
-import type { IsoView } from '../IsoView.js';
-import type { TypeBox } from '../TypeBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { FileTypeBox } from '../boxes/FileTypeBox.js';
 import { STRING } from '../fields/STRING.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 4.3 File Type Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type FileTypeBox = TypeBox;
+import type { IsoView } from '../IsoView.js';
 
 /**
  * Parse a FileTypeBox from an IsoView
@@ -22,7 +14,7 @@ export type FileTypeBox = TypeBox;
  *
  * @beta
  */
-export function ftyp(view: IsoView): FileTypeBox {
+export function ftyp(view: IsoView): Fields<FileTypeBox> {
 	const size = 4;
 	const majorBrand = view.readString(4);
 	const minorVersion = view.readUint(4);

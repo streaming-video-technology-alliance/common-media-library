@@ -1,4 +1,4 @@
-export const ContainerBoxes: string[] = [
+export const CONTAINERS: string[] = [
 	'dinf',
 	'edts',
 	'enca',

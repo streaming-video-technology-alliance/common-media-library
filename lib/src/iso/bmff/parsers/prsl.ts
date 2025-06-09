@@ -1,39 +1,7 @@
-import type { FullBox } from '../FullBox.js';
+import type { Entity } from '../boxes/Entity.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * Entity
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type Entity = {
-	/** Entity ID */
-	entityId: number;
-};
-
-/**
- * ISO/IEC 14496-12:202x - 8.18.4.1 Preselection group box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type PreselectionGroupBox = FullBox & {
-	/** Group ID */
-	groupId: number;
-
-	/** Number of entities in group */
-	numEntitiesInGroup: number;
-
-	/** Entities */
-	entities: Entity[];
-
-	preselectionTag?: string;
-	selectionPriority?: number;
-	interleavingTag?: string;
-};
 
 /**
  * Parse a PreselectionGroupBox from an IsoView
@@ -46,7 +14,7 @@ export type PreselectionGroupBox = FullBox & {
  *
  * @beta
  */
-export function prsl(view: IsoView): PreselectionGroupBox {
+export function prsl(view: IsoView): Fields<PreselectionGroupBox> {
 	const { version, flags } = view.readFullBox();
 	const groupId = view.readUint(4);
 	const numEntitiesInGroup = view.readUint(4);

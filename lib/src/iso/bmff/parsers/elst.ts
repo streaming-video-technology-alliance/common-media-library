@@ -1,31 +1,7 @@
-import type { FullBox } from '../FullBox.js';
+import type { EditListBox } from '../boxes/EditListBox.js';
+import type { EditListEntry } from '../boxes/EditListEntry.js';
+import type { Fields } from '../boxes/Fields.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * An edit list entry.
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type EditListEntry = {
-	segmentDuration: number;
-	mediaTime: number;
-	mediaRateInteger: number;
-	mediaRateFraction: number;
-};
-
-/**
- * ISO/IEC 14496-12:2012 - 8.6.6 Edit List Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type EditListBox = FullBox & {
-	entryCount: number;
-	entries: EditListEntry[];
-};
 
 /**
  * Parse a Box from an IsoView
@@ -38,7 +14,7 @@ export type EditListBox = FullBox & {
  *
  * @beta
  */
-export function elst(view: IsoView): EditListBox {
+export function elst(view: IsoView): Fields<EditListBox> {
 	const { version, flags } = view.readFullBox();
 	const v1 = version === 1;
 	const size = v1 ? 8 : 4;

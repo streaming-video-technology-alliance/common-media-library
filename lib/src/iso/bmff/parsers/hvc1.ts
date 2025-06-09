@@ -1,5 +1,7 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.js';
 import type { IsoView } from '../IsoView.js';
-import { avc1, type VisualSampleEntry } from './avc1.js';
+import { avc1 } from './avc1.js';
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView
@@ -12,6 +14,6 @@ import { avc1, type VisualSampleEntry } from './avc1.js';
  *
  * @beta
  */
-export function hvc1(view: IsoView): VisualSampleEntry {
+export function hvc1(view: IsoView): Fields<VisualSampleEntryBox<'avc1'>> {
 	return avc1(view);
 }
