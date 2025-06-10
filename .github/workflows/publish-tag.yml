@@ -5,7 +5,7 @@ on:
     inputs:
       tag:
         description: "The npm tag (i.e @svta/common-media-library@dev)"
-        default: 'dev'
+        default: "dev"
         required: true
       id:
         description: "An id to append to the version. Defaults to the current timestamp"
@@ -31,8 +31,8 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v3
         with:
-          node-version: 23
-          cache: 'npm'
+          node-version: 24
+          cache: "npm"
           registry-url: "https://registry.npmjs.org"
           scope: "@svta"
 
