@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add map type for ISO BMFF boxes to their type properties
+  ([#208](https://github.com/streaming-video-technology-alliance/common-media-library/issues/208))
+
 ## [0.13.0] - 2025-06-09
 
 ### Added
