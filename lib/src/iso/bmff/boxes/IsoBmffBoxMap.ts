@@ -6,9 +6,11 @@ import type { CompactSampleSizeBox } from './CompactSampleSizeBox.js';
 import type { CompositionTimeToSampleBox } from './CompositionTimeToSampleBox.js';
 import type { DataEntryUrlBox } from './DataEntryUrlBox.js';
 import type { DataEntryUrnBox } from './DataEntryUrnBox.js';
+import type { DataInformationBox } from './DataInformationBox.js';
 import type { DataReferenceBox } from './DataReferenceBox.js';
 import type { DecodingTimeToSampleBox } from './DecodingTimeToSampleBox.js';
 import type { DegradationPriorityBox } from './DegradationPriorityBox.js';
+import type { EditBox } from './EditBox.js';
 import type { EditListBox } from './EditListBox.js';
 import type { EventMessageBox } from './EventMessageBox.js';
 import type { ExtendedLanguageBox } from './ExtendedLanguageBox.js';
@@ -18,13 +20,23 @@ import type { HandlerReferenceBox } from './HandlerReferenceBox.js';
 import type { HintMediaHeaderBox } from './HintMediaHeaderBox.js';
 import type { IdentifiedMediaDataBox } from './IdentifiedMediaDataBox.js';
 import type { IpmpInfoBox } from './IpmpInfoBox.js';
+import type { ItemInfoBox } from './ItemInfoBox.js';
 import type { ItemInfoEntry } from './ItemInfoEntry.js';
 import type { ItemLocationBox } from './ItemLocationBox.js';
+import type { ItemProtectionBox } from './ItemProtectionBox.js';
+import type { ItemReferenceBox } from './ItemReferenceBox.js';
 import type { LabelBox } from './LabelBox.js';
+import type { MediaBox } from './MediaBox.js';
 import type { MediaDataBox } from './MediaDataBox.js';
 import type { MediaHeaderBox } from './MediaHeaderBox.js';
+import type { MediaInformationBox } from './MediaInformationBox.js';
+import type { MetaBox } from './MetaBox.js';
+import type { MovieBox } from './MovieBox.js';
+import type { MovieExtendsBox } from './MovieExtendsBox.js';
 import type { MovieExtendsHeaderBox } from './MovieExtendsHeaderBox.js';
+import type { MovieFragmentBox } from './MovieFragmentBox.js';
 import type { MovieFragmentHeaderBox } from './MovieFragmentHeaderBox.js';
+import type { MovieFragmentRandomAccessBox } from './MovieFragmentRandomAccessBox.js';
 import type { MovieFragmentRandomAccessOffsetBox } from './MovieFragmentRandomAccessOffsetBox.js';
 import type { MovieHeaderBox } from './MovieHeaderBox.js';
 import type { NullMediaHeaderBox } from './NullMediaHeaderBox.js';
@@ -32,6 +44,7 @@ import type { OriginalFormatBox } from './OriginalFormatBox.js';
 import type { PreselectionGroupBox } from './PreselectionGroupBox.js';
 import type { PrimaryItemBox } from './PrimaryItemBox.js';
 import type { ProducerReferenceTimeBox } from './ProducerReferenceTimeBox.js';
+import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformationBox.js';
 import type { ProtectionSystemSpecificHeaderBox } from './ProtectionSystemSpecificHeaderBox.js';
 import type { SampleAuxiliaryInformationOffsetsBox } from './SampleAuxiliaryInformationOffsetsBox.js';
 import type { SampleAuxiliaryInformationSizesBox } from './SampleAuxiliaryInformationSizesBox.js';
@@ -40,28 +53,31 @@ import type { SampleDescriptionBox } from './SampleDescriptionBox.js';
 import type { SampleEncryptionBox } from './SampleEncryptionBox.js';
 import type { SampleGroupDescriptionBox } from './SampleGroupDescriptionBox.js';
 import type { SampleSizeBox } from './SampleSizeBox.js';
+import type { SampleTableBox } from './SampleTableBox.js';
 import type { SampleToChunkBox } from './SampleToChunkBox.js';
 import type { SampleToGroupBox } from './SampleToGroupBox.js';
+import type { SchemeInformationBox } from './SchemeInformationBox.js';
 import type { SchemeTypeBox } from './SchemeTypeBox.js';
 import type { SegmentIndexBox } from './SegmentIndexBox.js';
 import type { SegmentTypeBox } from './SegmentTypeBox.js';
 import type { ShadowSyncSampleBox } from './ShadowSyncSampleBox.js';
-import type { SingleItemTypeReferenceBox } from './SingleItemTypeReferenceBox.js';
 import type { SoundMediaHeaderBox } from './SoundMediaHeaderBox.js';
 import type { SubsampleInformationBox } from './SubsampleInformationBox.js';
 import type { SubsegmentIndexBox } from './SubsegmentIndexBox.js';
 import type { SubtitleMediaHeaderBox } from './SubtitleMediaHeaderBox.js';
 import type { SyncSampleBox } from './SyncSampleBox.js';
+import type { TrackBox } from './TrackBox.js';
 import type { TrackEncryptionBox } from './TrackEncryptionBox.js';
 import type { TrackExtendsBox } from './TrackExtendsBox.js';
 import type { TrackFragmentBaseMediaDecodeTimeBox } from './TrackFragmentBaseMediaDecodeTimeBox.js';
+import type { TrackFragmentBox } from './TrackFragmentBox.js';
 import type { TrackFragmentHeaderBox } from './TrackFragmentHeaderBox.js';
 import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBox.js';
 import type { TrackHeaderBox } from './TrackHeaderBox.js';
 import type { TrackKindBox } from './TrackKindBox.js';
+import type { TrackReferenceBox } from './TrackReferenceBox.js';
 import type { TrackRunBox } from './TrackRunBox.js';
-import type { UrlBox } from './UrlBox.js';
-import type { UrnBox } from './UrnBox.js';
+import type { UserDataBox } from './UserDataBox.js';
 import type { VideoMediaHeaderBox } from './VideoMediaHeaderBox.js';
 import type { VisualSampleEntryBox } from './VisualSampleEntryBox.js';
 import type { WebVttConfigurationBox } from './WebVttConfigurationBox.js';
@@ -72,90 +88,107 @@ import type { WebVttSettingsBox } from './WebVttSettingsBox.js';
 import type { WebVttSourceLabelBox } from './WebVttSourceLabelBox.js';
 
 /**
- * Non-container Box types
+ * Comprehensive mapping from box type strings to their corresponding TypeScript interfaces
  *
  * @group ISOBMFF
  *
  * @beta
  */
-export type IsoBox =
-	| AudioRenderingIndicationBox
-	| AudioSampleEntryBox<'enca'>
-	| AudioSampleEntryBox<'mp4a'>
-	| ChunkLargeOffsetBox
-	| ChunkOffsetBox
-	| CompactSampleSizeBox
-	| CompositionTimeToSampleBox
-	| DataEntryUrlBox
-	| DataEntryUrnBox
-	| DataReferenceBox
-	| DecodingTimeToSampleBox
-	| DegradationPriorityBox
-	| EditListBox
-	| EventMessageBox
-	| ExtendedLanguageBox
-	| FileTypeBox
-	| FreeSpaceBox<'free'>
-	| FreeSpaceBox<'skip'>
-	| HandlerReferenceBox
-	| HintMediaHeaderBox
-	| IdentifiedMediaDataBox
-	| IpmpInfoBox
-	| ItemInfoEntry
-	| ItemLocationBox
-	| LabelBox
-	| MediaDataBox
-	| MediaHeaderBox
-	| MovieExtendsHeaderBox
-	| MovieFragmentHeaderBox
-	| MovieFragmentRandomAccessOffsetBox
-	| MovieHeaderBox
-	| NullMediaHeaderBox
-	| OriginalFormatBox
-	| PrimaryItemBox
-	| PreselectionGroupBox
-	| ProducerReferenceTimeBox
-	| ProtectionSystemSpecificHeaderBox
-	| SampleAuxiliaryInformationOffsetsBox
-	| SampleAuxiliaryInformationSizesBox
-	| SampleDependencyTypeBox
-	| SampleDescriptionBox
-	| SampleEncryptionBox
-	| SampleGroupDescriptionBox
-	| SampleSizeBox
-	| SampleToChunkBox
-	| SampleToGroupBox
-	| SchemeTypeBox
-	| SegmentIndexBox
-	| SegmentTypeBox
-	| ShadowSyncSampleBox
-	| SingleItemTypeReferenceBox
-	| SoundMediaHeaderBox
-	| SubsampleInformationBox
-	| SubsegmentIndexBox
-	| SubtitleMediaHeaderBox
-	| SyncSampleBox
-	| TrackEncryptionBox
-	| TrackExtendsBox
-	| TrackFragmentBaseMediaDecodeTimeBox
-	| TrackFragmentHeaderBox
-	| TrackFragmentRandomAccessBox
-	| TrackHeaderBox
-	| TrackKindBox
-	| TrackRunBox
-	| UrlBox
-	| UrnBox
-	| VideoMediaHeaderBox
-	| VisualSampleEntryBox<'avc1'>
-	| VisualSampleEntryBox<'avc2'>
-	| VisualSampleEntryBox<'avc3'>
-	| VisualSampleEntryBox<'avc4'>
-	| VisualSampleEntryBox<'encv'>
-	| VisualSampleEntryBox<'hev1'>
-	| VisualSampleEntryBox<'hvc1'>
-	| WebVttConfigurationBox
-	| WebVttCueIdBox
-	| WebVttCuePayloadBox
-	| WebVttEmptySampleBox
-	| WebVttSettingsBox
-	| WebVttSourceLabelBox;
+export type IsoBmffBoxMap = {
+	ardi: AudioRenderingIndicationBox;
+	avc1: VisualSampleEntryBox<'avc1'>;
+	avc2: VisualSampleEntryBox<'avc2'>;
+	avc3: VisualSampleEntryBox<'avc3'>;
+	avc4: VisualSampleEntryBox<'avc4'>;
+	co64: ChunkLargeOffsetBox;
+	ctts: CompositionTimeToSampleBox;
+	dinf: DataInformationBox;
+	dref: DataReferenceBox;
+	edts: EditBox;
+	elng: ExtendedLanguageBox;
+	elst: EditListBox;
+	emsg: EventMessageBox;
+	enca: AudioSampleEntryBox<'enca'>;
+	encv: VisualSampleEntryBox<'encv'>;
+	free: FreeSpaceBox<'free'>;
+	frma: OriginalFormatBox;
+	ftyp: FileTypeBox;
+	hdlr: HandlerReferenceBox;
+	hev1: VisualSampleEntryBox<'hev1'>;
+	hmhd: HintMediaHeaderBox;
+	hvc1: VisualSampleEntryBox<'hvc1'>;
+	iden: WebVttCueIdBox;
+	iinf: ItemInfoBox;
+	iloc: ItemLocationBox;
+	imda: IdentifiedMediaDataBox;
+	imif: IpmpInfoBox;
+	infe: ItemInfoEntry;
+	ipro: ItemProtectionBox;
+	iref: ItemReferenceBox;
+	kind: TrackKindBox;
+	labl: LabelBox;
+	mdat: MediaDataBox;
+	mdhd: MediaHeaderBox;
+	mdia: MediaBox;
+	mehd: MovieExtendsHeaderBox;
+	meta: MetaBox;
+	mfhd: MovieFragmentHeaderBox;
+	mfra: MovieFragmentRandomAccessBox;
+	mfro: MovieFragmentRandomAccessOffsetBox;
+	minf: MediaInformationBox;
+	moof: MovieFragmentBox;
+	moov: MovieBox;
+	mp4a: AudioSampleEntryBox<'mp4a'>;
+	mvex: MovieExtendsBox;
+	mvhd: MovieHeaderBox;
+	nmhd: NullMediaHeaderBox;
+	payl: WebVttCuePayloadBox;
+	pitm: PrimaryItemBox;
+	prft: ProducerReferenceTimeBox;
+	prsl: PreselectionGroupBox;
+	pssh: ProtectionSystemSpecificHeaderBox;
+	saio: SampleAuxiliaryInformationOffsetsBox;
+	saiz: SampleAuxiliaryInformationSizesBox;
+	sbgp: SampleToGroupBox;
+	schi: SchemeInformationBox;
+	schm: SchemeTypeBox;
+	sdtp: SampleDependencyTypeBox;
+	senc: SampleEncryptionBox;
+	sgpd: SampleGroupDescriptionBox;
+	sidx: SegmentIndexBox;
+	sinf: ProtectionSchemeInformationBox;
+	skip: FreeSpaceBox<'skip'>;
+	smhd: SoundMediaHeaderBox;
+	ssix: SubsegmentIndexBox;
+	stbl: SampleTableBox;
+	stco: ChunkOffsetBox;
+	stdp: DegradationPriorityBox;
+	sthd: SubtitleMediaHeaderBox;
+	stsc: SampleToChunkBox;
+	stsd: SampleDescriptionBox;
+	stsh: ShadowSyncSampleBox;
+	stss: SyncSampleBox;
+	stsz: SampleSizeBox;
+	sttg: WebVttSettingsBox;
+	stts: DecodingTimeToSampleBox;
+	styp: SegmentTypeBox;
+	subs: SubsampleInformationBox;
+	stz2: CompactSampleSizeBox;
+	tenc: TrackEncryptionBox;
+	tfdt: TrackFragmentBaseMediaDecodeTimeBox;
+	tfhd: TrackFragmentHeaderBox;
+	tfra: TrackFragmentRandomAccessBox;
+	tkhd: TrackHeaderBox;
+	traf: TrackFragmentBox;
+	trak: TrackBox;
+	tref: TrackReferenceBox;
+	trex: TrackExtendsBox;
+	trun: TrackRunBox;
+	udta: UserDataBox;
+	url: DataEntryUrlBox;
+	urn: DataEntryUrnBox;
+	vlab: WebVttSourceLabelBox;
+	vmhd: VideoMediaHeaderBox;
+	vttC: WebVttConfigurationBox;
+	vtte: WebVttEmptySampleBox;
+};

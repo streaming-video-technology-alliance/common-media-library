@@ -4,7 +4,7 @@ import type { SampleAuxiliaryInformationSizesBox } from './SampleAuxiliaryInform
 import type { SampleEncryptionBox } from './SampleEncryptionBox.js';
 import type { TrackFragmentBaseMediaDecodeTimeBox } from './TrackFragmentBaseMediaDecodeTimeBox.js';
 import type { TrackFragmentHeaderBox } from './TrackFragmentHeaderBox.js';
-import type { TrackFragmentRunBox } from './TrackFragmentRunBox.js';
+import type { TrackRunBox } from './TrackRunBox.js';
 
 /**
  * Track Fragment Box - 'traf' - Container
@@ -13,6 +13,6 @@ import type { TrackFragmentRunBox } from './TrackFragmentRunBox.js';
  *
  * @beta
  */
-export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
+export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
 	type: 'traf';
 };
