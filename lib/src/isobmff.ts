@@ -24,5 +24,4 @@ export * from './iso/bmff/IsoView.js';
 export * from './iso/bmff/IsoViewConfig.js';
 export * from './iso/bmff/parseBoxes.js';
 export * from './iso/bmff/parsers.js';
-export * from './iso/bmff/readers/ISOFieldTypeMap.js';
-
+export * from './iso/bmff/readers/IsoFieldTypeMap.js';

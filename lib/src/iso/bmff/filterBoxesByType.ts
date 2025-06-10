@@ -1,5 +1,5 @@
-import type { Box } from './boxes/Box.js';
 import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
+import type { IsoBmffBoxMap } from './boxes/IsoBmffBoxMap.js';
 import { filterBoxes } from './filterBoxes.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
@@ -17,10 +17,10 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @beta
  */
-export function filterBoxesByType<T extends Box = IsoBmffBox>(raw: IsoData, type: string | string[], config: IsoViewConfig = {}): T[] {
+export function filterBoxesByType<T extends keyof IsoBmffBoxMap>(raw: IsoData, type: T | T[], config: IsoViewConfig = {}): IsoBmffBoxMap[T][] {
 	if (!Array.isArray(type)) {
 		type = [type];
 	}
 
-	return filterBoxes(raw, box => type.includes(box.type), config);
+	return filterBoxes(raw, (box: IsoBmffBox): box is IsoBmffBoxMap[T] => type.includes(box.type as T), config);
 }
