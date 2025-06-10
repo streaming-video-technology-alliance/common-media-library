@@ -13,6 +13,11 @@ and this project adheres to
 - Add map type for ISO BMFF boxes to their type properties
   ([#208](https://github.com/streaming-video-technology-alliance/common-media-library/issues/208))
 
+### Changed
+
+- Update Node.js development version to 24
+  ([#211](https://github.com/streaming-video-technology-alliance/common-media-library/issues/211))
+
 ## [0.13.0] - 2025-06-09
 
 ### Added
