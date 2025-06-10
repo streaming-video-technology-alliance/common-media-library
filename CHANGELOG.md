@@ -12,6 +12,7 @@ and this project adheres to
 
 - Update Node.js development version to 24
   ([#211](https://github.com/streaming-video-technology-alliance/common-media-library/issues/211))
+- Added Zlema Throughput Estimator ([#212](https://github.com/streaming-video-technology-alliance/common-media-library/pull/212))
 
 ## [0.13.0] - 2025-06-09
 
@@ -25,7 +26,6 @@ and this project adheres to
   ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
 - Added Harmonic Mean Throughput Estimator ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
 - Added Arithmetic Mean Throughput Estimator ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
-- Added Zlema Throughput Estimator ([#212](https://github.com/streaming-video-technology-alliance/common-media-library/pull/212))
 
 ### Fixed
 
