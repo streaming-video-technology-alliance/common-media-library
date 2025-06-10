@@ -120,7 +120,7 @@ export type Box = {
 };
 
 // @beta
-export type BoxFilter = (box: IsoBmffBox) => boolean;
+export type BoxFilter<T extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T);
 
 // @beta
 export type BoxParser<V = IsoBox> = (view: IsoView, config?: IsoViewConfig) => Fields<V>;
@@ -863,16 +863,16 @@ export type Fields<T> = Omit<T, Exclude<keyof Box, 'data'> | 'boxes'>;
 export type FileTypeBox = TypeBox<'ftyp'>;
 
 // @beta
-export function filterBoxes<T extends Box = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter, config?: IsoViewConfig): T[];
+export function filterBoxes<T extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T>, config?: IsoViewConfig): T[];
 
 // @beta
-export function filterBoxesByType<T extends Box = IsoBmffBox>(raw: IsoData, type: string | string[], config?: IsoViewConfig): T[];
+export function filterBoxesByType<T extends keyof IsoBmffBoxMap>(raw: IsoData, type: T | T[], config?: IsoViewConfig): IsoBmffBoxMap[T][];
 
 // @beta
-export function findBox<T extends Box = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter, config?: IsoViewConfig): T | null;
+export function findBox<T extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T>, config?: IsoViewConfig): T | null;
 
 // @beta
-export function findBoxByType<T extends Box = IsoBmffBox>(raw: IsoData, type: string, config?: IsoViewConfig): T | null;
+export function findBoxByType<T extends keyof IsoBmffBoxMap>(raw: IsoData, type: T, config?: IsoViewConfig): IsoBmffBoxMap[T] | null;
 
 // @beta
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
@@ -1106,7 +1106,107 @@ export function isId3TimestampFrame(frame: Id3Frame): boolean;
 export type IsoBmffBox = IsoBox | IsoContainerBox;
 
 // @beta
-export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox | ChunkLargeOffsetBox | ChunkOffsetBox | CompactSampleSizeBox | CompositionTimeToSampleBox | DataEntryUrlBox | DataEntryUrnBox | DataReferenceBox | DecodingTimeToSampleBox | DegradationPriorityBox | EditListBox | EventMessageBox | ExtendedLanguageBox | FileTypeBox | FreeSpaceBox | HandlerReferenceBox | HintMediaHeaderBox | IdentifiedMediaDataBox | IpmpInfoBox | ItemInfoEntry | ItemLocationBox | LabelBox | MediaDataBox | MediaHeaderBox | MovieExtendsHeaderBox | MovieFragmentHeaderBox | MovieFragmentRandomAccessOffsetBox | MovieHeaderBox | NullMediaHeaderBox | OriginalFormatBox | PrimaryItemBox | PreselectionGroupBox | ProducerReferenceTimeBox | ProtectionSystemSpecificHeaderBox | SampleAuxiliaryInformationOffsetsBox | SampleAuxiliaryInformationSizesBox | SampleDependencyTypeBox | SampleDescriptionBox | SampleEncryptionBox | SampleGroupDescriptionBox | SampleSizeBox | SampleToChunkBox | SampleToGroupBox | SchemeTypeBox | SegmentIndexBox | SegmentTypeBox | ShadowSyncSampleBox | SingleItemTypeReferenceBox | SoundMediaHeaderBox | SubsampleInformationBox | SubsegmentIndexBox | SubtitleMediaHeaderBox | SyncSampleBox | TrackEncryptionBox | TrackExtendsBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentHeaderBox | TrackFragmentRandomAccessBox | TrackFragmentRunBox | TrackHeaderBox | TrackKindBox | TrackRunBox | UrlBox | UrnBox | VideoMediaHeaderBox | VisualSampleEntryBox | WebVttConfigurationBox | WebVttCueIdBox | WebVttCuePayloadBox | WebVttEmptySampleBox | WebVttSettingsBox | WebVttSourceLabelBox;
+export type IsoBmffBoxMap = {
+    ardi: AudioRenderingIndicationBox;
+    avc1: VisualSampleEntryBox<'avc1'>;
+    avc2: VisualSampleEntryBox<'avc2'>;
+    avc3: VisualSampleEntryBox<'avc3'>;
+    avc4: VisualSampleEntryBox<'avc4'>;
+    co64: ChunkLargeOffsetBox;
+    ctts: CompositionTimeToSampleBox;
+    dinf: DataInformationBox;
+    dref: DataReferenceBox;
+    edts: EditBox;
+    elng: ExtendedLanguageBox;
+    elst: EditListBox;
+    emsg: EventMessageBox;
+    enca: AudioSampleEntryBox<'enca'>;
+    encv: VisualSampleEntryBox<'encv'>;
+    free: FreeSpaceBox<'free'>;
+    frma: OriginalFormatBox;
+    ftyp: FileTypeBox;
+    hdlr: HandlerReferenceBox;
+    hev1: VisualSampleEntryBox<'hev1'>;
+    hmhd: HintMediaHeaderBox;
+    hvc1: VisualSampleEntryBox<'hvc1'>;
+    iden: WebVttCueIdBox;
+    iinf: ItemInfoBox;
+    iloc: ItemLocationBox;
+    imda: IdentifiedMediaDataBox;
+    imif: IpmpInfoBox;
+    infe: ItemInfoEntry;
+    ipro: ItemProtectionBox;
+    iref: ItemReferenceBox;
+    kind: TrackKindBox;
+    labl: LabelBox;
+    mdat: MediaDataBox;
+    mdhd: MediaHeaderBox;
+    mdia: MediaBox;
+    mehd: MovieExtendsHeaderBox;
+    meta: MetaBox;
+    mfhd: MovieFragmentHeaderBox;
+    mfra: MovieFragmentRandomAccessBox;
+    mfro: MovieFragmentRandomAccessOffsetBox;
+    minf: MediaInformationBox;
+    moof: MovieFragmentBox;
+    moov: MovieBox;
+    mp4a: AudioSampleEntryBox<'mp4a'>;
+    mvex: MovieExtendsBox;
+    mvhd: MovieHeaderBox;
+    nmhd: NullMediaHeaderBox;
+    payl: WebVttCuePayloadBox;
+    pitm: PrimaryItemBox;
+    prft: ProducerReferenceTimeBox;
+    prsl: PreselectionGroupBox;
+    pssh: ProtectionSystemSpecificHeaderBox;
+    saio: SampleAuxiliaryInformationOffsetsBox;
+    saiz: SampleAuxiliaryInformationSizesBox;
+    sbgp: SampleToGroupBox;
+    schi: SchemeInformationBox;
+    schm: SchemeTypeBox;
+    sdtp: SampleDependencyTypeBox;
+    senc: SampleEncryptionBox;
+    sgpd: SampleGroupDescriptionBox;
+    sidx: SegmentIndexBox;
+    sinf: ProtectionSchemeInformationBox;
+    skip: FreeSpaceBox<'skip'>;
+    smhd: SoundMediaHeaderBox;
+    ssix: SubsegmentIndexBox;
+    stbl: SampleTableBox;
+    stco: ChunkOffsetBox;
+    stdp: DegradationPriorityBox;
+    sthd: SubtitleMediaHeaderBox;
+    stsc: SampleToChunkBox;
+    stsd: SampleDescriptionBox;
+    stsh: ShadowSyncSampleBox;
+    stss: SyncSampleBox;
+    stsz: SampleSizeBox;
+    sttg: WebVttSettingsBox;
+    stts: DecodingTimeToSampleBox;
+    styp: SegmentTypeBox;
+    subs: SubsampleInformationBox;
+    stz2: CompactSampleSizeBox;
+    tenc: TrackEncryptionBox;
+    tfdt: TrackFragmentBaseMediaDecodeTimeBox;
+    tfhd: TrackFragmentHeaderBox;
+    tfra: TrackFragmentRandomAccessBox;
+    tkhd: TrackHeaderBox;
+    traf: TrackFragmentBox;
+    trak: TrackBox;
+    tref: TrackReferenceBox;
+    trex: TrackExtendsBox;
+    trun: TrackRunBox;
+    udta: UserDataBox;
+    url: DataEntryUrlBox;
+    urn: DataEntryUrnBox;
+    vlab: WebVttSourceLabelBox;
+    vmhd: VideoMediaHeaderBox;
+    vttC: WebVttConfigurationBox;
+    vtte: WebVttEmptySampleBox;
+};
+
+// @beta
+export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox<'enca'> | AudioSampleEntryBox<'mp4a'> | ChunkLargeOffsetBox | ChunkOffsetBox | CompactSampleSizeBox | CompositionTimeToSampleBox | DataEntryUrlBox | DataEntryUrnBox | DataReferenceBox | DecodingTimeToSampleBox | DegradationPriorityBox | EditListBox | EventMessageBox | ExtendedLanguageBox | FileTypeBox | FreeSpaceBox<'free'> | FreeSpaceBox<'skip'> | HandlerReferenceBox | HintMediaHeaderBox | IdentifiedMediaDataBox | IpmpInfoBox | ItemInfoEntry | ItemLocationBox | LabelBox | MediaDataBox | MediaHeaderBox | MovieExtendsHeaderBox | MovieFragmentHeaderBox | MovieFragmentRandomAccessOffsetBox | MovieHeaderBox | NullMediaHeaderBox | OriginalFormatBox | PrimaryItemBox | PreselectionGroupBox | ProducerReferenceTimeBox | ProtectionSystemSpecificHeaderBox | SampleAuxiliaryInformationOffsetsBox | SampleAuxiliaryInformationSizesBox | SampleDependencyTypeBox | SampleDescriptionBox | SampleEncryptionBox | SampleGroupDescriptionBox | SampleSizeBox | SampleToChunkBox | SampleToGroupBox | SchemeTypeBox | SegmentIndexBox | SegmentTypeBox | ShadowSyncSampleBox | SingleItemTypeReferenceBox | SoundMediaHeaderBox | SubsampleInformationBox | SubsegmentIndexBox | SubtitleMediaHeaderBox | SyncSampleBox | TrackEncryptionBox | TrackExtendsBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentHeaderBox | TrackFragmentRandomAccessBox | TrackHeaderBox | TrackKindBox | TrackRunBox | UrlBox | UrnBox | VideoMediaHeaderBox | VisualSampleEntryBox<'avc1'> | VisualSampleEntryBox<'avc2'> | VisualSampleEntryBox<'avc3'> | VisualSampleEntryBox<'avc4'> | VisualSampleEntryBox<'encv'> | VisualSampleEntryBox<'hev1'> | VisualSampleEntryBox<'hvc1'> | WebVttConfigurationBox | WebVttCueIdBox | WebVttCuePayloadBox | WebVttEmptySampleBox | WebVttSettingsBox | WebVttSourceLabelBox;
 
 // @beta
 export type IsoContainerBox = DataInformationBox | EditBox | ItemInfoBox | ItemProtectionBox | ItemReferenceBox | MediaBox | MediaInformationBox | MetaBox | MovieBox | MovieExtendsBox | MovieFragmentBox | MovieFragmentRandomAccessBox | ProtectionSchemeInformationBox | SampleTableBox | SchemeInformationBox | TrackBox | TrackFragmentBox | TrackReferenceBox | UserDataBox;
@@ -1115,7 +1215,7 @@ export type IsoContainerBox = DataInformationBox | EditBox | ItemInfoBox | ItemP
 export type IsoData = ArrayBuffer | DataView | Uint8Array;
 
 // @beta
-export type ISOFieldTypeMap = {
+export type IsoFieldTypeMap = {
     uint: number;
     int: number;
     template: number;
@@ -1132,7 +1232,7 @@ export class IsoView {
     get bytesRemaining(): number;
     get cursor(): number;
     get done(): boolean;
-    readArray: <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number) => ISOFieldTypeMap[T][];
+    readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
     readBox: () => RawBox;
     readBoxes: <T = IsoBmffBox>(length: number) => T[];
     readData: (size: number) => Uint8Array;
@@ -2158,6 +2258,12 @@ export type SubsegmentIndexBox = FullBox & {
 };
 
 // @beta
+export type SubsegmentRange = {
+    level: number;
+    rangeSize: number;
+};
+
+// @beta
 export type SubtitleMediaHeaderBox = FullBox & {
     type: 'sthd';
 };
@@ -2283,7 +2389,7 @@ export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
 };
 
 // @beta
-export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
+export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
     type: 'traf';
 };
 
@@ -2317,15 +2423,6 @@ export type TrackFragmentRandomAccessEntry = {
     trafNumber: number;
     trunNumber: number;
     sampleNumber: number;
-};
-
-// @beta
-export type TrackFragmentRunBox = FullBox & {
-    type: 'trun';
-    sampleCount: number;
-    dataOffset?: number;
-    firstSampleFlags?: number;
-    samples: TrackRunSample[];
 };
 
 // @beta
@@ -2737,9 +2834,5 @@ export type XmlParseOptions = {
     keepWhitespace?: boolean;
     keepComments?: boolean;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/iso/bmff/boxes/Subsegment.ts:12:2 - (ae-forgotten-export) The symbol "SubsegmentRange" needs to be exported by the entry point index.d.ts
 
 ```

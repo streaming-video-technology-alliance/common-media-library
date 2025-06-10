@@ -1,11 +1,11 @@
 /**
- * ISOFieldTypeMap is a map of ISO BMFF field types to their corresponding JavaScript types.
+ * IsoFieldTypeMap is a map of ISO BMFF field types to their corresponding JavaScript types.
  *
  * @group ISOBMFF
  *
  * @beta
  */
-export type ISOFieldTypeMap = {
+export type IsoFieldTypeMap = {
 	uint: number;
 	int: number;
 	template: number;

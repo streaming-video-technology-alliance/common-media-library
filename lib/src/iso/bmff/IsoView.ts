@@ -10,7 +10,7 @@ import { TEMPLATE } from './fields/TEMPLATE.js';
 import { UINT } from './fields/UINT.js';
 import { UTF8 } from './fields/UTF8.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
-import type { ISOFieldTypeMap } from './readers/ISOFieldTypeMap.js';
+import type { IsoFieldTypeMap } from './readers/IsoFieldTypeMap.js';
 import { readData } from './readers/readData.js';
 import { readInt } from './readers/readInt.js';
 import { readString } from './readers/readString.js';
@@ -96,7 +96,7 @@ export class IsoView {
 		return new IsoView(dataView, this.config);
 	};
 
-	private read = <T extends keyof ISOFieldTypeMap>(type: T, size: number = 0): ISOFieldTypeMap[T] => {
+	private read = <T extends keyof IsoFieldTypeMap>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
 		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this;
 
@@ -230,14 +230,14 @@ export class IsoView {
 	 * @param length - The number of values to read.
 	 * @returns The array of values.
 	 */
-	readArray = <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number): ISOFieldTypeMap[T][] => {
+	readArray = <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number): IsoFieldTypeMap[T][] => {
 		const value = [];
 
 		for (let i = 0; i < length; i++) {
 			value.push(this.read(type, size));
 		}
 
-		return value as ISOFieldTypeMap[T][];
+		return value as IsoFieldTypeMap[T][];
 	};
 
 	/**
