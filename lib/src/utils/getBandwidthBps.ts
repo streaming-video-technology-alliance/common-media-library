@@ -6,8 +6,8 @@ import type { ResourceTiming } from '../request/ResourceTiming';
  * @param sample - A ResourceTiming sample
  * @returns
  */
-export const getBandwidthBps = (sample: ResourceTiming): number => {
+export function getBandwidthBps(sample: ResourceTiming): number {
 	const durationSeconds = sample.duration / 1000;
 	const bandwidthBps = sample.encodedBodySize * 8 / durationSeconds;
 	return bandwidthBps;
-};
+}
