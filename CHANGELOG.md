@@ -12,6 +12,8 @@ and this project adheres to
 
 - Add map type for ISO BMFF boxes to their type properties
   ([#208](https://github.com/streaming-video-technology-alliance/common-media-library/issues/208))
+- Added Zlema Throughput Estimator
+  ([#212](https://github.com/streaming-video-technology-alliance/common-media-library/pull/212))
 
 ### Changed
 
@@ -28,8 +30,10 @@ and this project adheres to
   ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
 - VTT Parsing Utilities
   ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
-- Added Harmonic Mean Throughput Estimator ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
-- Added Arithmetic Mean Throughput Estimator ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
+- Added Harmonic Mean Throughput Estimator
+  ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
+- Added Arithmetic Mean Throughput Estimator
+  ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
 
 ### Fixed
 

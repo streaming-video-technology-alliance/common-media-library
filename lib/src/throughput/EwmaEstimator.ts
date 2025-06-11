@@ -1,4 +1,5 @@
 import type { ResourceTiming } from '../request/ResourceTiming.js';
+import { getBandwidthBps } from '../utils/getBandwidthBps.js';
 import { Ewma } from './Ewma.js';
 import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions.js';
 import type { ThroughputEstimator } from './ThroughputEstimator.js';
@@ -27,7 +28,7 @@ export class EwmaEstimator implements ThroughputEstimator {
 		// TODO: hls.js
 		// 1. If `durationSeconds` is less than `this.minDelayMs_`, make it `this.minDelayMs_` (default is 50ms)
 		const durationSeconds = sample.duration / 1000;
-		const bandwidthBps = sample.encodedBodySize * 8 / durationSeconds;
+		const bandwidthBps = getBandwidthBps(sample);
 
 		this.slowEwma.sample(durationSeconds, bandwidthBps);
 		this.fastEwma.sample(durationSeconds, bandwidthBps);

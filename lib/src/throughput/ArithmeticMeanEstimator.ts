@@ -1,4 +1,5 @@
 import type { ResourceTiming } from '../request/ResourceTiming.js';
+import { getBandwidthBps } from '../utils/getBandwidthBps.js';
 import type { ThroughputEstimator } from './ThroughputEstimator.js';
 
 /**
@@ -19,11 +20,7 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
 		let value: number = 0;
 
 		for (let i = 0; i < this.samples.length; i++) {
-			const sample = this.samples[i];
-			const durationSeconds = sample.duration / 1000;
-			const bandwidthBps = sample.encodedBodySize * 8 / durationSeconds;
-
-			value += bandwidthBps;
+			value += getBandwidthBps(this.samples[i]);
 		}
 
 		return value / this.samples.length;
