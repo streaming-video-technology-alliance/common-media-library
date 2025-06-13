@@ -14,8 +14,13 @@ import type { WebVttRegion } from './WebVttRegion.js';
 import type { WebVttRegionFactory } from './WebVttRegionFactory.js';
 
 const BAD_SIGNATURE = 'Malformed WebVTT signature.';
-const createCue = (): WebVttCue => typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : createWebVttCue();
-const createRegion = (): WebVttRegion => typeof VTTRegion !== 'undefined' ? new VTTRegion() : createWebVttRegion();
+
+function createCue(): WebVttCue {
+	return typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : createWebVttCue();
+}
+function createRegion(): WebVttRegion {
+	return typeof VTTRegion !== 'undefined' ? new VTTRegion() : createWebVttRegion();
+}
 
 /**
  * A WebVTT parser.
@@ -141,7 +146,7 @@ export class WebVttParser {
 		};
 
 		// 3.2 WebVtt metadata header syntax
-		const parseHeader = (input: string): void => {
+		function parseHeader(input: string): void {
 			if (input.match(/X-TIMESTAMP-MAP/)) {
 				// This line contains HLS X-TIMESTAMP-MAP metadata
 				parseOptions(input, (k: string, v: string): void => {

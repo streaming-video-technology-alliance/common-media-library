@@ -61,5 +61,6 @@ export default [
 				allowSingleLine: false,
 			}],
 			'tsdoc/syntax': 'warn',
+			"func-style": ["error", "declaration", { "allowArrowFunctions": false }]
 		},
 	}];
