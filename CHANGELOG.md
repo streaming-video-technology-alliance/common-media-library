@@ -19,6 +19,7 @@ and this project adheres to
 
 - Update Node.js development version to 24
   ([#211](https://github.com/streaming-video-technology-alliance/common-media-library/issues/211))
+- Consistently used function declaration across CML ([#213](https://github.com/streaming-video-technology-alliance/common-media-library/pull/213))
 
 ## [0.13.0] - 2025-06-09
 

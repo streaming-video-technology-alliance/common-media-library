@@ -3,14 +3,18 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import type { CmcdFormatter } from './CmcdFormatter.js';
 import type { CmcdValue } from './CmcdValue.js';
 
-const toRounded = (value: CmcdValue) => Math.round(value as number);
-const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions) => {
+function toRounded(value: CmcdValue) {
+	return Math.round(value as number);
+}
+function toUrlSafe(value: CmcdValue, options?: CmcdEncodeOptions) {
 	if (options?.baseUrl) {
 		value = urlToRelativePath(value as string, options.baseUrl);
 	}
 	return encodeURIComponent(value as string);
 };
-const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100;
+function toHundred(value: CmcdValue) {
+	return toRounded(value as number / 100) * 100;
+}
 
 /**
  * The default formatters for CMCD values.

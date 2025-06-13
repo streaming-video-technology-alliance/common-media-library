@@ -5,7 +5,7 @@ import { beforeEach, describe, it } from 'node:test';
 describe('parseInitDataFromContentProtection', () => {
 	let cpData: any;
 
-	const base64Decode = (base64: string): ArrayBuffer => {
+	function base64Decode(base64: string): ArrayBuffer {
 		const buffer = Buffer.from(base64, 'base64');
 		return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 	};
