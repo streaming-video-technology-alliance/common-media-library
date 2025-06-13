@@ -1,8 +1,8 @@
-import { assert, describe, it, parseBox, ssix } from './util/box.ts';
+import { assert, describe, it, parseBox, ssix, type SubsegmentIndexBox } from './util/box.ts';
 
 describe('ssix box', function () {
 	it('should correctly parse the box', function () {
-		const box = parseBox('spliced_10000.m4v', ssix, 4);
+		const box = parseBox('spliced_10000.m4v', ssix, 4) as SubsegmentIndexBox;
 
 		assert.strictEqual(box.type, 'ssix');
 		assert.strictEqual(box.size, 8124);
