@@ -4,6 +4,7 @@ describe('labl box', function () {
 	it('should correctly parse the box from sample data', function () {
 		const box = findBox('SRMP_AC4.mp4', [meta, prsl, labl])
 			.boxes?.filter((box: Box) => box.type === 'grpl')[0]
+			// @ts-expect-error: Add type for `boxes` and `groupId` in `grpl` box
 			.boxes?.filter((box: Box) => box.groupId === 234)[0];
 
 		assert.ok(box);

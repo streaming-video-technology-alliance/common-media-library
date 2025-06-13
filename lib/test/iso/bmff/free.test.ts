@@ -1,8 +1,8 @@
-import { assert, describe, free, it, parseBox } from './util/box.ts';
+import { assert, describe, free, it, parseBox, type FreeSpaceBox } from './util/box.ts';
 
 describe('free box', () => {
 	it('should correctly parse the box', () => {
-		const box = parseBox('captions.mp4', free, 3);
+		const box = parseBox('captions.mp4', free, 3) as FreeSpaceBox;
 
 		assert.strictEqual(box.type, 'free');
 		assert.strictEqual(box.size, 59);
