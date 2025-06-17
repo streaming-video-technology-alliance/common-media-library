@@ -9,10 +9,10 @@
 // common utils
 export * from './drm/cenc/findCencContentProtection.js';
 export * from './drm/cenc/getLicenseServerUrlFromContentProtection.js';
-export * from './drm/cenc/getPSSHData.js';
-export * from './drm/cenc/getPSSHForKeySystem.js';
+export * from './drm/cenc/getPsshData.js';
+export * from './drm/cenc/getPsshForKeySystem.js';
 export * from './drm/cenc/parseInitDataFromContentProtection.js';
-export * from './drm/cenc/parsePSSHList.js';
+export * from './drm/cenc/parsePsshList.js';
 
 // key system utils
 export * from './drm/keysystem/createMediaKeySystemConfiguration.js';

@@ -1,11 +1,10 @@
-import type { KeySystem } from '../common/KeySystem.js';
-import { parsePSSHList } from './parsePSSHList.js';
+import { parsePsshList } from './parsePsshList.js';
 
 /**
  * Returns the PSSH box associated with the given key system from the concatenated
  * list of PSSH boxes in the provided initData.
  *
- * @param keySystem - The desired key system
+ * @param uuid - The desired key system UUID
  * @param initData - 'cenc' initialization data. Concatenated list of PSSH boxes.
  * @returns The PSSH box ArrayBuffer corresponding to the given key system, or null if not found.
  *
@@ -15,18 +14,14 @@ import { parsePSSHList } from './parsePSSHList.js';
  * @example
  * {@includeCode ../../../test/drm/cenc/getPSSHForKeySystem.test.ts#example}
  */
-export function getPSSHForKeySystem(
-	keySystem: KeySystem | null | undefined,
-	initData: ArrayBuffer | null | undefined,
+export function getPsshForKeySystem(
+	uuid: string,
+	initData: ArrayBuffer,
 ): ArrayBuffer | null {
-	if (!initData || !keySystem) {
-		return null;
-	}
+	const psshList = parsePsshList(initData);
+	uuid = uuid.toLowerCase();
 
-	const psshList = parsePSSHList(initData);
-	const uuid = keySystem.uuid.toLowerCase();
-
-	if (Object.prototype.hasOwnProperty.call(psshList, keySystem.uuid.toLowerCase())) {
+	if (Object.prototype.hasOwnProperty.call(psshList, uuid)) {
 		return psshList[uuid];
 	}
 
