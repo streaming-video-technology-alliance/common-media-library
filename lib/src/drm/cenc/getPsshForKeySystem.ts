@@ -19,11 +19,5 @@ export function getPsshForKeySystem(
 	initData: ArrayBuffer,
 ): ArrayBuffer | null {
 	const psshList = parsePsshList(initData);
-	uuid = uuid.toLowerCase();
-
-	if (Object.prototype.hasOwnProperty.call(psshList, uuid)) {
-		return psshList[uuid];
-	}
-
-	return null;
+	return psshList[uuid.toLowerCase()] || null;
 }
