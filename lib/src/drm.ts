@@ -47,6 +47,7 @@ export * from './drm/common/CONTENT_TYPE.js';
 export * from './drm/common/EncryptionScheme.js';
 export * from './drm/common/EXPIRED.js';
 export * from './drm/common/FAIRPLAY_KEY_SYSTEM.js';
+export * from './drm/common/FAIRPLAY_UUID.js';
 export * from './drm/common/HTTP_HEADERS.js';
 export * from './drm/common/HW_SECURE_ALL.js';
 export * from './drm/common/HW_SECURE_CRYPTO.js';
