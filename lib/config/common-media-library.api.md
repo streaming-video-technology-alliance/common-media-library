@@ -1577,7 +1577,7 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 }): ArrayBuffer | null;
 
 // @beta
-export function parsePsshList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer>;
+export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer>;
 
 // @beta
 export function parseWebVtt(text: string, options?: WebVttParserOptions): WebVttParseResult;

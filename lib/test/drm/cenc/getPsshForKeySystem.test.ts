@@ -3,7 +3,7 @@ import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox.ts';
 
-describe('getPSSHForKeySystem', () => {
+describe('getPsshForKeySystem', () => {
 	// sample keySystem UUID. It matches the systemId in the
 	// samplePsshBox in the common folder.
 	const uuid = '1077efec-c0b2-4d02-ace3-3c1e52e2fb4b';

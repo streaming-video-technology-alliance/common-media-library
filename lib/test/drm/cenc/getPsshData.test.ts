@@ -3,7 +3,7 @@ import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox.ts';
 
-describe('getPSSHData', () => {
+describe('getPsshData', () => {
 	it('should extract the data portion of the PSSH box', () => {
 		//#region example
 		const psshBuffer = new Uint8Array(samplePsshBox).buffer;

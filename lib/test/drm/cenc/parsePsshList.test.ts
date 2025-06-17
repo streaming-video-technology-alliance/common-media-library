@@ -1,9 +1,9 @@
-import { parsePsshList } from '@svta/common-media-library/drm/cenc/parsePSSHList.js';
+import { parsePsshList } from '@svta/common-media-library/drm/cenc/parsePsshList.js';
 import { deepStrictEqual, strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox.ts';
 
-describe('parsePSSHList', () => {
+describe('parsePsshList', () => {
 	it('should return an object with the correct UUID and PSSH box', () => {
 		//#region example
 		const initData = new Uint8Array(samplePsshBox).buffer;
@@ -17,10 +17,5 @@ describe('parsePSSHList', () => {
 		const psshBox = result[expectedUUID];
 		strictEqual(psshBox.byteLength, samplePsshBox.length); // length should match
 		deepStrictEqual(new Uint8Array(psshBox), samplePsshBox);  // actual data should match
-	});
-
-	it('should return an empty object if undefined or null is provided', () => {
-		deepStrictEqual(parsePsshList(null), {});
-		deepStrictEqual(parsePsshList(undefined), {});
 	});
 });
