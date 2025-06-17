@@ -23,4 +23,19 @@ describe('getPsshForKeySystem', () => {
 
 		strictEqual(result, null);
 	});
+
+	it('should return null if no initData is provided', () => {
+		// @ts-expect-error - test case
+		const result = getPsshForKeySystem(uuid, null);
+
+		strictEqual(result, null);
+	});
+
+	it('should return null if no keySystem is provided', () => {
+		const initData = new Uint8Array(samplePsshBox).buffer;
+		// @ts-expect-error - test case
+		const result = getPsshForKeySystem(null, initData);
+
+		strictEqual(result, null);
+	});
 });

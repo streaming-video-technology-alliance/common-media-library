@@ -18,6 +18,10 @@ export function getPsshForKeySystem(
 	uuid: string,
 	initData: ArrayBuffer,
 ): ArrayBuffer | null {
+	if (!initData || !uuid) {
+		return null;
+	}
+
 	const psshList = parsePsshList(initData);
 	return psshList[uuid.toLowerCase()] || null;
 }

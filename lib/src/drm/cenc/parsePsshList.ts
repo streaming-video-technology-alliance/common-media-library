@@ -14,6 +14,10 @@
  * {@includeCode ../../../test/drm/cenc/parsePsshList.test.ts#example}
  */
 export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer> {
+	if (!data) {
+		return {};
+	}
+
 	// data.buffer first for Uint8Array support
 	const dv = new DataView(data instanceof ArrayBuffer ? data : (data as Uint8Array).buffer);
 	const pssh: Record<string, ArrayBuffer> = {};
