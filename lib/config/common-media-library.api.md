@@ -863,6 +863,9 @@ export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Ar
 export const FAIRPLAY_KEY_SYSTEM = "com.apple.fps.1_0";
 
 // @beta
+export const FAIRPLAY_UUID = "29701fe4-3cc7-4a34-8c5b-ae90c7439a47";
+
+// @beta
 export type Fields<T> = Omit<T, Exclude<keyof Box, 'data'> | 'boxes'>;
 
 // @beta
