@@ -104,10 +104,10 @@ export function avc3(view: IsoView): Fields<VisualSampleEntryBox<'avc3'>>;
 // @beta
 export function avc4(view: IsoView): Fields<VisualSampleEntryBox<'avc4'>>;
 
-// @beta
+// @beta @deprecated
 export function base64decode(str: string): Uint8Array;
 
-// @beta
+// @beta @deprecated
 export function base64encode(binary: Uint8Array): string;
 
 // @beta
@@ -508,7 +508,7 @@ export function convertUint8ToUint16(input: Uint8Array): Uint16Array;
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
 
 // @beta
-export function createMediaKeySystemConfiguration(supportedAudio: MediaCapability[] | null, supportedVideo: MediaCapability[] | null): KeySystemConfiguration;
+export function createMediaKeySystemConfiguration(supportedAudio: MediaKeySystemMediaCapability[] | null, supportedVideo: MediaKeySystemMediaCapability[] | null): MediaKeySystemConfiguration;
 
 // @beta
 export function createWebVttCue(): WebVttCue;
@@ -657,6 +657,9 @@ export type DataReferenceBox = FullBox & {
 export function dataViewToString(dataView: DataView, encoding?: Encoding): string;
 
 // @beta
+export function decodeBase64(str: string): Uint8Array;
+
+// @beta
 export function decodeCmcd(cmcd: string): Cmcd;
 
 // @beta
@@ -740,6 +743,9 @@ export function emsg(view: IsoView): Fields<EventMessageBox>;
 
 // @beta
 export function enca(view: IsoView): Fields<AudioSampleEntryBox<'enca'>>;
+
+// @beta
+export function encodeBase64(binary: Uint8Array): string;
 
 // @beta
 export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
@@ -931,15 +937,15 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @beta
-export function getKeySystemAccess(ksConfigurations: {
-    ks: KeySystem;
-    configs: KeySystemConfiguration[];
+export function getKeySystemAccess(configurations: {
+    keySystem: string;
+    configs: Iterable<MediaKeySystemConfiguration>;
 }[]): Promise<MediaKeySystemAccess | null>;
 
 // @beta
 export function getLegacyKeySystemAccess(ksConfigurations: {
-    ks: KeySystem;
-    configs: KeySystemConfiguration[];
+    keySystem: string;
+    configs: Iterable<MediaKeySystemConfiguration>;
 }[]): KeySystemAccess | null;
 
 // @beta
@@ -952,18 +958,18 @@ export function getLicenseServerUrl(initData: Uint16Array): string;
 export function getLicenseServerUrlFromContentProtection(contentProtectionElements: ContentProtection[], schemeIdUri: string): string | null;
 
 // @beta
-export function getPSSHData(pssh: ArrayBuffer): ArrayBuffer;
+export function getPsshData(pssh: ArrayBuffer): ArrayBuffer;
 
 // @beta
-export function getPSSHForKeySystem(keySystem: KeySystem | null | undefined, initData: ArrayBuffer | null | undefined): ArrayBuffer | null;
+export function getPsshForKeySystem(uuid: string, initData: ArrayBuffer): ArrayBuffer | null;
 
 // @beta
 export function getRequestHeadersFromMessage(message: ArrayBuffer, encoding?: typeof UTF_8 | typeof UTF_16): Record<string, string>;
 
 // @beta
-export function getSupportedKeySystemConfiguration(keySystemString: string, configs: KeySystemConfiguration[]): {
-    supportedAudio: MediaCapability[];
-    supportedVideo: MediaCapability[];
+export function getSupportedKeySystemConfiguration(keySystem: string, configs: Iterable<MediaKeySystemConfiguration>): {
+    supportedAudio: MediaKeySystemMediaCapability[];
+    supportedVideo: MediaKeySystemMediaCapability[];
 };
 
 // @alpha
@@ -1318,27 +1324,10 @@ export type KeyMessage = {
     messageType: ValueOf<typeof MediaKeyMessageType_2>;
 };
 
-// @beta
-export type KeySystem = {
-    uuid: string;
-    schemeIdURI?: string;
-    systemString: string;
-};
-
 // @public
 export type KeySystemAccess = {
     keySystem: string;
     configuration: MediaKeySystemConfiguration;
-};
-
-// @beta
-export type KeySystemConfiguration = {
-    initDataTypes?: string[];
-    audioCapabilities?: MediaCapability[];
-    videoCapabilities?: MediaCapability[];
-    distinctiveIdentifier?: 'required' | 'optional' | 'not-allowed';
-    persistentState?: 'required' | 'optional' | 'not-allowed';
-    sessionTypes?: string[];
 };
 
 // @beta
@@ -1401,13 +1390,6 @@ export function mdhd(view: IsoView): Fields<MediaHeaderBox>;
 // @beta
 export type MediaBox = ContainerBox<MediaHeaderBox | HandlerReferenceBox | MediaInformationBox> & {
     type: 'mdia';
-};
-
-// @beta
-export type MediaCapability = {
-    contentType: string;
-    robustness: string;
-    encryptionScheme?: 'cenc' | 'cbcs';
 };
 
 // @beta
@@ -1592,7 +1574,7 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 }): ArrayBuffer | null;
 
 // @beta
-export function parsePSSHList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer>;
+export function parsePsshList(data: ArrayBuffer | null | undefined): Record<string, ArrayBuffer>;
 
 // @beta
 export function parseWebVtt(text: string, options?: WebVttParserOptions): WebVttParseResult;
@@ -2834,5 +2816,13 @@ export type XmlParseOptions = {
     keepWhitespace?: boolean;
     keepComments?: boolean;
 };
+
+// @beta
+export class ZlemaEstimator implements ThroughputEstimator {
+    // (undocumented)
+    getEstimate(): number;
+    // (undocumented)
+    sample(sample: ResourceTiming): void;
+}
 
 ```
