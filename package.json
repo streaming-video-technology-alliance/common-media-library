@@ -34,9 +34,9 @@
 	"scripts": {
 		"format": "npm run lint -- --fix",
 		"lint": "eslint .",
-		"build": "npm run build -ws --if-present",
+		"build": "npm run build --workspaces --if-present",
 		"pretest": "npm run build && npm run lint",
-		"test": "npm test -ws --if-present",
+		"test": "npm test --workspaces --if-present",
 		"start": "npm start -w dev",
 		"pub": "npm publish -w lib --provenance --access public",
 		"ver": "node scripts/version.mts",
