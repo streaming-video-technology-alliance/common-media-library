@@ -1,24 +1,22 @@
-import type { KeySystem } from '../common/KeySystem.js';
-import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.js';
 
 /**
  * Attempts to get key system access using requestMediaKeySystemAccess from EME.
  *
- * @param ksConfigurations - An array of key system configurations.
+ * @param configurations - An array of key system configurations.
  * @returns MediaKeySystemAccess object if successful, or null if no system is supported.
  *
  * @group DRM
  * @beta
  */
 export async function getKeySystemAccess(
-	ksConfigurations: { ks: KeySystem; configs: KeySystemConfiguration[] }[],
+	configurations: { keySystem: string; configs: Iterable<MediaKeySystemConfiguration> }[],
 ): Promise<MediaKeySystemAccess | null> {
-	for (const { ks, configs } of ksConfigurations) {
+	for (const { keySystem, configs } of configurations) {
 		try {
-			return await navigator.requestMediaKeySystemAccess(ks.systemString, configs);
+			return await navigator.requestMediaKeySystemAccess(keySystem, configs);
 		}
 		catch {
-			// legacy approach ccould be used here
+			// legacy approach could be used here
 		}
 	}
 	return null;

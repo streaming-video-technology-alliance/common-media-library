@@ -1,4 +1,4 @@
-import { base64encode } from '../../utils/base64encode.js';
+import { encodeBase64 } from '../../utils/encodeBase64.js';
 import { BYTES } from '../utils/BYTES.js';
 import { serializeError } from './serializeError.js';
 
@@ -30,5 +30,5 @@ export function serializeByteSequence(value: Uint8Array) {
 	if (ArrayBuffer.isView(value) === false) {
 		throw serializeError(value, BYTES);
 	}
-	return `:${base64encode(value)}:`;
+	return `:${encodeBase64(value)}:`;
 }

@@ -1,6 +1,3 @@
-import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.js';
-import type { MediaCapability } from '../common/MediaCapability.js';
-
 /**
  * Creates a valid KeySystemConfiguration from supported audio and video capabilities.
  *
@@ -15,10 +12,10 @@ import type { MediaCapability } from '../common/MediaCapability.js';
  * {@includeCode ../../../test/drm/keysystem/createMediaKeySystemConfiguration.test.ts#example}
  */
 export function createMediaKeySystemConfiguration(
-	supportedAudio: MediaCapability[] | null,
-	supportedVideo: MediaCapability[] | null,
-): KeySystemConfiguration {
-	const config: KeySystemConfiguration = {};
+	supportedAudio: MediaKeySystemMediaCapability[] | null,
+	supportedVideo: MediaKeySystemMediaCapability[] | null,
+): MediaKeySystemConfiguration {
+	const config: MediaKeySystemConfiguration = {};
 
 	if (supportedAudio && supportedAudio.length > 0) {
 		config.audioCapabilities = supportedAudio;

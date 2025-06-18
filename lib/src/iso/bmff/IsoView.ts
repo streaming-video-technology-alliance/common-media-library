@@ -17,8 +17,8 @@ import { readString } from './readers/readString.js';
 import { readTemplate } from './readers/readTemplate.js';
 import { readTerminatedString } from './readers/readTerminatedString.js';
 import { readUint } from './readers/readUint.js';
-import { readUTF8String } from './readers/readUTF8String.js';
-import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js';
+import { readUtf8String } from './readers/readUtf8String.js';
+import { readUtf8TerminatedString } from './readers/readUtf8TerminatedString.js';
 
 /**
  * Raw ISO BMFF data box.
@@ -133,11 +133,11 @@ export class IsoView {
 
 			case UTF8:
 				if (size === -1) {
-					result = readUTF8TerminatedString(dataView, offset);
+					result = readUtf8TerminatedString(dataView, offset);
 					cursor = result.length + 1;
 				}
 				else {
-					result = readUTF8String(dataView, offset);
+					result = readUtf8String(dataView, offset);
 				}
 				break;
 
