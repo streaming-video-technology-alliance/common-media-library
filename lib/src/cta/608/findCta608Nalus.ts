@@ -14,7 +14,7 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 	const cta608NaluRanges = [];
 
 	// Check SEI data according to ANSI-SCTE 128
-	const isCTA608SEI = function (payloadType: number, payloadSize: number, raw: DataView, pos: number) {
+	const isCTA608SEI = (payloadType: number, payloadSize: number, raw: DataView, pos: number) => {
 		if (payloadType !== 4 || payloadSize < 8) {
 			return null;
 		}
