@@ -1,7 +1,7 @@
 import type { Encoding } from '../../utils/Encoding.js';
 import { UTF_16 } from '../../utils/UTF_16.js';
 import { arrayBufferToString } from '../../utils/arrayBufferToString.js';
-import { base64decode } from '../../utils/base64decode.js';
+import { decodeBase64 } from '../../utils/decodeBase64.js';
 import { getElementsByName } from '../../xml/getElementsByName.js';
 import { parseXml } from '../../xml/parseXml.js';
 import { CHALLENGE } from '../common/CHALLENGE.js';
@@ -44,7 +44,7 @@ export function getLicenseRequestFromMessage(
 	const challengeValue = challengeNode?.childNodes[0]?.nodeValue;
 
 	if (challengeValue) {
-		return base64decode(challengeValue).buffer as ArrayBuffer;
+		return decodeBase64(challengeValue).buffer as ArrayBuffer;
 	}
 
 	return message;

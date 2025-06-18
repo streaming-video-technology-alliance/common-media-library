@@ -1,6 +1,6 @@
 import { dataViewToString } from '../../../utils/dataViewToString.js';
 
-export function readUTF8TerminatedString(dataView: DataView, offset: number): string {
+export function readUtf8TerminatedString(dataView: DataView, offset: number): string {
 	const length = dataView.byteLength - (offset - dataView.byteOffset);
 
 	let data = '';
