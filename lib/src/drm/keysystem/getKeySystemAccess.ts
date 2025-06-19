@@ -1,3 +1,4 @@
+import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccessRequest.js';
 
 /**
  * Attempts to get key system access using requestMediaKeySystemAccess from EME.
@@ -9,11 +10,11 @@
  * @beta
  */
 export async function getKeySystemAccess(
-	configurations: { keySystem: string; configs: Iterable<MediaKeySystemConfiguration> }[],
+	requests: MediaKeySystemAccessRequest[],
 ): Promise<MediaKeySystemAccess | null> {
-	for (const { keySystem, configs } of configurations) {
+	for (const { keySystem, configurations } of requests) {
 		try {
-			return await navigator.requestMediaKeySystemAccess(keySystem, configs);
+			return await navigator.requestMediaKeySystemAccess(keySystem, configurations);
 		}
 		catch {
 			// legacy approach could be used here

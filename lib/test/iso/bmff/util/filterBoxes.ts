@@ -4,5 +4,5 @@ import { load } from './load.ts';
 
 export function filterBoxes<T extends Box = Box>(file: string, boxParsers: BoxParser<T> | BoxParser<T>[]): T[] {
 	const { name, parsers } = createParsers(boxParsers);
-	return filterBoxesByType<T>(load(file), name, { parsers });
+	return filterBoxesByType(load(file), name, { parsers }) as T[];
 }

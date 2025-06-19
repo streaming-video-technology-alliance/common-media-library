@@ -1,4 +1,4 @@
-import type { KeySystemAccess } from '../common/KeySystemAccess.js';
+import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccessRequest.js';
 import { createMediaKeySystemConfiguration } from './createMediaKeySystemConfiguration.js';
 import { getSupportedKeySystemConfiguration } from './getSupportedKeySystemConfiguration.js';
 
@@ -12,10 +12,10 @@ import { getSupportedKeySystemConfiguration } from './getSupportedKeySystemConfi
  * @beta
  */
 export function getLegacyKeySystemAccess(
-	ksConfigurations: { keySystem: string; configs: Iterable<MediaKeySystemConfiguration> }[],
-): KeySystemAccess | null {
-	for (const { keySystem, configs } of ksConfigurations) {
-		const supportedConfig = getSupportedKeySystemConfiguration(keySystem, configs);
+	requests: MediaKeySystemAccessRequest[],
+): MediaKeySystemAccessRequest | null {
+	for (const { keySystem, configurations } of requests) {
+		const supportedConfig = getSupportedKeySystemConfiguration(keySystem, configurations);
 		if (supportedConfig) {
 			const configuration = createMediaKeySystemConfiguration(
 				supportedConfig.supportedAudio,
@@ -24,7 +24,7 @@ export function getLegacyKeySystemAccess(
 
 			return {
 				keySystem,
-				configuration,
+				configurations: [configuration],
 			};
 		}
 	}

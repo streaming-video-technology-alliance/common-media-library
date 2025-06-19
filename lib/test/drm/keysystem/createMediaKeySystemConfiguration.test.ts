@@ -1,18 +1,17 @@
-import { describe, it } from 'node:test';
-import { deepStrictEqual, strictEqual } from 'node:assert';
-import { createMediaKeySystemConfiguration } from '@svta/common-media-library/drm/keysystem/createMediaKeySystemConfiguration';
-import type { MediaCapability } from '@svta/common-media-library/drm/common/MediaCapability';
 import { SW_SECURE_DECODE } from '@svta/common-media-library/drm/common/SW_SECURE_DECODE';
+import { createMediaKeySystemConfiguration } from '@svta/common-media-library/drm/keysystem/createMediaKeySystemConfiguration';
+import { deepStrictEqual, strictEqual } from 'node:assert';
+import { describe, it } from 'node:test';
 
 describe('createMediaKeySystemConfiguration', () => {
-	const audioCaps: MediaCapability[] = [
+	const audioCaps: MediaKeySystemMediaCapability[] = [
 		{
 			contentType: 'audio/mp4; codecs="mp4a.40.2"',
 			robustness: SW_SECURE_DECODE,
 		},
 	];
 
-	const videoCaps: MediaCapability[] = [
+	const videoCaps: MediaKeySystemMediaCapability[] = [
 		{
 			contentType: 'video/mp4; codecs="avc1.42E01E"',
 			robustness: SW_SECURE_DECODE,
