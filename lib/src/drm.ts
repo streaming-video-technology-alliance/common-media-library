@@ -33,7 +33,6 @@ export * from './drm/playready/getRequestHeadersFromMessage.js';
 
 // drm types
 export type { ContentProtection } from './drm/common/ContentProtection.js';
-export type { KeyMessage } from './drm/common/KeyMessage.js';
 export type { LicenseRequest } from './drm/common/LicenseRequest.js';
 export type { MediaKeySystemAccessRequest } from './drm/common/MediaKeySystemAccessRequest.js';
 
