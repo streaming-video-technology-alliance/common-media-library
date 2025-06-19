@@ -7,6 +7,7 @@ describe('find a box by type', function () {
 		const buffer = load('./captions.mp4');
 		const box = findBoxByType(buffer, 'mdat');
 
+		assert.ok(box);
 		assert.strictEqual(box.type, 'mdat');
 		assert.strictEqual(box.size, 21530);
 	});
