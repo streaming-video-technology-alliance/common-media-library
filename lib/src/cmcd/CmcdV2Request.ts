@@ -1,14 +1,5 @@
 import type { CmcdObjectType } from './CmcdObjectType';
 
-export const CMCD_V2_REQUEST_MODE_KEYS = [
-	'd', 
-	'dl', 
-	'nor', 
-	'ot', 
-	'rtp', 
-	'su',
-] as const;
-
 /**
  * CMCD v2 - Request group keys.
  */
