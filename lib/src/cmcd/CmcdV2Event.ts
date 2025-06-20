@@ -2,6 +2,14 @@ import type { CmcdReportingEvent } from './CmcdReportingEvent';
 
 /**
  * CMCD v2 - Event and Event-Response keys.
+ *
+ * Represents the event and event-response keys for CMCD v2.
+ *
+ * This type is used to structure the data for reporting events according to the
+ * Common Media Client Data (CMCD) version 2 specification. It encapsulates
+ * the reporting event token.
+ * 
+ * @group CMCD
  */
 export type CmcdV2Event = {
 	/** Reporting event (event mode; e.g. "e", "t", "ps")
