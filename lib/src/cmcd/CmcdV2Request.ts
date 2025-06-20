@@ -2,6 +2,11 @@ import type { CmcdObjectType } from './CmcdObjectType';
 
 /**
  * CMCD v2 - Request group keys.
+ * 
+ * Defines the keys for the CMCD (Common Media Client Data) v2 Request group.
+ * These keys are used to provide information about the media object being requested.
+ * 
+ * @group CMCD
  */
 export type CmcdV2Request = {
 	/** Object duration (ms) 
