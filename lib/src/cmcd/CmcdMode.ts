@@ -4,4 +4,4 @@ export const CMCD_MODE = {
 	EVENT: 'event',
 } as const;
 
-export type CmcdMode = typeof CMCD_MODE[keyof typeof CMCD_MODE];
+export type CmcdMode = ValueOf<typeof CMCD_MODE>;
