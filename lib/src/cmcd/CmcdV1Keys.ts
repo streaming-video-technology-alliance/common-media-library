@@ -1,3 +1,6 @@
+/**
+ * Defines the keys for CMCD (Common Media Client Data) version 1.
+ */
 export const CmcdV1Keys = [
 	'br', 
 	'd', 
