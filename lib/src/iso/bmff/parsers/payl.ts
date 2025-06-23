@@ -1,15 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-30:2014 - WebVTT Cue Payload Box.
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type WebVTTCuePayloadBox = {
-	cueText: string;
-};
 
 /**
  * Parse a WebVTTCuePayloadBox from an IsoView
@@ -22,7 +13,7 @@ export type WebVTTCuePayloadBox = {
  *
  * @beta
  */
-export function payl(view: IsoView): WebVTTCuePayloadBox {
+export function payl(view: IsoView): Fields<WebVttCuePayloadBox> {
 	return {
 		cueText: view.readUtf8(-1),
 	};

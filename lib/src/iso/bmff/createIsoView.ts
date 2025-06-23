@@ -15,5 +15,5 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  * @beta
  */
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView {
-	return raw instanceof IsoView ? raw : new IsoView(raw, config);
+	return new IsoView(raw, config);
 }

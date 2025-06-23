@@ -1,14 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { SubtitleMediaHeaderBox } from '../boxes/SubtitleMediaHeaderBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2015 - 12.6.2 Subtitle media header Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SubtitleMediaHeaderBox = FullBox;
 
 /**
  * Parse a SubtitleMediaHeaderBox from an IsoView
@@ -21,6 +13,6 @@ export type SubtitleMediaHeaderBox = FullBox;
  *
  * @beta
  */
-export function sthd(view: IsoView): SubtitleMediaHeaderBox {
+export function sthd(view: IsoView): Fields<SubtitleMediaHeaderBox> {
 	return view.readFullBox();
 };

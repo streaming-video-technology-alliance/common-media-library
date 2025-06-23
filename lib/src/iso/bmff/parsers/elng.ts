@@ -1,16 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.js';
+import type { Fields } from '../boxes/Fields.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:202x - 8.4.6 Extended language tag
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type ExtendedLanguageBox = FullBox & {
-	extendedLanguage: string;
-};
 
 /**
  * Parse a ExtendedLanguageBox from an IsoView
@@ -23,7 +13,7 @@ export type ExtendedLanguageBox = FullBox & {
  *
  * @beta
  */
-export function elng(view: IsoView): ExtendedLanguageBox {
+export function elng(view: IsoView): Fields<ExtendedLanguageBox> {
 	return {
 		...view.readFullBox(),
 		extendedLanguage: view.readUtf8(-1),

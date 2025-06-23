@@ -1,10 +1,10 @@
-import { assert, describe, ftyp, it, parseBoxes } from './util/box.ts';
+import { assert, describe, ftyp, it, parseBoxes, type FileTypeBox } from './util/box.ts';
 
 describe('parseBoxes', function () {
 	it('should parse a buffer', function () {
 		// Sample 'ftyp' box (20 bytes)
 		const arrayBuffer = new Uint8Array([0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d, 0x00, 0x00, 0x00, 0x01, 0x69, 0x73, 0x6f, 0x6d]).buffer;
-		const boxes = parseBoxes(arrayBuffer, { parsers: { ftyp } });
+		const boxes = parseBoxes(arrayBuffer, { parsers: { ftyp } }) as FileTypeBox[];
 		const box = boxes[0];
 
 		assert.strictEqual(boxes.length, 1);

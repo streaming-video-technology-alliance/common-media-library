@@ -2,7 +2,7 @@ import { filterBoxesByType, type Box, type BoxParser } from '@svta/common-media-
 import { createParsers } from './createParsers.ts';
 import { load } from './load.ts';
 
-export function filterBoxes<T>(file: string, boxParsers: BoxParser<T> | BoxParser<T>[]): Box<T>[] {
+export function filterBoxes<T extends Box = Box>(file: string, boxParsers: BoxParser<T> | BoxParser<T>[]): T[] {
 	const { name, parsers } = createParsers(boxParsers);
-	return filterBoxesByType(name, load(file), { parsers, recursive: true });
+	return filterBoxesByType(load(file), name, { parsers }) as T[];
 }

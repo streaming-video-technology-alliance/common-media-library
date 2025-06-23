@@ -1,3 +1,5 @@
+import { decodeBase64 } from './decodeBase64.js';
+
 /**
  * Decodes a base64 encoded string into binary data
  *
@@ -7,7 +9,10 @@
  * @group Utils
  *
  * @beta
+ *
+ * @deprecated Use `decodeBase64` instead.
+ * @see {@link decodeBase64}
  */
 export function base64decode(str: string): Uint8Array {
-	return new Uint8Array([...atob(str)].map((a) => a.charCodeAt(0)));
+	return decodeBase64(str);
 }

@@ -9,10 +9,10 @@
 // common utils
 export * from './drm/cenc/findCencContentProtection.js';
 export * from './drm/cenc/getLicenseServerUrlFromContentProtection.js';
-export * from './drm/cenc/getPSSHData.js';
-export * from './drm/cenc/getPSSHForKeySystem.js';
+export * from './drm/cenc/getPsshData.js';
+export * from './drm/cenc/getPsshForKeySystem.js';
 export * from './drm/cenc/parseInitDataFromContentProtection.js';
-export * from './drm/cenc/parsePSSHList.js';
+export * from './drm/cenc/parsePsshList.js';
 
 // key system utils
 export * from './drm/keysystem/createMediaKeySystemConfiguration.js';
@@ -33,12 +33,8 @@ export * from './drm/playready/getRequestHeadersFromMessage.js';
 
 // drm types
 export type { ContentProtection } from './drm/common/ContentProtection.js';
-export type { KeyMessage } from './drm/common/KeyMessage.js';
-export type { KeySystem } from './drm/common/KeySystem.js';
-export type { KeySystemAccess } from './drm/common/KeySystemAccess.js';
-export type { KeySystemConfiguration } from './drm/common/KeySystemConfiguration.js';
 export type { LicenseRequest } from './drm/common/LicenseRequest.js';
-export type { MediaCapability } from './drm/common/MediaCapability.js';
+export type { MediaKeySystemAccessRequest } from './drm/common/MediaKeySystemAccessRequest.js';
 
 // drm constants
 export * from './drm/common/CBCS.js';
@@ -50,6 +46,7 @@ export * from './drm/common/CONTENT_TYPE.js';
 export * from './drm/common/EncryptionScheme.js';
 export * from './drm/common/EXPIRED.js';
 export * from './drm/common/FAIRPLAY_KEY_SYSTEM.js';
+export * from './drm/common/FAIRPLAY_UUID.js';
 export * from './drm/common/HTTP_HEADERS.js';
 export * from './drm/common/HW_SECURE_ALL.js';
 export * from './drm/common/HW_SECURE_CRYPTO.js';

@@ -1,12 +1,9 @@
-import type { KeySystemConfiguration } from '../common/KeySystemConfiguration.js';
-import type { MediaCapability } from '../common/MediaCapability.js';
-
 const isTypeSupported: (keySystem: string, type: string) => boolean | undefined = (typeof MediaKeys !== 'undefined' && typeof (MediaKeys as any).isTypeSupported === 'function') ? (MediaKeys as any).isTypeSupported : undefined;
 
 /**
  * Filters and returns the supported key system configuration for a given system string.
  *
- * @param keySystemString - Key system string such as 'com.widevine.alpha'
+ * @param keySystem - Key system string such as 'com.widevine.alpha'
  * @param configs - An array of key system configurations.
  * @returns The first supported configuration or null if none are supported.
  *
@@ -14,10 +11,10 @@ const isTypeSupported: (keySystem: string, type: string) => boolean | undefined 
  * @beta
  */
 export function getSupportedKeySystemConfiguration(
-	keySystemString: string,
-	configs: KeySystemConfiguration[],
-): { supportedAudio: MediaCapability[]; supportedVideo: MediaCapability[] } {
-	if (!configs || configs.length === 0 || typeof isTypeSupported === 'undefined') {
+	keySystem: string,
+	configs: Iterable<MediaKeySystemConfiguration>,
+): { supportedAudio: MediaKeySystemMediaCapability[]; supportedVideo: MediaKeySystemMediaCapability[] } {
+	if (!configs || typeof isTypeSupported === 'undefined') {
 		return { supportedAudio: [], supportedVideo: [] };
 	}
 
@@ -25,8 +22,8 @@ export function getSupportedKeySystemConfiguration(
 		const audios = config.audioCapabilities || [];
 		const videos = config.videoCapabilities || [];
 
-		const supportedAudio = audios.filter(audio => isTypeSupported(keySystemString, audio.contentType));
-		const supportedVideo = videos.filter(video => isTypeSupported(keySystemString, video.contentType));
+		const supportedAudio = audios.filter(audio => isTypeSupported(keySystem, audio.contentType ?? ''));
+		const supportedVideo = videos.filter(video => isTypeSupported(keySystem, video.contentType ?? ''));
 
 		const hasAudio = supportedAudio.length > 0;
 		const hasVideo = supportedVideo.length > 0;

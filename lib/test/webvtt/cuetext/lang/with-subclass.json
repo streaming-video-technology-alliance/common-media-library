@@ -1,0 +1,21 @@
+{
+  "cues": [
+    {
+      "align": "center",
+      "endTime": 2,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 0,
+      "text": "<lang.first en-Us>Hee!</lang>",
+      "vertical": ""
+    }
+  ],
+  "regions": []
+}

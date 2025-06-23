@@ -1,5 +1,7 @@
-import type { BoxParser } from '../BoxParser.js';
-import { avc1, type VisualSampleEntry } from './avc1.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.js';
+import type { IsoView } from '../IsoView.js';
+import { avc1 } from './avc1.js';
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView
@@ -12,4 +14,6 @@ import { avc1, type VisualSampleEntry } from './avc1.js';
  *
  * @beta
  */
-export const avc4: BoxParser<VisualSampleEntry> = avc1;
+export function avc4(view: IsoView): Fields<VisualSampleEntryBox<'avc4'>> {
+	return avc1(view);
+}

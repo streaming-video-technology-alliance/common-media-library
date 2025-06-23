@@ -1,14 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { MetaBox } from '../boxes/MetaBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:202x - 8.11.1 Meta box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type MetaBox = FullBox;
 
 /**
  * Parse a MetaBox from an IsoView
@@ -21,6 +13,6 @@ export type MetaBox = FullBox;
  *
  * @beta
  */
-export function meta(view: IsoView): MetaBox {
+export function meta(view: IsoView): Fields<MetaBox> {
 	return view.readFullBox();
 };

@@ -1,10 +1,10 @@
-import type { Box } from './Box.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 
 /**
- * BoxFilter
+ * Box filter function
  *
  * @group ISOBMFF
  *
  * @beta
  */
-export type BoxFilter = (box: Box) => boolean;
+export type BoxFilter<T extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T);

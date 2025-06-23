@@ -1,5 +1,7 @@
-import type { BoxParser } from '../BoxParser.js';
-import { mp4a, type AudioSampleEntry } from './mp4a.js';
+import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { IsoView } from '../IsoView.js';
+import { mp4a } from './mp4a.js';
 
 /**
  * Parse an AudioSampleEntry from an IsoView
@@ -12,4 +14,6 @@ import { mp4a, type AudioSampleEntry } from './mp4a.js';
  *
  * @beta
  */
-export const enca: BoxParser<AudioSampleEntry> = mp4a;
+export function enca(view: IsoView): Fields<AudioSampleEntryBox<'enca'>> {
+	return mp4a(view);
+}

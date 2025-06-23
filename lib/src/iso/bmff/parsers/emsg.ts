@@ -1,23 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { EventMessageBox } from '../boxes/EventMessageBox.js';
+import type { Fields } from '../boxes/Fields.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 23009-1:2014 - 5.10.3.3 Event Message Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type EventMessageBox = FullBox & {
-	schemeIdUri: string,
-	value: string,
-	timescale: number,
-	presentationTime: number,
-	presentationTimeDelta: number,
-	eventDuration: number,
-	id: number,
-	messageData: Uint8Array,
-};
 
 /**
  * Parse an EventMessageBox from an IsoView
@@ -30,7 +13,7 @@ export type EventMessageBox = FullBox & {
  *
  * @beta
  */
-export function emsg(view: IsoView): EventMessageBox {
+export function emsg(view: IsoView): Fields<EventMessageBox> {
 	const { readUint, readString, readData } = view;
 
 	const result = { ...view.readFullBox() } as EventMessageBox;

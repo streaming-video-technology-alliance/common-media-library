@@ -1,21 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type TrackFragmentHeaderBox = FullBox & {
-	trackId: number;
-	baseDataOffset?: number;
-	sampleDescriptionOffset?: number;
-	defaultSampleDuration?: number;
-	defaultSampleSize?: number;
-	defaultSampleFlags?: number;
-};
 
 /**
  * Parse a TrackFragmentHeaderBox from an IsoView
@@ -28,7 +13,7 @@ export type TrackFragmentHeaderBox = FullBox & {
  *
  * @beta
  */
-export function tfhd(view: IsoView): TrackFragmentHeaderBox {
+export function tfhd(view: IsoView): Fields<TrackFragmentHeaderBox> {
 	const { version, flags } = view.readFullBox();
 
 	return {
@@ -36,7 +21,7 @@ export function tfhd(view: IsoView): TrackFragmentHeaderBox {
 		flags,
 		trackId: view.readUint(4),
 		baseDataOffset: flags & 0x01 ? view.readUint(8) : undefined,
-		sampleDescriptionOffset: flags & 0x02 ? view.readUint(4) : undefined,
+		sampleDescriptionIndex: flags & 0x02 ? view.readUint(4) : undefined,
 		defaultSampleDuration: flags & 0x08 ? view.readUint(4) : undefined,
 		defaultSampleSize: flags & 0x10 ? view.readUint(4) : undefined,
 		defaultSampleFlags: flags & 0x20 ? view.readUint(4) : undefined,

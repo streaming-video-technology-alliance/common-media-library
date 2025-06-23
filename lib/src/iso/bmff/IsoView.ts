@@ -1,22 +1,24 @@
-import type { Box } from './Box.js';
-import { ContainerBoxes } from './ContainerBoxes.js';
+import type { ContainerBox } from './boxes/ContainerBox.js';
+import type { Fields } from './boxes/Fields.js';
+import type { FullBox } from './boxes/FullBox.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
+import { CONTAINERS } from './CONTAINERS.js';
 import { DATA } from './fields/DATA.js';
 import { INT } from './fields/INT.js';
 import { STRING } from './fields/STRING.js';
 import { TEMPLATE } from './fields/TEMPLATE.js';
 import { UINT } from './fields/UINT.js';
 import { UTF8 } from './fields/UTF8.js';
-import type { FullBox } from './FullBox.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
-import type { ISOFieldTypeMap } from './readers/ISOFieldTypeMap.js';
+import type { IsoFieldTypeMap } from './readers/IsoFieldTypeMap.js';
 import { readData } from './readers/readData.js';
 import { readInt } from './readers/readInt.js';
 import { readString } from './readers/readString.js';
 import { readTemplate } from './readers/readTemplate.js';
 import { readTerminatedString } from './readers/readTerminatedString.js';
 import { readUint } from './readers/readUint.js';
-import { readUTF8String } from './readers/readUTF8String.js';
-import { readUTF8TerminatedString } from './readers/readUTF8TerminatedString.js';
+import { readUtf8String } from './readers/readUtf8String.js';
+import { readUtf8TerminatedString } from './readers/readUtf8TerminatedString.js';
 
 /**
  * Raw ISO BMFF data box.
@@ -47,31 +49,54 @@ export class IsoView {
 	private config: IsoViewConfig;
 	private truncated: boolean = false;
 
+	/**
+	 * Creates a new IsoView instance. Similar to DataView, but with additional
+	 * methods for reading ISO BMFF data. It implements the iterator protocol,
+	 * so it can be used in a for...of loop.
+	 *
+	 * @param raw - The raw data to view.
+	 * @param config - The configuration for the IsoView.
+	 */
 	constructor(raw: ArrayBuffer | DataView | Uint8Array, config?: IsoViewConfig) {
 		this.dataView = (raw instanceof ArrayBuffer) ? new DataView(raw) : (raw instanceof Uint8Array) ? new DataView(raw.buffer, raw.byteOffset, raw.byteLength) : raw;
 		this.offset = this.dataView.byteOffset;
 		this.config = config || { recursive: false, parsers: {} };
 	}
 
+	/**
+	 * The current byteoffset in the data view.
+	 */
 	get cursor(): number {
 		return this.offset - this.dataView.byteOffset;
 	}
 
+	/**
+	 * Whether the end of the data view has been reached.
+	 */
 	get done(): boolean {
 		return this.cursor >= this.dataView.byteLength || this.truncated;
 	}
 
+	/**
+	 * The number of bytes remaining in the data view.
+	 */
 	get bytesRemaining(): number {
 		return this.dataView.byteLength - this.cursor;
 	}
 
+	/**
+	 * Creates a new IsoView instance with a slice of the current data view.
+	 *
+	 * @param size - The size of the slice.
+	 * @returns A new IsoView instance.
+	 */
 	slice = (size: number): IsoView => {
 		const dataView = new DataView(this.dataView.buffer, this.offset, size);
 		this.offset += size;
 		return new IsoView(dataView, this.config);
 	};
 
-	private read = <T extends keyof ISOFieldTypeMap>(type: T, size: number = 0): ISOFieldTypeMap[T] => {
+	private read = <T extends keyof IsoFieldTypeMap>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
 		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this;
 
@@ -108,11 +133,11 @@ export class IsoView {
 
 			case UTF8:
 				if (size === -1) {
-					result = readUTF8TerminatedString(dataView, offset);
+					result = readUtf8TerminatedString(dataView, offset);
 					cursor = result.length + 1;
 				}
 				else {
-					result = readUTF8String(dataView, offset);
+					result = readUtf8String(dataView, offset);
 				}
 				break;
 
@@ -125,47 +150,101 @@ export class IsoView {
 		return result;
 	};
 
+	/**
+	 * Reads a unsigned integer from the data view.
+	 *
+	 * @param size - The size of the integer in bytes.
+	 * @returns The unsigned integer.
+	 */
 	readUint = (size: number): number => {
 		return this.read(UINT, size);
 	};
 
+	/**
+	 * Reads a signed integer from the data view.
+	 *
+	 * @param size - The size of the integer in bytes.
+	 * @returns The signed integer.
+	 */
 	readInt = (size: number): number => {
 		return this.read(INT, size);
 	};
 
+	/**
+	 * Reads a string from the data view.
+	 *
+	 * @param size - The size of the string in bytes.
+	 * @returns The string.
+	 */
 	readString = (size: number): string => {
 		return this.read(STRING, size);
 	};
 
+	/**
+	 * Reads a template from the data view.
+	 *
+	 * @param size - The size of the template in bytes.
+	 * @returns The template.
+	 */
 	readTemplate = (size: number): number => {
 		return this.read(TEMPLATE, size);
 	};
 
+	/**
+	 * Reads a byte array from the data view.
+	 *
+	 * @param size - The size of the data in bytes.
+	 * @returns The data.
+	 */
 	readData = (size: number): Uint8Array => {
 		return this.read(DATA, size);
 	};
 
+	/**
+	 * Reads a UTF-8 string from the data view.
+	 *
+	 * @param size - The size of the string in bytes.
+	 * @returns The UTF-8 string.
+	 */
 	readUtf8 = (size?: number): string => {
 		return this.read(UTF8, size);
 	};
 
-	readFullBox = (): FullBox => {
+	/**
+	 * Reads a full box from the data view.
+	 *
+	 * @returns The full box.
+	 */
+	readFullBox = (): Fields<FullBox> => {
 		return {
 			version: this.readUint(1),
 			flags: this.readUint(3),
 		};
 	};
 
-	readArray = <T extends keyof ISOFieldTypeMap>(type: T, size: number, length: number): ISOFieldTypeMap[T][] => {
+	/**
+	 * Reads an array of values from the data view.
+	 *
+	 * @param type - The type of the values.
+	 * @param size - The size of the values in bytes.
+	 * @param length - The number of values to read.
+	 * @returns The array of values.
+	 */
+	readArray = <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number): IsoFieldTypeMap[T][] => {
 		const value = [];
 
 		for (let i = 0; i < length; i++) {
 			value.push(this.read(type, size));
 		}
 
-		return value as ISOFieldTypeMap[T][];
+		return value as IsoFieldTypeMap[T][];
 	};
 
+	/**
+	 * Reads a raw box from the data view.
+	 *
+	 * @returns The box.
+	 */
 	readBox = (): RawBox => {
 		const { dataView, offset } = this;
 
@@ -201,11 +280,17 @@ export class IsoView {
 		return box;
 	};
 
-	readBoxes = (length: number): Box[] => {
-		const result: Box[] = [];
+	/**
+	 * Reads a number of boxes from the data view.
+	 *
+	 * @param length - The number of boxes to read.
+	 * @returns The boxes.
+	 */
+	readBoxes = <T = IsoBmffBox>(length: number): T[] => {
+		const result: T[] = [];
 
 		for (const box of this) {
-			result.push(box);
+			result.push(box as T);
 
 			if (length > 0 && result.length >= length) {
 				break;
@@ -215,6 +300,13 @@ export class IsoView {
 		return result;
 	};
 
+	/**
+	 * Reads a number of entries from the data view.
+	 *
+	 * @param length - The number of entries to read.
+	 * @param map - The function to map the entries.
+	 * @returns The entries.
+	 */
 	readEntries = <T>(length: number, map: () => T): T[] => {
 		const result: T[] = [];
 
@@ -225,19 +317,27 @@ export class IsoView {
 		return result;
 	};
 
-	*[Symbol.iterator](): Generator<Box> {
+	/**
+	 * Iterates over the boxes in the data view.
+	 *
+	 * @returns A generator of boxes.
+	 */
+	*[Symbol.iterator](): Generator<IsoBmffBox> {
 		const { parsers = {}, recursive = false } = this.config;
 
 		while (!this.done) {
 			try {
 				const { type, data, ...rest } = this.readBox();
-				const box = { type, ...rest } as Box;
+				const box = { type, ...rest } as IsoBmffBox;
 				const parser = parsers[type] || parsers[type.trim()]; // url and urn boxes have a trailing space in their type field
+
 				if (parser) {
 					Object.assign(box, parser(data, this.config));
 				}
 
-				if (ContainerBoxes.includes(type)) {
+				box.view = data;
+
+				if (CONTAINERS.includes(type)) {
 					const boxes = [];
 
 					for (const child of data) {
@@ -248,7 +348,7 @@ export class IsoView {
 						boxes.push(child);
 					}
 
-					box.boxes = boxes;
+					(box as ContainerBox<IsoBmffBox>).boxes = boxes;
 				}
 
 				yield box;
