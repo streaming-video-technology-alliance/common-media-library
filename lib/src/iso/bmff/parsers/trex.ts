@@ -1,20 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type TrackExtendsBox = FullBox & {
-	trackId: number;
-	defaultSampleDescriptionIndex: number;
-	defaultSampleDuration: number;
-	defaultSampleSize: number;
-	defaultSampleFlags: number;
-};
 
 /**
  * Parse a TrackExtendsBox from an IsoView
@@ -27,7 +13,7 @@ export type TrackExtendsBox = FullBox & {
  *
  * @beta
  */
-export function trex(view: IsoView): TrackExtendsBox {
+export function trex(view: IsoView): Fields<TrackExtendsBox> {
 	return {
 		...view.readFullBox(),
 		trackId: view.readUint(4),

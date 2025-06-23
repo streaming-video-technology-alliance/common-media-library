@@ -1,16 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { UrlBox } from '../boxes/UrlBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type UrlBox = FullBox & {
-	location: string;
-};
 
 /**
  * Parse a UrlBox from an IsoView
@@ -23,7 +13,7 @@ export type UrlBox = FullBox & {
  *
  * @beta
  */
-export function url(view: IsoView): UrlBox {
+export function url(view: IsoView): Fields<UrlBox> {
 	return {
 		...view.readFullBox(),
 		location: view.readString(-1),

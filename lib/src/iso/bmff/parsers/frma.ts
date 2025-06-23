@@ -1,15 +1,6 @@
+import type { Fields } from '../boxes/Fields.js';
+import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.12.2 Original Format Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type OriginalFormatBox = {
-	dataFormat: number;
-};
 
 /**
  * Parse an OriginalFormatBox from an IsoView
@@ -22,7 +13,7 @@ export type OriginalFormatBox = {
  *
  * @beta
  */
-export function frma(view: IsoView): OriginalFormatBox {
+export function frma(view: IsoView): Fields<OriginalFormatBox> {
 	return {
 		dataFormat: view.readUint(4),
 	};

@@ -1,44 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * Sub sample
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SubSample = {
-	subsampleSize: number;
-	subsamplePriority: number;
-	discardable: number;
-	codecSpecificParameters: number;
-};
-
-/**
- * Sub sample entry
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SubSampleEntry = {
-	sampleDelta: number;
-	subsampleCount: number;
-	subsamples: SubSample[];
-};
-
-/**
- * ISO/IEC 14496-12:2015 - 8.7.7 Sub-Sample Information Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SubSampleInformationBox = FullBox & {
-	entryCount: number;
-	entries: SubSampleEntry[];
-};
 
 /**
  * Parse a SubSampleInformationBox from an IsoView
@@ -51,7 +13,7 @@ export type SubSampleInformationBox = FullBox & {
  *
  * @beta
  */
-export function subs(view: IsoView): SubSampleInformationBox {
+export function subs(view: IsoView): Fields<SubsampleInformationBox> {
 	const { version, flags } = view.readFullBox();
 	const entryCount = view.readUint(4);
 	const entries = view.readEntries(entryCount, () => {

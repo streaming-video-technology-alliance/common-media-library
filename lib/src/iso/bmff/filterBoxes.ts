@@ -1,21 +1,23 @@
-import type { Box } from './Box.js';
+import type { ContainerBox } from './boxes/ContainerBox.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 import type { BoxFilter } from './BoxFilter.js';
 import { createIsoView } from './createIsoView.js';
 import type { IsoData } from './IsoData.js';
 import type { IsoViewConfig } from './IsoViewConfig.js';
 
-function filter(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter, boxes: Box[] = []): Box[] {
+function filter<T extends IsoBmffBox = IsoBmffBox>(iterator: Iterable<IsoBmffBox>, fn: BoxFilter<T>, recursive: boolean, result: T[]): T[] {
 	for (const box of iterator) {
 		if (fn(box)) {
-			boxes.push(box);
+			result.push(box as T);
 		}
 
-		if (recursive && Array.isArray(box.boxes)) {
-			filter(box.boxes, recursive, fn, boxes);
+		const { boxes } = box as ContainerBox<IsoBmffBox>;
+		if (recursive && Array.isArray(boxes)) {
+			filter(boxes, fn, recursive, result);
 		}
 	}
 
-	return boxes;
+	return result;
 }
 
 /**
@@ -29,6 +31,11 @@ function filter(iterator: Iterable<Box>, recursive: boolean, fn: BoxFilter, boxe
  * @group ISOBMFF
  * @beta
  */
-export function filterBoxes(raw: IsoData, config: IsoViewConfig, fn: BoxFilter): Box[] {
-	return filter(createIsoView(raw, { ...config, recursive: false }), !!config.recursive, fn);
+export function filterBoxes<T extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T>, config?: IsoViewConfig): T[] {
+	if (raw instanceof DataView || raw instanceof Uint8Array || raw instanceof ArrayBuffer) {
+		raw = createIsoView(raw, { ...config, recursive: false });
+	}
+
+	const recursive = config?.recursive ?? true;
+	return filter<T>(raw, fn, recursive, []);
 }

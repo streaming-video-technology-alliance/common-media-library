@@ -1,4 +1,4 @@
-import { base64decode } from '../../utils/base64decode.js';
+import { decodeBase64 } from '../../utils/decodeBase64.js';
 import { BYTES } from '../utils/BYTES.js';
 import type { ParsedValue } from './ParsedValue.js';
 import { parsedValue } from './ParsedValue.js';
@@ -60,7 +60,7 @@ export function parseByteSequence(src: string): ParsedValue<Uint8Array> {
 
 	// pass b64_content char check step 6
 	return parsedValue(
-		base64decode(b64_content),
+		decodeBase64(b64_content),
 		src,
 	);
 }

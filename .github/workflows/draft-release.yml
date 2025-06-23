@@ -1,0 +1,48 @@
+name: Draft Release
+
+on:
+  workflow_dispatch:
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  PKG_VERSION: ""
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 24
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@svta"
+
+      - name: Install
+        run: npm ci
+
+      - name: Get Version
+        run: echo "PKG_VERSION=`node -p "require('./package').version"`" >> $GITHUB_ENV
+
+      - name: Create Release Notes
+        run: npm run notes
+
+      - name: Draft Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
+        with:
+          tag_name: v${{ env.PKG_VERSION }}
+          release_name: ${{ env.PKG_VERSION }}
+          commitish: main
+          body_path: ./RELEASE.md
+          draft: true
+          prerelease: false

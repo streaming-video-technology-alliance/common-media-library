@@ -1,29 +1,7 @@
-import type { FullBox } from '../FullBox.js';
+import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.js';
+import type { CompositionTimeToSampleEntry } from '../boxes/CompositionTimeToSampleEntry.js';
+import type { Fields } from '../boxes/Fields.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * A Composition Time To Sample Entry
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type CompositionTimeToSampleEntry = {
-	sampleCount: number;
-	sampleOffset: number;
-};
-
-/**
- * ISO/IEC 14496-12:2012 - 8.6.1.3 Composition Time To Sample Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type CompositionTimeToSampleBox = FullBox & {
-	entryCount: number;
-	entries: CompositionTimeToSampleEntry[];
-};
 
 /**
  * Parse a CompositionTimeToSampleBox from an IsoView
@@ -36,7 +14,7 @@ export type CompositionTimeToSampleBox = FullBox & {
  *
  * @beta
  */
-export function ctts(view: IsoView): CompositionTimeToSampleBox {
+export function ctts(view: IsoView): Fields<CompositionTimeToSampleBox> {
 	const { version, flags } = view.readFullBox();
 	const read = version === 1 ? view.readInt : view.readUint;
 

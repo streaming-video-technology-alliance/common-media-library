@@ -1,0 +1,197 @@
+{
+  "cues": [
+    {
+      "align": "center",
+      "endTime": 35,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 0,
+      "text": "WevVTT Sample",
+      "vertical": ""
+    },
+    {
+      "align": "left",
+      "endTime": 20,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": {
+        "id": "fred",
+        "lines": 3,
+        "regionAnchorX": 0,
+        "regionAnchorY": 100,
+        "scroll": "up",
+        "viewportAnchorX": 10,
+        "viewportAnchorY": 90,
+        "width": 40
+      },
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 0,
+      "text": "<v Fred>Hi, my name is Fred",
+      "vertical": ""
+    },
+    {
+      "align": "right",
+      "endTime": 22.5,
+      "id": "cue_1234",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": {
+        "id": "bill",
+        "lines": 3,
+        "regionAnchorX": 100,
+        "regionAnchorY": 100,
+        "scroll": "up",
+        "viewportAnchorX": 90,
+        "viewportAnchorY": 90,
+        "width": 40
+      },
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 2.5,
+      "text": "<v Bill>Hi, I’m Bill",
+      "vertical": ""
+    },
+    {
+      "align": "left",
+      "endTime": 25,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": {
+        "id": "fred",
+        "lines": 3,
+        "regionAnchorX": 0,
+        "regionAnchorY": 100,
+        "scroll": "up",
+        "viewportAnchorX": 10,
+        "viewportAnchorY": 90,
+        "width": 40
+      },
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 5,
+      "text": "<v Fred>Would you like to get a coffee?",
+      "vertical": ""
+    },
+    {
+      "align": "right",
+      "endTime": 27.5,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": {
+        "id": "bill",
+        "lines": 3,
+        "regionAnchorX": 100,
+        "regionAnchorY": 100,
+        "scroll": "up",
+        "viewportAnchorX": 90,
+        "viewportAnchorY": 90,
+        "width": 40
+      },
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 7.5,
+      "text": "<v Bill>Sure! I’ve only had one today.",
+      "vertical": ""
+    },
+    {
+      "align": "left",
+      "endTime": 30,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": {
+        "id": "fred",
+        "lines": 3,
+        "regionAnchorX": 0,
+        "regionAnchorY": 100,
+        "scroll": "up",
+        "viewportAnchorX": 10,
+        "viewportAnchorY": 90,
+        "width": 40
+      },
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 10,
+      "text": "<v Fred>This is my fourth!",
+      "vertical": ""
+    },
+    {
+      "align": "left",
+      "endTime": 32.5,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": {
+        "id": "fred",
+        "lines": 3,
+        "regionAnchorX": 0,
+        "regionAnchorY": 100,
+        "scroll": "up",
+        "viewportAnchorX": 10,
+        "viewportAnchorY": 90,
+        "width": 40
+      },
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 12.5,
+      "text": "<v Fred>OK, let’s go.",
+      "vertical": ""
+    }
+  ],
+  "regions": [
+    {
+      "id": "fred",
+      "lines": 3,
+      "regionAnchorX": 0,
+      "regionAnchorY": 100,
+      "scroll": "up",
+      "viewportAnchorX": 10,
+      "viewportAnchorY": 90,
+      "width": 40
+    },
+    {
+      "id": "bill",
+      "lines": 3,
+      "regionAnchorX": 100,
+      "regionAnchorY": 100,
+      "scroll": "up",
+      "viewportAnchorX": 90,
+      "viewportAnchorY": 90,
+      "width": 40
+    }
+  ],
+  "styles": [
+    "::cue {\n  color: green;\n}\n",
+    "::cue(v[voice=\"Fred\"]) {\n  color: cyan;\n}\n::cue(v[voice=\"Bill\"]) {\n  color: yellow;\n}\n"
+  ],
+  "errors": []
+}

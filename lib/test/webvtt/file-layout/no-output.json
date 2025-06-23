@@ -1,0 +1,8 @@
+{
+  "regions": [],
+  "cues": [],
+  "styles": [],
+  "errors": [
+    "WebVttParsingError: Malformed WebVTT signature."
+  ]
+}

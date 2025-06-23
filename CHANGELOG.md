@@ -8,6 +8,47 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.14.0] - 2025-06-18
+
+### Added
+
+- Add map type for ISO BMFF boxes to their type properties
+  ([#208](https://github.com/streaming-video-technology-alliance/common-media-library/issues/208))
+- Added Zlema Throughput Estimator
+  ([#212](https://github.com/streaming-video-technology-alliance/common-media-library/pull/212))
+
+### Changed
+
+- Update Node.js development version to 24
+  ([#211](https://github.com/streaming-video-technology-alliance/common-media-library/issues/211))
+- Consistently used function declaration across CML
+  ([#213](https://github.com/streaming-video-technology-alliance/common-media-library/pull/213))
+
+### Fixed
+
+- Fixed TypeScript errors related to Boxes
+  ([#214](https://github.com/streaming-video-technology-alliance/common-media-library/pull/214))
+
+## [0.13.0] - 2025-06-09
+
+### Added
+
+- Add ISO BMFF `iden` box parser
+  ([#197](https://github.com/streaming-video-technology-alliance/common-media-library/issues/197))
+- Added EWMA Throughput Calculations
+  ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
+- VTT Parsing Utilities
+  ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
+- Added Harmonic Mean Throughput Estimator
+  ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
+- Added Arithmetic Mean Throughput Estimator
+  ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
+
+### Fixed
+
+- The ISO BMFF utilities are not properly typed
+  ([#202](https://github.com/streaming-video-technology-alliance/common-media-library/issues/202))
+
 ## [0.12.4] - 2025-05-16
 
 ### Fixed
@@ -347,7 +388,9 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.13.0...v0.14.0
+[0.13.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.4...v0.13.0
 [0.12.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.1...v0.12.2

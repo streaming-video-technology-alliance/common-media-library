@@ -1,4 +1,4 @@
-import { base64decode } from '../../utils/base64decode.js';
+import { decodeBase64 } from '../../utils/decodeBase64.js';
 
 /**
  * Decodes a FairPlay DRM license response.
@@ -15,6 +15,6 @@ import { base64decode } from '../../utils/base64decode.js';
 
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array {
 	return typeof response === 'string'
-		? base64decode(response)
+		? decodeBase64(response)
 		: new Uint8Array(response);
 }

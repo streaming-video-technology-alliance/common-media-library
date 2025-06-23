@@ -1,11 +1,5 @@
-/**
- * ISO/IEC 14496-30:2014 - WebVTT Empty Sample Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type WebVTTEmptySampleBox = object;
+import type { Fields } from '../boxes/Fields.js';
+import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.js';
 
 /**
  * Parse a WebVTT Empty Sample Box from an IsoView
@@ -16,7 +10,7 @@ export type WebVTTEmptySampleBox = object;
  *
  * @beta
  */
-export function vtte(): WebVTTEmptySampleBox {
+export function vtte(): Fields<WebVttEmptySampleBox> {
 	// Nothing should happen here.
 	return {};
 };

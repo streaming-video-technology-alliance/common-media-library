@@ -1,17 +1,6 @@
-import type { FullBox } from '../FullBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { TrackKindBox } from '../boxes/TrackKindBox.js';
 import type { IsoView } from '../IsoView.js';
-
-/**
- * ISO/IEC 14496-12:202x - 8.10.4 Track kind box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type TrackKindBox = FullBox & {
-	schemeUri: string;
-	value: string;
-};
 
 /**
  * Parse a TrackKinBox from an IsoView
@@ -24,7 +13,7 @@ export type TrackKindBox = FullBox & {
  *
  * @beta
  */
-export function kind(view: IsoView): TrackKindBox {
+export function kind(view: IsoView): Fields<TrackKindBox> {
 	return {
 		...view.readFullBox(),
 		schemeUri: view.readUtf8(-1),

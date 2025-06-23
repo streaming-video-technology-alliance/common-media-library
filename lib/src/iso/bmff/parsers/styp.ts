@@ -1,15 +1,7 @@
-import type { BoxParser } from '../BoxParser.js';
-import { type TypeBox } from '../TypeBox.js';
+import type { Fields } from '../boxes/Fields.js';
+import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.js';
+import type { IsoView } from '../IsoView.js';
 import { ftyp } from './ftyp.js';
-
-/**
- * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
- *
- * @group ISOBMFF
- *
- * @beta
- */
-export type SegmentTypeBox = TypeBox;
 
 /**
  * Parse a SegmentTypeBox from an IsoView
@@ -22,4 +14,6 @@ export type SegmentTypeBox = TypeBox;
  *
  * @beta
  */
-export const styp: BoxParser<SegmentTypeBox> = ftyp;
+export function styp(view: IsoView): Fields<SegmentTypeBox> {
+	return ftyp(view);
+}

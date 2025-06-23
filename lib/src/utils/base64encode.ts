@@ -1,3 +1,5 @@
+import { encodeBase64 } from './encodeBase64.js';
+
 /**
  * Encodes binary data to base64
  *
@@ -7,7 +9,10 @@
  * @group Utils
  *
  * @beta
+ *
+ * @deprecated Use `encodeBase64` instead.
+ * @see {@link encodeBase64}
  */
 export function base64encode(binary: Uint8Array): string {
-	return btoa(String.fromCharCode(...binary));
+	return encodeBase64(binary);
 }
