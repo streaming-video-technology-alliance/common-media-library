@@ -1,18 +1,54 @@
+import type { ValueOf } from '../utils/ValueOf.js';
+
 /**
- * CMCD v2 event types for the 'e' key (event mode).
+ * CMCD event types for the 'e' key (event mode).
+ *
+ * @group CMCD
+ *
+ * @enum
+ *
+ * @beta
  */
-
-
-export const CMCD_REPORTING_EVENTS = {
+export const CmcdReportingEvent = {
+	/**
+	 * A change in the player state.
+	 */
 	PLAY_STATE: 'ps',
+	/**
+	 * An error event.
+	 */
 	ERROR: 'e',
+	/**
+	 * A periodic report sent on a time interval.
+	 */
 	TIME_INTERVAL: 't',
+	/**
+	 * A change of the content ID.
+	 */
 	CONTENT_ID: 'c',
+	/**
+	 * A change in the application's backgrounded state.
+	 */
 	BACKGROUNDED_MODE: 'b',
+	/**
+	 * The player was muted.
+	 */
 	MUTE: 'm',
+	/**
+	 * Player unmuted.
+	 */
 	UNMUTE: 'um',
+	/**
+	 * The player view was expanded.
+	 */
 	PLAYER_EXPAND: 'pe',
+	/**
+	 * The player view was collapsed.
+	 */
 	PLAYER_COLLAPSE: 'pc',
 } as const;
 
-export type CmcdReportingEvent = typeof CMCD_REPORTING_EVENTS[keyof typeof CMCD_REPORTING_EVENTS];
+/**
+ * @beta
+ */
+export type CmcdReportingEvent = ValueOf<typeof CmcdReportingEvent>;
