@@ -4,7 +4,9 @@ import type { ValueOf } from '../utils/ValueOf.js';
  * CMCD v2 player states for the 'sta' key.
  * 
  * @group CMCD
+ * 
  * @enum
+ * 
  * @beta
 */
 export const CmcdPlayerState = {

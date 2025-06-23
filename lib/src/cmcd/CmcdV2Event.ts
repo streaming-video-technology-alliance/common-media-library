@@ -1,7 +1,7 @@
 import type { CmcdReportingEvent } from './CmcdReportingEvent';
 
 /**
- * CMCD v2 - Event and Event-Response keys.
+ * CMCD v2 - Event and Event-Response.
  *
  * Represents the event and event-response keys for CMCD v2.
  *
@@ -10,6 +10,8 @@ import type { CmcdReportingEvent } from './CmcdReportingEvent';
  * the reporting event token.
  * 
  * @group CMCD
+ * 
+ * @beta
  */
 export type CmcdV2Event = {
 	/** Reporting event (event mode; e.g. "e", "t", "ps")

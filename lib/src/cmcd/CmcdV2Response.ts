@@ -1,5 +1,14 @@
 import type { CmcdObjectType } from './CmcdObjectType';
 
+/**
+ * CMCD v2 - Response.
+ * 
+ * Defines the keys for the CMCD (Common Media Client Data) v2 Response group.
+ * 
+ * @group CMCD
+ * 
+ * @beta
+ */
 export type CmcdV2Response = {
 	/** Object duration (ms) 
 	 * 

@@ -1,5 +1,9 @@
 /**
  * CMCD v2 - Response-only and timing keys.
+ * 
+ * @group CMCD
+ * 
+ * @beta
  */
 export const CmcdV2ResponseKeys = [
 	'd', 
