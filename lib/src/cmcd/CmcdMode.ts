@@ -1,7 +1,29 @@
-export const CMCD_MODE = {
+import type { ValueOf } from '../utils/ValueOf.js';
+/**
+ * CMCD mode types.
+ *
+ * @group CMCD
+ *
+ * @enum
+ *
+ * @beta
+ */
+export const CmcdMode  = {
+	/**
+	 * Request mode
+	 */
 	REQUEST: 'request',
+	/**
+	 * Response mode
+	 */
 	RESPONSE: 'response',
+	/**
+	 * Event mode
+	 */
 	EVENT: 'event',
 } as const;
 
-export type CmcdMode = ValueOf<typeof CMCD_MODE>;
+/**
+ * @beta
+ */
+export type CmcdMode = ValueOf<typeof CmcdMode>;
