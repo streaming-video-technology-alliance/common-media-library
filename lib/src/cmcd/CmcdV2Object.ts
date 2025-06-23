@@ -1,8 +1,5 @@
-import type { CmcdCustomKey } from './CmcdCustomKey';
-import type { CmcdValue } from './CmcdValue';
-import type { CmcdStreamingFormat } from './CmcdStreamingFormat';
-import type { CmcdStreamType } from './CmcdStreamType';
 import type { CmcdPlayerState } from './CmcdPlayerState';
+import type { Cmcd } from './Cmcd';
 
 /**
  * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.
@@ -11,28 +8,10 @@ import type { CmcdPlayerState } from './CmcdPlayerState';
  *
  * @beta
  */
-export type CmcdV2Object = {
-
-	/**
-	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
-	 * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
-	 */
-	[index: CmcdCustomKey]: CmcdValue;
-
+export type CmcdV2Object = Cmcd & {
 	////////////////////
 	// CMCD V2 Object //
 	////////////////////
-
-	/**
-	 * Encoded bitrate
-	 *
-	 * The encoded bitrate of the audio or video object being requested. This may not be known precisely by the player; however,
-	 * it MAY be estimated based upon playlist/manifest declarations. If the playlist declares both peak and average bitrate values,
-	 * the peak value should be transmitted.
-	 *
-	 * Integer kbps
-	*/
-	br?: number;
 
 	/**
 	 * Aggregate encoded bitrate
@@ -46,15 +25,6 @@ export type CmcdV2Object = {
 	*/
 	ab?: number;
 
-	/** Buffer length (ms) 
-	 * 
-	 * The buffer length associated with the media object being requested. This value SHOULD be rounded to the nearest 100 ms. 
-	 * This value MUST NOT be sent for objects which do not have an object type of ‘a’, ‘v’, ‘av’, ‘tt’, ‘c’, or ‘o’.
-	 * 
-	 * Integer milliseconds
-	*/
-	bl?: number;
-	
 	/** Target buffer length (ms) 
 	 *
 	 * The target buffer length associated with the media object being requested at the time of the request. 
@@ -65,20 +35,6 @@ export type CmcdV2Object = {
 	*/
 	tbl?: number;
 
-	/** Buffer starvation occurred since last request (boolean) 
-	 * 
-	 * Key is included without a value if the buffer was starved at some point between the prior request and this object request, 
-	 * resulting in the player being in a rebuffering state and the video or audio playback being stalled. 
-	 * This key MUST be sent if the buffer was starved since the prior request. Note that if the player begins requesting data from a new CDN, 
-	 * then this key might initially report buffering caused by the prior CDN.
-	 * 
-	 * If the object type ‘ot’ key is sent along with this key, then the ‘bs’ key refers to the buffer associated with the particular object type. 
-	 * If no object type is communicated, then the buffer state applies to the current session.
-	 * 
-	 * Boolean
-	*/
-	bs?: boolean;
-
 	/** CDN ID (string, max 128 chars) 
 	 * 
 	 * A string identifying the current delivery network from which the player is retrieving content. Maximum length is 128 characters
@@ -86,16 +42,6 @@ export type CmcdV2Object = {
 	 * String
 	*/
 	cdn?: string;
-	
-	/** Content ID (string, max 128 chars) 
-	 * 
-	 * A unique string identifying the current content. Maximum length is 128 characters.
-	 * This value is consistent across multiple different sessions and devices and is defined and updated at the discretion of the service 
-	 * provider
-	 * 
-	 * String
-	*/
-	cid?: string;
 	
 	/** Live stream latency (ms) 
 	 * 
@@ -105,61 +51,6 @@ export type CmcdV2Object = {
 	 * Integer Milliseconds
 	*/
 	ltc?: number;
-
-	/** Measured throughput (kbps) 
-	 * 
-	 * The throughput between client and server, as measured by the client. Throughput MUST be rounded to the nearest 100 kbps. 
-	 * This value, however derived, SHOULD be the value that the client is using to make its next Adaptive Bitrate switching decision. 
-	 * If the client is connected to multiple servers concurrently, it must take care to report only the throughput measured against the receiving server. 
-	 * If the client has multiple concurrent connections to the server, then the intent is that this value communicates the aggregate throughput the 
-	 * client sees across all those connections.
-	 * 
-	 * Integer kilobits per second (kbps)
-	*/
-	mtp?: number;
-
-	/** Playback rate (decimal) 
-	 * 
-	 * 1 if real-time, 
-	 * 2 if double speed, 
-	 * 0 if not playing. 
-	 * 
-	 * SHOULD only be sent if not equal to 1
-	 * 
-	 * Decimal
-	*/
-	pr?: number;
-
-	/** Streaming format 
-	 * 
-	 * The streaming format that defines the current request.
-	 * d = MPEG DASH [10]
-	 * h = HTTP Live Streaming (HLS) [11]
-	 * e = HESP [12]
-	 * ld = Low latency DASH [10]
-	 * l3 = Low latency low delay DASH (L3D)
-	 * lh = Low Latency HLS [11]
-	 * o = other
-	 * s = Smooth Streaming [13]
-	 * 
-	 * If the streaming format being requested is unknown, then this key MUST NOT be used
-	 * 
-	 * Token - one of [d,h,e,ld,l3,lh,s,o]
-	*/
-	sf?: CmcdStreamingFormat;
-
-	/** Session ID (string, max 64 chars, UUID recommended) 
-	 * 
-	 * A GUID identifying the current playback session. 
-	 * A playback session typically ties together segments belonging to a single playback session. 
-	 * This session may comprise the playback of primary content combined with interstitial content. 
-	 * This session is being played on a single device. 
-	 * Maximum length is 64 characters.
-	 * It is RECOMMENDED to conform to the UUID specification
-	 * 
-	 * String
-	*/
-	sid?: string;
 	
 	/** Backgrounded (all players in session not visible, boolean) 
 	 * 
@@ -193,15 +84,6 @@ export type CmcdV2Object = {
 	*/
 	sta?: CmcdPlayerState;
 
-	/** Stream type 
-	 * 
-	 * v = all segments are available – e.g., VOD
-	 * l = segments become available over time – e.g., LIVE
-	 * 
-	 * Token - one of [v,l]
-	*/
-	st?: CmcdStreamType;
-
 	/** Timestamp (ms since UNIX epoch, required for event mode) 
 	 *
 	 * The timestamp at which the associated event occurred, expressed as milliseconds since the UNIX epoch. 
@@ -227,20 +109,6 @@ export type CmcdV2Object = {
 	 * Integer Kbps 
 	*/
 	tpb?: number;
-
-	/** Top encoded bitrate in manifest (kbps) 
-	 * 
-	 * The highest bitrate rendition in the manifest or playlist. 
-	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player. 
-	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted. 
-	 * This top bitrate MUST apply to the object type being requested. Requests for video objects MUST specify the top video bitrate and 
-	 * requests for audio objects MUST specify the top audio bitrate. 
-	 * 
-	 * This value MUST NOT be sent for objects which do not have an object type of ‘a’, ‘v’, ‘av’ or ‘c’.
-	 * 
-	 * Integer Kbps
-	*/
-	tb?: number;
 
 	/** Lowest encoded bitrate (kbps) 
 	 * 
@@ -313,14 +181,4 @@ export type CmcdV2Object = {
 	 * Integer milliseconds
 	*/
 	msd?: number;
-
-	/** CMCD version (integer, omit if 1)
-	 * 
-	 * The version of this specification used for interpreting the defined key names and values. 
-	 * If this key is omitted, the client and server MUST interpret the values as being defined by version 1. 
-	 * Client SHOULD omit this field if the version is 1 and MUST include this field if the version is not 1
-	 * 
-	 * Integer
-	 */
-	v?: number;
 };
