@@ -36,3 +36,25 @@ export { fromCmcdQuery } from './cmcd/fromCmcdQuery.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
+
+export type { CmcdV2Object } from './cmcd/CmcdV2Object';
+export type { CmcdV2Request } from './cmcd/CmcdV2Request';
+export type { CmcdV2Response } from './cmcd/CmcdV2Response';
+export type { CmcdV2Event } from './cmcd/CmcdV2Event';
+
+export { CmcdV1Keys } from './cmcd/CmcdV1Keys';
+export { CmcdV2CommonKeys } from './cmcd/CmcdV2CommonKeys';
+export { CmcdV2EventKeys } from './cmcd/CmcdV2EventKeys';
+export { CmcdV2RequestKeys } from './cmcd/CmcdV2RequestKeys';
+export { CmcdV2ResponseKeys } from './cmcd/CmcdV2ResponseKeys';
+
+export { CMCD_EVENT_MODE } from './cmcd/CMCD_EVENT_MODE';
+export { CMCD_REQUEST_MODE } from './cmcd/CMCD_REQUEST_MODE';
+export { CMCD_RESPONSE_MODE } from './cmcd/CMCD_RESPONSE_MODE';
+export { CmcdMode } from './cmcd/CmcdMode';
+
+export { CmcdPlayerState } from './cmcd/CmcdPlayerState';
+export { CmcdReportingEvent } from './cmcd/CmcdReportingEvent';
+export { CMCD_V2_TIME_INTERVAL_DEFAULT } from './cmcd/CmcdV2TimeInterval';
+
+export { CMCD_V2 } from './cmcd/CMCD_V2';
