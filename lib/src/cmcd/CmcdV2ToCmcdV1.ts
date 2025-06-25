@@ -1,4 +1,5 @@
 import type { Cmcd } from './Cmcd';
+import { CmcdV1Keys } from './CmcdV1Keys.js';
 
 /**
 * Type definition for valid CMCD keys.
@@ -6,10 +7,7 @@ import type { Cmcd } from './Cmcd';
 type CmcdKey = keyof Cmcd;
 
 // Keys supported in CMCD v1 spec
-const CMCD_V1_KEYS: Set<CmcdKey> = new Set([
-	'br', 'bl', 'bs', 'cid', 'd', 'dl', 'mtp', 'nor', 'nrr',
-	'ot', 'pr', 'rtp', 'sf', 'sid', 'st', 'su', 'tb', 'v',
-]);
+const CMCD_V1_KEYS: Set<CmcdKey> = new Set(CmcdV1Keys);
 
 /**
 * Type definition for a CMCD key-value object.
