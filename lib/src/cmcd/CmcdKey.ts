@@ -1,4 +1,4 @@
-import type { Cmcd } from './Cmcd.js';
+import type { CmcdData } from './CmcdData.js';
 
 /**
  * A CMCD key.
@@ -7,4 +7,4 @@ import type { Cmcd } from './Cmcd.js';
  *
  * @beta
  */
-export type CmcdKey = keyof Cmcd;
+export type CmcdKey = keyof CmcdData;

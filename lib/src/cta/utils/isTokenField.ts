@@ -8,5 +8,11 @@
  * @internal
  */
 export function isTokenField(key: string): boolean {
-	return key === 'ot' || key === 'sf' || key === 'st';
+	return [
+		'ot',
+		'sf',
+		'st',
+		'e',
+		'sta',
+	].includes(key as any);
 }

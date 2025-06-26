@@ -1,4 +1,4 @@
-import type { CmcdKey } from "./CmcdKey.js";
+import type { CmcdKey } from './CmcdKey.js';
 
 const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9-.]+-[a-zA-Z0-9-.]+$/;
 

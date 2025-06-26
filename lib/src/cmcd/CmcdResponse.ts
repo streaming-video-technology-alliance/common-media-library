@@ -1,4 +1,4 @@
-import type { CmcdRequest } from "./CmcdRequest.js";
+import type { CmcdRequest } from './CmcdRequest.js';
 
 /**
  * CMCD Response Mode.
@@ -10,6 +10,15 @@ import type { CmcdRequest } from "./CmcdRequest.js";
  * @beta
  */
 export type CmcdResponse = CmcdRequest & {
+	/** Response code for object request (response mode)
+	 *
+	 * The response code received when requesting a media object. In a redirect scenario, this would be the final response code received.
+	 * A value of 0 SHOULD be used to indicate that a response was not received.
+	 *
+	 * Integer
+	*/
+	rc?: number;
+
 	/** Time to first byte (ms; response mode)
 	 *
 	 * The elapsed time between when the request was first initiated (captured in ts) and the time when the first byte of the response was received.
@@ -47,4 +56,23 @@ export type CmcdResponse = CmcdRequest & {
 	 * String
 	*/
 	url?: string;
+
+
+	/** CMSD Dynamic Header (response mode)
+	 *
+	 * Holds a Base64 [base64] encoded copy of the CMSD data received on the CMSD-Dynamic response header.
+	 * This key MUST only be used in RESPONSE mode.
+	 *
+	 * String
+	*/
+	cmsdd?: string;
+
+	/** CMSD Static Header (response mode)
+	 *
+	 * Holds a Base64 [base64] encoded copy of the CMSD data received on the CMSD-Static response header.
+	 * This key MUST only be used in RESPONSE mode.
+	 *
+	 * String
+	*/
+	cmsds?: string;
 };

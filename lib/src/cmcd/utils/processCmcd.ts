@@ -1,7 +1,7 @@
 import { isTokenField } from '../../cta/utils/isTokenField.js';
 import { isValid } from '../../cta/utils/isValid.js';
 import { SfToken } from '../../structuredfield/SfToken.js';
-import type { Cmcd } from '../Cmcd.js';
+import type { CmcdData } from '../CmcdData.js';
 import type { CmcdEncodeOptions } from '../CmcdEncodeOptions.js';
 import { CmcdFormatters } from '../CmcdFormatters.js';
 import type { CmcdKey } from '../CmcdKey.js';
@@ -18,8 +18,8 @@ import type { CmcdValue } from '../CmcdValue.js';
  *
  * @group CMCD
  */
-export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOptions): Cmcd {
-	const results: Cmcd = {};
+export function processCmcd(obj: CmcdData | null | undefined, options?: CmcdEncodeOptions): CmcdData {
+	const results: CmcdData = {};
 
 	if (obj == null || typeof obj !== 'object') {
 		return results;
@@ -30,7 +30,7 @@ export function processCmcd(obj: Cmcd | null | undefined, options?: CmcdEncodeOp
 	const filter = options?.filter;
 
 	keys.forEach(key => {
-		if (filter?.(key)) {
+		if (filter?.(key) === false) {
 			return;
 		}
 

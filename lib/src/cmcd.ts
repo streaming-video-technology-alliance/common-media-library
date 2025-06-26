@@ -47,10 +47,17 @@ export { CmcdStreamType } from './cmcd/CmcdStreamType.js';
 export type { CmcdValue } from './cmcd/CmcdValue.js';
 export { decodeCmcd } from './cmcd/decodeCmcd.js';
 export { encodeCmcd } from './cmcd/encodeCmcd.js';
+export { encodeCmcdEvent } from './cmcd/encodeCmcdEvent.js';
+export { encodeCmcdRequest } from './cmcd/encodeCmcdRequest.js';
+export { encodeCmcdResponse } from './cmcd/encodeCmcdResponse.js';
 export { fromCmcdHeaders } from './cmcd/fromCmcdHeaders.js';
 export { fromCmcdQuery } from './cmcd/fromCmcdQuery.js';
 export { isCmcdCustomKey } from './cmcd/isCmcdCustomKey.js';
-export { isV1Key } from './cmcd/isV1Key.js';
+export { isCmcdEventKey } from './cmcd/isCmcdEventKey.js';
+export { isCmcdRequestKey } from './cmcd/isCmcdRequestKey.js';
+export { isCmcdResponeKey } from './cmcd/isCmcdResponeKey.js';
+export { isCmcdV1Key } from './cmcd/isCmcdV1Key.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
+
