@@ -10,4 +10,5 @@ export const CMCD_RESPONSE_KEYS = [
 	'ttfbb',
 	'ttlb',
 	'url',
+	'smrt',
 ] as const;

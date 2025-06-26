@@ -17,4 +17,11 @@ describe('encodeCmcdEvent', () => {
 			e: CmcdEventType.PLAY_STATE,
 		}), 'e=ps');
 	});
+
+	it('honors user filter', () => {
+		equal(encodeCmcdEvent({
+			br: 1000,
+			e: CmcdEventType.PLAY_STATE,
+		}, { filter: key => key === 'e' }), 'e=ps');
+	});
 });

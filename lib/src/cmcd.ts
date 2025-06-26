@@ -28,6 +28,7 @@ export { CMCD_V1 } from './cmcd/CMCD_V1.js';
 export { CMCD_V1_KEYS } from './cmcd/CMCD_V1_KEYS.js';
 export { CMCD_V2 } from './cmcd/CMCD_V2.js';
 export type { CmcdCustomKey } from './cmcd/CmcdCustomKey.js';
+export type { CmcdData } from './cmcd/CmcdData.js';
 export type { CmcdEncodeOptions } from './cmcd/CmcdEncodeOptions.js';
 export { CmcdEncoding } from './cmcd/CmcdEncoding.js';
 export type { CmcdEvent } from './cmcd/CmcdEvent.js';
@@ -60,4 +61,3 @@ export { isCmcdV1Key } from './cmcd/isCmcdV1Key.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
-

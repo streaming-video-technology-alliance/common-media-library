@@ -12,5 +12,6 @@ export const CMCD_OUTPUT = {
 	nor: '../testing/3.m4v',
 	nrr: '0-99',
 	ot: 'm',
+	pb: 1000,
 	sid: 'session-id',
 };

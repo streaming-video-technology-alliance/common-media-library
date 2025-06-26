@@ -8,6 +8,10 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  * @param key - The key to check.
  *
  * @returns `true` if the key is a valid CMCD event key, `false` otherwise.
+ *
+ * @group CMCD
+ *
+ * @beta
  */
 export function isCmcdEventKey(key: string): boolean {
 	return CMCD_COMMON_KEYS.includes(key as any) ||

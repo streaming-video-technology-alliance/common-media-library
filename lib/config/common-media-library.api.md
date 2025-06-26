@@ -239,7 +239,7 @@ export type Cmcd = {
 };
 
 // @beta
-export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "cdn", "cid", "ec", "lab", "lb", "ltc", "msd", "mtp", "pt", "pr", "sf", "sid", "sta", "st", "tab", "tb", "tbl", "tpb", "ts", "v"];
+export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "cdn", "cid", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pt", "pr", "sf", "sid", "sta", "st", "tab", "tb", "tbl", "tpb", "ts", "v", "cs", "df", "bsd", "sn"];
 
 // @beta
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
@@ -275,7 +275,7 @@ export const CMCD_REQUEST_KEYS: readonly ["d", "dl", "nor", "ot", "rtp", "su"];
 export const CMCD_REQUEST_MODE = "request";
 
 // @beta
-export const CMCD_RESPONSE_KEYS: readonly ["ttfb", "ttfbb", "ttlb", "url"];
+export const CMCD_RESPONSE_KEYS: readonly ["ttfb", "ttfbb", "ttlb", "url", "smrt"];
 
 // @beta
 export const CMCD_RESPONSE_MODE = "response";
@@ -297,6 +297,9 @@ export const CMCD_V2 = 2;
 
 // @beta
 export type CmcdCustomKey = `${string}-${string}`;
+
+// @beta
+export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
 
 // @beta
 export type CmcdEncodeOptions = {
@@ -359,8 +362,6 @@ export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 // @beta
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
-// Warning: (ae-forgotten-export) The symbol "CmcdData" needs to be exported by the entry point index.d.ts
-//
 // @beta
 export type CmcdKey = keyof CmcdData;
 
@@ -405,6 +406,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
     ltc?: number;
     bg?: boolean;
     sta?: CmcdPlayerState;
+    pb?: number;
     ts?: number;
     tpb?: number;
     lb?: number;
@@ -413,14 +415,22 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
     pt?: number;
     ec?: string | string[];
     msd?: number;
+    sn?: number;
+    bsd?: number;
+    df?: number;
+    cs?: number;
 };
 
 // @beta
 export type CmcdResponse = CmcdRequest & {
+    rc?: number;
     ttfb?: number;
     ttfbb?: number;
     ttlb?: number;
     url?: string;
+    cmsdd?: string;
+    cmsds?: string;
+    smrt?: number;
 };
 
 // Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
@@ -1218,13 +1228,13 @@ export type IpmpInfoBox = FullBox & {
 // @beta
 export function isCmcdCustomKey(key: CmcdKey): boolean;
 
-// @public
+// @beta
 export function isCmcdEventKey(key: string): boolean;
 
-// @public
+// @beta
 export function isCmcdRequestKey(key: string): boolean;
 
-// @public
+// @beta
 export function isCmcdResponeKey(key: string): boolean;
 
 // @beta

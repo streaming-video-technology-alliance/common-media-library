@@ -19,6 +19,7 @@ export const CMCD_COMMON_KEYS = [
 	'ltc',
 	'msd',
 	'mtp',
+	'pb',
 	'pt',
 	'pr',
 	'sf',
@@ -31,4 +32,8 @@ export const CMCD_COMMON_KEYS = [
 	'tpb',
 	'ts',
 	'v',
+	'cs',
+	'df',
+	'bsd',
+	'sn',
 ] as const;

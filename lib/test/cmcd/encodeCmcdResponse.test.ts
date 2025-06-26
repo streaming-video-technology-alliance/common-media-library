@@ -17,4 +17,11 @@ describe('encodeCmcdResponse', () => {
 			ttfb: 10234,
 		}), 'ttfb=10234');
 	});
+
+	it('honors user filter', () => {
+		equal(encodeCmcdResponse({
+			br: 1000,
+			ec: '10234',
+		}, { filter: key => key === 'ec' }), 'ec="10234"');
+	});
 });

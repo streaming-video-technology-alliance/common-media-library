@@ -9,6 +9,10 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  * @param key - The key to check.
  *
  * @returns `true` if the key is a valid CMCD request key, `false` otherwise.
+ *
+ * @group CMCD
+ *
+ * @beta
  */
 export function isCmcdResponeKey(key: string): boolean {
 	return CMCD_COMMON_KEYS.includes(key as any) ||

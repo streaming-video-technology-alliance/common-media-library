@@ -16,7 +16,8 @@ import type { CmcdRequest } from './CmcdRequest.js';
  * @beta
  */
 export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
-	/** Reporting event (event mode; e.g. "e", "t", "ps")
+	/**
+	 * Event (event mode; e.g. "e", "t", "ps")
 	 *
 	 * This key MUST only be used in Event mode.
 	 *

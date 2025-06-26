@@ -24,9 +24,6 @@ export function encodeCmcdRequest(cmcd: CmcdData, options: CmcdEncodeOptions = {
 
 	return encodeCmcd(cmcd, {
 		...options,
-		filter: (key) => {
-			console.log(key, isCmcdRequestKey(key));
-			return isCmcdRequestKey(key) && filter(key);
-		},
+		filter: (key) => isCmcdRequestKey(key) && filter(key),
 	});
 }

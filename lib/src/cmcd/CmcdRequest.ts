@@ -21,7 +21,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	ab?: number;
 
-	/** Target buffer length (ms)
+	/**
+	 * Target buffer length (ms)
 	 *
 	 * The target buffer length associated with the media object being requested at the time of the request.
 	 * This value SHOULD be rounded to the nearest 100 ms. This value MUST NOT be sent for objects which do not have an object
@@ -31,7 +32,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	tbl?: number;
 
-	/** CDN ID (string, max 128 chars)
+	/**
+	 * CDN ID (string, max 128 chars)
 	 *
 	 * A string identifying the current delivery network from which the player is retrieving content. Maximum length is 128 characters
 	 *
@@ -39,7 +41,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	cdn?: string;
 
-	/** Live stream latency (ms)
+	/**
+	 * Live stream latency (ms)
 	 *
 	 * The time delta between when a given media timestamp was made available at the origin and when it was rendered by the client.
 	 * The accuracy of this estimate is dependent on synchronization between the packager and the player clocks.
@@ -48,7 +51,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	ltc?: number;
 
-	/** Backgrounded (all players in session not visible, boolean)
+	/**
+	 * Backgrounded (all players in session not visible, boolean)
 	 *
 	 * All players in a session are currently in a state that is not visible to the user.
 	 * This key SHOULD only be sent if it is TRUE.
@@ -58,7 +62,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	bg?: boolean;
 
-	/** State (player state, e.g. "s", "p", etc.)
+	/**
+	 * State (player state, e.g. "s", "p", etc.)
 	 *
 	 * A token describing the current playback state of the player as perceived by the end user, one of:
 	 * s - starting: the player has been instructed to play media for a given session, either by a user interaction or by an autoplay action.
@@ -80,7 +85,15 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	sta?: CmcdPlayerState;
 
-	/** Timestamp (ms since UNIX epoch, required for event mode)
+	/**
+	 * The encoded bitrate of the audio or video object being shown to the end user.
+	 *
+	 * Integer Kbps
+	 */
+	pb?: number;
+
+	/**
+	 * Timestamp (ms since UNIX epoch, required for event mode)
 	 *
 	 * The timestamp at which the associated event occurred, expressed as milliseconds since the UNIX epoch.
 	 * When the event is a request for a media object the time SHOULD reference when the request was first initiated.
@@ -90,7 +103,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	ts?: number;
 
-	/** Top playable bitrate (kbps)
+	/**
+	 * Top playable bitrate (kbps)
 	 *
 	 * The highest bitrate rendition that the player is currently capable of playing for reasons other than bandwidth limitations.
 	 * This key captures the cases in which, for example, screen resolution, DRM, or performance constraints limit the player's topmost choice of bitrate.
@@ -106,7 +120,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	tpb?: number;
 
-	/** Lowest encoded bitrate (kbps)
+	/**
+	 * Lowest encoded bitrate (kbps)
 	 *
 	 * The lowest bitrate rendition in the manifest or playlist.
 	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
@@ -119,7 +134,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	lb?: number;
 
-	/** Top aggregated encoded bitrate (kbps)
+	/**
+	 * Top aggregated encoded bitrate (kbps)
 	 *
 	 * The highest aggregated bitrate rendition in the manifest or playlist.
 	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
@@ -132,7 +148,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	tab?: number;
 
-	/** Lowest aggregated encoded bitrate (kbps)
+	/**
+	 * Lowest aggregated encoded bitrate (kbps)
 	 *
 	 * The lowest aggregated bitrate rendition in the manifest or playlist.
 	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
@@ -145,7 +162,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 */
 	lab?: number;
 
-	/** Playhead time (ms)
+	/**
+	 * Playhead time (ms)
 	 *
 	 * The playhead time, expressed in milliseconds, which is being rendered to the viewer when the report is made.
 	 * For Response and State-Interval modes, this corresponds to the playhead time that was rendered at the wallclock time reported by the timestamp field.
@@ -154,7 +172,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	pt?: number;
 
-	/** Error code(s), application-defined
+	/**
+	 * Error code(s), application-defined
 	 *
 	 * A string defining an error code produced by the player.
 	 * The namespace and formatting of this error code is left to the application.
@@ -166,7 +185,8 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	*/
 	ec?: string | string[];
 
-	/** Media Start Delay (ms)
+	/**
+	 * Media Start Delay (ms)
 	 *
 	 * Measures the initial delay in wall-clock time from when a player is instructed to play media for a given session to when any media begins playback,
 	 * whether it be primary content or interstitial content.
@@ -177,4 +197,45 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * Integer milliseconds
 	*/
 	msd?: number;
+
+	/**
+	 * Sequence Number
+	 *
+	 * A monotonically increasing integer to identify the sequence of a CMCD report to a target within a session. This MUST be reset to zero on the start of
+	 * a new session-id. Sequence numbers increase independently per each combination of mode and target.
+	 *
+	 * Integer
+	*/
+	sn?: number;
+
+	/**
+	 * Buffer starvation duration
+	 *
+	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
+	 *
+	 * If the object type ‘ot’ key is sent along with this key, then the ‘bsd’ key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
+	 *
+	 * Integer milliseconds
+	 */
+	bsd?: number;
+
+	/**
+	 * Dropped Frames
+	 *
+	 * An absolute count of dropped frames since session initiation. This key should only be sent for content types of 'v','av' or 'o'.
+	 * Note that this value will be driven by the content being rendered rather than the content being retrieved, therefore it is beneficial if accompanied by the playhead time 'pt' key to allow for correct interpretation.
+	 *
+	 * Integer
+	*/
+	df?: number;
+
+	/**
+	 * Content Signature
+	 *
+	 * A string representing a signature of the content being played. This field SHOULD vary with content ID and be bound by some mechanism to the content.
+	 * For example, this field may be used to transmit the C2PA signature associated with the content being viewed.
+	 *
+	 * Integer bytes
+	*/
+	cs?: number;
 };
