@@ -1827,6 +1827,8 @@ export type ProtectionSchemeInformationBox = ContainerBox<OriginalFormatBox | Ip
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
     type: 'pssh';
     systemId: number[];
+    kidCount: number;
+    kid: number[];
     dataSize: number;
     data: number[];
 };

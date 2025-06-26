@@ -9,7 +9,7 @@ if (!ver) {
 
 // Update package.json for all workspaces
 await cmd(`npm --no-git-tag-version --allow-same-version version ${ver}`);
-await cmd(`npm --no-git-tag-version --allow-same-version version ${ver} -ws`);
+await cmd(`npm --no-git-tag-version --allow-same-version version ${ver} --workspaces`);
 
 // Update the CHANGELOG
 const changelog = await readFile('./CHANGELOG.md', 'utf8');
