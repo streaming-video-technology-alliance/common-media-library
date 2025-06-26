@@ -3,7 +3,7 @@ import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccess
 /**
  * Attempts to get key system access using requestMediaKeySystemAccess from EME.
  *
- * @param configurations - An array of key system configurations.
+ * @param requests - An array of key system access requests.
  * @returns MediaKeySystemAccess object if successful, or null if no system is supported.
  *
  * @group DRM

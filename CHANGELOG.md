@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add new CMCD Version 2 Keys, Constants and Types
+  ([#218](https://github.com/streaming-video-technology-alliance/common-media-library/issues/218))
+
 ## [0.14.0] - 2025-06-18
 
 ### Added

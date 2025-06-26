@@ -1,7 +1,7 @@
 import { symbolToStr } from '../cta/utils/symbolToStr.js';
 import type { SfItem } from '../structuredfield/SfItem.js';
 import { decodeSfDict } from '../structuredfield/decodeSfDict.js';
-import type { Cmcd } from './Cmcd.js';
+import type { CmcdData } from './CmcdData.js';
 
 /**
  * Decode a CMCD string to an object.
@@ -14,9 +14,9 @@ import type { Cmcd } from './Cmcd.js';
  *
  * @beta
  */
-export function decodeCmcd(cmcd: string): Cmcd {
+export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T {
 	if (!cmcd) {
-		return {};
+		return {} as T;
 	}
 
 	const sfDict = decodeSfDict(decodeURIComponent(cmcd.replace(/^CMCD=/, '')));
@@ -25,8 +25,8 @@ export function decodeCmcd(cmcd: string): Cmcd {
 		.entries<SfItem>(sfDict as any)
 		.reduce((acc, [key, item]) => {
 			const { value }: any = item;
-			// TODO: Find a better way to type this
-			acc[key as any] = (typeof value === 'symbol' ? symbolToStr(value) : item.value) as any;
+			// TODO: Find a better way to type this`
+			acc[key as keyof T] = (typeof value === 'symbol' ? symbolToStr(value) : item.value) as T[keyof T];
 			return acc;
-		}, {} as Cmcd);
+		}, {} as T);
 }

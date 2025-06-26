@@ -1,7 +1,7 @@
-import type { Cmcd } from '@svta/common-media-library/cmcd/Cmcd';
-import { CmcdObjectType } from '@svta/common-media-library/cmcd/CmcdObjectType';
+import type { CmcdData } from '@svta/common-media-library/cmcd';
+import { CmcdObjectType } from '@svta/common-media-library/cmcd';
 
-export const CMCD_INPUT: Cmcd = {
+export const CMCD_INPUT: CmcdData = {
 	sid: 'session-id',
 	cid: 'content-id',
 	su: false,
@@ -13,6 +13,7 @@ export const CMCD_INPUT: Cmcd = {
 	br: 200,
 	v: 1,
 	pr: 1,
+	pb: 1000,
 	ot: CmcdObjectType.MANIFEST,
 	// custom data
 	['com.example-hello']: 'world',

@@ -5,7 +5,7 @@ import { getSupportedKeySystemConfiguration } from './getSupportedKeySystemConfi
 /**
  * Fallback method to get key system access using legacy MediaKeys.isTypeSupported().
  *
- * @param ksConfigurations - An array of key system configurations.
+ * @param requests - An array of key system access requests.
  * @returns A KeySystemAccess object if successful, or null if no system is supported.
  *
  * @group DRM

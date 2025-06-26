@@ -10,7 +10,8 @@ import { encodeBase64 } from './encodeBase64.js';
  *
  * @beta
  *
- * @deprecated Use `encodeBase64` instead.
+ * @deprecated Use {@link encodeBase64} instead.
+ *
  * @see {@link encodeBase64}
  */
 export function base64encode(binary: Uint8Array): string {
