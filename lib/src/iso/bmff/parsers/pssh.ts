@@ -19,6 +19,15 @@ export function pssh(view: IsoView): Fields<ProtectionSystemSpecificHeaderBox> {
 	const { version, flags } = view.readFullBox();
 
 	const systemId = readArray(UINT, 1, 16);
+
+	let kidCount: number = 0;
+	let kid: number[] = [];
+
+	if (version > 0) {
+		kidCount = readUint(4);
+		kid = readArray(UINT, 1, kidCount);
+	}
+
 	const dataSize = readUint(4);
 	const data = readArray(UINT, 1, dataSize);
 
@@ -26,6 +35,8 @@ export function pssh(view: IsoView): Fields<ProtectionSystemSpecificHeaderBox> {
 		version,
 		flags,
 		systemId,
+		kidCount,
+		kid,
 		dataSize,
 		data,
 	};

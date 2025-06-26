@@ -10,6 +10,8 @@ import type { FullBox } from './FullBox.js';
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
 	type: 'pssh';
 	systemId: number[];
+	kidCount: number;
+	kid: number[];
 	dataSize: number;
 	data: number[];
 };
