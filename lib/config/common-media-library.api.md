@@ -275,7 +275,7 @@ export const CMCD_REQUEST_KEYS: readonly ["d", "dl", "nor", "ot", "rtp", "su"];
 export const CMCD_REQUEST_MODE = "request";
 
 // @beta
-export const CMCD_RESPONSE_KEYS: readonly ["ttfb", "ttfbb", "ttlb", "url", "smrt"];
+export const CMCD_RESPONSE_KEYS: readonly ["rc", "ttfb", "ttfbb", "ttlb", "url", "cmsdd", "cmsds", "smrt"];
 
 // @beta
 export const CMCD_RESPONSE_MODE = "response";
