@@ -12,15 +12,17 @@ import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
  *
  * @beta
  */
-export const CmcdMode  = {
+export const CmcdMode = {
 	/**
 	 * Request mode
 	 */
 	REQUEST: CMCD_REQUEST_MODE as typeof CMCD_REQUEST_MODE,
+
 	/**
 	 * Response mode
 	 */
 	RESPONSE: CMCD_RESPONSE_MODE as typeof CMCD_RESPONSE_MODE,
+
 	/**
 	 * Event mode
 	 */

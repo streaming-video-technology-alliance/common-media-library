@@ -239,6 +239,18 @@ export type Cmcd = {
 };
 
 // @beta
+export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "cdn", "cid", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pt", "pr", "sf", "sid", "sta", "st", "tab", "tb", "tbl", "tpb", "ts", "v", "cs", "df", "bsd", "sn"];
+
+// @beta
+export const CMCD_DEFAULT_TIME_INTERVAL = 30;
+
+// @beta
+export const CMCD_EVENT_KEYS: readonly ["e"];
+
+// @beta
+export const CMCD_EVENT_MODE = "event";
+
+// @beta
 export const CMCD_HEADERS = "headers";
 
 // @beta
@@ -257,6 +269,18 @@ export const CMCD_QUERY = "query";
 export const CMCD_REQUEST = "CMCD-Request";
 
 // @beta
+export const CMCD_REQUEST_KEYS: readonly ["d", "dl", "nor", "ot", "rtp", "su"];
+
+// @beta
+export const CMCD_REQUEST_MODE = "request";
+
+// @beta
+export const CMCD_RESPONSE_KEYS: readonly ["rc", "ttfb", "ttfbb", "ttlb", "url", "cmsdd", "cmsds", "smrt"];
+
+// @beta
+export const CMCD_RESPONSE_MODE = "response";
+
+// @beta
 export const CMCD_SESSION = "CMCD-Session";
 
 // @beta
@@ -266,7 +290,16 @@ export const CMCD_STATUS = "CMCD-Status";
 export const CMCD_V1 = 1;
 
 // @beta
+export const CMCD_V1_KEYS: readonly ["br", "d", "ot", "tb", "bl", "dl", "mtp", "nor", "nrr", "su", "bs", "rtp", "cid", "pr", "sf", "sid", "st", "v"];
+
+// @beta
+export const CMCD_V2 = 2;
+
+// @beta
 export type CmcdCustomKey = `${string}-${string}`;
+
+// @beta
+export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
 
 // @beta
 export type CmcdEncodeOptions = {
@@ -285,6 +318,29 @@ export const CmcdEncoding: {
 
 // @beta (undocumented)
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
+
+// Warning: (ae-forgotten-export) The symbol "CmcdEventExcludedKeys" needs to be exported by the entry point index.d.ts
+//
+// @beta
+export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
+    e?: CmcdEventType;
+};
+
+// @beta
+export const CmcdEventType: {
+    readonly PLAY_STATE: "ps";
+    readonly ERROR: "e";
+    readonly TIME_INTERVAL: "t";
+    readonly CONTENT_ID: "c";
+    readonly BACKGROUNDED_MODE: "b";
+    readonly MUTE: "m";
+    readonly UNMUTE: "um";
+    readonly PLAYER_EXPAND: "pe";
+    readonly PLAYER_COLLAPSE: "pc";
+};
+
+// @beta (undocumented)
+export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
 // @beta
 export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
@@ -307,7 +363,17 @@ export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
 // @beta
-export type CmcdKey = keyof Cmcd;
+export type CmcdKey = keyof CmcdData;
+
+// @beta
+export const CmcdMode: {
+    readonly REQUEST: typeof CMCD_REQUEST_MODE;
+    readonly RESPONSE: typeof CMCD_RESPONSE_MODE;
+    readonly EVENT: typeof CMCD_EVENT_MODE;
+};
+
+// @beta (undocumented)
+export type CmcdMode = ValueOf<typeof CmcdMode>;
 
 // Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
 //
@@ -316,6 +382,56 @@ export const CmcdObjectType: typeof CmObjectType;
 
 // @beta (undocumented)
 export type CmcdObjectType = CmObjectType;
+
+// @beta
+export const CmcdPlayerState: {
+    readonly STARTING: "s";
+    readonly PLAYING: "p";
+    readonly SEEKING: "k";
+    readonly REBUFFERING: "r";
+    readonly PAUSED: "a";
+    readonly WAITING: "w";
+    readonly ENDED: "e";
+    readonly FATAL_ERROR: "f";
+};
+
+// @beta (undocumented)
+export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
+
+// @beta
+export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
+    ab?: number;
+    tbl?: number;
+    cdn?: string;
+    ltc?: number;
+    bg?: boolean;
+    sta?: CmcdPlayerState;
+    pb?: number;
+    ts?: number;
+    tpb?: number;
+    lb?: number;
+    tab?: number;
+    lab?: number;
+    pt?: number;
+    ec?: string | string[];
+    msd?: number;
+    sn?: number;
+    bsd?: number;
+    df?: number;
+    cs?: number;
+};
+
+// @beta
+export type CmcdResponse = CmcdRequest & {
+    rc?: number;
+    ttfb?: number;
+    ttfbb?: number;
+    ttlb?: number;
+    url?: string;
+    cmsdd?: string;
+    cmsds?: string;
+    smrt?: number;
+};
 
 // Warning: (ae-forgotten-export) The symbol "CmStreamingFormat" needs to be exported by the entry point index.d.ts
 //
@@ -660,7 +776,7 @@ export function dataViewToString(dataView: DataView, encoding?: Encoding): strin
 export function decodeBase64(str: string): Uint8Array;
 
 // @beta
-export function decodeCmcd(cmcd: string): Cmcd;
+export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T;
 
 // @beta
 export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[];
@@ -748,7 +864,16 @@ export function enca(view: IsoView): Fields<AudioSampleEntryBox<'enca'>>;
 export function encodeBase64(binary: Uint8Array): string;
 
 // @beta
-export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+export function encodeCmcd(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
+
+// @beta
+export function encodeCmcdEvent(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
+
+// @beta
+export function encodeCmcdRequest(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
+
+// @beta
+export function encodeCmcdResponse(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function encodeCmsdDynamic(value: SfItem[]): string;
@@ -940,16 +1065,10 @@ export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @beta
-export function getKeySystemAccess(configurations: {
-    keySystem: string;
-    configs: Iterable<MediaKeySystemConfiguration>;
-}[]): Promise<MediaKeySystemAccess | null>;
+export function getKeySystemAccess(requests: MediaKeySystemAccessRequest[]): Promise<MediaKeySystemAccess | null>;
 
 // @beta
-export function getLegacyKeySystemAccess(ksConfigurations: {
-    keySystem: string;
-    configs: Iterable<MediaKeySystemConfiguration>;
-}[]): KeySystemAccess | null;
+export function getLegacyKeySystemAccess(requests: MediaKeySystemAccessRequest[]): MediaKeySystemAccessRequest | null;
 
 // @beta
 export function getLicenseRequestFromMessage(message: ArrayBuffer, encoding?: Encoding): ArrayBuffer;
@@ -1105,6 +1224,21 @@ export type IpmpInfoBox = FullBox & {
     type: 'imif';
     ipmpDescr: any[];
 };
+
+// @beta
+export function isCmcdCustomKey(key: CmcdKey): boolean;
+
+// @beta
+export function isCmcdEventKey(key: string): boolean;
+
+// @beta
+export function isCmcdRequestKey(key: string): boolean;
+
+// @beta
+export function isCmcdResponeKey(key: string): boolean;
+
+// @beta
+export function isCmcdV1Key(key: string): boolean;
 
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -1320,20 +1454,6 @@ export type ItemReferenceBox = ContainerBox<SingleItemTypeReferenceBox> & {
 export const KEYIDS = "keyids";
 
 // @beta
-export type KeyMessage = {
-    sessionId?: string;
-    message: ArrayBuffer;
-    defaultUrl?: string;
-    messageType: ValueOf<typeof MediaKeyMessageType_2>;
-};
-
-// @public
-export type KeySystemAccess = {
-    keySystem: string;
-    configuration: MediaKeySystemConfiguration;
-};
-
-// @beta
 export function kind(view: IsoView): Fields<TrackKindBox>;
 
 // @beta
@@ -1461,6 +1581,12 @@ const MediaKeyStatus_2: {
 // @beta
 type MediaKeyStatus_2 = ValueOf<typeof MediaKeyStatus_2>;
 export { MediaKeyStatus_2 as MediaKeyStatus }
+
+// @public
+export type MediaKeySystemAccessRequest = {
+    keySystem: string;
+    configurations: MediaKeySystemConfiguration[];
+};
 
 // @beta
 export function mehd(view: IsoView): Fields<MovieExtendsHeaderBox>;
@@ -2317,7 +2443,7 @@ export type TimestampMap = {
 export function tkhd(view: IsoView): Fields<TrackHeaderBox>;
 
 // @beta
-export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
+export function toCmcdHeaders(cmcd: CmcdData, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
 // @beta
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;

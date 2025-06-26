@@ -9,39 +9,47 @@ import type { ValueOf } from '../utils/ValueOf.js';
  *
  * @beta
  */
-export const CmcdReportingEvent = {
+export const CmcdEventType = {
 	/**
 	 * A change in the player state.
 	 */
 	PLAY_STATE: 'ps',
+
 	/**
 	 * An error event.
 	 */
 	ERROR: 'e',
+
 	/**
 	 * A periodic report sent on a time interval.
 	 */
 	TIME_INTERVAL: 't',
+
 	/**
 	 * A change of the content ID.
 	 */
 	CONTENT_ID: 'c',
+
 	/**
 	 * A change in the application's backgrounded state.
 	 */
 	BACKGROUNDED_MODE: 'b',
+
 	/**
 	 * The player was muted.
 	 */
 	MUTE: 'm',
+
 	/**
 	 * Player unmuted.
 	 */
 	UNMUTE: 'um',
+
 	/**
 	 * The player view was expanded.
 	 */
 	PLAYER_EXPAND: 'pe',
+
 	/**
 	 * The player view was collapsed.
 	 */
@@ -51,4 +59,4 @@ export const CmcdReportingEvent = {
 /**
  * @beta
  */
-export type CmcdReportingEvent = ValueOf<typeof CmcdReportingEvent>;
+export type CmcdEventType = ValueOf<typeof CmcdEventType>;

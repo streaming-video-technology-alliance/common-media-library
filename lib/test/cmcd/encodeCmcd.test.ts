@@ -19,6 +19,10 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(CMCD_INPUT), CMCD_STRING);
 	});
 
+	it('filters keys', () => {
+		equal(encodeCmcd(CMCD_INPUT, { filter: key => key === 'cid' }), 'cid="content-id"');
+	});
+
 	it('returns encoded string when SfToken is used', () => {
 		const input = Object.assign({}, CMCD_INPUT, { 'com.example-token': new SfToken('s') });
 		equal(encodeCmcd(input), CMCD_STRING);
