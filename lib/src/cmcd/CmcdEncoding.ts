@@ -1,7 +1,5 @@
 import type { ValueOf } from '../utils/ValueOf.js';
-import { CMCD_HEADERS } from './CMCD_HEADERS.js';
-import { CMCD_JSON } from './CMCD_JSON.js';
-import { CMCD_QUERY } from './CMCD_QUERY.js';
+import { CmcdTransmissionMode } from './CmcdTransmissionMode.js';
 
 /**
  * CMCD encoding types.
@@ -11,24 +9,12 @@ import { CMCD_QUERY } from './CMCD_QUERY.js';
  * @enum
  *
  * @beta
+ *
+ * @deprecated Use {@link CmcdTransmissionMode} instead.
+ *
+ * @see {@link CmcdTransmissionMode}
  */
-export const CmcdEncoding = {
-	/**
-	 * JSON
-	 */
-	JSON: CMCD_JSON as typeof CMCD_JSON,
-
-	/**
-	 * Query string
-	 */
-	QUERY: CMCD_QUERY as typeof CMCD_QUERY,
-
-	/**
-	 * Request headers
-	 */
-	HEADERS: CMCD_HEADERS as typeof CMCD_HEADERS,
-
-} as const;
+export const CmcdEncoding: typeof CmcdTransmissionMode = CmcdTransmissionMode;
 
 /**
  * @beta

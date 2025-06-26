@@ -1,4 +1,4 @@
-import type { CmcdEventExcludedKeys } from './CmcdEventExclusion.js';
+import type { CmcdEventExcludedKeys } from './CmcdEventExcludedKeys.js';
 import type { CmcdEventType } from './CmcdEventType.js';
 import type { CmcdRequest } from './CmcdRequest.js';
 

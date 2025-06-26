@@ -4,7 +4,7 @@ import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';
 import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
 
 /**
- * CMCD mode types.
+ * CMCD reporting mode types.
  *
  * @group CMCD
  *
@@ -12,7 +12,7 @@ import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
  *
  * @beta
  */
-export const CmcdMode = {
+export const CmcdReportingMode = {
 	/**
 	 * Request mode
 	 */
@@ -32,4 +32,4 @@ export const CmcdMode = {
 /**
  * @beta
  */
-export type CmcdMode = ValueOf<typeof CmcdMode>;
+export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;

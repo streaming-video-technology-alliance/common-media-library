@@ -239,7 +239,7 @@ export type Cmcd = {
 };
 
 // @beta
-export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "cdn", "cid", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pt", "pr", "sf", "sid", "sta", "st", "tab", "tb", "tbl", "tpb", "ts", "v", "cs", "df", "bsd", "sn"];
+export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "sta", "st", "tab", "tb", "tbl", "tpb", "ts", "v"];
 
 // @beta
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
@@ -275,7 +275,7 @@ export const CMCD_REQUEST_KEYS: readonly ["d", "dl", "nor", "ot", "rtp", "su"];
 export const CMCD_REQUEST_MODE = "request";
 
 // @beta
-export const CMCD_RESPONSE_KEYS: readonly ["rc", "ttfb", "ttfbb", "ttlb", "url", "cmsdd", "cmsds", "smrt"];
+export const CMCD_RESPONSE_KEYS: readonly ["cmsdd", "cmsds", "rc", "smrt", "ttfb", "ttfbb", "ttlb", "url"];
 
 // @beta
 export const CMCD_RESPONSE_MODE = "response";
@@ -309,22 +309,19 @@ export type CmcdEncodeOptions = {
     baseUrl?: string;
 };
 
-// @beta
-export const CmcdEncoding: {
-    readonly JSON: typeof CMCD_JSON;
-    readonly QUERY: typeof CMCD_QUERY;
-    readonly HEADERS: typeof CMCD_HEADERS;
-};
+// @beta @deprecated
+export const CmcdEncoding: typeof CmcdTransmissionMode;
 
 // @beta (undocumented)
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
-// Warning: (ae-forgotten-export) The symbol "CmcdEventExcludedKeys" needs to be exported by the entry point index.d.ts
-//
 // @beta
 export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
     e?: CmcdEventType;
 };
+
+// @beta
+export type CmcdEventExcludedKeys = 'bs' | 'bsd' | 'cmsdd' | 'cmsds' | 'd' | 'dl' | 'nor' | 'ot' | 'rc' | 'rtp' | 'smrt' | 'su' | 'ttfbb' | 'ttlb' | 'url';
 
 // @beta
 export const CmcdEventType: {
@@ -365,16 +362,6 @@ export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 // @beta
 export type CmcdKey = keyof CmcdData;
 
-// @beta
-export const CmcdMode: {
-    readonly REQUEST: typeof CMCD_REQUEST_MODE;
-    readonly RESPONSE: typeof CMCD_RESPONSE_MODE;
-    readonly EVENT: typeof CMCD_EVENT_MODE;
-};
-
-// @beta (undocumented)
-export type CmcdMode = ValueOf<typeof CmcdMode>;
-
 // Warning: (ae-forgotten-export) The symbol "CmObjectType" needs to be exported by the entry point index.d.ts
 //
 // @beta
@@ -397,6 +384,16 @@ export const CmcdPlayerState: {
 
 // @beta (undocumented)
 export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
+
+// @beta
+export const CmcdReportingMode: {
+    readonly REQUEST: typeof CMCD_REQUEST_MODE;
+    readonly RESPONSE: typeof CMCD_RESPONSE_MODE;
+    readonly EVENT: typeof CMCD_EVENT_MODE;
+};
+
+// @beta (undocumented)
+export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 
 // @beta
 export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
@@ -448,6 +445,16 @@ export const CmcdStreamType: typeof CmStreamType;
 
 // @beta (undocumented)
 export type CmcdStreamType = CmStreamType;
+
+// @beta
+export const CmcdTransmissionMode: {
+    readonly JSON: typeof CMCD_JSON;
+    readonly QUERY: typeof CMCD_QUERY;
+    readonly HEADERS: typeof CMCD_HEADERS;
+};
+
+// @beta (undocumented)
+export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
 
 // @beta
 export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
@@ -865,15 +872,6 @@ export function encodeBase64(binary: Uint8Array): string;
 
 // @beta
 export function encodeCmcd(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
-
-// @beta
-export function encodeCmcdEvent(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
-
-// @beta
-export function encodeCmcdRequest(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
-
-// @beta
-export function encodeCmcdResponse(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function encodeCmsdDynamic(value: SfItem[]): string;
