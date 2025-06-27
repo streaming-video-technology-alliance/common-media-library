@@ -1233,7 +1233,7 @@ export function isCmcdEventKey(key: string): boolean;
 export function isCmcdRequestKey(key: string): boolean;
 
 // @beta
-export function isCmcdResponeKey(key: string): boolean;
+export function isCmcdResponseKey(key: string): boolean;
 
 // @beta
 export function isCmcdV1Key(key: string): boolean;

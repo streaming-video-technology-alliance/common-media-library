@@ -55,7 +55,7 @@ export { fromCmcdQuery } from './cmcd/fromCmcdQuery.js';
 export { isCmcdCustomKey } from './cmcd/isCmcdCustomKey.js';
 export { isCmcdEventKey } from './cmcd/isCmcdEventKey.js';
 export { isCmcdRequestKey } from './cmcd/isCmcdRequestKey.js';
-export { isCmcdResponeKey } from './cmcd/isCmcdResponeKey.js';
+export { isCmcdResponseKey } from './cmcd/isCmcdResponseKey.js';
 export { isCmcdV1Key } from './cmcd/isCmcdV1Key.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
