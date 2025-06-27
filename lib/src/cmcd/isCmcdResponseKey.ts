@@ -14,7 +14,7 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  *
  * @beta
  */
-export function isCmcdResponeKey(key: string): boolean {
+export function isCmcdResponseKey(key: string): boolean {
 	return CMCD_COMMON_KEYS.includes(key as any) ||
 		CMCD_REQUEST_KEYS.includes(key as any) ||
 		CMCD_RESPONSE_KEYS.includes(key as any) ||

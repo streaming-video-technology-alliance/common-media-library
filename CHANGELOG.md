@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.15.1] - 2025-06-27
+
+### Fixed
+
+- Typo in `isCmcdResponseKey` function name
+
 ## [0.15.0] - 2025-06-26
 
 ### Added
@@ -395,7 +401,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.15.1...HEAD
+[0.15.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.12.4...v0.13.0
