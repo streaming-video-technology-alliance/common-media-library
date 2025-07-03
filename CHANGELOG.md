@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Added
 
-- Utility function for parsing DASH frame rates
+- Utility function for parsing DASH `frameRate` attributes
   ([#221](https://github.com/streaming-video-technology-alliance/common-media-library/issues/221))
 
 ## [0.15.1] - 2025-06-27
