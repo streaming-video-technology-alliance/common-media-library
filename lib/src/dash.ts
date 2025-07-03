@@ -1,2 +1,2 @@
-export { parseFramerate } from './dash/parseFramerate.js';
+export { parseFrameRate } from './dash/parseFrameRate.js';
 export { processUriTemplate } from './dash/processUriTemplate.js';

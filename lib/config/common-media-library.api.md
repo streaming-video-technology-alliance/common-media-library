@@ -1696,7 +1696,7 @@ export type PACData = {
 export function parseBoxes(raw: IsoData, config?: IsoViewConfig): IsoBmffBox[];
 
 // @beta
-export function parseFramerate(framerate: string): number;
+export function parseFrameRate(frameRate: string): number;
 
 // @beta
 export function parseInitDataFromContentProtection(cpData: ContentProtection, BASE64: {
