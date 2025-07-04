@@ -12,8 +12,7 @@ const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions): string | stri
 	}
 
 	if (value instanceof SfItem && typeof value.value === 'string') {
-		value.value = toUrlSafe(value.value, options) as string;
-		return value;
+		return new SfItem(toUrlSafe(value.value, options), value.params);
 	}
 	else {
 		if (options?.baseUrl) {
