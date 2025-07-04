@@ -15,6 +15,8 @@ import { processCmcd } from './utils/processCmcd.js';
  * @group CMCD
  *
  * @beta
+ *
+ * @deprecated Sending CMCD as JSON objects is deprecated. Use `toCmcdUrl` to create an array of url strings instead.
  */
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string {
 	const data = processCmcd(cmcd, options);

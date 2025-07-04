@@ -1,9 +1,14 @@
+import { CmcdReportingMode } from '@svta/common-media-library/cmcd/CmcdReportingMode';
 import { encodeCmcd } from '@svta/common-media-library/cmcd/encodeCmcd';
+import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
 import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts';
-import { CMCD_STRING } from './data/CMCD_STRING.ts';
+import { CMCD_STRING_EVENT } from './data/CMCD_STRING_EVENT.ts';
+import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts';
+import { CMCD_STRING_RESPONSE } from './data/CMCD_STRING_RESPONSE.ts';
+import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts';
 
 describe('encodeCmcd', () => {
 	it('handles null data object', () => {
@@ -15,17 +20,30 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), '');
 	});
 
-	it('returns encoded string', () => {
-		equal(encodeCmcd(CMCD_INPUT), CMCD_STRING);
+	describe('version 1', () => {
+		it('returns encoded v1 string when no version is provided', () => {
+			const { v, ...input } = CMCD_INPUT;
+			equal(encodeCmcd(input), CMCD_STRING_V1);
+		});
+
+		it('returns encoded v1 string when encoding options version is set to 1', () => {
+			equal(encodeCmcd(CMCD_INPUT, { version: 1 }), CMCD_STRING_V1);
+		});
 	});
 
-	it('filters keys', () => {
-		equal(encodeCmcd(CMCD_INPUT, { filter: key => key === 'cid' }), 'cid="content-id"');
+	describe('filtering', () => {
+		it('filters keys', () => {
+			equal(encodeCmcd({ cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' }), 'cid="content-id"');
+		});
+
+		it('doesn\'t filter version key', () => {
+			equal(encodeCmcd({ v: 2, cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' }), 'cid="content-id",v=2');
+		});
 	});
 
 	it('returns encoded string when SfToken is used', () => {
 		const input = Object.assign({}, CMCD_INPUT, { 'com.example-token': new SfToken('s') });
-		equal(encodeCmcd(input), CMCD_STRING);
+		equal(encodeCmcd(input, { version: 1 }), CMCD_STRING_V1);
 	});
 
 	it('returns converts to relative path when baseUrl is provided', () => {
@@ -36,5 +54,52 @@ describe('encodeCmcd', () => {
 			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
 		};
 		equal(encodeCmcd(input, options), 'nor="..%2Fsegments%2Fvideo%2F1.mp4"');
+	});
+
+	describe('reporting modes', () => {
+		it('defaults to request mode', () => {
+			equal(encodeCmcd(CMCD_INPUT), CMCD_STRING_REQUEST);
+		});
+
+		it('returns encoded string for request mode', () => {
+			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.REQUEST }), CMCD_STRING_REQUEST);
+		});
+
+		it('returns encoded string for response mode', () => {
+			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.RESPONSE }), CMCD_STRING_RESPONSE);
+		});
+
+		it('returns encoded string for event mode', () => {
+			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.EVENT }), CMCD_STRING_EVENT);
+		});
+	});
+
+	describe('nor', () => {
+		it('returns encoded string for request mode with nor string', () => {
+			const input = {
+				nor: '1.mp4',
+			};
+			equal(encodeCmcd(input), 'nor="1.mp4"');
+		});
+
+		it('returns encoded inner list for request mode with nor list of strings', () => {
+			const input = {
+				nor: [
+					'1.mp4',
+					'2.mp4',
+				],
+			};
+			equal(encodeCmcd(input), 'nor=("1.mp4" "2.mp4")');
+		});
+
+		it('returns encoded inner list for request mode with nor list of SfItem', () => {
+			const input = {
+				nor: [
+					new SfItem('1.mp4', { r: '0-100' }),
+					new SfItem('2.mp4', { r: '101-200' }),
+				],
+			};
+			equal(encodeCmcd(input), 'nor=("1.mp4";r="0-100" "2.mp4";r="101-200")');
+		});
 	});
 });

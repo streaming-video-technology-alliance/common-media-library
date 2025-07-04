@@ -1,7 +1,7 @@
 import { CMCD_PARAM } from './CMCD_PARAM.js';
 import type { Cmcd } from './Cmcd.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { encodeCmcd } from './encodeCmcd.js';
+import { toCmcdUrl } from './toCmcdUrl.js';
 
 /**
  * Convert a CMCD data object to a query arg.
@@ -20,7 +20,7 @@ export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string
 		return '';
 	}
 
-	const params = encodeCmcd(cmcd, options);
+	const value = toCmcdUrl(cmcd, options);
 
-	return `${CMCD_PARAM}=${encodeURIComponent(params)}`;
+	return `${CMCD_PARAM}=${value}`;
 }

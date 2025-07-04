@@ -1,4 +1,4 @@
-import { toCmcdQuery } from '@svta/common-media-library';
+import { toCmcdQuery } from '@svta/common-media-library/cmcd';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts';

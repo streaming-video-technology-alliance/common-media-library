@@ -1,3 +1,4 @@
+import type { SfItem } from '../structuredfield/SfItem.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 
@@ -12,4 +13,4 @@ import type { CmcdValue } from './CmcdValue.js';
  *
  * @beta
  */
-export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
+export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number | string[] | number[] | SfItem | SfItem[];

@@ -60,3 +60,4 @@ export { isCmcdV1Key } from './cmcd/isCmcdV1Key.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';
 export { toCmcdJson } from './cmcd/toCmcdJson.js';
 export { toCmcdQuery } from './cmcd/toCmcdQuery.js';
+export { toCmcdUrl } from './cmcd/toCmcdUrl.js';

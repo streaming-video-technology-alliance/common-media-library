@@ -1,8 +1,8 @@
 import { decodeCmcd } from '@svta/common-media-library/cmcd/decodeCmcd';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
-import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.ts';
-import { CMCD_STRING } from './data/CMCD_STRING.ts';
+import { CMCD_OUTPUT_REQUEST } from './data/CMCD_OUTPUT_REQUEST.ts';
+import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts';
 
 describe('decodeCmcd', () => {
 	it('handles null data object', () => {
@@ -14,6 +14,6 @@ describe('decodeCmcd', () => {
 	});
 
 	it('returns encoded string', () => {
-		deepEqual(decodeCmcd(CMCD_STRING), CMCD_OUTPUT);
+		deepEqual(decodeCmcd(CMCD_STRING_REQUEST), CMCD_OUTPUT_REQUEST);
 	});
 });

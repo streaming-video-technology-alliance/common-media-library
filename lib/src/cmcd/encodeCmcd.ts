@@ -20,5 +20,5 @@ export function encodeCmcd(cmcd: CmcdData, options: CmcdEncodeOptions = {}): str
 		return '';
 	}
 
-	return encodeSfDict(processCmcd(cmcd, options), Object.assign({ whitespace: false }, options));
+	return encodeSfDict(processCmcd(cmcd, options), { whitespace: false });
 }

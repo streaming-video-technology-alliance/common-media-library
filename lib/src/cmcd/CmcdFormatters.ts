@@ -1,14 +1,26 @@
+import { SfItem } from '../structuredfield/SfItem.js';
 import { urlToRelativePath } from '../utils/urlToRelativePath.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import type { CmcdFormatter } from './CmcdFormatter.js';
 import type { CmcdValue } from './CmcdValue.js';
 
 const toRounded = (value: CmcdValue) => Math.round(value as number);
-const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions) => {
-	if (options?.baseUrl) {
-		value = urlToRelativePath(value as string, options.baseUrl);
+
+const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions): string | string[] | SfItem | SfItem[] => {
+	if (Array.isArray(value)) {
+		return value.map(item => toUrlSafe(item, options) as string);
 	}
-	return encodeURIComponent(value as string);
+
+	if (value instanceof SfItem && typeof value.value === 'string') {
+		value.value = toUrlSafe(value.value, options) as string;
+		return value;
+	}
+	else {
+		if (options?.baseUrl) {
+			value = urlToRelativePath(value as string, options.baseUrl);
+		}
+		return encodeURIComponent(value as string);
+	}
 };
 const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100;
 

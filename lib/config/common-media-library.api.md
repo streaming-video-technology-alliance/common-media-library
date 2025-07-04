@@ -225,7 +225,7 @@ export type Cmcd = {
     bl?: number;
     dl?: number;
     mtp?: number;
-    nor?: string;
+    nor?: string | string[] | SfItem | SfItem[];
     nrr?: string;
     su?: boolean;
     cid?: string;
@@ -239,7 +239,7 @@ export type Cmcd = {
 };
 
 // @beta
-export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "sta", "st", "tab", "tb", "tbl", "tpb", "ts", "v"];
+export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
 
 // @beta
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
@@ -290,7 +290,7 @@ export const CMCD_STATUS = "CMCD-Status";
 export const CMCD_V1 = 1;
 
 // @beta
-export const CMCD_V1_KEYS: readonly ["br", "d", "ot", "tb", "bl", "dl", "mtp", "nor", "nrr", "su", "bs", "rtp", "cid", "pr", "sf", "sid", "st", "v"];
+export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", "nor", "nrr", "ot", "pr", "rtp", "sf", "sid", "st", "su", "tb", "v"];
 
 // @beta
 export const CMCD_V2 = 2;
@@ -303,6 +303,8 @@ export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
 
 // @beta
 export type CmcdEncodeOptions = {
+    version?: number;
+    reportingMode?: CmcdReportingMode;
     formatters?: Record<CmcdKey, CmcdFormatter>;
     customHeaderMap?: CmcdHeadersMap;
     filter?: (key: CmcdKey) => boolean;
@@ -340,7 +342,7 @@ export const CmcdEventType: {
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
 // @beta
-export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
+export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number | string[] | number[] | SfItem | SfItem[];
 
 // @beta
 export const CmcdFormatters: Record<string, CmcdFormatter>;
@@ -457,7 +459,7 @@ export const CmcdTransmissionMode: {
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
 
 // @beta
-export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // Warning: (ae-internal-missing-underscore) The name "CmCustomKey" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -547,7 +549,7 @@ export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | 
 // Warning: (ae-internal-missing-underscore) The name "CmValue" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
+export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // @beta
 export type CommonMediaRequest = {
@@ -1031,7 +1033,7 @@ export type FreeSpaceBox<T extends 'free' | 'skip' = 'free'> = Box & {
 export function frma(view: IsoView): Fields<OriginalFormatBox>;
 
 // @beta
-export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
+export function fromCmcdHeaders(headers: Record<string, string> | Headers): CmcdData;
 
 // @beta
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
@@ -2448,7 +2450,7 @@ export function tkhd(view: IsoView): Fields<TrackHeaderBox>;
 // @beta
 export function toCmcdHeaders(cmcd: CmcdData, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
-// @beta
+// @beta @deprecated
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta

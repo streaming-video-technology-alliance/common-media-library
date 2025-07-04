@@ -19,9 +19,14 @@ describe('toCmcdHeaders', () => {
 	});
 
 	it('ignores empty shards', () => {
-		deepEqual(toCmcdHeaders({ br: 200, pb: 1000 }), {
+		deepEqual(toCmcdHeaders({ br: 200, pb: 1000 }, { version: 1 }), {
+			'CMCD-Object': 'br=200',
+		});
+
+		deepEqual(toCmcdHeaders({ br: 200, pb: 1000 }, { version: 2 }), {
 			'CMCD-Object': 'br=200',
 			'CMCD-Request': 'pb=1000',
+			'CMCD-Session': 'v=2',
 		});
 	});
 
