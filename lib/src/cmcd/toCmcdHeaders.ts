@@ -3,7 +3,7 @@ import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import type { CmcdHeaderField } from './CmcdHeaderField.js';
 import { groupCmcdHeaders } from './groupCmcdHeaders.js';
-import { processCmcd } from './utils/processCmcd.js';
+import { prepareCmcdData } from './prepareCmcdData.js';
 
 /**
  * Convert a CMCD data object to request headers
@@ -24,7 +24,7 @@ export function toCmcdHeaders(cmcd: CmcdData, options: CmcdEncodeOptions = {}): 
 		return result;
 	}
 
-	const data = processCmcd(cmcd, options);
+	const data = prepareCmcdData(cmcd, options);
 	const shards = groupCmcdHeaders(data, options?.customHeaderMap);
 
 	return Object.entries(shards)

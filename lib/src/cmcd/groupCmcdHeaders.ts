@@ -22,7 +22,7 @@ function createHeaderMap(headerMap: Partial<CmcdHeadersMap>): Record<CmcdKey, Cm
  *
  * @group CMCD
  *
- * @internal
+ * @beta
  */
 export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeadersMap>): Record<CmcdHeaderField, CmcdData> {
 	const result = {} as Record<CmcdHeaderField, CmcdData>;

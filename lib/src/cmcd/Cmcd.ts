@@ -1,4 +1,5 @@
 import type { SfItem } from '../structuredfield/SfItem.js';
+import type { ValueOrArray } from '../utils/ValueOrArray.js';
 import type { CmcdCustomKey } from './CmcdCustomKey.js';
 import type { CmcdObjectType } from './CmcdObjectType.js';
 import type { CmcdStreamType } from './CmcdStreamType.js';
@@ -121,7 +122,7 @@ export type Cmcd = {
 	 *
 	 * String
 	 */
-	nor?: string | string[] | SfItem | SfItem[];
+	nor?: ValueOrArray<string | SfItem>;
 
 	/**
 	 * Next range request

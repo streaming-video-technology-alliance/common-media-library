@@ -1,7 +1,7 @@
 import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { processCmcd } from './utils/processCmcd.js';
+import { prepareCmcdData } from './prepareCmcdData.js';
 
 /**
  * Encode a CMCD object to a string.
@@ -20,5 +20,5 @@ export function encodeCmcd(cmcd: CmcdData, options: CmcdEncodeOptions = {}): str
 		return '';
 	}
 
-	return encodeSfDict(processCmcd(cmcd, options), { whitespace: false });
+	return encodeSfDict(prepareCmcdData(cmcd, options), { whitespace: false });
 }

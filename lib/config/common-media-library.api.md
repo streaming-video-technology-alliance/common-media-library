@@ -1103,6 +1103,9 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 // @alpha
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
+// @beta
+export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeadersMap>): Record<CmcdHeaderField, CmcdData>;
+
 // @alpha
 export type Ham = {
     id: string;
@@ -1229,16 +1232,16 @@ export type IpmpInfoBox = FullBox & {
 export function isCmcdCustomKey(key: CmcdKey): boolean;
 
 // @beta
-export function isCmcdEventKey(key: string): boolean;
+export function isCmcdEventKey(key: string): key is keyof CmcdEvent;
 
 // @beta
-export function isCmcdRequestKey(key: string): boolean;
+export function isCmcdRequestKey(key: string): key is keyof CmcdRequest;
 
 // @beta
-export function isCmcdResponseKey(key: string): boolean;
+export function isCmcdResponseKey(key: string): key is keyof CmcdResponse;
 
 // @beta
-export function isCmcdV1Key(key: string): boolean;
+export function isCmcdV1Key(key: string): key is keyof Cmcd;
 
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -1785,6 +1788,9 @@ export const PLAYREADY_RECOMMENDATION_KEY_SYSTEM = "com.microsoft.playready.reco
 
 // @beta
 export const PLAYREADY_UUID = "9a04f079-9840-4286-ab92-e65be0885f95";
+
+// @beta
+export function prepareCmcdData(obj: Record<string, any>, options?: CmcdEncodeOptions): CmcdData;
 
 // @beta
 export type PreselectionGroupBox = FullBox & {
@@ -2455,6 +2461,9 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @beta
+export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function toVttCue(cue: WebVttCue): VTTCue;

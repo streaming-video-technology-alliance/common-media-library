@@ -1,18 +1,17 @@
-import { isTokenField } from '../../cta/utils/isTokenField.js';
-import { isValid } from '../../cta/utils/isValid.js';
-import { SfToken } from '../../structuredfield/SfToken.js';
-import { CMCD_EVENT_MODE } from '../CMCD_EVENT_MODE.js';
-import { CMCD_REQUEST_MODE } from '../CMCD_REQUEST_MODE.js';
-import { CMCD_RESPONSE_MODE } from '../CMCD_RESPONSE_MODE.js';
-import type { CmcdData } from '../CmcdData.js';
-import type { CmcdEncodeOptions } from '../CmcdEncodeOptions.js';
-import { CmcdFormatters } from '../CmcdFormatters.js';
-import type { CmcdKey } from '../CmcdKey.js';
-import type { CmcdValue } from '../CmcdValue.js';
-import { isCmcdEventKey } from '../isCmcdEventKey.js';
-import { isCmcdRequestKey } from '../isCmcdRequestKey.js';
-import { isCmcdResponseKey } from '../isCmcdResponseKey.js';
-import { isCmcdV1Key } from '../isCmcdV1Key.js';
+import { isTokenField } from '../cta/utils/isTokenField.js';
+import { isValid } from '../cta/utils/isValid.js';
+import { SfToken } from '../structuredfield/SfToken.js';
+import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.js';
+import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';
+import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
+import type { CmcdData } from './CmcdData.js';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import { CmcdFormatters } from './CmcdFormatters.js';
+import type { CmcdValue } from './CmcdValue.js';
+import { isCmcdEventKey } from './isCmcdEventKey.js';
+import { isCmcdRequestKey } from './isCmcdRequestKey.js';
+import { isCmcdResponseKey } from './isCmcdResponseKey.js';
+import { isCmcdV1Key } from './isCmcdV1Key.js';
 
 const filterMap = {
 	[CMCD_RESPONSE_MODE]: isCmcdResponseKey,
@@ -21,29 +20,28 @@ const filterMap = {
 };
 
 /**
- * Internal CMCD processing function.
+ * Convert a generic object to CMCD data.
  *
  * @param obj - The CMCD object to process.
- * @param map - The mapping function to use.
  * @param options - Options for encoding.
  *
- * @internal
- *
  * @group CMCD
+ *
+ * @beta
  */
-export function processCmcd(obj: CmcdData | null | undefined, options: CmcdEncodeOptions = {}): CmcdData {
+export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): CmcdData {
 	const results: CmcdData = {};
 
 	if (obj == null || typeof obj !== 'object') {
 		return results;
 	}
 
-	const version = options.version || obj.v || 1;
+	const version = options.version || obj['v'] || 1;
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE;
 	const filter = options.filter;
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode];
 
-	const keys = Object.keys(obj).sort() as CmcdKey[];
+	const keys = Object.keys(obj).sort();
 	const formatters = Object.assign({}, CmcdFormatters, options.formatters);
 
 	keys.forEach(key => {
@@ -81,7 +79,7 @@ export function processCmcd(obj: CmcdData | null | undefined, options: CmcdEncod
 			value = new SfToken(value);
 		}
 
-		results[key as any] = value as any;
+		(results as any)[key] = value;
 	});
 
 	// Ensure version is set for non-v1

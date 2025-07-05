@@ -4,7 +4,7 @@ import { decodeSfDict } from '../structuredfield/decodeSfDict.js';
 import type { CmcdData } from './CmcdData.js';
 
 // TODO: Find a way to type this properly
-const reduceValue = (value: any): any => {
+function reduceValue(value: any): any {
 	if (Array.isArray(value)) {
 		return value.map(reduceValue);
 	}
