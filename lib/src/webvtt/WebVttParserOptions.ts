@@ -14,7 +14,7 @@ export type WebVttParserOptions = {
 	 * or `createRegion` are provided, they will be used instead of the default
 	 * factory functions.
 	 *
-	 * @default true
+	 * @defaultValue `true`
 	 */
 	useDomTypes?: boolean;
 

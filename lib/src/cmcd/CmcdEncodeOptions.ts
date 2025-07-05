@@ -1,6 +1,7 @@
 import type { CmcdFormatter } from './CmcdFormatter.js';
 import type { CmcdHeadersMap } from './CmcdHeadersMap.js';
 import type { CmcdKey } from './CmcdKey.js';
+import type { CmcdReportingMode } from './CmcdReportingMode.js';
 
 /**
  * Options for encoding CMCD values.
@@ -10,6 +11,16 @@ import type { CmcdKey } from './CmcdKey.js';
  * @beta
  */
 export type CmcdEncodeOptions = {
+	/**
+	 * The version of the CMCD specification to use.
+	 */
+	version?: number;
+
+	/**
+	 * The reporting mode to use.
+	 */
+	reportingMode?: CmcdReportingMode;
+
 	/**
 	 * A map of CMCD keys to custom formatters.
 	 */
