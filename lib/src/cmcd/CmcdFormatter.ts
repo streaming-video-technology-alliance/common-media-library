@@ -14,4 +14,4 @@ import type { CmcdValue } from './CmcdValue.js';
  *
  * @beta
  */
-export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => ValueOrArray<string | number | SfItem>;
+export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;

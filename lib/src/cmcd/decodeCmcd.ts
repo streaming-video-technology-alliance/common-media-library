@@ -1,10 +1,17 @@
 import { symbolToStr } from '../cta/utils/symbolToStr.js';
+import type { SfBareItem } from '../structuredfield/SfBareItem.js';
 import { SfItem } from '../structuredfield/SfItem.js';
 import { decodeSfDict } from '../structuredfield/decodeSfDict.js';
 import type { CmcdData } from './CmcdData.js';
+import type { CmcdValue } from './CmcdValue.js';
 
-// TODO: Find a way to type this properly
-function reduceValue(value: any): any {
+// Define the input type for reduceValue
+type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[];
+
+// Define the output type for reduceValue - matches what CMCD values can be, including arrays
+type ReduceValueOutput = CmcdValue | ReduceValueOutput[];
+
+function reduceValue(value: ReduceValueInput): ReduceValueOutput {
 	if (Array.isArray(value)) {
 		return value.map(reduceValue);
 	}
@@ -14,10 +21,10 @@ function reduceValue(value: any): any {
 	}
 
 	if (value instanceof SfItem && !value.params) {
-		return value.value;
+		return reduceValue(value.value);
 	}
 
-	return value;
+	return value as ReduceValueOutput;
 };
 
 /**
@@ -41,7 +48,7 @@ export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T {
 	return Object
 		.entries<SfItem>(sfDict as any)
 		.reduce((acc, [key, item]) => {
-			acc[key as keyof T] = reduceValue(item.value);
+			acc[key as keyof T] = reduceValue(item.value) as T[keyof T];
 			return acc;
 		}, {} as T);
 }

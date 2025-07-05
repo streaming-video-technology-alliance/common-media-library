@@ -225,7 +225,7 @@ export type Cmcd = {
     bl?: number;
     dl?: number;
     mtp?: number;
-    nor?: string | string[] | SfItem | SfItem[];
+    nor?: ValueOrArray<string | SfItem>;
     nrr?: string;
     su?: boolean;
     cid?: string;
@@ -342,7 +342,7 @@ export const CmcdEventType: {
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
 // @beta
-export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number | string[] | number[] | SfItem | SfItem[];
+export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
 
 // @beta
 export const CmcdFormatters: Record<string, CmcdFormatter>;
@@ -2712,6 +2712,9 @@ export type Validation = {
 
 // @beta
 export type ValueOf<T> = T[keyof T];
+
+// @beta
+export type ValueOrArray<T> = T | T[];
 
 // @beta
 export const VerboseLevel: {
