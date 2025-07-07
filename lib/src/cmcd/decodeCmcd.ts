@@ -24,6 +24,10 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
 		return reduceValue(value.value);
 	}
 
+	if (typeof value === 'string') {
+		return decodeURIComponent(value);
+	}
+
 	return value as ReduceValueOutput;
 };
 
@@ -37,13 +41,16 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  * @group CMCD
  *
  * @beta
+ *
+ * @example
+ * {@includeCode ../../test/cmcd/decodeCmcd.test.ts#example}
  */
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T {
 	if (!cmcd) {
 		return {} as T;
 	}
 
-	const sfDict = decodeSfDict(decodeURIComponent(cmcd.replace(/^CMCD=/, '')));
+	const sfDict = decodeSfDict(cmcd);
 
 	return Object
 		.entries<SfItem>(sfDict as any)

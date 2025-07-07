@@ -1,5 +1,5 @@
-import type { CmcdFormatter } from './CmcdFormatter.js';
-import type { CmcdHeadersMap } from './CmcdHeadersMap.js';
+import type { CmcdFormatterMap } from './CmcdFormatterMap.js';
+import type { CmcdHeaderMap } from './CmcdHeaderMap.js';
 import type { CmcdKey } from './CmcdKey.js';
 import type { CmcdReportingMode } from './CmcdReportingMode.js';
 
@@ -24,12 +24,12 @@ export type CmcdEncodeOptions = {
 	/**
 	 * A map of CMCD keys to custom formatters.
 	 */
-	formatters?: Record<CmcdKey, CmcdFormatter>;
+	formatters?: Partial<CmcdFormatterMap>;
 
 	/**
 	 * A map of CMCD header fields to custom CMCD keys.
 	 */
-	customHeaderMap?: CmcdHeadersMap;
+	customHeaderMap?: Partial<CmcdHeaderMap>;
 
 	/**
 	 * A filter function for CMCD keys.

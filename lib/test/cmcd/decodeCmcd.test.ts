@@ -5,6 +5,17 @@ import { CMCD_OUTPUT_REQUEST } from './data/CMCD_OUTPUT_REQUEST.ts';
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts';
 
 describe('decodeCmcd', () => {
+	it('provides a valid example', () => {
+		//#region example
+		deepEqual(decodeCmcd('br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su'), {
+			br: 1000,
+			'com.example-hello': 'world',
+			ec: ['ERR001', 'ERR002'],
+			su: true,
+		});
+		//#endregion example
+	});
+
 	it('handles null data object', () => {
 		deepEqual(decodeCmcd(null as any), {});
 	});

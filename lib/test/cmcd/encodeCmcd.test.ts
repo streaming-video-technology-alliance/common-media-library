@@ -11,6 +11,14 @@ import { CMCD_STRING_RESPONSE } from './data/CMCD_STRING_RESPONSE.ts';
 import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts';
 
 describe('encodeCmcd', () => {
+	it('provides a valid example', () => {
+		//#region example
+		const input = { br: 1000, 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true };
+		const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST };
+		equal(encodeCmcd(input, options), 'br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2');
+		//#endregion example
+	});
+
 	it('handles null data object', () => {
 		equal(encodeCmcd(null as any), '');
 	});

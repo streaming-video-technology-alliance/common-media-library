@@ -251,6 +251,9 @@ export const CMCD_EVENT_KEYS: readonly ["e"];
 export const CMCD_EVENT_MODE = "event";
 
 // @beta
+export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
+
+// @beta
 export const CMCD_HEADERS = "headers";
 
 // @beta
@@ -305,8 +308,8 @@ export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
 export type CmcdEncodeOptions = {
     version?: number;
     reportingMode?: CmcdReportingMode;
-    formatters?: Record<CmcdKey, CmcdFormatter>;
-    customHeaderMap?: CmcdHeadersMap;
+    formatters?: Partial<CmcdFormatterMap>;
+    customHeaderMap?: Partial<CmcdHeaderMap>;
     filter?: (key: CmcdKey) => boolean;
     baseUrl?: string;
 };
@@ -345,6 +348,9 @@ export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
 
 // @beta
+export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
+
+// @beta @deprecated
 export const CmcdFormatters: Record<string, CmcdFormatter>;
 
 // @beta
@@ -359,6 +365,9 @@ export const CmcdHeaderField: {
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
 // @beta
+export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
+
+// @beta @deprecated
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
 // @beta
@@ -1039,6 +1048,9 @@ export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
 
 // @beta
+export function fromCmcdUrl(url: string): Cmcd;
+
+// @beta
 export function ftyp(view: IsoView): Fields<FileTypeBox>;
 
 // @beta
@@ -1104,7 +1116,7 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
 // @beta
-export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeadersMap>): Record<CmcdHeaderField, CmcdData>;
+export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData>;
 
 // @alpha
 export type Ham = {

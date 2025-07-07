@@ -1,10 +1,10 @@
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.js';
 import type { CmcdData } from './CmcdData.js';
 import { CmcdHeaderField } from './CmcdHeaderField.js';
-import type { CmcdHeadersMap } from './CmcdHeadersMap.js';
+import type { CmcdHeaderMap } from './CmcdHeaderMap.js';
 import type { CmcdKey } from './CmcdKey.js';
 
-function createHeaderMap(headerMap: Partial<CmcdHeadersMap>): Record<CmcdKey, CmcdHeaderField> {
+function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, CmcdHeaderField> {
 	return Object.keys(headerMap)
 		.reduce((acc, field) => {
 			headerMap[field as CmcdHeaderField]?.forEach(key => acc[key] = field as CmcdHeaderField);
@@ -24,7 +24,7 @@ function createHeaderMap(headerMap: Partial<CmcdHeadersMap>): Record<CmcdKey, Cm
  *
  * @beta
  */
-export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeadersMap>): Record<CmcdHeaderField, CmcdData> {
+export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData> {
 	const result = {} as Record<CmcdHeaderField, CmcdData>;
 
 	if (!cmcd) {

@@ -7,7 +7,5 @@ import type { CmcdKey } from './CmcdKey.js';
  * @group CMCD
  *
  * @beta
- *
- * @deprecated Use `CmcdHeaderMap` instead.
  */
-export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
+export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
