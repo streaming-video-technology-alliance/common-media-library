@@ -1,7 +1,7 @@
 import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { processCmcd } from './utils/processCmcd.js';
+import { prepareCmcdData } from './prepareCmcdData.js';
 
 /**
  * Encode a CMCD object to a string.
@@ -14,11 +14,14 @@ import { processCmcd } from './utils/processCmcd.js';
  * @group CMCD
  *
  * @beta
+ *
+ * @example
+ * {@includeCode ../../test/cmcd/encodeCmcd.test.ts#example}
  */
 export function encodeCmcd(cmcd: CmcdData, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
 		return '';
 	}
 
-	return encodeSfDict(processCmcd(cmcd, options), Object.assign({ whitespace: false }, options));
+	return encodeSfDict(prepareCmcdData(cmcd, options), { whitespace: false });
 }

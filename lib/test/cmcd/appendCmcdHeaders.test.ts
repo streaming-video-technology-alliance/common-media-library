@@ -11,6 +11,23 @@ describe('appendCmcdHeaders', () => {
 		br: 1000,
 	};
 
+	it('provides a valid example', () => {
+		//#region example
+		const headers = {
+			hello: 'world',
+		};
+
+		const data = {
+			br: 1000,
+		};
+
+		deepEqual(appendCmcdHeaders(headers, data), {
+			hello: 'world',
+			['CMCD-Object']: 'br=1000',
+		});
+		//#endregion example
+	});
+
 	it('handles null data object', () => {
 		deepEqual(appendCmcdHeaders(headers, null as any), headers);
 	});

@@ -1,9 +1,9 @@
+import { encodeSfDict } from '../structuredfield/encodeSfDict.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { CmcdHeaderField } from './CmcdHeaderField.js';
-import { CmcdHeaderMap } from './CmcdHeaderMap.js';
-import type { CmcdKey } from './CmcdKey.js';
-import { encodeCmcd } from './encodeCmcd.js';
+import type { CmcdHeaderField } from './CmcdHeaderField.js';
+import { groupCmcdHeaders } from './groupCmcdHeaders.js';
+import { prepareCmcdData } from './prepareCmcdData.js';
 
 /**
  * Convert a CMCD data object to request headers
@@ -16,6 +16,9 @@ import { encodeCmcd } from './encodeCmcd.js';
  * @group CMCD
  *
  * @beta
+ *
+ * @example
+ * {@includeCode ../../test/cmcd/toCmcdHeaders.test.ts#example}
  */
 export function toCmcdHeaders(cmcd: CmcdData, options: CmcdEncodeOptions = {}): Record<CmcdHeaderField, string> {
 	const result = {} as Record<CmcdHeaderField, string>;
@@ -24,20 +27,15 @@ export function toCmcdHeaders(cmcd: CmcdData, options: CmcdEncodeOptions = {}): 
 		return result;
 	}
 
-	const entries = Object.entries(cmcd);
-	const headerMap = Object.entries(CmcdHeaderMap)
-		.concat(Object.entries(options?.customHeaderMap || {}));
-	const shards = entries.reduce((acc, entry) => {
-		const [key, value] = entry as [CmcdKey, CmcdData[CmcdKey]];
-		const field = headerMap.find(entry => entry[1].includes(key))?.[0] as CmcdHeaderField || CmcdHeaderField.REQUEST;
-		acc[field] ??= {};
-		acc[field][key as any] = value as any;
-		return acc;
-	}, {} as Record<CmcdHeaderField, CmcdData>);
+	const data = prepareCmcdData(cmcd, options);
+	const shards = groupCmcdHeaders(data, options?.customHeaderMap);
 
 	return Object.entries(shards)
 		.reduce((acc, [field, value]) => {
-			acc[field as CmcdHeaderField] = encodeCmcd(value, options);
+			const shard = encodeSfDict(value, { whitespace: false });
+			if (shard) {
+				acc[field as CmcdHeaderField] = shard;
+			}
 			return acc;
 		}, result);
 }

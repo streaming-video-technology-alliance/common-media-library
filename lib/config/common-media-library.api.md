@@ -225,7 +225,7 @@ export type Cmcd = {
     bl?: number;
     dl?: number;
     mtp?: number;
-    nor?: string;
+    nor?: ValueOrArray<string | SfItem>;
     nrr?: string;
     su?: boolean;
     cid?: string;
@@ -239,7 +239,7 @@ export type Cmcd = {
 };
 
 // @beta
-export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "sta", "st", "tab", "tb", "tbl", "tpb", "ts", "v"];
+export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
 
 // @beta
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
@@ -249,6 +249,9 @@ export const CMCD_EVENT_KEYS: readonly ["e"];
 
 // @beta
 export const CMCD_EVENT_MODE = "event";
+
+// @beta
+export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
 
 // @beta
 export const CMCD_HEADERS = "headers";
@@ -290,7 +293,7 @@ export const CMCD_STATUS = "CMCD-Status";
 export const CMCD_V1 = 1;
 
 // @beta
-export const CMCD_V1_KEYS: readonly ["br", "d", "ot", "tb", "bl", "dl", "mtp", "nor", "nrr", "su", "bs", "rtp", "cid", "pr", "sf", "sid", "st", "v"];
+export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", "nor", "nrr", "ot", "pr", "rtp", "sf", "sid", "st", "su", "tb", "v"];
 
 // @beta
 export const CMCD_V2 = 2;
@@ -303,8 +306,10 @@ export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
 
 // @beta
 export type CmcdEncodeOptions = {
-    formatters?: Record<CmcdKey, CmcdFormatter>;
-    customHeaderMap?: CmcdHeadersMap;
+    version?: number;
+    reportingMode?: CmcdReportingMode;
+    formatters?: Partial<CmcdFormatterMap>;
+    customHeaderMap?: Partial<CmcdHeaderMap>;
     filter?: (key: CmcdKey) => boolean;
     baseUrl?: string;
 };
@@ -340,9 +345,12 @@ export const CmcdEventType: {
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
 // @beta
-export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => string | number;
+export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
 
 // @beta
+export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
+
+// @beta @deprecated
 export const CmcdFormatters: Record<string, CmcdFormatter>;
 
 // @beta
@@ -357,6 +365,9 @@ export const CmcdHeaderField: {
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
 // @beta
+export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
+
+// @beta @deprecated
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
 // @beta
@@ -457,7 +468,7 @@ export const CmcdTransmissionMode: {
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
 
 // @beta
-export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | number | boolean | symbol | SfToken;
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // Warning: (ae-internal-missing-underscore) The name "CmCustomKey" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -547,7 +558,7 @@ export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | 
 // Warning: (ae-internal-missing-underscore) The name "CmValue" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | number | boolean | symbol | SfToken;
+export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // @beta
 export type CommonMediaRequest = {
@@ -1031,10 +1042,13 @@ export type FreeSpaceBox<T extends 'free' | 'skip' = 'free'> = Box & {
 export function frma(view: IsoView): Fields<OriginalFormatBox>;
 
 // @beta
-export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
+export function fromCmcdHeaders(headers: Record<string, string> | Headers): CmcdData;
 
 // @beta
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
+
+// @beta
+export function fromCmcdUrl(url: string): Cmcd;
 
 // @beta
 export function ftyp(view: IsoView): Fields<FileTypeBox>;
@@ -1100,6 +1114,9 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 
 // @alpha
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
+
+// @beta
+export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData>;
 
 // @alpha
 export type Ham = {
@@ -1227,16 +1244,16 @@ export type IpmpInfoBox = FullBox & {
 export function isCmcdCustomKey(key: CmcdKey): boolean;
 
 // @beta
-export function isCmcdEventKey(key: string): boolean;
+export function isCmcdEventKey(key: string): key is keyof CmcdEvent;
 
 // @beta
-export function isCmcdRequestKey(key: string): boolean;
+export function isCmcdRequestKey(key: string): key is keyof CmcdRequest;
 
 // @beta
-export function isCmcdResponseKey(key: string): boolean;
+export function isCmcdResponseKey(key: string): key is keyof CmcdResponse;
 
 // @beta
-export function isCmcdV1Key(key: string): boolean;
+export function isCmcdV1Key(key: string): key is keyof Cmcd;
 
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -1783,6 +1800,9 @@ export const PLAYREADY_RECOMMENDATION_KEY_SYSTEM = "com.microsoft.playready.reco
 
 // @beta
 export const PLAYREADY_UUID = "9a04f079-9840-4286-ab92-e65be0885f95";
+
+// @beta
+export function prepareCmcdData(obj: Record<string, any>, options?: CmcdEncodeOptions): CmcdData;
 
 // @beta
 export type PreselectionGroupBox = FullBox & {
@@ -2448,11 +2468,14 @@ export function tkhd(view: IsoView): Fields<TrackHeaderBox>;
 // @beta
 export function toCmcdHeaders(cmcd: CmcdData, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
-// @beta
+// @beta @deprecated
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @beta
+export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function toVttCue(cue: WebVttCue): VTTCue;
@@ -2701,6 +2724,9 @@ export type Validation = {
 
 // @beta
 export type ValueOf<T> = T[keyof T];
+
+// @beta
+export type ValueOrArray<T> = T | T[];
 
 // @beta
 export const VerboseLevel: {

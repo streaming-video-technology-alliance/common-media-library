@@ -16,6 +16,9 @@ const REGEX = /CMCD=[^&#]+/;
  * @group CMCD
  *
  * @beta
+ *
+ * @example
+ * {@includeCode ../../test/cmcd/appendCmcdQuery.test.ts#example}
  */
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string {
 	// TODO: Replace with URLSearchParams once we drop Safari < 10.1 & Chrome < 49 support.

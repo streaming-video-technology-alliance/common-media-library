@@ -21,3 +21,4 @@ export * from './utils/UTF_16.js';
 export * from './utils/UTF_8.js';
 export * from './utils/uuid.js';
 export type { ValueOf } from './utils/ValueOf.js';
+export type { ValueOrArray } from './utils/ValueOrArray.js';
