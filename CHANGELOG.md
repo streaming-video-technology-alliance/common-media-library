@@ -13,6 +13,11 @@ and this project adheres to
 - Utility function for parsing DASH `frameRate` attributes
   ([#221](https://github.com/streaming-video-technology-alliance/common-media-library/issues/221))
 
+### Changed
+
+- Update CMCD utilities to handle v2 rules, keys, and modes
+  ([#223](https://github.com/streaming-video-technology-alliance/common-media-library/issues/223))
+
 ## [0.15.1] - 2025-06-27
 
 ### Fixed

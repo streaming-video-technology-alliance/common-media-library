@@ -1,7 +1,7 @@
 import { CMCD_PARAM } from './CMCD_PARAM.js';
 import type { Cmcd } from './Cmcd.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { encodeCmcd } from './encodeCmcd.js';
+import { toCmcdUrl } from './toCmcdUrl.js';
 
 /**
  * Convert a CMCD data object to a query arg.
@@ -14,13 +14,16 @@ import { encodeCmcd } from './encodeCmcd.js';
  * @group CMCD
  *
  * @beta
+ *
+ * @example
+ * {@includeCode ../../test/cmcd/toCmcdQuery.test.ts#example}
  */
 export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
 		return '';
 	}
 
-	const params = encodeCmcd(cmcd, options);
+	const value = toCmcdUrl(cmcd, options);
 
-	return `${CMCD_PARAM}=${encodeURIComponent(params)}`;
+	return `${CMCD_PARAM}=${value}`;
 }

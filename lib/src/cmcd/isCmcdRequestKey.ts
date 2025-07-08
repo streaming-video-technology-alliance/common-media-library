@@ -1,5 +1,6 @@
 import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.js';
 import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.js';
+import type { CmcdRequest } from './CmcdRequest.js';
 import { isCmcdCustomKey } from './isCmcdCustomKey.js';
 
 /**
@@ -12,8 +13,11 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  * @group CMCD
  *
  * @beta
+ *
+ * @example
+ * {@includeCode ../../test/cmcd/isCmcdRequestKey.test.ts#example}
  */
-export function isCmcdRequestKey(key: string): boolean {
+export function isCmcdRequestKey(key: string): key is keyof CmcdRequest {
 	return CMCD_COMMON_KEYS.includes(key as any) ||
 		CMCD_REQUEST_KEYS.includes(key as any) ||
 		isCmcdCustomKey(key as any);

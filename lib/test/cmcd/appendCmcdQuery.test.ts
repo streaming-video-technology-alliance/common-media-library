@@ -8,6 +8,18 @@ describe('appendCmcdQuery', () => {
 		br: 1000,
 	};
 
+	it('provides a valid example', () => {
+		//#region example
+		const url = 'https://test.com';
+		const data = {
+			br: 1000,
+		};
+
+		equal(appendCmcdQuery(url, data), `${url}?CMCD=br%3D1000`);
+		equal(appendCmcdQuery(`${url}?hello=world`, data), `${url}?hello=world&CMCD=br%3D1000`);
+		//#endregion example
+	});
+
 	it('handles null data object', () => {
 		equal(appendCmcdQuery(url, null as any), url);
 	});
