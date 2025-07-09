@@ -11,15 +11,15 @@ export type PathwayClone = {
 	/**
 	 * A string that specifies the Pathway ID of the Base Pathway
 	 */
-	'BASE-ID': string,
+	'BASE-ID': string;
 
 	/**
 	 * A string that specifies the Pathway ID for the Pathway Clone
 	 */
-	'ID': string,
+	'ID': string;
 
 	/**
 	 * An object that defines URI modifications to apply during the cloning process.
 	 */
-	'URI-REPLACEMENT': UriReplacement,
+	'URI-REPLACEMENT': UriReplacement;
 };
