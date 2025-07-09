@@ -1417,6 +1417,12 @@ export type IsoViewConfig = {
 };
 
 // @beta
+export function isValidPathwayClone(clone: PathwayClone): boolean;
+
+// @beta
+export function isValidSteeringManifest(manifest: SteeringManifest): boolean;
+
+// @beta
 export type ItemExtent = {
     extentIndex?: number;
     extentOffset: number;
@@ -1739,7 +1745,7 @@ export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
 export type PathwayClone = {
     'BASE-ID': string;
     'ID': string;
-    'URI-REPLACEMENT': UriReplacement[];
+    'URI-REPLACEMENT': UriReplacement;
 };
 
 // @beta

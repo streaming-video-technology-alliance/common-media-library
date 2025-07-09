@@ -21,5 +21,5 @@ export type PathwayClone = {
 	/**
 	 * An object that defines URI modifications to apply during the cloning process.
 	 */
-	'URI-REPLACEMENT': UriReplacement[],
+	'URI-REPLACEMENT': UriReplacement,
 };

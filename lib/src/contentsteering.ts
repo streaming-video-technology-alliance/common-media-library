@@ -10,6 +10,8 @@
  */
 export { DEFAULT_PATHWAY_PENALTY } from './contentsteering/DEFAULT_PATHWAY_PENALTY.js';
 export { DEFAULT_TTL } from './contentsteering/DEFAULT_TTL.js';
+export { isValidPathwayClone } from './contentsteering/isValidPathwayClone.js';
+export { isValidSteeringManifest } from './contentsteering/isValidSteeringManifest.js';
 export type { PathwayClone } from './contentsteering/PathwayClone.js';
 export type { SteeringManifest } from './contentsteering/SteeringManifest.js';
 export type { UriReplacement } from './contentsteering/UriReplacement.js';
