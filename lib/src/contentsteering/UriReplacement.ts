@@ -12,7 +12,7 @@ export type UriReplacement = {
 	HOST?: string;
 
 	/**
-	 * A object that specifies query parameters for cloned URIs.
+	 * An object that specifies query parameters for cloned URIs.
 	 * The keys represent query parameter names, and the values
 	 * correspond to the associated parameter values.
 	 */
