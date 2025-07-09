@@ -12,6 +12,8 @@ and this project adheres to
 
 - Utility function for parsing DASH `frameRate` attributes
   ([#221](https://github.com/streaming-video-technology-alliance/common-media-library/issues/221))
+- Add type definitions for content steering entities
+  ([#176](https://github.com/streaming-video-technology-alliance/common-media-library/pull/176))
 
 ### Changed
 
