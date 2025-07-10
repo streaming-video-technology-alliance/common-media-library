@@ -7,6 +7,7 @@ export * from './608.js';
 export * from './cmaf-ham.js';
 export * from './cmcd.js';
 export * from './cmsd.js';
+export * from './contentsteering.js';
 export type * from './cta.js';
 export * from './dash.js';
 export * from './drm.js';

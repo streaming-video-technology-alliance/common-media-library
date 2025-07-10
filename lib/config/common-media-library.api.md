@@ -838,6 +838,12 @@ export type DecodingTimeToSampleBox = FullBox & {
 };
 
 // @beta
+export const DEFAULT_PATHWAY_PENALTY = 300000;
+
+// @beta
+export const DEFAULT_TTL = 300;
+
+// @beta
 export type DegradationPriorityBox = FullBox & {
     type: 'stdp';
     priority: number[];
@@ -1411,6 +1417,12 @@ export type IsoViewConfig = {
 };
 
 // @beta
+export function isValidPathwayClone(clone: PathwayClone): boolean;
+
+// @beta
+export function isValidSteeringManifest(manifest: SteeringManifest): boolean;
+
+// @beta
 export type ItemExtent = {
     extentIndex?: number;
     extentOffset: number;
@@ -1728,6 +1740,13 @@ export function parseWebVtt(text: string, options?: WebVttParserOptions): WebVtt
 
 // @beta
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
+
+// @beta
+export type PathwayClone = {
+    'BASE-ID': string;
+    'ID': string;
+    'URI-REPLACEMENT': UriReplacement;
+};
 
 // @beta
 export function payl(view: IsoView): Fields<WebVttCuePayloadBox>;
@@ -2304,6 +2323,15 @@ export function ssix(view: IsoView): Fields<SubsegmentIndexBox>;
 export const STATUS_PENDING = "status-pending";
 
 // @beta
+export type SteeringManifest = {
+    VERSION: number;
+    TTL: number;
+    'RELOAD-URI'?: string;
+    'PATHWAY-PRIORITY': string[];
+    'PATHWAY-CLONES'?: PathwayClone[];
+};
+
+// @beta
 export function sthd(view: IsoView): Fields<SubtitleMediaHeaderBox>;
 
 // @beta
@@ -2643,6 +2671,12 @@ export const UINT = "uint";
 
 // @beta
 export function unescapeHtml(text: string): string;
+
+// @beta
+export type UriReplacement = {
+    HOST?: string;
+    PARAMS?: Record<string, string>;
+};
 
 // @beta
 export function url(view: IsoView): Fields<UrlBox>;

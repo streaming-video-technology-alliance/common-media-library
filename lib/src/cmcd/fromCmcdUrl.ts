@@ -4,7 +4,7 @@ import { decodeCmcd } from './decodeCmcd.js';
 /**
  * Decode CMCD data from a url encoded string.
  *
- * @param query - The url encoded string to decode.
+ * @param url - The url encoded string to decode.
  *
  * @returns The decoded CMCD data.
  *
