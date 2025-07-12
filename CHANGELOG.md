@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add CMCD config type and request builder
+  ([#227](https://github.com/streaming-video-technology-alliance/common-media-library/issues/227))
+
 ## [0.16.0] - 2025-07-09
 
 ### Added
@@ -80,7 +85,8 @@ and this project adheres to
 
 ### Fixed
 
-- `processUriTemplate` cannot correctly resolve time values larger than MAX_SAFE_INTEGER
+- `processUriTemplate` cannot correctly resolve time values larger than
+  `MAX_SAFE_INTEGER`
   ([#190](https://github.com/streaming-video-technology-alliance/common-media-library/issues/190))
 
 ## [0.12.3] - 2025-05-15
