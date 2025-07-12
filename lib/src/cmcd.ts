@@ -15,6 +15,7 @@ export { CMCD_EVENT_MODE } from './cmcd/CMCD_EVENT_MODE.js';
 export { CMCD_FORMATTER_MAP } from './cmcd/CMCD_FORMATTER_MAP.js';
 export { CMCD_HEADERS } from './cmcd/CMCD_HEADERS.js';
 export { CMCD_JSON } from './cmcd/CMCD_JSON.js';
+export { CMCD_KEYS } from './cmcd/CMCD_KEYS.js';
 export { CMCD_OBJECT } from './cmcd/CMCD_OBJECT.js';
 export { CMCD_PARAM } from './cmcd/CMCD_PARAM.js';
 export { CMCD_QUERY } from './cmcd/CMCD_QUERY.js';

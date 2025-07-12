@@ -260,6 +260,9 @@ export const CMCD_HEADERS = "headers";
 export const CMCD_JSON = "json";
 
 // @beta
+export const CMCD_KEYS: CmcdKey[];
+
+// @beta
 export const CMCD_OBJECT = "CMCD-Object";
 
 // @beta
