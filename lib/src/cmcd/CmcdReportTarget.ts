@@ -18,7 +18,7 @@ export type CmcdReportTarget = {
 	/**
 	 * The reporting mode for the CMCD report.
 	 *
-	 * @defaultValue `'request'`
+	 * @defaultValue `CmcdReportingMode.REQUEST`
 	 */
 	reportingMode?: CmcdReportingMode;
 
@@ -32,14 +32,14 @@ export type CmcdReportTarget = {
 	/**
 	 * The version of the CMCD report.
 	 *
-	 * @defaultValue `2`
+	 * @defaultValue `1`
 	 */
 	version?: number;
 
 	/**
 	 * The transmission mode for the CMCD report.
 	 *
-	 * @defaultValue `'query'`
+	 * @defaultValue `CmcdTransmissionMode.QUERY`
 	 */
 	transmissionMode?: CmcdTransmissionMode;
 
