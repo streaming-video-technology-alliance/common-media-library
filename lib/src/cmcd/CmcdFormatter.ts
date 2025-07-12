@@ -1,6 +1,6 @@
 import type { SfItem } from '../structuredfield/SfItem.js';
 import type { ValueOrArray } from '../utils/ValueOrArray.js';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 
 /**
@@ -14,4 +14,4 @@ import type { CmcdValue } from './CmcdValue.js';
  *
  * @beta
  */
-export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
+export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;

@@ -22,7 +22,7 @@ export const CMCD_OUTPUT_REQUEST = {
 	ltc: 1500,
 	msd: 2500,
 	mtp: 10000,
-	nor: '../testing/3.m4v',
+	nor: ['../testing/3.m4v'] as const,
 	ot: 'm',
 	pb: 1000,
 	pt: 45000,

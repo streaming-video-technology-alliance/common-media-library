@@ -7,6 +7,7 @@ import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';
 import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 import { isCmcdEventKey } from './isCmcdEventKey.js';
 import { isCmcdRequestKey } from './isCmcdRequestKey.js';
@@ -36,13 +37,18 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results;
 	}
 
-	const version = options.version || obj['v'] || 1;
+	const version = options.version || (obj['v'] as number) || 1;
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE;
 	const filter = options.filter;
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode];
 
 	const keys = Object.keys(obj).sort();
 	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters);
+	const formatterOptions: CmcdFormatterOptions = {
+		version,
+		reportingMode,
+		baseUrl: options.baseUrl,
+	};
 
 	keys.forEach(key => {
 		if (keyFilter(key) === false) {
@@ -57,7 +63,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		const formatter = formatters[key];
 		if (typeof formatter === 'function') {
-			value = formatter(value, options);
+			value = formatter(value, formatterOptions);
 		}
 
 		// Version should only be reported if not equal to 1.
