@@ -8,8 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [0.16.0] - 2025-07-09
-
 ### Added
 
 - Add CMCD config type and request builder
