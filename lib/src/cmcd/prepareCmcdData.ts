@@ -93,5 +93,10 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		results.v = version;
 	}
 
+	// Ensure a timestamp is set for response and event modes
+	if ((reportingMode === CMCD_RESPONSE_MODE || reportingMode === CMCD_EVENT_MODE) && !Number.isFinite(results.ts)) {
+		results.ts = Date.now();
+	}
+
 	return results;
 }
