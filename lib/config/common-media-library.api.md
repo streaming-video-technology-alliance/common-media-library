@@ -256,7 +256,7 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
 // @beta
 export const CMCD_HEADERS = "headers";
 
-// @beta
+// @beta @deprecated
 export const CMCD_JSON = "json";
 
 // @beta
