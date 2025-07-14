@@ -81,8 +81,26 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.RESPONSE }), CMCD_STRING_RESPONSE);
 		});
 
+		it('appends timestamp in response mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 });
+			const input = Object.assign({}, CMCD_INPUT);
+			delete input.ts;
+
+			const output = CMCD_STRING_RESPONSE.replace(/ts=\d+/, 'ts=1234');
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.RESPONSE }), output);
+		});
+
 		it('returns encoded string for event mode', () => {
 			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.EVENT }), CMCD_STRING_EVENT);
+		});
+
+		it('appends timestamp in event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 });
+			const input = Object.assign({}, CMCD_INPUT);
+			delete input.ts;
+
+			const output = CMCD_STRING_EVENT.replace(/ts=\d+/, 'ts=1234');
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), output);
 		});
 	});
 

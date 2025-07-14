@@ -11,6 +11,7 @@ describe('toCmcdReport', () => {
 			'com.example-hello': 'world',
 			ec: ['ERR001', 'ERR002'],
 			su: true,
+			ts: 0,
 		};
 
 		const headerRequestReport = toCmcdReport(data, {
@@ -26,7 +27,7 @@ describe('toCmcdReport', () => {
 			method: 'POST',
 			headers: {
 				'CMCD-Object': 'br=1000',
-				'CMCD-Request': 'com.example-hello="world",su',
+				'CMCD-Request': 'com.example-hello="world",su,ts=0',
 				'CMCD-Session': 'v=2',
 				'CMCD-Status': 'ec=("ERR001" "ERR002")',
 			},
@@ -40,7 +41,7 @@ describe('toCmcdReport', () => {
 		});
 
 		deepEqual(queryResponseReport, {
-			url: 'https://hello.world/?CMCD=br%3D1000%2Ccom.example-hello%3D%22world%22%2Csu',
+			url: 'https://hello.world/?CMCD=br%3D1000%2Ccom.example-hello%3D%22world%22%2Csu%2Cts%3D0',
 			method: 'GET',
 			headers: {},
 		});

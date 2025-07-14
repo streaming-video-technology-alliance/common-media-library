@@ -31,8 +31,6 @@ export const CMCD_INPUT: CmcdData = {
 	tab: 3000,
 	tbl: 8000,
 	tpb: 4000,
-
-	// TODO: What modes allow the ts key?
 	ts: 1640995200000,
 
 	// request keys
