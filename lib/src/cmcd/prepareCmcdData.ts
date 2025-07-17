@@ -7,6 +7,7 @@ import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';
 import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 import { isCmcdEventKey } from './isCmcdEventKey.js';
 import { isCmcdRequestKey } from './isCmcdRequestKey.js';
@@ -36,38 +37,61 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results;
 	}
 
-	const version = options.version || obj['v'] || 1;
+	const version = options.version || (obj['v'] as number) || 1;
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE;
-	const filter = options.filter;
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode];
 
-	const keys = Object.keys(obj).sort();
+	// Filter keys based on the version, reporting mode and options
+	let keys = Object.keys(obj).filter(keyFilter);
+
+	const filter = options.filter;
+	if (typeof filter === 'function') {
+		keys = keys.filter(filter);
+	}
+
+	// Ensure all required keys are present before sorting
+	const needsTimestamp = reportingMode === CMCD_RESPONSE_MODE || reportingMode === CMCD_EVENT_MODE;
+	if (needsTimestamp && !keys.includes('ts')) {
+		keys.push('ts');
+	}
+
+	if (version > 1 && !keys.includes('v')) {
+		keys.push('v');
+	}
+
 	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters);
+	const formatterOptions: CmcdFormatterOptions = {
+		version,
+		reportingMode,
+		baseUrl: options.baseUrl,
+	};
 
-	keys.forEach(key => {
-		if (keyFilter(key) === false) {
-			return;
-		}
-
-		if (filter?.(key) === false) {
-			return;
-		}
-
+	keys.sort().forEach(key => {
 		let value = obj[key] as CmcdValue;
 
 		const formatter = formatters[key];
 		if (typeof formatter === 'function') {
-			value = formatter(value, options);
+			value = formatter(value, formatterOptions);
 		}
 
 		// Version should only be reported if not equal to 1.
-		if (key === 'v' && version === 1) {
-			return;
+		if (key === 'v') {
+			if (version === 1) {
+				return;
+			}
+			else {
+				value = version;
+			}
 		}
 
 		// Playback rate should only be sent if not equal to 1.
 		if (key == 'pr' && value === 1) {
 			return;
+		}
+
+		// Ensure a timestamp is set for response and event modes
+		if (needsTimestamp && key === 'ts' && !Number.isFinite(value)) {
+			value = Date.now();
 		}
 
 		// ignore invalid values
@@ -81,11 +105,6 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		(results as any)[key] = value;
 	});
-
-	// Ensure version is set for non-v1
-	if (version > 1) {
-		results.v = version;
-	}
 
 	return results;
 }

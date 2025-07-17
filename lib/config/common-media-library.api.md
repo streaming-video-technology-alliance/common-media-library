@@ -256,8 +256,11 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
 // @beta
 export const CMCD_HEADERS = "headers";
 
-// @beta
+// @beta @deprecated
 export const CMCD_JSON = "json";
+
+// @beta
+export const CMCD_KEYS: CmcdKey[];
 
 // @beta
 export const CMCD_OBJECT = "CMCD-Object";
@@ -345,10 +348,17 @@ export const CmcdEventType: {
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
 // @beta
-export type CmcdFormatter = (value: CmcdValue, options?: CmcdEncodeOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
+export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
 
 // @beta
 export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
+
+// @beta
+export type CmcdFormatterOptions = {
+    version: number;
+    reportingMode: CmcdReportingMode;
+    baseUrl?: string;
+};
 
 // @beta @deprecated
 export const CmcdFormatters: Record<string, CmcdFormatter>;
@@ -405,6 +415,16 @@ export const CmcdReportingMode: {
 
 // @beta (undocumented)
 export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
+
+// @beta
+export type CmcdReportTarget = {
+    url: string;
+    reportingMode?: CmcdReportingMode;
+    method?: 'GET' | 'POST';
+    version?: number;
+    transmissionMode?: CmcdTransmissionMode;
+    enabledKeys?: CmcdKey[];
+};
 
 // @beta
 export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
@@ -2501,6 +2521,9 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @beta
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @beta
+export function toCmcdReport(data: CmcdData, target: CmcdReportTarget): CommonMediaRequest | null;
 
 // @beta
 export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;

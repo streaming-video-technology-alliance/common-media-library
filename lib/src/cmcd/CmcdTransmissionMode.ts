@@ -15,6 +15,8 @@ import { CMCD_QUERY } from './CMCD_QUERY.js';
 export const CmcdTransmissionMode = {
 	/**
 	 * JSON
+	 *
+	 * @deprecated JSON transmission mode is deprecated and will be removed in future versions.
 	 */
 	JSON: CMCD_JSON as typeof CMCD_JSON,
 

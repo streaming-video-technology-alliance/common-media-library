@@ -1,13 +1,13 @@
 import { SfItem } from '../structuredfield/SfItem.js';
 import { urlToRelativePath } from '../utils/urlToRelativePath.js';
 import type { ValueOrArray } from '../utils/ValueOrArray.js';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import type { CmcdFormatter } from './CmcdFormatter.js';
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 
 const toRounded = (value: CmcdValue) => Math.round(value as number);
 
-const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions): ValueOrArray<string> | ValueOrArray<SfItem> => {
+const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string> | ValueOrArray<SfItem> => {
 	if (Array.isArray(value)) {
 		return value.map(item => toUrlSafe(item, options) as string);
 	}
@@ -16,13 +16,29 @@ const toUrlSafe = (value: CmcdValue, options?: CmcdEncodeOptions): ValueOrArray<
 		return new SfItem(toUrlSafe(value.value, options), value.params);
 	}
 	else {
-		if (options?.baseUrl) {
+		if (options.baseUrl) {
 			value = urlToRelativePath(value as string, options.baseUrl);
 		}
-		return encodeURIComponent(value as string);
+		return options.version === 1 ? encodeURIComponent(value as string) : (value as string);
 	}
 };
+
 const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100;
+
+const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
+	let norValue = value;
+
+	if (options.version >= 2) {
+		if (value instanceof SfItem && typeof value.value === 'string') {
+			norValue = new SfItem([value]);
+		}
+		else if (typeof value === 'string') {
+			norValue = [value];
+		}
+	}
+
+	return toUrlSafe(norValue, options);
+};
 
 /**
  * The default formatters for CMCD values.
@@ -60,7 +76,7 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter> = {
 	/**
 	 * Next Object Request URL encoded
 	 */
-	nor: toUrlSafe,
+	nor,
 
 	/**
 	 * Requested maximum throughput (kbps) rounded nearest 100kbps

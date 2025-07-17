@@ -1,3 +1,4 @@
+import type { CmcdEncodeOptions } from '@svta/common-media-library/cmcd/CmcdEncodeOptions';
 import { CmcdReportingMode } from '@svta/common-media-library/cmcd/CmcdReportingMode';
 import { encodeCmcd } from '@svta/common-media-library/cmcd/encodeCmcd';
 import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
@@ -58,10 +59,13 @@ describe('encodeCmcd', () => {
 		const input = {
 			nor: 'http://test.com/base/segments/video/1.mp4',
 		};
-		const options = {
+		const options: CmcdEncodeOptions = {
 			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
 		};
 		equal(encodeCmcd(input, options), 'nor="..%2Fsegments%2Fvideo%2F1.mp4"');
+
+		options.version = 2;
+		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4"),v=2');
 	});
 
 	describe('reporting modes', () => {
@@ -77,8 +81,26 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.RESPONSE }), CMCD_STRING_RESPONSE);
 		});
 
+		it('appends timestamp in response mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 });
+			const input = Object.assign({}, CMCD_INPUT);
+			delete input.ts;
+
+			const output = CMCD_STRING_RESPONSE.replace(/ts=\d+/, 'ts=1234');
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.RESPONSE }), output);
+		});
+
 		it('returns encoded string for event mode', () => {
 			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.EVENT }), CMCD_STRING_EVENT);
+		});
+
+		it('appends timestamp in event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 });
+			const input = Object.assign({}, CMCD_INPUT);
+			delete input.ts;
+
+			const output = CMCD_STRING_EVENT.replace(/ts=\d+/, 'ts=1234');
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), output);
 		});
 	});
 

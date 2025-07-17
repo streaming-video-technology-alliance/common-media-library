@@ -13,11 +13,15 @@ import type { CmcdReportingMode } from './CmcdReportingMode.js';
 export type CmcdEncodeOptions = {
 	/**
 	 * The version of the CMCD specification to use.
+	 *
+	 * @defaultValue `1`
 	 */
 	version?: number;
 
 	/**
 	 * The reporting mode to use.
+	 *
+	 * @defaultValue `CmcdReportingMode.REQUEST`
 	 */
 	reportingMode?: CmcdReportingMode;
 
