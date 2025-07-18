@@ -13,6 +13,10 @@ and this project adheres to
 - Add CMCD config type and request builder
   ([#227](https://github.com/streaming-video-technology-alliance/common-media-library/issues/227))
 
+### Changed
+
+- Convert `parseWebVtt` function to an `async` function.
+
 ## [0.16.0] - 2025-07-09
 
 ### Added
