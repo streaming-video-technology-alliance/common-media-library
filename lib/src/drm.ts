@@ -30,6 +30,7 @@ export * from './drm/fairplay/getLicenseServerUrl.js';
 // playready utilities
 export * from './drm/playready/getLicenseRequestFromMessage.js';
 export * from './drm/playready/getRequestHeadersFromMessage.js';
+export * from './drm/playready/toBigEndianKeyId.js';
 
 // drm types
 export type { ContentProtection } from './drm/common/ContentProtection.js';

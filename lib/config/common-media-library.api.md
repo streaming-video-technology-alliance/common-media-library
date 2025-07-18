@@ -60,6 +60,9 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
 // @beta
 export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
 
+// @beta
+export function arrayBufferToUuid(buffer: ArrayBuffer): string;
+
 // @alpha
 export type AudioChannelConfiguration = {
     $: {
@@ -833,6 +836,9 @@ export type DecodedId3Frame<T> = {
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array;
 
 // @beta
+export function decodeHex(hex: string): ArrayBuffer;
+
+// @beta
 export function decodeIso8601Duration(isoDuration: string): number;
 
 // @beta
@@ -918,6 +924,9 @@ export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
 // @beta
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string;
+
+// @beta
+export function encodeHex(buffer: ArrayBuffer): string;
 
 // @beta
 export function encodeIso8601Duration(duration: number): string;
@@ -2514,6 +2523,9 @@ export type TimestampMap = {
 export function tkhd(view: IsoView): Fields<TrackHeaderBox>;
 
 // @beta
+export function toBigEndianKeyId(keyId: ArrayBuffer): ArrayBuffer;
+
+// @beta
 export function toCmcdHeaders(cmcd: CmcdData, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
 // @beta @deprecated
@@ -2745,6 +2757,9 @@ export const UTF_8 = "utf-8";
 
 // @beta
 export function uuid(): string;
+
+// @beta
+export function uuidToArrayBuffer(uuid: string): ArrayBuffer;
 
 // @alpha
 export function validatePresentation(presentation: Presentation): Validation;
