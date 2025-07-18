@@ -14,6 +14,10 @@ and this project adheres to
   ([#227](https://github.com/streaming-video-technology-alliance/common-media-library/issues/227))
 - Add const for DASH thumbnail tile scheme ID URI
 
+### Changed
+
+- Convert `parseWebVtt` function to an `async` function.
+
 ## [0.16.0] - 2025-07-09
 
 ### Added
