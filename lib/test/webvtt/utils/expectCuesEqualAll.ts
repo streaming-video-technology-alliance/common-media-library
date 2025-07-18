@@ -11,7 +11,7 @@ export async function expectCuesEqualAll(vttFile: string, jsonFile: string, mess
 		readFile(path.resolve(jsonFile), 'utf-8').then(text => JSON.parse(text)),
 	]);
 
-	const { cues, regions, styles, errors } = parseWebVtt(vttText, options);
+	const { cues, regions, styles, errors } = await parseWebVtt(vttText, options);
 
 	for (let i = 0; i < cues.length; i++) {
 		deepEqual(cues[i], json.cues[i], message);
