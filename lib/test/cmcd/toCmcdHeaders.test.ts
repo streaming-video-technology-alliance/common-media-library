@@ -3,7 +3,7 @@ import { CmcdHeaderField } from '@svta/common-media-library/cmcd/CmcdHeaderField
 import type { CmcdHeaderMap } from '@svta/common-media-library/cmcd/CmcdHeaderMap';
 import { CmcdReportingMode } from '@svta/common-media-library/cmcd/CmcdReportingMode';
 import { toCmcdHeaders } from '@svta/common-media-library/cmcd/toCmcdHeaders';
-import { deepEqual } from 'node:assert';
+import { deepEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_HEADERS } from './data/CMCD_HEADERS.ts';
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts';
@@ -47,15 +47,25 @@ describe('toCmcdHeaders', () => {
 	});
 
 	it('ignores empty shards', () => {
-		deepEqual(toCmcdHeaders({ br: 200, pb: 1000 }, { version: 1 }), {
+		let headers = toCmcdHeaders({ br: 200, pb: 1000 }, { version: 1 });
+
+		deepEqual(headers, {
 			'CMCD-Object': 'br=200',
 		});
 
-		deepEqual(toCmcdHeaders({ br: 200, pb: 1000 }, { version: 2 }), {
+		equal(headers['CMCD-Request'], undefined);
+		equal(headers['CMCD-Session'], undefined);
+		equal(headers['CMCD-Status'], undefined);
+
+		headers = toCmcdHeaders({ br: 200, pb: 1000 }, { version: 2 });
+
+		deepEqual(headers, {
 			'CMCD-Object': 'br=200',
 			'CMCD-Request': 'pb=1000',
 			'CMCD-Session': 'v=2',
 		});
+
+		equal(headers['CMCD-Status'], undefined);
 	});
 
 	it('handles null data object', () => {
