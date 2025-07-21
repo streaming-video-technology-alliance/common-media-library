@@ -1,4 +1,4 @@
-import { encodeHex } from './encodeHex.js';
+import { arrayBufferToHex } from './arrayBufferToHex.js';
 
 /**
  * Converts an ArrayBuffer to a UUID string.
@@ -14,6 +14,6 @@ import { encodeHex } from './encodeHex.js';
  * {@includeCode ../../test/utils/arrayBufferToUuid.test.ts#example}
  */
 export function arrayBufferToUuid(buffer: ArrayBuffer): string {
-	const hex = encodeHex(buffer);
+	const hex = arrayBufferToHex(buffer);
 	return hex.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5');
 }

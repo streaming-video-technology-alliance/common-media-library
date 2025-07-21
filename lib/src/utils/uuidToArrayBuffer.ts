@@ -1,4 +1,4 @@
-import { decodeHex } from './decodeHex.js';
+import { hexToArrayBuffer } from './hexToArrayBuffer.js';
 
 /**
  * Converts a UUID string to an ArrayBuffer.
@@ -15,5 +15,5 @@ import { decodeHex } from './decodeHex.js';
  */
 export function uuidToArrayBuffer(uuid: string): ArrayBuffer {
 	const hex = uuid.replace(/-/g, '');
-	return decodeHex(hex);
+	return hexToArrayBuffer(hex);
 }

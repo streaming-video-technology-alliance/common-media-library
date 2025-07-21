@@ -9,9 +9,9 @@
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/encodeHex.test.ts#example}
+ * {@includeCode ../../test/utils/arrayBufferToHex.test.ts#example}
  */
-export function encodeHex(buffer: ArrayBuffer): string {
+export function arrayBufferToHex(buffer: ArrayBuffer): string {
 	const view = new Uint8Array(buffer);
 	return view.reduce((result, byte) => result + byte.toString(16).padStart(2, '0'), '');
 }

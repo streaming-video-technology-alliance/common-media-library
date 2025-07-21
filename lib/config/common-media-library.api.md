@@ -58,6 +58,9 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
 }
 
 // @beta
+export function arrayBufferToHex(buffer: ArrayBuffer): string;
+
+// @beta
 export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
 
 // @beta
@@ -836,9 +839,6 @@ export type DecodedId3Frame<T> = {
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array;
 
 // @beta
-export function decodeHex(hex: string): ArrayBuffer;
-
-// @beta
 export function decodeIso8601Duration(isoDuration: string): number;
 
 // @beta
@@ -924,9 +924,6 @@ export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
 // @beta
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string;
-
-// @beta
-export function encodeHex(buffer: ArrayBuffer): string;
 
 // @beta
 export function encodeIso8601Duration(duration: number): string;
@@ -1186,6 +1183,9 @@ export function hdlr(view: IsoView): Fields<HandlerReferenceBox>;
 
 // @beta
 export function hev1(view: IsoView): Fields<VisualSampleEntryBox<'hev1'>>;
+
+// @beta
+export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
 // @beta
 export type HintMediaHeaderBox = FullBox & {

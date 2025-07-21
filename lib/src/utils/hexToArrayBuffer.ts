@@ -9,9 +9,9 @@
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/decodeHex.test.ts#example}
+ * {@includeCode ../../test/utils/hexToArrayBuffer.test.ts#example}
  */
-export function decodeHex(hex: string): ArrayBuffer {
+export function hexToArrayBuffer(hex: string): ArrayBuffer {
 	const buffer = new ArrayBuffer(hex.length / 2);
 	const view = new Uint8Array(buffer);
 	for (let i = 0; i < hex.length; i += 2) {
