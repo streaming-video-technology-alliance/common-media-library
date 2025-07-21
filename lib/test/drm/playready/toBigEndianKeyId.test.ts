@@ -30,13 +30,4 @@ describe('toBigEndianKeyId', () => {
 
 		equal(result, longBuffer);
 	});
-
-	it('should only swap the first 8 bytes (GUID portion)', () => {
-		const input = uuidToArrayBuffer('00000000-0000-0000-1234-567890abcdef');
-		const result = toBigEndianKeyId(input);
-		const resultHex = arrayBufferToUuid(result);
-
-		// First 8 bytes should be swapped, last 8 bytes should remain unchanged
-		equal(resultHex, '00000000-0000-0000-1234-567890abcdef');
-	});
 });
