@@ -2505,6 +2505,9 @@ export type ThroughputEstimator = {
 };
 
 // @beta
+export const THUMBNAIL_TILE_SCHEME_ID_URI = "http://dashif.org/guidelines/thumbnail_tile";
+
+// @beta
 export type TimestampMap = {
     MPEGTS: number;
     LOCAL: number;
