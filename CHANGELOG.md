@@ -13,6 +13,8 @@ and this project adheres to
 - Add CMCD config type and request builder
   ([#227](https://github.com/streaming-video-technology-alliance/common-media-library/issues/227))
 - Add const for DASH thumbnail tile scheme ID URI
+- Add UUID utilities for converting to and from hex strings and changing
+  endianness
 
 ### Changed
 

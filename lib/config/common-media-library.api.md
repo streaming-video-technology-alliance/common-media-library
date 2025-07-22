@@ -58,7 +58,13 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
 }
 
 // @beta
+export function arrayBufferToHex(buffer: ArrayBuffer): string;
+
+// @beta
 export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
+
+// @beta
+export function arrayBufferToUuid(buffer: ArrayBuffer): string;
 
 // @alpha
 export type AudioChannelConfiguration = {
@@ -1177,6 +1183,9 @@ export function hdlr(view: IsoView): Fields<HandlerReferenceBox>;
 
 // @beta
 export function hev1(view: IsoView): Fields<VisualSampleEntryBox<'hev1'>>;
+
+// @beta
+export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
 // @beta
 export type HintMediaHeaderBox = FullBox & {
@@ -2517,6 +2526,9 @@ export type TimestampMap = {
 export function tkhd(view: IsoView): Fields<TrackHeaderBox>;
 
 // @beta
+export function toBigEndianKeyId(keyId: ArrayBuffer): ArrayBuffer;
+
+// @beta
 export function toCmcdHeaders(cmcd: CmcdData, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
 // @beta @deprecated
@@ -2748,6 +2760,9 @@ export const UTF_8 = "utf-8";
 
 // @beta
 export function uuid(): string;
+
+// @beta
+export function uuidToArrayBuffer(uuid: string): ArrayBuffer;
 
 // @alpha
 export function validatePresentation(presentation: Presentation): Validation;
