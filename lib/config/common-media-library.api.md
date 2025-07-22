@@ -1765,7 +1765,7 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer>;
 
 // @beta
-export function parseWebVtt(text: string, options?: WebVttParserOptions): WebVttParseResult;
+export function parseWebVtt(text: string, options?: WebVttParserOptions): Promise<WebVttParseResult>;
 
 // @beta
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;

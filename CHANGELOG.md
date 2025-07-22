@@ -16,6 +16,10 @@ and this project adheres to
 - Add UUID utilities for converting to and from hex strings and changing
   endianness
 
+### Changed
+
+- Convert `parseWebVtt` function to an `async` function.
+
 ## [0.16.0] - 2025-07-09
 
 ### Added
