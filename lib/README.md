@@ -12,7 +12,7 @@ npm install @svta/common-media-library
 ```
 
 ## Usage
-Too ensure the smallest bundle sizes possible, it is best practice to import all members and type definitions
+To ensure the smallest bundle sizes possible, it is best practice to import all members and type definitions
 individually from the library.
 ```typescript
 import { appendCmcdQuery } from '@svta/common-media-library/cmcd/appendCmcdQuery';
