@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.17.1] - 2025-07-28
+
+### Fixed
+
+- CMCD encoder strips query params from nor field.
+  ([#239](https://github.com/streaming-video-technology-alliance/common-media-library/issues/239))
+
 ## [0.17.0] - 2025-07-22
 
 ### Added
@@ -430,7 +437,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.1...HEAD
+[0.17.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.15.0...v0.15.1
