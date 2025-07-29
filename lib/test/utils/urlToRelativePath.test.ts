@@ -24,7 +24,11 @@ describe('urlToRelativePath', () => {
 
 	});
 
-	it('return url when origins are different', () => {
+	it('returns url when origins are different', () => {
 		equal(urlToRelativePath('http://foo.com/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), 'http://foo.com/1.mp4');
+	});
+
+	it('maintains query parameters and hash in the relative path', () => {
+		equal(urlToRelativePath('http://test.com/base/segments/video/1.mp4?param=foo&another=bar#hash=baz', 'http://test.com/base/manifest/manifest.mpd'), '../segments/video/1.mp4?param=foo&another=bar#hash=baz');
 	});
 });

@@ -27,7 +27,7 @@ Scan through our [existing issues](https://github.com/streaming-video-technology
 
 1. Create a working branch and start with your changes!
 
-1. Update the [CHANGELOG](./CHANGELOG.md). Make sure to update the change log with the change you've made, along with a referene to the issue.
+1. Update the [CHANGELOG](./CHANGELOG.md). Make sure to update the change log with the change you've made, along with a reference to the issue.
 
 1. Add yourself to the [Contributors List](./CONTRIBUTORS.md) if you haven't already.
 
@@ -44,7 +44,7 @@ Scan through our [existing issues](https://github.com/streaming-video-technology
 
 1. Make sure all tests pass by running `npm run test`.
 
-1. Mare sure to include a committ message that describes the change, following the [Conventional Commits](https://www.conventionalcommits.org/) format.
+1. Mare sure to include a commit message that describes the change, following the [Conventional Commits](https://www.conventionalcommits.org/) format.
 
 ### Pull Request
 

@@ -32,5 +32,8 @@ export function urlToRelativePath(url: string, base: string): string {
 		toPath.unshift('..');
 	}
 
-	return toPath.join('/');
+	const relativePath = toPath.join('/');
+
+	// preserve query parameters and hash of the destination url
+	return relativePath + to.search + to.hash;
 }
