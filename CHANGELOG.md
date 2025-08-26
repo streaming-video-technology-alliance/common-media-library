@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The extractContentId function does not handle UTF-16 data correctly
+  ([#242](https://github.com/streaming-video-technology-alliance/common-media-library/issues/242))
+
 ## [0.17.1] - 2025-07-28
 
 ### Fixed
