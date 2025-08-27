@@ -114,7 +114,7 @@ export function decodeText(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>, opt
 				}
 				// 4-byte sequence
 				else if (char >= 240 && char <= 244) {
-					if (byteOffset + 3 < byteLength) {
+					if (byteOffset + 3 <= byteLength - 1) {
 						const byte2 = view.getUint8(byteOffset + 1);
 						const byte3 = view.getUint8(byteOffset + 2);
 						const byte4 = view.getUint8(byteOffset + 3);
