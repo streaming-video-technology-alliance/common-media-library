@@ -60,9 +60,6 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
 // @beta
 export function arrayBufferToHex(buffer: ArrayBuffer): string;
 
-// @beta @deprecated
-export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
-
 // @beta
 export function arrayBufferToUuid(buffer: ArrayBuffer): string;
 
@@ -2757,7 +2754,7 @@ export type UserDataBox = ContainerBox<Box> & {
 // @beta
 export const UTF8 = "utf8";
 
-// @beta
+// @beta @deprecated
 export function utf8ArrayToStr(array: Uint8Array<ArrayBuffer>, exitOnNull?: boolean): string;
 
 // @beta
