@@ -18,6 +18,5 @@ export function extractContentId(initData: ArrayBuffer, encoding: Encoding = UTF
 	const initDataString = decodeText(initData, { encoding });
 
 	// Try extracting skd:// content ID
-	const id = initDataString.split('skd://').pop();
-	return id ?? '';
+	return initDataString.split('skd://')[1] || '';
 }
