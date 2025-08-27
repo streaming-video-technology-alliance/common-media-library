@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.17.2] - 2025-08-27
+
 ### Fixed
 
 - The extractContentId function does not handle UTF-16 data correctly
@@ -442,7 +444,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.2...HEAD
+[0.17.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.15.1...v0.16.0
