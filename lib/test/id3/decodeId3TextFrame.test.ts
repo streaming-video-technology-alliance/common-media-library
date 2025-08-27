@@ -11,11 +11,8 @@ describe('decodeId3TextFrame', () => {
 			size: 2, // required by the decodeTextFrame function
 		};
 
-		const testables = {
-			decodeId3TextFrame: decodeId3TextFrame,
-		};
+		const result: Id3Frame | undefined = decodeId3TextFrame(frame);
 
-		const result: Id3Frame | undefined = testables.decodeId3TextFrame(frame);
 		equal(result!.key, 'TXXX');
 		equal(result!.info, 'foo');
 		equal(result!.data, 'abc');

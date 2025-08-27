@@ -1,6 +1,7 @@
-import { dataViewToString } from '../../../utils/dataViewToString.js';
+import { decodeText } from '../../../utils/decodeText.js';
+import { UTF_8 } from '../../../utils/UTF_8.js';
 
-export function readUtf8TerminatedString(dataView: DataView, offset: number): string {
+export function readUtf8TerminatedString(dataView: DataView<ArrayBuffer>, offset: number): string {
 	const length = dataView.byteLength - (offset - dataView.byteOffset);
 
 	let data = '';
@@ -17,7 +18,7 @@ export function readUtf8TerminatedString(dataView: DataView, offset: number): st
 		}
 
 		// remap the Dataview with the actual length
-		data = dataViewToString(new DataView(dataView.buffer, offset, l));
+		data = decodeText(new DataView(dataView.buffer, offset, l), { encoding: UTF_8 });
 	}
 
 	return data;

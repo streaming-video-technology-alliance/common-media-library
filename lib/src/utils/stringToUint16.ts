@@ -11,7 +11,7 @@
  * @example
  * {@includeCode ../../test/utils/stringToUint16.test.ts#example}
  */
-export function stringToUint16(str: string): Uint16Array {
+export function stringToUint16(str: string): Uint16Array<ArrayBuffer> {
 	const buffer = new ArrayBuffer(str.length * 2);
 	const view = new DataView(buffer);
 

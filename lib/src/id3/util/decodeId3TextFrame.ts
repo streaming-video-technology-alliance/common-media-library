@@ -25,10 +25,11 @@ export function decodeId3TextFrame(frame: RawId3Frame): DecodedId3Frame<string> 
 		[1-?] = {Description}\0{Value}
 		*/
 		let index = 1;
-		const description = utf8ArrayToStr(frame.data.subarray(index), true);
+		const { data } = frame;
+		const description = utf8ArrayToStr(data.subarray(index), true);
 
 		index += description.length + 1;
-		const value = utf8ArrayToStr(frame.data.subarray(index));
+		const value = utf8ArrayToStr(data.subarray(index));
 
 		return { key: frame.type, info: description, data: value };
 	}

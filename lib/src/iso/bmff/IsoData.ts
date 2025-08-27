@@ -6,4 +6,4 @@
  *
  * @beta
  */
-export type IsoData = ArrayBuffer | DataView | Uint8Array;
+export type IsoData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;

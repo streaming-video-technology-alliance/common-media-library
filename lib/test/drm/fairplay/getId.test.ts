@@ -7,7 +7,7 @@ describe('getId', () => {
 	it('extracts contentId from skd:// format', () => {
 		//#region example
 		const laUrl = 'https://common-media-library.com';
-		const initData = stringToUint16('\tskd://common-media-library.com/asset1234');
+		const initData = stringToUint16('\tskd://common-media-library.com/asset1234').buffer as ArrayBuffer;
 
 		strictEqual(getId(laUrl, initData), 'common-media-library.com/asset1234');
 		//#endregion example
@@ -15,7 +15,7 @@ describe('getId', () => {
 
 	it('extracts query param when provided', () => {
 		const laUrl = 'https://common-media-library.com?videoId=svta-cml';
-		const initData = new Uint16Array();
+		const initData = new Uint16Array().buffer as ArrayBuffer;
 
 		strictEqual(getId(laUrl, initData, 'videoId'), 'svta-cml');
 	});
