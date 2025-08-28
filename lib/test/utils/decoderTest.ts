@@ -1,6 +1,6 @@
 import { after, before, describe } from 'node:test';
 
-const TD = TextDecoder;
+const NativeTextDecoder = TextDecoder;
 
 export function decoderTest(name: string, test: () => void | Promise<void>): void {
 	describe(`${name} with TextDecoder`, () => {
