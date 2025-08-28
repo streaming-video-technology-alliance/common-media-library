@@ -1,5 +1,7 @@
 # Common Media Library Contributors List
+
 Please add entries to the bottom of the list in the following format:
+
 ```
 - @GitHub UserName (Required) [Name, Organization] (Optional)
 ```
@@ -11,3 +13,5 @@ Please add entries to the bottom of the list in the following format:
 - @willdharris [Will Harris, Paramount]
 - @beraliv [Alexey Berezin, DAZN]
 - @mcintyrehh [Henry McIntyre, Vimeo]
+- @cotid-qualabs [Constanza Dibueno, Qualabs]
+- @juanmanuel-qualabs [Juan Manuel Gonzalez, Qualabs]
