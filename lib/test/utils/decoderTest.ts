@@ -13,7 +13,7 @@ export function decoderTest(name: string, test: () => void | Promise<void>): voi
 		});
 
 		after(() => {
-			globalThis.TextDecoder = TD;
+			globalThis.TextDecoder = NativeTextDecoder;
 		});
 
 		test();
