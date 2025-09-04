@@ -10,21 +10,21 @@ and this project adheres to
 
 ### Fixed
 
-- Infinite loop when encoding CMCD nor field
+- Infinite loop when encoding CMCD `nor` field
   ([#249](https://github.com/streaming-video-technology-alliance/common-media-library/issues/249))
 
 ## [0.17.2] - 2025-08-27
 
 ### Fixed
 
-- The extractContentId function does not handle UTF-16 data correctly
+- The `extractContentId` function does not handle UTF-16 data correctly
   ([#242](https://github.com/streaming-video-technology-alliance/common-media-library/issues/242))
 
 ## [0.17.1] - 2025-07-28
 
 ### Fixed
 
-- CMCD encoder strips query params from nor field.
+- CMCD encoder strips query params from `nor` field.
   ([#239](https://github.com/streaming-video-technology-alliance/common-media-library/issues/239))
 
 ## [0.17.0] - 2025-07-22
