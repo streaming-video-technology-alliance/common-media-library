@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Infinite loop when encoding CMCD nor field
+  ([#249](https://github.com/streaming-video-technology-alliance/common-media-library/issues/249))
+
 ## [0.17.2] - 2025-08-27
 
 ### Fixed
