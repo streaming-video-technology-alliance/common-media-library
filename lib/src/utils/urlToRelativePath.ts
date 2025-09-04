@@ -21,7 +21,13 @@ export function urlToRelativePath(url: string, base: string): string {
 	const fromPath = from.pathname.split('/').slice(1, -1);
 
 	// remove common parents
-	while (toPath[0] === fromPath[0]) {
+	const length = Math.min(toPath.length, fromPath.length);
+
+	for (let i = 0; i < length; i++) {
+		if (toPath[i] !== fromPath[i]) {
+			break;
+		}
+
 		toPath.shift();
 		fromPath.shift();
 	}
