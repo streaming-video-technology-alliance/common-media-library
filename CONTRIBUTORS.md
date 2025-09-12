@@ -15,3 +15,4 @@ Please add entries to the bottom of the list in the following format:
 - @mcintyrehh [Henry McIntyre, Vimeo]
 - @cotid-qualabs [Constanza Dibueno, Qualabs]
 - @juanmanuel-qualabs [Juan Manuel Gonzalez, Qualabs]
+- @dsilhavy [Daniel Silhavy, Fraunhofer FOKUS]

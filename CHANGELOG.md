@@ -8,6 +8,9 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Added missing fields `q` and `d` to `CmcdPlayerState`
+
 ## [0.17.3] - 2025-09-04
 
 ### Fixed
