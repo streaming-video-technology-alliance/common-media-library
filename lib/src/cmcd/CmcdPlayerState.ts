@@ -51,7 +51,7 @@ export const CmcdPlayerState = {
 	FATAL_ERROR: 'f',
 
 	/**
-	 * Quit : User initiated end of playback before media asset completion.
+	 * Quit: User initiated end of playback before media asset completion.
 	 */
 	QUIT: 'q',
 
