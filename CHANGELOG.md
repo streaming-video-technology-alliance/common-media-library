@@ -8,7 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.17.4] - 2025-09-12
+
 ### Fixed
+
 - Added missing fields `q` and `d` to `CmcdPlayerState`
 
 ## [0.17.3] - 2025-09-04
@@ -454,7 +457,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.3...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.4...HEAD
+[0.17.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.2...v0.17.3
 [0.17.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.0...v0.17.1
