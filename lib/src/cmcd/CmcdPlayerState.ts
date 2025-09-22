@@ -8,7 +8,7 @@ import type { ValueOf } from '../utils/ValueOf.js';
  * @enum
  *
  * @beta
-*/
+ */
 export const CmcdPlayerState = {
 	/**
 	 * Starting: Initial startup of the player.
@@ -49,6 +49,16 @@ export const CmcdPlayerState = {
 	 * Fatal Error: The player has encountered a fatal error.
 	 */
 	FATAL_ERROR: 'f',
+
+	/**
+	 * Quit: User initiated end of playback before media asset completion.
+	 */
+	QUIT: 'q',
+
+	/**
+	 * Preloading: The player is loading assets ahead of starting in order to provide a fast startup. The expectation is that playback will commence at a future time.
+	 */
+	PRELOADING: 'd',
 } as const;
 
 /**

@@ -1,6 +1,6 @@
 {
 	"name": "cmaf-ham-conversion",
-	"version": "0.17.2",
+	"version": "0.17.4",
 	"description": "",
 	"type": "module",
 	"scripts": {

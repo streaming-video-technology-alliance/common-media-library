@@ -31,4 +31,12 @@ describe('urlToRelativePath', () => {
 	it('maintains query parameters and hash in the relative path', () => {
 		equal(urlToRelativePath('http://test.com/base/segments/video/1.mp4?param=foo&another=bar#hash=baz', 'http://test.com/base/manifest/manifest.mpd'), '../segments/video/1.mp4?param=foo&another=bar#hash=baz');
 	});
+
+	it('produces a relative path when only query params are different', () => {
+		equal(urlToRelativePath('http://test.com/file.mp4?i=1', 'http://test.com/file.mp4?i=0'), 'file.mp4?i=1');
+	});
+
+	it('produces a relative path when only hash params are different', () => {
+		equal(urlToRelativePath('http://test.com/file.mp4#i=1', 'http://test.com/file.mp4#i=0'), 'file.mp4#i=1');
+	});
 });
