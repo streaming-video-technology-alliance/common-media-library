@@ -20,7 +20,7 @@ const FRAME_SIZE = 10;
  *
  * @beta
  */
-export function getId3Frames(id3Data: Uint8Array): Id3Frame[] {
+export function getId3Frames(id3Data: Uint8Array<ArrayBuffer>): Id3Frame[] {
 	let offset = 0;
 	const frames: Id3Frame[] = [];
 

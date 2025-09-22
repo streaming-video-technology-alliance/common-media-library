@@ -2,7 +2,7 @@ export function toUint8(
 	data: BufferSource,
 	offset: number = 0,
 	length: number = Infinity,
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
 	return view(data, offset, length, Uint8Array);
 }
 

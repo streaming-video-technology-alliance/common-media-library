@@ -44,7 +44,7 @@ export type RawBox = {
  * @beta
  */
 export class IsoView {
-	private dataView: DataView;
+	private dataView: DataView<ArrayBuffer>;
 	private offset: number;
 	private config: IsoViewConfig;
 	private truncated: boolean = false;
@@ -57,8 +57,8 @@ export class IsoView {
 	 * @param raw - The raw data to view.
 	 * @param config - The configuration for the IsoView.
 	 */
-	constructor(raw: ArrayBuffer | DataView | Uint8Array, config?: IsoViewConfig) {
-		this.dataView = (raw instanceof ArrayBuffer) ? new DataView(raw) : (raw instanceof Uint8Array) ? new DataView(raw.buffer, raw.byteOffset, raw.byteLength) : raw;
+	constructor(raw: ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>, config?: IsoViewConfig) {
+		this.dataView = (raw instanceof ArrayBuffer) ? new DataView<ArrayBuffer>(raw) : (raw instanceof Uint8Array) ? new DataView<ArrayBuffer>(raw.buffer, raw.byteOffset, raw.byteLength) : raw;
 		this.offset = this.dataView.byteOffset;
 		this.config = config || { recursive: false, parsers: {} };
 	}

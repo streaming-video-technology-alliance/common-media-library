@@ -1,6 +1,6 @@
 import { UTF_16 } from '../../utils/UTF_16.js';
 import type { UTF_8 } from '../../utils/UTF_8.js';
-import { arrayBufferToString } from '../../utils/arrayBufferToString.js';
+import { decodeText } from '../../utils/decodeText.js';
 import { getElementsByName } from '../../xml/getElementsByName.js';
 import { parseXml } from '../../xml/parseXml.js';
 import { CONTENT_TYPE } from '../common/CONTENT_TYPE.js';
@@ -33,7 +33,7 @@ export function getRequestHeadersFromMessage(
 		return headers;
 	}
 
-	const msg = arrayBufferToString(message, encoding);
+	const msg = decodeText(message, { encoding });
 	const xml = parseXml(msg);
 	const httpHeaders = getElementsByName(xml, HTTP_HEADERS)[0].childNodes;
 

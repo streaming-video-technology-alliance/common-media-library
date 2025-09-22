@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Consolidate text decoding utilities
+  ([#244](https://github.com/streaming-video-technology-alliance/common-media-library/issues/244))
+
 ## [0.17.4] - 2025-09-12
 
 ### Fixed

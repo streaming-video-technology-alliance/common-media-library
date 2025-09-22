@@ -1,7 +1,7 @@
 import type { Encoding } from '../../utils/Encoding.js';
 import { UTF_16 } from '../../utils/UTF_16.js';
-import { arrayBufferToString } from '../../utils/arrayBufferToString.js';
 import { decodeBase64 } from '../../utils/decodeBase64.js';
+import { decodeText } from '../../utils/decodeText.js';
 import { getElementsByName } from '../../xml/getElementsByName.js';
 import { parseXml } from '../../xml/parseXml.js';
 import { CHALLENGE } from '../common/CHALLENGE.js';
@@ -31,7 +31,7 @@ export function getLicenseRequestFromMessage(
 		return message;
 	}
 
-	const msg = arrayBufferToString(message, encoding);
+	const msg = decodeText(message, { encoding });
 	const xml = parseXml(msg);
 	const playReadyKeyMessage = getElementsByName(xml, PLAYREADY_KEY_MESSAGE)[0];
 

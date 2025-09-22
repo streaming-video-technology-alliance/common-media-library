@@ -61,9 +61,6 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
 export function arrayBufferToHex(buffer: ArrayBuffer): string;
 
 // @beta
-export function arrayBufferToString(arrayBuffer: ArrayBuffer, encoding: Encoding): string;
-
-// @beta
 export function arrayBufferToUuid(buffer: ArrayBuffer): string;
 
 // @alpha
@@ -814,9 +811,6 @@ export type DataReferenceBox = FullBox & {
 };
 
 // @beta
-export function dataViewToString(dataView: DataView, encoding?: Encoding): string;
-
-// @beta
 export function decodeBase64(str: string): Uint8Array;
 
 // @beta
@@ -849,6 +843,15 @@ export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem;
 
 // @beta
 export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember[];
+
+// @beta
+export function decodeText(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>, options?: DecodeTextOptions): string;
+
+// @beta
+export type DecodeTextOptions = {
+    encoding?: Encoding;
+    exitOnNull?: boolean;
+};
 
 // @beta
 export type DecodingTimeSample = {
@@ -944,6 +947,8 @@ export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): stri
 export const Encoding: {
     readonly UTF8: typeof UTF_8;
     readonly UTF16: typeof UTF_16;
+    readonly UTF16BE: typeof UTF_16_BE;
+    readonly UTF16LE: typeof UTF_16_LE;
 };
 
 // @beta
@@ -1020,7 +1025,7 @@ export type ExtendedLanguageBox = FullBox & {
 };
 
 // @beta
-export function extractContentId(initData: Uint16Array): string;
+export function extractContentId(initData: ArrayBuffer, encoding?: Encoding): string;
 
 // @beta
 export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>>;
@@ -1095,7 +1100,7 @@ export type FullBox = Box & {
 export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
 
 // @beta
-export function getId(licenseServerUrl: string, initData: Uint16Array, queryParam?: string): string;
+export function getId(licenseServerUrl: string, initData: ArrayBuffer, queryParam?: string): string;
 
 // Warning: (ae-internal-missing-underscore) The name "getId3Data" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -1103,10 +1108,10 @@ export function getId(licenseServerUrl: string, initData: Uint16Array, queryPara
 export function getId3Data(data: Uint8Array, offset: number): Uint8Array | undefined;
 
 // @beta
-export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
+export function getId3Frames(id3Data: Uint8Array<ArrayBuffer>): Id3Frame[];
 
 // @beta
-export function getId3Timestamp(data: Uint8Array): number | undefined;
+export function getId3Timestamp(data: Uint8Array<ArrayBuffer>): number | undefined;
 
 // @beta
 export function getKeySystemAccess(requests: MediaKeySystemAccessRequest[]): Promise<MediaKeySystemAccess | null>;
@@ -1405,7 +1410,7 @@ export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox<'enca'> |
 export type IsoContainerBox = DataInformationBox | EditBox | ItemInfoBox | ItemProtectionBox | ItemReferenceBox | MediaBox | MediaInformationBox | MetaBox | MovieBox | MovieExtendsBox | MovieFragmentBox | MovieFragmentRandomAccessBox | ProtectionSchemeInformationBox | SampleTableBox | SchemeInformationBox | TrackBox | TrackFragmentBox | TrackReferenceBox | UserDataBox;
 
 // @beta
-export type IsoData = ArrayBuffer | DataView | Uint8Array;
+export type IsoData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
 
 // @beta
 export type IsoFieldTypeMap = {
@@ -1421,7 +1426,7 @@ export type IsoFieldTypeMap = {
 // @beta
 export class IsoView {
     [Symbol.iterator](): Generator<IsoBmffBox>;
-    constructor(raw: ArrayBuffer | DataView | Uint8Array, config?: IsoViewConfig);
+    constructor(raw: ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>, config?: IsoViewConfig);
     get bytesRemaining(): number;
     get cursor(): number;
     get done(): boolean;
@@ -2367,7 +2372,7 @@ export function sthd(view: IsoView): Fields<SubtitleMediaHeaderBox>;
 export const STRING = "string";
 
 // @beta
-export function stringToUint16(str: string): Uint16Array;
+export function stringToUint16(str: string): Uint16Array<ArrayBuffer>;
 
 // @beta
 export function stsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoView): Fields<SampleDescriptionBox<E>>;
@@ -2749,11 +2754,17 @@ export type UserDataBox = ContainerBox<Box> & {
 // @beta
 export const UTF8 = "utf8";
 
-// @beta
-export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
+// @beta @deprecated
+export function utf8ArrayToStr(array: Uint8Array<ArrayBuffer>, exitOnNull?: boolean): string;
 
 // @beta
 export const UTF_16 = "utf-16";
+
+// @beta
+export const UTF_16_BE = "utf-16be";
+
+// @beta
+export const UTF_16_LE = "utf-16le";
 
 // @beta
 export const UTF_8 = "utf-8";
