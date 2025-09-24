@@ -1,4 +1,4 @@
-import { decodeCmsdDynamic } from '@svta/common-media-library/cmsd/decodeCmsdDynamic';
+import { decodeCmsdDynamic } from '@svta/cml-cmsd/decodeCmsdDynamic';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.ts';

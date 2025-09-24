@@ -1,4 +1,4 @@
-import { arrayBufferToUuid } from '@svta/common-media-library/utils';
+import { arrayBufferToUuid } from '@svta/cml-utils';
 import { equal } from 'assert/strict';
 import { describe, it } from 'node:test';
 

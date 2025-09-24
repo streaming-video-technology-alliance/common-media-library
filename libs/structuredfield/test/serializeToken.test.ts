@@ -1,4 +1,4 @@
-import { serializeToken } from '@svta/common-media-library/structuredfield/serialize/serializeToken';
+import { serializeToken } from '@svta/cml-structuredfield/serialize/serializeToken';
 import assert from 'node:assert';
 import test from 'node:test';
 

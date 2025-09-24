@@ -1,4 +1,4 @@
-import { parseToken } from '@svta/common-media-library/structuredfield/parse/parseToken';
+import { parseToken } from '@svta/cml-structuredfield/parse/parseToken';
 import assert from 'node:assert';
 import test from 'node:test';
 

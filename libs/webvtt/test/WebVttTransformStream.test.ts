@@ -1,5 +1,5 @@
-import { WebVttResultType } from '@svta/common-media-library/webvtt/WebVttResultType.js';
-import { WebVttTransformStream } from '@svta/common-media-library/webvtt/WebVttTransformStream.js';
+import { WebVttResultType } from '@svta/cml-webvtt/WebVttResultType.js';
+import { WebVttTransformStream } from '@svta/cml-webvtt/WebVttTransformStream.js';
 import { equal } from 'node:assert';
 import { createReadStream } from 'node:fs';
 import { resolve } from 'node:path';
@@ -16,7 +16,7 @@ function fetch(path: string): Promise<{ body: ReadableStream<any> }> {
 describe('WebVttTransformStream examples', () => {
 	it('provides a valid example', async () => {
 		//#region example
-		const response = await fetch('./test/webvtt/test.vtt');
+		const response = await fetch('./test/test.vtt');
 		const stream = response.body
 			.pipeThrough(new TextDecoderStream())
 			.pipeThrough(new WebVttTransformStream());

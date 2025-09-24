@@ -1,8 +1,8 @@
-import type { CmcdEncodeOptions } from '@svta/common-media-library/cmcd/CmcdEncodeOptions';
-import { CmcdReportingMode } from '@svta/common-media-library/cmcd/CmcdReportingMode';
-import { encodeCmcd } from '@svta/common-media-library/cmcd/encodeCmcd';
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
-import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
+import type { CmcdEncodeOptions } from '@svta/cml-cmcd/CmcdEncodeOptions';
+import { CmcdReportingMode } from '@svta/cml-cmcd/CmcdReportingMode';
+import { encodeCmcd } from '@svta/cml-cmcd/encodeCmcd';
+import { SfItem } from '@svta/cml-structuredfield/SfItem';
+import { SfToken } from '@svta/cml-structuredfield/SfToken';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts';

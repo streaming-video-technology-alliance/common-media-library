@@ -1,4 +1,4 @@
-import { parseWebVtt } from '@svta/common-media-library/webvtt/parseWebVtt.js';
+import { parseWebVtt } from '@svta/cml-webvtt/parseWebVtt.js';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 import './utils/pollyfill.ts';

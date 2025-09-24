@@ -1,4 +1,4 @@
-import { parseIntegerOrDecimal } from '@svta/common-media-library/structuredfield/parse/parseIntegerOrDecimal';
+import { parseIntegerOrDecimal } from '@svta/cml-structuredfield/parse/parseIntegerOrDecimal';
 import assert from 'node:assert';
 import test from 'node:test';
 

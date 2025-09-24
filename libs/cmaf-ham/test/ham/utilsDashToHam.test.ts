@@ -1,24 +1,24 @@
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import type { AdaptationSet } from '@svta/common-media-library/cmaf/ham/types/mapper/dash/AdaptationSet.js';
-import type { Period } from '@svta/common-media-library/cmaf/ham/types/mapper/dash/Period.js';
-import type { Representation } from '@svta/common-media-library/cmaf/ham/types/mapper/dash/Representation.js';
-import type { SegmentTemplate } from '@svta/common-media-library/cmaf/ham/types/mapper/dash/SegmentTemplate.js';
+import type { AdaptationSet } from '@svta/cml-cmaf-ham/types/mapper/dash/AdaptationSet.js';
+import type { Period } from '@svta/cml-cmaf-ham/types/mapper/dash/Period.js';
+import type { Representation } from '@svta/cml-cmaf-ham/types/mapper/dash/Representation.js';
+import type { SegmentTemplate } from '@svta/cml-cmaf-ham/types/mapper/dash/SegmentTemplate.js';
 
-import { calculateDuration } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/calculateDuration.js';
-import { getChannels } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getChannels.js';
-import { getCodec } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getCodec.js';
-import { getContentType } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getContentType.js';
-import { getFrameRate } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getFrameRate.js';
-import { getGroup } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getGroup.js';
-import { getLanguage } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getLanguage.js';
-import { getNumberOfSegments } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getNumberOfSegments.js';
-import { getPresentationId } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getPresentationId.js';
-import { getSampleRate } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getSampleRate.js';
-import { getSar } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getSar.js';
-import { getTrackDuration } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getTrackDuration.js';
-import { getUrlFromTemplate } from '@svta/common-media-library/cmaf/ham/mapper/dash/mapDashToHam/utils/getUrlFromTemplate.js';
+import { calculateDuration } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/calculateDuration.js';
+import { getChannels } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getChannels.js';
+import { getCodec } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getCodec.js';
+import { getContentType } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getContentType.js';
+import { getFrameRate } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getFrameRate.js';
+import { getGroup } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getGroup.js';
+import { getLanguage } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getLanguage.js';
+import { getNumberOfSegments } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getNumberOfSegments.js';
+import { getPresentationId } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getPresentationId.js';
+import { getSampleRate } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getSampleRate.js';
+import { getSar } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getSar.js';
+import { getTrackDuration } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getTrackDuration.js';
+import { getUrlFromTemplate } from '@svta/cml-cmaf-ham/mapper/dash/mapDashToHam/utils/getUrlFromTemplate.js';
 
 describe('calculateDuration', () => {
 	it('returns 1 when duration is 1 and timescale is 1', () => {

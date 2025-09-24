@@ -1,4 +1,5 @@
-import { type ContentProtection, getLicenseServerUrlFromContentProtection } from '@svta/common-media-library/drm.js';
+import { getLicenseServerUrlFromContentProtection } from '@svta/cml-drm/cenc/getLicenseServerUrlFromContentProtection';
+import { type ContentProtection } from '@svta/cml-drm/common/ContentProtection';
 import { strictEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 

@@ -1,5 +1,5 @@
-import { decodeSfItem } from '@svta/common-media-library/structuredfield/decodeSfItem';
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
+import { decodeSfItem } from '@svta/cml-structuredfield/decodeSfItem';
+import { SfItem } from '@svta/cml-structuredfield/SfItem';
 import assert from 'node:assert';
 import test from 'node:test';
 

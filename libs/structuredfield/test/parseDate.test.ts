@@ -1,4 +1,4 @@
-import { parseDate } from '@svta/common-media-library/structuredfield/parse/parseDate';
+import { parseDate } from '@svta/cml-structuredfield/parse/parseDate';
 import assert from 'node:assert';
 import test from 'node:test';
 

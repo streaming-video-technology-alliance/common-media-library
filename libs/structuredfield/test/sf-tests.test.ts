@@ -1,9 +1,9 @@
-import { decodeSfDict } from '@svta/common-media-library/structuredfield/decodeSfDict';
-import { decodeSfItem } from '@svta/common-media-library/structuredfield/decodeSfItem';
-import { decodeSfList } from '@svta/common-media-library/structuredfield/decodeSfList';
-import { encodeSfDict } from '@svta/common-media-library/structuredfield/encodeSfDict';
-import { encodeSfItem } from '@svta/common-media-library/structuredfield/encodeSfItem';
-import { encodeSfList } from '@svta/common-media-library/structuredfield/encodeSfList';
+import { decodeSfDict } from '@svta/cml-structuredfield/decodeSfDict';
+import { decodeSfItem } from '@svta/cml-structuredfield/decodeSfItem';
+import { decodeSfList } from '@svta/cml-structuredfield/decodeSfList';
+import { encodeSfDict } from '@svta/cml-structuredfield/encodeSfDict';
+import { encodeSfItem } from '@svta/cml-structuredfield/encodeSfItem';
+import { encodeSfList } from '@svta/cml-structuredfield/encodeSfList';
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
 import { formatDict, formatItem, formatList } from './util/format.ts';

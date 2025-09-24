@@ -1,4 +1,4 @@
-import { CmcdReportingMode, CmcdTransmissionMode, toCmcdReport } from '@svta/common-media-library/cmcd';
+import { CmcdReportingMode, CmcdTransmissionMode, toCmcdReport } from '@svta/cml-cmcd';
 import { deepEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { QUERY_TARGET } from './data/QUERY_TARGET.ts';

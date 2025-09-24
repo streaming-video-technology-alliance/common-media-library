@@ -1,4 +1,4 @@
-import { CMCD_EVENT_KEYS, isCmcdEventKey } from '@svta/common-media-library/cmcd';
+import { CMCD_EVENT_KEYS, isCmcdEventKey } from '@svta/cml-cmcd';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

@@ -1,4 +1,4 @@
-import { uuid } from '@svta/common-media-library/utils/uuid';
+import { uuid } from '@svta/cml-utils/uuid';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

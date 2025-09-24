@@ -1,5 +1,5 @@
 
-import { getRequestHeadersFromMessage } from '@svta/common-media-library/drm/playready/getRequestHeadersFromMessage';
+import { getRequestHeadersFromMessage } from '@svta/cml-drm/playready/getRequestHeadersFromMessage';
 import { deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { PLAYREADY_HEADERS } from './data/PLAYREADY_HEADERS.ts';

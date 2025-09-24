@@ -1,7 +1,7 @@
-import { decodeText } from '@svta/common-media-library/utils/decodeText';
-import { stringToUint16 } from '@svta/common-media-library/utils/stringToUint16';
-import { UTF_16 } from '@svta/common-media-library/utils/UTF_16';
-import { UTF_8 } from '@svta/common-media-library/utils/UTF_8';
+import { decodeText } from '@svta/cml-utils/decodeText';
+import { stringToUint16 } from '@svta/cml-utils/stringToUint16';
+import { UTF_16 } from '@svta/cml-utils/UTF_16';
+import { UTF_8 } from '@svta/cml-utils/UTF_8';
 import { equal } from 'node:assert';
 import { it } from 'node:test';
 import { decoderTest } from './decoderTest.ts';

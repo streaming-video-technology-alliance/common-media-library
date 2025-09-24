@@ -1,4 +1,4 @@
-import { serializeDecimal } from '@svta/common-media-library/structuredfield/serialize/serializeDecimal';
+import { serializeDecimal } from '@svta/cml-structuredfield/serialize/serializeDecimal';
 import assert from 'node:assert';
 import test from 'node:test';
 

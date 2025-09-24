@@ -1,4 +1,4 @@
-import { utf8ArrayToStr } from '@svta/common-media-library';
+import { utf8ArrayToStr } from '@svta/cml-utils/utf8ArrayToStr';
 import { equal } from 'node:assert';
 import { it } from 'node:test';
 import { decoderTest } from './decoderTest.ts';

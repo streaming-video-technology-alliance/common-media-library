@@ -1,4 +1,4 @@
-import { decodeFairPlayLicense } from '@svta/common-media-library/drm/fairplay/decodeFairPlayLicense';
+import { decodeFairPlayLicense } from '@svta/cml-drm/fairplay/decodeFairPlayLicense';
 import { deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

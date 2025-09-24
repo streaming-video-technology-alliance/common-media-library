@@ -1,5 +1,5 @@
-import { findCencContentProtection } from '@svta/common-media-library/drm/cenc/findCencContentProtection.js';
-import { MP4_PROTECTION_SCHEME } from '@svta/common-media-library/drm/common/MP4_PROTECTION_SCHEME.js';
+import { findCencContentProtection } from '@svta/cml-drm/cenc/findCencContentProtection.js';
+import { MP4_PROTECTION_SCHEME } from '@svta/cml-drm/common/MP4_PROTECTION_SCHEME.js';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

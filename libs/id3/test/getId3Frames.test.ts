@@ -1,5 +1,5 @@
-import { getId3Frames } from '@svta/common-media-library';
-import { toArrayBuffer } from '@svta/common-media-library/id3/util/toArrayBuffer';
+import { getId3Frames } from '@svta/cml-id3/getId3Frames';
+import { toArrayBuffer } from '@svta/cml-id3/util/toArrayBuffer';
 import { deepEqual, deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { DATA, DATA_BYTES, DATA_UINT8 } from './data/DATA.ts';
@@ -8,7 +8,7 @@ import { createId3 } from './data/createId3.ts';
 import {
 	generateId3,
 	generateId3Frame,
-} from './util/id3Generator.ts';
+} from './utils/id3Generator.ts';
 
 describe('getId3Frames', () => {
 	it('no valid data produces empty output', () => {

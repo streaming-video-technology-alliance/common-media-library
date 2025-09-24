@@ -1,5 +1,5 @@
-import { parseItem } from '@svta/common-media-library/structuredfield/parse/parseItem';
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
+import { parseItem } from '@svta/cml-structuredfield/parse/parseItem';
+import { SfItem } from '@svta/cml-structuredfield/SfItem';
 import assert from 'node:assert';
 import test from 'node:test';
 

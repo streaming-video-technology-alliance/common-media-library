@@ -1,4 +1,4 @@
-import { readId3Size } from '@svta/common-media-library/id3/util/readId3Size';
+import { readId3Size } from '@svta/cml-id3/util/readId3Size';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

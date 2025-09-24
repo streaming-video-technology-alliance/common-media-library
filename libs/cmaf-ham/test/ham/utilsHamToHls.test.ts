@@ -3,10 +3,10 @@ import { describe, it } from 'node:test';
 
 import type { AudioTrack } from '@svta/common-media-library/cmaf-ham';
 
-import { getByterange } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getByterange.js';
-import { getPlaylistData } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getPlaylistData.js';
-import { getSegments } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getSegments.js';
-import { getUrlInitialization } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHamToHls/utils/getUrlInitialization.js';
+import { getByterange } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getByterange.js';
+import { getPlaylistData } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getPlaylistData.js';
+import { getSegments } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getSegments.js';
+import { getUrlInitialization } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getUrlInitialization.js';
 
 import { getAudioTrack } from './data/hlsData.ts';
 

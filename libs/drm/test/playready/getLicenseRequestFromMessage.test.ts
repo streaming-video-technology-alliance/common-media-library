@@ -1,5 +1,5 @@
+import { base64decode } from '@svta/cml-utils/base64decode';
 import { UTF_16, getLicenseRequestFromMessage } from '@svta/common-media-library';
-import { base64decode } from '@svta/common-media-library/utils/base64decode';
 import { deepStrictEqual, strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { PLAYREADY_KEY_MESSAGE } from './data/PLAYREADY_KEY_MESSAGE.ts';

@@ -1,5 +1,5 @@
-import { parseBareItem } from '@svta/common-media-library/structuredfield/parse/parseBareItem';
-import { base64encode } from '@svta/common-media-library/utils/base64encode';
+import { parseBareItem } from '@svta/cml-structuredfield/parse/parseBareItem';
+import { base64encode } from '@svta/cml-utils/base64encode';
 import assert from 'node:assert';
 import test from 'node:test';
 

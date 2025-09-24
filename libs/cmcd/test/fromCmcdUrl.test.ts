@@ -1,4 +1,4 @@
-import { fromCmcdUrl } from '@svta/common-media-library/cmcd';
+import { fromCmcdUrl } from '@svta/cml-cmcd';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.ts';

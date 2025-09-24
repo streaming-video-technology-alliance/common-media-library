@@ -1,4 +1,4 @@
-import { parseParameters } from '@svta/common-media-library/structuredfield/parse/parseParameters';
+import { parseParameters } from '@svta/cml-structuredfield/parse/parseParameters';
 import assert from 'node:assert';
 import test from 'node:test';
 

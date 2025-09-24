@@ -1,4 +1,4 @@
-import { hexToArrayBuffer } from '@svta/common-media-library/utils';
+import { hexToArrayBuffer } from '@svta/cml-utils';
 import { deepEqual } from 'assert';
 import { describe, it } from 'node:test';
 

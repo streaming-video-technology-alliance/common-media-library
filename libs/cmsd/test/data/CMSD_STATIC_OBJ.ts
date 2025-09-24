@@ -1,7 +1,7 @@
-import { CmsdObjectType } from '@svta/common-media-library/cmsd/CmsdObjectType';
-import type { CmsdStatic } from '@svta/common-media-library/cmsd/CmsdStatic';
-import { CmsdStreamingFormat } from '@svta/common-media-library/cmsd/CmsdStreamingFormat';
-import { CmsdStreamType } from '@svta/common-media-library/cmsd/CmsdStreamType';
+import { CmsdObjectType } from '@svta/cml-cmsd/CmsdObjectType';
+import type { CmsdStatic } from '@svta/cml-cmsd/CmsdStatic';
+import { CmsdStreamingFormat } from '@svta/cml-cmsd/CmsdStreamingFormat';
+import { CmsdStreamType } from '@svta/cml-cmsd/CmsdStreamType';
 
 export const CMSD_STATIC_OBJ: CmsdStatic = {
 	ot: CmsdObjectType.VIDEO,

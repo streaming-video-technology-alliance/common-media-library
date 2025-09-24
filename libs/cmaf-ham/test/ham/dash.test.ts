@@ -1,8 +1,8 @@
 import './init.ts';
 
-import { dashToHam } from '@svta/common-media-library/cmaf/ham/services/converters/dashToHam';
-import { hamToDash } from '@svta/common-media-library/cmaf/ham/services/converters/hamToDash';
-import type { Presentation } from '@svta/common-media-library/cmaf/ham/types/model/Presentation';
+import { dashToHam } from '@svta/cml-cmaf-ham/services/converters/dashToHam';
+import { hamToDash } from '@svta/cml-cmaf-ham/services/converters/hamToDash';
+import type { Presentation } from '@svta/cml-cmaf-ham/types/model/Presentation';
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

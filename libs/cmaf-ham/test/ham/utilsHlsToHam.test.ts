@@ -1,11 +1,11 @@
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { formatSegments } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHlsToHam/utils/formatSegments.js';
-import { getByterange } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHlsToHam/utils/getByterange.js';
-import { getCodec } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHlsToHam/utils/getCodec.js';
-import { getDuration } from '@svta/common-media-library/cmaf/ham/mapper/hls/mapHlsToHam/utils/getDuration.js';
-import type { HlsManifest } from '@svta/common-media-library/cmaf/ham/types/mapper/hls/HlsManifest.js';
+import { formatSegments } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/formatSegments.js';
+import { getByterange } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/getByterange.js';
+import { getCodec } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/getCodec.js';
+import { getDuration } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/getDuration.js';
+import type { HlsManifest } from '@svta/cml-cmaf-ham/types/mapper/hls/HlsManifest.js';
 
 import { getSegments } from './data/hlsData.ts';
 

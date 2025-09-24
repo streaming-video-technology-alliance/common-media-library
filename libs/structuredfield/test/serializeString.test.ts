@@ -1,4 +1,4 @@
-import { serializeString } from '@svta/common-media-library/structuredfield/serialize/serializeString';
+import { serializeString } from '@svta/cml-structuredfield/serialize/serializeString';
 import assert from 'node:assert';
 import test from 'node:test';
 

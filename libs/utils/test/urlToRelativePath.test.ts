@@ -1,4 +1,4 @@
-import { urlToRelativePath } from '@svta/common-media-library/utils/urlToRelativePath';
+import { urlToRelativePath } from '@svta/cml-utils/urlToRelativePath';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

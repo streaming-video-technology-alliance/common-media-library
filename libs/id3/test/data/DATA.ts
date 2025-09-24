@@ -1,4 +1,4 @@
-import { strToCodes } from '../../utils/strToCodes.ts';
+import { strToCodes } from '../utils/strToCodes.ts';
 
 export const DATA: string = 'data';
 export const DATA_BYTES: number[] = strToCodes(DATA);

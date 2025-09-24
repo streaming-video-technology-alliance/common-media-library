@@ -1,4 +1,4 @@
-import { parseKey } from '@svta/common-media-library/structuredfield/parse/parseKey';
+import { parseKey } from '@svta/cml-structuredfield/parse/parseKey';
 import assert from 'node:assert';
 import test from 'node:test';
 

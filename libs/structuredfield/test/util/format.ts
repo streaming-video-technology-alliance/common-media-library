@@ -1,4 +1,4 @@
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
+import { SfItem } from '@svta/cml-structuredfield/SfItem';
 import base32 from 'hi-base32';
 
 // convert "expected" in test.json into JS Primitive

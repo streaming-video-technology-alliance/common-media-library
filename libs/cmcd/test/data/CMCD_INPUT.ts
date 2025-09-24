@@ -1,5 +1,5 @@
-import type { CmcdData } from '@svta/common-media-library/cmcd';
-import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType } from '@svta/common-media-library/cmcd';
+import type { CmcdData } from '@svta/cml-cmcd';
+import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType } from '@svta/cml-cmcd';
 
 export const CMCD_INPUT: CmcdData = {
 	// common keys

@@ -1,4 +1,4 @@
-import { getPsshForKeySystem } from '@svta/common-media-library/drm.js';
+import { getPsshForKeySystem } from '@svta/cml-drm/cenc/getPsshForKeySystem';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox.ts';

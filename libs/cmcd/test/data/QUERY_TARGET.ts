@@ -1,4 +1,4 @@
-import { CmcdReportingMode, CmcdTransmissionMode, type CmcdReportTarget } from '@svta/common-media-library/cmcd';
+import { CmcdReportingMode, CmcdTransmissionMode, type CmcdReportTarget } from '@svta/cml-cmcd';
 
 export const QUERY_TARGET: CmcdReportTarget = {
 	url: 'https://hello.world',

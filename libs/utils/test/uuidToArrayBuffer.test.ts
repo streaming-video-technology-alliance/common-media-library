@@ -1,4 +1,4 @@
-import { uuidToArrayBuffer } from '@svta/common-media-library/utils';
+import { uuidToArrayBuffer } from '@svta/cml-utils';
 import { deepEqual } from 'assert';
 import { describe, it } from 'node:test';
 

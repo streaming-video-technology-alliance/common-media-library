@@ -1,5 +1,5 @@
 {
-	"name": "@svta/common-media-library-*",
+	"name": "@svta/common-media-library-workspace",
 	"version": "0.17.4",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -36,7 +36,7 @@
 		"lint": "eslint .",
 		"build": "npm run build -w=libs/utils -w=libs/cta -w=libs/structuredfield -w=libs/request -w=libs/608 -w=libs/cmcd -w=libs/cmsd -w=libs/contentsteering -w=libs/dash -w=libs/id3 -w=libs/iso8601 -w=libs/isobmff -w=libs/throughput -w=libs/webvtt -w=libs/xml -w=libs/drm -w=libs/cmaf-ham -w=lib",
 		"pretest": "npm run build && npm run lint",
-		"test": "npm test --*s --if-present",
+		"test": "npm test --workspaces --if-present",
 		"start": "npm start -w dev",
 		"pub": "npm publish -w lib --provenance --access public",
 		"ver": "node scripts/version.mts",

@@ -1,4 +1,4 @@
-import { parseByteSequence } from '@svta/common-media-library/structuredfield/parse/parseByteSequence';
+import { parseByteSequence } from '@svta/cml-structuredfield/parse/parseByteSequence';
 import assert from 'node:assert';
 import test from 'node:test';
 

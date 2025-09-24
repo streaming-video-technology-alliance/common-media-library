@@ -1,4 +1,4 @@
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
+import { SfItem } from '@svta/cml-structuredfield/SfItem';
 
 export const CMSD_DYNAMIC_OBJ: SfItem[] = [
 	new SfItem('CDNB-3ak1', {

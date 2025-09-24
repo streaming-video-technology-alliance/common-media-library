@@ -1,4 +1,4 @@
-import { strToCodes } from '../../utils/strToCodes.ts';
+import { strToCodes } from '../utils/strToCodes.ts';
 import { ID3_BYTES, ID3_VERSION_BYTES } from './ID3.ts';
 
 function createId3Size(size: number) {
@@ -12,7 +12,7 @@ function createId3Size(size: number) {
 	];
 }
 
-export function createId3(type: string, data: Uint8Array): Uint8Array {
+export function createId3(type: string, data: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> {
 	const id3 = new Uint8Array([
 		////////////
 		// Header //

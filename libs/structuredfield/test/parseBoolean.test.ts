@@ -1,4 +1,4 @@
-import { parseBoolean } from '@svta/common-media-library/structuredfield/parse/parseBoolean';
+import { parseBoolean } from '@svta/cml-structuredfield/parse/parseBoolean';
 import assert from 'node:assert';
 import test from 'node:test';
 

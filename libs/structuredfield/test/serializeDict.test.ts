@@ -1,4 +1,4 @@
-import { serializeDict } from '@svta/common-media-library/structuredfield/serialize/serializeDict';
+import { serializeDict } from '@svta/cml-structuredfield/serialize/serializeDict';
 import assert from 'node:assert';
 import test from 'node:test';
 

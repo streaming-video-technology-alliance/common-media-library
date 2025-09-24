@@ -1,4 +1,4 @@
-import { serializeByteSequence } from '@svta/common-media-library/structuredfield/serialize/serializeByteSequence';
+import { serializeByteSequence } from '@svta/cml-structuredfield/serialize/serializeByteSequence';
 import assert from 'node:assert';
 import test from 'node:test';
 

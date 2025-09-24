@@ -1,4 +1,4 @@
-import { arrayBufferToHex } from '@svta/common-media-library/utils';
+import { arrayBufferToHex } from '@svta/cml-utils';
 import { equal } from 'assert/strict';
 import { describe, it } from 'node:test';
 

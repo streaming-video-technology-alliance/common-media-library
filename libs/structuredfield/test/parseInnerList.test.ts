@@ -1,6 +1,6 @@
-import { parseInnerList } from '@svta/common-media-library/structuredfield/parse/parseInnerList';
-import { parseList } from '@svta/common-media-library/structuredfield/parse/parseList';
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
+import { parseInnerList } from '@svta/cml-structuredfield/parse/parseInnerList';
+import { parseList } from '@svta/cml-structuredfield/parse/parseList';
+import { SfItem } from '@svta/cml-structuredfield/SfItem';
 import assert from 'node:assert';
 import test from 'node:test';
 
