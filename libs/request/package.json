@@ -70,7 +70,7 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-xml": "workspace:*",
-		"@svta/cml-utils": "workspace:*"
+		"@svta/cml-xml": "*",
+		"@svta/cml-utils": "*"
 	}
 }

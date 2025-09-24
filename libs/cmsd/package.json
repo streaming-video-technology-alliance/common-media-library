@@ -71,8 +71,8 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-cta": "workspace:*",
-		"@svta/cml-structuredfield": "workspace:*",
-		"@svta/cml-utils": "workspace:*"
+		"@svta/cml-cta": "*",
+		"@svta/cml-structuredfield": "*",
+		"@svta/cml-utils": "*"
 	}
 }

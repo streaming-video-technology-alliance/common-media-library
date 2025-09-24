@@ -74,7 +74,7 @@
 		}
 	},
 	"dependencies": {
-		"@svta/cml-utils": "workspace:*",
-		"@svta/cml-structuredfield": "workspace:*"
+		"@svta/cml-utils": "*",
+		"@svta/cml-structuredfield": "*"
 	}
 }

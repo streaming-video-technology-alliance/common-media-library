@@ -74,6 +74,6 @@
 		}
 	},
 	"dependencies": {
-		"@svta/cml-cta": "workspace:*"
+		"@svta/cml-cta": "*"
 	}
 }

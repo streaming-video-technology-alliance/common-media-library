@@ -73,7 +73,7 @@
 		}
 	},
 	"dependencies": {
-		"@svta/cml-utils": "workspace:*",
-		"@svta/cml-xml": "workspace:*"
+		"@svta/cml-utils": "*",
+		"@svta/cml-xml": "*"
 	}
 }

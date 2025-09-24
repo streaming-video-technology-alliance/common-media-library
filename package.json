@@ -1,5 +1,5 @@
 {
-	"name": "@svta/common-media-library-workspace",
+	"name": "@svta/common-media-library-*",
 	"version": "0.17.4",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
@@ -34,11 +34,9 @@
 	"scripts": {
 		"format": "npm run lint -- --fix",
 		"lint": "eslint .",
-		"build": "npm run build:libs && npm run build:main",
-		"build:libs": "npm run build --workspace=@svta/cml-utils --workspace=@svta/cml-cta --workspace=@svta/cml-structuredfield --workspace=@svta/cml-request --workspace=@svta/cml-608 --workspace=@svta/cml-cmcd --workspace=@svta/cml-cmsd --workspace=@svta/cml-contentsteering --workspace=@svta/cml-dash --workspace=@svta/cml-id3 --workspace=@svta/cml-iso8601 --workspace=@svta/cml-isobmff --workspace=@svta/cml-throughput --workspace=@svta/cml-webvtt --workspace=@svta/cml-xml --workspace=@svta/cml-drm --workspace=@svta/cml-cmaf-ham",
-		"build:main": "npm run build --workspace=@svta/common-media-library",
+		"build": "npm run build -w=libs/utils -w=libs/cta -w=libs/structuredfield -w=libs/request -w=libs/608 -w=libs/cmcd -w=libs/cmsd -w=libs/contentsteering -w=libs/dash -w=libs/id3 -w=libs/iso8601 -w=libs/isobmff -w=libs/throughput -w=libs/webvtt -w=libs/xml -w=libs/drm -w=libs/cmaf-ham -w=lib",
 		"pretest": "npm run build && npm run lint",
-		"test": "npm test --workspaces --if-present",
+		"test": "npm test --*s --if-present",
 		"start": "npm start -w dev",
 		"pub": "npm publish -w lib --provenance --access public",
 		"ver": "node scripts/version.mts",
@@ -68,7 +66,6 @@
 		"@eslint/js": "9.24.0",
 		"@microsoft/api-extractor": "7.52.3",
 		"@stylistic/eslint-plugin": "4.2.0",
-		"@types/m3u8-parser": "7.2.2",
 		"@types/node": "22.14.1",
 		"@typescript-eslint/eslint-plugin": "8.30.1",
 		"@typescript-eslint/parser": "8.30.1",
@@ -78,9 +75,7 @@
 		"glob": "11.0.1",
 		"globals": "16.0.0",
 		"hi-base32": "0.5.1",
-		"m3u8-parser": "7.2.0",
 		"typedoc": "0.28.5",
-		"typescript": "5.8.3",
-		"xml2js": "0.6.2"
+		"typescript": "5.8.3"
 	}
 }

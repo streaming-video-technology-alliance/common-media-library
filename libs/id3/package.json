@@ -69,6 +69,6 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-utils": "workspace:*"
+		"@svta/cml-utils": "*"
 	}
 }
