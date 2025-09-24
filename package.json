@@ -38,7 +38,7 @@
 		"pretest": "npm run build && npm run lint",
 		"test": "npm test --workspaces --if-present",
 		"start": "npm start -w dev",
-		"pub": "npm publish -w lib --provenance --access public",
+		"pub": "npm publish -w lib --access public",
 		"ver": "node scripts/version.mts",
 		"docs": "npm start -w docs",
 		"notes": "node scripts/createReleaseNotes.mts",
