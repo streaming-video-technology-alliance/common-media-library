@@ -102,9 +102,6 @@ export type FrameRate = {
     frameRateDenominator?: number;
 };
 
-// @alpha
-export function getByterange(track: VideoTrack | AudioTrack): string;
-
 // Warning: (ae-internal-missing-underscore) The name "getDashParser" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
@@ -115,26 +112,10 @@ export function getDashParser(): DashParser;
 // @internal (undocumented)
 export function getDashSerializer(): DashSerializer;
 
-// Warning: (ae-internal-missing-underscore) The name "getFrameRate" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function getFrameRate(track: Track): string | undefined;
-
 // Warning: (ae-internal-missing-underscore) The name "getHlsParser" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
 export function getHlsParser(): HlsParser;
-
-// @alpha
-export function getPlaylistData(track: AudioTrack | VideoTrack): string;
-
-// @alpha
-export function getSegments(segments: Segment[]): string;
-
-// Warning: (ae-internal-missing-underscore) The name "getTimescale" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function getTimescale(track: Track): number;
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
@@ -144,9 +125,6 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 
 // @alpha
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
-
-// @alpha
-export function getUrlInitialization(track: VideoTrack | AudioTrack): string;
 
 // @alpha
 export type Ham = {
@@ -183,9 +161,6 @@ export type Initialization = {
     };
 };
 
-// @public (undocumented)
-export function iso8601DurationToNumber(isoDuration: string): number;
-
 // @alpha
 export type Manifest = {
     manifest: string;
@@ -197,26 +172,6 @@ export type Manifest = {
 
 // @alpha
 export type ManifestFormat = 'hls' | 'dash';
-
-// Warning: (ae-internal-missing-underscore) The name "mapSegmentBase" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function mapSegmentBase(representation: Representation, duration: number): Segment[];
-
-// Warning: (ae-internal-missing-underscore) The name "mapSegmentList" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function mapSegmentList(segmentList: SegmentList[]): Segment[];
-
-// Warning: (ae-internal-missing-underscore) The name "mapSegments" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function mapSegments(adaptationSet: AdaptationSet, representation: Representation, duration: number): Segment[];
-
-// Warning: (ae-internal-missing-underscore) The name "mapSegmentTemplate" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function mapSegmentTemplate(representation: Representation, duration: number, segmentTemplate: SegmentTemplate): Segment[];
 
 // @alpha
 export type MediaGroups = {
@@ -235,9 +190,6 @@ export type MediaGroups = {
         };
     };
 };
-
-// @public (undocumented)
-export function numberToIso8601Duration(duration: number): string;
 
 // Warning: (ae-internal-missing-underscore) The name "parseDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
 //

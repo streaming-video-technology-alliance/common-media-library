@@ -60,7 +60,8 @@
 		"build": "tsc",
 		"postbuild": "api-extractor run --local",
 		"test": "node --no-warnings --test **/*.test.ts",
-		"prepublishOnly": "npm run build"
+		"prepublishOnly": "npm run build",
+		"dev": "node samples/cmaf-ham-conversion/src/index.ts"
 	},
 	"engines": {
 		"node": ">=20"
@@ -73,7 +74,12 @@
 		}
 	},
 	"dependencies": {
-		"@svta/cml-utils": "*",
-		"@svta/cml-cta": "*"
+		"@svta/cml-cta": "*",
+		"@svta/cml-utils": "*"
+	},
+	"devDependencies": {
+		"@types/m3u8-parser": "7.2.5",
+		"m3u8-parser": "7.2.0",
+		"xml2js": "0.6.2"
 	}
 }

@@ -48,7 +48,6 @@
 		"lib",
 		"docs",
 		"dev",
-		"samples/*",
 		"libs/*"
 	],
 	"engines": {

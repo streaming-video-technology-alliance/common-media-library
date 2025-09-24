@@ -32,7 +32,7 @@ import { dashFromHam3 } from './data/dash-samples/fromHam/dashFromHam3.ts';
 import { dashFromHam4 } from './data/dash-samples/fromHam/dashFromHam4.ts';
 import { dashFromHam5 } from './data/dash-samples/fromHam/dashFromHam5.ts';
 
-describe('dashToham', () => {
+describe('dashToHam', () => {
 	it('converts dash1 to ham1', () => {
 		const convertedHam0 = dashToHam(dashSample0);
 		deepStrictEqual(convertedHam0, jsonHam0);

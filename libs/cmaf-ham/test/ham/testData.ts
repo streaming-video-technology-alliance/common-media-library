@@ -99,6 +99,6 @@ const duration = 13;
 export {
 	duration, representationBase,
 	representationList,
-	representationTemplate, segmentTemplate
+	representationTemplate, segmentTemplate,
 };
 

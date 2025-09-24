@@ -9,7 +9,7 @@ import {
 	validatePresentation,
 	type DashManifest,
 	type HlsManifest,
-} from '@svta/common-media-library/cmaf-ham';
+} from '@svta/cml-cmaf-ham';
 import fs from 'fs';
 import { Parser } from 'm3u8-parser';
 import { Builder, parseString } from 'xml2js';

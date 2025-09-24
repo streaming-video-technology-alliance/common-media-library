@@ -1,4 +1,4 @@
-import { setDashParser, setDashSerializer, setHlsParser, type DashManifest, type HlsManifest } from '@svta/common-media-library';
+import { setDashParser, setDashSerializer, setHlsParser, type DashManifest, type HlsManifest } from '@svta/cml-cmaf-ham';
 import { Parser } from 'm3u8-parser';
 import { Builder, parseString } from 'xml2js';
 
