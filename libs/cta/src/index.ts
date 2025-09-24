@@ -11,4 +11,3 @@ export * from './CmStreamType.js';
 export type * from './CmValue.js';
 export * from './isTokenField.js';
 export * from './isValid.js';
-

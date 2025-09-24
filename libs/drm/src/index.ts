@@ -33,9 +33,9 @@ export * from './playready/getRequestHeadersFromMessage.js';
 export * from './playready/toBigEndianKeyId.js';
 
 // drm types
-export type { ContentProtection } from './common/ContentProtection.js';
-export type { LicenseRequest } from './common/LicenseRequest.js';
-export type { MediaKeySystemAccessRequest } from './common/MediaKeySystemAccessRequest.js';
+export type * from './common/ContentProtection.js';
+export type * from './common/LicenseRequest.js';
+export type * from './common/MediaKeySystemAccessRequest.js';
 
 // drm constants
 export * from './common/CBCS.js';
@@ -80,4 +80,3 @@ export * from './common/WEBM.js';
 export * from './common/WIDEVINE_KEY_SYSTEM.js';
 export * from './common/WIDEVINE_UUID.js';
 export * from './common/WidevineRobustness.js';
-

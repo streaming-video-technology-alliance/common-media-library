@@ -5,6 +5,5 @@
  *
  * @beta
  */
-export { decodeIso8601Duration } from './decodeIso8601Duration.js';
-export { encodeIso8601Duration } from './encodeIso8601Duration.js';
-
+export * from './decodeIso8601Duration.js';
+export * from './encodeIso8601Duration.js';

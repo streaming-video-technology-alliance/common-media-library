@@ -30,4 +30,3 @@ export * from './WebVttResult.js';
 export * from './WebVttResultType.js';
 export * from './WebVttStyleResult.js';
 export * from './WebVttTimestampMapResult.js';
-

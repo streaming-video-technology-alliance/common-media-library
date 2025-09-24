@@ -19,4 +19,3 @@ export type * from './SfMember.js';
 export type * from './SfParameters.js';
 export * from './SfToken.js';
 export * from './utils/symbolToStr.js';
-

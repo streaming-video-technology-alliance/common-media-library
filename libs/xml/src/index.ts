@@ -5,8 +5,7 @@
  * @packageDocumentation
  * @beta
  */
-export { getElementsByName } from './getElementsByName.js';
-export { parseXml } from './parseXml.js';
-export type { XmlNode } from './XmlNode.js';
-export type { XmlParseOptions } from './XmlParseOptions.js';
-
+export * from './getElementsByName.js';
+export * from './parseXml.js';
+export type * from './XmlNode.js';
+export type * from './XmlParseOptions.js';
