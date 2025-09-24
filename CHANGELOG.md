@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.18.0] - 2025-09-24
+
+### Changed
+
+- Implement trusted publishing
+  ([#254](https://github.com/streaming-video-technology-alliance/common-media-library/issues/254))
+
 ### Fixed
 
 - Consolidate text decoding utilities
@@ -462,7 +469,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.4...v0.18.0
 [0.17.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.2...v0.17.3
 [0.17.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.1...v0.17.2

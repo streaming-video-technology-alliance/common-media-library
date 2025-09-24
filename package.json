@@ -1,6 +1,6 @@
 {
 	"name": "@svta/common-media-library-workspace",
-	"version": "0.17.4",
+	"version": "0.18.0",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
@@ -38,7 +38,7 @@
 		"pretest": "npm run build && npm run lint",
 		"test": "npm test --workspaces --if-present",
 		"start": "npm start -w dev",
-		"pub": "npm publish -w lib --provenance --access public",
+		"pub": "npm publish -w lib --access public",
 		"ver": "node scripts/version.mts",
 		"docs": "npm start -w docs",
 		"notes": "node scripts/createReleaseNotes.mts",
