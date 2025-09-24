@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">
+<Sample>
+	<Url><![CDATA[https://www.sample.com?test=123&hello=world]]></Url>
+	<Text test="&amp;,&lt;,&gt;,&quot;,&apos;,&nbsp;,&lrm;,&rlm;">
+		&amp;,&lt;,&gt;,&quot;,&apos;,&nbsp;,&lrm;,&rlm;
+	</Text>
+	<tt:Text>Text</tt:Text>
+</Sample>

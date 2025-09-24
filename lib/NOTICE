@@ -422,7 +422,7 @@ SOFTWARE
 The following implementation in this project is derived from the `tXml` library
 (https://github.com/TobiasNickel/tXml)
 
-- src/utils/parseXml.ts
+- src/xml/parseXml.ts
 
 ```
 The MIT License (MIT)

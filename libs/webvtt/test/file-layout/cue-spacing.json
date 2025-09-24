@@ -1,0 +1,69 @@
+{
+  "cues": [
+    {
+      "align": "center",
+      "endTime": 2,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 0,
+      "text": "Text",
+      "vertical": ""
+    },
+    {
+      "align": "center",
+      "endTime": 4,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 2,
+      "text": "Text",
+      "vertical": ""
+    },
+    {
+      "align": "center",
+      "endTime": 8,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 6,
+      "text": "",
+      "vertical": ""
+    },
+    {
+      "align": "center",
+      "endTime": 8,
+      "id": "",
+      "line": "auto",
+      "lineAlign": "start",
+      "pauseOnExit": false,
+      "position": "auto",
+      "positionAlign": "auto",
+      "region": null,
+      "size": 100,
+      "snapToLines": true,
+      "startTime": 6,
+      "text": "Text",
+      "vertical": ""
+    }
+  ],
+  "regions": []
+}

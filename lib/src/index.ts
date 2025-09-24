@@ -1,8 +1,10 @@
 /**
- * The Common Media Libray
+ * The Common Media Library
  *
  * @packageDocumentation
  */
+export * from '@svta/cml-webvtt';
+export * from '@svta/cml-xml';
 export * from './608.js';
 export * from './cmaf-ham.js';
 export * from './cmcd.js';
@@ -18,5 +20,3 @@ export type * from './request.js';
 export * from './structuredfield.js';
 export * from './throughput.js';
 export * from './utils.js';
-export * from './webvtt.js';
-export * from './xml.js';
