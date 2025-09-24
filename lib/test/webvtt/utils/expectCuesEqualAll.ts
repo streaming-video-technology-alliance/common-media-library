@@ -1,5 +1,5 @@
-import { parseWebVtt } from '@svta/common-media-library/webvtt/parseWebVtt.js';
-import type { WebVttParsingError } from '@svta/common-media-library/webvtt/WebVttParsingError.js';
+import type { WebVttParsingError } from '@svta/common-media-library/webvtt';
+import { parseWebVtt } from '@svta/common-media-library/webvtt';
 import { deepEqual } from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';

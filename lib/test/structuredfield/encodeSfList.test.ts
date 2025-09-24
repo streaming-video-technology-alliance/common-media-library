@@ -1,5 +1,4 @@
-import { encodeSfList } from '@svta/common-media-library/structuredfield/encodeSfList';
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
+import { encodeSfList, SfItem } from '@svta/common-media-library/structuredfield';
 import assert from 'node:assert';
 import test from 'node:test';
 

@@ -1,6 +1,5 @@
-import { concatInitDataIdAndCertificate } from '@svta/common-media-library/drm/fairplay/concatInitDataIdAndCertificate';
-import { base64decode } from '@svta/common-media-library/utils/base64decode';
-import { convertUint8ToUint16 } from '@svta/common-media-library/utils/convertUint8ToUint16';
+import { concatInitDataIdAndCertificate } from '@svta/common-media-library/drm';
+import { base64decode, convertUint8ToUint16 } from '@svta/common-media-library/utils';
 import { deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 
@@ -20,7 +19,7 @@ describe('concatInitDataIdAndCertificate', () => {
 		// It should be 8-bit integer type and contain data
 		deepStrictEqual(result instanceof Uint8Array, true);
 		deepStrictEqual(result.length > 0, true);
-		//#endregion example 
+		//#endregion example
 	});
 
 	it('handles empty certificate and id correctly', () => {
@@ -28,7 +27,7 @@ describe('concatInitDataIdAndCertificate', () => {
 		const cert = new Uint8Array([]);
 		const result = concatInitDataIdAndCertificate(initData, id, cert);
 
-		// Length should account for added ID and cert size 
-		deepStrictEqual(result.length, initData.byteLength + 4 + 4); 
+		// Length should account for added ID and cert size
+		deepStrictEqual(result.length, initData.byteLength + 4 + 4);
 	});
 });

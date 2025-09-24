@@ -1,4 +1,4 @@
-import { decodeBase64 } from '@svta/common-media-library/utils/decodeBase64';
+import { decodeBase64 } from '@svta/common-media-library/utils';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

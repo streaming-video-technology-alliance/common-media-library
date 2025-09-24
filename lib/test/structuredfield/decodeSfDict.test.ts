@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { decodeSfDict, SfItem, SfToken } from '@svta/common-media-library';
+import { decodeSfDict, SfItem, SfToken } from '@svta/common-media-library/structuredfield';
 
 describe('decodeSfDict', () => {
 	it('handles blank string', () => {

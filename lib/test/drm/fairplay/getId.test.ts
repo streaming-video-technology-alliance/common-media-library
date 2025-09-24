@@ -1,5 +1,5 @@
-import { getId } from '@svta/common-media-library/drm/fairplay/getId';
-import { stringToUint16 } from '@svta/common-media-library/utils/stringToUint16';
+import { getId } from '@svta/common-media-library/drm';
+import { stringToUint16 } from '@svta/common-media-library/utils';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

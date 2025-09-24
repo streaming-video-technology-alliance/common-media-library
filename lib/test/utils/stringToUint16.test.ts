@@ -1,4 +1,4 @@
-import { stringToUint16 } from '@svta/common-media-library';
+import { stringToUint16 } from '@svta/common-media-library/utils';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

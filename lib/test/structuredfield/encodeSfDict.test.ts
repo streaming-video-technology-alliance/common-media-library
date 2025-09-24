@@ -1,6 +1,4 @@
-import { encodeSfDict } from '@svta/common-media-library/structuredfield/encodeSfDict';
-import { SfItem } from '@svta/common-media-library/structuredfield/SfItem';
-import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
+import { encodeSfDict, SfItem, SfToken } from '@svta/common-media-library/structuredfield';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 

@@ -1,5 +1,4 @@
-import { SW_SECURE_DECODE } from '@svta/common-media-library/drm/common/SW_SECURE_DECODE';
-import { createMediaKeySystemConfiguration } from '@svta/common-media-library/drm/keysystem/createMediaKeySystemConfiguration';
+import { createMediaKeySystemConfiguration, SW_SECURE_DECODE } from '@svta/common-media-library/drm';
 import { deepStrictEqual, strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

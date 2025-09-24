@@ -1,7 +1,4 @@
-import { decodeText } from '@svta/common-media-library/utils/decodeText';
-import { stringToUint16 } from '@svta/common-media-library/utils/stringToUint16';
-import { UTF_16 } from '@svta/common-media-library/utils/UTF_16';
-import { UTF_8 } from '@svta/common-media-library/utils/UTF_8';
+import { decodeText, stringToUint16, UTF_16, UTF_8 } from '@svta/common-media-library/utils';
 import { equal } from 'node:assert';
 import { it } from 'node:test';
 import { decoderTest } from './decoderTest.ts';

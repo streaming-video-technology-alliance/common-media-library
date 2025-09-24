@@ -1,4 +1,4 @@
-import { getLicenseServerUrl } from '@svta/common-media-library/drm/fairplay/getLicenseServerUrl';
+import { getLicenseServerUrl } from '@svta/common-media-library/drm';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

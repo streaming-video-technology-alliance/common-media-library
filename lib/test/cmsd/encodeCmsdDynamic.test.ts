@@ -1,4 +1,4 @@
-import { encodeCmsdDynamic } from '@svta/common-media-library/cmsd/encodeCmsdDynamic';
+import { encodeCmsdDynamic } from '@svta/common-media-library/cmsd';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.ts';

@@ -1,7 +1,5 @@
-import type { WebVttCue } from '@svta/common-media-library/webvtt/WebVttCue.js';
-import { WebVttParser } from '@svta/common-media-library/webvtt/WebVttParser.js';
-import type { WebVttParsingError } from '@svta/common-media-library/webvtt/WebVttParsingError.js';
-import type { WebVttRegion } from '@svta/common-media-library/webvtt/WebVttRegion.js';
+import type { WebVttCue, WebVttParsingError, WebVttRegion } from '@svta/common-media-library/webvtt';
+import { WebVttParser } from '@svta/common-media-library/webvtt';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 import './utils/pollyfill.ts';

@@ -1,5 +1,5 @@
-import { extractContentId } from '@svta/common-media-library/drm/fairplay/extractContentId';
-import { UTF_8 } from '@svta/common-media-library/utils/UTF_8';
+import { extractContentId } from '@svta/common-media-library/drm';
+import { UTF_8 } from '@svta/common-media-library/utils';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

@@ -1,4 +1,4 @@
-import { encodeSfItem } from '@svta/common-media-library/structuredfield/encodeSfItem';
+import { encodeSfItem } from '@svta/common-media-library/structuredfield';
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
 import { formatItem } from './util/format.ts';

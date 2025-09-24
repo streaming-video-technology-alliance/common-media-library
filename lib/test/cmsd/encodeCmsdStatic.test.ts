@@ -1,8 +1,5 @@
-import { CmsdObjectType } from '@svta/common-media-library/cmsd/CmsdObjectType';
-import { CmsdStreamType } from '@svta/common-media-library/cmsd/CmsdStreamType';
-import { CmsdStreamingFormat } from '@svta/common-media-library/cmsd/CmsdStreamingFormat';
-import { encodeCmsdStatic } from '@svta/common-media-library/cmsd/encodeCmsdStatic';
-import { SfToken } from '@svta/common-media-library/structuredfield/SfToken';
+import { CmsdObjectType, CmsdStreamingFormat, CmsdStreamType, encodeCmsdStatic } from '@svta/common-media-library/cmsd';
+import { SfToken } from '@svta/common-media-library/structuredfield';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.ts';
