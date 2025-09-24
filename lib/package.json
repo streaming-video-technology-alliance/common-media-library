@@ -25,18 +25,16 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",
-			"require": "./dist/cjs/index.js",
 			"default": "./dist/index.js"
 		},
 		"./*.js": {
+			"types": "./dist/*.d.ts",
 			"import": "./dist/*.js",
-			"require": "./dist/cjs/*.js",
 			"default": "./dist/*.js"
 		},
 		"./*": {
 			"types": "./dist/*.d.ts",
 			"import": "./dist/*.js",
-			"require": "./dist/cjs/*.js",
 			"default": "./dist/*.js"
 		}
 	},
@@ -49,6 +47,8 @@
 		}
 	},
 	"keywords": [
+		"Common Media Library",
+		"CML",
 		"CTA-5004",
 		"Common Media Client Data",
 		"CMCD",
@@ -65,10 +65,8 @@
 		"EIA-608"
 	],
 	"scripts": {
-		"build": "npm run build:esm && npm run build:cjs",
+		"build": "tsc",
 		"postbuild": "api-extractor run --local",
-		"build:esm": "node ../scripts/build.mts",
-		"build:cjs": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist/cjs",
 		"test": "node --no-warnings --test **/*.test.ts",
 		"prepublishOnly": "npm run build"
 	},
@@ -84,21 +82,21 @@
 	},
 	"peerDependencies": {
 		"@svta/cml-608": "workspace:*",
-		"@svta/cml-utils": "workspace:*",
-		"@svta/cml-cta": "workspace:*",
-		"@svta/cml-structuredfield": "workspace:*",
-		"@svta/cml-request": "workspace:*",
+		"@svta/cml-cmaf-ham": "workspace:*",
 		"@svta/cml-cmcd": "workspace:*",
 		"@svta/cml-cmsd": "workspace:*",
 		"@svta/cml-contentsteering": "workspace:*",
+		"@svta/cml-cta": "workspace:*",
 		"@svta/cml-dash": "workspace:*",
+		"@svta/cml-drm": "workspace:*",
 		"@svta/cml-id3": "workspace:*",
 		"@svta/cml-iso8601": "workspace:*",
 		"@svta/cml-isobmff": "workspace:*",
+		"@svta/cml-request": "workspace:*",
+		"@svta/cml-structuredfield": "workspace:*",
 		"@svta/cml-throughput": "workspace:*",
+		"@svta/cml-utils": "workspace:*",
 		"@svta/cml-webvtt": "workspace:*",
-		"@svta/cml-xml": "workspace:*",
-		"@svta/cml-drm": "workspace:*",
-		"@svta/cml-cmaf-ham": "workspace:*"
+		"@svta/cml-xml": "workspace:*"
 	}
 }

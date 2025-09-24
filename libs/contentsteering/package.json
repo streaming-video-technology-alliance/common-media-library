@@ -3,6 +3,7 @@
 	"version": "0.17.4",
 	"description": "Content steering functionality",
 	"license": "Apache-2.0",
+	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
 	"repository": {
@@ -26,18 +27,15 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",
-			"require": "./dist/cjs/index.js",
 			"default": "./dist/index.js"
 		},
 		"./*.js": {
 			"import": "./dist/*.js",
-			"require": "./dist/cjs/*.js",
 			"default": "./dist/*.js"
 		},
 		"./*": {
 			"types": "./dist/*.d.ts",
 			"import": "./dist/*.js",
-			"require": "./dist/cjs/*.js",
 			"default": "./dist/*.js"
 		}
 	},
@@ -50,14 +48,13 @@
 		}
 	},
 	"keywords": [
-		"content steering",
-		"media streaming",
-		"pathway"
+		"Common Media Library",
+		"CML",
+		"content steering"
 	],
 	"scripts": {
-		"build": "npm run build:esm && npm run build:cjs",
-		"build:esm": "tsc",
-		"build:cjs": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist/cjs",
+		"build": "tsc",
+		"postbuild": "api-extractor run --local",
 		"test": "node --no-warnings --test **/*.test.ts",
 		"prepublishOnly": "npm run build"
 	},

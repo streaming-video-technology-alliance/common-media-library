@@ -50,14 +50,13 @@
 		}
 	},
 	"keywords": [
-		"XML",
-		"parsing",
-		"utilities"
+		"Common Media Library",
+		"CML",
+		"XML"
 	],
 	"scripts": {
-		"build": "npm run build:esm && npm run build:cjs",
-		"build:esm": "tsc",
-		"build:cjs": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist/cjs",
+		"build": "tsc",
+		"postbuild": "api-extractor run --local",
 		"test": "node --no-warnings --test **/*.test.ts",
 		"prepublishOnly": "npm run build"
 	},
