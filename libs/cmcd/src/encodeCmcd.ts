@@ -16,7 +16,7 @@ import { prepareCmcdData } from './prepareCmcdData.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/encodeCmcd.test.ts#example}
+ * {@includeCode ../test/encodeCmcd.test.ts#example}
  */
 export function encodeCmcd(cmcd: CmcdData, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {

@@ -12,7 +12,7 @@ import { UTF_16 } from '@svta/cml-utils/UTF_16.js';
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/fairplay/extractContentId.test.ts#example}
+ * {@includeCode ../../test/fairplay/extractContentId.test.ts#example}
  */
 export function extractContentId(initData: ArrayBuffer, encoding: Encoding = UTF_16): string {
 	const initDataString = decodeText(initData, { encoding });

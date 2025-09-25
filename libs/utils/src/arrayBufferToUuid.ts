@@ -11,7 +11,7 @@ import { arrayBufferToHex } from './arrayBufferToHex.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/arrayBufferToUuid.test.ts#example}
+ * {@includeCode ../test/arrayBufferToUuid.test.ts#example}
  */
 export function arrayBufferToUuid(buffer: ArrayBuffer): string {
 	const hex = arrayBufferToHex(buffer);

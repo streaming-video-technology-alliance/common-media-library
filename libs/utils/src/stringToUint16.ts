@@ -9,7 +9,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/stringToUint16.test.ts#example}
+ * {@includeCode ../test/stringToUint16.test.ts#example}
  */
 export function stringToUint16(str: string): Uint16Array<ArrayBuffer> {
 	const buffer = new ArrayBuffer(str.length * 2);

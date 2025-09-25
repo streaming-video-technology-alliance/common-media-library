@@ -11,7 +11,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/cenc/parsePsshList.test.ts#example}
+ * {@includeCode ../../test/cenc/parsePsshList.test.ts#example}
  */
 export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer> {
 	if (!data) {

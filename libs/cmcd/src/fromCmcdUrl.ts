@@ -13,7 +13,7 @@ import { decodeCmcd } from './decodeCmcd.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/fromCmcdUrl.test.ts#example}
+ * {@includeCode ../test/fromCmcdUrl.test.ts#example}
  */
 export function fromCmcdUrl(url: string): Cmcd {
 	return decodeCmcd(decodeURIComponent(url.replace(/^CMCD=/, '')));

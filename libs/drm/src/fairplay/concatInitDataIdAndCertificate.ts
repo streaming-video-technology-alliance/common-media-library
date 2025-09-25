@@ -12,7 +12,7 @@ import { stringToUint16 } from '@svta/cml-utils/stringToUint16.js';
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/fairplay/concatInitDataIdAndCertificate.test.ts#example}
+ * {@includeCode ../../test/fairplay/concatInitDataIdAndCertificate.test.ts#example}
  */
 
 export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array {

@@ -18,7 +18,7 @@ import { prepareCmcdData } from './prepareCmcdData.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/toCmcdHeaders.test.ts#example}
+ * {@includeCode ../test/toCmcdHeaders.test.ts#example}
  */
 export function toCmcdHeaders(cmcd: CmcdData, options: CmcdEncodeOptions = {}): Record<CmcdHeaderField, string> {
 	const result = {} as Record<CmcdHeaderField, string>;

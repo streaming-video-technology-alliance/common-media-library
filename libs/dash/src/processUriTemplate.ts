@@ -16,7 +16,7 @@ const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]
  * @beta
  *
  * @example
- * {@includeCode ../../test/dash/processUriTemplate.test.ts#example}
+ * {@includeCode ../test/processUriTemplate.test.ts#example}
  */
 export function processUriTemplate(
 	uriTemplate: string,

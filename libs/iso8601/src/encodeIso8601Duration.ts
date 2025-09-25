@@ -8,7 +8,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../../test/iso/8601/encodeIso8601Duration.test.ts#example}
+ * {@includeCode ../test/encodeIso8601Duration.test.ts#example}
  */
 export function encodeIso8601Duration(duration: number): string {
 	if (!isFinite(duration)) {

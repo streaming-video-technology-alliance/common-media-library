@@ -17,7 +17,7 @@ import { UTF_8 } from './UTF_8.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/decodeText.test.ts#example}
+ * {@includeCode ../test/decodeText.test.ts#example}
  */
 export function decodeText(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>, options: DecodeTextOptions = {}): string {
 	let view: DataView<ArrayBuffer>;

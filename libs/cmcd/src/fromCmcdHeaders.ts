@@ -19,7 +19,7 @@ const keys = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS];
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/fromCmcdHeaders.test.ts#example}
+ * {@includeCode ../test/fromCmcdHeaders.test.ts#example}
  */
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): CmcdData {
 	if (!(headers instanceof Headers)) {

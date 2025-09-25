@@ -16,7 +16,7 @@ const SECONDS_IN_MIN = 60;
  * @beta
  *
  * @example
- * {@includeCode ../../../test/iso/8601/decodeIso8601Duration.test.ts#example}
+ * {@includeCode ../test/decodeIso8601Duration.test.ts#example}
  */
 export function decodeIso8601Duration(isoDuration: string): number {
 	const match = DURATION.exec(isoDuration);

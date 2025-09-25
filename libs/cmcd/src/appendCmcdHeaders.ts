@@ -16,7 +16,7 @@ import { toCmcdHeaders } from './toCmcdHeaders.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/appendCmcdHeaders.test.ts#example}
+ * {@includeCode ../test/appendCmcdHeaders.test.ts#example}
  */
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string> {
 	return Object.assign(headers, toCmcdHeaders(cmcd, options));

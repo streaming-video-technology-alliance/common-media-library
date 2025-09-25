@@ -18,7 +18,7 @@ import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.js';
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/playready/getRequestHeadersFromMessage.test.ts#example}
+ * {@includeCode ../../test/playready/getRequestHeadersFromMessage.test.ts#example}
  */
 export function getRequestHeadersFromMessage(
 	message: ArrayBuffer,

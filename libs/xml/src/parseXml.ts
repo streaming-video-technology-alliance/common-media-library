@@ -14,7 +14,7 @@ import type { XmlParseOptions } from './XmlParseOptions.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/xml/parseXml.test.ts#example}
+ * {@includeCode ../test/parseXml.test.ts#example}
  */
 export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode {
 	let pos = options.pos || 0;

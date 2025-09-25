@@ -23,7 +23,7 @@ import { toCmcdHeaders } from './toCmcdHeaders.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/toCmcdReport.test.ts#example}
+ * {@includeCode ../test/toCmcdReport.test.ts#example}
  */
 export function toCmcdReport(data: CmcdData, target: CmcdReportTarget): Request<{ cmcd: Cmcd }> | null {
 	if (!target || !target.url) {

@@ -16,7 +16,7 @@ import { toCmcdUrl } from './toCmcdUrl.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/toCmcdQuery.test.ts#example}
+ * {@includeCode ../test/toCmcdQuery.test.ts#example}
  */
 export function toCmcdQuery(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {

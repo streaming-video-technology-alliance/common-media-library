@@ -14,7 +14,7 @@ import { decodeCmcd } from './decodeCmcd.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/fromCmcdQuery.test.ts#example}
+ * {@includeCode ../test/fromCmcdQuery.test.ts#example}
  */
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd {
 	if (typeof query === 'string') {

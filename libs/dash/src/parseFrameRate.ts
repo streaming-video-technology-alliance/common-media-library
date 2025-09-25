@@ -8,7 +8,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../test/dash/parseFrameRate.test.ts#example}
+ * {@includeCode ../test/parseFrameRate.test.ts#example}
  */
 export function parseFrameRate(frameRate: string): number {
 	const [numerator, denominator] = frameRate.split('/').map(value => parseInt(value, 10));

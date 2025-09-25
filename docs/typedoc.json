@@ -4,7 +4,7 @@
 	"cleanOutputDir": true,
 	"customCss": "./styles.css",
 	"entryPoints": [
-		"../lib/src/index.ts"
+		"../libs/common-media-library/src/index.ts"
 	],
 	"excludeInternal": true,
 	"excludePrivate": true,
@@ -16,6 +16,6 @@
 		"includeGroups": true
 	},
 	"out": "./dist",
-	"readme": "../lib/README.md",
+	"readme": "../libs/common-media-library/README.md",
 	"searchInComments": true
 }

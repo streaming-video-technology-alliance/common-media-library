@@ -12,7 +12,7 @@ import { parsePsshList } from './parsePsshList.js';
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/cenc/getPsshForKeySystem.test.ts#example}
+ * {@includeCode ../../test/cenc/getPsshForKeySystem.test.ts#example}
  */
 export function getPsshForKeySystem(
 	uuid: string,

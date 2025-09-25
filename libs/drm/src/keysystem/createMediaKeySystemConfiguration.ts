@@ -9,7 +9,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/keysystem/createMediaKeySystemConfiguration.test.ts#example}
+ * {@includeCode ../../test/keysystem/createMediaKeySystemConfiguration.test.ts#example}
  */
 export function createMediaKeySystemConfiguration(
 	supportedAudio: MediaKeySystemMediaCapability[] | null,

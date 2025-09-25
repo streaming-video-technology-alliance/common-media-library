@@ -43,7 +43,7 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/decodeCmcd.test.ts#example}
+ * {@includeCode ../test/decodeCmcd.test.ts#example}
  */
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T {
 	if (!cmcd) {

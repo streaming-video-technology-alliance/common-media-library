@@ -11,7 +11,7 @@ import { hexToArrayBuffer } from './hexToArrayBuffer.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/uuidToArrayBuffer.test.ts#example}
+ * {@includeCode ../test/uuidToArrayBuffer.test.ts#example}
  */
 export function uuidToArrayBuffer(uuid: string): ArrayBuffer {
 	const hex = uuid.replace(/-/g, '');

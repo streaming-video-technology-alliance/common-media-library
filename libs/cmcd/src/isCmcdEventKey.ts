@@ -15,7 +15,7 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/isCmcdEventKey.test.ts#example}
+ * {@includeCode ../test/isCmcdEventKey.test.ts#example}
  */
 export function isCmcdEventKey(key: string): key is keyof CmcdEvent {
 	return CMCD_COMMON_KEYS.includes(key as any) ||

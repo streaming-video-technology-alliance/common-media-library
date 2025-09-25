@@ -9,7 +9,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/arrayBufferToHex.test.ts#example}
+ * {@includeCode ../test/arrayBufferToHex.test.ts#example}
  */
 export function arrayBufferToHex(buffer: ArrayBuffer): string {
 	const view = new Uint8Array(buffer);

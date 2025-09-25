@@ -13,7 +13,7 @@ import { MP4_PROTECTION_SCHEME } from '../common/MP4_PROTECTION_SCHEME.js';
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/cenc/findCencContentProtection.test.ts#example}
+ * {@includeCode ../../test/cenc/findCencContentProtection.test.ts#example}
  */
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null {
 	if (!cpArray) {

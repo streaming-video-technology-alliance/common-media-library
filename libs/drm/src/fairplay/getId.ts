@@ -12,7 +12,7 @@ import { extractContentId } from './extractContentId.js';
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/fairplay/getId.test.ts#example}
+ * {@includeCode ../../test/fairplay/getId.test.ts#example}
  */
 
 export function getId(licenseServerUrl: string, initData: ArrayBuffer, queryParam: string = 'ContentId'): string {

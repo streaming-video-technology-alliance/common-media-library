@@ -6,9 +6,9 @@
  *
  * @group DRM
  * @beta
- * 
+ *
  * @example
- * {@includeCode ../../../test/drm/fairplay/getLicenseServerUrl.test.ts#example}
+ * {@includeCode ../../test/fairplay/getLicenseServerUrl.test.ts#example}
  */
 
 export function getLicenseServerUrl(initData: Uint16Array): string {

@@ -8,7 +8,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../../test/drm/playready/toBigEndianKeyId.test.ts#example}
+ * {@includeCode ../../test/playready/toBigEndianKeyId.test.ts#example}
  */
 export function toBigEndianKeyId(keyId: ArrayBuffer): ArrayBuffer {
 	if (keyId.byteLength !== 16) {

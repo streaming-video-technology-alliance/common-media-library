@@ -9,7 +9,7 @@
  * @beta
  *
  * @example
- * {@includeCode ../../test/utils/hexToArrayBuffer.test.ts#example}
+ * {@includeCode ../test/hexToArrayBuffer.test.ts#example}
  */
 export function hexToArrayBuffer(hex: string): ArrayBuffer {
 	const buffer = new ArrayBuffer(hex.length / 2);
