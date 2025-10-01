@@ -404,6 +404,8 @@ export const CmcdPlayerState: {
     readonly WAITING: "w";
     readonly ENDED: "e";
     readonly FATAL_ERROR: "f";
+    readonly QUIT: "q";
+    readonly PRELOADING: "d";
 };
 
 // @beta (undocumented)
