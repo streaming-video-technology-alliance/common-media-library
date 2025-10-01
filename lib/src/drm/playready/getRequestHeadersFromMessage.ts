@@ -35,7 +35,7 @@ export function getRequestHeadersFromMessage(
 
 	const msg = decodeText(message, { encoding });
 	const xml = parseXml(msg);
-	const httpHeaders = getElementsByName(xml, HTTP_HEADERS)[0].childNodes;
+	const httpHeaders = getElementsByName(xml, HTTP_HEADERS)[0]?.childNodes;
 
 	for (const header of httpHeaders) {
 		const name = getElementsByName(header, 'name')[0]?.childNodes[0]?.nodeValue;

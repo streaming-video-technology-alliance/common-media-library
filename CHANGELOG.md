@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.18.1] - 2025-10-01
+
+### Fixed
+
+- Added missing `null` checks to `getRequestHeadersFromMessage` and `getElementsByName`
+
 ## [0.18.0] - 2025-09-24
 
 ### Changed
@@ -469,7 +475,8 @@ and this project adheres to
 - Bootstrap project
   ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.1...HEAD
+[0.18.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.4...v0.18.0
 [0.17.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.2...v0.17.3
