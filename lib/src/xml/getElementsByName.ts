@@ -14,6 +14,10 @@ import type { XmlNode } from './XmlNode.js';
  *
  */
 export function getElementsByName(node: XmlNode, name: string, found: XmlNode[] = []): XmlNode[] {
+	if (!node) {
+		return found;
+	}
+
 	if (node.nodeName === name) {
 		found.push(node);
 	}
