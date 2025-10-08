@@ -8,24 +8,24 @@ on:
         required: true
         type: choice
         options:
-          - "cml-608"
-          - "cml-cmaf-ham"
-          - "cml-cmcd"
-          - "cml-cmsd"
-          - "cml-common-media-library"
-          - "cml-content-steering"
-          - "cml-cta"
-          - "cml-dash"
-          - "cml-drm"
-          - "cml-id3"
-          - "cml-iso-8601"
-          - "cml-iso-bmff"
-          - "cml-request"
-          - "cml-structured-field-values"
-          - "cml-throughput"
-          - "cml-utils"
-          - "cml-webvtt"
-          - "cml-xml"
+          - "608"
+          - "cmaf-ham"
+          - "cmcd"
+          - "cmsd"
+          - "common-media-library"
+          - "content-steering"
+          - "cta"
+          - "dash"
+          - "drm"
+          - "id3"
+          - "iso-8601"
+          - "iso-bmff"
+          - "request"
+          - "structured-field-values"
+          - "throughput"
+          - "utils"
+          - "webvtt"
+          - "xml"
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -40,10 +40,10 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           submodules: true
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: "npm"
