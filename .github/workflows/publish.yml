@@ -54,7 +54,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npm test -w libs/${{ github.event.inputs.package }}
+        run: npm test
 
       - name: Publish
         run: npm publish --provenance --access public -w libs/${{ github.event.inputs.package }}
