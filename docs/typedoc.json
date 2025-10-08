@@ -3,9 +3,15 @@
 	"categorizeByGroup": true,
 	"cleanOutputDir": true,
 	"customCss": "./styles.css",
+	"entryPointStrategy": "packages",
 	"entryPoints": [
-		"../libs/common-media-library/src/index.ts"
+		"../libs/*"
 	],
+	"packageOptions": {
+		"entryPoints": [
+			"src/index.ts"
+		]
+	},
 	"excludeInternal": true,
 	"excludePrivate": true,
 	"hideGenerator": true,

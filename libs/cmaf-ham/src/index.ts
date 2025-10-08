@@ -1,10 +1,3 @@
-/**
- * @packageDocumentation
- *
- * A collection of tools for working with Common Media Application Format - Hypothetical Application Model (CMAF-HAM).
- *
- * @alpha
- */
 export type * from './types/model/AlignedSwitchingSet.js';
 export type * from './types/model/AudioTrack.js';
 export type * from './types/model/FrameRate.js';
