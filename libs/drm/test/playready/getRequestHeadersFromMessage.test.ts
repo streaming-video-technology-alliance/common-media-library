@@ -14,4 +14,10 @@ describe('getRequestHeadersFromMessage', () => {
 		deepStrictEqual(result, PLAYREADY_HEADERS);
 		//#endregion example
 	});
+
+	it('handles invalid message', () => {
+		const message = stringToUtf16Buffer('<test></test>');
+		const result = getRequestHeadersFromMessage(message);
+		deepStrictEqual(result, {});
+	});
 });
