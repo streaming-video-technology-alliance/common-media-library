@@ -5,6 +5,10 @@ import type { ResourceTiming } from './ResourceTiming.js';
  *
  * @param sample - A ResourceTiming sample
  * @returns
+ *
+ * @group Utils
+ *
+ * @beta
  */
 export function getBandwidthBps(sample: ResourceTiming): number {
 	const durationSeconds = sample.duration / 1000;

@@ -3,7 +3,7 @@ import type { RequestType } from './RequestType.js';
 /**
  * Generic request API.
  *
- * @group Request
+ * @group Utils
  *
  * @beta
  */
