@@ -83,14 +83,14 @@ export type DashManifest = {
     };
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "DashParser" is marked as @public, but its signature references "DashManifest" which is marked as @alpha
+// Warning: (ae-internal-missing-underscore) The name "DashParser" should be prefixed with an underscore because the declaration is marked as @internal
 //
-// @public (undocumented)
+// @internal (undocumented)
 export type DashParser = (raw: string) => DashManifest;
 
-// Warning: (ae-incompatible-release-tags) The symbol "DashSerializer" is marked as @public, but its signature references "DashManifest" which is marked as @alpha
+// Warning: (ae-internal-missing-underscore) The name "DashSerializer" should be prefixed with an underscore because the declaration is marked as @internal
 //
-// @public (undocumented)
+// @internal (undocumented)
 export type DashSerializer = (json: DashManifest) => string;
 
 // @alpha
@@ -145,9 +145,9 @@ export type HlsManifest = {
     targetDuration?: number;
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "HlsParser" is marked as @public, but its signature references "HlsManifest" which is marked as @alpha
+// Warning: (ae-internal-missing-underscore) The name "HlsParser" should be prefixed with an underscore because the declaration is marked as @internal
 //
-// @public (undocumented)
+// @internal (undocumented)
 export type HlsParser = (text: string) => HlsManifest;
 
 // @alpha
@@ -196,9 +196,9 @@ export type MediaGroups = {
 // @internal
 export function parseDashManifest(raw: string): DashManifest;
 
-// Warning: (ae-incompatible-release-tags) The symbol "parseHlsManifest" is marked as @public, but its signature references "HlsManifest" which is marked as @alpha
+// Warning: (ae-internal-missing-underscore) The name "parseHlsManifest" should be prefixed with an underscore because the declaration is marked as @internal
 //
-// @public (undocumented)
+// @internal (undocumented)
 export function parseHlsManifest(text?: string): HlsManifest;
 
 // @alpha
@@ -324,9 +324,9 @@ export type SelectionSet = Ham & {
     alignedSwitchingSets?: AlignedSwitchingSet[];
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "serializeDashManifest" is marked as @public, but its signature references "DashManifest" which is marked as @alpha
+// Warning: (ae-internal-missing-underscore) The name "serializeDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
 //
-// @public (undocumented)
+// @internal (undocumented)
 export function serializeDashManifest(json: DashManifest): string;
 
 // Warning: (ae-internal-missing-underscore) The name "setDashParser" should be prefixed with an underscore because the declaration is marked as @internal

@@ -55,7 +55,6 @@ export const CmObjectType = {
 /**
  * Common Media Object Type
  *
- * @see {@link CmcdEncoding}
  * @internal
  */
 export type CmObjectType = ValueOf<typeof CmObjectType>;

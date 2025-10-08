@@ -1,5 +1,8 @@
 import type { DashManifest } from '../../types/mapper/dash/DashManifest.js';
 
+/**
+ * @internal
+ */
 export type DashSerializer = (json: DashManifest) => string;
 
 let xmlSerializer: DashSerializer;
@@ -18,6 +21,9 @@ export function getDashSerializer(): DashSerializer {
 	return xmlSerializer;
 }
 
+/**
+ * @internal
+ */
 export function serializeDashManifest(json: DashManifest): string {
 	return xmlSerializer(json);
 }

@@ -30,7 +30,6 @@ export const CmStreamingFormat = {
 /**
  * Common Media Streaming Format
  *
- * @see {@link CmcdEncoding}
  * @internal
  */
 export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;

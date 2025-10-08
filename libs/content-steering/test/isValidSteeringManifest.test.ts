@@ -1,4 +1,4 @@
-import { isValidSteeringManifest } from '@svta/common-media-library/contentsteering';
+import { isValidSteeringManifest } from '@svta/common-media-library/content-steering';
 import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { MANIFEST } from './MANIFEST.ts';
@@ -13,13 +13,13 @@ describe('isValidSteeringManifest', () => {
 			'PATHWAY-CLONES': [{
 				'BASE-ID': 'pathway1',
 				'ID': 'clone1',
-				'URI-REPLACEMENT': [{
+				'URI-REPLACEMENT': {
 					HOST: 'example.com',
 					PARAMS: {
 						param1: 'value1',
 						param2: 'value2',
 					},
-				}],
+				},
 			}],
 		};
 

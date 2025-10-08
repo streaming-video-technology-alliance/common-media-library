@@ -21,6 +21,5 @@ export const CmStreamType = {
  * Common Media Stream Type
  *
  * @internal
- * @see {@link CmcdEncoding}
  */
 export type CmStreamType = ValueOf<typeof CmStreamType>;

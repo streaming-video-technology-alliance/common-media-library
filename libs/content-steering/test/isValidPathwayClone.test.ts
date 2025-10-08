@@ -1,4 +1,4 @@
-import { isValidPathwayClone } from '@svta/common-media-library/contentsteering';
+import { isValidPathwayClone } from '@svta/common-media-library/content-steering';
 import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { PATHWAY_CLONE } from './PATHWAY_CLONE.ts';

@@ -1,5 +1,8 @@
 import type { DashManifest } from '../../types/mapper/dash/DashManifest.js';
 
+/**
+ * @internal
+ */
 export type DashParser = (raw: string) => DashManifest;
 
 let dashParser: DashParser;

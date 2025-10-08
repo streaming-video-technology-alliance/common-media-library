@@ -1,5 +1,8 @@
 import type { HlsManifest } from '../../types/mapper/hls/HlsManifest.js';
 
+/**
+ * @internal
+ */
 export type HlsParser = (text: string) => HlsManifest;
 
 let hlsParser: HlsParser;
@@ -18,6 +21,9 @@ export function getHlsParser(): HlsParser {
 	return hlsParser;
 }
 
+/**
+ * @internal
+ */
 export function parseHlsManifest(text?: string): HlsManifest {
 	if (!text) {
 		console.error("Can't parse empty HLS Manifest");
