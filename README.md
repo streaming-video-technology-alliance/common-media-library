@@ -6,7 +6,7 @@ Looking at open source players like [hls.js](https://github.com/video-dev/hls.js
 
 ## Project structure
 
-This project is a mono-repo with the following workspaces: `lib`, `docs`. The `lib` package contains the compiled code for the library which is published to npm. The `docs` package contains the documentation for the library and is published to GitHub pages.
+This project is a mono-repo with the following workspaces: `libs` and `docs`. The `libs` package contains the individual libraries which are published to npm. The `docs` package contains the documentation for all of the libraries and is published as a single site to GitHub pages.
 
 ## Installation
 
@@ -15,6 +15,8 @@ npm install @svta/common-media-library
 ```
 
 ## Usage
+
+The top level `@svta/common-media-library` package is a meta package that re-exports all of the individual libraries. It is only maintained for backward compatibility. Features should be imported from the individual libraries instead.
 
 To ensure the smallest bundle sizes possible, it is best practice to import all members and type definitions
 individually from the library.
