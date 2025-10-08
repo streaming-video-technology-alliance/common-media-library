@@ -1,4 +1,4 @@
-import { ArithmeticMeanEstimator } from '@svta/common-media-library';
+import { ArithmeticMeanEstimator } from '@svta/cml-throughput';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

@@ -1,0 +1,72 @@
+{
+	"name": "@svta/cml-content-steering",
+	"version": "0.19.0",
+	"description": "Content steering functionality",
+	"license": "Apache-2.0",
+	"type": "module",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
+	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
+	},
+	"bugs": {
+		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org",
+		"provenance": true,
+		"scope": "svta"
+	},
+	"files": [
+		"dist/**/*",
+		"NOTICE"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./*.js": {
+			"import": "./dist/*.js",
+			"default": "./dist/*.js"
+		},
+		"./*": {
+			"types": "./dist/*.d.ts",
+			"import": "./dist/*.js",
+			"default": "./dist/*.js"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"*": [
+				"dist/*",
+				"dist/cjs/*"
+			]
+		}
+	},
+	"keywords": [
+		"Common Media Library",
+		"CML",
+		"content steering"
+	],
+	"scripts": {
+		"build": "tsc",
+		"postbuild": "api-extractor run --local",
+		"test": "node --no-warnings --test **/*.test.ts",
+		"prepublishOnly": "npm run build"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24",
+			"onFail": "error"
+		}
+	},
+	"dependencies": {}
+}

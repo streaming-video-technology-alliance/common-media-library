@@ -1,4 +1,4 @@
-import { appendCmcdQuery } from '@svta/common-media-library';
+import { appendCmcdQuery } from '@svta/cml-cmcd';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

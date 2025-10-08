@@ -7,8 +7,8 @@
 import { CmObjectType } from '@svta/cml-cta/CmObjectType.js';
 import { CmStreamingFormat } from '@svta/cml-cta/CmStreamingFormat.js';
 import { CmStreamType } from '@svta/cml-cta/CmStreamType.js';
-import { SfItem } from '@svta/cml-structuredfield/SfItem.js';
-import type { SfToken } from '@svta/cml-structuredfield/SfToken.js';
+import { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
+import type { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
 import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
 
 // @beta

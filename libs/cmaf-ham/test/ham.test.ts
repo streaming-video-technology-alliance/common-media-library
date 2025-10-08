@@ -4,11 +4,11 @@ import { beforeEach, describe, it } from 'node:test';
 import type {
 	Presentation,
 	SelectionSet,
-} from '@svta/common-media-library';
+} from '@svta/cml-cmaf-ham';
 import {
 	getTracksFromSelectionSet,
 	validateTracks,
-} from '@svta/common-media-library';
+} from '@svta/cml-cmaf-ham';
 
 import jsonHam0 from './data/ham-samples/fromDash/ham0.json' with { type: 'json' };
 

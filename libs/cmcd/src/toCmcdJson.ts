@@ -1,5 +1,5 @@
-import { SfToken } from '@svta/cml-structuredfield/SfToken.js';
-import { symbolToStr } from '@svta/cml-structuredfield/utils/symbolToStr.js';
+import { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
+import { symbolToStr } from '@svta/cml-structured-field-values/utils/symbolToStr.js';
 import type { Cmcd } from './Cmcd.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { prepareCmcdData } from './prepareCmcdData.js';

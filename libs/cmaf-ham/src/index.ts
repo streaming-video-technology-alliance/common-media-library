@@ -50,3 +50,8 @@ export * from './services/validators/validateSwitchingSet.js';
 export * from './services/validators/validateSwitchingSets.js';
 export * from './services/validators/validateTrack.js';
 export * from './services/validators/validateTracks.js';
+
+export * from './utils/dash/parseDashManifest.js';
+export * from './utils/dash/serializeDashManifest.js';
+export * from './utils/hls/parseHlsManifest.js';
+

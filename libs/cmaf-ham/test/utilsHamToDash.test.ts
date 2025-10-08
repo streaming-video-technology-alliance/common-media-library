@@ -1,7 +1,7 @@
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import type { AudioTrack, Track } from '@svta/common-media-library/cmaf-ham';
+import type { AudioTrack, Track } from '@svta/cml-cmaf-ham';
 
 import { getTimescale } from '@svta/cml-cmaf-ham/mapper/dash/mapHamToDash/utils/getTimescale.js';
 

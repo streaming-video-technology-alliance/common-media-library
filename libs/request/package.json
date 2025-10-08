@@ -56,7 +56,6 @@
 	"scripts": {
 		"build": "tsc",
 		"postbuild": "api-extractor run --local",
-		"test": "node --no-warnings --test **/*.test.ts",
 		"prepublishOnly": "npm run build"
 	},
 	"engines": {

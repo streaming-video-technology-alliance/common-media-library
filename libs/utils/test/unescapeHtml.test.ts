@@ -1,4 +1,4 @@
-import { unescapeHtml } from '@svta/common-media-library';
+import { unescapeHtml } from '@svta/cml-utils';
 import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

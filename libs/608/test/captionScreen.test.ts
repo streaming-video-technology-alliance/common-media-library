@@ -1,4 +1,4 @@
-import { CaptionScreen, Row } from '@svta/common-media-library/608';
+import { CaptionScreen, Row } from '@svta/cml-608';
 import { deepEqual, equal } from 'node:assert';
 import { beforeEach, describe, it, mock } from 'node:test';
 

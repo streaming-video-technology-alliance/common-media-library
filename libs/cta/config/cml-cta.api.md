@@ -4,8 +4,8 @@
 
 ```ts
 
-import type { SfItem } from '@svta/cml-structuredfield/SfItem.js';
-import type { SfToken } from '@svta/cml-structuredfield/SfToken.js';
+import type { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
+import type { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
 import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
 
 // @beta

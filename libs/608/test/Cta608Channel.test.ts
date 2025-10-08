@@ -1,5 +1,5 @@
-import type { CueHandler } from '@svta/common-media-library/608';
-import { CaptionScreen, Cta608Channel } from '@svta/common-media-library/608';
+import type { CueHandler } from '@svta/cml-608';
+import { CaptionScreen, Cta608Channel } from '@svta/cml-608';
 import { deepEqual, equal } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 

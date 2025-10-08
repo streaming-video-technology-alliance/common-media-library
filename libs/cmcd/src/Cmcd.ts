@@ -1,4 +1,4 @@
-import type { SfItem } from '@svta/cml-structuredfield/SfItem.js';
+import type { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
 import type { ValueOrArray } from '@svta/cml-utils/ValueOrArray.js';
 import type { CmcdCustomKey } from './CmcdCustomKey.js';
 import type { CmcdObjectType } from './CmcdObjectType.js';

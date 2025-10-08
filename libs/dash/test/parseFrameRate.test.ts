@@ -1,4 +1,4 @@
-import { parseFrameRate } from '@svta/common-media-library/dash';
+import { parseFrameRate } from '@svta/cml-dash';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

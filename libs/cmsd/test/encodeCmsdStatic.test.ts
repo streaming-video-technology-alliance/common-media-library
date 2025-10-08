@@ -2,7 +2,7 @@ import { CmsdObjectType } from '@svta/cml-cmsd/CmsdObjectType';
 import { CmsdStreamType } from '@svta/cml-cmsd/CmsdStreamType';
 import { CmsdStreamingFormat } from '@svta/cml-cmsd/CmsdStreamingFormat';
 import { encodeCmsdStatic } from '@svta/cml-cmsd/encodeCmsdStatic';
-import { SfToken } from '@svta/cml-structuredfield/SfToken';
+import { SfToken } from '@svta/cml-structured-field-values/SfToken';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.ts';

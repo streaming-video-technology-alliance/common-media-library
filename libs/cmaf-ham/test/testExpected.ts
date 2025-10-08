@@ -1,4 +1,4 @@
-import type { Segment } from '@svta/common-media-library/cmaf-ham';
+import type { Segment } from '@svta/cml-cmaf-ham';
 
 const expectedSegmentBase: Segment[] = [
 	{

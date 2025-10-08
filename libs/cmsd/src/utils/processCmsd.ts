@@ -1,7 +1,7 @@
 import type { CmValue } from '@svta/cml-cta/CmValue.js';
 import { isTokenField } from '@svta/cml-cta/isTokenField.js';
 import { isValid } from '@svta/cml-cta/isValid.js';
-import { SfToken } from '@svta/cml-structuredfield/SfToken.js';
+import { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
 import type { CmsdEncodeOptions } from '../CmsdEncodeOptions.js';
 import type { CmsdStatic } from '../CmsdStatic.js';
 

@@ -1,4 +1,4 @@
-import { CMCD_REQUEST_KEYS, isCmcdRequestKey } from '@svta/common-media-library';
+import { CMCD_REQUEST_KEYS, isCmcdRequestKey } from '@svta/cml-cmcd';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

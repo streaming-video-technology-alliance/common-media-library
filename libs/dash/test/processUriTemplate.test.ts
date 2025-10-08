@@ -1,4 +1,4 @@
-import { processUriTemplate } from '@svta/common-media-library/dash';
+import { processUriTemplate } from '@svta/cml-dash';
 import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

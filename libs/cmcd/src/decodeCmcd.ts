@@ -1,7 +1,7 @@
-import type { SfBareItem } from '@svta/cml-structuredfield/SfBareItem.js';
-import { SfItem } from '@svta/cml-structuredfield/SfItem.js';
-import { decodeSfDict } from '@svta/cml-structuredfield/decodeSfDict.js';
-import { symbolToStr } from '@svta/cml-structuredfield/utils/symbolToStr.js';
+import type { SfBareItem } from '@svta/cml-structured-field-values/SfBareItem.js';
+import { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
+import { decodeSfDict } from '@svta/cml-structured-field-values/decodeSfDict.js';
+import { symbolToStr } from '@svta/cml-structured-field-values/utils/symbolToStr.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdValue } from './CmcdValue.js';
 

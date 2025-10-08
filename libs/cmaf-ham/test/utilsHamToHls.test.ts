@@ -1,7 +1,7 @@
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import type { AudioTrack } from '@svta/common-media-library/cmaf-ham';
+import type { AudioTrack } from '@svta/cml-cmaf-ham';
 
 import { getByterange } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getByterange.js';
 import { getPlaylistData } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getPlaylistData.js';

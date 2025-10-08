@@ -1,5 +1,5 @@
-import { decodeSfDict } from '@svta/cml-structuredfield/decodeSfDict.js';
-import { symbolToStr } from '@svta/cml-structuredfield/utils/symbolToStr.js';
+import { decodeSfDict } from '@svta/cml-structured-field-values/decodeSfDict.js';
+import { symbolToStr } from '@svta/cml-structured-field-values/utils/symbolToStr.js';
 import type { CmsdStatic } from './CmsdStatic.js';
 
 /**

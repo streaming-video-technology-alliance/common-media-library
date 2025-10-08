@@ -1,5 +1,5 @@
-import { SfItem } from '@svta/cml-structuredfield/SfItem.js';
-import { encodeSfList } from '@svta/cml-structuredfield/encodeSfList.js';
+import { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
+import { encodeSfList } from '@svta/cml-structured-field-values/encodeSfList.js';
 import type { CmsdDynamic } from './CmsdDynamic.js';
 
 /**

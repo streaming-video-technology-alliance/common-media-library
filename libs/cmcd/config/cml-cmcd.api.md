@@ -8,8 +8,8 @@ import { CmObjectType } from '@svta/cml-cta/CmObjectType.js';
 import { CmStreamingFormat } from '@svta/cml-cta/CmStreamingFormat.js';
 import { CmStreamType } from '@svta/cml-cta/CmStreamType.js';
 import type { Request as Request_2 } from '@svta/cml-utils/Request.js';
-import type { SfItem } from '@svta/cml-structuredfield/SfItem.js';
-import type { SfToken } from '@svta/cml-structuredfield/SfToken.js';
+import type { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
+import type { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
 import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
 import type { ValueOrArray } from '@svta/cml-utils/ValueOrArray.js';
 

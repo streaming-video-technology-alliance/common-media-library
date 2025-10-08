@@ -83,6 +83,16 @@ export type DashManifest = {
     };
 };
 
+// Warning: (ae-incompatible-release-tags) The symbol "DashParser" is marked as @public, but its signature references "DashManifest" which is marked as @alpha
+//
+// @public (undocumented)
+export type DashParser = (raw: string) => DashManifest;
+
+// Warning: (ae-incompatible-release-tags) The symbol "DashSerializer" is marked as @public, but its signature references "DashManifest" which is marked as @alpha
+//
+// @public (undocumented)
+export type DashSerializer = (json: DashManifest) => string;
+
 // @alpha
 export function dashToHam(manifest: string): Presentation[];
 
@@ -91,6 +101,21 @@ export type FrameRate = {
     frameRateNumerator: number;
     frameRateDenominator?: number;
 };
+
+// Warning: (ae-internal-missing-underscore) The name "getDashParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function getDashParser(): DashParser;
+
+// Warning: (ae-internal-missing-underscore) The name "getDashSerializer" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function getDashSerializer(): DashSerializer;
+
+// Warning: (ae-internal-missing-underscore) The name "getHlsParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function getHlsParser(): HlsParser;
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
@@ -119,6 +144,11 @@ export type HlsManifest = {
     segments: SegmentHls[];
     targetDuration?: number;
 };
+
+// Warning: (ae-incompatible-release-tags) The symbol "HlsParser" is marked as @public, but its signature references "HlsManifest" which is marked as @alpha
+//
+// @public (undocumented)
+export type HlsParser = (text: string) => HlsManifest;
 
 // @alpha
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
@@ -160,6 +190,16 @@ export type MediaGroups = {
         };
     };
 };
+
+// Warning: (ae-internal-missing-underscore) The name "parseDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function parseDashManifest(raw: string): DashManifest;
+
+// Warning: (ae-incompatible-release-tags) The symbol "parseHlsManifest" is marked as @public, but its signature references "HlsManifest" which is marked as @alpha
+//
+// @public (undocumented)
+export function parseHlsManifest(text?: string): HlsManifest;
 
 // @alpha
 export type Period = {
@@ -284,6 +324,26 @@ export type SelectionSet = Ham & {
     alignedSwitchingSets?: AlignedSwitchingSet[];
 };
 
+// Warning: (ae-incompatible-release-tags) The symbol "serializeDashManifest" is marked as @public, but its signature references "DashManifest" which is marked as @alpha
+//
+// @public (undocumented)
+export function serializeDashManifest(json: DashManifest): string;
+
+// Warning: (ae-internal-missing-underscore) The name "setDashParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setDashParser(parser: DashParser): void;
+
+// Warning: (ae-internal-missing-underscore) The name "setDashSerializer" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setDashSerializer(serializer: DashSerializer): void;
+
+// Warning: (ae-internal-missing-underscore) The name "setHlsParser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function setHlsParser(parser: HlsParser): void;
+
 // @alpha
 export type SwitchingSet = Ham & {
     tracks: Track[];
@@ -351,5 +411,7 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
+
+// (No @packageDocumentation comment for this package)
 
 ```

@@ -1,4 +1,4 @@
-import { encodeSfDict } from '@svta/cml-structuredfield/encodeSfDict.js';
+import { encodeSfDict } from '@svta/cml-structured-field-values/encodeSfDict.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import { prepareCmcdData } from './prepareCmcdData.js';

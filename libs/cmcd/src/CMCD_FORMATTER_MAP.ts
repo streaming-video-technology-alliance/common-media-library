@@ -1,4 +1,4 @@
-import { SfItem } from '@svta/cml-structuredfield/SfItem.js';
+import { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
 import { urlToRelativePath } from '@svta/cml-utils/urlToRelativePath.js';
 import type { ValueOrArray } from '@svta/cml-utils/ValueOrArray.js';
 import type { CmcdFormatter } from './CmcdFormatter.js';

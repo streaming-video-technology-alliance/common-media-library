@@ -1,4 +1,5 @@
-import { roundToEven, ZlemaEstimator } from '@svta/common-media-library';
+import { ZlemaEstimator } from '@svta/cml-throughput';
+import { roundToEven } from '@svta/cml-utils/roundToEven';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

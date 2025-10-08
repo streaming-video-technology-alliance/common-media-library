@@ -2,7 +2,7 @@ import {
 	validatePresentation,
 	validateSegments,
 	validateTrack,
-} from '@svta/common-media-library/cmaf-ham';
+} from '@svta/cml-cmaf-ham';
 import { deepEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import {
