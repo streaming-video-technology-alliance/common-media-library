@@ -10,7 +10,6 @@ import type { IsoView } from '../IsoView.js';
  *
  * @returns A parsed SampleDependencyTypeBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

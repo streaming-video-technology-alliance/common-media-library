@@ -19,7 +19,6 @@ import { MapperContext } from '../../mapper/MapperContext.js';
  * @param presentation - List of presentations from ham
  * @returns Manifest object containing the Dash manifest as string
  *
- * @group CMAF
  * @alpha
  */
 export function hamToDash(presentation: Presentation[]): Manifest {

@@ -1,7 +1,6 @@
 /**
  * Segment index reference
  *
- * @group ISOBMFF
  *
  * @beta
  */

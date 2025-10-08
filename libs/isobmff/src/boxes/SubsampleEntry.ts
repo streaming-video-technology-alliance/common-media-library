@@ -3,7 +3,6 @@ import type { Subsample } from './Subsample.js';
 /**
  * Sub sample entry
  *
- * @group ISOBMFF
  *
  * @beta
  */

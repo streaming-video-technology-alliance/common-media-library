@@ -13,7 +13,6 @@ const REGEX = /CMCD=[^&#]+/;
  *
  * @returns The URL with the CMCD query args appended.
  *
- * @group CMCD
  *
  * @beta
  *

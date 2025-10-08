@@ -1,7 +1,6 @@
 /**
  * Track fragment random access entry
  *
- * @group ISOBMFF
  *
  * @beta
  */

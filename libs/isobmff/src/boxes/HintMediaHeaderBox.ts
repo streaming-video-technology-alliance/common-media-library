@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Hint Media Header Box - 'hmhd'
  *
- * @group ISOBMFF
  *
  * @beta
  */

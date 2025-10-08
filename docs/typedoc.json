@@ -1,6 +1,7 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
-	"categorizeByGroup": true,
+	"alwaysCreateEntryPointModule": false,
+	"groupReferencesByType": false,
 	"cleanOutputDir": true,
 	"customCss": "./styles.css",
 	"entryPointStrategy": "packages",

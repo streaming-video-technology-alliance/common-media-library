@@ -1,7 +1,6 @@
 /**
  * W3C Clear Key UUID.
  *
- * @group DRM
  *
  * @beta
  */

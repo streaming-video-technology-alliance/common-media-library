@@ -5,7 +5,6 @@
  * frameRateNumerator - Numerator.
  * frameRateDenominator - Denominator.
  *
- * @group CMAF
  * @alpha
 */
 

@@ -1,7 +1,6 @@
 /**
  * FairPlay UUID.
  *
- * @group DRM
  *
  * @beta
  */

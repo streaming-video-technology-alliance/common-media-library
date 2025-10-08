@@ -6,7 +6,6 @@ import type { SelectionSet } from './SelectionSet.js';
  *
  * selectionSets - List of SelectionSets
  *
- * @group CMAF
  * @alpha
  */
 export type Presentation = Ham & {

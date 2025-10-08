@@ -1,7 +1,6 @@
 /**
  * Exponential Weighted Moving Average (EWMA)
  *
- * @group Throughput
  *
  * @beta
  */

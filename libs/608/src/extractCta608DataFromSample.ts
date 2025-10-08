@@ -12,7 +12,6 @@ import {
  * @param sampleSize - The size of the sample in bytes
  * @returns fieldData array containing field 1 and field 2 data arrays
  *
- * @group CTA-608
  * @beta
  */
 export function extractCta608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {

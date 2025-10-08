@@ -1,7 +1,6 @@
 /**
  * DASH Initialization
  *
- * @group CMAF
  * @alpha
  */
 export type Initialization = {

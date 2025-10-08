@@ -1,7 +1,6 @@
 /**
  * CMCD response mode variable name.
  *
- * @group CMCD
  *
  * @beta
  */

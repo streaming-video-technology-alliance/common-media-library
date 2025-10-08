@@ -4,7 +4,6 @@ import type { WebVttParsingError } from './WebVttParsingError.js';
 /**
  * WebVTT transform stream error result.
  *
- * @group WebVTT
  *
  * @beta
  */

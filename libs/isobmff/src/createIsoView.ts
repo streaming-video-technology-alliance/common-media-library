@@ -10,7 +10,6 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @returns The created IsoView
  *
- * @group ISOBMFF
  *
  * @beta
  */

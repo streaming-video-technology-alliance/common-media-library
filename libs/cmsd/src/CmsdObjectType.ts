@@ -3,7 +3,6 @@ import { CmObjectType } from '@svta/cml-cta/CmObjectType.js';
 /**
  * Common Media Server Data Object Type
  *
- * @group CMSD
  *
  * @enum
  *

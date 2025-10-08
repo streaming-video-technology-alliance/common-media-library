@@ -4,7 +4,6 @@ import type { ItemLocation } from './ItemLocation.js';
 /**
  * Item Location Box - 'iloc'
  *
- * @group ISOBMFF
  *
  * @beta
  */

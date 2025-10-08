@@ -1,7 +1,6 @@
 /**
  * Composition Time to Sample Entry
  *
- * @group ISOBMFF
  *
  * @beta
  */

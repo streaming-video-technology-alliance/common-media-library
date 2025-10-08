@@ -6,7 +6,6 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
 /**
  * Box parser
  *
- * @group ISOBMFF
  *
  * @beta
  */

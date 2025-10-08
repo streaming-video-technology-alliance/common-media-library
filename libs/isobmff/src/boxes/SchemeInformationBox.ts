@@ -5,7 +5,6 @@ import type { TrackEncryptionBox } from './TrackEncryptionBox.js';
 /**
  * Scheme Information Box - 'schi' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

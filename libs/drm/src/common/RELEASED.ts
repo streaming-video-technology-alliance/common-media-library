@@ -1,7 +1,6 @@
 /**
  * Released Media Key Status.
  *
- * @group DRM
  *
  * @beta
  */

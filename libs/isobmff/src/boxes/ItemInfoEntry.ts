@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Item Info Entry - 'infe'
  *
- * @group ISOBMFF
  *
  * @beta
  */

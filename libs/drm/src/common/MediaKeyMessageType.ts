@@ -7,7 +7,6 @@ import { LICENSE_REQUEST } from './LICENSE_REQUEST.js';
 /**
  * Media Key Message Types.
  *
- * @group DRM
  *
  * @beta
  */
@@ -21,7 +20,6 @@ export const MediaKeyMessageType = {
 /**
  * Media Key Message Types.
  *
- * @group DRM
  *
  * @beta
  */

@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * ISO/IEC 23009-1:2014 - 5.10.3.3 Event Message Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

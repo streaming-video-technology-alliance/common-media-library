@@ -3,7 +3,6 @@ import type { Box } from './Box.js';
 /**
  * Full Box Type (has version and flags)
  *
- * @group ISOBMFF
  *
  * @beta
  */

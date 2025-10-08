@@ -6,7 +6,6 @@ import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
 /**
  * CMCD reporting mode types.
  *
- * @group CMCD
  *
  * @enum
  *

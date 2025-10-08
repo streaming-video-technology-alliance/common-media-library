@@ -8,7 +8,6 @@ import type { CmsdDynamic } from './CmsdDynamic.js';
  *
  * @returns The decoded CMSD object.
  *
- * @group CMSD
  *
  * @beta
  */

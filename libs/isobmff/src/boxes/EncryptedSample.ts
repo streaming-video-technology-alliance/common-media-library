@@ -3,7 +3,6 @@ import type { SubsampleEncryption } from './SubsampleEncryption.js';
 /**
  * Encrypted Sample
  *
- * @group ISOBMFF
  *
  * @beta
  */

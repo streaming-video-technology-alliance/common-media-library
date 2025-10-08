@@ -10,7 +10,6 @@ import { serializeList } from './serialize/serializeList.js';
  *
  * @returns The structured field string
  *
- * @group Structured Field
  *
  * @beta
  */

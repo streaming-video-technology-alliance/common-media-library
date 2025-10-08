@@ -1,7 +1,6 @@
 /**
  * License Request.
  *
- * @group DRM
  *
  * @beta
  */

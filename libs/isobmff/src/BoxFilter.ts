@@ -3,7 +3,6 @@ import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
 /**
  * Box filter function
  *
- * @group ISOBMFF
  *
  * @beta
  */

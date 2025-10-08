@@ -1,7 +1,6 @@
 /**
  * Key IDs.
  *
- * @group DRM
  *
  * @beta
  */

@@ -3,7 +3,6 @@ import type { PathwayClone } from './PathwayClone.js';
 /**
  * A manifest for content steering.
  *
- * @group Content Steering
  *
  * @beta
  */

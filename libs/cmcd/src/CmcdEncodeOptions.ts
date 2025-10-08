@@ -6,7 +6,6 @@ import type { CmcdReportingMode } from './CmcdReportingMode.js';
 /**
  * Options for encoding CMCD values.
  *
- * @group CMCD
  *
  * @beta
  */

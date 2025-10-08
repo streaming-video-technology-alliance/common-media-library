@@ -6,7 +6,6 @@ import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.js';
  *
  * @returns A parsed WebVTT Empty Sample Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

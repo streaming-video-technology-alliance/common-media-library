@@ -1,7 +1,6 @@
 /**
  * XML formatted, UTF-8 encoded, text header.
  *
- * @group DRM
  *
  * @beta
  */

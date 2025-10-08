@@ -1,7 +1,6 @@
 /**
  * WEBM.
  *
- * @group DRM
  *
  * @beta
  */

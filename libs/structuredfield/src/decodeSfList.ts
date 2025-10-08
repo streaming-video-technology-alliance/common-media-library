@@ -10,7 +10,6 @@ import { LIST } from './utils/LIST.js';
  * @param input - The structured field string to decode
  * @returns The structured field list
  *
- * @group Structured Field
  *
  * @beta
  */

@@ -5,7 +5,6 @@
  * Source:
  * https://www.w3.org/TR/2013/WD-encrypted-media-20130903/#common-key-systems
  * 
- * @group DRM   
  */
 
 export const samplePsshBox: Uint8Array = new Uint8Array([

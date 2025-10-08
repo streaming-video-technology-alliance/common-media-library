@@ -4,7 +4,6 @@ import type { TimestampMap } from './TimestampMap.js';
 /**
  * WebVTT transform stream timestamp map result.
  *
- * @group WebVTT
  *
  * @beta
  */

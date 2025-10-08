@@ -1,7 +1,6 @@
 /**
  * HLS Playlist
  *
- * @group CMAF
  * @alpha
  */
 export type PlayList = {

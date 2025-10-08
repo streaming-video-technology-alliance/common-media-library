@@ -6,7 +6,6 @@ import type { CmcdResponse } from './CmcdResponse.js';
 /**
  * All CMCD data types combined.
  *
- * @group CMCD
  *
  * @beta
  */

@@ -1,7 +1,6 @@
 /**
  * Individualization Request.
  *
- * @group DRM
  *
  * @beta
  */

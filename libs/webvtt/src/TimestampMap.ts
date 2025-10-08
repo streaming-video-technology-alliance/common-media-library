@@ -1,7 +1,6 @@
 /**
  * A timestamp map is a mapping of MPEG timestamps to local timestamps.
  *
- * @group WebVTT
  *
  * @beta
  *

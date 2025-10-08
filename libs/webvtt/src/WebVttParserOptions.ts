@@ -4,7 +4,6 @@ import type { WebVttRegionFactory } from './WebVttRegionFactory';
 /**
  * Options for the WebVtt parser.
  *
- * @group WebVTT
  *
  * @beta
  */

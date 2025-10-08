@@ -14,7 +14,6 @@ import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.js';
  * @param encoding - The message encoding type. Default is UTF-16.
  * @returns The license request as an ArrayBuffer.
  *
- * @group DRM
  * @beta
  *
  * @example

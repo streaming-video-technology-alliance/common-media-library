@@ -4,7 +4,6 @@ import { WebVttTransformer } from './WebVttTransformer.js';
 /**
  * WebVTT transform stream.
  *
- * @group WebVTT
  *
  * @beta
  */

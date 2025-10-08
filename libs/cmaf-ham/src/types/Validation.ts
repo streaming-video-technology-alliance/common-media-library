@@ -1,7 +1,6 @@
 /**
  * CMAF-HAM Validation type
  *
- * @group CMAF
  * @alpha
  */
 export type Validation = {

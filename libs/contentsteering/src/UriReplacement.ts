@@ -1,7 +1,6 @@
 /**
  * A URI replacement for content steering.
  *
- * @group Content Steering
  *
  * @beta
  */

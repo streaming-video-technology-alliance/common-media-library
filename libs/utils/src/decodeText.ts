@@ -12,7 +12,6 @@ import { UTF_8 } from './UTF_8.js';
  * @param options - The options for the decoding.
  * @returns The string representation of the ArrayBuffer.
  *
- * @group Utils
  *
  * @beta
  *

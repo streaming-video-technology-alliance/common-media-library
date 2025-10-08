@@ -4,7 +4,6 @@
  * @param pssh - The PSSH ArrayBuffer.
  * @returns The data portion of the PSSH.
  *
- * @group DRM
  * @beta
  *
  * @example

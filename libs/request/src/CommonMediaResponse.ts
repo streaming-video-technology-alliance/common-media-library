@@ -5,7 +5,6 @@ import type { ResponseTypeMap } from './ResponseTypeMap.js';
 /**
  * Common response API.
  *
- * @group Request
  *
  * @beta
  */

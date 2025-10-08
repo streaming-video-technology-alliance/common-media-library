@@ -13,7 +13,6 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @returns The first box that matches the type
  *
- * @group ISOBMFF
  *
  * @beta
  */

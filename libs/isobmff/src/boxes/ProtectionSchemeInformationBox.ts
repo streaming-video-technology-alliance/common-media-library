@@ -7,7 +7,6 @@ import type { SchemeTypeBox } from './SchemeTypeBox.js';
 /**
  * Protection Scheme Information Box - 'sinf' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

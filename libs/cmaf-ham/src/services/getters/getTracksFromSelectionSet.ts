@@ -10,7 +10,6 @@ import { getTracksFromSwitchingSet } from './getTracksFromSwitchingSet.js';
  * @param predicate - Filtering function
  * @returns Track[]
  *
- * @group CMAF
  * @alpha
  */
 export function getTracksFromSelectionSet(

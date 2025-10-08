@@ -3,7 +3,6 @@ import type { SfMember } from './SfMember.js';
 /**
  * A dictionary of structured field members.
  *
- * @group Structured Field
  *
  * @beta
  */

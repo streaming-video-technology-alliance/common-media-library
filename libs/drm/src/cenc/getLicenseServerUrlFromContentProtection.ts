@@ -7,7 +7,6 @@ import type { ContentProtection } from '../common/ContentProtection.js';
  * @param schemeIdUri - schemeIdUri we are searching for.
  * @returns The license server URL, and if not found then null.
  *
- * @group DRM
  * @beta
  *
  * @example

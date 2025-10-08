@@ -5,7 +5,6 @@ import type { TrackExtendsBox } from './TrackExtendsBox.js';
 /**
  * Movie Extends Box - 'mvex' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

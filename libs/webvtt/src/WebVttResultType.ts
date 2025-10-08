@@ -3,7 +3,6 @@ import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
 /**
  * WebVTT result types.
  *
- * @group WebVTT
  *
  * @beta
  *

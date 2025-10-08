@@ -10,7 +10,6 @@ import type { CmcdValue } from './CmcdValue.js';
  *
  * @returns The formatted value.
  *
- * @group CMCD
  *
  * @beta
  */

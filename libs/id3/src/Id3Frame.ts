@@ -3,7 +3,6 @@ import type { DecodedId3Frame } from './DecodedId3Frame.js';
 /**
  * ID3 frame.
  *
- * @group ID3
  *
  * @beta
  */

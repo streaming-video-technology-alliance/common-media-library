@@ -1,7 +1,6 @@
 /**
  * Clear Key UUID.
  *
- * @group DRM
  *
  * @beta
  */

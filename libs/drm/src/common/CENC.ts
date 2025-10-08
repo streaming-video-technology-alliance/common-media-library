@@ -1,7 +1,6 @@
 /**
  * Common Encryption scheme.
  *
- * @group DRM
  *
  * @beta
  */

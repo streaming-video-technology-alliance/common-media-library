@@ -1,7 +1,6 @@
 /**
  * Widevine UUID.
  *
- * @group DRM
  *
  * @beta
  */

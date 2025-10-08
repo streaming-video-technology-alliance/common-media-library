@@ -1,7 +1,6 @@
 /**
  * The string field type
  *
- * @group ISOBMFF
  *
  * @beta
  */

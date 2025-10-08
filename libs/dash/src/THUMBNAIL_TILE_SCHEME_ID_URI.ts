@@ -1,7 +1,6 @@
 /**
  * The scheme ID URI for thumbnail tiles in DASH.
  *
- * @group DASH
  *
  * @beta
  */

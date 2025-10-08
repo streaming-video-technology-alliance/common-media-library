@@ -4,7 +4,6 @@ import type { CmcdPlayerState } from './CmcdPlayerState';
 /**
  * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.
  *
- * @group CMCD
  *
  * @beta
  */

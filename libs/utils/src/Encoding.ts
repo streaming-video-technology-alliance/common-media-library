@@ -7,7 +7,6 @@ import type { ValueOf } from './ValueOf.js';
 /**
  * Text encoding types.
  *
- * @group Utils
  *
  * @beta
  */
@@ -21,7 +20,6 @@ export const Encoding = {
 /**
  * Text encoding types.
  *
- * @group Utils
  *
  * @beta
  */

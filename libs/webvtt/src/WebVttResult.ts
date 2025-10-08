@@ -7,7 +7,6 @@ import type { WebVttTimestampMapResult } from './WebVttTimestampMapResult.js';
 /**
  * WebVTT transform stream result.
  *
- * @group WebVTT
  *
  * @beta
  */

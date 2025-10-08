@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Sample Auxiliary Information Offsets Box - 'saio'
  *
- * @group ISOBMFF
  *
  * @beta
  */

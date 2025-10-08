@@ -1,7 +1,6 @@
 /**
  * CMSD Version 1
  *
- * @group CMSD
  *
  * @beta
  */

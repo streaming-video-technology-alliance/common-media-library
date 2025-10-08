@@ -1,7 +1,6 @@
 /**
  * License Acquisition.
  *
- * @group DRM
  *
  * @beta
  */

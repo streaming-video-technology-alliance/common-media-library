@@ -1,7 +1,6 @@
 /**
  * Internal Error Media Key Status.
  *
- * @group DRM
  *
  * @beta
  */

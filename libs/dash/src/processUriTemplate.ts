@@ -12,7 +12,6 @@ const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]
  *
  * @returns Processed URI template.
  *
- * @group DASH
  * @beta
  *
  * @example

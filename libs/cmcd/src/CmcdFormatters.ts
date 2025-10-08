@@ -4,7 +4,6 @@ import type { CmcdFormatter } from './CmcdFormatter.js';
 /**
  * The default formatters for CMCD values.
  *
- * @group CMCD
  *
  * @beta
  *

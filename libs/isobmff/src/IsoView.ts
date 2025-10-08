@@ -23,7 +23,6 @@ import { readUtf8TerminatedString } from './readers/readUtf8TerminatedString.js'
 /**
  * Raw ISO BMFF data box.
  *
- * @group ISOBMFF
  *
  * @beta
  */
@@ -39,7 +38,6 @@ export type RawBox = {
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
  * It implements the iterator protocol, so it can be used in a for...of loop.
  *
- * @group ISOBMFF
  *
  * @beta
  */

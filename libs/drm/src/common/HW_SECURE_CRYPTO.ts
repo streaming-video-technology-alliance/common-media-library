@@ -1,7 +1,6 @@
 /**
  * Hardware Secure Crypto Robustness.
  *
- * @group DRM
  *
  * @beta
  */

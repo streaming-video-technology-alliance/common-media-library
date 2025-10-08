@@ -10,7 +10,6 @@ import { free } from './free.js';
  *
  * @returns A parsed FreeSpaceBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

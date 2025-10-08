@@ -14,7 +14,6 @@ import {
  * @param track - Track to get the byterange from
  * @returns string containing the byterange in the hls format
  *
- * @group CMAF
  * @alpha
  */
 export function getByterange(track: VideoTrack | AudioTrack): string {

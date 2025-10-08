@@ -11,7 +11,6 @@ import type { Track } from './Track.js';
  * sar - Sample Aspect Ratio of the video track in string.
  * scanType - The method used to display the video track.
  *
- * @group CMAF
  * @alpha
  */
 export type VideoTrack = Track & {

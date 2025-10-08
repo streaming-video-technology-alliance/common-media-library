@@ -11,7 +11,6 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @returns The parsed boxes
  *
- * @group ISOBMFF
  *
  * @beta
  */

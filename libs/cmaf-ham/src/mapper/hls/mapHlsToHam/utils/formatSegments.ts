@@ -11,7 +11,6 @@ import { getByterange } from './getByterange.js';
  * @param segments - List of HLS segments
  * @returns ham formatted list of segments
  *
- * @group CMAF
  * @alpha
  */
 export function formatSegments(segments: SegmentHls[]): Segment[] {

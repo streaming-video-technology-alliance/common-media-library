@@ -4,7 +4,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * ISO/IEC 14496-12:202x - 8.18.4.1 Preselection group box
  *
- * @group ISOBMFF
  *
  * @beta
  */

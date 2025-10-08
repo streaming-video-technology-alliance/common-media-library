@@ -1,7 +1,6 @@
 /**
  * A WebVTT region.
  *
- * @group WebVTT
  *
  * @beta
  */

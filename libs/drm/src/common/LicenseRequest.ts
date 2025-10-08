@@ -4,7 +4,6 @@
  * Contains all data needed to make a license acquisition request
  * to a DRM license server.
  *
- * @group DRM
  *
  * @beta
  */

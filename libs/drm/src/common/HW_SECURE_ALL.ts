@@ -1,7 +1,6 @@
 /**
  * Hardware Secure All Robustness.
  *
- * @group DRM
  *
  * @beta
  */

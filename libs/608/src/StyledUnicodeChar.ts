@@ -41,7 +41,6 @@ import { PenState } from './PenState.js';
 /**
  * Unicode character with styling and background.
  *
- * @group CTA-608
  * @beta
  */
 export class StyledUnicodeChar {

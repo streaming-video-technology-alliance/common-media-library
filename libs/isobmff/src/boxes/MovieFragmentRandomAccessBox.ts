@@ -5,7 +5,6 @@ import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBo
 /**
  * Movie Fragment Random Access Box - 'mfra' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

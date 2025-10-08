@@ -3,7 +3,6 @@ import type { ItemExtent } from './ItemExtent.js';
 /**
  * Item Location
  *
- * @group ISOBMFF
  *
  * @beta
  */

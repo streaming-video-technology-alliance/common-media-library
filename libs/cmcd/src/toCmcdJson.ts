@@ -12,7 +12,6 @@ import { prepareCmcdData } from './prepareCmcdData.js';
  *
  * @returns The CMCD JSON.
  *
- * @group CMCD
  *
  * @beta
  *

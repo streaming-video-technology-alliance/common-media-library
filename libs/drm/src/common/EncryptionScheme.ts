@@ -5,7 +5,6 @@ import { CENC } from './CENC.js';
 /**
  * Encryption schemes.
  *
- * @group DRM
  *
  * @beta
  */
@@ -17,7 +16,6 @@ export const EncryptionScheme = {
 /**
  * Encryption schemes.
  *
- * @group DRM
  *
  * @beta
  */

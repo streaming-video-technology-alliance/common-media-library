@@ -4,7 +4,6 @@
  * @param str - The string to convert
  * @returns A Uint16Array representation of the string
  *
- * @group Utils
  *
  * @beta
  *

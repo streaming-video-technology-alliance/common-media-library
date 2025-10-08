@@ -11,7 +11,6 @@ import { toCmcdUrl } from './toCmcdUrl.js';
  *
  * @returns The CMCD query arg.
  *
- * @group CMCD
  *
  * @beta
  *

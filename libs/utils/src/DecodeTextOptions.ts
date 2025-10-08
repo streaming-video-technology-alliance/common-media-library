@@ -3,7 +3,6 @@ import type { Encoding } from './Encoding.js';
 /**
  * Options for the `decodeText` function.
  *
- * @group Utils
  *
  * @beta
  */

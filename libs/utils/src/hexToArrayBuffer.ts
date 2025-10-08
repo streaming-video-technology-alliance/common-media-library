@@ -4,7 +4,6 @@
  * @param hex - The hexadecimal string to decode.
  * @returns The decoded ArrayBuffer.
  *
- * @group Utils
  *
  * @beta
  *

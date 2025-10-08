@@ -1,7 +1,6 @@
 /**
  * Exponential Weighted Moving Average (EWMA) Estimator Options
  *
- * @group Throughput
  *
  * @beta
  */

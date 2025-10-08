@@ -6,7 +6,6 @@ import type { WebVttRegion } from './WebVttRegion.js';
  * @param region - The WebVTT region to convert.
  * @returns The converted VTTRegion.
  *
- * @group WebVTT
  *
  * @beta
  *

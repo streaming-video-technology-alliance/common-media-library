@@ -8,7 +8,6 @@ import type { ContentProtection } from '../common/ContentProtection.js';
  * @param BASE64 - The BASE64 reference.
  * @returns init data as an ArrayBuffer, or null if not found.
  *
- * @group DRM
  * @beta
  *
  * @example

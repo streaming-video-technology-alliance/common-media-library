@@ -43,7 +43,6 @@ const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
 /**
  * The default formatters for CMCD values.
  *
- * @group CMCD
  *
  * @beta
  */

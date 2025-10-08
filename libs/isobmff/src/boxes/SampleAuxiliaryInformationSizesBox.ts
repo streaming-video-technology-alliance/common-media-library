@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Sample Auxiliary Information Sizes Box - 'saiz'
  *
- * @group ISOBMFF
  *
  * @beta
  */

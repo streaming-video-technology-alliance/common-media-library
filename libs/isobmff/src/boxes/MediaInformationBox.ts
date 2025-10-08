@@ -9,7 +9,6 @@ import type { VideoMediaHeaderBox } from './VideoMediaHeaderBox.js';
 /**
  * Media Information Box - 'minf' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

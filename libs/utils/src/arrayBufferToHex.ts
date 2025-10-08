@@ -4,7 +4,6 @@
  * @param buffer - The ArrayBuffer to encode.
  * @returns The hexadecimal string representation.
  *
- * @group Utils
  *
  * @beta
  *

@@ -10,7 +10,6 @@ const keySet = new Set([...CMCD_V1_KEYS, ...CMCD_COMMON_KEYS, ...CMCD_REQUEST_KE
 /**
  * A list of all CMCD keys.
  *
- * @group CMCD
  *
  * @beta
  */

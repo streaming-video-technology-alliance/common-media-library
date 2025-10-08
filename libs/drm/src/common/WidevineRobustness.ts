@@ -8,7 +8,6 @@ import { SW_SECURE_DECODE } from './SW_SECURE_DECODE.js';
 /**
  * Widevine Robustness.
  *
- * @group DRM
  *
  * @beta
  */
@@ -23,7 +22,6 @@ export const WidevineRobustness = {
 /**
  * Widevine Robustness.
  *
- * @group DRM
  *
  * @beta
  */

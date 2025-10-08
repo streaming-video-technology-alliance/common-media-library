@@ -10,7 +10,6 @@ import type { SampleEntryBox } from '../boxes/SampleEntryBox.js';
  *
  * @returns A parsed SampleDescriptionBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

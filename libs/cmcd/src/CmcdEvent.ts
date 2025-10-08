@@ -11,7 +11,6 @@ import type { CmcdRequest } from './CmcdRequest.js';
  * Common Media Client Data (CMCD) version 2 specification. It encapsulates
  * the reporting event token.
  *
- * @group CMCD
  *
  * @beta
  */

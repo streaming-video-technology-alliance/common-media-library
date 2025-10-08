@@ -11,7 +11,6 @@ import type { PrimaryItemBox } from './PrimaryItemBox.js';
 /**
  * ISO/IEC 14496-12:202x - 8.11.1 Meta box
  *
- * @group ISOBMFF
  *
  * @beta
  */

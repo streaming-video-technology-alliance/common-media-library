@@ -9,7 +9,6 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  *
  * @returns `true` if the key should be included, `false` otherwise.
  *
- * @group CMCD
  *
  * @beta
  *

@@ -1,7 +1,6 @@
 /**
  * The template field type
  *
- * @group ISOBMFF
  *
  * @beta
  */

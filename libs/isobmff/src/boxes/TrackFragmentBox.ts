@@ -9,7 +9,6 @@ import type { TrackRunBox } from './TrackRunBox.js';
 /**
  * Track Fragment Box - 'traf' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

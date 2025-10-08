@@ -23,7 +23,6 @@ import { validateSegment } from './validateSegment.js';
  * @param prevValidation - Optional: validation object from parent previous validate method call
  * @returns Validation
  *
- * @group CMAF
  * @alpha
  *
  */

@@ -10,7 +10,6 @@ import { avc1 } from './avc1.js';
  *
  * @returns A parsed VisualSampleEntryBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

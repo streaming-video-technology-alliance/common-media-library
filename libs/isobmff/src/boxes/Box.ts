@@ -3,7 +3,6 @@ import type { IsoView } from '../IsoView.js';
 /**
  * Base Box Type
  *
- * @group ISOBMFF
  *
  * @beta
  */

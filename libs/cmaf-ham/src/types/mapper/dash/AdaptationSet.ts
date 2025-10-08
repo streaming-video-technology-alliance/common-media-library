@@ -8,7 +8,6 @@ import type { SegmentTemplate } from './SegmentTemplate.js';
 /**
  * DASH Adaptation Set
  *
- * @group CMAF
  * @alpha
  */
 export type AdaptationSet = {

@@ -13,7 +13,6 @@ import { readId3Size } from './util/readId3Size.js';
  *
  * @internal
  *
- * @group ID3
  */
 export function getId3Data(
 	data: Uint8Array,

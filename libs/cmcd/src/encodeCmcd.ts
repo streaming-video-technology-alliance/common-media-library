@@ -11,7 +11,6 @@ import { prepareCmcdData } from './prepareCmcdData.js';
  *
  * @returns The encoded CMCD string.
  *
- * @group CMCD
  *
  * @beta
  *

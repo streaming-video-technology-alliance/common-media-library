@@ -58,7 +58,6 @@ import { setLastCmd } from './utils/setLastCmd.js';
 /**
  * CEA-608 caption parser.
  *
- * @group CTA-608
  * @beta
  */
 export class Cta608Parser {

@@ -10,7 +10,6 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  *
  * @returns `true` if the key is a valid CMCD request key, `false` otherwise.
  *
- * @group CMCD
  *
  * @beta
  *

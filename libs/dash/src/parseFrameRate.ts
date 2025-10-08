@@ -4,7 +4,6 @@
  * @param frameRate - The frame rate string to parse.
  * @returns The frame rate as a number.
  *
- * @group DASH
  * @beta
  *
  * @example

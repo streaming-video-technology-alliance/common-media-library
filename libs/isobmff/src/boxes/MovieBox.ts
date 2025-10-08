@@ -7,7 +7,6 @@ import type { UserDataBox } from './UserDataBox.js';
 /**
  * Movie Box - 'moov' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

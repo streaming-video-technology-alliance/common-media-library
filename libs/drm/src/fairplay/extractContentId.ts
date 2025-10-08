@@ -8,7 +8,6 @@ import { UTF_16 } from '@svta/cml-utils/UTF_16.js';
  * @param initData - The initialization data (PSSH box)
  * @returns The extracted content ID
  *
- * @group DRM
  * @beta
  *
  * @example

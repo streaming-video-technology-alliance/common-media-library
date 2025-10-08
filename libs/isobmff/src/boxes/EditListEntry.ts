@@ -1,7 +1,6 @@
 /**
  * An edit list entry.
  *
- * @group ISOBMFF
  *
  * @beta
  */

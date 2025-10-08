@@ -6,7 +6,6 @@ import { encodeBase64 } from './encodeBase64.js';
  * @param binary - The binary data to encode
  * @returns The base64 encoded string
  *
- * @group Utils
  *
  * @beta
  *

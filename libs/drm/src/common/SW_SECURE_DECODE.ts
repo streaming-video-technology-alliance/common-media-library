@@ -1,7 +1,6 @@
 /**
  * Software Secure Decode Robustness.
  *
- * @group DRM
  *
  * @beta
  */

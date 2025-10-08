@@ -31,7 +31,6 @@ import { ITEM } from './utils/ITEM.js';
  * @param input - The structured field string to decode
  * @returns The structured field item
  *
- * @group Structured Field
  *
  * @beta
  */

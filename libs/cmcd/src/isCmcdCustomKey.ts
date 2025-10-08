@@ -9,7 +9,6 @@ const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9-.]+-[a-zA-Z0-9-.]+$/;
  *
  * @returns `true` if the key is a custom key, `false` otherwise.
  *
- * @group CMCD
  *
  * @beta
  */

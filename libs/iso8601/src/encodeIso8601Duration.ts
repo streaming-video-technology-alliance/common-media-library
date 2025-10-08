@@ -4,7 +4,6 @@
  * @param duration - Duration in seconds.
  * @returns ISO 8601 duration string.
  *
- * @group ISO 8601
  * @beta
  *
  * @example

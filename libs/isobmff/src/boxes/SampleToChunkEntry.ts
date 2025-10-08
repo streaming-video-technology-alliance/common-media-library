@@ -1,7 +1,6 @@
 /**
  * Sample to Chunk Entry
  *
- * @group ISOBMFF
  *
  * @beta
  */

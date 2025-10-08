@@ -1,7 +1,6 @@
 /**
  * The UTF8 field type
  *
- * @group ISOBMFF
  *
  * @beta
  */

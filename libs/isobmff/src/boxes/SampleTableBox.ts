@@ -15,7 +15,6 @@ import type { SyncSampleBox } from './SyncSampleBox.js';
 /**
  * Sample Table Box - 'stbl' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

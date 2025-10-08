@@ -3,7 +3,6 @@
  * 
  * id - Identifier of the object
  * 
- * @group CMAF
  * @alpha
  */
 export type Ham = {

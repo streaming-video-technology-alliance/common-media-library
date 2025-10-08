@@ -1,7 +1,6 @@
 /**
  * FairPlay Key System.
  *
- * @group DRM
  *
  * @beta
  */

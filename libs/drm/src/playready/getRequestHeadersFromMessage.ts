@@ -14,7 +14,6 @@ import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.js';
  * @param encoding - The message encoding type. Default is UTF-16.
  * @returns Request headers.
  *
- * @group DRM
  * @beta
  *
  * @example

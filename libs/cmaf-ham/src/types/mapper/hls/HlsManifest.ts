@@ -5,7 +5,6 @@ import type { SegmentHls } from './SegmentHls.js';
 /**
  * HLS manifest
  *
- * @group CMAF
  * @alpha
  */
 export type HlsManifest = {

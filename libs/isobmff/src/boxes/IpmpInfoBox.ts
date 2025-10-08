@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * IPMP Info Box - 'imif'
  *
- * @group ISOBMFF
  *
  * @beta
  */

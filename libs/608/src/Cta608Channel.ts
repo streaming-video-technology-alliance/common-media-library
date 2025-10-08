@@ -49,7 +49,6 @@ import { NR_ROWS } from './utils/NR_ROWS.js';
 /**
  * CTA-608 Channel
  *
- * @group CTA-608
  * @beta
  */
 export class Cta608Channel {

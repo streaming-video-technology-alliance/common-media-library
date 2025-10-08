@@ -4,7 +4,6 @@ import type { SegmentIndexReference } from './SegmentIndexReference.js';
 /**
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

@@ -1,7 +1,6 @@
 /**
  * CMCD `json` transmission mode.
  *
- * @group CMCD
  *
  * @beta
  *

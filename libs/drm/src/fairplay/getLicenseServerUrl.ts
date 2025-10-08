@@ -4,7 +4,6 @@
  * @param initData - The initialization data (PSSH box)
  * @returns The license server URL as a string
  *
- * @group DRM
  * @beta
  *
  * @example

@@ -11,7 +11,6 @@ import { readId3Timestamp } from './util/readId3Timestamp.js';
  *
  * @returns The timestamp
  *
- * @group ID3
  *
  * @beta
  */

@@ -10,7 +10,6 @@ import { readId3Size } from './readId3Size.js';
  *
  * @internal
  *
- * @group ID3
  */
 export function getId3FrameData(data: Uint8Array<ArrayBuffer>): RawId3Frame {
 	/*

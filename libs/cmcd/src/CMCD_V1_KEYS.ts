@@ -1,7 +1,6 @@
 /**
  * Defines the keys for CMCD (Common Media Client Data) version 1.
  *
- * @group CMCD
  *
  * @beta
  */

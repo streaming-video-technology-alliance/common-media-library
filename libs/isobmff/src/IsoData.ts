@@ -2,7 +2,6 @@
 /**
  * ISO data
  *
- * @group ISOBMFF
  *
  * @beta
  */

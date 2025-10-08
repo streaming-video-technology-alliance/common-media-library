@@ -4,7 +4,6 @@ import type { ShadowSyncEntry } from './ShadowSyncEntry.js';
 /**
  * Shadow Sync Sample Box - 'stsh'
  *
- * @group ISOBMFF
  *
  * @beta
  */

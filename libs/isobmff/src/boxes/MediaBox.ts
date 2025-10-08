@@ -6,7 +6,6 @@ import type { MediaInformationBox } from './MediaInformationBox.js';
 /**
  * Media Box - 'mdia' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

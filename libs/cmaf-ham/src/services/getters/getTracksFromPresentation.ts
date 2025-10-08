@@ -10,7 +10,6 @@ import { getTracksFromSelectionSet } from './getTracksFromSelectionSet.js';
  * @param predicate - Filtering function
  * @returns Track[]
  *
- * @group CMAF
  * @alpha
  */
 export function getTracksFromPresentation(

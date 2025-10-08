@@ -3,7 +3,6 @@ import type { WebVttRegion } from './WebVttRegion.js';
 /**
  * A WebVTT cue.
  *
- * @group WebVTT
  *
  * @beta
  */

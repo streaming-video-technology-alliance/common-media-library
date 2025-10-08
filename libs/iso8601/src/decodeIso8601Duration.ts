@@ -12,7 +12,6 @@ const SECONDS_IN_MIN = 60;
  * @param isoDuration - ISO 8601 duration string.
  * @returns Duration in seconds.
  *
- * @group ISO 8601
  * @beta
  *
  * @example

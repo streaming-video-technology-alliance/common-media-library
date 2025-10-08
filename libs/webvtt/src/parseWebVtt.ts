@@ -12,7 +12,6 @@ import type { WebVttRegion } from './WebVttRegion.js';
  * @param options - The options to use for the parser.
  * @returns The parsed WebVttParseResult.
  *
- * @group WebVTT
  *
  * @beta
  *

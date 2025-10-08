@@ -10,7 +10,6 @@ import { encodeCmcd } from './encodeCmcd.js';
  *
  * @returns The URL encoded CMCD data.
  *
- * @group CMCD
  *
  * @beta
  */

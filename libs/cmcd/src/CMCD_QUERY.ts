@@ -1,7 +1,6 @@
 /**
  * CMCD `query` transmission mode.
  *
- * @group CMCD
  *
  * @beta
  */

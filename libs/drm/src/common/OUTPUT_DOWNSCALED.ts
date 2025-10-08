@@ -1,7 +1,6 @@
 /**
  * Output Downscaled Media Key Status.
  *
- * @group DRM
  *
  * @beta
  */

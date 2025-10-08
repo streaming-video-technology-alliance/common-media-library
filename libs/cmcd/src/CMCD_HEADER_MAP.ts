@@ -8,7 +8,6 @@ import type { CmcdKey } from './CmcdKey.js';
 /**
  * The map of CMCD keys to their appropriate header shard.
  *
- * @group CMCD
  *
  * @internal
  */

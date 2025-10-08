@@ -1,7 +1,6 @@
 /**
  * License Challenge.
  *
- * @group DRM
  *
  * @beta
  */

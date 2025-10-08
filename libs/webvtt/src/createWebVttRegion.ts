@@ -6,7 +6,6 @@ import type { WebVttRegion } from './WebVttRegion.js';
  *
  * @returns A WebVttRegion object with default values
  *
- * @group WebVTT
  *
  * @beta
  */

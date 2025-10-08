@@ -4,7 +4,6 @@ import type { EditListBox } from './EditListBox.js';
 /**
  * Edit Box - 'edts' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

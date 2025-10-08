@@ -1,7 +1,6 @@
 /**
  * Widevine Key System.
  *
- * @group DRM
  *
  * @beta
  */

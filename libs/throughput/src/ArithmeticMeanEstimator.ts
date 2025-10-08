@@ -5,7 +5,6 @@ import type { ThroughputEstimator } from './ThroughputEstimator.js';
 /**
  * Arithmetic Mean throughput estimator
  *
- * @group Throughput
  *
  * @beta
  */

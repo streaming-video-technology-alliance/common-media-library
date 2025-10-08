@@ -3,7 +3,6 @@ import type { ResourceTiming } from '@svta/cml-utils/ResourceTiming.js';
 /**
  * Throughput Estimator.
  *
- * @group Throughput
  *
  * @beta
  */

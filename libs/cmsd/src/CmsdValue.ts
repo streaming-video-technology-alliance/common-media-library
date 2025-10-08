@@ -6,7 +6,6 @@ import type { CmsdStreamingFormat } from './CmsdStreamingFormat.js';
 /**
  * CMSD Value
  *
- * @group CMSD
  *
  * @beta
  */

@@ -1,7 +1,6 @@
 /**
  * Playready Recommendation Key System.
  *
- * @group DRM
  *
  * @beta
  */

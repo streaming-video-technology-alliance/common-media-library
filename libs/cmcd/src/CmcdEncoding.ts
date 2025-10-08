@@ -4,7 +4,6 @@ import { CmcdTransmissionMode } from './CmcdTransmissionMode.js';
 /**
  * CMCD encoding types.
  *
- * @group CMCD
  *
  * @enum
  *

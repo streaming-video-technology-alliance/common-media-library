@@ -3,7 +3,6 @@ import type { BoxParserMap } from './BoxParserMap.js';
 /**
  * ISO View configuration
  *
- * @group ISOBMFF
  *
  * @beta
  */

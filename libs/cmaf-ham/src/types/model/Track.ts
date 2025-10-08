@@ -15,7 +15,6 @@ import type { TrackType } from './TrackType.js';
  * byteRange - Byte range of the track.
  * segments - List of segments of the track.
  *
- * @group CMAF
  * @alpha
  */
 

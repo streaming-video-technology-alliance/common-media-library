@@ -11,7 +11,6 @@ import { toCmcdHeaders } from './toCmcdHeaders.js';
  *
  * @returns The headers with the CMCD header shards appended.
  *
- * @group CMCD
  *
  * @beta
  *

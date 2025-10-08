@@ -10,7 +10,6 @@ import { DICT } from './utils/DICT.js';
  * @param input - The structured field string to decode
  * @returns The structured field dictionary
  *
- * @group Structured Field
  *
  * @beta
  */

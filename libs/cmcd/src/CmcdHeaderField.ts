@@ -7,7 +7,6 @@ import { CMCD_STATUS } from './CMCD_STATUS.js';
 /**
  * CMCD header fields.
  *
- * @group CMCD
  *
  * @enum
  *

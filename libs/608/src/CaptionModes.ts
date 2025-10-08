@@ -1,7 +1,6 @@
 /**
  * The different caption modes that can be used.
  *
- * @group CTA-608
  * @beta
  */
 export type CaptionModes = 'MODE_ROLL-UP' |

@@ -4,7 +4,6 @@ import type { TrackReferenceTypeBox } from './TrackReferenceTypeBox.js';
 /**
  * Track Reference Box - 'tref' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

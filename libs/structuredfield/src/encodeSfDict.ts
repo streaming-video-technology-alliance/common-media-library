@@ -9,7 +9,6 @@ import { serializeDict } from './serialize/serializeDict.js';
  *
  * @returns The structured field string
  *
- * @group Structured Field
  *
  * @beta
  */

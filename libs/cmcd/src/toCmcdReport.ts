@@ -18,7 +18,6 @@ import { toCmcdHeaders } from './toCmcdHeaders.js';
  *
  * @return A CMCD report object
  *
- * @group CMCD
  *
  * @beta
  *

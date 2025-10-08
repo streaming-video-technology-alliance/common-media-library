@@ -1,7 +1,6 @@
 /**
  * CMSD static header name.
  *
- * @group CMSD
  *
  * @beta
  */

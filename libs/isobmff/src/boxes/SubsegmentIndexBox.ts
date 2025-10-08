@@ -4,7 +4,6 @@ import type { Subsegment } from './Subsegment.js';
 /**
  * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

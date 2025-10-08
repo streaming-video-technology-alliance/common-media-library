@@ -1,7 +1,6 @@
 /**
  * Clear Key System.
  *
- * @group DRM
  *
  * @beta
  */

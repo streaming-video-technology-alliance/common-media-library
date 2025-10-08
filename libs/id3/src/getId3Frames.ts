@@ -16,7 +16,6 @@ const FRAME_SIZE = 10;
  *
  * @returns Array of ID3 frame objects
  *
- * @group ID3
  *
  * @beta
  */

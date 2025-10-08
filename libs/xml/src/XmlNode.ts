@@ -2,7 +2,6 @@
 /**
  * XML node
  *
- * @group XML
  *
  * @beta
  */

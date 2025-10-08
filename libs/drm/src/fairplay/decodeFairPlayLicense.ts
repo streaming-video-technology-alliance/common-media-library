@@ -6,7 +6,6 @@ import { decodeBase64 } from '@svta/cml-utils/decodeBase64.js';
  * @param response - The license response, either a base64 string or ArrayBuffer
  * @returns A Uint8Array containing the decoded license
  *
- * @group DRM
  * @beta
  *
  * @example

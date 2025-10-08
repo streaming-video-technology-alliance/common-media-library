@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Sample Group Description Box - 'sgpd'
  *
- * @group ISOBMFF
  *
  * @beta
  */

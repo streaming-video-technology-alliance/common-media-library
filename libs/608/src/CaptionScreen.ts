@@ -46,7 +46,6 @@ import { VerboseLevel } from './VerboseLevel.js';
 /**
  * Keep a CTA-608 screen of 32x15 styled characters
  *
- * @group CTA-608
  * @beta
  */
 export class CaptionScreen {

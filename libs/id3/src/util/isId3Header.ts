@@ -8,7 +8,6 @@
  *
  * @internal
  *
- * @group ID3
  */
 export function isId3Header(data: Uint8Array, offset: number): boolean {
 	/*

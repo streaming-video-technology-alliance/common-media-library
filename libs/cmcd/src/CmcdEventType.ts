@@ -3,7 +3,6 @@ import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
 /**
  * CMCD event types for the 'e' key (event mode).
  *
- * @group CMCD
  *
  * @enum
  *

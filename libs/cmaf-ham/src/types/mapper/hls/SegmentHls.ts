@@ -3,7 +3,6 @@ import type { Byterange } from './Byterange.js';
 /**
  * HLS Segments
  *
- * @group CMAF
  * @alpha
  */
 export type SegmentHls = {

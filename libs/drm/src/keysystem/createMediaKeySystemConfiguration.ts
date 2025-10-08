@@ -5,7 +5,6 @@
  * @param supportedVideo - supported video capabilities.
  * @returns KeySystemConfiguration object.
  *
- * @group DRM
  * @beta
  *
  * @example

@@ -3,7 +3,6 @@ import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
 /**
  * CMCD v2 player states for the 'sta' key.
  *
- * @group CMCD
  *
  * @enum
  *

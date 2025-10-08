@@ -1,7 +1,6 @@
 /**
  * CMCD session header name.
  *
- * @group CMCD
  *
  * @beta
  */

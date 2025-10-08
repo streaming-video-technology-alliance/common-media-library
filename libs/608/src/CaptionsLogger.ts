@@ -41,7 +41,6 @@ import { VerboseLevel } from './VerboseLevel.js';
 /**
  * CaptionsLogger. To be removed in the future.
  *
- * @group CTA-608
  * @beta
  */
 export class CaptionsLogger {

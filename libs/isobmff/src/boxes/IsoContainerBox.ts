@@ -21,7 +21,6 @@ import type { UserDataBox } from './UserDataBox.js';
 /**
  * Container boxes that can contain other boxes
  *
- * @group ISOBMFF
  *
  * @beta
  */

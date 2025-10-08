@@ -25,7 +25,6 @@ import { validateSelectionSets } from './validateSelectionSets.js';
  * @param presentation - Presentation from cmaf ham model
  * @returns Validation
  *
- * @group CMAF
  * @alpha
  *
  */

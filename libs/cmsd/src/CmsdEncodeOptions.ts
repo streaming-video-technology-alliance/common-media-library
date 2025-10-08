@@ -1,7 +1,6 @@
 /**
  * Options for encoding CMCD values.
  *
- * @group CMSD
  *
  * @beta
  */

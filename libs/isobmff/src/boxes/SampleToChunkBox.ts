@@ -4,7 +4,6 @@ import type { SampleToChunkEntry } from './SampleToChunkEntry.js';
 /**
  * Sample to Chunk Box - 'stsc'
  *
- * @group ISOBMFF
  *
  * @beta
  */

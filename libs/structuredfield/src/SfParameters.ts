@@ -1,7 +1,6 @@
 /**
  * Structured Field Parameters
  *
- * @group Structured Field
  *
  * @beta
  */

@@ -19,7 +19,6 @@ import { MapperContext } from '../../mapper/MapperContext.js';
  * @param ancillaryManifests - Ancillary Manifests . Must be in order, first audio, subtitle and video
  * @returns List of presentations from ham
  *
- * @group CMAF
  * @alpha
  */
 export function hlsToHam(

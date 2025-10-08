@@ -10,7 +10,6 @@ import { mp4a } from './mp4a.js';
  *
  * @returns A parsed AudioSampleEntry
  *
- * @group ISOBMFF
  *
  * @beta
  */

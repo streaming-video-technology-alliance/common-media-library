@@ -32,7 +32,6 @@
 /**
  * SCC Parser
  *
- * @group CTA-608
  * @beta
  */
 export class SccParser {

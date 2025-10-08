@@ -4,7 +4,6 @@ import type { Track } from './Track.js';
 /**
  * CMAF-HAM SwitchingSet type
  *
- * @group CMAF
  * @alpha
  */
 export type SwitchingSet = Ham & {

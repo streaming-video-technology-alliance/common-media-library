@@ -8,7 +8,6 @@ import { extractContentId } from './extractContentId.js';
  * @param queryParam - The query parameter key to extract (default: 'ContentId')
  * @returns The extracted content ID as a string or null if not found
  *
- * @group DRM
  * @beta
  *
  * @example

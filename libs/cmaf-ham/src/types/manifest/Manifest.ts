@@ -3,7 +3,6 @@ import type { ManifestFormat } from './ManifestFormat.js';
 /**
  * Manifest object received as an input by the conversion to HAM object
  *
- * @group CMAF
  * @alpha
  */
 export type Manifest = {

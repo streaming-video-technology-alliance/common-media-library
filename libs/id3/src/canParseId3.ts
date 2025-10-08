@@ -9,7 +9,6 @@ import { readId3Size } from './util/readId3Size.js';
  *
  * @returns `true` if an ID3 tag is found
  *
- * @group ID3
  *
  * @beta
  */

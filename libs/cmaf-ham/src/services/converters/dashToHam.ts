@@ -19,7 +19,6 @@ import { MapperContext } from '../../mapper/MapperContext.js';
  * @param manifest - String of the XML Dash manifest
  * @returns List of presentations from ham
  *
- * @group CMAF
  * @alpha
  */
 

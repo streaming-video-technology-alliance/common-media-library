@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Chunk Offset Box - 'stco'
  *
- * @group ISOBMFF
  *
  * @beta
  */

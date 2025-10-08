@@ -1,7 +1,6 @@
 /**
  * CMCD request mode variable name.
  *
- * @group CMCD
  *
  * @beta
  */

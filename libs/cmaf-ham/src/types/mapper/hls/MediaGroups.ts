@@ -1,7 +1,6 @@
 /**
  * HLS Media Groups
  *
- * @group CMAF
  * @alpha
  */
 export type MediaGroups = {

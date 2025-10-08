@@ -6,7 +6,6 @@ import type { SegmentTemplate } from './SegmentTemplate.js';
 /**
  * DASH Representation
  *
- * @group CMAF
  * @alpha
  */
 export type Representation = {

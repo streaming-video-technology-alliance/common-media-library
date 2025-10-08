@@ -74,7 +74,6 @@ import type { WebVttSourceLabelBox } from './WebVttSourceLabelBox.js';
 /**
  * Non-container Box types
  *
- * @group ISOBMFF
  *
  * @beta
  */

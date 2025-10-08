@@ -1,7 +1,6 @@
 /**
  * CMCD object header name.
  *
- * @group CMCD
  *
  * @beta
  */

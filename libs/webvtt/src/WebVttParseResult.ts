@@ -5,7 +5,6 @@ import type { WebVttRegion } from './WebVttRegion.js';
 /**
  * The result of parsing a WebVTT string.
  *
- * @group WebVTT
  *
  * @beta
  */

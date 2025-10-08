@@ -12,7 +12,6 @@ import { getUrlInitialization } from './getUrlInitialization.js';
  * @param track - Track to get the playlist data from
  * @returns string containing the playlist data in the hls format
  *
- * @group CMAF
  * @alpha
  */
 export function getPlaylistData(track: AudioTrack | VideoTrack): string {

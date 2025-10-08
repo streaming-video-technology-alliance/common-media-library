@@ -1,7 +1,6 @@
 /**
  * Byterange
  *
- * @group CMAF
  *
  * @alpha
  */

@@ -6,7 +6,6 @@ import type { PathwayClone } from './PathwayClone.js';
  * @param clone - The pathway clone to validate.
  * @returns `true` if the pathway clone is valid, `false` otherwise.
  *
- * @group Content Steering
  *
  * @beta
  */

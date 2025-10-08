@@ -5,7 +5,6 @@ import type { SfItem } from './SfItem.js';
 /**
  * A member of a structured field.
  *
- * @group Structured Field
  *
  * @beta
  */

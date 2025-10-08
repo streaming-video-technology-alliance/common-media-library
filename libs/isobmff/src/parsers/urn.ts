@@ -9,7 +9,6 @@ import type { UrnBox } from '../boxes/UrnBox.js';
  *
  * @returns A parsed UrnBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

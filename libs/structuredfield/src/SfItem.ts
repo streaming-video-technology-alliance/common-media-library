@@ -4,7 +4,6 @@ import type { SfParameters } from './SfParameters.js';
 /**
  * Structured Field Item
  *
- * @group Structured Field
  *
  * @beta
  */

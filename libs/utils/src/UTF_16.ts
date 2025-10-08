@@ -1,7 +1,6 @@
 /**
  * UTF-16 Encoding.
  *
- * @group Utils
  *
  * @beta
  */

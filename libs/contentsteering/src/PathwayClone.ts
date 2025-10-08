@@ -3,7 +3,6 @@ import type { UriReplacement } from './UriReplacement.js';
 /**
  * A pathway clone for content steering.
  *
- * @group Content Steering
  *
  * @beta
  */

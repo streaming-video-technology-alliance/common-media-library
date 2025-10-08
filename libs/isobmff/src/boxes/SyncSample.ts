@@ -1,7 +1,6 @@
 /**
  * Sync sample
  *
- * @group ISOBMFF
  *
  * @beta
  */

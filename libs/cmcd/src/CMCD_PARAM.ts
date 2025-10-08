@@ -1,7 +1,6 @@
 /**
  * CMCD parameter name.
  *
- * @group CMCD
  *
  * @beta
  */

@@ -5,7 +5,6 @@ import type { TrackFragmentBox } from './TrackFragmentBox.js';
 /**
  * Movie Fragment Box - 'moof' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

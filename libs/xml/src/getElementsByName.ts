@@ -8,7 +8,6 @@ import type { XmlNode } from './XmlNode.js';
  * @param found - An array to collect matching nodes.
  * @returns An array of all matching XmlNodes.
  *
- * @group XML
  *
  * @beta
  *

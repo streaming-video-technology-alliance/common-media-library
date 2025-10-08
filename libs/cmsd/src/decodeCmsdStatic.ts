@@ -9,7 +9,6 @@ import type { CmsdStatic } from './CmsdStatic.js';
  *
  * @returns The decoded CMSD object.
  *
- * @group CMSD
  *
  * @beta
  */

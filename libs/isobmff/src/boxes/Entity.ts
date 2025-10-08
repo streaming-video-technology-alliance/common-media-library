@@ -1,7 +1,6 @@
 /**
  * Entity
  *
- * @group ISOBMFF
  *
  * @beta
  */

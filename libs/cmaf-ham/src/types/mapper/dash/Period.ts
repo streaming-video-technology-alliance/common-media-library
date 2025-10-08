@@ -3,7 +3,6 @@ import type { AdaptationSet } from './AdaptationSet.js';
 /**
  * DASH Period
  *
- * @group CMAF
  * @alpha
  */
 export type Period = {

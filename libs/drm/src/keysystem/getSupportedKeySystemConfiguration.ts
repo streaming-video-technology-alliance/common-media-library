@@ -7,7 +7,6 @@ const isTypeSupported: (keySystem: string, type: string) => boolean | undefined 
  * @param configs - An array of key system configurations.
  * @returns The first supported configuration or null if none are supported.
  *
- * @group DRM
  * @beta
  */
 export function getSupportedKeySystemConfiguration(

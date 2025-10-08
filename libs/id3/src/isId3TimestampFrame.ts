@@ -9,7 +9,6 @@ import type { Id3Frame } from './Id3Frame.js';
  *
  * @internal
  *
- * @group ID3
  */
 export function isId3TimestampFrame(frame: Id3Frame): boolean {
 	return (

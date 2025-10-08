@@ -1,7 +1,6 @@
 /**
  * The content type of the request.
  *
- * @group Request
  *
  * @beta
  */

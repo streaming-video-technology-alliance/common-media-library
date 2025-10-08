@@ -9,7 +9,6 @@ import type { XmlParseOptions } from './XmlParseOptions.js';
  * @param options - Optional parsing options
  * @returns The parsed XML
  *
- * @group XML
  *
  * @beta
  *

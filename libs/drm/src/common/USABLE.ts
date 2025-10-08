@@ -1,7 +1,6 @@
 /**
  * Usable Media Key Status.
  *
- * @group DRM
  *
  * @beta
  */

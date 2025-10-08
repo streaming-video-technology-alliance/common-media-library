@@ -1,7 +1,6 @@
 /**
  * The default penalty for a pathway in milliseconds.
  *
- * @group Content Steering
  *
  * @beta
  */

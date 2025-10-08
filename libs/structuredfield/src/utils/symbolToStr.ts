@@ -7,7 +7,6 @@ import type { SfToken } from '../SfToken.js';
  *
  * @returns The string representation of the symbol.
  *
- * @group Structured Field
  *
  * @beta
  */

@@ -3,7 +3,6 @@ import type { XmlNode } from '@svta/cml-xml/XmlNode.js';
 /**
  * The a request's `responseType` to the corresponding data type.
  *
- * @group Request
  *
  * @beta
  */

@@ -47,7 +47,6 @@ import { getCharForByte } from './utils/getCharForByte.js';
 /**
  * CTA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
  *
- * @group CTA-608
  * @beta
  */
 export class Row {

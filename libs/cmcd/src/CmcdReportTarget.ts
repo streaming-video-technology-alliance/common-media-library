@@ -5,7 +5,6 @@ import type { CmcdTransmissionMode } from './CmcdTransmissionMode.js';
 /**
  * A CMCD report target configuration.
  *
- * @group CMCD
  *
  * @beta
  */

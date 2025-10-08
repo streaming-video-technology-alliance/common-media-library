@@ -3,7 +3,6 @@ import type { SubsegmentRange } from './SubsegmentRange.js';
 /**
  * Subsegment
  *
- * @group ISOBMFF
  *
  * @beta
  */

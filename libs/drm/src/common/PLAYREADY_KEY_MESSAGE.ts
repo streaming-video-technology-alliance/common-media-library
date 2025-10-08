@@ -1,7 +1,6 @@
 /**
  * Playready Key Message.
  *
- * @group DRM
  *
  * @beta
  */

@@ -4,7 +4,6 @@ import type { ItemInfoEntry } from './ItemInfoEntry.js';
 /**
  * Item Info Box - 'iinf' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

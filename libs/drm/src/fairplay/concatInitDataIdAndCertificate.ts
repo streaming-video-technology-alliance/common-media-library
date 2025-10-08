@@ -8,7 +8,6 @@ import { stringToUint16 } from '@svta/cml-utils/stringToUint16.js';
  * @param cert - The application certificate (Uint8Array)
  * @returns A Uint8Array containing the concatenated data
  *
- * @group DRM
  * @beta
  *
  * @example

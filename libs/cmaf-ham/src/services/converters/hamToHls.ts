@@ -19,7 +19,6 @@ import { MapperContext } from '../../mapper/MapperContext.js';
  * @param presentation - List of presentations from ham
  * @returns Manifest object containing the Hls manifest as string and its playlists
  *
- * @group CMAF
  * @alpha
  */
 export function hamToHls(presentation: Presentation[]): Manifest {

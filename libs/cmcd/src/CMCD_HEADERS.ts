@@ -1,7 +1,6 @@
 /**
  * CMCD `headers` transmission mode.
  *
- * @group CMCD
  *
  * @beta
  */

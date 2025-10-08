@@ -1,7 +1,6 @@
 /**
  * License Release.
  *
- * @group DRM
  *
  * @beta
  */

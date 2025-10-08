@@ -1,7 +1,6 @@
 /**
  * CMCD event mode variable name.
  *
- * @group CMCD
  *
  * @beta
  */

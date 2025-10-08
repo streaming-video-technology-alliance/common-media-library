@@ -7,7 +7,6 @@ import type { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
 /**
  * CMCD Value
  *
- * @group CMCD
  *
  * @beta
  */

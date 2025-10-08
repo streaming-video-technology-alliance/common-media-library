@@ -1,7 +1,6 @@
 /**
  * Subsample Encryption
  *
- * @group ISOBMFF
  *
  * @beta
  */

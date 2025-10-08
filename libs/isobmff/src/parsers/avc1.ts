@@ -10,7 +10,6 @@ import type { IsoView } from '../IsoView.js';
  *
  * @returns A parsed VisualSampleEntryBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

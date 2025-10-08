@@ -4,7 +4,6 @@
  * @param str - The base64 encoded string to decode
  * @returns The decoded binary data
  *
- * @group Utils
  *
  * @beta
  */

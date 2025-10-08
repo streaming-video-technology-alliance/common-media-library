@@ -1,7 +1,6 @@
 /**
  * Playready HTTP Headers.
  *
- * @group DRM
  *
  * @beta
  */

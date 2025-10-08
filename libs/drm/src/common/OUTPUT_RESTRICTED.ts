@@ -1,7 +1,6 @@
 /**
  * Output Restricted Media Key Status.
  *
- * @group DRM
  *
  * @beta
  */

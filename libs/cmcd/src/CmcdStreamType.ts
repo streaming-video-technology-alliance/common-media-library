@@ -3,7 +3,6 @@ import { CmStreamType } from '@svta/cml-cta/CmStreamType.js';
 /**
  * Common Media Client Data Stream Type
  *
- * @group CMCD
  *
  * @enum
  *

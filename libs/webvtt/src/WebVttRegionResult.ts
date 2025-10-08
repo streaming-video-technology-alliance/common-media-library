@@ -4,7 +4,6 @@ import type { WebVttRegion } from './WebVttRegion.js';
 /**
  * WebVTT transform stream region result.
  *
- * @group WebVTT
  *
  * @beta
  */

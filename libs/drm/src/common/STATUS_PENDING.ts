@@ -1,7 +1,6 @@
 /**
  * Status Pending Media Key Status.
  *
- * @group DRM
  *
  * @beta
  */

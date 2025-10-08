@@ -26,7 +26,6 @@ const filterMap = {
  * @param obj - The CMCD object to process.
  * @param options - Options for encoding.
  *
- * @group CMCD
  *
  * @beta
  */

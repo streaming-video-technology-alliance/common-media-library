@@ -1,7 +1,6 @@
 /**
  * UTF-16 Big Endian Encoding.
  *
- * @group Utils
  *
  * @beta
  */

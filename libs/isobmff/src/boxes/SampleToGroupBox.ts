@@ -4,7 +4,6 @@ import type { SampleToGroupEntry } from './SampleToGroupEntry.js';
 /**
  * Sample to Group Box - 'sbgp'
  *
- * @group ISOBMFF
  *
  * @beta
  */

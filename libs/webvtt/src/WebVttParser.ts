@@ -20,7 +20,6 @@ const createRegion = (): WebVttRegion => typeof VTTRegion !== 'undefined' ? new 
 /**
  * A WebVTT parser.
  *
- * @group WebVTT
  *
  * @beta
  *

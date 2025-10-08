@@ -9,7 +9,6 @@ import { MP4_PROTECTION_SCHEME } from '../common/MP4_PROTECTION_SCHEME.js';
  * @param cpArray - Array of ContentProtection elements.
  * @returns The Common Encryption content protection element, or null if not found.
  *
- * @group DRM
  * @beta
  *
  * @example

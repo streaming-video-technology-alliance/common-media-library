@@ -6,7 +6,6 @@
  * @param precision - The number of decimal places to round to
  * @returns The rounded value
  *
- * @group Utils
  *
  * @beta
  */

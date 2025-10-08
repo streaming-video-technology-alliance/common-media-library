@@ -1,7 +1,6 @@
 /**
  * Utility type to create a typed result.
  *
- * @group Utils
  *
  * @beta
  */

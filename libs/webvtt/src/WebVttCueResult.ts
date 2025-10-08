@@ -4,7 +4,6 @@ import type { WebVttCue } from './WebVttCue.js';
 /**
  * WebVTT transform stream cue result.
  *
- * @group WebVTT
  *
  * @beta
  */

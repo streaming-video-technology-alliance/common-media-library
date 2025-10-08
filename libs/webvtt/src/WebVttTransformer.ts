@@ -5,7 +5,6 @@ import { WebVttResultType } from './WebVttResultType.js';
 /**
  * WebVTT transform stream transformer.
  *
- * @group WebVTT
  *
  * @beta
  */

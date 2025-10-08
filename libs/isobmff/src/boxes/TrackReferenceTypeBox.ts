@@ -3,7 +3,6 @@ import type { Box } from './Box.js';
 /**
  * Track Reference Type Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

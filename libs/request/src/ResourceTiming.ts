@@ -1,7 +1,6 @@
 /**
  * Resource Timing.
  *
- * @group Request
  *
  * @beta
  */

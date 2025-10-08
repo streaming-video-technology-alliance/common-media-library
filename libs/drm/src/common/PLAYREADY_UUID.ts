@@ -1,7 +1,6 @@
 /**
  * Playready UUID.
  *
- * @group DRM
  *
  * @beta
  */

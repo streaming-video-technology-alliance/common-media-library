@@ -3,7 +3,6 @@ import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
 /**
  * Logging levels for the CTA-608 parser.
  *
- * @group CTA-608
  *
  * @enum
  *

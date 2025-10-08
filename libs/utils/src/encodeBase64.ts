@@ -4,7 +4,6 @@
  * @param binary - The binary data to encode
  * @returns The base64 encoded string
  *
- * @group Utils
  *
  * @beta
  */

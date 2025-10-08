@@ -9,7 +9,6 @@ import type { Track } from './Track.js';
  * channels - The number of channels in the audio track. It defines the number of separate audio signals that are encoded in the audio.
  *            For example, if the channels is 2, it means the audio is stereo with a separate signal for left and right.
  *
- * @group CMAF
  * @alpha
  */
 export type AudioTrack = Track & {

@@ -4,7 +4,6 @@ import type { DataReferenceBox } from './DataReferenceBox.js';
 /**
  * Data Information Box - 'dinf' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

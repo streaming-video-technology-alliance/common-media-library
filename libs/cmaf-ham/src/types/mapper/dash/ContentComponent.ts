@@ -1,5 +1,4 @@
 /**
- * @group CMAF
  *
  * @alpha
  */

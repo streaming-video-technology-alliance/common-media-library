@@ -8,7 +8,6 @@ import { decodeCmcd } from './decodeCmcd.js';
  *
  * @returns The decoded CMCD data.
  *
- * @group CMCD
  *
  * @beta
  *

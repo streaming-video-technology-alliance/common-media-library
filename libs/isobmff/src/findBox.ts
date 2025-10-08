@@ -33,7 +33,6 @@ function find<T extends IsoBmffBox = IsoBmffBox>(iterator: Iterable<IsoBmffBox>,
  *
  * @returns The first box that matches the filter function
  *
- * @group ISOBMFF
  *
  * @beta
  */

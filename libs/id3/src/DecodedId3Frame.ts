@@ -1,7 +1,6 @@
 /**
  * Decoded ID3 frame.
  *
- * @group ID3
  *
  * @beta
  */

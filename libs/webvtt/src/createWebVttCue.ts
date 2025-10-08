@@ -6,7 +6,6 @@ import type { WebVttCue } from './WebVttCue.js';
  *
  * @returns A WebVttCue object with default values
  *
- * @group WebVTT
  *
  * @beta
  */

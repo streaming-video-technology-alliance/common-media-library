@@ -24,7 +24,6 @@ import { validateSwitchingSet } from './validateSwitchingSet.js';
  * @param prevValidation - Optional: validation object from parent previous validate method call
  * @returns Validation
  *
- * @group CMAF
  * @alpha
  *
  */

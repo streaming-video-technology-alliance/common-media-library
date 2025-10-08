@@ -11,7 +11,6 @@ import { utf8ArrayToStr } from './utf8ArrayToStr.js';
  *
  * @internal
  *
- * @group ID3
  */
 export function decodeId3UrlFrame(frame: RawId3Frame): DecodedId3Frame<string> | undefined {
 	if (frame.type === 'WXXX') {

@@ -4,7 +4,6 @@ import type { SingleItemTypeReferenceBox } from './SingleItemTypeReferenceBox.js
 /**
  * Item Reference Box - 'iref' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

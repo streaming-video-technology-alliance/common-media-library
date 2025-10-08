@@ -20,7 +20,6 @@ import { getDuration } from './utils/getDuration.js';
  * @param manifestPlaylists - Array of Manifest
  * @returns Array of switchingSet
  *
- * @group CMAF
  * @alpha
  */
 export function audioGroupsToSwitchingSets(

@@ -1,7 +1,6 @@
 /**
  * CMCD Version 2
  *
- * @group CMCD
  *
  * @beta
  */

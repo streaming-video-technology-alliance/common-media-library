@@ -1,7 +1,6 @@
 /**
  * The unsigned integer field type
  *
- * @group ISOBMFF
  *
  * @beta
  */

@@ -1,7 +1,6 @@
 /**
  * Keys that are excluded from CMCD event mode.
  *
- * @group CMCD
  *
  * @beta
  */

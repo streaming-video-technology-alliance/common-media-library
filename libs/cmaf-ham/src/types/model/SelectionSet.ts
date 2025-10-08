@@ -5,7 +5,6 @@ import type { SwitchingSet } from './SwitchingSet.js';
 /**
  * CMAF-HAM SelectionSet type
  *
- * @group CMAF
  * @alpha
  */
 export type SelectionSet = Ham & {

@@ -5,7 +5,6 @@ import type { ThroughputEstimator } from './ThroughputEstimator.js';
 /**
  * Zero-Lag Exponential Moving Average (ZLEMA) throughput estimator
  *
- * @group Throughput
  *
  * @beta
  */

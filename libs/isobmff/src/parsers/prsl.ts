@@ -10,7 +10,6 @@ import type { IsoView } from '../IsoView.js';
  *
  * @returns A parsed PreselectionGroupBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

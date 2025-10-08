@@ -12,7 +12,6 @@ import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.js';
  * @param segments - Array of segments in a track
  * @returns duration of a track
  *
- * @group CMAF
  * @alpha
  */
 export function getDuration(

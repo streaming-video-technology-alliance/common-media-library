@@ -1,7 +1,6 @@
 /**
  * Decoding time sample
  *
- * @group ISOBMFF
  *
  * @beta
  */

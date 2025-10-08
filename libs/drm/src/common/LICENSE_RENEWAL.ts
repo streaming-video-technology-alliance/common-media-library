@@ -1,7 +1,6 @@
 /**
  * License Renewal.
  *
- * @group DRM
  *
  * @beta
  */

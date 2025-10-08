@@ -5,7 +5,6 @@
  * @param base - The base URL
  * @returns The relative path
  *
- * @group Utils
  *
  * @beta
  */

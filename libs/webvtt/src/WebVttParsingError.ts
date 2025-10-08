@@ -1,7 +1,6 @@
 /**
  * A WebVTT parsing error.
  *
- * @group WebVTT
  *
  * @beta
  */

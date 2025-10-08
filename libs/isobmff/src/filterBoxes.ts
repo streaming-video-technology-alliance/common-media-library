@@ -28,7 +28,6 @@ function filter<T extends IsoBmffBox = IsoBmffBox>(iterator: Iterable<IsoBmffBox
  * @param fn - The filter function.
  * @returns The filtered boxes.
  *
- * @group ISOBMFF
  * @beta
  */
 export function filterBoxes<T extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T>, config?: IsoViewConfig): T[] {

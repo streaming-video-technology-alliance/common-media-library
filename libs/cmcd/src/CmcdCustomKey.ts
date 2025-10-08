@@ -4,7 +4,6 @@
  * revisions to this specification. Clients SHOULD use a reverse-DNS
  * syntax when defining their own prefix.
  *
- * @group CMCD
  *
  * @beta
  */

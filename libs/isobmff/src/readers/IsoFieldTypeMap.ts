@@ -1,7 +1,6 @@
 /**
  * IsoFieldTypeMap is a map of ISO BMFF field types to their corresponding JavaScript types.
  *
- * @group ISOBMFF
  *
  * @beta
  */

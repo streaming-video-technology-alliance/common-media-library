@@ -6,7 +6,6 @@ import { arrayBufferToHex } from './arrayBufferToHex.js';
  * @param buffer - The ArrayBuffer to convert.
  * @returns The UUID string representation.
  *
- * @group Utils
  *
  * @beta
  *

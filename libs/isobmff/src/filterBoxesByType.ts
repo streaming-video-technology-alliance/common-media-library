@@ -13,7 +13,6 @@ import type { IsoViewConfig } from './IsoViewConfig.js';
  *
  * @returns The filtered boxes
  *
- * @group ISOBMFF
  *
  * @beta
  */

@@ -1,7 +1,6 @@
 /**
  * Shadow Sync Entry
  *
- * @group ISOBMFF
  *
  * @beta
  */

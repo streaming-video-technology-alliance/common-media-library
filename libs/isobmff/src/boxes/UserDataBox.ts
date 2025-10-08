@@ -4,7 +4,6 @@ import type { ContainerBox } from './ContainerBox.js';
 /**
  * User Data Box - 'udta' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

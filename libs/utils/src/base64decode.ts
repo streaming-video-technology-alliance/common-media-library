@@ -6,7 +6,6 @@ import { decodeBase64 } from './decodeBase64.js';
  * @param str - The base64 encoded string to decode
  * @returns The decoded binary data
  *
- * @group Utils
  *
  * @beta
  *

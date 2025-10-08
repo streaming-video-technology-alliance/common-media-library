@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * ISO/IEC 14496-12:2012 - 8.12.5 Scheme Type Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

@@ -4,7 +4,6 @@ import type { SyncSample } from './SyncSample.js';
 /**
  * ISO/IEC 14496-12:2015 - 8.6.2 Sync Sample Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

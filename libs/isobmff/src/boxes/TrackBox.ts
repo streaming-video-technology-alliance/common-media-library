@@ -8,7 +8,6 @@ import type { UserDataBox } from './UserDataBox.js';
 /**
  * Track Box - 'trak' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

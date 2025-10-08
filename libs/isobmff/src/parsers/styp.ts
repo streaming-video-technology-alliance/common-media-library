@@ -10,7 +10,6 @@ import { ftyp } from './ftyp.js';
  *
  * @returns A parsed SegmentTypeBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

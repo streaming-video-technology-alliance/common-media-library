@@ -3,7 +3,6 @@
  *
  * @returns A random v4 UUID
  *
- * @group Utils
  *
  * @beta
  */

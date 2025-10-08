@@ -3,7 +3,6 @@ import type { Box } from './Box.js';
 /**
  * Utility TypeBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

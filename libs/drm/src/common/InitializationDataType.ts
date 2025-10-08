@@ -7,7 +7,6 @@ import { WEBM } from './WEBM.js';
 /**
  * Initialization Data Type.
  *
- * @group DRM
  *
  * @beta
  */
@@ -21,7 +20,6 @@ export const InitializationDataType = {
 /**
  * Initialization Data Type.
  *
- * @group DRM
  *
  * @beta
  */

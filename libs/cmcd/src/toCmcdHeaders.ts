@@ -13,7 +13,6 @@ import { prepareCmcdData } from './prepareCmcdData.js';
  *
  * @returns The CMCD header shards.
  *
- * @group CMCD
  *
  * @beta
  *

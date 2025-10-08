@@ -1,7 +1,6 @@
 /**
  * A collection of tools for working with XML.
  *
- * @groupDescription XML
  * @packageDocumentation
  * @beta
  */

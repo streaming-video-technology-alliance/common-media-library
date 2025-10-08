@@ -3,7 +3,6 @@ import type { CmcdReportingMode } from './CmcdReportingMode.js';
 /**
  * Options for formatting CMCD data values.
  *
- * @group CMCD
  *
  * @beta
  */

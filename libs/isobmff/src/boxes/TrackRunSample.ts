@@ -1,7 +1,6 @@
 /**
  * Track run sample
  *
- * @group ISOBMFF
  *
  * @beta
  */

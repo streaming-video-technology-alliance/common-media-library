@@ -1,7 +1,6 @@
 /**
  * XML parsing options
  *
- * @group XML
  *
  * @beta
  */

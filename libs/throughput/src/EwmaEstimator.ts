@@ -7,7 +7,6 @@ import type { ThroughputEstimator } from './ThroughputEstimator.js';
 /**
  * Exponential Weighted Moving Average (EWMA) throughput estimator based on 2 half-lives
  *
- * @group Throughput
  *
  * @beta
  */

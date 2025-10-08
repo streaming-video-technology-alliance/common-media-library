@@ -7,7 +7,6 @@
  * @param codecs - String containing multiple codecs separated with commas
  * @returns string containing codec
  *
- * @group CMAF
  * @alpha
  */
 export function getCodec(type: string, codecs?: string): string {

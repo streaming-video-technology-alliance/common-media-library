@@ -38,7 +38,6 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  *
  * @returns The decoded CMCD object.
  *
- * @group CMCD
  *
  * @beta
  *

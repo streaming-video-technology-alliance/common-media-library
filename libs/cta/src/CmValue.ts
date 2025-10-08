@@ -7,7 +7,6 @@ import type { CmStreamType } from './CmStreamType.js';
 /**
  * A common media value.
  *
- * @group CTA
  *
  * @beta
  */

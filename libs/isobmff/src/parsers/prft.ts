@@ -9,7 +9,6 @@ import type { IsoView } from '../IsoView.js';
  *
  * @returns A parsed ProducerReferenceTimeBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

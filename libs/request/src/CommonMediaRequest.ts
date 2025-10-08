@@ -4,7 +4,6 @@ import type { Request } from '@svta/cml-utils/Request.js';
 /**
  * Common Media Request.
  *
- * @group Request
  *
  * @beta
  */

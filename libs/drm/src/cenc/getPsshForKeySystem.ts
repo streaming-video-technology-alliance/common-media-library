@@ -8,7 +8,6 @@ import { parsePsshList } from './parsePsshList.js';
  * @param initData - 'cenc' initialization data. Concatenated list of PSSH boxes.
  * @returns The PSSH box ArrayBuffer corresponding to the given key system, or null if not found.
  *
- * @group DRM
  * @beta
  *
  * @example

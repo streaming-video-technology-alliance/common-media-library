@@ -4,7 +4,6 @@ import type { TrackFragmentRandomAccessEntry } from './TrackFragmentRandomAccess
 /**
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
  *
- * @group ISOBMFF
  *
  * @beta
  */

@@ -7,7 +7,6 @@ import type { SteeringManifest } from './SteeringManifest.js';
  * @param manifest - The steering manifest to validate.
  * @returns `true` if the steering manifest is valid, `false` otherwise.
  *
- * @group Content Steering
  *
  * @beta
  */

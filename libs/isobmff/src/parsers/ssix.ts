@@ -9,7 +9,6 @@ import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.js';
  *
  * @returns A parsed SubsegmentIndexBox
  *
- * @group ISOBMFF
  *
  * @beta
  */

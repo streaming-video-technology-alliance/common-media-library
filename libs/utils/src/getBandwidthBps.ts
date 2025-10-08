@@ -6,7 +6,6 @@ import type { ResourceTiming } from './ResourceTiming.js';
  * @param sample - A ResourceTiming sample
  * @returns
  *
- * @group Utils
  *
  * @beta
  */

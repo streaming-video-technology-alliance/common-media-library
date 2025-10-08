@@ -4,7 +4,6 @@
  * @param keyId - The little-endian key ID to convert.
  * @returns The big-endian representation of the key ID.
  *
- * @group DRM
  * @beta
  *
  * @example

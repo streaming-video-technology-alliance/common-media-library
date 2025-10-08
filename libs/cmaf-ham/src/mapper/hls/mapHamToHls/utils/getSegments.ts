@@ -15,7 +15,6 @@ import {
  * @param segments - Segments to be formatted
  * @returns string containing the segments in the hls format
  *
- * @group CMAF
  * @alpha
  */
 export function getSegments(segments: Segment[]): string {

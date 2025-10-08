@@ -4,7 +4,6 @@ import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformati
 /**
  * Item Protection Box - 'ipro' - Container
  *
- * @group ISOBMFF
  *
  * @beta
  */

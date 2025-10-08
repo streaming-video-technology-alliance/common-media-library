@@ -20,7 +20,6 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, Cmc
  *
  * @returns The CMCD header shards.
  *
- * @group CMCD
  *
  * @beta
  */

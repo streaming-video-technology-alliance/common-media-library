@@ -10,7 +10,6 @@ import { USABLE } from './USABLE.js';
 /**
  * Media Key Statuses.
  *
- * @group DRM
  *
  * @beta
  */
@@ -27,7 +26,6 @@ export const MediaKeyStatus = {
 /**
  * Media Key Statuses.
  *
- * @group DRM
  *
  * @beta
  */

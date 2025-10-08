@@ -5,7 +5,6 @@
  * @param cta608Range - The range of the CTA-608 data
  * @returns The extracted CTA-608 data
  *
- * @group CTA-608
  * @beta
  */
 export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>> {

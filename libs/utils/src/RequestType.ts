@@ -3,7 +3,6 @@ import type { ValueOf } from './ValueOf.js';
 /**
  * The content type of the request.
  *
- * @group Utils
  *
  * @enum
  *

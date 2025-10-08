@@ -3,7 +3,6 @@ import { CmStreamingFormat } from '@svta/cml-cta/CmStreamingFormat.js';
 /**
  * Common Media Server Data Streaming Format
  *
- * @group CMSD
  *
  * @enum
  *

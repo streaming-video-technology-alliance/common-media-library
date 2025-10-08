@@ -1,7 +1,6 @@
 /**
  * Item Extent
  *
- * @group ISOBMFF
  *
  * @beta
  */

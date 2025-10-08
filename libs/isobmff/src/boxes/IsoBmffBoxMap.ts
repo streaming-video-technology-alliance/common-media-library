@@ -90,7 +90,6 @@ import type { WebVttSourceLabelBox } from './WebVttSourceLabelBox.js';
 /**
  * Comprehensive mapping from box type strings to their corresponding TypeScript interfaces
  *
- * @group ISOBMFF
  *
  * @beta
  */

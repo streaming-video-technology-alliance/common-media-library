@@ -1,7 +1,6 @@
 /**
  * Content-Type header.
  *
- * @group DRM
  *
  * @beta
  */

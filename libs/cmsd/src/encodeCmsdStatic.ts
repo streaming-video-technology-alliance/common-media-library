@@ -11,7 +11,6 @@ import { processCmsd } from './utils/processCmsd.js';
  *
  * @returns The encoded CMSD string.
  *
- * @group CMSD
  *
  * @beta
  */

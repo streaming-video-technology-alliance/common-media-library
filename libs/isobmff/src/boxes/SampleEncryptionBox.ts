@@ -4,7 +4,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Sample Encryption Box - 'senc'
  *
- * @group ISOBMFF
  *
  * @beta
  */

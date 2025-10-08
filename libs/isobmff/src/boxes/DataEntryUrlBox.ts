@@ -3,7 +3,6 @@ import type { FullBox } from './FullBox.js';
 /**
  * Data Entry Url Box - 'url '
  *
- * @group ISOBMFF
  *
  * @beta
  */

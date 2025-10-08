@@ -6,7 +6,6 @@ import type { WebVttCue } from './WebVttCue.js';
  * @param cue - The WebVTT cue to convert.
  * @returns The converted VTTCue.
  *
- * @group WebVTT
  *
  * @beta
  *

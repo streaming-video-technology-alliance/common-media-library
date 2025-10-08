@@ -1,7 +1,6 @@
 /**
  * Subsegment range
  *
- * @group ISOBMFF
  *
  * @beta
  */

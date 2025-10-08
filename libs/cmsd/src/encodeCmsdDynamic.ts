@@ -9,7 +9,6 @@ import type { CmsdDynamic } from './CmsdDynamic.js';
  *
  * @returns The encoded CMSD string.
  *
- * @group CMSD
  *
  * @beta
  */
@@ -23,7 +22,6 @@ export function encodeCmsdDynamic(value: SfItem[]): string;
  *
  * @returns The encoded CMSD string.
  *
- * @group CMSD
  *
  * @beta
  */

@@ -5,7 +5,6 @@ import type { CmcdRequest } from './CmcdRequest.js';
  *
  * Defines the keys for the CMCD (Common Media Client Data) v2 Response group.
  *
- * @group CMCD
  *
  * @beta
  */

@@ -6,7 +6,6 @@ import { CMCD_QUERY } from './CMCD_QUERY.js';
 /**
  * CMCD transmission modes.
  *
- * @group CMCD
  *
  * @enum
  *

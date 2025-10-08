@@ -1,7 +1,6 @@
 /**
  * The scheme ID URI for ID3 tags.
  *
- * @group ID3
  *
  * @beta
  *

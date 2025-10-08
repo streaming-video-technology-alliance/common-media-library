@@ -1,7 +1,6 @@
 /**
  * Sample to Group Entry
  *
- * @group ISOBMFF
  *
  * @beta
  */

@@ -6,7 +6,6 @@ import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccess
  * @param requests - An array of key system access requests.
  * @returns MediaKeySystemAccess object if successful, or null if no system is supported.
  *
- * @group DRM
  * @beta
  */
 export async function getKeySystemAccess(

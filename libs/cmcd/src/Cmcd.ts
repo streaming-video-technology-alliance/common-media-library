@@ -11,7 +11,6 @@ import type { CmcdValue } from './CmcdValue.js';
  *
  * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD Spec}
  *
- * @group CMCD
  *
  * @beta
  */

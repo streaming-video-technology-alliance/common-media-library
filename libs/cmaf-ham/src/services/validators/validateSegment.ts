@@ -13,7 +13,6 @@ import type { Validation } from '../../types/Validation.js';
  * @param prevValidation - Optional: validation object from parent previous validate method call
  * @returns Validation
  *
- * @group CMAF
  * @alpha
  */
 export function validateSegment(

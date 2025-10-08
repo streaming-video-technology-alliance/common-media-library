@@ -1,7 +1,6 @@
 /**
  * Options for decoding Structured Field values
  *
- * @group Structured Field
  *
  * @beta
  */

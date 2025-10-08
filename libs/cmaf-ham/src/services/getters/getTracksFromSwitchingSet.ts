@@ -8,7 +8,6 @@ import type { Track } from '../../types/model/Track.js';
  * @param predicate - Filtering function
  * @returns Track[]
  *
- * @group CMAF
  * @alpha
  */
 export function getTracksFromSwitchingSet(
