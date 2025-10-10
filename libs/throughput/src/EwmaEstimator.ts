@@ -11,46 +11,51 @@ import type { ThroughputEstimator } from './ThroughputEstimator.js';
  * @beta
  */
 export class EwmaEstimator implements ThroughputEstimator {
+	private defaultEstimate: number;
+	private minTotalBytes: number;
+	private minBodySize: number;
+	private totalBytes: number = 0;
 	private fastEwma: Ewma;
 	private slowEwma: Ewma;
 
 	public constructor(options: EwmaEstimatorOptions) {
+		this.minTotalBytes = options.minTotalBytes || 0;
+		this.minBodySize = options.minBodySize || 0;
+		this.defaultEstimate = options.defaultEstimate ?? NaN;
+
 		this.slowEwma = new Ewma(options.slowHalfLife);
 		this.fastEwma = new Ewma(options.fastHalfLife);
+
+		if (!isNaN(this.defaultEstimate)) {
+			this.fastEwma.sample(1, this.defaultEstimate);
+			this.slowEwma.sample(1, this.defaultEstimate);
+		}
 	}
 
 	public sample(sample: ResourceTiming): void {
-		// TODO: shaka
-		// 1. If `sample.encodedBodySize` is less than `this.minBytes_`, don't do anything
-		// TODO: dash.js
-		// 1. If `sample.encodedBodySize` is NaN or Infinity, don't do anything
-		// TODO: hls.js
-		// 1. If `durationSeconds` is less than `this.minDelayMs_`, make it `this.minDelayMs_` (default is 50ms)
+		const { encodedBodySize, duration } = sample;
+
+		if (!Number.isFinite(encodedBodySize) || !Number.isFinite(duration)) {
+			return;
+		}
+
+		if (encodedBodySize < this.minBodySize) {
+			return;
+		}
+
 		const durationSeconds = sample.duration / 1000;
 		const bandwidthBps = getBandwidthBps(sample);
+		this.totalBytes += encodedBodySize;
 
 		this.slowEwma.sample(durationSeconds, bandwidthBps);
 		this.fastEwma.sample(durationSeconds, bandwidthBps);
 	}
 
 	public getEstimate(): number {
-		// TODO: shaka
-		// 1. Returns `defaultEstimate` for this.totalBytes < `options.minTotalBytes`
-		// 1.1. Returns `options.defaultBandwidthEstimate`
-		// 1.2. or `navigator.connection.downlink * 1e6` if available
-		// TODO: dash.js
-		// 1. Returns `NaN` for this.totalDuration <= 0
-		// 2. `Math.max` for latency calculation
-		// TODO: hls.js
-		// 1. Returns `defaultEstimate` for this.totalDuration < `this.minDuration`
-		// 1.1. Returns `config.abrEwmaDefaultEstimate` (default: 500 kbps)
-		return Math.min(this.fastEwma.getEstimate(), this.slowEwma.getEstimate());
-	}
+		if (this.totalBytes < this.minTotalBytes) {
+			return this.defaultEstimate;
+		}
 
-	public canEstimate(): boolean {
-		// TODO: shaka, `this.totalBytes >= options.minTotalBytes`
-		// TODO: hls.js, `this.totalDuration >= this.minDuration`
-
-		return true;
+		return Math.floor(Math.min(this.fastEwma.getEstimate(), this.slowEwma.getEstimate()));
 	}
 }

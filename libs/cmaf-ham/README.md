@@ -7,3 +7,9 @@ A collection of tools for working with Common Media Application Format - Hypothe
 ```bash
 npm i @svta/cml-cmaf-ham
 ```
+
+## Usage
+
+```typescript
+
+```

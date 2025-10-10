@@ -26,8 +26,6 @@ export class Ewma {
 export class EwmaEstimator implements ThroughputEstimator {
     constructor(options: EwmaEstimatorOptions);
     // (undocumented)
-    canEstimate(): boolean;
-    // (undocumented)
     getEstimate(): number;
     // (undocumented)
     sample(sample: ResourceTiming): void;
@@ -35,6 +33,9 @@ export class EwmaEstimator implements ThroughputEstimator {
 
 // @beta
 export type EwmaEstimatorOptions = {
+    defaultEstimate?: number;
+    minTotalBytes?: number;
+    minBodySize?: number;
     fastHalfLife: number;
     slowHalfLife: number;
 };

@@ -27,6 +27,8 @@ describe('encodeSfDict', () => {
 			])),
 			`a=10, b=20, c=30`,
 		);
+
+		//#region example
 		assert.deepStrictEqual(
 			encodeSfDict({
 				a: 1,
@@ -37,6 +39,8 @@ describe('encodeSfDict', () => {
 			}),
 			`a=1, b=?0, c="x", d=y, e=:AQID:`,
 		);
+		//#endregion example
+
 		assert.deepStrictEqual(
 			encodeSfDict({
 				a: new SfItem(1),
