@@ -11,10 +11,10 @@ export function arrayBufferToHex(buffer: ArrayBuffer): string;
 export function arrayBufferToUuid(buffer: ArrayBuffer): string;
 
 // @beta @deprecated
-export function base64decode(str: string): Uint8Array;
+export const base64decode: typeof decodeBase64;
 
 // @beta @deprecated
-export function base64encode(binary: Uint8Array): string;
+export const base64encode: typeof encodeBase64;
 
 // @beta
 export function convertUint8ToUint16(input: Uint8Array): Uint16Array;

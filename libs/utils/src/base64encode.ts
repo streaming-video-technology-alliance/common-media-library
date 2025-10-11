@@ -13,6 +13,4 @@ import { encodeBase64 } from './encodeBase64.js';
  *
  * @see {@link encodeBase64}
  */
-export function base64encode(binary: Uint8Array): string {
-	return encodeBase64(binary);
-}
+export const base64encode: typeof encodeBase64 = encodeBase64;

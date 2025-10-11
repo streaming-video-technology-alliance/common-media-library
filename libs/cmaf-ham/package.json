@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-cmaf-ham",
-	"version": "0.19.0",
+	"version": "0.20.0",
 	"description": "CMAF Hypothetical Application Model (HAM) functionality",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -73,9 +73,8 @@
 			"onFail": "error"
 		}
 	},
-	"dependencies": {
-		"@svta/cml-cta": "*",
-		"@svta/cml-utils": "*"
+	"peerDependencies": {
+		"@svta/cml-utils": "1.0.0"
 	},
 	"devDependencies": {
 		"@types/m3u8-parser": "7.2.5",

@@ -13,6 +13,4 @@ import { decodeBase64 } from './decodeBase64.js';
  *
  * @see {@link decodeBase64}
  */
-export function base64decode(str: string): Uint8Array {
-	return decodeBase64(str);
-}
+export const base64decode: typeof decodeBase64 = decodeBase64;

@@ -1,6 +1,6 @@
 {
 	"name": "@svta/common-media-library",
-	"version": "0.19.0",
+	"version": "1.0.0",
 	"license": "Apache-2.0",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
@@ -80,22 +80,22 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-608": "*",
-		"@svta/cml-cmaf-ham": "*",
-		"@svta/cml-cmcd": "*",
-		"@svta/cml-cmsd": "*",
-		"@svta/cml-content-steering": "*",
-		"@svta/cml-cta": "*",
-		"@svta/cml-dash": "*",
-		"@svta/cml-drm": "*",
-		"@svta/cml-id3": "*",
-		"@svta/cml-iso-8601": "*",
-		"@svta/cml-iso-bmff": "*",
-		"@svta/cml-request": "*",
-		"@svta/cml-structured-field-values": "*",
-		"@svta/cml-throughput": "*",
-		"@svta/cml-utils": "*",
-		"@svta/cml-webvtt": "*",
-		"@svta/cml-xml": "*"
+		"@svta/cml-608": "1.0.0",
+		"@svta/cml-cmaf-ham": "0.20.0",
+		"@svta/cml-cmcd": "1.0.0",
+		"@svta/cml-cmsd": "1.0.0",
+		"@svta/cml-content-steering": "1.0.0",
+		"@svta/cml-cta": "1.0.0",
+		"@svta/cml-dash": "1.0.0",
+		"@svta/cml-drm": "1.0.0",
+		"@svta/cml-id3": "1.0.0",
+		"@svta/cml-iso-8601": "1.0.0",
+		"@svta/cml-iso-bmff": "0.20.0",
+		"@svta/cml-request": "1.0.0",
+		"@svta/cml-structured-field-values": "1.0.0",
+		"@svta/cml-throughput": "1.0.0",
+		"@svta/cml-utils": "1.0.0",
+		"@svta/cml-webvtt": "1.0.0",
+		"@svta/cml-xml": "1.0.0"
 	}
 }

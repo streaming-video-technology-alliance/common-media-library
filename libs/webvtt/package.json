@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-webvtt",
-	"version": "0.19.0",
+	"version": "1.0.0",
 	"description": "WebVTT parsing and rendering functionality",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -72,6 +72,6 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-utils": "*"
+		"@svta/cml-utils": "1.0.0"
 	}
 }

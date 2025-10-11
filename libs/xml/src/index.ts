@@ -4,6 +4,8 @@
  * @packageDocumentation
  * @beta
  */
+export * from './decodeXml.js';
+export * from './encodeXml.js';
 export * from './getElementsByName.js';
 export * from './parseXml.js';
 export type * from './XmlNode.js';

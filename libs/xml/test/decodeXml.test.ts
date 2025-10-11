@@ -1,13 +1,13 @@
-import { parseXml } from '@svta/cml-xml/parseXml';
+import { decodeXml } from '@svta/cml-xml/decodeXml';
 import assert, { equal } from 'node:assert';
 import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it } from 'node:test';
 
-describe('parseXml', () => {
+describe('decodeXml', () => {
 	it('provides a valid example', async () => {
 		//#region example
-		const obj = parseXml(
+		const obj = decodeXml(
 			`<root>
 				<child>text</child>
 				<ns:tag>content</ns:tag>
@@ -24,7 +24,7 @@ describe('parseXml', () => {
 
 	it('parses DASH manifest', async () => {
 		const xml = await fs.readFile(resolve('./test/fixtures/bbb_30fps.mpd'), 'utf8');
-		const doc = parseXml(xml);
+		const doc = decodeXml(xml);
 		const { childNodes } = doc;
 
 		equal(childNodes.length, 1);
@@ -40,7 +40,7 @@ describe('parseXml', () => {
 
 	it('parses all node types', async () => {
 		const xml = await fs.readFile(resolve('./test/fixtures/node_types.xml'), 'utf8');
-		const doc = parseXml(xml);
+		const doc = decodeXml(xml);
 		const { childNodes } = doc;
 		equal(childNodes.length, 2);
 

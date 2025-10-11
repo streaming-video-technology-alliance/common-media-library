@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-iso-bmff",
-	"version": "0.19.0",
+	"version": "0.20.0",
 	"description": "ISO Base Media File Format (ISOBMFF) parsing functionality",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -70,6 +70,6 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-utils": "*"
+		"@svta/cml-utils": "1.0.0"
 	}
 }
