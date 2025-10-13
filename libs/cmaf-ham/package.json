@@ -74,7 +74,7 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-utils": "1.0.0"
+		"@svta/cml-utils": "*"
 	},
 	"devDependencies": {
 		"@types/m3u8-parser": "7.2.5",
