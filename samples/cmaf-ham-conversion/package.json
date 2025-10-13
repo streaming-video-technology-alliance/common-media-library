@@ -1,0 +1,21 @@
+{
+	"name": "cmaf-ham-conversion",
+	"version": "0.18.1",
+	"description": "",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx src/index.ts",
+		"serve": "serve --cors ./dist"
+	},
+	"dependencies": {
+		"@svta/common-media-library": "*"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@types/xml2js": "0.4.14",
+		"m3u8-parser": "7.2.0",
+		"serve": "14.2.4",
+		"xml2js": "0.6.2"
+	}
+}
