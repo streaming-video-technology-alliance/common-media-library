@@ -4,7 +4,7 @@
 	"description": "ISO Base Media File Format (ISOBMFF) parsing functionality",
 	"license": "Apache-2.0",
 	"type": "module",
-	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/iso-bmff",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
 	"repository": {
 		"type": "git",
