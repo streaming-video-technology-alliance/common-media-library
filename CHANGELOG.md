@@ -8,6 +8,32 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-10-24
+
+### Added
+
+- Add `@svta/cml-608` package
+- Add `@svta/cml-cmaf-ham` package
+- Add `@svta/cml-cmcd` package
+- Add `@svta/cml-cmsd` package
+- Add `@svta/cml-content-steering` package
+- Add `@svta/cml-cta` package
+- Add `@svta/cml-dash` package
+- Add `@svta/cml-drm` package
+- Add `@svta/cml-id3` package
+- Add `@svta/cml-iso-8601` package
+- Add `@svta/cml-iso-bmff` package
+- Add `@svta/cml-request` package
+- Add `@svta/cml-structured-field-values` package
+- Add `@svta/cml-throughput` package
+- Add `@svta/cml-utils` package
+- Add `@svta/cml-webvtt` package
+- Add `@svta/cml-xml` package
+
+### Changed
+
+- Move all features into their own packages ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
+
 ## [0.18.1] - 2025-10-01
 
 ### Fixed
@@ -18,13 +44,11 @@ and this project adheres to
 
 ### Changed
 
-- Implement trusted publishing
-  ([#254](https://github.com/streaming-video-technology-alliance/common-media-library/issues/254))
+- Implement trusted publishing ([#254](https://github.com/streaming-video-technology-alliance/common-media-library/issues/254))
 
 ### Fixed
 
-- Consolidate text decoding utilities
-  ([#244](https://github.com/streaming-video-technology-alliance/common-media-library/issues/244))
+- Consolidate text decoding utilities ([#244](https://github.com/streaming-video-technology-alliance/common-media-library/issues/244))
 
 ## [0.17.4] - 2025-09-12
 
@@ -36,29 +60,25 @@ and this project adheres to
 
 ### Fixed
 
-- Infinite loop when encoding CMCD `nor` field
-  ([#249](https://github.com/streaming-video-technology-alliance/common-media-library/issues/249))
+- Infinite loop when encoding CMCD `nor` field ([#249](https://github.com/streaming-video-technology-alliance/common-media-library/issues/249))
 
 ## [0.17.2] - 2025-08-27
 
 ### Fixed
 
-- The `extractContentId` function does not handle UTF-16 data correctly
-  ([#242](https://github.com/streaming-video-technology-alliance/common-media-library/issues/242))
+- The `extractContentId` function does not handle UTF-16 data correctly ([#242](https://github.com/streaming-video-technology-alliance/common-media-library/issues/242))
 
 ## [0.17.1] - 2025-07-28
 
 ### Fixed
 
-- CMCD encoder strips query params from `nor` field.
-  ([#239](https://github.com/streaming-video-technology-alliance/common-media-library/issues/239))
+- CMCD encoder strips query params from `nor` field. ([#239](https://github.com/streaming-video-technology-alliance/common-media-library/issues/239))
 
 ## [0.17.0] - 2025-07-22
 
 ### Added
 
-- Add CMCD config type and request builder
-  ([#227](https://github.com/streaming-video-technology-alliance/common-media-library/issues/227))
+- Add CMCD config type and request builder ([#227](https://github.com/streaming-video-technology-alliance/common-media-library/issues/227))
 - Add const for DASH thumbnail tile scheme ID URI
 - Add UUID utilities for converting to and from hex strings and changing
   endianness
@@ -71,15 +91,12 @@ and this project adheres to
 
 ### Added
 
-- Utility function for parsing DASH `frameRate` attributes
-  ([#221](https://github.com/streaming-video-technology-alliance/common-media-library/issues/221))
-- Add type definitions for content steering entities
-  ([#176](https://github.com/streaming-video-technology-alliance/common-media-library/pull/176))
+- Utility function for parsing DASH `frameRate` attributes ([#221](https://github.com/streaming-video-technology-alliance/common-media-library/issues/221))
+- Add type definitions for content steering entities ([#176](https://github.com/streaming-video-technology-alliance/common-media-library/pull/176))
 
 ### Changed
 
-- Update CMCD utilities to handle v2 rules, keys, and modes
-  ([#223](https://github.com/streaming-video-technology-alliance/common-media-library/issues/223))
+- Update CMCD utilities to handle v2 rules, keys, and modes ([#223](https://github.com/streaming-video-technology-alliance/common-media-library/issues/223))
 
 ## [0.15.1] - 2025-06-27
 
@@ -91,145 +108,114 @@ and this project adheres to
 
 ### Added
 
-- Add new CMCD Version 2 Keys, Constants and Types
-  ([#218](https://github.com/streaming-video-technology-alliance/common-media-library/issues/218))
+- Add new CMCD Version 2 Keys, Constants and Types ([#218](https://github.com/streaming-video-technology-alliance/common-media-library/issues/218))
 
 ## [0.14.0] - 2025-06-18
 
 ### Added
 
-- Add map type for ISO BMFF boxes to their type properties
-  ([#208](https://github.com/streaming-video-technology-alliance/common-media-library/issues/208))
-- Added Zlema Throughput Estimator
-  ([#212](https://github.com/streaming-video-technology-alliance/common-media-library/pull/212))
+- Add map type for ISO BMFF boxes to their type properties ([#208](https://github.com/streaming-video-technology-alliance/common-media-library/issues/208))
+- Added Zlema Throughput Estimator ([#212](https://github.com/streaming-video-technology-alliance/common-media-library/pull/212))
 
 ### Changed
 
-- Update Node.js development version to 24
-  ([#211](https://github.com/streaming-video-technology-alliance/common-media-library/issues/211))
-- Consistently used function declaration across CML
-  ([#213](https://github.com/streaming-video-technology-alliance/common-media-library/pull/213))
+- Update Node.js development version to 24 ([#211](https://github.com/streaming-video-technology-alliance/common-media-library/issues/211))
+- Consistently used function declaration across CML ([#213](https://github.com/streaming-video-technology-alliance/common-media-library/pull/213))
 
 ### Fixed
 
-- Fixed TypeScript errors related to Boxes
-  ([#214](https://github.com/streaming-video-technology-alliance/common-media-library/pull/214))
+- Fixed TypeScript errors related to Boxes ([#214](https://github.com/streaming-video-technology-alliance/common-media-library/pull/214))
 
 ## [0.13.0] - 2025-06-09
 
 ### Added
 
-- Add ISO BMFF `iden` box parser
-  ([#197](https://github.com/streaming-video-technology-alliance/common-media-library/issues/197))
-- Added EWMA Throughput Calculations
-  ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
-- VTT Parsing Utilities
-  ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
-- Added Harmonic Mean Throughput Estimator
-  ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
-- Added Arithmetic Mean Throughput Estimator
-  ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
+- Add ISO BMFF `iden` box parser ([#197](https://github.com/streaming-video-technology-alliance/common-media-library/issues/197))
+- Added EWMA Throughput Calculations ([#160](https://github.com/streaming-video-technology-alliance/common-media-library/pull/160))
+- VTT Parsing Utilities ([#193](https://github.com/streaming-video-technology-alliance/common-media-library/issues/193))
+- Added Harmonic Mean Throughput Estimator ([#199](https://github.com/streaming-video-technology-alliance/common-media-library/pull/199))
+- Added Arithmetic Mean Throughput Estimator ([#201](https://github.com/streaming-video-technology-alliance/common-media-library/pull/201))
 
 ### Fixed
 
-- The ISO BMFF utilities are not properly typed
-  ([#202](https://github.com/streaming-video-technology-alliance/common-media-library/issues/202))
+- The ISO BMFF utilities are not properly typed ([#202](https://github.com/streaming-video-technology-alliance/common-media-library/issues/202))
 
 ## [0.12.4] - 2025-05-16
 
 ### Fixed
 
 - `processUriTemplate` cannot correctly resolve time values larger than
-  `MAX_SAFE_INTEGER`
-  ([#190](https://github.com/streaming-video-technology-alliance/common-media-library/issues/190))
+  `MAX_SAFE_INTEGER` ([#190](https://github.com/streaming-video-technology-alliance/common-media-library/issues/190))
 
 ## [0.12.3] - 2025-05-15
 
 ### Fixed
 
-- The `parseXml` function does not decode HTML entities in attribute values
-  ([#187](https://github.com/streaming-video-technology-alliance/common-media-library/issues/187))
+- The `parseXml` function does not decode HTML entities in attribute values ([#187](https://github.com/streaming-video-technology-alliance/common-media-library/issues/187))
 
 ## [0.12.2] - 2025-05-15
 
 ### Fixed
 
-- Additional fixes for TS Error: Import path cannot end with a '.ts' extension
-  ([#183](https://github.com/streaming-video-technology-alliance/common-media-library/issues/183))
+- Additional fixes for TS Error: Import path cannot end with a '.ts' extension ([#183](https://github.com/streaming-video-technology-alliance/common-media-library/issues/183))
 
 ## [0.12.1] - 2025-05-14
 
 ### Fixed
 
-- TS Error: Import path cannot end with a '.ts' extension
-  ([#183](https://github.com/streaming-video-technology-alliance/common-media-library/issues/183))
+- TS Error: Import path cannot end with a '.ts' extension ([#183](https://github.com/streaming-video-technology-alliance/common-media-library/issues/183))
 
 ## [0.12.0] - 2025-05-08
 
 ### Added
 
-- Added Throughput Calculation Interfaces
-  ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
-- Add ID3 scheme ID URI
-  ([#174](https://github.com/streaming-video-technology-alliance/common-media-library/pull/174))
-- PlayReady DRM Utilities
-  ([#172](https://github.com/streaming-video-technology-alliance/common-media-library/issues/172))
+- Added Throughput Calculation Interfaces ([#170](https://github.com/streaming-video-technology-alliance/common-media-library/pull/170))
+- Add ID3 scheme ID URI ([#174](https://github.com/streaming-video-technology-alliance/common-media-library/pull/174))
+- PlayReady DRM Utilities ([#172](https://github.com/streaming-video-technology-alliance/common-media-library/issues/172))
 
 ### Changed
 
-- Ensure CML is compliant with the type annotations proposal
-  ([#134](https://github.com/streaming-video-technology-alliance/common-media-library/issues/134))
+- Ensure CML is compliant with the type annotations proposal ([#134](https://github.com/streaming-video-technology-alliance/common-media-library/issues/134))
 
 ### Fixed
 
-- TSLib imported in version 0.11.0's utils.js.
-  ([#177](https://github.com/streaming-video-technology-alliance/common-media-library/issues/177))
+- TSLib imported in version 0.11.0's utils.js. ([#177](https://github.com/streaming-video-technology-alliance/common-media-library/issues/177))
 
 ## [0.11.0] - 2025-04-03
 
 ### Added
 
-- Common DRM Models and Constants
-  ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
-- Core DRM Utilities - CommonEncryption, KeySystemUtils
-  ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
+- Common DRM Models and Constants ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
+- Core DRM Utilities - CommonEncryption, KeySystemUtils ([#156](https://github.com/streaming-video-technology-alliance/common-media-library/issues/156))
 
 ### Changed
 
-- `CommonMediaRequest` / `CommonMediaResponse` Updates
-  ([#163](https://github.com/streaming-video-technology-alliance/common-media-library/issues/163))
+- `CommonMediaRequest` / `CommonMediaResponse` Updates ([#163](https://github.com/streaming-video-technology-alliance/common-media-library/issues/163))
 
 ### Fixed
 
-- The format command no longer works
-  ([#166](https://github.com/streaming-video-technology-alliance/common-media-library/issues/166))
+- The format command no longer works ([#166](https://github.com/streaming-video-technology-alliance/common-media-library/issues/166))
 
 ## [0.10.0] - 2025-03-10
 
 ### Added
 
-- FairPlay Utilities
-  ([#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131))
-- Add `prefix` and `localName` support to the XML types and utilities
-  ([#145](https://github.com/streaming-video-technology-alliance/common-media-library/issues/145))
-- Common DRM Models and Constants
-  ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
+- FairPlay Utilities ([#131](https://github.com/streaming-video-technology-alliance/common-media-library/issues/131))
+- Add `prefix` and `localName` support to the XML types and utilities ([#145](https://github.com/streaming-video-technology-alliance/common-media-library/issues/145))
+- Common DRM Models and Constants ([#154](https://github.com/streaming-video-technology-alliance/common-media-library/issues/154))
 
 ## [0.9.0] - 2025-02-21
 
 ### Added
 
-- ISO BMFF parser and utilities
-  ([#118](https://github.com/streaming-video-technology-alliance/common-media-library/issues/118))
+- ISO BMFF parser and utilities ([#118](https://github.com/streaming-video-technology-alliance/common-media-library/issues/118))
 
 ## [0.8.0] - 2025-02-14
 
 ### Added
 
-- Add DASH Segment Template Utility
-  ([#129](https://github.com/streaming-video-technology-alliance/common-media-library/issues/129))
-- Add XML parsing utils
-  ([#125](https://github.com/streaming-video-technology-alliance/common-media-library/issues/125))
+- Add DASH Segment Template Utility ([#129](https://github.com/streaming-video-technology-alliance/common-media-library/issues/129))
+- Add XML parsing utils ([#125](https://github.com/streaming-video-technology-alliance/common-media-library/issues/125))
 
 ### Changed
 
@@ -245,33 +231,27 @@ and this project adheres to
 
 ### Changed
 
-- Replace Typescript enums with constants
-  ([#103](https://github.com/streaming-video-technology-alliance/common-media-library/issues/103))
-- Remove CMAF HAM dependencies
-  ([#119](https://github.com/streaming-video-technology-alliance/common-media-library/issues/119))
+- Replace Typescript enums with constants ([#103](https://github.com/streaming-video-technology-alliance/common-media-library/issues/103))
+- Remove CMAF HAM dependencies ([#119](https://github.com/streaming-video-technology-alliance/common-media-library/issues/119))
 
 ## [0.7.3] - 2024-08-30
 
 ### Fix
 
-- Cannot import library in jest tests
-  ([#98](https://github.com/streaming-video-technology-alliance/common-media-library/issues/98))
-- Replace `ts-node`
-  ([#101](https://github.com/streaming-video-technology-alliance/common-media-library/issues/101))
+- Cannot import library in jest tests ([#98](https://github.com/streaming-video-technology-alliance/common-media-library/issues/98))
+- Replace `ts-node` ([#101](https://github.com/streaming-video-technology-alliance/common-media-library/issues/101))
 
 ## [0.7.2] - 2024-08-28
 
 ### Fix
 
-- Cannot import library in jest tests
-  ([#98](https://github.com/streaming-video-technology-alliance/common-media-library/issues/98))
+- Cannot import library in jest tests ([#98](https://github.com/streaming-video-technology-alliance/common-media-library/issues/98))
 
 ## [0.7.1] - 2024-06-21
 
 ### Fix
 
-- Missing dependencies in package.json
-  ([#96](https://github.com/streaming-video-technology-alliance/common-media-library/issues/96))
+- Missing dependencies in package.json ([#96](https://github.com/streaming-video-technology-alliance/common-media-library/issues/96))
 
 ## [0.7.0] - 2024-06-05
 
@@ -280,60 +260,49 @@ and this project adheres to
 - Add CMAF-Ham types, mappers and services to convert and manipulate VOD HLS and
   VOD DASH manifests.
 - Add cmaf-ham-converter sample to showcase the CMAF-Ham functions.
-- Implement CEA 608/708 parser
-  ([#62](https://github.com/streaming-video-technology-alliance/common-media-library/issues/62))
+- Implement CEA 608/708 parser ([#62](https://github.com/streaming-video-technology-alliance/common-media-library/issues/62))
 
 ### Fix
 
-- Integrate outstanding 608 PR
-  ([#88](https://github.com/streaming-video-technology-alliance/common-media-library/issues/88))
+- Integrate outstanding 608 PR ([#88](https://github.com/streaming-video-technology-alliance/common-media-library/issues/88))
 
 ## [0.6.4] - 2024-03-04
 
 ### Fixed
 
-- Resolve module import error on id3 feature
-  ([#83](https://github.com/streaming-video-technology-alliance/common-media-library/issues/83))
+- Resolve module import error on id3 feature ([#83](https://github.com/streaming-video-technology-alliance/common-media-library/issues/83))
 
 ## [0.6.3] - 2024-03-01
 
 ### Added
 
-- Unit tests for ID3 feature helper functions
-  ([#74](https://github.com/streaming-video-technology-alliance/common-media-library/pull/74))
-- ID3 APIC frame decode functionality, and it's respective unit tests
-  ([#77](https://github.com/streaming-video-technology-alliance/common-media-library/issues/77))
+- Unit tests for ID3 feature helper functions ([#74](https://github.com/streaming-video-technology-alliance/common-media-library/pull/74))
+- ID3 APIC frame decode functionality, and it's respective unit tests ([#77](https://github.com/streaming-video-technology-alliance/common-media-library/issues/77))
 
 ## [0.6.2] - 2023-01-18
 
 ### Fixed
 
-- Some imports are pulling in unnecessary files
-  ([#64](https://github.com/streaming-video-technology-alliance/common-media-library/issues/64))
+- Some imports are pulling in unnecessary files ([#64](https://github.com/streaming-video-technology-alliance/common-media-library/issues/64))
 
 ## [0.6.1] - 2023-12-14
 
 ### Fixed
 
-- Incorrect return type for `decodeCmsdDynamic` function
-  ([#55](https://github.com/streaming-video-technology-alliance/common-media-library/issues/55))
+- Incorrect return type for `decodeCmsdDynamic` function ([#55](https://github.com/streaming-video-technology-alliance/common-media-library/issues/55))
 
 ## [0.6.0] - 2023-11-29
 
 ### Added
 
 - Add the ability to pass a base URL to all CMCD encode utilities to construct
-  relative paths for `nor`
-  ([#50](https://github.com/streaming-video-technology-alliance/common-media-library/issues/50))
-- Export constants for CMCD and CMSD version numbers
-  ([#44](https://github.com/streaming-video-technology-alliance/common-media-library/issues/44))
+  relative paths for `nor` ([#50](https://github.com/streaming-video-technology-alliance/common-media-library/issues/50))
+- Export constants for CMCD and CMSD version numbers ([#44](https://github.com/streaming-video-technology-alliance/common-media-library/issues/44))
 
 ### Fixed
 
-- CMCD does not protect against non-Finite numeric values
-  ([#45](https://github.com/streaming-video-technology-alliance/common-media-library/issues/45))
-- `appendCmcdQuery` does not account for existing CMCD query params
-  ([#48](https://github.com/streaming-video-technology-alliance/common-media-library/issues/48))
+- CMCD does not protect against non-Finite numeric values ([#45](https://github.com/streaming-video-technology-alliance/common-media-library/issues/45))
+- `appendCmcdQuery` does not account for existing CMCD query params ([#48](https://github.com/streaming-video-technology-alliance/common-media-library/issues/48))
 
 ## [0.5.1] - 2023-11-16
 
@@ -345,35 +314,29 @@ and this project adheres to
 
 ### Added
 
-- Implement Common Media Server Data (CMSD) utilities
-  ([#35](https://github.com/streaming-video-technology-alliance/common-media-library/issues/35))
+- Implement Common Media Server Data (CMSD) utilities ([#35](https://github.com/streaming-video-technology-alliance/common-media-library/issues/35))
 - Add request and response interceptors API
 
 ## [0.4.5] - 2023-10-12
 
 ### Fixed
 
-- `CMCD_PARAM` constant does not match file name
-  ([#27](https://github.com/streaming-video-technology-alliance/common-media-library/issues/27))
-- lint errors when using typedoc specific tags
-  ([#32](https://github.com/streaming-video-technology-alliance/common-media-library/issues/32))
-- Allow imports with file extensions
-  ([#26](https://github.com/streaming-video-technology-alliance/common-media-library/issues/26))
+- `CMCD_PARAM` constant does not match file name ([#27](https://github.com/streaming-video-technology-alliance/common-media-library/issues/27))
+- lint errors when using typedoc specific tags ([#32](https://github.com/streaming-video-technology-alliance/common-media-library/issues/32))
+- Allow imports with file extensions ([#26](https://github.com/streaming-video-technology-alliance/common-media-library/issues/26))
 
 ## [0.4.4] - 2023-10-11
 
 ### Fixed
 
-- Module not found: Error: Default condition should be last one
-  ([#22](https://github.com/streaming-video-technology-alliance/common-media-library/issues/22))
+- Module not found: Error: Default condition should be last one ([#22](https://github.com/streaming-video-technology-alliance/common-media-library/issues/22))
 
 ## [0.4.3] - 2023-07-25
 
 ### Added
 
 - Add `NOTICE` file for attributions
-- Export library in cjs format
-  ([#11](https://github.com/streaming-video-technology-alliance/common-media-library/issues/11))
+- Export library in cjs format ([#11](https://github.com/streaming-video-technology-alliance/common-media-library/issues/11))
 
 ### Changed
 
@@ -397,8 +360,7 @@ and this project adheres to
 
 ### Added
 
-- Add ID3 APIs
-  ([#16](https://github.com/streaming-video-technology-alliance/common-media-library/issues/16))
+- Add ID3 APIs ([#16](https://github.com/streaming-video-technology-alliance/common-media-library/issues/16))
 
 ## [0.3.0] - 2023-05-04
 
@@ -465,17 +427,16 @@ and this project adheres to
 
 ### Added
 
-- Add CMCD encode and decode APIs
-  ([#1](https://github.com/streaming-video-technology-alliance/common-media-library/issues/1))
+- Add CMCD encode and decode APIs ([#1](https://github.com/streaming-video-technology-alliance/common-media-library/issues/1))
 
 ## [0.1.0] - 2023-04-27
 
 ### Added
 
-- Bootstrap project
-  ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
+- Bootstrap project ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.1...v1.0.0
 [0.18.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.4...v0.18.0
 [0.17.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.3...v0.17.4
