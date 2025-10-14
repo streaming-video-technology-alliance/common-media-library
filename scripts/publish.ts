@@ -38,8 +38,25 @@ for (const [name, pkg] of Object.entries(packages)) {
 	}
 
 	const latest = await exec(`npm view ${name} version`);
+	const updated = latest < version;
 
-	if (latest < version) {
-		await cmd(`npm publish --provenance --access public -w libs/${name.replace('@svta/cml-', '')}`);
+	// if (!updated) {
+	// 	const [peerDependencies, dependencies] = await Promise.all([
+	// 		exec(`npm view ${name} peerDependencies`).then(JSON.parse),
+	// 		exec(`npm view ${name} dependencies`).then(JSON.parse),
+	// 	]);
+
+	// 	const deps = { ...peerDependencies, ...dependencies };
+
+	// 	for (const dep in deps) {
+	// 		const { version } = deps[dep];
+	// 		if (packages[dep] && packages[dep][1] < version) {
+	// 			throw new Error(`Package ${name} needs to update peerDependency ${dep}. Version is ${version} but ${packages[dep][1]} is required.`);
+	// 		}
+	// 	}
+	// }
+
+	if (updated) {
+		await cmd(`npm publish --provenance --access public -w libs/${name.replace('@svta/cml-', '')} --dry-run`);
 	}
 }
