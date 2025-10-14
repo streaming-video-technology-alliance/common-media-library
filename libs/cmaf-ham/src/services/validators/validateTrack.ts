@@ -1,11 +1,11 @@
-import type { AudioTrack } from '../../types/model/AudioTrack.ts';
-import type { TextTrack } from '../../types/model/TextTrack.ts';
-import type { Track } from '../../types/model/Track.ts';
-import type { VideoTrack } from '../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../types/model/AudioTrack.ts'
+import type { TextTrack } from '../../types/model/TextTrack.ts'
+import type { Track } from '../../types/model/Track.ts'
+import type { VideoTrack } from '../../types/model/VideoTrack.ts'
 
-import type { Validation } from '../../types/Validation.ts';
+import type { Validation } from '../../types/Validation.ts'
 
-import { validateSegments } from './validateSegments.ts';
+import { validateSegments } from './validateSegments.ts'
 
 /**
  * Validate a track.
@@ -43,16 +43,16 @@ export function validateTrack(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
-		: '.';
+		: '.'
 
 	if (!track.id) {
-		validation.status = false;
+		validation.status = false
 		validation.errorMessages.push(
 			`Track id is undefined${moreInformation}`,
-		);
+		)
 	}
 
 	switch (track.type) {
@@ -61,23 +61,23 @@ export function validateTrack(
 				track as VideoTrack,
 				switchingSetId,
 				validation,
-			);
-			break;
+			)
+			break
 		case 'audio':
 			_validateAudioTrack(
 				track as AudioTrack,
 				switchingSetId,
 				validation,
-			);
-			break;
+			)
+			break
 		case 'text':
-			_validateTextTrack(track as TextTrack, switchingSetId, validation);
-			break;
+			_validateTextTrack(track as TextTrack, switchingSetId, validation)
+			break
 	}
 
-	validateSegments(track.segments, track.id, validation);
+	validateSegments(track.segments, track.id, validation)
 
-	return validation;
+	return validation
 }
 
 /**
@@ -102,19 +102,19 @@ function _validateVideoTrack(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
-		: '.';
+		: '.'
 
 	if (!videoTrack.codec) {
-		validation.status = false;
+		validation.status = false
 		validation.errorMessages.push(
 			`VideoTrack with id: ${videoTrack.id} does not have codec${moreInformation}`,
-		);
+		)
 	}
 
-	return validation;
+	return validation
 }
 
 /**
@@ -139,19 +139,19 @@ function _validateAudioTrack(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
-		: '.';
+		: '.'
 
 	if (!audioTrack.codec) {
-		validation.status = false;
+		validation.status = false
 		validation.errorMessages.push(
 			`AudioTrack with id: ${audioTrack.id} does not have codec${moreInformation}`,
-		);
+		)
 	}
 
-	return validation;
+	return validation
 }
 
 /**
@@ -176,17 +176,17 @@ function _validateTextTrack(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
-		: '.';
+		: '.'
 
 	if (!textTrack.language) {
-		validation.status = false;
+		validation.status = false
 		validation.errorMessages.push(
 			`TextTrack with id: ${textTrack.id} does not have codec${moreInformation}`,
-		);
+		)
 	}
 
-	return validation;
+	return validation
 }

@@ -1,9 +1,9 @@
-import { CMCD_OBJECT } from './CMCD_OBJECT.ts';
-import { CMCD_REQUEST } from './CMCD_REQUEST.ts';
-import { CMCD_SESSION } from './CMCD_SESSION.ts';
-import { CMCD_STATUS } from './CMCD_STATUS.ts';
-import type { CmcdHeaderField } from './CmcdHeaderField.ts';
-import type { CmcdKey } from './CmcdKey.ts';
+import { CMCD_OBJECT } from './CMCD_OBJECT.ts'
+import { CMCD_REQUEST } from './CMCD_REQUEST.ts'
+import { CMCD_SESSION } from './CMCD_SESSION.ts'
+import { CMCD_STATUS } from './CMCD_STATUS.ts'
+import type { CmcdHeaderField } from './CmcdHeaderField.ts'
+import type { CmcdKey } from './CmcdKey.ts'
 
 /**
  * The map of CMCD keys to their appropriate header shard.
@@ -67,4 +67,4 @@ export const CMCD_HEADER_MAP: Record<CmcdKey, CmcdHeaderField> = {
 	pt: CMCD_STATUS,
 	ec: CMCD_STATUS,
 	e: CMCD_STATUS,
-};
+}

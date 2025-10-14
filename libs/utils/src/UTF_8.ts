@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const UTF_8 = 'utf-8';
+export const UTF_8 = 'utf-8'

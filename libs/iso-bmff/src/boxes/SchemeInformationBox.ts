@@ -1,6 +1,6 @@
-import type { Box } from './Box.ts';
-import type { ContainerBox } from './ContainerBox.ts';
-import type { TrackEncryptionBox } from './TrackEncryptionBox.ts';
+import type { Box } from './Box.ts'
+import type { ContainerBox } from './ContainerBox.ts'
+import type { TrackEncryptionBox } from './TrackEncryptionBox.ts'
 
 /**
  * Scheme Information Box - 'schi' - Container

@@ -1,4 +1,4 @@
-const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]+)([diouxX]))?\$/g;
+const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]+)([diouxX]))?\$/g
 
 /**
  * Process a URI template used in `SegmentTemplate` nodes.
@@ -26,74 +26,74 @@ export function processUriTemplate(
 	time: string | number | null | undefined,
 ): string {
 	const uri = uriTemplate.replace(TOKENS, (match, name, widthStr, format) => {
-		let value: string | number | null | undefined;
+		let value: string | number | null | undefined
 
 		switch (name) {
 			case undefined: // $$ case
-				return '$';
+				return '$'
 
 			case 'RepresentationID':
-				value = representationId;
-				break;
+				value = representationId
+				break
 
 			case 'Number':
-				value = number;
-				break;
+				value = number
+				break
 
 			case 'SubNumber':
-				value = subNumber;
-				break;
+				value = subNumber
+				break
 
 			case 'Bandwidth':
-				value = bandwidth;
-				break;
+				value = bandwidth
+				break
 
 			case 'Time':
 				if (typeof time === 'string') {
-					return time;
+					return time
 				}
 
-				value = time ? Math.round(time) : time;
-				break;
+				value = time ? Math.round(time) : time
+				break
 
 			default:
-				value = null;
+				value = null
 		}
 
 		if (value == null) {
-			return match;
+			return match
 		}
 
-		let valueString: string;
+		let valueString: string
 
 		switch (format) {
 			case undefined:  // Happens if there is no format specifier.
 			case 'd':
 			case 'i':
 			case 'u':
-				valueString = value.toString();
-				break;
+				valueString = value.toString()
+				break
 
 			case 'o':
-				valueString = value.toString(8);
-				break;
+				valueString = value.toString(8)
+				break
 
 			case 'x':
-				valueString = value.toString(16);
-				break;
+				valueString = value.toString(16)
+				break
 
 			case 'X':
-				valueString = value.toString(16).toUpperCase();
-				break;
+				valueString = value.toString(16).toUpperCase()
+				break
 
 			default:
-				valueString = value.toString();
-				break;
+				valueString = value.toString()
+				break
 		}
 
-		const width = parseInt(widthStr, 10) || 1;
-		return valueString.padStart(width, '0');
-	});
+		const width = parseInt(widthStr, 10) || 1
+		return valueString.padStart(width, '0')
+	})
 
-	return uri;
+	return uri
 }

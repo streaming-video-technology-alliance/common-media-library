@@ -1,8 +1,8 @@
-import { decodeBase64 } from '@svta/cml-utils';
-import { BYTES } from '../utils/BYTES.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import { decodeBase64 } from '@svta/cml-utils'
+import { BYTES } from '../utils/BYTES.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
 
 // 4.2.7.  Parsing a Byte Sequence
 //
@@ -49,21 +49,21 @@ import { parseError } from './parseError.ts';
  */
 export function parseByteSequence(src: string): ParsedValue<Uint8Array> {
 	if (src[0] !== ':') {
-		throw parseError(src, BYTES);
+		throw parseError(src, BYTES)
 	}
 
-	src = src.substring(1);
+	src = src.substring(1)
 	if (src.includes(':') === false) {
-		throw parseError(src, BYTES);
+		throw parseError(src, BYTES)
 	}
 
-	const re = /(^.*?)(:)/g;
-	const b64_content = (re.exec(src) as any)[1];
-	src = src.substring(re.lastIndex);
+	const re = /(^.*?)(:)/g
+	const b64_content = (re.exec(src) as any)[1]
+	src = src.substring(re.lastIndex)
 
 	// pass b64_content char check step 6
 	return parsedValue(
 		decodeBase64(b64_content),
 		src,
-	);
+	)
 }

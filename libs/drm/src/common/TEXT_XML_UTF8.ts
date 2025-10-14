@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const TEXT_XML_UTF8 = 'text/xml; charset=utf-8';
+export const TEXT_XML_UTF8 = 'text/xml; charset=utf-8'

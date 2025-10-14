@@ -1,5 +1,5 @@
-import type { ContainerBox } from './ContainerBox.ts';
-import type { EditListBox } from './EditListBox.ts';
+import type { ContainerBox } from './ContainerBox.ts'
+import type { EditListBox } from './EditListBox.ts'
 
 /**
  * Edit Box - 'edts' - Container

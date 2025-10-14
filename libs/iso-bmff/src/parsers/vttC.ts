@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a WebVTTConfigurationBox from an IsoView
@@ -15,5 +15,5 @@ import type { IsoView } from '../IsoView.ts';
 export function vttC(view: IsoView): Fields<WebVttConfigurationBox> {
 	return {
 		config: view.readUtf8(),
-	};
+	}
 };

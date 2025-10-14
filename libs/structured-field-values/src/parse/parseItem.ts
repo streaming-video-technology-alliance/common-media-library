@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import { SfItem } from '../SfItem.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseBareItem } from './parseBareItem.ts';
-import { parseParameters } from './parseParameters.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import { SfItem } from '../SfItem.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseBareItem } from './parseBareItem.ts'
+import { parseParameters } from './parseParameters.ts'
 
 // 4.2.3.  Parsing an Item
 //
@@ -22,14 +22,14 @@ import { parseParameters } from './parseParameters.ts';
  * @internal
  */
 export function parseItem(src: string, options?: SfDecodeOptions): ParsedValue<SfItem> {
-	const parsedBareItem = parseBareItem(src, options);
-	src = parsedBareItem.src;
+	const parsedBareItem = parseBareItem(src, options)
+	src = parsedBareItem.src
 
-	const parsedParameters = parseParameters(src, options);
-	src = parsedParameters.src;
+	const parsedParameters = parseParameters(src, options)
+	src = parsedParameters.src
 
 	return parsedValue(
 		new SfItem(parsedBareItem.value, parsedParameters.value),
 		src,
-	);
+	)
 }

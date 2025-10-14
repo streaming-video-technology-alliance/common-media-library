@@ -39,10 +39,10 @@ export function isId3Header(data: Uint8Array, offset: number): boolean {
 					data[offset + 8] < 0x80 &&
 					data[offset + 9] < 0x80
 				) {
-					return true;
+					return true
 				}
 			}
 		}
 	}
-	return false;
+	return false
 }

@@ -1,4 +1,4 @@
-import type { ResourceTiming } from '@svta/cml-utils';
+import type { ResourceTiming } from '@svta/cml-utils'
 
 /**
  * Throughput Estimator.

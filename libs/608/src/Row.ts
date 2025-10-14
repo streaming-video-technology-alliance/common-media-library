@@ -36,13 +36,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CaptionsLogger } from './CaptionsLogger.ts';
-import { PenState } from './PenState.ts';
-import type { PenStyles } from './PenStyles.ts';
-import { StyledUnicodeChar } from './StyledUnicodeChar.ts';
-import { VerboseLevel } from './VerboseLevel.ts';
-import { NR_COLS } from './utils/NR_COLS.ts';
-import { getCharForByte } from './utils/getCharForByte.ts';
+import { CaptionsLogger } from './CaptionsLogger.ts'
+import { PenState } from './PenState.ts'
+import type { PenStyles } from './PenStyles.ts'
+import { StyledUnicodeChar } from './StyledUnicodeChar.ts'
+import { VerboseLevel } from './VerboseLevel.ts'
+import { NR_COLS } from './utils/NR_COLS.ts'
+import { getCharForByte } from './utils/getCharForByte.ts'
 
 /**
  * CTA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
@@ -50,44 +50,44 @@ import { getCharForByte } from './utils/getCharForByte.ts';
  * @beta
  */
 export class Row {
-	public chars: StyledUnicodeChar[] = [];
-	public cueStartTime: number | null = null;
+	public chars: StyledUnicodeChar[] = []
+	public cueStartTime: number | null = null
 
-	private pos: number = 0;
-	private currPenState: PenState = new PenState();
-	private logger: CaptionsLogger;
+	private pos: number = 0
+	private currPenState: PenState = new PenState()
+	private logger: CaptionsLogger
 
 	constructor(logger: CaptionsLogger = new CaptionsLogger()) {
 		for (let i = 0; i < NR_COLS; i++) {
-			this.chars.push(new StyledUnicodeChar());
+			this.chars.push(new StyledUnicodeChar())
 		}
-		this.logger = logger;
+		this.logger = logger
 	}
 
 	equals(other: Row): boolean {
 		for (let i = 0; i < NR_COLS; i++) {
 			if (!this.chars[i].equals(other.chars[i])) {
-				return false;
+				return false
 			}
 		}
-		return true;
+		return true
 	}
 
 	copy(other: Row): void {
 		for (let i = 0; i < NR_COLS; i++) {
-			this.chars[i].copy(other.chars[i]);
+			this.chars[i].copy(other.chars[i])
 		}
 	}
 
 	isEmpty(): boolean {
-		let empty = true;
+		let empty = true
 		for (let i = 0; i < NR_COLS; i++) {
 			if (!this.chars[i].isEmpty()) {
-				empty = false;
-				break;
+				empty = false
+				break
 			}
 		}
-		return empty;
+		return empty
 	}
 
 	/**
@@ -95,22 +95,22 @@ export class Row {
 	 */
 	setCursor(absPos: number): void {
 		if (this.pos !== absPos) {
-			this.pos = absPos;
+			this.pos = absPos
 		}
 
 		if (this.pos < 0) {
 			this.logger.log(
 				VerboseLevel.DEBUG,
 				'Negative cursor position ' + this.pos,
-			);
-			this.pos = 0;
+			)
+			this.pos = 0
 		}
 		else if (this.pos > NR_COLS) {
 			this.logger.log(
 				VerboseLevel.DEBUG,
 				'Too large cursor position ' + this.pos,
-			);
-			this.pos = NR_COLS;
+			)
+			this.pos = NR_COLS
 		}
 	}
 
@@ -118,29 +118,29 @@ export class Row {
 	 * Move the cursor relative to current position.
 	 */
 	moveCursor(relPos: number): void {
-		const newPos = this.pos + relPos;
+		const newPos = this.pos + relPos
 		if (relPos > 1) {
 			for (let i = this.pos + 1; i < newPos + 1; i++) {
-				this.chars[i].setPenState(this.currPenState);
+				this.chars[i].setPenState(this.currPenState)
 			}
 		}
-		this.setCursor(newPos);
+		this.setCursor(newPos)
 	}
 
 	/**
 	 * Backspace, move one step back and clear character.
 	 */
 	backSpace(): void {
-		this.moveCursor(-1);
-		this.chars[this.pos].setChar(' ', this.currPenState);
+		this.moveCursor(-1)
+		this.chars[this.pos].setChar(' ', this.currPenState)
 	}
 
 	insertChar(byte: number): void {
 		if (byte >= 0x90) {
 			// Extended char
-			this.backSpace();
+			this.backSpace()
 		}
-		const char = getCharForByte(byte);
+		const char = getCharForByte(byte)
 		if (this.pos >= NR_COLS) {
 			this.logger.log(
 				VerboseLevel.ERROR,
@@ -152,52 +152,52 @@ export class Row {
 					') at position ' +
 					this.pos +
 					'. Skipping it!',
-			);
-			return;
+			)
+			return
 		}
-		this.chars[this.pos].setChar(char, this.currPenState);
-		this.moveCursor(1);
+		this.chars[this.pos].setChar(char, this.currPenState)
+		this.moveCursor(1)
 	}
 
 	clearFromPos(startPos: number): void {
-		let i: number;
+		let i: number
 		for (i = startPos; i < NR_COLS; i++) {
-			this.chars[i].reset();
+			this.chars[i].reset()
 		}
 	}
 
 	clear(): void {
-		this.clearFromPos(0);
-		this.pos = 0;
-		this.currPenState.reset();
+		this.clearFromPos(0)
+		this.pos = 0
+		this.currPenState.reset()
 	}
 
 	clearToEndOfRow(): void {
-		this.clearFromPos(this.pos);
+		this.clearFromPos(this.pos)
 	}
 
 	getTextString(): string {
-		const chars: string[] = [];
-		let empty = true;
+		const chars: string[] = []
+		let empty = true
 		for (let i = 0; i < NR_COLS; i++) {
-			const char = this.chars[i].uchar;
+			const char = this.chars[i].uchar
 			if (char !== ' ') {
-				empty = false;
+				empty = false
 			}
 
-			chars.push(char);
+			chars.push(char)
 		}
 		if (empty) {
-			return '';
+			return ''
 		}
 		else {
-			return chars.join('');
+			return chars.join('')
 		}
 	}
 
 	setPenStyles(styles: Partial<PenStyles>): void {
-		this.currPenState.setStyles(styles);
-		const currChar = this.chars[this.pos];
-		currChar.setPenState(this.currPenState);
+		this.currPenState.setStyles(styles)
+		const currChar = this.chars[this.pos]
+		currChar.setPenState(this.currPenState)
 	}
 }

@@ -1,5 +1,5 @@
-import type { CmsdStatic } from '@svta/cml-cmsd';
-import { CmsdObjectType, CmsdStreamingFormat, CmsdStreamType } from '@svta/cml-cmsd';
+import type { CmsdStatic } from '@svta/cml-cmsd'
+import { CmsdObjectType, CmsdStreamingFormat, CmsdStreamType } from '@svta/cml-cmsd'
 
 export const CMSD_STATIC_OBJ: CmsdStatic = {
 	ot: CmsdObjectType.VIDEO,
@@ -8,4 +8,4 @@ export const CMSD_STATIC_OBJ: CmsdStatic = {
 	d: 5000,
 	br: 2000,
 	n: 'OriginProviderA',
-};
+}

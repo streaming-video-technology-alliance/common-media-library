@@ -1,10 +1,10 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfMember } from '../SfMember.ts';
-import { LIST } from '../utils/LIST.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
-import { parseItemOrInnerList } from './parseItemOrInnerList.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import type { SfMember } from '../SfMember.ts'
+import { LIST } from '../utils/LIST.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
+import { parseItemOrInnerList } from './parseItemOrInnerList.ts'
 
 // 4.2.1.  Parsing a List
 //
@@ -37,24 +37,24 @@ import { parseItemOrInnerList } from './parseItemOrInnerList.ts';
  * @internal
  */
 export function parseList(src: string, options?: SfDecodeOptions): ParsedValue<SfMember[]> {
-	const value: SfMember[] = [];
+	const value: SfMember[] = []
 	while (src.length > 0) {
-		const parsedItemOrInnerList = parseItemOrInnerList(src, options);
-		value.push(parsedItemOrInnerList.value);
+		const parsedItemOrInnerList = parseItemOrInnerList(src, options)
+		value.push(parsedItemOrInnerList.value)
 
-		src = parsedItemOrInnerList.src.trim();
+		src = parsedItemOrInnerList.src.trim()
 		if (src.length === 0) {
-			return parsedValue(value, src);
+			return parsedValue(value, src)
 		}
 
 		if (src[0] !== ',') {
-			throw parseError(src, LIST);
+			throw parseError(src, LIST)
 		}
 
-		src = src.substring(1).trim();
+		src = src.substring(1).trim()
 		if (src.length === 0 || src[0] === ',') {
-			throw parseError(src, LIST);
+			throw parseError(src, LIST)
 		}
 	}
-	return parsedValue(value, src);
+	return parsedValue(value, src)
 }

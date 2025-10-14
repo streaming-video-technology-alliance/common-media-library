@@ -1,4 +1,4 @@
-import type { Byterange } from '../../../../types/mapper/hls/Byterange.ts';
+import type { Byterange } from '../../../../types/mapper/hls/Byterange.ts'
 
 /**
  * @internal
@@ -12,7 +12,7 @@ import type { Byterange } from '../../../../types/mapper/hls/Byterange.ts';
  */
 export function decodeByteRange(byteRange: Byterange | undefined): string {
 	if (!byteRange) {
-		return '';
+		return ''
 	}
-	return `${byteRange.length}@${byteRange.offset}`;
+	return `${byteRange.length}@${byteRange.offset}`
 }

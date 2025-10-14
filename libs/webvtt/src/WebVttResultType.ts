@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * WebVTT result types.
@@ -14,7 +14,7 @@ export const WebVttResultType = {
 	TIMESTAMP_MAP: 'timestampmap',
 	STYLE: 'style',
 	ERROR: 'error',
-} as const;
+} as const
 
 /**
  * @beta

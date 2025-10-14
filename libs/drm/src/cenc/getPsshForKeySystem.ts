@@ -1,4 +1,4 @@
-import { parsePsshList } from './parsePsshList.ts';
+import { parsePsshList } from './parsePsshList.ts'
 
 /**
  * Returns the PSSH box associated with the given key system from the concatenated
@@ -18,9 +18,9 @@ export function getPsshForKeySystem(
 	initData: ArrayBuffer,
 ): ArrayBuffer | null {
 	if (!initData || !uuid) {
-		return null;
+		return null
 	}
 
-	const psshList = parsePsshList(initData);
-	return psshList[uuid.toLowerCase()] || null;
+	const psshList = parsePsshList(initData)
+	return psshList[uuid.toLowerCase()] || null
 }

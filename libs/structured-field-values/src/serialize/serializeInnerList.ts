@@ -1,6 +1,6 @@
-import type { SfInnerList } from '../SfInnerList.ts';
-import { serializeItem } from './serializeItem.ts';
-import { serializeParams } from './serializeParams.ts';
+import type { SfInnerList } from '../SfInnerList.ts'
+import { serializeItem } from './serializeItem.ts'
+import { serializeParams } from './serializeParams.ts'
 
 // 4.1.1.1.  Serializing an Inner List
 //
@@ -28,5 +28,5 @@ import { serializeParams } from './serializeParams.ts';
  * @internal
  */
 export function serializeInnerList(value: SfInnerList) {
-	return `(${value.value.map(serializeItem).join(' ')})${serializeParams(value.params)}`;
+	return `(${value.value.map(serializeItem).join(' ')})${serializeParams(value.params)}`
 }

@@ -1,7 +1,7 @@
-import type { SelectionSet } from '../../types/model/SelectionSet.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { SelectionSet } from '../../types/model/SelectionSet.ts'
+import type { Validation } from '../../types/Validation.ts'
 
-import { validateSelectionSet } from './validateSelectionSet.ts';
+import { validateSelectionSet } from './validateSelectionSet.ts'
 
 /**
  * Validate a list of selection set.
@@ -35,11 +35,11 @@ export function validateSelectionSets(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 
 	selectionSets.forEach((selectionSet: SelectionSet) => {
-		validateSelectionSet(selectionSet, presentationId, validation);
-	});
+		validateSelectionSet(selectionSet, presentationId, validation)
+	})
 
-	return validation;
+	return validation
 }

@@ -1,4 +1,4 @@
-import type { WebVttCue } from './WebVttCue.ts';
+import type { WebVttCue } from './WebVttCue.ts'
 
 /**
  * Create a generic WebVttCue object with default values
@@ -25,5 +25,5 @@ export function createWebVttCue(): WebVttCue {
 		vertical: '',
 		pauseOnExit: false,
 		text: '',
-	};
+	}
 }

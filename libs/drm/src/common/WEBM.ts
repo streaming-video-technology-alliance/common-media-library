@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const WEBM = 'webm';
+export const WEBM = 'webm'

@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts';
-import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
+import { UINT } from '../fields/UINT.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a VideoMediaHeaderBox from an IsoView
@@ -18,5 +18,5 @@ export function vmhd(view: IsoView): Fields<VideoMediaHeaderBox> {
 		...view.readFullBox(),
 		graphicsmode: view.readUint(2),
 		opcolor: view.readArray(UINT, 2, 3),
-	};
+	}
 };

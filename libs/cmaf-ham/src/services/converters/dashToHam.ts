@@ -1,7 +1,7 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Presentation } from '../../types/model/Presentation.ts'
 
-import { DashMapper } from '../../mapper/dash/DashMapper.ts';
-import { MapperContext } from '../../mapper/MapperContext.ts';
+import { DashMapper } from '../../mapper/dash/DashMapper.ts'
+import { MapperContext } from '../../mapper/MapperContext.ts'
 
 
 /**
@@ -23,7 +23,7 @@ import { MapperContext } from '../../mapper/MapperContext.ts';
  */
 
 export function dashToHam(manifest: string): Presentation[] {
-	const mapperContext: MapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new DashMapper());
-	return mapperContext.getHamFormat({ manifest, type: 'dash' });
+	const mapperContext: MapperContext = MapperContext.getInstance()
+	mapperContext.setStrategy(new DashMapper())
+	return mapperContext.getHamFormat({ manifest, type: 'dash' })
 }

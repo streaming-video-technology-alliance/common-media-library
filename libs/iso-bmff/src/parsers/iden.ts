@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a WebVTTCueIdBox from an IsoView
@@ -15,5 +15,5 @@ import type { IsoView } from '../IsoView.ts';
 export function iden(view: IsoView): Fields<WebVttCueIdBox> {
 	return {
 		cueId: view.readUtf8(-1),
-	};
+	}
 };

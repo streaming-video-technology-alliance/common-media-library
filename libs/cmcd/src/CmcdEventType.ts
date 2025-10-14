@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * CMCD event types for the 'e' key (event mode).
@@ -53,7 +53,7 @@ export const CmcdEventType = {
 	 * The player view was collapsed.
 	 */
 	PLAYER_COLLAPSE: 'pc',
-} as const;
+} as const
 
 /**
  * @beta

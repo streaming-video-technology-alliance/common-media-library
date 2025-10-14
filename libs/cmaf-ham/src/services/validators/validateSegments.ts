@@ -1,7 +1,7 @@
-import type { Segment } from '../../types/model/Segment.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { Segment } from '../../types/model/Segment.ts'
+import type { Validation } from '../../types/Validation.ts'
 
-import { validateSegment } from './validateSegment.ts';
+import { validateSegment } from './validateSegment.ts'
 
 /**
  * Validate a list of segments.
@@ -34,11 +34,11 @@ export function validateSegments(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 
 	segments.forEach((segment: Segment) => {
-		validateSegment(segment, trackId, validation);
-	});
+		validateSegment(segment, trackId, validation)
+	})
 
-	return validation;
+	return validation
 }

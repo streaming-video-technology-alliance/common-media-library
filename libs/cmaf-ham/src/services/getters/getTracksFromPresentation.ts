@@ -1,7 +1,7 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
-import type { Track } from '../../types/model/Track.ts';
+import type { Presentation } from '../../types/model/Presentation.ts'
+import type { Track } from '../../types/model/Track.ts'
 
-import { getTracksFromSelectionSet } from './getTracksFromSelectionSet.ts';
+import { getTracksFromSelectionSet } from './getTracksFromSelectionSet.ts'
 
 /**
  * Get a list of Tracks contained on a Presentation
@@ -18,6 +18,6 @@ export function getTracksFromPresentation(
 ): Track[] {
 	const tracks = presentation.selectionSets.flatMap((selectionSet) =>
 		getTracksFromSelectionSet(selectionSet),
-	);
-	return predicate ? tracks.filter(predicate) : tracks;
+	)
+	return predicate ? tracks.filter(predicate) : tracks
 }

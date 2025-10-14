@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts';
-import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
+import { UINT } from '../fields/UINT.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a ProtectionSystemSpecificHeaderBox from an IsoView
@@ -14,21 +14,21 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function pssh(view: IsoView): Fields<ProtectionSystemSpecificHeaderBox> {
-	const { readUint, readArray } = view;
-	const { version, flags } = view.readFullBox();
+	const { readUint, readArray } = view
+	const { version, flags } = view.readFullBox()
 
-	const systemId = readArray(UINT, 1, 16);
+	const systemId = readArray(UINT, 1, 16)
 
-	let kidCount: number = 0;
-	let kid: number[] = [];
+	let kidCount: number = 0
+	let kid: number[] = []
 
 	if (version > 0) {
-		kidCount = readUint(4);
-		kid = readArray(UINT, 1, kidCount);
+		kidCount = readUint(4)
+		kid = readArray(UINT, 1, kidCount)
 	}
 
-	const dataSize = readUint(4);
-	const data = readArray(UINT, 1, dataSize);
+	const dataSize = readUint(4)
+	const data = readArray(UINT, 1, dataSize)
 
 	return {
 		version,
@@ -38,5 +38,5 @@ export function pssh(view: IsoView): Fields<ProtectionSystemSpecificHeaderBox> {
 		kid,
 		dataSize,
 		data,
-	};
+	}
 };

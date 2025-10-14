@@ -1,6 +1,6 @@
-import type { CmcdKey } from './CmcdKey.ts';
-import type { CmcdReportingMode } from './CmcdReportingMode.ts';
-import type { CmcdTransmissionMode } from './CmcdTransmissionMode.ts';
+import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdReportingMode } from './CmcdReportingMode.ts'
+import type { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
 
 /**
  * A CMCD report target configuration.

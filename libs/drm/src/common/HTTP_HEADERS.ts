@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const HTTP_HEADERS = 'HttpHeaders';
+export const HTTP_HEADERS = 'HttpHeaders'

@@ -14,20 +14,20 @@ export function createMediaKeySystemConfiguration(
 	supportedAudio: MediaKeySystemMediaCapability[] | null,
 	supportedVideo: MediaKeySystemMediaCapability[] | null,
 ): MediaKeySystemConfiguration {
-	const config: MediaKeySystemConfiguration = {};
+	const config: MediaKeySystemConfiguration = {}
 
 	if (supportedAudio && supportedAudio.length > 0) {
-		config.audioCapabilities = supportedAudio;
+		config.audioCapabilities = supportedAudio
 	}
 
 	if (supportedVideo && supportedVideo.length > 0) {
-		config.videoCapabilities = supportedVideo;
+		config.videoCapabilities = supportedVideo
 	}
 
 	// default values
-	config.distinctiveIdentifier = 'optional';
-	config.persistentState = 'optional';
-	config.sessionTypes = ['temporary'];
+	config.distinctiveIdentifier = 'optional'
+	config.persistentState = 'optional'
+	config.sessionTypes = ['temporary']
 
-	return config;
+	return config
 }

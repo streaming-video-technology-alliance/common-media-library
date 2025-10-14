@@ -1,4 +1,4 @@
-import { CmObjectType } from '@svta/cml-cta';
+import { CmObjectType } from '@svta/cml-cta'
 
 /**
  * Common Media Server Data Object Type
@@ -8,7 +8,7 @@ import { CmObjectType } from '@svta/cml-cta';
  *
  * @beta
  */
-export const CmsdObjectType = CmObjectType as typeof CmObjectType;
+export const CmsdObjectType = CmObjectType as typeof CmObjectType
 
 /**
  * @beta

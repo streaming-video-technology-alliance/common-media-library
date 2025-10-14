@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CHALLENGE = 'Challenge';
+export const CHALLENGE = 'Challenge'

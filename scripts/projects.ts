@@ -16,4 +16,4 @@ export const projects: string[] = [
 	'libs/webvtt',
 	'libs/drm',
 	'libs/cmaf-ham',
-];
+]

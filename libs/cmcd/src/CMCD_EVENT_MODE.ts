@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_EVENT_MODE = 'event';
+export const CMCD_EVENT_MODE = 'event'

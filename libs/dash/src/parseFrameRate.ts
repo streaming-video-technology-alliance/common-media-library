@@ -10,15 +10,15 @@
  * {@includeCode ../test/parseFrameRate.test.ts#example}
  */
 export function parseFrameRate(frameRate: string): number {
-	const [numerator, denominator] = frameRate.split('/').map(value => parseInt(value, 10));
+	const [numerator, denominator] = frameRate.split('/').map(value => parseInt(value, 10))
 
 	if (denominator === undefined) {
-		return numerator;
+		return numerator
 	}
 
 	if (isNaN(numerator) || isNaN(denominator) || denominator === 0) {
-		return NaN;
+		return NaN
 	}
 
-	return numerator / denominator;
+	return numerator / denominator
 }

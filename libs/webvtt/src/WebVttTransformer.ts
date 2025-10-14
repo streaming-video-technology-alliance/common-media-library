@@ -1,6 +1,6 @@
-import { WebVttParser } from './WebVttParser.ts';
-import type { WebVttResult } from './WebVttResult.ts';
-import { WebVttResultType } from './WebVttResultType.ts';
+import { WebVttParser } from './WebVttParser.ts'
+import type { WebVttResult } from './WebVttResult.ts'
+import { WebVttResultType } from './WebVttResultType.ts'
 
 /**
  * WebVTT transform stream transformer.
@@ -9,28 +9,28 @@ import { WebVttResultType } from './WebVttResultType.ts';
  * @beta
  */
 export class WebVttTransformer {
-	private readonly parser: WebVttParser;
-	private results: WebVttResult[] = [];
+	private readonly parser: WebVttParser
+	private results: WebVttResult[] = []
 
 	/**
 	 * Creates a new WebVTT transformer.
 	 */
 	constructor() {
-		this.parser = new WebVttParser();
-		this.parser.oncue = cue => this.results.push({ type: WebVttResultType.CUE, data: cue });
-		this.parser.onregion = region => this.results.push({ type: WebVttResultType.REGION, data: region });
-		this.parser.onstyle = style => this.results.push({ type: WebVttResultType.STYLE, data: style });
-		this.parser.ontimestampmap = timestampmap => this.results.push({ type: WebVttResultType.TIMESTAMP_MAP, data: timestampmap });
-		this.parser.onparsingerror = error => this.results.push({ type: WebVttResultType.ERROR, data: error });
+		this.parser = new WebVttParser()
+		this.parser.oncue = cue => this.results.push({ type: WebVttResultType.CUE, data: cue })
+		this.parser.onregion = region => this.results.push({ type: WebVttResultType.REGION, data: region })
+		this.parser.onstyle = style => this.results.push({ type: WebVttResultType.STYLE, data: style })
+		this.parser.ontimestampmap = timestampmap => this.results.push({ type: WebVttResultType.TIMESTAMP_MAP, data: timestampmap })
+		this.parser.onparsingerror = error => this.results.push({ type: WebVttResultType.ERROR, data: error })
 	}
 
 	private enqueueResults(controller: TransformStreamDefaultController<WebVttResult>): void {
 		// TODO: Should parse errors throw?
 		for (const result of this.results) {
-			controller.enqueue(result);
+			controller.enqueue(result)
 		}
 
-		this.results = [];
+		this.results = []
 	}
 
 	/**
@@ -41,11 +41,11 @@ export class WebVttTransformer {
 	 */
 	transform(chunk: string, controller: TransformStreamDefaultController<WebVttResult>): void {
 		try {
-			this.parser.parse(chunk);
-			this.enqueueResults(controller);
+			this.parser.parse(chunk)
+			this.enqueueResults(controller)
 		}
 		catch (error) {
-			controller.error(error);
+			controller.error(error)
 		}
 	}
 
@@ -56,11 +56,11 @@ export class WebVttTransformer {
 	 */
 	flush(controller: TransformStreamDefaultController<WebVttResult>): void {
 		try {
-			this.parser.flush();
-			this.enqueueResults(controller);
+			this.parser.flush()
+			this.enqueueResults(controller)
 		}
 		catch (error) {
-			controller.error(error);
+			controller.error(error)
 		}
 	}
 }

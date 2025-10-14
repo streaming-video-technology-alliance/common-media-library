@@ -1,5 +1,5 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 
 /**
  * @internal
@@ -18,11 +18,11 @@ export function getSampleRate(
 		representation.$.audioSamplingRate ??
 		adaptationSet.$.audioSamplingRate ??
 		0
-	);
+	)
 	if (!sampleRate) {
 		console.error(
 			`Representation ${representation.$.id} has no audioSamplingRate`,
-		);
+		)
 	}
-	return sampleRate;
+	return sampleRate
 }

@@ -1,20 +1,20 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts'
+import type { Representation } from '../../../types/mapper/dash/Representation.ts'
 
-import type { AudioTrack } from '../../../types/model/AudioTrack.ts';
-import type { Segment } from '../../../types/model/Segment.ts';
-import type { TextTrack } from '../../../types/model/TextTrack.ts';
-import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../types/model/AudioTrack.ts'
+import type { Segment } from '../../../types/model/Segment.ts'
+import type { TextTrack } from '../../../types/model/TextTrack.ts'
+import type { VideoTrack } from '../../../types/model/VideoTrack.ts'
 
 
-import { getChannels } from './utils/getChannels.ts';
-import { getCodec } from './utils/getCodec.ts';
-import { getContentType } from './utils/getContentType.ts';
-import { getFrameRate } from './utils/getFrameRate.ts';
-import { getLanguage } from './utils/getLanguage.ts';
-import { getSampleRate } from './utils/getSampleRate.ts';
-import { getSar } from './utils/getSar.ts';
-import { getTrackDuration } from './utils/getTrackDuration.ts';
+import { getChannels } from './utils/getChannels.ts'
+import { getCodec } from './utils/getCodec.ts'
+import { getContentType } from './utils/getContentType.ts'
+import { getFrameRate } from './utils/getFrameRate.ts'
+import { getLanguage } from './utils/getLanguage.ts'
+import { getSampleRate } from './utils/getSampleRate.ts'
+import { getSar } from './utils/getSar.ts'
+import { getTrackDuration } from './utils/getTrackDuration.ts'
 
 /**
  * @internal
@@ -34,9 +34,9 @@ export function mapTracks(
 	initializationUrl: string | undefined,
 ): AudioTrack | VideoTrack | TextTrack {
 	if (!adaptationSet) {
-		throw new Error('Error: AdaptationSet is undefined');
+		throw new Error('Error: AdaptationSet is undefined')
 	}
-	const type = getContentType(adaptationSet, representation);
+	const type = getContentType(adaptationSet, representation)
 	if (type === 'video') {
 		return {
 			bandwidth: +(representation.$.bandwidth ?? 0),
@@ -53,7 +53,7 @@ export function mapTracks(
 			type,
 			width: +(representation.$.width ?? 0),
 			urlInitialization: initializationUrl,
-		} as VideoTrack;
+		} as VideoTrack
 	}
 	else if (type === 'audio') {
 		return {
@@ -67,7 +67,7 @@ export function mapTracks(
 			segments,
 			type,
 			urlInitialization: initializationUrl,
-		} as AudioTrack;
+		} as AudioTrack
 	}
 	else {
 		// if (type === 'text')
@@ -80,6 +80,6 @@ export function mapTracks(
 			segments,
 			type,
 			urlInitialization: initializationUrl,
-		} as TextTrack;
+		} as TextTrack
 	}
 }

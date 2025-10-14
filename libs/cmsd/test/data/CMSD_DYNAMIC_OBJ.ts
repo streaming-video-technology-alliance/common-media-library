@@ -1,4 +1,4 @@
-import { SfItem } from '@svta/cml-structured-field-values';
+import { SfItem } from '@svta/cml-structured-field-values'
 
 export const CMSD_DYNAMIC_OBJ: SfItem[] = [
 	new SfItem('CDNB-3ak1', {
@@ -18,4 +18,4 @@ export const CMSD_DYNAMIC_OBJ: SfItem[] = [
 		rtt: 16,
 		mb: 5000,
 	}),
-];
+]

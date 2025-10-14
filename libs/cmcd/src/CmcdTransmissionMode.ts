@@ -1,7 +1,7 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { CMCD_HEADERS } from './CMCD_HEADERS.ts';
-import { CMCD_JSON } from './CMCD_JSON.ts';
-import { CMCD_QUERY } from './CMCD_QUERY.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { CMCD_HEADERS } from './CMCD_HEADERS.ts'
+import { CMCD_JSON } from './CMCD_JSON.ts'
+import { CMCD_QUERY } from './CMCD_QUERY.ts'
 
 /**
  * CMCD transmission modes.
@@ -29,7 +29,7 @@ export const CmcdTransmissionMode = {
 	 */
 	HEADERS: CMCD_HEADERS as typeof CMCD_HEADERS,
 
-} as const;
+} as const
 
 /**
  * @beta

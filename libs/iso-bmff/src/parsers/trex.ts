@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a TrackExtendsBox from an IsoView
@@ -20,5 +20,5 @@ export function trex(view: IsoView): Fields<TrackExtendsBox> {
 		defaultSampleDuration: view.readUint(4),
 		defaultSampleSize: view.readUint(4),
 		defaultSampleFlags: view.readUint(4),
-	};
+	}
 };

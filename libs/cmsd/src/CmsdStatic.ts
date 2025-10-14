@@ -1,8 +1,8 @@
-import type { CmsdCustomKey } from './CmsdCustomKey.ts';
-import type { CmsdObjectType } from './CmsdObjectType.ts';
-import type { CmsdStreamType } from './CmsdStreamType.ts';
-import type { CmsdStreamingFormat } from './CmsdStreamingFormat.ts';
-import type { CmsdValue } from './CmsdValue.ts';
+import type { CmsdCustomKey } from './CmsdCustomKey.ts'
+import type { CmsdObjectType } from './CmsdObjectType.ts'
+import type { CmsdStreamType } from './CmsdStreamType.ts'
+import type { CmsdStreamingFormat } from './CmsdStreamingFormat.ts'
+import type { CmsdValue } from './CmsdValue.ts'
 
 /**
  * Common Media Server Data (CMSD) static response header fields.

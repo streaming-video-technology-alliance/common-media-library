@@ -1,11 +1,11 @@
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
-import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate.ts';
+import type { Representation } from '../../../types/mapper/dash/Representation.ts'
+import type { SegmentTemplate } from '../../../types/mapper/dash/SegmentTemplate.ts'
 
-import type { Segment } from '../../../types/model/Segment.ts';
+import type { Segment } from '../../../types/model/Segment.ts'
 
-import { calculateDuration } from './utils/calculateDuration.ts';
-import { getNumberOfSegments } from './utils/getNumberOfSegments.ts';
-import { getUrlFromTemplate } from './utils/getUrlFromTemplate.ts';
+import { calculateDuration } from './utils/calculateDuration.ts'
+import { getNumberOfSegments } from './utils/getNumberOfSegments.ts'
+import { getUrlFromTemplate } from './utils/getUrlFromTemplate.ts'
 
 /**
  * @internal
@@ -25,9 +25,9 @@ export function mapSegmentTemplate(
 	const numberOfSegments: number = getNumberOfSegments(
 		segmentTemplate,
 		duration,
-	);
-	const init: number = +(segmentTemplate.$.startNumber ?? 0);
-	const segments: Segment[] = [];
+	)
+	const init: number = +(segmentTemplate.$.startNumber ?? 0)
+	const segments: Segment[] = []
 	for (let id = init; id < numberOfSegments + init; id++) {
 		segments.push({
 			duration: calculateDuration(
@@ -35,7 +35,7 @@ export function mapSegmentTemplate(
 				segmentTemplate.$.timescale,
 			),
 			url: getUrlFromTemplate(representation, segmentTemplate, id),
-		} as Segment);
+		} as Segment)
 	}
-	return segments;
+	return segments
 }

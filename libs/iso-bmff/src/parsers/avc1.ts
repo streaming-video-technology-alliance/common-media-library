@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts';
-import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import { UINT } from '../fields/UINT.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView
@@ -14,7 +14,7 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function avc1(view: IsoView): Fields<VisualSampleEntryBox<'avc1'>> {
-	const { readArray, readUint, readInt, readTemplate, readData } = view;
+	const { readArray, readUint, readInt, readTemplate, readData } = view
 
 	return {
 		reserved1: readArray(UINT, 1, 6),
@@ -32,5 +32,5 @@ export function avc1(view: IsoView): Fields<VisualSampleEntryBox<'avc1'>> {
 		depth: readUint(2),
 		preDefined3: readInt(2),
 		config: readData(-1),
-	};
+	}
 };

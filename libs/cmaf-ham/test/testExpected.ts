@@ -1,4 +1,4 @@
-import type { Segment } from '@svta/cml-cmaf-ham';
+import type { Segment } from '@svta/cml-cmaf-ham'
 
 const expectedSegmentBase: Segment[] = [
 	{
@@ -6,7 +6,7 @@ const expectedSegmentBase: Segment[] = [
 		url: 'tears-of-steel-aac-64k.cmfa',
 		byteRange: '704-2211',
 	},
-];
+]
 
 const expectedSegmentList: Segment[] = [
 	{
@@ -21,7 +21,7 @@ const expectedSegmentList: Segment[] = [
 		duration: 10,
 		url: 'testStream01bbb/video/72000/segment_20833.m4s',
 	},
-];
+]
 
 const expectedSegmentTemplate: Segment[] = [
 	{
@@ -36,6 +36,6 @@ const expectedSegmentTemplate: Segment[] = [
 		duration: 4,
 		url: '1/0003.m4s',
 	},
-];
+]
 
-export { expectedSegmentBase, expectedSegmentList, expectedSegmentTemplate };
+export { expectedSegmentBase, expectedSegmentList, expectedSegmentTemplate }

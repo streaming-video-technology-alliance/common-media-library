@@ -1,9 +1,9 @@
-import type { SegmentList } from '../../../types/mapper/dash/SegmentList.ts';
-import type { SegmentURL } from '../../../types/mapper/dash/SegmentUrl.ts';
+import type { SegmentList } from '../../../types/mapper/dash/SegmentList.ts'
+import type { SegmentURL } from '../../../types/mapper/dash/SegmentUrl.ts'
 
-import type { Segment } from '../../../types/model/Segment.ts';
+import type { Segment } from '../../../types/model/Segment.ts'
 
-import { calculateDuration } from './utils/calculateDuration.ts';
+import { calculateDuration } from './utils/calculateDuration.ts'
 
 /**
  * @internal
@@ -14,7 +14,7 @@ import { calculateDuration } from './utils/calculateDuration.ts';
  * @returns list of ham segments
  */
 export function mapSegmentList(segmentList: SegmentList[]): Segment[] {
-	const segments: Segment[] = [];
+	const segments: Segment[] = []
 	segmentList.map((segment: SegmentList) => {
 		if (segment.SegmentURL) {
 			return segment.SegmentURL.forEach((segmentURL: SegmentURL) => {
@@ -24,9 +24,9 @@ export function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 						segment.$.timescale,
 					),
 					url: segmentURL.$.media ?? '',
-				} as Segment);
-			});
+				} as Segment)
+			})
 		}
-	});
-	return segments;
+	})
+	return segments
 }

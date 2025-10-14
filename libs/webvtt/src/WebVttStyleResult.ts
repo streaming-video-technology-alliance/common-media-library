@@ -1,4 +1,4 @@
-import type { TypedResult } from '@svta/cml-utils';
+import type { TypedResult } from '@svta/cml-utils'
 
 /**
  * WebVTT transform stream style result.

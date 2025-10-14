@@ -1,4 +1,4 @@
-import { spawn, type SpawnOptionsWithoutStdio } from 'node:child_process';
+import { spawn, type SpawnOptionsWithoutStdio } from 'node:child_process'
 
 export function cmd(cmd: string, args?: string[], options?: SpawnOptionsWithoutStdio): Promise<void> {
 	const opts = Object.assign({
@@ -6,18 +6,18 @@ export function cmd(cmd: string, args?: string[], options?: SpawnOptionsWithoutS
 		env: process.env,
 		stdio: 'inherit',
 		shell: true,
-	}, options);
+	}, options)
 
 	return new Promise<void>((resolve, reject) => {
-		const proc = spawn(cmd, args, opts);
-		proc.on('error', reject);
+		const proc = spawn(cmd, args, opts)
+		proc.on('error', reject)
 		proc.on('close', (code) => {
 			if (code === 0) {
-				resolve();
+				resolve()
 			}
 			else {
-				reject(new Error(`Exit with error code: ${code}`));
+				reject(new Error(`Exit with error code: ${code}`))
 			}
-		});
-	});
+		})
+	})
 }

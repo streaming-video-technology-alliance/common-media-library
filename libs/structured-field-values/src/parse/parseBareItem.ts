@@ -1,14 +1,14 @@
-import type { SfBareItem } from '../SfBareItem.ts';
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import { BARE_ITEM } from '../utils/BARE_ITEM.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parseBoolean } from './parseBoolean.ts';
-import { parseByteSequence } from './parseByteSequence.ts';
-import { parseDate } from './parseDate.ts';
-import { parseError } from './parseError.ts';
-import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts';
-import { parseString } from './parseString.ts';
-import { parseToken } from './parseToken.ts';
+import type { SfBareItem } from '../SfBareItem.ts'
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import { BARE_ITEM } from '../utils/BARE_ITEM.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parseBoolean } from './parseBoolean.ts'
+import { parseByteSequence } from './parseByteSequence.ts'
+import { parseDate } from './parseDate.ts'
+import { parseError } from './parseError.ts'
+import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts'
+import { parseString } from './parseString.ts'
+import { parseToken } from './parseToken.ts'
 
 // 4.2.3.1.  Parsing a Bare Item
 //
@@ -42,24 +42,24 @@ import { parseToken } from './parseToken.ts';
  * @internal
  */
 export function parseBareItem(src: string, options?: SfDecodeOptions): ParsedValue<SfBareItem> {
-	const first = src[0];
+	const first = src[0]
 	if (first === `"`) {
-		return parseString(src);
+		return parseString(src)
 	}
 	if (/^[-0-9]/.test(first)) {
-		return parseIntegerOrDecimal(src);
+		return parseIntegerOrDecimal(src)
 	}
 	if (first === `?`) {
-		return parseBoolean(src);
+		return parseBoolean(src)
 	}
 	if (first === `:`) {
-		return parseByteSequence(src);
+		return parseByteSequence(src)
 	}
 	if (/^[a-zA-Z*]/.test(first)) {
-		return parseToken(src, options);
+		return parseToken(src, options)
 	}
 	if (first === `@`) {
-		return parseDate(src);
+		return parseDate(src)
 	}
-	throw parseError(src, BARE_ITEM);
+	throw parseError(src, BARE_ITEM)
 }

@@ -1,4 +1,4 @@
-import { hexToArrayBuffer } from './hexToArrayBuffer.ts';
+import { hexToArrayBuffer } from './hexToArrayBuffer.ts'
 
 /**
  * Converts a UUID string to an ArrayBuffer.
@@ -13,6 +13,6 @@ import { hexToArrayBuffer } from './hexToArrayBuffer.ts';
  * {@includeCode ../test/uuidToArrayBuffer.test.ts#example}
  */
 export function uuidToArrayBuffer(uuid: string): ArrayBuffer {
-	const hex = uuid.replace(/-/g, '');
-	return hexToArrayBuffer(hex);
+	const hex = uuid.replace(/-/g, '')
+	return hexToArrayBuffer(hex)
 }

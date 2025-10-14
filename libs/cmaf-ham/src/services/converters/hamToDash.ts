@@ -1,8 +1,8 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts';
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Manifest } from '../../types/manifest/Manifest.ts'
+import type { Presentation } from '../../types/model/Presentation.ts'
 
-import { DashMapper } from '../../mapper/dash/DashMapper.ts';
-import { MapperContext } from '../../mapper/MapperContext.ts';
+import { DashMapper } from '../../mapper/dash/DashMapper.ts'
+import { MapperContext } from '../../mapper/MapperContext.ts'
 
 /**
  * Convert HAM object into Dash Manifest.
@@ -22,8 +22,8 @@ import { MapperContext } from '../../mapper/MapperContext.ts';
  * @alpha
  */
 export function hamToDash(presentation: Presentation[]): Manifest {
-	const mapperContext: MapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new DashMapper());
-	return mapperContext.getManifestFormat(presentation);
+	const mapperContext: MapperContext = MapperContext.getInstance()
+	mapperContext.setStrategy(new DashMapper())
+	return mapperContext.getManifestFormat(presentation)
 }
 

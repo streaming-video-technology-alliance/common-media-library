@@ -36,12 +36,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CaptionsLogger } from './CaptionsLogger.ts';
-import type { PACData } from './PACData.ts';
-import type { PenStyles } from './PenStyles.ts';
-import { Row } from './Row.ts';
-import { NR_ROWS } from './utils/NR_ROWS.ts';
-import { VerboseLevel } from './VerboseLevel.ts';
+import { CaptionsLogger } from './CaptionsLogger.ts'
+import type { PACData } from './PACData.ts'
+import type { PenStyles } from './PenStyles.ts'
+import { Row } from './Row.ts'
+import { NR_ROWS } from './utils/NR_ROWS.ts'
+import { VerboseLevel } from './VerboseLevel.ts'
 
 /**
  * Keep a CTA-608 screen of 32x15 styled characters
@@ -49,131 +49,131 @@ import { VerboseLevel } from './VerboseLevel.ts';
  * @beta
  */
 export class CaptionScreen {
-	rows: Row[] = [];
-	private currRow: number = NR_ROWS - 1;
-	private nrRollUpRows: number | null = null;
-	private lastOutputScreen: CaptionScreen | null = null;
-	private logger: CaptionsLogger;
+	rows: Row[] = []
+	private currRow: number = NR_ROWS - 1
+	private nrRollUpRows: number | null = null
+	private lastOutputScreen: CaptionScreen | null = null
+	private logger: CaptionsLogger
 
 	constructor(logger: CaptionsLogger = new CaptionsLogger()) {
 		for (let i = 0; i < NR_ROWS; i++) {
-			this.rows.push(new Row(logger));
+			this.rows.push(new Row(logger))
 		}
-		this.logger = logger;
+		this.logger = logger
 	}
 
 	reset(): void {
 		for (let i = 0; i < NR_ROWS; i++) {
-			this.rows[i].clear();
+			this.rows[i].clear()
 		}
-		this.currRow = NR_ROWS - 1;
+		this.currRow = NR_ROWS - 1
 	}
 
 	equals(other: CaptionScreen): boolean {
-		let equal = true;
+		let equal = true
 		for (let i = 0; i < NR_ROWS; i++) {
 			if (!this.rows[i].equals(other.rows[i])) {
-				equal = false;
-				break;
+				equal = false
+				break
 			}
 		}
-		return equal;
+		return equal
 	}
 
 	copy(other: CaptionScreen): void {
 		for (let i = 0; i < NR_ROWS; i++) {
-			this.rows[i].copy(other.rows[i]);
+			this.rows[i].copy(other.rows[i])
 		}
 	}
 
 	isEmpty(): boolean {
-		let empty = true;
+		let empty = true
 		for (let i = 0; i < NR_ROWS; i++) {
 			if (!this.rows[i].isEmpty()) {
-				empty = false;
-				break;
+				empty = false
+				break
 			}
 		}
-		return empty;
+		return empty
 	}
 
 	backSpace(): void {
-		const row = this.rows[this.currRow];
-		row.backSpace();
+		const row = this.rows[this.currRow]
+		row.backSpace()
 	}
 
 	clearToEndOfRow(): void {
-		const row = this.rows[this.currRow];
-		row.clearToEndOfRow();
+		const row = this.rows[this.currRow]
+		row.clearToEndOfRow()
 	}
 
 	/**
 	 * Insert a character (without styling) in the current row.
 	 */
 	insertChar(char: number): void {
-		const row = this.rows[this.currRow];
-		row.insertChar(char);
+		const row = this.rows[this.currRow]
+		row.insertChar(char)
 	}
 
 	setPen(styles: Partial<PenStyles>): void {
-		const row = this.rows[this.currRow];
-		row.setPenStyles(styles);
+		const row = this.rows[this.currRow]
+		row.setPenStyles(styles)
 	}
 
 	moveCursor(relPos: number): void {
-		const row = this.rows[this.currRow];
-		row.moveCursor(relPos);
+		const row = this.rows[this.currRow]
+		row.moveCursor(relPos)
 	}
 
 	setCursor(absPos: number): void {
-		this.logger.log(VerboseLevel.INFO, 'setCursor: ' + absPos);
-		const row = this.rows[this.currRow];
-		row.setCursor(absPos);
+		this.logger.log(VerboseLevel.INFO, 'setCursor: ' + absPos)
+		const row = this.rows[this.currRow]
+		row.setCursor(absPos)
 	}
 
 	setPAC(pacData: PACData): void {
 		this.logger.log(
 			VerboseLevel.INFO,
 			() => 'pacData = ' + JSON.stringify(pacData),
-		);
-		let newRow = pacData.row - 1;
+		)
+		let newRow = pacData.row - 1
 		if (this.nrRollUpRows && newRow < this.nrRollUpRows - 1) {
-			newRow = this.nrRollUpRows - 1;
+			newRow = this.nrRollUpRows - 1
 		}
 
 		// Make sure this only affects Roll-up Captions by checking this.nrRollUpRows
 		if (this.nrRollUpRows && this.currRow !== newRow) {
 			// clear all rows first
 			for (let i = 0; i < NR_ROWS; i++) {
-				this.rows[i].clear();
+				this.rows[i].clear()
 			}
 
 			// Copy this.nrRollUpRows rows from lastOutputScreen and place it in the newRow location
 			// topRowIndex - the start of rows to copy (inclusive index)
-			const topRowIndex = this.currRow + 1 - this.nrRollUpRows;
+			const topRowIndex = this.currRow + 1 - this.nrRollUpRows
 			// We only copy if the last position was already shown.
 			// We use the cueStartTime value to check this.
-			const lastOutputScreen = this.lastOutputScreen;
+			const lastOutputScreen = this.lastOutputScreen
 			if (lastOutputScreen) {
-				const prevLineTime = lastOutputScreen.rows[topRowIndex].cueStartTime;
-				const time = this.logger.time;
+				const prevLineTime = lastOutputScreen.rows[topRowIndex].cueStartTime
+				const time = this.logger.time
 				if (prevLineTime !== null && time !== null && prevLineTime < time) {
 					for (let i = 0; i < this.nrRollUpRows; i++) {
 						this.rows[newRow - this.nrRollUpRows + i + 1].copy(
 							lastOutputScreen.rows[topRowIndex + i],
-						);
+						)
 					}
 				}
 			}
 		}
 
-		this.currRow = newRow;
-		const row = this.rows[this.currRow];
+		this.currRow = newRow
+		const row = this.rows[this.currRow]
 		if (pacData.indent !== null) {
-			const indent = pacData.indent;
-			const prevPos = Math.max(indent - 1, 0);
-			row.setCursor(pacData.indent);
-			pacData.color = row.chars[prevPos].penState.foreground;
+			const indent = pacData.indent
+			const prevPos = Math.max(indent - 1, 0)
+			row.setCursor(pacData.indent)
+			pacData.color = row.chars[prevPos].penState.foreground
 		}
 		const styles: PenStyles = {
 			foreground: pacData.color,
@@ -181,8 +181,8 @@ export class CaptionScreen {
 			italics: pacData.italics,
 			background: 'black',
 			flash: false,
-		};
-		this.setPen(styles);
+		}
+		this.setPen(styles)
 	}
 
 	/**
@@ -192,14 +192,14 @@ export class CaptionScreen {
 		this.logger.log(
 			VerboseLevel.INFO,
 			() => 'bkgData = ' + JSON.stringify(bkgData),
-		);
-		this.backSpace();
-		this.setPen(bkgData);
-		this.insertChar(0x20); // Space
+		)
+		this.backSpace()
+		this.setPen(bkgData)
+		this.insertChar(0x20) // Space
 	}
 
 	setRollUpRows(nrRows: number | null): void {
-		this.nrRollUpRows = nrRows;
+		this.nrRollUpRows = nrRows
 	}
 
 	rollUp(): void {
@@ -207,49 +207,49 @@ export class CaptionScreen {
 			this.logger.log(
 				VerboseLevel.DEBUG,
 				'roll_up but nrRollUpRows not set yet',
-			);
-			return; // Not properly setup
+			)
+			return // Not properly setup
 		}
-		this.logger.log(VerboseLevel.TEXT, () => this.getDisplayText());
-		const topRowIndex = this.currRow + 1 - this.nrRollUpRows;
-		const topRow = this.rows.splice(topRowIndex, 1)[0];
-		topRow.clear();
-		this.rows.splice(this.currRow, 0, topRow);
-		this.logger.log(VerboseLevel.INFO, 'Rolling up');
+		this.logger.log(VerboseLevel.TEXT, () => this.getDisplayText())
+		const topRowIndex = this.currRow + 1 - this.nrRollUpRows
+		const topRow = this.rows.splice(topRowIndex, 1)[0]
+		topRow.clear()
+		this.rows.splice(this.currRow, 0, topRow)
+		this.logger.log(VerboseLevel.INFO, 'Rolling up')
 	}
 
 	/**
 	 * Get all non-empty rows with as unicode text.
 	 */
 	getDisplayText(asOneRow?: boolean): string {
-		asOneRow = asOneRow || false;
-		const displayText: string[] = [];
-		let text = '';
-		let rowNr = -1;
+		asOneRow = asOneRow || false
+		const displayText: string[] = []
+		let text = ''
+		let rowNr = -1
 		for (let i = 0; i < NR_ROWS; i++) {
-			const rowText = this.rows[i].getTextString();
+			const rowText = this.rows[i].getTextString()
 			if (rowText) {
-				rowNr = i + 1;
+				rowNr = i + 1
 				if (asOneRow) {
-					displayText.push('Row ' + rowNr + ": '" + rowText + "'");
+					displayText.push('Row ' + rowNr + ": '" + rowText + "'")
 				}
 				else {
-					displayText.push(rowText.trim());
+					displayText.push(rowText.trim())
 				}
 			}
 		}
 		if (displayText.length > 0) {
 			if (asOneRow) {
-				text = '[' + displayText.join(' | ') + ']';
+				text = '[' + displayText.join(' | ') + ']'
 			}
 			else {
-				text = displayText.join('\n');
+				text = displayText.join('\n')
 			}
 		}
-		return text;
+		return text
 	}
 
 	getTextAndFormat(): Row[] {
-		return this.rows;
+		return this.rows
 	}
 }

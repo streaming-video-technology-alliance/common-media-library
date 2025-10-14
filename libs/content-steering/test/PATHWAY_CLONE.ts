@@ -1,4 +1,4 @@
-import type { PathwayClone } from '@svta/cml-content-steering';
+import type { PathwayClone } from '@svta/cml-content-steering'
 
 export const PATHWAY_CLONE: PathwayClone = {
 	'BASE-ID': 'pathway1',
@@ -10,4 +10,4 @@ export const PATHWAY_CLONE: PathwayClone = {
 			param2: 'value2',
 		},
 	},
-};
+}

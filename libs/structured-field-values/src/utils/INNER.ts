@@ -1,1 +1,1 @@
-export const INNER = 'Inner List';
+export const INNER = 'Inner List'

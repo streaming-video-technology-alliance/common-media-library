@@ -1,7 +1,7 @@
-import type { SfToken } from '../SfToken.ts';
-import { symbolToStr } from '../utils/symbolToStr.ts';
-import { TOKEN } from '../utils/TOKEN.ts';
-import { serializeError } from './serializeError.ts';
+import type { SfToken } from '../SfToken.ts'
+import { symbolToStr } from '../utils/symbolToStr.ts'
+import { TOKEN } from '../utils/TOKEN.ts'
+import { serializeError } from './serializeError.ts'
 
 // 4.1.7.  Serializing a Token
 //
@@ -34,9 +34,9 @@ export function serializeToken(token: SfToken): string;
  * @internal
  */
 export function serializeToken(token: symbol | SfToken) {
-	const value = symbolToStr(token);
+	const value = symbolToStr(token)
 	if (/^([a-zA-Z*])([!#$%&'*+\-.^_`|~\w:/]*)$/.test(value) === false) {
-		throw serializeError(value, TOKEN);
+		throw serializeError(value, TOKEN)
 	}
-	return value;
+	return value
 }

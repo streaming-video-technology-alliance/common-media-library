@@ -1,8 +1,8 @@
-import { STRING } from '../utils/STRING.ts';
-import { STRING_REGEX } from '../utils/STRING_REGEX.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import { STRING } from '../utils/STRING.ts'
+import { STRING_REGEX } from '../utils/STRING_REGEX.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
 
 // 4.2.5.  Parsing a String
 //
@@ -45,41 +45,41 @@ import { parseError } from './parseError.ts';
  * @internal
  */
 export function parseString(src: string): ParsedValue<string> {
-	let output = '';
-	let i = 0;
+	let output = ''
+	let i = 0
 
 	if (src[i] !== `"`) {
-		throw parseError(src, STRING);
+		throw parseError(src, STRING)
 	}
 
-	i++;
+	i++
 
 	while (src.length > i) {
 		if (src[i] === `\\`) {
 			if (src.length <= i + 1) {
-				throw parseError(src, STRING);
+				throw parseError(src, STRING)
 			}
 
-			i++;
+			i++
 
 			if (src[i] !== `"` && src[i] !== `\\`) {
-				throw parseError(src, STRING);
+				throw parseError(src, STRING)
 			}
 
-			output += src[i];
+			output += src[i]
 		}
 		else if (src[i] === `"`) {
-			return parsedValue(output, src.substring(++i));
+			return parsedValue(output, src.substring(++i))
 		}
 		else if (STRING_REGEX.test(src[i])) {
-			throw parseError(src, STRING);
+			throw parseError(src, STRING)
 		}
 		else {
-			output += src[i];
+			output += src[i]
 		}
 
-		i++;
+		i++
 	}
 
-	throw parseError(src, STRING);
+	throw parseError(src, STRING)
 }

@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const LICENSE_ACQUISITION = 'LicenseAcquisition';
+export const LICENSE_ACQUISITION = 'LicenseAcquisition'

@@ -1,7 +1,7 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts';
-import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts';
-import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts'
+import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts'
+import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.ts'
 
 /**
  * CMCD reporting mode types.
@@ -26,7 +26,7 @@ export const CmcdReportingMode = {
 	 * Event mode
 	 */
 	EVENT: CMCD_EVENT_MODE as typeof CMCD_EVENT_MODE,
-} as const;
+} as const
 
 /**
  * @beta

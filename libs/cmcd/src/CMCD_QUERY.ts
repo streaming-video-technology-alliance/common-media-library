@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_QUERY = 'query';
+export const CMCD_QUERY = 'query'

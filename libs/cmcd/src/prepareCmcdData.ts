@@ -1,23 +1,23 @@
-import { isTokenField, isValid } from '@svta/cml-cta';
-import { SfToken } from '@svta/cml-structured-field-values';
-import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts';
-import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts';
-import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts';
-import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.ts';
-import type { CmcdData } from './CmcdData.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts';
-import type { CmcdValue } from './CmcdValue.ts';
-import { isCmcdEventKey } from './isCmcdEventKey.ts';
-import { isCmcdRequestKey } from './isCmcdRequestKey.ts';
-import { isCmcdResponseKey } from './isCmcdResponseKey.ts';
-import { isCmcdV1Key } from './isCmcdV1Key.ts';
+import { isTokenField, isValid } from '@svta/cml-cta'
+import { SfToken } from '@svta/cml-structured-field-values'
+import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts'
+import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
+import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts'
+import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.ts'
+import type { CmcdData } from './CmcdData.ts'
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
+import type { CmcdValue } from './CmcdValue.ts'
+import { isCmcdEventKey } from './isCmcdEventKey.ts'
+import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
+import { isCmcdResponseKey } from './isCmcdResponseKey.ts'
+import { isCmcdV1Key } from './isCmcdV1Key.ts'
 
 const filterMap = {
 	[CMCD_RESPONSE_MODE]: isCmcdResponseKey,
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
-};
+}
 
 /**
  * Convert a generic object to CMCD data.
@@ -29,80 +29,80 @@ const filterMap = {
  * @beta
  */
 export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): CmcdData {
-	const results: CmcdData = {};
+	const results: CmcdData = {}
 
 	if (obj == null || typeof obj !== 'object') {
-		return results;
+		return results
 	}
 
-	const version = options.version || (obj['v'] as number) || 1;
-	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE;
-	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode];
+	const version = options.version || (obj['v'] as number) || 1
+	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
+	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
 	// Filter keys based on the version, reporting mode and options
-	let keys = Object.keys(obj).filter(keyFilter);
+	let keys = Object.keys(obj).filter(keyFilter)
 
-	const filter = options.filter;
+	const filter = options.filter
 	if (typeof filter === 'function') {
-		keys = keys.filter(filter);
+		keys = keys.filter(filter)
 	}
 
 	// Ensure all required keys are present before sorting
-	const needsTimestamp = reportingMode === CMCD_RESPONSE_MODE || reportingMode === CMCD_EVENT_MODE;
+	const needsTimestamp = reportingMode === CMCD_RESPONSE_MODE || reportingMode === CMCD_EVENT_MODE
 	if (needsTimestamp && !keys.includes('ts')) {
-		keys.push('ts');
+		keys.push('ts')
 	}
 
 	if (version > 1 && !keys.includes('v')) {
-		keys.push('v');
+		keys.push('v')
 	}
 
-	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters);
+	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters)
 	const formatterOptions: CmcdFormatterOptions = {
 		version,
 		reportingMode,
 		baseUrl: options.baseUrl,
-	};
+	}
 
 	keys.sort().forEach(key => {
-		let value = obj[key] as CmcdValue;
+		let value = obj[key] as CmcdValue
 
-		const formatter = formatters[key];
+		const formatter = formatters[key]
 		if (typeof formatter === 'function') {
-			value = formatter(value, formatterOptions);
+			value = formatter(value, formatterOptions)
 		}
 
 		// Version should only be reported if not equal to 1.
 		if (key === 'v') {
 			if (version === 1) {
-				return;
+				return
 			}
 			else {
-				value = version;
+				value = version
 			}
 		}
 
 		// Playback rate should only be sent if not equal to 1.
 		if (key == 'pr' && value === 1) {
-			return;
+			return
 		}
 
 		// Ensure a timestamp is set for response and event modes
 		if (needsTimestamp && key === 'ts' && !Number.isFinite(value)) {
-			value = Date.now();
+			value = Date.now()
 		}
 
 		// ignore invalid values
 		if (!isValid(value)) {
-			return;
+			return
 		}
 
 		if (isTokenField(key) && typeof value === 'string') {
-			value = new SfToken(value);
+			value = new SfToken(value)
 		}
 
-		(results as any)[key] = value;
-	});
+		(results as any)[key] = value
+	})
 
-	return results;
+	return results
 }

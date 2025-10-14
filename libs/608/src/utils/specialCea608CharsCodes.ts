@@ -106,4 +106,4 @@ export const specialCea608CharsCodes: Record<number, number> = {
 	205: 9491, // Box drawings heavy down and left
 	206: 9495, // Box drawings heavy up and right
 	207: 9499, // Box drawings heavy up and left
-};
+}

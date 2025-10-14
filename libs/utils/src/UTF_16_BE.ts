@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const UTF_16_BE = 'utf-16be';
+export const UTF_16_BE = 'utf-16be'

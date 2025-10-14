@@ -1,6 +1,6 @@
-import { parseList, SfItem } from '@svta/cml-structured-field-values';
-import assert from 'node:assert';
-import test, { describe } from 'node:test';
+import { parseList, SfItem } from '@svta/cml-structured-field-values'
+import assert from 'node:assert'
+import test, { describe } from 'node:test'
 
 describe('parseList', () => {
 	test('string list', () => {
@@ -13,8 +13,8 @@ describe('parseList', () => {
 					new SfItem(`It was the best of times.`),
 				], src: ``,
 			},
-		);
-	});
+		)
+	})
 
 	test('token list', () => {
 		assert.deepStrictEqual(
@@ -25,8 +25,8 @@ describe('parseList', () => {
 					new SfItem(Symbol.for(`bar`)),
 				], src: ``,
 			},
-		);
-	});
+		)
+	})
 
 	test('mixed list', () => {
 		assert.deepStrictEqual(
@@ -42,8 +42,8 @@ describe('parseList', () => {
 					new SfItem(new Date(1659578233 * 1000)),
 				], src: ``,
 			},
-		);
-	});
+		)
+	})
 
 	test('list of lists', () => {
 		assert.deepStrictEqual(
@@ -56,8 +56,8 @@ describe('parseList', () => {
 					new SfItem([]),
 				], src: ``,
 			},
-		);
-	});
+		)
+	})
 
 	test('list with params', () => {
 		assert.deepStrictEqual(parseList(`("foo"; a=1;b=2);lvl=5, ("bar" "baz");lvl=1`), {
@@ -67,11 +67,11 @@ describe('parseList', () => {
 				], { 'lvl': 5 }),
 				new SfItem(['bar', 'baz'], { 'lvl': 1 }),
 			], src: ``,
-		});
-	});
+		})
+	})
 
 	test('fails on invalid input', () => {
-		assert.throws(() => parseList(`("aaa").`), /failed to parse "." as List/);
-		assert.throws(() => parseList(`("aaa"),`), /failed to parse "" as List/);
-	});
-});
+		assert.throws(() => parseList(`("aaa").`), /failed to parse "." as List/)
+		assert.throws(() => parseList(`("aaa"),`), /failed to parse "" as List/)
+	})
+})

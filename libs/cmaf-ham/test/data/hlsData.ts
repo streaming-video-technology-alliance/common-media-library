@@ -1,4 +1,4 @@
-import type { AudioTrack, SegmentHls } from '@svta/cml-cmaf-ham';
+import type { AudioTrack, SegmentHls } from '@svta/cml-cmaf-ham'
 
 export type AudioTrackInfo = {
 	byteRange?: string;
@@ -38,7 +38,7 @@ function getAudioTrack({
 		sampleRate: 0,
 		channels: 0,
 		urlInitialization: urlInitialization,
-	} as AudioTrack;
+	} as AudioTrack
 }
 
 function getSegments(): SegmentHls[] {
@@ -53,7 +53,7 @@ function getSegments(): SegmentHls[] {
 			uri: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
 			byterange: { length: 56, offset: 78 },
 		},
-	];
+	]
 }
 
-export { getAudioTrack, getSegments };
+export { getAudioTrack, getSegments }

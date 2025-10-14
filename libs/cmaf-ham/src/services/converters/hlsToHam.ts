@@ -1,7 +1,7 @@
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Presentation } from '../../types/model/Presentation.ts'
 
-import { HlsMapper } from '../../mapper/hls/HlsMapper.ts';
-import { MapperContext } from '../../mapper/MapperContext.ts';
+import { HlsMapper } from '../../mapper/hls/HlsMapper.ts'
+import { MapperContext } from '../../mapper/MapperContext.ts'
 
 /**
  * Convert hls manifest into a ham object.
@@ -25,8 +25,8 @@ export function hlsToHam(
 	manifest: string,
 	ancillaryManifests: string[],
 ): Presentation[] {
-	const mapperContext = MapperContext.getInstance();
-	mapperContext.setStrategy(new HlsMapper());
+	const mapperContext = MapperContext.getInstance()
+	mapperContext.setStrategy(new HlsMapper())
 	return mapperContext.getHamFormat({
 		manifest,
 		ancillaryManifests: ancillaryManifests.map((ancillaryManifest) => ({
@@ -34,5 +34,5 @@ export function hlsToHam(
 			type: 'hls',
 		})),
 		type: 'hls',
-	});
+	})
 }

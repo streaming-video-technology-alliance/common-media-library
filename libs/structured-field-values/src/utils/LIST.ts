@@ -1,1 +1,1 @@
-export const LIST = 'List';
+export const LIST = 'List'

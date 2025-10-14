@@ -1,6 +1,6 @@
-import { processUriTemplate } from '@svta/cml-dash';
-import assert, { equal } from 'node:assert';
-import { describe, it } from 'node:test';
+import { processUriTemplate } from '@svta/cml-dash'
+import assert, { equal } from 'node:assert'
+import { describe, it } from 'node:test'
 
 describe('processUriTemplate', () => {
 	it('provides a valid example', async () => {
@@ -12,11 +12,11 @@ describe('processUriTemplate', () => {
 			2,      // SubNumber
 			3,      // Bandwidth
 			4,      // Time
-		);
+		)
 
-		assert(result === 'http://example.com/rep1/1/2/3/04/$');
+		assert(result === 'http://example.com/rep1/1/2/3/04/$')
 		//#endregion example
-	});
+	})
 
 	it('handles a single RepresentationID identifier', () => {
 		equal(
@@ -25,7 +25,7 @@ describe('processUriTemplate', () => {
 				'100', null, null, null, null,
 			),
 			'/example/100.mp4',
-		);
+		)
 
 		// RepresentationID cannot use a width specifier.
 		equal(
@@ -34,7 +34,7 @@ describe('processUriTemplate', () => {
 				'100', null, null, null, null,
 			),
 			'/example/100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -42,8 +42,8 @@ describe('processUriTemplate', () => {
 				null, null, null, null, null,
 			),
 			'/example/$RepresentationID$.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles a single Number identifier', () => {
 		equal(
@@ -52,7 +52,7 @@ describe('processUriTemplate', () => {
 				null, 100, null, null, null,
 			),
 			'/example/100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -60,7 +60,7 @@ describe('processUriTemplate', () => {
 				null, 100, null, null, null,
 			),
 			'/example/00100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -68,8 +68,8 @@ describe('processUriTemplate', () => {
 				null, null, null, null, null,
 			),
 			'/example/$Number$.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles a single SubNumber identifier', () => {
 		equal(
@@ -78,7 +78,7 @@ describe('processUriTemplate', () => {
 				null, null, 100, null, null,
 			),
 			'/example/100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -86,7 +86,7 @@ describe('processUriTemplate', () => {
 				null, null, 100, null, null,
 			),
 			'/example/00100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -94,8 +94,8 @@ describe('processUriTemplate', () => {
 				null, null, null, null, null,
 			),
 			'/example/$SubNumber$.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles a single Bandwidth identifier', () => {
 		equal(
@@ -104,7 +104,7 @@ describe('processUriTemplate', () => {
 				null, null, null, 100, null,
 			),
 			'/example/100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -112,7 +112,7 @@ describe('processUriTemplate', () => {
 				null, null, null, 100, null,
 			),
 			'/example/00100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -120,8 +120,8 @@ describe('processUriTemplate', () => {
 				null, null, null, null, null,
 			),
 			'/example/$Bandwidth$.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles a single Time identifier', () => {
 		equal(
@@ -130,7 +130,7 @@ describe('processUriTemplate', () => {
 				null, null, null, null, 100,
 			),
 			'/example/100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -138,7 +138,7 @@ describe('processUriTemplate', () => {
 				null, null, null, null, 100,
 			),
 			'/example/00100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -146,8 +146,8 @@ describe('processUriTemplate', () => {
 				null, null, null, null, null,
 			),
 			'/example/$Time$.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles rounding errors for calculated Times', () => {
 		equal(
@@ -156,7 +156,7 @@ describe('processUriTemplate', () => {
 				null, null, null, null, 100.0001,
 			),
 			'/example/100.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -164,8 +164,8 @@ describe('processUriTemplate', () => {
 				null, null, null, null, 99.9999,
 			),
 			'/example/00100.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles multiple identifiers', () => {
 		equal(
@@ -174,7 +174,7 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 5,
 			),
 			'/example/1_2_3_4_5.mp4',
-		);
+		)
 
 		// No spaces.
 		equal(
@@ -183,7 +183,7 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 5,
 			),
 			'/example/12345.mp4',
-		);
+		)
 
 		// Different order.
 		equal(
@@ -192,7 +192,7 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 5,
 			),
 			'/example/3_4_5_1_2.mp4',
-		);
+		)
 
 		// Single width.
 		equal(
@@ -201,7 +201,7 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 500,
 			),
 			'1_2_3_4_500',
-		);
+		)
 
 		// Different widths.
 		equal(
@@ -210,7 +210,7 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 5,
 			),
 			'1_02_03_04_05',
-		);
+		)
 
 		// Double $$.
 		equal(
@@ -219,8 +219,8 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 5,
 			),
 			'$/1$2$3$4$5$.$',
-		);
-	});
+		)
+	})
 
 	it('handles invalid identifiers', () => {
 		equal(
@@ -229,7 +229,7 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 5,
 			),
 			'/example/$Garbage$.mp4',
-		);
+		)
 
 		equal(
 			processUriTemplate(
@@ -237,8 +237,8 @@ describe('processUriTemplate', () => {
 				'1', 2, 3, 4, 5,
 			),
 			'/example/$Time.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles non-decimal format specifiers', () => {
 		equal(
@@ -247,8 +247,8 @@ describe('processUriTemplate', () => {
 				'', 180, 0, 0, 0,
 			),
 			'/000b4_B4_180_264.mp4',
-		);
-	});
+		)
+	})
 
 	it('handles Times bigger than MAX_SAFE_INTEGER', () => {
 		equal(
@@ -257,6 +257,6 @@ describe('processUriTemplate', () => {
 				null, null, null, null, '17472959488675333',
 			),
 			'/example/17472959488675333.mp4',
-		);
-	});
-});
+		)
+	})
+})

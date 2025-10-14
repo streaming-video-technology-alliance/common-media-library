@@ -11,13 +11,13 @@
  */
 
 export function getLicenseServerUrl(initData: Uint16Array): string {
-	let initDataString = '';
+	let initDataString = ''
 	for (let i = 0; i < initData.length; i++) {
 		if (initData[i] !== 0) { // Ignore null characters
-			initDataString += String.fromCharCode(initData[i]);
+			initDataString += String.fromCharCode(initData[i])
 		}
 	}
 
-	const match = initDataString.match(/skd:\/\/([^"\s]+)/);
-	return match ? `https://${match[1]}` : '';
+	const match = initDataString.match(/skd:\/\/([^"\s]+)/)
+	return match ? `https://${match[1]}` : ''
 }

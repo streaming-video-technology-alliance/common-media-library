@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * Common Media Stream Type
@@ -15,7 +15,7 @@ export const CmStreamType = {
 	 * Segments become available over time – e.g., LIVE
 	 */
 	LIVE: 'l',
-} as const;
+} as const
 
 /**
  * Common Media Stream Type

@@ -1,9 +1,9 @@
-import { encodeSfDict } from '@svta/cml-structured-field-values';
-import type { CmcdData } from './CmcdData.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import type { CmcdHeaderField } from './CmcdHeaderField.ts';
-import { groupCmcdHeaders } from './groupCmcdHeaders.ts';
-import { prepareCmcdData } from './prepareCmcdData.ts';
+import { encodeSfDict } from '@svta/cml-structured-field-values'
+import type { CmcdData } from './CmcdData.ts'
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import type { CmcdHeaderField } from './CmcdHeaderField.ts'
+import { groupCmcdHeaders } from './groupCmcdHeaders.ts'
+import { prepareCmcdData } from './prepareCmcdData.ts'
 
 /**
  * Convert a CMCD data object to request headers
@@ -20,21 +20,21 @@ import { prepareCmcdData } from './prepareCmcdData.ts';
  * {@includeCode ../test/toCmcdHeaders.test.ts#example}
  */
 export function toCmcdHeaders(cmcd: CmcdData, options: CmcdEncodeOptions = {}): Record<CmcdHeaderField, string> {
-	const result = {} as Record<CmcdHeaderField, string>;
+	const result = {} as Record<CmcdHeaderField, string>
 
 	if (!cmcd) {
-		return result;
+		return result
 	}
 
-	const data = prepareCmcdData(cmcd, options);
-	const shards = groupCmcdHeaders(data, options?.customHeaderMap);
+	const data = prepareCmcdData(cmcd, options)
+	const shards = groupCmcdHeaders(data, options?.customHeaderMap)
 
 	return Object.entries(shards)
 		.reduce((acc, [field, value]) => {
-			const shard = encodeSfDict(value, { whitespace: false });
+			const shard = encodeSfDict(value, { whitespace: false })
 			if (shard) {
-				acc[field as CmcdHeaderField] = shard;
+				acc[field as CmcdHeaderField] = shard
 			}
-			return acc;
-		}, result);
+			return acc
+		}, result)
 }

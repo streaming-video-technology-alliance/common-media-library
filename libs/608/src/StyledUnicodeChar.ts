@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { PenState } from './PenState.ts';
+import { PenState } from './PenState.ts'
 
 /**
  * Unicode character with styling and background.
@@ -44,33 +44,33 @@ import { PenState } from './PenState.ts';
  * @beta
  */
 export class StyledUnicodeChar {
-	uchar: string = ' ';
-	penState: PenState = new PenState();
+	uchar: string = ' '
+	penState: PenState = new PenState()
 
 	reset(): void {
-		this.uchar = ' ';
-		this.penState.reset();
+		this.uchar = ' '
+		this.penState.reset()
 	}
 
 	setChar(uchar: string, newPenState: PenState): void {
-		this.uchar = uchar;
-		this.penState.copy(newPenState);
+		this.uchar = uchar
+		this.penState.copy(newPenState)
 	}
 
 	setPenState(newPenState: PenState): void {
-		this.penState.copy(newPenState);
+		this.penState.copy(newPenState)
 	}
 
 	equals(other: StyledUnicodeChar): boolean {
-		return this.uchar === other.uchar && this.penState.equals(other.penState);
+		return this.uchar === other.uchar && this.penState.equals(other.penState)
 	}
 
 	copy(newChar: StyledUnicodeChar): void {
-		this.uchar = newChar.uchar;
-		this.penState.copy(newChar.penState);
+		this.uchar = newChar.uchar
+		this.penState.copy(newChar.penState)
 	}
 
 	isEmpty(): boolean {
-		return this.uchar === ' ' && this.penState.isDefault();
+		return this.uchar === ' ' && this.penState.isDefault()
 	}
 }

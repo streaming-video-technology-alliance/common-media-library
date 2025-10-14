@@ -1,12 +1,12 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfInnerList } from '../SfInnerList.ts';
-import { SfItem } from '../SfItem.ts';
-import { INNER } from '../utils/INNER.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
-import { parseItem } from './parseItem.ts';
-import { parseParameters } from './parseParameters.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import type { SfInnerList } from '../SfInnerList.ts'
+import { SfItem } from '../SfItem.ts'
+import { INNER } from '../utils/INNER.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
+import { parseItem } from './parseItem.ts'
+import { parseParameters } from './parseParameters.ts'
 
 // 4.2.1.2.  Parsing an Inner List
 //
@@ -46,31 +46,31 @@ import { parseParameters } from './parseParameters.ts';
  */
 export function parseInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfInnerList> {
 	if (src[0] !== '(') {
-		throw parseError(src, INNER);
+		throw parseError(src, INNER)
 	}
 
-	src = src.substring(1);
-	const innerList: SfItem[] = [];
+	src = src.substring(1)
+	const innerList: SfItem[] = []
 	while (src.length > 0) {
-		src = src.trim();
+		src = src.trim()
 		if (src[0] === ')') {
-			src = src.substring(1);
-			const parsedParameters = parseParameters(src, options);
+			src = src.substring(1)
+			const parsedParameters = parseParameters(src, options)
 
 			return parsedValue(
 				new SfItem(innerList, parsedParameters.value) as any,
 				parsedParameters.src,
-			);
+			)
 		}
 
-		const parsedItem = parseItem(src, options);
-		innerList.push(parsedItem.value);
-		src = parsedItem.src;
+		const parsedItem = parseItem(src, options)
+		innerList.push(parsedItem.value)
+		src = parsedItem.src
 
 		if (src[0] !== ' ' && src[0] !== ')') {
-			throw parseError(src, INNER);
+			throw parseError(src, INNER)
 		}
 	}
 
-	throw parseError(src, INNER);
+	throw parseError(src, INNER)
 }

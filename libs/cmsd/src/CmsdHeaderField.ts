@@ -1,6 +1,6 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { CMSD_DYNAMIC } from './CMSD_DYNAMIC.ts';
-import { CMSD_STATIC } from './CMSD_STATIC.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { CMSD_DYNAMIC } from './CMSD_DYNAMIC.ts'
+import { CMSD_STATIC } from './CMSD_STATIC.ts'
 
 /**
  * CMSD header fields.
@@ -22,7 +22,7 @@ export const CmsdHeaderField = {
 	 * participating in the delivery.
 	 */
 	DYNAMIC: CMSD_DYNAMIC as typeof CMSD_DYNAMIC,
-} as const;
+} as const
 
 /**
  * @beta

@@ -1,7 +1,7 @@
-import type { IsoView } from '../IsoView.ts';
-import type { Fields } from '../boxes/Fields.ts';
-import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts';
-import { free } from './free.ts';
+import type { IsoView } from '../IsoView.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
+import { free } from './free.ts'
 
 /**
  * Parse a FreeSpaceBox from an IsoView
@@ -14,5 +14,5 @@ import { free } from './free.ts';
  * @beta
  */
 export function skip(view: IsoView): Fields<FreeSpaceBox<'skip'>> {
-	return free(view);
+	return free(view)
 };

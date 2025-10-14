@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts';
-import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
+import { UINT } from '../fields/UINT.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a HandlerReferenceBox from an IsoView
@@ -20,5 +20,5 @@ export function hdlr(view: IsoView): Fields<HandlerReferenceBox> {
 		handlerType: view.readString(4),
 		reserved: view.readArray(UINT, 4, 3),
 		name: view.readString(-1),
-	};
+	}
 };

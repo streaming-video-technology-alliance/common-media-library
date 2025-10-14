@@ -1,5 +1,5 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 
 /**
  * @internal
@@ -18,9 +18,9 @@ export function getChannels(
 		adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ??
 		representation.AudioChannelConfiguration?.at(0)?.$.value ??
 		0
-	);
+	)
 	if (!channels) {
-		console.error(`Representation ${representation.$.id} has no channels`);
+		console.error(`Representation ${representation.$.id} has no channels`)
 	}
-	return channels;
+	return channels
 }

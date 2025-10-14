@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { LabelBox } from '../boxes/LabelBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { LabelBox } from '../boxes/LabelBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a LabelBox from an IsoView
@@ -13,7 +13,7 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function labl(view: IsoView): Fields<LabelBox> {
-	const { version, flags } = view.readFullBox();
+	const { version, flags } = view.readFullBox()
 
 	return {
 		version,
@@ -22,5 +22,5 @@ export function labl(view: IsoView): Fields<LabelBox> {
 		labelId: view.readUint(2),
 		language: view.readUtf8(-1),
 		label: view.readUtf8(-1),
-	};
+	}
 }

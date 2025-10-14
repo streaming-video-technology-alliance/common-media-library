@@ -1,4 +1,4 @@
-import type { WebVttRegion } from './WebVttRegion.ts';
+import type { WebVttRegion } from './WebVttRegion.ts'
 
 /**
  * A factory for creating WebVttRegion objects.

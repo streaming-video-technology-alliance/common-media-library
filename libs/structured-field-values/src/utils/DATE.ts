@@ -1,1 +1,1 @@
-export const DATE = 'Date';
+export const DATE = 'Date'

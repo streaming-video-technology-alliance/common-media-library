@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const TEMPLATE = 'template';
+export const TEMPLATE = 'template'

@@ -35,4 +35,4 @@ export const CMCD_COMMON_KEYS = [
 	'tpb',
 	'ts',
 	'v',
-] as const;
+] as const

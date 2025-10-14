@@ -1,7 +1,7 @@
-import type { SwitchingSet } from '../../types/model/SwitchingSet.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { SwitchingSet } from '../../types/model/SwitchingSet.ts'
+import type { Validation } from '../../types/Validation.ts'
 
-import { validateSwitchingSet } from './validateSwitchingSet.ts';
+import { validateSwitchingSet } from './validateSwitchingSet.ts'
 
 /**
  * Validate a list of switching set.
@@ -35,11 +35,11 @@ export function validateSwitchingSets(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 
 	switchingSets.forEach((switchingSet: SwitchingSet) => {
-		validateSwitchingSet(switchingSet, selectionSetId, validation);
-	});
+		validateSwitchingSet(switchingSet, selectionSetId, validation)
+	})
 
-	return validation;
+	return validation
 }

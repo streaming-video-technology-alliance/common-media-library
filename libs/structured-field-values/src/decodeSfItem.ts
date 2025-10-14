@@ -1,8 +1,8 @@
-import type { SfDecodeOptions } from './SfDecodeOptions.ts';
-import type { SfItem } from './SfItem.ts';
-import { parseError } from './parse/parseError.ts';
-import { parseItem } from './parse/parseItem.ts';
-import { ITEM } from './utils/ITEM.ts';
+import type { SfDecodeOptions } from './SfDecodeOptions.ts'
+import type { SfItem } from './SfItem.ts'
+import { parseError } from './parse/parseError.ts'
+import { parseItem } from './parse/parseItem.ts'
+import { ITEM } from './utils/ITEM.ts'
 
 // 4.2.  Parsing Structured Fields
 //
@@ -36,14 +36,14 @@ import { ITEM } from './utils/ITEM.ts';
  */
 export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem {
 	try {
-		const { src, value } = parseItem(input.trim(), options);
+		const { src, value } = parseItem(input.trim(), options)
 		if (src !== '') {
-			throw parseError(src, ITEM);
+			throw parseError(src, ITEM)
 		}
 
-		return value;
+		return value
 	}
 	catch (cause) {
-		throw parseError(input, ITEM, cause);
+		throw parseError(input, ITEM, cause)
 	}
 }

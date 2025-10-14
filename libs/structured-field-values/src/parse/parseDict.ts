@@ -1,14 +1,14 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfDictionary } from '../SfDictionary.ts';
-import type { SfInnerList } from '../SfInnerList.ts';
-import { SfItem } from '../SfItem.ts';
-import { DICT } from '../utils/DICT.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
-import { parseItemOrInnerList } from './parseItemOrInnerList.ts';
-import { parseKey } from './parseKey.ts';
-import { parseParameters } from './parseParameters.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import type { SfDictionary } from '../SfDictionary.ts'
+import type { SfInnerList } from '../SfInnerList.ts'
+import { SfItem } from '../SfItem.ts'
+import { DICT } from '../utils/DICT.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
+import { parseItemOrInnerList } from './parseItemOrInnerList.ts'
+import { parseKey } from './parseKey.ts'
+import { parseParameters } from './parseParameters.ts'
 
 // 4.2.2.  Parsing a Dictionary
 //
@@ -64,41 +64,41 @@ import { parseParameters } from './parseParameters.ts';
  * @internal
  */
 export function parseDict(src: string, options?: SfDecodeOptions): ParsedValue<SfDictionary> {
-	const value: SfDictionary = {};
+	const value: SfDictionary = {}
 
 	while (src.length > 0) {
-		let member: SfItem | SfInnerList;
-		const parsedKey = parseKey(src);
-		const key = parsedKey.value;
-		src = parsedKey.src;
+		let member: SfItem | SfInnerList
+		const parsedKey = parseKey(src)
+		const key = parsedKey.value
+		src = parsedKey.src
 
 		if (src[0] === '=') {
-			const parsedItemOrInnerList = parseItemOrInnerList(src.substring(1), options);
-			member = parsedItemOrInnerList.value;
-			src = parsedItemOrInnerList.src;
+			const parsedItemOrInnerList = parseItemOrInnerList(src.substring(1), options)
+			member = parsedItemOrInnerList.value
+			src = parsedItemOrInnerList.src
 		}
 		else {
-			const parsedParameters = parseParameters(src, options);
-			member = new SfItem(true, parsedParameters.value);
-			src = parsedParameters.src;
+			const parsedParameters = parseParameters(src, options)
+			member = new SfItem(true, parsedParameters.value)
+			src = parsedParameters.src
 		}
 
-		value[key] = member;
+		value[key] = member
 
-		src = src.trim();
+		src = src.trim()
 		if (src.length === 0) {
-			return parsedValue(value, src);
+			return parsedValue(value, src)
 		}
 
 		if (src[0] !== ',') {
-			throw parseError(src, DICT);
+			throw parseError(src, DICT)
 		}
 
-		src = src.substring(1).trim();
+		src = src.substring(1).trim()
 		if (src.length === 0 || src[0] === ',') {
-			throw parseError(src, DICT);
+			throw parseError(src, DICT)
 		}
 	}
 
-	return parsedValue(value, src);
+	return parsedValue(value, src)
 }

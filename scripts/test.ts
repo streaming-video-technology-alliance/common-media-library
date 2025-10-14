@@ -1,3 +1,3 @@
-import { cmd } from './cmd.ts';
+import { cmd } from './cmd.ts'
 
-await cmd('node --no-warnings --test **/*.test.ts');
+await cmd('node --no-warnings --test **/*.test.ts')

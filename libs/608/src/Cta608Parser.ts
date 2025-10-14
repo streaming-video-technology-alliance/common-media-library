@@ -36,24 +36,24 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CaptionsLogger } from './CaptionsLogger.ts';
-import type { Channels } from './Channels.ts';
-import type { CmdHistory } from './CmdHistory.ts';
-import { Cta608Channel } from './Cta608Channel.ts';
-import type { PACData } from './PACData.ts';
-import type { PenStyles } from './PenStyles.ts';
-import type { SupportedField } from './SupportedField.ts';
-import { VerboseLevel } from './VerboseLevel.ts';
-import { backgroundColors } from './utils/backgroundColors.ts';
-import { createCmdHistory } from './utils/createCmdHistory.ts';
-import { getCharForByte } from './utils/getCharForByte.ts';
-import { hasCmdRepeated } from './utils/hasCmdRepeated.ts';
-import { numArrayToHexArray } from './utils/numArrayToHexArray.ts';
-import { rowsHighCh1 } from './utils/rowsHighCh1.ts';
-import { rowsHighCh2 } from './utils/rowsHighCh2.ts';
-import { rowsLowCh1 } from './utils/rowsLowCh1.ts';
-import { rowsLowCh2 } from './utils/rowsLowCh2.ts';
-import { setLastCmd } from './utils/setLastCmd.ts';
+import { CaptionsLogger } from './CaptionsLogger.ts'
+import type { Channels } from './Channels.ts'
+import type { CmdHistory } from './CmdHistory.ts'
+import { Cta608Channel } from './Cta608Channel.ts'
+import type { PACData } from './PACData.ts'
+import type { PenStyles } from './PenStyles.ts'
+import type { SupportedField } from './SupportedField.ts'
+import { VerboseLevel } from './VerboseLevel.ts'
+import { backgroundColors } from './utils/backgroundColors.ts'
+import { createCmdHistory } from './utils/createCmdHistory.ts'
+import { getCharForByte } from './utils/getCharForByte.ts'
+import { hasCmdRepeated } from './utils/hasCmdRepeated.ts'
+import { numArrayToHexArray } from './utils/numArrayToHexArray.ts'
+import { rowsHighCh1 } from './utils/rowsHighCh1.ts'
+import { rowsHighCh2 } from './utils/rowsHighCh2.ts'
+import { rowsLowCh1 } from './utils/rowsLowCh1.ts'
+import { rowsLowCh2 } from './utils/rowsLowCh2.ts'
+import { setLastCmd } from './utils/setLastCmd.ts'
 
 /**
  * CEA-608 caption parser.
@@ -61,19 +61,19 @@ import { setLastCmd } from './utils/setLastCmd.ts';
  * @beta
  */
 export class Cta608Parser {
-	private channels: (Cta608Channel | null)[];
-	private currentChannel: Channels = 0;
-	private cmdHistory: CmdHistory = createCmdHistory();
-	private logger: CaptionsLogger;
-	private lastTime: number | null = null;
+	private channels: (Cta608Channel | null)[]
+	private currentChannel: Channels = 0
+	private cmdHistory: CmdHistory = createCmdHistory()
+	private logger: CaptionsLogger
+	private lastTime: number | null = null
 
 	constructor(field: SupportedField, out1: any, out2: any) {
-		const logger = (this.logger = new CaptionsLogger());
+		const logger = (this.logger = new CaptionsLogger())
 		this.channels = [
 			null,
 			new Cta608Channel(field, out1, logger),
 			new Cta608Channel(field + 1, out2, logger),
-		];
+		]
 	}
 
 	/**
@@ -83,22 +83,22 @@ export class Cta608Parser {
 	 * @param byteList - The list of bytes
 	 */
 	addData(time: number | null, byteList: number[]): void {
-		this.lastTime = time;
-		this.logger.time = time;
+		this.lastTime = time
+		this.logger.time = time
 
 		for (let i = 0; i < byteList.length; i += 2) {
-			const a = byteList[i] & 0x7f;
-			const b = byteList[i + 1] & 0x7f;
-			let cmdFound: boolean = false;
-			let charsFound: number[] | null = null;
+			const a = byteList[i] & 0x7f
+			const b = byteList[i + 1] & 0x7f
+			let cmdFound: boolean = false
+			let charsFound: number[] | null = null
 
 			if (this.lastTime !== null) {
-				time = this.lastTime + 0.5 * i * 1001 / 30000;
-				this.logger.time = time;
+				time = this.lastTime + 0.5 * i * 1001 / 30000
+				this.logger.time = time
 			}
 
 			if (a === 0 && b === 0) {
-				continue;
+				continue
 			}
 			else {
 				this.logger.log(
@@ -109,57 +109,57 @@ export class Cta608Parser {
 						'] -> (' +
 						numArrayToHexArray([a, b]) +
 						')',
-				);
+				)
 			}
 
-			const cmdHistory = this.cmdHistory;
-			const isControlCode = a >= 0x10 && a <= 0x1f;
+			const cmdHistory = this.cmdHistory
+			const isControlCode = a >= 0x10 && a <= 0x1f
 			if (isControlCode) {
 				// Skip redundant control codes
 				if (hasCmdRepeated(a, b, cmdHistory)) {
-					setLastCmd(null, null, cmdHistory);
+					setLastCmd(null, null, cmdHistory)
 					this.logger.log(
 						VerboseLevel.DEBUG,
 						() =>
 							'Repeated command (' +
 							numArrayToHexArray([a, b]) +
 							') is dropped',
-					);
-					continue;
+					)
+					continue
 				}
-				setLastCmd(a, b, this.cmdHistory);
+				setLastCmd(a, b, this.cmdHistory)
 
-				cmdFound = this.parseCmd(a, b);
+				cmdFound = this.parseCmd(a, b)
 
 				if (!cmdFound) {
-					cmdFound = this.parseMidrow(a, b);
-				}
-
-				if (!cmdFound) {
-					cmdFound = this.parsePAC(a, b);
+					cmdFound = this.parseMidrow(a, b)
 				}
 
 				if (!cmdFound) {
-					cmdFound = this.parseBackgroundAttributes(a, b);
+					cmdFound = this.parsePAC(a, b)
+				}
+
+				if (!cmdFound) {
+					cmdFound = this.parseBackgroundAttributes(a, b)
 				}
 			}
 			else {
-				setLastCmd(null, null, cmdHistory);
+				setLastCmd(null, null, cmdHistory)
 			}
 
 			if (!cmdFound) {
-				charsFound = this.parseChars(a, b);
+				charsFound = this.parseChars(a, b)
 				if (charsFound.length) {
-					const currChNr = this.currentChannel;
+					const currChNr = this.currentChannel
 					if (currChNr && currChNr > 0) {
-						const channel = this.channels[currChNr] as Cta608Channel;
-						channel.insertChars(charsFound);
+						const channel = this.channels[currChNr] as Cta608Channel
+						channel.insertChars(charsFound)
 					}
 					else {
 						this.logger.log(
 							VerboseLevel.WARNING,
 							'No channel found yet. TEXT-MODE?',
-						);
+						)
 					}
 				}
 			}
@@ -171,7 +171,7 @@ export class Cta608Parser {
 						numArrayToHexArray([a, b]) +
 						' orig: ' +
 						numArrayToHexArray([byteList[i], byteList[i + 1]]),
-				);
+				)
 			}
 		}
 	}
@@ -188,72 +188,72 @@ export class Cta608Parser {
 		const cond1 =
 			(a === 0x14 || a === 0x1c || a === 0x15 || a === 0x1d) &&
 			b >= 0x20 &&
-			b <= 0x2f;
-		const cond2 = (a === 0x17 || a === 0x1f) && b >= 0x21 && b <= 0x23;
+			b <= 0x2f
+		const cond2 = (a === 0x17 || a === 0x1f) && b >= 0x21 && b <= 0x23
 		if (!(cond1 || cond2)) {
-			return false;
+			return false
 		}
 
-		const chNr = a === 0x14 || a === 0x15 || a === 0x17 ? 1 : 2;
-		const channel = this.channels[chNr] as Cta608Channel;
+		const chNr = a === 0x14 || a === 0x15 || a === 0x17 ? 1 : 2
+		const channel = this.channels[chNr] as Cta608Channel
 
 		if (a === 0x14 || a === 0x15 || a === 0x1c || a === 0x1d) {
 			if (b === 0x20) {
-				channel.ccRCL();
+				channel.ccRCL()
 			}
 			else if (b === 0x21) {
-				channel.ccBS();
+				channel.ccBS()
 			}
 			else if (b === 0x22) {
-				channel.ccAOF();
+				channel.ccAOF()
 			}
 			else if (b === 0x23) {
-				channel.ccAON();
+				channel.ccAON()
 			}
 			else if (b === 0x24) {
-				channel.ccDER();
+				channel.ccDER()
 			}
 			else if (b === 0x25) {
-				channel.ccRU(2);
+				channel.ccRU(2)
 			}
 			else if (b === 0x26) {
-				channel.ccRU(3);
+				channel.ccRU(3)
 			}
 			else if (b === 0x27) {
-				channel.ccRU(4);
+				channel.ccRU(4)
 			}
 			else if (b === 0x28) {
-				channel.ccFON();
+				channel.ccFON()
 			}
 			else if (b === 0x29) {
-				channel.ccRDC();
+				channel.ccRDC()
 			}
 			else if (b === 0x2a) {
-				channel.ccTR();
+				channel.ccTR()
 			}
 			else if (b === 0x2b) {
-				channel.ccRTD();
+				channel.ccRTD()
 			}
 			else if (b === 0x2c) {
-				channel.ccEDM();
+				channel.ccEDM()
 			}
 			else if (b === 0x2d) {
-				channel.ccCR();
+				channel.ccCR()
 			}
 			else if (b === 0x2e) {
-				channel.ccENM();
+				channel.ccENM()
 			}
 			else if (b === 0x2f) {
-				channel.ccEOC();
+				channel.ccEOC()
 			}
 		}
 		else {
 			// a == 0x17 || a == 0x1F
-			channel.ccTO(b - 0x20);
+			channel.ccTO(b - 0x20)
 		}
 
-		this.currentChannel = chNr;
-		return true;
+		this.currentChannel = chNr
+		return true
 	}
 
 	/**
@@ -264,35 +264,35 @@ export class Cta608Parser {
 	 * @returns `true` if midrow styling command was found
 	 */
 	private parseMidrow(a: number, b: number): boolean {
-		let chNr: number = 0;
+		let chNr: number = 0
 
 		if ((a === 0x11 || a === 0x19) && b >= 0x20 && b <= 0x2f) {
 			if (a === 0x11) {
-				chNr = 1;
+				chNr = 1
 			}
 			else {
-				chNr = 2;
+				chNr = 2
 			}
 
 			if (chNr !== this.currentChannel) {
 				this.logger.log(
 					VerboseLevel.ERROR,
 					'Mismatch channel in midrow parsing',
-				);
-				return false;
+				)
+				return false
 			}
-			const channel = this.channels[chNr];
+			const channel = this.channels[chNr]
 			if (!channel) {
-				return false;
+				return false
 			}
-			channel.ccMIDROW(b);
+			channel.ccMIDROW(b)
 			this.logger.log(
 				VerboseLevel.DEBUG,
 				() => 'MIDROW (' + numArrayToHexArray([a, b]) + ')',
-			);
-			return true;
+			)
+			return true
 		}
-		return false;
+		return false
 	}
 
 	/**
@@ -303,33 +303,33 @@ export class Cta608Parser {
 	 * @returns A Boolean that tells if PAC found
 	 */
 	private parsePAC(a: number, b: number): boolean {
-		let row: number;
+		let row: number
 
 		const case1 =
 			((a >= 0x11 && a <= 0x17) || (a >= 0x19 && a <= 0x1f)) &&
 			b >= 0x40 &&
-			b <= 0x7f;
-		const case2 = (a === 0x10 || a === 0x18) && b >= 0x40 && b <= 0x5f;
+			b <= 0x7f
+		const case2 = (a === 0x10 || a === 0x18) && b >= 0x40 && b <= 0x5f
 		if (!(case1 || case2)) {
-			return false;
+			return false
 		}
 
-		const chNr: Channels = a <= 0x17 ? 1 : 2;
+		const chNr: Channels = a <= 0x17 ? 1 : 2
 
 		if (b >= 0x40 && b <= 0x5f) {
-			row = chNr === 1 ? rowsLowCh1[a] : rowsLowCh2[a];
+			row = chNr === 1 ? rowsLowCh1[a] : rowsLowCh2[a]
 		}
 		else {
 			// 0x60 <= b <= 0x7F
-			row = chNr === 1 ? rowsHighCh1[a] : rowsHighCh2[a];
+			row = chNr === 1 ? rowsHighCh1[a] : rowsHighCh2[a]
 		}
-		const channel = this.channels[chNr];
+		const channel = this.channels[chNr]
 		if (!channel) {
-			return false;
+			return false
 		}
-		channel.setPAC(this.interpretPAC(row, b));
-		this.currentChannel = chNr;
-		return true;
+		channel.setPAC(this.interpretPAC(row, b))
+		this.currentChannel = chNr
+		return true
 	}
 
 	/**
@@ -340,23 +340,23 @@ export class Cta608Parser {
 	 * @returns pacData with style parameters
 	 */
 	private interpretPAC(row: number, byte: number): PACData {
-		let pacIndex;
+		let pacIndex
 		const pacData: PACData = {
 			color: null,
 			italics: false,
 			indent: null,
 			underline: false,
 			row: row,
-		};
+		}
 
 		if (byte > 0x5f) {
-			pacIndex = byte - 0x60;
+			pacIndex = byte - 0x60
 		}
 		else {
-			pacIndex = byte - 0x40;
+			pacIndex = byte - 0x40
 		}
 
-		pacData.underline = (pacIndex & 1) === 1;
+		pacData.underline = (pacIndex & 1) === 1
 		if (pacIndex <= 0xd) {
 			pacData.color = [
 				'white',
@@ -367,16 +367,16 @@ export class Cta608Parser {
 				'yellow',
 				'magenta',
 				'white',
-			][Math.floor(pacIndex / 2)];
+			][Math.floor(pacIndex / 2)]
 		}
 		else if (pacIndex <= 0xf) {
-			pacData.italics = true;
-			pacData.color = 'white';
+			pacData.italics = true
+			pacData.color = 'white'
 		}
 		else {
-			pacData.indent = Math.floor((pacIndex - 0x10) / 2) * 4;
+			pacData.indent = Math.floor((pacIndex - 0x10) / 2) * 4
 		}
-		return pacData; // Note that row has zero offset. The spec uses 1.
+		return pacData // Note that row has zero offset. The spec uses 1.
 	}
 
 	/**
@@ -387,29 +387,29 @@ export class Cta608Parser {
 	 * @returns An array with 1 to 2 codes corresponding to chars, if found. null otherwise.
 	 */
 	private parseChars(a: number, b: number): number[] {
-		let channelNr: Channels;
-		let charCodes: number[] = [];
-		let charCode1: number | null = null;
+		let channelNr: Channels
+		let charCodes: number[] = []
+		let charCode1: number | null = null
 
 		if (a >= 0x19) {
-			channelNr = 2;
-			charCode1 = a - 8;
+			channelNr = 2
+			charCode1 = a - 8
 		}
 		else {
-			channelNr = 1;
-			charCode1 = a;
+			channelNr = 1
+			charCode1 = a
 		}
 		if (charCode1 >= 0x11 && charCode1 <= 0x13) {
 			// Special character
-			let oneCode: number;
+			let oneCode: number
 			if (charCode1 === 0x11) {
-				oneCode = b + 0x50;
+				oneCode = b + 0x50
 			}
 			else if (charCode1 === 0x12) {
-				oneCode = b + 0x70;
+				oneCode = b + 0x70
 			}
 			else {
-				oneCode = b + 0x90;
+				oneCode = b + 0x90
 			}
 
 			this.logger.log(
@@ -419,19 +419,19 @@ export class Cta608Parser {
 					getCharForByte(oneCode) +
 					"' in channel " +
 					channelNr,
-			);
-			charCodes = [oneCode];
+			)
+			charCodes = [oneCode]
 		}
 		else if (a >= 0x20 && a <= 0x7f) {
-			charCodes = b === 0 ? [a] : [a, b];
+			charCodes = b === 0 ? [a] : [a, b]
 		}
 		if (charCodes) {
 			this.logger.log(
 				VerboseLevel.DEBUG,
 				() => 'Char codes =  ' + numArrayToHexArray(charCodes).join(','),
-			);
+			)
 		}
-		return charCodes;
+		return charCodes
 	}
 
 	/**
@@ -442,33 +442,33 @@ export class Cta608Parser {
 	 * @returns True if background attributes are found
 	 */
 	private parseBackgroundAttributes(a: number, b: number): boolean {
-		const case1 = (a === 0x10 || a === 0x18) && b >= 0x20 && b <= 0x2f;
-		const case2 = (a === 0x17 || a === 0x1f) && b >= 0x2d && b <= 0x2f;
+		const case1 = (a === 0x10 || a === 0x18) && b >= 0x20 && b <= 0x2f
+		const case2 = (a === 0x17 || a === 0x1f) && b >= 0x2d && b <= 0x2f
 		if (!(case1 || case2)) {
-			return false;
+			return false
 		}
-		let index: number;
-		const bkgData: Partial<PenStyles> = {};
+		let index: number
+		const bkgData: Partial<PenStyles> = {}
 		if (a === 0x10 || a === 0x18) {
-			index = Math.floor((b - 0x20) / 2);
-			bkgData.background = backgroundColors[index];
+			index = Math.floor((b - 0x20) / 2)
+			bkgData.background = backgroundColors[index]
 			if (b % 2 === 1) {
-				bkgData.background = bkgData.background + '_semi';
+				bkgData.background = bkgData.background + '_semi'
 			}
 		}
 		else if (b === 0x2d) {
-			bkgData.background = 'transparent';
+			bkgData.background = 'transparent'
 		}
 		else {
-			bkgData.foreground = 'black';
+			bkgData.foreground = 'black'
 			if (b === 0x2f) {
-				bkgData.underline = true;
+				bkgData.underline = true
 			}
 		}
-		const chNr: Channels = a <= 0x17 ? 1 : 2;
-		const channel: Cta608Channel = this.channels[chNr] as Cta608Channel;
-		channel.setBkgData(bkgData);
-		return true;
+		const chNr: Channels = a <= 0x17 ? 1 : 2
+		const channel: Cta608Channel = this.channels[chNr] as Cta608Channel
+		channel.setBkgData(bkgData)
+		return true
 	}
 
 	/**
@@ -476,12 +476,12 @@ export class Cta608Parser {
 	 */
 	reset(): void {
 		for (let i = 0; i < Object.keys(this.channels).length; i++) {
-			const channel = this.channels[i];
+			const channel = this.channels[i]
 			if (channel) {
-				channel.reset();
+				channel.reset()
 			}
 		}
-		setLastCmd(null, null, this.cmdHistory);
+		setLastCmd(null, null, this.cmdHistory)
 	}
 
 	/**
@@ -489,9 +489,9 @@ export class Cta608Parser {
 	 */
 	cueSplitAtTime(t: number): void {
 		for (let i = 0; i < this.channels.length; i++) {
-			const channel = this.channels[i];
+			const channel = this.channels[i]
 			if (channel) {
-				channel.cueSplitAtTime(t);
+				channel.cueSplitAtTime(t)
 			}
 		}
 	}

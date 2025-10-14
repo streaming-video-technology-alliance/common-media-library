@@ -1,6 +1,6 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { CBCS } from './CBCS.ts';
-import { CENC } from './CENC.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { CBCS } from './CBCS.ts'
+import { CENC } from './CENC.ts'
 
 /**
  * Encryption schemes.
@@ -11,7 +11,7 @@ import { CENC } from './CENC.ts';
 export const EncryptionScheme = {
 	CENC: CENC as typeof CENC,
 	CBCS: CBCS as typeof CBCS,
-} as const;
+} as const
 
 /**
  * Encryption schemes.

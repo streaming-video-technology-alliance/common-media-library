@@ -36,15 +36,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { CaptionModes } from './CaptionModes.ts';
-import { CaptionScreen } from './CaptionScreen.ts';
-import { CaptionsLogger } from './CaptionsLogger.ts';
-import type { CueHandler } from './CueHandler.ts';
-import type { PACData } from './PACData.ts';
-import type { PenStyles } from './PenStyles.ts';
-import type { Row } from './Row.ts';
-import { VerboseLevel } from './VerboseLevel.ts';
-import { NR_ROWS } from './utils/NR_ROWS.ts';
+import type { CaptionModes } from './CaptionModes.ts'
+import { CaptionScreen } from './CaptionScreen.ts'
+import { CaptionsLogger } from './CaptionsLogger.ts'
+import type { CueHandler } from './CueHandler.ts'
+import type { PACData } from './PACData.ts'
+import type { PenStyles } from './PenStyles.ts'
+import type { Row } from './Row.ts'
+import { VerboseLevel } from './VerboseLevel.ts'
+import { NR_ROWS } from './utils/NR_ROWS.ts'
 
 /**
  * CTA-608 Channel
@@ -52,123 +52,123 @@ import { NR_ROWS } from './utils/NR_ROWS.ts';
  * @beta
  */
 export class Cta608Channel {
-	chNr: number;
-	outputFilter: CueHandler;
-	mode: CaptionModes;
-	displayedMemory: CaptionScreen;
-	nonDisplayedMemory: CaptionScreen;
-	lastOutputScreen: CaptionScreen;
-	currRollUpRow: Row;
-	writeScreen: CaptionScreen;
-	cueStartTime: number | null;
+	chNr: number
+	outputFilter: CueHandler
+	mode: CaptionModes
+	displayedMemory: CaptionScreen
+	nonDisplayedMemory: CaptionScreen
+	lastOutputScreen: CaptionScreen
+	currRollUpRow: Row
+	writeScreen: CaptionScreen
+	cueStartTime: number | null
 
-	private logger: CaptionsLogger;
+	private logger: CaptionsLogger
 
 	constructor(
 		channelNumber: number,
 		outputFilter: CueHandler,
 		logger: CaptionsLogger = new CaptionsLogger(),
 	) {
-		this.chNr = channelNumber;
-		this.outputFilter = outputFilter;
-		this.mode = null;
-		this.displayedMemory = new CaptionScreen(logger);
-		this.nonDisplayedMemory = new CaptionScreen(logger);
-		this.lastOutputScreen = new CaptionScreen(logger);
-		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1];
-		this.writeScreen = this.displayedMemory;
-		this.mode = null;
-		this.cueStartTime = null; // Keeps track of where a cue started.
-		this.logger = logger;
+		this.chNr = channelNumber
+		this.outputFilter = outputFilter
+		this.mode = null
+		this.displayedMemory = new CaptionScreen(logger)
+		this.nonDisplayedMemory = new CaptionScreen(logger)
+		this.lastOutputScreen = new CaptionScreen(logger)
+		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1]
+		this.writeScreen = this.displayedMemory
+		this.mode = null
+		this.cueStartTime = null // Keeps track of where a cue started.
+		this.logger = logger
 
-		this.logger.log(VerboseLevel.INFO, 'new Cea608Channel(' + this.chNr + ')');
+		this.logger.log(VerboseLevel.INFO, 'new Cea608Channel(' + this.chNr + ')')
 	}
 
 	reset(): void {
-		this.mode = null;
-		this.displayedMemory.reset();
-		this.nonDisplayedMemory.reset();
-		this.lastOutputScreen.reset();
-		this.outputFilter?.reset?.();
-		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1];
-		this.writeScreen = this.displayedMemory;
-		this.mode = null;
-		this.cueStartTime = null;
+		this.mode = null
+		this.displayedMemory.reset()
+		this.nonDisplayedMemory.reset()
+		this.lastOutputScreen.reset()
+		this.outputFilter?.reset?.()
+		this.currRollUpRow = this.displayedMemory.rows[NR_ROWS - 1]
+		this.writeScreen = this.displayedMemory
+		this.mode = null
+		this.cueStartTime = null
 	}
 
 	getHandler(): CueHandler {
-		return this.outputFilter;
+		return this.outputFilter
 	}
 
 	setHandler(outputFilter: CueHandler): void {
-		this.outputFilter = outputFilter;
+		this.outputFilter = outputFilter
 	}
 
 	setPAC(pacData: PACData): void {
-		this.writeScreen.setPAC(pacData);
+		this.writeScreen.setPAC(pacData)
 	}
 
 	setBkgData(bkgData: Partial<PenStyles>): void {
-		this.writeScreen.setBkgData(bkgData);
+		this.writeScreen.setBkgData(bkgData)
 	}
 
 	setMode(newMode: CaptionModes): void {
 		if (newMode === this.mode) {
-			return;
+			return
 		}
 
-		this.mode = newMode;
-		this.logger.log(VerboseLevel.INFO, () => 'MODE=' + newMode);
+		this.mode = newMode
+		this.logger.log(VerboseLevel.INFO, () => 'MODE=' + newMode)
 		if (this.mode === 'MODE_POP-ON') {
-			this.writeScreen = this.nonDisplayedMemory;
+			this.writeScreen = this.nonDisplayedMemory
 		}
 		else {
-			this.writeScreen = this.displayedMemory;
-			this.writeScreen.reset();
+			this.writeScreen = this.displayedMemory
+			this.writeScreen.reset()
 		}
 		if (this.mode !== 'MODE_ROLL-UP') {
-			this.displayedMemory.setRollUpRows(null);
-			this.nonDisplayedMemory.setRollUpRows(null);
+			this.displayedMemory.setRollUpRows(null)
+			this.nonDisplayedMemory.setRollUpRows(null)
 		}
-		this.mode = newMode;
+		this.mode = newMode
 	}
 
 	insertChars(chars: number[]): void {
 		for (let i = 0; i < chars.length; i++) {
-			this.writeScreen.insertChar(chars[i]);
+			this.writeScreen.insertChar(chars[i])
 		}
 
 		const screen =
-			this.writeScreen === this.displayedMemory ? 'DISP' : 'NON_DISP';
+			this.writeScreen === this.displayedMemory ? 'DISP' : 'NON_DISP'
 		this.logger.log(
 			VerboseLevel.INFO,
 			() => screen + ': ' + this.writeScreen.getDisplayText(true),
-		);
+		)
 		if (this.mode === 'MODE_PAINT-ON' || this.mode === 'MODE_ROLL-UP') {
 			this.logger.log(
 				VerboseLevel.TEXT,
 				() => 'DISPLAYED: ' + this.displayedMemory.getDisplayText(true),
-			);
-			this.outputDataUpdate();
+			)
+			this.outputDataUpdate()
 		}
 	}
 
 	ccRCL(): void {
 		// Resume Caption Loading (switch mode to Pop On)
-		this.logger.log(VerboseLevel.INFO, 'RCL - Resume Caption Loading');
-		this.setMode('MODE_POP-ON');
+		this.logger.log(VerboseLevel.INFO, 'RCL - Resume Caption Loading')
+		this.setMode('MODE_POP-ON')
 	}
 
 	ccBS(): void {
 		// BackSpace
-		this.logger.log(VerboseLevel.INFO, 'BS - BackSpace');
+		this.logger.log(VerboseLevel.INFO, 'BS - BackSpace')
 		if (this.mode === 'MODE_TEXT') {
-			return;
+			return
 		}
 
-		this.writeScreen.backSpace();
+		this.writeScreen.backSpace()
 		if (this.writeScreen === this.displayedMemory) {
-			this.outputDataUpdate();
+			this.outputDataUpdate()
 		}
 	}
 
@@ -182,92 +182,92 @@ export class Cta608Channel {
 
 	ccDER(): void {
 		// Delete to End of Row
-		this.logger.log(VerboseLevel.INFO, 'DER- Delete to End of Row');
-		this.writeScreen.clearToEndOfRow();
-		this.outputDataUpdate();
+		this.logger.log(VerboseLevel.INFO, 'DER- Delete to End of Row')
+		this.writeScreen.clearToEndOfRow()
+		this.outputDataUpdate()
 	}
 
 	ccRU(nrRows: number | null): void {
 		// Roll-Up Captions-2,3,or 4 Rows
-		this.logger.log(VerboseLevel.INFO, 'RU(' + nrRows + ') - Roll Up');
-		this.writeScreen = this.displayedMemory;
-		this.setMode('MODE_ROLL-UP');
-		this.writeScreen.setRollUpRows(nrRows);
+		this.logger.log(VerboseLevel.INFO, 'RU(' + nrRows + ') - Roll Up')
+		this.writeScreen = this.displayedMemory
+		this.setMode('MODE_ROLL-UP')
+		this.writeScreen.setRollUpRows(nrRows)
 	}
 
 	ccFON(): void {
 		// Flash On
-		this.logger.log(VerboseLevel.INFO, 'FON - Flash On');
-		this.writeScreen.setPen({ flash: true });
+		this.logger.log(VerboseLevel.INFO, 'FON - Flash On')
+		this.writeScreen.setPen({ flash: true })
 	}
 
 	ccRDC(): void {
 		// Resume Direct Captioning (switch mode to PaintOn)
-		this.logger.log(VerboseLevel.INFO, 'RDC - Resume Direct Captioning');
-		this.setMode('MODE_PAINT-ON');
+		this.logger.log(VerboseLevel.INFO, 'RDC - Resume Direct Captioning')
+		this.setMode('MODE_PAINT-ON')
 	}
 
 	ccTR(): void {
 		// Text Restart in text mode (not supported, however)
-		this.logger.log(VerboseLevel.INFO, 'TR');
-		this.setMode('MODE_TEXT');
+		this.logger.log(VerboseLevel.INFO, 'TR')
+		this.setMode('MODE_TEXT')
 	}
 
 	ccRTD(): void {
 		// Resume Text Display in Text mode (not supported, however)
-		this.logger.log(VerboseLevel.INFO, 'RTD');
-		this.setMode('MODE_TEXT');
+		this.logger.log(VerboseLevel.INFO, 'RTD')
+		this.setMode('MODE_TEXT')
 	}
 
 	ccEDM(): void {
 		// Erase Displayed Memory
-		this.logger.log(VerboseLevel.INFO, 'EDM - Erase Displayed Memory');
-		this.displayedMemory.reset();
-		this.outputDataUpdate(true);
+		this.logger.log(VerboseLevel.INFO, 'EDM - Erase Displayed Memory')
+		this.displayedMemory.reset()
+		this.outputDataUpdate(true)
 	}
 
 	ccCR(): void {
 		// Carriage Return
-		this.logger.log(VerboseLevel.INFO, 'CR - Carriage Return');
-		this.writeScreen.rollUp();
-		this.outputDataUpdate(true);
+		this.logger.log(VerboseLevel.INFO, 'CR - Carriage Return')
+		this.writeScreen.rollUp()
+		this.outputDataUpdate(true)
 	}
 
 	ccENM(): void {
 		// Erase Non-Displayed Memory
-		this.logger.log(VerboseLevel.INFO, 'ENM - Erase Non-displayed Memory');
-		this.nonDisplayedMemory.reset();
+		this.logger.log(VerboseLevel.INFO, 'ENM - Erase Non-displayed Memory')
+		this.nonDisplayedMemory.reset()
 	}
 
 	ccEOC(): void {
 		// End of Caption (Flip Memories)
-		this.logger.log(VerboseLevel.INFO, 'EOC - End Of Caption');
+		this.logger.log(VerboseLevel.INFO, 'EOC - End Of Caption')
 		if (this.mode === 'MODE_POP-ON') {
-			const tmp = this.displayedMemory;
-			this.displayedMemory = this.nonDisplayedMemory;
-			this.nonDisplayedMemory = tmp;
-			this.writeScreen = this.nonDisplayedMemory;
+			const tmp = this.displayedMemory
+			this.displayedMemory = this.nonDisplayedMemory
+			this.nonDisplayedMemory = tmp
+			this.writeScreen = this.nonDisplayedMemory
 			this.logger.log(
 				VerboseLevel.TEXT,
 				() => 'DISP: ' + this.displayedMemory.getDisplayText(),
-			);
+			)
 		}
-		this.outputDataUpdate(true);
+		this.outputDataUpdate(true)
 	}
 
 	ccTO(nrCols: number): void {
 		// Tab Offset 1,2, or 3 columns
-		this.logger.log(VerboseLevel.INFO, 'TO(' + nrCols + ') - Tab Offset');
-		this.writeScreen.moveCursor(nrCols);
+		this.logger.log(VerboseLevel.INFO, 'TO(' + nrCols + ') - Tab Offset')
+		this.writeScreen.moveCursor(nrCols)
 	}
 
 	ccMIDROW(secondByte: number): void {
 		// Parse MIDROW command
-		const styles: Partial<PenStyles> = { flash: false };
-		styles.underline = secondByte % 2 === 1;
-		styles.italics = secondByte >= 0x2e;
+		const styles: Partial<PenStyles> = { flash: false }
+		styles.underline = secondByte % 2 === 1
+		styles.italics = secondByte >= 0x2e
 		if (!styles.italics) {
-			const colorIndex = Math.floor(secondByte / 2) - 0x10;
+			const colorIndex = Math.floor(secondByte / 2) - 0x10
 			const colors = [
 				'white',
 				'green',
@@ -276,26 +276,26 @@ export class Cta608Channel {
 				'red',
 				'yellow',
 				'magenta',
-			];
-			styles.foreground = colors[colorIndex];
+			]
+			styles.foreground = colors[colorIndex]
 		}
 		else {
-			styles.foreground = 'white';
+			styles.foreground = 'white'
 		}
-		this.logger.log(VerboseLevel.INFO, 'MIDROW: ' + JSON.stringify(styles));
-		this.writeScreen.setPen(styles);
+		this.logger.log(VerboseLevel.INFO, 'MIDROW: ' + JSON.stringify(styles))
+		this.writeScreen.setPen(styles)
 	}
 
 	outputDataUpdate(dispatch: boolean = false): void {
-		const time = this.logger.time;
+		const time = this.logger.time
 		if (time === null) {
-			return;
+			return
 		}
 
 		if (this.outputFilter) {
 			if (this.cueStartTime === null && !this.displayedMemory.isEmpty()) {
 				// Start of a new cue
-				this.cueStartTime = time;
+				this.cueStartTime = time
 			}
 			else {
 				if (!this.displayedMemory.equals(this.lastOutputScreen)) {
@@ -303,15 +303,15 @@ export class Cta608Channel {
 						this.cueStartTime!,
 						time,
 						this.lastOutputScreen,
-					);
+					)
 					if (dispatch && this.outputFilter.dispatchCue) {
-						this.outputFilter.dispatchCue();
+						this.outputFilter.dispatchCue()
 					}
 
-					this.cueStartTime = this.displayedMemory.isEmpty() ? null : time;
+					this.cueStartTime = this.displayedMemory.isEmpty() ? null : time
 				}
 			}
-			this.lastOutputScreen.copy(this.displayedMemory);
+			this.lastOutputScreen.copy(this.displayedMemory)
 		}
 	}
 
@@ -319,10 +319,10 @@ export class Cta608Channel {
 		if (this.outputFilter) {
 			if (!this.displayedMemory.isEmpty()) {
 				if (this.outputFilter.newCue) {
-					this.outputFilter.newCue(this.cueStartTime!, t, this.displayedMemory);
+					this.outputFilter.newCue(this.cueStartTime!, t, this.displayedMemory)
 				}
 
-				this.cueStartTime = t;
+				this.cueStartTime = t
 			}
 		}
 	}

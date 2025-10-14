@@ -1,6 +1,6 @@
-import { findCencContentProtection, MP4_PROTECTION_SCHEME } from '@svta/cml-drm';
-import { strictEqual } from 'node:assert';
-import { describe, it } from 'node:test';
+import { findCencContentProtection, MP4_PROTECTION_SCHEME } from '@svta/cml-drm'
+import { strictEqual } from 'node:assert'
+import { describe, it } from 'node:test'
 
 describe('findCencContentProtection', () => {
 
@@ -15,18 +15,18 @@ describe('findCencContentProtection', () => {
 				schemeIdUri: MP4_PROTECTION_SCHEME,
 				value: 'other',
 			},
-		];
+		]
 
-		const result = findCencContentProtection(cpArray);
+		const result = findCencContentProtection(cpArray)
 		//#endregion example
-		strictEqual(result, null);
-	});
+		strictEqual(result, null)
+	})
 
 	it('should return the ContentProtection with matching schemeIdUri and value = "cenc"', () => {
 		const matchingCP = {
 			schemeIdUri: MP4_PROTECTION_SCHEME,
 			value: 'cenc',
-		};
+		}
 
 		const cpArray = [
 			{
@@ -34,33 +34,33 @@ describe('findCencContentProtection', () => {
 				value: 'cenc',
 			},
 			matchingCP,
-		];
+		]
 
-		const result = findCencContentProtection(cpArray);
-		strictEqual(result, matchingCP);
-	});
+		const result = findCencContentProtection(cpArray)
+		strictEqual(result, matchingCP)
+	})
 
 	it('should return the ContentProtection with matching schemeIdUri and value = "cbcs"', () => {
 		const matchingCP = {
 			schemeIdUri: MP4_PROTECTION_SCHEME,
 			value: 'cbcs',
-		};
+		}
 
-		const cpArray = [matchingCP];
+		const cpArray = [matchingCP]
 
-		const result = findCencContentProtection(cpArray);
-		strictEqual(result, matchingCP);
-	});
+		const result = findCencContentProtection(cpArray)
+		strictEqual(result, matchingCP)
+	})
 
 	it('should be case-insensitive for schemeIdUri and value', () => {
 		const matchingCP = {
 			schemeIdUri: MP4_PROTECTION_SCHEME.toUpperCase(),
 			value: 'CENC', // uppercase value
-		};
+		}
 
-		const cpArray = [matchingCP];
+		const cpArray = [matchingCP]
 
-		const result = findCencContentProtection(cpArray);
-		strictEqual(result, matchingCP);
-	});
-});
+		const result = findCencContentProtection(cpArray)
+		strictEqual(result, matchingCP)
+	})
+})

@@ -1,6 +1,6 @@
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import { encodeCmcd } from './encodeCmcd.ts';
+import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import { encodeCmcd } from './encodeCmcd.ts'
 
 /**
  * Convert a CMCD data object to a URL encoded string.
@@ -15,10 +15,10 @@ import { encodeCmcd } from './encodeCmcd.ts';
  */
 export function toCmcdUrl(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
-		return '';
+		return ''
 	}
 
-	const params = encodeCmcd(cmcd, options);
+	const params = encodeCmcd(cmcd, options)
 
-	return encodeURIComponent(params);
+	return encodeURIComponent(params)
 }

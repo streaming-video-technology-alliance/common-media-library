@@ -1,5 +1,5 @@
-import { encodeSfList, SfItem } from '@svta/cml-structured-field-values';
-import type { CmsdDynamic } from './CmsdDynamic.ts';
+import { encodeSfList, SfItem } from '@svta/cml-structured-field-values'
+import type { CmsdDynamic } from './CmsdDynamic.ts'
 
 /**
  * Encode a list of CMSD Dynamic objects.
@@ -28,16 +28,16 @@ export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
 export function encodeCmsdDynamic(value: string | SfItem[], cmsd?: CmsdDynamic): string {
 	if (!value) {
-		return '';
+		return ''
 	}
 
 	if (typeof value === 'string') {
 		if (!cmsd) {
-			return '';
+			return ''
 		}
 
-		value = [new SfItem(value, cmsd as any)];
+		value = [new SfItem(value, cmsd as any)]
 	}
 
-	return encodeSfList(value, { whitespace: false });
+	return encodeSfList(value, { whitespace: false })
 }

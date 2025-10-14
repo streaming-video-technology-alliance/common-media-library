@@ -14,7 +14,7 @@ export function calculateDuration(
 	timescale: string | undefined,
 ): number {
 	if (!duration || !timescale) {
-		return 1;
+		return 1
 	}
-	return +(duration ?? 1) / +(timescale ?? 1);
+	return +(duration ?? 1) / +(timescale ?? 1)
 }

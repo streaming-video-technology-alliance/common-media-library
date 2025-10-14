@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const LICENSE_REQUEST = 'license-request';
+export const LICENSE_REQUEST = 'license-request'

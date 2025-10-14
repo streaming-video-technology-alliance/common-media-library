@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const SW_SECURE_CRYPTO = 'SW_SECURE_CRYPTO';
+export const SW_SECURE_CRYPTO = 'SW_SECURE_CRYPTO'

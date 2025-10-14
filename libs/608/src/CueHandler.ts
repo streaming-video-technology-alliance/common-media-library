@@ -1,4 +1,4 @@
-import type { CaptionScreen } from './CaptionScreen.ts';
+import type { CaptionScreen } from './CaptionScreen.ts'
 
 /**
  * A handler for CTA-608 cues.

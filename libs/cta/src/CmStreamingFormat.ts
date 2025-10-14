@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * Common Media Streaming Format
@@ -25,7 +25,7 @@ export const CmStreamingFormat = {
 	 * Other
 	 */
 	OTHER: 'o',
-} as const;
+} as const
 
 /**
  * Common Media Streaming Format

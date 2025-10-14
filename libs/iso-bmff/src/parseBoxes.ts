@@ -1,7 +1,7 @@
-import type { IsoBmffBox } from './boxes/IsoBmffBox.ts';
-import { createIsoView } from './createIsoView.ts';
-import type { IsoData } from './IsoData.ts';
-import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
+import { createIsoView } from './createIsoView.ts'
+import type { IsoData } from './IsoData.ts'
+import type { IsoViewConfig } from './IsoViewConfig.ts'
 
 /**
  * Parse boxes from an IsoView
@@ -15,11 +15,11 @@ import type { IsoViewConfig } from './IsoViewConfig.ts';
  * @beta
  */
 export function parseBoxes(raw: IsoData, config?: IsoViewConfig): IsoBmffBox[] {
-	const boxes = [];
+	const boxes = []
 
 	for (const box of createIsoView(raw, config)) {
-		boxes.push(box);
+		boxes.push(box)
 	}
 
-	return boxes;
+	return boxes
 }

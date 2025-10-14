@@ -1,4 +1,4 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
 
 /**
  * @internal
@@ -9,12 +9,12 @@ import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.
  * @returns language of the content
  */
 export function getLanguage(adaptationSet: AdaptationSet): string {
-	let language = adaptationSet.$.lang;
+	let language = adaptationSet.$.lang
 	if (!language) {
 		console.info(
 			`AdaptationSet ${adaptationSet.$.id} has no lang, using "und" as default`,
-		);
-		language = 'und';
+		)
+		language = 'und'
 	}
-	return language;
+	return language
 }

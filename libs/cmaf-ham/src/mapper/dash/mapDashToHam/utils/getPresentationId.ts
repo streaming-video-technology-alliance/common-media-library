@@ -1,4 +1,4 @@
-import type { Period } from '../../../../types/mapper/dash/Period.ts';
+import type { Period } from '../../../../types/mapper/dash/Period.ts'
 
 /**
  * @internal
@@ -11,5 +11,5 @@ import type { Period } from '../../../../types/mapper/dash/Period.ts';
  * @returns Presentation id
  */
 export function getPresentationId(period: Period, duration: number): string {
-	return period.$.id ?? `presentation-id-${duration}`;
+	return period.$.id ?? `presentation-id-${duration}`
 }

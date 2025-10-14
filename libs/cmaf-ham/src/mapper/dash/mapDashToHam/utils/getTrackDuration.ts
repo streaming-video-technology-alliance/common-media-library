@@ -1,4 +1,4 @@
-import type { Segment } from '../../../../types/model/Segment.ts';
+import type { Segment } from '../../../../types/model/Segment.ts'
 
 /**
  * @internal
@@ -15,6 +15,6 @@ import type { Segment } from '../../../../types/model/Segment.ts';
  */
 export function getTrackDuration(segments: Segment[]): number {
 	return segments.reduce((acc: number, segment: Segment) => {
-		return acc + segment.duration;
-	}, 0);
+		return acc + segment.duration
+	}, 0)
 }

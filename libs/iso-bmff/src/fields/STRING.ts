@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const STRING = 'string';
+export const STRING = 'string'

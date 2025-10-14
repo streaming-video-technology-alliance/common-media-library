@@ -1,7 +1,7 @@
-import { encodeSfDict } from '@svta/cml-structured-field-values';
-import type { CmcdData } from './CmcdData.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import { prepareCmcdData } from './prepareCmcdData.ts';
+import { encodeSfDict } from '@svta/cml-structured-field-values'
+import type { CmcdData } from './CmcdData.ts'
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import { prepareCmcdData } from './prepareCmcdData.ts'
 
 /**
  * Encode a CMCD object to a string.
@@ -19,8 +19,8 @@ import { prepareCmcdData } from './prepareCmcdData.ts';
  */
 export function encodeCmcd(cmcd: CmcdData, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
-		return '';
+		return ''
 	}
 
-	return encodeSfDict(prepareCmcdData(cmcd, options), { whitespace: false });
+	return encodeSfDict(prepareCmcdData(cmcd, options), { whitespace: false })
 }

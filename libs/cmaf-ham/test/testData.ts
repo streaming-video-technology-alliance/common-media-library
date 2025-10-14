@@ -1,4 +1,4 @@
-import type { Representation, SegmentTemplate } from '@svta/cml-cmaf-ham';
+import type { Representation, SegmentTemplate } from '@svta/cml-cmaf-ham'
 
 const representationBase: Representation = {
 	$: {
@@ -22,7 +22,7 @@ const representationBase: Representation = {
 			],
 		},
 	],
-};
+}
 
 const representationList: Representation = {
 	$: {
@@ -67,7 +67,7 @@ const representationList: Representation = {
 			],
 		},
 	],
-};
+}
 
 const representationTemplate: Representation = {
 	$: {
@@ -81,7 +81,7 @@ const representationTemplate: Representation = {
 		startWithSAP: '1',
 		bandwidth: '386437',
 	},
-};
+}
 
 const segmentTemplate: SegmentTemplate = {
 	$: {
@@ -91,13 +91,13 @@ const segmentTemplate: SegmentTemplate = {
 		duration: '96',
 		initialization: '$RepresentationID$/init.mp4',
 	},
-};
+}
 
-const duration = 13;
+const duration = 13
 
 export {
 	duration, representationBase,
 	representationList,
 	representationTemplate, segmentTemplate,
-};
+}
 

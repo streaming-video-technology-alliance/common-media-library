@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts';
-import type { IsoView } from '../IsoView.ts';
-import { avc1 } from './avc1.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { IsoView } from '../IsoView.ts'
+import { avc1 } from './avc1.ts'
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView
@@ -14,5 +14,5 @@ import { avc1 } from './avc1.ts';
  * @beta
  */
 export function hvc1(view: IsoView): Fields<VisualSampleEntryBox<'avc1'>> {
-	return avc1(view);
+	return avc1(view)
 }

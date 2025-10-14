@@ -1,4 +1,4 @@
-import { CmStreamType } from '@svta/cml-cta';
+import { CmStreamType } from '@svta/cml-cta'
 
 /**
  * Common Media Server Data Stream Type
@@ -8,7 +8,7 @@ import { CmStreamType } from '@svta/cml-cta';
  *
  * @beta
  */
-export const CmsdStreamType = CmStreamType as typeof CmStreamType;
+export const CmsdStreamType = CmStreamType as typeof CmStreamType
 
 /**
  * @beta

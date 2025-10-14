@@ -1,7 +1,7 @@
-import type { SfToken } from '@svta/cml-structured-field-values';
-import type { CmsdObjectType } from './CmsdObjectType.ts';
-import type { CmsdStreamType } from './CmsdStreamType.ts';
-import type { CmsdStreamingFormat } from './CmsdStreamingFormat.ts';
+import type { SfToken } from '@svta/cml-structured-field-values'
+import type { CmsdObjectType } from './CmsdObjectType.ts'
+import type { CmsdStreamType } from './CmsdStreamType.ts'
+import type { CmsdStreamingFormat } from './CmsdStreamingFormat.ts'
 
 /**
  * CMSD Value

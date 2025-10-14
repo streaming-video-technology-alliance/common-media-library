@@ -1,6 +1,6 @@
-import type { SfEncodeOptions } from './SfEncodeOptions.ts';
-import type { SfMember } from './SfMember.ts';
-import { serializeList } from './serialize/serializeList.ts';
+import type { SfEncodeOptions } from './SfEncodeOptions.ts'
+import type { SfMember } from './SfMember.ts'
+import { serializeList } from './serialize/serializeList.ts'
 
 /**
  * Encode a list into a structured field dictionary
@@ -14,5 +14,5 @@ import { serializeList } from './serialize/serializeList.ts';
  * @beta
  */
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string {
-	return serializeList(value, options);
+	return serializeList(value, options)
 }

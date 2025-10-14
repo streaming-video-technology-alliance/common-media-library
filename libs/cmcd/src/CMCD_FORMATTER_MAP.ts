@@ -1,43 +1,43 @@
-import { SfItem } from '@svta/cml-structured-field-values';
-import { urlToRelativePath, type ValueOrArray } from '@svta/cml-utils';
-import type { CmcdFormatter } from './CmcdFormatter.ts';
-import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts';
-import type { CmcdValue } from './CmcdValue.ts';
+import { SfItem } from '@svta/cml-structured-field-values'
+import { urlToRelativePath, type ValueOrArray } from '@svta/cml-utils'
+import type { CmcdFormatter } from './CmcdFormatter.ts'
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
+import type { CmcdValue } from './CmcdValue.ts'
 
-const toRounded = (value: CmcdValue) => Math.round(value as number);
+const toRounded = (value: CmcdValue) => Math.round(value as number)
 
 const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string> | ValueOrArray<SfItem> => {
 	if (Array.isArray(value)) {
-		return value.map(item => toUrlSafe(item, options) as string);
+		return value.map(item => toUrlSafe(item, options) as string)
 	}
 
 	if (value instanceof SfItem && typeof value.value === 'string') {
-		return new SfItem(toUrlSafe(value.value, options), value.params);
+		return new SfItem(toUrlSafe(value.value, options), value.params)
 	}
 	else {
 		if (options.baseUrl) {
-			value = urlToRelativePath(value as string, options.baseUrl);
+			value = urlToRelativePath(value as string, options.baseUrl)
 		}
-		return options.version === 1 ? encodeURIComponent(value as string) : (value as string);
+		return options.version === 1 ? encodeURIComponent(value as string) : (value as string)
 	}
-};
+}
 
-const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100;
+const toHundred = (value: CmcdValue) => toRounded(value as number / 100) * 100
 
 const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
-	let norValue = value;
+	let norValue = value
 
 	if (options.version >= 2) {
 		if (value instanceof SfItem && typeof value.value === 'string') {
-			norValue = new SfItem([value]);
+			norValue = new SfItem([value])
 		}
 		else if (typeof value === 'string') {
-			norValue = [value];
+			norValue = [value]
 		}
 	}
 
-	return toUrlSafe(norValue, options);
-};
+	return toUrlSafe(norValue, options)
+}
 
 /**
  * The default formatters for CMCD values.
@@ -85,4 +85,4 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter> = {
 	 * Top Bitrate (kbps) rounded integer
 	 */
 	tb: toRounded,
-} as const;
+} as const

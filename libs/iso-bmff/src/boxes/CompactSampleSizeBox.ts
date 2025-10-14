@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.ts';
+import type { FullBox } from './FullBox.ts'
 
 /**
  * Compact Sample Size Box - 'stz2'

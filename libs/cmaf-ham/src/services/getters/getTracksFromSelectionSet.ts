@@ -1,7 +1,7 @@
-import type { SelectionSet } from '../../types/model/SelectionSet.ts';
-import type { Track } from '../../types/model/Track.ts';
+import type { SelectionSet } from '../../types/model/SelectionSet.ts'
+import type { Track } from '../../types/model/Track.ts'
 
-import { getTracksFromSwitchingSet } from './getTracksFromSwitchingSet.ts';
+import { getTracksFromSwitchingSet } from './getTracksFromSwitchingSet.ts'
 
 /**
  * Get a list of Tracks contained on a SelectionSet
@@ -18,6 +18,6 @@ export function getTracksFromSelectionSet(
 ): Track[] {
 	const tracks = selectionSet.switchingSets.flatMap((switchingSet) =>
 		getTracksFromSwitchingSet(switchingSet),
-	);
-	return predicate ? tracks.filter(predicate) : tracks;
+	)
+	return predicate ? tracks.filter(predicate) : tracks
 }

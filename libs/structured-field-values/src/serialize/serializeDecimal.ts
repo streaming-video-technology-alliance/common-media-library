@@ -1,6 +1,6 @@
-import { roundToEven } from '@svta/cml-utils';
-import { DECIMAL } from '../utils/DECIMAL.ts';
-import { serializeError } from './serializeError.ts';
+import { roundToEven } from '@svta/cml-utils'
+import { DECIMAL } from '../utils/DECIMAL.ts'
+import { serializeError } from './serializeError.ts'
 
 // 4.1.5.  Serializing a Decimal
 //
@@ -40,10 +40,10 @@ import { serializeError } from './serializeError.ts';
  * @internal
  */
 export function serializeDecimal(value: number): string {
-	const roundedValue = roundToEven(value, 3); // round to 3 decimal places
+	const roundedValue = roundToEven(value, 3) // round to 3 decimal places
 	if (Math.floor(Math.abs(roundedValue)).toString().length > 12) {
-		throw serializeError(value, DECIMAL);
+		throw serializeError(value, DECIMAL)
 	}
-	const stringValue = roundedValue.toString();
-	return stringValue.includes('.') ? stringValue : `${stringValue}.0`;
+	const stringValue = roundedValue.toString()
+	return stringValue.includes('.') ? stringValue : `${stringValue}.0`
 }

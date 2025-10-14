@@ -1,1 +1,1 @@
-export const BOOLEAN = 'Boolean';
+export const BOOLEAN = 'Boolean'

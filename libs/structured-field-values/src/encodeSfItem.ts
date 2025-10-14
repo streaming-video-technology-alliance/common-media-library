@@ -1,7 +1,7 @@
-import type { SfBareItem } from './SfBareItem.ts';
-import { SfItem } from './SfItem.ts';
-import type { SfParameters } from './SfParameters.ts';
-import { serializeItem } from './serialize/serializeItem.ts';
+import type { SfBareItem } from './SfBareItem.ts'
+import { SfItem } from './SfItem.ts'
+import type { SfParameters } from './SfParameters.ts'
+import { serializeItem } from './serialize/serializeItem.ts'
 
 /**
  * Encode a structured field item to a string
@@ -29,8 +29,8 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 
 export function encodeSfItem(value: SfItem | SfBareItem, params?: SfParameters) {
 	if (!(value instanceof SfItem)) {
-		value = new SfItem(value, params);
+		value = new SfItem(value, params)
 	}
 
-	return serializeItem(value);
+	return serializeItem(value)
 }

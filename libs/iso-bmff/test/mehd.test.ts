@@ -1,12 +1,12 @@
-import { mehd } from '@svta/cml-iso-bmff';
-import { assert, describe, findBox, it } from './util/box.ts';
+import { mehd } from '@svta/cml-iso-bmff'
+import { assert, describe, findBox, it } from './util/box.ts'
 
 describe('mehd box', function () {
 	it('should correctly parse the box', function () {
-		const box = findBox('test_frag.mp4', mehd);
+		const box = findBox('test_frag.mp4', mehd)
 
-		assert.strictEqual(box.type, 'mehd');
-		assert.strictEqual(box.size, 16);
-		assert.strictEqual(box.fragmentDuration, 2047);
-	});
-});
+		assert.strictEqual(box.type, 'mehd')
+		assert.strictEqual(box.size, 16)
+		assert.strictEqual(box.fragmentDuration, 2047)
+	})
+})

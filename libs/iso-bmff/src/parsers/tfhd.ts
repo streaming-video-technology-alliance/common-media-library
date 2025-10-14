@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a TrackFragmentHeaderBox from an IsoView
@@ -13,7 +13,7 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function tfhd(view: IsoView): Fields<TrackFragmentHeaderBox> {
-	const { version, flags } = view.readFullBox();
+	const { version, flags } = view.readFullBox()
 
 	return {
 		version,
@@ -24,5 +24,5 @@ export function tfhd(view: IsoView): Fields<TrackFragmentHeaderBox> {
 		defaultSampleDuration: flags & 0x08 ? view.readUint(4) : undefined,
 		defaultSampleSize: flags & 0x10 ? view.readUint(4) : undefined,
 		defaultSampleFlags: flags & 0x20 ? view.readUint(4) : undefined,
-	};
+	}
 };

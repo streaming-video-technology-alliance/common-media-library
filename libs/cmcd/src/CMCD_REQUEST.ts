@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_REQUEST = 'CMCD-Request';
+export const CMCD_REQUEST = 'CMCD-Request'

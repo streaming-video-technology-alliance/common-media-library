@@ -9,48 +9,48 @@ import {
 	validatePresentation,
 	type DashManifest,
 	type HlsManifest,
-} from '@svta/cml-cmaf-ham';
-import fs from 'fs';
-import { Parser } from 'm3u8-parser';
-import { Builder, parseString } from 'xml2js';
-import { listDirectories, listM3U8Files, listMPDFiles } from './utils.ts';
+} from '@svta/cml-cmaf-ham'
+import fs from 'fs'
+import { Parser } from 'm3u8-parser'
+import { Builder, parseString } from 'xml2js'
+import { listDirectories, listM3U8Files, listMPDFiles } from './utils.ts'
 
-const FILE_ENCODING = 'utf8';
+const FILE_ENCODING = 'utf8'
 
-const INPUT_PATH_HLS = `./input/hls/`;
-const OUTPUT_PATH_HLS = `./dist/hls/`;
+const INPUT_PATH_HLS = `./input/hls/`
+const OUTPUT_PATH_HLS = `./dist/hls/`
 
-const SAMPLES_PATH_DASH = `./input/dash/`;
-const OUTPUT_PATH_DASH = `./dist/dash/`;
+const SAMPLES_PATH_DASH = `./input/dash/`
+const OUTPUT_PATH_DASH = `./dist/dash/`
 
 setHlsParser((text: string) => {
-	const parser = new Parser();
+	const parser = new Parser()
 
-	parser.push(text);
-	parser.end();
-	const parsedHlsManifest = parser.manifest as any;
+	parser.push(text)
+	parser.end()
+	const parsedHlsManifest = parser.manifest as any
 	if (!parsedHlsManifest) {
-		throw new Error();
+		throw new Error()
 	}
 
-	return parsedHlsManifest as HlsManifest;
-});
+	return parsedHlsManifest as HlsManifest
+})
 
 setDashParser((raw: string) => {
-	let parsed: DashManifest | undefined;
+	let parsed: DashManifest | undefined
 	parseString(raw, (err: Error | null, result: DashManifest) => {
 		if (err) {
-			throw new Error(err.message);
+			throw new Error(err.message)
 		}
-		parsed = result as DashManifest;
-	});
-	return parsed;
-});
+		parsed = result as DashManifest
+	})
+	return parsed
+})
 
 setDashSerializer((manifest: DashManifest) => {
-	const builder = new Builder();
-	return builder.buildObject(manifest);
-});
+	const builder = new Builder()
+	return builder.buildObject(manifest)
+})
 
 /**
  * This function converts a given manifest file (along with optional playlists for HLS)
@@ -67,61 +67,61 @@ function manifestToAllFormats(
 	AncillaryManifestsPath?: string[],
 ) {
 	// Read the Manifests
-	const manifest = fs.readFileSync(mainManifestPath, FILE_ENCODING);
+	const manifest = fs.readFileSync(mainManifestPath, FILE_ENCODING)
 	const ancillaryManifests = AncillaryManifestsPath?.map(
 		(ancillaryManifest) =>
 			fs.readFileSync(ancillaryManifest, FILE_ENCODING),
-	);
+	)
 
 	// Convert the Manifest to HAM
 	const ham = mainManifestPath.endsWith('.m3u8')
 		? hlsToHam(manifest, ancillaryManifests)
-		: dashToHam(manifest);
+		: dashToHam(manifest)
 
 	// Create output directory if it doesn't exist
 	if (!fs.existsSync(outputPath)) {
-		fs.mkdirSync(outputPath, { recursive: true });
+		fs.mkdirSync(outputPath, { recursive: true })
 	}
 
 	// Run validations and save them to a file
-	const validations = ham.map(validatePresentation);
+	const validations = ham.map(validatePresentation)
 	fs.writeFileSync(
 		`${outputPath}/validations.json`,
 		JSON.stringify(validations),
-	);
+	)
 
 	// Save HAM object
-	fs.writeFileSync(`${outputPath}/ham.json`, JSON.stringify(ham));
+	fs.writeFileSync(`${outputPath}/ham.json`, JSON.stringify(ham))
 
 	// Convert the HAM to DASH and save the MPD file
-	const dash = hamToDash(ham);
-	fs.writeFileSync(`${outputPath}/main.mpd`, dash.manifest);
+	const dash = hamToDash(ham)
+	fs.writeFileSync(`${outputPath}/main.mpd`, dash.manifest)
 
 	// Convert the HAM to HLS and save the m3u8 files
-	const hls = hamToHls(ham);
-	fs.writeFileSync(`${outputPath}/main.m3u8`, hls.manifest);
+	const hls = hamToHls(ham)
+	fs.writeFileSync(`${outputPath}/main.m3u8`, hls.manifest)
 	hls.ancillaryManifests?.forEach((ancillaryManifest, index: any) => {
 		fs.writeFileSync(
 			`${outputPath}/${ancillaryManifest.fileName ?? `${index + 1}.m3u8`}`,
 			ancillaryManifest.manifest,
-		);
-	});
+		)
+	})
 }
 
 listDirectories(SAMPLES_PATH_DASH).forEach((contentDir) => {
-	const mpds = listMPDFiles(`${SAMPLES_PATH_DASH}/${contentDir}`);
+	const mpds = listMPDFiles(`${SAMPLES_PATH_DASH}/${contentDir}`)
 	mpds.forEach((mpd) => {
-		manifestToAllFormats(mpd, `${OUTPUT_PATH_DASH}/${contentDir}`);
-	});
-});
+		manifestToAllFormats(mpd, `${OUTPUT_PATH_DASH}/${contentDir}`)
+	})
+})
 
 listDirectories(INPUT_PATH_HLS).forEach((contentDir) => {
-	const hlsManifests = listM3U8Files(`${INPUT_PATH_HLS}/${contentDir}`);
+	const hlsManifests = listM3U8Files(`${INPUT_PATH_HLS}/${contentDir}`)
 	if (!hlsManifests.error) {
 		manifestToAllFormats(
 			hlsManifests.manifest,
 			`${OUTPUT_PATH_HLS}/${contentDir}`,
 			hlsManifests.playlists,
-		);
+		)
 	}
-});
+})

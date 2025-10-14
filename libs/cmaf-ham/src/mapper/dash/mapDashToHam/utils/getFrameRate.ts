@@ -1,7 +1,7 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 
-import type { FrameRate } from '../../../../types/model/FrameRate.ts';
+import type { FrameRate } from '../../../../types/model/FrameRate.ts'
 
 import {
 	DENOMINATOR,
@@ -9,7 +9,7 @@ import {
 	FRAME_RATE_SEPARATOR,
 	NUMERATOR,
 	ZERO,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.ts'
 
 /**
  * @internal
@@ -27,15 +27,15 @@ export function getFrameRate(
 	representation: Representation,
 ): FrameRate {
 	const frameRateDash: string =
-		representation.$.frameRate ?? adaptationSet.$.frameRate ?? '';
+		representation.$.frameRate ?? adaptationSet.$.frameRate ?? ''
 	if (!frameRateDash) {
 		console.error(
 			`Representation ${representation.$.id} has no frame rate`,
-		);
+		)
 	}
-	const frameRate = frameRateDash.split(FRAME_RATE_SEPARATOR);
-	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '');
-	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '');
+	const frameRate = frameRateDash.split(FRAME_RATE_SEPARATOR)
+	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '')
+	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '')
 
 	return {
 		frameRateNumerator: isNaN(frameRateNumerator)
@@ -44,5 +44,5 @@ export function getFrameRate(
 		frameRateDenominator: isNaN(frameRateDenominator)
 			? ZERO
 			: frameRateDenominator,
-	} as FrameRate;
+	} as FrameRate
 }

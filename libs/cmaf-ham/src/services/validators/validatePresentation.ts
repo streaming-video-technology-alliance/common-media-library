@@ -1,7 +1,7 @@
-import type { Validation } from '../../types/Validation.ts';
-import type { Presentation } from '../../types/model/Presentation.ts';
+import type { Validation } from '../../types/Validation.ts'
+import type { Presentation } from '../../types/model/Presentation.ts'
 
-import { validateSelectionSets } from './validateSelectionSets.ts';
+import { validateSelectionSets } from './validateSelectionSets.ts'
 
 /**
  * Validate a presentation.
@@ -29,18 +29,18 @@ import { validateSelectionSets } from './validateSelectionSets.ts';
  *
  */
 export function validatePresentation(presentation: Presentation): Validation {
-	const validation: Validation = { status: true, errorMessages: [] };
+	const validation: Validation = { status: true, errorMessages: [] }
 
 	if (!presentation.id) {
-		validation.status = false;
-		validation.errorMessages.push('Presentation id is undefined');
+		validation.status = false
+		validation.errorMessages.push('Presentation id is undefined')
 	}
 
 	validateSelectionSets(
 		presentation.selectionSets,
 		presentation.id,
 		validation,
-	);
+	)
 
-	return validation;
+	return validation
 }

@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * CMCD v2 player states for the 'sta' key.
@@ -58,7 +58,7 @@ export const CmcdPlayerState = {
 	 * Preloading: The player is loading assets ahead of starting in order to provide a fast startup. The expectation is that playback will commence at a future time.
 	 */
 	PRELOADING: 'd',
-} as const;
+} as const
 
 /**
  * @beta

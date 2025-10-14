@@ -1,22 +1,22 @@
-import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts';
-import type { DashManifest } from '../../../types/mapper/dash/DashManifest.ts';
-import type { Period } from '../../../types/mapper/dash/Period.ts';
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../types/mapper/dash/AdaptationSet.ts'
+import type { DashManifest } from '../../../types/mapper/dash/DashManifest.ts'
+import type { Period } from '../../../types/mapper/dash/Period.ts'
+import type { Representation } from '../../../types/mapper/dash/Representation.ts'
 
-import type { Presentation } from '../../../types/model/Presentation.ts';
-import type { Segment } from '../../../types/model/Segment.ts';
-import type { SelectionSet } from '../../../types/model/SelectionSet.ts';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
-import type { Track } from '../../../types/model/Track.ts';
+import type { Presentation } from '../../../types/model/Presentation.ts'
+import type { Segment } from '../../../types/model/Segment.ts'
+import type { SelectionSet } from '../../../types/model/SelectionSet.ts'
+import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
+import type { Track } from '../../../types/model/Track.ts'
 
-import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts';
+import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts'
 
-import { getGroup } from './utils/getGroup.ts';
-import { getInitializationUrl } from './utils/getInitializationUrl.ts';
-import { getPresentationId } from './utils/getPresentationId.ts';
+import { getGroup } from './utils/getGroup.ts'
+import { getInitializationUrl } from './utils/getInitializationUrl.ts'
+import { getPresentationId } from './utils/getPresentationId.ts'
 
-import { mapSegments } from './mapSegments.ts';
-import { mapTracks } from './mapTracks.ts';
+import { mapSegments } from './mapSegments.ts'
+import { mapTracks } from './mapTracks.ts'
 
 /**
  * @internal
@@ -28,10 +28,10 @@ import { mapTracks } from './mapTracks.ts';
  */
 export function mapDashToHam(dash: DashManifest): Presentation[] {
 	return dash.MPD.Period.map((period: Period) => {
-		const duration: number = iso8601DurationToNumber(period.$.duration);
-		const presentationId: string = getPresentationId(period, duration);
+		const duration: number = iso8601DurationToNumber(period.$.duration)
+		const presentationId: string = getPresentationId(period, duration)
 
-		const selectionSetGroups: Record<string, SelectionSet> = {};
+		const selectionSetGroups: Record<string, SelectionSet> = {}
 
 		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
 			const tracks: Track[] = adaptationSet.Representation.map(
@@ -40,23 +40,23 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 						adaptationSet,
 						representation,
 						duration,
-					);
+					)
 
 					return mapTracks(
 						adaptationSet,
 						representation,
 						segments,
 						getInitializationUrl(adaptationSet, representation),
-					);
+					)
 				},
-			);
+			)
 
-			const group: string = getGroup(adaptationSet);
+			const group: string = getGroup(adaptationSet)
 			if (!selectionSetGroups[group]) {
 				selectionSetGroups[group] = {
 					id: group,
 					switchingSets: [],
-				} as SelectionSet;
+				} as SelectionSet
 			}
 
 			selectionSetGroups[group].switchingSets.push({
@@ -65,11 +65,11 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 					adaptationSet.ContentComponent?.at(0)?.$.id ??
 					group,
 				tracks,
-			} as SwitchingSet);
-		});
+			} as SwitchingSet)
+		})
 
-		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups);
+		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups)
 
-		return { id: presentationId, selectionSets } as Presentation;
-	});
+		return { id: presentationId, selectionSets } as Presentation
+	})
 }

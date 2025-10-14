@@ -1,6 +1,6 @@
-import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts';
-import type { Fields } from '../boxes/Fields.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a AudioRenderingIndicationBox from an IsoView
@@ -16,5 +16,5 @@ export function ardi(view: IsoView): Fields<AudioRenderingIndicationBox> {
 	return {
 		...view.readFullBox(),
 		audioRenderingIndication: view.readUint(1),
-	};
+	}
 };

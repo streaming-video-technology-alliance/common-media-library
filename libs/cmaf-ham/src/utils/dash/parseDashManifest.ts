@@ -1,24 +1,24 @@
-import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts';
+import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts'
 
 /**
  * @internal
  */
 export type DashParser = (raw: string) => DashManifest;
 
-let dashParser: DashParser;
+let dashParser: DashParser
 
 /**
  * @internal
  */
 export function setDashParser(parser: DashParser): void {
-	dashParser = parser;
+	dashParser = parser
 }
 
 /**
  * @internal
  */
 export function getDashParser(): DashParser {
-	return dashParser;
+	return dashParser
 }
 
 /**
@@ -29,5 +29,5 @@ export function getDashParser(): DashParser {
  * @returns json with the Dash Manifest structure
  */
 export function parseDashManifest(raw: string): DashManifest {
-	return dashParser(raw);
+	return dashParser(raw)
 }

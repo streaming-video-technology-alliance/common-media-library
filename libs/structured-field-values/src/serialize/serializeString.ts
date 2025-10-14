@@ -1,6 +1,6 @@
-import { STRING } from '../utils/STRING.ts';
-import { STRING_REGEX } from '../utils/STRING_REGEX.ts';
-import { serializeError } from './serializeError.ts';
+import { STRING } from '../utils/STRING.ts'
+import { STRING_REGEX } from '../utils/STRING_REGEX.ts'
+import { serializeError } from './serializeError.ts'
 
 // 4.1.6.  Serializing a String
 //
@@ -31,8 +31,8 @@ import { serializeError } from './serializeError.ts';
  */
 export function serializeString(value: string) {
 	if (STRING_REGEX.test(value)) {
-		throw serializeError(value, STRING);
+		throw serializeError(value, STRING)
 	}
 
-	return `"${value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)}"`;
+	return `"${value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)}"`
 }

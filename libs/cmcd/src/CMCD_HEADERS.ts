@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_HEADERS = 'headers';
+export const CMCD_HEADERS = 'headers'

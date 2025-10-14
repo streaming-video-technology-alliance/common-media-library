@@ -1,5 +1,5 @@
-import type { RawId3Frame } from './RawFrame.ts';
-import { readId3Size } from './readId3Size.ts';
+import type { RawId3Frame } from './RawFrame.ts'
+import { readId3Size } from './readId3Size.ts'
 
 /**
  * Returns the data of an ID3 frame.
@@ -17,11 +17,11 @@ export function getId3FrameData(data: Uint8Array<ArrayBuffer>): RawId3Frame {
 	Size           $xx xx xx xx
 	Flags          $xx xx
 	*/
-	const type: string = String.fromCharCode(data[0], data[1], data[2], data[3]);
-	const size: number = readId3Size(data, 4);
+	const type: string = String.fromCharCode(data[0], data[1], data[2], data[3])
+	const size: number = readId3Size(data, 4)
 
 	// skip frame id, size, and flags
-	const offset = 10;
+	const offset = 10
 
-	return { type, size, data: data.subarray(offset, offset + size) };
+	return { type, size, data: data.subarray(offset, offset + size) }
 }

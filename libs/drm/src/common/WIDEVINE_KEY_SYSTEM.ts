@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const WIDEVINE_KEY_SYSTEM = 'com.widevine.alpha';
+export const WIDEVINE_KEY_SYSTEM = 'com.widevine.alpha'

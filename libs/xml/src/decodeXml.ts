@@ -1,6 +1,6 @@
-import { unescapeHtml } from '@svta/cml-utils';
-import type { XmlNode } from './XmlNode.ts';
-import type { XmlParseOptions } from './XmlParseOptions.ts';
+import { unescapeHtml } from '@svta/cml-utils'
+import type { XmlNode } from './XmlNode.ts'
+import type { XmlParseOptions } from './XmlParseOptions.ts'
 
 /**
  * Parse XML into a JS object with no validation and some failure tolerance
@@ -15,25 +15,25 @@ import type { XmlParseOptions } from './XmlParseOptions.ts';
  * {@includeCode ../test/decodeXml.test.ts#example}
  */
 export function decodeXml(input: string, options: XmlParseOptions = {}): XmlNode {
-	let pos = options.pos || 0;
+	let pos = options.pos || 0
 
-	const length = input.length;
-	const keepComments = !!options.keepComments;
-	const keepWhitespace = !!options.keepWhitespace;
+	const length = input.length
+	const keepComments = !!options.keepComments
+	const keepWhitespace = !!options.keepWhitespace
 
-	const openBracket = '<';
-	const openBracketCC = '<'.charCodeAt(0);
-	const closeBracket = '>';
-	const closeBracketCC = '>'.charCodeAt(0);
-	const minusCC = '-'.charCodeAt(0);
-	const slashCC = '/'.charCodeAt(0);
-	const questionCC = '?'.charCodeAt(0);
-	const exclamationCC = '!'.charCodeAt(0);
-	const singleQuoteCC = "'".charCodeAt(0);
-	const doubleQuoteCC = '"'.charCodeAt(0);
-	const openCornerBracketCC = '['.charCodeAt(0);
-	const closeCornerBracketCC = ']'.charCodeAt(0);
-	const nameSpacer = '\r\n\t>/= ';
+	const openBracket = '<'
+	const openBracketCC = '<'.charCodeAt(0)
+	const closeBracket = '>'
+	const closeBracketCC = '>'.charCodeAt(0)
+	const minusCC = '-'.charCodeAt(0)
+	const slashCC = '/'.charCodeAt(0)
+	const questionCC = '?'.charCodeAt(0)
+	const exclamationCC = '!'.charCodeAt(0)
+	const singleQuoteCC = "'".charCodeAt(0)
+	const doubleQuoteCC = '"'.charCodeAt(0)
+	const openCornerBracketCC = '['.charCodeAt(0)
+	const closeCornerBracketCC = ']'.charCodeAt(0)
+	const nameSpacer = '\r\n\t>/= '
 
 	function createTextNode(value: string, nodeName = '#text'): XmlNode {
 		return {
@@ -41,52 +41,52 @@ export function decodeXml(input: string, options: XmlParseOptions = {}): XmlNode
 			nodeValue: value,
 			attributes: {},
 			childNodes: [],
-		};
+		}
 	}
 
 	/**
 	 * parsing a list of entries
 	 */
 	function parseChildren(tagName: string = ''): XmlNode[] {
-		const children: any[] = [];
+		const children: any[] = []
 		while (input[pos]) {
 			if (input.charCodeAt(pos) == openBracketCC) {
 				if (input.charCodeAt(pos + 1) === slashCC) {
-					const closeStart = pos + 2;
-					pos = input.indexOf(closeBracket, pos);
+					const closeStart = pos + 2
+					pos = input.indexOf(closeBracket, pos)
 					if (!input.startsWith(tagName, closeStart)) {
-						const parsedText = input.substring(0, pos).split('\n');
+						const parsedText = input.substring(0, pos).split('\n')
 						throw new Error(
 							'Unexpected close tag\nLine: ' + (parsedText.length - 1) +
 							'\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
 							'\nChar: ' + input[pos],
-						);
+						)
 					}
 
 					if (pos + 1) {
-						pos += 1;
+						pos += 1
 					}
 
-					return children;
+					return children
 				}
 				else if (input.charCodeAt(pos + 1) === questionCC) {
 					// xml declaration
-					pos = input.indexOf(closeBracket, pos);
-					pos++;
-					continue;
+					pos = input.indexOf(closeBracket, pos)
+					pos++
+					continue
 				}
 				else if (input.charCodeAt(pos + 1) === exclamationCC) {
 					if (input.charCodeAt(pos + 2) == minusCC) {
 						// comment support
-						const startCommentPos = pos;
+						const startCommentPos = pos
 						while (pos !== -1 && !(input.charCodeAt(pos) === closeBracketCC && input.charCodeAt(pos - 1) == minusCC && input.charCodeAt(pos - 2) == minusCC && pos != -1)) {
-							pos = input.indexOf(closeBracket, pos + 1);
+							pos = input.indexOf(closeBracket, pos + 1)
 						}
 						if (pos === -1) {
-							pos = length;
+							pos = length
 						}
 						if (keepComments) {
-							children.push(createTextNode(input.substring(startCommentPos, pos + 1), '#comment'));
+							children.push(createTextNode(input.substring(startCommentPos, pos + 1), '#comment'))
 						}
 					}
 					else if (
@@ -95,146 +95,146 @@ export function decodeXml(input: string, options: XmlParseOptions = {}): XmlNode
 						input.startsWith('CDATA', pos + 3)
 					) {
 						// cdata
-						const cdataEndIndex = input.indexOf(']]>', pos);
+						const cdataEndIndex = input.indexOf(']]>', pos)
 						if (cdataEndIndex == -1) {
-							children.push(createTextNode(input.substr(pos + 9), '#cdata'));
-							pos = length;
+							children.push(createTextNode(input.substr(pos + 9), '#cdata'))
+							pos = length
 						}
 						else {
-							children.push(createTextNode(input.substring(pos + 9, cdataEndIndex), '#cdata'));
-							pos = cdataEndIndex + 3;
+							children.push(createTextNode(input.substring(pos + 9, cdataEndIndex), '#cdata'))
+							pos = cdataEndIndex + 3
 						}
-						continue;
+						continue
 					}
 					else {
 						// doctypesupport
-						const startDoctype = pos + 1;
-						pos += 2;
-						let encapsuled = false;
+						const startDoctype = pos + 1
+						pos += 2
+						let encapsuled = false
 						while ((input.charCodeAt(pos) !== closeBracketCC || encapsuled === true) && input[pos]) {
 							if (input.charCodeAt(pos) === openCornerBracketCC) {
-								encapsuled = true;
+								encapsuled = true
 							}
 							else if (encapsuled === true && input.charCodeAt(pos) === closeCornerBracketCC) {
-								encapsuled = false;
+								encapsuled = false
 							}
-							pos++;
+							pos++
 						}
-						children.push(createTextNode(input.substring(startDoctype, pos), '#doctype'));
+						children.push(createTextNode(input.substring(startDoctype, pos), '#doctype'))
 					}
 
-					pos++;
-					continue;
+					pos++
+					continue
 				}
 
-				const node = parseNode();
-				children.push(node);
+				const node = parseNode()
+				children.push(node)
 			}
 			else {
-				const text = parseText();
+				const text = parseText()
 				if (keepWhitespace) {
 					if (text.length > 0) {
-						children.push(createTextNode(text));
+						children.push(createTextNode(text))
 					}
 				}
 				else {
-					const trimmed = text.trim();
+					const trimmed = text.trim()
 					if (trimmed.length > 0) {
-						children.push(createTextNode(trimmed));
+						children.push(createTextNode(trimmed))
 					}
 				}
-				pos++;
+				pos++
 			}
 		}
-		return children;
+		return children
 	}
 
 	/**
 	 * returns the text outside of texts until the first '&lt;'
 	 */
 	function parseText(): string {
-		const start = pos;
-		pos = input.indexOf(openBracket, pos) - 1;
+		const start = pos
+		pos = input.indexOf(openBracket, pos) - 1
 		if (pos === -2) {
-			pos = length;
+			pos = length
 		}
 
-		return unescapeHtml(input.slice(start, pos + 1));
+		return unescapeHtml(input.slice(start, pos + 1))
 	}
 
 	/**
 	 * returns text until the first nonAlphabetic letter
 	 */
 	function parseName(): string {
-		const start = pos;
+		const start = pos
 		while (nameSpacer.indexOf(input[pos]) === -1 && input[pos]) {
-			pos++;
+			pos++
 		}
-		return input.slice(start, pos);
+		return input.slice(start, pos)
 	}
 
 	/**
 	 * parses the attributes of a node
 	 */
 	function parseAttributes(): Record<string, string> {
-		const attributes: Record<string, string> = {};
+		const attributes: Record<string, string> = {}
 
 		// parsing attributes
 		while (input.charCodeAt(pos) !== closeBracketCC && input[pos]) {
-			const c = input.charCodeAt(pos);
+			const c = input.charCodeAt(pos)
 			if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
-				const name = parseName();
-				let value: string = '';
+				const name = parseName()
+				let value: string = ''
 				// search beginning of the string
-				let code = input.charCodeAt(pos);
+				let code = input.charCodeAt(pos)
 				while (code !== singleQuoteCC && code !== doubleQuoteCC) {
-					pos++;
-					code = input.charCodeAt(pos);
+					pos++
+					code = input.charCodeAt(pos)
 				}
 
 				if (code === singleQuoteCC || code === doubleQuoteCC) {
-					value = parseString();
+					value = parseString()
 					if (pos === -1) {
-						throw new Error('Missing closing quote');
+						throw new Error('Missing closing quote')
 					}
 				}
 				else {
-					pos--;
+					pos--
 				}
 
-				attributes[name] = unescapeHtml(value);
+				attributes[name] = unescapeHtml(value)
 			}
-			pos++;
+			pos++
 		}
 
-		return attributes;
+		return attributes
 	}
 
 	/**
 	 * parses a node
 	 */
 	function parseNode(): XmlNode {
-		pos++;
-		const nodeName = parseName();
-		let localName = nodeName;
-		let prefix = null;
+		pos++
+		const nodeName = parseName()
+		let localName = nodeName
+		let prefix = null
 
-		const nsIndex = nodeName.indexOf(':');
+		const nsIndex = nodeName.indexOf(':')
 		if (nsIndex !== -1) {
-			prefix = nodeName.slice(0, nsIndex);
-			localName = nodeName.slice(nsIndex + 1);
+			prefix = nodeName.slice(0, nsIndex)
+			localName = nodeName.slice(nsIndex + 1)
 		}
 
-		const attributes = parseAttributes();
+		const attributes = parseAttributes()
 
-		let childNodes: any[] = [];
+		let childNodes: any[] = []
 
 		// optional parsing of children
-		const prev = input.charCodeAt(pos - 1);
-		pos++;
+		const prev = input.charCodeAt(pos - 1)
+		pos++
 
 		if (prev !== slashCC) {
-			childNodes = parseChildren(nodeName);
+			childNodes = parseChildren(nodeName)
 		}
 
 		return {
@@ -244,17 +244,17 @@ export function decodeXml(input: string, options: XmlParseOptions = {}): XmlNode
 			childNodes,
 			prefix,
 			localName,
-		};
+		}
 	}
 
 	/**
 	 * is parsing a string, that starts with a char and with the same usually ' or "
 	 */
 	function parseString(): string {
-		const startChar = input[pos];
-		const startpos = pos + 1;
-		pos = input.indexOf(startChar, startpos);
-		return input.slice(startpos, pos);
+		const startChar = input[pos]
+		const startpos = pos + 1
+		pos = input.indexOf(startChar, startpos)
+		return input.slice(startpos, pos)
 	}
 
 	return {
@@ -262,5 +262,5 @@ export function decodeXml(input: string, options: XmlParseOptions = {}): XmlNode
 		nodeValue: null,
 		childNodes: parseChildren(''),
 		attributes: {},
-	};
+	}
 }

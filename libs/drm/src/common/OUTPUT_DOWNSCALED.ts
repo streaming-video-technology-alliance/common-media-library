@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const OUTPUT_DOWNSCALED = 'output-downscaled';
+export const OUTPUT_DOWNSCALED = 'output-downscaled'

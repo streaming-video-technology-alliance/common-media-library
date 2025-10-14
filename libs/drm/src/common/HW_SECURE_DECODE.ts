@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const HW_SECURE_DECODE = 'HW_SECURE_DECODE';
+export const HW_SECURE_DECODE = 'HW_SECURE_DECODE'

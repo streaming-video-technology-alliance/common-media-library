@@ -35,79 +35,79 @@
  * @beta
  */
 export class SccParser {
-	hasHeader: boolean = false;
-	nrLinesParsed: number = 0;
-	processor: any;
-	field: number | any;
+	hasHeader: boolean = false
+	nrLinesParsed: number = 0
+	processor: any
+	field: number | any
 
 	constructor(processor: any, field: number | any = 1) {
-		this.processor = processor;
-		this.field = field;
+		this.processor = processor
+		this.field = field
 	}
 
 	parse(text: string): void {
-		const lines = text.split(/\r?\n/);
-		this.nrLinesParsed = 0;
+		const lines = text.split(/\r?\n/)
+		this.nrLinesParsed = 0
 
 		if (lines[0] === 'Scenarist_SCC V1.0') {
-			this.hasHeader = true;
-			this.nrLinesParsed++;
+			this.hasHeader = true
+			this.nrLinesParsed++
 		}
 
 		for (let l = 1; l < lines.length; l += 2) {
 			if (lines[l] !== '') {
-				break;  // Every second line should be empty
+				break  // Every second line should be empty
 			}
-			this.nrLinesParsed++;
-			const lineData = this.parseDataLine(lines[l + 1]);
+			this.nrLinesParsed++
+			const lineData = this.parseDataLine(lines[l + 1])
 			if (lineData === null) {
-				break;
+				break
 			}
-			this.nrLinesParsed++;
-			this.processor.addData(lineData[0], lineData[1]);
+			this.nrLinesParsed++
+			this.processor.addData(lineData[0], lineData[1])
 		}
 	}
 
 	parseDataLine(line: string): [number, number[]] | null {
 		if (!line) {
-			return null;
+			return null
 		}
 
-		const lineParts = line.split(/\s+/);
-		const timeData = lineParts[0];
-		const ceaData: number[] = [];
+		const lineParts = line.split(/\s+/)
+		const timeData = lineParts[0]
+		const ceaData: number[] = []
 
 		for (let i = 1; i < lineParts.length; i++) {
-			const fourHexChars = lineParts[i];
-			const a = parseInt(fourHexChars.substring(0, 2), 16);
-			const b = parseInt(fourHexChars.substring(2, 4), 16);
-			ceaData.push(a, b);
+			const fourHexChars = lineParts[i]
+			const a = parseInt(fourHexChars.substring(0, 2), 16)
+			const b = parseInt(fourHexChars.substring(2, 4), 16)
+			ceaData.push(a, b)
 		}
 
-		const time = this.timeConverter(timeData);
-		return [time, ceaData];
+		const time = this.timeConverter(timeData)
+		return [time, ceaData]
 	}
 
 	timeConverter(smpteTs: string): number {
-		const parts = smpteTs.split(':');
+		const parts = smpteTs.split(':')
 		if (parts.length === 3) {
-			const lastParts = parts[2].split(';');
-			parts[2] = lastParts[0];
-			const frames = parseInt(lastParts[1], 10);
-			return (30 * (60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) + frames) * 1001 / 30000;
+			const lastParts = parts[2].split(';')
+			parts[2] = lastParts[0]
+			const frames = parseInt(lastParts[1], 10)
+			return (30 * (60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) + frames) * 1001 / 30000
 		}
-		return 0;  // in case if format is incorrect
+		return 0  // in case if format is incorrect
 	}
 
 	getHeaderStatus(): boolean {
-		return this.hasHeader;
+		return this.hasHeader
 	}
 
 	getField(): number | any {
-		return this.field;
+		return this.field
 	}
 
 	getLinesParsed(): number {
-		return this.nrLinesParsed;
+		return this.nrLinesParsed
 	}
 }

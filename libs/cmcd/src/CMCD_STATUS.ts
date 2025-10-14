@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_STATUS = 'CMCD-Status';
+export const CMCD_STATUS = 'CMCD-Status'

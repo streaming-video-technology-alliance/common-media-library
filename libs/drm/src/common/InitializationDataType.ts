@@ -1,8 +1,8 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { CBCS } from './CBCS.ts';
-import { CENC } from './CENC.ts';
-import { KEYIDS } from './KEYIDS.ts';
-import { WEBM } from './WEBM.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { CBCS } from './CBCS.ts'
+import { CENC } from './CENC.ts'
+import { KEYIDS } from './KEYIDS.ts'
+import { WEBM } from './WEBM.ts'
 
 /**
  * Initialization Data Type.
@@ -15,7 +15,7 @@ export const InitializationDataType = {
 	CBCS: CBCS as typeof CBCS,
 	KEYIDS: KEYIDS as typeof KEYIDS,
 	WEBM: WEBM as typeof WEBM,
-} as const;
+} as const
 
 /**
  * Initialization Data Type.

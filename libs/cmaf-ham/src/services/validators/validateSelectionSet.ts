@@ -1,7 +1,7 @@
-import type { SelectionSet } from '../../types/model/SelectionSet.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { SelectionSet } from '../../types/model/SelectionSet.ts'
+import type { Validation } from '../../types/Validation.ts'
 
-import { validateSwitchingSets } from './validateSwitchingSets.ts';
+import { validateSwitchingSets } from './validateSwitchingSets.ts'
 
 
 /**
@@ -39,23 +39,23 @@ export function validateSelectionSet(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 	const moreInformation = presentationId
 		? ` in the presentation with id = ${presentationId}`
-		: '.';
+		: '.'
 
 	if (!selectionSet.id) {
-		validation.status = false;
+		validation.status = false
 		validation.errorMessages.push(
 			`SelectionSet id is undefined${moreInformation}`,
-		);
+		)
 	}
 
 	validateSwitchingSets(
 		selectionSet.switchingSets,
 		selectionSet.id,
 		validation,
-	);
+	)
 
-	return validation;
+	return validation
 }

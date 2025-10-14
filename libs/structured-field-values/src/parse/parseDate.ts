@@ -1,8 +1,8 @@
-import { DATE } from '../utils/DATE.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
-import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts';
+import { DATE } from '../utils/DATE.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
+import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts'
 
 // 4.2.9.  Parsing a Date
 //
@@ -23,20 +23,20 @@ import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.ts';
  * @internal
  */
 export function parseDate(src: string): ParsedValue<Date> {
-	let i = 0;
+	let i = 0
 	if (src[i] !== '@') {
-		throw parseError(src, DATE);
+		throw parseError(src, DATE)
 	}
 
-	i++;
-	const date = parseIntegerOrDecimal(src.substring(i));
+	i++
+	const date = parseIntegerOrDecimal(src.substring(i))
 
 	if (Number.isInteger(date.value) === false) {
-		throw parseError(src, DATE);
+		throw parseError(src, DATE)
 	}
 
 	return parsedValue(
 		new Date(date.value * 1000),
 		date.src,
-	);
+	)
 }

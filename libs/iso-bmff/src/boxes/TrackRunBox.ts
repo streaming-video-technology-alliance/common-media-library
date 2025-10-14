@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.ts';
-import type { TrackRunSample } from './TrackRunSample.ts';
+import type { FullBox } from './FullBox.ts'
+import type { TrackRunSample } from './TrackRunSample.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box

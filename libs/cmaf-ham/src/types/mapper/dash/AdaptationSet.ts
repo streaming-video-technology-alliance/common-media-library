@@ -1,9 +1,9 @@
-import type { AudioChannelConfiguration } from './AudioChannelConfiguration.ts';
-import type { ContentComponent } from './ContentComponent.ts';
-import type { Representation } from './Representation.ts';
-import type { Role } from './Role.ts';
-import type { SegmentList } from './SegmentList.ts';
-import type { SegmentTemplate } from './SegmentTemplate.ts';
+import type { AudioChannelConfiguration } from './AudioChannelConfiguration.ts'
+import type { ContentComponent } from './ContentComponent.ts'
+import type { Representation } from './Representation.ts'
+import type { Role } from './Role.ts'
+import type { SegmentList } from './SegmentList.ts'
+import type { SegmentTemplate } from './SegmentTemplate.ts'
 
 /**
  * DASH Adaptation Set

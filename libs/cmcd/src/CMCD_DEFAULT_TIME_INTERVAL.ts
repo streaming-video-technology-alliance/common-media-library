@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_DEFAULT_TIME_INTERVAL = 30;
+export const CMCD_DEFAULT_TIME_INTERVAL = 30

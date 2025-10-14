@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const PLAYREADY_KEY_MESSAGE = 'PlayReadyKeyMessage';
+export const PLAYREADY_KEY_MESSAGE = 'PlayReadyKeyMessage'

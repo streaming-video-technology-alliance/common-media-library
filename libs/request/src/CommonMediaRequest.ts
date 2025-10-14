@@ -1,5 +1,5 @@
-import type { Cmcd } from '@svta/cml-cmcd';
-import type { Request } from '@svta/cml-utils';
+import type { Cmcd } from '@svta/cml-cmcd'
+import type { Request } from '@svta/cml-utils'
 
 /**
  * Common Media Request.

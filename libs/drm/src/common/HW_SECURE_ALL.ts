@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const HW_SECURE_ALL = 'HW_SECURE_ALL';
+export const HW_SECURE_ALL = 'HW_SECURE_ALL'

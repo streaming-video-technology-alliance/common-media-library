@@ -1,4 +1,4 @@
-import { decodeText, UTF_8 } from '@svta/cml-utils';
+import { decodeText, UTF_8 } from '@svta/cml-utils'
 
 /**
  * Converts a UTF-8 array to a string.
@@ -14,9 +14,9 @@ export function utf8ArrayToStr(
 	array: Uint8Array<ArrayBuffer>,
 	exitOnNull: boolean = false,
 ): string {
-	const byteLength = exitOnNull ? array.indexOf(0) : array.length;
-	const view = new DataView<ArrayBuffer>(array.buffer, array.byteOffset, byteLength);
-	const result = decodeText(view, { encoding: UTF_8 });
+	const byteLength = exitOnNull ? array.indexOf(0) : array.length
+	const view = new DataView<ArrayBuffer>(array.buffer, array.byteOffset, byteLength)
+	const result = decodeText(view, { encoding: UTF_8 })
 
-	return exitOnNull ? result : result.replace(/\0/g, '');
+	return exitOnNull ? result : result.replace(/\0/g, '')
 }

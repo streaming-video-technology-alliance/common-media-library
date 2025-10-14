@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const STATUS_PENDING = 'status-pending';
+export const STATUS_PENDING = 'status-pending'

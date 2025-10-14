@@ -1,1 +1,1 @@
-export const BYTES = 'Byte Sequence';
+export const BYTES = 'Byte Sequence'

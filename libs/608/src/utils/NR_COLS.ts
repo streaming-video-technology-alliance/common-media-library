@@ -1,1 +1,1 @@
-export const NR_COLS = 100;
+export const NR_COLS = 100

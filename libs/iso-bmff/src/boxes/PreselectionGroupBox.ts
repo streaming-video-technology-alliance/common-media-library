@@ -1,5 +1,5 @@
-import type { Entity } from './Entity.ts';
-import type { FullBox } from './FullBox.ts';
+import type { Entity } from './Entity.ts'
+import type { FullBox } from './FullBox.ts'
 
 /**
  * ISO/IEC 14496-12:202x - 8.18.4.1 Preselection group box

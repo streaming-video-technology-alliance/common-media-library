@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const DEFAULT_PATHWAY_PENALTY = 300000;
+export const DEFAULT_PATHWAY_PENALTY = 300000

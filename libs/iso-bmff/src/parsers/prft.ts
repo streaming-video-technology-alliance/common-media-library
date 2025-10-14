@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a ProducerReferenceTimeBox from an IsoView
@@ -13,7 +13,7 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function prft(view: IsoView): Fields<ProducerReferenceTimeBox> {
-	const { version, flags } = view.readFullBox();
+	const { version, flags } = view.readFullBox()
 
 	return {
 		version,
@@ -22,5 +22,5 @@ export function prft(view: IsoView): Fields<ProducerReferenceTimeBox> {
 		ntpTimestampSec: view.readUint(4),
 		ntpTimestampFrac: view.readUint(4),
 		mediaTime: view.readUint(version === 1 ? 8 : 4),
-	};
+	}
 };

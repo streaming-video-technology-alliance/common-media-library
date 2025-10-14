@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a WebVTTCuePayloadBox from an IsoView
@@ -15,5 +15,5 @@ import type { IsoView } from '../IsoView.ts';
 export function payl(view: IsoView): Fields<WebVttCuePayloadBox> {
 	return {
 		cueText: view.readUtf8(-1),
-	};
+	}
 };

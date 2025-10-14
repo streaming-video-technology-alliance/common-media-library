@@ -1,6 +1,6 @@
-import { encodeXml } from '@svta/cml-xml';
-import { equal } from 'node:assert';
-import { describe, it } from 'node:test';
+import { encodeXml } from '@svta/cml-xml'
+import { equal } from 'node:assert'
+import { describe, it } from 'node:test'
 
 describe('encodeXml', () => {
 	it('provides a valid example', async () => {
@@ -46,9 +46,9 @@ describe('encodeXml', () => {
 					],
 				},
 			],
-		};
+		}
 
-		equal(encodeXml(xml), '<?xml version="1.0" encoding="UTF-8"?><root><child hello="world">text</child><ns:tag>content</ns:tag></root>');
+		equal(encodeXml(xml), '<?xml version="1.0" encoding="UTF-8"?><root><child hello="world">text</child><ns:tag>content</ns:tag></root>')
 		//#endregion example
-	});
-});
+	})
+})

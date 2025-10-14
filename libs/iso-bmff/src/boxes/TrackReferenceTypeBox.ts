@@ -1,4 +1,4 @@
-import type { Box } from './Box.ts';
+import type { Box } from './Box.ts'
 
 /**
  * Track Reference Type Box

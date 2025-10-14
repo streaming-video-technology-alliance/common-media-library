@@ -1,5 +1,5 @@
-import { strToCodes } from '../utils/strToCodes.ts';
-import { ID3_BYTES, ID3_VERSION_BYTES } from './ID3.ts';
+import { strToCodes } from '../utils/strToCodes.ts'
+import { ID3_BYTES, ID3_VERSION_BYTES } from './ID3.ts'
 
 function createId3Size(size: number) {
 	// size is stored as a sequence of four 7-bit integers with the
@@ -9,7 +9,7 @@ function createId3Size(size: number) {
 		(size >>> 14) & 0x7f,
 		(size >>> 7) & 0x7f,
 		size & 0x7f,
-	];
+	]
 }
 
 export function createId3(type: string, data: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> {
@@ -45,7 +45,7 @@ export function createId3(type: string, data: Uint8Array<ArrayBuffer>): Uint8Arr
 
 		// Payload
 		...data,
-	]);
+	])
 
-	return id3;
+	return id3
 }

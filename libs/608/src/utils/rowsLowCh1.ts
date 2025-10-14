@@ -9,4 +9,4 @@ export const rowsLowCh1: Record<number, number> = {
 	16: 11,
 	19: 12,
 	20: 14,
-};
+}

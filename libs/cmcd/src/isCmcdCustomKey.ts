@@ -1,6 +1,6 @@
-import type { CmcdKey } from './CmcdKey.ts';
+import type { CmcdKey } from './CmcdKey.ts'
 
-const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9-.]+-[a-zA-Z0-9-.]+$/;
+const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9-.]+-[a-zA-Z0-9-.]+$/
 
 /**
  * Check if a key is a custom key.
@@ -13,5 +13,5 @@ const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9-.]+-[a-zA-Z0-9-.]+$/;
  * @beta
  */
 export function isCmcdCustomKey(key: CmcdKey): boolean {
-	return CUSTOM_KEY_REGEX.test(key);
+	return CUSTOM_KEY_REGEX.test(key)
 }

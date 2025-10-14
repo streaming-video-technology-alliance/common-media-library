@@ -1,6 +1,6 @@
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import { toCmcdHeaders } from './toCmcdHeaders.ts';
+import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import { toCmcdHeaders } from './toCmcdHeaders.ts'
 
 /**
  * Append CMCD query args to a header object.
@@ -18,5 +18,5 @@ import { toCmcdHeaders } from './toCmcdHeaders.ts';
  * {@includeCode ../test/appendCmcdHeaders.test.ts#example}
  */
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string> {
-	return Object.assign(headers, toCmcdHeaders(cmcd, options));
+	return Object.assign(headers, toCmcdHeaders(cmcd, options))
 }

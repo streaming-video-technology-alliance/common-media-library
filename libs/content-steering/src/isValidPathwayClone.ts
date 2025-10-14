@@ -1,4 +1,4 @@
-import type { PathwayClone } from './PathwayClone.ts';
+import type { PathwayClone } from './PathwayClone.ts'
 
 /**
  * Validates a pathway clone.
@@ -11,14 +11,14 @@ import type { PathwayClone } from './PathwayClone.ts';
  */
 export function isValidPathwayClone(clone: PathwayClone): boolean {
 	if (typeof clone !== 'object' || !clone) {
-		return false;
+		return false
 	}
 
-	const { ID, 'BASE-ID': BASE_ID, 'URI-REPLACEMENT': URI_REPLACEMENT } = clone;
+	const { ID, 'BASE-ID': BASE_ID, 'URI-REPLACEMENT': URI_REPLACEMENT } = clone
 
 	if (typeof ID !== 'string' || typeof BASE_ID !== 'string' || URI_REPLACEMENT == null || typeof URI_REPLACEMENT !== 'object') {
-		return false;
+		return false
 	}
 
-	return true;
+	return true
 }

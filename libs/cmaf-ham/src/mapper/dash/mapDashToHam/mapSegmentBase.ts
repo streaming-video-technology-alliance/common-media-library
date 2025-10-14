@@ -1,7 +1,7 @@
-import type { Representation } from '../../../types/mapper/dash/Representation.ts';
-import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase.ts';
+import type { Representation } from '../../../types/mapper/dash/Representation.ts'
+import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase.ts'
 
-import type { Segment } from '../../../types/model/Segment.ts';
+import type { Segment } from '../../../types/model/Segment.ts'
 
 /**
  * @internal
@@ -21,6 +21,6 @@ export function mapSegmentBase(
 			duration,
 			url: representation.BaseURL![0] ?? '',
 			byteRange: segment.$.indexRange,
-		} as Segment;
-	});
+		} as Segment
+	})
 }

@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CENC = 'cenc';
+export const CENC = 'cenc'

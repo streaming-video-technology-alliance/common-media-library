@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CBCS = 'cbcs';
+export const CBCS = 'cbcs'

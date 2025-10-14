@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.ts';
+import type { FullBox } from './FullBox.ts'
 
 /**
  * Hint Media Header Box - 'hmhd'

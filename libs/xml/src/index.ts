@@ -4,10 +4,10 @@
  * @packageDocumentation
  * @beta
  */
-export * from './decodeXml.ts';
-export * from './encodeXml.ts';
-export * from './getElementsByName.ts';
-export * from './parseXml.ts';
-export type * from './XmlNode.ts';
-export type * from './XmlParseOptions.ts';
+export * from './decodeXml.ts'
+export * from './encodeXml.ts'
+export * from './getElementsByName.ts'
+export * from './parseXml.ts'
+export type * from './XmlNode.ts'
+export type * from './XmlParseOptions.ts'
 

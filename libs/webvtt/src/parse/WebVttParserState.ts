@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 export const WebVttParserState = {
 	INITIAL: 'INITIAL',
@@ -12,6 +12,6 @@ export const WebVttParserState = {
 	CUE_TEXT: 'CUE_EXT',
 	BAD_CUE: 'BAD_CUE',
 	BAD_WEBVTT: 'BAD_WEBVTT',
-} as const;
+} as const
 
 export type WebVttParserState = ValueOf<typeof WebVttParserState>;

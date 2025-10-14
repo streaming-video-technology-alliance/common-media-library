@@ -1,8 +1,8 @@
-import type { Cmcd } from './Cmcd.ts';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
-import { toCmcdQuery } from './toCmcdQuery.ts';
+import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import { toCmcdQuery } from './toCmcdQuery.ts'
 
-const REGEX = /CMCD=[^&#]+/;
+const REGEX = /CMCD=[^&#]+/
 
 /**
  * Append CMCD query args to a URL.
@@ -23,15 +23,15 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 	// TODO: Replace with URLSearchParams once we drop Safari < 10.1 & Chrome < 49 support.
 	// https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
 
-	const query = toCmcdQuery(cmcd, options);
+	const query = toCmcdQuery(cmcd, options)
 	if (!query) {
-		return url;
+		return url
 	}
 
 	if (REGEX.test(url)) {
-		return url.replace(REGEX, query);
+		return url.replace(REGEX, query)
 	}
 
-	const separator = url.includes('?') ? '&' : '?';
-	return `${url}${separator}${query}`;
+	const separator = url.includes('?') ? '&' : '?'
+	return `${url}${separator}${query}`
 }

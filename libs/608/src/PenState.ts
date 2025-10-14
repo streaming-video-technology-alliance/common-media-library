@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PenStyles } from './PenStyles.ts';
+import type { PenStyles } from './PenStyles.ts'
 
 /**
  * Pen state.
@@ -44,18 +44,18 @@ import type { PenStyles } from './PenStyles.ts';
  * @beta
  */
 export class PenState {
-	public foreground: string = 'white';
-	public underline: boolean = false;
-	public italics: boolean = false;
-	public background: string = 'black';
-	public flash: boolean = false;
+	public foreground: string = 'white'
+	public underline: boolean = false
+	public italics: boolean = false
+	public background: string = 'black'
+	public flash: boolean = false
 
 	reset(): void {
-		this.foreground = 'white';
-		this.underline = false;
-		this.italics = false;
-		this.background = 'black';
-		this.flash = false;
+		this.foreground = 'white'
+		this.underline = false
+		this.italics = false
+		this.background = 'black'
+		this.flash = false
 	}
 
 	setStyles(styles: Partial<PenStyles>): void {
@@ -65,11 +65,11 @@ export class PenState {
 			'italics',
 			'background',
 			'flash',
-		];
+		]
 		for (let i = 0; i < attribs.length; i++) {
-			const style = attribs[i];
+			const style = attribs[i]
 			if (Object.prototype.hasOwnProperty.call(styles, style)) {
-				(this as any)[style] = (styles as any)[style];
+				(this as any)[style] = (styles as any)[style]
 			}
 		}
 	}
@@ -81,7 +81,7 @@ export class PenState {
 			!this.italics &&
 			this.background === 'black' &&
 			!this.flash
-		);
+		)
 	}
 
 	equals(other: PenState): boolean {
@@ -91,14 +91,14 @@ export class PenState {
 			this.italics === other.italics &&
 			this.background === other.background &&
 			this.flash === other.flash
-		);
+		)
 	}
 
 	copy(newPenState: PenState): void {
-		this.foreground = newPenState.foreground;
-		this.underline = newPenState.underline;
-		this.italics = newPenState.italics;
-		this.background = newPenState.background;
-		this.flash = newPenState.flash;
+		this.foreground = newPenState.foreground
+		this.underline = newPenState.underline
+		this.italics = newPenState.italics
+		this.background = newPenState.background
+		this.flash = newPenState.flash
 	}
 }

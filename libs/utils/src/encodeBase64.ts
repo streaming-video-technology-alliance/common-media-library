@@ -8,5 +8,5 @@
  * @beta
  */
 export function encodeBase64(binary: Uint8Array): string {
-	return btoa(String.fromCharCode(...binary));
+	return btoa(String.fromCharCode(...binary))
 }

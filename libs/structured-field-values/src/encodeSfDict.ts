@@ -1,5 +1,5 @@
-import type { SfEncodeOptions } from './SfEncodeOptions.ts';
-import { serializeDict } from './serialize/serializeDict.ts';
+import type { SfEncodeOptions } from './SfEncodeOptions.ts'
+import { serializeDict } from './serialize/serializeDict.ts'
 
 /**
  * Encode an object into a structured field dictionary
@@ -13,5 +13,5 @@ import { serializeDict } from './serialize/serializeDict.ts';
  * @beta
  */
 export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string {
-	return serializeDict(value, options);
+	return serializeDict(value, options)
 }

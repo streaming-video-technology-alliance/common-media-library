@@ -1,29 +1,29 @@
-import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts';
+import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts'
 
 /**
  * @internal
  */
 export type DashSerializer = (json: DashManifest) => string;
 
-let xmlSerializer: DashSerializer;
+let xmlSerializer: DashSerializer
 
 /**
  * @internal
  */
 export function setDashSerializer(serializer: DashSerializer): void {
-	xmlSerializer = serializer;
+	xmlSerializer = serializer
 }
 
 /**
  * @internal
  */
 export function getDashSerializer(): DashSerializer {
-	return xmlSerializer;
+	return xmlSerializer
 }
 
 /**
  * @internal
  */
 export function serializeDashManifest(json: DashManifest): string {
-	return xmlSerializer(json);
+	return xmlSerializer(json)
 }

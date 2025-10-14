@@ -1,4 +1,4 @@
-import { serializeInteger } from './serializeInteger.ts';
+import { serializeInteger } from './serializeInteger.ts'
 
 // 4.1.10.  Serializing a Date
 //
@@ -12,5 +12,5 @@ import { serializeInteger } from './serializeInteger.ts';
  * @internal
  */
 export function serializeDate(value: Date) {
-	return `@${serializeInteger(value.getTime() / 1000)}`;
+	return `@${serializeInteger(value.getTime() / 1000)}`
 }

@@ -1,10 +1,10 @@
-const DURATION = /^([-])?P(?:([\d.]*)Y)?(?:([\d.]*)M)?(?:([\d.]*)D)?T?(?:([\d.]*)H)?(?:([\d.]*)M)?(?:([\d.]*)S)?$/;
+const DURATION = /^([-])?P(?:([\d.]*)Y)?(?:([\d.]*)M)?(?:([\d.]*)D)?T?(?:([\d.]*)H)?(?:([\d.]*)M)?(?:([\d.]*)S)?$/
 
-const SECONDS_IN_YEAR = 365 * 24 * 60 * 60;
-const SECONDS_IN_MONTH = 30 * 24 * 60 * 60;
-const SECONDS_IN_DAY = 24 * 60 * 60;
-const SECONDS_IN_HOUR = 60 * 60;
-const SECONDS_IN_MIN = 60;
+const SECONDS_IN_YEAR = 365 * 24 * 60 * 60
+const SECONDS_IN_MONTH = 30 * 24 * 60 * 60
+const SECONDS_IN_DAY = 24 * 60 * 60
+const SECONDS_IN_HOUR = 60 * 60
+const SECONDS_IN_MIN = 60
 
 /**
  * Decode an ISO 8601 duration string into seconds.
@@ -18,10 +18,10 @@ const SECONDS_IN_MIN = 60;
  * {@includeCode ../test/decodeIso8601Duration.test.ts#example}
  */
 export function decodeIso8601Duration(isoDuration: string): number {
-	const match = DURATION.exec(isoDuration);
+	const match = DURATION.exec(isoDuration)
 
 	if (!match) {
-		return NaN;
+		return NaN
 	}
 
 	const duration =
@@ -30,11 +30,11 @@ export function decodeIso8601Duration(isoDuration: string): number {
 		Number(match[4] || 0) * SECONDS_IN_DAY +
 		Number(match[5] || 0) * SECONDS_IN_HOUR +
 		Number(match[6] || 0) * SECONDS_IN_MIN +
-		Number(match[7] || 0);
+		Number(match[7] || 0)
 
 	if (!isFinite(duration)) {
-		return NaN;
+		return NaN
 	}
 
-	return match[1] === undefined ? duration : -duration;
+	return match[1] === undefined ? duration : -duration
 }

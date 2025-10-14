@@ -1,1 +1,1 @@
-export const DICT = 'Dict';
+export const DICT = 'Dict'

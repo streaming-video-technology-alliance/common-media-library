@@ -1,5 +1,5 @@
-import { decodeSfList } from '@svta/cml-structured-field-values';
-import type { CmsdDynamic } from './CmsdDynamic.ts';
+import { decodeSfList } from '@svta/cml-structured-field-values'
+import type { CmsdDynamic } from './CmsdDynamic.ts'
 
 /**
  * Decode a CMSD dynamic string to an object.
@@ -13,10 +13,10 @@ import type { CmsdDynamic } from './CmsdDynamic.ts';
  */
 export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[] {
 	if (!cmsd) {
-		return [];
+		return []
 	}
 
-	const sfDict = decodeSfList(cmsd);
+	const sfDict = decodeSfList(cmsd)
 
-	return sfDict as CmsdDynamic[];
+	return sfDict as CmsdDynamic[]
 }

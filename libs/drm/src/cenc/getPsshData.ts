@@ -10,18 +10,18 @@
  * {@includeCode ../../test/cenc/getPsshData.test.ts#example}
  */
 export function getPsshData(pssh: ArrayBuffer): ArrayBuffer {
-	const offset = 8; // Box size and type fields
-	const view = new DataView(pssh);
+	const offset = 8 // Box size and type fields
+	const view = new DataView(pssh)
 
-	const version = view.getUint8(offset); // Read version
-	let dataOffset = offset + 20;
+	const version = view.getUint8(offset) // Read version
+	let dataOffset = offset + 20
 
 	if (version > 0) {
-		const kidCount = view.getUint32(dataOffset);
-		dataOffset += 4 + (16 * kidCount);
+		const kidCount = view.getUint32(dataOffset)
+		dataOffset += 4 + (16 * kidCount)
 	}
 
-	dataOffset += 4; // Data size
-	return pssh.slice(dataOffset);
+	dataOffset += 4 // Data size
+	return pssh.slice(dataOffset)
 }
 

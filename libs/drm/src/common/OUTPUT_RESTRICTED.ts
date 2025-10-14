@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const OUTPUT_RESTRICTED = 'output-restricted';
+export const OUTPUT_RESTRICTED = 'output-restricted'

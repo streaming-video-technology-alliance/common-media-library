@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const LICENSE_RENEWAL = 'license-renewal';
+export const LICENSE_RENEWAL = 'license-renewal'

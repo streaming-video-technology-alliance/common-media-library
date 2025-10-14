@@ -7,4 +7,4 @@ export const rowsLowCh2: Record<number, number> = {
 	24: 11,
 	27: 12,
 	28: 14,
-};
+}

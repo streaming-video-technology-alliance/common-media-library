@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const KEYIDS = 'keyids';
+export const KEYIDS = 'keyids'

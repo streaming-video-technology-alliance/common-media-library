@@ -5,9 +5,9 @@
  * @beta
  */
 export class SfToken {
-	description: string;
+	description: string
 
 	constructor(description: string) {
-		this.description = description;
+		this.description = description
 	}
 }

@@ -1,5 +1,5 @@
-import type { CmcdData } from '@svta/cml-cmcd';
-import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType } from '@svta/cml-cmcd';
+import type { CmcdData } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType } from '@svta/cml-cmcd'
 
 export const CMCD_INPUT: CmcdData = {
 	// common keys
@@ -63,4 +63,4 @@ export const CMCD_INPUT: CmcdData = {
 	['com.example-not-exists']: false,
 	['com.example-token']: Symbol('s'),
 	['com.example-quote']: '"Quote"',
-};
+}

@@ -1,6 +1,6 @@
-import type { WebVttCue } from './WebVttCue.ts';
-import type { WebVttParsingError } from './WebVttParsingError.ts';
-import type { WebVttRegion } from './WebVttRegion.ts';
+import type { WebVttCue } from './WebVttCue.ts'
+import type { WebVttParsingError } from './WebVttParsingError.ts'
+import type { WebVttRegion } from './WebVttRegion.ts'
 
 /**
  * The result of parsing a WebVTT string.

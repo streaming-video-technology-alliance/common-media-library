@@ -1,8 +1,8 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { CMCD_OBJECT } from './CMCD_OBJECT.ts';
-import { CMCD_REQUEST } from './CMCD_REQUEST.ts';
-import { CMCD_SESSION } from './CMCD_SESSION.ts';
-import { CMCD_STATUS } from './CMCD_STATUS.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { CMCD_OBJECT } from './CMCD_OBJECT.ts'
+import { CMCD_REQUEST } from './CMCD_REQUEST.ts'
+import { CMCD_SESSION } from './CMCD_SESSION.ts'
+import { CMCD_STATUS } from './CMCD_STATUS.ts'
 
 /**
  * CMCD header fields.
@@ -32,7 +32,7 @@ export const CmcdHeaderField = {
 	 * keys whose values do not vary with every request or object.
 	 */
 	STATUS: CMCD_STATUS as typeof CMCD_STATUS,
-} as const;
+} as const
 
 /**
  * @beta

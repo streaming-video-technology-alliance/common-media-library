@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.ts';
-import type { SegmentIndexReference } from './SegmentIndexReference.ts';
+import type { FullBox } from './FullBox.ts'
+import type { SegmentIndexReference } from './SegmentIndexReference.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box

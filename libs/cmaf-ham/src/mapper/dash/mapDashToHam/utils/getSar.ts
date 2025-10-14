@@ -1,5 +1,5 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 
 /**
  * @internal
@@ -14,9 +14,9 @@ export function getSar(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
 ): string {
-	const sar: string = representation.$.sar ?? adaptationSet.$.sar ?? '';
+	const sar: string = representation.$.sar ?? adaptationSet.$.sar ?? ''
 	if (!sar) {
-		console.error(`Representation ${representation.$.id} has no sar`);
+		console.error(`Representation ${representation.$.id} has no sar`)
 	}
-	return sar;
+	return sar
 }

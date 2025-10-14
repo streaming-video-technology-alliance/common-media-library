@@ -5,6 +5,6 @@
  *
  * @beta
  */
-export * from './decodeIso8601Duration.ts';
-export * from './encodeIso8601Duration.ts';
+export * from './decodeIso8601Duration.ts'
+export * from './encodeIso8601Duration.ts'
 

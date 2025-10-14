@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a WebVTTSettingsBox from an IsoView
@@ -15,5 +15,5 @@ import type { IsoView } from '../IsoView.ts';
 export function sttg(view: IsoView): Fields<WebVttSettingsBox> {
 	return {
 		settings: view.readUtf8(-1),
-	};
+	}
 };

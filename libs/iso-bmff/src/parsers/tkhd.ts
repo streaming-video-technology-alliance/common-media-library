@@ -1,8 +1,8 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts';
-import { TEMPLATE } from '../fields/TEMPLATE.ts';
-import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
+import { TEMPLATE } from '../fields/TEMPLATE.ts'
+import { UINT } from '../fields/UINT.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a TrackHeaderBox from an IsoView
@@ -15,8 +15,8 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function tkhd(view: IsoView): Fields<TrackHeaderBox> {
-	const { version, flags } = view.readFullBox();
-	const size = version === 1 ? 8 : 4;
+	const { version, flags } = view.readFullBox()
+	const size = version === 1 ? 8 : 4
 
 	return {
 		version,
@@ -34,5 +34,5 @@ export function tkhd(view: IsoView): Fields<TrackHeaderBox> {
 		matrix: view.readArray(TEMPLATE, 4, 9),
 		width: view.readTemplate(4),
 		height: view.readTemplate(4),
-	};
+	}
 };

@@ -1,11 +1,11 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { EXPIRED } from './EXPIRED.ts';
-import { INTERNAL_ERROR } from './INTERNAL_ERROR.ts';
-import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.ts';
-import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED.ts';
-import { RELEASED } from './RELEASED.ts';
-import { STATUS_PENDING } from './STATUS_PENDING.ts';
-import { USABLE } from './USABLE.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { EXPIRED } from './EXPIRED.ts'
+import { INTERNAL_ERROR } from './INTERNAL_ERROR.ts'
+import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.ts'
+import { OUTPUT_RESTRICTED } from './OUTPUT_RESTRICTED.ts'
+import { RELEASED } from './RELEASED.ts'
+import { STATUS_PENDING } from './STATUS_PENDING.ts'
+import { USABLE } from './USABLE.ts'
 
 /**
  * Media Key Statuses.
@@ -21,7 +21,7 @@ export const MediaKeyStatus = {
 	OUTPUT_DOWNSCALED: OUTPUT_DOWNSCALED as typeof OUTPUT_DOWNSCALED,
 	STATUS_PENDING: STATUS_PENDING as typeof STATUS_PENDING,
 	INTERNAL_ERROR: INTERNAL_ERROR as typeof INTERNAL_ERROR,
-} as const;
+} as const
 
 /**
  * Media Key Statuses.

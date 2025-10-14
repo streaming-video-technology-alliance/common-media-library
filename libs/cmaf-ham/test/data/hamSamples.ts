@@ -3,7 +3,7 @@ import type {
 	Presentation,
 	Segment,
 	VideoTrack,
-} from '@svta/cml-cmaf-ham';
+} from '@svta/cml-cmaf-ham'
 
 export const videoSegments: Segment[] = [
 	{
@@ -26,7 +26,7 @@ export const videoSegments: Segment[] = [
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000005.cmfv',
 	},
-];
+]
 
 export const audioSegments: Segment[] = [
 	{
@@ -49,7 +49,7 @@ export const audioSegments: Segment[] = [
 		duration: 18.75,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000005.cmfa',
 	},
-];
+]
 
 export const invalidSegments: Segment[] = [
 	{
@@ -72,7 +72,7 @@ export const invalidSegments: Segment[] = [
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000005.cmfv',
 	},
-];
+]
 
 export const videoTrack: VideoTrack = {
 	fileName: 'video/mp4',
@@ -94,7 +94,7 @@ export const videoTrack: VideoTrack = {
 	width: 1920,
 	urlInitialization:
 		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv',
-} as VideoTrack;
+} as VideoTrack
 
 export const invalidVideoTrack: VideoTrack = {
 	fileName: 'video/mp4',
@@ -125,7 +125,7 @@ export const invalidVideoTrack: VideoTrack = {
 	width: 1920,
 	urlInitialization:
 		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv',
-} as VideoTrack;
+} as VideoTrack
 
 export const audioTrack: AudioTrack = {
 	name: 'audio/mp4',
@@ -140,7 +140,7 @@ export const audioTrack: AudioTrack = {
 	type: 'audio',
 	urlInitialization:
 		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
-} as AudioTrack;
+} as AudioTrack
 
 export const invalidAudioTrack: AudioTrack = {
 	name: 'audio/mp4',
@@ -155,7 +155,7 @@ export const invalidAudioTrack: AudioTrack = {
 	type: 'audio',
 	urlInitialization:
 		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
-} as AudioTrack;
+} as AudioTrack
 
 export const presentation: Presentation = {
 	id: '1',
@@ -179,7 +179,7 @@ export const presentation: Presentation = {
 			],
 		},
 	],
-};
+}
 
 export const invalidPresentation: Presentation = {
 	id: '',
@@ -203,4 +203,4 @@ export const invalidPresentation: Presentation = {
 			],
 		},
 	],
-};
+}

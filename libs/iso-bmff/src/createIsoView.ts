@@ -1,6 +1,6 @@
-import type { IsoData } from './IsoData.ts';
-import { IsoView } from './IsoView.ts';
-import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { IsoData } from './IsoData.ts'
+import { IsoView } from './IsoView.ts'
+import type { IsoViewConfig } from './IsoViewConfig.ts'
 
 /**
  * Create an IsoView from a raw ISO data.
@@ -14,5 +14,5 @@ import type { IsoViewConfig } from './IsoViewConfig.ts';
  * @beta
  */
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView {
-	return new IsoView(raw, config);
+	return new IsoView(raw, config)
 }

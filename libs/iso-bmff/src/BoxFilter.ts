@@ -1,4 +1,4 @@
-import type { IsoBmffBox } from './boxes/IsoBmffBox.ts';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
 
 /**
  * Box filter function

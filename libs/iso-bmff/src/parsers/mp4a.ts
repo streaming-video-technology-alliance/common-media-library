@@ -1,7 +1,7 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts';
-import type { Fields } from '../boxes/Fields.ts';
-import { UINT } from '../fields/UINT.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import { UINT } from '../fields/UINT.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse an AudioSampleEntry from an IsoView
@@ -14,7 +14,7 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function mp4a(view: IsoView): Fields<AudioSampleEntryBox<'mp4a'>> {
-	const { readArray, readUint, readTemplate, readData } = view;
+	const { readArray, readUint, readTemplate, readData } = view
 
 	return {
 		reserved1: readArray(UINT, 1, 6),
@@ -26,5 +26,5 @@ export function mp4a(view: IsoView): Fields<AudioSampleEntryBox<'mp4a'>> {
 		reserved3: readUint(2),
 		samplerate: readTemplate(4),
 		esds: readData(-1),
-	};
+	}
 };

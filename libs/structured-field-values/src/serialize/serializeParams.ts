@@ -1,5 +1,5 @@
-import { serializeBareItem } from './serializeBareItem.ts';
-import { serializeKey } from './serializeKey.ts';
+import { serializeBareItem } from './serializeBareItem.ts'
+import { serializeKey } from './serializeKey.ts'
 
 // 4.1.1.2.  Serializing Parameters
 //
@@ -30,16 +30,16 @@ import { serializeKey } from './serializeKey.ts';
  */
 export function serializeParams(params?: Record<string, any>): string {
 	if (params == null) {
-		return '';
+		return ''
 	}
 
 	return Object.entries(params)
 		.map(([key, value]) => {
 			if (value === true) {
-				return `;${serializeKey(key)}`; // omit true
+				return `;${serializeKey(key)}` // omit true
 			}
 
-			return `;${serializeKey(key)}=${serializeBareItem(value)}`;
+			return `;${serializeKey(key)}=${serializeBareItem(value)}`
 		})
-		.join('');
+		.join('')
 }

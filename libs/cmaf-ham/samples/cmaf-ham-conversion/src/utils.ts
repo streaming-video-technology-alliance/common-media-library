@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs'
+import path from 'path'
 
 /**
  * Returns the main and playlists paths of a HLS content from a folder.
@@ -12,27 +12,27 @@ export function listM3U8Files(directory: string): {
 	playlists: string[];
 	error: boolean;
 } {
-	let manifest: string = null;
-	const playlists: string[] = [];
+	let manifest: string = null
+	const playlists: string[] = []
 
-	const files = fs.readdirSync(directory);
+	const files = fs.readdirSync(directory)
 
 	files.forEach((file) => {
 		if (path.extname(file) === '.m3u8') {
 			if (file === 'manifest.m3u8' || file === 'main.m3u8') {
-				manifest = path.join(directory, file);
+				manifest = path.join(directory, file)
 			}
 			else {
-				playlists.push(path.join(directory, file));
+				playlists.push(path.join(directory, file))
 			}
 		}
-	});
+	})
 
 	return {
 		manifest: manifest,
 		playlists: playlists,
 		error: manifest === null || playlists.length === 0,
-	};
+	}
 }
 
 /**
@@ -41,14 +41,14 @@ export function listM3U8Files(directory: string): {
  * @returns Array of .mpd path files.
  */
 export function listMPDFiles(directory: string): string[] {
-	const mpds: string[] = [];
-	const files = fs.readdirSync(directory);
+	const mpds: string[] = []
+	const files = fs.readdirSync(directory)
 	files.forEach((file) => {
 		if (path.extname(file) === '.mpd') {
-			mpds.push(path.join(directory, file));
+			mpds.push(path.join(directory, file))
 		}
-	});
-	return mpds;
+	})
+	return mpds
 }
 
 /**
@@ -57,9 +57,9 @@ export function listMPDFiles(directory: string): string[] {
  * @returns Array of stirngs.
  */
 export function listDirectories(directoryPath: string): string[] {
-	const filesAndDirectories = fs.readdirSync(directoryPath);
+	const filesAndDirectories = fs.readdirSync(directoryPath)
 	const directories = filesAndDirectories.filter((item) =>
 		fs.statSync(path.join(directoryPath, item)).isDirectory(),
-	);
-	return directories;
+	)
+	return directories
 }

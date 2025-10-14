@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const INT = 'int';
+export const INT = 'int'

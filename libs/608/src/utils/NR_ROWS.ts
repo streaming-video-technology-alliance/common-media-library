@@ -1,1 +1,1 @@
-export const NR_ROWS = 15;
+export const NR_ROWS = 15

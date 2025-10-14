@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.ts';
-import type { SampleToGroupEntry } from './SampleToGroupEntry.ts';
+import type { FullBox } from './FullBox.ts'
+import type { SampleToGroupEntry } from './SampleToGroupEntry.ts'
 
 /**
  * Sample to Group Box - 'sbgp'

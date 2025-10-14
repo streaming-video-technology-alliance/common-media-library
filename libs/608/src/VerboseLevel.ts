@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * Logging levels for the CTA-608 parser.
@@ -15,7 +15,7 @@ export const VerboseLevel = {
 	INFO: 2,
 	DEBUG: 3,
 	DATA: 3,
-} as const;
+} as const
 
 /**
  * @beta

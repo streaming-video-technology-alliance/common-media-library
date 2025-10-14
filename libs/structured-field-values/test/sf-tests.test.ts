@@ -1,8 +1,8 @@
-import { decodeSfDict, decodeSfItem, decodeSfList, encodeSfDict, encodeSfItem, encodeSfList } from '@svta/cml-structured-field-values';
-import assert from 'node:assert';
-import test, { describe } from 'node:test';
-import { formatDict, formatItem, formatList } from './util/format.ts';
-import { read } from './util/read.ts';
+import { decodeSfDict, decodeSfItem, decodeSfList, encodeSfDict, encodeSfItem, encodeSfList } from '@svta/cml-structured-field-values'
+import assert from 'node:assert'
+import test, { describe } from 'node:test'
+import { formatDict, formatItem, formatList } from './util/format.ts'
+import { read } from './util/read.ts'
 
 describe('structured_field_tests', async () => {
 	const suites = await Promise.all([
@@ -25,7 +25,7 @@ describe('structured_field_tests', async () => {
 		read(`string`),
 		read(`token-generated`),
 		read(`token`),
-	]);
+	])
 
 	suites.flat().forEach((suite) => {
 		const ignore = [
@@ -40,32 +40,32 @@ describe('structured_field_tests', async () => {
 			// example.json
 			`Example-Hdr (list on two lines)`,
 			`Example-Hdr (dictionary on two lines)`,
-		];
+		]
 		if (ignore.includes(suite.name)) {
-			return;
+			return
 		}
 		if (suite.name.endsWith('0 decimal')) {
-			return;
+			return
 		} // .0 is Integer in JS
 
 		test(suite.name, () => {
 			try {
 				if (suite.header_type === `item`) {
 					// decode
-					const obj = formatItem(suite.expected);
-					const decoded = decodeSfItem(suite.raw[0]);
-					assert.deepStrictEqual(decoded, obj, suite.name);
+					const obj = formatItem(suite.expected)
+					const decoded = decodeSfItem(suite.raw[0])
+					assert.deepStrictEqual(decoded, obj, suite.name)
 
 					// encode
-					const str = suite?.canonical?.[0] || suite.raw[0];
-					const encoded = encodeSfItem(obj);
-					assert.deepStrictEqual(str, encoded, suite.name);
+					const str = suite?.canonical?.[0] || suite.raw[0]
+					const encoded = encodeSfItem(obj)
+					assert.deepStrictEqual(str, encoded, suite.name)
 				}
 				if (suite.header_type === `list`) {
 					// decode
-					const obj = formatList(suite.expected);
-					const decoded = decodeSfList(suite.raw[0]);
-					assert.deepStrictEqual(decoded, obj, suite.name);
+					const obj = formatList(suite.expected)
+					const decoded = decodeSfList(suite.raw[0])
+					assert.deepStrictEqual(decoded, obj, suite.name)
 
 					// encode
 					if ([
@@ -74,18 +74,18 @@ describe('structured_field_tests', async () => {
 						`missing parameter value parameterised list`,
 						`missing terminal parameter value parameterised list`,
 					].includes(suite.name)) {
-						return;
+						return
 					}
 
-					const str = suite?.canonical?.[0] || suite.raw[0];
-					const encoded = encodeSfList(obj);
-					assert.deepStrictEqual(str, encoded, suite.name);
+					const str = suite?.canonical?.[0] || suite.raw[0]
+					const encoded = encodeSfList(obj)
+					assert.deepStrictEqual(str, encoded, suite.name)
 				}
 				if (suite.header_type === `dictionary`) {
 					// decode
-					const obj = formatDict(suite.expected);
-					const decoded = decodeSfDict(suite.raw[0]);
-					assert.deepStrictEqual(decoded, obj, suite.name);
+					const obj = formatDict(suite.expected)
+					const decoded = decodeSfDict(suite.raw[0])
+					assert.deepStrictEqual(decoded, obj, suite.name)
 
 					// encode
 					if ([
@@ -93,18 +93,18 @@ describe('structured_field_tests', async () => {
 						`single item parameterised dict`,
 						`list item parameterised dictionary`,
 					].includes(suite.name)) {
-						return;
+						return
 					}
 
-					const str = suite?.canonical?.[0] || suite.raw[0];
-					const encoded = encodeSfDict(obj);
-					assert.deepStrictEqual(str, encoded, suite.name);
+					const str = suite?.canonical?.[0] || suite.raw[0]
+					const encoded = encodeSfDict(obj)
+					assert.deepStrictEqual(str, encoded, suite.name)
 				}
 			}
 			catch (error: any) {
-				assert.deepStrictEqual(suite.must_fail, true, error);
+				assert.deepStrictEqual(suite.must_fail, true, error)
 			}
-		});
-	});
-});
+		})
+	})
+})
 

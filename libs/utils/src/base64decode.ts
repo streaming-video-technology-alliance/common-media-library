@@ -1,4 +1,4 @@
-import { decodeBase64 } from './decodeBase64.ts';
+import { decodeBase64 } from './decodeBase64.ts'
 
 /**
  * Decodes a base64 encoded string into binary data
@@ -13,4 +13,4 @@ import { decodeBase64 } from './decodeBase64.ts';
  *
  * @see {@link decodeBase64}
  */
-export const base64decode: typeof decodeBase64 = decodeBase64;
+export const base64decode: typeof decodeBase64 = decodeBase64

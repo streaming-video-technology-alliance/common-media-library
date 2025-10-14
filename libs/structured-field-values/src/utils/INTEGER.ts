@@ -1,1 +1,1 @@
-export const INTEGER: string = 'Integer';
+export const INTEGER: string = 'Integer'

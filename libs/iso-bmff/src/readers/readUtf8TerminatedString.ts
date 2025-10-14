@@ -1,4 +1,4 @@
-import { decodeText, UTF_8 } from '@svta/cml-utils';
+import { decodeText, UTF_8 } from '@svta/cml-utils'
 
 /**
  * Reads a UTF-8 terminated string from a data view.
@@ -10,24 +10,24 @@ import { decodeText, UTF_8 } from '@svta/cml-utils';
  * @internal
  */
 export function readUtf8TerminatedString(dataView: DataView<ArrayBuffer>, offset: number): string {
-	const length = dataView.byteLength - (offset - dataView.byteOffset);
+	const length = dataView.byteLength - (offset - dataView.byteOffset)
 
-	let data = '';
+	let data = ''
 
 	if (length > 0) {
-		const view = new DataView(dataView.buffer, offset, length);
+		const view = new DataView(dataView.buffer, offset, length)
 
-		let l = 0;
+		let l = 0
 
 		for (; l < length; l++) {
 			if (view.getUint8(l) === 0) {
-				break;
+				break
 			}
 		}
 
 		// remap the Dataview with the actual length
-		data = decodeText(new DataView(dataView.buffer, offset, l), { encoding: UTF_8 });
+		data = decodeText(new DataView(dataView.buffer, offset, l), { encoding: UTF_8 })
 	}
 
-	return data;
+	return data
 };

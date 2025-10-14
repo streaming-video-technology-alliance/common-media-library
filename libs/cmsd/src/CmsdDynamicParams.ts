@@ -1,5 +1,5 @@
-import type { CmsdCustomKey } from './CmsdCustomKey.ts';
-import type { CmsdValue } from './CmsdValue.ts';
+import type { CmsdCustomKey } from './CmsdCustomKey.ts'
+import type { CmsdValue } from './CmsdValue.ts'
 
 /**
  * Common Media Server Data (CMSD) dynamic response header field parameters.

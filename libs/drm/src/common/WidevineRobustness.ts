@@ -1,9 +1,9 @@
-import type { ValueOf } from '@svta/cml-utils';
-import { HW_SECURE_ALL } from './HW_SECURE_ALL.ts';
-import { HW_SECURE_CRYPTO } from './HW_SECURE_CRYPTO.ts';
-import { HW_SECURE_DECODE } from './HW_SECURE_DECODE.ts';
-import { SW_SECURE_CRYPTO } from './SW_SECURE_CRYPTO.ts';
-import { SW_SECURE_DECODE } from './SW_SECURE_DECODE.ts';
+import type { ValueOf } from '@svta/cml-utils'
+import { HW_SECURE_ALL } from './HW_SECURE_ALL.ts'
+import { HW_SECURE_CRYPTO } from './HW_SECURE_CRYPTO.ts'
+import { HW_SECURE_DECODE } from './HW_SECURE_DECODE.ts'
+import { SW_SECURE_CRYPTO } from './SW_SECURE_CRYPTO.ts'
+import { SW_SECURE_DECODE } from './SW_SECURE_DECODE.ts'
 
 /**
  * Widevine Robustness.
@@ -17,7 +17,7 @@ export const WidevineRobustness = {
 	HW_SECURE_CRYPTO: HW_SECURE_CRYPTO as typeof HW_SECURE_CRYPTO,
 	HW_SECURE_DECODE: HW_SECURE_DECODE as typeof HW_SECURE_DECODE,
 	HW_SECURE_ALL: HW_SECURE_ALL as typeof HW_SECURE_ALL,
-} as const;
+} as const
 
 /**
  * Widevine Robustness.

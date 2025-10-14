@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.ts';
-import type { ItemLocation } from './ItemLocation.ts';
+import type { FullBox } from './FullBox.ts'
+import type { ItemLocation } from './ItemLocation.ts'
 
 /**
  * Item Location Box - 'iloc'

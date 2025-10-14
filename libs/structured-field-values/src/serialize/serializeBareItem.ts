@@ -1,13 +1,13 @@
-import { SfToken } from '../SfToken.ts';
-import { BARE_ITEM } from '../utils/BARE_ITEM.ts';
-import { serializeBoolean } from './serializeBoolean.ts';
-import { serializeByteSequence } from './serializeByteSequence.ts';
-import { serializeDate } from './serializeDate.ts';
-import { serializeDecimal } from './serializeDecimal.ts';
-import { serializeError } from './serializeError.ts';
-import { serializeInteger } from './serializeInteger.ts';
-import { serializeString } from './serializeString.ts';
-import { serializeToken } from './serializeToken.ts';
+import { SfToken } from '../SfToken.ts'
+import { BARE_ITEM } from '../utils/BARE_ITEM.ts'
+import { serializeBoolean } from './serializeBoolean.ts'
+import { serializeByteSequence } from './serializeByteSequence.ts'
+import { serializeDate } from './serializeDate.ts'
+import { serializeDecimal } from './serializeDecimal.ts'
+import { serializeError } from './serializeError.ts'
+import { serializeInteger } from './serializeInteger.ts'
+import { serializeString } from './serializeString.ts'
+import { serializeToken } from './serializeToken.ts'
 
 // 4.1.3.1.  Serializing a Bare Item
 //
@@ -43,31 +43,31 @@ export function serializeBareItem(value: any): string {
 	switch (typeof value) {
 		case 'number':
 			if (!Number.isFinite(value)) {
-				throw serializeError(value, BARE_ITEM);
+				throw serializeError(value, BARE_ITEM)
 			}
 
 			if (Number.isInteger(value)) {
-				return serializeInteger(value);
+				return serializeInteger(value)
 			}
-			return serializeDecimal(value);
+			return serializeDecimal(value)
 		case 'string':
-			return serializeString(value);
+			return serializeString(value)
 		case 'symbol':
-			return serializeToken(value);
+			return serializeToken(value)
 		case 'boolean':
-			return serializeBoolean(value);
+			return serializeBoolean(value)
 		case 'object':
 			if (value instanceof Date) {
-				return serializeDate(value);
+				return serializeDate(value)
 			}
 			if (value instanceof Uint8Array) {
-				return serializeByteSequence(value);
+				return serializeByteSequence(value)
 			}
 			if (value instanceof SfToken) {
-				return serializeToken(value);
+				return serializeToken(value)
 			}
 		default:
 			// fail
-			throw serializeError(value, BARE_ITEM);
+			throw serializeError(value, BARE_ITEM)
 	}
 }

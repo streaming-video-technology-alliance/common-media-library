@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const RELEASED = 'released';
+export const RELEASED = 'released'

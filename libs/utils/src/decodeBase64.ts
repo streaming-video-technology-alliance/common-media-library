@@ -8,5 +8,5 @@
  * @beta
  */
 export function decodeBase64(str: string): Uint8Array {
-	return new Uint8Array([...atob(str)].map((a) => a.charCodeAt(0)));
+	return new Uint8Array([...atob(str)].map((a) => a.charCodeAt(0)))
 }

@@ -1,10 +1,10 @@
-import type { Track } from '../../../../types/model/Track.ts';
-import type { VideoTrack } from '../../../../types/model/VideoTrack.ts';
+import type { Track } from '../../../../types/model/Track.ts'
+import type { VideoTrack } from '../../../../types/model/VideoTrack.ts'
 
 import {
 	FRAME_RATE_NUMERATOR_30,
 	ZERO,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.ts'
 
 
 /**
@@ -18,15 +18,15 @@ import {
  * @returns frame rate as a string formatted as `numerator/denominator`
  */
 export function getFrameRate(track: Track): string | undefined {
-	let frameRate: string | undefined = undefined;
+	let frameRate: string | undefined = undefined
 	if (track?.type === 'video') {
-		const videoTrack = track as VideoTrack;
-		frameRate = `${videoTrack.frameRate.frameRateNumerator ?? FRAME_RATE_NUMERATOR_30}`;
+		const videoTrack = track as VideoTrack
+		frameRate = `${videoTrack.frameRate.frameRateNumerator ?? FRAME_RATE_NUMERATOR_30}`
 		frameRate =
 			videoTrack.frameRate.frameRateDenominator !== ZERO
 				? `${frameRate}/${videoTrack.frameRate.frameRateDenominator}`
-				: frameRate;
+				: frameRate
 	}
 
-	return frameRate;
+	return frameRate
 }

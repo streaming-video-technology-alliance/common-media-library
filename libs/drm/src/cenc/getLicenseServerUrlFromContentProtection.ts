@@ -1,4 +1,4 @@
-import type { ContentProtection } from '../common/ContentProtection.ts';
+import type { ContentProtection } from '../common/ContentProtection.ts'
 
 /**
  * Extracts a license server URL from an array of ContentProtection elements.
@@ -16,5 +16,5 @@ export function getLicenseServerUrlFromContentProtection(
 	contentProtectionElements: ContentProtection[],
 	schemeIdUri: string,
 ): string | null {
-	return contentProtectionElements.find(cp => cp.schemeIdUri === schemeIdUri)?.laUrl || null;
+	return contentProtectionElements.find(cp => cp.schemeIdUri === schemeIdUri)?.laUrl || null
 }

@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export { RequestType } from '@svta/cml-utils';
+export { RequestType } from '@svta/cml-utils'

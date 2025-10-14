@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a WebVTTSourceLabelBox from an IsoView
@@ -15,5 +15,5 @@ import type { IsoView } from '../IsoView.ts';
 export function vlab(view: IsoView): Fields<WebVttSourceLabelBox> {
 	return {
 		sourceLabel: view.readUtf8(-1),
-	};
+	}
 };

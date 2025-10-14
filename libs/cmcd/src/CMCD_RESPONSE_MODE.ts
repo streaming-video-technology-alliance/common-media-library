@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_RESPONSE_MODE = 'response';
+export const CMCD_RESPONSE_MODE = 'response'

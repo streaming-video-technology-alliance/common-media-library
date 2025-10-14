@@ -1,7 +1,7 @@
-import { BOOLEAN } from '../utils/BOOLEAN.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import { BOOLEAN } from '../utils/BOOLEAN.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
 
 // 4.2.8.  Parsing a Boolean
 //
@@ -23,20 +23,20 @@ import { parseError } from './parseError.ts';
  * @internal
  */
 export function parseBoolean(src: string): ParsedValue<boolean> {
-	let i = 0;
+	let i = 0
 	if (src[i] !== '?') {
-		throw parseError(src, BOOLEAN);
+		throw parseError(src, BOOLEAN)
 	}
 
-	i++;
+	i++
 
 	if (src[i] === '1') {
-		return parsedValue(true, src.substring(++i));
+		return parsedValue(true, src.substring(++i))
 	}
 
 	if (src[i] === '0') {
-		return parsedValue(false, src.substring(++i));
+		return parsedValue(false, src.substring(++i))
 	}
 
-	throw parseError(src, BOOLEAN);
+	throw parseError(src, BOOLEAN)
 }

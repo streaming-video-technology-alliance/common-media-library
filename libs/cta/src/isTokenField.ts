@@ -14,5 +14,5 @@ export function isTokenField(key: string): boolean {
 		'st',
 		'e',
 		'sta',
-	].includes(key as any);
+	].includes(key as any)
 }

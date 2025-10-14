@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const UINT = 'uint';
+export const UINT = 'uint'

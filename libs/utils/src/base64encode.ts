@@ -1,4 +1,4 @@
-import { encodeBase64 } from './encodeBase64.ts';
+import { encodeBase64 } from './encodeBase64.ts'
 
 /**
  * Encodes binary data to base64
@@ -13,4 +13,4 @@ import { encodeBase64 } from './encodeBase64.ts';
  *
  * @see {@link encodeBase64}
  */
-export const base64encode: typeof encodeBase64 = encodeBase64;
+export const base64encode: typeof encodeBase64 = encodeBase64

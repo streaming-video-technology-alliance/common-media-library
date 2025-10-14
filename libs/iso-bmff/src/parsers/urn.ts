@@ -1,6 +1,6 @@
-import type { IsoView } from '../IsoView.ts';
-import type { Fields } from '../boxes/Fields.ts';
-import type { UrnBox } from '../boxes/UrnBox.ts';
+import type { IsoView } from '../IsoView.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { UrnBox } from '../boxes/UrnBox.ts'
 
 /**
  * Parse a UrnBox from an IsoView
@@ -17,5 +17,5 @@ export function urn(view: IsoView): Fields<UrnBox> {
 		...view.readFullBox(),
 		name: view.readString(-1),
 		location: view.readString(-1),
-	};
+	}
 };

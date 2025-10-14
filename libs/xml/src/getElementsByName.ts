@@ -1,4 +1,4 @@
-import type { XmlNode } from './XmlNode.ts';
+import type { XmlNode } from './XmlNode.ts'
 
 /**
  * Recursively finds all elements by name within an XML structure.
@@ -14,18 +14,18 @@ import type { XmlNode } from './XmlNode.ts';
  */
 export function getElementsByName(node: XmlNode, name: string, found: XmlNode[] = []): XmlNode[] {
 	if (!node) {
-		return found;
+		return found
 	}
 
 	if (node.nodeName === name) {
-		found.push(node);
+		found.push(node)
 	}
 
 	if (node.childNodes) {
 		for (const child of node.childNodes) {
-			getElementsByName(child, name, found);
+			getElementsByName(child, name, found)
 		}
 	}
 
-	return found;
+	return found
 }

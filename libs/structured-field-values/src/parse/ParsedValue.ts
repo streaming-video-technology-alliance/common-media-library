@@ -10,5 +10,5 @@ export type ParsedValue<T> = {
  * @internal
  */
 export function parsedValue<T>(value: T, src: string): ParsedValue<T> {
-	return { value, src };
+	return { value, src }
 }

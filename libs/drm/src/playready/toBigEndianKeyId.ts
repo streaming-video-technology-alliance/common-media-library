@@ -11,14 +11,14 @@
  */
 export function toBigEndianKeyId(keyId: ArrayBuffer): ArrayBuffer {
 	if (keyId.byteLength !== 16) {
-		return keyId;
+		return keyId
 	}
 
-	const buffer = keyId.slice(0);
-	const dataView = new DataView(buffer);
-	dataView.setUint32(0, dataView.getUint32(0, true), false);
-	dataView.setUint16(4, dataView.getUint16(4, true), false);
-	dataView.setUint16(6, dataView.getUint16(6, true), false);
+	const buffer = keyId.slice(0)
+	const dataView = new DataView(buffer)
+	dataView.setUint32(0, dataView.getUint32(0, true), false)
+	dataView.setUint16(4, dataView.getUint16(4, true), false)
+	dataView.setUint16(6, dataView.getUint16(6, true), false)
 
-	return buffer;
+	return buffer
 }

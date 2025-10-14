@@ -1,4 +1,4 @@
-import type { RequestType } from './RequestType.ts';
+import type { RequestType } from './RequestType.ts'
 
 /**
  * Generic request API.

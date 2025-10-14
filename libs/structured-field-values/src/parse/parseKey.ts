@@ -1,7 +1,7 @@
-import { KEY } from '../utils/KEY.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import { KEY } from '../utils/KEY.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
 
 // 4.2.3.3.  Parsing a Key
 //
@@ -28,21 +28,21 @@ import { parseError } from './parseError.ts';
  * @internal
  */
 export function parseKey(src: string): ParsedValue<string> {
-	let i = 0;
+	let i = 0
 	if (/^[a-z*]$/.test(src[i]) === false) {
-		throw parseError(src, KEY);
+		throw parseError(src, KEY)
 	}
 
-	let value = '';
+	let value = ''
 
 	while (src.length > i) {
 		if (/^[a-z0-9_\-.*]$/.test(src[i]) === false) {
-			return parsedValue(value, src.substring(i));
+			return parsedValue(value, src.substring(i))
 		}
 
-		value += src[i];
-		i++;
+		value += src[i]
+		i++
 	}
 
-	return parsedValue(value, src.substring(i));
+	return parsedValue(value, src.substring(i))
 }

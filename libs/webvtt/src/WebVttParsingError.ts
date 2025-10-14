@@ -12,7 +12,7 @@ export class WebVttParsingError extends Error {
 	 * @param message - The message of the error.
 	 */
 	constructor(message: string) {
-		super(message);
-		this.name = 'WebVttParsingError';
+		super(message)
+		this.name = 'WebVttParsingError'
 	}
 }

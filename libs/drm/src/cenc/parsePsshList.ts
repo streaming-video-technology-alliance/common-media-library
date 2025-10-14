@@ -14,92 +14,92 @@
  */
 export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer> {
 	if (!data) {
-		return {};
+		return {}
 	}
 
 	// data.buffer first for Uint8Array support
-	const dv = new DataView(data instanceof ArrayBuffer ? data : (data as Uint8Array).buffer);
-	const pssh: Record<string, ArrayBuffer> = {};
-	let byteCursor = 0;
+	const dv = new DataView(data instanceof ArrayBuffer ? data : (data as Uint8Array).buffer)
+	const pssh: Record<string, ArrayBuffer> = {}
+	let byteCursor = 0
 
 	while (true) {
 		if (byteCursor >= dv.byteLength) {
-			break;
+			break
 		}
 
-		const boxStart = byteCursor;
+		const boxStart = byteCursor
 
 		// Box size
-		const size = dv.getUint32(byteCursor);
-		const nextBox = byteCursor + size;
-		byteCursor += 4;
+		const size = dv.getUint32(byteCursor)
+		const nextBox = byteCursor + size
+		byteCursor += 4
 
 		// Verify PSSH
 		if (dv.getUint32(byteCursor) !== 0x70737368) {
-			byteCursor = nextBox;
-			continue;
+			byteCursor = nextBox
+			continue
 		}
-		byteCursor += 4;
+		byteCursor += 4
 
 		// Version must be 0 or 1
-		const version = dv.getUint8(byteCursor);
+		const version = dv.getUint8(byteCursor)
 		if (version !== 0 && version !== 1) {
-			byteCursor = nextBox;
-			continue;
+			byteCursor = nextBox
+			continue
 		}
 
-		byteCursor += 1; // Move past version
-		byteCursor += 3; // Skip flags
+		byteCursor += 1 // Move past version
+		byteCursor += 3 // Skip flags
 
 		// 16-byte UUID/SystemID
-		let systemID = '';
-		let val: string;
+		let systemID = ''
+		let val: string
 
 		for (let i = 0; i < 4; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16);
-			systemID += val.length === 1 ? '0' + val : val;
+			val = dv.getUint8(byteCursor + i).toString(16)
+			systemID += val.length === 1 ? '0' + val : val
 		}
-		byteCursor += 4;
-		systemID += '-';
+		byteCursor += 4
+		systemID += '-'
 
 		for (let i = 0; i < 2; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16);
-			systemID += val.length === 1 ? '0' + val : val;
+			val = dv.getUint8(byteCursor + i).toString(16)
+			systemID += val.length === 1 ? '0' + val : val
 		}
-		byteCursor += 2;
-		systemID += '-';
+		byteCursor += 2
+		systemID += '-'
 
 		for (let i = 0; i < 2; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16);
-			systemID += val.length === 1 ? '0' + val : val;
+			val = dv.getUint8(byteCursor + i).toString(16)
+			systemID += val.length === 1 ? '0' + val : val
 		}
-		byteCursor += 2;
-		systemID += '-';
+		byteCursor += 2
+		systemID += '-'
 
 		for (let i = 0; i < 2; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16);
-			systemID += val.length === 1 ? '0' + val : val;
+			val = dv.getUint8(byteCursor + i).toString(16)
+			systemID += val.length === 1 ? '0' + val : val
 		}
-		byteCursor += 2;
-		systemID += '-';
+		byteCursor += 2
+		systemID += '-'
 
 		for (let i = 0; i < 6; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16);
-			systemID += val.length === 1 ? '0' + val : val;
+			val = dv.getUint8(byteCursor + i).toString(16)
+			systemID += val.length === 1 ? '0' + val : val
 		}
-		byteCursor += 6;
+		byteCursor += 6
 
-		systemID = systemID.toLowerCase();
+		systemID = systemID.toLowerCase()
 
 		// PSSH Data Size
-		byteCursor += 4;
+		byteCursor += 4
 
 		// PSSH boxdata
-		pssh[systemID] = data.slice(boxStart, nextBox);
+		pssh[systemID] = data.slice(boxStart, nextBox)
 
-		byteCursor = nextBox;
+		byteCursor = nextBox
 	}
 
-	return pssh;
+	return pssh
 }
 

@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMCD_SESSION = 'CMCD-Session';
+export const CMCD_SESSION = 'CMCD-Session'

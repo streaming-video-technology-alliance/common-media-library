@@ -36,7 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { VerboseLevel } from './VerboseLevel.ts';
+import { VerboseLevel } from './VerboseLevel.ts'
 
 /**
  * CaptionsLogger. To be removed in the future.
@@ -44,13 +44,13 @@ import { VerboseLevel } from './VerboseLevel.ts';
  * @beta
  */
 export class CaptionsLogger {
-	public time: number | null = null;
-	public verboseLevel: VerboseLevel = VerboseLevel.ERROR;
+	public time: number | null = null
+	public verboseLevel: VerboseLevel = VerboseLevel.ERROR
 
 	log(severity: VerboseLevel, msg: string | (() => string)): void {
 		if (this.verboseLevel >= severity) {
-			const m: string = typeof msg === 'function' ? msg() : msg;
-			console.log(`${this.time} [${severity}] ${m}`);
+			const m: string = typeof msg === 'function' ? msg() : msg
+			console.log(`${this.time} [${severity}] ${m}`)
 		}
 	}
 }

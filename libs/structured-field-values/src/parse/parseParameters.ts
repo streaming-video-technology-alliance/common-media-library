@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfParameters } from '../SfParameters.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseBareItem } from './parseBareItem.ts';
-import { parseKey } from './parseKey.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import type { SfParameters } from '../SfParameters.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseBareItem } from './parseBareItem.ts'
+import { parseKey } from './parseKey.ts'
 
 // 4.2.3.2.  Parsing Parameters
 //
@@ -47,32 +47,32 @@ import { parseKey } from './parseKey.ts';
  * @internal
  */
 export function parseParameters(src: string, options?: SfDecodeOptions): ParsedValue<SfParameters | undefined> {
-	let parameters: SfParameters | undefined = undefined;
+	let parameters: SfParameters | undefined = undefined
 	while (src.length > 0) {
 		if (src[0] !== ';') {
-			break;
+			break
 		}
 
-		src = src.substring(1).trim();
-		const parsedKey = parseKey(src);
-		const key = parsedKey.value;
-		let value = true;
-		src = parsedKey.src;
+		src = src.substring(1).trim()
+		const parsedKey = parseKey(src)
+		const key = parsedKey.value
+		let value = true
+		src = parsedKey.src
 
 		if (src[0] === '=') {
-			src = src.substring(1);
-			const parsedBareItem = parseBareItem(src, options);
-			value = parsedBareItem.value as any;
-			src = parsedBareItem.src;
+			src = src.substring(1)
+			const parsedBareItem = parseBareItem(src, options)
+			value = parsedBareItem.value as any
+			src = parsedBareItem.src
 		}
 
 		// initialize as object when params exists
 		if (parameters == null) {
-			parameters = {};
+			parameters = {}
 		}
 
 		// override if param_name exists
-		parameters[key] = value;
+		parameters[key] = value
 	}
-	return parsedValue(parameters, src);
+	return parsedValue(parameters, src)
 }

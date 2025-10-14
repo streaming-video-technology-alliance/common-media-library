@@ -1,4 +1,4 @@
-import type { WebVttRegion } from './WebVttRegion.ts';
+import type { WebVttRegion } from './WebVttRegion.ts'
 
 /**
  * Create a generic WebVttRegion object with default values
@@ -19,5 +19,5 @@ export function createWebVttRegion(): WebVttRegion {
 		viewportAnchorX: 0,
 		viewportAnchorY: 100,
 		scroll: '',
-	};
+	}
 }

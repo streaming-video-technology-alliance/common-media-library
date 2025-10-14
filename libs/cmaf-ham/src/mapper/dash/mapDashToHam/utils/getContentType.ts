@@ -1,5 +1,5 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 
 /**
  * @internal
@@ -16,31 +16,31 @@ export function getContentType(
 	representation?: Representation,
 ): string {
 	if (adaptationSet.$.contentType) {
-		return adaptationSet.$.contentType;
+		return adaptationSet.$.contentType
 	}
 	if (adaptationSet.ContentComponent?.at(0)) {
-		return adaptationSet.ContentComponent.at(0)!.$.contentType;
+		return adaptationSet.ContentComponent.at(0)!.$.contentType
 	}
 	if (adaptationSet.$.mimeType || representation?.$.mimeType) {
 		const type =
 			adaptationSet.$.mimeType?.split('/')[0] ||
-			representation?.$.mimeType?.split('/')[0];
+			representation?.$.mimeType?.split('/')[0]
 		if (type === 'audio' || type === 'video' || type === 'text') {
-			return type;
+			return type
 		}
 		if (type === 'application') {
-			return 'text';
+			return 'text'
 		}
 	}
 	if (adaptationSet.$.maxHeight) {
-		return 'video';
+		return 'video'
 	}
 	const adaptationRef =
 		adaptationSet.$.id ??
-		`group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`;
+		`group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`
 	console.error(
 		`Could not find contentType from adaptationSet ${adaptationRef}`,
-	);
-	console.info('Using "text" as default contentType');
-	return 'text';
+	)
+	console.info('Using "text" as default contentType')
+	return 'text'
 }

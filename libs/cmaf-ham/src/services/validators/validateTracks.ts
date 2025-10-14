@@ -1,7 +1,7 @@
-import type { Track } from '../../types/model/Track.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { Track } from '../../types/model/Track.ts'
+import type { Validation } from '../../types/Validation.ts'
 
-import { validateTrack } from './validateTrack.ts';
+import { validateTrack } from './validateTrack.ts'
 
 /**
  * Validate a list of tracks.
@@ -35,24 +35,24 @@ export function validateTracks(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 	const moreInformation = switchingSetId
 		? ` in the switching set with id = ${switchingSetId}`
-		: '.';
-	let tracksDuration: number;
+		: '.'
+	let tracksDuration: number
 
 	tracks.forEach((track: Track) => {
 		if (!tracksDuration) {
-			tracksDuration = track.duration;
+			tracksDuration = track.duration
 		}
 		if (tracksDuration !== track.duration) {
-			validation.status = false;
+			validation.status = false
 			validation.errorMessages.push(
 				`All the tracks must have the same duration${moreInformation}`,
-			);
+			)
 		}
-		validateTrack(track, switchingSetId, validation);
-	});
+		validateTrack(track, switchingSetId, validation)
+	})
 
-	return validation;
+	return validation
 }

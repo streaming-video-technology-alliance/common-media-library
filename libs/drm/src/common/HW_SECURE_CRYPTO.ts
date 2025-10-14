@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const HW_SECURE_CRYPTO = 'HW_SECURE_CRYPTO';
+export const HW_SECURE_CRYPTO = 'HW_SECURE_CRYPTO'

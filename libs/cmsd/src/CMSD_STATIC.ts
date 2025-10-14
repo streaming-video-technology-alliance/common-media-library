@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const CMSD_STATIC = 'CMSD-Static';
+export const CMSD_STATIC = 'CMSD-Static'

@@ -1,5 +1,5 @@
-import type { SwitchingSet } from '../../types/model/SwitchingSet.ts';
-import type { Track } from '../../types/model/Track.ts';
+import type { SwitchingSet } from '../../types/model/SwitchingSet.ts'
+import type { Track } from '../../types/model/Track.ts'
 
 /**
  * Get a list of Tracks contained on a SwitchingSet
@@ -14,6 +14,6 @@ export function getTracksFromSwitchingSet(
 	switchingSet: SwitchingSet,
 	predicate?: (track: Track) => boolean,
 ): Track[] {
-	const tracks = switchingSet.tracks;
-	return predicate ? tracks.filter(predicate) : tracks;
+	const tracks = switchingSet.tracks
+	return predicate ? tracks.filter(predicate) : tracks
 }

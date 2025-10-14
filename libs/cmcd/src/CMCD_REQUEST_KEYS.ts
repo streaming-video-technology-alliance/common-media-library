@@ -11,4 +11,4 @@ export const CMCD_REQUEST_KEYS = [
 	'ot',
 	'rtp',
 	'su',
-] as const;
+] as const

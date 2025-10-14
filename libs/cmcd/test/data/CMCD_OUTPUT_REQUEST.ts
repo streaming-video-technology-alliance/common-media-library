@@ -39,4 +39,4 @@ export const CMCD_OUTPUT_REQUEST = {
 	tpb: 4000,
 	ts: 1640995200000,
 	v: 2,
-};
+}

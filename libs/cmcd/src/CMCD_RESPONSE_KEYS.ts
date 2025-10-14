@@ -13,4 +13,4 @@ export const CMCD_RESPONSE_KEYS = [
 	'ttfbb',
 	'ttlb',
 	'url',
-] as const;
+] as const

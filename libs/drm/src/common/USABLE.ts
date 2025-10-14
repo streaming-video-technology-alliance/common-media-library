@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const USABLE = 'usable';
+export const USABLE = 'usable'

@@ -1,4 +1,4 @@
-import type { PathwayClone } from './PathwayClone.ts';
+import type { PathwayClone } from './PathwayClone.ts'
 
 /**
  * A manifest for content steering.

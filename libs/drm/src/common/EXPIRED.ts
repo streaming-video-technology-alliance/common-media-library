@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const EXPIRED = 'expired';
+export const EXPIRED = 'expired'

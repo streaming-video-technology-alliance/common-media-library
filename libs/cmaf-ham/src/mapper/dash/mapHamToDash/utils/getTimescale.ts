@@ -1,11 +1,11 @@
-import type { AudioTrack } from '../../../../types/model/AudioTrack.ts';
-import type { Track } from '../../../../types/model/Track.ts';
+import type { AudioTrack } from '../../../../types/model/AudioTrack.ts'
+import type { Track } from '../../../../types/model/Track.ts'
 
 import {
 	TEXT_SAMPLE_RATE,
 	TIMESCALE_48000,
 	VIDEO_SAMPLE_RATE,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.ts'
 
 /**
  * @internal
@@ -23,16 +23,16 @@ import {
 
 export function getTimescale(track: Track): number {
 	if (track?.type === 'audio') {
-		const audioTrack = track as AudioTrack;
+		const audioTrack = track as AudioTrack
 		return audioTrack.sampleRate !== 0
 			? audioTrack.sampleRate
-			: TIMESCALE_48000;
+			: TIMESCALE_48000
 	}
 	if (track?.type === 'video') {
-		return VIDEO_SAMPLE_RATE;
+		return VIDEO_SAMPLE_RATE
 	}
 	if (track?.type === 'text') {
-		return TEXT_SAMPLE_RATE;
+		return TEXT_SAMPLE_RATE
 	}
-	return VIDEO_SAMPLE_RATE;
+	return VIDEO_SAMPLE_RATE
 }

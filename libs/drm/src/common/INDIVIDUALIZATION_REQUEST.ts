@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const INDIVIDUALIZATION_REQUEST = 'individualization-request';
+export const INDIVIDUALIZATION_REQUEST = 'individualization-request'

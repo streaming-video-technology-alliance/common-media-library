@@ -1,5 +1,5 @@
-import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts';
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 
 /**
  * @internal
@@ -14,9 +14,9 @@ export function getCodec(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
 ): string {
-	const codec = representation.$.codecs ?? adaptationSet.$.codecs ?? '';
+	const codec = representation.$.codecs ?? adaptationSet.$.codecs ?? ''
 	if (!codec) {
-		console.error(`Representation ${representation.$.id} has no codecs`);
+		console.error(`Representation ${representation.$.id} has no codecs`)
 	}
-	return codec;
+	return codec
 }

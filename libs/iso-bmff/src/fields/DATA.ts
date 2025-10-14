@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const DATA = 'data';
+export const DATA = 'data'

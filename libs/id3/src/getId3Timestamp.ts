@@ -1,8 +1,8 @@
-import type { DecodedId3Frame } from './DecodedId3Frame.ts';
-import type { Id3Frame } from './Id3Frame.ts';
-import { getId3Frames } from './getId3Frames.ts';
-import { isId3TimestampFrame } from './isId3TimestampFrame.ts';
-import { readId3Timestamp } from './util/readId3Timestamp.ts';
+import type { DecodedId3Frame } from './DecodedId3Frame.ts'
+import type { Id3Frame } from './Id3Frame.ts'
+import { getId3Frames } from './getId3Frames.ts'
+import { isId3TimestampFrame } from './isId3TimestampFrame.ts'
+import { readId3Timestamp } from './util/readId3Timestamp.ts'
 
 /**
  * Searches for the Elementary Stream timestamp found in the ID3 data chunk
@@ -15,15 +15,15 @@ import { readId3Timestamp } from './util/readId3Timestamp.ts';
  * @beta
  */
 export function getId3Timestamp(data: Uint8Array<ArrayBuffer>): number | undefined {
-	const frames: Id3Frame[] = getId3Frames(data);
+	const frames: Id3Frame[] = getId3Frames(data)
 
 	for (let i = 0; i < frames.length; i++) {
-		const frame = frames[i];
+		const frame = frames[i]
 
 		if (isId3TimestampFrame(frame)) {
-			return readId3Timestamp(frame as DecodedId3Frame<ArrayBuffer>);
+			return readId3Timestamp(frame as DecodedId3Frame<ArrayBuffer>)
 		}
 	}
 
-	return undefined;
+	return undefined
 }

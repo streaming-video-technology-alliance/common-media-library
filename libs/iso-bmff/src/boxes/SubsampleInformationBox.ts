@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.ts';
-import type { SubsampleEntry } from './SubsampleEntry.ts';
+import type { FullBox } from './FullBox.ts'
+import type { SubsampleEntry } from './SubsampleEntry.ts'
 
 /**
  * ISO/IEC 14496-12:2015 - 8.7.7 Sub-Sample Information Box

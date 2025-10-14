@@ -6,4 +6,4 @@
  */
 export const CMCD_EVENT_KEYS = [
 	'e',
-] as const;
+] as const

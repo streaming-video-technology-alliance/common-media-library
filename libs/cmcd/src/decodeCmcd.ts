@@ -1,7 +1,7 @@
-import type { SfBareItem } from '@svta/cml-structured-field-values';
-import { decodeSfDict, SfItem, symbolToStr } from '@svta/cml-structured-field-values';
-import type { CmcdData } from './CmcdData.ts';
-import type { CmcdValue } from './CmcdValue.ts';
+import type { SfBareItem } from '@svta/cml-structured-field-values'
+import { decodeSfDict, SfItem, symbolToStr } from '@svta/cml-structured-field-values'
+import type { CmcdData } from './CmcdData.ts'
+import type { CmcdValue } from './CmcdValue.ts'
 
 // Define the input type for reduceValue
 type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[];
@@ -11,22 +11,22 @@ type ReduceValueOutput = CmcdValue | ReduceValueOutput[];
 
 function reduceValue(value: ReduceValueInput): ReduceValueOutput {
 	if (Array.isArray(value)) {
-		return value.map(reduceValue);
+		return value.map(reduceValue)
 	}
 
 	if (typeof value === 'symbol') {
-		return symbolToStr(value);
+		return symbolToStr(value)
 	}
 
 	if (value instanceof SfItem && !value.params) {
-		return reduceValue(value.value);
+		return reduceValue(value.value)
 	}
 
 	if (typeof value === 'string') {
-		return decodeURIComponent(value);
+		return decodeURIComponent(value)
 	}
 
-	return value as ReduceValueOutput;
+	return value as ReduceValueOutput
 };
 
 /**
@@ -44,15 +44,15 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  */
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T {
 	if (!cmcd) {
-		return {} as T;
+		return {} as T
 	}
 
-	const sfDict = decodeSfDict(cmcd);
+	const sfDict = decodeSfDict(cmcd)
 
 	return Object
 		.entries<SfItem>(sfDict as any)
 		.reduce((acc, [key, item]) => {
-			acc[key as keyof T] = reduceValue(item.value) as T[keyof T];
-			return acc;
-		}, {} as T);
+			acc[key as keyof T] = reduceValue(item.value) as T[keyof T]
+			return acc
+		}, {} as T)
 }

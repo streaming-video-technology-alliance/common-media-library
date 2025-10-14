@@ -1,12 +1,12 @@
-import { encodeSfDict, SfItem, SfToken } from '@svta/cml-structured-field-values';
-import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { encodeSfDict, SfItem, SfToken } from '@svta/cml-structured-field-values'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 
 describe('encodeSfDict', () => {
 	it('handles empty objects', () => {
-		assert.deepStrictEqual(encodeSfDict({}), ``);
-		assert.deepStrictEqual(encodeSfDict(new Map()), ``);
-	});
+		assert.deepStrictEqual(encodeSfDict({}), ``)
+		assert.deepStrictEqual(encodeSfDict(new Map()), ``)
+	})
 
 	it('encodes valid objects', () => {
 		assert.deepStrictEqual(
@@ -16,7 +16,7 @@ describe('encodeSfDict', () => {
 				c: 30,
 			}),
 			`a=10, b=20, c=30`,
-		);
+		)
 		assert.deepStrictEqual(
 			encodeSfDict(new Map([
 				['a', 10],
@@ -24,7 +24,7 @@ describe('encodeSfDict', () => {
 				['c', 30],
 			])),
 			`a=10, b=20, c=30`,
-		);
+		)
 
 		//#region example
 		assert.deepStrictEqual(
@@ -36,7 +36,7 @@ describe('encodeSfDict', () => {
 				e: new Uint8Array([1, 2, 3]),
 			}),
 			`a=1, b=?0, c="x", d=y, e=:AQID:`,
-		);
+		)
 		//#endregion example
 
 		assert.deepStrictEqual(
@@ -48,7 +48,7 @@ describe('encodeSfDict', () => {
 				e: new SfItem(new Uint8Array([1, 2, 3])),
 			}),
 			`a=1, b=?0, c="x", d=y, e=:AQID:`,
-		);
+		)
 		assert.deepStrictEqual(
 			encodeSfDict(new Map([
 				['a', new SfItem(1)],
@@ -58,8 +58,8 @@ describe('encodeSfDict', () => {
 				['e', new SfItem(new Uint8Array([1, 2, 3]))],
 			])),
 			`a=1, b=?0, c="x", d=y, e=:AQID:`,
-		);
-	});
+		)
+	})
 
 	it('handles SfToken and Symbol for tokens', () => {
 		assert.deepStrictEqual(
@@ -68,7 +68,7 @@ describe('encodeSfDict', () => {
 				['c', new SfItem(new SfToken('d'))],
 			])),
 			`a=b, c=d`,
-		);
-	});
+		)
+	})
 
-});
+})

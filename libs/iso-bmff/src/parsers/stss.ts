@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { SyncSample } from '../boxes/SyncSample.ts';
-import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { SyncSample } from '../boxes/SyncSample.ts'
+import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a SyncSampleBox from an IsoView
@@ -14,8 +14,8 @@ import type { IsoView } from '../IsoView.ts';
  * @beta
  */
 export function stss(view: IsoView): Fields<SyncSampleBox> {
-	const { version, flags } = view.readFullBox();
-	const entryCount = view.readUint(4);
+	const { version, flags } = view.readFullBox()
+	const entryCount = view.readUint(4)
 
 	return {
 		version,
@@ -24,5 +24,5 @@ export function stss(view: IsoView): Fields<SyncSampleBox> {
 		entries: view.readEntries<SyncSample>(entryCount, () => ({
 			sampleNumber: view.readUint(4),
 		})),
-	};
+	}
 };

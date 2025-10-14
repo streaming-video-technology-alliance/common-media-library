@@ -1,7 +1,7 @@
-import type { SwitchingSet } from '../../types/model/SwitchingSet.ts';
-import type { Validation } from '../../types/Validation.ts';
+import type { SwitchingSet } from '../../types/model/SwitchingSet.ts'
+import type { Validation } from '../../types/Validation.ts'
 
-import { validateTracks } from './validateTracks.ts';
+import { validateTracks } from './validateTracks.ts'
 
 /**
  * Validate a switching set.
@@ -38,19 +38,19 @@ export function validateSwitchingSet(
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
-	};
+	}
 	const moreInformation = selectionSetId
 		? ` in the selection set with id = ${selectionSetId}`
-		: '.';
+		: '.'
 
 	if (!switchingSet.id) {
-		validation.status = false;
+		validation.status = false
 		validation.errorMessages.push(
 			`SwitchingSet id is undefined${moreInformation}`,
-		);
+		)
 	}
 
-	validateTracks(switchingSet.tracks, switchingSet.id, validation);
+	validateTracks(switchingSet.tracks, switchingSet.id, validation)
 
-	return validation;
+	return validation
 }

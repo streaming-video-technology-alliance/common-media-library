@@ -1,5 +1,5 @@
-import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
-import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.ts';
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
+import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.ts'
 
 /**
  * @internal
@@ -20,23 +20,23 @@ export function getUrlFromTemplate(
 	segmentTemplate: SegmentTemplate,
 	segmentId: number,
 ): string {
-	const regexTemplate = /\$(.*?)\$/g;
+	const regexTemplate = /\$(.*?)\$/g
 	return segmentTemplate.$.media.replace(regexTemplate, (match: any) => {
 		if (match.includes('RepresentationID')) {
-			return representation.$.id;
+			return representation.$.id
 		}
 		/**
 		 * Number with 4 digits e.g: 0001
 		 */
 		if (match.includes('Number%04d')) {
-			return segmentId.toString().padStart(4, '0');
+			return segmentId.toString().padStart(4, '0')
 		}
 		if (match.includes('Number')) {
-			return segmentId;
+			return segmentId
 		}
 		console.error(
 			`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`,
-		);
-		return match;
-	});
+		)
+		return match
+	})
 }

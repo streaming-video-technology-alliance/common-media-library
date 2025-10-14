@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export type { ResourceTiming } from '@svta/cml-utils';
+export type { ResourceTiming } from '@svta/cml-utils'

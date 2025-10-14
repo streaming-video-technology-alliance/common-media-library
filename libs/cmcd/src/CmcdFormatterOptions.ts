@@ -1,4 +1,4 @@
-import type { CmcdReportingMode } from './CmcdReportingMode.ts';
+import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 
 /**
  * Options for formatting CMCD data values.

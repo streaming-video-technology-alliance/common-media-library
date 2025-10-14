@@ -1,8 +1,8 @@
-import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.ts';
-import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.ts';
-import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts';
-import type { CmcdResponse } from './CmcdResponse.ts';
-import { isCmcdCustomKey } from './isCmcdCustomKey.ts';
+import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.ts'
+import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.ts'
+import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
+import type { CmcdResponse } from './CmcdResponse.ts'
+import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
 /**
  * Check if a key is a valid CMCD response key.
@@ -21,5 +21,5 @@ export function isCmcdResponseKey(key: string): key is keyof CmcdResponse {
 	return CMCD_COMMON_KEYS.includes(key as any) ||
 		CMCD_REQUEST_KEYS.includes(key as any) ||
 		CMCD_RESPONSE_KEYS.includes(key as any) ||
-		isCmcdCustomKey(key as any);
+		isCmcdCustomKey(key as any)
 }

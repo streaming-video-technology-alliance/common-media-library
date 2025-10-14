@@ -1,1 +1,1 @@
-export const ITEM = 'Item';
+export const ITEM = 'Item'

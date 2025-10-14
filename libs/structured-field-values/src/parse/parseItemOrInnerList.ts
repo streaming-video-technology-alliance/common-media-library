@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import type { SfInnerList } from '../SfInnerList.ts';
-import type { SfItem } from '../SfItem.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parseInnerList } from './parseInnerList.ts';
-import { parseItem } from './parseItem.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import type { SfInnerList } from '../SfInnerList.ts'
+import type { SfItem } from '../SfItem.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parseInnerList } from './parseInnerList.ts'
+import { parseItem } from './parseItem.ts'
 
 // 4.2.1.1.  Parsing an Item or Inner List
 //
@@ -23,8 +23,8 @@ import { parseItem } from './parseItem.ts';
  */
 export function parseItemOrInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfItem | SfInnerList> {
 	if (src[0] === '(') {
-		return parseInnerList(src, options);
+		return parseInnerList(src, options)
 	}
 
-	return parseItem(src, options);
+	return parseItem(src, options)
 }

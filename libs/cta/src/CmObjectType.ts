@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils';
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * Common Media Object Type
@@ -50,7 +50,7 @@ export const CmObjectType = {
 	 * other
 	 */
 	OTHER: 'o',
-} as const;
+} as const
 
 /**
  * Common Media Object Type

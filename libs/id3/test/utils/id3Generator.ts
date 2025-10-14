@@ -1,4 +1,4 @@
-import { toUint8 } from '@svta/cml-id3';
+import { toUint8 } from '@svta/cml-id3'
 
 export function generateId3(
 	frames: Uint8Array<ArrayBuffer>,
@@ -27,7 +27,7 @@ export function generateId3(
 			0x02, // size of padding
 		]),
 		frames,
-	);
+	)
 	if (!extendedHeader) {
 		result = concat(
 			stringToInts('ID3'),
@@ -41,19 +41,19 @@ export function generateId3(
 				0x00, // size. set later
 			]),
 			frames,
-		);
+		)
 	}
 
 	// size is stored as a sequence of four 7-bit integers with the
 	// high bit of each byte set to zero
-	const size = result.length - 10;
+	const size = result.length - 10
 
-	result[6] = (size >>> 21) & 0x7f;
-	result[7] = (size >>> 14) & 0x7f;
-	result[8] = (size >>> 7) & 0x7f;
-	result[9] = size & 0x7f;
+	result[6] = (size >>> 21) & 0x7f
+	result[7] = (size >>> 14) & 0x7f
+	result[8] = (size >>> 7) & 0x7f
+	result[9] = size & 0x7f
 
-	return result;
+	return result
 }
 
 export function generateId3Frame(type: string, value: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> {
@@ -68,47 +68,47 @@ export function generateId3Frame(type: string, value: Uint8Array<ArrayBuffer>): 
 			0x00, // flags
 		]),
 		value,
-	);
+	)
 
 	// set the size
-	const size = result.length - 10;
+	const size = result.length - 10
 
-	result[4] = (size >>> 21) & 0x7f;
-	result[5] = (size >>> 14) & 0x7f;
-	result[6] = (size >>> 7) & 0x7f;
-	result[7] = size & 0x7f;
+	result[4] = (size >>> 21) & 0x7f
+	result[5] = (size >>> 14) & 0x7f
+	result[6] = (size >>> 7) & 0x7f
+	result[7] = size & 0x7f
 
-	return result;
+	return result
 }
 
 function concat(...varArgs: BufferSource[]) {
-	let totalLength = 0;
+	let totalLength = 0
 	for (let i = 0; i < varArgs.length; ++i) {
-		const value = varArgs[i];
-		totalLength += value.byteLength;
+		const value = varArgs[i]
+		totalLength += value.byteLength
 	}
 
-	const result = new Uint8Array(totalLength);
-	let offset = 0;
+	const result = new Uint8Array(totalLength)
+	let offset = 0
 
 	for (let i = 0; i < varArgs.length; ++i) {
-		const value = varArgs[i];
+		const value = varArgs[i]
 		if (value instanceof Uint8Array) {
-			result.set(value, offset);
+			result.set(value, offset)
 		}
 		else {
-			result.set(toUint8(value), offset);
+			result.set(toUint8(value), offset)
 		}
-		offset += value.byteLength;
+		offset += value.byteLength
 	}
 
-	return result;
+	return result
 }
 
 function stringToInts(string: string) {
-	const result: number[] = [];
+	const result: number[] = []
 	for (let i = 0; i < string.length; i++) {
-		result[i] = string.charCodeAt(i);
+		result[i] = string.charCodeAt(i)
 	}
-	return new Uint8Array(result);
+	return new Uint8Array(result)
 }

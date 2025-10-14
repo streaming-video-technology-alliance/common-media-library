@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const INTERNAL_ERROR = 'internal-error';
+export const INTERNAL_ERROR = 'internal-error'

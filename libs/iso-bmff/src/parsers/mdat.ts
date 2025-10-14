@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts';
-import type { MediaDataBox } from '../boxes/MediaDataBox.ts';
-import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts'
+import type { MediaDataBox } from '../boxes/MediaDataBox.ts'
+import type { IsoView } from '../IsoView.ts'
 
 /**
  * Parse a MediaDataBox from an IsoView
@@ -15,5 +15,5 @@ import type { IsoView } from '../IsoView.ts';
 export function mdat(view: IsoView): Fields<MediaDataBox> {
 	return {
 		data: view.readData(-1),
-	};
+	}
 };

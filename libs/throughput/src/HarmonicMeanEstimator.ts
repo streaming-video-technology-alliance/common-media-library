@@ -1,6 +1,6 @@
-import type { ResourceTiming } from '@svta/cml-utils';
-import { getBandwidthBps } from '@svta/cml-utils';
-import type { ThroughputEstimator } from './ThroughputEstimator.ts';
+import type { ResourceTiming } from '@svta/cml-utils'
+import { getBandwidthBps } from '@svta/cml-utils'
+import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 
 /**
  * Harmonic Mean throughput estimator
@@ -9,19 +9,19 @@ import type { ThroughputEstimator } from './ThroughputEstimator.ts';
  * @beta
  */
 export class HarmonicMeanEstimator implements ThroughputEstimator {
-	private samples: ResourceTiming[] = [];
+	private samples: ResourceTiming[] = []
 
 	public sample(sample: ResourceTiming): void {
-		this.samples.push(sample);
+		this.samples.push(sample)
 	}
 
 	public getEstimate(): number {
-		let value: number = 0;
+		let value: number = 0
 
 		for (let i = 0; i < this.samples.length; i++) {
-			value += 1 / getBandwidthBps(this.samples[i]);
+			value += 1 / getBandwidthBps(this.samples[i])
 		}
 
-		return this.samples.length / value;
+		return this.samples.length / value
 	}
 }

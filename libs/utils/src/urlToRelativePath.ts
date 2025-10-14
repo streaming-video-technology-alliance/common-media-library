@@ -9,36 +9,36 @@
  * @beta
  */
 export function urlToRelativePath(url: string, base: string): string {
-	const to = new URL(url);
-	const from = new URL(base);
+	const to = new URL(url)
+	const from = new URL(base)
 
 	if (to.origin !== from.origin) {
-		return url;
+		return url
 	}
 
-	const toPath = to.pathname.split('/').slice(1);
-	const fromPath = from.pathname.split('/').slice(1, -1);
+	const toPath = to.pathname.split('/').slice(1)
+	const fromPath = from.pathname.split('/').slice(1, -1)
 
 	// remove common parents
-	const length = Math.min(toPath.length, fromPath.length);
+	const length = Math.min(toPath.length, fromPath.length)
 
 	for (let i = 0; i < length; i++) {
 		if (toPath[i] !== fromPath[i]) {
-			break;
+			break
 		}
 
-		toPath.shift();
-		fromPath.shift();
+		toPath.shift()
+		fromPath.shift()
 	}
 
 	// add back paths
 	while (fromPath.length) {
-		fromPath.shift();
-		toPath.unshift('..');
+		fromPath.shift()
+		toPath.unshift('..')
 	}
 
-	const relativePath = toPath.join('/');
+	const relativePath = toPath.join('/')
 
 	// preserve query parameters and hash of the destination url
-	return relativePath + to.search + to.hash;
+	return relativePath + to.search + to.hash
 }

@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const LICENSE_RELEASE = 'license-release';
+export const LICENSE_RELEASE = 'license-release'

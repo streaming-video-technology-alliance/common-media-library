@@ -1,4 +1,4 @@
-import type { Track } from './Track.ts';
+import type { Track } from './Track.ts'
 
 /**
  * CMAF-HAM Audio Track type

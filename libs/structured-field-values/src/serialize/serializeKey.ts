@@ -1,5 +1,5 @@
-import { KEY } from '../utils/KEY.ts';
-import { serializeError } from './serializeError.ts';
+import { KEY } from '../utils/KEY.ts'
+import { serializeError } from './serializeError.ts'
 
 // 4.1.1.3.  Serializing a Key
 //
@@ -25,7 +25,7 @@ import { serializeError } from './serializeError.ts';
  */
 export function serializeKey(value: string): string {
 	if (/^[a-z*][a-z0-9\-_.*]*$/.test(value) === false) {
-		throw serializeError(value, KEY);
+		throw serializeError(value, KEY)
 	}
-	return value;
+	return value
 }

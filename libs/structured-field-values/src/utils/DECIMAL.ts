@@ -1,1 +1,1 @@
-export const DECIMAL: string = 'Decimal';
+export const DECIMAL: string = 'Decimal'

@@ -1,1 +1,1 @@
-export const KEY = 'Key';
+export const KEY = 'Key'

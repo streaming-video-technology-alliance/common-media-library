@@ -1,10 +1,10 @@
-import type { AudioTrack } from '../../../../types/model/AudioTrack.ts';
-import type { VideoTrack } from '../../../../types/model/VideoTrack.ts';
+import type { AudioTrack } from '../../../../types/model/AudioTrack.ts'
+import type { VideoTrack } from '../../../../types/model/VideoTrack.ts'
 
 import {
 	AT_SEPARATOR,
 	HYPHEN_MINUS_SEPARATOR,
-} from '../../../../utils/constants.ts';
+} from '../../../../utils/constants.ts'
 
 /**
  * @internal
@@ -18,10 +18,10 @@ import {
  */
 export function encodeByteRange(track: VideoTrack | AudioTrack): string {
 	if (track.byteRange) {
-		return `BYTERANGE:${track.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}\n`;
+		return `BYTERANGE:${track.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}\n`
 	}
 	else if (track.segments?.at(0)?.byteRange) {
-		return `BYTERANGE:0@${Number(track.segments.at(0)?.byteRange?.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}\n`;
+		return `BYTERANGE:0@${Number(track.segments.at(0)?.byteRange?.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}\n`
 	}
-	return '';
+	return ''
 }

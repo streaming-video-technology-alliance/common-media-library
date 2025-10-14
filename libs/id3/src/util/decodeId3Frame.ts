@@ -1,9 +1,9 @@
-import type { Id3Frame } from '../Id3Frame.ts';
-import type { RawId3Frame } from './RawFrame.ts';
-import { decodeId3ImageFrame } from './decodeId3ImageFrame.ts';
-import { decodeId3PrivFrame } from './decodeId3PrivFrame.ts';
-import { decodeId3TextFrame } from './decodeId3TextFrame.ts';
-import { decodeId3UrlFrame } from './decodeId3UrlFrame.ts';
+import type { Id3Frame } from '../Id3Frame.ts'
+import type { RawId3Frame } from './RawFrame.ts'
+import { decodeId3ImageFrame } from './decodeId3ImageFrame.ts'
+import { decodeId3PrivFrame } from './decodeId3PrivFrame.ts'
+import { decodeId3TextFrame } from './decodeId3TextFrame.ts'
+import { decodeId3UrlFrame } from './decodeId3UrlFrame.ts'
 
 /**
  * Decode an ID3 frame.
@@ -17,15 +17,15 @@ import { decodeId3UrlFrame } from './decodeId3UrlFrame.ts';
  */
 export function decodeId3Frame(frame: RawId3Frame): Id3Frame | undefined {
 	if (frame.type === 'PRIV') {
-		return decodeId3PrivFrame(frame);
+		return decodeId3PrivFrame(frame)
 	}
 	else if (frame.type[0] === 'W') {
-		return decodeId3UrlFrame(frame);
+		return decodeId3UrlFrame(frame)
 	}
 
 	else if (frame.type === 'APIC') {
-		return decodeId3ImageFrame(frame);
+		return decodeId3ImageFrame(frame)
 	}
 
-	return decodeId3TextFrame(frame);
+	return decodeId3TextFrame(frame)
 }

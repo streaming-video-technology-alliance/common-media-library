@@ -1,10 +1,10 @@
-import type { SfEncodeOptions } from '../SfEncodeOptions.ts';
-import { SfItem } from '../SfItem.ts';
-import type { SfMember } from '../SfMember.ts';
-import { LIST } from '../utils/LIST.ts';
-import { serializeError } from './serializeError.ts';
-import { serializeInnerList } from './serializeInnerList.ts';
-import { serializeItem } from './serializeItem.ts';
+import type { SfEncodeOptions } from '../SfEncodeOptions.ts'
+import { SfItem } from '../SfItem.ts'
+import type { SfMember } from '../SfMember.ts'
+import { LIST } from '../utils/LIST.ts'
+import { serializeError } from './serializeError.ts'
+import { serializeInnerList } from './serializeInnerList.ts'
+import { serializeItem } from './serializeItem.ts'
 
 // 4.1.1.  Serializing a List
 //
@@ -34,24 +34,24 @@ import { serializeItem } from './serializeItem.ts';
  */
 export function serializeList(list: SfMember[], options: SfEncodeOptions = { whitespace: true }): string {
 	if (Array.isArray(list) === false) {
-		throw serializeError(list, LIST);
+		throw serializeError(list, LIST)
 	}
 
-	const optionalWhiteSpace = options?.whitespace ? ' ' : '';
+	const optionalWhiteSpace = options?.whitespace ? ' ' : ''
 
 	return list
 		.map(item => {
 			if (item instanceof SfItem === false) {
-				item = new SfItem(item);
+				item = new SfItem(item)
 			}
 
 			// TODO: Fix this type assertion
-			const i = item as any;
+			const i = item as any
 			if (Array.isArray(i.value)) {
-				return serializeInnerList(i);
+				return serializeInnerList(i)
 			}
 
-			return serializeItem(i);
+			return serializeItem(i)
 		})
-		.join(`,${optionalWhiteSpace}`);
+		.join(`,${optionalWhiteSpace}`)
 }

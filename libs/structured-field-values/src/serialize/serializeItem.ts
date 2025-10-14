@@ -1,7 +1,7 @@
-import type { SfBareItem } from '../SfBareItem.ts';
-import { SfItem } from '../SfItem.ts';
-import { serializeBareItem } from './serializeBareItem.ts';
-import { serializeParams } from './serializeParams.ts';
+import type { SfBareItem } from '../SfBareItem.ts'
+import { SfItem } from '../SfItem.ts'
+import { serializeBareItem } from './serializeBareItem.ts'
+import { serializeParams } from './serializeParams.ts'
 
 // 4.1.3.  Serializing an Item
 //
@@ -22,9 +22,9 @@ import { serializeParams } from './serializeParams.ts';
  */
 export function serializeItem(value: SfItem | SfBareItem): string {
 	if (value instanceof SfItem) {
-		return `${serializeBareItem(value.value)}${serializeParams(value.params)}`;
+		return `${serializeBareItem(value.value)}${serializeParams(value.params)}`
 	}
 	else {
-		return serializeBareItem(value);
+		return serializeBareItem(value)
 	}
 }

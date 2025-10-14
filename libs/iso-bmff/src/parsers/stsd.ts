@@ -1,7 +1,7 @@
-import type { IsoView } from '../IsoView.ts';
-import type { Fields } from '../boxes/Fields.ts';
-import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts';
-import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts';
+import type { IsoView } from '../IsoView.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
+import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts'
 
 /**
  * Parse a SampleDescriptionBox from an IsoView
@@ -14,13 +14,13 @@ import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts';
  * @beta
  */
 export function stsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoView): Fields<SampleDescriptionBox<E>> {
-	const { version, flags } = view.readFullBox();
-	const entryCount = view.readUint(4);
+	const { version, flags } = view.readFullBox()
+	const entryCount = view.readUint(4)
 
 	return {
 		version,
 		flags,
 		entryCount,
 		entries: view.readBoxes<E>(entryCount),
-	};
+	}
 };

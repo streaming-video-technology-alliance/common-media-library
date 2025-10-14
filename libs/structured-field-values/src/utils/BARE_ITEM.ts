@@ -1,1 +1,1 @@
-export const BARE_ITEM = 'Bare Item';
+export const BARE_ITEM = 'Bare Item'

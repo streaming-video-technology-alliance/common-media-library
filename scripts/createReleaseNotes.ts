@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises'
 
 function release(version: string, changes: string) {
 	return `## Release Notes
@@ -12,27 +12,27 @@ ${changes}
 \`\`\`sh
 npm install @svta/common-media-library@${version}
 \`\`\`
-`;
+`
 }
 
 async function getChanges(version: string) {
-	const changeLog = await readFile('./CHANGELOG.md', 'utf8');
-	const logs = changeLog.split(/^## /m);
-	const match = `[${version}]`;
-	const log = logs.find(log => log.includes(match)) || '';
-	return log.split('\n\n').slice(1).join('\n\n');
+	const changeLog = await readFile('./CHANGELOG.md', 'utf8')
+	const logs = changeLog.split(/^## /m)
+	const match = `[${version}]`
+	const log = logs.find(log => log.includes(match)) || ''
+	return log.split('\n\n').slice(1).join('\n\n')
 }
 
 async function getVersion() {
-	const txt = await readFile('./package.json', 'utf8');
-	return JSON.parse(txt).version;
+	const txt = await readFile('./package.json', 'utf8')
+	return JSON.parse(txt).version
 }
 
 const createReleaseNotes = async () => {
-	const version = await getVersion();
-	const changes = await getChanges(version);
-	const releaseNotes = release(version, changes);
-	await writeFile('./RELEASE.md', releaseNotes);
-};
+	const version = await getVersion()
+	const changes = await getChanges(version)
+	const releaseNotes = release(version, changes)
+	await writeFile('./RELEASE.md', releaseNotes)
+}
 
-createReleaseNotes();
+createReleaseNotes()

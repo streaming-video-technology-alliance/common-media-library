@@ -1,6 +1,6 @@
-import { parseDict, SfItem } from '@svta/cml-structured-field-values';
-import assert from 'node:assert';
-import test from 'node:test';
+import { parseDict, SfItem } from '@svta/cml-structured-field-values'
+import assert from 'node:assert'
+import test from 'node:test'
 
 test('parseDictionary', () => {
 	assert.deepStrictEqual(parseDict(
@@ -16,7 +16,7 @@ test('parseDictionary', () => {
 			'date': new SfItem(new Date(1659578233 * 1000)),
 		},
 		src: ``,
-	});
+	})
 
 	assert.deepEqual(parseDict(`a=?0, b, c; foo=bar`), {
 		value: {
@@ -25,7 +25,7 @@ test('parseDictionary', () => {
 			'c': new SfItem(true, { 'foo': Symbol.for('bar') }),
 		},
 		src: ``,
-	});
+	})
 
 	assert.deepStrictEqual(parseDict(`rating=1.5, feelings=(joy sadness)`), {
 		value: {
@@ -33,7 +33,7 @@ test('parseDictionary', () => {
 			'feelings': new SfItem([Symbol.for('joy'), Symbol.for('sadness')]),
 		},
 		src: ``,
-	});
+	})
 
 	assert.deepStrictEqual(parseDict(`a=(1 2), b=3, c=4;aa=bb, d=(5 6);valid`), {
 		value: {
@@ -43,8 +43,8 @@ test('parseDictionary', () => {
 			'd': new SfItem([5, 6], { 'valid': true }),
 		},
 		src: ``,
-	});
+	})
 
-	assert.throws(() => parseDict(`a=1&`), /failed to parse "&" as Dict/);
-	assert.throws(() => parseDict(`a=1,`), /failed to parse "" as Dict/);
-});
+	assert.throws(() => parseDict(`a=1&`), /failed to parse "&" as Dict/)
+	assert.throws(() => parseDict(`a=1,`), /failed to parse "" as Dict/)
+})

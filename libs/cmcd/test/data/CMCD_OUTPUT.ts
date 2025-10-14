@@ -39,4 +39,4 @@ export const CMCD_OUTPUT = {
 	ec: ['ERR001', 'ERR002'] as const,
 	pt: 45000,
 	rtp: 8000,
-};
+}

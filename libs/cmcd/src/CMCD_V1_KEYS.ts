@@ -23,4 +23,4 @@ export const CMCD_V1_KEYS = [
 	'su',
 	'tb',
 	'v',
-] as const;
+] as const

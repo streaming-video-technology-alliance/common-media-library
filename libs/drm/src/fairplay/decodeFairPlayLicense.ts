@@ -1,4 +1,4 @@
-import { decodeBase64 } from '@svta/cml-utils';
+import { decodeBase64 } from '@svta/cml-utils'
 
 /**
  * Decodes a FairPlay DRM license response.
@@ -15,5 +15,5 @@ import { decodeBase64 } from '@svta/cml-utils';
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array {
 	return typeof response === 'string'
 		? decodeBase64(response)
-		: new Uint8Array(response);
+		: new Uint8Array(response)
 }

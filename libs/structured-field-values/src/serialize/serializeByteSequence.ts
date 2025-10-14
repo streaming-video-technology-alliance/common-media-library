@@ -1,6 +1,6 @@
-import { encodeBase64 } from '@svta/cml-utils';
-import { BYTES } from '../utils/BYTES.ts';
-import { serializeError } from './serializeError.ts';
+import { encodeBase64 } from '@svta/cml-utils'
+import { BYTES } from '../utils/BYTES.ts'
+import { serializeError } from './serializeError.ts'
 
 // 4.1.8.  Serializing a Byte Sequence
 //
@@ -31,7 +31,7 @@ import { serializeError } from './serializeError.ts';
  */
 export function serializeByteSequence(value: Uint8Array) {
 	if (ArrayBuffer.isView(value) === false) {
-		throw serializeError(value, BYTES);
+		throw serializeError(value, BYTES)
 	}
-	return `:${encodeBase64(value)}:`;
+	return `:${encodeBase64(value)}:`
 }

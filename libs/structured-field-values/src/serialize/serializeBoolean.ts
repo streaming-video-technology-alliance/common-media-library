@@ -1,5 +1,5 @@
-import { BOOLEAN } from '../utils/BOOLEAN.ts';
-import { serializeError } from './serializeError.ts';
+import { BOOLEAN } from '../utils/BOOLEAN.ts'
+import { serializeError } from './serializeError.ts'
 
 // 4.1.9.  Serializing a Boolean
 //
@@ -22,7 +22,7 @@ import { serializeError } from './serializeError.ts';
  */
 export function serializeBoolean(value: boolean): string {
 	if (typeof value !== 'boolean') {
-		throw serializeError(value, BOOLEAN);
+		throw serializeError(value, BOOLEAN)
 	}
-	return value ? '?1' : '?0';
+	return value ? '?1' : '?0'
 }

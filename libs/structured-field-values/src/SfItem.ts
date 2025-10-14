@@ -1,5 +1,5 @@
-import type { SfBareItem } from './SfBareItem.ts';
-import type { SfParameters } from './SfParameters.ts';
+import type { SfBareItem } from './SfBareItem.ts'
+import type { SfParameters } from './SfParameters.ts'
 
 /**
  * Structured Field Item
@@ -9,16 +9,16 @@ import type { SfParameters } from './SfParameters.ts';
  */
 export class SfItem {
 
-	value: SfBareItem;
+	value: SfBareItem
 
-	params?: SfParameters;
+	params?: SfParameters
 
 	constructor(value: any, params?: SfParameters) {
 		if (Array.isArray(value)) {
-			value = value.map((v) => (v instanceof SfItem) ? v : new SfItem(v));
+			value = value.map((v) => (v instanceof SfItem) ? v : new SfItem(v))
 		}
 
-		this.value = value;
-		this.params = params;
+		this.value = value
+		this.params = params
 	}
 }

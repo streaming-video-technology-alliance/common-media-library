@@ -1,9 +1,9 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
-import { SfToken } from '../SfToken.ts';
-import { TOKEN } from '../utils/TOKEN.ts';
-import type { ParsedValue } from './ParsedValue.ts';
-import { parsedValue } from './ParsedValue.ts';
-import { parseError } from './parseError.ts';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
+import { SfToken } from '../SfToken.ts'
+import { TOKEN } from '../utils/TOKEN.ts'
+import type { ParsedValue } from './ParsedValue.ts'
+import { parsedValue } from './ParsedValue.ts'
+import { parseError } from './parseError.ts'
 
 // 4.2.6.  Parsing a Token
 //
@@ -31,15 +31,15 @@ import { parseError } from './parseError.ts';
  */
 export function parseToken(src: string, options?: SfDecodeOptions): ParsedValue<symbol | SfToken> {
 	if (/^[a-zA-Z*]$/.test(src[0]) === false) {
-		throw parseError(src, TOKEN);
+		throw parseError(src, TOKEN)
 	}
 
-	const re = /^([!#$%&'*+\-.^_`|~\w:/]+)/g;
-	const value = (re.exec(src) as any)[1];
-	src = src.substring(re.lastIndex);
+	const re = /^([!#$%&'*+\-.^_`|~\w:/]+)/g
+	const value = (re.exec(src) as any)[1]
+	src = src.substring(re.lastIndex)
 
 	return parsedValue(
 		options?.useSymbol === false ? new SfToken(value) : Symbol.for(value),
 		src,
-	);
+	)
 }

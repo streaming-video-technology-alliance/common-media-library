@@ -1,11 +1,11 @@
-import type { SfEncodeOptions } from '../SfEncodeOptions.ts';
-import { SfItem } from '../SfItem.ts';
-import { DICT } from '../utils/DICT.ts';
-import { serializeError } from './serializeError.ts';
-import { serializeInnerList } from './serializeInnerList.ts';
-import { serializeItem } from './serializeItem.ts';
-import { serializeKey } from './serializeKey.ts';
-import { serializeParams } from './serializeParams.ts';
+import type { SfEncodeOptions } from '../SfEncodeOptions.ts'
+import { SfItem } from '../SfItem.ts'
+import { DICT } from '../utils/DICT.ts'
+import { serializeError } from './serializeError.ts'
+import { serializeInnerList } from './serializeInnerList.ts'
+import { serializeItem } from './serializeItem.ts'
+import { serializeKey } from './serializeKey.ts'
+import { serializeParams } from './serializeParams.ts'
 
 // 4.1.2.  Serializing a Dictionary
 //
@@ -50,31 +50,31 @@ import { serializeParams } from './serializeParams.ts';
  */
 export function serializeDict(dict: Record<string, any> | Map<string, any>, options: SfEncodeOptions = { whitespace: true }): string {
 	if (typeof dict !== 'object' || dict == null) {
-		throw serializeError(dict, DICT);
+		throw serializeError(dict, DICT)
 	}
 
-	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict);
-	const optionalWhiteSpace = options?.whitespace ? ' ' : '';
+	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict)
+	const optionalWhiteSpace = options?.whitespace ? ' ' : ''
 
 	return Array.from(entries)
 		.map(([key, item]) => {
 			if (item instanceof SfItem === false) {
-				item = new SfItem(item);
+				item = new SfItem(item)
 			}
-			let output = serializeKey(key);
+			let output = serializeKey(key)
 			if (item.value === true) {
-				output += serializeParams(item.params);
+				output += serializeParams(item.params)
 			}
 			else {
-				output += '=';
+				output += '='
 				if (Array.isArray(item.value)) {
-					output += serializeInnerList(item);
+					output += serializeInnerList(item)
 				}
 				else {
-					output += serializeItem(item);
+					output += serializeItem(item)
 				}
 			}
-			return output;
+			return output
 		})
-		.join(`,${optionalWhiteSpace}`);
+		.join(`,${optionalWhiteSpace}`)
 }

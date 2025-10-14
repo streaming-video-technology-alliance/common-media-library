@@ -1,6 +1,6 @@
-import type { Cmcd } from './Cmcd.ts';
-import { CMCD_PARAM } from './CMCD_PARAM.ts';
-import { decodeCmcd } from './decodeCmcd.ts';
+import type { Cmcd } from './Cmcd.ts'
+import { CMCD_PARAM } from './CMCD_PARAM.ts'
+import { decodeCmcd } from './decodeCmcd.ts'
 
 /**
  * Decode CMCD data from a query string.
@@ -17,10 +17,10 @@ import { decodeCmcd } from './decodeCmcd.ts';
  */
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd {
 	if (typeof query === 'string') {
-		query = new URLSearchParams(query);
+		query = new URLSearchParams(query)
 	}
 
-	const value = query.get(CMCD_PARAM);
+	const value = query.get(CMCD_PARAM)
 
-	return decodeCmcd(value as string);
+	return decodeCmcd(value as string)
 }

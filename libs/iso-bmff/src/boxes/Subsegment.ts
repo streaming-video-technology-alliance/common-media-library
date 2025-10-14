@@ -1,4 +1,4 @@
-import type { SubsegmentRange } from './SubsegmentRange.ts';
+import type { SubsegmentRange } from './SubsegmentRange.ts'
 
 /**
  * Subsegment

@@ -1,7 +1,7 @@
-import eslint from '@eslint/js';
-import tsdoc from 'eslint-plugin-tsdoc';
-import { defineConfig } from 'eslint/config';
-import tseslint from 'typescript-eslint';
+import eslint from '@eslint/js'
+import tsdoc from 'eslint-plugin-tsdoc'
+import { defineConfig } from 'eslint/config'
+import tseslint from 'typescript-eslint'
 
 const config = defineConfig(
 	eslint.configs.recommended,
@@ -21,6 +21,7 @@ const config = defineConfig(
 			'@typescript-eslint/no-inferrable-types': 'off',
 			"@typescript-eslint/no-unused-vars": ["error", { caughtErrors: "none" }],
 			'no-case-declarations': 'off',
+			'semi': ['error', 'never'],
 		},
 	}
 )

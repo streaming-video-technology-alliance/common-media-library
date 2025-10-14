@@ -1,4 +1,4 @@
-import { decodeXml } from './decodeXml.ts';
+import { decodeXml } from './decodeXml.ts'
 
 /**
  * Parse XML into a JS object with no validation and some failure tolerance
@@ -11,4 +11,4 @@ import { decodeXml } from './decodeXml.ts';
  *
  * @deprecated Use {@link decodeXml} instead.
  */
-export const parseXml: typeof decodeXml = decodeXml;
+export const parseXml: typeof decodeXml = decodeXml

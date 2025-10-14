@@ -4,4 +4,4 @@
  *
  * @beta
  */
-export const PLAYREADY_KEY_SYSTEM = 'com.microsoft.playready';
+export const PLAYREADY_KEY_SYSTEM = 'com.microsoft.playready'

@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.ts';
+import type { FullBox } from './FullBox.ts'
 
 /**
  * Item Info Entry - 'infe'
