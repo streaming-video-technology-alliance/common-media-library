@@ -37,7 +37,7 @@
 		"Common Media Response"
 	],
 	"scripts": {
-		"build": "node ../../scripts/build.mts",
+		"build": "node ../../scripts/build.ts",
 		"prepublishOnly": "npm run build",
 		"pub": "npm publish --provenance --access public"
 	},
@@ -52,7 +52,7 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-xml": "*",
-		"@svta/cml-utils": "*"
+		"@svta/cml-xml": "1.0.0",
+		"@svta/cml-utils": "1.0.0"
 	}
 }

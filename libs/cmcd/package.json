@@ -38,10 +38,8 @@
 		"Common Media Client Data"
 	],
 	"scripts": {
-		"build": "node ../../scripts/build.mts",
-		"test": "node --no-warnings --test **/*.test.ts",
-		"prepublishOnly": "npm run build",
-		"pub": "npm publish --provenance --access public"
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts"
 	},
 	"engines": {
 		"node": ">=20"
@@ -54,8 +52,8 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-cta": "*",
-		"@svta/cml-structured-field-values": "*",
-		"@svta/cml-utils": "*"
+		"@svta/cml-cta": "1.0.0",
+		"@svta/cml-structured-field-values": "1.0.0",
+		"@svta/cml-utils": "1.0.0"
 	}
 }

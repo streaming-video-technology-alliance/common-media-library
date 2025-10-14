@@ -39,11 +39,11 @@
 		"pretest": "npm run build && npm run lint",
 		"test": "npm test --workspaces --if-present",
 		"start": "npm start -w dev",
-		"pub": "npm publish -w lib --access public",
-		"clean": "node scripts/clean.mts",
-		"ver": "node scripts/version.mts",
+		"pub": "node scripts/publish.ts",
+		"clean": "node scripts/clean.ts",
+		"ver": "node scripts/version.ts",
 		"docs": "npm start -w docs",
-		"notes": "node scripts/createReleaseNotes.mts",
+		"notes": "node scripts/createReleaseNotes.ts",
 		"typecheck": "tsc --noEmit"
 	},
 	"workspaces": [

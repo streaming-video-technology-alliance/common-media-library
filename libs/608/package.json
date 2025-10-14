@@ -40,10 +40,8 @@
 		"subtitles"
 	],
 	"scripts": {
-		"build": "node ../../scripts/build.mts",
-		"test": "node --no-warnings --test **/*.test.ts",
-		"prepublishOnly": "npm run build",
-		"pub": "npm publish --provenance --access public"
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts"
 	},
 	"engines": {
 		"node": ">=20"

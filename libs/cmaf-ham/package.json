@@ -40,10 +40,8 @@
 		"DASH"
 	],
 	"scripts": {
-		"build": "node ../../scripts/build.mts",
-		"test": "node --no-warnings --test **/*.test.ts",
-		"prepublishOnly": "npm run build",
-		"pub": "npm publish --provenance --access public",
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts",
 		"dev": "node samples/cmaf-ham-conversion/src/index.ts"
 	},
 	"engines": {
@@ -57,7 +55,7 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-utils": "*"
+		"@svta/cml-utils": "0.20.0"
 	},
 	"devDependencies": {
 		"@types/m3u8-parser": "7.2.5",

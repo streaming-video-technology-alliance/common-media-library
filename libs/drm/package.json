@@ -40,10 +40,8 @@
 		"FairPlay"
 	],
 	"scripts": {
-		"build": "node ../../scripts/build.mts",
-		"test": "node --no-warnings --test **/*.test.ts",
-		"prepublishOnly": "npm run build",
-		"pub": "npm publish --provenance --access public"
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts"
 	},
 	"engines": {
 		"node": ">=20"
@@ -56,7 +54,7 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-utils": "*",
-		"@svta/cml-xml": "*"
+		"@svta/cml-utils": "1.0.0",
+		"@svta/cml-xml": "1.0.0"
 	}
 }
