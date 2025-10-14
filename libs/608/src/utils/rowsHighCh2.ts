@@ -1,4 +1,4 @@
-export const rowsHighCh2: { [key: number]: number; } = {
+export const rowsHighCh2: Record<number, number> = {
 	25: 2,
 	26: 4,
 	29: 6,

@@ -7,7 +7,7 @@
  *
  * @beta
  */
-export function extractCta608Data(raw: DataView, cta608Range: Array<number>): Array<Array<number>> {
+export function extractCta608Data(raw: DataView, cta608Range: number[]): number[][] {
 	let pos = cta608Range[0];
 	const fieldData: number[][] = [[], []];
 

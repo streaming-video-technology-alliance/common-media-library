@@ -31,7 +31,7 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 		const duration: number = iso8601DurationToNumber(period.$.duration);
 		const presentationId: string = getPresentationId(period, duration);
 
-		const selectionSetGroups: { [group: string]: SelectionSet } = {};
+		const selectionSetGroups: Record<string, SelectionSet> = {};
 
 		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
 			const tracks: Track[] = adaptationSet.Representation.map(

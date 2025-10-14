@@ -179,7 +179,7 @@ export class WebVttParser {
 			}
 
 			let alreadyCollectedLine = false;
-			var sawCue = reuseCue;
+			let sawCue = reuseCue;
 
 			if (!reuseCue) {
 				this.cue = null;

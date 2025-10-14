@@ -8,7 +8,7 @@
  *
  * @beta
  */
-export function findCta608Nalus(raw: DataView, startPos: number, size: number): Array<Array<number>> {
+export function findCta608Nalus(raw: DataView, startPos: number, size: number): number[][] {
 	let nalSize = 0, cursor = startPos, nalType = 0;
 	const cta608NaluRanges = [];
 

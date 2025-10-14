@@ -4,7 +4,7 @@ import { expectError } from '../utils/expectError.ts';
 describe('parsing error tests', function () {
 
 	it('parsing error tests', async () => {
-		var testInfo = [{
+		const testInfo = [{
 			file: './test/webvtt/file-layout/blank-file.vtt',
 			name: 'WebVttParsingError',
 			code: 0,

@@ -7,5 +7,5 @@ import type { Box } from './Box.ts';
  * @beta
  */
 export type ContainerBox<T> = Box & {
-	boxes: Array<T>;
+	boxes: T[];
 };

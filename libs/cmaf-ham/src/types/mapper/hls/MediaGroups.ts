@@ -4,18 +4,10 @@
  * @alpha
  */
 export type MediaGroups = {
-	AUDIO: {
-		[key: string]: {
-			[key: string]: {
+	AUDIO: Record<string, Record<string, {
 				language: string;
-			};
-		};
-	};
-	SUBTITLES: {
-		[key: string]: {
-			[key: string]: {
+			}>>;
+	SUBTITLES: Record<string, Record<string, {
 				language: string;
-			};
-		};
-	};
+			}>>;
 };

@@ -1,7 +1,7 @@
 /**
  *  Exceptions from regular ASCII. CodePoints are mapped to UTF-16 codes
  */
-export const specialCea608CharsCodes: { [key: number]: number; } = {
+export const specialCea608CharsCodes: Record<number, number> = {
 	42: 225, // lowercase a, acute accent
 	92: 233, // lowercase e, acute accent
 	94: 237, // lowercase i, acute accent

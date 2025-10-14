@@ -11,5 +11,5 @@ import type { FullBox } from './FullBox.ts';
 export type DataReferenceBox = FullBox & {
 	type: 'dref';
 	entryCount: number;
-	entries: Array<DataEntryUrlBox | DataEntryUrnBox>;
+	entries: (DataEntryUrlBox | DataEntryUrnBox)[];
 };

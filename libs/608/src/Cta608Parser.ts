@@ -61,7 +61,7 @@ import { setLastCmd } from './utils/setLastCmd.ts';
  * @beta
  */
 export class Cta608Parser {
-	private channels: Array<Cta608Channel | null>;
+	private channels: (Cta608Channel | null)[];
 	private currentChannel: Channels = 0;
 	private cmdHistory: CmdHistory = createCmdHistory();
 	private logger: CaptionsLogger;

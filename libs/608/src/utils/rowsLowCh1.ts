@@ -1,6 +1,6 @@
 // Tables to look up row from PAC data
 
-export const rowsLowCh1: { [key: number]: number; } = {
+export const rowsLowCh1: Record<number, number> = {
 	17: 1,
 	18: 3,
 	21: 5,
