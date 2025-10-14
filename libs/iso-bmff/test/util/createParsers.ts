@@ -1,5 +1,5 @@
 import type { IsoBmffBoxMap } from '@svta/cml-iso-bmff';
-import type { BoxParser, BoxParserMap } from './box';
+import type { BoxParser, BoxParserMap } from './box.js';
 
 export function createParsers(parsers: BoxParser | BoxParser[]): { name: keyof IsoBmffBoxMap, parsers: BoxParserMap } {
 	if (!Array.isArray(parsers)) {

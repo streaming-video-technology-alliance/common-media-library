@@ -3,7 +3,7 @@ import type {
 	Presentation,
 	Segment,
 	VideoTrack,
-} from '@svta/common-media-library/cmaf-ham';
+} from '@svta/cml-cmaf-ham';
 
 export const videoSegments: Segment[] = [
 	{

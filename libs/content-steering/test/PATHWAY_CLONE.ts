@@ -1,4 +1,4 @@
-import type { PathwayClone } from '@svta/common-media-library/contentsteering';
+import type { PathwayClone } from '@svta/cml-content-steering';
 
 export const PATHWAY_CLONE: PathwayClone = {
 	'BASE-ID': 'pathway1',

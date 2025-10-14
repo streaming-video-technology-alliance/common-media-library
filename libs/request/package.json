@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-request",
-	"version": "0.20.0",
+	"version": "1.0.0",
 	"description": "Common Media Request and Response types",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -37,9 +37,7 @@
 		"Common Media Response"
 	],
 	"scripts": {
-		"build": "node ../../scripts/build.ts",
-		"prepublishOnly": "npm run build",
-		"pub": "npm publish --provenance --access public"
+		"build": "node ../../scripts/build.ts"
 	},
 	"engines": {
 		"node": ">=20"

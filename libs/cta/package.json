@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-cta",
-	"version": "0.20.0",
+	"version": "1.0.0",
 	"description": "Common functionality for CTA standards including CTA-608/CEA-608",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -41,9 +41,7 @@
 		"standards"
 	],
 	"scripts": {
-		"build": "node ../../scripts/build.ts",
-		"prepublishOnly": "npm run build",
-		"pub": "npm publish --provenance --access public"
+		"build": "node ../../scripts/build.ts"
 	},
 	"engines": {
 		"node": ">=20"

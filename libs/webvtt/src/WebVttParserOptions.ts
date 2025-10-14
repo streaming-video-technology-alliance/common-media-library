@@ -1,5 +1,5 @@
-import type { WebVttCueFactory } from './WebVttCueFactory';
-import type { WebVttRegionFactory } from './WebVttRegionFactory';
+import type { WebVttCueFactory } from './WebVttCueFactory.js';
+import type { WebVttRegionFactory } from './WebVttRegionFactory.js';
 
 /**
  * Options for the WebVtt parser.

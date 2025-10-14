@@ -1,5 +1,5 @@
-import type { Cmcd } from './Cmcd';
-import type { CmcdPlayerState } from './CmcdPlayerState';
+import type { Cmcd } from './Cmcd.js';
+import type { CmcdPlayerState } from './CmcdPlayerState.js';
 
 /**
  * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.

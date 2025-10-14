@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-id3",
-	"version": "0.20.0",
+	"version": "1.0.0",
 	"description": "ID3 tag parsing functionality",
 	"license": "Apache-2.0",
 	"type": "module",

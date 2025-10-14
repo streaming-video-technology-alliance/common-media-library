@@ -1,4 +1,4 @@
-import type { SteeringManifest } from '@svta/common-media-library/contentsteering';
+import type { SteeringManifest } from '@svta/cml-content-steering';
 
 export const MANIFEST: SteeringManifest = {
 	VERSION: 1,
