@@ -1,8 +1,8 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.js';
-import { TEMPLATE } from '../fields/TEMPLATE.js';
-import { UINT } from '../fields/UINT.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts';
+import { TEMPLATE } from '../fields/TEMPLATE.ts';
+import { UINT } from '../fields/UINT.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a TrackHeaderBox from an IsoView

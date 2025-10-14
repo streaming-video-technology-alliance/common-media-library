@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { LabelBox } from '../boxes/LabelBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { LabelBox } from '../boxes/LabelBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a LabelBox from an IsoView

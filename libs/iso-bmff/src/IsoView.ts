@@ -1,24 +1,24 @@
-import type { ContainerBox } from './boxes/ContainerBox.js';
-import type { Fields } from './boxes/Fields.js';
-import type { FullBox } from './boxes/FullBox.js';
-import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
-import { CONTAINERS } from './CONTAINERS.js';
-import { DATA } from './fields/DATA.js';
-import { INT } from './fields/INT.js';
-import { STRING } from './fields/STRING.js';
-import { TEMPLATE } from './fields/TEMPLATE.js';
-import { UINT } from './fields/UINT.js';
-import { UTF8 } from './fields/UTF8.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
-import type { IsoFieldTypeMap } from './readers/IsoFieldTypeMap.js';
-import { readData } from './readers/readData.js';
-import { readInt } from './readers/readInt.js';
-import { readString } from './readers/readString.js';
-import { readTemplate } from './readers/readTemplate.js';
-import { readTerminatedString } from './readers/readTerminatedString.js';
-import { readUint } from './readers/readUint.js';
-import { readUtf8String } from './readers/readUtf8String.js';
-import { readUtf8TerminatedString } from './readers/readUtf8TerminatedString.js';
+import type { ContainerBox } from './boxes/ContainerBox.ts';
+import type { Fields } from './boxes/Fields.ts';
+import type { FullBox } from './boxes/FullBox.ts';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.ts';
+import { CONTAINERS } from './CONTAINERS.ts';
+import { DATA } from './fields/DATA.ts';
+import { INT } from './fields/INT.ts';
+import { STRING } from './fields/STRING.ts';
+import { TEMPLATE } from './fields/TEMPLATE.ts';
+import { UINT } from './fields/UINT.ts';
+import { UTF8 } from './fields/UTF8.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
+import type { IsoFieldTypeMap } from './readers/IsoFieldTypeMap.ts';
+import { readData } from './readers/readData.ts';
+import { readInt } from './readers/readInt.ts';
+import { readString } from './readers/readString.ts';
+import { readTemplate } from './readers/readTemplate.ts';
+import { readTerminatedString } from './readers/readTerminatedString.ts';
+import { readUint } from './readers/readUint.ts';
+import { readUtf8String } from './readers/readUtf8String.ts';
+import { readUtf8TerminatedString } from './readers/readUtf8TerminatedString.ts';
 
 /**
  * Raw ISO BMFF data box.

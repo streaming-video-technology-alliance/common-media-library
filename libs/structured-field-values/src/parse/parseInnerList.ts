@@ -1,12 +1,12 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.js';
-import type { SfInnerList } from '../SfInnerList.js';
-import { SfItem } from '../SfItem.js';
-import { INNER } from '../utils/INNER.js';
-import type { ParsedValue } from './ParsedValue.js';
-import { parsedValue } from './ParsedValue.js';
-import { parseError } from './parseError.js';
-import { parseItem } from './parseItem.js';
-import { parseParameters } from './parseParameters.js';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
+import type { SfInnerList } from '../SfInnerList.ts';
+import { SfItem } from '../SfItem.ts';
+import { INNER } from '../utils/INNER.ts';
+import type { ParsedValue } from './ParsedValue.ts';
+import { parsedValue } from './ParsedValue.ts';
+import { parseError } from './parseError.ts';
+import { parseItem } from './parseItem.ts';
+import { parseParameters } from './parseParameters.ts';
 
 // 4.2.1.2.  Parsing an Inner List
 //

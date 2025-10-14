@@ -1,7 +1,7 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { IsoView } from '../IsoView.js';
-import { mp4a } from './mp4a.js';
+import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IsoView } from '../IsoView.ts';
+import { mp4a } from './mp4a.ts';
 
 /**
  * Parse an AudioSampleEntry from an IsoView

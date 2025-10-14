@@ -1,5 +1,5 @@
-import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.js';
-import type { Segment } from '../../../../types/model/Segment.js';
+import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.ts';
+import type { Segment } from '../../../../types/model/Segment.ts';
 
 import { decodeByteRange } from './decodeByteRange.ts';
 

@@ -1,4 +1,4 @@
-import { decodeXml } from './decodeXml.js';
+import { decodeXml } from './decodeXml.ts';
 
 /**
  * Parse XML into a JS object with no validation and some failure tolerance

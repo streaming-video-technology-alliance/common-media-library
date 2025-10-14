@@ -1,5 +1,5 @@
-import type { CommonMediaRequest } from './CommonMediaRequest.js';
-import type { CommonMediaResponse } from './CommonMediaResponse.js';
+import type { CommonMediaRequest } from './CommonMediaRequest.ts';
+import type { CommonMediaResponse } from './CommonMediaResponse.ts';
 
 /**
  * A function that executes a request and returns a response that adhere to the

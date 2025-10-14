@@ -1,8 +1,8 @@
-import type { DecodeTextOptions } from './DecodeTextOptions.js';
-import { UTF_16 } from './UTF_16.js';
-import { UTF_16_BE } from './UTF_16_BE.js';
-import { UTF_16_LE } from './UTF_16_LE.js';
-import { UTF_8 } from './UTF_8.js';
+import type { DecodeTextOptions } from './DecodeTextOptions.ts';
+import { UTF_16 } from './UTF_16.ts';
+import { UTF_16_BE } from './UTF_16_BE.ts';
+import { UTF_16_LE } from './UTF_16_LE.ts';
+import { UTF_8 } from './UTF_8.ts';
 
 /**
  * Converts an ArrayBuffer or ArrayBufferView to a string. Similar to `TextDecoder.decode`

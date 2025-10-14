@@ -1,4 +1,4 @@
-import type { Box } from './Box.js';
+import type { Box } from './Box.ts';
 
 /**
  * Full Box Type (has version and flags)

@@ -1,8 +1,8 @@
-import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.js';
-import type { CmcdData } from './CmcdData.js';
-import { CmcdHeaderField } from './CmcdHeaderField.js';
-import type { CmcdHeaderMap } from './CmcdHeaderMap.js';
-import type { CmcdKey } from './CmcdKey.js';
+import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts';
+import type { CmcdData } from './CmcdData.ts';
+import { CmcdHeaderField } from './CmcdHeaderField.ts';
+import type { CmcdHeaderMap } from './CmcdHeaderMap.ts';
+import type { CmcdKey } from './CmcdKey.ts';
 
 function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, CmcdHeaderField> {
 	return Object.keys(headerMap)

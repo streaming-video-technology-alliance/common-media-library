@@ -1,8 +1,8 @@
 import type { ResourceTiming } from '@svta/cml-utils';
 import { getBandwidthBps } from '@svta/cml-utils';
-import { Ewma } from './Ewma.js';
-import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions.js';
-import type { ThroughputEstimator } from './ThroughputEstimator.js';
+import { Ewma } from './Ewma.ts';
+import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions.ts';
+import type { ThroughputEstimator } from './ThroughputEstimator.ts';
 
 /**
  * Exponential Weighted Moving Average (EWMA) throughput estimator based on 2 half-lives

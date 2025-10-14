@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { TrackRunBox } from '../boxes/TrackRunBox.js';
-import type { TrackRunSample } from '../boxes/TrackRunSample.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { TrackRunBox } from '../boxes/TrackRunBox.ts';
+import type { TrackRunSample } from '../boxes/TrackRunSample.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a TrackRunBox from an IsoView

@@ -1,7 +1,7 @@
 import type { SfBareItem } from '@svta/cml-structured-field-values';
 import { decodeSfDict, SfItem, symbolToStr } from '@svta/cml-structured-field-values';
-import type { CmcdData } from './CmcdData.js';
-import type { CmcdValue } from './CmcdValue.js';
+import type { CmcdData } from './CmcdData.ts';
+import type { CmcdValue } from './CmcdValue.ts';
 
 // Define the input type for reduceValue
 type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[];

@@ -3,8 +3,8 @@
  *
  * @packageDocumentation
  */
-export * from './isInvalidInt.js';
-export * from './STRING_REGEX.js';
-export * from './symbolToStr.js';
-export * from './throwError.js';
+export * from './isInvalidInt.ts';
+export * from './STRING_REGEX.ts';
+export * from './symbolToStr.ts';
+export * from './throwError.ts';
 

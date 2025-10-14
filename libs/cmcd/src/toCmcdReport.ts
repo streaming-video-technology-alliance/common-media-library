@@ -1,14 +1,14 @@
 import type { Request } from '@svta/cml-utils';
-import type { Cmcd } from './Cmcd.js';
-import { CMCD_HEADERS } from './CMCD_HEADERS.js';
-import { CMCD_PARAM } from './CMCD_PARAM.js';
-import { CMCD_QUERY } from './CMCD_QUERY.js';
-import type { CmcdData } from './CmcdData.js';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import type { CmcdKey } from './CmcdKey.js';
-import type { CmcdReportTarget } from './CmcdReportTarget.js';
-import { encodeCmcd } from './encodeCmcd.js';
-import { toCmcdHeaders } from './toCmcdHeaders.js';
+import type { Cmcd } from './Cmcd.ts';
+import { CMCD_HEADERS } from './CMCD_HEADERS.ts';
+import { CMCD_PARAM } from './CMCD_PARAM.ts';
+import { CMCD_QUERY } from './CMCD_QUERY.ts';
+import type { CmcdData } from './CmcdData.ts';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { CmcdKey } from './CmcdKey.ts';
+import type { CmcdReportTarget } from './CmcdReportTarget.ts';
+import { encodeCmcd } from './encodeCmcd.ts';
+import { toCmcdHeaders } from './toCmcdHeaders.ts';
 
 /**
  * Converts CMCD data into a report format.

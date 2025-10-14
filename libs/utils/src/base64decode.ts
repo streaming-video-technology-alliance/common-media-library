@@ -1,4 +1,4 @@
-import { decodeBase64 } from './decodeBase64.js';
+import { decodeBase64 } from './decodeBase64.ts';
 
 /**
  * Decodes a base64 encoded string into binary data

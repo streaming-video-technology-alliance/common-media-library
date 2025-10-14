@@ -13,7 +13,7 @@ import {
 import fs from 'fs';
 import { Parser } from 'm3u8-parser';
 import { Builder, parseString } from 'xml2js';
-import { listDirectories, listM3U8Files, listMPDFiles } from './utils.js';
+import { listDirectories, listM3U8Files, listMPDFiles } from './utils.ts';
 
 const FILE_ENCODING = 'utf8';
 

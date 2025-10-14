@@ -1,9 +1,9 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { EditBox } from './EditBox.js';
-import type { MediaBox } from './MediaBox.js';
-import type { TrackHeaderBox } from './TrackHeaderBox.js';
-import type { TrackReferenceBox } from './TrackReferenceBox.js';
-import type { UserDataBox } from './UserDataBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { EditBox } from './EditBox.ts';
+import type { MediaBox } from './MediaBox.ts';
+import type { TrackHeaderBox } from './TrackHeaderBox.ts';
+import type { TrackReferenceBox } from './TrackReferenceBox.ts';
+import type { UserDataBox } from './UserDataBox.ts';
 
 /**
  * Track Box - 'trak' - Container

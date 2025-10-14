@@ -3,20 +3,21 @@
  *
  * @packageDocumentation
  */
-export * from './CMSD_DYNAMIC.js';
-export * from './CMSD_STATIC.js';
-export * from './CMSD_V1.js';
-export type * from './CmsdCustomKey.js';
-export type * from './CmsdDynamic.js';
-export type * from './CmsdDynamicParams.js';
-export type * from './CmsdEncodeOptions.js';
-export * from './CmsdHeaderField.js';
-export * from './CmsdObjectType.js';
-export type * from './CmsdStatic.js';
-export * from './CmsdStreamingFormat.js';
-export * from './CmsdStreamType.js';
-export type * from './CmsdValue.js';
-export * from './decodeCmsdDynamic.js';
-export * from './decodeCmsdStatic.js';
-export * from './encodeCmsdDynamic.js';
-export * from './encodeCmsdStatic.js';
+export * from './CMSD_DYNAMIC.ts';
+export * from './CMSD_STATIC.ts';
+export * from './CMSD_V1.ts';
+export type * from './CmsdCustomKey.ts';
+export type * from './CmsdDynamic.ts';
+export type * from './CmsdDynamicParams.ts';
+export type * from './CmsdEncodeOptions.ts';
+export * from './CmsdHeaderField.ts';
+export * from './CmsdObjectType.ts';
+export type * from './CmsdStatic.ts';
+export * from './CmsdStreamingFormat.ts';
+export * from './CmsdStreamType.ts';
+export type * from './CmsdValue.ts';
+export * from './decodeCmsdDynamic.ts';
+export * from './decodeCmsdStatic.ts';
+export * from './encodeCmsdDynamic.ts';
+export * from './encodeCmsdStatic.ts';
+

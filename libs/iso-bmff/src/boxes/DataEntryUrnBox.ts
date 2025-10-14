@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.js';
+import type { FullBox } from './FullBox.ts';
 
 /**
  * Data Entry Urn Box - 'urn '

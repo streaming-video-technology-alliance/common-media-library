@@ -1,5 +1,5 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformationBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformationBox.ts';
 
 /**
  * Item Protection Box - 'ipro' - Container

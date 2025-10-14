@@ -1,6 +1,6 @@
-import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { IsoView } from '../IsoView.js';
+import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a DecodingTimeToSampleBox from an IsoView

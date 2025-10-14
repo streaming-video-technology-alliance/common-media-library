@@ -1,9 +1,9 @@
-import { CMCD_OBJECT } from './CMCD_OBJECT.js';
-import { CMCD_REQUEST } from './CMCD_REQUEST.js';
-import { CMCD_SESSION } from './CMCD_SESSION.js';
-import { CMCD_STATUS } from './CMCD_STATUS.js';
-import type { CmcdData } from './CmcdData.js';
-import { decodeCmcd } from './decodeCmcd.js';
+import { CMCD_OBJECT } from './CMCD_OBJECT.ts';
+import { CMCD_REQUEST } from './CMCD_REQUEST.ts';
+import { CMCD_SESSION } from './CMCD_SESSION.ts';
+import { CMCD_STATUS } from './CMCD_STATUS.ts';
+import type { CmcdData } from './CmcdData.ts';
+import { decodeCmcd } from './decodeCmcd.ts';
 
 const keys = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS];
 

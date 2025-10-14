@@ -1,4 +1,4 @@
-import type { WebVttRegion } from './WebVttRegion.js';
+import type { WebVttRegion } from './WebVttRegion.ts';
 
 /**
  * Create a generic WebVttRegion object with default values

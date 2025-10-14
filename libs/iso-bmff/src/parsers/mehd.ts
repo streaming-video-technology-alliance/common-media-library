@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a MovieExtendsHeaderBox from an IsoView

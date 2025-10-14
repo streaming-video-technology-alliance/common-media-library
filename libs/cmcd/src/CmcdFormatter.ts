@@ -1,7 +1,7 @@
 import type { SfItem } from '@svta/cml-structured-field-values';
 import type { ValueOrArray } from '@svta/cml-utils';
-import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
-import type { CmcdValue } from './CmcdValue.js';
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts';
+import type { CmcdValue } from './CmcdValue.ts';
 
 /**
  * A formatter for CMCD values.

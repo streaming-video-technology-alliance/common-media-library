@@ -1,4 +1,4 @@
-import type { ResourceTiming } from './ResourceTiming.js';
+import type { ResourceTiming } from './ResourceTiming.ts';
 
 /**
  * Converts a ResourceTiming sample to bandwidth in bits per second (bps).

@@ -1,7 +1,7 @@
 import { SfToken, symbolToStr } from '@svta/cml-structured-field-values';
-import type { Cmcd } from './Cmcd.js';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { prepareCmcdData } from './prepareCmcdData.js';
+import type { Cmcd } from './Cmcd.ts';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import { prepareCmcdData } from './prepareCmcdData.ts';
 
 /**
  * Convert a CMCD data object to JSON.

@@ -1,16 +1,16 @@
-import type { Segment } from '../../../types/model/Segment.js';
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.js';
-import type { VideoTrack } from '../../../types/model/VideoTrack.js';
+import type { Segment } from '../../../types/model/Segment.ts';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
+import type { VideoTrack } from '../../../types/model/VideoTrack.ts';
 
-import type { Manifest } from '../../../types/manifest/Manifest.js';
-import type { PlayList } from '../../../types/mapper/hls/Playlist.js';
+import type { Manifest } from '../../../types/manifest/Manifest.ts';
+import type { PlayList } from '../../../types/mapper/hls/Playlist.ts';
 
-import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.js';
-import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.js';
+import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.ts';
+import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts';
 
 import { decodeByteRange } from './utils/decodeByteRange.ts';
-import { formatSegments } from './utils/formatSegments.js';
-import { getDuration } from './utils/getDuration.js';
+import { formatSegments } from './utils/formatSegments.ts';
+import { getDuration } from './utils/getDuration.ts';
 import { getHlsCodec } from './utils/getHlsCodec.ts';
 
 export function videoPlaylistsToSwitchingSets(

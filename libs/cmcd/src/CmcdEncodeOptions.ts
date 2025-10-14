@@ -1,7 +1,7 @@
-import type { CmcdFormatterMap } from './CmcdFormatterMap.js';
-import type { CmcdHeaderMap } from './CmcdHeaderMap.js';
-import type { CmcdKey } from './CmcdKey.js';
-import type { CmcdReportingMode } from './CmcdReportingMode.js';
+import type { CmcdFormatterMap } from './CmcdFormatterMap.ts';
+import type { CmcdHeaderMap } from './CmcdHeaderMap.ts';
+import type { CmcdKey } from './CmcdKey.ts';
+import type { CmcdReportingMode } from './CmcdReportingMode.ts';
 
 /**
  * Options for encoding CMCD values.

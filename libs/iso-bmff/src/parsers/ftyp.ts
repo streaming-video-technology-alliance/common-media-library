@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { FileTypeBox } from '../boxes/FileTypeBox.js';
-import { STRING } from '../fields/STRING.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { FileTypeBox } from '../boxes/FileTypeBox.ts';
+import { STRING } from '../fields/STRING.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a FileTypeBox from an IsoView

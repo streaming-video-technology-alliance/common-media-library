@@ -1,8 +1,8 @@
-import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
-import type { IsoBmffBoxMap } from './boxes/IsoBmffBoxMap.js';
-import { filterBoxes } from './filterBoxes.js';
-import type { IsoData } from './IsoData.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.ts';
+import type { IsoBmffBoxMap } from './boxes/IsoBmffBoxMap.ts';
+import { filterBoxes } from './filterBoxes.ts';
+import type { IsoData } from './IsoData.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
 
 /**
  * Filter boxes by type from an IsoView

@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.js';
-import type { ShadowSyncEntry } from './ShadowSyncEntry.js';
+import type { FullBox } from './FullBox.ts';
+import type { ShadowSyncEntry } from './ShadowSyncEntry.ts';
 
 /**
  * Shadow Sync Sample Box - 'stsh'

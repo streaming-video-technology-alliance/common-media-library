@@ -1,7 +1,7 @@
-import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.js';
-import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.js';
-import type { CmcdEvent } from './CmcdEvent.js';
-import { isCmcdCustomKey } from './isCmcdCustomKey.js';
+import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.ts';
+import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts';
+import type { CmcdEvent } from './CmcdEvent.ts';
+import { isCmcdCustomKey } from './isCmcdCustomKey.ts';
 
 /**
  * Check if a key is a valid CMCD event key.

@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.js';
+import type { FullBox } from './FullBox.ts';
 
 /**
  * ISO/IEC 23001-7:2011 - 8.1 Protection System Specific Header Box

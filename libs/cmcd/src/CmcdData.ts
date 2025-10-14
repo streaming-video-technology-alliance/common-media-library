@@ -1,7 +1,7 @@
-import type { Cmcd } from './Cmcd.js';
-import type { CmcdEvent } from './CmcdEvent.js';
-import type { CmcdRequest } from './CmcdRequest.js';
-import type { CmcdResponse } from './CmcdResponse.js';
+import type { Cmcd } from './Cmcd.ts';
+import type { CmcdEvent } from './CmcdEvent.ts';
+import type { CmcdRequest } from './CmcdRequest.ts';
+import type { CmcdResponse } from './CmcdResponse.ts';
 
 /**
  * All CMCD data types combined.

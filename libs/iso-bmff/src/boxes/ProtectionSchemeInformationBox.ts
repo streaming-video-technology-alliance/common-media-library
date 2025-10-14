@@ -1,8 +1,8 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { IpmpInfoBox } from './IpmpInfoBox.js';
-import type { OriginalFormatBox } from './OriginalFormatBox.js';
-import type { SchemeInformationBox } from './SchemeInformationBox.js';
-import type { SchemeTypeBox } from './SchemeTypeBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { IpmpInfoBox } from './IpmpInfoBox.ts';
+import type { OriginalFormatBox } from './OriginalFormatBox.ts';
+import type { SchemeInformationBox } from './SchemeInformationBox.ts';
+import type { SchemeTypeBox } from './SchemeTypeBox.ts';
 
 /**
  * Protection Scheme Information Box - 'sinf' - Container

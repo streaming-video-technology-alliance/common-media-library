@@ -1,7 +1,7 @@
 import { encodeSfDict } from '@svta/cml-structured-field-values';
-import type { CmcdData } from './CmcdData.js';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import { prepareCmcdData } from './prepareCmcdData.js';
+import type { CmcdData } from './CmcdData.ts';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import { prepareCmcdData } from './prepareCmcdData.ts';
 
 /**
  * Encode a CMCD object to a string.

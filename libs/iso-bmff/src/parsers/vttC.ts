@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a WebVTTConfigurationBox from an IsoView

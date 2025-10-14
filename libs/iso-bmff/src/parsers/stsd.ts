@@ -1,7 +1,7 @@
-import type { IsoView } from '../IsoView.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.js';
-import type { SampleEntryBox } from '../boxes/SampleEntryBox.js';
+import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts';
+import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts';
 
 /**
  * Parse a SampleDescriptionBox from an IsoView

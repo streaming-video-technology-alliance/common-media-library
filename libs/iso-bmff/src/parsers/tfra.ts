@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.js';
-import type { TrackFragmentRandomAccessEntry } from '../boxes/TrackFragmentRandomAccessEntry.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts';
+import type { TrackFragmentRandomAccessEntry } from '../boxes/TrackFragmentRandomAccessEntry.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a TrackFragmentRandomAccessBox from an IsoView

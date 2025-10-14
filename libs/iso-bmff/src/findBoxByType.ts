@@ -1,8 +1,8 @@
-import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
-import type { IsoBmffBoxMap } from './boxes/IsoBmffBoxMap.js';
-import { findBox } from './findBox.js';
-import type { IsoData } from './IsoData.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.ts';
+import type { IsoBmffBoxMap } from './boxes/IsoBmffBoxMap.ts';
+import { findBox } from './findBox.ts';
+import type { IsoData } from './IsoData.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
 
 /**
  * Find a box from an IsoView that matches a given type

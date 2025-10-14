@@ -1,4 +1,4 @@
-import { encodeBase64 } from './encodeBase64.js';
+import { encodeBase64 } from './encodeBase64.ts';
 
 /**
  * Encodes binary data to base64

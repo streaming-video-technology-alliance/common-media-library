@@ -1,5 +1,5 @@
 import type { ValueOf } from '@svta/cml-utils';
-import { CmcdTransmissionMode } from './CmcdTransmissionMode.js';
+import { CmcdTransmissionMode } from './CmcdTransmissionMode.ts';
 
 /**
  * CMCD encoding types.

@@ -1,11 +1,11 @@
-import type { Segment } from '../../../../types/model/Segment.js';
+import type { Segment } from '../../../../types/model/Segment.ts';
 
 import {
 	AT_SEPARATOR,
 	HYPHEN_MINUS_SEPARATOR,
 	WHITE_SPACE,
 	WHITE_SPACE_ENCODED,
-} from '../../../../utils/constants.js';
+} from '../../../../utils/constants.ts';
 
 /**
  * @internal

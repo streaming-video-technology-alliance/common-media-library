@@ -1,4 +1,4 @@
-import type { WebVttRegion } from './WebVttRegion.js';
+import type { WebVttRegion } from './WebVttRegion.ts';
 
 /**
  * A WebVTT cue.

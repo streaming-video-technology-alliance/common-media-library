@@ -1,4 +1,4 @@
-import type { UriReplacement } from './UriReplacement.js';
+import type { UriReplacement } from './UriReplacement.ts';
 
 /**
  * A pathway clone for content steering.

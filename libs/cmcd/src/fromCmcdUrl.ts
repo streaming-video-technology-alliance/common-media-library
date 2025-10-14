@@ -1,5 +1,5 @@
-import type { Cmcd } from './Cmcd.js';
-import { decodeCmcd } from './decodeCmcd.js';
+import type { Cmcd } from './Cmcd.ts';
+import { decodeCmcd } from './decodeCmcd.ts';
 
 /**
  * Decode CMCD data from a url encoded string.

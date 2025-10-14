@@ -1,6 +1,6 @@
-import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { IsoView } from '../IsoView.js';
+import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a ExtendedLanguageBox from an IsoView

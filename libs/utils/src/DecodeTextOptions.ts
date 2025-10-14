@@ -1,4 +1,4 @@
-import type { Encoding } from './Encoding.js';
+import type { Encoding } from './Encoding.ts';
 
 /**
  * Options for the `decodeText` function.

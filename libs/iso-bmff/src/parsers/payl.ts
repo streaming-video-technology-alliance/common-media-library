@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a WebVTTCuePayloadBox from an IsoView

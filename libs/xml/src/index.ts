@@ -4,9 +4,10 @@
  * @packageDocumentation
  * @beta
  */
-export * from './decodeXml.js';
-export * from './encodeXml.js';
-export * from './getElementsByName.js';
-export * from './parseXml.js';
-export type * from './XmlNode.js';
-export type * from './XmlParseOptions.js';
+export * from './decodeXml.ts';
+export * from './encodeXml.ts';
+export * from './getElementsByName.ts';
+export * from './parseXml.ts';
+export type * from './XmlNode.ts';
+export type * from './XmlParseOptions.ts';
+

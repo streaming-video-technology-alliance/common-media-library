@@ -1,6 +1,6 @@
 import { encodeBase64 } from '@svta/cml-utils';
-import { BYTES } from '../utils/BYTES.js';
-import { serializeError } from './serializeError.js';
+import { BYTES } from '../utils/BYTES.ts';
+import { serializeError } from './serializeError.ts';
 
 // 4.1.8.  Serializing a Byte Sequence
 //

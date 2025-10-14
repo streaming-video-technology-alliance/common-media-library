@@ -3,20 +3,20 @@
  *
  * @packageDocumentation
  */
-export * from './parseBareItem.js';
-export * from './parseBoolean.js';
-export * from './parseByteSequence.js';
-export * from './parseDate.js';
-export * from './parseDict.js';
-export type { ParsedValue } from './ParsedValue.js';
-export * from './parseError.js';
-export * from './parseInnerList.js';
-export * from './parseIntegerOrDecimal.js';
-export * from './parseItem.js';
-export * from './parseItemOrInnerList.js';
-export * from './parseKey.js';
-export * from './parseList.js';
-export * from './parseParameters.js';
-export * from './parseString.js';
-export * from './parseToken.js';
+export * from './parseBareItem.ts';
+export * from './parseBoolean.ts';
+export * from './parseByteSequence.ts';
+export * from './parseDate.ts';
+export * from './parseDict.ts';
+export type { ParsedValue } from './ParsedValue.ts';
+export * from './parseError.ts';
+export * from './parseInnerList.ts';
+export * from './parseIntegerOrDecimal.ts';
+export * from './parseItem.ts';
+export * from './parseItemOrInnerList.ts';
+export * from './parseKey.ts';
+export * from './parseList.ts';
+export * from './parseParameters.ts';
+export * from './parseString.ts';
+export * from './parseToken.ts';
 

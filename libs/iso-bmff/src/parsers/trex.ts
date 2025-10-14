@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a TrackExtendsBox from an IsoView

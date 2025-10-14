@@ -1,4 +1,4 @@
-import type { AdaptationSet } from './AdaptationSet.js';
+import type { AdaptationSet } from './AdaptationSet.ts';
 
 /**
  * DASH Period

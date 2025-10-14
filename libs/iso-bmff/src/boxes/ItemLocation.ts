@@ -1,4 +1,4 @@
-import type { ItemExtent } from './ItemExtent.js';
+import type { ItemExtent } from './ItemExtent.ts';
 
 /**
  * Item Location

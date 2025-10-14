@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.js';
+import type { FullBox } from './FullBox.ts';
 
 /**
  * IPMP Info Box - 'imif'

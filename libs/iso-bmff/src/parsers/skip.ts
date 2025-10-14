@@ -1,7 +1,7 @@
-import type { IsoView } from '../IsoView.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.js';
-import { free } from './free.js';
+import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts';
+import { free } from './free.ts';
 
 /**
  * Parse a FreeSpaceBox from an IsoView

@@ -1,4 +1,4 @@
-import type { WebVttCue } from './WebVttCue.js';
+import type { WebVttCue } from './WebVttCue.ts';
 
 /**
  * A factory for creating WebVttCue objects.

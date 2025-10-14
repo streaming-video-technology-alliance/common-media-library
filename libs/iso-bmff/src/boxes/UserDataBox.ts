@@ -1,5 +1,5 @@
-import type { Box } from './Box.js';
-import type { ContainerBox } from './ContainerBox.js';
+import type { Box } from './Box.ts';
+import type { ContainerBox } from './ContainerBox.ts';
 
 /**
  * User Data Box - 'udta' - Container

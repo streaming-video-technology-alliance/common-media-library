@@ -1,13 +1,13 @@
-import { SfToken } from '../SfToken.js';
-import { BARE_ITEM } from '../utils/BARE_ITEM.js';
-import { serializeBoolean } from './serializeBoolean.js';
-import { serializeByteSequence } from './serializeByteSequence.js';
-import { serializeDate } from './serializeDate.js';
-import { serializeDecimal } from './serializeDecimal.js';
-import { serializeError } from './serializeError.js';
-import { serializeInteger } from './serializeInteger.js';
-import { serializeString } from './serializeString.js';
-import { serializeToken } from './serializeToken.js';
+import { SfToken } from '../SfToken.ts';
+import { BARE_ITEM } from '../utils/BARE_ITEM.ts';
+import { serializeBoolean } from './serializeBoolean.ts';
+import { serializeByteSequence } from './serializeByteSequence.ts';
+import { serializeDate } from './serializeDate.ts';
+import { serializeDecimal } from './serializeDecimal.ts';
+import { serializeError } from './serializeError.ts';
+import { serializeInteger } from './serializeInteger.ts';
+import { serializeString } from './serializeString.ts';
+import { serializeToken } from './serializeToken.ts';
 
 // 4.1.3.1.  Serializing a Bare Item
 //

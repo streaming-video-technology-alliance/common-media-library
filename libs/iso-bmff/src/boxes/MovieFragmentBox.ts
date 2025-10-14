@@ -1,6 +1,6 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { MovieFragmentHeaderBox } from './MovieFragmentHeaderBox.js';
-import type { TrackFragmentBox } from './TrackFragmentBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { MovieFragmentHeaderBox } from './MovieFragmentHeaderBox.ts';
+import type { TrackFragmentBox } from './TrackFragmentBox.ts';
 
 /**
  * Movie Fragment Box - 'moof' - Container

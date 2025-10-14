@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.js';
-import type { SampleToChunkEntry } from './SampleToChunkEntry.js';
+import type { FullBox } from './FullBox.ts';
+import type { SampleToChunkEntry } from './SampleToChunkEntry.ts';
 
 /**
  * Sample to Chunk Box - 'stsc'

@@ -1,4 +1,4 @@
-import type { CmcdRequest } from './CmcdRequest.js';
+import type { CmcdRequest } from './CmcdRequest.ts';
 
 /**
  * CMCD Response Mode.

@@ -1,5 +1,5 @@
 import { encodeSfList, SfItem } from '@svta/cml-structured-field-values';
-import type { CmsdDynamic } from './CmsdDynamic.js';
+import type { CmsdDynamic } from './CmsdDynamic.ts';
 
 /**
  * Encode a list of CMSD Dynamic objects.

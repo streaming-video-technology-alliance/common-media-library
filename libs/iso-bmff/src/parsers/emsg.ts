@@ -1,6 +1,6 @@
-import type { EventMessageBox } from '../boxes/EventMessageBox.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { IsoView } from '../IsoView.js';
+import type { EventMessageBox } from '../boxes/EventMessageBox.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse an EventMessageBox from an IsoView

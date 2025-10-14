@@ -1,5 +1,5 @@
-import { isValidPathwayClone } from './isValidPathwayClone.js';
-import type { SteeringManifest } from './SteeringManifest.js';
+import { isValidPathwayClone } from './isValidPathwayClone.ts';
+import type { SteeringManifest } from './SteeringManifest.ts';
 
 /**
  * Validates a steering manifest.

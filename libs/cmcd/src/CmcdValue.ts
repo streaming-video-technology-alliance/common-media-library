@@ -1,7 +1,7 @@
 import type { SfItem, SfToken } from '@svta/cml-structured-field-values';
-import type { CmcdObjectType } from './CmcdObjectType.js';
-import type { CmcdStreamType } from './CmcdStreamType.js';
-import type { CmcdStreamingFormat } from './CmcdStreamingFormat.js';
+import type { CmcdObjectType } from './CmcdObjectType.ts';
+import type { CmcdStreamType } from './CmcdStreamType.ts';
+import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts';
 
 /**
  * CMCD Value

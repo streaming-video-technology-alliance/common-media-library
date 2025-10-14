@@ -1,7 +1,7 @@
 import type { ValueOf } from '@svta/cml-utils';
-import { CMCD_HEADERS } from './CMCD_HEADERS.js';
-import { CMCD_JSON } from './CMCD_JSON.js';
-import { CMCD_QUERY } from './CMCD_QUERY.js';
+import { CMCD_HEADERS } from './CMCD_HEADERS.ts';
+import { CMCD_JSON } from './CMCD_JSON.ts';
+import { CMCD_QUERY } from './CMCD_QUERY.ts';
 
 /**
  * CMCD transmission modes.

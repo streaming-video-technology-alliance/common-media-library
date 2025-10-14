@@ -3,11 +3,12 @@
  *
  * @packageDocumentation
  */
-export type * from './CommonMediaRequest.js';
-export type * from './CommonMediaResponse.js';
-export type * from './Requester.js';
-export type * from './RequestInterceptor.js';
-export * from './RequestType.js';
-export type * from './ResourceTiming.js';
-export type * from './ResponseInterceptor.js';
-export type * from './ResponseTypeMap.js';
+export type * from './CommonMediaRequest.ts';
+export type * from './CommonMediaResponse.ts';
+export type * from './Requester.ts';
+export type * from './RequestInterceptor.ts';
+export * from './RequestType.ts';
+export type * from './ResourceTiming.ts';
+export type * from './ResponseInterceptor.ts';
+export type * from './ResponseTypeMap.ts';
+

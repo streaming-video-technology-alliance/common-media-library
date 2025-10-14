@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a SubSampleInformationBox from an IsoView

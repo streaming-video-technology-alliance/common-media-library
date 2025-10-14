@@ -1,7 +1,7 @@
-import type { Validation } from '../../types/Validation.js';
-import type { Presentation } from '../../types/model/Presentation.js';
+import type { Validation } from '../../types/Validation.ts';
+import type { Presentation } from '../../types/model/Presentation.ts';
 
-import { validateSelectionSets } from './validateSelectionSets.js';
+import { validateSelectionSets } from './validateSelectionSets.ts';
 
 /**
  * Validate a presentation.

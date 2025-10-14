@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.js';
+import type { FullBox } from './FullBox.ts';
 
 /**
  * Chunk Offset Box - 'stco'

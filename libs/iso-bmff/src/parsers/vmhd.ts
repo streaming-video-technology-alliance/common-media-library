@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.js';
-import { UINT } from '../fields/UINT.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts';
+import { UINT } from '../fields/UINT.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a VideoMediaHeaderBox from an IsoView

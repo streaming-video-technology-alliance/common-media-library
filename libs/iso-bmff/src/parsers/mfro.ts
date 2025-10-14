@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a MovieFragmentRandomAccessBox from an IsoView

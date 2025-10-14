@@ -1,6 +1,6 @@
-import type { IsoView } from '../IsoView.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.js';
+import type { IsoView } from '../IsoView.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts';
 
 /**
  * Parse a SubsegmentIndexBox from an IsoView

@@ -1,5 +1,5 @@
-import { KEY } from '../utils/KEY.js';
-import { serializeError } from './serializeError.js';
+import { KEY } from '../utils/KEY.ts';
+import { serializeError } from './serializeError.ts';
 
 // 4.1.1.3.  Serializing a Key
 //

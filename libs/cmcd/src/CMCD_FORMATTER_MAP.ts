@@ -1,8 +1,8 @@
 import { SfItem } from '@svta/cml-structured-field-values';
 import { urlToRelativePath, type ValueOrArray } from '@svta/cml-utils';
-import type { CmcdFormatter } from './CmcdFormatter.js';
-import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
-import type { CmcdValue } from './CmcdValue.js';
+import type { CmcdFormatter } from './CmcdFormatter.ts';
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts';
+import type { CmcdValue } from './CmcdValue.ts';
 
 const toRounded = (value: CmcdValue) => Math.round(value as number);
 

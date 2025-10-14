@@ -1,10 +1,10 @@
-import type { SfDecodeOptions } from '../SfDecodeOptions.js';
-import type { SfMember } from '../SfMember.js';
-import { LIST } from '../utils/LIST.js';
-import type { ParsedValue } from './ParsedValue.js';
-import { parsedValue } from './ParsedValue.js';
-import { parseError } from './parseError.js';
-import { parseItemOrInnerList } from './parseItemOrInnerList.js';
+import type { SfDecodeOptions } from '../SfDecodeOptions.ts';
+import type { SfMember } from '../SfMember.ts';
+import { LIST } from '../utils/LIST.ts';
+import type { ParsedValue } from './ParsedValue.ts';
+import { parsedValue } from './ParsedValue.ts';
+import { parseError } from './parseError.ts';
+import { parseItemOrInnerList } from './parseItemOrInnerList.ts';
 
 // 4.2.1.  Parsing a List
 //

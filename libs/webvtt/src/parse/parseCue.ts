@@ -1,9 +1,9 @@
-import type { WebVttCue } from '../WebVttCue.js';
-import { WebVttParsingError } from '../WebVttParsingError.js';
-import type { WebVttRegion } from '../WebVttRegion.js';
-import { parseOptions } from './parseOptions.js';
-import { parseTimeStamp } from './parseTimestamp.js';
-import { Settings } from './Settings.js';
+import type { WebVttCue } from '../WebVttCue.ts';
+import { WebVttParsingError } from '../WebVttParsingError.ts';
+import type { WebVttRegion } from '../WebVttRegion.ts';
+import { parseOptions } from './parseOptions.ts';
+import { parseTimeStamp } from './parseTimestamp.ts';
+import { Settings } from './Settings.ts';
 
 const BAD_TIMESTAMP = 'Malformed time stamp.';
 

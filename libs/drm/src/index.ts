@@ -7,76 +7,77 @@
  */
 
 // common utils
-export * from './cenc/findCencContentProtection.js';
-export * from './cenc/getLicenseServerUrlFromContentProtection.js';
-export * from './cenc/getPsshData.js';
-export * from './cenc/getPsshForKeySystem.js';
-export * from './cenc/parseInitDataFromContentProtection.js';
-export * from './cenc/parsePsshList.js';
+export * from './cenc/findCencContentProtection.ts';
+export * from './cenc/getLicenseServerUrlFromContentProtection.ts';
+export * from './cenc/getPsshData.ts';
+export * from './cenc/getPsshForKeySystem.ts';
+export * from './cenc/parseInitDataFromContentProtection.ts';
+export * from './cenc/parsePsshList.ts';
 
 // key system utils
-export * from './keysystem/createMediaKeySystemConfiguration.js';
-export * from './keysystem/getKeySystemAccess.js';
-export * from './keysystem/getLegacyKeySystemAccess.js';
-export * from './keysystem/getSupportedKeySystemConfiguration.js';
+export * from './keysystem/createMediaKeySystemConfiguration.ts';
+export * from './keysystem/getKeySystemAccess.ts';
+export * from './keysystem/getLegacyKeySystemAccess.ts';
+export * from './keysystem/getSupportedKeySystemConfiguration.ts';
 
 // fairplay utilities
-export * from './fairplay/concatInitDataIdAndCertificate.js';
-export * from './fairplay/decodeFairPlayLicense.js';
-export * from './fairplay/extractContentId.js';
-export * from './fairplay/getId.js';
-export * from './fairplay/getLicenseServerUrl.js';
+export * from './fairplay/concatInitDataIdAndCertificate.ts';
+export * from './fairplay/decodeFairPlayLicense.ts';
+export * from './fairplay/extractContentId.ts';
+export * from './fairplay/getId.ts';
+export * from './fairplay/getLicenseServerUrl.ts';
 
 // playready utilities
-export * from './playready/getLicenseRequestFromMessage.js';
-export * from './playready/getRequestHeadersFromMessage.js';
-export * from './playready/toBigEndianKeyId.js';
+export * from './playready/getLicenseRequestFromMessage.ts';
+export * from './playready/getRequestHeadersFromMessage.ts';
+export * from './playready/toBigEndianKeyId.ts';
 
 // drm types
-export type * from './common/ContentProtection.js';
-export type * from './common/LicenseRequest.js';
-export type * from './common/MediaKeySystemAccessRequest.js';
+export type * from './common/ContentProtection.ts';
+export type * from './common/LicenseRequest.ts';
+export type * from './common/MediaKeySystemAccessRequest.ts';
 
 // drm constants
-export * from './common/CBCS.js';
-export * from './common/CENC.js';
-export * from './common/CHALLENGE.js';
-export * from './common/CLEAR_KEY_SYSTEM.js';
-export * from './common/CLEAR_KEY_UUID.js';
-export * from './common/CONTENT_TYPE.js';
-export * from './common/EncryptionScheme.js';
-export * from './common/EXPIRED.js';
-export * from './common/FAIRPLAY_KEY_SYSTEM.js';
-export * from './common/FAIRPLAY_UUID.js';
-export * from './common/HTTP_HEADERS.js';
-export * from './common/HW_SECURE_ALL.js';
-export * from './common/HW_SECURE_CRYPTO.js';
-export * from './common/HW_SECURE_DECODE.js';
-export * from './common/INDIVIDUALIZATION_REQUEST.js';
-export * from './common/InitializationDataType.js';
-export * from './common/INTERNAL_ERROR.js';
-export * from './common/KEYIDS.js';
-export * from './common/LICENSE_ACQUISITION.js';
-export * from './common/LICENSE_RELEASE.js';
-export * from './common/LICENSE_RENEWAL.js';
-export * from './common/LICENSE_REQUEST.js';
-export * from './common/MediaKeyMessageType.js';
-export * from './common/MediaKeyStatus.js';
-export * from './common/MP4_PROTECTION_SCHEME.js';
-export * from './common/OUTPUT_DOWNSCALED.js';
-export * from './common/OUTPUT_RESTRICTED.js';
-export * from './common/PLAYREADY_KEY_MESSAGE.js';
-export * from './common/PLAYREADY_KEY_SYSTEM.js';
-export * from './common/PLAYREADY_RECOMMENDATION_KEY_SYSTEM.js';
-export * from './common/PLAYREADY_UUID.js';
-export * from './common/RELEASED.js';
-export * from './common/STATUS_PENDING.js';
-export * from './common/SW_SECURE_CRYPTO.js';
-export * from './common/SW_SECURE_DECODE.js';
-export * from './common/TEXT_XML_UTF8.js';
-export * from './common/USABLE.js';
-export * from './common/W3C_CLEAR_KEY_UUID.js';
-export * from './common/WEBM.js';
-export * from './common/WIDEVINE_KEY_SYSTEM.js';
-export * from './common/WIDEVINE_UUID.js';
-export * from './common/WidevineRobustness.js';
+export * from './common/CBCS.ts';
+export * from './common/CENC.ts';
+export * from './common/CHALLENGE.ts';
+export * from './common/CLEAR_KEY_SYSTEM.ts';
+export * from './common/CLEAR_KEY_UUID.ts';
+export * from './common/CONTENT_TYPE.ts';
+export * from './common/EncryptionScheme.ts';
+export * from './common/EXPIRED.ts';
+export * from './common/FAIRPLAY_KEY_SYSTEM.ts';
+export * from './common/FAIRPLAY_UUID.ts';
+export * from './common/HTTP_HEADERS.ts';
+export * from './common/HW_SECURE_ALL.ts';
+export * from './common/HW_SECURE_CRYPTO.ts';
+export * from './common/HW_SECURE_DECODE.ts';
+export * from './common/INDIVIDUALIZATION_REQUEST.ts';
+export * from './common/InitializationDataType.ts';
+export * from './common/INTERNAL_ERROR.ts';
+export * from './common/KEYIDS.ts';
+export * from './common/LICENSE_ACQUISITION.ts';
+export * from './common/LICENSE_RELEASE.ts';
+export * from './common/LICENSE_RENEWAL.ts';
+export * from './common/LICENSE_REQUEST.ts';
+export * from './common/MediaKeyMessageType.ts';
+export * from './common/MediaKeyStatus.ts';
+export * from './common/MP4_PROTECTION_SCHEME.ts';
+export * from './common/OUTPUT_DOWNSCALED.ts';
+export * from './common/OUTPUT_RESTRICTED.ts';
+export * from './common/PLAYREADY_KEY_MESSAGE.ts';
+export * from './common/PLAYREADY_KEY_SYSTEM.ts';
+export * from './common/PLAYREADY_RECOMMENDATION_KEY_SYSTEM.ts';
+export * from './common/PLAYREADY_UUID.ts';
+export * from './common/RELEASED.ts';
+export * from './common/STATUS_PENDING.ts';
+export * from './common/SW_SECURE_CRYPTO.ts';
+export * from './common/SW_SECURE_DECODE.ts';
+export * from './common/TEXT_XML_UTF8.ts';
+export * from './common/USABLE.ts';
+export * from './common/W3C_CLEAR_KEY_UUID.ts';
+export * from './common/WEBM.ts';
+export * from './common/WIDEVINE_KEY_SYSTEM.ts';
+export * from './common/WIDEVINE_UUID.ts';
+export * from './common/WidevineRobustness.ts';
+

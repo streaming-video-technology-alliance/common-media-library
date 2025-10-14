@@ -1,5 +1,5 @@
-import type { FullBox } from './FullBox.js';
-import type { SyncSample } from './SyncSample.js';
+import type { FullBox } from './FullBox.ts';
+import type { SyncSample } from './SyncSample.ts';
 
 /**
  * ISO/IEC 14496-12:2015 - 8.6.2 Sync Sample Box

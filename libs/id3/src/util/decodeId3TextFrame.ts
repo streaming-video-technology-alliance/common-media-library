@@ -1,6 +1,6 @@
-import type { DecodedId3Frame } from '../DecodedId3Frame.js';
-import type { RawId3Frame } from './RawFrame.js';
-import { utf8ArrayToStr } from './utf8ArrayToStr.js';
+import type { DecodedId3Frame } from '../DecodedId3Frame.ts';
+import type { RawId3Frame } from './RawFrame.ts';
+import { utf8ArrayToStr } from './utf8ArrayToStr.ts';
 
 /**
  * Decodes an ID3 text frame

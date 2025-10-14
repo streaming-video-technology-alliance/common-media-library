@@ -1,10 +1,10 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { DataInformationBox } from './DataInformationBox.js';
-import type { HintMediaHeaderBox } from './HintMediaHeaderBox.js';
-import type { NullMediaHeaderBox } from './NullMediaHeaderBox.js';
-import type { SampleTableBox } from './SampleTableBox.js';
-import type { SoundMediaHeaderBox } from './SoundMediaHeaderBox.js';
-import type { VideoMediaHeaderBox } from './VideoMediaHeaderBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { DataInformationBox } from './DataInformationBox.ts';
+import type { HintMediaHeaderBox } from './HintMediaHeaderBox.ts';
+import type { NullMediaHeaderBox } from './NullMediaHeaderBox.ts';
+import type { SampleTableBox } from './SampleTableBox.ts';
+import type { SoundMediaHeaderBox } from './SoundMediaHeaderBox.ts';
+import type { VideoMediaHeaderBox } from './VideoMediaHeaderBox.ts';
 
 /**
  * Media Information Box - 'minf' - Container

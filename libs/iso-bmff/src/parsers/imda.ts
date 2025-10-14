@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a IdentifiedMediaDataBox from an IsoView

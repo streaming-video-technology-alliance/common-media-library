@@ -1,7 +1,7 @@
-import type { EditListBox } from '../boxes/EditListBox.js';
-import type { EditListEntry } from '../boxes/EditListEntry.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { IsoView } from '../IsoView.js';
+import type { EditListBox } from '../boxes/EditListBox.ts';
+import type { EditListEntry } from '../boxes/EditListEntry.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a Box from an IsoView

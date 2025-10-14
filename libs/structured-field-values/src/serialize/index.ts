@@ -3,19 +3,19 @@
  *
  * @packageDocumentation
  */
-export * from './serializeBareItem.js';
-export * from './serializeBoolean.js';
-export * from './serializeByteSequence.js';
-export * from './serializeDate.js';
-export * from './serializeDecimal.js';
-export * from './serializeDict.js';
-export * from './serializeError.js';
-export * from './serializeInnerList.js';
-export * from './serializeInteger.js';
-export * from './serializeItem.js';
-export * from './serializeKey.js';
-export * from './serializeList.js';
-export * from './serializeParams.js';
-export * from './serializeString.js';
-export * from './serializeToken.js';
+export * from './serializeBareItem.ts';
+export * from './serializeBoolean.ts';
+export * from './serializeByteSequence.ts';
+export * from './serializeDate.ts';
+export * from './serializeDecimal.ts';
+export * from './serializeDict.ts';
+export * from './serializeError.ts';
+export * from './serializeInnerList.ts';
+export * from './serializeInteger.ts';
+export * from './serializeItem.ts';
+export * from './serializeKey.ts';
+export * from './serializeList.ts';
+export * from './serializeParams.ts';
+export * from './serializeString.ts';
+export * from './serializeToken.ts';
 

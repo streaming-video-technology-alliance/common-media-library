@@ -1,6 +1,6 @@
 import type { ValueOf } from '@svta/cml-utils';
-import { CBCS } from './CBCS.js';
-import { CENC } from './CENC.js';
+import { CBCS } from './CBCS.ts';
+import { CENC } from './CENC.ts';
 
 /**
  * Encryption schemes.

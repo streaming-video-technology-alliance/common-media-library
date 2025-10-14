@@ -1,6 +1,6 @@
-import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccessRequest.js';
-import { createMediaKeySystemConfiguration } from './createMediaKeySystemConfiguration.js';
-import { getSupportedKeySystemConfiguration } from './getSupportedKeySystemConfiguration.js';
+import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccessRequest.ts';
+import { createMediaKeySystemConfiguration } from './createMediaKeySystemConfiguration.ts';
+import { getSupportedKeySystemConfiguration } from './getSupportedKeySystemConfiguration.ts';
 
 /**
  * Fallback method to get key system access using legacy MediaKeys.isTypeSupported().

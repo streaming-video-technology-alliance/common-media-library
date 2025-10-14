@@ -5,27 +5,28 @@
  *
  * @packageDocumentation
  */
-export * from './createWebVttCue.js';
-export * from './createWebVttRegion.js';
-export * from './parseWebVtt.js';
-export * from './toVttCue.js';
-export * from './toVttRegion.js';
-export * from './WebVttParser.js';
-export * from './WebVttParsingError.js';
-export * from './WebVttTransformer.js';
-export * from './WebVttTransformStream.js';
+export * from './createWebVttCue.ts';
+export * from './createWebVttRegion.ts';
+export * from './parseWebVtt.ts';
+export * from './toVttCue.ts';
+export * from './toVttRegion.ts';
+export * from './WebVttParser.ts';
+export * from './WebVttParsingError.ts';
+export * from './WebVttTransformer.ts';
+export * from './WebVttTransformStream.ts';
 
-export * from './TimestampMap.js';
-export * from './WebVttCue.js';
-export * from './WebVttCueFactory.js';
-export * from './WebVttCueResult.js';
-export * from './WebVttErrorResult.js';
-export * from './WebVttParseResult.js';
-export * from './WebVttParserOptions.js';
-export * from './WebVttRegion.js';
-export * from './WebVttRegionFactory.js';
-export * from './WebVttRegionResult.js';
-export * from './WebVttResult.js';
-export * from './WebVttResultType.js';
-export * from './WebVttStyleResult.js';
-export * from './WebVttTimestampMapResult.js';
+export * from './TimestampMap.ts';
+export * from './WebVttCue.ts';
+export * from './WebVttCueFactory.ts';
+export * from './WebVttCueResult.ts';
+export * from './WebVttErrorResult.ts';
+export * from './WebVttParseResult.ts';
+export * from './WebVttParserOptions.ts';
+export * from './WebVttRegion.ts';
+export * from './WebVttRegionFactory.ts';
+export * from './WebVttRegionResult.ts';
+export * from './WebVttResult.ts';
+export * from './WebVttResultType.ts';
+export * from './WebVttStyleResult.ts';
+export * from './WebVttTimestampMapResult.ts';
+

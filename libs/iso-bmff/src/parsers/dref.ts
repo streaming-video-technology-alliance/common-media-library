@@ -1,8 +1,8 @@
-import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.js';
-import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.js';
-import type { DataReferenceBox } from '../boxes/DataReferenceBox.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { IsoView } from '../IsoView.js';
+import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts';
+import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts';
+import type { DataReferenceBox } from '../boxes/DataReferenceBox.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a DataReferenceBox from an IsoView

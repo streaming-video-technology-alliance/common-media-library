@@ -1,6 +1,6 @@
 import { unescapeHtml } from '@svta/cml-utils';
-import type { XmlNode } from './XmlNode.js';
-import type { XmlParseOptions } from './XmlParseOptions.js';
+import type { XmlNode } from './XmlNode.ts';
+import type { XmlParseOptions } from './XmlParseOptions.ts';
 
 /**
  * Parse XML into a JS object with no validation and some failure tolerance

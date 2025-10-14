@@ -1,5 +1,5 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { SingleItemTypeReferenceBox } from './SingleItemTypeReferenceBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { SingleItemTypeReferenceBox } from './SingleItemTypeReferenceBox.ts';
 
 /**
  * Item Reference Box - 'iref' - Container

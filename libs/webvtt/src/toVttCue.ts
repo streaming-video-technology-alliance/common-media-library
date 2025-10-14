@@ -1,4 +1,4 @@
-import type { WebVttCue } from './WebVttCue.js';
+import type { WebVttCue } from './WebVttCue.ts';
 
 /**
  * Convert a generic WebVTT cue to a VTTCue.

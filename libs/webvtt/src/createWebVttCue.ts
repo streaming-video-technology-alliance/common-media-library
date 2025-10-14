@@ -1,4 +1,4 @@
-import type { WebVttCue } from './WebVttCue.js';
+import type { WebVttCue } from './WebVttCue.ts';
 
 /**
  * Create a generic WebVttCue object with default values

@@ -1,4 +1,4 @@
-import type { Byterange } from './Byterange.js';
+import type { Byterange } from './Byterange.ts';
 
 /**
  * HLS Segments

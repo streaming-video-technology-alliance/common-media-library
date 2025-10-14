@@ -1,4 +1,4 @@
-import type { XmlNode } from './XmlNode.js';
+import type { XmlNode } from './XmlNode.ts';
 
 /**
  * Basic xml encoding utility. Encodes XML into a string.

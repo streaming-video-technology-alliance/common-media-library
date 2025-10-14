@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { SyncSample } from '../boxes/SyncSample.js';
-import type { SyncSampleBox } from '../boxes/SyncSampleBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { SyncSample } from '../boxes/SyncSample.ts';
+import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a SyncSampleBox from an IsoView

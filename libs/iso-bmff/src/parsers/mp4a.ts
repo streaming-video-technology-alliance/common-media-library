@@ -1,7 +1,7 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.js';
-import type { Fields } from '../boxes/Fields.js';
-import { UINT } from '../fields/UINT.js';
-import type { IsoView } from '../IsoView.js';
+import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import { UINT } from '../fields/UINT.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse an AudioSampleEntry from an IsoView

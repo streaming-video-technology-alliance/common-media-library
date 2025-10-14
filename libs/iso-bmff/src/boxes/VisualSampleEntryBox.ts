@@ -1,4 +1,4 @@
-import type { SampleEntryBox } from './SampleEntryBox.js';
+import type { SampleEntryBox } from './SampleEntryBox.ts';
 
 /**
  * ISO/IEC 14496-15:2014 - 12.1.3.1 avc1/2/3/4, hev1, hvc1, encv

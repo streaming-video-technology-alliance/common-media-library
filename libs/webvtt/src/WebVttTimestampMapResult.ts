@@ -1,5 +1,5 @@
 import type { TypedResult } from '@svta/cml-utils';
-import type { TimestampMap } from './TimestampMap.js';
+import type { TimestampMap } from './TimestampMap.ts';
 
 /**
  * WebVTT transform stream timestamp map result.

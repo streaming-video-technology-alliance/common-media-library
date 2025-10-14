@@ -1,4 +1,4 @@
-import { parsePsshList } from './parsePsshList.js';
+import { parsePsshList } from './parsePsshList.ts';
 
 /**
  * Returns the PSSH box associated with the given key system from the concatenated

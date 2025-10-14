@@ -3,6 +3,7 @@
  *
  * @packageDocumentation
  */
-export * from './parseFrameRate.js';
-export * from './processUriTemplate.js';
-export * from './THUMBNAIL_TILE_SCHEME_ID_URI.js';
+export * from './parseFrameRate.ts';
+export * from './processUriTemplate.ts';
+export * from './THUMBNAIL_TILE_SCHEME_ID_URI.ts';
+

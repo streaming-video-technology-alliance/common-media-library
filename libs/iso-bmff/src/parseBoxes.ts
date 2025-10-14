@@ -1,7 +1,7 @@
-import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
-import { createIsoView } from './createIsoView.js';
-import type { IsoData } from './IsoData.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.ts';
+import { createIsoView } from './createIsoView.ts';
+import type { IsoData } from './IsoData.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
 
 /**
  * Parse boxes from an IsoView

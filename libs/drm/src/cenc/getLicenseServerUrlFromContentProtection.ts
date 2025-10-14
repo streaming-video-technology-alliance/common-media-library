@@ -1,4 +1,4 @@
-import type { ContentProtection } from '../common/ContentProtection.js';
+import type { ContentProtection } from '../common/ContentProtection.ts';
 
 /**
  * Extracts a license server URL from an array of ContentProtection elements.

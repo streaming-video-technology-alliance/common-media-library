@@ -1,9 +1,9 @@
 import type { UTF_8 } from '@svta/cml-utils';
 import { decodeText, UTF_16 } from '@svta/cml-utils';
 import { getElementsByName, parseXml } from '@svta/cml-xml';
-import { CONTENT_TYPE } from '../common/CONTENT_TYPE.js';
-import { HTTP_HEADERS } from '../common/HTTP_HEADERS.js';
-import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.js';
+import { CONTENT_TYPE } from '../common/CONTENT_TYPE.ts';
+import { HTTP_HEADERS } from '../common/HTTP_HEADERS.ts';
+import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.ts';
 
 /**
  * Gets the PlayReady license request headers from the MediaKeyMessageEvent.

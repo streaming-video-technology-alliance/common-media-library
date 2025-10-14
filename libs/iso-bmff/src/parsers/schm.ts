@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a SchemeTypeBox from an IsoView

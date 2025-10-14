@@ -1,5 +1,5 @@
-import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.js';
-import type { CmcdFormatter } from './CmcdFormatter.js';
+import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts';
+import type { CmcdFormatter } from './CmcdFormatter.ts';
 
 /**
  * The default formatters for CMCD values.

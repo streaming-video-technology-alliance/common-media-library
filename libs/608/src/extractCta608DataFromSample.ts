@@ -2,7 +2,7 @@ import {
 	getSeiData,
 	isSeiNalUnitType,
 	parseCta608DataFromSei,
-} from './utils/seiHelpers.js';
+} from './utils/seiHelpers.ts';
 
 /**
  * Extracts CEA-608 data from a given sample.

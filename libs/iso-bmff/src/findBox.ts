@@ -1,9 +1,9 @@
-import type { ContainerBox } from './boxes/ContainerBox.js';
-import type { IsoBmffBox } from './boxes/IsoBmffBox.js';
-import type { BoxFilter } from './BoxFilter.js';
-import { createIsoView } from './createIsoView.js';
-import type { IsoData } from './IsoData.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
+import type { ContainerBox } from './boxes/ContainerBox.ts';
+import type { IsoBmffBox } from './boxes/IsoBmffBox.ts';
+import type { BoxFilter } from './BoxFilter.ts';
+import { createIsoView } from './createIsoView.ts';
+import type { IsoData } from './IsoData.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
 
 function find<T extends IsoBmffBox = IsoBmffBox>(iterator: Iterable<IsoBmffBox>, recursive: boolean, fn: BoxFilter<T>): T | null {
 	for (const box of iterator) {

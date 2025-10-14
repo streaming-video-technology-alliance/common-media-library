@@ -1,12 +1,12 @@
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.js';
-import type { TextTrack } from '../../../types/model/TextTrack.js';
+import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts';
+import type { TextTrack } from '../../../types/model/TextTrack.ts';
 
-import type { Manifest } from '../../../types/manifest/Manifest.js';
+import type { Manifest } from '../../../types/manifest/Manifest.ts';
 
-import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.js';
+import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts';
 
-import { formatSegments } from './utils/formatSegments.js';
-import { getDuration } from './utils/getDuration.js';
+import { formatSegments } from './utils/formatSegments.ts';
+import { getDuration } from './utils/getDuration.ts';
 import { getHlsCodec } from './utils/getHlsCodec.ts';
 
 export function subtitleGroupsToSwitchingSets(

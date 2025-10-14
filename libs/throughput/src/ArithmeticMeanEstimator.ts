@@ -1,6 +1,6 @@
 import type { ResourceTiming } from '@svta/cml-utils';
 import { getBandwidthBps } from '@svta/cml-utils';
-import type { ThroughputEstimator } from './ThroughputEstimator.js';
+import type { ThroughputEstimator } from './ThroughputEstimator.ts';
 
 /**
  * Arithmetic Mean throughput estimator

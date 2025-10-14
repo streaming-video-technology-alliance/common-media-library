@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.js';
-import type { SegmentIndexReference } from '../boxes/SegmentIndexReference.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts';
+import type { SegmentIndexReference } from '../boxes/SegmentIndexReference.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a SegmentIndexBox from an IsoView

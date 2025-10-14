@@ -1,6 +1,6 @@
-import type { CmcdEventExcludedKeys } from './CmcdEventExcludedKeys.js';
-import type { CmcdEventType } from './CmcdEventType.js';
-import type { CmcdRequest } from './CmcdRequest.js';
+import type { CmcdEventExcludedKeys } from './CmcdEventExcludedKeys.ts';
+import type { CmcdEventType } from './CmcdEventType.ts';
+import type { CmcdRequest } from './CmcdRequest.ts';
 
 /**
  * CMCD v2 - Event Mode.

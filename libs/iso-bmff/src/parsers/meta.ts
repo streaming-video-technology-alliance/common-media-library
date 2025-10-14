@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { MetaBox } from '../boxes/MetaBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { MetaBox } from '../boxes/MetaBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a MetaBox from an IsoView

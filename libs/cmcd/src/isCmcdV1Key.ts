@@ -1,6 +1,6 @@
-import { CMCD_V1_KEYS } from './CMCD_V1_KEYS.js';
-import type { Cmcd } from './Cmcd.js';
-import { isCmcdCustomKey } from './isCmcdCustomKey.js';
+import { CMCD_V1_KEYS } from './CMCD_V1_KEYS.ts';
+import type { Cmcd } from './Cmcd.ts';
+import { isCmcdCustomKey } from './isCmcdCustomKey.ts';
 
 /**
  * Filter function for CMCD v1 keys.

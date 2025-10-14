@@ -1,4 +1,4 @@
-import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccessRequest.js';
+import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccessRequest.ts';
 
 /**
  * Attempts to get key system access using requestMediaKeySystemAccess from EME.

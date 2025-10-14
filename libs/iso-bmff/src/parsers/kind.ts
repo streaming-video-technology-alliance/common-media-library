@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { TrackKindBox } from '../boxes/TrackKindBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { TrackKindBox } from '../boxes/TrackKindBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a TrackKinBox from an IsoView

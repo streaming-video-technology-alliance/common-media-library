@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a TrackFragmentHeaderBox from an IsoView

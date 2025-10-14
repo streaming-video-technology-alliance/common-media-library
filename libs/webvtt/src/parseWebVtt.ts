@@ -1,9 +1,9 @@
-import type { WebVttCue } from './WebVttCue.js';
-import { WebVttParser } from './WebVttParser.js';
-import type { WebVttParseResult } from './WebVttParseResult.js';
-import type { WebVttParserOptions } from './WebVttParserOptions.js';
-import type { WebVttParsingError } from './WebVttParsingError.js';
-import type { WebVttRegion } from './WebVttRegion.js';
+import type { WebVttCue } from './WebVttCue.ts';
+import { WebVttParser } from './WebVttParser.ts';
+import type { WebVttParseResult } from './WebVttParseResult.ts';
+import type { WebVttParserOptions } from './WebVttParserOptions.ts';
+import type { WebVttParsingError } from './WebVttParsingError.ts';
+import type { WebVttRegion } from './WebVttRegion.ts';
 
 /**
  * Parse a WebVTT string into a WebVttParseResult.

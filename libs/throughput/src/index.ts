@@ -3,10 +3,11 @@
  *
  * @packageDocumentation
  */
-export * from './ArithmeticMeanEstimator.js';
-export * from './Ewma.js';
-export * from './EwmaEstimator.js';
-export type * from './EwmaEstimatorOptions.js';
-export * from './HarmonicMeanEstimator.js';
-export type * from './ThroughputEstimator.js';
-export * from './ZlemaEstimator.js';
+export * from './ArithmeticMeanEstimator.ts';
+export * from './Ewma.ts';
+export * from './EwmaEstimator.ts';
+export type * from './EwmaEstimatorOptions.ts';
+export * from './HarmonicMeanEstimator.ts';
+export type * from './ThroughputEstimator.ts';
+export * from './ZlemaEstimator.ts';
+

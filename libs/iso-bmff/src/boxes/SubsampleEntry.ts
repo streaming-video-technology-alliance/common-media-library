@@ -1,4 +1,4 @@
-import type { Subsample } from './Subsample.js';
+import type { Subsample } from './Subsample.ts';
 
 /**
  * Sub sample entry

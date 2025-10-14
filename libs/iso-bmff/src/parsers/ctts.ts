@@ -1,7 +1,7 @@
-import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.js';
-import type { CompositionTimeToSampleEntry } from '../boxes/CompositionTimeToSampleEntry.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { IsoView } from '../IsoView.js';
+import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.ts';
+import type { CompositionTimeToSampleEntry } from '../boxes/CompositionTimeToSampleEntry.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a CompositionTimeToSampleBox from an IsoView

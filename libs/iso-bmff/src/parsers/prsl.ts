@@ -1,7 +1,7 @@
-import type { Entity } from '../boxes/Entity.js';
-import type { Fields } from '../boxes/Fields.js';
-import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Entity } from '../boxes/Entity.ts';
+import type { Fields } from '../boxes/Fields.ts';
+import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a PreselectionGroupBox from an IsoView

@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a MediaHeaderBox from an IsoView

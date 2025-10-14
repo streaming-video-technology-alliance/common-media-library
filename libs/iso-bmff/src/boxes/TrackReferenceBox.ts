@@ -1,5 +1,5 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { TrackReferenceTypeBox } from './TrackReferenceTypeBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { TrackReferenceTypeBox } from './TrackReferenceTypeBox.ts';
 
 /**
  * Track Reference Box - 'tref' - Container

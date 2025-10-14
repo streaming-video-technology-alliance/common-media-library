@@ -1,4 +1,4 @@
-import type { Box } from './Box.js';
+import type { Box } from './Box.ts';
 
 /**
  * Single Item Type Reference Box

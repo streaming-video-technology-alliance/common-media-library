@@ -1,4 +1,4 @@
-import type { FullBox } from './FullBox.js';
+import type { FullBox } from './FullBox.ts';
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Decode Time

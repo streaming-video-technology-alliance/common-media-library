@@ -1,7 +1,7 @@
-import type { Fields } from './boxes/Fields.js';
-import type { IsoBox } from './boxes/IsoBox.js';
-import type { IsoView } from './IsoView.js';
-import type { IsoViewConfig } from './IsoViewConfig.js';
+import type { Fields } from './boxes/Fields.ts';
+import type { IsoBox } from './boxes/IsoBox.ts';
+import type { IsoView } from './IsoView.ts';
+import type { IsoViewConfig } from './IsoViewConfig.ts';
 
 /**
  * Box parser

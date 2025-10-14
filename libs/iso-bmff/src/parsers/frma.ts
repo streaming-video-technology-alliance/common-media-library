@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse an OriginalFormatBox from an IsoView

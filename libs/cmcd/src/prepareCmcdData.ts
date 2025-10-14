@@ -1,17 +1,17 @@
 import { isTokenField, isValid } from '@svta/cml-cta';
 import { SfToken } from '@svta/cml-structured-field-values';
-import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.js';
-import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.js';
-import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';
-import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
-import type { CmcdData } from './CmcdData.js';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
-import type { CmcdValue } from './CmcdValue.js';
-import { isCmcdEventKey } from './isCmcdEventKey.js';
-import { isCmcdRequestKey } from './isCmcdRequestKey.js';
-import { isCmcdResponseKey } from './isCmcdResponseKey.js';
-import { isCmcdV1Key } from './isCmcdV1Key.js';
+import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts';
+import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts';
+import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts';
+import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.ts';
+import type { CmcdData } from './CmcdData.ts';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts';
+import type { CmcdValue } from './CmcdValue.ts';
+import { isCmcdEventKey } from './isCmcdEventKey.ts';
+import { isCmcdRequestKey } from './isCmcdRequestKey.ts';
+import { isCmcdResponseKey } from './isCmcdResponseKey.ts';
+import { isCmcdV1Key } from './isCmcdV1Key.ts';
 
 const filterMap = {
 	[CMCD_RESPONSE_MODE]: isCmcdResponseKey,

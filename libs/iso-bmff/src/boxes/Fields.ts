@@ -1,4 +1,4 @@
-import type { Box } from './Box.js';
+import type { Box } from './Box.ts';
 
 /**
  * Utility type to get just the fields of a box

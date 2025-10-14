@@ -3,18 +3,18 @@
  *
  * @packageDocumentation
  */
-export * from './backgroundColors.js';
-export * from './createCmdHistory.js';
-export * from './getCharForByte.js';
-export * from './hasCmdRepeated.js';
-export * from './NR_COLS.js';
-export * from './NR_ROWS.js';
-export * from './numArrayToHexArray.js';
-export * from './rowsHighCh1.js';
-export * from './rowsHighCh2.js';
-export * from './rowsLowCh1.js';
-export * from './rowsLowCh2.js';
-export * from './seiHelpers.js';
-export * from './setLastCmd.js';
-export * from './specialCea608CharsCodes.js';
+export * from './backgroundColors.ts';
+export * from './createCmdHistory.ts';
+export * from './getCharForByte.ts';
+export * from './hasCmdRepeated.ts';
+export * from './NR_COLS.ts';
+export * from './NR_ROWS.ts';
+export * from './numArrayToHexArray.ts';
+export * from './rowsHighCh1.ts';
+export * from './rowsHighCh2.ts';
+export * from './rowsLowCh1.ts';
+export * from './rowsLowCh2.ts';
+export * from './seiHelpers.ts';
+export * from './setLastCmd.ts';
+export * from './specialCea608CharsCodes.ts';
 

@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.js';
-import { UINT } from '../fields/UINT.js';
-import type { IsoView } from '../IsoView.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts';
+import { UINT } from '../fields/UINT.ts';
+import type { IsoView } from '../IsoView.ts';
 
 /**
  * Parse a TrackEncryptionBox from an IsoView

@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.js';
-import type { IsoView } from '../IsoView.js';
-import { avc1 } from './avc1.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts';
+import type { IsoView } from '../IsoView.ts';
+import { avc1 } from './avc1.ts';
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView

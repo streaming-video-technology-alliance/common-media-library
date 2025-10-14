@@ -1,6 +1,6 @@
-import { WebVttParser } from './WebVttParser.js';
-import type { WebVttResult } from './WebVttResult.js';
-import { WebVttResultType } from './WebVttResultType.js';
+import { WebVttParser } from './WebVttParser.ts';
+import type { WebVttResult } from './WebVttResult.ts';
+import { WebVttResultType } from './WebVttResultType.ts';
 
 /**
  * WebVTT transform stream transformer.

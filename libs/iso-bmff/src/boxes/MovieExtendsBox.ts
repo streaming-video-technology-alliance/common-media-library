@@ -1,6 +1,6 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { MovieExtendsHeaderBox } from './MovieExtendsHeaderBox.js';
-import type { TrackExtendsBox } from './TrackExtendsBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { MovieExtendsHeaderBox } from './MovieExtendsHeaderBox.ts';
+import type { TrackExtendsBox } from './TrackExtendsBox.ts';
 
 /**
  * Movie Extends Box - 'mvex' - Container

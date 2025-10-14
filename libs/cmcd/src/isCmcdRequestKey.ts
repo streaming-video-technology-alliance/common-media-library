@@ -1,7 +1,7 @@
-import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.js';
-import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.js';
-import type { CmcdRequest } from './CmcdRequest.js';
-import { isCmcdCustomKey } from './isCmcdCustomKey.js';
+import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.ts';
+import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.ts';
+import type { CmcdRequest } from './CmcdRequest.ts';
+import { isCmcdCustomKey } from './isCmcdCustomKey.ts';
 
 /**
  * Check if a key is a valid CMCD request key.

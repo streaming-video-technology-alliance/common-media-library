@@ -1,6 +1,6 @@
-import type { ContainerBox } from './ContainerBox.js';
-import type { MovieFragmentRandomAccessOffsetBox } from './MovieFragmentRandomAccessOffsetBox.js';
-import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBox.js';
+import type { ContainerBox } from './ContainerBox.ts';
+import type { MovieFragmentRandomAccessOffsetBox } from './MovieFragmentRandomAccessOffsetBox.ts';
+import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBox.ts';
 
 /**
  * Movie Fragment Random Access Box - 'mfra' - Container

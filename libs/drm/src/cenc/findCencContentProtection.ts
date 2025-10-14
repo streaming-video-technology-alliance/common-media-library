@@ -1,7 +1,7 @@
-import { CBCS } from '../common/CBCS.js';
-import { CENC } from '../common/CENC.js';
-import type { ContentProtection } from '../common/ContentProtection.js';
-import { MP4_PROTECTION_SCHEME } from '../common/MP4_PROTECTION_SCHEME.js';
+import { CBCS } from '../common/CBCS.ts';
+import { CENC } from '../common/CENC.ts';
+import type { ContentProtection } from '../common/ContentProtection.ts';
+import { MP4_PROTECTION_SCHEME } from '../common/MP4_PROTECTION_SCHEME.ts';
 
 /**
  * Finds and returns the ContentProtection element for MP4 Common Encryption.

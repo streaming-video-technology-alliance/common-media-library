@@ -1,8 +1,8 @@
 import type { Encoding } from '@svta/cml-utils';
 import { decodeBase64, decodeText, UTF_16 } from '@svta/cml-utils';
 import { getElementsByName, parseXml } from '@svta/cml-xml';
-import { CHALLENGE } from '../common/CHALLENGE.js';
-import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.js';
+import { CHALLENGE } from '../common/CHALLENGE.ts';
+import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.ts';
 
 /**
  * Gets the PlayReady license request from the MediaKeyMessageEvent.

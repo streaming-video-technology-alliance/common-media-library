@@ -1,9 +1,9 @@
 import { encodeSfDict } from '@svta/cml-structured-field-values';
-import type { CmcdData } from './CmcdData.js';
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
-import type { CmcdHeaderField } from './CmcdHeaderField.js';
-import { groupCmcdHeaders } from './groupCmcdHeaders.js';
-import { prepareCmcdData } from './prepareCmcdData.js';
+import type { CmcdData } from './CmcdData.ts';
+import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts';
+import type { CmcdHeaderField } from './CmcdHeaderField.ts';
+import { groupCmcdHeaders } from './groupCmcdHeaders.ts';
+import { prepareCmcdData } from './prepareCmcdData.ts';
 
 /**
  * Convert a CMCD data object to request headers

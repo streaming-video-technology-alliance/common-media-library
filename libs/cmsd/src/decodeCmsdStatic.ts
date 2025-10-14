@@ -1,5 +1,5 @@
 import { decodeSfDict, symbolToStr } from '@svta/cml-structured-field-values';
-import type { CmsdStatic } from './CmsdStatic.js';
+import type { CmsdStatic } from './CmsdStatic.ts';
 
 /**
  * Decode a CMSD Static dict string to an object.

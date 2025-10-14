@@ -1,5 +1,5 @@
-import type { EncryptedSample } from './EncryptedSample.js';
-import type { FullBox } from './FullBox.js';
+import type { EncryptedSample } from './EncryptedSample.ts';
+import type { FullBox } from './FullBox.ts';
 
 /**
  * Sample Encryption Box - 'senc'

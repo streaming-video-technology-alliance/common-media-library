@@ -1,4 +1,4 @@
-import type { SfToken } from '../SfToken.js';
+import type { SfToken } from '../SfToken.ts';
 
 /**
  * Converts a symbol to a string.

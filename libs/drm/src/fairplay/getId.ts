@@ -1,4 +1,4 @@
-import { extractContentId } from './extractContentId.js';
+import { extractContentId } from './extractContentId.ts';
 
 /**
  * Extracts the content ID from the license server URL or InitData.

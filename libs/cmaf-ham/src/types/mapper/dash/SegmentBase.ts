@@ -1,4 +1,4 @@
-import type { Initialization } from './Initialization.js';
+import type { Initialization } from './Initialization.ts';
 
 /**
  * DASH Segment Base

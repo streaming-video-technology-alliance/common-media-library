@@ -1,5 +1,5 @@
-import type { WebVttResult } from './WebVttResult.js';
-import { WebVttTransformer } from './WebVttTransformer.js';
+import type { WebVttResult } from './WebVttResult.ts';
+import { WebVttTransformer } from './WebVttTransformer.ts';
 
 /**
  * WebVTT transform stream.

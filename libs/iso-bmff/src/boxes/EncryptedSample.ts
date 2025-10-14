@@ -1,4 +1,4 @@
-import type { SubsampleEncryption } from './SubsampleEncryption.js';
+import type { SubsampleEncryption } from './SubsampleEncryption.ts';
 
 /**
  * Encrypted Sample

@@ -36,15 +36,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { CaptionModes } from './CaptionModes.js';
-import { CaptionScreen } from './CaptionScreen.js';
-import { CaptionsLogger } from './CaptionsLogger.js';
-import type { CueHandler } from './CueHandler.js';
-import type { PACData } from './PACData.js';
-import type { PenStyles } from './PenStyles.js';
-import type { Row } from './Row.js';
-import { VerboseLevel } from './VerboseLevel.js';
-import { NR_ROWS } from './utils/NR_ROWS.js';
+import type { CaptionModes } from './CaptionModes.ts';
+import { CaptionScreen } from './CaptionScreen.ts';
+import { CaptionsLogger } from './CaptionsLogger.ts';
+import type { CueHandler } from './CueHandler.ts';
+import type { PACData } from './PACData.ts';
+import type { PenStyles } from './PenStyles.ts';
+import type { Row } from './Row.ts';
+import { VerboseLevel } from './VerboseLevel.ts';
+import { NR_ROWS } from './utils/NR_ROWS.ts';
 
 /**
  * CTA-608 Channel

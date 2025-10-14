@@ -1,7 +1,7 @@
-import type { Fields } from '../boxes/Fields.js';
-import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.js';
-import type { IsoView } from '../IsoView.js';
-import { ftyp } from './ftyp.js';
+import type { Fields } from '../boxes/Fields.ts';
+import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.ts';
+import type { IsoView } from '../IsoView.ts';
+import { ftyp } from './ftyp.ts';
 
 /**
  * Parse a SegmentTypeBox from an IsoView

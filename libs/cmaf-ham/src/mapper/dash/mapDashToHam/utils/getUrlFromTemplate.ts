@@ -1,5 +1,5 @@
-import type { Representation } from '../../../../types/mapper/dash/Representation.js';
-import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.js';
+import type { Representation } from '../../../../types/mapper/dash/Representation.ts';
+import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.ts';
 
 /**
  * @internal

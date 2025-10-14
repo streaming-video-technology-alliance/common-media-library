@@ -1,8 +1,8 @@
-import type { DecodedId3Frame } from '../DecodedId3Frame.js';
-import type { RawId3Frame } from './RawFrame.js';
-import { toArrayBuffer } from './toArrayBuffer.js';
-import { toUint8 } from './utf8.js';
-import { utf8ArrayToStr } from './utf8ArrayToStr.js';
+import type { DecodedId3Frame } from '../DecodedId3Frame.ts';
+import type { RawId3Frame } from './RawFrame.ts';
+import { toArrayBuffer } from './toArrayBuffer.ts';
+import { toUint8 } from './utf8.ts';
+import { utf8ArrayToStr } from './utf8ArrayToStr.ts';
 
 type MetadataFrame = {
 	key: string;

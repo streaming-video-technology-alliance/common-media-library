@@ -1,4 +1,4 @@
-import { hexToArrayBuffer } from './hexToArrayBuffer.js';
+import { hexToArrayBuffer } from './hexToArrayBuffer.ts';
 
 /**
  * Converts a UUID string to an ArrayBuffer.

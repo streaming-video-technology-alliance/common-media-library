@@ -1,4 +1,4 @@
-import type { SfMember } from './SfMember.js';
+import type { SfMember } from './SfMember.ts';
 
 /**
  * A dictionary of structured field members.

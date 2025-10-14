@@ -1,8 +1,8 @@
 import type { CmValue } from '@svta/cml-cta';
 import { isTokenField, isValid } from '@svta/cml-cta';
 import { SfToken } from '@svta/cml-structured-field-values';
-import type { CmsdEncodeOptions } from '../CmsdEncodeOptions.js';
-import type { CmsdStatic } from '../CmsdStatic.js';
+import type { CmsdEncodeOptions } from '../CmsdEncodeOptions.ts';
+import type { CmsdStatic } from '../CmsdStatic.ts';
 
 export function processCmsd(obj: CmsdStatic, options?: CmsdEncodeOptions): CmsdStatic {
 	const results: CmsdStatic = {};

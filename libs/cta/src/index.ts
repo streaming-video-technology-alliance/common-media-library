@@ -4,10 +4,11 @@
  * @packageDocumentation
  */
 
-export type * from './CmCustomKey.js';
-export * from './CmObjectType.js';
-export * from './CmStreamingFormat.js';
-export * from './CmStreamType.js';
-export type * from './CmValue.js';
-export * from './isTokenField.js';
-export * from './isValid.js';
+export type * from './CmCustomKey.ts';
+export * from './CmObjectType.ts';
+export * from './CmStreamingFormat.ts';
+export * from './CmStreamType.ts';
+export type * from './CmValue.ts';
+export * from './isTokenField.ts';
+export * from './isValid.ts';
+

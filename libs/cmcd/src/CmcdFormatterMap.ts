@@ -1,5 +1,5 @@
-import type { CmcdFormatter } from './CmcdFormatter.js';
-import type { CmcdKey } from './CmcdKey.js';
+import type { CmcdFormatter } from './CmcdFormatter.ts';
+import type { CmcdKey } from './CmcdKey.ts';
 
 /**
  * A map of CMCD keys to format functions.

@@ -1,4 +1,4 @@
-import type { PathwayClone } from './PathwayClone.js';
+import type { PathwayClone } from './PathwayClone.ts';
 
 /**
  * Validates a pathway clone.
