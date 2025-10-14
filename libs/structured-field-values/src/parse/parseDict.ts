@@ -60,6 +60,9 @@ import { parseParameters } from './parseParameters.js';
 //
 // Note that when duplicate Dictionary keys are encountered, this has
 // the effect of ignoring all but the last instance.
+/**
+ * @internal
+ */
 export function parseDict(src: string, options?: SfDecodeOptions): ParsedValue<SfDictionary> {
 	const value: SfDictionary = {};
 

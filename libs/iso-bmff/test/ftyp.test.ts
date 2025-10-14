@@ -1,4 +1,4 @@
-import { ftyp } from '@svta/common-media-library';
+import { ftyp } from '@svta/cml-iso-bmff';
 import { assert, describe, it, parseBox } from './util/box.ts';
 
 describe('ftyp box', function () {

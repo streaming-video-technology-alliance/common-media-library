@@ -1,8 +1,7 @@
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { iso8601DurationToNumber } from '@svta/cml-cmaf-ham/utils/dash/iso8601DurationToNumber.js';
-import { numberToIso8601Duration } from '@svta/cml-cmaf-ham/utils/dash/numberToIso8601Duration.js';
+import { iso8601DurationToNumber, numberToIso8601Duration } from '@svta/cml-cmaf-ham';
 
 describe('iso8601DurationToNumber', () => {
 	it('converts PT5S to 5', () => {

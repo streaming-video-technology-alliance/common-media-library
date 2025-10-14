@@ -24,6 +24,9 @@ import { parseError } from './parseError.js';
 //     3.  Append char to output_string.
 //
 // 4.  Return output_string.
+/**
+ * @internal
+ */
 export function parseKey(src: string): ParsedValue<string> {
 	let i = 0;
 	if (/^[a-z*]$/.test(src[i]) === false) {

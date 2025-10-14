@@ -1,5 +1,4 @@
-import type { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
-import type { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
+import type { SfItem, SfToken } from '@svta/cml-structured-field-values';
 import type { CmObjectType } from './CmObjectType.js';
 import type { CmStreamingFormat } from './CmStreamingFormat.js';
 import type { CmStreamType } from './CmStreamType.js';

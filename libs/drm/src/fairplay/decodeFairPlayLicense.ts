@@ -1,4 +1,4 @@
-import { decodeBase64 } from '@svta/cml-utils/decodeBase64.js';
+import { decodeBase64 } from '@svta/cml-utils';
 
 /**
  * Decodes a FairPlay DRM license response.

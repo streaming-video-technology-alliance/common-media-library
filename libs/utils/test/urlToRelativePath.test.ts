@@ -1,4 +1,4 @@
-import { urlToRelativePath } from '@svta/cml-utils/urlToRelativePath';
+import { urlToRelativePath } from '@svta/cml-utils';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

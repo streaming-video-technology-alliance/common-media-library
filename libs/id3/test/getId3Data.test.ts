@@ -1,4 +1,4 @@
-import { getId3Data } from '@svta/cml-id3/getId3Data';
+import { getId3Data } from '@svta/cml-id3';
 import { assert } from 'node:console';
 import { describe, it } from 'node:test';
 import { PTS } from './data/PTS.ts';

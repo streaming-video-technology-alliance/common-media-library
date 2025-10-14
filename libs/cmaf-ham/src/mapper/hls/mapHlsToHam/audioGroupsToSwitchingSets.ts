@@ -5,10 +5,10 @@ import type { Manifest } from '../../../types/manifest/Manifest.js';
 
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.js';
 
+import { decodeByteRange } from './utils/decodeByteRange.ts';
 import { formatSegments } from './utils/formatSegments.js';
-import { getByterange } from './utils/getByterange.js';
-import { getCodec } from './utils/getCodec.js';
 import { getDuration } from './utils/getDuration.js';
+import { getHlsCodec } from './utils/getHlsCodec.ts';
 
 /**
  * @internal
@@ -42,12 +42,12 @@ export function audioGroupsToSwitchingSets(
 
 			// TODO: channels, sampleRate, bandwith and codec need to be
 			// updated with real values. Right now we are using simple hardcoded values.
-			const byteRange = getByterange(map?.byterange);
+			const byteRange = decodeByteRange(map?.byterange);
 			audioTracks.push({
 				id: audio,
 				type: 'audio',
 				fileName: uri,
-				codec: getCodec('audio'),
+				codec: getHlsCodec('audio'),
 				duration: getDuration(audioParsed, segments),
 				language: language,
 				bandwidth: 0,

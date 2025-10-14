@@ -1,5 +1,4 @@
-import { decodeSfList } from '@svta/cml-structured-field-values/decodeSfList';
-import { SfItem } from '@svta/cml-structured-field-values/SfItem';
+import { decodeSfList, SfItem } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 

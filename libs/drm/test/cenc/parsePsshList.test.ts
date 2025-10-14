@@ -1,4 +1,4 @@
-import { parsePsshList } from '@svta/cml-drm/cenc/parsePsshList.js';
+import { parsePsshList } from '@svta/cml-drm';
 import { deepStrictEqual, strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { samplePsshBox } from '../common/samplePsshBox.ts';

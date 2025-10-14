@@ -1,4 +1,4 @@
-import { stringToUint16 } from '@svta/cml-utils/stringToUint16.js';
+import { stringToUint16 } from '@svta/cml-utils';
 
 /**
  * Concatenates InitData, ID, and Certificate for FairPlay DRM.

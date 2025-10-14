@@ -1,4 +1,4 @@
-import { serializeBareItem } from '@svta/cml-structured-field-values/serialize/serializeBareItem';
+import { serializeBareItem } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import test from 'node:test';
 

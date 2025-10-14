@@ -194,7 +194,7 @@ export class IsoView {
 	 * @param size - The size of the data in bytes.
 	 * @returns The data.
 	 */
-	readData = (size: number): Uint8Array => {
+	readData = (size: number): Uint8Array<ArrayBuffer> => {
 		return this.read(DATA, size);
 	};
 

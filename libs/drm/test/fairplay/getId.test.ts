@@ -1,5 +1,5 @@
-import { getId } from '@svta/cml-drm/fairplay/getId';
-import { stringToUint16 } from '@svta/cml-utils/stringToUint16';
+import { getId } from '@svta/cml-drm';
+import { stringToUint16 } from '@svta/cml-utils';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

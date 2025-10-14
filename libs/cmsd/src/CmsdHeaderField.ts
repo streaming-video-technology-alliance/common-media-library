@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import type { ValueOf } from '@svta/cml-utils';
 import { CMSD_DYNAMIC } from './CMSD_DYNAMIC.js';
 import { CMSD_STATIC } from './CMSD_STATIC.js';
 

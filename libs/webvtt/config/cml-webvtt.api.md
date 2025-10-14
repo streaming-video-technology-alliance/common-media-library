@@ -4,8 +4,8 @@
 
 ```ts
 
-import type { TypedResult } from '@svta/cml-utils/TypedResult.js';
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import { TypedResult } from '@svta/cml-utils';
+import { ValueOf } from '@svta/cml-utils';
 
 // @beta
 export function createWebVttCue(): WebVttCue;
@@ -50,10 +50,10 @@ export type WebVttCue = {
 export type WebVttCueFactory = () => WebVttCue;
 
 // @beta
-export type WebVttCueResult = TypedResult<'cue', WebVttCue>;
+export type WebVttCueResult = TypedResult<"cue", WebVttCue>;
 
 // @beta
-export type WebVttErrorResult = TypedResult<'error', WebVttParsingError>;
+export type WebVttErrorResult = TypedResult<"error", WebVttParsingError>;
 
 // @beta
 export class WebVttParser {
@@ -104,7 +104,7 @@ export type WebVttRegion = {
 export type WebVttRegionFactory = () => WebVttRegion;
 
 // @beta
-export type WebVttRegionResult = TypedResult<'region', WebVttRegion>;
+export type WebVttRegionResult = TypedResult<"region", WebVttRegion>;
 
 // @beta
 export type WebVttResult = WebVttCueResult | WebVttRegionResult | WebVttTimestampMapResult | WebVttStyleResult | WebVttErrorResult;
@@ -122,10 +122,10 @@ export const WebVttResultType: {
 export type WebVttResultType = ValueOf<typeof WebVttResultType>;
 
 // @beta
-export type WebVttStyleResult = TypedResult<'style', string>;
+export type WebVttStyleResult = TypedResult<"style", string>;
 
 // @beta
-export type WebVttTimestampMapResult = TypedResult<'timestampmap', TimestampMap>;
+export type WebVttTimestampMapResult = TypedResult<"timestampmap", TimestampMap>;
 
 // @beta
 export class WebVttTransformer {
@@ -138,5 +138,7 @@ export class WebVttTransformer {
 export class WebVttTransformStream extends TransformStream<string, WebVttResult> {
     constructor(writableStrategy?: QueuingStrategy<string>, readableStrategy?: QueuingStrategy<WebVttResult>);
 }
+
+// (No @packageDocumentation comment for this package)
 
 ```

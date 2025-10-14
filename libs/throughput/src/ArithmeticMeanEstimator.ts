@@ -1,5 +1,5 @@
-import { getBandwidthBps } from '@svta/cml-utils/getBandwidthBps.js';
-import type { ResourceTiming } from '@svta/cml-utils/ResourceTiming.js';
+import type { ResourceTiming } from '@svta/cml-utils';
+import { getBandwidthBps } from '@svta/cml-utils';
 import type { ThroughputEstimator } from './ThroughputEstimator.js';
 
 /**

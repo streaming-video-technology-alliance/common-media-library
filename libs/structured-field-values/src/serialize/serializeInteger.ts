@@ -20,6 +20,9 @@ import { serializeError } from './serializeError.js';
 //     only decimal digits to output.
 //
 // 5.  Return output.
+/**
+ * @internal
+ */
 export function serializeInteger(value: number): string {
 	if (isInvalidInt(value)) {
 		throw serializeError(value, INTEGER);

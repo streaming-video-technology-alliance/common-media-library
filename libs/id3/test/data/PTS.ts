@@ -1,5 +1,4 @@
-import { getId3Frames } from '@svta/cml-id3/getId3Frames';
-import { type Id3Frame } from '@svta/cml-id3/Id3Frame';
+import { getId3Frames, type Id3Frame } from '@svta/cml-id3';
 import { strToCodes } from '../utils/strToCodes.ts';
 import { createId3 } from './createId3.ts';
 

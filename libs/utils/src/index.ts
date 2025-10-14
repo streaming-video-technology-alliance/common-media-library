@@ -13,6 +13,7 @@ export * from './decodeText.js';
 export * from './DecodeTextOptions.js';
 export * from './encodeBase64.js';
 export * from './Encoding.js';
+export * from './getBandwidthBps.js';
 export * from './hexToArrayBuffer.js';
 export * from './Request.js';
 export * from './RequestType.js';
@@ -30,3 +31,4 @@ export * from './uuid.js';
 export * from './uuidToArrayBuffer.js';
 export * from './ValueOf.js';
 export * from './ValueOrArray.js';
+

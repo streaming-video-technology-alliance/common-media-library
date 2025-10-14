@@ -1,4 +1,4 @@
-import type { WebVttParserOptions } from '@svta/cml-webvtt/WebVttParserOptions.js';
+import type { WebVttParserOptions } from '@svta/cml-webvtt';
 
 export const options: WebVttParserOptions = {
 	useDomTypes: false,

@@ -13,4 +13,6 @@ export function processUriTemplate(uriTemplate: string, representationId: string
 // @beta
 export const THUMBNAIL_TILE_SCHEME_ID_URI = "http://dashif.org/guidelines/thumbnail_tile";
 
+// (No @packageDocumentation comment for this package)
+
 ```

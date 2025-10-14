@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 export function toUint8(
 	data: BufferSource,
 	offset: number = 0,

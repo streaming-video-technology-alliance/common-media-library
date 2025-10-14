@@ -1,4 +1,4 @@
-import { uuid } from '@svta/cml-utils/uuid';
+import { uuid } from '@svta/cml-utils';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

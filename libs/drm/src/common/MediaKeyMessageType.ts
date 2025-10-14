@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import type { ValueOf } from '@svta/cml-utils';
 import { INDIVIDUALIZATION_REQUEST } from './INDIVIDUALIZATION_REQUEST.js';
 import { LICENSE_RELEASE } from './LICENSE_RELEASE.js';
 import { LICENSE_RENEWAL } from './LICENSE_RENEWAL.js';

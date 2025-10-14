@@ -1,5 +1,4 @@
-import { getId3Frames } from '@svta/cml-id3/getId3Frames';
-import { toArrayBuffer } from '@svta/cml-id3/util/toArrayBuffer';
+import { getId3Frames, toArrayBuffer } from '@svta/cml-id3';
 import { deepEqual, deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { DATA, DATA_BYTES, DATA_UINT8 } from './data/DATA.ts';

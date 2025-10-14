@@ -1,7 +1,7 @@
 import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.js';
 import type { Segment } from '../../../../types/model/Segment.js';
 
-import { getByterange } from './getByterange.js';
+import { decodeByteRange } from './decodeByteRange.ts';
 
 /**
  * @internal
@@ -16,7 +16,7 @@ import { getByterange } from './getByterange.js';
 export function formatSegments(segments: SegmentHls[]): Segment[] {
 	return (
 		segments?.map((segment: SegmentHls) => {
-			const byteRange = getByterange(segment?.byterange);
+			const byteRange = decodeByteRange(segment?.byterange);
 			return {
 				duration: segment.duration,
 				url: segment.uri,

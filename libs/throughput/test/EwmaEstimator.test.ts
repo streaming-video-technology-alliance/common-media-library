@@ -1,4 +1,4 @@
-import { EwmaEstimator } from '@svta/cml-throughput/EwmaEstimator';
+import { EwmaEstimator } from '@svta/cml-throughput';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

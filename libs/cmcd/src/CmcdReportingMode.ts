@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import type { ValueOf } from '@svta/cml-utils';
 import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.js';
 import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';
 import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';

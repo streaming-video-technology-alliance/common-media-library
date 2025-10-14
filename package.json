@@ -2,6 +2,7 @@
 	"name": "@svta/common-media-library-workspace",
 	"version": "1.0.0",
 	"license": "Apache-2.0",
+	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
 	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
 	"repository": {
@@ -73,6 +74,7 @@
 		"eslint-plugin-typescript-enum": "2.1.0",
 		"globals": "16.4.0",
 		"hi-base32": "0.5.1",
+		"tsdown": "0.15.7",
 		"typedoc": "0.28.13",
 		"typescript": "5.8.2"
 	}

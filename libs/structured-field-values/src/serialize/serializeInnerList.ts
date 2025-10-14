@@ -24,6 +24,9 @@ import { serializeParams } from './serializeParams.js';
 //     (Section 4.1.1.2) with list_parameters to output.
 //
 // 5.  Return output.
+/**
+ * @internal
+ */
 export function serializeInnerList(value: SfInnerList) {
 	return `(${value.value.map(serializeItem).join(' ')})${serializeParams(value.params)}`;
 }

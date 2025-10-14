@@ -19,6 +19,9 @@ import { parseError } from './parseError.js';
 //     first character, and return false.
 //
 // 5.  No value has matched; fail parsing.
+/**
+ * @internal
+ */
 export function parseBoolean(src: string): ParsedValue<boolean> {
 	let i = 0;
 	if (src[i] !== '?') {

@@ -1,5 +1,5 @@
-import type { Id3Frame } from '@svta/cml-id3/Id3Frame';
-import { decodeId3TextFrame } from '@svta/cml-id3/util/decodeId3TextFrame';
+import type { Id3Frame } from '@svta/cml-id3';
+import { decodeId3TextFrame } from '@svta/cml-id3';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

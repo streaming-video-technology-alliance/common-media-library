@@ -1,4 +1,4 @@
-import { unescapeHtml } from '@svta/cml-utils/unescapeHtml.js';
+import { unescapeHtml } from '@svta/cml-utils';
 import type { XmlNode } from './XmlNode.js';
 import type { XmlParseOptions } from './XmlParseOptions.js';
 

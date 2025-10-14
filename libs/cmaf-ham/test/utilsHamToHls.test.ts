@@ -3,29 +3,26 @@ import { describe, it } from 'node:test';
 
 import type { AudioTrack } from '@svta/cml-cmaf-ham';
 
-import { getByterange } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getByterange.js';
-import { getPlaylistData } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getPlaylistData.js';
-import { getSegments } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getSegments.js';
-import { getUrlInitialization } from '@svta/cml-cmaf-ham/mapper/hls/mapHamToHls/utils/getUrlInitialization.js';
+import { encodeByteRange, getPlaylistData, getSegments, getUrlInitialization } from '@svta/cml-cmaf-ham';
 
 import { getAudioTrack } from './data/hlsData.ts';
 
 describe('getByterange', () => {
 	it('returns byteRange string if track has byteRange', () => {
 		const track: AudioTrack = getAudioTrack({ byteRange: '50379@2212' });
-		const res = getByterange(track);
+		const res = encodeByteRange(track);
 		equal(res, 'BYTERANGE:50379@2212\n');
 	});
 
 	it('returns byteRange string if segment has byteRange', () => {
 		const track: AudioTrack = getAudioTrack({});
 		track.segments[0].byteRange = '123@456';
-		const res = getByterange(track);
+		const res = encodeByteRange(track);
 		equal(res, 'BYTERANGE:0@122\n');
 	});
 
 	it('returns empty string if track and segments have no byteRange', () => {
-		const res = getByterange({} as AudioTrack);
+		const res = encodeByteRange({} as AudioTrack);
 		equal(res, '');
 	});
 });

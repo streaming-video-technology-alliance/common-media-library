@@ -17,7 +17,6 @@ import type { TrackType } from './TrackType.js';
  *
  * @alpha
  */
-
 export type Track = Ham & {
 	/** Track type */
 	type: TrackType;

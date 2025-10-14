@@ -1,4 +1,4 @@
-import { decodeSfList } from '@svta/cml-structured-field-values/decodeSfList.js';
+import { decodeSfList } from '@svta/cml-structured-field-values';
 import type { CmsdDynamic } from './CmsdDynamic.js';
 
 /**

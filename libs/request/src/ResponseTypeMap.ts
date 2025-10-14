@@ -1,4 +1,4 @@
-import type { XmlNode } from '@svta/cml-xml/XmlNode.js';
+import type { XmlNode } from '@svta/cml-xml';
 
 /**
  * The a request's `responseType` to the corresponding data type.

@@ -1,4 +1,4 @@
-import { getLicenseServerUrl } from '@svta/cml-drm/fairplay/getLicenseServerUrl';
+import { getLicenseServerUrl } from '@svta/cml-drm';
 import { strictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

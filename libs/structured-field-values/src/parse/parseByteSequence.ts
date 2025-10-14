@@ -1,4 +1,4 @@
-import { decodeBase64 } from '@svta/cml-utils/decodeBase64.js';
+import { decodeBase64 } from '@svta/cml-utils';
 import { BYTES } from '../utils/BYTES.js';
 import type { ParsedValue } from './ParsedValue.js';
 import { parsedValue } from './ParsedValue.js';
@@ -44,6 +44,9 @@ import { parseError } from './parseError.js';
 // This specification does not relax the requirements in [RFC4648],
 // Section 3.1 and 3.3; therefore, parsers MUST fail on characters
 // outside the base64 alphabet, and on line feeds in encoded data.
+/**
+ * @internal
+ */
 export function parseByteSequence(src: string): ParsedValue<Uint8Array> {
 	if (src[0] !== ':') {
 		throw parseError(src, BYTES);

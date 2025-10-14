@@ -1,7 +1,5 @@
-import { CmsdObjectType } from '@svta/cml-cmsd/CmsdObjectType';
-import type { CmsdStatic } from '@svta/cml-cmsd/CmsdStatic';
-import { CmsdStreamingFormat } from '@svta/cml-cmsd/CmsdStreamingFormat';
-import { CmsdStreamType } from '@svta/cml-cmsd/CmsdStreamType';
+import type { CmsdStatic } from '@svta/cml-cmsd';
+import { CmsdObjectType, CmsdStreamingFormat, CmsdStreamType } from '@svta/cml-cmsd';
 
 export const CMSD_STATIC_OBJ: CmsdStatic = {
 	ot: CmsdObjectType.VIDEO,

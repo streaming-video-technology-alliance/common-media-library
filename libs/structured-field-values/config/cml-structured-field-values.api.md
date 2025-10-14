@@ -25,6 +25,167 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 // @beta
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
+// Warning: (ae-internal-missing-underscore) The name "parseBareItem" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseBareItem(src: string, options?: SfDecodeOptions): ParsedValue<SfBareItem>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseBoolean" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseBoolean(src: string): ParsedValue<boolean>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseByteSequence" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseByteSequence(src: string): ParsedValue<Uint8Array>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseDate" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseDate(src: string): ParsedValue<Date>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseDict" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseDict(src: string, options?: SfDecodeOptions): ParsedValue<SfDictionary>;
+
+// Warning: (ae-internal-missing-underscore) The name "ParsedValue" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export type ParsedValue<T> = {
+    value: T;
+    src: string;
+};
+
+// Warning: (ae-internal-missing-underscore) The name "parseError" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseError(src: any, type: string, cause?: any): Error;
+
+// Warning: (ae-internal-missing-underscore) The name "parseInnerList" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfInnerList>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseIntegerOrDecimal" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseIntegerOrDecimal(src: string): ParsedValue<number>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseItem" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseItem(src: string, options?: SfDecodeOptions): ParsedValue<SfItem>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseItemOrInnerList" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseItemOrInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfItem | SfInnerList>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseKey" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseKey(src: string): ParsedValue<string>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseList" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseList(src: string, options?: SfDecodeOptions): ParsedValue<SfMember[]>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseParameters" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseParameters(src: string, options?: SfDecodeOptions): ParsedValue<SfParameters | undefined>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseString" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseString(src: string): ParsedValue<string>;
+
+// Warning: (ae-internal-missing-underscore) The name "parseToken" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function parseToken(src: string, options?: SfDecodeOptions): ParsedValue<symbol | SfToken>;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeBareItem" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeBareItem(value: any): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeBoolean" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeBoolean(value: boolean): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeByteSequence" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeByteSequence(value: Uint8Array): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeDate" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeDate(value: Date): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeDecimal" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeDecimal(value: number): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeDict" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeDict(dict: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeError" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeError(src: any, type: string, cause?: any): Error;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeInnerList" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeInnerList(value: SfInnerList): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeInteger" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeInteger(value: number): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeItem" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeItem(value: SfItem | SfBareItem): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeKey" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeKey(value: string): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeList" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeList(list: SfMember[], options?: SfEncodeOptions): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeParams" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeParams(params?: Record<string, any>): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeString" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeString(value: string): string;
+
+// Warning: (ae-internal-missing-underscore) The name "serializeToken" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function serializeToken(token: symbol): string;
+
+// @internal (undocumented)
+export function serializeToken(token: SfToken): string;
+
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
 
@@ -71,5 +232,7 @@ export class SfToken {
 
 // @beta
 export function symbolToStr(symbol: symbol | SfToken): string;
+
+// (No @packageDocumentation comment for this package)
 
 ```

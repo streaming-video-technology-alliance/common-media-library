@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import type { ValueOf } from '@svta/cml-utils';
 import { EXPIRED } from './EXPIRED.js';
 import { INTERNAL_ERROR } from './INTERNAL_ERROR.js';
 import { OUTPUT_DOWNSCALED } from './OUTPUT_DOWNSCALED.js';

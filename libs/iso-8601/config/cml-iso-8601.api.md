@@ -10,4 +10,6 @@ export function decodeIso8601Duration(isoDuration: string): number;
 // @beta
 export function encodeIso8601Duration(duration: number): string;
 
+// (No @packageDocumentation comment for this package)
+
 ```

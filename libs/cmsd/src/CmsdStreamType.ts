@@ -1,4 +1,4 @@
-import { CmStreamType } from '@svta/cml-cta/CmStreamType.js';
+import { CmStreamType } from '@svta/cml-cta';
 
 /**
  * Common Media Server Data Stream Type

@@ -41,6 +41,9 @@ import { parseError } from './parseError.js';
 //
 // 5.  Reached the end of input_string without finding a closing DQUOTE;
 //     fail parsing.
+/**
+ * @internal
+ */
 export function parseString(src: string): ParsedValue<string> {
 	let output = '';
 	let i = 0;

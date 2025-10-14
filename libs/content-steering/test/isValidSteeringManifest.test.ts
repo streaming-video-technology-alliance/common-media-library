@@ -1,4 +1,4 @@
-import { isValidSteeringManifest } from '@svta/common-media-library/content-steering';
+import { isValidSteeringManifest } from '@svta/cml-content-steering';
 import assert, { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { MANIFEST } from './MANIFEST.ts';

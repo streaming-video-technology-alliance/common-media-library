@@ -1,5 +1,4 @@
-import { parseList } from '@svta/cml-structured-field-values/parse/parseList';
-import { SfItem } from '@svta/cml-structured-field-values/SfItem';
+import { parseList, SfItem } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
 

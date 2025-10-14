@@ -1,5 +1,4 @@
-import type { SegmentHls } from '@svta/cml-cmaf-ham/types/mapper/hls/SegmentHls';
-import type { AudioTrack } from '@svta/cml-cmaf-ham/types/model/AudioTrack';
+import type { AudioTrack, SegmentHls } from '@svta/cml-cmaf-ham';
 
 export type AudioTrackInfo = {
 	byteRange?: string;

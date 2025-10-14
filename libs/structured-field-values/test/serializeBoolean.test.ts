@@ -1,4 +1,4 @@
-import { serializeBoolean } from '@svta/cml-structured-field-values/serialize/serializeBoolean';
+import { serializeBoolean } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import test from 'node:test';
 

@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import type { ValueOf } from '@svta/cml-utils';
 import { CMCD_HEADERS } from './CMCD_HEADERS.js';
 import { CMCD_JSON } from './CMCD_JSON.js';
 import { CMCD_QUERY } from './CMCD_QUERY.js';

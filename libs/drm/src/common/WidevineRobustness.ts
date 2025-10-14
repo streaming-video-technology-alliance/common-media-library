@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import type { ValueOf } from '@svta/cml-utils';
 import { HW_SECURE_ALL } from './HW_SECURE_ALL.js';
 import { HW_SECURE_CRYPTO } from './HW_SECURE_CRYPTO.js';
 import { HW_SECURE_DECODE } from './HW_SECURE_DECODE.js';

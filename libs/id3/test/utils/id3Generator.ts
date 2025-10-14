@@ -1,4 +1,4 @@
-import { toUint8 } from '@svta/cml-id3/util/utf8';
+import { toUint8 } from '@svta/cml-id3';
 
 export function generateId3(
 	frames: Uint8Array<ArrayBuffer>,

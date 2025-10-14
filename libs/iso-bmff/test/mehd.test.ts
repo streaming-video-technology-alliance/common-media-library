@@ -1,4 +1,4 @@
-import { mehd } from '@svta/common-media-library';
+import { mehd } from '@svta/cml-iso-bmff';
 import { assert, describe, findBox, it } from './util/box.ts';
 
 describe('mehd box', function () {

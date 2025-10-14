@@ -33,4 +33,6 @@ export type XmlParseOptions = {
     keepComments?: boolean;
 };
 
+// (No @packageDocumentation comment for this package)
+
 ```

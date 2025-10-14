@@ -1,4 +1,4 @@
-import type { TypedResult } from '@svta/cml-utils/TypedResult.js';
+import type { TypedResult } from '@svta/cml-utils';
 import type { TimestampMap } from './TimestampMap.js';
 
 /**

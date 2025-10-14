@@ -69,6 +69,9 @@ import { parseError } from './parseError.js';
 //          be the product of the result and sign.
 //
 // 10.  Return output_number.
+/**
+ * @internal
+ */
 export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 	const orig = src;
 	let sign = 1;

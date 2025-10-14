@@ -26,6 +26,9 @@ import { parseError } from './parseError.js';
 //     3.  Append char to output_string.
 //
 // 4.  Return output_string.
+/**
+ * @internal
+ */
 export function parseToken(src: string, options?: SfDecodeOptions): ParsedValue<symbol | SfToken> {
 	if (/^[a-zA-Z*]$/.test(src[0]) === false) {
 		throw parseError(src, TOKEN);

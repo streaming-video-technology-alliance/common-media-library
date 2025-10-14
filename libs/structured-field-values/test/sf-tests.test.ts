@@ -1,9 +1,4 @@
-import { decodeSfDict } from '@svta/cml-structured-field-values/decodeSfDict';
-import { decodeSfItem } from '@svta/cml-structured-field-values/decodeSfItem';
-import { decodeSfList } from '@svta/cml-structured-field-values/decodeSfList';
-import { encodeSfDict } from '@svta/cml-structured-field-values/encodeSfDict';
-import { encodeSfItem } from '@svta/cml-structured-field-values/encodeSfItem';
-import { encodeSfList } from '@svta/cml-structured-field-values/encodeSfList';
+import { decodeSfDict, decodeSfItem, decodeSfList, encodeSfDict, encodeSfItem, encodeSfList } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
 import { formatDict, formatItem, formatList } from './util/format.ts';

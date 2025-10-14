@@ -1,5 +1,4 @@
-import { decodeText } from '@svta/cml-utils/decodeText.js';
-import { UTF_8 } from '@svta/cml-utils/UTF_8.js';
+import { decodeText, UTF_8 } from '@svta/cml-utils';
 
 /**
  * Converts a UTF-8 array to a string.

@@ -1,4 +1,4 @@
-import { stringToUint16 } from '@svta/cml-utils/stringToUint16.js';
+import { stringToUint16 } from '@svta/cml-utils';
 
 /**
  * Creates a UTF-16 encoded ArrayBuffer from a string.

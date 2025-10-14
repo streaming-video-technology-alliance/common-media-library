@@ -1,5 +1,4 @@
-import type { Representation } from '@svta/cml-cmaf-ham/types/mapper/dash/Representation.ts';
-import type { SegmentTemplate } from '@svta/cml-cmaf-ham/types/mapper/dash/SegmentTemplate.ts';
+import type { Representation, SegmentTemplate } from '@svta/cml-cmaf-ham';
 
 const representationBase: Representation = {
 	$: {

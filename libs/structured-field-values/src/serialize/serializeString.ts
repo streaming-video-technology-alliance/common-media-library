@@ -26,6 +26,9 @@ import { serializeError } from './serializeError.js';
 // 5.  Append DQUOTE to output.
 //
 // 6.  Return output.
+/**
+ * @internal
+ */
 export function serializeString(value: string) {
 	if (STRING_REGEX.test(value)) {
 		throw serializeError(value, STRING);

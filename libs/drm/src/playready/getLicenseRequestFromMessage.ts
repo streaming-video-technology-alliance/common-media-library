@@ -1,9 +1,6 @@
-import type { Encoding } from '@svta/cml-utils/Encoding.js';
-import { UTF_16 } from '@svta/cml-utils/UTF_16.js';
-import { decodeBase64 } from '@svta/cml-utils/decodeBase64.js';
-import { decodeText } from '@svta/cml-utils/decodeText.js';
-import { getElementsByName } from '@svta/cml-xml/getElementsByName.js';
-import { parseXml } from '@svta/cml-xml/parseXml.js';
+import type { Encoding } from '@svta/cml-utils';
+import { decodeBase64, decodeText, UTF_16 } from '@svta/cml-utils';
+import { getElementsByName, parseXml } from '@svta/cml-xml';
 import { CHALLENGE } from '../common/CHALLENGE.js';
 import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.js';
 

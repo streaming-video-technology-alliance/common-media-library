@@ -1,5 +1,5 @@
-import { parseBareItem } from '@svta/cml-structured-field-values/parse/parseBareItem';
-import { base64encode } from '@svta/cml-utils/base64encode';
+import { parseBareItem } from '@svta/cml-structured-field-values';
+import { base64encode } from '@svta/cml-utils';
 import assert from 'node:assert';
 import test from 'node:test';
 
