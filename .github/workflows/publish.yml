@@ -33,29 +33,29 @@ jobs:
       - name: Publish
         run: npm run pub
 
-      - name: Get Version
-        run: echo "PKG_VERSION=`node -p "require('./package').version"`" >> $GITHUB_ENV
+      # - name: Get Version
+      #   run: echo "PKG_VERSION=`node -p "require('./package').version"`" >> $GITHUB_ENV
 
-      - name: Create Release Notes
-        run: npm run notes
+      # - name: Create Release Notes
+      #   run: npm run notes
 
-      - name: Draft Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
-        with:
-          tag_name: v${{ env.PKG_VERSION }}
-          release_name: ${{ env.PKG_VERSION }}
-          commitish: main
-          body_path: ./RELEASE.md
-          draft: true
-          prerelease: false
+      # - name: Draft Release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
+      #   with:
+      #     tag_name: v${{ env.PKG_VERSION }}
+      #     release_name: ${{ env.PKG_VERSION }}
+      #     commitish: main
+      #     body_path: ./RELEASE.md
+      #     draft: true
+      #     prerelease: false
 
-      - name: Build Docs
-        run: npm run build -w docs
+      # - name: Build Docs
+      #   run: npm run build -w docs
 
-      - name: Deploy Docs
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          publish_dir: ./docs/dist/
-          personal_token: ${{ secrets.GH_ACTIONS }}
+      # - name: Deploy Docs
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     publish_dir: ./docs/dist/
+      #     personal_token: ${{ secrets.GH_ACTIONS }}
