@@ -57,6 +57,6 @@ for (const [name, pkg] of Object.entries(packages)) {
 	// }
 
 	if (updated) {
-		await cmd(`npm publish --provenance --access public -w libs/${name.replace('@svta/cml-', '')} --dry-run`);
+		await cmd(`npm publish --provenance --access public -w libs/${name.replace('@svta/cml-', '')}`);
 	}
 }
