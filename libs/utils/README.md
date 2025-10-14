@@ -11,12 +11,14 @@ npm i @svta/cml-utils
 ## Usage
 
 ```typescript
-import { unescapeHtml } from "@svta/cml-utils/unescapeHtml";
-import { stringToUint16 } from "@svta/cml-utils/stringToUint16";
-import { hexToArrayBuffer } from "@svta/cml-utils/hexToArrayBuffer";
-import { decodeBase64 } from "@svta/cml-utils/decodeBase64";
-import { arrayBufferToUuid } from "@svta/cml-utils/arrayBufferToUuid";
-import { arrayBufferToHex } from "@svta/cml-utils/arrayBufferToHex";
+import {
+	stringToUint16,
+	hexToArrayBuffer,
+	decodeBase64,
+	arrayBufferToUuid,
+	arrayBufferToHex,
+	unescapeHtml,
+} from "@svta/cml-utils";
 
 // Unescape HTML entities
 const unescaped = unescapeHtml("&quot;&lt;Hello&amp;World&gt;&quot;");

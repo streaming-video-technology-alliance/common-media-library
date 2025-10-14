@@ -11,7 +11,7 @@ npm i @svta/cml-cmsd
 ## Usage
 
 ```typescript
-import { encodeCmsdStatic } from "@svta/cml-cmsd/encodeCmsdStatic";
+import { encodeCmsdStatic } from "@svta/cml-cmsd";
 
 const input = Object.assign({}, CMSD_STATIC_OBJ, {
 	ot: new SfToken(CmsdObjectType.VIDEO),

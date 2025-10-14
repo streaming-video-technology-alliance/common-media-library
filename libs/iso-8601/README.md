@@ -11,8 +11,10 @@ npm i @svta/cml-iso-8601
 ## Usage
 
 ```typescript
-import { encodeIso8601Duration } from "@svta/cml-iso-8601/encodeIso8601Duration";
-import { decodeIso8601Duration } from "@svta/cml-iso-8601/decodeIso8601Duration";
+import {
+	decodeIso8601Duration,
+	encodeIso8601Duration,
+} from "@svta/cml-iso-8601";
 
 // Encode duration
 const encoded = encodeIso8601Duration(3661);

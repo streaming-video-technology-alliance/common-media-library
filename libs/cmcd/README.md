@@ -11,8 +11,7 @@ npm i @svta/cml-cmcd
 ## Usage
 
 ```typescript
-import { encodeCmcd } from "@svta/cml-cmcd/encodeCmcd";
-import { CmcdReportingMode } from "@svta/cml-cmcd/CmcdReportingMode";
+import { CmcdReportingMode, encodeCmcd } from "@svta/cml-cmcd";
 
 const input = {
 	br: 1000,

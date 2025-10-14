@@ -11,7 +11,7 @@ npm i @svta/cml-webvtt
 ## Usage
 
 ```typescript
-import { parseWebVtt } from "@svta/cml-webvtt/parseWebVtt.js";
+import { parseWebVtt } from "@svta/cml-webvtt";
 
 const vtt = `WEBVTT\n\nREGION\nid:test\n\nSTYLE\n::cue {}\n\nCUE_1\n00:00:00.000 --> 00:00:35.000\nWevVTT Sample\n`;
 

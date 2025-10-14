@@ -11,7 +11,8 @@ npm i @svta/cml-structured-field-values
 ## Usage
 
 ```typescript
-import { encodeSfDict } from "@svta/cml-structured-field-values/encodeSfDict";
+import { encodeSfDict } from "@svta/cml-structured-field-values";
+
 const dict = encodeSfDict({
 	a: 1,
 	b: false,

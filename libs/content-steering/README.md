@@ -11,8 +11,10 @@ npm i @svta/cml-content-steering
 ## Usage
 
 ```typescript
-import { isValidSteeringManifest } from "@svta/cml-content-steering/isValidSteeringManifest";
-import { isValidPathwayClone } from "@svta/cml-content-steering/isValidPathwayClone";
+import {
+	isValidPathwayClone,
+	isValidSteeringManifest,
+} from "@svta/cml-content-steering";
 
 const manifest = {
 	VERSION: 1,

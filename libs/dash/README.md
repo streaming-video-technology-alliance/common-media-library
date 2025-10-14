@@ -11,8 +11,7 @@ npm i @svta/cml-dash
 ## Usage
 
 ```typescript
-import { processUriTemplate } from "@svta/cml-dash/processUriTemplate";
-import { parseFrameRate } from "@svta/cml-dash/parseFrameRate";
+import { processUriTemplate, parseFrameRate } from "@svta/cml-dash";
 
 // Process URI template
 const result = processUriTemplate(
