@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-cmsd",
-	"version": "1.0.0",
+	"version": "0.20.0",
 	"description": "Common Media Server Data (CMSD) encoding and decoding",
 	"license": "Apache-2.0",
 	"type": "module",

@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-608",
-	"version": "1.0.0",
+	"version": "0.20.0",
 	"description": "CTA-608/CEA-608 closed captioning functionality",
 	"license": "Apache-2.0",
 	"type": "module",

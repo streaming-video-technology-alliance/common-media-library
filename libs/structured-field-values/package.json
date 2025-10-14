@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-structured-field-values",
-	"version": "1.0.0",
+	"version": "0.20.0",
 	"description": "RFC8941 Structured Field Values implementation",
 	"license": "Apache-2.0",
 	"type": "module",

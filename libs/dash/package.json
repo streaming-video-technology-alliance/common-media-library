@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-dash",
-	"version": "1.0.0",
+	"version": "0.20.0",
 	"description": "DASH manifest parsing functionality",
 	"license": "Apache-2.0",
 	"type": "module",
