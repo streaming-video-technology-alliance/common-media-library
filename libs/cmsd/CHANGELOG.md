@@ -15,3 +15,4 @@ and this project adheres to
 - Move cmsd into its own package: `@svta/cml-cmsd` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v1.0.0...HEAD
+
