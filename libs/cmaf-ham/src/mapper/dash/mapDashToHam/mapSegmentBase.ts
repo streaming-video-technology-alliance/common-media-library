@@ -16,11 +16,11 @@ export function mapSegmentBase(
 	representation: Representation,
 	duration: number,
 ): Segment[] {
-	return representation.SegmentBase!.map((segment: SegmentBase) => {
+	return representation.SegmentBase?.map((segment: SegmentBase) => {
 		return {
 			duration,
-			url: representation.BaseURL![0] ?? '',
+			url: representation.BaseURL?.[0] ?? '',
 			byteRange: segment.$.indexRange,
 		} as Segment
-	})
+	}) ?? []
 }

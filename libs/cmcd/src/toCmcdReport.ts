@@ -38,8 +38,9 @@ export function toCmcdReport(data: CmcdData, target: CmcdReportTarget): Request<
 		reportingMode: target.reportingMode,
 	}
 
-	if (target.enabledKeys) {
-		options.filter = (key: CmcdKey) => target.enabledKeys!.includes(key)
+	const { enabledKeys } = target
+	if (enabledKeys) {
+		options.filter = (key: CmcdKey) => enabledKeys.includes(key)
 	}
 
 	switch (transimissionMode) {

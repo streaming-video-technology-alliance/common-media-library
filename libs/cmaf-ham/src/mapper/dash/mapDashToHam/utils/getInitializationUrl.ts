@@ -17,7 +17,7 @@ export function getInitializationUrl(
 ): string | undefined {
 	let initializationUrl: string | undefined
 	if (representation.SegmentBase) {
-		initializationUrl = representation.BaseURL![0] ?? ''
+		initializationUrl = representation.BaseURL?.[0] ?? ''
 	}
 	else if (adaptationSet.SegmentList || representation.SegmentList) {
 		initializationUrl =

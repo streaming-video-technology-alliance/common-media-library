@@ -300,6 +300,7 @@ export class Cta608Channel {
 			else {
 				if (!this.displayedMemory.equals(this.lastOutputScreen)) {
 					this.outputFilter.newCue(
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 						this.cueStartTime!,
 						time,
 						this.lastOutputScreen,
@@ -319,6 +320,7 @@ export class Cta608Channel {
 		if (this.outputFilter) {
 			if (!this.displayedMemory.isEmpty()) {
 				if (this.outputFilter.newCue) {
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 					this.outputFilter.newCue(this.cueStartTime!, t, this.displayedMemory)
 				}
 

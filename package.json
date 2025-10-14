@@ -35,7 +35,7 @@
 		"format": "npm run lint -- --fix",
 		"lint": "eslint .",
 		"build": "npm run build -w=libs/utils -w=libs/xml -w=libs/structured-field-values -w=libs/cta -w=libs/608 -w=libs/cmcd -w=libs/cmsd -w=libs/request -w=libs/content-steering -w=libs/dash -w=libs/id3 -w=libs/iso-8601 -w=libs/iso-bmff -w=libs/throughput -w=libs/webvtt -w=libs/drm -w=libs/cmaf-ham",
-		"pretest": "npm run typecheck && npm run lint && npm run build",
+		"pretest": "npm run lint && npm run build && npm run typecheck",
 		"test": "npm test --workspaces --if-present",
 		"start": "npm start -w dev",
 		"pub": "node scripts/publish.ts",

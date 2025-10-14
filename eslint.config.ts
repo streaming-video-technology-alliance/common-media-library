@@ -26,7 +26,6 @@ const config: Linter.Config[] = defineConfig(
 			'quotes': ['error', 'single', { allowTemplateLiterals: true, avoidEscape: true }],
 
 			// TODO: Remove these
-			'@typescript-eslint/no-non-null-assertion': 'off',
 			'@typescript-eslint/no-explicit-any': 'off',
 		},
 	}

@@ -1,6 +1,6 @@
 import type { Id3Frame } from '@svta/cml-id3'
 import { decodeId3TextFrame } from '@svta/cml-id3'
-import { equal } from 'node:assert'
+import assert, { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('decodeId3TextFrame', () => {
@@ -13,8 +13,10 @@ describe('decodeId3TextFrame', () => {
 
 		const result: Id3Frame | undefined = decodeId3TextFrame(frame)
 
-		equal(result!.key, 'TXXX')
-		equal(result!.info, 'foo')
-		equal(result!.data, 'abc')
+		assert(result)
+
+		equal(result.key, 'TXXX')
+		equal(result.info, 'foo')
+		equal(result.data, 'abc')
 	})
 })

@@ -19,7 +19,7 @@ export function getContentType(
 		return adaptationSet.$.contentType
 	}
 	if (adaptationSet.ContentComponent?.at(0)) {
-		return adaptationSet.ContentComponent.at(0)!.$.contentType
+		return adaptationSet.ContentComponent.at(0)?.$.contentType ?? ''
 	}
 	if (adaptationSet.$.mimeType || representation?.$.mimeType) {
 		const type =

@@ -349,6 +349,7 @@ export class WebVttParser {
 					case WebVttParserState.CUE:
 						// 40 - Collect cue timings and settings.
 						try {
+							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							parseCue(line, this.cue!, this.regionList)
 						}
 						catch (e) {
@@ -370,6 +371,7 @@ export class WebVttParser {
 						// one as a new cue.
 						if (!line || hasSubstring && (alreadyCollectedLine = true)) {
 							// We are done parsing this cue.
+							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							this.oncue?.(this.cue!)
 							this.cue = null
 							this.state = WebVttParserState.ID
@@ -378,6 +380,7 @@ export class WebVttParser {
 						if (this.cue?.text) {
 							this.cue.text += '\n'
 						}
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 						this.cue!.text += line.replace(/\u2028/g, '\n').replace(/u2029/g, '\n')
 						continue
 
