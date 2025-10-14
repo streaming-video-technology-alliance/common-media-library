@@ -18,8 +18,8 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
 	public getEstimate(): number {
 		let value: number = 0
 
-		for (let i = 0; i < this.samples.length; i++) {
-			value += getBandwidthBps(this.samples[i])
+		for (const sample of this.samples) {
+			value += getBandwidthBps(sample)
 		}
 
 		return value / this.samples.length

@@ -6,9 +6,9 @@ import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.ts'
 
 describe('decodeCmsdStatic', () => {
 	it('handles null data object', () => {
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		deepEqual(decodeCmsdStatic(undefined), {})
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		deepEqual(decodeCmsdStatic(null), {})
 	})
 

@@ -40,8 +40,8 @@ export class Settings {
 
 	// Accept a setting if its one of the given alternatives.
 	alt(k: string, v: string, a: string[]): void {
-		for (let n = 0; n < a.length; ++n) {
-			if (v === a[n]) {
+		for (const n of a) {
+			if (v === n) {
 				this.set(k, v)
 				break
 			}

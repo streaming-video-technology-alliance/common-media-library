@@ -10,6 +10,6 @@ test('serializeByteSequence', () => {
 	])
 	assert.deepStrictEqual(serializeByteSequence(value), `:cHJldGVuZCB0aGlzIGlzIGJpbmFyeSBjb250ZW50Lg==:`)
 
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => serializeByteSequence([1, 2, 3]), /failed to serialize "\[1,2,3\]" as Byte Sequence/)
 })

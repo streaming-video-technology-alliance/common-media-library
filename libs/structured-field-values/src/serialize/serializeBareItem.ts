@@ -50,12 +50,16 @@ export function serializeBareItem(value: any): string {
 				return serializeInteger(value)
 			}
 			return serializeDecimal(value)
+
 		case 'string':
 			return serializeString(value)
+
 		case 'symbol':
 			return serializeToken(value)
+
 		case 'boolean':
 			return serializeBoolean(value)
+
 		case 'object':
 			if (value instanceof Date) {
 				return serializeDate(value)
@@ -66,6 +70,8 @@ export function serializeBareItem(value: any): string {
 			if (value instanceof SfToken) {
 				return serializeToken(value)
 			}
+
+		// eslint-disable-next-line no-fallthrough
 		default:
 			// fail
 			throw serializeError(value, BARE_ITEM)

@@ -23,12 +23,13 @@ describe('encodeCmcd', () => {
 	})
 
 	it('ignore invalid values', () => {
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), '')
 	})
 
 	describe('version 1', () => {
 		it('returns encoded v1 string when no version is provided', () => {
+			 
 			const { v, ...input } = CMCD_INPUT
 			equal(encodeCmcd(input), CMCD_STRING_V1)
 		})

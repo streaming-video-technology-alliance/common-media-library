@@ -134,8 +134,8 @@ export class Cta608Channel {
 	}
 
 	insertChars(chars: number[]): void {
-		for (let i = 0; i < chars.length; i++) {
-			this.writeScreen.insertChar(chars[i])
+		for (const char of chars) {
+			this.writeScreen.insertChar(char)
 		}
 
 		const screen =

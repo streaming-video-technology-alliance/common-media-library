@@ -26,8 +26,8 @@ export class ZlemaEstimator implements ThroughputEstimator {
 
 		ema = zlema = getBandwidthBps(this.samples[this.samples.length - 1])
 
-		for (let i = 0; i < this.samples.length; i++) {
-			ema = alpha * getBandwidthBps(this.samples[i]) + (1 - alpha) * ema
+		for (const sample of this.samples) {
+			ema = alpha * getBandwidthBps(sample) + (1 - alpha) * ema
 			zlema = alpha * ema + (1 - alpha) * zlema
 		}
 

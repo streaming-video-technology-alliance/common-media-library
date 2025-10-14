@@ -7,9 +7,9 @@ import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.ts'
 
 describe('decodeCmsdDynamic', () => {
 	it('handles null data object', () => {
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		deepEqual(decodeCmsdDynamic(undefined), [])
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		deepEqual(decodeCmsdDynamic(null), [])
 	})
 

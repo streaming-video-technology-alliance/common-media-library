@@ -7,12 +7,12 @@ import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.ts'
 
 describe('encodeCmsdDynamic', () => {
 	it('handles null value object', () => {
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		equal(encodeCmsdDynamic(null), '')
 	})
 
 	it('handles null param object', () => {
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		equal(encodeCmsdDynamic('test', null), '')
 	})
 

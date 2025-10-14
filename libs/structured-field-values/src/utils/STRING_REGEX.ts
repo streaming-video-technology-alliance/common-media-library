@@ -1,1 +1,2 @@
-export const STRING_REGEX: RegExp = /[\x00-\x1f\x7f]+/  
+// eslint-disable-next-line no-control-regex
+export const STRING_REGEX: RegExp = /[\x00-\x1f\x7f]+/

@@ -17,9 +17,7 @@ import { readId3Timestamp } from './util/readId3Timestamp.ts'
 export function getId3Timestamp(data: Uint8Array<ArrayBuffer>): number | undefined {
 	const frames: Id3Frame[] = getId3Frames(data)
 
-	for (let i = 0; i < frames.length; i++) {
-		const frame = frames[i]
-
+	for (const frame of frames) {
 		if (isId3TimestampFrame(frame)) {
 			return readId3Timestamp(frame as DecodedId3Frame<ArrayBuffer>)
 		}

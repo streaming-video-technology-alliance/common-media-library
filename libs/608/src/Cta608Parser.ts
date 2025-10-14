@@ -488,8 +488,7 @@ export class Cta608Parser {
 	 * Trigger the generation of a cue, and the start of a new one if displayScreens are not empty.
 	 */
 	cueSplitAtTime(t: number): void {
-		for (let i = 0; i < this.channels.length; i++) {
-			const channel = this.channels[i]
+		for (const channel of this.channels) {
 			if (channel) {
 				channel.cueSplitAtTime(t)
 			}

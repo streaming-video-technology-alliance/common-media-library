@@ -13,7 +13,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 *
 	 * The aggregate encoded bitrate of the complete media object including all object types. This SHOULD be derived from
 	 * playlist/manifest declarations, or it MAY be estimated by the player. If the playlist declares both peak and average bitrate values,
-	 * the peak value MUST be transmitted. This value MUST NOT be sent for objects which do not have an object type of ‘a’, ‘v’, ‘av’ or ‘o’.
+	 * the peak value MUST be transmitted. This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'o'.
 	 * This value MUST NOT be sent if the encoded bitrate is known.
 	 *
 	 * Integer kbps
@@ -25,7 +25,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 *
 	 * The target buffer length associated with the media object being requested at the time of the request.
 	 * This value SHOULD be rounded to the nearest 100 ms. This value MUST NOT be sent for objects which do not have an object
-	 * type of ‘a’, ‘v’, ‘av’, ‘tt’, ‘c’, or ‘o’
+	 * type of 'a', 'v', 'av', 'tt', 'c', or 'o'
 	 *
 	 * Integer milliseconds
 	*/
@@ -113,7 +113,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
 	 * This top playable bitrate MUST apply to the object type being requested.
 	 * Requests for video objects MUST specify the top playable video bitrate and requests for audio objects MUST specify the top playable audio bitrate.
-	 * This value MUST NOT be sent for objects which do not have an object type of ‘a’, ‘v’, ‘av’ or ‘c’.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
 	 *
 	 * Integer Kbps
 	*/
@@ -127,7 +127,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
 	 * This lowest bitrate MUST apply to the object type being requested.
 	 * Requests for video objects MUST specify the lowest video bitrate and requests for audio objects MUST specify the lowest audio bitrate.
-	 * This value MUST NOT be sent for objects which do not have an object type of ‘a’, ‘v’, ‘av’ or ‘c’.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
 	 *
 	 * Integer Kbps
 	*/
@@ -140,7 +140,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
 	 * If the playlist declares both peak and average bitrate values,the peak value MUST be transmitted.
 	 * The aggregate encoded bitrate is of the complete media object including all object types.
-	 * This value MUST NOT be sent for objects which do not have an object type of ‘a’, ‘v’, ‘av’ or ‘c’.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
 	 * This value MUST NOT be sent if the top encoded bitrate is known
 	 *
 	 * Integer Kbps
@@ -154,7 +154,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
 	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
 	 * The aggregate encoded bitrate is of the complete media object including all object types.
-	 * This value MUST NOT be sent for objects which do not have an object type of ‘a’, ‘v’, ‘av’ or ‘c’.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
 	 * This value MUST NOT be sent if the lowest encoded bitrate is known.
 	 *
 	 * Integer Kbps
@@ -212,7 +212,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 *
 	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
 	 *
-	 * If the object type ‘ot’ key is sent along with this key, then the ‘bsd’ key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
+	 * If the object type 'ot' key is sent along with this key, then the 'bsd' key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
 	 *
 	 * Integer milliseconds
 	 */

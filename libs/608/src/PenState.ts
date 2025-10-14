@@ -66,8 +66,7 @@ export class PenState {
 			'background',
 			'flash',
 		]
-		for (let i = 0; i < attribs.length; i++) {
-			const style = attribs[i]
+		for (const style of attribs) {
 			if (Object.prototype.hasOwnProperty.call(styles, style)) {
 				(this as any)[style] = (styles as any)[style]
 			}

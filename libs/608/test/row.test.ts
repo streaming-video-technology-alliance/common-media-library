@@ -13,8 +13,8 @@ describe('Row Tests', () => {
 	})
 
 	it('should initialize with empty characters and default state', () => {
-		for (let i = 0; i < row.chars.length; i++) {
-			equal(row.chars[i].isEmpty(), true)
+		for (const char of row.chars) {
+			equal(char.isEmpty(), true)
 		}
 		equal(row.pos, 0)
 	})

@@ -48,13 +48,13 @@ export function getRequestHeadersFromMessage(
 	}
 	// Some versions of the PlayReady CDM return 'Content' instead of 'Content-Type'.
 	// This does not adhere to the W3C spec and license servers may reject the request.
-	if (headers.hasOwnProperty('Content')) {
+	if (headers['Content']) {
 		headers[CONTENT_TYPE] = headers['Content']
 		delete headers['Content']
 	}
 	// Set 'Content-Type' header by default if not provided in the the CDM message
 	// or if the message is unwrapped.
-	if (!headers.hasOwnProperty(CONTENT_TYPE)) {
+	if (!headers[CONTENT_TYPE]) {
 		headers[CONTENT_TYPE] = TEXT_XML_UTF8
 	}
 

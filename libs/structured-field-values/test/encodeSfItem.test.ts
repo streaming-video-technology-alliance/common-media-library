@@ -16,20 +16,22 @@ test('encodeSfItem', () => {
 	assert.deepStrictEqual(encodeSfItem(new SfItem(new Uint8Array([1, 2, 3]))), `:AQID:`)
 	assert.deepStrictEqual(encodeSfItem(new SfItem(new Date(1659578233000))), `@1659578233`)
 
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	assert.throws(() => encodeSfItem(function () { }), /failed to serialize "function \(\) \{ \}" as Bare Item/)
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	assert.throws(() => encodeSfItem(() => { }), /failed to serialize "\(\) => \{ \}" as Bare Item/)
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => encodeSfItem(999n), /failed to serialize "999" as Bare Item/)
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => encodeSfItem([]), /failed to serialize "\[\]" as Bare Item/)
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => encodeSfItem(new Map()), /failed to serialize "Map{}" as Bare Item/)
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => encodeSfItem(new Set()), /failed to serialize "Set{}" as Bare Item/)
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => encodeSfItem(null), /failed to serialize "null" as Bare Item/)
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => encodeSfItem(undefined), /failed to serialize "undefined" as Bare Item/)
 })

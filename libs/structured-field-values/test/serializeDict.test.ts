@@ -6,6 +6,6 @@ test('serializeDict', () => {
 	assert.deepStrictEqual(serializeDict(new Map()), '')
 	assert.deepStrictEqual(serializeDict(new Map([['a', 2]])), 'a=2')
 
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => serializeDict(0), /failed to serialize "0" as Dict/)
 })

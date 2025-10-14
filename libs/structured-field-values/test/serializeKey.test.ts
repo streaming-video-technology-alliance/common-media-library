@@ -12,6 +12,6 @@ test('serializeKey', () => {
 	assert.throws(() => serializeKey(`#`), /failed to serialize "#" as Key/)
 	assert.throws(() => serializeKey(`?`), /failed to serialize "\?" as Key/)
 
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => serializeKey(0), /failed to serialize "0" as Key/)
 })

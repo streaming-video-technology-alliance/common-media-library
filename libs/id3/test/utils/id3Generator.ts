@@ -83,16 +83,14 @@ export function generateId3Frame(type: string, value: Uint8Array<ArrayBuffer>): 
 
 function concat(...varArgs: BufferSource[]) {
 	let totalLength = 0
-	for (let i = 0; i < varArgs.length; ++i) {
-		const value = varArgs[i]
+	for (const value of varArgs) {
 		totalLength += value.byteLength
 	}
 
 	const result = new Uint8Array(totalLength)
 	let offset = 0
 
-	for (let i = 0; i < varArgs.length; ++i) {
-		const value = varArgs[i]
+	for (const value of varArgs) {
 		if (value instanceof Uint8Array) {
 			result.set(value, offset)
 		}

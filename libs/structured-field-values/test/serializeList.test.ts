@@ -6,6 +6,6 @@ test('serializeList', () => {
 	assert.deepStrictEqual(serializeList([1, 2, 3]), '1, 2, 3')
 	assert.deepStrictEqual(serializeList([]), '')
 
-	// @ts-expect-error
+	// @ts-expect-error - This is a test
 	assert.throws(() => serializeList({}), /failed to serialize "{}" as List/)
 })

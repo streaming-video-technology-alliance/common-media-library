@@ -7,7 +7,7 @@ import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.ts'
 
 describe('encodeCmsdStatic', () => {
 	it('handles null value object', () => {
-		// @ts-expect-error
+		// @ts-expect-error - This is a test
 		equal(encodeCmsdStatic(null), '')
 	})
 

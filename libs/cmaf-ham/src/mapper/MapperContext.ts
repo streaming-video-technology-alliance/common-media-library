@@ -7,8 +7,6 @@ export class MapperContext {
 	private strategy!: Mapper
 	private static instance: MapperContext
 
-	private constructor() { }
-
 	public static getInstance(): MapperContext {
 		if (!MapperContext.instance) {
 			MapperContext.instance = new MapperContext()

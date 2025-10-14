@@ -6,7 +6,9 @@ test('serializeString', () => {
 	assert.deepStrictEqual(serializeString('string'), `"string"`)
 	assert.deepStrictEqual(serializeString('str\\ing'), `"str\\\\ing"`)
 	assert.deepStrictEqual(serializeString('str"ing'), `"str\\"ing"`)
+	// eslint-disable-next-line no-control-regex
 	assert.throws(() => serializeString('str\x00ing'), /failed to serialize "str\x00ing" as String/)
+	// eslint-disable-next-line no-control-regex
 	assert.throws(() => serializeString('str\x1fing'), /failed to serialize "str\x1fing" as String/)
 	assert.throws(() => serializeString('str\x7fing'), /failed to serialize "str\x7fing" as String/)
 })

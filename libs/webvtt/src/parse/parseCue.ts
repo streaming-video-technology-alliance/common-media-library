@@ -45,7 +45,9 @@ export function parseCue(input: string, cue: WebVttCue, regionList: WebVttRegion
 					const vals = v.split(',')
 					const vals0 = vals[0]
 					settings.integer(k, vals0)
-					settings.percent(k, vals0) ? settings.set('snapToLines', false) : null
+					if (settings.percent(k, vals0)) {
+						settings.set('snapToLines', false)
+					}
 					settings.alt(k, vals0, ['auto'])
 					if (vals.length === 2) {
 						settings.alt('lineAlign', vals[1], ['start', 'center', 'end'])

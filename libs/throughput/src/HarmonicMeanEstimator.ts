@@ -18,8 +18,8 @@ export class HarmonicMeanEstimator implements ThroughputEstimator {
 	public getEstimate(): number {
 		let value: number = 0
 
-		for (let i = 0; i < this.samples.length; i++) {
-			value += 1 / getBandwidthBps(this.samples[i])
+		for (const sample of this.samples) {
+			value += 1 / getBandwidthBps(sample)
 		}
 
 		return this.samples.length / value
