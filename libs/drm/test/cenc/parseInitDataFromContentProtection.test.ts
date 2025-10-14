@@ -1,4 +1,4 @@
-import { parseInitDataFromContentProtection } from '@svta/cml-drm/cenc/parseInitDataFromContentProtection.js';
+import { parseInitDataFromContentProtection } from '@svta/cml-drm';
 import { strictEqual } from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
 

@@ -1,6 +1,4 @@
-import { encodeSfDict } from '@svta/cml-structured-field-values/encodeSfDict';
-import { SfItem } from '@svta/cml-structured-field-values/SfItem';
-import { SfToken } from '@svta/cml-structured-field-values/SfToken';
+import { encodeSfDict, SfItem, SfToken } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 

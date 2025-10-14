@@ -38,6 +38,9 @@ import { parseToken } from './parseToken.js';
 //     of running Parsing a Date (Section 4.2.9) with input_string.
 //
 // 7.  Otherwise, the item type is unrecognized; fail parsing.
+/**
+ * @internal
+ */
 export function parseBareItem(src: string, options?: SfDecodeOptions): ParsedValue<SfBareItem> {
 	const first = src[0];
 	if (first === `"`) {

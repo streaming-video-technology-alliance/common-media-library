@@ -45,6 +45,9 @@ export const Encoding: {
 export type Encoding = ValueOf<typeof Encoding>;
 
 // @beta
+export function getBandwidthBps(sample: ResourceTiming): number;
+
+// @beta
 export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
 // @beta
@@ -122,5 +125,7 @@ export type ValueOf<T> = T[keyof T];
 
 // @beta
 export type ValueOrArray<T> = T | T[];
+
+// (No @packageDocumentation comment for this package)
 
 ```

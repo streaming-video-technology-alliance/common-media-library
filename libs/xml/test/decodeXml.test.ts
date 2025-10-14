@@ -1,4 +1,4 @@
-import { decodeXml } from '@svta/cml-xml/decodeXml';
+import { decodeXml } from '@svta/cml-xml';
 import assert, { equal } from 'node:assert';
 import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';

@@ -19,6 +19,9 @@ import { parseIntegerOrDecimal } from './parseIntegerOrDecimal.js';
 // 4.  If output_date is a Decimal, fail parsing.
 //
 // 5.  Return output_date.
+/**
+ * @internal
+ */
 export function parseDate(src: string): ParsedValue<Date> {
 	let i = 0;
 	if (src[i] !== '@') {

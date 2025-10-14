@@ -1,4 +1,4 @@
-import { encodeBase64 } from '@svta/cml-utils/encodeBase64.js';
+import { encodeBase64 } from '@svta/cml-utils';
 import { BYTES } from '../utils/BYTES.js';
 import { serializeError } from './serializeError.js';
 
@@ -26,6 +26,9 @@ import { serializeError } from './serializeError.js';
 // Likewise, encoded data SHOULD have pad bits set to zero, as per
 // [RFC4648], Section 3.5, unless it is not possible to do so due to
 // implementation constraints.
+/**
+ * @internal
+ */
 export function serializeByteSequence(value: Uint8Array) {
 	if (ArrayBuffer.isView(value) === false) {
 		throw serializeError(value, BYTES);

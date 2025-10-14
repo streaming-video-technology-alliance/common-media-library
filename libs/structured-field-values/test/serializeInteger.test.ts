@@ -1,4 +1,4 @@
-import { serializeInteger } from '@svta/cml-structured-field-values/serialize/serializeInteger';
+import { serializeInteger } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import test from 'node:test';
 

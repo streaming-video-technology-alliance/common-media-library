@@ -1,5 +1,4 @@
-import { WebVttResultType } from '@svta/cml-webvtt/WebVttResultType.js';
-import { WebVttTransformStream } from '@svta/cml-webvtt/WebVttTransformStream.js';
+import { WebVttResultType, WebVttTransformStream } from '@svta/cml-webvtt';
 import { equal } from 'node:assert';
 import { createReadStream } from 'node:fs';
 import { resolve } from 'node:path';

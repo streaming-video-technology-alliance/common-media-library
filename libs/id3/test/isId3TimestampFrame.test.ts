@@ -1,4 +1,4 @@
-import { isId3TimestampFrame } from '@svta/cml-id3/isId3TimestampFrame';
+import { isId3TimestampFrame } from '@svta/cml-id3';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { PTS_FRAME } from './data/PTS.ts';

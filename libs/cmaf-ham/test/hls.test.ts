@@ -1,8 +1,7 @@
 import './init.ts';
 
-import { hamToHls } from '@svta/cml-cmaf-ham/services/converters/hamToHls';
-import { hlsToHam } from '@svta/cml-cmaf-ham/services/converters/hlsToHam';
-import type { Presentation } from '@svta/cml-cmaf-ham/types/model/Presentation';
+import type { Presentation } from '@svta/cml-cmaf-ham';
+import { hamToHls, hlsToHam } from '@svta/cml-cmaf-ham';
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

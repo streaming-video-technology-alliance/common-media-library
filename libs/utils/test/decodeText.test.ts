@@ -1,7 +1,4 @@
-import { decodeText } from '@svta/cml-utils/decodeText';
-import { stringToUint16 } from '@svta/cml-utils/stringToUint16';
-import { UTF_16 } from '@svta/cml-utils/UTF_16';
-import { UTF_8 } from '@svta/cml-utils/UTF_8';
+import { decodeText, stringToUint16, UTF_16, UTF_8 } from '@svta/cml-utils';
 import { equal } from 'node:assert';
 import { it } from 'node:test';
 import { decoderTest } from './decoderTest.ts';

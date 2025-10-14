@@ -28,24 +28,6 @@
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",
 			"default": "./dist/index.js"
-		},
-		"./*.js": {
-			"types": "./dist/*.d.ts",
-			"import": "./dist/*.js",
-			"default": "./dist/*.js"
-		},
-		"./*": {
-			"types": "./dist/*.d.ts",
-			"import": "./dist/*.js",
-			"default": "./dist/*.js"
-		}
-	},
-	"typesVersions": {
-		"*": {
-			"*": [
-				"dist/*",
-				"dist/cjs/*"
-			]
 		}
 	},
 	"keywords": [
@@ -58,11 +40,8 @@
 		"subtitles"
 	],
 	"scripts": {
-		"build": "tsc",
-		"postbuild": "api-extractor run --local",
-		"test": "node --no-warnings --test **/*.test.ts",
-		"prepublishOnly": "npm run build",
-		"pub": "npm publish --provenance --access public"
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts"
 	},
 	"engines": {
 		"node": ">=20"

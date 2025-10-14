@@ -2,34 +2,9 @@ name: Publish
 
 on:
   workflow_dispatch:
-    inputs:
-      package:
-        description: "Choose an package."
-        required: true
-        type: choice
-        options:
-          - "608"
-          - "cmaf-ham"
-          - "cmcd"
-          - "cmsd"
-          - "common-media-library"
-          - "content-steering"
-          - "cta"
-          - "dash"
-          - "drm"
-          - "id3"
-          - "iso-8601"
-          - "iso-bmff"
-          - "request"
-          - "structured-field-values"
-          - "throughput"
-          - "utils"
-          - "webvtt"
-          - "xml"
 
 env:
   PKG_VERSION: ""
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -56,31 +31,31 @@ jobs:
         run: npm test
 
       - name: Publish
-        run: npm publish --provenance --access public -w libs/${{ github.event.inputs.package }}
+        run: npm run pub
 
-      # - name: Get Version
-      #   run: echo "PKG_VERSION=`node -p "require('./package').version"`" >> $GITHUB_ENV
+      - name: Get Version
+        run: echo "PKG_VERSION=`node -p "require('./package').version"`" >> $GITHUB_ENV
 
-      # - name: Create Release Notes
-      #   run: npm run notes
+      - name: Create Release Notes
+        run: npm run notes
 
-      # - name: Draft Release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
-      #   with:
-      #     tag_name: v${{ env.PKG_VERSION }}
-      #     release_name: ${{ env.PKG_VERSION }}
-      #     commitish: main
-      #     body_path: ./RELEASE.md
-      #     draft: true
-      #     prerelease: false
+      - name: Draft Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
+        with:
+          tag_name: v${{ env.PKG_VERSION }}
+          release_name: ${{ env.PKG_VERSION }}
+          commitish: main
+          body_path: ./RELEASE.md
+          draft: true
+          prerelease: false
 
-      # - name: Build Docs
-      #   run: npm run build -w docs
+      - name: Build Docs
+        run: npm run build -w docs
 
-      # - name: Deploy Docs
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     publish_dir: ./docs/dist/
-      #     personal_token: ${{ secrets.GH_ACTIONS }}
+      - name: Deploy Docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./docs/dist/
+          personal_token: ${{ secrets.GH_ACTIONS }}

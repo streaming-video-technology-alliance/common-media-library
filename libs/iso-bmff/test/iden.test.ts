@@ -1,4 +1,4 @@
-import type { ContainerBox } from '../../../src/isobmff.ts';
+import type { ContainerBox } from '@svta/cml-iso-bmff';
 import { assert, describe, findBox, iden, it, mdat, parseBoxes, type WebVttCueIdBox } from './util/box.ts';
 
 describe('iden box', function () {

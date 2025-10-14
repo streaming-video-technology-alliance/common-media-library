@@ -1,4 +1,4 @@
-import { mfro } from '@svta/common-media-library';
+import { mfro } from '@svta/cml-iso-bmff';
 import { assert, describe, findBox, it } from './util/box.ts';
 
 describe('mfro box', function () {

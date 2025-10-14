@@ -1,4 +1,4 @@
-import { CmObjectType } from '@svta/cml-cta/CmObjectType.js';
+import { CmObjectType } from '@svta/cml-cta';
 
 /**
  * Common Media Server Data Object Type

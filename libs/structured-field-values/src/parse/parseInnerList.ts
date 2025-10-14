@@ -41,6 +41,9 @@ import { parseParameters } from './parseParameters.js';
 //         parsing.
 //
 // 4.  The end of the inner list was not found; fail parsing.
+/**
+ * @internal
+ */
 export function parseInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfInnerList> {
 	if (src[0] !== '(') {
 		throw parseError(src, INNER);

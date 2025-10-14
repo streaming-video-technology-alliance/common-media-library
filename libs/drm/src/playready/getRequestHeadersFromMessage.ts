@@ -1,8 +1,6 @@
-import { UTF_16 } from '@svta/cml-utils/UTF_16.js';
-import type { UTF_8 } from '@svta/cml-utils/UTF_8.js';
-import { decodeText } from '@svta/cml-utils/decodeText.js';
-import { getElementsByName } from '@svta/cml-xml/getElementsByName.js';
-import { parseXml } from '@svta/cml-xml/parseXml.js';
+import type { UTF_8 } from '@svta/cml-utils';
+import { decodeText, UTF_16 } from '@svta/cml-utils';
+import { getElementsByName, parseXml } from '@svta/cml-xml';
 import { CONTENT_TYPE } from '../common/CONTENT_TYPE.js';
 import { HTTP_HEADERS } from '../common/HTTP_HEADERS.js';
 import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.js';

@@ -1,6 +1,5 @@
-import { isTokenField } from '@svta/cml-cta/isTokenField.js';
-import { isValid } from '@svta/cml-cta/isValid.js';
-import { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
+import { isTokenField, isValid } from '@svta/cml-cta';
+import { SfToken } from '@svta/cml-structured-field-values';
 import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.js';
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.js';
 import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';

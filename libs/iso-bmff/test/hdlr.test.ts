@@ -1,4 +1,4 @@
-import { hdlr } from '@svta/common-media-library';
+import { hdlr } from '@svta/cml-iso-bmff';
 import { assert, describe, findBox, it } from './util/box.ts';
 
 describe('hdlr box', function () {

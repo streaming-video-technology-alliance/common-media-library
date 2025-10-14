@@ -1,4 +1,4 @@
-import { roundToEven } from '@svta/cml-utils/roundToEven.js';
+import { roundToEven } from '@svta/cml-utils';
 import { DECIMAL } from '../utils/DECIMAL.js';
 import { serializeError } from './serializeError.js';
 
@@ -36,6 +36,9 @@ import { serializeError } from './serializeError.js';
 //      digits) to output.
 //
 // 10.  Return output.
+/**
+ * @internal
+ */
 export function serializeDecimal(value: number): string {
 	const roundedValue = roundToEven(value, 3); // round to 3 decimal places
 	if (Math.floor(Math.abs(roundedValue)).toString().length > 12) {

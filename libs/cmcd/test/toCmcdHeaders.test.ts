@@ -1,8 +1,5 @@
-import type { CmcdCustomKey } from '@svta/cml-cmcd/CmcdCustomKey';
-import { CmcdHeaderField } from '@svta/cml-cmcd/CmcdHeaderField';
-import type { CmcdHeaderMap } from '@svta/cml-cmcd/CmcdHeaderMap';
-import { CmcdReportingMode } from '@svta/cml-cmcd/CmcdReportingMode';
-import { toCmcdHeaders } from '@svta/cml-cmcd/toCmcdHeaders';
+import type { CmcdCustomKey, CmcdHeaderMap } from '@svta/cml-cmcd';
+import { CmcdHeaderField, CmcdReportingMode, toCmcdHeaders } from '@svta/cml-cmcd';
 import { deepEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_HEADERS } from './data/CMCD_HEADERS.ts';

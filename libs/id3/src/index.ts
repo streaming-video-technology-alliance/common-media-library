@@ -14,3 +14,12 @@ export * from './getId3Timestamp.js';
 export * from './ID3_SCHEME_ID_URI.js';
 export type * from './Id3Frame.js';
 export * from './isId3TimestampFrame.js';
+export * from './util/decodeId3Frame.js';
+export * from './util/decodeId3TextFrame.js';
+export * from './util/isId3Footer.js';
+export * from './util/isId3Header.js';
+export * from './util/readId3Size.js';
+export * from './util/toArrayBuffer.js';
+export * from './util/utf8.js';
+export * from './util/utf8ArrayToStr.js';
+

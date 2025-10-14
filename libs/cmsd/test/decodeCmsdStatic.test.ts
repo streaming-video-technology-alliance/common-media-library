@@ -1,4 +1,4 @@
-import { decodeCmsdStatic } from '@svta/cml-cmsd/decodeCmsdStatic';
+import { decodeCmsdStatic } from '@svta/cml-cmsd';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.ts';

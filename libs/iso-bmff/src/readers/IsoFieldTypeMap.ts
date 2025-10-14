@@ -9,7 +9,7 @@ export type IsoFieldTypeMap = {
 	int: number;
 	template: number;
 	string: string;
-	data: Uint8Array;
+	data: Uint8Array<ArrayBuffer>;
 	utf8: string;
 	utf8string: string;
 };

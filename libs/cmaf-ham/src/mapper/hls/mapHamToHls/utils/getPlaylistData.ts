@@ -1,7 +1,7 @@
 import type { AudioTrack } from '../../../../types/model/AudioTrack.js';
 import type { VideoTrack } from '../../../../types/model/VideoTrack.js';
 
-import { getByterange } from './getByterange.js';
+import { encodeByteRange } from './encodeByteRange.ts';
 import { getUrlInitialization } from './getUrlInitialization.js';
 
 /**
@@ -15,5 +15,5 @@ import { getUrlInitialization } from './getUrlInitialization.js';
  * @alpha
  */
 export function getPlaylistData(track: AudioTrack | VideoTrack): string {
-	return `#EXT-X-MAP:URI="${getUrlInitialization(track)}",${getByterange(track)}\n`;
+	return `#EXT-X-MAP:URI="${getUrlInitialization(track)}",${encodeByteRange(track)}\n`;
 }

@@ -33,6 +33,9 @@ import { parseItemOrInnerList } from './parseItemOrInnerList.js';
 //
 // 3.  No structured data has been found; return members (which is
 //     empty).
+/**
+ * @internal
+ */
 export function parseList(src: string, options?: SfDecodeOptions): ParsedValue<SfMember[]> {
 	const value: SfMember[] = [];
 	while (src.length > 0) {

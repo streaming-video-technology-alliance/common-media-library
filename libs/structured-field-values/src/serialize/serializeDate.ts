@@ -8,6 +8,9 @@ import { serializeInteger } from './serializeInteger.js';
 // 2.  Append to output the result of running Serializing an Integer
 //     with input_date (Section 4.1.4).
 // 3.  Return output.
+/**
+ * @internal
+ */
 export function serializeDate(value: Date) {
 	return `@${serializeInteger(value.getTime() / 1000)}`;
 }

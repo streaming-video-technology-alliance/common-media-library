@@ -1,4 +1,4 @@
-import { decodeBase64 } from '@svta/cml-utils/decodeBase64';
+import { decodeBase64 } from '@svta/cml-utils';
 import { deepEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

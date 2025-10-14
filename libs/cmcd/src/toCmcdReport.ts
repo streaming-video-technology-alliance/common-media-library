@@ -1,4 +1,4 @@
-import type { Request } from '@svta/cml-utils/Request.js';
+import type { Request } from '@svta/cml-utils';
 import type { Cmcd } from './Cmcd.js';
 import { CMCD_HEADERS } from './CMCD_HEADERS.js';
 import { CMCD_PARAM } from './CMCD_PARAM.js';

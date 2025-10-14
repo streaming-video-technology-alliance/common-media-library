@@ -4,12 +4,12 @@
 
 ```ts
 
-import { CmObjectType } from '@svta/cml-cta/CmObjectType.js';
-import { CmStreamingFormat } from '@svta/cml-cta/CmStreamingFormat.js';
-import { CmStreamType } from '@svta/cml-cta/CmStreamType.js';
-import { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
-import type { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import { CmObjectType } from '@svta/cml-cta';
+import { CmStreamingFormat } from '@svta/cml-cta';
+import { CmStreamType } from '@svta/cml-cta';
+import { SfItem } from '@svta/cml-structured-field-values';
+import { SfToken } from '@svta/cml-structured-field-values';
+import { ValueOf } from '@svta/cml-utils';
 
 // @beta
 export const CMSD_DYNAMIC = "CMSD-Dynamic";
@@ -105,5 +105,7 @@ export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
 // @beta
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string;
+
+// (No @packageDocumentation comment for this package)
 
 ```

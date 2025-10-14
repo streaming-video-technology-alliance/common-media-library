@@ -4,10 +4,11 @@
 
 ```ts
 
-import type { Cmcd } from '@svta/cml-cmcd/Cmcd.js';
-import type { Request as Request_2 } from '@svta/cml-utils/Request.js';
-import { ResourceTiming } from '@svta/cml-utils/ResourceTiming.js';
-import type { XmlNode } from '@svta/cml-xml/XmlNode.js';
+import { Cmcd } from '@svta/cml-cmcd';
+import { Request as Request_2 } from '@svta/cml-utils';
+import { RequestType } from '@svta/cml-utils';
+import { ResourceTiming } from '@svta/cml-utils';
+import { XmlNode } from '@svta/cml-xml';
 
 // @beta
 export type CommonMediaRequest = Request_2<{
@@ -23,7 +24,7 @@ export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaReques
     statusText?: string;
     type?: string;
     headers?: Record<string, string>;
-    data?: ResponseTypeMap<R['responseType']>;
+    data?: ResponseTypeMap<R["responseType"]>;
     resourceTiming?: ResourceTiming;
 };
 
@@ -33,14 +34,16 @@ export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResp
 // @beta
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
+export { RequestType }
+
+export { ResourceTiming }
+
 // @beta
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
 
 // @beta
-export type ResponseTypeMap<T extends string | undefined> = T extends 'json' ? any : T extends 'text' ? string : T extends 'blob' ? Blob : T extends 'arraybuffer' ? ArrayBuffer : T extends 'document' ? XmlNode : unknown;
+export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : unknown;
 
-
-export * from "@svta/cml-utils/RequestType.js";
-export * from "@svta/cml-utils/ResourceTiming.js";
+// (No @packageDocumentation comment for this package)
 
 ```

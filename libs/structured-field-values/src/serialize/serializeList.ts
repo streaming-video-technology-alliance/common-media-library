@@ -29,6 +29,9 @@ import { serializeItem } from './serializeItem.js';
 //         2.  Append a single SP to output.
 //
 // 3.  Return output.
+/**
+ * @internal
+ */
 export function serializeList(list: SfMember[], options: SfEncodeOptions = { whitespace: true }): string {
 	if (Array.isArray(list) === false) {
 		throw serializeError(list, LIST);

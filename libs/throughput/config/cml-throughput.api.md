@@ -4,7 +4,7 @@
 
 ```ts
 
-import type { ResourceTiming } from '@svta/cml-utils/ResourceTiming.js';
+import { ResourceTiming } from '@svta/cml-utils';
 
 // @beta
 export class ArithmeticMeanEstimator implements ThroughputEstimator {
@@ -61,5 +61,7 @@ export class ZlemaEstimator implements ThroughputEstimator {
     // (undocumented)
     sample(sample: ResourceTiming): void;
 }
+
+// (No @packageDocumentation comment for this package)
 
 ```

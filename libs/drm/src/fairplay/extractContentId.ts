@@ -1,6 +1,5 @@
-import { decodeText } from '@svta/cml-utils/decodeText.js';
-import type { Encoding } from '@svta/cml-utils/Encoding.js';
-import { UTF_16 } from '@svta/cml-utils/UTF_16.js';
+import type { Encoding } from '@svta/cml-utils';
+import { decodeText, UTF_16 } from '@svta/cml-utils';
 
 /**
  * Extracts the content ID from InitData using skd:// URI or query parameters.

@@ -1,4 +1,7 @@
-type TypedArray =
+/**
+ * @internal
+ */
+export type TypedArray =
 	| Int8Array
 	| Uint8Array
 	| Int16Array
@@ -9,6 +12,9 @@ type TypedArray =
 	| Float64Array
 	| Uint8ClampedArray;
 
+/**
+ * @internal
+ */
 export function toArrayBuffer(view: ArrayBuffer | TypedArray): ArrayBuffer {
 	if (view instanceof ArrayBuffer) {
 		return view;

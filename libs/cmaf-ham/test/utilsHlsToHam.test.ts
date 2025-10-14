@@ -1,43 +1,40 @@
 import { deepStrictEqual, equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { formatSegments } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/formatSegments.js';
-import { getByterange } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/getByterange.js';
-import { getCodec } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/getCodec.js';
-import { getDuration } from '@svta/cml-cmaf-ham/mapper/hls/mapHlsToHam/utils/getDuration.js';
-import type { HlsManifest } from '@svta/cml-cmaf-ham/types/mapper/hls/HlsManifest.js';
+import type { HlsManifest } from '@svta/cml-cmaf-ham';
+import { decodeByteRange, formatSegments, getDuration, getHlsCodec } from '@svta/cml-cmaf-ham';
 
 import { getSegments } from './data/hlsData.ts';
 
 describe('getByterange', () => {
 	it('returns byterange in hsl format if byterange exists', () => {
-		const res = getByterange({ length: 123, offset: 456 });
+		const res = decodeByteRange({ length: 123, offset: 456 });
 		equal(res, '123@456');
 	});
 
 	it('returns empty string if byterange does not exist', () => {
-		const res = getByterange(undefined);
+		const res = decodeByteRange(undefined);
 		equal(res, '');
 	});
 });
 
 describe('getCodec', () => {
 	it('returns audio codec when type is audio', () => {
-		const res = getCodec('audio');
+		const res = getHlsCodec('audio');
 		equal(res, 'mp4a.40.2');
 	});
 
 	it('returns empty string when type is text', () => {
-		const res = getCodec('text');
+		const res = getHlsCodec('text');
 		equal(res, '');
 	});
 
 	it('returns video codec when type is video', () => {
-		const res = getCodec('video', 'videoCodec,otherCodec,anotherCodec');
+		const res = getHlsCodec('video', 'videoCodec,otherCodec,anotherCodec');
 		equal(res, 'videoCodec');
 	});
 	it('returns empty string when type is video and codecs is empty', () => {
-		const res = getCodec('video', '');
+		const res = getHlsCodec('video', '');
 		equal(res, '');
 	});
 });

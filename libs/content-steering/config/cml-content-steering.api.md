@@ -5,7 +5,7 @@
 ```ts
 
 // @beta
-export const DEFAULT_PATHWAY_PENALTY = 300000;
+export const DEFAULT_PATHWAY_PENALTY = 3e5;
 
 // @beta
 export const DEFAULT_TTL = 300;
@@ -18,18 +18,18 @@ export function isValidSteeringManifest(manifest: SteeringManifest): boolean;
 
 // @beta
 export type PathwayClone = {
-    'BASE-ID': string;
-    'ID': string;
-    'URI-REPLACEMENT': UriReplacement;
+    "BASE-ID": string;
+    "ID": string;
+    "URI-REPLACEMENT": UriReplacement;
 };
 
 // @beta
 export type SteeringManifest = {
     VERSION: number;
     TTL: number;
-    'RELOAD-URI'?: string;
-    'PATHWAY-PRIORITY': string[];
-    'PATHWAY-CLONES'?: PathwayClone[];
+    "RELOAD-URI"?: string;
+    "PATHWAY-PRIORITY": string[];
+    "PATHWAY-CLONES"?: PathwayClone[];
 };
 
 // @beta
@@ -37,5 +37,7 @@ export type UriReplacement = {
     HOST?: string;
     PARAMS?: Record<string, string>;
 };
+
+// (No @packageDocumentation comment for this package)
 
 ```

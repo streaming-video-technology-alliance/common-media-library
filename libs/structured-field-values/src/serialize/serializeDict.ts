@@ -45,6 +45,9 @@ import { serializeParams } from './serializeParams.js';
 //         2.  Append a single SP to output.
 //
 // 3.  Return output.
+/**
+ * @internal
+ */
 export function serializeDict(dict: Record<string, any> | Map<string, any>, options: SfEncodeOptions = { whitespace: true }): string {
 	if (typeof dict !== 'object' || dict == null) {
 		throw serializeError(dict, DICT);

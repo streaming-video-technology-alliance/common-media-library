@@ -1,4 +1,4 @@
-import { encodeXml } from '@svta/cml-xml/encodeXml';
+import { encodeXml } from '@svta/cml-xml';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

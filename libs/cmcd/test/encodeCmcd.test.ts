@@ -1,8 +1,6 @@
-import type { CmcdEncodeOptions } from '@svta/cml-cmcd/CmcdEncodeOptions';
-import { CmcdReportingMode } from '@svta/cml-cmcd/CmcdReportingMode';
-import { encodeCmcd } from '@svta/cml-cmcd/encodeCmcd';
-import { SfItem } from '@svta/cml-structured-field-values/SfItem';
-import { SfToken } from '@svta/cml-structured-field-values/SfToken';
+import type { CmcdEncodeOptions } from '@svta/cml-cmcd';
+import { CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd';
+import { SfItem, SfToken } from '@svta/cml-structured-field-values';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts';

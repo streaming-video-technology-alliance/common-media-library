@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 export function iso8601DurationToNumber(isoDuration: string): number {
 	const hours = /(?:([.,\d]+)H)/.exec(isoDuration);
 	const minutes = /(?:([.,\d]+)M)/.exec(isoDuration);

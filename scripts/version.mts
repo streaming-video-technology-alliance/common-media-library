@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { cmd } from './cmd.mts';
+import { cmd } from './cmd.ts';
 
 const ver = process.argv[2];
 

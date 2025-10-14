@@ -4,9 +4,9 @@
 
 ```ts
 
-import type { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
-import type { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import { SfItem } from '@svta/cml-structured-field-values';
+import { SfToken } from '@svta/cml-structured-field-values';
+import { ValueOf } from '@svta/cml-utils';
 
 // @beta
 export type CmCustomKey = `${string}-${string}`;
@@ -69,5 +69,7 @@ export function isTokenField(key: string): boolean;
 //
 // @internal
 export function isValid(value: CmValue): boolean;
+
+// (No @packageDocumentation comment for this package)
 
 ```

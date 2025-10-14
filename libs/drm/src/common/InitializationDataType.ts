@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import type { ValueOf } from '@svta/cml-utils';
 import { CBCS } from './CBCS.js';
 import { CENC } from './CENC.js';
 import { KEYIDS } from './KEYIDS.js';

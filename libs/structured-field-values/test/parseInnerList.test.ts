@@ -1,6 +1,4 @@
-import { parseInnerList } from '@svta/cml-structured-field-values/parse/parseInnerList';
-import { parseList } from '@svta/cml-structured-field-values/parse/parseList';
-import { SfItem } from '@svta/cml-structured-field-values/SfItem';
+import { parseInnerList, parseList, SfItem } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import test from 'node:test';
 

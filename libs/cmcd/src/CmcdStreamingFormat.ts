@@ -1,4 +1,4 @@
-import { CmStreamingFormat } from '@svta/cml-cta/CmStreamingFormat.js';
+import { CmStreamingFormat } from '@svta/cml-cta';
 
 /**
  * Common Media Client Data Streaming Format

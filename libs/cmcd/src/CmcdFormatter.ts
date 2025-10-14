@@ -1,5 +1,5 @@
-import type { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
-import type { ValueOrArray } from '@svta/cml-utils/ValueOrArray.js';
+import type { SfItem } from '@svta/cml-structured-field-values';
+import type { ValueOrArray } from '@svta/cml-utils';
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 

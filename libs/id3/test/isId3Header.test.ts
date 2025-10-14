@@ -1,4 +1,4 @@
-import { isId3Header } from '@svta/cml-id3/util/isId3Header';
+import { isId3Header } from '@svta/cml-id3';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 

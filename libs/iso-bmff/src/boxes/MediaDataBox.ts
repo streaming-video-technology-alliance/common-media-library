@@ -8,5 +8,5 @@ import type { Box } from './Box.js';
  */
 export type MediaDataBox = Box & {
 	type: 'mdat';
-	data: Uint8Array;
+	data: Uint8Array<ArrayBuffer>;
 };

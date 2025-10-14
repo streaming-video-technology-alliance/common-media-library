@@ -36,6 +36,9 @@ import { serializeToken } from './serializeToken.js';
 //     a Date (Section 4.1.10) with input_item.
 //
 // 8.  Otherwise, fail serialization.
+/**
+ * @internal
+ */
 export function serializeBareItem(value: any): string {
 	switch (typeof value) {
 		case 'number':

@@ -1,6 +1,5 @@
-import { concatInitDataIdAndCertificate } from '@svta/cml-drm/fairplay/concatInitDataIdAndCertificate';
-import { base64decode } from '@svta/cml-utils/base64decode';
-import { convertUint8ToUint16 } from '@svta/cml-utils/convertUint8ToUint16';
+import { concatInitDataIdAndCertificate } from '@svta/cml-drm';
+import { base64decode, convertUint8ToUint16 } from '@svta/cml-utils';
 import { deepStrictEqual } from 'node:assert';
 import { describe, it } from 'node:test';
 

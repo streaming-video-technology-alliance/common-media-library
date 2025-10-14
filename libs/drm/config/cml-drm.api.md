@@ -4,10 +4,10 @@
 
 ```ts
 
-import type { Encoding } from '@svta/cml-utils/Encoding.js';
-import { UTF_16 } from '@svta/cml-utils/UTF_16.js';
-import type { UTF_8 } from '@svta/cml-utils/UTF_8.js';
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
+import { Encoding } from '@svta/cml-utils';
+import { UTF_16 } from '@svta/cml-utils';
+import { UTF_8 } from '@svta/cml-utils';
+import { ValueOf } from '@svta/cml-utils';
 
 // @beta
 export const CBCS = "cbcs";
@@ -148,7 +148,7 @@ export const LICENSE_REQUEST = "license-request";
 // @beta
 export type LicenseRequest = {
     url: string;
-    method: 'GET' | 'POST';
+    method: "GET" | "POST";
     responseType: XMLHttpRequestResponseType;
     headers?: Record<string, string>;
     withCredentials?: boolean;
@@ -263,5 +263,7 @@ export const WidevineRobustness: {
 
 // @beta
 export type WidevineRobustness = ValueOf<typeof WidevineRobustness>;
+
+// (No @packageDocumentation comment for this package)
 
 ```

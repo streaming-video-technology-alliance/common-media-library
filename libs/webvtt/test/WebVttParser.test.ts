@@ -1,7 +1,5 @@
-import type { WebVttCue } from '@svta/cml-webvtt/WebVttCue.js';
-import { WebVttParser } from '@svta/cml-webvtt/WebVttParser.js';
-import type { WebVttParsingError } from '@svta/cml-webvtt/WebVttParsingError.js';
-import type { WebVttRegion } from '@svta/cml-webvtt/WebVttRegion.js';
+import type { WebVttCue, WebVttParsingError, WebVttRegion } from '@svta/cml-webvtt';
+import { WebVttParser } from '@svta/cml-webvtt';
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 import './utils/pollyfill.ts';

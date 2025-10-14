@@ -8,10 +8,10 @@ import type { PlayList } from '../../../types/mapper/hls/Playlist.js';
 import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.js';
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.js';
 
+import { decodeByteRange } from './utils/decodeByteRange.ts';
 import { formatSegments } from './utils/formatSegments.js';
-import { getByterange } from './utils/getByterange.js';
-import { getCodec } from './utils/getCodec.js';
 import { getDuration } from './utils/getDuration.js';
+import { getHlsCodec } from './utils/getHlsCodec.ts';
 
 export function videoPlaylistsToSwitchingSets(
 	playlists: PlayList[],
@@ -28,12 +28,12 @@ export function videoPlaylistsToSwitchingSets(
 		const segments: Segment[] = formatSegments(parsedHlsManifest?.segments);
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes;
 		const map = parsedHlsManifest?.segments?.at(0)?.map;
-		const byteRange = getByterange(map?.byterange);
+		const byteRange = decodeByteRange(map?.byterange);
 		videoTracks.push({
 			id: `video-${videoTrackId++}`,
 			type: 'video',
 			fileName: playlist.uri,
-			codec: getCodec('video', CODECS),
+			codec: getHlsCodec('video', CODECS),
 			duration: getDuration(parsedHlsManifest, segments),
 			language: LANGUAGE ?? 'und',
 			bandwidth: BANDWIDTH,

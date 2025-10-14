@@ -60,6 +60,11 @@ export type Byterange = {
     offset: number;
 };
 
+// Warning: (ae-internal-missing-underscore) The name "calculateDuration" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function calculateDuration(duration: string | undefined, timescale: string | undefined): number;
+
 // @alpha (undocumented)
 export type ContentComponent = {
     $: {
@@ -97,10 +102,34 @@ export type DashSerializer = (json: DashManifest) => string;
 export function dashToHam(manifest: string): Presentation[];
 
 // @alpha
+export function decodeByteRange(byteRange: Byterange | undefined): string;
+
+// @alpha
+export function encodeByteRange(track: VideoTrack | AudioTrack): string;
+
+// @alpha
+export function formatSegments(segments: SegmentHls[]): Segment[];
+
+// @alpha
 export type FrameRate = {
     frameRateNumerator: number;
     frameRateDenominator?: number;
 };
+
+// Warning: (ae-internal-missing-underscore) The name "getChannels" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getChannels(adaptationSet: AdaptationSet, representation: Representation): number;
+
+// Warning: (ae-internal-missing-underscore) The name "getCodec" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getCodec(adaptationSet: AdaptationSet, representation: Representation): string;
+
+// Warning: (ae-internal-missing-underscore) The name "getContentType" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getContentType(adaptationSet: AdaptationSet, representation?: Representation): string;
 
 // Warning: (ae-internal-missing-underscore) The name "getDashParser" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -112,10 +141,67 @@ export function getDashParser(): DashParser;
 // @internal (undocumented)
 export function getDashSerializer(): DashSerializer;
 
+// @alpha
+export function getDuration(manifest: HlsManifest, segments: SegmentHls[]): number | null;
+
+// Warning: (ae-internal-missing-underscore) The name "getFrameRate" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getFrameRate(adaptationSet: AdaptationSet, representation: Representation): FrameRate;
+
+// Warning: (ae-internal-missing-underscore) The name "getGroup" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function getGroup(adaptationSet: AdaptationSet): string;
+
+// @alpha
+export function getHlsCodec(type: string, codecs?: string): string;
+
 // Warning: (ae-internal-missing-underscore) The name "getHlsParser" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
 export function getHlsParser(): HlsParser;
+
+// Warning: (ae-internal-missing-underscore) The name "getLanguage" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getLanguage(adaptationSet: AdaptationSet): string;
+
+// Warning: (ae-internal-missing-underscore) The name "getNumberOfSegments" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getNumberOfSegments(segmentTemplate: SegmentTemplate, duration: number): number;
+
+// @alpha
+export function getPlaylistData(track: AudioTrack | VideoTrack): string;
+
+// Warning: (ae-internal-missing-underscore) The name "getPresentationId" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getPresentationId(period: Period, duration: number): string;
+
+// Warning: (ae-internal-missing-underscore) The name "getSampleRate" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getSampleRate(adaptationSet: AdaptationSet, representation: Representation): number;
+
+// Warning: (ae-internal-missing-underscore) The name "getSar" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getSar(adaptationSet: AdaptationSet, representation: Representation): string;
+
+// @alpha
+export function getSegments(segments: Segment[]): string;
+
+// Warning: (ae-internal-missing-underscore) The name "getTimescale" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getTimescale(track: Track): number;
+
+// Warning: (ae-internal-missing-underscore) The name "getTrackDuration" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getTrackDuration(segments: Segment[]): number;
 
 // @alpha
 export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[];
@@ -125,6 +211,14 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 
 // @alpha
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
+
+// Warning: (ae-internal-missing-underscore) The name "getUrlFromTemplate" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function getUrlFromTemplate(representation: Representation, segmentTemplate: SegmentTemplate, segmentId: number): string;
+
+// @alpha
+export function getUrlInitialization(track: VideoTrack | AudioTrack): string;
 
 // @alpha
 export type Ham = {
@@ -161,6 +255,11 @@ export type Initialization = {
     };
 };
 
+// Warning: (ae-internal-missing-underscore) The name "iso8601DurationToNumber" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function iso8601DurationToNumber(isoDuration: string): number;
+
 // @alpha
 export type Manifest = {
     manifest: string;
@@ -171,7 +270,27 @@ export type Manifest = {
 };
 
 // @alpha
-export type ManifestFormat = 'hls' | 'dash';
+export type ManifestFormat = "hls" | "dash";
+
+// Warning: (ae-internal-missing-underscore) The name "mapSegmentBase" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function mapSegmentBase(representation: Representation, duration: number): Segment[];
+
+// Warning: (ae-internal-missing-underscore) The name "mapSegmentList" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function mapSegmentList(segmentList: SegmentList[]): Segment[];
+
+// Warning: (ae-internal-missing-underscore) The name "mapSegments" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function mapSegments(adaptationSet: AdaptationSet, representation: Representation, duration: number): Segment[];
+
+// Warning: (ae-internal-missing-underscore) The name "mapSegmentTemplate" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function mapSegmentTemplate(representation: Representation, duration: number, segmentTemplate: SegmentTemplate): Segment[];
 
 // @alpha
 export type MediaGroups = {
@@ -190,6 +309,11 @@ export type MediaGroups = {
         };
     };
 };
+
+// Warning: (ae-internal-missing-underscore) The name "numberToIso8601Duration" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function numberToIso8601Duration(duration: number): string;
 
 // Warning: (ae-internal-missing-underscore) The name "parseDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -367,7 +491,7 @@ export type Track = Ham & {
 };
 
 // @alpha
-export type TrackType = 'audio' | 'video' | 'text';
+export type TrackType = "audio" | "video" | "text";
 
 // @alpha
 export function validatePresentation(presentation: Presentation): Validation;

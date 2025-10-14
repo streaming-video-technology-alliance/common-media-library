@@ -6,8 +6,8 @@ import type { Manifest } from '../../../types/manifest/Manifest.js';
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.js';
 
 import { formatSegments } from './utils/formatSegments.js';
-import { getCodec } from './utils/getCodec.js';
 import { getDuration } from './utils/getDuration.js';
+import { getHlsCodec } from './utils/getHlsCodec.ts';
 
 export function subtitleGroupsToSwitchingSets(
 	mediaGroupsSubtitles: any,
@@ -31,7 +31,7 @@ export function subtitleGroupsToSwitchingSets(
 				id: subtitle,
 				type: 'text',
 				fileName: uri,
-				codec: getCodec('text'),
+				codec: getHlsCodec('text'),
 				duration: getDuration(subtitleParsed, segments),
 				language: language,
 				bandwidth: 0,

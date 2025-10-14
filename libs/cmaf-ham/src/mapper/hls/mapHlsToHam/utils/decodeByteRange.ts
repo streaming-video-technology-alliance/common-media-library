@@ -1,16 +1,16 @@
-import type { Byterange } from '../../../../types/mapper/hls/Byterange.js';
+import type { Byterange } from '../../../../types/mapper/hls/Byterange.ts';
 
 /**
  * @internal
  *
  * Get byterange from HLS Manifest.
  *
- * @param byteRange - Byterange object containning length and offset
+ * @param byteRange - Byterange object containing length and offset
  * @returns string containing the byterange. If byterange is undefined, it returns undefined
  *
  * @alpha
  */
-export function getByterange(byteRange: Byterange | undefined): string {
+export function decodeByteRange(byteRange: Byterange | undefined): string {
 	if (!byteRange) {
 		return '';
 	}

@@ -28,23 +28,6 @@
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",
 			"default": "./dist/index.js"
-		},
-		"./*.js": {
-			"import": "./dist/*.js",
-			"default": "./dist/*.js"
-		},
-		"./*": {
-			"types": "./dist/*.d.ts",
-			"import": "./dist/*.js",
-			"default": "./dist/*.js"
-		}
-	},
-	"typesVersions": {
-		"*": {
-			"*": [
-				"dist/*",
-				"dist/cjs/*"
-			]
 		}
 	},
 	"keywords": [
@@ -57,10 +40,8 @@
 		"DASH"
 	],
 	"scripts": {
-		"build": "tsc",
-		"postbuild": "api-extractor run --local",
-		"test": "node --no-warnings --test **/*.test.ts",
-		"prepublishOnly": "npm run build",
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts",
 		"dev": "node samples/cmaf-ham-conversion/src/index.ts"
 	},
 	"engines": {

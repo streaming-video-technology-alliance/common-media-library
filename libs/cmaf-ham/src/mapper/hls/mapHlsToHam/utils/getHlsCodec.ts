@@ -9,7 +9,7 @@
  *
  * @alpha
  */
-export function getCodec(type: string, codecs?: string): string {
+export function getHlsCodec(type: string, codecs?: string): string {
 	if (type === 'audio') {
 		// Using codec mp4a.40.2 for now, we should retrieve it by finding
 		// the video playlist that is related to this audio group.

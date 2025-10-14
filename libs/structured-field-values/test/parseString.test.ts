@@ -1,4 +1,4 @@
-import { parseString } from '@svta/cml-structured-field-values/parse/parseString';
+import { parseString } from '@svta/cml-structured-field-values';
 import assert from 'node:assert';
 import test from 'node:test';
 

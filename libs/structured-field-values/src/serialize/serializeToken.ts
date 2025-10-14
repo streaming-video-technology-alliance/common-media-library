@@ -20,8 +20,19 @@ import { serializeError } from './serializeError.js';
 // 4.  Append input_token to output.
 //
 // 5.  Return output.
+/**
+ * @internal
+ */
 export function serializeToken(token: symbol): string;
+
+/**
+ * @internal
+ */
 export function serializeToken(token: SfToken): string;
+
+/**
+ * @internal
+ */
 export function serializeToken(token: symbol | SfToken) {
 	const value = symbolToStr(token);
 	if (/^([a-zA-Z*])([!#$%&'*+\-.^_`|~\w:/]*)$/.test(value) === false) {

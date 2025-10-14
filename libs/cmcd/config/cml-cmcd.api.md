@@ -4,14 +4,14 @@
 
 ```ts
 
-import { CmObjectType } from '@svta/cml-cta/CmObjectType.js';
-import { CmStreamingFormat } from '@svta/cml-cta/CmStreamingFormat.js';
-import { CmStreamType } from '@svta/cml-cta/CmStreamType.js';
-import type { Request as Request_2 } from '@svta/cml-utils/Request.js';
-import type { SfItem } from '@svta/cml-structured-field-values/SfItem.js';
-import type { SfToken } from '@svta/cml-structured-field-values/SfToken.js';
-import type { ValueOf } from '@svta/cml-utils/ValueOf.js';
-import type { ValueOrArray } from '@svta/cml-utils/ValueOrArray.js';
+import { CmObjectType } from '@svta/cml-cta';
+import { CmStreamingFormat } from '@svta/cml-cta';
+import { CmStreamType } from '@svta/cml-cta';
+import { Request as Request_2 } from '@svta/cml-utils';
+import { SfItem } from '@svta/cml-structured-field-values';
+import { SfToken } from '@svta/cml-structured-field-values';
+import { ValueOf } from '@svta/cml-utils';
+import { ValueOrArray } from '@svta/cml-utils';
 
 // @beta
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string>;
@@ -133,7 +133,7 @@ export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
 };
 
 // @beta
-export type CmcdEventExcludedKeys = 'bs' | 'bsd' | 'cmsdd' | 'cmsds' | 'd' | 'dl' | 'nor' | 'ot' | 'rc' | 'rtp' | 'smrt' | 'su' | 'ttfbb' | 'ttlb' | 'url';
+export type CmcdEventExcludedKeys = "bs" | "bsd" | "cmsdd" | "cmsds" | "d" | "dl" | "nor" | "ot" | "rc" | "rtp" | "smrt" | "su" | "ttfbb" | "ttlb" | "url";
 
 // @beta
 export const CmcdEventType: {
@@ -224,14 +224,14 @@ export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 export type CmcdReportTarget = {
     url: string;
     reportingMode?: CmcdReportingMode;
-    method?: 'GET' | 'POST';
+    method?: "GET" | "POST";
     version?: number;
     transmissionMode?: CmcdTransmissionMode;
     enabledKeys?: CmcdKey[];
 };
 
 // @beta
-export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
+export type CmcdRequest = Omit<Cmcd, "nrr"> & {
     ab?: number;
     tbl?: number;
     cdn?: string;
@@ -342,5 +342,7 @@ export function toCmcdReport(data: CmcdData, target: CmcdReportTarget): Request_
 
 // @beta
 export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// (No @packageDocumentation comment for this package)
 
 ```

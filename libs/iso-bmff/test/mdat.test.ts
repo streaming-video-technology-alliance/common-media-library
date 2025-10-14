@@ -1,4 +1,4 @@
-import { mdat } from '@svta/common-media-library';
+import { mdat } from '@svta/cml-iso-bmff';
 import { assert, describe, it, parseBox } from './util/box.ts';
 
 describe('mdat box', function () {

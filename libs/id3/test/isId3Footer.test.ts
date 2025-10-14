@@ -1,4 +1,4 @@
-import { isId3Footer } from '@svta/cml-id3/util/isId3Footer';
+import { isId3Footer } from '@svta/cml-id3';
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
