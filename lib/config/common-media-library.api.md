@@ -346,6 +346,7 @@ export const CmcdEventType: {
     readonly UNMUTE: "um";
     readonly PLAYER_EXPAND: "pe";
     readonly PLAYER_COLLAPSE: "pc";
+    readonly RESPONSE_RECEIVED: "rr";
 };
 
 // @beta (undocumented)
