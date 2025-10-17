@@ -39,15 +39,12 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE;
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode];
 
-	if (!options.events || !options.events.includes('rr')){
-		const remainingObj = Object.fromEntries(
-			Object.entries(obj).filter(([key]) => !isCmcdResponseReceivedKey(key)),
-		);
-		obj = remainingObj;
-	}
-
 	// Filter keys based on the version, reporting mode and options
 	let keys = Object.keys(obj).filter(keyFilter);
+	
+	if (obj['e'] && obj['e'] !== 'rr') {
+		keys = keys.filter(key => !isCmcdResponseReceivedKey(key));
+	}
 
 	const filter = options.filter;
 	if (typeof filter === 'function') {
