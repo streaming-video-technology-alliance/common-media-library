@@ -333,7 +333,7 @@ export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
 };
 
 // @beta
-export type CmcdEventExcludedKeys = 'bsd' | 'd' | 'dl' | 'nor' | 'ot' | 'rtp' | 'su';
+export type CmcdEventExcludedKeys = 'bsd' | 'd' | 'dl' | 'nor' | 'ot' | 'rtp' | 'sid' | 'su';
 
 // @beta
 export const CmcdEventType: {
