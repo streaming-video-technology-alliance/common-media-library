@@ -2,17 +2,17 @@ import { CMCD_REQUEST_KEYS, CMCD_RESPONSE_KEYS, isCmcdResponseKey } from '@svta/
 import { equal } from 'node:assert';
 import { describe, it } from 'node:test';
 
-describe('isCmcdRequestKey', () => {
+describe('isCmcdResponseKey', () => {
 	it('provides a valid example', () => {
 		//#region example
-		equal(isCmcdResponseKey('br'), true);
+		equal(isCmcdResponseKey('url'), true);
 		equal(isCmcdResponseKey('e'), false);
 		//#endregion example
 	});
 
-	it('Accepts all request keys', () => {
+	it('Rejects all request keys', () => {
 		for (const key of CMCD_REQUEST_KEYS) {
-			equal(isCmcdResponseKey(key), true);
+			equal(isCmcdResponseKey(key), false);
 		}
 	});
 
@@ -22,8 +22,8 @@ describe('isCmcdRequestKey', () => {
 		}
 	});
 
-	it('Accepts custom keys', () => {
-		equal(isCmcdResponseKey('com.hello.world-foo'), true);
+	it('Rejects custom keys', () => {
+		equal(isCmcdResponseKey('com.hello.world-foo'), false);
 	});
 
 	it('Rejects invalid keys', () => {
