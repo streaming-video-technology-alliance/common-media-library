@@ -4,18 +4,16 @@ import { SfToken } from '../structuredfield/SfToken.js';
 import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.js';
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.js';
 import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.js';
-import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.js';
 import type { CmcdData } from './CmcdData.js';
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.js';
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 import { isCmcdEventKey } from './isCmcdEventKey.js';
 import { isCmcdRequestKey } from './isCmcdRequestKey.js';
-import { isCmcdResponseKey } from './isCmcdResponseKey.js';
+import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.js';
 import { isCmcdV1Key } from './isCmcdV1Key.js';
 
 const filterMap = {
-	[CMCD_RESPONSE_MODE]: isCmcdResponseKey,
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
 };
@@ -41,6 +39,13 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE;
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode];
 
+	if (!options.events || !options.events.includes('rr')){
+		const remainingObj = Object.fromEntries(
+			Object.entries(obj).filter(([key]) => !CMCD_RESPONSE_KEYS.includes(key as any)),
+		);
+		obj = remainingObj;
+	}
+
 	// Filter keys based on the version, reporting mode and options
 	let keys = Object.keys(obj).filter(keyFilter);
 
@@ -50,7 +55,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	}
 
 	// Ensure all required keys are present before sorting
-	const needsTimestamp = reportingMode === CMCD_RESPONSE_MODE || reportingMode === CMCD_EVENT_MODE;
+	const needsTimestamp = reportingMode === CMCD_EVENT_MODE;
 	if (needsTimestamp && !keys.includes('ts')) {
 		keys.push('ts');
 	}
