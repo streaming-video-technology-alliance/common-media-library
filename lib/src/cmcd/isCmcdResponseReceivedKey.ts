@@ -1,8 +1,5 @@
-import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.js';
-import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.js';
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.js';
 import type { CmcdResponse } from './CmcdResponse.js';
-import { isCmcdCustomKey } from './isCmcdCustomKey.js';
 
 /**
  * Check if a key is a valid CMCD response key.
@@ -16,8 +13,8 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
  * @beta
  *
  * @example
- * {@includeCode ../../test/cmcd/isCmcdResponseKey.test.ts#example}
+ * {@includeCode ../../test/cmcd/isCmcdResponseReceivedKey.test.ts#example}
  */
-export function isCmcdResponseKey(key: string): key is keyof CmcdResponse {
+export function isCmcdResponseReceivedKey(key: string): key is keyof CmcdResponse {
 	return CMCD_RESPONSE_KEYS.includes(key as any);
 }

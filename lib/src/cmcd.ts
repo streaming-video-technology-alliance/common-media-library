@@ -63,7 +63,7 @@ export { groupCmcdHeaders } from './cmcd/groupCmcdHeaders.js';
 export { isCmcdCustomKey } from './cmcd/isCmcdCustomKey.js';
 export { isCmcdEventKey } from './cmcd/isCmcdEventKey.js';
 export { isCmcdRequestKey } from './cmcd/isCmcdRequestKey.js';
-export { isCmcdResponseKey } from './cmcd/isCmcdResponseKey.js';
+export { isCmcdResponseReceivedKey } from './cmcd/isCmcdResponseReceivedKey.js';
 export { isCmcdV1Key } from './cmcd/isCmcdV1Key.js';
 export { prepareCmcdData } from './cmcd/prepareCmcdData.js';
 export { toCmcdHeaders } from './cmcd/toCmcdHeaders.js';

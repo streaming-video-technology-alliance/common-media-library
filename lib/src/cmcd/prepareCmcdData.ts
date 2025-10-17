@@ -10,7 +10,7 @@ import type { CmcdFormatterOptions } from './CmcdFormatterOptions.js';
 import type { CmcdValue } from './CmcdValue.js';
 import { isCmcdEventKey } from './isCmcdEventKey.js';
 import { isCmcdRequestKey } from './isCmcdRequestKey.js';
-import { isCmcdResponseKey } from './isCmcdResponseKey.js';
+import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.js';
 import { isCmcdV1Key } from './isCmcdV1Key.js';
 
 const filterMap = {
@@ -41,7 +41,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	if (!options.events || !options.events.includes('rr')){
 		const remainingObj = Object.fromEntries(
-			Object.entries(obj).filter(([key]) => !isCmcdResponseKey(key)),
+			Object.entries(obj).filter(([key]) => !isCmcdResponseReceivedKey(key)),
 		);
 		obj = remainingObj;
 	}
