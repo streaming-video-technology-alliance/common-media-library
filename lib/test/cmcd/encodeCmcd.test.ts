@@ -81,8 +81,8 @@ describe('encodeCmcd', () => {
 		it('returns encoded string for response received', () => {
 			const input = Object.assign({}, CMCD_INPUT);
 			input.e = CmcdEventType.RESPONSE_RECEIVED;
+			
 			const output = CMCD_STRING_RESPONSE.replace(/e=[a-z]+/, 'e=rr');
-
 			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), output);
 		});
 
