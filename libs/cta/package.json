@@ -55,6 +55,6 @@
 	},
 	"peerDependencies": {
 		"@svta/cml-utils": "*",
-		"@svta/cml-structuredfield": "*"
+		"@svta/cml-structured-field-values": "*"
 	}
 }
