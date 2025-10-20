@@ -10,7 +10,7 @@ import { CMCD_STRING_EVENT } from './data/CMCD_STRING_EVENT.ts';
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts';
 import { CMCD_STRING_RESPONSE } from './data/CMCD_STRING_RESPONSE.ts';
 import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts';
-import { CmcdEventType } from '../../src/cmcd.ts';
+import { CmcdEventType } from '@svta/common-media-library/cmcd';
 
 describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
