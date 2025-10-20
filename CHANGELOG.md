@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.18.2] - 2025-10-20
+
+### Changed
+
+- Removed `response mode` from CMCD encoding
+- Added `response received` event and filtering
+
 ## [0.18.1] - 2025-10-01
 
 ### Fixed
