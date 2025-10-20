@@ -1,5 +1,6 @@
 import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.js';
 import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.js';
+import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.js';
 import type { CmcdEvent } from './CmcdEvent.js';
 import { isCmcdCustomKey } from './isCmcdCustomKey.js';
 
@@ -20,5 +21,6 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.js';
 export function isCmcdEventKey(key: string): key is keyof CmcdEvent {
 	return CMCD_COMMON_KEYS.includes(key as any) ||
 		CMCD_EVENT_KEYS.includes(key as any) ||
+		CMCD_RESPONSE_KEYS.includes(key as any) ||
 		isCmcdCustomKey(key as any);
 }
