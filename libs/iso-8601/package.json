@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-iso-8601",
-	"version": "1.0.0",
+	"version": "0.21.0",
 	"description": "ISO 8601 date/time handling functionality",
 	"license": "Apache-2.0",
 	"type": "module",
