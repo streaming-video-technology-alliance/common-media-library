@@ -76,5 +76,5 @@ const needsPublish = await Promise.all(
 
 // Publish the packages
 for (const folder of needsPublish) {
-	await cmd(`npm publish --provenance --access public -w ${folder} --dry-run`)
+	await cmd(`npm publish --provenance --access public -w ${folder}`)
 }
