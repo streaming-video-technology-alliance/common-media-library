@@ -294,20 +294,12 @@ export function mapSegmentTemplate(representation: Representation, duration: num
 
 // @alpha
 export type MediaGroups = {
-    AUDIO: {
-        [key: string]: {
-            [key: string]: {
-                language: string;
-            };
-        };
-    };
-    SUBTITLES: {
-        [key: string]: {
-            [key: string]: {
-                language: string;
-            };
-        };
-    };
+    AUDIO: Record<string, Record<string, {
+        language: string;
+    }>>;
+    SUBTITLES: Record<string, Record<string, {
+        language: string;
+    }>>;
 };
 
 // Warning: (ae-internal-missing-underscore) The name "numberToIso8601Duration" should be prefixed with an underscore because the declaration is marked as @internal

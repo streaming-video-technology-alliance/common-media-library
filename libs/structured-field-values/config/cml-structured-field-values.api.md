@@ -181,10 +181,7 @@ export function serializeString(value: string): string;
 // Warning: (ae-internal-missing-underscore) The name "serializeToken" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
-export function serializeToken(token: symbol): string;
-
-// @internal (undocumented)
-export function serializeToken(token: SfToken): string;
+export function serializeToken(token: symbol | SfToken): string;
 
 // @beta
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;

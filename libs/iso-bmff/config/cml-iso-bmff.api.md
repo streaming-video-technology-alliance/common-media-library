@@ -14,8 +14,8 @@ export type AudioRenderingIndicationBox = FullBox & {
 };
 
 // @beta
-export type AudioSampleEntryBox<T extends "mp4a" | "enca" = "mp4a" | "enca"> = SampleEntryBox & {
-    type: T;
+export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> = SampleEntryBox & {
+    type: T$1;
     reserved2: number[];
     channelcount: number;
     samplesize: number;
@@ -47,7 +47,7 @@ export type Box = {
 };
 
 // @beta
-export type BoxFilter<T extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T);
+export type BoxFilter<T$1 extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T$1);
 
 // @beta
 export type BoxParser<V = IsoBox> = (view: IsoView, config?: IsoViewConfig) => Fields<V>;
@@ -91,8 +91,8 @@ export type CompositionTimeToSampleEntry = {
 };
 
 // @beta
-export type ContainerBox<T> = Box & {
-    boxes: Array<T>;
+export type ContainerBox<T$1> = Box & {
+    boxes: T$1[];
 };
 
 // @beta
@@ -126,7 +126,7 @@ export type DataInformationBox = ContainerBox<DataReferenceBox> & {
 export type DataReferenceBox = FullBox & {
     type: "dref";
     entryCount: number;
-    entries: Array<DataEntryUrlBox | DataEntryUrnBox>;
+    entries: (DataEntryUrlBox | DataEntryUrnBox)[];
 };
 
 // @beta
@@ -217,29 +217,29 @@ export type ExtendedLanguageBox = FullBox & {
 };
 
 // @beta
-export type Fields<T> = Omit<T, Exclude<keyof Box, "data"> | "boxes">;
+export type Fields<T$1> = Omit<T$1, Exclude<keyof Box, "data"> | "boxes">;
 
 // @beta
 export type FileTypeBox = TypeBox<"ftyp">;
 
 // @beta
-export function filterBoxes<T extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T>, config?: IsoViewConfig): T[];
+export function filterBoxes<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T$1>, config?: IsoViewConfig): T$1[];
 
 // @beta
-export function filterBoxesByType<T extends keyof IsoBmffBoxMap>(raw: IsoData, type: T | T[], config?: IsoViewConfig): IsoBmffBoxMap[T][];
+export function filterBoxesByType<T$1 extends keyof IsoBmffBoxMap>(raw: IsoData, type: T$1 | T$1[], config?: IsoViewConfig): IsoBmffBoxMap[T$1][];
 
 // @beta
-export function findBox<T extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T>, config?: IsoViewConfig): T | null;
+export function findBox<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T$1>, config?: IsoViewConfig): T$1 | null;
 
 // @beta
-export function findBoxByType<T extends keyof IsoBmffBoxMap>(raw: IsoData, type: T, config?: IsoViewConfig): IsoBmffBoxMap[T] | null;
+export function findBoxByType<T$1 extends keyof IsoBmffBoxMap>(raw: IsoData, type: T$1, config?: IsoViewConfig): IsoBmffBoxMap[T$1] | null;
 
 // @beta
 export function free(view: IsoView): Fields<FreeSpaceBox>;
 
 // @beta
-export type FreeSpaceBox<T extends "free" | "skip" = "free"> = Box & {
-    type: T;
+export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = Box & {
+    type: T$1;
     data: Uint8Array;
 };
 
@@ -1122,8 +1122,8 @@ export function trex(view: IsoView): Fields<TrackExtendsBox>;
 export function trun(view: IsoView): Fields<TrackRunBox>;
 
 // @beta
-export type TypeBox<T> = Box & {
-    type: T;
+export type TypeBox<T$1> = Box & {
+    type: T$1;
     majorBrand: string;
     minorVersion: number;
     compatibleBrands: string[];
@@ -1167,8 +1167,8 @@ export type VideoMediaHeaderBox = FullBox & {
 };
 
 // @beta
-export type VisualSampleEntryBox<T extends "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv"> = SampleEntryBox & {
-    type: T;
+export type VisualSampleEntryBox<T$1 extends "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv"> = SampleEntryBox & {
+    type: T$1;
     preDefined1: number;
     reserved2: number;
     preDefined2: number[];
