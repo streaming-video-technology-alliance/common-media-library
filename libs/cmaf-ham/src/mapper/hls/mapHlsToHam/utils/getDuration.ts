@@ -2,8 +2,6 @@ import type { HlsManifest } from '../../../../types/mapper/hls/HlsManifest.ts'
 import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.ts'
 
 /**
- * @internal
- *
  * Calculate the duration of a track.
  *
  * `target duration * number of segments`

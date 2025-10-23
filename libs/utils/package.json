@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-utils",
-	"version": "0.21.0",
+	"version": "0.22.0",
 	"description": "Common utility functions for media processing",
 	"license": "Apache-2.0",
 	"type": "module",

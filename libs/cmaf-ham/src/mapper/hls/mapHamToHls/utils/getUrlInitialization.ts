@@ -7,8 +7,6 @@ import {
 } from '../../../../utils/constants.ts'
 
 /**
- * @internal
- *
  * Get url initialization from ham track.
  *
  * @param track - Track to get the url initialization from

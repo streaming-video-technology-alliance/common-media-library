@@ -1,8 +1,6 @@
 import type { Byterange } from '../../../../types/mapper/hls/Byterange.ts'
 
 /**
- * @internal
- *
  * Get byterange from HLS Manifest.
  *
  * @param byteRange - Byterange object containing length and offset

@@ -1,6 +1,4 @@
 /**
- * @internal
- *
  * Get the codec for a type of content.
  *
  * @param type - Type of the content to get the codecs from

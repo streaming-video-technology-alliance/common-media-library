@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-webvtt",
-	"version": "0.21.0",
+	"version": "0.22.0",
 	"description": "WebVTT parsing and rendering functionality",
 	"license": "Apache-2.0",
 	"type": "module",

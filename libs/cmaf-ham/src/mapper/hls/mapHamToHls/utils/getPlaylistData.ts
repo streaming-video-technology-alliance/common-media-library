@@ -5,8 +5,6 @@ import { encodeByteRange } from './encodeByteRange.ts'
 import { getUrlInitialization } from './getUrlInitialization.ts'
 
 /**
- * @internal
- *
  * Get the playlist data in hls format from ham track.
  *
  * @param track - Track to get the playlist data from

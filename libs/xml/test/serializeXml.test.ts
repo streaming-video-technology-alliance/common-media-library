@@ -1,8 +1,8 @@
-import { encodeXml } from '@svta/cml-xml'
+import { serializeXml } from '@svta/cml-xml'
 import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 
-describe('encodeXml', () => {
+describe('serializeXml', () => {
 	it('provides a valid example', async () => {
 		//#region example
 		const xml = {
@@ -48,7 +48,7 @@ describe('encodeXml', () => {
 			],
 		}
 
-		equal(encodeXml(xml), '<?xml version="1.0" encoding="UTF-8"?><root><child hello="world">text</child><ns:tag>content</ns:tag></root>')
+		equal(serializeXml(xml), '<?xml version="1.0" encoding="UTF-8"?><root><child hello="world">text</child><ns:tag>content</ns:tag></root>')
 		//#endregion example
 	})
 })

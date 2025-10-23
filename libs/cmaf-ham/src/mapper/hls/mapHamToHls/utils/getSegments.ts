@@ -8,8 +8,6 @@ import {
 } from '../../../../utils/constants.ts'
 
 /**
- * @internal
- *
  * Format the ham segments to hls.
  *
  * @param segments - Segments to be formatted

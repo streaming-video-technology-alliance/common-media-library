@@ -23,6 +23,6 @@
 		"includeGroups": true
 	},
 	"out": "./dist",
-	"readme": "../libs/common-media-library/README.md",
+	"readme": "../README.md",
 	"searchInComments": true
 }

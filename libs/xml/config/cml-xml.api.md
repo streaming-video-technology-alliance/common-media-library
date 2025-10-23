@@ -5,16 +5,13 @@
 ```ts
 
 // @beta
-export function decodeXml(input: string, options?: XmlParseOptions): XmlNode;
-
-// @beta
 export function encodeXml(xml: XmlNode): string;
 
 // @beta
 export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
 
-// @beta @deprecated
-export const parseXml: typeof decodeXml;
+// @beta
+export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
 
 // @beta
 export type XmlNode = {

@@ -7,8 +7,6 @@ import {
 } from '../../../../utils/constants.ts'
 
 /**
- * @internal
- *
  * Get the byterange in hls format from ham track.
  *
  * @param track - Track to get the byterange from

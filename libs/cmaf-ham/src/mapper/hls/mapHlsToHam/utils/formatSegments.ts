@@ -4,8 +4,6 @@ import type { Segment } from '../../../../types/model/Segment.ts'
 import { decodeByteRange } from './decodeByteRange.ts'
 
 /**
- * @internal
- *
  * Format the hls segments into the ham segments.
  *
  * @param segments - List of HLS segments

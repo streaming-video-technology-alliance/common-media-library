@@ -1,6 +1,6 @@
 {
 	"extends": "../tsconfig.json",
 	"include": [
-		"../libs/common-media-library/src/index.ts"
+		"../libs/**/*.ts"
 	]
 }
