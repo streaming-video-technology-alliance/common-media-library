@@ -9,13 +9,13 @@ import type { XmlNode } from './XmlNode.ts'
  * @beta
  *
  * @example
- * {@includeCode ../test/decodeXml.test.ts#example}
+ * {@includeCode ../test/serializeXml.test.ts#example}
  */
-export function encodeXml(xml: XmlNode): string {
+export function serializeXml(xml: XmlNode): string {
 	const { nodeName, attributes, childNodes } = xml
 
 	if (nodeName === '#document') {
-		return `<?xml version="1.0" encoding="UTF-8"?>${encodeXml(childNodes[0])}`
+		return `<?xml version="1.0" encoding="UTF-8"?>${serializeXml(childNodes[0])}`
 	}
 
 	if (nodeName === '#text') {
@@ -36,7 +36,7 @@ export function encodeXml(xml: XmlNode): string {
 
 	if (childCount) {
 		for (let i = 0; i < childCount; i++) {
-			children += encodeXml(childNodes[i])
+			children += serializeXml(childNodes[i])
 		}
 	}
 
