@@ -1,0 +1,58 @@
+{
+	"name": "@svta/cml-webvtt",
+	"version": "0.22.0",
+	"description": "WebVTT parsing and rendering functionality",
+	"license": "Apache-2.0",
+	"type": "module",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/webvtt",
+	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
+	},
+	"bugs": {
+		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org",
+		"provenance": true,
+		"scope": "svta"
+	},
+	"files": [
+		"dist/**/*",
+		"NOTICE"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"keywords": [
+		"Common Media Library",
+		"CML",
+		"WebVTT",
+		"VTT",
+		"subtitles",
+		"captions"
+	],
+	"scripts": {
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24",
+			"onFail": "error"
+		}
+	},
+	"peerDependencies": {
+		"@svta/cml-utils": "*"
+	}
+}
