@@ -8,11 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-10-24
+## [0.22.0] - 2025-10-24
 
 ### Changed
 
 - Move content-steering into its own package: `@svta/cml-content-steering` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v1.0.0...HEAD
-

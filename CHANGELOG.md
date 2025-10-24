@@ -13,16 +13,13 @@ and this project adheres to
 ### Added
 
 - Add `@svta/cml-608` package
-- Add `@svta/cml-cmaf-ham` package
 - Add `@svta/cml-cmcd` package
 - Add `@svta/cml-cmsd` package
-- Add `@svta/cml-content-steering` package
 - Add `@svta/cml-cta` package
 - Add `@svta/cml-dash` package
 - Add `@svta/cml-drm` package
 - Add `@svta/cml-id3` package
 - Add `@svta/cml-iso-8601` package
-- Add `@svta/cml-iso-bmff` package
 - Add `@svta/cml-request` package
 - Add `@svta/cml-structured-field-values` package
 - Add `@svta/cml-throughput` package

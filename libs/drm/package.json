@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-drm",
-	"version": "0.22.0",
+	"version": "1.0.0",
 	"description": "Digital Rights Management (DRM) functionality",
 	"license": "Apache-2.0",
 	"type": "module",

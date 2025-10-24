@@ -5,13 +5,13 @@
 ```ts
 
 // @beta
-export function encodeXml(xml: XmlNode): string;
-
-// @beta
 export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
 
 // @beta
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
+
+// @beta
+export function serializeXml(xml: XmlNode): string;
 
 // @beta
 export type XmlNode = {
