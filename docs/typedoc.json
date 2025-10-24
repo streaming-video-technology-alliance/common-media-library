@@ -1,11 +1,18 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
-	"categorizeByGroup": true,
+	"alwaysCreateEntryPointModule": false,
+	"groupReferencesByType": false,
 	"cleanOutputDir": true,
 	"customCss": "./styles.css",
+	"entryPointStrategy": "packages",
 	"entryPoints": [
-		"../lib/src/index.ts"
+		"../libs/*"
 	],
+	"packageOptions": {
+		"entryPoints": [
+			"src/index.ts"
+		]
+	},
 	"excludeInternal": true,
 	"excludePrivate": true,
 	"hideGenerator": true,
@@ -16,6 +23,6 @@
 		"includeGroups": true
 	},
 	"out": "./dist",
-	"readme": "../lib/README.md",
+	"readme": "../README.md",
 	"searchInComments": true
 }

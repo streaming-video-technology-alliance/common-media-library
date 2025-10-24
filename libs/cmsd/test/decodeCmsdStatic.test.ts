@@ -1,0 +1,22 @@
+import { decodeCmsdStatic } from '@svta/cml-cmsd'
+import { deepEqual } from 'node:assert'
+import { describe, it } from 'node:test'
+import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.ts'
+import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.ts'
+
+describe('decodeCmsdStatic', () => {
+	it('handles null data object', () => {
+		// @ts-expect-error - This is a test
+		deepEqual(decodeCmsdStatic(undefined), {})
+		// @ts-expect-error - This is a test
+		deepEqual(decodeCmsdStatic(null), {})
+	})
+
+	it('handles empty string', () => {
+		deepEqual(decodeCmsdStatic(''), {})
+	})
+
+	it('returns encoded string', () => {
+		deepEqual(decodeCmsdStatic(CMSD_STATIC_STRING), CMSD_STATIC_OBJ)
+	})
+})
