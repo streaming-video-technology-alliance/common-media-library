@@ -8,29 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-10-24
-
-### Added
-
-- Add `@svta/cml-608` package
-- Add `@svta/cml-cmcd` package
-- Add `@svta/cml-cmsd` package
-- Add `@svta/cml-cta` package
-- Add `@svta/cml-dash` package
-- Add `@svta/cml-drm` package
-- Add `@svta/cml-id3` package
-- Add `@svta/cml-iso-8601` package
-- Add `@svta/cml-request` package
-- Add `@svta/cml-structured-field-values` package
-- Add `@svta/cml-throughput` package
-- Add `@svta/cml-utils` package
-- Add `@svta/cml-webvtt` package
-- Add `@svta/cml-xml` package
-
-### Changed
-
-- Move all features into their own packages ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
-
 ## [0.18.1] - 2025-10-01
 
 ### Fixed
@@ -433,7 +410,6 @@ and this project adheres to
 - Bootstrap project ([#2](https://github.com/streaming-video-technology-alliance/common-media-library/issues/2))
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.1...v1.0.0
 [0.18.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.4...v0.18.0
 [0.17.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.17.3...v0.17.4

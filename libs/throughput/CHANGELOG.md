@@ -12,7 +12,8 @@ and this project adheres to
 
 ### Changed
 
-- Move throughput into its own package: `@svta/cml-throughput` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
+- Remove CommonJS exports ([#192](https://github.com/streaming-video-technology-alliance/common-media-library/issues/192))
+- Move cmcd into its own package: `@svta/cml-cmcd` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
+- Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v1.0.0...HEAD
-
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.0...HEAD

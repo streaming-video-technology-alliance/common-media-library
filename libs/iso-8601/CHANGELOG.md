@@ -12,7 +12,8 @@ and this project adheres to
 
 ### Changed
 
-- Move iso-8601 into its own package: `@svta/cml-iso-8601` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
+- Remove CommonJS exports ([#192](https://github.com/streaming-video-technology-alliance/common-media-library/issues/192))
+- Move cmcd into its own package: `@svta/cml-cmcd` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
+- Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v1.0.0...HEAD
-
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-8601-v1.0.0...HEAD

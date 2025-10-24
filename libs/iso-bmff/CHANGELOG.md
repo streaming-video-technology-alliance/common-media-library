@@ -8,10 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [0.22.0] - 2025-10-24
+## [0.23.0] - 2025-10-24
 
 ### Changed
 
-- Move iso-bmff into its own package: `@svta/cml-iso-bmff` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
+- Remove CommonJS exports ([#192](https://github.com/streaming-video-technology-alliance/common-media-library/issues/192))
+- Move cmcd into its own package: `@svta/cml-cmcd` ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
+- Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/v0.20.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v0.23.0...HEAD

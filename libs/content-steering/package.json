@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-content-steering",
-	"version": "0.22.0",
+	"version": "0.23.0",
 	"description": "Content steering functionality",
 	"license": "Apache-2.0",
 	"type": "module",
