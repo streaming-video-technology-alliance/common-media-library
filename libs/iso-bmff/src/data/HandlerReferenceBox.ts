@@ -11,25 +11,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
  */
 export class HandlerReferenceBox extends FullBox {
-	preDefined: number
-	handlerType: string
-	reserved: number[]
-	name: string
-
-	constructor(
-		version: number,
-		flags: number,
-		preDefined: number,
-		handlerType: string,
-		reserved: number[],
-		name: string
-	) {
-		super('hdlr', version, flags)
-		this.preDefined = preDefined
-		this.handlerType = handlerType
-		this.reserved = reserved
-		this.name = name
-	}
+	static readonly type = 'hdlr'
 
 	/**
 	 * Reads a HandlerReferenceBox from an IsoView
@@ -57,40 +39,66 @@ export class HandlerReferenceBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: HandlerReferenceBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write preDefined (4 bytes)
-		writeUint(dataView, cursor, 4, this.preDefined)
+		writeUint(dataView, cursor, 4, box.preDefined)
 		cursor += 4
 
 		// Write handlerType (4 bytes)
-		writeString(dataView, cursor, 4, this.handlerType)
+		writeString(dataView, cursor, 4, box.handlerType)
 		cursor += 4
 
 		// Write reserved
-		for (let i = 0; i < this.reserved.length; i++) {
-			writeUint(dataView, cursor, 4, this.reserved[i])
+		for (let i = 0; i < box.reserved.length; i++) {
+			writeUint(dataView, cursor, 4, box.reserved[i])
 			cursor += 4
 		}
 
 		// Write name (null-terminated string)
-		writeTerminatedString(dataView, cursor, this.name)
-		const nameBytes = encodeText(this.name)
+		writeTerminatedString(dataView, cursor, box.name)
+		const nameBytes = encodeText(box.name)
 		cursor += nameBytes.length + 1
 
 		return cursor - bufferOffset
 	}
-}
 
+	preDefined: number
+	handlerType: string
+	reserved: number[]
+	name: string
+
+	constructor(
+		version: number,
+		flags: number,
+		preDefined: number,
+		handlerType: string,
+		reserved: number[],
+		name: string
+	) {
+		super('hdlr', version, flags)
+		this.preDefined = preDefined
+		this.handlerType = handlerType
+		this.reserved = reserved
+		this.name = name
+	}
+
+	override get size(): number {
+		const nameBytes = encodeText(this.name)
+		const nameSize = nameBytes.length + 1 // null-terminated
+		// 8 (box header) + 4 (FullBox) + 4 + 4 + (reserved.length * 4) + nameSize
+		return 20 + (this.reserved.length * 4) + nameSize
+	}
+}

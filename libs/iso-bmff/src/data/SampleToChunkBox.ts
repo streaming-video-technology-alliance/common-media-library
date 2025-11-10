@@ -14,14 +14,7 @@ export type SampleToChunkEntry = {
 }
 
 export class SampleToChunkBox extends FullBox {
-	entryCount: number
-	entries: SampleToChunkEntry[]
-
-	constructor(version: number, flags: number, entryCount: number, entries: SampleToChunkEntry[] = []) {
-		super('stsc', version, flags)
-		this.entryCount = entryCount
-		this.entries = entries
-	}
+	static readonly type = 'stsc'
 
 	/**
 	 * Reads a SampleToChunkBox from an IsoView
@@ -49,26 +42,26 @@ export class SampleToChunkBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.6.4 Sample to Chunk Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: SampleToChunkBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, this.entryCount)
+		writeUint(dataView, cursor, 4, box.entryCount)
 		cursor += 4
 
 		// Write entries
-		for (const entry of this.entries) {
+		for (const entry of box.entries) {
 			writeUint(dataView, cursor, 4, entry.firstChunk)
 			cursor += 4
 			writeUint(dataView, cursor, 4, entry.samplesPerChunk)
@@ -79,5 +72,18 @@ export class SampleToChunkBox extends FullBox {
 
 		return cursor - bufferOffset
 	}
-}
 
+	entryCount: number
+	entries: SampleToChunkEntry[]
+
+	constructor(version: number, flags: number, entryCount: number, entries: SampleToChunkEntry[] = []) {
+		super('stsc', version, flags)
+		this.entryCount = entryCount
+		this.entries = entries
+	}
+
+	override get size(): number {
+		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (entries.length * 12)
+		return 16 + (this.entries.length * 12)
+	}
+}

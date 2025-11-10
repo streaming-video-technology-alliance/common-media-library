@@ -13,14 +13,7 @@ export type DecodingTimeSample = {
 }
 
 export class DecodingTimeToSampleBox extends FullBox {
-	entryCount: number
-	entries: DecodingTimeSample[]
-
-	constructor(version: number, flags: number, entryCount: number, entries: DecodingTimeSample[] = []) {
-		super('stts', version, flags)
-		this.entryCount = entryCount
-		this.entries = entries
-	}
+	static readonly type = 'stts'
 
 	/**
 	 * Reads a DecodingTimeToSampleBox from an IsoView
@@ -47,26 +40,26 @@ export class DecodingTimeToSampleBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.6.1.2 Decoding Time To Sample Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: DecodingTimeToSampleBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, this.entryCount)
+		writeUint(dataView, cursor, 4, box.entryCount)
 		cursor += 4
 
 		// Write entries
-		for (const entry of this.entries) {
+		for (const entry of box.entries) {
 			writeUint(dataView, cursor, 4, entry.sampleCount)
 			cursor += 4
 			writeUint(dataView, cursor, 4, entry.sampleDelta)
@@ -75,5 +68,18 @@ export class DecodingTimeToSampleBox extends FullBox {
 
 		return cursor - bufferOffset
 	}
-}
 
+	entryCount: number
+	entries: DecodingTimeSample[]
+
+	constructor(version: number, flags: number, entryCount: number, entries: DecodingTimeSample[] = []) {
+		super('stts', version, flags)
+		this.entryCount = entryCount
+		this.entries = entries
+	}
+
+	override get size(): number {
+		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (entries.length * 8)
+		return 16 + (this.entries.length * 8)
+	}
+}

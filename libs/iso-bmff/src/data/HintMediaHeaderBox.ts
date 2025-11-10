@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.4.5.5 Hint Media Header Box
  */
 export class HintMediaHeaderBox extends FullBox {
+	static readonly type = 'hmhd'
 	maxPDUsize: number
 	avgPDUsize: number
 	maxbitrate: number
@@ -29,4 +30,3 @@ export class HintMediaHeaderBox extends FullBox {
 		return 24
 	}
 }
-

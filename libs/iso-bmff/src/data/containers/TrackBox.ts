@@ -9,6 +9,7 @@ import type { UserDataBox } from './UserDataBox.ts'
  * Track Box - 'trak' - Container
  */
 export class TrackBox extends ContainerBox<TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox> {
+	static readonly type = 'trak'
 	constructor(boxes: (TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox)[] = []) {
 		super('trak', boxes)
 	}

@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Decode Time
  */
 export class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
+	static readonly type = 'tfdt'
 	baseMediaDecodeTime: number
 
 	constructor(version: number, flags: number, baseMediaDecodeTime: number) {
@@ -17,4 +18,3 @@ export class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
 		return 12 + timeSize
 	}
 }
-

@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.12.5 Scheme Type Box
  */
 export class SchemeTypeBox extends FullBox {
+	static readonly type = 'schm'
 	schemeType: number
 	schemeVersion: number
 	schemeUri?: string
@@ -27,4 +28,3 @@ export class SchemeTypeBox extends FullBox {
 		return size
 	}
 }
-

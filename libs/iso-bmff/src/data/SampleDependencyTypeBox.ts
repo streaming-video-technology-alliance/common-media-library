@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.6.4.1 Sample Dependency Type box
  */
 export class SampleDependencyTypeBox extends FullBox {
+	static readonly type = 'sdtp'
 	sampleDependencyTable: number[]
 
 	constructor(version: number, flags: number, sampleDependencyTable: number[] = []) {
@@ -16,4 +17,3 @@ export class SampleDependencyTypeBox extends FullBox {
 		return 12 + this.sampleDependencyTable.length
 	}
 }
-

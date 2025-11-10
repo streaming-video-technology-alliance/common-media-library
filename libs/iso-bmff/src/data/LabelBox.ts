@@ -10,18 +10,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:202x - 8.10.5 Label box
  */
 export class LabelBox extends FullBox {
-	isGroupLabel: boolean
-	labelId: number
-	language: string
-	label: string
-
-	constructor(version: number, flags: number, isGroupLabel: boolean, labelId: number, language: string, label: string) {
-		super('labl', version, flags)
-		this.isGroupLabel = isGroupLabel
-		this.labelId = labelId
-		this.language = language
-		this.label = label
-	}
+	static readonly type = 'labl'
 
 	/**
 	 * Reads a LabelBox from an IsoView
@@ -49,39 +38,58 @@ export class LabelBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:202x - 8.10.5 Label box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: LabelBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write isGroupLabel (1 byte) - stored as boolean, written as 0 or 1
-		writeUint(dataView, cursor, 1, this.isGroupLabel ? 1 : 0)
+		writeUint(dataView, cursor, 1, box.isGroupLabel ? 1 : 0)
 		cursor += 1
 
 		// Write labelId (4 bytes based on size calculation, though parser reads 2)
-		writeUint(dataView, cursor, 4, this.labelId)
+		writeUint(dataView, cursor, 4, box.labelId)
 		cursor += 4
 
 		// Write language (null-terminated string)
-		writeTerminatedString(dataView, cursor, this.language)
-		const languageBytes = encodeText(this.language)
+		writeTerminatedString(dataView, cursor, box.language)
+		const languageBytes = encodeText(box.language)
 		cursor += languageBytes.length + 1
 
 		// Write label (null-terminated string)
-		writeTerminatedString(dataView, cursor, this.label)
-		const labelBytes = encodeText(this.label)
+		writeTerminatedString(dataView, cursor, box.label)
+		const labelBytes = encodeText(box.label)
 		cursor += labelBytes.length + 1
 
 		return cursor - bufferOffset
 	}
-}
 
+	isGroupLabel: boolean
+	labelId: number
+	language: string
+	label: string
+
+	constructor(version: number, flags: number, isGroupLabel: boolean, labelId: number, language: string, label: string) {
+		super('labl', version, flags)
+		this.isGroupLabel = isGroupLabel
+		this.labelId = labelId
+		this.language = language
+		this.label = label
+	}
+
+	override get size(): number {
+		const languageBytes = encodeText(this.language)
+		const labelBytes = encodeText(this.label)
+		// 8 (box header) + 4 (FullBox) + 1 + 4 + languageBytes.length + 1 + labelBytes.length + 1
+		return 8 + 4 + 1 + 4 + languageBytes.length + 1 + labelBytes.length + 1
+	}
+}

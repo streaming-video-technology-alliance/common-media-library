@@ -5,6 +5,7 @@ import { Box } from '../Box.ts'
  * Item Reference Box - 'iref' - Container
  */
 export class ItemReferenceBox extends ContainerBox<Box> {
+	static readonly type = 'iref'
 	constructor(boxes: Box[] = []) {
 		super('iref', boxes)
 	}

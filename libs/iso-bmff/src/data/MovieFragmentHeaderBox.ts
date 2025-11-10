@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.8.5 Movie Fragment Header Box
  */
 export class MovieFragmentHeaderBox extends FullBox {
+	static readonly type = 'mfhd'
 	sequenceNumber: number
 
 	constructor(version: number, flags: number, sequenceNumber: number) {
@@ -16,4 +17,3 @@ export class MovieFragmentHeaderBox extends FullBox {
 		return 16
 	}
 }
-

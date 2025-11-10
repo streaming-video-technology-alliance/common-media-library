@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.8.11 Movie Fragment Random Access Box
  */
 export class MovieFragmentRandomAccessOffsetBox extends FullBox {
+	static readonly type = 'mfro'
 	mfraSize: number
 
 	constructor(version: number, flags: number, mfraSize: number) {
@@ -16,4 +17,3 @@ export class MovieFragmentRandomAccessOffsetBox extends FullBox {
 		return 16
 	}
 }
-

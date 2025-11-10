@@ -6,6 +6,7 @@ import type { TrackFragmentRandomAccessBox } from '../TrackFragmentRandomAccessB
  * Movie Fragment Random Access Box - 'mfra' - Container
  */
 export class MovieFragmentRandomAccessBox extends ContainerBox<TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox> {
+	static readonly type = 'mfra'
 	constructor(boxes: (TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox)[] = []) {
 		super('mfra', boxes)
 	}

@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.7.1.1 Chunk Large Offset Box
  */
 export class ChunkLargeOffsetBox extends FullBox {
+	static readonly type = 'co64'
 	entryCount: number
 	chunkOffset: number[]
 

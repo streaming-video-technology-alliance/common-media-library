@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.4.5.4 Null Media Header Box
  */
 export class NullMediaHeaderBox extends FullBox {
+	static readonly type = 'nmhd'
 	constructor(version: number, flags: number) {
 		super('nmhd', version, flags)
 	}
@@ -13,4 +14,3 @@ export class NullMediaHeaderBox extends FullBox {
 		return 12
 	}
 }
-

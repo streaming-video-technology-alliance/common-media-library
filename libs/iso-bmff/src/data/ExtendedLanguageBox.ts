@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:202x - 8.4.6 Extended language tag
  */
 export class ExtendedLanguageBox extends FullBox {
+	static readonly type = 'elng'
 	extendedLanguage: string
 
 	constructor(version: number, flags: number, extendedLanguage: string) {
@@ -18,4 +19,3 @@ export class ExtendedLanguageBox extends FullBox {
 		return 12 + langBytes.length
 	}
 }
-

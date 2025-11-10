@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time
  */
 export class ProducerReferenceTimeBox extends FullBox {
+	static readonly type = 'prft'
 	referenceTrackId: number
 	ntpTimestampSec: number
 	ntpTimestampFrac: number
@@ -30,4 +31,3 @@ export class ProducerReferenceTimeBox extends FullBox {
 		return 24 + timeSize
 	}
 }
-

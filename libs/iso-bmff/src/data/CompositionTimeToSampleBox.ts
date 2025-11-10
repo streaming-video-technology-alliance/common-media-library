@@ -13,14 +13,7 @@ export type CompositionTimeToSampleEntry = {
 }
 
 export class CompositionTimeToSampleBox extends FullBox {
-	entryCount: number
-	entries: CompositionTimeToSampleEntry[]
-
-	constructor(version: number, entryCount: number, entries: CompositionTimeToSampleEntry[] = []) {
-		super('ctts', version, 0)
-		this.entryCount = entryCount
-		this.entries = entries
-	}
+	static readonly type = 'ctts'
 
 	/**
 	 * Reads a CompositionTimeToSampleBox from an IsoView
@@ -48,26 +41,26 @@ export class CompositionTimeToSampleBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.6.1.3 Composition Time To Sample Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: CompositionTimeToSampleBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, this.entryCount)
+		writeUint(dataView, cursor, 4, box.entryCount)
 		cursor += 4
 
 		// Write entries
-		for (const entry of this.entries) {
+		for (const entry of box.entries) {
 			writeUint(dataView, cursor, 4, entry.sampleCount)
 			cursor += 4
 			writeUint(dataView, cursor, 4, entry.sampleOffset)
@@ -75,6 +68,20 @@ export class CompositionTimeToSampleBox extends FullBox {
 		}
 
 		return cursor - bufferOffset
+	}
+
+	entryCount: number
+	entries: CompositionTimeToSampleEntry[]
+
+	constructor(version: number, entryCount: number, entries: CompositionTimeToSampleEntry[] = []) {
+		super('ctts', version, 0)
+		this.entryCount = entryCount
+		this.entries = entries
+	}
+
+	override get size(): number {
+		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (entries.length * 8)
+		return 16 + (this.entries.length * 8)
 	}
 }
 

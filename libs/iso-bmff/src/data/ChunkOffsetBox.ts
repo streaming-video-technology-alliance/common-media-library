@@ -9,14 +9,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.7.1 Chunk Offset Box
  */
 export class ChunkOffsetBox extends FullBox {
-	entryCount: number
-	chunkOffset: number[]
-
-	constructor(version: number, flags: number, entryCount: number, chunkOffset: number[] = []) {
-		super('stco', version, flags)
-		this.entryCount = entryCount
-		this.chunkOffset = chunkOffset
-	}
+	static readonly type = 'stco'
 
 	/**
 	 * Reads a ChunkOffsetBox from an IsoView
@@ -40,31 +33,44 @@ export class ChunkOffsetBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.7.1 Chunk Offset Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: ChunkOffsetBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, this.entryCount)
+		writeUint(dataView, cursor, 4, box.entryCount)
 		cursor += 4
 
 		// Write chunk offsets
-		for (const offset of this.chunkOffset) {
-			writeUint(dataView, cursor, 4, offset)
+		for (const chunkOffset of box.chunkOffset) {
+			writeUint(dataView, cursor, 4, chunkOffset)
 			cursor += 4
 		}
 
 		return cursor - bufferOffset
 	}
-}
 
+	entryCount: number
+	chunkOffset: number[]
+
+	constructor(version: number, flags: number, entryCount: number, chunkOffset: number[] = []) {
+		super('stco', version, flags)
+		this.entryCount = entryCount
+		this.chunkOffset = chunkOffset
+	}
+
+	override get size(): number {
+		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (chunkOffset.length * 4)
+		return 16 + (this.chunkOffset.length * 4)
+	}
+}

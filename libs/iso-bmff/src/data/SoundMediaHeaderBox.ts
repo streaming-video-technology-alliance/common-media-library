@@ -9,14 +9,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.4.5.3 Sound Media Header Box
  */
 export class SoundMediaHeaderBox extends FullBox {
-	balance: number
-	reserved: number
-
-	constructor(version: number, flags: number, balance: number, reserved: number) {
-		super('smhd', version, flags)
-		this.balance = balance
-		this.reserved = reserved
-	}
+	static readonly type = 'smhd'
 
 	/**
 	 * Reads a SoundMediaHeaderBox from an IsoView
@@ -40,29 +33,42 @@ export class SoundMediaHeaderBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.4.5.3 Sound Media Header Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: SoundMediaHeaderBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write balance (2 bytes, signed)
-		writeInt(dataView, cursor, 2, this.balance)
+		writeInt(dataView, cursor, 2, box.balance)
 		cursor += 2
 
 		// Write reserved (2 bytes)
-		writeUint(dataView, cursor, 2, this.reserved)
+		writeUint(dataView, cursor, 2, box.reserved)
 		cursor += 2
 
 		return cursor - bufferOffset
 	}
-}
 
+	balance: number
+	reserved: number
+
+	constructor(version: number, flags: number, balance: number, reserved: number) {
+		super('smhd', version, flags)
+		this.balance = balance
+		this.reserved = reserved
+	}
+
+	override get size(): number {
+		// 8 (box header) + 4 (FullBox) + 2 (balance) + 2 (reserved)
+		return 16
+	}
+}

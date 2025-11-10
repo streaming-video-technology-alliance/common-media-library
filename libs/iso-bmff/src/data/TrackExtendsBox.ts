@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
  */
 export class TrackExtendsBox extends FullBox {
+	static readonly type = 'trex'
 	trackId: number
 	defaultSampleDescriptionIndex: number
 	defaultSampleDuration: number

@@ -9,16 +9,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.6.3 Sample Size Box
  */
 export class SampleSizeBox extends FullBox {
-	sampleSize: number
-	sampleCount: number
-	entrySize?: number[]
-
-	constructor(version: number, flags: number, sampleSize: number, sampleCount: number, entrySize?: number[]) {
-		super('stsz', version, flags)
-		this.sampleSize = sampleSize
-		this.sampleCount = sampleCount
-		this.entrySize = entrySize
-	}
+	static readonly type = 'stsz'
 
 	/**
 	 * Reads a SampleSizeBox from an IsoView
@@ -52,31 +43,31 @@ export class SampleSizeBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.6.3 Sample Size Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: SampleSizeBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write sampleSize (4 bytes)
-		writeUint(dataView, cursor, 4, this.sampleSize)
+		writeUint(dataView, cursor, 4, box.sampleSize)
 		cursor += 4
 
 		// Write sampleCount (4 bytes)
-		writeUint(dataView, cursor, 4, this.sampleCount)
+		writeUint(dataView, cursor, 4, box.sampleCount)
 		cursor += 4
 
 		// Write entrySize array if sampleSize is 0
-		if (this.sampleSize === 0 && this.entrySize) {
-			for (const entrySize of this.entrySize) {
+		if (box.sampleSize === 0 && box.entrySize) {
+			for (const entrySize of box.entrySize) {
 				writeUint(dataView, cursor, 4, entrySize)
 				cursor += 4
 			}
@@ -84,5 +75,26 @@ export class SampleSizeBox extends FullBox {
 
 		return cursor - bufferOffset
 	}
-}
 
+	sampleSize: number
+	sampleCount: number
+	entrySize?: number[]
+
+	constructor(version: number, flags: number, sampleSize: number, sampleCount: number, entrySize?: number[]) {
+		super('stsz', version, flags)
+		this.sampleSize = sampleSize
+		this.sampleCount = sampleCount
+		this.entrySize = entrySize
+	}
+
+	override get size(): number {
+		// 8 (box header) + 4 (FullBox) + 4 (sampleSize) + 4 (sampleCount) + optional entrySize array
+		let size = 20
+
+		if (this.sampleSize === 0 && this.entrySize) {
+			size += this.entrySize.length * 4
+		}
+
+		return size
+	}
+}

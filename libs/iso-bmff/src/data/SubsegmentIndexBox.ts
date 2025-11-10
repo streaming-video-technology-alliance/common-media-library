@@ -14,6 +14,7 @@ export type Subsegment = {
 }
 
 export class SubsegmentIndexBox extends FullBox {
+	static readonly type = 'ssix'
 	subsegmentCount: number
 	subsegments: Subsegment[]
 
@@ -35,4 +36,3 @@ export class SubsegmentIndexBox extends FullBox {
 		return size
 	}
 }
-

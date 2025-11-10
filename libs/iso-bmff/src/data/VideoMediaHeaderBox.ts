@@ -9,14 +9,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.4.5.2 Video Media Header Box
  */
 export class VideoMediaHeaderBox extends FullBox {
-	graphicsmode: number
-	opcolor: number[]
-
-	constructor(version: number, flags: number, graphicsmode: number, opcolor: number[]) {
-		super('vmhd', version, flags)
-		this.graphicsmode = graphicsmode
-		this.opcolor = opcolor
-	}
+	static readonly type = 'vmhd'
 
 	/**
 	 * Reads a VideoMediaHeaderBox from an IsoView
@@ -40,31 +33,44 @@ export class VideoMediaHeaderBox extends FullBox {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.4.5.2 Video Media Header Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: VideoMediaHeaderBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box header
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		// Write FullBox header
-		writeFullBoxHeader(this, dataView, cursor)
+		writeFullBoxHeader(box, dataView, cursor)
 		cursor += 4
 
 		// Write graphicsmode (2 bytes)
-		writeUint(dataView, cursor, 2, this.graphicsmode)
+		writeUint(dataView, cursor, 2, box.graphicsmode)
 		cursor += 2
 
 		// Write opcolor (3 * 2 bytes)
-		for (let i = 0; i < this.opcolor.length; i++) {
-			writeUint(dataView, cursor, 2, this.opcolor[i])
+		for (let i = 0; i < box.opcolor.length; i++) {
+			writeUint(dataView, cursor, 2, box.opcolor[i])
 			cursor += 2
 		}
 
 		return cursor - bufferOffset
 	}
-}
 
+	graphicsmode: number
+	opcolor: number[]
+
+	constructor(version: number, flags: number, graphicsmode: number, opcolor: number[]) {
+		super('vmhd', version, flags)
+		this.graphicsmode = graphicsmode
+		this.opcolor = opcolor
+	}
+
+	override get size(): number {
+		// 8 (box header) + 4 (FullBox) + 2 (graphicsmode) + (opcolor.length * 2)
+		return 14 + (this.opcolor.length * 2)
+	}
+}

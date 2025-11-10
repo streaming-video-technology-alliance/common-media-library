@@ -8,9 +8,7 @@ import { Box } from './Box.ts'
  * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
  */
 export class SegmentTypeBox extends Box {
-	constructor() {
-		super('styp')
-	}
+	static readonly type = 'styp'
 
 	/**
 	 * Reads a SegmentTypeBox from an IsoView
@@ -37,19 +35,27 @@ export class SegmentTypeBox extends Box {
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
 	 */
-	write(dataView: DataView, offset: number = 0): number {
+	static write(box: SegmentTypeBox, dataView: DataView, offset: number = 0): number {
 		const bufferOffset = dataView.byteOffset + offset
 		let cursor = bufferOffset
 
 		// Write box size (4 bytes)
-		writeUint(dataView, cursor, 4, this.size)
+		writeUint(dataView, cursor, 4, box.size)
 		cursor += 4
 
 		// Write box type (4 bytes) - 'styp'
-		writeString(dataView, cursor, 4, this.type)
+		writeString(dataView, cursor, 4, box.type)
 		cursor += 4
 
 		return cursor - bufferOffset
 	}
-}
 
+	constructor() {
+		super('styp')
+	}
+
+	override get size(): number {
+		// 8 bytes header minimum
+		return 8
+	}
+}

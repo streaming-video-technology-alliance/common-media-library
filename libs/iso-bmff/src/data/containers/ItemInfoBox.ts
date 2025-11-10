@@ -5,6 +5,7 @@ import { Box } from '../Box.ts'
  * Item Info Box - 'iinf' - Container
  */
 export class ItemInfoBox extends ContainerBox<Box> {
+	static readonly type = 'iinf'
 	entryCount: number
 
 	constructor(entryCount: number, boxes: Box[] = []) {

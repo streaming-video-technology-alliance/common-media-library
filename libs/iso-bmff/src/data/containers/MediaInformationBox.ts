@@ -10,6 +10,7 @@ import type { VideoMediaHeaderBox } from '../VideoMediaHeaderBox.ts'
  * Media Information Box - 'minf' - Container
  */
 export class MediaInformationBox extends ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox> {
+	static readonly type = 'minf'
 	constructor(boxes: (VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox)[] = []) {
 		super('minf', boxes)
 	}

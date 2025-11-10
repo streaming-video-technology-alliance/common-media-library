@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
  */
 export class TrackFragmentHeaderBox extends FullBox {
+	static readonly type = 'tfhd'
 	trackId: number
 	baseDataOffset?: number
 	sampleDescriptionIndex?: number
@@ -43,4 +44,3 @@ export class TrackFragmentHeaderBox extends FullBox {
 		return size
 	}
 }
-

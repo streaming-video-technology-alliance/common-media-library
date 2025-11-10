@@ -15,6 +15,7 @@ import type { SyncSampleBox } from '../SyncSampleBox.ts'
  * Sample Table Box - 'stbl' - Container
  */
 export class SampleTableBox extends ContainerBox<SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | Box> {
+	static readonly type = 'stbl'
 	constructor(boxes: (SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | Box)[] = []) {
 		super('stbl', boxes)
 	}

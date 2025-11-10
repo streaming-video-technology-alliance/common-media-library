@@ -11,6 +11,7 @@ import type { ItemReferenceBox } from './ItemReferenceBox.ts'
  * ISO/IEC 14496-12:202x - 8.11.1 Meta box
  */
 export class MetaBox extends ContainerBox<HandlerReferenceBox | Box | DataInformationBox | Box | ItemProtectionBox | ItemInfoBox | ItemReferenceBox> {
+	static readonly type = 'meta'
 	version: number
 	flags: number
 

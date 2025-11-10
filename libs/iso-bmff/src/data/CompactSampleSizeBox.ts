@@ -4,6 +4,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.6.3.1 Compact Sample Size Box
  */
 export class CompactSampleSizeBox extends FullBox {
+	static readonly type = 'stz2'
 	fieldSize: number
 	sampleCount: number
 	entrySize: number[]
@@ -21,4 +22,3 @@ export class CompactSampleSizeBox extends FullBox {
 		return 20 + (this.entrySize.length * fieldSizeBytes)
 	}
 }
-

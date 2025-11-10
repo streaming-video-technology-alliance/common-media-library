@@ -18,4 +18,3 @@ export class SampleEntryBox extends Box {
 		return 10 + this.reserved1.length
 	}
 }
-

@@ -5,6 +5,7 @@ import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformati
  * Item Protection Box - 'ipro' - Container
  */
 export class ItemProtectionBox extends ContainerBox<ProtectionSchemeInformationBox> {
+	static readonly type = 'ipro'
 	protectionCount: number
 
 	constructor(protectionCount: number, boxes: ProtectionSchemeInformationBox[] = []) {

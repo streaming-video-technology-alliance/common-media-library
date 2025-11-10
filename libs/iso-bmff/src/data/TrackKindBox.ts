@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:202x - 8.10.4 Track kind box
  */
 export class TrackKindBox extends FullBox {
+	static readonly type = 'kind'
 	schemeUri: string
 	value: string
 
@@ -21,4 +22,3 @@ export class TrackKindBox extends FullBox {
 		return 14 + schemeUriBytes.length + valueBytes.length
 	}
 }
-

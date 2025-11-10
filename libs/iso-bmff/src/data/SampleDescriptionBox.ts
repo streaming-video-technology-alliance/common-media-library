@@ -5,6 +5,7 @@ import { SampleEntryBox } from './SampleEntryBox.ts'
  * ISO/IEC 14496-12:2012 - 8.5.2 Sample Description Box
  */
 export class SampleDescriptionBox extends FullBox {
+	static readonly type = 'stsd'
 	entryCount: number
 	entries: SampleEntryBox[]
 
@@ -24,4 +25,3 @@ export class SampleDescriptionBox extends FullBox {
 		return 12 + entriesSize
 	}
 }
-
