@@ -7,7 +7,7 @@ export function writeTerminatedString(dataView: DataView, offset: number, value:
 
 	let cursor = dataView.byteOffset + offset
 
-	for (let c = 0; c < value.length; c++) {
+	for (let c = 0, len = value.length; c < len; c++) {
 		writeUint(dataView, cursor++, 8, value.charCodeAt(c))
 	}
 

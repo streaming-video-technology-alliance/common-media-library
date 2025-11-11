@@ -17,7 +17,7 @@ import { writeUint } from './writeUint.ts'
  * @param offset - The offset in the DataView to start writing
  * @returns The number of bytes written (8 for box header + 4 for version/flags = 12)
  */
-export function writeFullBoxHeader(box: FullBox, dataView: DataView, offset: number): number {
+export function writeFullBoxHeader(box: FullBox, dataView: DataView, offset: number): void {
 	let cursor = offset
 
 	// Write box type (4 bytes) - already written by base box header
@@ -29,7 +29,5 @@ export function writeFullBoxHeader(box: FullBox, dataView: DataView, offset: num
 	// Write flags (3 bytes)
 	writeUint(dataView, cursor, 3, box.flags)
 	cursor += 3
-
-	return cursor - offset
 }
 

@@ -95,7 +95,6 @@ export class IsoView {
 	}
 
 	private read = <T extends keyof IsoFieldTypeMap>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
-		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this
 
 		let result: any

@@ -1,8 +1,7 @@
 import { STRING } from '../fields/STRING.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { Box } from './Box.ts'
+import type { IsoDataView } from './IsoDataView.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 4.3 File Type Box
@@ -29,33 +28,13 @@ export class FileTypeBox extends Box {
 	 *
 	 * ISO/IEC 14496-12:2012 - 4.3 File Type Box
 	 */
-	static write(box: FileTypeBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box size (4 bytes)
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-
-		// Write box type (4 bytes) - 'ftyp'
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write majorBrand (4 bytes)
-		writeString(dataView, cursor, 4, box.majorBrand)
-		cursor += 4
-
-		// Write minorVersion (4 bytes)
-		writeUint(dataView, cursor, 4, box.minorVersion)
-		cursor += 4
-
-		// Write compatibleBrands (4 bytes each)
+	static write(box: FileTypeBox, view: IsoDataView): void {
+		view.writeBoxHeader(box)
+		view.writeString(box.majorBrand)
+		view.writeUint(box.minorVersion, 4)
 		for (const brand of box.compatibleBrands) {
-			writeString(dataView, cursor, 4, brand)
-			cursor += 4
+			view.writeString(brand)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	majorBrand: string
