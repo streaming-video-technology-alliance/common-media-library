@@ -27,17 +27,6 @@ export class SampleSizeBox extends FullBox {
 		return new SampleSizeBox(version, flags, sampleSize, sampleCount, entrySize)
 	}
 
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 4 (sampleSize) + 4 (sampleCount) + optional entrySize array
-		let size = 20
-
-		if (this.sampleSize === 0 && this.entrySize) {
-			size += this.entrySize.length * 4
-		}
-
-		return size
-	}
-
 	/**
 	 * Writes a SampleSizeBox to a DataView
 	 *

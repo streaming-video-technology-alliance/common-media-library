@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class HintMediaHeaderBox extends FullBox {
 	static readonly type = 'hmhd'
+
 	maxPDUsize: number
 	avgPDUsize: number
 	maxbitrate: number

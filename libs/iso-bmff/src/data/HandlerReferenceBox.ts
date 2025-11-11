@@ -27,13 +27,6 @@ export class HandlerReferenceBox extends FullBox {
 		return new HandlerReferenceBox(version, flags, preDefined, handlerType, reserved, name)
 	}
 
-	override get size(): number {
-		const nameBytes = encodeText(this.name)
-		const nameSize = nameBytes.length + 1 // null-terminated
-		// 8 (box header) + 4 (FullBox) + 4 + 4 + (reserved.length * 4) + nameSize
-		return 20 + (this.reserved.length * 4) + nameSize
-	}
-
 	/**
 	 * Writes a HandlerReferenceBox to a DataView
 	 *
@@ -62,8 +55,8 @@ export class HandlerReferenceBox extends FullBox {
 		cursor += 4
 
 		// Write reserved
-		for (let i = 0; i < box.reserved.length; i++) {
-			writeUint(dataView, cursor, 4, box.reserved[i])
+		for (const value of box.reserved) {
+			writeUint(dataView, cursor, 4, value)
 			cursor += 4
 		}
 

@@ -10,7 +10,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.7.2.1 Data Entry URL Box
  */
 export class DataEntryUrlBox extends FullBox {
-	static readonly type = 'url '
+	static readonly type = 'url'
 
 	/**
 	 * Reads a DataEntryUrlBox from an IsoView
@@ -54,7 +54,7 @@ export class DataEntryUrlBox extends FullBox {
 	location?: string
 
 	constructor(version: number, flags: number, location?: string) {
-		super('url ', version, flags)
+		super('url', version, flags)
 		this.location = location
 	}
 

@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class TrackExtendsBox extends FullBox {
 	static readonly type = 'trex'
+
 	trackId: number
 	defaultSampleDescriptionIndex: number
 	defaultSampleDuration: number

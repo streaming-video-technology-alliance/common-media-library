@@ -10,6 +10,7 @@ export type Entity = {
 
 export class PreselectionGroupBox extends FullBox {
 	static readonly type = 'prsl'
+
 	groupId: number
 	numEntitiesInGroup: number
 	entities: Entity[]

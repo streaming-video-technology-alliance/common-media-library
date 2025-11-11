@@ -23,11 +23,6 @@ export class ChunkOffsetBox extends FullBox {
 		return new ChunkOffsetBox(version, flags, entryCount, chunkOffset)
 	}
 
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (chunkOffset.length * 4)
-		return 16 + (this.chunkOffset.length * 4)
-	}
-
 	/**
 	 * Writes a ChunkOffsetBox to a DataView
 	 *

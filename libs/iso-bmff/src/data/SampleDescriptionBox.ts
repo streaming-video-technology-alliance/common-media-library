@@ -6,6 +6,7 @@ import { SampleEntryBox } from './SampleEntryBox.ts'
  */
 export class SampleDescriptionBox extends FullBox {
 	static readonly type = 'stsd'
+
 	entryCount: number
 	entries: SampleEntryBox[]
 

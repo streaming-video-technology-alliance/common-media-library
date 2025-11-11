@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class ProducerReferenceTimeBox extends FullBox {
 	static readonly type = 'prft'
+
 	referenceTrackId: number
 	ntpTimestampSec: number
 	ntpTimestampFrac: number

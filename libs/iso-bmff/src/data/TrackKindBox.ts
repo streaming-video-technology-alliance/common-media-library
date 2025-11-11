@@ -6,6 +6,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class TrackKindBox extends FullBox {
 	static readonly type = 'kind'
+
 	schemeUri: string
 	value: string
 

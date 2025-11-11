@@ -30,11 +30,6 @@ export class DecodingTimeToSampleBox extends FullBox {
 		return new DecodingTimeToSampleBox(version, flags, entryCount, entries)
 	}
 
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (entries.length * 8)
-		return 16 + (this.entries.length * 8)
-	}
-
 	/**
 	 * Writes a DecodingTimeToSampleBox to a DataView
 	 *

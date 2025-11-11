@@ -6,6 +6,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class ExtendedLanguageBox extends FullBox {
 	static readonly type = 'elng'
+
 	extendedLanguage: string
 
 	constructor(version: number, flags: number, extendedLanguage: string) {

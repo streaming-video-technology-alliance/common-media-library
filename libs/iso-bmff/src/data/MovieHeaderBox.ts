@@ -34,14 +34,6 @@ export class MovieHeaderBox extends FullBox {
 		return new MovieHeaderBox(version, flags, creationTime, modificationTime, timescale, duration, rate, volume, reserved1, reserved2, matrix, preDefined, nextTrackId)
 	}
 
-	override get size(): number {
-		const isVersion1 = this.version === 1
-		const timeSize = isVersion1 ? 8 : 4
-		const durationSize = isVersion1 ? 8 : 4
-		// 8 (box header) + 4 (FullBox) + timeSize + timeSize + 4 + durationSize + 4 + 2 + 2 + 8 + 36 + 24 + 4
-		return 96 + timeSize + timeSize + durationSize
-	}
-
 	/**
 	 * Writes a MovieHeaderBox to a DataView
 	 *
@@ -96,20 +88,20 @@ export class MovieHeaderBox extends FullBox {
 		cursor += 2
 
 		// Write reserved2 (8 bytes - 2 * 4 bytes)
-		for (let i = 0; i < box.reserved2.length; i++) {
-			writeUint(dataView, cursor, 4, box.reserved2[i])
+		for (const value of box.reserved2) {
+			writeUint(dataView, cursor, 4, value)
 			cursor += 4
 		}
 
 		// Write matrix (36 bytes - 9 * 4 bytes)
-		for (let i = 0; i < box.matrix.length; i++) {
-			writeInt(dataView, cursor, 4, box.matrix[i])
+		for (const value of box.matrix) {
+			writeInt(dataView, cursor, 4, value)
 			cursor += 4
 		}
 
 		// Write preDefined (24 bytes - 6 * 4 bytes)
-		for (let i = 0; i < box.preDefined.length; i++) {
-			writeUint(dataView, cursor, 4, box.preDefined[i])
+		for (const value of box.preDefined) {
+			writeUint(dataView, cursor, 4, value)
 			cursor += 4
 		}
 

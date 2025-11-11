@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class TrackFragmentHeaderBox extends FullBox {
 	static readonly type = 'tfhd'
+
 	trackId: number
 	baseDataOffset?: number
 	sampleDescriptionIndex?: number

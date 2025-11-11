@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class MovieExtendsHeaderBox extends FullBox {
 	static readonly type = 'mehd'
+
 	fragmentDuration: number
 
 	constructor(version: number, flags: number, fragmentDuration: number) {

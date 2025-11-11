@@ -28,12 +28,7 @@ export class CompositionTimeToSampleBox extends FullBox {
 			sampleCount: view.readUint(4),
 			sampleOffset: read(4),
 		}))
-		return new CompositionTimeToSampleBox(version, entryCount, entries)
-	}
-
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (entries.length * 8)
-		return 16 + (this.entries.length * 8)
+		return new CompositionTimeToSampleBox(version, flags, entryCount, entries)
 	}
 
 	/**
@@ -73,8 +68,8 @@ export class CompositionTimeToSampleBox extends FullBox {
 	entryCount: number
 	entries: CompositionTimeToSampleEntry[]
 
-	constructor(version: number, entryCount: number, entries: CompositionTimeToSampleEntry[] = []) {
-		super('ctts', version, 0)
+	constructor(version: number, flags: number, entryCount: number, entries: CompositionTimeToSampleEntry[] = []) {
+		super('ctts', version, flags)
 		this.entryCount = entryCount
 		this.entries = entries
 	}

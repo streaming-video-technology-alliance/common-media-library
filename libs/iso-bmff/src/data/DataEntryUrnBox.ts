@@ -10,7 +10,7 @@ import { FullBox } from './FullBox.ts'
  * ISO/IEC 14496-12:2012 - 8.7.2.2 Data Entry URN Box
  */
 export class DataEntryUrnBox extends FullBox {
-	static readonly type = 'urn '
+	static readonly type = 'urn'
 
 	/**
 	 * Reads a DataEntryUrnBox from an IsoView
@@ -22,21 +22,6 @@ export class DataEntryUrnBox extends FullBox {
 		const name = view.readString(-1)
 		const location = view.readString(-1)
 		return new DataEntryUrnBox(version, flags, name, location)
-	}
-
-	override get size(): number {
-		let payloadSize = 0
-
-		if (this.name) {
-			payloadSize += encodeText(this.name).length + 1 // null-terminated
-		}
-
-		if (this.location) {
-			payloadSize += encodeText(this.location).length + 1 // null-terminated
-		}
-
-		// 8 (box header) + 4 (FullBox) + payloadSize
-		return 12 + payloadSize
 	}
 
 	/**
@@ -77,7 +62,7 @@ export class DataEntryUrnBox extends FullBox {
 	location?: string
 
 	constructor(version: number, flags: number, name?: string, location?: string) {
-		super('urn ', version, flags)
+		super('urn', version, flags)
 		this.name = name
 		this.location = location
 	}

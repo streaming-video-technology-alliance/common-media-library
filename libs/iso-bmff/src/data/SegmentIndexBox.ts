@@ -16,6 +16,7 @@ export type SegmentIndexReference = {
 
 export class SegmentIndexBox extends FullBox {
 	static readonly type = 'sidx'
+
 	referenceId: number
 	timescale: number
 	earliestPresentationTime: number

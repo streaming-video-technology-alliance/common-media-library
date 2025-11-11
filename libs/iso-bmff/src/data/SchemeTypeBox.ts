@@ -6,6 +6,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class SchemeTypeBox extends FullBox {
 	static readonly type = 'schm'
+
 	schemeType: number
 	schemeVersion: number
 	schemeUri?: string

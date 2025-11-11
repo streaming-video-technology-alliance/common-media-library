@@ -13,6 +13,7 @@ export type TrackFragmentRandomAccessEntry = {
 
 export class TrackFragmentRandomAccessBox extends FullBox {
 	static readonly type = 'tfra'
+
 	trackId: number
 	reserved: number
 	numberOfEntry: number

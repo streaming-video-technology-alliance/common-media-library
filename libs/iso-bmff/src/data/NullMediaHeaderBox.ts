@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class NullMediaHeaderBox extends FullBox {
 	static readonly type = 'nmhd'
+
 	constructor(version: number, flags: number) {
 		super('nmhd', version, flags)
 	}

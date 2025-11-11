@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
 	static readonly type = 'tfdt'
+
 	baseMediaDecodeTime: number
 
 	constructor(version: number, flags: number, baseMediaDecodeTime: number) {

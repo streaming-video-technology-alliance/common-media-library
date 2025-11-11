@@ -10,6 +10,7 @@ export type ShadowSyncEntry = {
 
 export class ShadowSyncSampleBox extends FullBox {
 	static readonly type = 'stsh'
+
 	entryCount: number
 	entries: ShadowSyncEntry[]
 

@@ -24,11 +24,6 @@ export class FileTypeBox extends Box {
 		return new FileTypeBox(majorBrand, minorVersion, compatibleBrands)
 	}
 
-	override get size(): number {
-		// 8 bytes header + 4 (majorBrand) + 4 (minorVersion) + (4 * compatibleBrands.length)
-		return 16 + (this.compatibleBrands.length * 4)
-	}
-
 	/**
 	 * Writes a FileTypeBox to a DataView
 	 *

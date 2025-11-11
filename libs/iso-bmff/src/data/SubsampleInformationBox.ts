@@ -18,6 +18,7 @@ export type SubsampleEntry = {
 
 export class SubsampleInformationBox extends FullBox {
 	static readonly type = 'subs'
+
 	entryCount: number
 	entries: SubsampleEntry[]
 

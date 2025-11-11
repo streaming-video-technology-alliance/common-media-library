@@ -25,11 +25,6 @@ export class SegmentTypeBox extends Box {
 		return new SegmentTypeBox()
 	}
 
-	override get size(): number {
-		// 8 bytes header minimum
-		return 8
-	}
-
 	/**
 	 * Writes a SegmentTypeBox to a DataView
 	 *

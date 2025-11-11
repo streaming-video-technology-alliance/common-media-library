@@ -26,13 +26,6 @@ export class LabelBox extends FullBox {
 		return new LabelBox(version, flags, isGroupLabel, labelId, language, label)
 	}
 
-	override get size(): number {
-		const languageBytes = encodeText(this.language)
-		const labelBytes = encodeText(this.label)
-		// 8 (box header) + 4 (FullBox) + 1 + 4 + languageBytes.length + 1 + labelBytes.length + 1
-		return 8 + 4 + 1 + 4 + languageBytes.length + 1 + labelBytes.length + 1
-	}
-
 	/**
 	 * Writes a LabelBox to a DataView
 	 *
@@ -90,6 +83,6 @@ export class LabelBox extends FullBox {
 		const languageBytes = encodeText(this.language)
 		const labelBytes = encodeText(this.label)
 		// 8 (box header) + 4 (FullBox) + 1 + 4 + languageBytes.length + 1 + labelBytes.length + 1
-		return 8 + 4 + 1 + 4 + languageBytes.length + 1 + labelBytes.length + 1
+		return 19 + languageBytes.length + labelBytes.length
 	}
 }

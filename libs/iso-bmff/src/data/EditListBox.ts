@@ -12,6 +12,7 @@ export type EditListEntry = {
 
 export class EditListBox extends FullBox {
 	static readonly type = 'elst'
+
 	entryCount: number
 	entries: EditListEntry[]
 

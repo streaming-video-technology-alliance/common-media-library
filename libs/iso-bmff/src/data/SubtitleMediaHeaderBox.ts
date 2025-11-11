@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class SubtitleMediaHeaderBox extends FullBox {
 	static readonly type = 'sthd'
+
 	constructor(version: number, flags: number) {
 		super('sthd', version, flags)
 	}

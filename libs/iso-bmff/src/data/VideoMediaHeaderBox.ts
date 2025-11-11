@@ -23,11 +23,6 @@ export class VideoMediaHeaderBox extends FullBox {
 		return new VideoMediaHeaderBox(version, flags, graphicsmode, opcolor)
 	}
 
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 2 (graphicsmode) + (opcolor.length * 2)
-		return 14 + (this.opcolor.length * 2)
-	}
-
 	/**
 	 * Writes a VideoMediaHeaderBox to a DataView
 	 *
@@ -52,8 +47,8 @@ export class VideoMediaHeaderBox extends FullBox {
 		cursor += 2
 
 		// Write opcolor (3 * 2 bytes)
-		for (let i = 0; i < box.opcolor.length; i++) {
-			writeUint(dataView, cursor, 2, box.opcolor[i])
+		for (const color of box.opcolor) {
+			writeUint(dataView, cursor, 2, color)
 			cursor += 2
 		}
 

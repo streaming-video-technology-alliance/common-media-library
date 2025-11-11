@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class MovieFragmentRandomAccessOffsetBox extends FullBox {
 	static readonly type = 'mfro'
+
 	mfraSize: number
 
 	constructor(version: number, flags: number, mfraSize: number) {

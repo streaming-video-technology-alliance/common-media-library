@@ -28,11 +28,6 @@ export class SyncSampleBox extends FullBox {
 		return new SyncSampleBox(version, flags, entryCount, entries)
 	}
 
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (entries.length * 4)
-		return 16 + (this.entries.length * 4)
-	}
-
 	/**
 	 * Writes a SyncSampleBox to a DataView
 	 *

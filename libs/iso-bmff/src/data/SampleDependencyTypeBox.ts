@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class SampleDependencyTypeBox extends FullBox {
 	static readonly type = 'sdtp'
+
 	sampleDependencyTable: number[]
 
 	constructor(version: number, flags: number, sampleDependencyTable: number[] = []) {

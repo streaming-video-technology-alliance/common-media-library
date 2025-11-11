@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class MovieFragmentHeaderBox extends FullBox {
 	static readonly type = 'mfhd'
+
 	sequenceNumber: number
 
 	constructor(version: number, flags: number, sequenceNumber: number) {

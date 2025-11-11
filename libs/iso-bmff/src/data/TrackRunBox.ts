@@ -12,6 +12,7 @@ export type TrackRunSample = {
 
 export class TrackRunBox extends FullBox {
 	static readonly type = 'trun'
+
 	sampleCount: number
 	dataOffset?: number
 	firstSampleFlags?: number

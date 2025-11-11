@@ -37,14 +37,6 @@ export class TrackHeaderBox extends FullBox {
 		return new TrackHeaderBox(version, flags, creationTime, modificationTime, trackId, reserved1, duration, reserved2, layer, alternateGroup, volume, reserved3, matrix, width, height)
 	}
 
-	override get size(): number {
-		const isVersion1 = this.version === 1
-		const timeSize = isVersion1 ? 8 : 4
-		const durationSize = isVersion1 ? 8 : 4
-		// 8 (box header) + 4 (FullBox) + timeSize + timeSize + 4 + 4 + durationSize + 8 + 2 + 2 + 2 + 2 + 36 + 8
-		return 80 + timeSize + timeSize + durationSize
-	}
-
 	/**
 	 * Writes a TrackHeaderBox to a DataView
 	 *
@@ -81,8 +73,8 @@ export class TrackHeaderBox extends FullBox {
 		cursor += durationSize
 
 		// Write reserved2 (8 bytes)
-		for (let i = 0; i < box.reserved2.length; i++) {
-			writeUint(dataView, cursor, 4, box.reserved2[i])
+		for (const value of box.reserved2) {
+			writeUint(dataView, cursor, 4, value)
 			cursor += 4
 		}
 
@@ -96,8 +88,8 @@ export class TrackHeaderBox extends FullBox {
 		cursor += 2
 
 		// Write matrix (36 bytes)
-		for (let i = 0; i < box.matrix.length; i++) {
-			writeInt(dataView, cursor, 4, box.matrix[i])
+		for (const value of box.matrix) {
+			writeInt(dataView, cursor, 4, value)
 			cursor += 4
 		}
 

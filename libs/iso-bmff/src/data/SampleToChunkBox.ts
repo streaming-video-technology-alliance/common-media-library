@@ -32,11 +32,6 @@ export class SampleToChunkBox extends FullBox {
 		return new SampleToChunkBox(version, flags, entryCount, entries)
 	}
 
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 4 (entryCount) + (entries.length * 12)
-		return 16 + (this.entries.length * 12)
-	}
-
 	/**
 	 * Writes a SampleToChunkBox to a DataView
 	 *

@@ -1,8 +1,7 @@
 import type { BoxType } from './BoxType.ts'
 
-export class Box<C extends Box<any> = Box<any>> {
+export class Box {
 	type: BoxType
-	container: C | undefined
 
 	// eslint-disable-next-line
 	get size(): number {

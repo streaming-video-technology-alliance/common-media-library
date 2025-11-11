@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class CompactSampleSizeBox extends FullBox {
 	static readonly type = 'stz2'
+
 	fieldSize: number
 	sampleCount: number
 	entrySize: number[]

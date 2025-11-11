@@ -23,11 +23,6 @@ export class SoundMediaHeaderBox extends FullBox {
 		return new SoundMediaHeaderBox(version, flags, balance, reserved)
 	}
 
-	override get size(): number {
-		// 8 (box header) + 4 (FullBox) + 2 (balance) + 2 (reserved)
-		return 16
-	}
-
 	/**
 	 * Writes a SoundMediaHeaderBox to a DataView
 	 *

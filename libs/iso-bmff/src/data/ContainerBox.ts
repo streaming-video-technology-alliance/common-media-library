@@ -2,7 +2,7 @@ import { Box } from './Box.ts'
 import type { BoxType } from './BoxType.ts'
 
 
-export class ContainerBox<T extends Box<any> = Box<any>> extends Box<T> {
+export class ContainerBox<T extends Box = Box> extends Box {
 	boxes: T[]
 
 	constructor(type: BoxType, boxes: T[] = []) {

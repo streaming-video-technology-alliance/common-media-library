@@ -5,6 +5,7 @@ import { FullBox } from './FullBox.ts'
  */
 export class DegradationPriorityBox extends FullBox {
 	static readonly type = 'stdp'
+
 	priority: number[]
 
 	constructor(version: number, flags: number, priority: number[] = []) {
