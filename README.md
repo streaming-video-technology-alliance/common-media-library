@@ -1,4 +1,4 @@
-# common-media-library
+# Common Media Library
 
 A common library for media playback in JavaScript
 
@@ -53,6 +53,21 @@ console.log(cmcdUrl);
 ## Documentation
 
 API docs can be found [here](https://streaming-video-technology-alliance.github.io/common-media-library/).
+
+## Community
+
+If you need help with anything related to the Common Media Library, or if you'd like to chat with other members directly:
+
+- [Join the Discord Server](https://discord.gg/g2c5vwGvUc)
+- [See GitHub Discussions](https://github.com/streaming-video-technology-alliance/common-media-library/discussions)
+
+## Contributing
+
+The Common Media Library is a free and open source library, and we appreciate any help you're willing to give - whether it's fixing bugs, improving documentation, or suggesting new features. Check out the [contributing guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md) for more details. Contributions and project decisions are overseen by the [SVTA](https://www.svta.org) Players and Playback working group.
+
+## Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 ## Thanks
 
