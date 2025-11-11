@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
@@ -26,45 +24,18 @@ export class TrackExtendsBox extends FullBox {
 	}
 
 	/**
-	 * Writes a TrackExtendsBox to a DataView
+	 * Writes a TrackExtendsBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
 	 */
-	static write(box: TrackExtendsBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write trackId (4 bytes)
-		writeUint(dataView, cursor, 4, box.trackId)
-		cursor += 4
-
-		// Write defaultSampleDescriptionIndex (4 bytes)
-		writeUint(dataView, cursor, 4, box.defaultSampleDescriptionIndex)
-		cursor += 4
-
-		// Write defaultSampleDuration (4 bytes)
-		writeUint(dataView, cursor, 4, box.defaultSampleDuration)
-		cursor += 4
-
-		// Write defaultSampleSize (4 bytes)
-		writeUint(dataView, cursor, 4, box.defaultSampleSize)
-		cursor += 4
-
-		// Write defaultSampleFlags (4 bytes)
-		writeUint(dataView, cursor, 4, box.defaultSampleFlags)
-		cursor += 4
-
-		return cursor - bufferOffset
+	static write(box: TrackExtendsBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.trackId, 4)
+		view.writeUint(box.defaultSampleDescriptionIndex, 4)
+		view.writeUint(box.defaultSampleDuration, 4)
+		view.writeUint(box.defaultSampleSize, 4)
+		view.writeUint(box.defaultSampleFlags, 4)
 	}
 
 	trackId: number

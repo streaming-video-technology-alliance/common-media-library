@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time
@@ -25,42 +23,18 @@ export class ProducerReferenceTimeBox extends FullBox {
 	}
 
 	/**
-	 * Writes a ProducerReferenceTimeBox to a DataView
+	 * Writes a ProducerReferenceTimeBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time
 	 */
-	static write(box: ProducerReferenceTimeBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write referenceTrackId (4 bytes)
-		writeUint(dataView, cursor, 4, box.referenceTrackId)
-		cursor += 4
-
-		// Write ntpTimestampSec (4 bytes)
-		writeUint(dataView, cursor, 4, box.ntpTimestampSec)
-		cursor += 4
-
-		// Write ntpTimestampFrac (4 bytes)
-		writeUint(dataView, cursor, 4, box.ntpTimestampFrac)
-		cursor += 4
-
-		// Write mediaTime
+	static write(box: ProducerReferenceTimeBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.referenceTrackId, 4)
+		view.writeUint(box.ntpTimestampSec, 4)
+		view.writeUint(box.ntpTimestampFrac, 4)
 		const timeSize = box.version === 1 ? 8 : 4
-		writeUint(dataView, cursor, timeSize, box.mediaTime)
-		cursor += timeSize
-
-		return cursor - bufferOffset
+		view.writeUint(box.mediaTime, timeSize)
 	}
 
 	referenceTrackId: number

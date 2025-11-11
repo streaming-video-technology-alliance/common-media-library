@@ -1,10 +1,7 @@
 import { UINT } from '../fields/UINT.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeInt } from '../writers/writeInt.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
@@ -35,81 +32,33 @@ export class MovieHeaderBox extends FullBox {
 	}
 
 	/**
-	 * Writes a MovieHeaderBox to a DataView
+	 * Writes a MovieHeaderBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
 	 */
-	static write(box: MovieHeaderBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
+	static write(box: MovieHeaderBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
 		const isVersion1 = box.version === 1
 		const timeSize = isVersion1 ? 8 : 4
 		const durationSize = isVersion1 ? 8 : 4
-
-		// Write box size (4 bytes)
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-
-		// Write box type (4 bytes) - 'mvhd'
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header (version + flags)
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write creationTime
-		writeUint(dataView, cursor, timeSize, box.creationTime)
-		cursor += timeSize
-
-		// Write modificationTime
-		writeUint(dataView, cursor, timeSize, box.modificationTime)
-		cursor += timeSize
-
-		// Write timescale (4 bytes)
-		writeUint(dataView, cursor, 4, box.timescale)
-		cursor += 4
-
-		// Write duration
-		writeUint(dataView, cursor, durationSize, box.duration)
-		cursor += durationSize
-
-		// Write rate (4 bytes, signed)
-		writeInt(dataView, cursor, 4, box.rate)
-		cursor += 4
-
-		// Write volume (2 bytes, signed)
-		writeInt(dataView, cursor, 2, box.volume)
-		cursor += 2
-
-		// Write reserved1 (2 bytes)
-		writeUint(dataView, cursor, 2, box.reserved1)
-		cursor += 2
-
-		// Write reserved2 (8 bytes - 2 * 4 bytes)
+		view.writeUint(box.creationTime, timeSize)
+		view.writeUint(box.modificationTime, timeSize)
+		view.writeUint(box.timescale, 4)
+		view.writeUint(box.duration, durationSize)
+		view.writeInt(box.rate, 4)
+		view.writeInt(box.volume, 2)
+		view.writeUint(box.reserved1, 2)
 		for (const value of box.reserved2) {
-			writeUint(dataView, cursor, 4, value)
-			cursor += 4
+			view.writeUint(value, 4)
 		}
-
-		// Write matrix (36 bytes - 9 * 4 bytes)
 		for (const value of box.matrix) {
-			writeInt(dataView, cursor, 4, value)
-			cursor += 4
+			view.writeInt(value, 4)
 		}
-
-		// Write preDefined (24 bytes - 6 * 4 bytes)
 		for (const value of box.preDefined) {
-			writeUint(dataView, cursor, 4, value)
-			cursor += 4
+			view.writeUint(value, 4)
 		}
-
-		// Write nextTrackId (4 bytes)
-		writeUint(dataView, cursor, 4, box.nextTrackId)
-		cursor += 4
-
-		return cursor - bufferOffset
+		view.writeUint(box.nextTrackId, 4)
 	}
 
 	creationTime: number

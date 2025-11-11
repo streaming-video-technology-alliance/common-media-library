@@ -1,9 +1,7 @@
 import { UINT } from '../fields/UINT.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.6.3 Sample Size Box
@@ -28,41 +26,20 @@ export class SampleSizeBox extends FullBox {
 	}
 
 	/**
-	 * Writes a SampleSizeBox to a DataView
+	 * Writes a SampleSizeBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.6.3 Sample Size Box
 	 */
-	static write(box: SampleSizeBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write sampleSize (4 bytes)
-		writeUint(dataView, cursor, 4, box.sampleSize)
-		cursor += 4
-
-		// Write sampleCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.sampleCount)
-		cursor += 4
-
-		// Write entrySize array if sampleSize is 0
+	static write(box: SampleSizeBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.sampleSize, 4)
+		view.writeUint(box.sampleCount, 4)
 		if (box.sampleSize === 0 && box.entrySize) {
 			for (const entrySize of box.entrySize) {
-				writeUint(dataView, cursor, 4, entrySize)
-				cursor += 4
+				view.writeUint(entrySize, 4)
 			}
 		}
-
-		return cursor - bufferOffset
 	}
 
 	sampleSize: number

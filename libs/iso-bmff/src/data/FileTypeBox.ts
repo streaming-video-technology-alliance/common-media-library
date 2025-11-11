@@ -1,7 +1,7 @@
 import { STRING } from '../fields/STRING.ts'
 import type { IsoView } from '../IsoView.ts'
 import { Box } from './Box.ts'
-import type { IsoDataView } from './IsoDataView.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 4.3 File Type Box
@@ -28,7 +28,7 @@ export class FileTypeBox extends Box {
 	 *
 	 * ISO/IEC 14496-12:2012 - 4.3 File Type Box
 	 */
-	static write(box: FileTypeBox, view: IsoDataView): void {
+	static write(box: FileTypeBox, view: IsoDataWriter): void {
 		view.writeBoxHeader(box)
 		view.writeString(box.majorBrand)
 		view.writeUint(box.minorVersion, 4)

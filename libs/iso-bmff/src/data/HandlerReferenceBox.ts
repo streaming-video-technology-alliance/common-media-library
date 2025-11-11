@@ -1,11 +1,8 @@
 import { encodeText } from '@svta/cml-utils'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeTerminatedString } from '../writers/writeTerminatedString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
@@ -28,44 +25,19 @@ export class HandlerReferenceBox extends FullBox {
 	}
 
 	/**
-	 * Writes a HandlerReferenceBox to a DataView
+	 * Writes a HandlerReferenceBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
 	 */
-	static write(box: HandlerReferenceBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write preDefined (4 bytes)
-		writeUint(dataView, cursor, 4, box.preDefined)
-		cursor += 4
-
-		// Write handlerType (4 bytes)
-		writeString(dataView, cursor, 4, box.handlerType)
-		cursor += 4
-
-		// Write reserved
+	static write(box: HandlerReferenceBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.preDefined, 4)
+		view.writeString(box.handlerType)
 		for (const value of box.reserved) {
-			writeUint(dataView, cursor, 4, value)
-			cursor += 4
+			view.writeUint(value, 4)
 		}
-
-		// Write name (null-terminated string)
-		writeTerminatedString(dataView, cursor, box.name)
-		const nameBytes = encodeText(box.name)
-		cursor += nameBytes.length + 1
-
-		return cursor - bufferOffset
+		view.writeTerminatedString(box.name)
 	}
 
 	preDefined: number

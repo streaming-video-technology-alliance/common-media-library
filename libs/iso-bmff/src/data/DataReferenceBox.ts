@@ -1,10 +1,8 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { DataEntryUrlBox } from './DataEntryUrlBox.ts'
 import { DataEntryUrnBox } from './DataEntryUrnBox.ts'
 import { FullBox } from './FullBox.ts'
+import { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
@@ -33,38 +31,21 @@ export class DataReferenceBox extends FullBox {
 	}
 
 	/**
-	 * Writes a DataReferenceBox to a DataView
+	 * Writes a DataReferenceBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
 	 */
-	static write(box: DataReferenceBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.entryCount)
-		cursor += 4
-
-		// Write entries
+	static write(box: DataReferenceBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.entryCount, 4)
 		for (const entry of box.entries) {
 			if (entry instanceof DataEntryUrlBox) {
-				cursor += DataEntryUrlBox.write(entry, dataView, cursor)
+				DataEntryUrlBox.write(entry, view)
 			} else if (entry instanceof DataEntryUrnBox) {
-				cursor += DataEntryUrnBox.write(entry, dataView, cursor)
+				DataEntryUrnBox.write(entry, view)
 			}
 		}
-
-		return cursor - bufferOffset
 	}
 
 	entryCount: number

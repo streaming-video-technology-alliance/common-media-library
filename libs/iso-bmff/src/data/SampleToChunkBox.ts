@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.6.4 Sample to Chunk Box
@@ -33,39 +31,19 @@ export class SampleToChunkBox extends FullBox {
 	}
 
 	/**
-	 * Writes a SampleToChunkBox to a DataView
+	 * Writes a SampleToChunkBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.6.4 Sample to Chunk Box
 	 */
-	static write(box: SampleToChunkBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.entryCount)
-		cursor += 4
-
-		// Write entries
+	static write(box: SampleToChunkBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.entryCount, 4)
 		for (const entry of box.entries) {
-			writeUint(dataView, cursor, 4, entry.firstChunk)
-			cursor += 4
-			writeUint(dataView, cursor, 4, entry.samplesPerChunk)
-			cursor += 4
-			writeUint(dataView, cursor, 4, entry.sampleDescriptionIndex)
-			cursor += 4
+			view.writeUint(entry.firstChunk, 4)
+			view.writeUint(entry.samplesPerChunk, 4)
+			view.writeUint(entry.sampleDescriptionIndex, 4)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	entryCount: number

@@ -1,7 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { Box } from './Box.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.12.2 Original Format Box
@@ -20,27 +19,13 @@ export class OriginalFormatBox extends Box {
 	}
 
 	/**
-	 * Writes an OriginalFormatBox to a DataView
+	 * Writes an OriginalFormatBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.12.2 Original Format Box
 	 */
-	static write(box: OriginalFormatBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box size (4 bytes)
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-
-		// Write box type (4 bytes) - 'frma'
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write dataFormat (4 bytes)
-		writeUint(dataView, cursor, 4, box.dataFormat)
-		cursor += 4
-
-		return cursor - bufferOffset
+	static write(box: OriginalFormatBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeUint(box.dataFormat, 4)
 	}
 
 	dataFormat: number

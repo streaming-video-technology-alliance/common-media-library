@@ -1,8 +1,7 @@
 import { STRING } from '../fields/STRING.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { Box } from './Box.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
@@ -16,37 +15,37 @@ export class SegmentTypeBox extends Box {
 	 * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
 	 */
 	static read(view: IsoView): SegmentTypeBox {
-		// SegmentTypeBox has the same structure as FileTypeBox
 		const size = 4
-		view.readString(4) // majorBrand
-		view.readUint(4) // minorVersion
+		const majorBrand = view.readString(4)
+		const minorVersion = view.readUint(4)
 		const length = view.bytesRemaining / size
-		view.readArray(STRING, size, length) // compatibleBrands
-		return new SegmentTypeBox()
+		const compatibleBrands = view.readArray(STRING, size, length)
+		return new SegmentTypeBox(majorBrand, minorVersion, compatibleBrands)
 	}
 
 	/**
-	 * Writes a SegmentTypeBox to a DataView
+	 * Writes a SegmentTypeBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
 	 */
-	static write(box: SegmentTypeBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box size (4 bytes)
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-
-		// Write box type (4 bytes) - 'styp'
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		return cursor - bufferOffset
+	static write(box: SegmentTypeBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeString(box.majorBrand)
+		view.writeUint(box.minorVersion, 4)
+		for (const brand of box.compatibleBrands) {
+			view.writeString(brand)
+		}
 	}
 
-	constructor() {
+	majorBrand: string
+	minorVersion: number
+	compatibleBrands: string[]
+
+	constructor(majorBrand: string, minorVersion: number, compatibleBrands: string[] = []) {
 		super('styp')
+		this.majorBrand = majorBrand
+		this.minorVersion = minorVersion
+		this.compatibleBrands = compatibleBrands
 	}
 
 	override get size(): number {

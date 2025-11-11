@@ -1,1 +1,1 @@
-export type BoxType = `${string}${string}${string}${string}`;
+export type BoxType = `${string}${string}${string}` | `${string}${string}${string}${string}`;

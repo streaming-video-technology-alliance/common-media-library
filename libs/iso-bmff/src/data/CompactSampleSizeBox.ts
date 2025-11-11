@@ -1,9 +1,7 @@
 import { UINT } from '../fields/UINT.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.6.3.1 Compact Sample Size Box
@@ -30,48 +28,22 @@ export class CompactSampleSizeBox extends FullBox {
 	}
 
 	/**
-	 * Writes a CompactSampleSizeBox to a DataView
+	 * Writes a CompactSampleSizeBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.6.3.1 Compact Sample Size Box
 	 */
-	static write(box: CompactSampleSizeBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write fieldSize (1 byte, lower 4 bits)
-		writeUint(dataView, cursor, 1, box.fieldSize & 0x0F)
-		cursor += 1
-
-		// Write reserved (3 bytes)
-		writeUint(dataView, cursor, 1, 0)
-		cursor += 1
-		writeUint(dataView, cursor, 1, 0)
-		cursor += 1
-		writeUint(dataView, cursor, 1, 0)
-		cursor += 1
-
-		// Write sampleCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.sampleCount)
-		cursor += 4
-
-		// Write entrySize array
+	static write(box: CompactSampleSizeBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.fieldSize & 0x0F, 1)
+		view.writeUint(0, 1)
+		view.writeUint(0, 1)
+		view.writeUint(0, 1)
+		view.writeUint(box.sampleCount, 4)
 		const fieldSizeBytes = box.fieldSize === 4 ? 1 : box.fieldSize === 8 ? 1 : box.fieldSize === 16 ? 2 : 1
 		for (const value of box.entrySize) {
-			writeUint(dataView, cursor, fieldSizeBytes, value)
-			cursor += fieldSizeBytes
+			view.writeUint(value, fieldSizeBytes)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	fieldSize: number

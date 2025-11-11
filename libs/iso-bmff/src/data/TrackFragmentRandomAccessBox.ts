@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
@@ -46,53 +44,25 @@ export class TrackFragmentRandomAccessBox extends FullBox {
 	}
 
 	/**
-	 * Writes a TrackFragmentRandomAccessBox to a DataView
+	 * Writes a TrackFragmentRandomAccessBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
 	 */
-	static write(box: TrackFragmentRandomAccessBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write trackId (4 bytes)
-		writeUint(dataView, cursor, 4, box.trackId)
-		cursor += 4
-
-		// Write reserved (4 bytes) - pack lengthSize values
+	static write(box: TrackFragmentRandomAccessBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.trackId, 4)
 		const reserved = (box.lengthSizeOfTrafNum << 4) | (box.lengthSizeOfTrunNum << 2) | box.lengthSizeOfSampleNum
-		writeUint(dataView, cursor, 4, reserved)
-		cursor += 4
-
-		// Write numberOfEntry (4 bytes)
-		writeUint(dataView, cursor, 4, box.numberOfEntry)
-		cursor += 4
-
-		// Write entries
+		view.writeUint(reserved, 4)
+		view.writeUint(box.numberOfEntry, 4)
 		const timeSize = box.version === 1 ? 8 : 4
 		for (const entry of box.entries) {
-			writeUint(dataView, cursor, timeSize, entry.time)
-			cursor += timeSize
-			writeUint(dataView, cursor, timeSize, entry.moofOffset)
-			cursor += timeSize
-			writeUint(dataView, cursor, box.lengthSizeOfTrafNum + 1, entry.trafNumber)
-			cursor += box.lengthSizeOfTrafNum + 1
-			writeUint(dataView, cursor, box.lengthSizeOfTrunNum + 1, entry.trunNumber)
-			cursor += box.lengthSizeOfTrunNum + 1
-			writeUint(dataView, cursor, box.lengthSizeOfSampleNum + 1, entry.sampleNumber)
-			cursor += box.lengthSizeOfSampleNum + 1
+			view.writeUint(entry.time, timeSize)
+			view.writeUint(entry.moofOffset, timeSize)
+			view.writeUint(entry.trafNumber, box.lengthSizeOfTrafNum + 1)
+			view.writeUint(entry.trunNumber, box.lengthSizeOfTrunNum + 1)
+			view.writeUint(entry.sampleNumber, box.lengthSizeOfSampleNum + 1)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	trackId: number

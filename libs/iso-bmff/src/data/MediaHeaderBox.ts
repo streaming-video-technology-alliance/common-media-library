@@ -1,9 +1,6 @@
-import { encodeText } from '@svta/cml-utils'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
@@ -31,49 +28,24 @@ export class MediaHeaderBox extends FullBox {
 	}
 
 	/**
-	 * Writes a MediaHeaderBox to a DataView
+	 * Writes a MediaHeaderBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
 	 */
-	static write(box: MediaHeaderBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
+	static write(box: MediaHeaderBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
 		const isVersion1 = box.version === 1
 		const timeSize = isVersion1 ? 8 : 4
 		const durationSize = isVersion1 ? 8 : 4
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write fields
-		writeUint(dataView, cursor, timeSize, box.creationTime)
-		cursor += timeSize
-		writeUint(dataView, cursor, timeSize, box.modificationTime)
-		cursor += timeSize
-		writeUint(dataView, cursor, 4, box.timescale)
-		cursor += 4
-		writeUint(dataView, cursor, durationSize, box.duration)
-		cursor += durationSize
-
-		// Write language (2 bytes) - ISO 639-2/T language code
-		const langBytes = encodeText(box.language)
-		writeUint(dataView, cursor, 1, langBytes.length > 0 ? langBytes[0] : 0)
-		cursor += 1
-		writeUint(dataView, cursor, 1, langBytes.length > 1 ? langBytes[1] : 0)
-		cursor += 1
-
-		writeUint(dataView, cursor, 2, box.preDefined)
-		cursor += 2
-
-		return cursor - bufferOffset
+		view.writeUint(box.creationTime, timeSize)
+		view.writeUint(box.modificationTime, timeSize)
+		view.writeUint(box.timescale, 4)
+		view.writeUint(box.duration, durationSize)
+		const langBytes = new TextEncoder().encode(box.language)
+		view.writeUint(langBytes.length > 0 ? langBytes[0] : 0, 1)
+		view.writeUint(langBytes.length > 1 ? langBytes[1] : 0, 1)
+		view.writeUint(box.preDefined, 2)
 	}
 
 	creationTime: number

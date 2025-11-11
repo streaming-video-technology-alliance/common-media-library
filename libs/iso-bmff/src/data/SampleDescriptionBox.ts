@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 import { SampleEntryBox } from './SampleEntryBox.ts'
 
 /**
@@ -24,53 +22,27 @@ export class SampleDescriptionBox extends FullBox {
 	}
 
 	/**
-	 * Writes a SampleDescriptionBox to a DataView
+	 * Writes a SampleDescriptionBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.5.2 Sample Description Box
 	 */
-	static write(box: SampleDescriptionBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.entryCount)
-		cursor += 4
+	static write(box: SampleDescriptionBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.entryCount, 4)
 
 		// Write entries (each entry is a box)
 		// Note: Each specific SampleEntryBox type (e.g., VisualSampleEntry, AudioSampleEntry)
 		// would need its own write method. For now, we write the basic SampleEntryBox structure.
 		for (const entry of box.entries) {
-			// Write box header
-			writeUint(dataView, cursor, 4, entry.size)
-			cursor += 4
-			writeString(dataView, cursor, 4, entry.type)
-			cursor += 4
-
-			// Write reserved1 (typically 6 bytes)
+			view.writeBoxHeader(entry)
 			for (const value of entry.reserved1) {
-				writeUint(dataView, cursor, 1, value)
-				cursor += 1
+				view.writeUint(value, 1)
 			}
-
-			// Write dataReferenceIndex (2 bytes)
-			writeUint(dataView, cursor, 2, entry.dataReferenceIndex)
-			cursor += 2
-
+			view.writeUint(entry.dataReferenceIndex, 2)
 			// Note: Specific sample entry types would have additional fields here
 			// that need to be written by their respective write methods
 		}
-
-		return cursor - bufferOffset
 	}
 
 	entryCount: number

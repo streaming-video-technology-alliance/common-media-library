@@ -1,9 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeInt } from '../writers/writeInt.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box
@@ -60,64 +57,38 @@ export class TrackRunBox extends FullBox {
 	}
 
 	/**
-	 * Writes a TrackRunBox to a DataView
+	 * Writes a TrackRunBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box
 	 */
-	static write(box: TrackRunBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write sampleCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.sampleCount)
-		cursor += 4
-
-		// Write optional fields based on flags
+	static write(box: TrackRunBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.sampleCount, 4)
 		if (box.flags & 0x1 && box.dataOffset !== undefined) {
-			writeInt(dataView, cursor, 4, box.dataOffset)
-			cursor += 4
+			view.writeInt(box.dataOffset, 4)
 		}
-
 		if (box.flags & 0x4 && box.firstSampleFlags !== undefined) {
-			writeUint(dataView, cursor, 4, box.firstSampleFlags)
-			cursor += 4
+			view.writeUint(box.firstSampleFlags, 4)
 		}
-
-		// Write samples
 		for (const sample of box.samples) {
 			if (box.flags & 0x100 && sample.sampleDuration !== undefined) {
-				writeUint(dataView, cursor, 4, sample.sampleDuration)
-				cursor += 4
+				view.writeUint(sample.sampleDuration, 4)
 			}
 			if (box.flags & 0x200 && sample.sampleSize !== undefined) {
-				writeUint(dataView, cursor, 4, sample.sampleSize)
-				cursor += 4
+				view.writeUint(sample.sampleSize, 4)
 			}
 			if (box.flags & 0x400 && sample.sampleFlags !== undefined) {
-				writeUint(dataView, cursor, 4, sample.sampleFlags)
-				cursor += 4
+				view.writeUint(sample.sampleFlags, 4)
 			}
 			if (box.flags & 0x800 && sample.sampleCompositionTimeOffset !== undefined) {
 				if (box.version === 1) {
-					writeInt(dataView, cursor, 4, sample.sampleCompositionTimeOffset)
+					view.writeInt(sample.sampleCompositionTimeOffset, 4)
 				} else {
-					writeUint(dataView, cursor, 4, sample.sampleCompositionTimeOffset)
+					view.writeUint(sample.sampleCompositionTimeOffset, 4)
 				}
-				cursor += 4
 			}
 		}
-
-		return cursor - bufferOffset
 	}
 
 	sampleCount: number

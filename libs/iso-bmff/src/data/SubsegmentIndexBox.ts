@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
@@ -40,42 +38,21 @@ export class SubsegmentIndexBox extends FullBox {
 	}
 
 	/**
-	 * Writes a SubsegmentIndexBox to a DataView
+	 * Writes a SubsegmentIndexBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
 	 */
-	static write(box: SubsegmentIndexBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write subsegmentCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.subsegmentCount)
-		cursor += 4
-
-		// Write subsegments
+	static write(box: SubsegmentIndexBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.subsegmentCount, 4)
 		for (const subsegment of box.subsegments) {
-			writeUint(dataView, cursor, 4, subsegment.rangesCount)
-			cursor += 4
-
+			view.writeUint(subsegment.rangesCount, 4)
 			for (const range of subsegment.ranges) {
-				writeUint(dataView, cursor, 1, range.level)
-				cursor += 1
-				writeUint(dataView, cursor, 3, range.rangeSize)
-				cursor += 3
+				view.writeUint(range.level, 1)
+				view.writeUint(range.rangeSize, 3)
 			}
 		}
-
-		return cursor - bufferOffset
 	}
 
 	subsegmentCount: number

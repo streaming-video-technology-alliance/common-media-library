@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
@@ -58,66 +56,27 @@ export class SegmentIndexBox extends FullBox {
 	}
 
 	/**
-	 * Writes a SegmentIndexBox to a DataView
+	 * Writes a SegmentIndexBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
 	 */
-	static write(box: SegmentIndexBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write referenceId (4 bytes)
-		writeUint(dataView, cursor, 4, box.referenceId)
-		cursor += 4
-
-		// Write timescale (4 bytes)
-		writeUint(dataView, cursor, 4, box.timescale)
-		cursor += 4
-
-		// Write earliestPresentationTime
+	static write(box: SegmentIndexBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.referenceId, 4)
+		view.writeUint(box.timescale, 4)
 		const timeSize = box.version === 1 ? 8 : 4
-		writeUint(dataView, cursor, timeSize, box.earliestPresentationTime)
-		cursor += timeSize
-
-		// Write firstOffset
-		writeUint(dataView, cursor, timeSize, box.firstOffset)
-		cursor += timeSize
-
-		// Write reserved (2 bytes)
-		writeUint(dataView, cursor, 2, box.reserved)
-		cursor += 2
-
-		// Write referenceCount (2 bytes)
-		writeUint(dataView, cursor, 2, box.references.length)
-		cursor += 2
-
-		// Write references
+		view.writeUint(box.earliestPresentationTime, timeSize)
+		view.writeUint(box.firstOffset, timeSize)
+		view.writeUint(box.reserved, 2)
+		view.writeUint(box.references.length, 2)
 		for (const ref of box.references) {
-			// Pack referenceType and referencedSize into reference field
 			const reference = (ref.referenceType << 31) | (ref.referencedSize & 0x7FFFFFFF)
-			writeUint(dataView, cursor, 4, reference)
-			cursor += 4
-
-			writeUint(dataView, cursor, 4, ref.subsegmentDuration)
-			cursor += 4
-
-			// Pack startsWithSap, sapType, and sapDeltaTime into sap field
+			view.writeUint(reference, 4)
+			view.writeUint(ref.subsegmentDuration, 4)
 			const sap = (ref.startsWithSap << 31) | ((ref.sapType & 0x07) << 28) | (ref.sapDeltaTime & 0x0FFFFFFF)
-			writeUint(dataView, cursor, 4, sap)
-			cursor += 4
+			view.writeUint(sap, 4)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	referenceId: number

@@ -1,10 +1,7 @@
 import { encodeText } from '@svta/cml-utils'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeTerminatedString } from '../writers/writeTerminatedString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:202x - 8.10.5 Label box
@@ -27,43 +24,17 @@ export class LabelBox extends FullBox {
 	}
 
 	/**
-	 * Writes a LabelBox to a DataView
+	 * Writes a LabelBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:202x - 8.10.5 Label box
 	 */
-	static write(box: LabelBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write isGroupLabel (1 byte) - stored as boolean, written as 0 or 1
-		writeUint(dataView, cursor, 1, box.isGroupLabel ? 1 : 0)
-		cursor += 1
-
-		// Write labelId (4 bytes based on size calculation, though parser reads 2)
-		writeUint(dataView, cursor, 4, box.labelId)
-		cursor += 4
-
-		// Write language (null-terminated string)
-		writeTerminatedString(dataView, cursor, box.language)
-		const languageBytes = encodeText(box.language)
-		cursor += languageBytes.length + 1
-
-		// Write label (null-terminated string)
-		writeTerminatedString(dataView, cursor, box.label)
-		const labelBytes = encodeText(box.label)
-		cursor += labelBytes.length + 1
-
-		return cursor - bufferOffset
+	static write(box: LabelBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.isGroupLabel ? 1 : 0, 1)
+		view.writeUint(box.labelId, 4)
+		view.writeUtf8TerminatedString(box.language)
+		view.writeUtf8TerminatedString(box.label)
 	}
 
 	isGroupLabel: boolean

@@ -1,9 +1,7 @@
 import { UINT } from '../fields/UINT.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.4.5.2 Video Media Header Box
@@ -24,35 +22,17 @@ export class VideoMediaHeaderBox extends FullBox {
 	}
 
 	/**
-	 * Writes a VideoMediaHeaderBox to a DataView
+	 * Writes a VideoMediaHeaderBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.4.5.2 Video Media Header Box
 	 */
-	static write(box: VideoMediaHeaderBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write graphicsmode (2 bytes)
-		writeUint(dataView, cursor, 2, box.graphicsmode)
-		cursor += 2
-
-		// Write opcolor (3 * 2 bytes)
+	static write(box: VideoMediaHeaderBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.graphicsmode, 2)
 		for (const color of box.opcolor) {
-			writeUint(dataView, cursor, 2, color)
-			cursor += 2
+			view.writeUint(color, 2)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	graphicsmode: number

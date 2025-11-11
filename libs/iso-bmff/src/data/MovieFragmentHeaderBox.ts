@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.8.5 Movie Fragment Header Box
@@ -22,29 +20,14 @@ export class MovieFragmentHeaderBox extends FullBox {
 	}
 
 	/**
-	 * Writes a MovieFragmentHeaderBox to a DataView
+	 * Writes a MovieFragmentHeaderBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.8.5 Movie Fragment Header Box
 	 */
-	static write(box: MovieFragmentHeaderBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write sequenceNumber (4 bytes)
-		writeUint(dataView, cursor, 4, box.sequenceNumber)
-		cursor += 4
-
-		return cursor - bufferOffset
+	static write(box: MovieFragmentHeaderBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.sequenceNumber, 4)
 	}
 
 	sequenceNumber: number

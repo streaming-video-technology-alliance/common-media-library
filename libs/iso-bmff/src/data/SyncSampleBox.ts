@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2015 - 8.6.2 Sync Sample Box
@@ -29,35 +27,17 @@ export class SyncSampleBox extends FullBox {
 	}
 
 	/**
-	 * Writes a SyncSampleBox to a DataView
+	 * Writes a SyncSampleBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2015 - 8.6.2 Sync Sample Box
 	 */
-	static write(box: SyncSampleBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write entryCount (4 bytes)
-		writeUint(dataView, cursor, 4, box.entryCount)
-		cursor += 4
-
-		// Write entries
+	static write(box: SyncSampleBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
+		view.writeUint(box.entryCount, 4)
 		for (const entry of box.entries) {
-			writeUint(dataView, cursor, 4, entry.sampleNumber)
-			cursor += 4
+			view.writeUint(entry.sampleNumber, 4)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	entryCount: number

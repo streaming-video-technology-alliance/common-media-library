@@ -1,11 +1,8 @@
 import { TEMPLATE } from '../fields/TEMPLATE.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeInt } from '../writers/writeInt.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.3.2 Track Header Box
@@ -38,67 +35,33 @@ export class TrackHeaderBox extends FullBox {
 	}
 
 	/**
-	 * Writes a TrackHeaderBox to a DataView
+	 * Writes a TrackHeaderBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.3.2 Track Header Box
 	 */
-	static write(box: TrackHeaderBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
+	static write(box: TrackHeaderBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
 		const isVersion1 = box.version === 1
 		const timeSize = isVersion1 ? 8 : 4
 		const durationSize = isVersion1 ? 8 : 4
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write fields
-		writeUint(dataView, cursor, timeSize, box.creationTime)
-		cursor += timeSize
-		writeUint(dataView, cursor, timeSize, box.modificationTime)
-		cursor += timeSize
-		writeUint(dataView, cursor, 4, box.trackId)
-		cursor += 4
-		writeUint(dataView, cursor, 4, box.reserved1)
-		cursor += 4
-		writeUint(dataView, cursor, durationSize, box.duration)
-		cursor += durationSize
-
-		// Write reserved2 (8 bytes)
+		view.writeUint(box.creationTime, timeSize)
+		view.writeUint(box.modificationTime, timeSize)
+		view.writeUint(box.trackId, 4)
+		view.writeUint(box.reserved1, 4)
+		view.writeUint(box.duration, durationSize)
 		for (const value of box.reserved2) {
-			writeUint(dataView, cursor, 4, value)
-			cursor += 4
+			view.writeUint(value, 4)
 		}
-
-		writeInt(dataView, cursor, 2, box.layer)
-		cursor += 2
-		writeInt(dataView, cursor, 2, box.alternateGroup)
-		cursor += 2
-		writeInt(dataView, cursor, 2, box.volume)
-		cursor += 2
-		writeUint(dataView, cursor, 2, box.reserved3)
-		cursor += 2
-
-		// Write matrix (36 bytes)
+		view.writeInt(box.layer, 2)
+		view.writeInt(box.alternateGroup, 2)
+		view.writeInt(box.volume, 2)
+		view.writeUint(box.reserved3, 2)
 		for (const value of box.matrix) {
-			writeInt(dataView, cursor, 4, value)
-			cursor += 4
+			view.writeInt(value, 4)
 		}
-
-		writeUint(dataView, cursor, 4, box.width)
-		cursor += 4
-		writeUint(dataView, cursor, 4, box.height)
-		cursor += 4
-
-		return cursor - bufferOffset
+		view.writeUint(box.width, 4)
+		view.writeUint(box.height, 4)
 	}
 
 	creationTime: number

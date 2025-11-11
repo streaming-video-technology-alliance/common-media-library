@@ -1,10 +1,7 @@
 import { encodeText } from '@svta/cml-utils'
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeTerminatedString } from '../writers/writeTerminatedString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.7.2.2 Data Entry URN Box
@@ -25,37 +22,19 @@ export class DataEntryUrnBox extends FullBox {
 	}
 
 	/**
-	 * Writes a DataEntryUrnBox to a DataView
+	 * Writes a DataEntryUrnBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.7.2.2 Data Entry URN Box
 	 */
-	static write(box: DataEntryUrnBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		// Write name if present (null-terminated string)
+	static write(box: DataEntryUrnBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
 		if (box.name) {
-			writeTerminatedString(dataView, cursor, box.name)
-			cursor += encodeText(box.name).length + 1
+			view.writeTerminatedString(box.name)
 		}
-
-		// Write location if present (null-terminated string)
 		if (box.location) {
-			writeTerminatedString(dataView, cursor, box.location)
-			cursor += encodeText(box.location).length + 1
+			view.writeTerminatedString(box.location)
 		}
-
-		return cursor - bufferOffset
 	}
 
 	name?: string

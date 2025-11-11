@@ -1,8 +1,6 @@
 import type { IsoView } from '../IsoView.ts'
-import { writeFullBoxHeader } from '../writers/writeFullBox.ts'
-import { writeString } from '../writers/writeString.ts'
-import { writeUint } from '../writers/writeUint.ts'
 import { FullBox } from './FullBox.ts'
+import type { IsoDataWriter } from './IsoDataWriter.ts'
 
 /**
  * ISO/IEC 14496-12:2012 - 8.4.5.4 Null Media Header Box
@@ -21,25 +19,13 @@ export class NullMediaHeaderBox extends FullBox {
 	}
 
 	/**
-	 * Writes a NullMediaHeaderBox to a DataView
+	 * Writes a NullMediaHeaderBox to an IsoDataView
 	 *
 	 * ISO/IEC 14496-12:2012 - 8.4.5.4 Null Media Header Box
 	 */
-	static write(box: NullMediaHeaderBox, dataView: DataView, offset: number = 0): number {
-		const bufferOffset = dataView.byteOffset + offset
-		let cursor = bufferOffset
-
-		// Write box header
-		writeUint(dataView, cursor, 4, box.size)
-		cursor += 4
-		writeString(dataView, cursor, 4, box.type)
-		cursor += 4
-
-		// Write FullBox header
-		writeFullBoxHeader(box, dataView, cursor)
-		cursor += 4
-
-		return cursor - bufferOffset
+	static write(box: NullMediaHeaderBox, view: IsoDataWriter): void {
+		view.writeBoxHeader(box)
+		view.writeFullBoxHeader(box)
 	}
 
 	constructor(version: number, flags: number) {
