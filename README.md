@@ -58,8 +58,8 @@ API docs can be found [here](https://streaming-video-technology-alliance.github.
 
 If you need help with anything related to the Common Media Library, or if you'd like to chat with other members directly:
 
-[Join Discord Server](https://discord.gg/g2c5vwGvUc)
-[See GitHub Discussions](https://github.com/streaming-video-technology-alliance/common-media-library/discussions)
+- [Join Discord Server](https://discord.gg/g2c5vwGvUc)
+- [See GitHub Discussions](https://github.com/streaming-video-technology-alliance/common-media-library/discussions)
 
 ## Contributing
 
