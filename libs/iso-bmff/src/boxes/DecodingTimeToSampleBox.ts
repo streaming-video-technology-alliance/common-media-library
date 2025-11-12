@@ -7,9 +7,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type DecodingTimeToSampleBox = FullBox & {
-	type: 'stts';
-
+export type DecodingTimeToSampleBox = FullBox<'stts'> & {
 	/** A 32-bit integer that specifies the number of entries in the decoding time-to-sample table. */
 	entryCount: number;
 

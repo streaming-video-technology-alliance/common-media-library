@@ -6,8 +6,7 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type IdentifiedMediaDataBox = Box & {
-	type: 'imda';
+export type IdentifiedMediaDataBox = Box<'imda'> & {
 	imdaIdentifier: number;
 	data: Uint8Array;
 };

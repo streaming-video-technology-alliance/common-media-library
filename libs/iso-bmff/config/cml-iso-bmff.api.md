@@ -7,14 +7,18 @@
 // @beta
 export function ardi(view: IsoView): Fields<AudioRenderingIndicationBox>;
 
+// Warning: (ae-forgotten-export) The symbol "FullBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export type AudioRenderingIndicationBox = FullBox & {
+export type AudioRenderingIndicationBox = FullBox$1 & {
     type: "ardi";
     audioRenderingIndication: number;
 };
 
+// Warning: (ae-forgotten-export) The symbol "SampleEntryBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> = SampleEntryBox & {
+export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> = SampleEntryBox$1 & {
     type: T$1;
     reserved2: number[];
     channelcount: number;
@@ -37,14 +41,14 @@ export function avc3(view: IsoView): Fields<VisualSampleEntryBox<"avc3">>;
 // @beta
 export function avc4(view: IsoView): Fields<VisualSampleEntryBox<"avc4">>;
 
-// @beta
-export type Box = {
-    type: string;
-    size: number;
-    view: IsoView;
-    largesize?: number;
-    usertype?: number[];
-};
+// @public (undocumented)
+export class Box {
+    constructor(type: BoxType);
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    type: BoxType;
+}
 
 // @beta
 export type BoxFilter<T$1 extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T$1);
@@ -55,115 +59,219 @@ export type BoxParser<V = IsoBox> = (view: IsoView, config?: IsoViewConfig) => F
 // @beta
 export type BoxParserMap = Record<string, BoxParser>;
 
-// @beta
-export type ChunkLargeOffsetBox = FullBox & {
-    type: "co64";
-    entryCount: number;
-    chunkOffset: number[];
-};
+// @public (undocumented)
+export type BoxType = `${string}${string}${string}` | `${string}${string}${string}${string}`;
 
-// @beta
-export type ChunkOffsetBox = FullBox & {
-    type: "stco";
-    entryCount: number;
+// @public
+export class ChunkLargeOffsetBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, chunkOffset?: number[]);
+    // (undocumented)
     chunkOffset: number[];
-};
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): ChunkLargeOffsetBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "co64";
+    static write(box: ChunkLargeOffsetBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type CompactSampleSizeBox = FullBox & {
-    type: "stz2";
-    fieldSize: number;
-    sampleCount: number;
+// @public
+export class ChunkOffsetBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, chunkOffset?: number[]);
+    // (undocumented)
+    chunkOffset: number[];
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): ChunkOffsetBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stco";
+    static write(box: ChunkOffsetBox, view: IsoDataWriter): void;
+}
+
+// @public
+export class CompactSampleSizeBox extends FullBox {
+    constructor(version: number, flags: number, fieldSize: number, sampleCount: number, entrySize?: number[]);
+    // (undocumented)
     entrySize: number[];
-};
+    // (undocumented)
+    fieldSize: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): CompactSampleSizeBox;
+    // (undocumented)
+    sampleCount: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stz2";
+    static write(box: CompactSampleSizeBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type CompositionTimeToSampleBox = FullBox & {
-    type: "ctts";
-    entryCount: number;
+// @public (undocumented)
+export class CompositionTimeToSampleBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: CompositionTimeToSampleEntry[]);
+    // (undocumented)
     entries: CompositionTimeToSampleEntry[];
-};
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): CompositionTimeToSampleBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "ctts";
+    static write(box: CompositionTimeToSampleBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type CompositionTimeToSampleEntry = {
     sampleCount: number;
     sampleOffset: number;
 };
 
-// @beta
-export type ContainerBox<T$1> = Box & {
+// @public (undocumented)
+export class ContainerBox<T$1 extends Box = Box> extends Box {
+    constructor(type: BoxType, boxes?: T$1[]);
+    // (undocumented)
     boxes: T$1[];
-};
+    // (undocumented)
+    get size(): number;
+}
 
 // @beta
 export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
 
+// Warning: (ae-forgotten-export) The symbol "CompositionTimeToSampleBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export function ctts(view: IsoView): Fields<CompositionTimeToSampleBox>;
+export function ctts(view: IsoView): Fields<CompositionTimeToSampleBox$1>;
 
 // @beta
 export const DATA = "data";
 
-// @beta
-export type DataEntryUrlBox = FullBox & {
-    type: "url ";
+// @public
+export class DataEntryUrlBox extends FullBox {
+    constructor(version: number, flags: number, location?: string);
+    // (undocumented)
     location?: string;
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): DataEntryUrlBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "url";
+    static write(box: DataEntryUrlBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type DataEntryUrnBox = FullBox & {
-    type: "urn ";
+// @public
+export class DataEntryUrnBox extends FullBox {
+    constructor(version: number, flags: number, name?: string, location?: string);
+    // (undocumented)
+    location?: string;
+    // (undocumented)
     name?: string;
-    location?: string;
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): DataEntryUrnBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "urn";
+    static write(box: DataEntryUrnBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type DataInformationBox = ContainerBox<DataReferenceBox> & {
-    type: "dinf";
-};
+// @public
+export class DataInformationBox extends ContainerBox<DataReferenceBox> {
+    constructor(boxes?: DataReferenceBox[]);
+    // (undocumented)
+    static readonly type = "dinf";
+}
 
-// @beta
-export type DataReferenceBox = FullBox & {
-    type: "dref";
-    entryCount: number;
+// @public
+export class DataReferenceBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: (DataEntryUrlBox | DataEntryUrnBox)[]);
+    // (undocumented)
     entries: (DataEntryUrlBox | DataEntryUrnBox)[];
-};
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): DataReferenceBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "dref";
+    static write(box: DataReferenceBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type DecodingTimeSample = {
     sampleCount: number;
     sampleDelta: number;
 };
 
-// @beta
-export type DecodingTimeToSampleBox = FullBox & {
-    type: "stts";
-    entryCount: number;
+// @public (undocumented)
+export class DecodingTimeToSampleBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: DecodingTimeSample[]);
+    // (undocumented)
     entries: DecodingTimeSample[];
-};
-
-// @beta
-export type DegradationPriorityBox = FullBox & {
-    type: "stdp";
-    priority: number[];
-};
-
-// @beta
-export function dref(view: IsoView): Fields<DataReferenceBox>;
-
-// @beta
-export type EditBox = ContainerBox<EditListBox> & {
-    type: "edts";
-};
-
-// @beta
-export type EditListBox = FullBox & {
-    type: "elst";
+    // (undocumented)
     entryCount: number;
-    entries: EditListEntry[];
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): DecodingTimeToSampleBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stts";
+    static write(box: DecodingTimeToSampleBox, view: IsoDataWriter): void;
+}
 
+// @public
+export class DegradationPriorityBox extends FullBox {
+    constructor(version: number, flags: number, priority?: number[]);
+    // (undocumented)
+    priority: number[];
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): DegradationPriorityBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stdp";
+    static write(box: DegradationPriorityBox, view: IsoDataWriter): void;
+}
+
+// Warning: (ae-forgotten-export) The symbol "DataReferenceBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
+export function dref(view: IsoView): Fields<DataReferenceBox$1>;
+
+// @public
+export class EditBox extends ContainerBox<EditListBox> {
+    constructor(boxes?: EditListBox[]);
+    // (undocumented)
+    static readonly type = "edts";
+}
+
+// @public (undocumented)
+export class EditListBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: EditListEntry[]);
+    // (undocumented)
+    entries: EditListEntry[];
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): EditListBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "elst";
+    static write(box: EditListBox, view: IsoDataWriter): void;
+}
+
+// @public
 export type EditListEntry = {
     segmentDuration: number;
     mediaTime: number;
@@ -171,11 +279,15 @@ export type EditListEntry = {
     mediaRateFraction: number;
 };
 
+// Warning: (ae-forgotten-export) The symbol "ExtendedLanguageBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export function elng(view: IsoView): Fields<ExtendedLanguageBox>;
+export function elng(view: IsoView): Fields<ExtendedLanguageBox$1>;
 
+// Warning: (ae-forgotten-export) The symbol "EditListBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export function elst(view: IsoView): Fields<EditListBox>;
+export function elst(view: IsoView): Fields<EditListBox$1>;
 
 // @beta
 export function emsg(view: IsoView): Fields<EventMessageBox>;
@@ -192,13 +304,13 @@ export type EncryptedSample = {
 // @beta
 export function encv(view: IsoView): Fields<VisualSampleEntryBox<"encv">>;
 
-// @beta
+// @public
 export type Entity = {
     entityId: number;
 };
 
 // @beta
-export type EventMessageBox = FullBox & {
+export type EventMessageBox = FullBox$1 & {
     type: "emsg";
     schemeIdUri: string;
     value: string;
@@ -210,17 +322,42 @@ export type EventMessageBox = FullBox & {
     messageData: Uint8Array;
 };
 
-// @beta
-export type ExtendedLanguageBox = FullBox & {
-    type: "elng";
+// @public
+export class ExtendedLanguageBox extends FullBox {
+    constructor(version: number, flags: number, extendedLanguage: string);
+    // (undocumented)
     extendedLanguage: string;
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): ExtendedLanguageBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "elng";
+    static write(box: ExtendedLanguageBox, view: IsoDataWriter): void;
+}
 
+// Warning: (ae-forgotten-export) The symbol "Box$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export type Fields<T$1> = Omit<T$1, Exclude<keyof Box, "data"> | "boxes">;
+export type Fields<T$1> = Omit<T$1, Exclude<keyof Box$1, "data"> | "boxes">;
 
-// @beta
-export type FileTypeBox = TypeBox<"ftyp">;
+// @public
+export class FileTypeBox extends Box {
+    constructor(majorBrand: string, minorVersion: number, compatibleBrands?: string[]);
+    // (undocumented)
+    compatibleBrands: string[];
+    // (undocumented)
+    majorBrand: string;
+    // (undocumented)
+    minorVersion: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): FileTypeBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "ftyp";
+    static write(box: FileTypeBox, view: IsoDataWriter): void;
+}
 
 // @beta
 export function filterBoxes<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T$1>, config?: IsoViewConfig): T$1[];
@@ -234,50 +371,91 @@ export function findBox<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iter
 // @beta
 export function findBoxByType<T$1 extends keyof IsoBmffBoxMap>(raw: IsoData, type: T$1, config?: IsoViewConfig): IsoBmffBoxMap[T$1] | null;
 
+// Warning: (ae-forgotten-export) The symbol "FreeSpaceBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export function free(view: IsoView): Fields<FreeSpaceBox>;
+export function free(view: IsoView): Fields<FreeSpaceBox$1>;
 
-// @beta
-export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = Box & {
-    type: T$1;
+// @public
+export class FreeSpaceBox extends Box {
+    constructor(type?: "free" | "skip", data?: Uint8Array);
+    // (undocumented)
     data: Uint8Array;
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView, type?: "free" | "skip"): FreeSpaceBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "free";
+    static write(box: FreeSpaceBox, view: IsoDataWriter): void;
+}
 
+// Warning: (ae-forgotten-export) The symbol "OriginalFormatBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export function frma(view: IsoView): Fields<OriginalFormatBox>;
+export function frma(view: IsoView): Fields<OriginalFormatBox$1>;
 
+// Warning: (ae-forgotten-export) The symbol "FileTypeBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export function ftyp(view: IsoView): Fields<FileTypeBox>;
+export function ftyp(view: IsoView): Fields<FileTypeBox$1>;
 
-// @beta
-export type FullBox = Box & {
-    version: number;
+// @public (undocumented)
+export class FullBox extends Box {
+    constructor(type: BoxType, version: number, flags: number);
+    // (undocumented)
     flags: number;
-};
+    // (undocumented)
+    version: number;
+}
 
-// @beta
-export type HandlerReferenceBox = FullBox & {
-    type: "hdlr";
-    preDefined: number;
+// @public
+export class HandlerReferenceBox extends FullBox {
+    constructor(version: number, flags: number, preDefined: number, handlerType: string, reserved: number[], name: string);
+    // (undocumented)
     handlerType: string;
-    reserved: number[];
+    // (undocumented)
     name: string;
-};
+    // (undocumented)
+    preDefined: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): HandlerReferenceBox;
+    // (undocumented)
+    reserved: number[];
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "hdlr";
+    static write(box: HandlerReferenceBox, view: IsoDataWriter): void;
+}
 
+// Warning: (ae-forgotten-export) The symbol "HandlerReferenceBox$1" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export function hdlr(view: IsoView): Fields<HandlerReferenceBox>;
+export function hdlr(view: IsoView): Fields<HandlerReferenceBox$1>;
 
 // @beta
 export function hev1(view: IsoView): Fields<VisualSampleEntryBox<"hev1">>;
 
-// @beta
-export type HintMediaHeaderBox = FullBox & {
-    type: "hmhd";
-    maxPDUsize: number;
-    avgPDUsize: number;
-    maxbitrate: number;
+// @public
+export class HintMediaHeaderBox extends FullBox {
+    constructor(version: number, flags: number, maxPDUsize: number, avgPDUsize: number, maxbitrate: number, avgbitrate: number);
+    // (undocumented)
     avgbitrate: number;
-};
+    // (undocumented)
+    avgPDUsize: number;
+    // (undocumented)
+    maxbitrate: number;
+    // (undocumented)
+    maxPDUsize: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): HintMediaHeaderBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "hmhd";
+    static write(box: HintMediaHeaderBox, view: IsoDataWriter): void;
+}
 
 // @beta
 export function hvc1(view: IsoView): Fields<VisualSampleEntryBox<"avc1">>;
@@ -286,7 +464,7 @@ export function hvc1(view: IsoView): Fields<VisualSampleEntryBox<"avc1">>;
 export function iden(view: IsoView): Fields<WebVttCueIdBox>;
 
 // @beta
-export type IdentifiedMediaDataBox = Box & {
+export type IdentifiedMediaDataBox = Box$1 & {
     type: "imda";
     imdaIdentifier: number;
     data: Uint8Array;
@@ -299,7 +477,7 @@ export function imda(view: IsoView): Fields<IdentifiedMediaDataBox>;
 export const INT = "int";
 
 // @beta
-export type IpmpInfoBox = FullBox & {
+export type IpmpInfoBox = FullBox$1 & {
     type: "imif";
     ipmpDescr: any[];
 };
@@ -314,107 +492,130 @@ export type IsoBmffBoxMap = {
     avc2: VisualSampleEntryBox<"avc2">;
     avc3: VisualSampleEntryBox<"avc3">;
     avc4: VisualSampleEntryBox<"avc4">;
-    co64: ChunkLargeOffsetBox;
-    ctts: CompositionTimeToSampleBox;
-    dinf: DataInformationBox;
-    dref: DataReferenceBox;
-    edts: EditBox;
-    elng: ExtendedLanguageBox;
-    elst: EditListBox;
+    co64: ChunkLargeOffsetBox$1;
+    ctts: CompositionTimeToSampleBox$1;
+    dinf: DataInformationBox$1;
+    dref: DataReferenceBox$1;
+    edts: EditBox$1;
+    elng: ExtendedLanguageBox$1;
+    elst: EditListBox$1;
     emsg: EventMessageBox;
     enca: AudioSampleEntryBox<"enca">;
     encv: VisualSampleEntryBox<"encv">;
-    free: FreeSpaceBox<"free">;
-    frma: OriginalFormatBox;
-    ftyp: FileTypeBox;
-    hdlr: HandlerReferenceBox;
+    free: FreeSpaceBox$1<"free">;
+    frma: OriginalFormatBox$1;
+    ftyp: FileTypeBox$1;
+    hdlr: HandlerReferenceBox$1;
     hev1: VisualSampleEntryBox<"hev1">;
-    hmhd: HintMediaHeaderBox;
+    hmhd: HintMediaHeaderBox$1;
     hvc1: VisualSampleEntryBox<"hvc1">;
     iden: WebVttCueIdBox;
-    iinf: ItemInfoBox;
+    iinf: ItemInfoBox$1;
     iloc: ItemLocationBox;
     imda: IdentifiedMediaDataBox;
     imif: IpmpInfoBox;
     infe: ItemInfoEntry;
-    ipro: ItemProtectionBox;
-    iref: ItemReferenceBox;
-    kind: TrackKindBox;
-    labl: LabelBox;
-    mdat: MediaDataBox;
-    mdhd: MediaHeaderBox;
-    mdia: MediaBox;
-    mehd: MovieExtendsHeaderBox;
-    meta: MetaBox;
-    mfhd: MovieFragmentHeaderBox;
-    mfra: MovieFragmentRandomAccessBox;
-    mfro: MovieFragmentRandomAccessOffsetBox;
-    minf: MediaInformationBox;
-    moof: MovieFragmentBox;
-    moov: MovieBox;
+    ipro: ItemProtectionBox$1;
+    iref: ItemReferenceBox$1;
+    kind: TrackKindBox$1;
+    labl: LabelBox$1;
+    mdat: MediaDataBox$1;
+    mdhd: MediaHeaderBox$1;
+    mdia: MediaBox$1;
+    mehd: MovieExtendsHeaderBox$1;
+    meta: MetaBox$1;
+    mfhd: MovieFragmentHeaderBox$1;
+    mfra: MovieFragmentRandomAccessBox$1;
+    mfro: MovieFragmentRandomAccessOffsetBox$1;
+    minf: MediaInformationBox$1;
+    moof: MovieFragmentBox$1;
+    moov: MovieBox$1;
     mp4a: AudioSampleEntryBox<"mp4a">;
-    mvex: MovieExtendsBox;
-    mvhd: MovieHeaderBox;
-    nmhd: NullMediaHeaderBox;
+    mvex: MovieExtendsBox$1;
+    mvhd: MovieHeaderBox$1;
+    nmhd: NullMediaHeaderBox$1;
     payl: WebVttCuePayloadBox;
     pitm: PrimaryItemBox;
-    prft: ProducerReferenceTimeBox;
-    prsl: PreselectionGroupBox;
+    prft: ProducerReferenceTimeBox$1;
+    prsl: PreselectionGroupBox$1;
     pssh: ProtectionSystemSpecificHeaderBox;
     saio: SampleAuxiliaryInformationOffsetsBox;
     saiz: SampleAuxiliaryInformationSizesBox;
     sbgp: SampleToGroupBox;
-    schi: SchemeInformationBox;
-    schm: SchemeTypeBox;
-    sdtp: SampleDependencyTypeBox;
+    schi: SchemeInformationBox$1;
+    schm: SchemeTypeBox$1;
+    sdtp: SampleDependencyTypeBox$1;
     senc: SampleEncryptionBox;
     sgpd: SampleGroupDescriptionBox;
-    sidx: SegmentIndexBox;
-    sinf: ProtectionSchemeInformationBox;
-    skip: FreeSpaceBox<"skip">;
-    smhd: SoundMediaHeaderBox;
-    ssix: SubsegmentIndexBox;
-    stbl: SampleTableBox;
-    stco: ChunkOffsetBox;
-    stdp: DegradationPriorityBox;
-    sthd: SubtitleMediaHeaderBox;
-    stsc: SampleToChunkBox;
-    stsd: SampleDescriptionBox;
-    stsh: ShadowSyncSampleBox;
-    stss: SyncSampleBox;
-    stsz: SampleSizeBox;
+    sidx: SegmentIndexBox$1;
+    sinf: ProtectionSchemeInformationBox$1;
+    skip: FreeSpaceBox$1<"skip">;
+    smhd: SoundMediaHeaderBox$1;
+    ssix: SubsegmentIndexBox$1;
+    stbl: SampleTableBox$1;
+    stco: ChunkOffsetBox$1;
+    stdp: DegradationPriorityBox$1;
+    sthd: SubtitleMediaHeaderBox$1;
+    stsc: SampleToChunkBox$1;
+    stsd: SampleDescriptionBox$1;
+    stsh: ShadowSyncSampleBox$1;
+    stss: SyncSampleBox$1;
+    stsz: SampleSizeBox$1;
     sttg: WebVttSettingsBox;
-    stts: DecodingTimeToSampleBox;
-    styp: SegmentTypeBox;
-    subs: SubsampleInformationBox;
-    stz2: CompactSampleSizeBox;
+    stts: DecodingTimeToSampleBox$1;
+    styp: SegmentTypeBox$1;
+    subs: SubsampleInformationBox$1;
+    stz2: CompactSampleSizeBox$1;
     tenc: TrackEncryptionBox;
-    tfdt: TrackFragmentBaseMediaDecodeTimeBox;
-    tfhd: TrackFragmentHeaderBox;
-    tfra: TrackFragmentRandomAccessBox;
-    tkhd: TrackHeaderBox;
-    traf: TrackFragmentBox;
-    trak: TrackBox;
-    tref: TrackReferenceBox;
-    trex: TrackExtendsBox;
-    trun: TrackRunBox;
-    udta: UserDataBox;
-    url: DataEntryUrlBox;
-    urn: DataEntryUrnBox;
+    tfdt: TrackFragmentBaseMediaDecodeTimeBox$1;
+    tfhd: TrackFragmentHeaderBox$1;
+    tfra: TrackFragmentRandomAccessBox$1;
+    tkhd: TrackHeaderBox$1;
+    traf: TrackFragmentBox$1;
+    trak: TrackBox$1;
+    tref: TrackReferenceBox$1;
+    trex: TrackExtendsBox$1;
+    trun: TrackRunBox$1;
+    udta: UserDataBox$1;
+    url: DataEntryUrlBox$1;
+    urn: DataEntryUrnBox$1;
     vlab: WebVttSourceLabelBox;
-    vmhd: VideoMediaHeaderBox;
+    vmhd: VideoMediaHeaderBox$1;
     vttC: WebVttConfigurationBox;
     vtte: WebVttEmptySampleBox;
 };
 
 // @beta
-export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox<"enca"> | AudioSampleEntryBox<"mp4a"> | ChunkLargeOffsetBox | ChunkOffsetBox | CompactSampleSizeBox | CompositionTimeToSampleBox | DataEntryUrlBox | DataEntryUrnBox | DataReferenceBox | DecodingTimeToSampleBox | DegradationPriorityBox | EditListBox | EventMessageBox | ExtendedLanguageBox | FileTypeBox | FreeSpaceBox<"free"> | FreeSpaceBox<"skip"> | HandlerReferenceBox | HintMediaHeaderBox | IdentifiedMediaDataBox | IpmpInfoBox | ItemInfoEntry | ItemLocationBox | LabelBox | MediaDataBox | MediaHeaderBox | MovieExtendsHeaderBox | MovieFragmentHeaderBox | MovieFragmentRandomAccessOffsetBox | MovieHeaderBox | NullMediaHeaderBox | OriginalFormatBox | PrimaryItemBox | PreselectionGroupBox | ProducerReferenceTimeBox | ProtectionSystemSpecificHeaderBox | SampleAuxiliaryInformationOffsetsBox | SampleAuxiliaryInformationSizesBox | SampleDependencyTypeBox | SampleDescriptionBox | SampleEncryptionBox | SampleGroupDescriptionBox | SampleSizeBox | SampleToChunkBox | SampleToGroupBox | SchemeTypeBox | SegmentIndexBox | SegmentTypeBox | ShadowSyncSampleBox | SingleItemTypeReferenceBox | SoundMediaHeaderBox | SubsampleInformationBox | SubsegmentIndexBox | SubtitleMediaHeaderBox | SyncSampleBox | TrackEncryptionBox | TrackExtendsBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentHeaderBox | TrackFragmentRandomAccessBox | TrackHeaderBox | TrackKindBox | TrackRunBox | UrlBox | UrnBox | VideoMediaHeaderBox | VisualSampleEntryBox<"avc1"> | VisualSampleEntryBox<"avc2"> | VisualSampleEntryBox<"avc3"> | VisualSampleEntryBox<"avc4"> | VisualSampleEntryBox<"encv"> | VisualSampleEntryBox<"hev1"> | VisualSampleEntryBox<"hvc1"> | WebVttConfigurationBox | WebVttCueIdBox | WebVttCuePayloadBox | WebVttEmptySampleBox | WebVttSettingsBox | WebVttSourceLabelBox;
+export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox<"enca"> | AudioSampleEntryBox<"mp4a"> | ChunkLargeOffsetBox$1 | ChunkOffsetBox$1 | CompactSampleSizeBox$1 | CompositionTimeToSampleBox$1 | DataEntryUrlBox$1 | DataEntryUrnBox$1 | DataReferenceBox$1 | DecodingTimeToSampleBox$1 | DegradationPriorityBox$1 | EditListBox$1 | EventMessageBox | ExtendedLanguageBox$1 | FileTypeBox$1 | FreeSpaceBox$1<"free"> | FreeSpaceBox$1<"skip"> | HandlerReferenceBox$1 | HintMediaHeaderBox$1 | IdentifiedMediaDataBox | IpmpInfoBox | ItemInfoEntry | ItemLocationBox | LabelBox$1 | MediaDataBox$1 | MediaHeaderBox$1 | MovieExtendsHeaderBox$1 | MovieFragmentHeaderBox$1 | MovieFragmentRandomAccessOffsetBox$1 | MovieHeaderBox$1 | NullMediaHeaderBox$1 | OriginalFormatBox$1 | PrimaryItemBox | PreselectionGroupBox$1 | ProducerReferenceTimeBox$1 | ProtectionSystemSpecificHeaderBox | SampleAuxiliaryInformationOffsetsBox | SampleAuxiliaryInformationSizesBox | SampleDependencyTypeBox$1 | SampleDescriptionBox$1 | SampleEncryptionBox | SampleGroupDescriptionBox | SampleSizeBox$1 | SampleToChunkBox$1 | SampleToGroupBox | SchemeTypeBox$1 | SegmentIndexBox$1 | SegmentTypeBox$1 | ShadowSyncSampleBox$1 | SingleItemTypeReferenceBox | SoundMediaHeaderBox$1 | SubsampleInformationBox$1 | SubsegmentIndexBox$1 | SubtitleMediaHeaderBox$1 | SyncSampleBox$1 | TrackEncryptionBox | TrackExtendsBox$1 | TrackFragmentBaseMediaDecodeTimeBox$1 | TrackFragmentHeaderBox$1 | TrackFragmentRandomAccessBox$1 | TrackHeaderBox$1 | TrackKindBox$1 | TrackRunBox$1 | UrlBox | UrnBox | VideoMediaHeaderBox$1 | VisualSampleEntryBox<"avc1"> | VisualSampleEntryBox<"avc2"> | VisualSampleEntryBox<"avc3"> | VisualSampleEntryBox<"avc4"> | VisualSampleEntryBox<"encv"> | VisualSampleEntryBox<"hev1"> | VisualSampleEntryBox<"hvc1"> | WebVttConfigurationBox | WebVttCueIdBox | WebVttCuePayloadBox | WebVttEmptySampleBox | WebVttSettingsBox | WebVttSourceLabelBox;
 
 // @beta
-export type IsoContainerBox = DataInformationBox | EditBox | ItemInfoBox | ItemProtectionBox | ItemReferenceBox | MediaBox | MediaInformationBox | MetaBox | MovieBox | MovieExtendsBox | MovieFragmentBox | MovieFragmentRandomAccessBox | ProtectionSchemeInformationBox | SampleTableBox | SchemeInformationBox | TrackBox | TrackFragmentBox | TrackReferenceBox | UserDataBox;
+export type IsoContainerBox = DataInformationBox$1 | EditBox$1 | ItemInfoBox$1 | ItemProtectionBox$1 | ItemReferenceBox$1 | MediaBox$1 | MediaInformationBox$1 | MetaBox$1 | MovieBox$1 | MovieExtendsBox$1 | MovieFragmentBox$1 | MovieFragmentRandomAccessBox$1 | ProtectionSchemeInformationBox$1 | SampleTableBox$1 | SchemeInformationBox$1 | TrackBox$1 | TrackFragmentBox$1 | TrackReferenceBox$1 | UserDataBox$1;
 
 // @beta
 export type IsoData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
+
+// @public (undocumented)
+export class IsoDataWriter {
+    constructor(dataView: DataView);
+    // (undocumented)
+    writeBoxHeader(box: Box): void;
+    // (undocumented)
+    writeBoxSize(size: number): void;
+    // (undocumented)
+    writeBytes(data: Uint8Array): void;
+    // (undocumented)
+    writeFullBoxHeader(box: FullBox): void;
+    // (undocumented)
+    writeInt(value: number, size: number): void;
+    // (undocumented)
+    writeString(value: string): void;
+    // (undocumented)
+    writeTerminatedString(value: string): void;
+    // (undocumented)
+    writeUint(value: number, size: number): void;
+    // (undocumented)
+    writeUtf8TerminatedString(value: string): void;
+}
 
 // @beta
 export type IsoFieldTypeMap = {
@@ -439,7 +640,7 @@ export class IsoView {
     readBoxes: <T = IsoBmffBox>(length: number) => T[];
     readData: (size: number) => Uint8Array<ArrayBuffer>;
     readEntries: <T>(length: number, map: () => T) => T[];
-    readFullBox: () => Fields<FullBox>;
+    readFullBox: () => Fields<FullBox$1>;
     readInt: (size: number) => number;
     readString: (size: number) => string;
     readTemplate: (size: number) => number;
@@ -461,14 +662,19 @@ export type ItemExtent = {
     extentLength: number;
 };
 
-// @beta
-export type ItemInfoBox = ContainerBox<ItemInfoEntry> & {
-    type: "iinf";
+// @public
+export class ItemInfoBox extends ContainerBox<Box> {
+    constructor(entryCount: number, boxes?: Box[]);
+    // (undocumented)
     entryCount: number;
-};
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "iinf";
+}
 
 // @beta
-export type ItemInfoEntry = FullBox & {
+export type ItemInfoEntry = FullBox$1 & {
     type: "infe";
     itemId: number;
     itemProtectionIndex: number;
@@ -488,7 +694,7 @@ export type ItemLocation = {
 };
 
 // @beta
-export type ItemLocationBox = FullBox & {
+export type ItemLocationBox = FullBox$1 & {
     type: "iloc";
     offsetSize: number;
     lengthSize: number;
@@ -498,152 +704,268 @@ export type ItemLocationBox = FullBox & {
     items: ItemLocation[];
 };
 
-// @beta
-export type ItemProtectionBox = ContainerBox<ProtectionSchemeInformationBox> & {
-    type: "ipro";
+// @public
+export class ItemProtectionBox extends ContainerBox<ProtectionSchemeInformationBox> {
+    constructor(protectionCount: number, boxes?: ProtectionSchemeInformationBox[]);
+    // (undocumented)
     protectionCount: number;
-};
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "ipro";
+}
+
+// @public
+export class ItemReferenceBox extends ContainerBox<Box> {
+    constructor(boxes?: Box[]);
+    // (undocumented)
+    static readonly type = "iref";
+}
 
 // @beta
-export type ItemReferenceBox = ContainerBox<SingleItemTypeReferenceBox> & {
-    type: "iref";
-};
+export function kind(view: IsoView): Fields<TrackKindBox$1>;
 
-// @beta
-export function kind(view: IsoView): Fields<TrackKindBox>;
-
-// @beta
-export type LabelBox = FullBox & {
-    type: "labl";
+// @public
+export class LabelBox extends FullBox {
+    constructor(version: number, flags: number, isGroupLabel: boolean, labelId: number, language: string, label: string);
+    // (undocumented)
     isGroupLabel: boolean;
-    labelId: number;
-    language: string;
+    // (undocumented)
     label: string;
-};
-
-// @beta
-export function labl(view: IsoView): Fields<LabelBox>;
-
-// @beta
-export function mdat(view: IsoView): Fields<MediaDataBox>;
-
-// @beta
-export function mdhd(view: IsoView): Fields<MediaHeaderBox>;
-
-// @beta
-export type MediaBox = ContainerBox<MediaHeaderBox | HandlerReferenceBox | MediaInformationBox> & {
-    type: "mdia";
-};
-
-// @beta
-export type MediaDataBox = Box & {
-    type: "mdat";
-    data: Uint8Array<ArrayBuffer>;
-};
-
-// @beta
-export type MediaHeaderBox = FullBox & {
-    type: "mdhd";
-    creationTime: number;
-    modificationTime: number;
-    timescale: number;
-    duration: number;
+    // (undocumented)
+    labelId: number;
+    // (undocumented)
     language: string;
-    preDefined: number;
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): LabelBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "labl";
+    static write(box: LabelBox, view: IsoDataWriter): void;
+}
 
 // @beta
-export type MediaInformationBox = ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox> & {
-    type: "minf";
-};
+export function labl(view: IsoView): Fields<LabelBox$1>;
 
 // @beta
-export function mehd(view: IsoView): Fields<MovieExtendsHeaderBox>;
+export function mdat(view: IsoView): Fields<MediaDataBox$1>;
 
 // @beta
-export function meta(view: IsoView): Fields<MetaBox>;
+export function mdhd(view: IsoView): Fields<MediaHeaderBox$1>;
 
-// @beta
-export type MetaBox = FullBox & ContainerBox<HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox> & {
-    type: "meta";
-};
+// @public
+export class MediaBox extends ContainerBox<MediaHeaderBox | HandlerReferenceBox | MediaInformationBox> {
+    constructor(boxes?: (MediaHeaderBox | HandlerReferenceBox | MediaInformationBox)[]);
+    // (undocumented)
+    static readonly type = "mdia";
+}
 
-// @beta
-export function mfhd(view: IsoView): Fields<MovieFragmentHeaderBox>;
+// @public
+export class MediaDataBox extends Box {
+    constructor(data?: Uint8Array);
+    // (undocumented)
+    data: Uint8Array;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): MediaDataBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "mdat";
+    static write(box: MediaDataBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export function mfro(view: IsoView): Fields<MovieFragmentRandomAccessOffsetBox>;
-
-// @beta
-export type MovieBox = ContainerBox<MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox> & {
-    type: "moov";
-};
-
-// @beta
-export type MovieExtendsBox = ContainerBox<MovieExtendsHeaderBox | TrackExtendsBox> & {
-    type: "mvex";
-};
-
-// @beta
-export type MovieExtendsHeaderBox = FullBox & {
-    type: "mehd";
-    fragmentDuration: number;
-};
-
-// @beta
-export type MovieFragmentBox = ContainerBox<MovieFragmentHeaderBox | TrackFragmentBox> & {
-    type: "moof";
-};
-
-// @beta
-export type MovieFragmentHeaderBox = FullBox & {
-    type: "mfhd";
-    sequenceNumber: number;
-};
-
-// @beta
-export type MovieFragmentRandomAccessBox = ContainerBox<TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox> & {
-    type: "mfra";
-};
-
-// @beta
-export type MovieFragmentRandomAccessOffsetBox = FullBox & {
-    type: "mfro";
-    mfraSize: number;
-};
-
-// @beta
-export type MovieHeaderBox = FullBox & {
-    type: "mvhd";
+// @public
+export class MediaHeaderBox extends FullBox {
+    constructor(version: number, flags: number, creationTime: number, modificationTime: number, timescale: number, duration: number, language: string, preDefined: number);
+    // (undocumented)
     creationTime: number;
-    modificationTime: number;
-    timescale: number;
+    // (undocumented)
     duration: number;
-    rate: number;
-    volume: number;
-    reserved1: number;
-    reserved2: number[];
+    // (undocumented)
+    language: string;
+    // (undocumented)
+    modificationTime: number;
+    // (undocumented)
+    preDefined: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): MediaHeaderBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    timescale: number;
+    // (undocumented)
+    static readonly type = "mdhd";
+    static write(box: MediaHeaderBox, view: IsoDataWriter): void;
+}
+
+// @public
+export class MediaInformationBox extends ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox> {
+    constructor(boxes?: (VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox)[]);
+    // (undocumented)
+    static readonly type = "minf";
+}
+
+// @beta
+export function mehd(view: IsoView): Fields<MovieExtendsHeaderBox$1>;
+
+// @beta
+export function meta(view: IsoView): Fields<MetaBox$1>;
+
+// @public
+export class MetaBox extends ContainerBox<HandlerReferenceBox | Box | DataInformationBox | Box | ItemProtectionBox | ItemInfoBox | ItemReferenceBox> {
+    constructor(version: number, flags: number, boxes?: (HandlerReferenceBox | Box | DataInformationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox)[]);
+    // (undocumented)
+    flags: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "meta";
+    // (undocumented)
+    version: number;
+}
+
+// @beta
+export function mfhd(view: IsoView): Fields<MovieFragmentHeaderBox$1>;
+
+// @beta
+export function mfro(view: IsoView): Fields<MovieFragmentRandomAccessOffsetBox$1>;
+
+// @public
+export class MovieBox extends ContainerBox<MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox> {
+    constructor(boxes?: (MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox)[]);
+    // (undocumented)
+    static readonly type = "moov";
+}
+
+// @public
+export class MovieExtendsBox extends ContainerBox<MovieExtendsHeaderBox | TrackExtendsBox> {
+    constructor(boxes?: (MovieExtendsHeaderBox | TrackExtendsBox)[]);
+    // (undocumented)
+    static readonly type = "mvex";
+}
+
+// @public
+export class MovieExtendsHeaderBox extends FullBox {
+    constructor(version: number, flags: number, fragmentDuration: number);
+    // (undocumented)
+    fragmentDuration: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): MovieExtendsHeaderBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "mehd";
+    static write(box: MovieExtendsHeaderBox, view: IsoDataWriter): void;
+}
+
+// @public
+export class MovieFragmentBox extends ContainerBox<MovieFragmentHeaderBox | TrackFragmentBox> {
+    constructor(boxes?: (MovieFragmentHeaderBox | TrackFragmentBox)[]);
+    // (undocumented)
+    static readonly type = "moof";
+}
+
+// @public
+export class MovieFragmentHeaderBox extends FullBox {
+    constructor(version: number, flags: number, sequenceNumber: number);
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): MovieFragmentHeaderBox;
+    // (undocumented)
+    sequenceNumber: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "mfhd";
+    static write(box: MovieFragmentHeaderBox, view: IsoDataWriter): void;
+}
+
+// @public
+export class MovieFragmentRandomAccessBox extends ContainerBox<TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox> {
+    constructor(boxes?: (TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox)[]);
+    // (undocumented)
+    static readonly type = "mfra";
+}
+
+// @public
+export class MovieFragmentRandomAccessOffsetBox extends FullBox {
+    constructor(version: number, flags: number, mfraSize: number);
+    // (undocumented)
+    mfraSize: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): MovieFragmentRandomAccessOffsetBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "mfro";
+    static write(box: MovieFragmentRandomAccessOffsetBox, view: IsoDataWriter): void;
+}
+
+// @public
+export class MovieHeaderBox extends FullBox {
+    constructor(version: number, flags: number, creationTime: number, modificationTime: number, timescale: number, duration: number, rate: number, volume: number, reserved1: number, reserved2: number[], matrix: number[], preDefined: number[], nextTrackId: number);
+    // (undocumented)
+    creationTime: number;
+    // (undocumented)
+    duration: number;
+    // (undocumented)
     matrix: number[];
-    preDefined: number[];
+    // (undocumented)
+    modificationTime: number;
+    // (undocumented)
     nextTrackId: number;
-};
+    // (undocumented)
+    preDefined: number[];
+    // (undocumented)
+    rate: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): MovieHeaderBox;
+    // (undocumented)
+    reserved1: number;
+    // (undocumented)
+    reserved2: number[];
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    timescale: number;
+    // (undocumented)
+    static readonly type = "mvhd";
+    // (undocumented)
+    volume: number;
+    static write(box: MovieHeaderBox, view: IsoDataWriter): void;
+}
 
 // @beta
 export function mp4a(view: IsoView): Fields<AudioSampleEntryBox<"mp4a">>;
 
 // @beta
-export function mvhd(view: IsoView): Fields<MovieHeaderBox>;
+export function mvhd(view: IsoView): Fields<MovieHeaderBox$1>;
 
-// @beta
-export type NullMediaHeaderBox = FullBox & {
-    type: "nmhd";
-};
+// @public
+export class NullMediaHeaderBox extends FullBox {
+    constructor(version: number, flags: number);
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): NullMediaHeaderBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "nmhd";
+    static write(box: NullMediaHeaderBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type OriginalFormatBox = Box & {
-    type: "frma";
+// @public
+export class OriginalFormatBox extends Box {
+    constructor(dataFormat: number);
+    // (undocumented)
     dataFormat: number;
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): OriginalFormatBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "frma";
+    static write(box: OriginalFormatBox, view: IsoDataWriter): void;
+}
 
 // @beta
 export function parseBoxes(raw: IsoData, config?: IsoViewConfig): IsoBmffBox[];
@@ -651,42 +973,68 @@ export function parseBoxes(raw: IsoData, config?: IsoViewConfig): IsoBmffBox[];
 // @beta
 export function payl(view: IsoView): Fields<WebVttCuePayloadBox>;
 
-// @beta
-export type PreselectionGroupBox = FullBox & {
-    type: "prsl";
-    groupId: number;
-    numEntitiesInGroup: number;
+// @public (undocumented)
+export class PreselectionGroupBox extends FullBox {
+    constructor(version: number, flags: number, groupId: number, numEntitiesInGroup: number, entities?: Entity[], preselectionTag?: string, selectionPriority?: number, interleavingTag?: string);
+    // (undocumented)
     entities: Entity[];
-    preselectionTag?: string;
-    selectionPriority?: number;
+    // (undocumented)
+    groupId: number;
+    // (undocumented)
     interleavingTag?: string;
-};
+    // (undocumented)
+    numEntitiesInGroup: number;
+    // (undocumented)
+    preselectionTag?: string;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): PreselectionGroupBox;
+    // (undocumented)
+    selectionPriority?: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "prsl";
+    static write(box: PreselectionGroupBox, view: IsoDataWriter): void;
+}
 
 // @beta
-export function prft(view: IsoView): Fields<ProducerReferenceTimeBox>;
+export function prft(view: IsoView): Fields<ProducerReferenceTimeBox$1>;
 
 // @beta
-export type PrimaryItemBox = FullBox & {
+export type PrimaryItemBox = FullBox$1 & {
     type: "pitm";
     itemId: number;
 };
 
-// @beta
-export type ProducerReferenceTimeBox = FullBox & {
-    type: "prft";
-    referenceTrackId: number;
-    ntpTimestampSec: number;
-    ntpTimestampFrac: number;
+// @public
+export class ProducerReferenceTimeBox extends FullBox {
+    constructor(version: number, flags: number, referenceTrackId: number, ntpTimestampSec: number, ntpTimestampFrac: number, mediaTime: number);
+    // (undocumented)
     mediaTime: number;
-};
+    // (undocumented)
+    ntpTimestampFrac: number;
+    // (undocumented)
+    ntpTimestampSec: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): ProducerReferenceTimeBox;
+    // (undocumented)
+    referenceTrackId: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "prft";
+    static write(box: ProducerReferenceTimeBox, view: IsoDataWriter): void;
+}
+
+// @public
+export class ProtectionSchemeInformationBox extends ContainerBox<OriginalFormatBox | Box | SchemeTypeBox | SchemeInformationBox> {
+    constructor(boxes?: (OriginalFormatBox | Box | SchemeTypeBox | SchemeInformationBox)[]);
+    // (undocumented)
+    static readonly type = "sinf";
+}
 
 // @beta
-export type ProtectionSchemeInformationBox = ContainerBox<OriginalFormatBox | IpmpInfoBox | SchemeTypeBox | SchemeInformationBox> & {
-    type: "sinf";
-};
-
-// @beta
-export type ProtectionSystemSpecificHeaderBox = FullBox & {
+export type ProtectionSystemSpecificHeaderBox = FullBox$1 & {
     type: "pssh";
     systemId: number[];
     kidCount: number;
@@ -696,7 +1044,7 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 };
 
 // @beta
-export function prsl(view: IsoView): Fields<PreselectionGroupBox>;
+export function prsl(view: IsoView): Fields<PreselectionGroupBox$1>;
 
 // @beta
 export function pssh(view: IsoView): Fields<ProtectionSystemSpecificHeaderBox>;
@@ -711,7 +1059,7 @@ export type RawBox = {
 };
 
 // @beta
-export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
+export type SampleAuxiliaryInformationOffsetsBox = FullBox$1 & {
     type: "saio";
     auxInfoType?: number;
     auxInfoTypeParameter?: number;
@@ -720,7 +1068,7 @@ export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
 };
 
 // @beta
-export type SampleAuxiliaryInformationSizesBox = FullBox & {
+export type SampleAuxiliaryInformationSizesBox = FullBox$1 & {
     type: "saiz";
     auxInfoType?: number;
     auxInfoTypeParameter?: number;
@@ -729,34 +1077,56 @@ export type SampleAuxiliaryInformationSizesBox = FullBox & {
     sampleInfoSize?: number[];
 };
 
-// @beta
-export type SampleDependencyTypeBox = FullBox & {
-    type: "sdtp";
+// @public
+export class SampleDependencyTypeBox extends FullBox {
+    constructor(version: number, flags: number, sampleDependencyTable?: number[]);
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SampleDependencyTypeBox;
+    // (undocumented)
     sampleDependencyTable: number[];
-};
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "sdtp";
+    static write(box: SampleDependencyTypeBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type SampleDescriptionBox<E extends SampleEntryBox = SampleEntryBox> = FullBox & {
-    type: "stsd";
+// @public
+export class SampleDescriptionBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: SampleEntryBox[]);
+    // (undocumented)
+    entries: SampleEntryBox[];
+    // (undocumented)
     entryCount: number;
-    entries: E[];
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SampleDescriptionBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stsd";
+    static write(box: SampleDescriptionBox, view: IsoDataWriter): void;
+}
 
 // @beta
-export type SampleEncryptionBox = FullBox & {
+export type SampleEncryptionBox = FullBox$1 & {
     type: "senc";
     sampleCount: number;
     samples: EncryptedSample[];
 };
 
-// @beta
-export type SampleEntryBox = Box & {
-    reserved1: number[];
+// @public
+export class SampleEntryBox extends Box {
+    constructor(type: `${string}${string}${string}${string}`, reserved1: number[], dataReferenceIndex: number);
+    // (undocumented)
     dataReferenceIndex: number;
-};
+    // (undocumented)
+    reserved1: number[];
+    // (undocumented)
+    get size(): number;
+}
 
 // @beta
-export type SampleGroupDescriptionBox = FullBox & {
+export type SampleGroupDescriptionBox = FullBox$1 & {
     type: "sgpd";
     groupingType: number;
     defaultLength?: number;
@@ -764,27 +1134,48 @@ export type SampleGroupDescriptionBox = FullBox & {
     entries: any[];
 };
 
-// @beta
-export type SampleSizeBox = FullBox & {
-    type: "stsz";
-    sampleSize: number;
-    sampleCount: number;
+// @public
+export class SampleSizeBox extends FullBox {
+    constructor(version: number, flags: number, sampleSize: number, sampleCount: number, entrySize?: number[]);
+    // (undocumented)
     entrySize?: number[];
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SampleSizeBox;
+    // (undocumented)
+    sampleCount: number;
+    // (undocumented)
+    sampleSize: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stsz";
+    static write(box: SampleSizeBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type SampleTableBox = ContainerBox<SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox> & {
-    type: "stbl";
-};
+// @public
+export class SampleTableBox extends ContainerBox<SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | Box> {
+    constructor(boxes?: (SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | Box)[]);
+    // (undocumented)
+    static readonly type = "stbl";
+}
 
-// @beta
-export type SampleToChunkBox = FullBox & {
-    type: "stsc";
-    entryCount: number;
+// @public (undocumented)
+export class SampleToChunkBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: SampleToChunkEntry[]);
+    // (undocumented)
     entries: SampleToChunkEntry[];
-};
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SampleToChunkBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stsc";
+    static write(box: SampleToChunkBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type SampleToChunkEntry = {
     firstChunk: number;
     samplesPerChunk: number;
@@ -792,7 +1183,7 @@ export type SampleToChunkEntry = {
 };
 
 // @beta
-export type SampleToGroupBox = FullBox & {
+export type SampleToGroupBox = FullBox$1 & {
     type: "sbgp";
     groupingType: number;
     groupingTypeParameter?: number;
@@ -806,37 +1197,62 @@ export type SampleToGroupEntry = {
     groupDescriptionIndex: number;
 };
 
-// @beta
-export type SchemeInformationBox = ContainerBox<TrackEncryptionBox | Box> & {
-    type: "schi";
-};
+// @public
+export class SchemeInformationBox extends ContainerBox<Box> {
+    constructor(boxes?: Box[]);
+    // (undocumented)
+    static readonly type = "schi";
+}
 
-// @beta
-export type SchemeTypeBox = FullBox & {
-    type: "schm";
+// @public
+export class SchemeTypeBox extends FullBox {
+    constructor(version: number, flags: number, schemeType: number, schemeVersion: number, schemeUri?: string);
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SchemeTypeBox;
+    // (undocumented)
     schemeType: number;
-    schemeVersion: number;
+    // (undocumented)
     schemeUri?: string;
-};
+    // (undocumented)
+    schemeVersion: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "schm";
+    static write(box: SchemeTypeBox, view: IsoDataWriter): void;
+}
 
 // @beta
-export function schm(view: IsoView): Fields<SchemeTypeBox>;
+export function schm(view: IsoView): Fields<SchemeTypeBox$1>;
 
 // @beta
-export function sdtp(view: IsoView): Fields<SampleDependencyTypeBox>;
+export function sdtp(view: IsoView): Fields<SampleDependencyTypeBox$1>;
 
-// @beta
-export type SegmentIndexBox = FullBox & {
-    type: "sidx";
-    referenceId: number;
-    timescale: number;
+// @public (undocumented)
+export class SegmentIndexBox extends FullBox {
+    constructor(version: number, flags: number, referenceId: number, timescale: number, earliestPresentationTime: number, firstOffset: number, reserved: number, references?: SegmentIndexReference[]);
+    // (undocumented)
     earliestPresentationTime: number;
+    // (undocumented)
     firstOffset: number;
-    reserved: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SegmentIndexBox;
+    // (undocumented)
+    referenceId: number;
+    // (undocumented)
     references: SegmentIndexReference[];
-};
+    // (undocumented)
+    reserved: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    timescale: number;
+    // (undocumented)
+    static readonly type = "sidx";
+    static write(box: SegmentIndexBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type SegmentIndexReference = {
     reference: number;
     subsegmentDuration: number;
@@ -848,73 +1264,106 @@ export type SegmentIndexReference = {
     sapDeltaTime: number;
 };
 
-// @beta
-export type SegmentTypeBox = TypeBox<"styp">;
+// @public
+export class SegmentTypeBox extends Box {
+    constructor(majorBrand: string, minorVersion: number, compatibleBrands?: string[]);
+    // (undocumented)
+    compatibleBrands: string[];
+    // (undocumented)
+    majorBrand: string;
+    // (undocumented)
+    minorVersion: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SegmentTypeBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "styp";
+    static write(box: SegmentTypeBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type ShadowSyncEntry = {
     shadowedSampleNumber: number;
     syncSampleNumber: number;
 };
 
-// @beta
-export type ShadowSyncSampleBox = FullBox & {
-    type: "stsh";
-    entryCount: number;
+// @public (undocumented)
+export class ShadowSyncSampleBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: ShadowSyncEntry[]);
+    // (undocumented)
     entries: ShadowSyncEntry[];
-};
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): ShadowSyncSampleBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stsh";
+    static write(box: ShadowSyncSampleBox, view: IsoDataWriter): void;
+}
 
 // @beta
-export function sidx(view: IsoView): Fields<SegmentIndexBox>;
+export function sidx(view: IsoView): Fields<SegmentIndexBox$1>;
 
 // @beta
-export type SingleItemTypeReferenceBox = Box & {
+export type SingleItemTypeReferenceBox = Box$1 & {
     fromItemId: number;
     referenceCount: number;
     toItemId: number[];
 };
 
 // @beta
-export function skip(view: IsoView): Fields<FreeSpaceBox<"skip">>;
+export function skip(view: IsoView): Fields<FreeSpaceBox$1<"skip">>;
 
 // @beta
-export function smhd(view: IsoView): Fields<SoundMediaHeaderBox>;
+export function smhd(view: IsoView): Fields<SoundMediaHeaderBox$1>;
 
-// @beta
-export type SoundMediaHeaderBox = FullBox & {
-    type: "smhd";
+// @public
+export class SoundMediaHeaderBox extends FullBox {
+    constructor(version: number, flags: number, balance: number, reserved: number);
+    // (undocumented)
     balance: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SoundMediaHeaderBox;
+    // (undocumented)
     reserved: number;
-};
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "smhd";
+    static write(box: SoundMediaHeaderBox, view: IsoDataWriter): void;
+}
 
 // @beta
-export function ssix(view: IsoView): Fields<SubsegmentIndexBox>;
+export function ssix(view: IsoView): Fields<SubsegmentIndexBox$1>;
 
 // @beta
-export function sthd(view: IsoView): Fields<SubtitleMediaHeaderBox>;
+export function sthd(view: IsoView): Fields<SubtitleMediaHeaderBox$1>;
 
 // @beta
 export const STRING = "string";
 
 // @beta
-export function stsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoView): Fields<SampleDescriptionBox<E>>;
+export function stsd<E extends SampleEntryBox$1 = SampleEntryBox$1>(view: IsoView): Fields<SampleDescriptionBox$1<E>>;
 
 // @beta
-export function stss(view: IsoView): Fields<SyncSampleBox>;
+export function stss(view: IsoView): Fields<SyncSampleBox$1>;
 
 // @beta
 export function sttg(view: IsoView): Fields<WebVttSettingsBox>;
 
 // @beta
-export function stts(view: IsoView): Fields<DecodingTimeToSampleBox>;
+export function stts(view: IsoView): Fields<DecodingTimeToSampleBox$1>;
 
 // @beta
-export function styp(view: IsoView): Fields<SegmentTypeBox>;
+export function styp(view: IsoView): Fields<SegmentTypeBox$1>;
 
 // @beta
-export function subs(view: IsoView): Fields<SubsampleInformationBox>;
+export function subs(view: IsoView): Fields<SubsampleInformationBox$1>;
 
-// @beta
+// @public
 export type Subsample = {
     subsampleSize: number;
     subsamplePriority: number;
@@ -928,55 +1377,89 @@ export type SubsampleEncryption = {
     bytesOfProtectedData: number;
 };
 
-// @beta
+// @public (undocumented)
 export type SubsampleEntry = {
     sampleDelta: number;
     subsampleCount: number;
     subsamples: Subsample[];
 };
 
-// @beta
-export type SubsampleInformationBox = FullBox & {
-    type: "subs";
-    entryCount: number;
+// @public (undocumented)
+export class SubsampleInformationBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: SubsampleEntry[]);
+    // (undocumented)
     entries: SubsampleEntry[];
-};
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SubsampleInformationBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "subs";
+    static write(box: SubsampleInformationBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public (undocumented)
 export type Subsegment = {
     rangesCount: number;
     ranges: SubsegmentRange[];
 };
 
-// @beta
-export type SubsegmentIndexBox = FullBox & {
-    type: "ssix";
+// @public (undocumented)
+export class SubsegmentIndexBox extends FullBox {
+    constructor(version: number, flags: number, subsegmentCount: number, subsegments?: Subsegment[]);
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SubsegmentIndexBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
     subsegmentCount: number;
+    // (undocumented)
     subsegments: Subsegment[];
-};
+    // (undocumented)
+    static readonly type = "ssix";
+    static write(box: SubsegmentIndexBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type SubsegmentRange = {
     level: number;
     rangeSize: number;
 };
 
-// @beta
-export type SubtitleMediaHeaderBox = FullBox & {
-    type: "sthd";
-};
+// @public
+export class SubtitleMediaHeaderBox extends FullBox {
+    constructor(version: number, flags: number);
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SubtitleMediaHeaderBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "sthd";
+    static write(box: SubtitleMediaHeaderBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type SyncSample = {
     sampleNumber: number;
 };
 
-// @beta
-export type SyncSampleBox = FullBox & {
-    type: "stss";
-    entryCount: number;
+// @public (undocumented)
+export class SyncSampleBox extends FullBox {
+    constructor(version: number, flags: number, entryCount: number, entries?: SyncSample[]);
+    // (undocumented)
     entries: SyncSample[];
-};
+    // (undocumented)
+    entryCount: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): SyncSampleBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "stss";
+    static write(box: SyncSampleBox, view: IsoDataWriter): void;
+}
 
 // @beta
 export const TEMPLATE = "template";
@@ -985,75 +1468,126 @@ export const TEMPLATE = "template";
 export function tenc(view: IsoView): Fields<TrackEncryptionBox>;
 
 // @beta
-export function tfdt(view: IsoView): Fields<TrackFragmentBaseMediaDecodeTimeBox>;
+export function tfdt(view: IsoView): Fields<TrackFragmentBaseMediaDecodeTimeBox$1>;
 
 // @beta
-export function tfhd(view: IsoView): Fields<TrackFragmentHeaderBox>;
+export function tfhd(view: IsoView): Fields<TrackFragmentHeaderBox$1>;
 
 // @beta
-export function tfra(view: IsoView): Fields<TrackFragmentRandomAccessBox>;
+export function tfra(view: IsoView): Fields<TrackFragmentRandomAccessBox$1>;
 
 // @beta
-export function tkhd(view: IsoView): Fields<TrackHeaderBox>;
+export function tkhd(view: IsoView): Fields<TrackHeaderBox$1>;
+
+// @public
+export class TrackBox extends ContainerBox<TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox> {
+    constructor(boxes?: (TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox)[]);
+    // (undocumented)
+    static readonly type = "trak";
+}
 
 // @beta
-export type TrackBox = ContainerBox<TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox> & {
-    type: "trak";
-};
-
-// @beta
-export type TrackEncryptionBox = FullBox & {
+export type TrackEncryptionBox = FullBox$1 & {
     type: "tenc";
     defaultIsEncrypted: number;
     defaultIvSize: number;
     defaultKid: number[];
 };
 
-// @beta
-export type TrackExtendsBox = FullBox & {
-    type: "trex";
-    trackId: number;
+// @public
+export class TrackExtendsBox extends FullBox {
+    constructor(version: number, flags: number, trackId: number, defaultSampleDescriptionIndex: number, defaultSampleDuration: number, defaultSampleSize: number, defaultSampleFlags: number);
+    // (undocumented)
     defaultSampleDescriptionIndex: number;
+    // (undocumented)
     defaultSampleDuration: number;
-    defaultSampleSize: number;
+    // (undocumented)
     defaultSampleFlags: number;
-};
+    // (undocumented)
+    defaultSampleSize: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): TrackExtendsBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    trackId: number;
+    // (undocumented)
+    static readonly type = "trex";
+    static write(box: TrackExtendsBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
-    type: "tfdt";
+// @public
+export class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
+    constructor(version: number, flags: number, baseMediaDecodeTime: number);
+    // (undocumented)
     baseMediaDecodeTime: number;
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): TrackFragmentBaseMediaDecodeTimeBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "tfdt";
+    static write(box: TrackFragmentBaseMediaDecodeTimeBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
-    type: "traf";
-};
+// @public
+export class TrackFragmentBox extends ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | Box> {
+    constructor(boxes?: (TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | Box)[]);
+    // (undocumented)
+    static readonly type = "traf";
+}
 
-// @beta
-export type TrackFragmentHeaderBox = FullBox & {
-    type: "tfhd";
-    trackId: number;
+// @public
+export class TrackFragmentHeaderBox extends FullBox {
+    constructor(version: number, flags: number, trackId: number, baseDataOffset?: number, sampleDescriptionIndex?: number, defaultSampleDuration?: number, defaultSampleSize?: number, defaultSampleFlags?: number);
+    // (undocumented)
     baseDataOffset?: number;
-    sampleDescriptionIndex?: number;
+    // (undocumented)
     defaultSampleDuration?: number;
-    defaultSampleSize?: number;
+    // (undocumented)
     defaultSampleFlags?: number;
-};
-
-// @beta
-export type TrackFragmentRandomAccessBox = FullBox & {
-    type: "tfra";
+    // (undocumented)
+    defaultSampleSize?: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): TrackFragmentHeaderBox;
+    // (undocumented)
+    sampleDescriptionIndex?: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
     trackId: number;
-    reserved: number;
-    numberOfEntry: number;
-    lengthSizeOfTrafNum: number;
-    lengthSizeOfTrunNum: number;
-    lengthSizeOfSampleNum: number;
-    entries: TrackFragmentRandomAccessEntry[];
-};
+    // (undocumented)
+    static readonly type = "tfhd";
+    static write(box: TrackFragmentHeaderBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public (undocumented)
+export class TrackFragmentRandomAccessBox extends FullBox {
+    constructor(version: number, flags: number, trackId: number, reserved: number, numberOfEntry: number, lengthSizeOfTrafNum: number, lengthSizeOfTrunNum: number, lengthSizeOfSampleNum: number, entries?: TrackFragmentRandomAccessEntry[]);
+    // (undocumented)
+    entries: TrackFragmentRandomAccessEntry[];
+    // (undocumented)
+    lengthSizeOfSampleNum: number;
+    // (undocumented)
+    lengthSizeOfTrafNum: number;
+    // (undocumented)
+    lengthSizeOfTrunNum: number;
+    // (undocumented)
+    numberOfEntry: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): TrackFragmentRandomAccessBox;
+    // (undocumented)
+    reserved: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    trackId: number;
+    // (undocumented)
+    static readonly type = "tfra";
+    static write(box: TrackFragmentRandomAccessBox, view: IsoDataWriter): void;
+}
+
+// @public
 export type TrackFragmentRandomAccessEntry = {
     time: number;
     moofOffset: number;
@@ -1062,52 +1596,94 @@ export type TrackFragmentRandomAccessEntry = {
     sampleNumber: number;
 };
 
-// @beta
-export type TrackHeaderBox = FullBox & {
-    type: "tkhd";
-    creationTime: number;
-    modificationTime: number;
-    trackId: number;
-    reserved1: number;
-    duration: number;
-    reserved2: number[];
-    layer: number;
+// @public
+export class TrackHeaderBox extends FullBox {
+    constructor(version: number, flags: number, creationTime: number, modificationTime: number, trackId: number, reserved1: number, duration: number, reserved2: number[], layer: number, alternateGroup: number, volume: number, reserved3: number, matrix: number[], width: number, height: number);
+    // (undocumented)
     alternateGroup: number;
-    volume: number;
-    reserved3: number;
-    matrix: number[];
-    width: number;
+    // (undocumented)
+    creationTime: number;
+    // (undocumented)
+    duration: number;
+    // (undocumented)
     height: number;
-};
+    // (undocumented)
+    layer: number;
+    // (undocumented)
+    matrix: number[];
+    // (undocumented)
+    modificationTime: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): TrackHeaderBox;
+    // (undocumented)
+    reserved1: number;
+    // (undocumented)
+    reserved2: number[];
+    // (undocumented)
+    reserved3: number;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    trackId: number;
+    // (undocumented)
+    static readonly type = "tkhd";
+    // (undocumented)
+    volume: number;
+    // (undocumented)
+    width: number;
+    static write(box: TrackHeaderBox, view: IsoDataWriter): void;
+}
 
-// @beta
-export type TrackKindBox = FullBox & {
-    type: "kind";
+// @public
+export class TrackKindBox extends FullBox {
+    constructor(version: number, flags: number, schemeUri: string, value: string);
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): TrackKindBox;
+    // (undocumented)
     schemeUri: string;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "kind";
+    // (undocumented)
     value: string;
-};
+    static write(box: TrackKindBox, view: IsoDataWriter): void;
+}
+
+// @public
+export class TrackReferenceBox extends ContainerBox<Box> {
+    constructor(boxes?: Box[]);
+    // (undocumented)
+    static readonly type = "tref";
+}
 
 // @beta
-export type TrackReferenceBox = ContainerBox<TrackReferenceTypeBox> & {
-    type: "tref";
-};
-
-// @beta
-export type TrackReferenceTypeBox = Box & {
+export type TrackReferenceTypeBox = Box$1 & {
     type: "tref";
     trackIds: number[];
 };
 
-// @beta
-export type TrackRunBox = FullBox & {
-    type: "trun";
-    sampleCount: number;
+// @public (undocumented)
+export class TrackRunBox extends FullBox {
+    constructor(version: number, flags: number, sampleCount: number, samples?: TrackRunSample[], dataOffset?: number, firstSampleFlags?: number);
+    // (undocumented)
     dataOffset?: number;
+    // (undocumented)
     firstSampleFlags?: number;
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): TrackRunBox;
+    // (undocumented)
+    sampleCount: number;
+    // (undocumented)
     samples: TrackRunSample[];
-};
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "trun";
+    static write(box: TrackRunBox, view: IsoDataWriter): void;
+}
 
-// @beta
+// @public
 export type TrackRunSample = {
     sampleDuration?: number;
     sampleSize?: number;
@@ -1116,13 +1692,13 @@ export type TrackRunSample = {
 };
 
 // @beta
-export function trex(view: IsoView): Fields<TrackExtendsBox>;
+export function trex(view: IsoView): Fields<TrackExtendsBox$1>;
 
 // @beta
-export function trun(view: IsoView): Fields<TrackRunBox>;
+export function trun(view: IsoView): Fields<TrackRunBox$1>;
 
 // @beta
-export type TypeBox<T$1> = Box & {
+export type TypeBox<T$1> = Box$1 & {
     type: T$1;
     majorBrand: string;
     minorVersion: number;
@@ -1136,7 +1712,7 @@ export const UINT = "uint";
 export function url(view: IsoView): Fields<UrlBox>;
 
 // @beta
-export type UrlBox = FullBox & {
+export type UrlBox = FullBox$1 & {
     type: "url";
     location: string;
 };
@@ -1145,29 +1721,40 @@ export type UrlBox = FullBox & {
 export function urn(view: IsoView): Fields<UrnBox>;
 
 // @beta
-export type UrnBox = FullBox & {
+export type UrnBox = FullBox$1 & {
     type: "urn";
     name: string;
     location: string;
 };
 
-// @beta
-export type UserDataBox = ContainerBox<Box> & {
-    type: "udta";
-};
+// @public
+export class UserDataBox extends ContainerBox<Box> {
+    constructor(boxes?: Box[]);
+    // (undocumented)
+    static readonly type = "udta";
+}
 
 // @beta
 export const UTF8 = "utf8";
 
-// @beta
-export type VideoMediaHeaderBox = FullBox & {
-    type: "vmhd";
+// @public
+export class VideoMediaHeaderBox extends FullBox {
+    constructor(version: number, flags: number, graphicsmode: number, opcolor: number[]);
+    // (undocumented)
     graphicsmode: number;
+    // (undocumented)
     opcolor: number[];
-};
+    // Warning: (ae-incompatible-release-tags) The symbol "read" is marked as @public, but its signature references "IsoView" which is marked as @beta
+    static read(view: IsoView): VideoMediaHeaderBox;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    static readonly type = "vmhd";
+    static write(box: VideoMediaHeaderBox, view: IsoDataWriter): void;
+}
 
 // @beta
-export type VisualSampleEntryBox<T$1 extends "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv"> = SampleEntryBox & {
+export type VisualSampleEntryBox<T$1 extends "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv"> = SampleEntryBox$1 & {
     type: T$1;
     preDefined1: number;
     reserved2: number;
@@ -1188,7 +1775,7 @@ export type VisualSampleEntryBox<T$1 extends "avc1" | "avc2" | "avc3" | "avc4" |
 export function vlab(view: IsoView): Fields<WebVttSourceLabelBox>;
 
 // @beta
-export function vmhd(view: IsoView): Fields<VideoMediaHeaderBox>;
+export function vmhd(view: IsoView): Fields<VideoMediaHeaderBox$1>;
 
 // @beta
 export function vttC(view: IsoView): Fields<WebVttConfigurationBox>;
@@ -1197,39 +1784,100 @@ export function vttC(view: IsoView): Fields<WebVttConfigurationBox>;
 export function vtte(): Fields<WebVttEmptySampleBox>;
 
 // @beta
-export type WebVttConfigurationBox = Box & {
+export type WebVttConfigurationBox = Box$1 & {
     type: "vttC";
     config: string;
 };
 
 // @beta
-export type WebVttCueIdBox = Box & {
+export type WebVttCueIdBox = Box$1 & {
     type: "iden";
     cueId: string;
 };
 
 // @beta
-export type WebVttCuePayloadBox = Box & {
+export type WebVttCuePayloadBox = Box$1 & {
     type: "payl";
     cueText: string;
 };
 
 // @beta
-export type WebVttEmptySampleBox = Box & {
+export type WebVttEmptySampleBox = Box$1 & {
     type: "vtte";
 };
 
 // @beta
-export type WebVttSettingsBox = Box & {
+export type WebVttSettingsBox = Box$1 & {
     type: "sttg";
     settings: string;
 };
 
 // @beta
-export type WebVttSourceLabelBox = Box & {
+export type WebVttSourceLabelBox = Box$1 & {
     type: "vlab";
     sourceLabel: string;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/boxes/Entity.ts:7:1 - (ae-forgotten-export) The symbol "TrackHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/Entity.ts:7:13 - (ae-forgotten-export) The symbol "TrackFragmentBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/FreeSpaceBox.ts:10:8 - (ae-forgotten-export) The symbol "ChunkLargeOffsetBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/FreeSpaceBox.ts:11:8 - (ae-forgotten-export) The symbol "DataInformationBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IdentifiedMediaDataBox.ts:9:13 - (ae-forgotten-export) The symbol "HintMediaHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IpmpInfoBox.ts:9:1 - (ae-forgotten-export) The symbol "ItemInfoBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:106:2 - (ae-forgotten-export) The symbol "EditBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:126:2 - (ae-forgotten-export) The symbol "ItemReferenceBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:127:2 - (ae-forgotten-export) The symbol "TrackKindBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:130:2 - (ae-forgotten-export) The symbol "MediaHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:131:2 - (ae-forgotten-export) The symbol "MediaBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:134:2 - (ae-forgotten-export) The symbol "MovieFragmentHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:135:2 - (ae-forgotten-export) The symbol "MovieFragmentRandomAccessBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:138:2 - (ae-forgotten-export) The symbol "MovieFragmentBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:139:2 - (ae-forgotten-export) The symbol "MovieBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:142:2 - (ae-forgotten-export) The symbol "MovieHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:143:2 - (ae-forgotten-export) The symbol "NullMediaHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:154:2 - (ae-forgotten-export) The symbol "SampleDependencyTypeBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:158:2 - (ae-forgotten-export) The symbol "ProtectionSchemeInformationBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:162:2 - (ae-forgotten-export) The symbol "SampleTableBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:163:2 - (ae-forgotten-export) The symbol "ChunkOffsetBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:166:2 - (ae-forgotten-export) The symbol "SampleToChunkBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:167:2 - (ae-forgotten-export) The symbol "SampleDescriptionBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:170:2 - (ae-forgotten-export) The symbol "SampleSizeBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:174:2 - (ae-forgotten-export) The symbol "SubsampleInformationBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:175:2 - (ae-forgotten-export) The symbol "CompactSampleSizeBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:178:2 - (ae-forgotten-export) The symbol "TrackFragmentHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:179:2 - (ae-forgotten-export) The symbol "TrackFragmentRandomAccessBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:182:2 - (ae-forgotten-export) The symbol "TrackBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:183:2 - (ae-forgotten-export) The symbol "TrackReferenceBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:186:2 - (ae-forgotten-export) The symbol "UserDataBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:187:2 - (ae-forgotten-export) The symbol "DataEntryUrlBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/IsoBmffBoxMap.ts:190:2 - (ae-forgotten-export) The symbol "VideoMediaHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/ItemExtent.ts:7:1 - (ae-forgotten-export) The symbol "LabelBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/ItemExtent.ts:7:13 - (ae-forgotten-export) The symbol "MediaDataBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/ItemInfoEntry.ts:9:13 - (ae-forgotten-export) The symbol "ItemProtectionBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/ItemLocation.ts:9:1 - (ae-forgotten-export) The symbol "MovieExtendsHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/ItemLocation.ts:9:13 - (ae-forgotten-export) The symbol "MetaBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/ItemLocationBox.ts:10:1 - (ae-forgotten-export) The symbol "MovieFragmentRandomAccessOffsetBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/ItemLocationBox.ts:10:31 - (ae-forgotten-export) The symbol "MediaInformationBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/LabelBox.ts:9:24 - (ae-forgotten-export) The symbol "MovieExtendsBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MediaDataBox.ts:11:19 - (ae-forgotten-export) The symbol "ProducerReferenceTimeBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MediaDataBox.ts:11:8 - (ae-forgotten-export) The symbol "PreselectionGroupBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MediaHeaderBox.ts:9:1 - (ae-forgotten-export) The symbol "SchemeInformationBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MediaHeaderBox.ts:9:13 - (ae-forgotten-export) The symbol "SchemeTypeBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MovieExtendsHeaderBox.ts:9:13 - (ae-forgotten-export) The symbol "SegmentIndexBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MovieFragmentHeaderBox.ts:9:1 - (ae-forgotten-export) The symbol "SoundMediaHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MovieFragmentHeaderBox.ts:9:13 - (ae-forgotten-export) The symbol "SubsegmentIndexBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MovieFragmentRandomAccessOffsetBox.ts:9:1 - (ae-forgotten-export) The symbol "DegradationPriorityBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MovieFragmentRandomAccessOffsetBox.ts:9:13 - (ae-forgotten-export) The symbol "SubtitleMediaHeaderBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MovieHeaderBox.ts:9:1 - (ae-forgotten-export) The symbol "ShadowSyncSampleBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/MovieHeaderBox.ts:9:13 - (ae-forgotten-export) The symbol "SyncSampleBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/NullMediaHeaderBox.ts:9:1 - (ae-forgotten-export) The symbol "DecodingTimeToSampleBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/NullMediaHeaderBox.ts:9:13 - (ae-forgotten-export) The symbol "SegmentTypeBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/OriginalFormatBox.ts:9:13 - (ae-forgotten-export) The symbol "TrackFragmentBaseMediaDecodeTimeBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/PreselectionGroupBox.ts:10:1 - (ae-forgotten-export) The symbol "TrackExtendsBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/PreselectionGroupBox.ts:10:13 - (ae-forgotten-export) The symbol "TrackRunBox$1" needs to be exported by the entry point index.d.ts
+// src/boxes/PrimaryItemBox.ts:9:1 - (ae-forgotten-export) The symbol "DataEntryUrnBox$1" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -6,7 +6,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type WebVttCueIdBox = Box & {
-	type: 'iden';
+export type WebVttCueIdBox = Box<'iden'> & {
 	cueId: string;
 };

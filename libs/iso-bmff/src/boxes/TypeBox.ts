@@ -1,4 +1,5 @@
-import type { Box } from './Box.ts'
+import type { Box } from './Box.ts';
+import type { BoxType } from './BoxType.ts';
 
 /**
  * Utility TypeBox
@@ -6,8 +7,7 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type TypeBox<T> = Box & {
-	type: T;
+export type TypeBox<T extends BoxType> = Box<T> & {
 	majorBrand: string;
 	minorVersion: number;
 	compatibleBrands: string[];

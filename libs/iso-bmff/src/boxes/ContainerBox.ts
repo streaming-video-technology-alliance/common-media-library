@@ -1,4 +1,5 @@
 import type { Box } from './Box.ts'
+import type { BoxType } from './BoxType.ts'
 
 /**
  * Container Box
@@ -6,6 +7,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type ContainerBox<T> = Box & {
-	boxes: T[];
+export type ContainerBox<T extends BoxType, B> = Box<T> & {
+	boxes: B[];
 };

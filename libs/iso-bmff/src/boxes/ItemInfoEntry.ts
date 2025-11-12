@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type ItemInfoEntry = FullBox & {
-	type: 'infe';
+export type ItemInfoEntry = FullBox<'infe'> & {
 	itemId: number;
 	itemProtectionIndex: number;
 	itemName: string;

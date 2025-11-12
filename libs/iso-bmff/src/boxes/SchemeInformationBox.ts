@@ -1,4 +1,5 @@
 import type { Box } from './Box.ts'
+import type { BoxType } from './BoxType.ts'
 import type { ContainerBox } from './ContainerBox.ts'
 import type { TrackEncryptionBox } from './TrackEncryptionBox.ts'
 
@@ -8,6 +9,4 @@ import type { TrackEncryptionBox } from './TrackEncryptionBox.ts'
  *
  * @beta
  */
-export type SchemeInformationBox = ContainerBox<TrackEncryptionBox | Box> & {
-	type: 'schi';
-};
+export type SchemeInformationBox = ContainerBox<'schi', TrackEncryptionBox | Box<BoxType>>;

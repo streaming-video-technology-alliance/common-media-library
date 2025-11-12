@@ -12,6 +12,4 @@ import type { TrackRunBox } from './TrackRunBox.ts'
  *
  * @beta
  */
-export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
-	type: 'traf';
-};
+export type TrackFragmentBox = ContainerBox<'traf', TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox>

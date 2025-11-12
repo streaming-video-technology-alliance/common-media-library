@@ -6,7 +6,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type MediaDataBox = Box & {
-	type: 'mdat';
+export type MediaDataBox = Box<'mdat'> & {
 	data: Uint8Array<ArrayBuffer>;
 };

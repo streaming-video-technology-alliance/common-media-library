@@ -1,4 +1,5 @@
 import type { Box } from './Box.ts'
+import type { BoxType } from './BoxType.ts'
 import type { ContainerBox } from './ContainerBox.ts'
 
 /**
@@ -7,6 +8,4 @@ import type { ContainerBox } from './ContainerBox.ts'
  *
  * @beta
  */
-export type UserDataBox = ContainerBox<Box> & {
-	type: 'udta';
-};
+export type UserDataBox = ContainerBox<'udta', Box<BoxType>>;

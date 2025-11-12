@@ -6,7 +6,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type WebVttConfigurationBox = Box & {
-	type: 'vttC';
+export type WebVttConfigurationBox = Box<'vttC'> & {
 	config: string;
 };

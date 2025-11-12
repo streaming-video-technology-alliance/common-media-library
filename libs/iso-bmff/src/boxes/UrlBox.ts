@@ -6,7 +6,6 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type UrlBox = FullBox & {
-	type: 'url';
+export type UrlBox = FullBox<'url'> & {
 	location: string;
 };

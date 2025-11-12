@@ -7,8 +7,7 @@ import type { TrackFragmentRandomAccessEntry } from './TrackFragmentRandomAccess
  *
  * @beta
  */
-export type TrackFragmentRandomAccessBox = FullBox & {
-	type: 'tfra';
+export type TrackFragmentRandomAccessBox = FullBox<'tfra'> & {
 	trackId: number;
 	reserved: number;
 	numberOfEntry: number;

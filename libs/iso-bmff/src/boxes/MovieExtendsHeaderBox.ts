@@ -6,7 +6,6 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type MovieExtendsHeaderBox = FullBox & {
-	type: 'mehd';
+export type MovieExtendsHeaderBox = FullBox<'mehd'> & {
 	fragmentDuration: number;
 };

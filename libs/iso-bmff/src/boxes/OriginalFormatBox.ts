@@ -6,7 +6,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type OriginalFormatBox = Box & {
-	type: 'frma';
+export type OriginalFormatBox = Box<'frma'> & {
 	dataFormat: number;
 };

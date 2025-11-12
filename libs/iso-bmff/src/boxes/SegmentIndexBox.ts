@@ -7,8 +7,7 @@ import type { SegmentIndexReference } from './SegmentIndexReference.ts'
  *
  * @beta
  */
-export type SegmentIndexBox = FullBox & {
-	type: 'sidx';
+export type SegmentIndexBox = FullBox<'sidx'> & {
 	referenceId: number;
 	timescale: number;
 	earliestPresentationTime: number;

@@ -7,6 +7,4 @@ import type { EditListBox } from './EditListBox.ts'
  *
  * @beta
  */
-export type EditBox = ContainerBox<EditListBox> & {
-	type: 'edts';
-};
+export type EditBox = ContainerBox<'edts', EditListBox>;

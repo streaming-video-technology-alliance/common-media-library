@@ -8,6 +8,4 @@ import type { TrackExtendsBox } from './TrackExtendsBox.ts'
  *
  * @beta
  */
-export type MovieExtendsBox = ContainerBox<MovieExtendsHeaderBox | TrackExtendsBox> & {
-	type: 'mvex';
-};
+export type MovieExtendsBox = ContainerBox<'mvex', MovieExtendsHeaderBox | TrackExtendsBox>;

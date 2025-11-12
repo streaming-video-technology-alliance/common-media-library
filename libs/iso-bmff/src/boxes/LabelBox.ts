@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type LabelBox = FullBox & {
-	type: 'labl';
+export type LabelBox = FullBox<'labl'> & {
 	isGroupLabel: boolean;
 	labelId: number;
 	language: string;

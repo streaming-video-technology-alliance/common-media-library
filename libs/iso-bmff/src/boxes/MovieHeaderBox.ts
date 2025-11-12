@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type MovieHeaderBox = FullBox & {
-	type: 'mvhd';
+export type MovieHeaderBox = FullBox<'mvhd'> & {
 	creationTime: number;
 	modificationTime: number;
 	timescale: number;

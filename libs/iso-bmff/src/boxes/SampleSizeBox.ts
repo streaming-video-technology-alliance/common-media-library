@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type SampleSizeBox = FullBox & {
-	type: 'stsz';
+export type SampleSizeBox = FullBox<'stsz'> & {
 	sampleSize: number;
 	sampleCount: number;
 	entrySize?: number[];

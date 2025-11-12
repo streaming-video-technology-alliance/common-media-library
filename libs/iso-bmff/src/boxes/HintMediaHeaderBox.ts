@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type HintMediaHeaderBox = FullBox & {
-	type: 'hmhd';
+export type HintMediaHeaderBox = FullBox<'hmhd'> & {
 	maxPDUsize: number;
 	avgPDUsize: number;
 	maxbitrate: number;

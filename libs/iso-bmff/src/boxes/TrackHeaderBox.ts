@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type TrackHeaderBox = FullBox & {
-	type: 'tkhd';
+export type TrackHeaderBox = FullBox<'tkhd'> & {
 	creationTime: number;
 	modificationTime: number;
 	trackId: number;

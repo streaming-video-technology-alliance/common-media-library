@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type ProtectionSystemSpecificHeaderBox = FullBox & {
-	type: 'pssh';
+export type ProtectionSystemSpecificHeaderBox = FullBox<'pssh'> & {
 	systemId: number[];
 	kidCount: number;
 	kid: number[];

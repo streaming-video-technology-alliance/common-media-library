@@ -9,6 +9,4 @@ import type { MediaInformationBox } from './MediaInformationBox.ts'
  *
  * @beta
  */
-export type MediaBox = ContainerBox<MediaHeaderBox | HandlerReferenceBox | MediaInformationBox> & {
-	type: 'mdia';
-};
+export type MediaBox = ContainerBox<'mdia', MediaHeaderBox | HandlerReferenceBox | MediaInformationBox>;

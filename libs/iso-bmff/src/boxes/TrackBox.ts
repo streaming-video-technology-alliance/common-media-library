@@ -11,6 +11,4 @@ import type { UserDataBox } from './UserDataBox.ts'
  *
  * @beta
  */
-export type TrackBox = ContainerBox<TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox> & {
-	type: 'trak';
-};
+export type TrackBox = ContainerBox<'trak', TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox>;

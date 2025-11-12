@@ -6,7 +6,6 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type MovieFragmentRandomAccessOffsetBox = FullBox & {
-	type: 'mfro';
+export type MovieFragmentRandomAccessOffsetBox = FullBox<'mfro'> & {
 	mfraSize: number;
 };

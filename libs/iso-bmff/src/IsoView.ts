@@ -1,3 +1,4 @@
+import type { BoxType } from './boxes/BoxType.ts'
 import type { ContainerBox } from './boxes/ContainerBox.ts'
 import type { Fields } from './boxes/Fields.ts'
 import type { FullBox } from './boxes/FullBox.ts'
@@ -212,7 +213,7 @@ export class IsoView {
 	 *
 	 * @returns The full box.
 	 */
-	readFullBox = (): Fields<FullBox> => {
+	readFullBox = (): Fields<FullBox<BoxType>> => {
 		return {
 			version: this.readUint(1),
 			flags: this.readUint(3),
@@ -332,8 +333,6 @@ export class IsoView {
 					Object.assign(box, parser(data, this.config))
 				}
 
-				box.view = data
-
 				if (CONTAINERS.includes(type)) {
 					const boxes = []
 
@@ -345,7 +344,7 @@ export class IsoView {
 						boxes.push(child)
 					}
 
-					(box as ContainerBox<IsoBmffBox>).boxes = boxes
+					(box as ContainerBox<BoxType, IsoBmffBox>).boxes = boxes
 				}
 
 				yield box

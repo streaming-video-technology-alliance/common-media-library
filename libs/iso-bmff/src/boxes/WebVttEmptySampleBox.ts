@@ -6,6 +6,4 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type WebVttEmptySampleBox = Box & {
-	type: 'vtte';
-};
+export type WebVttEmptySampleBox = Box<'vtte'>;

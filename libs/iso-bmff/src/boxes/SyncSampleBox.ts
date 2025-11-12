@@ -7,8 +7,7 @@ import type { SyncSample } from './SyncSample.ts'
  *
  * @beta
  */
-export type SyncSampleBox = FullBox & {
-	type: 'stss';
+export type SyncSampleBox = FullBox<'stss'> & {
 	entryCount: number;
 	entries: SyncSample[];
 };

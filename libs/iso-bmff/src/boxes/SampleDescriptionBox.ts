@@ -7,8 +7,7 @@ import type { SampleEntryBox } from './SampleEntryBox.ts'
  *
  * @beta
  */
-export type SampleDescriptionBox<E extends SampleEntryBox = SampleEntryBox> = FullBox & {
-	type: 'stsd';
+export type SampleDescriptionBox<E extends SampleEntryBox = SampleEntryBox> = FullBox<'stsd'> & {
 	entryCount: number,
 	entries: E[],
 };

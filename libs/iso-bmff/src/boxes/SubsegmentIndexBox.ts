@@ -7,8 +7,7 @@ import type { Subsegment } from './Subsegment.ts'
  *
  * @beta
  */
-export type SubsegmentIndexBox = FullBox & {
-	type: 'ssix';
+export type SubsegmentIndexBox = FullBox<'ssix'> & {
 	subsegmentCount: number;
 	subsegments: Subsegment[];
 };

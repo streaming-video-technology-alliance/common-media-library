@@ -6,7 +6,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type FreeSpaceBox<T extends 'free' | 'skip' = 'free'> = Box & {
-	type: T;
+export type FreeSpaceBox<T extends 'free' | 'skip' = 'free'> = Box<T> & {
 	data: Uint8Array;
 };

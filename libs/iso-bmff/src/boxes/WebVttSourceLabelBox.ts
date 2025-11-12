@@ -6,7 +6,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type WebVttSourceLabelBox = Box & {
-	type: 'vlab';
+export type WebVttSourceLabelBox = Box<'vlab'> & {
 	sourceLabel: string;
 };

@@ -6,6 +6,4 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type NullMediaHeaderBox = FullBox & {
-	type: 'nmhd';
-};
+export type NullMediaHeaderBox = FullBox<'nmhd'>;

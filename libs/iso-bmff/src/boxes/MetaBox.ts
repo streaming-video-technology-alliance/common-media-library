@@ -14,6 +14,4 @@ import type { PrimaryItemBox } from './PrimaryItemBox.ts'
  *
  * @beta
  */
-export type MetaBox = FullBox & ContainerBox<HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox> & {
-	type: 'meta';
-};
+export type MetaBox = FullBox<'meta'> & ContainerBox<'meta', HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox>;

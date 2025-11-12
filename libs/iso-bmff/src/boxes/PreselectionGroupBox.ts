@@ -7,9 +7,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type PreselectionGroupBox = FullBox & {
-	type: 'prsl';
-
+export type PreselectionGroupBox = FullBox<'prsl'> & {
 	/** Group ID */
 	groupId: number;
 

@@ -12,6 +12,4 @@ import type { VideoMediaHeaderBox } from './VideoMediaHeaderBox.ts'
  *
  * @beta
  */
-export type MediaInformationBox = ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox> & {
-	type: 'minf';
-};
+export type MediaInformationBox = ContainerBox<'minf', VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox>;

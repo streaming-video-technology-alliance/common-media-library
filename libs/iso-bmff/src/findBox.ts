@@ -1,3 +1,4 @@
+import type { BoxType } from './boxes/BoxType.ts'
 import type { ContainerBox } from './boxes/ContainerBox.ts'
 import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
 import type { BoxFilter } from './BoxFilter.ts'
@@ -11,7 +12,7 @@ function find<T extends IsoBmffBox = IsoBmffBox>(iterator: Iterable<IsoBmffBox>,
 			return box as T
 		}
 
-		const { boxes } = box as ContainerBox<IsoBmffBox>
+		const { boxes } = box as ContainerBox<BoxType, IsoBmffBox>
 		if (recursive && Array.isArray(boxes)) {
 			const result = find(boxes, recursive, fn)
 

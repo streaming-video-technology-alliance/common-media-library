@@ -7,8 +7,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type EditListBox = FullBox & {
-	type: 'elst';
+export type EditListBox = FullBox<'elst'> & {
 	entryCount: number;
 	entries: EditListEntry[];
 };

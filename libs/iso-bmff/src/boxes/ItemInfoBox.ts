@@ -7,7 +7,6 @@ import type { ItemInfoEntry } from './ItemInfoEntry.ts'
  *
  * @beta
  */
-export type ItemInfoBox = ContainerBox<ItemInfoEntry> & {
-	type: 'iinf';
+export type ItemInfoBox = ContainerBox<'iinf', ItemInfoEntry> & {
 	entryCount: number;
 };

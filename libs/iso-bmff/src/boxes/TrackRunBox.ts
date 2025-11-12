@@ -10,8 +10,7 @@ import type { TrackRunSample } from './TrackRunSample.ts'
  *
  * @beta
  */
-export type TrackRunBox = FullBox & {
-	type: 'trun';
+export type TrackRunBox = FullBox<'trun'> & {
 	sampleCount: number;
 	dataOffset?: number;
 	firstSampleFlags?: number;

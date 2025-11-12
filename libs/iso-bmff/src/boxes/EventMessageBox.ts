@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type EventMessageBox = FullBox & {
-	type: 'emsg';
+export type EventMessageBox = FullBox<'emsg'> & {
 	schemeIdUri: string,
 	value: string,
 	timescale: number,

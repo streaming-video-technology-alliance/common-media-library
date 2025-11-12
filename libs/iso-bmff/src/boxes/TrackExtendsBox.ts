@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type TrackExtendsBox = FullBox & {
-	type: 'trex';
+export type TrackExtendsBox = FullBox<'trex'> & {
 	trackId: number;
 	defaultSampleDescriptionIndex: number;
 	defaultSampleDuration: number;

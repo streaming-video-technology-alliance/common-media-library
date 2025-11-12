@@ -8,8 +8,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type DataReferenceBox = FullBox & {
-	type: 'dref';
+export type DataReferenceBox = FullBox<'dref'> & {
 	entryCount: number;
 	entries: (DataEntryUrlBox | DataEntryUrnBox)[];
 };

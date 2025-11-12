@@ -6,7 +6,6 @@ import type { Box } from './Box.ts'
  *
  * @beta
  */
-export type WebVttCuePayloadBox = Box & {
-	type: 'payl';
+export type WebVttCuePayloadBox = Box<'payl'> & {
 	cueText: string;
 };

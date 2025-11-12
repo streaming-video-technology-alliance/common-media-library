@@ -1,4 +1,4 @@
-import type { IsoView } from '../IsoView.ts'
+import type { BoxType } from './BoxType.ts'
 
 /**
  * Base Box Type
@@ -6,10 +6,9 @@ import type { IsoView } from '../IsoView.ts'
  *
  * @beta
  */
-export type Box = {
-	type: string;
-	size: number;
-	view: IsoView;
-	largesize?: number;
-	usertype?: number[];
-};
+export type Box<T extends BoxType> = {
+	type: T
+	size: number
+	largesize?: number
+	usertype?: number[]
+}

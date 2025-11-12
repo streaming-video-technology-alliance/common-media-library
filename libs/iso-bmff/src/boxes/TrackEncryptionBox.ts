@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type TrackEncryptionBox = FullBox & {
-	type: 'tenc';
+export type TrackEncryptionBox = FullBox<'tenc'> & {
 	defaultIsEncrypted: number;
 	defaultIvSize: number;
 	defaultKid: number[];

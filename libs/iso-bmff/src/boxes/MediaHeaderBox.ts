@@ -6,9 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type MediaHeaderBox = FullBox & {
-	type: 'mdhd';
-
+export type MediaHeaderBox = FullBox<'mdhd'> & {
 	/** A 32-bit integer that specifies the creation time of the media in this track. */
 	creationTime: number;
 

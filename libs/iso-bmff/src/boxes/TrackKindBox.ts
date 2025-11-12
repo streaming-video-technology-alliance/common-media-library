@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type TrackKindBox = FullBox & {
-	type: 'kind';
+export type TrackKindBox = FullBox<'kind'> & {
 	schemeUri: string;
 	value: string;
 };

@@ -8,6 +8,4 @@ import type { TrackFragmentBox } from './TrackFragmentBox.ts'
  *
  * @beta
  */
-export type MovieFragmentBox = ContainerBox<MovieFragmentHeaderBox | TrackFragmentBox> & {
-	type: 'moof';
-};
+export type MovieFragmentBox = ContainerBox<'moof', MovieFragmentHeaderBox | TrackFragmentBox>;

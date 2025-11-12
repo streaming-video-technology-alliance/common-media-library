@@ -6,8 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @beta
  */
-export type ChunkOffsetBox = FullBox & {
-	type: 'stco';
+export type ChunkOffsetBox = FullBox<'stco'> & {
 	entryCount: number;
 	chunkOffset: number[];
 };

@@ -7,7 +7,6 @@ import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformati
  *
  * @beta
  */
-export type ItemProtectionBox = ContainerBox<ProtectionSchemeInformationBox> & {
-	type: 'ipro';
+export type ItemProtectionBox = ContainerBox<'ipro', ProtectionSchemeInformationBox> & {
 	protectionCount: number;
 };
