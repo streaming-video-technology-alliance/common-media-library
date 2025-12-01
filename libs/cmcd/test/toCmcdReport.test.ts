@@ -33,18 +33,6 @@ describe('toCmcdReport', () => {
 			},
 		})
 
-		const queryResponseReport = toCmcdReport(data, {
-			url: 'https://hello.world',
-			version: 1,
-			reportingMode: CmcdReportingMode.RESPONSE,
-			transmissionMode: CmcdTransmissionMode.QUERY,
-		})
-
-		deepEqual(queryResponseReport, {
-			url: 'https://hello.world/?CMCD=br%3D1000%2Ccom.example-hello%3D%22world%22%2Csu%2Cts%3D0',
-			method: 'GET',
-			headers: {},
-		})
 		//#endregion example
 	})
 

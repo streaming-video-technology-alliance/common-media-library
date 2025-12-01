@@ -3,18 +3,16 @@ import { SfToken } from '@svta/cml-structured-field-values'
 import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts'
-import { CMCD_RESPONSE_MODE } from './CMCD_RESPONSE_MODE.ts'
 import type { CmcdData } from './CmcdData.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
-import { isCmcdResponseKey } from './isCmcdResponseKey.ts'
+import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
 
 const filterMap = {
-	[CMCD_RESPONSE_MODE]: isCmcdResponseKey,
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
 }
@@ -42,13 +40,17 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	// Filter keys based on the version, reporting mode and options
 	let keys = Object.keys(obj).filter(keyFilter)
 
+	if (obj['e'] && obj['e'] !== 'rr') {
+		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
+	}
+
 	const filter = options.filter
 	if (typeof filter === 'function') {
 		keys = keys.filter(filter)
 	}
 
 	// Ensure all required keys are present before sorting
-	const needsTimestamp = reportingMode === CMCD_RESPONSE_MODE || reportingMode === CMCD_EVENT_MODE
+	const needsTimestamp = reportingMode === CMCD_EVENT_MODE
 	if (needsTimestamp && !keys.includes('ts')) {
 		keys.push('ts')
 	}

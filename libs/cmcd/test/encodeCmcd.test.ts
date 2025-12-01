@@ -8,6 +8,7 @@ import { CMCD_STRING_EVENT } from './data/CMCD_STRING_EVENT.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
 import { CMCD_STRING_RESPONSE } from './data/CMCD_STRING_RESPONSE.ts'
 import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts'
+import { CmcdEventType } from '@svta/cml-cmcd'
 
 describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
@@ -76,17 +77,22 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.REQUEST }), CMCD_STRING_REQUEST)
 		})
 
-		it('returns encoded string for response mode', () => {
-			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.RESPONSE }), CMCD_STRING_RESPONSE)
+		it('returns encoded string for response received', () => {
+			const input = Object.assign({}, CMCD_INPUT)
+			input.e = CmcdEventType.RESPONSE_RECEIVED
+
+			const output = CMCD_STRING_RESPONSE.replace(/e=[a-z]+/, 'e=rr')
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), output)
 		})
 
-		it('appends timestamp in response mode', (context) => {
+		it('appends timestamp in response received', (context) => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = Object.assign({}, CMCD_INPUT)
+			input.e = CmcdEventType.RESPONSE_RECEIVED
 			delete input.ts
 
-			const output = CMCD_STRING_RESPONSE.replace(/ts=\d+/, 'ts=1234')
-			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.RESPONSE }), output)
+			const output = CMCD_STRING_RESPONSE.replace(/e=[a-z]+/, 'e=rr').replace(/ts=\d+/, 'ts=1234')
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), output)
 		})
 
 		it('returns encoded string for event mode', () => {

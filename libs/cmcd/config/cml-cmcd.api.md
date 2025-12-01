@@ -119,6 +119,7 @@ export type CmcdEncodeOptions = {
     customHeaderMap?: Partial<CmcdHeaderMap>;
     filter?: (key: CmcdKey) => boolean;
     baseUrl?: string;
+    events?: string[];
 };
 
 // @beta @deprecated
@@ -133,7 +134,7 @@ export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
 };
 
 // @beta
-export type CmcdEventExcludedKeys = "bs" | "bsd" | "cmsdd" | "cmsds" | "d" | "dl" | "nor" | "ot" | "rc" | "rtp" | "smrt" | "su" | "ttfbb" | "ttlb" | "url";
+export type CmcdEventExcludedKeys = "bsd" | "d" | "dl" | "nor" | "ot" | "rtp" | "sid" | "su";
 
 // @beta
 export const CmcdEventType: {
@@ -146,6 +147,7 @@ export const CmcdEventType: {
     readonly UNMUTE: "um";
     readonly PLAYER_EXPAND: "pe";
     readonly PLAYER_COLLAPSE: "pc";
+    readonly RESPONSE_RECEIVED: "rr";
 };
 
 // @beta (undocumented)
@@ -213,7 +215,6 @@ export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
 // @beta
 export const CmcdReportingMode: {
     readonly REQUEST: typeof CMCD_REQUEST_MODE;
-    readonly RESPONSE: typeof CMCD_RESPONSE_MODE;
     readonly EVENT: typeof CMCD_EVENT_MODE;
 };
 
@@ -318,7 +319,7 @@ export function isCmcdEventKey(key: string): key is keyof CmcdEvent;
 export function isCmcdRequestKey(key: string): key is keyof CmcdRequest;
 
 // @beta
-export function isCmcdResponseKey(key: string): key is keyof CmcdResponse;
+export function isCmcdResponseReceivedKey(key: string): key is keyof CmcdResponse;
 
 // @beta
 export function isCmcdV1Key(key: string): key is keyof Cmcd;
