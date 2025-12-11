@@ -53,6 +53,11 @@ export const CmcdEventType = {
 	 * The player view was collapsed.
 	 */
 	PLAYER_COLLAPSE: 'pc',
+
+	/**
+	 * The receipt of a response.
+	 */
+	RESPONSE_RECEIVED: 'rr',
 } as const
 
 /**
