@@ -1,3 +1,5 @@
+// TODO: Build this list dynamically from the package.json files in
+//       the libs directory sorted topologically by dependencies.
 export const projects: string[] = [
 	'libs/utils',
 	'libs/xml',

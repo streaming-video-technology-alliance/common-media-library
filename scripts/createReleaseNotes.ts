@@ -1,7 +1,9 @@
 import { readFile, writeFile } from 'node:fs/promises'
 
-function release(version: string, changes: string) {
-	return `## Release Notes
+function release(pkg: string, version: string, changes: string) {
+	return `# @svta/cml-${pkg} - ${version}
+
+## Release Notes
 
 ${changes}
 
@@ -10,29 +12,29 @@ ${changes}
 
 ## NPM Package
 \`\`\`sh
-npm install @svta/common-media-library@${version}
+npm install @svta/cml-${pkg}@${version}
 \`\`\`
 `
 }
 
-async function getChanges(version: string) {
-	const changeLog = await readFile('./CHANGELOG.md', 'utf8')
+async function getChanges(pkg: string, version: string) {
+	const changeLog = await readFile(`libs/${pkg}/CHANGELOG.md`, 'utf8')
 	const logs = changeLog.split(/^## /m)
 	const match = `[${version}]`
 	const log = logs.find(log => log.includes(match)) || ''
 	return log.split('\n\n').slice(1).join('\n\n')
 }
 
-async function getVersion() {
-	const txt = await readFile('./package.json', 'utf8')
+async function getVersion(pkg: string) {
+	const txt = await readFile(`libs/${pkg}/package.json`, 'utf8')
 	return JSON.parse(txt).version
 }
 
-const createReleaseNotes = async () => {
-	const version = await getVersion()
-	const changes = await getChanges(version)
-	const releaseNotes = release(version, changes)
+const createReleaseNotes = async (pkg: string) => {
+	const version = await getVersion(pkg)
+	const changes = await getChanges(pkg, version)
+	const releaseNotes = release(pkg, version, changes)
 	await writeFile('./RELEASE.md', releaseNotes)
 }
 
-createReleaseNotes()
+createReleaseNotes(process.argv[2])
