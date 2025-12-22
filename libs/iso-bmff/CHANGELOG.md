@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.23.1] - 2025-12-22
+
+### Fixed
+
+- Use fixed version numbers for all CML peer dependencies ([#277](https://github.com/streaming-video-technology-alliance/common-media-library/issues/277))
+
 ## [0.23.0] - 2025-10-24
 
 ### Changed

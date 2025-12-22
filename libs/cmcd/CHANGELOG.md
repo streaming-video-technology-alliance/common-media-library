@@ -8,12 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.0.1] - 2025-12-1
+## [1.0.1] - 2025-12-22
 
 ### Changed
 
 - Removed `response mode` from CMCD encoding
 - Added `response received` event and filtering
+
+### Fixed
+
+- Use fixed version numbers for all CML peer dependencies ([#277](https://github.com/streaming-video-technology-alliance/common-media-library/issues/277))
 
 ## [1.0.0] - 2025-10-24
 

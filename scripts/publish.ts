@@ -36,29 +36,37 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 	const [folder, file, packageJson] = pkg
 	const { version, peerDependencies = {} } = packageJson
 
-	await Promise.all(Object.entries(peerDependencies).map(async ([dep, version]) => {
-		if (packages[dep] && version === '*') {
-			peerDependencies[dep] = version
-			await writeFile(file, JSON.stringify(packageJson, null, '\t') + '\n')
+	let peersUpdated = false
+	Object.entries(peerDependencies).forEach(([dep, version]) => {
+		if (!packages[dep] || version !== '*') {
+			return
 		}
-	}))
+
+		peersUpdated = true
+		peerDependencies[dep] = packages[dep][2].version
+	})
+
+	if (peersUpdated) {
+		await writeFile(file, JSON.stringify(packageJson, null, '\t') + '\n')
+	}
 
 	const latest = await exec(`npm view ${name} version`)
-	const updated = latest < version
+	const updated = latest !== version
 	const deps = await exec(`npm view ${name} peerDependencies --json`)
 
 	if (!updated && deps) {
 		const peerDependencies = JSON.parse(deps)
 
 		for (const dep in peerDependencies) {
-			if (!packages[dep]) {
+			// TODO: Remove the wildcard check after first successful publish.
+			if (!packages[dep] || peerDependencies[dep] === '*') {
 				continue
 			}
 
 			const version = peerDependencies[dep]
 
 			if (version < packages[dep][1]) {
-				throw new Error(`Package ${name} needs to update its version because ${dep}'s version has changed.`)
+				throw new Error(`Package ${name} (${version}) needs to update its version because ${dep}'s version (${packages[dep][1]}) has changed.`)
 			}
 		}
 	}
@@ -71,10 +79,13 @@ const needsPublish = await Promise.all(
 	Object
 		.entries(packages)
 		.map(([name, pkg]) => processPackage(name, pkg, packages))
-		.filter(Boolean),
 )
 
 // Publish the packages
 for (const folder of needsPublish) {
-	await cmd(`npm publish --provenance --access public -w ${folder}`)
+	if (!folder) {
+		continue
+	}
+
+	await cmd(`npm publish --provenance --access public --dry-run -w ${folder}`)
 }
