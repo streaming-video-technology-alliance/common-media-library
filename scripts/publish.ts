@@ -87,5 +87,5 @@ for (const folder of needsPublish) {
 		continue
 	}
 
-	await cmd(`npm publish --provenance --access public --dry-run -w ${folder}`)
+	await cmd(`npm publish --provenance --access public -w ${folder}`)
 }
