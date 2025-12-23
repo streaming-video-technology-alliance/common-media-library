@@ -22,4 +22,6 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-8601-v1.0.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-8601-v1.0.1...HEAD
+[1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-8601-v1.0.0...iso-8601-v1.0.1
+[1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/iso-8601-v1.0.0
