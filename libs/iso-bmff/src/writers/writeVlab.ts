@@ -1,35 +1,27 @@
+import { encodeText } from '@svta/cml-utils'
 import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a WebVttSourceLabelBox to a Uint8Array.
+ * Write a WebVttSourceLabelBox to an IsoDataWriter.
  *
  * @param box - The WebVttSourceLabelBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeVlab(box: Fields<WebVttSourceLabelBox>): Uint8Array {
-	const encoder = new TextEncoder()
-	const sourceLabelBytes = encoder.encode(box.sourceLabel)
+export function writeVlab(box: Fields<WebVttSourceLabelBox>): IsoDataWriter {
+	const sourceLabelBytes = encodeText(box.sourceLabel)
 
 	const headerSize = 8
 	const sourceLabelSize = sourceLabelBytes.length + 1 // null-terminated
 	const totalSize = headerSize + sourceLabelSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-	const result = new Uint8Array(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('vlab', totalSize)
+	writer.writeUtf8TerminatedString(box.sourceLabel)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'vlab', totalSize)
-
-	result.set(sourceLabelBytes, offset)
-	offset += sourceLabelBytes.length
-	dataView.setUint8(offset, 0) // null terminator
-
-	return result
+	return writer
 }
-

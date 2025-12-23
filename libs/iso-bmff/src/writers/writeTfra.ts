@@ -1,21 +1,19 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a TrackFragmentRandomAccessBox to a Uint8Array.
+ * Write a TrackFragmentRandomAccessBox to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
  *
  * @param box - The TrackFragmentRandomAccessBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeTfra(box: Fields<TrackFragmentRandomAccessBox>): Uint8Array {
+export function writeTfra(box: Fields<TrackFragmentRandomAccessBox>): IsoDataWriter {
 	const v1 = box.version === 1
 	const timeSize = v1 ? 8 : 4
 	const entrySize = timeSize + timeSize + // time + moofOffset
@@ -31,41 +29,25 @@ export function writeTfra(box: Fields<TrackFragmentRandomAccessBox>): Uint8Array
 	const entriesSize = box.numberOfEntry * entrySize
 	const totalSize = headerSize + fullBoxSize + trackIdSize + reservedSize + numberOfEntrySize + entriesSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('tfra', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'tfra', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
-
-	writeUint(dataView, offset, 4, box.trackId)
-	offset += 4
+	writer.writeUint(box.trackId, 4)
 
 	// Pack reserved with length sizes
 	const reserved = (box.lengthSizeOfTrafNum << 4) | (box.lengthSizeOfTrunNum << 2) | box.lengthSizeOfSampleNum
-	writeUint(dataView, offset, 4, reserved)
-	offset += 4
+	writer.writeUint(reserved, 4)
 
-	writeUint(dataView, offset, 4, box.numberOfEntry)
-	offset += 4
+	writer.writeUint(box.numberOfEntry, 4)
 
 	for (const entry of box.entries) {
-		writeUint(dataView, offset, timeSize, entry.time)
-		offset += timeSize
-
-		writeUint(dataView, offset, timeSize, entry.moofOffset)
-		offset += timeSize
-
-		writeUint(dataView, offset, box.lengthSizeOfTrafNum + 1, entry.trafNumber)
-		offset += box.lengthSizeOfTrafNum + 1
-
-		writeUint(dataView, offset, box.lengthSizeOfTrunNum + 1, entry.trunNumber)
-		offset += box.lengthSizeOfTrunNum + 1
-
-		writeUint(dataView, offset, box.lengthSizeOfSampleNum + 1, entry.sampleNumber)
-		offset += box.lengthSizeOfSampleNum + 1
+		writer.writeUint(entry.time, timeSize)
+		writer.writeUint(entry.moofOffset, timeSize)
+		writer.writeUint(entry.trafNumber, box.lengthSizeOfTrafNum + 1)
+		writer.writeUint(entry.trunNumber, box.lengthSizeOfTrunNum + 1)
+		writer.writeUint(entry.sampleNumber, box.lengthSizeOfSampleNum + 1)
 	}
 
-	return new Uint8Array(buffer)
+	return writer
 }
-

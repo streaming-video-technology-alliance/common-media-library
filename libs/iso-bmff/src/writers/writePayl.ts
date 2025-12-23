@@ -1,35 +1,27 @@
+import { encodeText } from '@svta/cml-utils'
 import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a WebVttCuePayloadBox to a Uint8Array.
+ * Write a WebVttCuePayloadBox to an IsoDataWriter.
  *
  * @param box - The WebVttCuePayloadBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writePayl(box: Fields<WebVttCuePayloadBox>): Uint8Array {
-	const encoder = new TextEncoder()
-	const cueTextBytes = encoder.encode(box.cueText)
+export function writePayl(box: Fields<WebVttCuePayloadBox>): IsoDataWriter {
+	const cueTextBytes = encodeText(box.cueText)
 
 	const headerSize = 8
 	const cueTextSize = cueTextBytes.length + 1 // null-terminated
 	const totalSize = headerSize + cueTextSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-	const result = new Uint8Array(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('payl', totalSize)
+	writer.writeUtf8TerminatedString(box.cueText)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'payl', totalSize)
-
-	result.set(cueTextBytes, offset)
-	offset += cueTextBytes.length
-	dataView.setUint8(offset, 0) // null terminator
-
-	return result
+	return writer
 }
-

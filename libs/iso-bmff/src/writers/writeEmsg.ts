@@ -1,22 +1,19 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeString } from './writeString.ts'
-import { writeUint } from './writeUint.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write an EventMessageBox to a Uint8Array.
+ * Write an EventMessageBox to an IsoDataWriter.
  *
  * ISO/IEC 23009-1 - 5.10.3.3 Event Message Box
  *
  * @param box - The EventMessageBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeEmsg(box: Fields<EventMessageBox>): Uint8Array {
+export function writeEmsg(box: Fields<EventMessageBox>): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 
@@ -32,62 +29,27 @@ export function writeEmsg(box: Fields<EventMessageBox>): Uint8Array {
 
 	const totalSize = headerSize + fullBoxSize + contentSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-	const result = new Uint8Array(buffer)
-
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'emsg', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('emsg', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
 	if (box.version === 0) {
-		writeString(dataView, offset, box.schemeIdUri)
-		offset += box.schemeIdUri.length
-		dataView.setUint8(offset, 0) // null terminator
-		offset += 1
-
-		writeString(dataView, offset, box.value)
-		offset += box.value.length
-		dataView.setUint8(offset, 0) // null terminator
-		offset += 1
-
-		writeUint(dataView, offset, 4, box.timescale)
-		offset += 4
-
-		writeUint(dataView, offset, 4, box.presentationTimeDelta ?? 0)
-		offset += 4
-
-		writeUint(dataView, offset, 4, box.eventDuration)
-		offset += 4
-
-		writeUint(dataView, offset, 4, box.id)
-		offset += 4
+		writer.writeTerminatedString(box.schemeIdUri)
+		writer.writeTerminatedString(box.value)
+		writer.writeUint(box.timescale, 4)
+		writer.writeUint(box.presentationTimeDelta ?? 0, 4)
+		writer.writeUint(box.eventDuration, 4)
+		writer.writeUint(box.id, 4)
 	} else {
-		writeUint(dataView, offset, 4, box.timescale)
-		offset += 4
-
-		writeUint(dataView, offset, 8, box.presentationTime ?? 0)
-		offset += 8
-
-		writeUint(dataView, offset, 4, box.eventDuration)
-		offset += 4
-
-		writeUint(dataView, offset, 4, box.id)
-		offset += 4
-
-		writeString(dataView, offset, box.schemeIdUri)
-		offset += box.schemeIdUri.length
-		dataView.setUint8(offset, 0) // null terminator
-		offset += 1
-
-		writeString(dataView, offset, box.value)
-		offset += box.value.length
-		dataView.setUint8(offset, 0) // null terminator
-		offset += 1
+		writer.writeUint(box.timescale, 4)
+		writer.writeUint(box.presentationTime ?? 0, 8)
+		writer.writeUint(box.eventDuration, 4)
+		writer.writeUint(box.id, 4)
+		writer.writeTerminatedString(box.schemeIdUri)
+		writer.writeTerminatedString(box.value)
 	}
 
-	result.set(box.messageData, offset)
+	writer.writeBytes(box.messageData)
 
-	return result
+	return writer
 }
-

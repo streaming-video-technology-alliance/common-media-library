@@ -1,22 +1,19 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeString } from './writeString.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a HandlerReferenceBox to a Uint8Array.
+ * Write a HandlerReferenceBox to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
  *
  * @param box - The HandlerReferenceBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeHdlr(box: Fields<HandlerReferenceBox>): Uint8Array {
+export function writeHdlr(box: Fields<HandlerReferenceBox>): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const preDefinedSize = 4
@@ -25,28 +22,18 @@ export function writeHdlr(box: Fields<HandlerReferenceBox>): Uint8Array {
 	const nameSize = box.name.length + 1 // null-terminated string
 	const totalSize = headerSize + fullBoxSize + preDefinedSize + handlerTypeSize + reservedSize + nameSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('hdlr', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'hdlr', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
-
-	writeUint(dataView, offset, 4, box.preDefined)
-	offset += preDefinedSize
-
-	writeString(dataView, offset, box.handlerType)
-	offset += handlerTypeSize
+	writer.writeUint(box.preDefined, 4)
+	writer.writeString(box.handlerType)
 
 	for (let i = 0; i < 3; i++) {
-		writeUint(dataView, offset, 4, box.reserved[i] ?? 0)
-		offset += 4
+		writer.writeUint(box.reserved[i] ?? 0, 4)
 	}
 
-	writeString(dataView, offset, box.name)
-	offset += box.name.length
-	dataView.setUint8(offset, 0) // null terminator
+	writer.writeTerminatedString(box.name)
 
-	return new Uint8Array(buffer)
+	return writer
 }
-

@@ -1,21 +1,19 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a ProtectionSystemSpecificHeaderBox to a Uint8Array.
+ * Write a ProtectionSystemSpecificHeaderBox to an IsoDataWriter.
  *
  * ISO/IEC 23001-7 - 8.1 Protection System Specific Header Box
  *
  * @param box - The ProtectionSystemSpecificHeaderBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writePssh(box: Fields<ProtectionSystemSpecificHeaderBox>): Uint8Array {
+export function writePssh(box: Fields<ProtectionSystemSpecificHeaderBox>): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const systemIdSize = 16
@@ -25,36 +23,27 @@ export function writePssh(box: Fields<ProtectionSystemSpecificHeaderBox>): Uint8
 	const dataSize = box.dataSize
 	const totalSize = headerSize + fullBoxSize + systemIdSize + kidCountSize + kidSize + dataSizeField + dataSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'pssh', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('pssh', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
 	for (let i = 0; i < 16; i++) {
-		writeUint(dataView, offset, 1, box.systemId[i] ?? 0)
-		offset += 1
+		writer.writeUint(box.systemId[i] ?? 0, 1)
 	}
 
 	if (box.version > 0) {
-		writeUint(dataView, offset, 4, box.kidCount)
-		offset += 4
+		writer.writeUint(box.kidCount, 4)
 
 		for (let i = 0; i < box.kidCount; i++) {
-			writeUint(dataView, offset, 1, box.kid[i] ?? 0)
-			offset += 1
+			writer.writeUint(box.kid[i] ?? 0, 1)
 		}
 	}
 
-	writeUint(dataView, offset, 4, box.dataSize)
-	offset += 4
+	writer.writeUint(box.dataSize, 4)
 
 	for (let i = 0; i < box.dataSize; i++) {
-		writeUint(dataView, offset, 1, box.data[i] ?? 0)
-		offset += 1
+		writer.writeUint(box.data[i] ?? 0, 1)
 	}
 
-	return new Uint8Array(buffer)
+	return writer
 }
-

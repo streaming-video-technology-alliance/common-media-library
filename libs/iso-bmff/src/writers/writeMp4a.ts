@@ -1,21 +1,19 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
 import type { Fields } from '../boxes/Fields.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeTemplate } from './writeTemplate.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write an AudioSampleEntryBox to a Uint8Array.
+ * Write an AudioSampleEntryBox to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 12.2.3 Audio Sample Entry
  *
  * @param box - The AudioSampleEntryBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeMp4a(box: Fields<AudioSampleEntryBox<'mp4a'>>): Uint8Array {
+export function writeMp4a(box: Fields<AudioSampleEntryBox<'mp4a'>>): IsoDataWriter {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2
@@ -29,43 +27,25 @@ export function writeMp4a(box: Fields<AudioSampleEntryBox<'mp4a'>>): Uint8Array 
 	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + reserved2Size +
 		channelcountSize + samplesizeSize + preDefinedSize + reserved3Size + samplerateSize + esdsSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-	const result = new Uint8Array(buffer)
-
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'mp4a', totalSize)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('mp4a', totalSize)
 
 	for (let i = 0; i < 6; i++) {
-		writeUint(dataView, offset, 1, box.reserved1[i] ?? 0)
-		offset += 1
+		writer.writeUint(box.reserved1[i] ?? 0, 1)
 	}
 
-	writeUint(dataView, offset, 2, box.dataReferenceIndex)
-	offset += 2
+	writer.writeUint(box.dataReferenceIndex, 2)
 
 	for (let i = 0; i < 2; i++) {
-		writeUint(dataView, offset, 4, box.reserved2[i] ?? 0)
-		offset += 4
+		writer.writeUint(box.reserved2[i] ?? 0, 4)
 	}
 
-	writeUint(dataView, offset, 2, box.channelcount)
-	offset += 2
+	writer.writeUint(box.channelcount, 2)
+	writer.writeUint(box.samplesize, 2)
+	writer.writeUint(box.preDefined, 2)
+	writer.writeUint(box.reserved3, 2)
+	writer.writeTemplate(box.samplerate, 4)
+	writer.writeBytes(box.esds)
 
-	writeUint(dataView, offset, 2, box.samplesize)
-	offset += 2
-
-	writeUint(dataView, offset, 2, box.preDefined)
-	offset += 2
-
-	writeUint(dataView, offset, 2, box.reserved3)
-	offset += 2
-
-	writeTemplate(dataView, offset, 4, box.samplerate)
-	offset += 4
-
-	result.set(box.esds, offset)
-
-	return result
+	return writer
 }
-

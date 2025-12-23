@@ -1,25 +1,18 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a WebVttEmptySampleBox to a Uint8Array.
+ * Write a WebVttEmptySampleBox to an IsoDataWriter.
  *
- * @param _box - The WebVttEmptySampleBox fields to write (empty)
- *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeVtte(_box: Fields<WebVttEmptySampleBox>): Uint8Array {
+export function writeVtte(): IsoDataWriter {
 	const headerSize = 8
 	const totalSize = headerSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('vtte', totalSize)
 
-	writeBoxHeader(dataView, 0, 'vtte', totalSize)
-
-	return new Uint8Array(buffer)
+	return writer
 }
-

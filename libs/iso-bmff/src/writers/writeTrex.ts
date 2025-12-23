@@ -1,21 +1,19 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a TrackExtendsBox to a Uint8Array.
+ * Write a TrackExtendsBox to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
  *
  * @param box - The TrackExtendsBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeTrex(box: Fields<TrackExtendsBox>): Uint8Array {
+export function writeTrex(box: Fields<TrackExtendsBox>): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
@@ -26,27 +24,15 @@ export function writeTrex(box: Fields<TrackExtendsBox>): Uint8Array {
 	const totalSize = headerSize + fullBoxSize + trackIdSize + defaultSampleDescriptionIndexSize +
 		defaultSampleDurationSize + defaultSampleSizeSize + defaultSampleFlagsSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('trex', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'trex', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
+	writer.writeUint(box.trackId, 4)
+	writer.writeUint(box.defaultSampleDescriptionIndex, 4)
+	writer.writeUint(box.defaultSampleDuration, 4)
+	writer.writeUint(box.defaultSampleSize, 4)
+	writer.writeUint(box.defaultSampleFlags, 4)
 
-	writeUint(dataView, offset, 4, box.trackId)
-	offset += 4
-
-	writeUint(dataView, offset, 4, box.defaultSampleDescriptionIndex)
-	offset += 4
-
-	writeUint(dataView, offset, 4, box.defaultSampleDuration)
-	offset += 4
-
-	writeUint(dataView, offset, 4, box.defaultSampleSize)
-	offset += 4
-
-	writeUint(dataView, offset, 4, box.defaultSampleFlags)
-
-	return new Uint8Array(buffer)
+	return writer
 }
-

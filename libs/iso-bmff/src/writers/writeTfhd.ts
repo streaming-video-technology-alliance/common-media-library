@@ -1,21 +1,19 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a TrackFragmentHeaderBox to a Uint8Array.
+ * Write a TrackFragmentHeaderBox to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
  *
  * @param box - The TrackFragmentHeaderBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeTfhd(box: Fields<TrackFragmentHeaderBox>): Uint8Array {
+export function writeTfhd(box: Fields<TrackFragmentHeaderBox>): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
@@ -27,41 +25,31 @@ export function writeTfhd(box: Fields<TrackFragmentHeaderBox>): Uint8Array {
 	const totalSize = headerSize + fullBoxSize + trackIdSize + baseDataOffsetSize +
 		sampleDescriptionIndexSize + defaultSampleDurationSize + defaultSampleSizeSize + defaultSampleFlagsSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('tfhd', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'tfhd', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
-
-	writeUint(dataView, offset, 4, box.trackId)
-	offset += 4
+	writer.writeUint(box.trackId, 4)
 
 	if (box.flags & 0x01) {
-		writeUint(dataView, offset, 8, box.baseDataOffset ?? 0)
-		offset += 8
+		writer.writeUint(box.baseDataOffset ?? 0, 8)
 	}
 
 	if (box.flags & 0x02) {
-		writeUint(dataView, offset, 4, box.sampleDescriptionIndex ?? 0)
-		offset += 4
+		writer.writeUint(box.sampleDescriptionIndex ?? 0, 4)
 	}
 
 	if (box.flags & 0x08) {
-		writeUint(dataView, offset, 4, box.defaultSampleDuration ?? 0)
-		offset += 4
+		writer.writeUint(box.defaultSampleDuration ?? 0, 4)
 	}
 
 	if (box.flags & 0x10) {
-		writeUint(dataView, offset, 4, box.defaultSampleSize ?? 0)
-		offset += 4
+		writer.writeUint(box.defaultSampleSize ?? 0, 4)
 	}
 
 	if (box.flags & 0x20) {
-		writeUint(dataView, offset, 4, box.defaultSampleFlags ?? 0)
-		offset += 4
+		writer.writeUint(box.defaultSampleFlags ?? 0, 4)
 	}
 
-	return new Uint8Array(buffer)
+	return writer
 }
-

@@ -1,32 +1,26 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a FreeSpaceBox (skip variant) to a Uint8Array.
+ * Write a FreeSpaceBox (skip variant) to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 8.1.2 Free Space Box
  *
  * @param box - The FreeSpaceBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeSkip(box: Fields<FreeSpaceBox<'skip'>>): Uint8Array {
+export function writeSkip(box: Fields<FreeSpaceBox<'skip'>>): IsoDataWriter {
 	const headerSize = 8
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-	const result = new Uint8Array(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('skip', totalSize)
+	writer.writeBytes(box.data)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'skip', totalSize)
-
-	result.set(box.data, offset)
-
-	return result
+	return writer
 }
-

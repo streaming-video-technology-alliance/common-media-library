@@ -1,21 +1,19 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a MediaHeaderBox to a Uint8Array.
+ * Write a MediaHeaderBox to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
  *
  * @param box - The MediaHeaderBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeMdhd(box: Fields<MediaHeaderBox>): Uint8Array {
+export function writeMdhd(box: Fields<MediaHeaderBox>): IsoDataWriter {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -25,30 +23,26 @@ export function writeMdhd(box: Fields<MediaHeaderBox>): Uint8Array {
 	const preDefined = 2
 	const totalSize = headerSize + fullBoxSize + timesSize + timescaleSize + languageSize + preDefined
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('mdhd', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'mdhd', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
+	writer.writeUint(box.creationTime, size)
+	writer.writeUint(box.modificationTime, size)
+	writer.writeUint(box.timescale, 4)
+	writer.writeUint(box.duration, size)
 
-	writeUint(dataView, offset, size, box.creationTime)
-	offset += size
+	// Encode ISO-639-2/T language code as 3 5-bit integers in a 16-bit value
+	// Format: bits 14-10 (char1), bits 9-5 (char2), bits 4-0 (char3)
+	// Each character code is (charCode - 0x60) to convert from ASCII to 5-bit value
+	const lang = box.language.length >= 3
+		? (((box.language.charCodeAt(0) - 0x60) & 0x1F) << 10) |
+		(((box.language.charCodeAt(1) - 0x60) & 0x1F) << 5) |
+		((box.language.charCodeAt(2) - 0x60) & 0x1F)
+		: 0 // Default to "und" (undefined) if invalid
+	writer.writeUint(lang, 2)
 
-	writeUint(dataView, offset, size, box.modificationTime)
-	offset += size
+	writer.writeUint(box.preDefined, 2)
 
-	writeUint(dataView, offset, 4, box.timescale)
-	offset += 4
-
-	writeUint(dataView, offset, size, box.duration)
-	offset += size
-
-	writeUint(dataView, offset, 2, box.language)
-	offset += 2
-
-	writeUint(dataView, offset, 2, box.preDefined)
-
-	return new Uint8Array(buffer)
+	return writer
 }
-

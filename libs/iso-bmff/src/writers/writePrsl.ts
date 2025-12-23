@@ -1,26 +1,23 @@
+import { encodeText } from '@svta/cml-utils'
 import type { Fields } from '../boxes/Fields.ts'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a PreselectionGroupBox to a Uint8Array.
+ * Write a PreselectionGroupBox to an IsoDataWriter.
  *
  * @param box - The PreselectionGroupBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writePrsl(box: Fields<PreselectionGroupBox>): Uint8Array {
-	const encoder = new TextEncoder()
-
+export function writePrsl(box: Fields<PreselectionGroupBox>): IsoDataWriter {
 	const preselectionTagBytes = (box.flags & 0x1000) && box.preselectionTag
-		? encoder.encode(box.preselectionTag)
+		? encodeText(box.preselectionTag)
 		: null
 	const interleavingTagBytes = (box.flags & 0x4000) && box.interleavingTag
-		? encoder.encode(box.interleavingTag)
+		? encodeText(box.interleavingTag)
 		: null
 
 	const headerSize = 8
@@ -35,43 +32,28 @@ export function writePrsl(box: Fields<PreselectionGroupBox>): Uint8Array {
 	const totalSize = headerSize + fullBoxSize + groupIdSize + numEntitiesInGroupSize +
 		entitiesSize + preselectionTagSize + selectionPrioritySize + interleavingTagSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-	const result = new Uint8Array(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('prsl', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'prsl', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
-
-	writeUint(dataView, offset, 4, box.groupId)
-	offset += 4
-
-	writeUint(dataView, offset, 4, box.numEntitiesInGroup)
-	offset += 4
+	writer.writeUint(box.groupId, 4)
+	writer.writeUint(box.numEntitiesInGroup, 4)
 
 	for (const entity of box.entities) {
-		writeUint(dataView, offset, 4, entity.entityId)
-		offset += 4
+		writer.writeUint(entity.entityId, 4)
 	}
 
-	if (preselectionTagBytes) {
-		result.set(preselectionTagBytes, offset)
-		offset += preselectionTagBytes.length
-		dataView.setUint8(offset, 0) // null terminator
-		offset += 1
+	if (preselectionTagBytes && box.preselectionTag) {
+		writer.writeUtf8TerminatedString(box.preselectionTag)
 	}
 
 	if (box.flags & 0x2000) {
-		writeUint(dataView, offset, 1, box.selectionPriority ?? 0)
-		offset += 1
+		writer.writeUint(box.selectionPriority ?? 0, 1)
 	}
 
-	if (interleavingTagBytes) {
-		result.set(interleavingTagBytes, offset)
-		offset += interleavingTagBytes.length
-		dataView.setUint8(offset, 0) // null terminator
+	if (interleavingTagBytes && box.interleavingTag) {
+		writer.writeUtf8TerminatedString(box.interleavingTag)
 	}
 
-	return result
+	return writer
 }
-

@@ -1,22 +1,20 @@
+import { encodeText } from '@svta/cml-utils'
 import type { Fields } from '../boxes/Fields.ts'
 import type { LabelBox } from '../boxes/LabelBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeUint } from './writeUint.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a LabelBox to a Uint8Array.
+ * Write a LabelBox to an IsoDataWriter.
  *
  * @param box - The LabelBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeLabl(box: Fields<LabelBox>): Uint8Array {
-	const encoder = new TextEncoder()
-	const languageBytes = encoder.encode(box.language)
-	const labelBytes = encoder.encode(box.label)
+export function writeLabl(box: Fields<LabelBox>): IsoDataWriter {
+	const languageBytes = encodeText(box.language)
+	const labelBytes = encodeText(box.label)
 
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -25,26 +23,13 @@ export function writeLabl(box: Fields<LabelBox>): Uint8Array {
 	const labelSize = labelBytes.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + labelIdSize + languageSize + labelSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
-	const result = new Uint8Array(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('labl', totalSize)
+	writer.writeFullBox(box.version, box.flags)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'labl', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
+	writer.writeUint(box.labelId, 2)
+	writer.writeUtf8TerminatedString(box.language)
+	writer.writeUtf8TerminatedString(box.label)
 
-	writeUint(dataView, offset, 2, box.labelId)
-	offset += 2
-
-	result.set(languageBytes, offset)
-	offset += languageBytes.length
-	dataView.setUint8(offset, 0) // null terminator
-	offset += 1
-
-	result.set(labelBytes, offset)
-	offset += labelBytes.length
-	dataView.setUint8(offset, 0) // null terminator
-
-	return result
+	return writer
 }
-

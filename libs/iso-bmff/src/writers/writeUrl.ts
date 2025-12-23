@@ -1,37 +1,28 @@
 import type { Fields } from '../boxes/Fields.ts'
 import type { UrlBox } from '../boxes/UrlBox.ts'
-import { writeBoxHeader } from './writeBoxHeader.ts'
-import { writeFullBox } from './writeFullBox.ts'
-import { writeString } from './writeString.ts'
+import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
- * Write a UrlBox to a Uint8Array.
+ * Write a UrlBox to an IsoDataWriter.
  *
  * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
  *
  * @param box - The UrlBox fields to write
  *
- * @returns A Uint8Array containing the encoded box
+ * @returns An IsoDataWriter containing the encoded box
  *
  * @beta
  */
-export function writeUrl(box: Fields<UrlBox>): Uint8Array {
+export function writeUrl(box: Fields<UrlBox>): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const locationSize = box.location.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + locationSize
 
-	const buffer = new ArrayBuffer(totalSize)
-	const dataView = new DataView(buffer)
+	const writer = new IsoDataWriter(totalSize)
+	writer.writeBoxHeader('url ', totalSize)
+	writer.writeFullBox(box.version, box.flags)
+	writer.writeTerminatedString(box.location)
 
-	let offset = 0
-	offset += writeBoxHeader(dataView, offset, 'url ', totalSize)
-	offset += writeFullBox(dataView, offset, box.version, box.flags)
-
-	writeString(dataView, offset, box.location)
-	offset += box.location.length
-	dataView.setUint8(offset, 0) // null terminator
-
-	return new Uint8Array(buffer)
+	return writer
 }
-
