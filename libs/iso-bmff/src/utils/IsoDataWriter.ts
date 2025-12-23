@@ -142,5 +142,4 @@ export class IsoDataWriter {
 	get buffer(): Uint8Array {
 		return new Uint8Array(this.dataView.buffer)
 	}
-
 }
