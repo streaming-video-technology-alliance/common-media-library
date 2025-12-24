@@ -1,0 +1,13 @@
+import type { Box } from '../boxes/Box.ts'
+import type { ContainerBox } from '../boxes/ContainerBox.ts'
+
+/**
+ * Check if a box is a container
+ *
+ * @param box - The box to check
+ *
+ * @returns `true` if the box is a container, `false` otherwise
+ */
+export function isContainer(box: Box | ContainerBox<any>): box is ContainerBox<any> {
+	return 'boxes' in box
+}

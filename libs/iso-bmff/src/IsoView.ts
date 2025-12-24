@@ -1,9 +1,7 @@
 import type { Box } from './boxes/Box.ts'
-import type { ContainerBox } from './boxes/ContainerBox.ts'
 import type { Fields } from './boxes/Fields.ts'
 import type { FullBox } from './boxes/FullBox.ts'
 import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
-import { CONTAINERS } from './CONTAINERS.ts'
 import { DATA } from './fields/DATA.ts'
 import { INT } from './fields/INT.ts'
 import { STRING } from './fields/STRING.ts'
@@ -20,6 +18,7 @@ import { readTerminatedString } from './readers/readTerminatedString.ts'
 import { readUint } from './readers/readUint.ts'
 import { readUtf8String } from './readers/readUtf8String.ts'
 import { readUtf8TerminatedString } from './readers/readUtf8TerminatedString.ts'
+import { isContainer } from './utils/isContainer.ts'
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
@@ -355,7 +354,7 @@ export class IsoView {
 				Object.assign(box, parser(view, this.config))
 			}
 
-			if (CONTAINERS.includes(type)) {
+			if (isContainer(box)) {
 				const boxes = []
 
 				for (const child of view) {
@@ -366,7 +365,7 @@ export class IsoView {
 					boxes.push(child)
 				}
 
-				(box as ContainerBox<IsoBmffBox>).boxes = boxes
+				box.boxes = boxes
 			}
 
 			yield box

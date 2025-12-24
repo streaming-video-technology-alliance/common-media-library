@@ -23,6 +23,7 @@ export type * from './IsoView.ts'
 export type * from './IsoViewConfig.ts'
 export * from './parseBoxes.ts'
 export type * from './readers/IsoFieldTypeMap.ts'
+export * from './utils/isContainer.ts'
 
 // Parsers
 export * from './parsers/ardi.ts'
@@ -208,4 +209,3 @@ export type * from './boxes/WebVttCuePayloadBox.ts'
 export type * from './boxes/WebVttEmptySampleBox.ts'
 export type * from './boxes/WebVttSettingsBox.ts'
 export type * from './boxes/WebVttSourceLabelBox.ts'
-
