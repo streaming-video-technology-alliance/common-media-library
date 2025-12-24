@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -14,7 +13,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeAvc1(box: Fields<VisualSampleEntryBox<'avc1'>>, boxType: string = 'avc1'): IsoDataWriter {
+export function writeAvc1(box: VisualSampleEntryBox<'avc1'>, boxType: string = 'avc1'): IsoDataWriter {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2

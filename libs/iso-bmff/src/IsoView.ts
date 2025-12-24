@@ -1,3 +1,4 @@
+import type { Box } from './boxes/Box.ts'
 import type { ContainerBox } from './boxes/ContainerBox.ts'
 import type { Fields } from './boxes/Fields.ts'
 import type { FullBox } from './boxes/FullBox.ts'
@@ -19,20 +20,6 @@ import { readTerminatedString } from './readers/readTerminatedString.ts'
 import { readUint } from './readers/readUint.ts'
 import { readUtf8String } from './readers/readUtf8String.ts'
 import { readUtf8TerminatedString } from './readers/readUtf8TerminatedString.ts'
-
-/**
- * Raw ISO BMFF data box.
- *
- *
- * @beta
- */
-export type RawBox = {
-	type: string;
-	size: number;
-	largesize?: number;
-	usertype?: number[];
-	data: IsoView;
-};
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
@@ -62,6 +49,27 @@ export class IsoView {
 	}
 
 	/**
+	 * The buffer of the data view.
+	 */
+	get buffer(): ArrayBuffer {
+		return this.dataView.buffer
+	}
+
+	/**
+	 * The byte offset of the data view.
+	 */
+	get byteOffset(): number {
+		return this.dataView.byteOffset
+	}
+
+	/**
+	 * The byte length of the data view.
+	 */
+	get byteLength(): number {
+		return this.dataView.byteLength
+	}
+
+	/**
 	 * The current byteoffset in the data view.
 	 */
 	get cursor(): number {
@@ -88,10 +96,16 @@ export class IsoView {
 	 * @param size - The size of the slice.
 	 * @returns A new IsoView instance.
 	 */
-	slice = (size: number): IsoView => {
-		const dataView = new DataView(this.dataView.buffer, this.offset, size)
-		this.offset += size
-		return new IsoView(dataView, this.config)
+	slice = (offset: number, size: number): IsoView => {
+		const dataView = new DataView(this.dataView.buffer, offset, size)
+		const isoView = new IsoView(dataView, this.config)
+		const headerSize = this.offset - offset
+		const bodySize = size - headerSize
+
+		this.offset += bodySize
+		isoView.jump(headerSize)
+
+		return isoView
 	}
 
 	private read = <T extends keyof IsoFieldTypeMap>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
@@ -239,11 +253,20 @@ export class IsoView {
 	}
 
 	/**
+	 * Skips a number of bytes in the view.
+	 *
+	 * @param size - The number of bytes to skip.
+	 */
+	jump = (size: number): void => {
+		this.offset += size
+	}
+
+	/**
 	 * Reads a raw box from the data view.
 	 *
 	 * @returns The box.
 	 */
-	readBox = (): RawBox => {
+	readBox = (): Box => {
 		const { dataView, offset } = this
 
 		// read box size and type without advancing the cursor in case the box is truncated
@@ -252,7 +275,7 @@ export class IsoView {
 		const box = {
 			size: readUint(dataView, offset, 4),
 			type: readString(dataView, offset + 4, 4),
-		} as RawBox
+		} as Box
 
 		cursor += 8
 
@@ -261,19 +284,19 @@ export class IsoView {
 			cursor += 8
 		}
 
-		const actualSize = box.largesize || box.size
+		const actualSize = box.size === 0 ? this.bytesRemaining : box.largesize ?? box.size
 		if (this.cursor + actualSize > dataView.byteLength) {
 			this.truncated = true
 			throw new Error('Truncated box')
 		}
 
-		this.offset += cursor
+		this.jump(cursor)
+
 		if (box.type === 'uuid') {
 			box.usertype = this.readArray('uint', 1, 16)
 		}
 
-		const viewSize = box.size === 0 ? this.bytesRemaining : actualSize - cursor
-		box.data = this.slice(viewSize)
+		box.view = this.slice(offset, actualSize)
 
 		return box
 	}
@@ -324,36 +347,29 @@ export class IsoView {
 		const { parsers = {}, recursive = false } = this.config
 
 		while (!this.done) {
-			try {
-				const { type, data, ...rest } = this.readBox()
-				const box = { type, ...rest } as IsoBmffBox
-				const parser = parsers[type] || parsers[type.trim()] // url and urn boxes have a trailing space in their type field
+			const box = this.readBox() as IsoBmffBox
+			const { type, view } = box
+			const parser = parsers[type] || parsers[type.trim()] // url and urn boxes have a trailing space in their type field
 
-				if (parser) {
-					Object.assign(box, parser(data, this.config))
-				}
+			if (parser) {
+				Object.assign(box, parser(view, this.config))
+			}
 
-				box.view = data
+			if (CONTAINERS.includes(type)) {
+				const boxes = []
 
-				if (CONTAINERS.includes(type)) {
-					const boxes = []
-
-					for (const child of data) {
-						if (recursive) {
-							yield child
-						}
-
-						boxes.push(child)
+				for (const child of view) {
+					if (recursive) {
+						yield child
 					}
 
-					(box as ContainerBox<IsoBmffBox>).boxes = boxes
+					boxes.push(child)
 				}
 
-				yield box
+				(box as ContainerBox<IsoBmffBox>).boxes = boxes
 			}
-			catch (error) {
-				break
-			}
+
+			yield box
 		}
 	}
 }

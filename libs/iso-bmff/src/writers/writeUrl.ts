@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { UrlBox } from '../boxes/UrlBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeUrl(box: Fields<UrlBox>): IsoDataWriter {
+export function writeUrl(box: UrlBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const locationSize = box.location.length + 1 // null-terminated

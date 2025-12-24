@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSdtp(box: Fields<SampleDependencyTypeBox>): IsoDataWriter {
+export function writeSdtp(box: SampleDependencyTypeBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleDependencyTableSize = box.sampleDependencyTable.length

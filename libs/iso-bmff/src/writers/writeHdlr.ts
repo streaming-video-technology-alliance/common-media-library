@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeHdlr(box: Fields<HandlerReferenceBox>): IsoDataWriter {
+export function writeHdlr(box: HandlerReferenceBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const preDefinedSize = 4

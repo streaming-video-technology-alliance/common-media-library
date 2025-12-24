@@ -1,6 +1,5 @@
 import { encodeText } from '@svta/cml-utils'
 import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
@@ -14,7 +13,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeElng(box: Fields<ExtendedLanguageBox>): IsoDataWriter {
+export function writeElng(box: ExtendedLanguageBox): IsoDataWriter {
 	const extendedLanguageBytes = encodeText(box.extendedLanguage)
 
 	const headerSize = 8

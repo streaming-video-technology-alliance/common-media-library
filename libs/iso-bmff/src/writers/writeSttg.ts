@@ -1,5 +1,4 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -12,7 +11,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSttg(box: Fields<WebVttSettingsBox>): IsoDataWriter {
+export function writeSttg(box: WebVttSettingsBox): IsoDataWriter {
 	const settingsBytes = encodeText(box.settings)
 
 	const headerSize = 8

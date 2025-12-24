@@ -1,5 +1,4 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -12,7 +11,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writePayl(box: Fields<WebVttCuePayloadBox>): IsoDataWriter {
+export function writePayl(box: WebVttCuePayloadBox): IsoDataWriter {
 	const cueTextBytes = encodeText(box.cueText)
 
 	const headerSize = 8

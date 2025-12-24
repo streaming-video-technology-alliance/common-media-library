@@ -1,5 +1,4 @@
 import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeStts(box: Fields<DecodingTimeToSampleBox>): IsoDataWriter {
+export function writeStts(box: DecodingTimeToSampleBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

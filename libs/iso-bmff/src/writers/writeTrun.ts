@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTrun(box: Fields<TrackRunBox>): IsoDataWriter {
+export function writeTrun(box: TrackRunBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleCountSize = 4

@@ -1,5 +1,4 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
@@ -11,7 +10,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeEnca(box: Fields<AudioSampleEntryBox<'enca'>>): IsoDataWriter {
+export function writeEnca(box: AudioSampleEntryBox<'enca'>): IsoDataWriter {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2

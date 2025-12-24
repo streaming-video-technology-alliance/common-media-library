@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSchm(box: Fields<SchemeTypeBox>): IsoDataWriter {
+export function writeSchm(box: SchemeTypeBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const schemeTypeSize = 4

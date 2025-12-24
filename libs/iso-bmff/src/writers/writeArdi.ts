@@ -1,5 +1,4 @@
 import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
@@ -11,7 +10,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeArdi(box: Fields<AudioRenderingIndicationBox>): IsoDataWriter {
+export function writeArdi(box: AudioRenderingIndicationBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const audioRenderingIndicationSize = 1

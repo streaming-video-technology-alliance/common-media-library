@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -11,7 +10,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeImda(box: Fields<IdentifiedMediaDataBox>): IsoDataWriter {
+export function writeImda(box: IdentifiedMediaDataBox): IsoDataWriter {
 	const headerSize = 8
 	const imdaIdentifierSize = 4
 	const dataSize = box.data.length

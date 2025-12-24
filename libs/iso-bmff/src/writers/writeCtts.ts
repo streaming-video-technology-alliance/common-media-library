@@ -1,5 +1,4 @@
 import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeCtts(box: Fields<CompositionTimeToSampleBox>): IsoDataWriter {
+export function writeCtts(box: CompositionTimeToSampleBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writePrft(box: Fields<ProducerReferenceTimeBox>): IsoDataWriter {
+export function writePrft(box: ProducerReferenceTimeBox): IsoDataWriter {
 	const v1 = box.version === 1
 	const mediaTimeSize = v1 ? 8 : 4
 	const headerSize = 8

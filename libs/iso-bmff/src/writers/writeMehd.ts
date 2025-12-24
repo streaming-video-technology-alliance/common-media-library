@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMehd(box: Fields<MovieExtendsHeaderBox>): IsoDataWriter {
+export function writeMehd(box: MovieExtendsHeaderBox): IsoDataWriter {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8

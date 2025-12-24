@@ -1,5 +1,4 @@
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeEmsg(box: Fields<EventMessageBox>): IsoDataWriter {
+export function writeEmsg(box: EventMessageBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 

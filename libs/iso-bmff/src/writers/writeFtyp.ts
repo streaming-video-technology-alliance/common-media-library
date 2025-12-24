@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeFtyp(box: Fields<FileTypeBox>): IsoDataWriter {
+export function writeFtyp(box: FileTypeBox): IsoDataWriter {
 	const headerSize = 8
 	const majorBrandSize = 4
 	const minorVersionSize = 4

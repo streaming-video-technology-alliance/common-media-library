@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTenc(box: Fields<TrackEncryptionBox>): IsoDataWriter {
+export function writeTenc(box: TrackEncryptionBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const defaultIsEncryptedSize = 3

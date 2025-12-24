@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeStss(box: Fields<SyncSampleBox>): IsoDataWriter {
+export function writeStss(box: SyncSampleBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

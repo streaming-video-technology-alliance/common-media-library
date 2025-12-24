@@ -1,5 +1,4 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
 /**
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMp4a(box: Fields<AudioSampleEntryBox<'mp4a'>>): IsoDataWriter {
+export function writeMp4a(box: AudioSampleEntryBox<'mp4a'>): IsoDataWriter {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2

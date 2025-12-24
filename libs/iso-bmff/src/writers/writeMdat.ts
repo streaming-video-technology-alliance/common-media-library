@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MediaDataBox } from '../boxes/MediaDataBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMdat(box: Fields<MediaDataBox>): IsoDataWriter {
+export function writeMdat(box: MediaDataBox): IsoDataWriter {
 	const headerSize = 8
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize

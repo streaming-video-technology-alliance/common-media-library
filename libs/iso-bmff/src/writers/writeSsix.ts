@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSsix(box: Fields<SubsegmentIndexBox>): IsoDataWriter {
+export function writeSsix(box: SubsegmentIndexBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const subsegmentCountSize = 4

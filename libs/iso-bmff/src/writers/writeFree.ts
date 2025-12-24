@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeFree(box: Fields<FreeSpaceBox<'free'>>): IsoDataWriter {
+export function writeFree(box: FreeSpaceBox<'free'>): IsoDataWriter {
 	const headerSize = 8
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize

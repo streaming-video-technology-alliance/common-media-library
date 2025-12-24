@@ -3,12 +3,24 @@ import { UINT } from '../fields/UINT.ts'
 import type { IsoFieldTypeMap } from '../readers/IsoFieldTypeMap.ts'
 
 export class IsoDataWriter {
-	private dataView: DataView
+	private dataView: DataView<ArrayBuffer>
 	private cursor: number
 
 	constructor(size: number) {
 		this.dataView = new DataView(new ArrayBuffer(size))
 		this.cursor = 0
+	}
+
+	get buffer(): ArrayBuffer {
+		return this.dataView.buffer
+	}
+
+	get byteLength(): number {
+		return this.dataView.byteLength
+	}
+
+	get byteOffset(): number {
+		return this.dataView.byteOffset
 	}
 
 	writeUint(value: number, size: number): void {
@@ -80,7 +92,7 @@ export class IsoDataWriter {
 
 	writeString(value: string): void {
 		for (let c = 0, len = value.length; c < len; c++) {
-			this.writeUint(1, value.charCodeAt(c))
+			this.writeUint(value.charCodeAt(c), 1)
 		}
 	}
 
@@ -101,7 +113,7 @@ export class IsoDataWriter {
 		const uint8View = new Uint8Array(this.dataView.buffer)
 		uint8View.set(bytes, this.cursor)
 		this.cursor += bytes.length
-		this.writeUint(1, 0) // null terminator
+		this.writeUint(0, 1) // null terminator
 	}
 
 	writeBytes(data: Uint8Array): void {
@@ -134,12 +146,33 @@ export class IsoDataWriter {
 		}
 	}
 
+	// writeBoxHeader(type: string, extendedType?: number[]): void {
+	// 	const { size } = box
+	// 	const isLarge = size > 0xffffffff
+	// 	const isExtended = box.type === 'uuid' && extendedType
+	// 	let boxSize = size
+
+	// 	if (isLarge) {
+	// 		boxSize += 8
+	// 	}
+
+	// 	if (isExtended) {
+	// 		boxSize += 16
+	// 	}
+	// 	this.writeUint(isLarge ? 1 : boxSize, 4)
+	// 	this.writeString(box.type)
+
+	// 	if (isLarge) {
+	// 		this.writeUint(boxSize, 8)
+	// 	}
+
+	// 	if (isExtended) {
+	// 		this.writeArray(extendedType, UINT, 1)
+	// 	}
+	// }
+
 	writeFullBox(version: number, flags: number): void {
 		this.writeUint(version, 1)
 		this.writeUint(flags, 3)
-	}
-
-	get buffer(): Uint8Array {
-		return new Uint8Array(this.dataView.buffer)
 	}
 }

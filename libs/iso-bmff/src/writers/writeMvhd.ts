@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMvhd(box: Fields<MovieHeaderBox>): IsoDataWriter {
+export function writeMvhd(box: MovieHeaderBox): IsoDataWriter {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4

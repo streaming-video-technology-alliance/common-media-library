@@ -1,5 +1,4 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -12,7 +11,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeVlab(box: Fields<WebVttSourceLabelBox>): IsoDataWriter {
+export function writeVlab(box: WebVttSourceLabelBox): IsoDataWriter {
 	const sourceLabelBytes = encodeText(box.sourceLabel)
 
 	const headerSize = 8

@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTrex(box: Fields<TrackExtendsBox>): IsoDataWriter {
+export function writeTrex(box: TrackExtendsBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4

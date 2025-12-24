@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSmhd(box: Fields<SoundMediaHeaderBox>): IsoDataWriter {
+export function writeSmhd(box: SoundMediaHeaderBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const balanceSize = 2

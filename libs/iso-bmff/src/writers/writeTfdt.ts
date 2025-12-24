@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragmentBaseMediaDecodeTimeBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTfdt(box: Fields<TrackFragmentBaseMediaDecodeTimeBox>): IsoDataWriter {
+export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoDataWriter {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4

@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMfhd(box: Fields<MovieFragmentHeaderBox>): IsoDataWriter {
+export function writeMfhd(box: MovieFragmentHeaderBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sequenceNumberSize = 4

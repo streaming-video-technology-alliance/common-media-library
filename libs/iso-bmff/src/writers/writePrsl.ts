@@ -1,5 +1,4 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/Fields.ts'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -12,7 +11,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writePrsl(box: Fields<PreselectionGroupBox>): IsoDataWriter {
+export function writePrsl(box: PreselectionGroupBox): IsoDataWriter {
 	const preselectionTagBytes = (box.flags & 0x1000) && box.preselectionTag
 		? encodeText(box.preselectionTag)
 		: null

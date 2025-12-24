@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SubtitleMediaHeaderBox } from '../boxes/SubtitleMediaHeaderBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSthd(box: Fields<SubtitleMediaHeaderBox>): IsoDataWriter {
+export function writeSthd(box: SubtitleMediaHeaderBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize

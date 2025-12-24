@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeVmhd(box: Fields<VideoMediaHeaderBox>): IsoDataWriter {
+export function writeVmhd(box: VideoMediaHeaderBox): IsoDataWriter {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const graphicsmodeSize = 2

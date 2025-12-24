@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.ts'
 import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
 
@@ -13,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeStyp(box: Fields<SegmentTypeBox>): IsoDataWriter {
+export function writeStyp(box: SegmentTypeBox): IsoDataWriter {
 	const headerSize = 8
 	const majorBrandSize = 4
 	const minorVersionSize = 4
