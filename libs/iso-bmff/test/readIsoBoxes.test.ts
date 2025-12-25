@@ -1,10 +1,10 @@
-import { assert, describe, ftyp, it, readIsoBoxes, type FileTypeBox } from './util/box.ts'
+import { assert, describe, it, readFtyp, readIsoBoxes, type FileTypeBox } from './util/box.ts'
 
 describe('readIsoBoxes', function () {
 	it('should read a buffer', function () {
 		// Sample 'ftyp' box (20 bytes)
 		const arrayBuffer = new Uint8Array([0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d, 0x00, 0x00, 0x00, 0x01, 0x69, 0x73, 0x6f, 0x6d]).buffer
-		const boxes = readIsoBoxes(arrayBuffer, { readers: { ftyp } }) as FileTypeBox[]
+		const boxes = readIsoBoxes(arrayBuffer, { readers: { ftyp: readFtyp } }) as FileTypeBox[]
 		const box = boxes[0]
 
 		assert.strictEqual(boxes.length, 1)

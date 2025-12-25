@@ -1,4 +1,5 @@
 import type { IsoBmffBoxMap, IsoBoxReader, IsoBoxReaderMap } from '@svta/cml-iso-bmff'
+import { getReaderName } from './getReaderName.ts'
 
 export function createReaders(readers: IsoBoxReader | IsoBoxReader[]): { name: keyof IsoBmffBoxMap, readers: IsoBoxReaderMap } {
 	if (!Array.isArray(readers)) {
@@ -6,9 +7,9 @@ export function createReaders(readers: IsoBoxReader | IsoBoxReader[]): { name: k
 	}
 
 	return {
-		name: readers[0].name as keyof IsoBmffBoxMap,
+		name: getReaderName(readers[0]) as keyof IsoBmffBoxMap,
 		readers: readers.reduce((acc, reader) => {
-			acc[reader.name] = reader
+			acc[getReaderName(reader)] = reader
 			return acc
 		}, {} as IsoBoxReaderMap),
 	}
