@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
 import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an ExtendedLanguageBox to an IsoDataWriter.
@@ -13,7 +13,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeElng(box: ExtendedLanguageBox): IsoDataWriter {
+export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView {
 	const extendedLanguageBytes = encodeText(box.extendedLanguage)
 
 	const headerSize = 8
@@ -21,7 +21,7 @@ export function writeElng(box: ExtendedLanguageBox): IsoDataWriter {
 	const extendedLanguageSize = extendedLanguageBytes.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + extendedLanguageSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('elng', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

@@ -1,5 +1,5 @@
 import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an IdentifiedMediaDataBox to an IsoDataWriter.
@@ -10,13 +10,13 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeImda(box: IdentifiedMediaDataBox): IsoDataWriter {
+export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView {
 	const headerSize = 8
 	const imdaIdentifierSize = 4
 	const dataSize = box.data.length
 	const totalSize = headerSize + imdaIdentifierSize + dataSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('imda', totalSize)
 	writer.writeUint(box.imdaIdentifier, 4)
 	writer.writeBytes(box.data)

@@ -1,5 +1,5 @@
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a SubsegmentIndexBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSsix(box: SubsegmentIndexBox): IsoDataWriter {
+export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const subsegmentCountSize = 4
@@ -25,7 +25,7 @@ export function writeSsix(box: SubsegmentIndexBox): IsoDataWriter {
 
 	const totalSize = headerSize + fullBoxSize + subsegmentCountSize + rangesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('ssix', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

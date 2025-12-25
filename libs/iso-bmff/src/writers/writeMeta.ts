@@ -1,5 +1,5 @@
 import type { MetaBox } from '../boxes/MetaBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a MetaBox to an IsoDataWriter.
@@ -12,12 +12,12 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMeta(box: MetaBox): IsoDataWriter {
+export function writeMeta(box: MetaBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('meta', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

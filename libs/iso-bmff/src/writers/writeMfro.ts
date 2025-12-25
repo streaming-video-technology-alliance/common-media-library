@@ -1,5 +1,5 @@
 import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a MovieFragmentRandomAccessOffsetBox to an IsoDataWriter.
@@ -12,13 +12,13 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoDataWriter {
+export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const mfraSizeSize = 4
 	const totalSize = headerSize + fullBoxSize + mfraSizeSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('mfro', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.mfraSize, 4)

@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
 import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a WebVttSettingsBox to an IsoDataWriter.
@@ -11,14 +11,14 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSttg(box: WebVttSettingsBox): IsoDataWriter {
+export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView {
 	const settingsBytes = encodeText(box.settings)
 
 	const headerSize = 8
 	const settingsSize = settingsBytes.length + 1 // null-terminated
 	const totalSize = headerSize + settingsSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('sttg', totalSize)
 	writer.writeUtf8TerminatedString(box.settings)
 

@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
 import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a WebVttCueIdBox to an IsoDataWriter.
@@ -11,14 +11,14 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeIden(box: WebVttCueIdBox): IsoDataWriter {
+export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView {
 	const cueIdBytes = encodeText(box.cueId)
 
 	const headerSize = 8
 	const cueIdSize = cueIdBytes.length + 1 // null-terminated
 	const totalSize = headerSize + cueIdSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('iden', totalSize)
 	writer.writeUtf8TerminatedString(box.cueId)
 

@@ -1,5 +1,5 @@
 import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a MovieFragmentHeaderBox to an IsoDataWriter.
@@ -12,13 +12,13 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMfhd(box: MovieFragmentHeaderBox): IsoDataWriter {
+export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sequenceNumberSize = 4
 	const totalSize = headerSize + fullBoxSize + sequenceNumberSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('mfhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.sequenceNumber, 4)

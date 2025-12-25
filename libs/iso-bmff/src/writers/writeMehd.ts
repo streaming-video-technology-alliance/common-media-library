@@ -1,5 +1,5 @@
 import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a MovieExtendsHeaderBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMehd(box: MovieExtendsHeaderBox): IsoDataWriter {
+export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -20,7 +20,7 @@ export function writeMehd(box: MovieExtendsHeaderBox): IsoDataWriter {
 	const fragmentDurationSize = size
 	const totalSize = headerSize + fullBoxSize + fragmentDurationSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('mehd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.fragmentDuration, size)

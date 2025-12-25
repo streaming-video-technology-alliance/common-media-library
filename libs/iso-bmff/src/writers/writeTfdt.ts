@@ -1,5 +1,5 @@
 import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragmentBaseMediaDecodeTimeBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackFragmentBaseMediaDecodeTimeBox to an IsoDataWriter.
@@ -12,14 +12,14 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoDataWriter {
+export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWriteView {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4
 	const baseMediaDecodeTimeSize = size
 	const totalSize = headerSize + fullBoxSize + baseMediaDecodeTimeSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('tfdt', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.baseMediaDecodeTime, size)

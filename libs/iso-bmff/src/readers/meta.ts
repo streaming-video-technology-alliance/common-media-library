@@ -1,0 +1,17 @@
+import type { Fields } from '../boxes/Fields.ts'
+import type { MetaBox } from '../boxes/MetaBox.ts'
+import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+
+/**
+ * Parse a MetaBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed MetaBox
+ *
+ *
+ * @beta
+ */
+export function meta(view: IsoBoxReadView): Fields<MetaBox> {
+	return view.readFullBox()
+};

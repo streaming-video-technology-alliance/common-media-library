@@ -1,5 +1,5 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackHeaderBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTkhd(box: TrackHeaderBox): IsoDataWriter {
+export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -33,7 +33,7 @@ export function writeTkhd(box: TrackHeaderBox): IsoDataWriter {
 		reserved2Size + layerSize + alternateGroupSize + volumeSize + reserved3Size +
 		matrixSize + widthSize + heightSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('tkhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

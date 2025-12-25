@@ -1,5 +1,5 @@
 import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a SyncSampleBox to an IsoDataWriter.
@@ -12,14 +12,14 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeStss(box: SyncSampleBox): IsoDataWriter {
+export function writeStss(box: SyncSampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4
 	const entriesSize = box.entryCount * 4
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('stss', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

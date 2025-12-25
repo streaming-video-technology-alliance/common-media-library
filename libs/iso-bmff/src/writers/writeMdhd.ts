@@ -1,5 +1,5 @@
 import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a MediaHeaderBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMdhd(box: MediaHeaderBox): IsoDataWriter {
+export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -22,7 +22,7 @@ export function writeMdhd(box: MediaHeaderBox): IsoDataWriter {
 	const preDefined = 2
 	const totalSize = headerSize + fullBoxSize + timesSize + timescaleSize + languageSize + preDefined
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('mdhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

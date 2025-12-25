@@ -1,5 +1,5 @@
 import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an AudioRenderingIndicationBox to an IsoDataWriter.
@@ -10,13 +10,13 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeArdi(box: AudioRenderingIndicationBox): IsoDataWriter {
+export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const audioRenderingIndicationSize = 1
 	const totalSize = headerSize + fullBoxSize + audioRenderingIndicationSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('ardi', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.audioRenderingIndication, 1)

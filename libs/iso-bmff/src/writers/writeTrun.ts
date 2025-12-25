@@ -1,5 +1,5 @@
 import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackRunBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTrun(box: TrackRunBox): IsoDataWriter {
+export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleCountSize = 4
@@ -28,7 +28,7 @@ export function writeTrun(box: TrackRunBox): IsoDataWriter {
 	const samplesSize = sampleSize * box.sampleCount
 	const totalSize = headerSize + fullBoxSize + sampleCountSize + dataOffsetSize + firstSampleFlagsSize + samplesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('trun', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

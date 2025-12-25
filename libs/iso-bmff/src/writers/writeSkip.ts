@@ -1,5 +1,5 @@
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a FreeSpaceBox (skip variant) to an IsoDataWriter.
@@ -12,12 +12,12 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSkip(box: FreeSpaceBox<'skip'>): IsoDataWriter {
+export function writeSkip(box: FreeSpaceBox<'skip'>): IsoBoxWriteView {
 	const headerSize = 8
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('skip', totalSize)
 	writer.writeBytes(box.data)
 

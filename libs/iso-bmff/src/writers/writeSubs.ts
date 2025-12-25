@@ -1,5 +1,5 @@
 import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a SubsampleInformationBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSubs(box: SubsampleInformationBox): IsoDataWriter {
+export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const subsampleSizeBytes = v1 ? 4 : 2
 
@@ -28,7 +28,7 @@ export function writeSubs(box: SubsampleInformationBox): IsoDataWriter {
 	const entryCountSize = 4
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('subs', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

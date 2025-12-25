@@ -1,5 +1,5 @@
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a ProtectionSystemSpecificHeaderBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoDataWriter {
+export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const systemIdSize = 16
@@ -22,7 +22,7 @@ export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoDataWriter
 	const dataSize = box.dataSize
 	const totalSize = headerSize + fullBoxSize + systemIdSize + kidCountSize + kidSize + dataSizeField + dataSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('pssh', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

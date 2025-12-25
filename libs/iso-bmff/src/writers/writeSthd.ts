@@ -1,5 +1,5 @@
 import type { SubtitleMediaHeaderBox } from '../boxes/SubtitleMediaHeaderBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a SubtitleMediaHeaderBox to an IsoDataWriter.
@@ -12,12 +12,12 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSthd(box: SubtitleMediaHeaderBox): IsoDataWriter {
+export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('sthd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

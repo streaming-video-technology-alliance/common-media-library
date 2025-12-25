@@ -1,5 +1,5 @@
 import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackFragmentHeaderBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTfhd(box: TrackFragmentHeaderBox): IsoDataWriter {
+export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
@@ -24,7 +24,7 @@ export function writeTfhd(box: TrackFragmentHeaderBox): IsoDataWriter {
 	const totalSize = headerSize + fullBoxSize + trackIdSize + baseDataOffsetSize +
 		sampleDescriptionIndexSize + defaultSampleDurationSize + defaultSampleSizeSize + defaultSampleFlagsSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('tfhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

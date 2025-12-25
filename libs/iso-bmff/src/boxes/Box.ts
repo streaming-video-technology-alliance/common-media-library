@@ -1,4 +1,4 @@
-import type { IsoView } from '../IsoView.ts'
+import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
  * Base Box Type
@@ -9,7 +9,7 @@ import type { IsoView } from '../IsoView.ts'
 export type Box = {
 	type: string;
 	size: number;
-	view: IsoView;
+	view: IsoBoxReadView;
 	largesize?: number;
 	usertype?: number[];
 };

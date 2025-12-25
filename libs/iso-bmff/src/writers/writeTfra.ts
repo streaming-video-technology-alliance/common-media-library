@@ -1,5 +1,5 @@
 import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackFragmentRandomAccessBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTfra(box: TrackFragmentRandomAccessBox): IsoDataWriter {
+export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const timeSize = v1 ? 8 : 4
 	const entrySize = timeSize + timeSize + // time + moofOffset
@@ -28,7 +28,7 @@ export function writeTfra(box: TrackFragmentRandomAccessBox): IsoDataWriter {
 	const entriesSize = box.numberOfEntry * entrySize
 	const totalSize = headerSize + fullBoxSize + trackIdSize + reservedSize + numberOfEntrySize + entriesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('tfra', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

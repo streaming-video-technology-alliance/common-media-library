@@ -1,5 +1,5 @@
 import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a SegmentIndexBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSidx(box: SegmentIndexBox): IsoDataWriter {
+export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -27,7 +27,7 @@ export function writeSidx(box: SegmentIndexBox): IsoDataWriter {
 	const totalSize = headerSize + fullBoxSize + referenceIdSize + timescaleSize +
 		earliestPresentationTimeSize + firstOffsetSize + reservedSize + referenceCountSize + referencesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('sidx', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

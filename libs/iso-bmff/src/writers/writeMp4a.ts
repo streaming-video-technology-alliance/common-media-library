@@ -1,5 +1,5 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an AudioSampleEntryBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeMp4a(box: AudioSampleEntryBox<'mp4a'>): IsoDataWriter {
+export function writeMp4a(box: AudioSampleEntryBox<'mp4a'>): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2
@@ -26,7 +26,7 @@ export function writeMp4a(box: AudioSampleEntryBox<'mp4a'>): IsoDataWriter {
 	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + reserved2Size +
 		channelcountSize + samplesizeSize + preDefinedSize + reserved3Size + samplerateSize + esdsSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('mp4a', totalSize)
 
 	for (let i = 0; i < 6; i++) {

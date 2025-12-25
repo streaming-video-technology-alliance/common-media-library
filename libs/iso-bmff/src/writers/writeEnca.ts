@@ -1,5 +1,5 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an AudioSampleEntryBox (enca) to an IsoDataWriter.
@@ -10,7 +10,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeEnca(box: AudioSampleEntryBox<'enca'>): IsoDataWriter {
+export function writeEnca(box: AudioSampleEntryBox<'enca'>): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2
@@ -24,7 +24,7 @@ export function writeEnca(box: AudioSampleEntryBox<'enca'>): IsoDataWriter {
 	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + reserved2Size +
 		channelcountSize + samplesizeSize + preDefinedSize + reserved3Size + samplerateSize + esdsSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('enca', totalSize)
 
 	for (let i = 0; i < 6; i++) {

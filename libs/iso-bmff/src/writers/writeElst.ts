@@ -1,5 +1,5 @@
 import type { EditListBox } from '../boxes/EditListBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an EditListBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeElst(box: EditListBox): IsoDataWriter {
+export function writeElst(box: EditListBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -22,7 +22,7 @@ export function writeElst(box: EditListBox): IsoDataWriter {
 	const entriesSize = box.entryCount * entrySize
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('elst', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
 import type { LabelBox } from '../boxes/LabelBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a LabelBox to an IsoDataWriter.
@@ -11,7 +11,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeLabl(box: LabelBox): IsoDataWriter {
+export function writeLabl(box: LabelBox): IsoBoxWriteView {
 	const languageBytes = encodeText(box.language)
 	const labelBytes = encodeText(box.label)
 
@@ -22,7 +22,7 @@ export function writeLabl(box: LabelBox): IsoDataWriter {
 	const labelSize = labelBytes.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + labelIdSize + languageSize + labelSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('labl', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

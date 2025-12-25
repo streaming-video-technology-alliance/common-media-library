@@ -1,4 +1,4 @@
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a WebVttEmptySampleBox to an IsoDataWriter.
@@ -7,11 +7,11 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeVtte(): IsoDataWriter {
+export function writeVtte(): IsoBoxWriteView {
 	const headerSize = 8
 	const totalSize = headerSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('vtte', totalSize)
 
 	return writer

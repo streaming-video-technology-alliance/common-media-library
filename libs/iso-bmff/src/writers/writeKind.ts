@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
 import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackKindBox to an IsoDataWriter.
@@ -11,7 +11,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeKind(box: TrackKindBox): IsoDataWriter {
+export function writeKind(box: TrackKindBox): IsoBoxWriteView {
 	const schemeUriBytes = encodeText(box.schemeUri)
 	const valueBytes = encodeText(box.value)
 
@@ -21,7 +21,7 @@ export function writeKind(box: TrackKindBox): IsoDataWriter {
 	const valueSize = valueBytes.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + schemeUriSize + valueSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('kind', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

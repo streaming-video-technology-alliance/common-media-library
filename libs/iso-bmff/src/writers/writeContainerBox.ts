@@ -1,37 +1,36 @@
+import type { Box } from '../boxes/Box.ts'
 import type { ContainerBox } from '../boxes/ContainerBox.ts'
-import type { FullBox } from '../boxes/FullBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { isFullBox } from '../utils/isFullBox.ts'
 
 /**
- * Write a ContainerBox to an IsoDataWriter.
+ * Write a ContainerBox to an IsoBmffWriter.
  *
- * This function writes a container box with its child boxes. Child boxes should be
- * pre-encoded as Uint8Array or IsoDataWriter instances.
+ * This function writes a container box with its child boxes. Child boxes are
+ * extracted from the container box's `boxes` array and encoded using their `view` property.
  *
  * @param box - The ContainerBox to write
- * @param childBoxes - Array of pre-encoded child boxes as Uint8Array or IsoDataWriter
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An IsoBmffWriter containing the encoded box
  *
  * @beta
  */
-export function writeContainerBox<T>(
-	box: ContainerBox<T>,
-	childBoxes: ArrayBufferView[]
-): IsoDataWriter {
+export function writeContainerBox<T extends Box>(
+	box: ContainerBox<T>
+): IsoBoxWriteView {
 	const headerSize = 8
-	const isFullBox = 'version' in box && 'flags' in box
-	const fullBoxSize = isFullBox ? 4 : 0
+	const isFullContainerBox = isFullBox(box)
+	const fullBoxSize = isFullContainerBox ? 4 : 0
 
 	// Calculate total size of all child boxes
 	let childBoxesSize = 0
-	for (const childBox of childBoxes) {
-		childBoxesSize += childBox.byteLength
+	for (const childBox of box.boxes) {
+		childBoxesSize += childBox.view.byteLength
 	}
 
 	const totalSize = headerSize + fullBoxSize + childBoxesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 
 	// Handle largesize if needed
 	if (box.largesize !== undefined) {
@@ -41,14 +40,14 @@ export function writeContainerBox<T>(
 	}
 
 	// Write FullBox header if applicable
-	if (isFullBox) {
-		const fullBox = box as ContainerBox<T> & FullBox
-		writer.writeFullBox(fullBox.version, fullBox.flags)
+	if (isFullContainerBox) {
+		writer.writeFullBox(box.version, box.flags)
 	}
 
 	// Write all child boxes
-	for (const childBox of childBoxes) {
-		writer.writeBytes(new Uint8Array(childBox.buffer, childBox.byteOffset, childBox.byteLength))
+	for (const childBox of box.boxes) {
+		const view = childBox.view
+		writer.writeBytes(new Uint8Array(view.buffer, view.byteOffset, view.byteLength))
 	}
 
 	return writer

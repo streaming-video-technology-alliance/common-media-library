@@ -1,5 +1,5 @@
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a HandlerReferenceBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeHdlr(box: HandlerReferenceBox): IsoDataWriter {
+export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const preDefinedSize = 4
@@ -21,7 +21,7 @@ export function writeHdlr(box: HandlerReferenceBox): IsoDataWriter {
 	const nameSize = box.name.length + 1 // null-terminated string
 	const totalSize = headerSize + fullBoxSize + preDefinedSize + handlerTypeSize + reservedSize + nameSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('hdlr', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

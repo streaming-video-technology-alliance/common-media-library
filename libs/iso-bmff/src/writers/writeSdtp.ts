@@ -1,5 +1,5 @@
 import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a SampleDependencyTypeBox to an IsoDataWriter.
@@ -12,13 +12,13 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSdtp(box: SampleDependencyTypeBox): IsoDataWriter {
+export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleDependencyTableSize = box.sampleDependencyTable.length
 	const totalSize = headerSize + fullBoxSize + sampleDependencyTableSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('sdtp', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

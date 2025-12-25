@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a PreselectionGroupBox to an IsoDataWriter.
@@ -11,7 +11,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writePrsl(box: PreselectionGroupBox): IsoDataWriter {
+export function writePrsl(box: PreselectionGroupBox): IsoBoxWriteView {
 	const preselectionTagBytes = (box.flags & 0x1000) && box.preselectionTag
 		? encodeText(box.preselectionTag)
 		: null
@@ -31,7 +31,7 @@ export function writePrsl(box: PreselectionGroupBox): IsoDataWriter {
 	const totalSize = headerSize + fullBoxSize + groupIdSize + numEntitiesInGroupSize +
 		entitiesSize + preselectionTagSize + selectionPrioritySize + interleavingTagSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('prsl', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

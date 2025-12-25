@@ -1,5 +1,5 @@
 import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a FileTypeBox to an IsoDataWriter.
@@ -12,14 +12,14 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeFtyp(box: FileTypeBox): IsoDataWriter {
+export function writeFtyp(box: FileTypeBox): IsoBoxWriteView {
 	const headerSize = 8
 	const majorBrandSize = 4
 	const minorVersionSize = 4
 	const compatibleBrandsSize = box.compatibleBrands.length * 4
 	const totalSize = headerSize + majorBrandSize + minorVersionSize + compatibleBrandsSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('ftyp', totalSize)
 	writer.writeString(box.majorBrand)
 	writer.writeUint(box.minorVersion, 4)

@@ -1,5 +1,5 @@
 import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an OriginalFormatBox to an IsoDataWriter.
@@ -12,12 +12,12 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeFrma(box: OriginalFormatBox): IsoDataWriter {
+export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView {
 	const headerSize = 8
 	const dataFormatSize = 4
 	const totalSize = headerSize + dataFormatSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('frma', totalSize)
 	writer.writeUint(box.dataFormat, 4)
 

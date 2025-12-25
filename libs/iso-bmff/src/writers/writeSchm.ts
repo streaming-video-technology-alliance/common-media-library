@@ -1,5 +1,5 @@
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a SchemeTypeBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeSchm(box: SchemeTypeBox): IsoDataWriter {
+export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const schemeTypeSize = 4
@@ -20,7 +20,7 @@ export function writeSchm(box: SchemeTypeBox): IsoDataWriter {
 	const schemeUriSize = (box.flags & 0x000001) && box.schemeUri ? box.schemeUri.length + 1 : 0
 	const totalSize = headerSize + fullBoxSize + schemeTypeSize + schemeVersionSize + schemeUriSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('schm', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

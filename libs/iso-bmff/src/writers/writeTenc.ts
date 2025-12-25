@@ -1,5 +1,5 @@
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackEncryptionBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTenc(box: TrackEncryptionBox): IsoDataWriter {
+export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const defaultIsEncryptedSize = 3
@@ -20,7 +20,7 @@ export function writeTenc(box: TrackEncryptionBox): IsoDataWriter {
 	const defaultKidSize = 16
 	const totalSize = headerSize + fullBoxSize + defaultIsEncryptedSize + defaultIvSizeSize + defaultKidSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('tenc', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

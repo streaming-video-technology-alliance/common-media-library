@@ -1,5 +1,5 @@
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a TrackExtendsBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeTrex(box: TrackExtendsBox): IsoDataWriter {
+export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
@@ -23,7 +23,7 @@ export function writeTrex(box: TrackExtendsBox): IsoDataWriter {
 	const totalSize = headerSize + fullBoxSize + trackIdSize + defaultSampleDescriptionIndexSize +
 		defaultSampleDurationSize + defaultSampleSizeSize + defaultSampleFlagsSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('trex', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

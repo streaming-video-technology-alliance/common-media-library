@@ -1,5 +1,5 @@
 import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a DecodingTimeToSampleBox to an IsoDataWriter.
@@ -12,14 +12,14 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeStts(box: DecodingTimeToSampleBox): IsoDataWriter {
+export function writeStts(box: DecodingTimeToSampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4
 	const entriesSize = box.entryCount * 8 // 4 bytes sampleCount + 4 bytes sampleDelta
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('stts', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

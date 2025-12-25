@@ -1,6 +1,6 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
-import type { IsoDataWriter } from '../utils/IsoDataWriter.ts'
-import { writeAvc1 } from './writeAvc1.ts'
+import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
 
 /**
  * Write a VisualSampleEntryBox (hev1) to an IsoDataWriter.
@@ -11,6 +11,6 @@ import { writeAvc1 } from './writeAvc1.ts'
  *
  * @beta
  */
-export function writeHev1(box: VisualSampleEntryBox<'hev1'>): IsoDataWriter {
-	return writeAvc1(box, 'hev1')
+export function writeHev1(box: VisualSampleEntryBox<'hev1'>): IsoBoxWriteView {
+	return writeVisualSampleEntryBox(box, 'hev1')
 }

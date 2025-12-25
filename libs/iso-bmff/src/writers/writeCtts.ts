@@ -1,5 +1,5 @@
 import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write a CompositionTimeToSampleBox to an IsoDataWriter.
@@ -12,14 +12,14 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeCtts(box: CompositionTimeToSampleBox): IsoDataWriter {
+export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4
 	const entriesSize = box.entryCount * 8 // 4 bytes sampleCount + 4 bytes sampleOffset
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('ctts', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 

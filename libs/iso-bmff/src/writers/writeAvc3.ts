@@ -1,6 +1,6 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
-import type { IsoDataWriter } from '../utils/IsoDataWriter.ts'
-import { writeAvc1 } from './writeAvc1.ts'
+import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
 
 /**
  * Write a VisualSampleEntryBox (avc3) to an IsoDataWriter.
@@ -11,6 +11,6 @@ import { writeAvc1 } from './writeAvc1.ts'
  *
  * @beta
  */
-export function writeAvc3(box: VisualSampleEntryBox<'avc3'>): IsoDataWriter {
-	return writeAvc1(box, 'avc3')
+export function writeAvc3(box: VisualSampleEntryBox<'avc3'>): IsoBoxWriteView {
+	return writeVisualSampleEntryBox(box, 'avc3')
 }

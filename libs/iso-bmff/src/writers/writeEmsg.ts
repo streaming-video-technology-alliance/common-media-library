@@ -1,5 +1,5 @@
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
-import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
+import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write an EventMessageBox to an IsoDataWriter.
@@ -12,7 +12,7 @@ import { IsoDataWriter } from '../utils/IsoDataWriter.ts'
  *
  * @beta
  */
-export function writeEmsg(box: EventMessageBox): IsoDataWriter {
+export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 
@@ -28,7 +28,7 @@ export function writeEmsg(box: EventMessageBox): IsoDataWriter {
 
 	const totalSize = headerSize + fullBoxSize + contentSize
 
-	const writer = new IsoDataWriter(totalSize)
+	const writer = new IsoBoxWriteView(totalSize)
 	writer.writeBoxHeader('emsg', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
