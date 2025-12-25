@@ -1,6 +1,6 @@
 import { assert, describe, readFree, it, parseBox } from '../util/box.ts'
 
-describe('free box', () => {
+describe('readFree', () => {
 	it('should correctly parse the box', () => {
 		const box = parseBox('captions.mp4', readFree, 3)
 

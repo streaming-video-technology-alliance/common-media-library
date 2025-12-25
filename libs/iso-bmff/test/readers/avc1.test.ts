@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readAvc1, readStsd, type SampleDescr
 
 type Avc1Box = VisualSampleEntryBox<'avc1'>;
 
-describe('avc1 box', function () {
+describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
 		const container = filterBoxes<
 			SampleDescriptionBox<Avc1Box> | Avc1Box

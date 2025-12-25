@@ -1,6 +1,6 @@
 import { assert, describe, findBox, it, readLabl, readMeta, readPrsl, type Box } from '../util/box.ts'
 
-describe('labl box', function () {
+describe('readLabl', function () {
 	it('should correctly parse the box from sample data', function () {
 		const box = findBox('SRMP_AC4.mp4', [readMeta, readPrsl, readLabl])
 			.boxes?.filter((box: Box) => box.type === 'grpl')[0]

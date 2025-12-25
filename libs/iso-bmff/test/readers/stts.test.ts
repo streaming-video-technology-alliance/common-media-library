@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readStts } from '../util/box.ts'
 
-describe('stts box', function () {
+describe('readStts', function () {
 	it('should correctly parse the box', function () {
 		const boxes = filterBoxes('editlist.mp4', readStts)
 		const box = boxes[0]

@@ -1,6 +1,6 @@
 import { assert, readCtts, describe, filterBoxes, it } from '../util/box.ts'
 
-describe('ctts box', function () {
+describe('readCtts', function () {
 	it('should correctly parse the box', function () {
 		const boxes = filterBoxes('time_to_sample.mp4', readCtts)
 		const box = boxes[0]

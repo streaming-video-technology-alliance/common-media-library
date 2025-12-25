@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readMeta, readPrsl } from '../util/box.ts'
 
-describe('prsl box', function () {
+describe('readPrsl', function () {
 	it('should correctly parse the readPrsl box from sample data', function () {
 		const boxes = filterBoxes<any>('SRMP_AC4.mp4', [readPrsl, readMeta])
 

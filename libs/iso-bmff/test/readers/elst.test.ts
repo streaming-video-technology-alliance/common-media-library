@@ -1,6 +1,6 @@
 import { assert, describe, readElst, findBox, it } from '../util/box.ts'
 
-describe('elst box', function () {
+describe('readElst', function () {
 	it('should correctly parse the box', function () {
 		const box = findBox('editlist.mp4', readElst)
 

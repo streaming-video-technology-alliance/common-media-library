@@ -1,6 +1,6 @@
 import { assert, describe, it, parseBox, readMdat } from '../util/box.ts'
 
-describe('mdat box', function () {
+describe('readMdat', function () {
 	it('should correctly parse the readMdat box', function () {
 		const box = parseBox('captions.mp4', readMdat, 2)
 

@@ -1,6 +1,6 @@
 import { assert, describe, findBox, it, readHdlr } from '../util/box.ts'
 
-describe('hdlr box', function () {
+describe('readHdlr', function () {
 	it('should correctly parse the box', function () {
 		const box = findBox('captions.mp4', readHdlr)
 

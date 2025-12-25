@@ -1,6 +1,6 @@
 import { assert, describe, it, parseBox, readSsix } from '../util/box.ts'
 
-describe('ssix box', function () {
+describe('readSsix', function () {
 	it('should correctly parse the box', function () {
 		const box = parseBox('spliced_10000.m4v', readSsix, 4)
 

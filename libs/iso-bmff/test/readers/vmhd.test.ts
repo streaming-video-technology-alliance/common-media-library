@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readVmhd } from '../util/box.ts'
 
-describe('vmhd box', function () {
+describe('readVmhd', function () {
 	it('should correctly parse the box from sample data', function () {
 		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', readVmhd)
 

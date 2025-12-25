@@ -1,6 +1,6 @@
 import { assert, describe, findBox, it, readEmsg, type EventMessageBox } from '../util/box.ts'
 
-describe('emsg box', function () {
+describe('readEmsg', function () {
 	it('should correctly parse the box from sample data', function () {
 		const box = findBox<EventMessageBox>('emsg.m4s', [readEmsg])
 

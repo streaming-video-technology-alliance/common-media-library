@@ -1,6 +1,6 @@
 import { assert, describe, findBox, it, readMdhd, type MediaHeaderBox } from '../util/box.ts'
 
-describe('mdhd box', function () {
+describe('readMdhd', function () {
 	it('should correctly parse the box from sample data', function () {
 		const box = findBox<MediaHeaderBox>('captions.mp4', [readMdhd])
 

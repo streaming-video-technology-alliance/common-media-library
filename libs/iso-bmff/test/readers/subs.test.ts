@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readSubs } from '../util/box.ts'
 
-describe('subs box', function () {
+describe('readSubs', function () {
 	it('should correctly parse the box from sample data', function () {
 		const boxes = filterBoxes('subsample.m4s', readSubs)
 

@@ -1,6 +1,6 @@
 import { assert, describe, it, parseContainer, type MovieBox } from '../util/box.ts'
 
-describe('moov box', function () {
+describe('readMoov', function () {
 	it('should correctly parse the box', function () {
 		const box = parseContainer('captions.mp4', -3) as MovieBox
 

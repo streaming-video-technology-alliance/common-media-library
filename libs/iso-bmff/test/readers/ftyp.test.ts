@@ -1,6 +1,6 @@
 import { assert, describe, it, parseBox, readFtyp } from '../util/box.ts'
 
-describe('ftyp box', function () {
+describe('readFtyp', function () {
 	it('should correctly parse the box', function () {
 		const box = parseBox('captions.mp4', readFtyp, 0)
 

@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readPrft } from '../util/box.ts'
 
-describe('prft box', function () {
+describe('readPrft', function () {
 	it('should correctly parse the box from sample data', function () {
 		const boxes = filterBoxes('dash-chunks-prft.m4s', readPrft)
 		assert.strictEqual(boxes.length, 60)

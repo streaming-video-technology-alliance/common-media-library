@@ -1,6 +1,6 @@
 import { assert, describe, findBox, it, readMdat, readIsoBoxes } from '../util/box.ts'
 
-describe('vttc box', function () {
+describe('readVttc', function () {
 	it('should correctly parse the box from sample data', function () {
 		const { data } = findBox('webvtt.m4s', readMdat)
 		const boxes = readIsoBoxes(data)

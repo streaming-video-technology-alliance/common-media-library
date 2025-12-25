@@ -1,6 +1,6 @@
 import { assert, describe, findBox, it, readMfro } from '../util/box.ts'
 
-describe('mfro box', function () {
+describe('readMfro', function () {
 	it('should correctly parse the box', function () {
 		const box = findBox('test_frag.mp4', readMfro)
 

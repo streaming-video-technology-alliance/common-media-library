@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readHvc1, readStsd, type SampleDescriptionBox, type VisualSampleEntryBox } from '../util/box.ts'
 
-describe('hvc1 box', function () {
+describe('readHvc1', function () {
 	it('should correctly parse the box', function () {
 		const container = filterBoxes<
 			SampleDescriptionBox<VisualSampleEntryBox<'hvc1'>> | VisualSampleEntryBox<'hvc1'>

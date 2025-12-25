@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readMp4a, readStsd } from '../util/box.ts'
 
-describe('mp4a box', function () {
+describe('readMp4a', function () {
 	it('should correctly parse the box', function () {
 		const container = filterBoxes<any>('240fps_go_pro_hero_4.mp4', [readStsd, readMp4a])
 		const box = container[1].entries[0]

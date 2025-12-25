@@ -1,6 +1,6 @@
 import { assert, describe, findBox, it, readTrun, type TrackRunBox } from '../util/box.ts'
 
-describe('trun box', function () {
+describe('readTrun', function () {
 	it('should correctly parse the box from sample data', function () {
 		const box = findBox<TrackRunBox>('mss_moof_tfdt.mp4', [readTrun])
 

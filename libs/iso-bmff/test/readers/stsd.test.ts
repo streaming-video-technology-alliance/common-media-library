@@ -1,6 +1,6 @@
 import { assert, describe, filterBoxes, it, readStsd } from '../util/box.ts'
 
-describe('stsd box', function () {
+describe('readStsd', function () {
 	it('should correctly parse the box', function () {
 		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', readStsd)
 
