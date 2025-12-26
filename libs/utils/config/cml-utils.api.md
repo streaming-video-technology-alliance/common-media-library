@@ -34,6 +34,9 @@ export type DecodeTextOptions = {
 export function encodeBase64(binary: Uint8Array): string;
 
 // @beta
+export function encodeText(data: string): Uint8Array;
+
+// @beta
 export const Encoding: {
     readonly UTF8: typeof UTF_8;
     readonly UTF16: typeof UTF_16;
