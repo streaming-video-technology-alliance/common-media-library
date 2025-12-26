@@ -1,7 +1,6 @@
 /**
  * CMSD static header name.
  *
- *
- * @beta
+ * @public
  */
 export const CMSD_STATIC = 'CMSD-Static'

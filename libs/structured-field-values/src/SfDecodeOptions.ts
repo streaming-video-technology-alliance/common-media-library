@@ -1,8 +1,7 @@
 /**
  * Options for decoding Structured Field values
  *
- *
- * @beta
+ * @public
  */
 export type SfDecodeOptions = {
 	/**

@@ -6,7 +6,7 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmcdEventType = {
 	/**
@@ -61,6 +61,6 @@ export const CmcdEventType = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;

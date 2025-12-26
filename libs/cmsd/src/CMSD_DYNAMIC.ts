@@ -1,7 +1,6 @@
 /**
  * CMSD dynamic header name.
  *
- *
- * @beta
+ * @public
  */
 export const CMSD_DYNAMIC = 'CMSD-Dynamic'

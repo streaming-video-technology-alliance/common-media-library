@@ -11,8 +11,7 @@ import { processCmsd } from './utils/processCmsd.ts'
  *
  * @returns The encoded CMSD string.
  *
- *
- * @beta
+ * @public
  */
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string {
 	if (!cmsd) {

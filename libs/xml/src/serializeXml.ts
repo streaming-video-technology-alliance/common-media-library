@@ -6,7 +6,7 @@ import type { XmlNode } from './XmlNode.ts'
  * @param xml - The XML node to encode
  * @returns The parsed XML
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/serializeXml.test.ts#example}

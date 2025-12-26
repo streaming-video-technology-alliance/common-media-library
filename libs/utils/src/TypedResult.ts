@@ -1,8 +1,7 @@
 /**
  * Utility type to create a typed result.
  *
- *
- * @beta
+ * @public
  */
 export type TypedResult<T, D> = {
 	type: T;

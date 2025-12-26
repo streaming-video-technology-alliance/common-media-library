@@ -11,8 +11,7 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  * Common Media Client Data (CMCD) version 2 specification. It encapsulates
  * the reporting event token.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
 	/**

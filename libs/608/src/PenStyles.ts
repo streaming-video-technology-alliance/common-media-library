@@ -1,7 +1,7 @@
 /**
  * PenStyles
  *
- * @beta
+ * @public
  */
 export type PenStyles = {
 	foreground: string | null;

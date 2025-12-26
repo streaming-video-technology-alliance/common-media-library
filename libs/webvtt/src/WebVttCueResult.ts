@@ -4,7 +4,6 @@ import type { WebVttCue } from './WebVttCue.ts'
 /**
  * WebVTT transform stream cue result.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttCueResult = TypedResult<'cue', WebVttCue>;

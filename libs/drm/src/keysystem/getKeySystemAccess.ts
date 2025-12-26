@@ -6,7 +6,7 @@ import type { MediaKeySystemAccessRequest } from '../common/MediaKeySystemAccess
  * @param requests - An array of key system access requests.
  * @returns MediaKeySystemAccess object if successful, or null if no system is supported.
  *
- * @beta
+ * @public
  */
 export async function getKeySystemAccess(
 	requests: MediaKeySystemAccessRequest[],

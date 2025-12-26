@@ -36,8 +36,7 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  *
  * @returns The decoded CMCD object.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/decodeCmcd.test.ts#example}

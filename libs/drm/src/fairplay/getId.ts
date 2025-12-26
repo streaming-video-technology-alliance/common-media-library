@@ -8,7 +8,7 @@ import { extractContentId } from './extractContentId.ts'
  * @param queryParam - The query parameter key to extract (default: 'ContentId')
  * @returns The extracted content ID as a string or null if not found
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/fairplay/getId.test.ts#example}

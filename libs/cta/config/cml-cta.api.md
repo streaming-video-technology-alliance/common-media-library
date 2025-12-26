@@ -8,7 +8,7 @@ import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
 
-// @beta
+// @public
 export type CmCustomKey = `${string}-${string}`;
 
 // Warning: (ae-internal-missing-underscore) The name "CmObjectType" should be prefixed with an underscore because the declaration is marked as @internal
@@ -53,11 +53,11 @@ export const CmStreamType: {
 // @internal
 export type CmStreamType = ValueOf<typeof CmStreamType>;
 
-// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @beta, but its signature references "CmObjectType" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @beta, but its signature references "CmStreamingFormat" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @beta, but its signature references "CmStreamType" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmObjectType" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmStreamingFormat" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmStreamType" which is marked as @internal
 //
-// @beta
+// @public
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // Warning: (ae-internal-missing-underscore) The name "isTokenField" should be prefixed with an underscore because the declaration is marked as @internal

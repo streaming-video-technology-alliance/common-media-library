@@ -10,8 +10,7 @@ import { serializeList } from './serialize/serializeList.ts'
  *
  * @returns The structured field string
  *
- *
- * @beta
+ * @public
  */
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string {
 	return serializeList(value, options)

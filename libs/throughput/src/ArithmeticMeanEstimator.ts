@@ -5,8 +5,7 @@ import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 /**
  * Arithmetic Mean throughput estimator
  *
- *
- * @beta
+ * @public
  */
 export class ArithmeticMeanEstimator implements ThroughputEstimator {
 	private samples: ResourceTiming[] = []

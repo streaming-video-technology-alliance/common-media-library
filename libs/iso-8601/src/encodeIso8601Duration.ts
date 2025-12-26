@@ -4,7 +4,7 @@
  * @param duration - Duration in seconds.
  * @returns ISO 8601 duration string.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/encodeIso8601Duration.test.ts#example}

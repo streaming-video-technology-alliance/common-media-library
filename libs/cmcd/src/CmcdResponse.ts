@@ -5,8 +5,7 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  *
  * Defines the keys for the CMCD (Common Media Client Data) v2 Response group.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdResponse = CmcdRequest & {
 	/**

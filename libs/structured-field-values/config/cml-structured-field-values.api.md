@@ -4,25 +4,25 @@
 
 ```ts
 
-// @beta
+// @public
 export function decodeSfDict(input: string, options?: SfDecodeOptions): SfDictionary;
 
-// @beta
+// @public
 export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem;
 
-// @beta
+// @public
 export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember[];
 
-// @beta
+// @public
 export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string;
 
-// @beta
+// @public
 export function encodeSfItem(value: SfItem): string;
 
-// @beta
+// @public
 export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 
-// @beta
+// @public
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
 // Warning: (ae-internal-missing-underscore) The name "parseBareItem" should be prefixed with an underscore because the declaration is marked as @internal
@@ -183,29 +183,29 @@ export function serializeString(value: string): string;
 // @internal (undocumented)
 export function serializeToken(token: symbol | SfToken): string;
 
-// @beta
+// @public
 export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
 
-// @beta
+// @public
 export type SfDecodeOptions = {
     useSymbol?: boolean;
 };
 
-// @beta
+// @public
 export type SfDictionary = Record<string, SfMember> | Map<string, SfMember>;
 
-// @beta
+// @public
 export type SfEncodeOptions = {
     whitespace?: boolean;
 };
 
-// @beta
+// @public
 export type SfInnerList = {
     value: SfItem[] | SfBareItem[];
     params: SfParameters;
 };
 
-// @beta
+// @public
 export class SfItem {
     constructor(value: any, params?: SfParameters);
     // (undocumented)
@@ -214,20 +214,20 @@ export class SfItem {
     value: SfBareItem;
 }
 
-// @beta
+// @public
 export type SfMember = SfItem | SfInnerList | SfBareItem;
 
-// @beta
+// @public
 export type SfParameters = Record<string, any>;
 
-// @beta
+// @public
 export class SfToken {
     constructor(description: string);
     // (undocumented)
     description: string;
 }
 
-// @beta
+// @public
 export function symbolToStr(symbol: symbol | SfToken): string;
 
 // (No @packageDocumentation comment for this package)

@@ -13,13 +13,13 @@ import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
 import { ValueOrArray } from '@svta/cml-utils';
 
-// @beta
+// @public
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string>;
 
-// @beta
+// @public
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @beta
+// @public
 export type Cmcd = {
     [index: CmcdCustomKey]: CmcdValue;
     br?: number;
@@ -42,76 +42,76 @@ export type Cmcd = {
     rtp?: number;
 };
 
-// @beta
+// @public
 export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
 
-// @beta
+// @public
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
 
-// @beta
+// @public
 export const CMCD_EVENT_KEYS: readonly ["e"];
 
-// @beta
+// @public
 export const CMCD_EVENT_MODE = "event";
 
-// @beta
+// @public
 export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
 
-// @beta
+// @public
 export const CMCD_HEADERS = "headers";
 
-// @beta @deprecated
+// @public @deprecated
 export const CMCD_JSON = "json";
 
-// @beta
+// @public
 export const CMCD_KEYS: CmcdKey[];
 
-// @beta
+// @public
 export const CMCD_OBJECT = "CMCD-Object";
 
-// @beta
+// @public
 export const CMCD_PARAM = "CMCD";
 
-// @beta
+// @public
 export const CMCD_QUERY = "query";
 
-// @beta
+// @public
 export const CMCD_REQUEST = "CMCD-Request";
 
-// @beta
+// @public
 export const CMCD_REQUEST_KEYS: readonly ["d", "dl", "nor", "ot", "rtp", "su"];
 
-// @beta
+// @public
 export const CMCD_REQUEST_MODE = "request";
 
-// @beta
+// @public
 export const CMCD_RESPONSE_KEYS: readonly ["cmsdd", "cmsds", "rc", "smrt", "ttfb", "ttfbb", "ttlb", "url"];
 
-// @beta
+// @public
 export const CMCD_RESPONSE_MODE = "response";
 
-// @beta
+// @public
 export const CMCD_SESSION = "CMCD-Session";
 
-// @beta
+// @public
 export const CMCD_STATUS = "CMCD-Status";
 
-// @beta
+// @public
 export const CMCD_V1 = 1;
 
-// @beta
+// @public
 export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", "nor", "nrr", "ot", "pr", "rtp", "sf", "sid", "st", "su", "tb", "v"];
 
-// @beta
+// @public
 export const CMCD_V2 = 2;
 
-// @beta
+// @public
 export type CmcdCustomKey = `${string}-${string}`;
 
-// @beta
+// @public
 export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
 
-// @beta
+// @public
 export type CmcdEncodeOptions = {
     version?: number;
     reportingMode?: CmcdReportingMode;
@@ -122,21 +122,21 @@ export type CmcdEncodeOptions = {
     events?: string[];
 };
 
-// @beta @deprecated
+// @public @deprecated
 export const CmcdEncoding: typeof CmcdTransmissionMode;
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
-// @beta
+// @public
 export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
     e?: CmcdEventType;
 };
 
-// @beta
+// @public
 export type CmcdEventExcludedKeys = "bsd" | "d" | "dl" | "nor" | "ot" | "rtp" | "sid" | "su";
 
-// @beta
+// @public
 export const CmcdEventType: {
     readonly PLAY_STATE: "ps";
     readonly ERROR: "e";
@@ -150,26 +150,26 @@ export const CmcdEventType: {
     readonly RESPONSE_RECEIVED: "rr";
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
-// @beta
+// @public
 export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
 
-// @beta
+// @public
 export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
 
-// @beta
+// @public
 export type CmcdFormatterOptions = {
     version: number;
     reportingMode: CmcdReportingMode;
     baseUrl?: string;
 };
 
-// @beta @deprecated
+// @public @deprecated
 export const CmcdFormatters: Record<string, CmcdFormatter>;
 
-// @beta
+// @public
 export const CmcdHeaderField: {
     readonly OBJECT: typeof CMCD_OBJECT;
     readonly REQUEST: typeof CMCD_REQUEST;
@@ -177,25 +177,25 @@ export const CmcdHeaderField: {
     readonly STATUS: typeof CMCD_STATUS;
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
-// @beta
+// @public
 export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
 
-// @beta @deprecated
+// @public @deprecated
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
-// @beta
+// @public
 export type CmcdKey = keyof CmcdData;
 
-// @beta
+// @public
 export const CmcdObjectType: typeof CmObjectType;
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdObjectType = CmObjectType;
 
-// @beta
+// @public
 export const CmcdPlayerState: {
     readonly STARTING: "s";
     readonly PLAYING: "p";
@@ -209,19 +209,19 @@ export const CmcdPlayerState: {
     readonly PRELOADING: "d";
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
 
-// @beta
+// @public
 export const CmcdReportingMode: {
     readonly REQUEST: typeof CMCD_REQUEST_MODE;
     readonly EVENT: typeof CMCD_EVENT_MODE;
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 
-// @beta
+// @public
 export type CmcdReportTarget = {
     url: string;
     reportingMode?: CmcdReportingMode;
@@ -231,7 +231,7 @@ export type CmcdReportTarget = {
     enabledKeys?: CmcdKey[];
 };
 
-// @beta
+// @public
 export type CmcdRequest = Omit<Cmcd, "nrr"> & {
     ab?: number;
     tbl?: number;
@@ -254,7 +254,7 @@ export type CmcdRequest = Omit<Cmcd, "nrr"> & {
     cs?: number;
 };
 
-// @beta
+// @public
 export type CmcdResponse = CmcdRequest & {
     rc?: number;
     ttfb?: number;
@@ -266,82 +266,82 @@ export type CmcdResponse = CmcdRequest & {
     smrt?: number;
 };
 
-// @beta
+// @public
 export const CmcdStreamingFormat: typeof CmStreamingFormat;
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdStreamingFormat = CmStreamingFormat;
 
-// @beta
+// @public
 export const CmcdStreamType: typeof CmStreamType;
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdStreamType = CmStreamType;
 
-// @beta
+// @public
 export const CmcdTransmissionMode: {
     readonly JSON: typeof CMCD_JSON;
     readonly QUERY: typeof CMCD_QUERY;
     readonly HEADERS: typeof CMCD_HEADERS;
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
 
-// @beta
+// @public
 export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
-// @beta
+// @public
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T;
 
-// @beta
+// @public
 export function encodeCmcd(cmcd: CmcdData, options?: CmcdEncodeOptions): string;
 
-// @beta
+// @public
 export function fromCmcdHeaders(headers: Record<string, string> | Headers): CmcdData;
 
-// @beta
+// @public
 export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
 
-// @beta
+// @public
 export function fromCmcdUrl(url: string): Cmcd;
 
-// @beta
+// @public
 export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData>;
 
-// @beta
+// @public
 export function isCmcdCustomKey(key: CmcdKey): boolean;
 
-// @beta
+// @public
 export function isCmcdEventKey(key: string): key is keyof CmcdEvent;
 
-// @beta
+// @public
 export function isCmcdRequestKey(key: string): key is keyof CmcdRequest;
 
-// @beta
+// @public
 export function isCmcdResponseReceivedKey(key: string): key is keyof CmcdResponse;
 
-// @beta
+// @public
 export function isCmcdV1Key(key: string): key is keyof Cmcd;
 
-// @beta
+// @public
 export function prepareCmcdData(obj: Record<string, any>, options?: CmcdEncodeOptions): CmcdData;
 
-// @beta
+// @public
 export function toCmcdHeaders(cmcd: CmcdData, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
-// @beta @deprecated
+// @public @deprecated
 export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @beta
+// @public
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @beta
+// @public
 export function toCmcdReport(data: CmcdData, target: CmcdReportTarget): Request_2<{
     cmcd: Cmcd;
 }> | null;
 
-// @beta
+// @public
 export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // (No @packageDocumentation comment for this package)

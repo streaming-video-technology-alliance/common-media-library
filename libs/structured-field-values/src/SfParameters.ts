@@ -1,7 +1,6 @@
 /**
  * Structured Field Parameters
  *
- *
- * @beta
+ * @public
  */
 export type SfParameters = Record<string, any>;

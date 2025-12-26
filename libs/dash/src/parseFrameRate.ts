@@ -4,7 +4,7 @@
  * @param frameRate - The frame rate string to parse.
  * @returns The frame rate as a number.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/parseFrameRate.test.ts#example}

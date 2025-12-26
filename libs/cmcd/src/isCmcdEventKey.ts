@@ -11,8 +11,7 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  *
  * @returns `true` if the key is a valid CMCD event key, `false` otherwise.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/isCmcdEventKey.test.ts#example}

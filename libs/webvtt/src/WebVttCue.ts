@@ -3,8 +3,7 @@ import type { WebVttRegion } from './WebVttRegion.ts'
 /**
  * A WebVTT cue.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttCue = {
 	id: string;

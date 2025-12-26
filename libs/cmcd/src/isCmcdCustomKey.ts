@@ -9,8 +9,7 @@ const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9-.]+-[a-zA-Z0-9-.]+$/
  *
  * @returns `true` if the key is a custom key, `false` otherwise.
  *
- *
- * @beta
+ * @public
  */
 export function isCmcdCustomKey(key: CmcdKey): boolean {
 	return CUSTOM_KEY_REGEX.test(key)

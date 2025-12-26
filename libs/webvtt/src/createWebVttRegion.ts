@@ -6,8 +6,7 @@ import type { WebVttRegion } from './WebVttRegion.ts'
  *
  * @returns A WebVttRegion object with default values
  *
- *
- * @beta
+ * @public
  */
 export function createWebVttRegion(): WebVttRegion {
 	return {

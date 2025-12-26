@@ -6,8 +6,7 @@
  * @param data - The string to encode.
  * @returns The Uint8Array representation of the string.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/encodeText.test.ts#example}

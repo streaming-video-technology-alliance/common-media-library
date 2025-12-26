@@ -4,7 +4,7 @@
  * @param initData - The initialization data (PSSH box)
  * @returns The license server URL as a string
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/fairplay/getLicenseServerUrl.test.ts#example}

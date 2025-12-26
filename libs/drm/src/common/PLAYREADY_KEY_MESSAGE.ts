@@ -1,7 +1,6 @@
 /**
  * Playready Key Message.
  *
- *
- * @beta
+ * @public
  */
 export const PLAYREADY_KEY_MESSAGE = 'PlayReadyKeyMessage'

@@ -8,8 +8,7 @@ import type { CmsdStatic } from './CmsdStatic.ts'
  *
  * @returns The decoded CMSD object.
  *
- *
- * @beta
+ * @public
  */
 export function decodeCmsdStatic(cmsd: string): CmsdStatic {
 	if (!cmsd) {

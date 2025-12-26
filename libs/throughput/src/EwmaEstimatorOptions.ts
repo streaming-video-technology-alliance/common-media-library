@@ -1,8 +1,7 @@
 /**
  * Exponential Weighted Moving Average (EWMA) Estimator Options
  *
- *
- * @beta
+ * @public
  */
 export type EwmaEstimatorOptions = {
 	defaultEstimate?: number;

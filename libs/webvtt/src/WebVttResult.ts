@@ -7,7 +7,6 @@ import type { WebVttTimestampMapResult } from './WebVttTimestampMapResult.ts'
 /**
  * WebVTT transform stream result.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttResult = WebVttCueResult | WebVttRegionResult | WebVttTimestampMapResult | WebVttStyleResult | WebVttErrorResult;

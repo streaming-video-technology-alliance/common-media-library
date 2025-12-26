@@ -1,7 +1,6 @@
 /**
  * CMCD object header name.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_OBJECT = 'CMCD-Object'

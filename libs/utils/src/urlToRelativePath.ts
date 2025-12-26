@@ -5,8 +5,7 @@
  * @param base - The base URL
  * @returns The relative path
  *
- *
- * @beta
+ * @public
  */
 export function urlToRelativePath(url: string, base: string): string {
 	const to = new URL(url)

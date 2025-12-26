@@ -41,7 +41,7 @@ import { PenState } from './PenState.ts'
 /**
  * Unicode character with styling and background.
  *
- * @beta
+ * @public
  */
 export class StyledUnicodeChar {
 	uchar: string = ' '

@@ -1,7 +1,6 @@
 /**
  * Common Encryption scheme.
  *
- *
- * @beta
+ * @public
  */
 export const CENC = 'cenc'

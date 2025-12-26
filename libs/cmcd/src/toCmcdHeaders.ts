@@ -13,8 +13,7 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
  *
  * @returns The CMCD header shards.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/toCmcdHeaders.test.ts#example}

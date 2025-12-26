@@ -49,7 +49,7 @@ import { NR_ROWS } from './utils/NR_ROWS.ts'
 /**
  * CTA-608 Channel
  *
- * @beta
+ * @public
  */
 export class Cta608Channel {
 	chNr: number

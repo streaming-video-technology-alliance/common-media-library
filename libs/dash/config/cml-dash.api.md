@@ -4,13 +4,13 @@
 
 ```ts
 
-// @beta
+// @public
 export function parseFrameRate(frameRate: string): number;
 
-// @beta
+// @public
 export function processUriTemplate(uriTemplate: string, representationId: string | null | undefined, number: number | null | undefined, subNumber: number | null | undefined, bandwidth: number | null | undefined, time: string | number | null | undefined): string;
 
-// @beta
+// @public
 export const THUMBNAIL_TILE_SCHEME_ID_URI = "http://dashif.org/guidelines/thumbnail_tile";
 
 // (No @packageDocumentation comment for this package)

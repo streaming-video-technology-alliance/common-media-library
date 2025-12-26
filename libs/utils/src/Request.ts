@@ -3,8 +3,7 @@ import type { RequestType } from './RequestType.ts'
 /**
  * Generic request API.
  *
- *
- * @beta
+ * @public
  */
 export type Request<D = any> = {
 

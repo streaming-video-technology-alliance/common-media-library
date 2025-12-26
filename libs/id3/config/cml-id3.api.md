@@ -4,10 +4,10 @@
 
 ```ts
 
-// @beta
+// @public
 export function canParseId3(data: Uint8Array, offset: number): boolean;
 
-// @beta
+// @public
 export type DecodedId3Frame<T> = {
     key: string;
     data: T;
@@ -30,16 +30,16 @@ export function decodeId3TextFrame(frame: RawId3Frame): DecodedId3Frame<string> 
 // @internal
 export function getId3Data(data: Uint8Array, offset: number): Uint8Array | undefined;
 
-// @beta
+// @public
 export function getId3Frames(id3Data: Uint8Array<ArrayBuffer>): Id3Frame[];
 
-// @beta
+// @public
 export function getId3Timestamp(data: Uint8Array<ArrayBuffer>): number | undefined;
 
-// @beta
+// @public
 export const ID3_SCHEME_ID_URI = "https://aomedia.org/emsg/ID3";
 
-// @beta
+// @public
 export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
 
 // Warning: (ae-internal-missing-underscore) The name "isId3Footer" should be prefixed with an underscore because the declaration is marked as @internal

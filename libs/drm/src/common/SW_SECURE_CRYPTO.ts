@@ -1,7 +1,6 @@
 /**
  * Software Secure Crypto Robustness.
  *
- *
- * @beta
+ * @public
  */
 export const SW_SECURE_CRYPTO = 'SW_SECURE_CRYPTO'

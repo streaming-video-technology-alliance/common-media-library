@@ -1,8 +1,7 @@
 /**
  * Options for encoding CMCD values.
  *
- *
- * @beta
+ * @public
  */
 export type CmsdEncodeOptions = {
 	/**

@@ -4,7 +4,6 @@ import type { CmcdKey } from './CmcdKey.ts'
 /**
  * A map of CMCD header fields to CMCD keys.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;

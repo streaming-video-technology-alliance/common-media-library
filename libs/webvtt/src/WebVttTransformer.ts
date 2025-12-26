@@ -5,8 +5,7 @@ import { WebVttResultType } from './WebVttResultType.ts'
 /**
  * WebVTT transform stream transformer.
  *
- *
- * @beta
+ * @public
  */
 export class WebVttTransformer {
 	private readonly parser: WebVttParser

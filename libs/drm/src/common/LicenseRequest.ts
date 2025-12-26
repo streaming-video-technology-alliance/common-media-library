@@ -4,8 +4,7 @@
  * Contains all data needed to make a license acquisition request
  * to a DRM license server.
  *
- *
- * @beta
+ * @public
  */
 export type LicenseRequest = {
 	/**

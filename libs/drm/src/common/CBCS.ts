@@ -1,7 +1,6 @@
 /**
  * Cipher Block Chaining Sample encryption scheme.
  *
- *
- * @beta
+ * @public
  */
 export const CBCS = 'cbcs'

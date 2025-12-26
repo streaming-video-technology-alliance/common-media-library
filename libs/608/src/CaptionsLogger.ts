@@ -41,7 +41,7 @@ import { VerboseLevel } from './VerboseLevel.ts'
 /**
  * CaptionsLogger. To be removed in the future.
  *
- * @beta
+ * @public
  */
 export class CaptionsLogger {
 	public time: number | null = null

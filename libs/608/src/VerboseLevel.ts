@@ -6,7 +6,7 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const VerboseLevel = {
 	ERROR: 0,
@@ -18,6 +18,6 @@ export const VerboseLevel = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type VerboseLevel = ValueOf<typeof VerboseLevel>;

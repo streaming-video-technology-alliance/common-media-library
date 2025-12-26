@@ -5,8 +5,7 @@ import type { ResponseTypeMap } from './ResponseTypeMap.ts'
 /**
  * Common response API.
  *
- *
- * @beta
+ * @public
  */
 
 export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = {

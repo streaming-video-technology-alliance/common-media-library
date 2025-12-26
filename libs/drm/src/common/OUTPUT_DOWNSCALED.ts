@@ -1,7 +1,6 @@
 /**
  * Output Downscaled Media Key Status.
  *
- *
- * @beta
+ * @public
  */
 export const OUTPUT_DOWNSCALED = 'output-downscaled'

@@ -1,7 +1,6 @@
 /**
  * UTF-16 Little Endian Encoding.
  *
- *
- * @beta
+ * @public
  */
 export const UTF_16_LE = 'utf-16le'

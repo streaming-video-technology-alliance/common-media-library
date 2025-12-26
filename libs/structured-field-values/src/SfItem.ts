@@ -4,8 +4,7 @@ import type { SfParameters } from './SfParameters.ts'
 /**
  * Structured Field Item
  *
- *
- * @beta
+ * @public
  */
 export class SfItem {
 

@@ -1,7 +1,6 @@
 /**
  * Status Pending Media Key Status.
  *
- *
- * @beta
+ * @public
  */
 export const STATUS_PENDING = 'status-pending'

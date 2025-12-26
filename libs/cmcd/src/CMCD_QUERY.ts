@@ -1,7 +1,6 @@
 /**
  * CMCD `query` transmission mode.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_QUERY = 'query'

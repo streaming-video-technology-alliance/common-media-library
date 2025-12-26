@@ -7,8 +7,7 @@ import type { ValueOf } from './ValueOf.ts'
 /**
  * Text encoding types.
  *
- *
- * @beta
+ * @public
  */
 export const Encoding = {
 	UTF8: UTF_8 as typeof UTF_8,
@@ -20,7 +19,6 @@ export const Encoding = {
 /**
  * Text encoding types.
  *
- *
- * @beta
+ * @public
  */
 export type Encoding = ValueOf<typeof Encoding>;

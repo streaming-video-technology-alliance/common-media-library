@@ -3,7 +3,7 @@
  *
  * @packageDocumentation
  *
- * @beta
+ * @public
  */
 
 // common utils

@@ -18,8 +18,7 @@ import { toCmcdHeaders } from './toCmcdHeaders.ts'
  *
  * @return A CMCD report object
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/toCmcdReport.test.ts#example}

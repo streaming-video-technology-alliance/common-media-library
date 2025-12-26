@@ -1,7 +1,6 @@
 /**
  * Released Media Key Status.
  *
- *
- * @beta
+ * @public
  */
 export const RELEASED = 'released'

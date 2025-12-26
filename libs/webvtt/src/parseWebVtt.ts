@@ -12,8 +12,7 @@ import type { WebVttRegion } from './WebVttRegion.ts'
  * @param options - The options to use for the parser.
  * @returns The parsed WebVttParseResult.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/parseWebVtt.test.ts#example}

@@ -1,7 +1,6 @@
 /**
  * License Acquisition.
  *
- *
- * @beta
+ * @public
  */
 export const LICENSE_ACQUISITION = 'LicenseAcquisition'

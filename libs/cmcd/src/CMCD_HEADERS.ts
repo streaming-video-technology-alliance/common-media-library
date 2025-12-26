@@ -1,7 +1,6 @@
 /**
  * CMCD `headers` transmission mode.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_HEADERS = 'headers'

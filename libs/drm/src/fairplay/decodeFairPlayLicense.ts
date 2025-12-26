@@ -6,7 +6,7 @@ import { decodeBase64 } from '@svta/cml-utils'
  * @param response - The license response, either a base64 string or ArrayBuffer
  * @returns A Uint8Array containing the decoded license
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/fairplay/decodeFairPlayLicense.test.ts#example}

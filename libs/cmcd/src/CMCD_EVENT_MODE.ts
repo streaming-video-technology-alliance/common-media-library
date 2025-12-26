@@ -1,7 +1,6 @@
 /**
  * CMCD event mode variable name.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_EVENT_MODE = 'event'

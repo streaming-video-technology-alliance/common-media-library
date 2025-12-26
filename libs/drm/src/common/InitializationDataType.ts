@@ -7,8 +7,7 @@ import { WEBM } from './WEBM.ts'
 /**
  * Initialization Data Type.
  *
- *
- * @beta
+ * @public
  */
 export const InitializationDataType = {
 	CENC: CENC as typeof CENC,
@@ -20,7 +19,6 @@ export const InitializationDataType = {
 /**
  * Initialization Data Type.
  *
- *
- * @beta
+ * @public
  */
 export type InitializationDataType = ValueOf<typeof InitializationDataType>;

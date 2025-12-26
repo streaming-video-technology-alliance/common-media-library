@@ -7,7 +7,7 @@
  * the detected key system UUIDs (e.g. 00000000-0000-0000-0000-0000000000)
  * and a ArrayBuffer (the entire PSSH box) as the property value
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/cenc/parsePsshList.test.ts#example}

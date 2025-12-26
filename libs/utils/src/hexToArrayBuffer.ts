@@ -4,8 +4,7 @@
  * @param hex - The hexadecimal string to decode.
  * @returns The decoded ArrayBuffer.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/hexToArrayBuffer.test.ts#example}

@@ -16,8 +16,7 @@ const FRAME_SIZE = 10
  *
  * @returns Array of ID3 frame objects
  *
- *
- * @beta
+ * @public
  */
 export function getId3Frames(id3Data: Uint8Array<ArrayBuffer>): Id3Frame[] {
 	let offset = 0

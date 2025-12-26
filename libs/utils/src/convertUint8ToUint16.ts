@@ -4,7 +4,7 @@
  * @param input - The Uint8Array to convert
  * @returns A properly aligned Uint16Array
  *
- * @beta
+ * @public
  */
 export function convertUint8ToUint16(input: Uint8Array): Uint16Array {
 	if (input.length % 2 !== 0) {

@@ -8,7 +8,7 @@ import type { ContentProtection } from '../common/ContentProtection.ts'
  * @param BASE64 - The BASE64 reference.
  * @returns init data as an ArrayBuffer, or null if not found.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/cenc/parseInitDataFromContentProtection.test.ts#example}

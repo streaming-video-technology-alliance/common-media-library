@@ -1,7 +1,6 @@
 /**
  * CMCD request header name.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_REQUEST = 'CMCD-Request'

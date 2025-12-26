@@ -58,7 +58,7 @@ import { setLastCmd } from './utils/setLastCmd.ts'
 /**
  * CEA-608 caption parser.
  *
- * @beta
+ * @public
  */
 export class Cta608Parser {
 	private channels: (Cta608Channel | null)[]
