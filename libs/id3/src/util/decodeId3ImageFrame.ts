@@ -1,5 +1,5 @@
 import type { DecodedId3Frame } from '../DecodedId3Frame.ts'
-import type { RawId3Frame } from './RawFrame.ts'
+import type { RawId3Frame } from './RawId3Frame.ts'
 import { toArrayBuffer } from './toArrayBuffer.ts'
 import { toUint8 } from './utf8.ts'
 import { utf8ArrayToStr } from './utf8ArrayToStr.ts'
@@ -12,6 +12,15 @@ type MetadataFrame = {
 	pictureType: number | null;
 };
 
+/**
+ * Decode an ID3 APIC frame.
+ *
+ * @param frame - the ID3 APIC frame
+ *
+ * @returns The decoded ID3 APIC frame
+ *
+ * @internal
+ */
 export function decodeId3ImageFrame(
 	frame: RawId3Frame,
 ): DecodedId3Frame<string | ArrayBuffer> | undefined {
@@ -65,5 +74,6 @@ export function decodeId3ImageFrame(
 	metadataFrame.pictureType = pictureType
 	metadataFrame.description = description
 	metadataFrame.data = data
+
 	return metadataFrame
 }

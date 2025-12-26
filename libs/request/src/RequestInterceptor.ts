@@ -5,7 +5,6 @@ import type { CommonMediaRequest } from './CommonMediaRequest.ts'
  * @param request - The request to be executed.
  * @returns A promise with updated request that is resolved when the interceptor has completed the process of the request.
  *
- *
- * @beta
+ * @public
  */
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;

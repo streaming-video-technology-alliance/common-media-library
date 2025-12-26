@@ -10,8 +10,7 @@ import { encodeCmcd } from './encodeCmcd.ts'
  *
  * @returns The URL encoded CMCD data.
  *
- *
- * @beta
+ * @public
  */
 export function toCmcdUrl(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {

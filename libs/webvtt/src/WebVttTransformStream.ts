@@ -4,8 +4,7 @@ import { WebVttTransformer } from './WebVttTransformer.ts'
 /**
  * WebVTT transform stream.
  *
- *
- * @beta
+ * @public
  */
 export class WebVttTransformStream extends TransformStream<string, WebVttResult> {
 	constructor(writableStrategy?: QueuingStrategy<string>, readableStrategy?: QueuingStrategy<WebVttResult>) {

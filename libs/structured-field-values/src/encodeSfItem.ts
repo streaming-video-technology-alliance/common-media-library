@@ -10,8 +10,7 @@ import { serializeItem } from './serialize/serializeItem.ts'
  *
  * @returns The structured field string
  *
- *
- * @beta
+ * @public
  */
 export function encodeSfItem(value: SfItem): string;
 
@@ -23,7 +22,7 @@ export function encodeSfItem(value: SfItem): string;
  *
  * @returns The structured field string
  *
- * @beta
+ * @public
  */
 export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 

@@ -6,11 +6,11 @@ import { CmObjectType } from '@svta/cml-cta'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmsdObjectType = CmObjectType as typeof CmObjectType
 
 /**
- * @beta
+ * @public
  */
 export type CmsdObjectType = CmObjectType;

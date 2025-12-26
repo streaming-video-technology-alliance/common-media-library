@@ -1,8 +1,7 @@
 /**
  * Defines the keys for CMCD (Common Media Client Data) version 1.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_V1_KEYS = [
 	'bl',

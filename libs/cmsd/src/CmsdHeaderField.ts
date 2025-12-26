@@ -8,7 +8,7 @@ import { CMSD_STATIC } from './CMSD_STATIC.ts'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmsdHeaderField = {
 	/**
@@ -25,6 +25,6 @@ export const CmsdHeaderField = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;

@@ -1,7 +1,6 @@
 /**
  * Software Secure Decode Robustness.
  *
- *
- * @beta
+ * @public
  */
 export const SW_SECURE_DECODE = 'SW_SECURE_DECODE'

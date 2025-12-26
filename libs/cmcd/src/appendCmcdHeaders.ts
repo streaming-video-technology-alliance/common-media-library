@@ -11,8 +11,7 @@ import { toCmcdHeaders } from './toCmcdHeaders.ts'
  *
  * @returns The headers with the CMCD header shards appended.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/appendCmcdHeaders.test.ts#example}

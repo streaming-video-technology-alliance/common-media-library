@@ -4,7 +4,7 @@
  * @param keyId - The little-endian key ID to convert.
  * @returns The big-endian representation of the key ID.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/playready/toBigEndianKeyId.test.ts#example}

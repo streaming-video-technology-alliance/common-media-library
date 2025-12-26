@@ -12,8 +12,7 @@ import { UTF_8 } from './UTF_8.ts'
  * @param options - The options for the decoding.
  * @returns The string representation of the ArrayBuffer.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/decodeText.test.ts#example}

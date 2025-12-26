@@ -3,8 +3,7 @@ import type { Encoding } from './Encoding.ts'
 /**
  * Options for the `decodeText` function.
  *
- *
- * @beta
+ * @public
  */
 export type DecodeTextOptions = {
 	/**

@@ -6,8 +6,7 @@ import type { WebVttRegion } from './WebVttRegion.ts'
  * @param region - The WebVTT region to convert.
  * @returns The converted VTTRegion.
  *
- *
- * @beta
+ * @public
  *
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/VTTRegion | VTTRegion}
  */

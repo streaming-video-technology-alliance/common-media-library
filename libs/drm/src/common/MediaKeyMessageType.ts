@@ -7,8 +7,7 @@ import { LICENSE_REQUEST } from './LICENSE_REQUEST.ts'
 /**
  * Media Key Message Types.
  *
- *
- * @beta
+ * @public
  */
 export const MediaKeyMessageType = {
 	LICENSE_REQUEST: LICENSE_REQUEST as typeof LICENSE_REQUEST,
@@ -20,7 +19,6 @@ export const MediaKeyMessageType = {
 /**
  * Media Key Message Types.
  *
- *
- * @beta
+ * @public
  */
 export type MediaKeyMessageType = ValueOf<typeof MediaKeyMessageType>;

@@ -4,8 +4,7 @@
  * @param str - The string to convert
  * @returns A Uint16Array representation of the string
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/stringToUint16.test.ts#example}

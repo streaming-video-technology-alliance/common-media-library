@@ -3,8 +3,7 @@ import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 /**
  * Options for formatting CMCD data values.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdFormatterOptions = {
 	/**

@@ -2,8 +2,7 @@
 /**
  * XML node
  *
- *
- * @beta
+ * @public
  */
 export type XmlNode = {
 	nodeName: string;

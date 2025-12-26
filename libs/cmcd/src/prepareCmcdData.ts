@@ -23,8 +23,7 @@ const filterMap = {
  * @param obj - The CMCD object to process.
  * @param options - Options for encoding.
  *
- *
- * @beta
+ * @public
  */
 export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): CmcdData {
 	const results: CmcdData = {}

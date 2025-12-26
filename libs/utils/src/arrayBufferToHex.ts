@@ -4,8 +4,7 @@
  * @param buffer - The ArrayBuffer to encode.
  * @returns The hexadecimal string representation.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/arrayBufferToHex.test.ts#example}

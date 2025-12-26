@@ -1,7 +1,6 @@
 /**
  * Playready Recommendation Key System.
  *
- *
- * @beta
+ * @public
  */
 export const PLAYREADY_RECOMMENDATION_KEY_SYSTEM = 'com.microsoft.playready.recommendation'

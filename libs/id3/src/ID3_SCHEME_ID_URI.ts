@@ -1,8 +1,7 @@
 /**
  * The scheme ID URI for ID3 tags.
  *
- *
- * @beta
+ * @public
  *
  * @see {@link https://aomediacodec.github.io/id3-emsg/ | Carriage of ID3 Timed Metadata in the Common Media Application Format (CMAF)}
  * @see {@link https://developer.apple.com/documentation/http-live-streaming/about-the-common-media-application-format-with-http-live-streaming-hls#CMAF-Tracks-Segments-Headers-and-Fragments | CMAF Tracks, Segments, Headers, and Fragments}

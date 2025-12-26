@@ -1,7 +1,7 @@
 /**
  * Command history for CTA-608.
  *
- * @beta
+ * @public
  */
 export type CmdHistory = {
 	a: number | null;

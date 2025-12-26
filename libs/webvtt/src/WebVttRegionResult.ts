@@ -4,7 +4,6 @@ import type { WebVttRegion } from './WebVttRegion.ts'
 /**
  * WebVTT transform stream region result.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttRegionResult = TypedResult<'region', WebVttRegion>;

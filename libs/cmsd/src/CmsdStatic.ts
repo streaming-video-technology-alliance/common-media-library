@@ -9,8 +9,7 @@ import type { CmsdValue } from './CmsdValue.ts'
  *
  * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5006-final.pdf|CMSD Spec}
  *
- *
- * @beta
+ * @public
  */
 export type CmsdStatic = {
 

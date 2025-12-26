@@ -5,7 +5,7 @@
  * @param supportedVideo - supported video capabilities.
  * @returns KeySystemConfiguration object.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/keysystem/createMediaKeySystemConfiguration.test.ts#example}

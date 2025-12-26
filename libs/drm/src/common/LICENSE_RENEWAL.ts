@@ -1,7 +1,6 @@
 /**
  * License Renewal.
  *
- *
- * @beta
+ * @public
  */
 export const LICENSE_RENEWAL = 'license-renewal'

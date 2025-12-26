@@ -7,7 +7,7 @@ import type { ContentProtection } from '../common/ContentProtection.ts'
  * @param schemeIdUri - schemeIdUri we are searching for.
  * @returns The license server URL, and if not found then null.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/cenc/getLicenseServerUrlFromContentProtection.test.ts#example}

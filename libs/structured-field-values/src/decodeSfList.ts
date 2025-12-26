@@ -10,8 +10,7 @@ import { LIST } from './utils/LIST.ts'
  * @param input - The structured field string to decode
  * @returns The structured field list
  *
- *
- * @beta
+ * @public
  */
 export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember[] {
 	try {

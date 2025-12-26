@@ -5,8 +5,7 @@ import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 /**
  * Zero-Lag Exponential Moving Average (ZLEMA) throughput estimator
  *
- *
- * @beta
+ * @public
  */
 export class ZlemaEstimator implements ThroughputEstimator {
 	private samples: ResourceTiming[] = []

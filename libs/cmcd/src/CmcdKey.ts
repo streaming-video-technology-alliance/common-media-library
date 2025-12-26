@@ -3,7 +3,6 @@ import type { CmcdData } from './CmcdData.ts'
 /**
  * A CMCD key.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdKey = keyof CmcdData;

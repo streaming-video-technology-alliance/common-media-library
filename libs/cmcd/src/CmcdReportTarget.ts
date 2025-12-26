@@ -5,8 +5,7 @@ import type { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
 /**
  * A CMCD report target configuration.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdReportTarget = {
 	/**

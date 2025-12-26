@@ -1,7 +1,6 @@
 /**
  * Playready Key System.
  *
- *
- * @beta
+ * @public
  */
 export const PLAYREADY_KEY_SYSTEM = 'com.microsoft.playready'

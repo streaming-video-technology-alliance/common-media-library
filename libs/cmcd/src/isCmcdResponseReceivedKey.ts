@@ -10,7 +10,7 @@ import type { CmcdResponse } from './CmcdResponse.js'
  *
  * @group CMCD
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/cmcd/isCmcdResponseReceivedKey.test.ts#example}

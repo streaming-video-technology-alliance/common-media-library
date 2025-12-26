@@ -10,7 +10,7 @@ import { CMCD_STATUS } from './CMCD_STATUS.ts'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmcdHeaderField = {
 	/**
@@ -35,6 +35,6 @@ export const CmcdHeaderField = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;

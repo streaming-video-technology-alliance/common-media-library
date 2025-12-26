@@ -1,7 +1,6 @@
 /**
  * CMCD parameter name.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_PARAM = 'CMCD'

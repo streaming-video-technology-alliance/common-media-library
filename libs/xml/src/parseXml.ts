@@ -9,7 +9,7 @@ import type { XmlParseOptions } from './XmlParseOptions.ts'
  * @param options - Optional parsing options
  * @returns The parsed XML
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/decodeXml.test.ts#example}

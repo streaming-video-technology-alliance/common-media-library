@@ -51,7 +51,7 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 	}
 
 	const latest = await exec(`npm view ${name} version`)
-	const updated = latest !== version
+	const updated = latest.trim() !== version
 	const deps = await exec(`npm view ${name} peerDependencies --json`)
 
 	if (!updated && deps) {

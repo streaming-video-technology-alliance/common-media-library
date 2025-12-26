@@ -8,7 +8,7 @@ import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmcdReportingMode = {
 	/**
@@ -23,6 +23,6 @@ export const CmcdReportingMode = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;

@@ -6,7 +6,7 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmcdPlayerState = {
 	/**
@@ -61,6 +61,6 @@ export const CmcdPlayerState = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;

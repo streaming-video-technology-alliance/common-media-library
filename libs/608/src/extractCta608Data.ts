@@ -5,7 +5,7 @@
  * @param cta608Range - The range of the CTA-608 data
  * @returns The extracted CTA-608 data
  *
- * @beta
+ * @public
  */
 export function extractCta608Data(raw: DataView, cta608Range: number[]): number[][] {
 	let pos = cta608Range[0]

@@ -8,8 +8,7 @@ import type { CmsdDynamic } from './CmsdDynamic.ts'
  *
  * @returns The encoded CMSD string.
  *
- *
- * @beta
+ * @public
  */
 export function encodeCmsdDynamic(value: SfItem[]): string;
 
@@ -21,8 +20,7 @@ export function encodeCmsdDynamic(value: SfItem[]): string;
  *
  * @returns The encoded CMSD string.
  *
- *
- * @beta
+ * @public
  */
 export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 

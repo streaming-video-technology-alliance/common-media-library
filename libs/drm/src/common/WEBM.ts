@@ -1,7 +1,6 @@
 /**
  * WEBM.
  *
- *
- * @beta
+ * @public
  */
 export const WEBM = 'webm'

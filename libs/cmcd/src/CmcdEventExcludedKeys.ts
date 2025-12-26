@@ -1,8 +1,7 @@
 /**
  * Keys that are excluded from CMCD event mode.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdEventExcludedKeys =
 	| 'bsd'

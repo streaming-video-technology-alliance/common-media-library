@@ -1,7 +1,6 @@
 /**
  * Key IDs.
  *
- *
- * @beta
+ * @public
  */
 export const KEYIDS = 'keyids'

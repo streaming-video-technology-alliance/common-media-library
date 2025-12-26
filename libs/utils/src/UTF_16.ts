@@ -1,7 +1,6 @@
 /**
  * UTF-16 Encoding.
  *
- *
- * @beta
+ * @public
  */
 export const UTF_16 = 'utf-16'

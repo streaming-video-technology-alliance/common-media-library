@@ -3,8 +3,7 @@ import type { ValueOf } from '@svta/cml-utils'
 /**
  * WebVTT result types.
  *
- *
- * @beta
+ * @public
  *
  * @enum
  */
@@ -17,6 +16,6 @@ export const WebVttResultType = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type WebVttResultType = ValueOf<typeof WebVttResultType>;

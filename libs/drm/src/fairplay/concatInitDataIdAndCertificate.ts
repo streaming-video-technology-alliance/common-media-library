@@ -8,7 +8,7 @@ import { stringToUint16 } from '@svta/cml-utils'
  * @param cert - The application certificate (Uint8Array)
  * @returns A Uint8Array containing the concatenated data
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/fairplay/concatInitDataIdAndCertificate.test.ts#example}

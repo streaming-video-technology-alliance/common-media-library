@@ -8,8 +8,7 @@ import type { CmsdDynamic } from './CmsdDynamic.ts'
  *
  * @returns The decoded CMSD object.
  *
- *
- * @beta
+ * @public
  */
 export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[] {
 	if (!cmsd) {

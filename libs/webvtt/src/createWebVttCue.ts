@@ -6,8 +6,7 @@ import type { WebVttCue } from './WebVttCue.ts'
  *
  * @returns A WebVttCue object with default values
  *
- *
- * @beta
+ * @public
  */
 export function createWebVttCue(): WebVttCue {
 	return {

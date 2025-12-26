@@ -1,7 +1,7 @@
 /**
  * The different caption modes that can be used.
  *
- * @beta
+ * @public
  */
 export type CaptionModes = 'MODE_ROLL-UP' |
 	'MODE_POP-ON' |

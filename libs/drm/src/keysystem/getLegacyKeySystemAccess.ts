@@ -8,7 +8,7 @@ import { getSupportedKeySystemConfiguration } from './getSupportedKeySystemConfi
  * @param requests - An array of key system access requests.
  * @returns A KeySystemAccess object if successful, or null if no system is supported.
  *
- * @beta
+ * @public
  */
 export function getLegacyKeySystemAccess(
 	requests: MediaKeySystemAccessRequest[],

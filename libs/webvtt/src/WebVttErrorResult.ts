@@ -4,7 +4,6 @@ import type { WebVttParsingError } from './WebVttParsingError.ts'
 /**
  * WebVTT transform stream error result.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttErrorResult = TypedResult<'error', WebVttParsingError>;

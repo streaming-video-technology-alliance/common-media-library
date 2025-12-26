@@ -12,7 +12,7 @@ const TOKENS = /\$(RepresentationID|Number|SubNumber|Bandwidth|Time)?(?:%0([0-9]
  *
  * @returns Processed URI template.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/processUriTemplate.test.ts#example}

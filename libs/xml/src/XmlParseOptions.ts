@@ -1,8 +1,7 @@
 /**
  * XML parsing options
  *
- *
- * @beta
+ * @public
  */
 export type XmlParseOptions = {
 	pos?: number;

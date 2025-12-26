@@ -1,7 +1,6 @@
 /**
  * Playready HTTP Headers.
  *
- *
- * @beta
+ * @public
  */
 export const HTTP_HEADERS = 'HttpHeaders'

@@ -4,36 +4,39 @@
 
 ```ts
 
-// @beta
+// @public
 export function arrayBufferToHex(buffer: ArrayBuffer): string;
 
-// @beta
+// @public
 export function arrayBufferToUuid(buffer: ArrayBuffer): string;
 
-// @beta @deprecated
+// @public @deprecated
 export const base64decode: typeof decodeBase64;
 
-// @beta @deprecated
+// @public @deprecated
 export const base64encode: typeof encodeBase64;
 
-// @beta
+// @public
 export function convertUint8ToUint16(input: Uint8Array): Uint16Array;
 
-// @beta
+// @public
 export function decodeBase64(str: string): Uint8Array;
 
-// @beta
+// @public
 export function decodeText(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>, options?: DecodeTextOptions): string;
 
-// @beta
+// @public
 export type DecodeTextOptions = {
     encoding?: Encoding;
 };
 
-// @beta
+// @public
 export function encodeBase64(binary: Uint8Array): string;
 
-// @beta
+// @public
+export function encodeText(data: string): Uint8Array;
+
+// @public
 export const Encoding: {
     readonly UTF8: typeof UTF_8;
     readonly UTF16: typeof UTF_16;
@@ -41,16 +44,16 @@ export const Encoding: {
     readonly UTF16LE: typeof UTF_16_LE;
 };
 
-// @beta
+// @public
 export type Encoding = ValueOf<typeof Encoding>;
 
-// @beta
+// @public
 export function getBandwidthBps(sample: ResourceTiming): number;
 
-// @beta
+// @public
 export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
-// @beta
+// @public
 type Request_2<D = any> = {
     url: string;
     method?: string;
@@ -64,7 +67,7 @@ type Request_2<D = any> = {
 };
 export { Request_2 as Request }
 
-// @beta
+// @public
 export const RequestType: {
     readonly TEXT: "text";
     readonly JSON: "json";
@@ -73,10 +76,10 @@ export const RequestType: {
     readonly DOCUMENT: "document";
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type RequestType = ValueOf<typeof RequestType>;
 
-// @beta
+// @public
 export type ResourceTiming = {
     startTime: number;
     encodedBodySize: number;
@@ -84,46 +87,46 @@ export type ResourceTiming = {
     duration: number;
 };
 
-// @beta
+// @public
 export function roundToEven(value: number, precision: number): number;
 
-// @beta
+// @public
 export function stringToUint16(str: string): Uint16Array<ArrayBuffer>;
 
-// @beta
+// @public
 export type TypedResult<T, D> = {
     type: T;
     data: D;
 };
 
-// @beta
+// @public
 export function unescapeHtml(text: string): string;
 
-// @beta
+// @public
 export function urlToRelativePath(url: string, base: string): string;
 
-// @beta
+// @public
 export const UTF_16 = "utf-16";
 
-// @beta
+// @public
 export const UTF_16_BE = "utf-16be";
 
-// @beta
+// @public
 export const UTF_16_LE = "utf-16le";
 
-// @beta
+// @public
 export const UTF_8 = "utf-8";
 
-// @beta
+// @public
 export function uuid(): string;
 
-// @beta
+// @public
 export function uuidToArrayBuffer(uuid: string): ArrayBuffer;
 
-// @beta
+// @public
 export type ValueOf<T> = T[keyof T];
 
-// @beta
+// @public
 export type ValueOrArray<T> = T | T[];
 
 // (No @packageDocumentation comment for this package)

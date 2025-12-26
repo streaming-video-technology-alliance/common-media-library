@@ -11,8 +11,7 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
  *
  * @returns The encoded CMCD string.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/encodeCmcd.test.ts#example}

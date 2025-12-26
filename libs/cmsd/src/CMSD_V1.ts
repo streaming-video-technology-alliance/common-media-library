@@ -1,7 +1,6 @@
 /**
  * CMSD Version 1
  *
- *
- * @beta
+ * @public
  */
 export const CMSD_V1 = 1

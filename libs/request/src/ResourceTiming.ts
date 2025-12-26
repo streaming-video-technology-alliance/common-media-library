@@ -1,7 +1,7 @@
 /**
  * Resource Timing.
  *
- *
- * @beta
+ * @public
  */
 export type { ResourceTiming } from '@svta/cml-utils'
+

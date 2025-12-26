@@ -1,8 +1,7 @@
 /**
  * A WebVTT parsing error.
  *
- *
- * @beta
+ * @public
  */
 export class WebVttParsingError extends Error {
 

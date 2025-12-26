@@ -4,16 +4,16 @@
 
 ```ts
 
-// @beta
+// @public
 export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
 
-// @beta
+// @public
 export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
 
-// @beta
+// @public
 export function serializeXml(xml: XmlNode): string;
 
-// @beta
+// @public
 export type XmlNode = {
     nodeName: string;
     nodeValue: string | null;
@@ -23,7 +23,7 @@ export type XmlNode = {
     localName?: string;
 };
 
-// @beta
+// @public
 export type XmlParseOptions = {
     pos?: number;
     keepWhitespace?: boolean;

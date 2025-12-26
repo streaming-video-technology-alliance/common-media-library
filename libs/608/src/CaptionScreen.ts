@@ -46,7 +46,7 @@ import { VerboseLevel } from './VerboseLevel.ts'
 /**
  * Keep a CTA-608 screen of 32x15 styled characters
  *
- * @beta
+ * @public
  */
 export class CaptionScreen {
 	rows: Row[] = []

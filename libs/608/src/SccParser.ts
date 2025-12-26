@@ -32,7 +32,7 @@
 /**
  * SCC Parser
  *
- * @beta
+ * @public
  */
 export class SccParser {
 	hasHeader: boolean = false

@@ -41,7 +41,7 @@ import type { PenStyles } from './PenStyles.ts'
 /**
  * Pen state.
  *
- * @beta
+ * @public
  */
 export class PenState {
 	public foreground: string = 'white'

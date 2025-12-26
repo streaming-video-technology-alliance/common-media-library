@@ -6,8 +6,7 @@
  * @param precision - The number of decimal places to round to
  * @returns The rounded value
  *
- *
- * @beta
+ * @public
  */
 export function roundToEven(value: number, precision: number): number {
 	if (value < 0) {

@@ -1,7 +1,6 @@
 /**
  * CMCD session header name.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_SESSION = 'CMCD-Session'

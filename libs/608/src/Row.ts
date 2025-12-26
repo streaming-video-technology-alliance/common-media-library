@@ -47,7 +47,7 @@ import { getCharForByte } from './utils/getCharForByte.ts'
 /**
  * CTA-608 row consisting of NR_COLS instances of StyledUnicodeChar.
  *
- * @beta
+ * @public
  */
 export class Row {
 	public chars: StyledUnicodeChar[] = []

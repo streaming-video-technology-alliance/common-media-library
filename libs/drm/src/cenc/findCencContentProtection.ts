@@ -9,7 +9,7 @@ import { MP4_PROTECTION_SCHEME } from '../common/MP4_PROTECTION_SCHEME.ts'
  * @param cpArray - Array of ContentProtection elements.
  * @returns The Common Encryption content protection element, or null if not found.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/cenc/findCencContentProtection.test.ts#example}

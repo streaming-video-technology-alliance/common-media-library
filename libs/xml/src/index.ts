@@ -2,7 +2,7 @@
  * A collection of tools for working with XML.
  *
  * @packageDocumentation
- * @beta
+ * @public
  */
 export * from './getElementsByName.ts'
 export * from './parseXml.ts'

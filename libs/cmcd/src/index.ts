@@ -3,7 +3,7 @@
  *
  * @packageDocumentation
  *
- * @beta
+ * @public
  */
 export * from './appendCmcdHeaders.ts'
 export * from './appendCmcdQuery.ts'

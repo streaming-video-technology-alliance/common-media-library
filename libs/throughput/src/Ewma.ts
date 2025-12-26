@@ -1,8 +1,7 @@
 /**
  * Exponential Weighted Moving Average (EWMA)
  *
- *
- * @beta
+ * @public
  */
 export class Ewma {
 	// The smoothing factor for the EWMA

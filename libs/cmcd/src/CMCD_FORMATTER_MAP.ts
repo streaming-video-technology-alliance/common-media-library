@@ -42,8 +42,7 @@ const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
 /**
  * The default formatters for CMCD values.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter> = {
 	/**

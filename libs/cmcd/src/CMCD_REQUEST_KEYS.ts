@@ -1,8 +1,7 @@
 /**
  * Defines the request-specific keys for CMCD (Common Media Client Data) version 2.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_REQUEST_KEYS = [
 	'd',

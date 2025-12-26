@@ -1,8 +1,7 @@
 /**
  * Decoded ID3 frame.
  *
- *
- * @beta
+ * @public
  */
 export type DecodedId3Frame<T> = {
 	/**

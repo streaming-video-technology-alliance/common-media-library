@@ -3,8 +3,7 @@ import type { ResourceTiming } from '@svta/cml-utils'
 /**
  * Throughput Estimator.
  *
- *
- * @beta
+ * @public
  */
 export type ThroughputEstimator = {
 	/**

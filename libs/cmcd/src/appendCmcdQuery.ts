@@ -13,8 +13,7 @@ const REGEX = /CMCD=[^&#]+/
  *
  * @returns The URL with the CMCD query args appended.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/appendCmcdQuery.test.ts#example}

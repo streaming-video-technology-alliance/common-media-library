@@ -4,7 +4,7 @@
  * @param pssh - The PSSH ArrayBuffer.
  * @returns The data portion of the PSSH.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/cenc/getPsshData.test.ts#example}

@@ -1,7 +1,6 @@
 /**
  * CMCD status header name.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_STATUS = 'CMCD-Status'

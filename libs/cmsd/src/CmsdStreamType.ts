@@ -6,11 +6,11 @@ import { CmStreamType } from '@svta/cml-cta'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmsdStreamType = CmStreamType as typeof CmStreamType
 
 /**
- * @beta
+ * @public
  */
 export type CmsdStreamType = CmStreamType;

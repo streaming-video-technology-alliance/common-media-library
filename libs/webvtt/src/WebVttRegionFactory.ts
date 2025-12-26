@@ -3,7 +3,6 @@ import type { WebVttRegion } from './WebVttRegion.ts'
 /**
  * A factory for creating WebVttRegion objects.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttRegionFactory = () => WebVttRegion;

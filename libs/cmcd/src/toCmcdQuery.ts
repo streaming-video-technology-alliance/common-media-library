@@ -11,8 +11,7 @@ import { toCmcdUrl } from './toCmcdUrl.ts'
  *
  * @returns The CMCD query arg.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/toCmcdQuery.test.ts#example}

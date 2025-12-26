@@ -9,8 +9,7 @@ import { serializeDict } from './serialize/serializeDict.ts'
  *
  * @returns The structured field string
  *
- *
- * @beta
+ * @public
  */
 export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string {
 	return serializeDict(value, options)

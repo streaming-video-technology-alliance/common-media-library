@@ -4,7 +4,6 @@ import type { CmcdKey } from './CmcdKey.ts'
 /**
  * A map of CMCD keys to format functions.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;

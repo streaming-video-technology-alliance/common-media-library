@@ -1,7 +1,6 @@
 /**
  * Content-Type header.
  *
- *
- * @beta
+ * @public
  */
 export const CONTENT_TYPE = 'Content-Type'

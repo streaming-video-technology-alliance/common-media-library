@@ -5,8 +5,7 @@ import type { SfParameters } from './SfParameters.ts'
 /**
  * Structured Field Inner List
  *
- *
- * @beta
+ * @public
  */
 export type SfInnerList = {
 	value: SfItem[] | SfBareItem[],

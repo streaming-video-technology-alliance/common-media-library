@@ -3,8 +3,7 @@
  *
  * @returns A random v4 UUID
  *
- *
- * @beta
+ * @public
  */
 export function uuid(): string {
 	try {
