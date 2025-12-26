@@ -7,7 +7,6 @@
  * @returns The size
  *
  * @internal
- *
  */
 export function readId3Size(data: Uint8Array, offset: number): number {
 	let size = 0

@@ -7,7 +7,6 @@
  * @returns `true` if an ID3 header is found
  *
  * @internal
- *
  */
 export function isId3Header(data: Uint8Array, offset: number): boolean {
 	/*

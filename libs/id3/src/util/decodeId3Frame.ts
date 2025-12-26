@@ -1,5 +1,5 @@
 import type { Id3Frame } from '../Id3Frame.ts'
-import type { RawId3Frame } from './RawFrame.ts'
+import type { RawId3Frame } from './RawId3Frame.ts'
 import { decodeId3ImageFrame } from './decodeId3ImageFrame.ts'
 import { decodeId3PrivFrame } from './decodeId3PrivFrame.ts'
 import { decodeId3TextFrame } from './decodeId3TextFrame.ts'
@@ -13,7 +13,6 @@ import { decodeId3UrlFrame } from './decodeId3UrlFrame.ts'
  * @returns The decoded ID3 frame
  *
  * @internal
- *
  */
 export function decodeId3Frame(frame: RawId3Frame): Id3Frame | undefined {
 	if (frame.type === 'PRIV') {

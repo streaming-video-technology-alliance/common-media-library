@@ -14,7 +14,6 @@ export type DecodedId3Frame<T> = {
     info?: any;
 };
 
-// Warning: (ae-forgotten-export) The symbol "RawId3Frame" needs to be exported by the entry point index.d.ts
 // Warning: (ae-internal-missing-underscore) The name "decodeId3Frame" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -56,6 +55,15 @@ export function isId3Header(data: Uint8Array, offset: number): boolean;
 //
 // @internal
 export function isId3TimestampFrame(frame: Id3Frame): boolean;
+
+// Warning: (ae-internal-missing-underscore) The name "RawId3Frame" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export type RawId3Frame = {
+    type: string;
+    size: number;
+    data: Uint8Array<ArrayBuffer>;
+};
 
 // Warning: (ae-internal-missing-underscore) The name "readId3Size" should be prefixed with an underscore because the declaration is marked as @internal
 //

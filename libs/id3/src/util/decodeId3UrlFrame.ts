@@ -1,5 +1,5 @@
 import type { DecodedId3Frame } from '../DecodedId3Frame.ts'
-import type { RawId3Frame } from './RawFrame.ts'
+import type { RawId3Frame } from './RawId3Frame.ts'
 import { utf8ArrayToStr } from './utf8ArrayToStr.ts'
 
 /**
@@ -10,7 +10,6 @@ import { utf8ArrayToStr } from './utf8ArrayToStr.ts'
  * @returns The decoded ID3 URL frame
  *
  * @internal
- *
  */
 export function decodeId3UrlFrame(frame: RawId3Frame): DecodedId3Frame<string> | undefined {
 	if (frame.type === 'WXXX') {

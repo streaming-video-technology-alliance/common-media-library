@@ -7,7 +7,6 @@
  * @returns `true` if an ID3 footer is found
  *
  * @internal
- *
  */
 export function isId3Footer(data: Uint8Array, offset: number): boolean {
 	/*
