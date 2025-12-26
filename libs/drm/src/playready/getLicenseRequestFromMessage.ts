@@ -11,7 +11,7 @@ import { PLAYREADY_KEY_MESSAGE } from '../common/PLAYREADY_KEY_MESSAGE.ts'
  * @param encoding - The message encoding type. Default is UTF-16.
  * @returns The license request as an ArrayBuffer.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/playready/getLicenseRequestFromMessage.test.ts#example}

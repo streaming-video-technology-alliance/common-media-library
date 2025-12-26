@@ -1,7 +1,6 @@
 /**
  * Hardware Secure Crypto Robustness.
  *
- *
- * @beta
+ * @public
  */
 export const HW_SECURE_CRYPTO = 'HW_SECURE_CRYPTO'

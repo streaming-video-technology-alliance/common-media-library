@@ -12,7 +12,7 @@ import { TEXT_XML_UTF8 } from '../common/TEXT_XML_UTF8.ts'
  * @param encoding - The message encoding type. Default is UTF-16.
  * @returns Request headers.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/playready/getRequestHeadersFromMessage.test.ts#example}

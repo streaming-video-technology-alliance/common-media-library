@@ -1,7 +1,6 @@
 /**
  * Widevine Key System.
  *
- *
- * @beta
+ * @public
  */
 export const WIDEVINE_KEY_SYSTEM = 'com.widevine.alpha'

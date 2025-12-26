@@ -1,7 +1,6 @@
 /**
  * CMCD request mode variable name.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_REQUEST_MODE = 'request'

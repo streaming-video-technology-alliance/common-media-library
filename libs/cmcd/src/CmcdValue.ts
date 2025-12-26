@@ -6,8 +6,7 @@ import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
 /**
  * CMCD Value
  *
- *
- * @beta
+ * @public
  */
 export type CmcdValue =
 	| CmcdObjectType

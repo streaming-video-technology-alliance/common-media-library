@@ -1,4 +1,4 @@
-import type { RawId3Frame } from './RawFrame.ts'
+import type { RawId3Frame } from './RawId3Frame.ts'
 import { readId3Size } from './readId3Size.ts'
 
 /**
@@ -9,7 +9,6 @@ import { readId3Size } from './readId3Size.ts'
  * @returns The data of the ID3 frame
  *
  * @internal
- *
  */
 export function getId3FrameData(data: Uint8Array<ArrayBuffer>): RawId3Frame {
 	/*

@@ -4,8 +4,7 @@ import type { CmcdFormatter } from './CmcdFormatter.ts'
 /**
  * The default formatters for CMCD values.
  *
- *
- * @beta
+ * @public
  *
  * @deprecated Use `CMCD_FORMATTER_MAP` instead.
  */

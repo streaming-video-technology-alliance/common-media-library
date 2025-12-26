@@ -8,8 +8,7 @@ import { decodeCmcd } from './decodeCmcd.ts'
  *
  * @returns The decoded CMCD data.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/fromCmcdUrl.test.ts#example}

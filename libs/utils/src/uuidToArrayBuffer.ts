@@ -6,8 +6,7 @@ import { hexToArrayBuffer } from './hexToArrayBuffer.ts'
  * @param uuid - The UUID string to convert.
  * @returns The ArrayBuffer representation.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/uuidToArrayBuffer.test.ts#example}

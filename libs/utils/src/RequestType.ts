@@ -6,7 +6,7 @@ import type { ValueOf } from './ValueOf.ts'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const RequestType = {
 	TEXT: 'text' as const,
@@ -17,6 +17,6 @@ export const RequestType = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type RequestType = ValueOf<typeof RequestType>;

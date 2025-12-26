@@ -1,8 +1,7 @@
 /**
  * CMCD v2 - Response-only and timing keys.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_RESPONSE_KEYS = [
 	'cmsdd',

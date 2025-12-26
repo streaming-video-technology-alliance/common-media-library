@@ -10,8 +10,7 @@ import { USABLE } from './USABLE.ts'
 /**
  * Media Key Statuses.
  *
- *
- * @beta
+ * @public
  */
 export const MediaKeyStatus = {
 	USABLE: USABLE as typeof USABLE,
@@ -26,7 +25,6 @@ export const MediaKeyStatus = {
 /**
  * Media Key Statuses.
  *
- *
- * @beta
+ * @public
  */
 export type MediaKeyStatus = ValueOf<typeof MediaKeyStatus>;

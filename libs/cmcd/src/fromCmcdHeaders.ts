@@ -14,8 +14,7 @@ const keys = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS]
  *
  * @returns The decoded CMCD data.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/fromCmcdHeaders.test.ts#example}

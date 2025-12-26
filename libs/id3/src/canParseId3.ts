@@ -9,8 +9,7 @@ import { readId3Size } from './util/readId3Size.ts'
  *
  * @returns `true` if an ID3 tag is found
  *
- *
- * @beta
+ * @public
  */
 export function canParseId3(data: Uint8Array, offset: number): boolean {
 	return (

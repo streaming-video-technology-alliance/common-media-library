@@ -11,8 +11,7 @@ import type { CmcdValue } from './CmcdValue.ts'
  *
  * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD Spec}
  *
- *
- * @beta
+ * @public
  */
 export type Cmcd = {
 

@@ -6,7 +6,7 @@
 
 import { ResourceTiming } from '@svta/cml-utils';
 
-// @beta
+// @public
 export class ArithmeticMeanEstimator implements ThroughputEstimator {
     // (undocumented)
     getEstimate(): number;
@@ -14,7 +14,7 @@ export class ArithmeticMeanEstimator implements ThroughputEstimator {
     sample(sample: ResourceTiming): void;
 }
 
-// @beta
+// @public
 export class Ewma {
     constructor(alpha: number);
     getEstimate(): number;
@@ -22,7 +22,7 @@ export class Ewma {
     sample(weight: number, value: number): void;
 }
 
-// @beta
+// @public
 export class EwmaEstimator implements ThroughputEstimator {
     constructor(options: EwmaEstimatorOptions);
     // (undocumented)
@@ -31,7 +31,7 @@ export class EwmaEstimator implements ThroughputEstimator {
     sample(sample: ResourceTiming): void;
 }
 
-// @beta
+// @public
 export type EwmaEstimatorOptions = {
     defaultEstimate?: number;
     minTotalBytes?: number;
@@ -40,7 +40,7 @@ export type EwmaEstimatorOptions = {
     slowHalfLife: number;
 };
 
-// @beta
+// @public
 export class HarmonicMeanEstimator implements ThroughputEstimator {
     // (undocumented)
     getEstimate(): number;
@@ -48,13 +48,13 @@ export class HarmonicMeanEstimator implements ThroughputEstimator {
     sample(sample: ResourceTiming): void;
 }
 
-// @beta
+// @public
 export type ThroughputEstimator = {
     sample(sample: ResourceTiming): void;
     getEstimate(): number;
 };
 
-// @beta
+// @public
 export class ZlemaEstimator implements ThroughputEstimator {
     // (undocumented)
     getEstimate(): number;

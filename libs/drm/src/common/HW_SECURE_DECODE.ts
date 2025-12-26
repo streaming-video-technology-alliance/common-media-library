@@ -1,7 +1,6 @@
 /**
  * Hardware Secure Decode Robustness.
  *
- *
- * @beta
+ * @public
  */
 export const HW_SECURE_DECODE = 'HW_SECURE_DECODE'

@@ -7,28 +7,28 @@
 import { TypedResult } from '@svta/cml-utils';
 import { ValueOf } from '@svta/cml-utils';
 
-// @beta
+// @public
 export function createWebVttCue(): WebVttCue;
 
-// @beta
+// @public
 export function createWebVttRegion(): WebVttRegion;
 
-// @beta
+// @public
 export function parseWebVtt(text: string, options?: WebVttParserOptions): Promise<WebVttParseResult>;
 
-// @beta
+// @public
 export type TimestampMap = {
     MPEGTS: number;
     LOCAL: number;
 };
 
-// @beta
+// @public
 export function toVttCue(cue: WebVttCue): VTTCue;
 
-// @beta
+// @public
 export function toVttRegion(region: WebVttRegion): VTTRegion;
 
-// @beta
+// @public
 export type WebVttCue = {
     id: string;
     startTime: number;
@@ -46,16 +46,16 @@ export type WebVttCue = {
     size: number;
 };
 
-// @beta
+// @public
 export type WebVttCueFactory = () => WebVttCue;
 
-// @beta
+// @public
 export type WebVttCueResult = TypedResult<"cue", WebVttCue>;
 
-// @beta
+// @public
 export type WebVttErrorResult = TypedResult<"error", WebVttParsingError>;
 
-// @beta
+// @public
 export class WebVttParser {
     constructor(options?: WebVttParserOptions);
     flush(): WebVttParser;
@@ -68,7 +68,7 @@ export class WebVttParser {
     parse(data?: string, reuseCue?: boolean): WebVttParser;
 }
 
-// @beta
+// @public
 export type WebVttParseResult = {
     cues: WebVttCue[];
     regions: WebVttRegion[];
@@ -76,19 +76,19 @@ export type WebVttParseResult = {
     errors: WebVttParsingError[];
 };
 
-// @beta
+// @public
 export type WebVttParserOptions = {
     useDomTypes?: boolean;
     createCue?: WebVttCueFactory;
     createRegion?: WebVttRegionFactory;
 };
 
-// @beta
+// @public
 export class WebVttParsingError extends Error {
     constructor(message: string);
 }
 
-// @beta
+// @public
 export type WebVttRegion = {
     id: string;
     width: number;
@@ -100,16 +100,16 @@ export type WebVttRegion = {
     scroll: ScrollSetting;
 };
 
-// @beta
+// @public
 export type WebVttRegionFactory = () => WebVttRegion;
 
-// @beta
+// @public
 export type WebVttRegionResult = TypedResult<"region", WebVttRegion>;
 
-// @beta
+// @public
 export type WebVttResult = WebVttCueResult | WebVttRegionResult | WebVttTimestampMapResult | WebVttStyleResult | WebVttErrorResult;
 
-// @beta
+// @public
 export const WebVttResultType: {
     readonly CUE: "cue";
     readonly REGION: "region";
@@ -118,23 +118,23 @@ export const WebVttResultType: {
     readonly ERROR: "error";
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type WebVttResultType = ValueOf<typeof WebVttResultType>;
 
-// @beta
+// @public
 export type WebVttStyleResult = TypedResult<"style", string>;
 
-// @beta
+// @public
 export type WebVttTimestampMapResult = TypedResult<"timestampmap", TimestampMap>;
 
-// @beta
+// @public
 export class WebVttTransformer {
     constructor();
     flush(controller: TransformStreamDefaultController<WebVttResult>): void;
     transform(chunk: string, controller: TransformStreamDefaultController<WebVttResult>): void;
 }
 
-// @beta
+// @public
 export class WebVttTransformStream extends TransformStream<string, WebVttResult> {
     constructor(writableStrategy?: QueuingStrategy<string>, readableStrategy?: QueuingStrategy<WebVttResult>);
 }

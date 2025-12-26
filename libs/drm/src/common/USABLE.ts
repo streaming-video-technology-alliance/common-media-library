@@ -1,7 +1,6 @@
 /**
  * Usable Media Key Status.
  *
- *
- * @beta
+ * @public
  */
 export const USABLE = 'usable'

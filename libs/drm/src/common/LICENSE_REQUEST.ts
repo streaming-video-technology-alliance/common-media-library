@@ -1,7 +1,6 @@
 /**
  * License Request.
  *
- *
- * @beta
+ * @public
  */
 export const LICENSE_REQUEST = 'license-request'

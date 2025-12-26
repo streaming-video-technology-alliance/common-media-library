@@ -6,7 +6,7 @@
  * @param size - The size of the data
  * @returns The extracted CTA-608 NAL units
  *
- * @beta
+ * @public
  */
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): number[][] {
 	let nalSize = 0, cursor = startPos, nalType = 0

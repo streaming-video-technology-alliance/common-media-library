@@ -6,7 +6,6 @@ import type { CmsdStreamingFormat } from './CmsdStreamingFormat.ts'
 /**
  * CMSD Value
  *
- *
- * @beta
+ * @public
  */
 export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;

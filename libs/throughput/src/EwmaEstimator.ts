@@ -7,8 +7,7 @@ import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 /**
  * Exponential Weighted Moving Average (EWMA) throughput estimator based on 2 half-lives
  *
- *
- * @beta
+ * @public
  */
 export class EwmaEstimator implements ThroughputEstimator {
 	private defaultEstimate: number

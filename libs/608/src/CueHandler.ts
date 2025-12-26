@@ -3,7 +3,7 @@ import type { CaptionScreen } from './CaptionScreen.ts'
 /**
  * A handler for CTA-608 cues.
  *
- * @beta
+ * @public
  */
 export type CueHandler = {
 	newCue(startTime: number, endTime: number, screen: CaptionScreen): void;

@@ -7,7 +7,7 @@ import { decodeText, UTF_16 } from '@svta/cml-utils'
  * @param initData - The initialization data (PSSH box)
  * @returns The extracted content ID
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/fairplay/extractContentId.test.ts#example}

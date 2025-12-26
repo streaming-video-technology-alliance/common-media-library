@@ -1,7 +1,7 @@
 /**
  * Represents a single PAC (Preamble Address Code) data.
  *
- * @beta
+ * @public
  */
 export type PACData = {
 	row: number;

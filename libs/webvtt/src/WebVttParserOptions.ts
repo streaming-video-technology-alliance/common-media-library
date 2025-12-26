@@ -4,8 +4,7 @@ import type { WebVttRegionFactory } from './WebVttRegionFactory.ts'
 /**
  * Options for the WebVtt parser.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttParserOptions = {
 	/**

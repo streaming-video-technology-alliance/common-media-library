@@ -10,8 +10,7 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  *
  * @returns `true` if the key is a valid CMCD request key, `false` otherwise.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/isCmcdRequestKey.test.ts#example}

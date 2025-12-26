@@ -8,7 +8,7 @@ import { parsePsshList } from './parsePsshList.ts'
  * @param initData - 'cenc' initialization data. Concatenated list of PSSH boxes.
  * @returns The PSSH box ArrayBuffer corresponding to the given key system, or null if not found.
  *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../../test/cenc/getPsshForKeySystem.test.ts#example}

@@ -10,8 +10,7 @@ import { DICT } from './utils/DICT.ts'
  * @param input - The structured field string to decode
  * @returns The structured field dictionary
  *
- *
- * @beta
+ * @public
  */
 export function decodeSfDict(input: string, options?: SfDecodeOptions): SfDictionary {
 	try {

@@ -1,8 +1,7 @@
 /**
  * Resource Timing.
  *
- *
- * @beta
+ * @public
  */
 export type ResourceTiming = {
 	// The timestamp for the time a resource fetch started.

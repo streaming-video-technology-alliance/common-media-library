@@ -10,7 +10,6 @@ import type { CmcdValue } from './CmcdValue.ts'
  *
  * @returns The formatted value.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;

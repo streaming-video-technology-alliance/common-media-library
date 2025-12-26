@@ -5,7 +5,6 @@ import type { SfItem } from './SfItem.ts'
 /**
  * A member of a structured field.
  *
- *
- * @beta
+ * @public
  */
 export type SfMember = SfItem | SfInnerList | SfBareItem;

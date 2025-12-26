@@ -5,8 +5,7 @@ import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 /**
  * Harmonic Mean throughput estimator
  *
- *
- * @beta
+ * @public
  */
 export class HarmonicMeanEstimator implements ThroughputEstimator {
 	private samples: ResourceTiming[] = []

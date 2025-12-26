@@ -1,7 +1,6 @@
 /**
  * Output Restricted Media Key Status.
  *
- *
- * @beta
+ * @public
  */
 export const OUTPUT_RESTRICTED = 'output-restricted'

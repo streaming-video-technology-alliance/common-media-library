@@ -6,8 +6,7 @@ import type { WebVttCue } from './WebVttCue.ts'
  * @param cue - The WebVTT cue to convert.
  * @returns The converted VTTCue.
  *
- *
- * @beta
+ * @public
  *
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/VTTCue | VTTCue}
  */

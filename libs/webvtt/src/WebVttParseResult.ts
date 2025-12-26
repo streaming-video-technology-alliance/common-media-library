@@ -5,8 +5,7 @@ import type { WebVttRegion } from './WebVttRegion.ts'
 /**
  * The result of parsing a WebVTT string.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttParseResult = {
 	/**

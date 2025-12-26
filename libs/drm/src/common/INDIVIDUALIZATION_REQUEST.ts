@@ -1,7 +1,6 @@
 /**
  * Individualization Request.
  *
- *
- * @beta
+ * @public
  */
 export const INDIVIDUALIZATION_REQUEST = 'individualization-request'

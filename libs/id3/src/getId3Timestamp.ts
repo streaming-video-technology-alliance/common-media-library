@@ -11,8 +11,7 @@ import { readId3Timestamp } from './util/readId3Timestamp.ts'
  *
  * @returns The timestamp
  *
- *
- * @beta
+ * @public
  */
 export function getId3Timestamp(data: Uint8Array<ArrayBuffer>): number | undefined {
 	const frames: Id3Frame[] = getId3Frames(data)

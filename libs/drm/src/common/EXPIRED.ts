@@ -1,7 +1,6 @@
 /**
  * Expired Media Key Status.
  *
- *
- * @beta
+ * @public
  */
 export const EXPIRED = 'expired'

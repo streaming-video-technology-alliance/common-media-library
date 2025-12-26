@@ -6,8 +6,7 @@ const escapedHtml = /&(?:amp|lt|gt|quot|apos|nbsp|lrm|rlm|#[xX]?[0-9a-fA-F]+);/g
  * @param text - The text to unescape
  * @returns The unescaped text
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/unescapeHtml.test.ts#example}

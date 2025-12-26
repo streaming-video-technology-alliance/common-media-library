@@ -11,8 +11,7 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
  *
  * @returns The CMCD JSON.
  *
- *
- * @beta
+ * @public
  *
  * @deprecated Sending CMCD as JSON objects is deprecated. Use `toCmcdUrl` to create an array of url strings instead.
  */

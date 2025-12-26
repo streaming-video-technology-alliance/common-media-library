@@ -9,7 +9,7 @@ import { CMCD_QUERY } from './CMCD_QUERY.ts'
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const CmcdTransmissionMode = {
 	/**
@@ -32,6 +32,6 @@ export const CmcdTransmissionMode = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;

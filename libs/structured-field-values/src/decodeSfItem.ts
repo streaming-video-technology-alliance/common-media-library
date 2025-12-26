@@ -31,8 +31,7 @@ import { ITEM } from './utils/ITEM.ts'
  * @param input - The structured field string to decode
  * @returns The structured field item
  *
- *
- * @beta
+ * @public
  */
 export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem {
 	try {

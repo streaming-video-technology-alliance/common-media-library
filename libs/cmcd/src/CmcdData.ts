@@ -6,7 +6,6 @@ import type { CmcdResponse } from './CmcdResponse.ts'
 /**
  * All CMCD data types combined.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;

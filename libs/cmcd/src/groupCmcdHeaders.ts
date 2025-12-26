@@ -20,8 +20,7 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, Cmc
  *
  * @returns The CMCD header shards.
  *
- *
- * @beta
+ * @public
  */
 export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData> {
 	const result = {} as Record<CmcdHeaderField, CmcdData>

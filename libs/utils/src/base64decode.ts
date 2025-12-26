@@ -6,8 +6,7 @@ import { decodeBase64 } from './decodeBase64.ts'
  * @param str - The base64 encoded string to decode
  * @returns The decoded binary data
  *
- *
- * @beta
+ * @public
  *
  * @deprecated Use {@link decodeBase64} instead.
  *

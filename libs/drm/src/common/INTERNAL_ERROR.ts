@@ -1,7 +1,6 @@
 /**
  * Internal Error Media Key Status.
  *
- *
- * @beta
+ * @public
  */
 export const INTERNAL_ERROR = 'internal-error'

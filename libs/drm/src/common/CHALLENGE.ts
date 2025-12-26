@@ -1,7 +1,6 @@
 /**
  * License Challenge.
  *
- *
- * @beta
+ * @public
  */
 export const CHALLENGE = 'Challenge'

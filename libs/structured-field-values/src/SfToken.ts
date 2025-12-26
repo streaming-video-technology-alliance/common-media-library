@@ -1,8 +1,7 @@
 /**
  * A class to represent structured field tokens when `Symbol` is not available.
  *
- *
- * @beta
+ * @public
  */
 export class SfToken {
 	description: string

@@ -7,7 +7,7 @@ import { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
  *
  * @enum
  *
- * @beta
+ * @public
  *
  * @deprecated Use {@link CmcdTransmissionMode} instead.
  *
@@ -16,6 +16,6 @@ import { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
 export const CmcdEncoding: typeof CmcdTransmissionMode = CmcdTransmissionMode
 
 /**
- * @beta
+ * @public
  */
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;

@@ -1,5 +1,5 @@
 import type { Id3Frame } from './Id3Frame.ts'
-import type { RawId3Frame } from './util/RawFrame.ts'
+import type { RawId3Frame } from './util/RawId3Frame.ts'
 import { decodeId3Frame } from './util/decodeId3Frame.ts'
 import { getId3FrameData } from './util/getId3FrameData.ts'
 import { isId3Footer } from './util/isId3Footer.ts'
@@ -16,8 +16,7 @@ const FRAME_SIZE = 10
  *
  * @returns Array of ID3 frame objects
  *
- *
- * @beta
+ * @public
  */
 export function getId3Frames(id3Data: Uint8Array<ArrayBuffer>): Id3Frame[] {
 	let offset = 0

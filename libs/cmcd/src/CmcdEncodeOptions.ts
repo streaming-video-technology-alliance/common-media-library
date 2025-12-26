@@ -6,8 +6,7 @@ import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 /**
  * Options for encoding CMCD values.
  *
- *
- * @beta
+ * @public
  */
 export type CmcdEncodeOptions = {
 	/**

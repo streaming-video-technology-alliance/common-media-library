@@ -1,7 +1,6 @@
 /**
  * CMCD Version 2
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_V2 = 2

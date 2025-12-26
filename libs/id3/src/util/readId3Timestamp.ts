@@ -8,7 +8,6 @@ import type { DecodedId3Frame } from '../DecodedId3Frame.ts'
  * @returns The timestamp
  *
  * @internal
- *
  */
 export function readId3Timestamp(
 	timeStampFrame: DecodedId3Frame<ArrayBuffer>,

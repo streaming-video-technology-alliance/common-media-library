@@ -1,8 +1,7 @@
 /**
  * A WebVTT region.
  *
- *
- * @beta
+ * @public
  */
 export type WebVttRegion = {
 	id: string;

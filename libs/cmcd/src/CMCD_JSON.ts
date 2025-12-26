@@ -1,8 +1,7 @@
 /**
  * CMCD `json` transmission mode.
  *
- *
- * @beta
+ * @public
  *
  * @deprecated JSON transmission mode is deprecated and will be removed in future versions.
  */

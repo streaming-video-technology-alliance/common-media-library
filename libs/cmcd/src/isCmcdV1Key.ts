@@ -9,8 +9,7 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  *
  * @returns `true` if the key should be included, `false` otherwise.
  *
- *
- * @beta
+ * @public
  *
  * @example
  * {@includeCode ../test/isCmcdV1Key.test.ts#example}

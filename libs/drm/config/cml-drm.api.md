@@ -9,28 +9,28 @@ import { UTF_16 } from '@svta/cml-utils';
 import { UTF_8 } from '@svta/cml-utils';
 import { ValueOf } from '@svta/cml-utils';
 
-// @beta
+// @public
 export const CBCS = "cbcs";
 
-// @beta
+// @public
 export const CENC = "cenc";
 
-// @beta
+// @public
 export const CHALLENGE = "Challenge";
 
-// @beta
+// @public
 export const CLEAR_KEY_SYSTEM = "org.w3.clearkey";
 
-// @beta
+// @public
 export const CLEAR_KEY_UUID = "e2719d58-a985-b3c9-781a-b030af78d30e";
 
-// @beta
+// @public
 export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array;
 
-// @beta
+// @public
 export const CONTENT_TYPE = "Content-Type";
 
-// @beta
+// @public
 export type ContentProtection = {
     schemeIdUri?: string;
     value?: string;
@@ -38,85 +38,85 @@ export type ContentProtection = {
     laUrl?: string;
 };
 
-// @beta
+// @public
 export function createMediaKeySystemConfiguration(supportedAudio: MediaKeySystemMediaCapability[] | null, supportedVideo: MediaKeySystemMediaCapability[] | null): MediaKeySystemConfiguration;
 
-// @beta
+// @public
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array;
 
-// @beta
+// @public
 export const EncryptionScheme: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
 };
 
-// @beta
+// @public
 export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;
 
-// @beta
+// @public
 export const EXPIRED = "expired";
 
-// @beta
+// @public
 export function extractContentId(initData: ArrayBuffer, encoding?: Encoding): string;
 
-// @beta
+// @public
 export const FAIRPLAY_KEY_SYSTEM = "com.apple.fps.1_0";
 
-// @beta
+// @public
 export const FAIRPLAY_UUID = "29701fe4-3cc7-4a34-8c5b-ae90c7439a47";
 
-// @beta
+// @public
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
 
-// @beta
+// @public
 export function getId(licenseServerUrl: string, initData: ArrayBuffer, queryParam?: string): string;
 
-// @beta
+// @public
 export function getKeySystemAccess(requests: MediaKeySystemAccessRequest[]): Promise<MediaKeySystemAccess | null>;
 
-// @beta
+// @public
 export function getLegacyKeySystemAccess(requests: MediaKeySystemAccessRequest[]): MediaKeySystemAccessRequest | null;
 
-// @beta
+// @public
 export function getLicenseRequestFromMessage(message: ArrayBuffer, encoding?: Encoding): ArrayBuffer;
 
-// @beta
+// @public
 export function getLicenseServerUrl(initData: Uint16Array): string;
 
-// @beta
+// @public
 export function getLicenseServerUrlFromContentProtection(contentProtectionElements: ContentProtection[], schemeIdUri: string): string | null;
 
-// @beta
+// @public
 export function getPsshData(pssh: ArrayBuffer): ArrayBuffer;
 
-// @beta
+// @public
 export function getPsshForKeySystem(uuid: string, initData: ArrayBuffer): ArrayBuffer | null;
 
-// @beta
+// @public
 export function getRequestHeadersFromMessage(message: ArrayBuffer, encoding?: typeof UTF_8 | typeof UTF_16): Record<string, string>;
 
-// @beta
+// @public
 export function getSupportedKeySystemConfiguration(keySystem: string, configs: Iterable<MediaKeySystemConfiguration>): {
     supportedAudio: MediaKeySystemMediaCapability[];
     supportedVideo: MediaKeySystemMediaCapability[];
 };
 
-// @beta
+// @public
 export const HTTP_HEADERS = "HttpHeaders";
 
-// @beta
+// @public
 export const HW_SECURE_ALL = "HW_SECURE_ALL";
 
-// @beta
+// @public
 export const HW_SECURE_CRYPTO = "HW_SECURE_CRYPTO";
 
-// @beta
+// @public
 export const HW_SECURE_DECODE = "HW_SECURE_DECODE";
 
-// @beta
+// @public
 export const INDIVIDUALIZATION_REQUEST = "individualization-request";
 
-// @beta
+// @public
 export const InitializationDataType: {
     readonly CENC: typeof CENC;
     readonly CBCS: typeof CBCS;
@@ -124,28 +124,28 @@ export const InitializationDataType: {
     readonly WEBM: typeof WEBM;
 };
 
-// @beta
+// @public
 export type InitializationDataType = ValueOf<typeof InitializationDataType>;
 
-// @beta
+// @public
 export const INTERNAL_ERROR = "internal-error";
 
-// @beta
+// @public
 export const KEYIDS = "keyids";
 
-// @beta
+// @public
 export const LICENSE_ACQUISITION = "LicenseAcquisition";
 
-// @beta
+// @public
 export const LICENSE_RELEASE = "license-release";
 
-// @beta
+// @public
 export const LICENSE_RENEWAL = "license-renewal";
 
-// @beta
+// @public
 export const LICENSE_REQUEST = "license-request";
 
-// @beta
+// @public
 export type LicenseRequest = {
     url: string;
     method: "GET" | "POST";
@@ -157,7 +157,7 @@ export type LicenseRequest = {
     data?: ArrayBuffer;
 };
 
-// @beta
+// @public
 const MediaKeyMessageType_2: {
     readonly LICENSE_REQUEST: typeof LICENSE_REQUEST;
     readonly LICENSE_RENEWAL: typeof LICENSE_RENEWAL;
@@ -165,11 +165,11 @@ const MediaKeyMessageType_2: {
     readonly INDIVIDUALIZATION_REQUEST: typeof INDIVIDUALIZATION_REQUEST;
 };
 
-// @beta
+// @public
 type MediaKeyMessageType_2 = ValueOf<typeof MediaKeyMessageType_2>;
 export { MediaKeyMessageType_2 as MediaKeyMessageType }
 
-// @beta
+// @public
 const MediaKeyStatus_2: {
     readonly USABLE: typeof USABLE;
     readonly EXPIRED: typeof EXPIRED;
@@ -180,7 +180,7 @@ const MediaKeyStatus_2: {
     readonly INTERNAL_ERROR: typeof INTERNAL_ERROR;
 };
 
-// @beta
+// @public
 type MediaKeyStatus_2 = ValueOf<typeof MediaKeyStatus_2>;
 export { MediaKeyStatus_2 as MediaKeyStatus }
 
@@ -190,69 +190,69 @@ export type MediaKeySystemAccessRequest = {
     configurations: MediaKeySystemConfiguration[];
 };
 
-// @beta
+// @public
 export const MP4_PROTECTION_SCHEME = "urn:mpeg:dash:mp4protection:2011";
 
-// @beta
+// @public
 export const OUTPUT_DOWNSCALED = "output-downscaled";
 
-// @beta
+// @public
 export const OUTPUT_RESTRICTED = "output-restricted";
 
-// @beta
+// @public
 export function parseInitDataFromContentProtection(cpData: ContentProtection, BASE64: {
     decodeArray: (input: string) => Uint8Array;
 }): ArrayBuffer | null;
 
-// @beta
+// @public
 export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer>;
 
-// @beta
+// @public
 export const PLAYREADY_KEY_MESSAGE = "PlayReadyKeyMessage";
 
-// @beta
+// @public
 export const PLAYREADY_KEY_SYSTEM = "com.microsoft.playready";
 
-// @beta
+// @public
 export const PLAYREADY_RECOMMENDATION_KEY_SYSTEM = "com.microsoft.playready.recommendation";
 
-// @beta
+// @public
 export const PLAYREADY_UUID = "9a04f079-9840-4286-ab92-e65be0885f95";
 
-// @beta
+// @public
 export const RELEASED = "released";
 
-// @beta
+// @public
 export const STATUS_PENDING = "status-pending";
 
-// @beta
+// @public
 export const SW_SECURE_CRYPTO = "SW_SECURE_CRYPTO";
 
-// @beta
+// @public
 export const SW_SECURE_DECODE = "SW_SECURE_DECODE";
 
-// @beta
+// @public
 export const TEXT_XML_UTF8 = "text/xml; charset=utf-8";
 
-// @beta
+// @public
 export function toBigEndianKeyId(keyId: ArrayBuffer): ArrayBuffer;
 
-// @beta
+// @public
 export const USABLE = "usable";
 
-// @beta
+// @public
 export const W3C_CLEAR_KEY_UUID = "1077efec-c0b2-4d02-ace3-3c1e52e2fb4b";
 
-// @beta
+// @public
 export const WEBM = "webm";
 
-// @beta
+// @public
 export const WIDEVINE_KEY_SYSTEM = "com.widevine.alpha";
 
-// @beta
+// @public
 export const WIDEVINE_UUID = "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed";
 
-// @beta
+// @public
 export const WidevineRobustness: {
     readonly SW_SECURE_CRYPTO: typeof SW_SECURE_CRYPTO;
     readonly SW_SECURE_DECODE: typeof SW_SECURE_DECODE;
@@ -261,7 +261,7 @@ export const WidevineRobustness: {
     readonly HW_SECURE_ALL: typeof HW_SECURE_ALL;
 };
 
-// @beta
+// @public
 export type WidevineRobustness = ValueOf<typeof WidevineRobustness>;
 
 // (No @packageDocumentation comment for this package)

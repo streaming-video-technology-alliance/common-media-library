@@ -7,8 +7,7 @@ import type { SfToken } from '../SfToken.ts'
  *
  * @returns The string representation of the symbol.
  *
- *
- * @beta
+ * @public
  */
 export function symbolToStr(symbol: symbol | SfToken): string {
 	return symbol.description || symbol.toString().slice(7, -1)

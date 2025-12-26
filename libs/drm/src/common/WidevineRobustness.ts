@@ -8,8 +8,7 @@ import { SW_SECURE_DECODE } from './SW_SECURE_DECODE.ts'
 /**
  * Widevine Robustness.
  *
- *
- * @beta
+ * @public
  */
 export const WidevineRobustness = {
 	SW_SECURE_CRYPTO: SW_SECURE_CRYPTO as typeof SW_SECURE_CRYPTO,
@@ -22,7 +21,6 @@ export const WidevineRobustness = {
 /**
  * Widevine Robustness.
  *
- *
- * @beta
+ * @public
  */
 export type WidevineRobustness = ValueOf<typeof WidevineRobustness>;

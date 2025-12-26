@@ -5,8 +5,7 @@ import { CENC } from './CENC.ts'
 /**
  * Encryption schemes.
  *
- *
- * @beta
+ * @public
  */
 export const EncryptionScheme = {
 	CENC: CENC as typeof CENC,
@@ -16,7 +15,6 @@ export const EncryptionScheme = {
 /**
  * Encryption schemes.
  *
- *
- * @beta
+ * @public
  */
 export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;

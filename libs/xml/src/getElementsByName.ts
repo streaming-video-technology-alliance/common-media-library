@@ -8,8 +8,7 @@ import type { XmlNode } from './XmlNode.ts'
  * @param found - An array to collect matching nodes.
  * @returns An array of all matching XmlNodes.
  *
- *
- * @beta
+ * @public
  *
  */
 export function getElementsByName(node: XmlNode, name: string, found: XmlNode[] = []): XmlNode[] {

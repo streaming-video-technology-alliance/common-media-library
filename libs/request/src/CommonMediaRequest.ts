@@ -4,7 +4,6 @@ import type { Request } from '@svta/cml-utils'
 /**
  * Common Media Request.
  *
- *
- * @beta
+ * @public
  */
 export type CommonMediaRequest = Request<{ cmcd: Cmcd }>;

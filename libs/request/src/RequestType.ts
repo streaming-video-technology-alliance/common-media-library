@@ -1,7 +1,7 @@
 /**
  * The content type of the request.
  *
- *
- * @beta
+ * @public
  */
 export { RequestType } from '@svta/cml-utils'
+

@@ -1,8 +1,7 @@
 /**
  * Defines the common keys for CMCD (Common Media Client Data) version 2.
  *
- *
- * @beta
+ * @public
  */
 export const CMCD_COMMON_KEYS = [
 	'ab',

@@ -11,25 +11,25 @@ import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
 
-// @beta
+// @public
 export const CMSD_DYNAMIC = "CMSD-Dynamic";
 
-// @beta
+// @public
 export const CMSD_STATIC = "CMSD-Static";
 
-// @beta
+// @public
 export const CMSD_V1 = 1;
 
-// @beta
+// @public
 export type CmsdCustomKey = `${string}-${string}`;
 
-// @beta
+// @public
 export type CmsdDynamic = {
     value: string;
     params: CmsdDynamicParams;
 };
 
-// @beta
+// @public
 export type CmsdDynamicParams = {
     [index: CmsdCustomKey]: CmsdValue;
     du?: boolean;
@@ -39,27 +39,27 @@ export type CmsdDynamicParams = {
     rtt?: number;
 };
 
-// @beta
+// @public
 export type CmsdEncodeOptions = {
     useSymbol?: boolean;
 };
 
-// @beta
+// @public
 export const CmsdHeaderField: {
     readonly STATIC: typeof CMSD_STATIC;
     readonly DYNAMIC: typeof CMSD_DYNAMIC;
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;
 
-// @beta
+// @public
 export const CmsdObjectType: typeof CmObjectType;
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmsdObjectType = CmObjectType;
 
-// @beta
+// @public
 export type CmsdStatic = {
     [index: CmsdCustomKey]: CmsdValue;
     at?: number;
@@ -76,34 +76,34 @@ export type CmsdStatic = {
     v?: number;
 };
 
-// @beta
+// @public
 export const CmsdStreamingFormat: typeof CmStreamingFormat;
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmsdStreamingFormat = CmStreamingFormat;
 
-// @beta
+// @public
 export const CmsdStreamType: typeof CmStreamType;
 
-// @beta (undocumented)
+// @public (undocumented)
 export type CmsdStreamType = CmStreamType;
 
-// @beta
+// @public
 export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
 
-// @beta
+// @public
 export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[];
 
-// @beta
+// @public
 export function decodeCmsdStatic(cmsd: string): CmsdStatic;
 
-// @beta
+// @public
 export function encodeCmsdDynamic(value: SfItem[]): string;
 
-// @beta
+// @public
 export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
-// @beta
+// @public
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string;
 
 // (No @packageDocumentation comment for this package)

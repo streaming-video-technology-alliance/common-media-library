@@ -1,8 +1,7 @@
 /**
  * Options for encoding a structured field.
  *
- *
- * @beta
+ * @public
  */
 export type SfEncodeOptions = {
 	/**

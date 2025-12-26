@@ -4,8 +4,7 @@ import type { CmcdKey } from './CmcdKey.ts'
 /**
  * A map of CMCD header fields to CMCD keys.
  *
- *
- * @beta
+ * @public
  *
  * @deprecated Use `CmcdHeaderMap` instead.
  */
