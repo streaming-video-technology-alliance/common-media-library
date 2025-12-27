@@ -1,5 +1,6 @@
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
-import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { VisualSampleEntryBox } from '../boxes/types/VisualSampleEntryBox.ts'
+import type { VisualSampleEntryType } from '../boxes/types/VisualSampleEntryType.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -14,7 +15,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeVisualSampleEntryBox<T extends VisualSampleEntryType>(box: VisualSampleEntryBox<T>, type: T): IsoBoxWriteView {
+export function writeVisualSampleEntryBox<T extends VisualSampleEntryType>(box: Fields<VisualSampleEntryBox<T>>, type: T): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2

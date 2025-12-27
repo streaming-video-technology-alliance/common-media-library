@@ -1,4 +1,5 @@
-import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { TrackRunBox } from '../boxes/types/TrackRunBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
+export function writeTrun(box: Fields<TrackRunBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleCountSize = 4

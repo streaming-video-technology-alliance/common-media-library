@@ -1,6 +1,6 @@
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import type { Fields } from '../boxes/Fields.ts'
-import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { FreeSpaceBox } from '../boxes/types/FreeSpaceBox.ts'
 import { readFree } from './readFree.ts'
 
 /**

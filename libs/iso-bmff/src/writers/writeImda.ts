@@ -1,4 +1,5 @@
-import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { IdentifiedMediaDataBox } from '../boxes/types/IdentifiedMediaDataBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -10,7 +11,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView {
+export function writeImda(box: Fields<IdentifiedMediaDataBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const imdaIdentifierSize = 4
 	const dataSize = box.data.length

@@ -1,5 +1,5 @@
-import type { Fields } from './boxes/Fields.ts'
-import type { IsoBox } from './boxes/IsoBox.ts'
+import type { Fields } from './boxes/types/Fields.ts'
+import type { IsoBox } from './boxes/types/IsoBox.ts'
 import type { IsoBoxReadView } from './IsoBoxReadView.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 
@@ -8,4 +8,6 @@ import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
  *
  * @public
  */
-export type IsoBoxReader<V = IsoBox> = (view: IsoBoxReadView, config?: IsoBoxReadViewConfig) => Fields<V>;
+export type IsoBoxReader<B extends IsoBox = IsoBox> = {
+	read: (view: IsoBoxReadView, config?: IsoBoxReadViewConfig) => Fields<B>;
+}

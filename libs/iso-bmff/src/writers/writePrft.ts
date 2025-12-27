@@ -1,4 +1,5 @@
-import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { ProducerReferenceTimeBox } from '../boxes/types/ProducerReferenceTimeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView {
+export function writePrft(box: Fields<ProducerReferenceTimeBox>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const mediaTimeSize = v1 ? 8 : 4
 	const headerSize = 8

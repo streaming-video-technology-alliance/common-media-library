@@ -1,6 +1,13 @@
-import type { Box } from './boxes/Box.ts'
-import type { IsoBoxWriteView } from './IsoBoxWriteView.ts'
+import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
 
+/**
+ * Configuration for the IsoBoxReadableStream.
+ *
+ * @public
+ */
 export type IsoBoxReadableStreamConfig = {
-	writers: Record<string, (box: Box) => IsoBoxWriteView>;
+	/**
+	 * A map of box writers to their box types
+	 */
+	writers?: IsoBoxWriterMap;
 };

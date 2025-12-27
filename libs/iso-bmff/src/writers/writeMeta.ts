@@ -1,4 +1,5 @@
-import type { MetaBox } from '../boxes/MetaBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { MetaBox } from '../boxes/types/MetaBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMeta(box: MetaBox): IsoBoxWriteView {
+export function writeMeta(box: Fields<MetaBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize

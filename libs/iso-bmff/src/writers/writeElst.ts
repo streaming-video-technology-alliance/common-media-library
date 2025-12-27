@@ -1,4 +1,5 @@
-import type { EditListBox } from '../boxes/EditListBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { EditListBox } from '../boxes/types/EditListBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeElst(box: EditListBox): IsoBoxWriteView {
+export function writeElst(box: Fields<EditListBox>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8

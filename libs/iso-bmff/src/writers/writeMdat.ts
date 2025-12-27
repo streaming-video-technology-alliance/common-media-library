@@ -1,4 +1,5 @@
-import type { MediaDataBox } from '../boxes/MediaDataBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { MediaDataBox } from '../boxes/types/MediaDataBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMdat(box: MediaDataBox): IsoBoxWriteView {
+export function writeMdat(box: Fields<MediaDataBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize

@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { MediaHeaderBox } from '../boxes/types/MediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

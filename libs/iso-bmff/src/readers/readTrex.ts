@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { TrackExtendsBox } from '../boxes/types/TrackExtendsBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

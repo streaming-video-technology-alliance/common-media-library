@@ -1,5 +1,5 @@
-import type { Box } from '../boxes/Box.ts'
-import type { ContainerBox } from '../boxes/ContainerBox.ts'
+import type { Box } from '../boxes/types/Box.ts'
+import type { ContainerBox } from '../boxes/types/ContainerBox.ts'
 import { CONTAINERS } from './CONTAINERS.ts'
 
 /**

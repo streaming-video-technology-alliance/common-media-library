@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SubsampleInformationBox } from '../boxes/types/SubsampleInformationBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

@@ -1,4 +1,5 @@
-import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { FreeSpaceBox } from '../boxes/types/FreeSpaceBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeSkip(box: FreeSpaceBox<'skip'>): IsoBoxWriteView {
+export function writeSkip(box: Fields<FreeSpaceBox<'skip'>>): IsoBoxWriteView {
 	const headerSize = 8
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize

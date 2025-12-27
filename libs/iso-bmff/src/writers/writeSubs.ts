@@ -1,4 +1,5 @@
-import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SubsampleInformationBox } from '../boxes/types/SubsampleInformationBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView {
+export function writeSubs(box: Fields<SubsampleInformationBox>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const subsampleSizeBytes = v1 ? 4 : 2
 

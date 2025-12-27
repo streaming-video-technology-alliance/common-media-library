@@ -1,4 +1,5 @@
-import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { TrackFragmentRandomAccessBox } from '../boxes/types/TrackFragmentRandomAccessBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView {
+export function writeTfra(box: Fields<TrackFragmentRandomAccessBox>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const timeSize = v1 ? 8 : 4
 	const entrySize = timeSize + timeSize + // time + moofOffset

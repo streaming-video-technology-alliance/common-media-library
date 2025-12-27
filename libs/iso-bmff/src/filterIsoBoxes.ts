@@ -1,5 +1,5 @@
-import type { ContainerBox } from './boxes/ContainerBox.ts'
-import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
+import type { ContainerBox } from './boxes/types/ContainerBox.ts'
+import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import type { IsoBoxFilter } from './IsoBoxFilter.ts'
 import { IsoBoxReadView } from './IsoBoxReadView.ts'

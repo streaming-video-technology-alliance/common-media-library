@@ -1,4 +1,5 @@
-import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SegmentIndexBox } from '../boxes/types/SegmentIndexBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
+export function writeSidx(box: Fields<SegmentIndexBox>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8

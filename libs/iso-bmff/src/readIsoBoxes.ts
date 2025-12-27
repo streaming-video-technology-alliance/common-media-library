@@ -1,4 +1,4 @@
-import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
+import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import { IsoBoxReadView } from './IsoBoxReadView.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
@@ -10,6 +10,9 @@ import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
  * @param config - The configuration for the IsoView
  *
  * @returns The parsed boxes
+ *
+ * @example
+ * {@includeCode ../test/readIsoBoxes.test.ts#example}
  *
  * @public
  */

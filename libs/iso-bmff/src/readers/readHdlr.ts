@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { HandlerReferenceBox } from '../boxes/types/HandlerReferenceBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 

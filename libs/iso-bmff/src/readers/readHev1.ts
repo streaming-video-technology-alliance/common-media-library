@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { VisualSampleEntryBox } from '../boxes/types/VisualSampleEntryBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import { readAvc1 } from './readAvc1.ts'
 
