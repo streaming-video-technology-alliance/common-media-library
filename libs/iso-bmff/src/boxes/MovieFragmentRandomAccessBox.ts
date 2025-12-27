@@ -5,8 +5,7 @@ import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBo
 /**
  * Movie Fragment Random Access Box - 'mfra' - Container
  *
- *
- * @beta
+ * @public
  */
 export type MovieFragmentRandomAccessBox = ContainerBox<TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox> & {
 	type: 'mfra';

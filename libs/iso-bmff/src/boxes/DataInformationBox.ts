@@ -4,8 +4,7 @@ import type { DataReferenceBox } from './DataReferenceBox.ts'
 /**
  * Data Information Box - 'dinf' - Container
  *
- *
- * @beta
+ * @public
  */
 export type DataInformationBox = ContainerBox<DataReferenceBox> & {
 	type: 'dinf';

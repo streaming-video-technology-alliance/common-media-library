@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Sample Size Box - 'stsz'
  *
- *
- * @beta
+ * @public
  */
 export type SampleSizeBox = FullBox & {
 	type: 'stsz';

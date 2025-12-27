@@ -8,4 +8,3 @@ import { parseFile } from './parseFile.ts'
 
 export * from '@svta/cml-iso-bmff'
 export { assert, describe, filterBoxes, findBox, it, parseBox, parseContainer, parseFile }
-

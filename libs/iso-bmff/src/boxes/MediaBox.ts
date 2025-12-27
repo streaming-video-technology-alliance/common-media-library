@@ -6,8 +6,7 @@ import type { MediaInformationBox } from './MediaInformationBox.ts'
 /**
  * Media Box - 'mdia' - Container
  *
- *
- * @beta
+ * @public
  */
 export type MediaBox = ContainerBox<MediaHeaderBox | HandlerReferenceBox | MediaInformationBox> & {
 	type: 'mdia';

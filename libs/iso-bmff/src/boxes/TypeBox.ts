@@ -3,8 +3,7 @@ import type { Box } from './Box.ts'
 /**
  * Utility TypeBox
  *
- *
- * @beta
+ * @public
  */
 export type TypeBox<T> = Box & {
 	type: T;

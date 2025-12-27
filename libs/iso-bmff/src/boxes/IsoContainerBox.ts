@@ -21,8 +21,7 @@ import type { UserDataBox } from './UserDataBox.ts'
 /**
  * Container boxes that can contain other boxes
  *
- *
- * @beta
+ * @public
  */
 export type IsoContainerBox =
 	| DataInformationBox

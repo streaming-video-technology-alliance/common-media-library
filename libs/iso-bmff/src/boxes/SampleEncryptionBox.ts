@@ -4,8 +4,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Sample Encryption Box - 'senc'
  *
- *
- * @beta
+ * @public
  */
 export type SampleEncryptionBox = FullBox & {
 	type: 'senc';

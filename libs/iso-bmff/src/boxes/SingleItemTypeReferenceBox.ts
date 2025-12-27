@@ -3,8 +3,7 @@ import type { Box } from './Box.ts'
 /**
  * Single Item Type Reference Box
  *
- *
- * @beta
+ * @public
  */
 export type SingleItemTypeReferenceBox = Box & {
 	fromItemId: number;

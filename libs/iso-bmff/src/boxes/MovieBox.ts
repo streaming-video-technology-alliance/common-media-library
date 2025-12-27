@@ -7,8 +7,7 @@ import type { UserDataBox } from './UserDataBox.ts'
 /**
  * Movie Box - 'moov' - Container
  *
- *
- * @beta
+ * @public
  */
 export type MovieBox = ContainerBox<MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox> & {
 	type: 'moov';

@@ -4,8 +4,7 @@ import type { EditListBox } from './EditListBox.ts'
 /**
  * Edit Box - 'edts' - Container
  *
- *
- * @beta
+ * @public
  */
 export type EditBox = ContainerBox<EditListBox> & {
 	type: 'edts';

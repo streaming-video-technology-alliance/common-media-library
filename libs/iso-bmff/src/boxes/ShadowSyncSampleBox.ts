@@ -4,8 +4,7 @@ import type { ShadowSyncEntry } from './ShadowSyncEntry.ts'
 /**
  * Shadow Sync Sample Box - 'stsh'
  *
- *
- * @beta
+ * @public
  */
 export type ShadowSyncSampleBox = FullBox & {
 	type: 'stsh';

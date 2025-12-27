@@ -1,8 +1,7 @@
 /**
  * Sync sample
  *
- *
- * @beta
+ * @public
  */
 export type SyncSample = {
 	sampleNumber: number;

@@ -3,8 +3,7 @@ import type { Subsample } from './Subsample.ts'
 /**
  * Sub sample entry
  *
- *
- * @beta
+ * @public
  */
 export type SubsampleEntry = {
 	sampleDelta: number;

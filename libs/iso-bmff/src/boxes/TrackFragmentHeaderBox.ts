@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
  *
- *
- * @beta
+ * @public
  */
 export type TrackFragmentHeaderBox = FullBox & {
 	type: 'tfhd';

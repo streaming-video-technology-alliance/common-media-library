@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Primary Item Box - 'pitm'
  *
- *
- * @beta
+ * @public
  */
 export type PrimaryItemBox = FullBox & {
 	type: 'pitm';

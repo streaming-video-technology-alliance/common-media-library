@@ -1,0 +1,16 @@
+import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
+
+/**
+ * Write a VisualSampleEntryBox (avc3) to an IsoDataWriter.
+ *
+ * @param box - The VisualSampleEntryBox fields to write
+ *
+ * @returns An IsoDataWriter containing the encoded box
+ *
+ * @public
+ */
+export function writeAvc3(box: VisualSampleEntryBox<'avc3'>): IsoBoxWriteView {
+	return writeVisualSampleEntryBox(box, 'avc3')
+}

@@ -1,0 +1,36 @@
+import type { Entity } from '../boxes/Entity.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
+import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+
+/**
+ * Parse a PreselectionGroupBox from an IsoView
+ *
+ * @param view - The IsoView to read data from
+ *
+ * @returns A parsed PreselectionGroupBox
+ *
+ * @public
+ */
+export function readPrsl(view: IsoBoxReadView): Fields<PreselectionGroupBox> {
+	const { version, flags } = view.readFullBox()
+	const groupId = view.readUint(4)
+	const numEntitiesInGroup = view.readUint(4)
+	const entities = view.readEntries<Entity>(numEntitiesInGroup, () => ({
+		entityId: view.readUint(4),
+	}))
+	const preselectionTag = flags & 0x1000 ? view.readUtf8(-1) : undefined
+	const selectionPriority = flags & 0x2000 ? view.readUint(1) : undefined
+	const interleavingTag = flags & 0x4000 ? view.readUtf8(-1) : undefined
+
+	return {
+		version,
+		flags,
+		groupId,
+		numEntitiesInGroup,
+		entities,
+		preselectionTag,
+		selectionPriority,
+		interleavingTag,
+	}
+}

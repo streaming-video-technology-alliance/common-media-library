@@ -1,7 +1,6 @@
 /**
  * The string field type
  *
- *
- * @beta
+ * @public
  */
 export const STRING = 'string'

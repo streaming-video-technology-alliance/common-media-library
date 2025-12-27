@@ -1,8 +1,7 @@
 /**
  * Sub sample
  *
- *
- * @beta
+ * @public
  */
 export type Subsample = {
 	subsampleSize: number;

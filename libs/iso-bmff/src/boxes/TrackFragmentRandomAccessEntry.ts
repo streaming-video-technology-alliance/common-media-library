@@ -1,8 +1,7 @@
 /**
  * Track fragment random access entry
  *
- *
- * @beta
+ * @public
  */
 export type TrackFragmentRandomAccessEntry = {
 	time: number;

@@ -1,7 +1,6 @@
 /**
  * The integer field type
  *
- *
- * @beta
+ * @public
  */
 export const INT = 'int'

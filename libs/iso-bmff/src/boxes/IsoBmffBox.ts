@@ -4,7 +4,6 @@ import type { IsoContainerBox } from './IsoContainerBox.ts'
 /**
  * Utility type for all ISO BMFF boxes
  *
- *
- * @beta
+ * @public
  */
 export type IsoBmffBox = IsoBox | IsoContainerBox;
