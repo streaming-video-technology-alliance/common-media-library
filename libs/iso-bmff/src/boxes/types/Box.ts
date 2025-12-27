@@ -1,4 +1,4 @@
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadView } from '../../IsoBoxReadView.ts'
 
 /**
  * Base Box Type

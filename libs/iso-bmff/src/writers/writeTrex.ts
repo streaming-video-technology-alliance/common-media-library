@@ -1,4 +1,5 @@
-import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { TrackExtendsBox } from '../boxes/types/TrackExtendsBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView {
+export function writeTrex(box: Fields<TrackExtendsBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4

@@ -1,4 +1,5 @@
-import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/types/MovieFragmentRandomAccessOffsetBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView {
+export function writeMfro(box: Fields<MovieFragmentRandomAccessOffsetBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const mfraSizeSize = 4

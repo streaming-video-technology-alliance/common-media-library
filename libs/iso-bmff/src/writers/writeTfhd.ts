@@ -1,4 +1,5 @@
-import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { TrackFragmentHeaderBox } from '../boxes/types/TrackFragmentHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
+export function writeTfhd(box: Fields<TrackFragmentHeaderBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4

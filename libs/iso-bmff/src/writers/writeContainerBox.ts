@@ -1,5 +1,5 @@
-import type { Box } from '../boxes/Box.ts'
-import type { ContainerBox } from '../boxes/ContainerBox.ts'
+import type { Box } from '../boxes/types/Box.ts'
+import type { ContainerBox } from '../boxes/types/ContainerBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import { isFullBox } from '../utils/isFullBox.ts'
 
@@ -16,7 +16,7 @@ import { isFullBox } from '../utils/isFullBox.ts'
  * @public
  */
 export function writeContainerBox<T extends Box>(
-	box: ContainerBox<T>
+	box: ContainerBox<T> & Pick<Box, 'type' | 'largesize'>
 ): IsoBoxWriteView {
 	const headerSize = 8
 	const isFullContainerBox = isFullBox(box)

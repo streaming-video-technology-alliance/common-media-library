@@ -1,5 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
-import type { LabelBox } from '../boxes/LabelBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { LabelBox } from '../boxes/types/LabelBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -11,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeLabl(box: LabelBox): IsoBoxWriteView {
+export function writeLabl(box: Fields<LabelBox>): IsoBoxWriteView {
 	const languageBytes = encodeText(box.language)
 	const labelBytes = encodeText(box.label)
 

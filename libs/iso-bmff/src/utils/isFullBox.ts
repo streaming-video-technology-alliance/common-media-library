@@ -1,5 +1,5 @@
-import type { Box } from '../boxes/Box.ts'
-import type { FullBox } from '../boxes/FullBox.ts'
+import type { Box } from '../boxes/types/Box.ts'
+import type { FullBox } from '../boxes/types/FullBox.ts'
 
 /**
  * Check if a box is a full box

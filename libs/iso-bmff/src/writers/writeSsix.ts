@@ -1,4 +1,5 @@
-import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SubsegmentIndexBox } from '../boxes/types/SubsegmentIndexBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView {
+export function writeSsix(box: Fields<SubsegmentIndexBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const subsegmentCountSize = 4

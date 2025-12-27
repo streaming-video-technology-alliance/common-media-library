@@ -1,7 +1,7 @@
-import type { Box } from './boxes/Box.ts'
-import type { Fields } from './boxes/Fields.ts'
-import type { FullBox } from './boxes/FullBox.ts'
-import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
+import type { Box } from './boxes/types/Box.ts'
+import type { Fields } from './boxes/types/Fields.ts'
+import type { FullBox } from './boxes/types/FullBox.ts'
+import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
 import { DATA } from './fields/DATA.ts'
 import { INT } from './fields/INT.ts'
 import { STRING } from './fields/STRING.ts'
@@ -351,7 +351,7 @@ export class IsoBoxReadView {
 				const parser = readers[type] || readers[type.trim()] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
-					Object.assign(box, parser(view, this.config))
+					Object.assign(box, parser.read(view, this.config))
 				}
 
 				if (isContainer(box)) {

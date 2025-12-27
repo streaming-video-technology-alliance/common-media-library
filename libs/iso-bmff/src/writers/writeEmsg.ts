@@ -1,4 +1,5 @@
-import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { EventMessageBox } from '../boxes/types/EventMessageBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
+export function writeEmsg(box: Fields<EventMessageBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 

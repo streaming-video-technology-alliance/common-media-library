@@ -1,4 +1,5 @@
-import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { ProtectionSystemSpecificHeaderBox } from '../boxes/types/ProtectionSystemSpecificHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView {
+export function writePssh(box: Fields<ProtectionSystemSpecificHeaderBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const systemIdSize = 16

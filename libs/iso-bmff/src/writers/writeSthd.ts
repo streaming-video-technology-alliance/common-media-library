@@ -1,4 +1,5 @@
-import type { SubtitleMediaHeaderBox } from '../boxes/SubtitleMediaHeaderBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SubtitleMediaHeaderBox } from '../boxes/types/SubtitleMediaHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView {
+export function writeSthd(box: Fields<SubtitleMediaHeaderBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize

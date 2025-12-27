@@ -1,4 +1,5 @@
-import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { TrackHeaderBox } from '../boxes/types/TrackHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView {
+export function writeTkhd(box: Fields<TrackHeaderBox>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8

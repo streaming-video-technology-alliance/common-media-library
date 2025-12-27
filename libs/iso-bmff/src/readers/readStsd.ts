@@ -1,7 +1,7 @@
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import type { Fields } from '../boxes/Fields.ts'
-import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
-import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SampleDescriptionBox } from '../boxes/types/SampleDescriptionBox.ts'
+import type { SampleEntryBox } from '../boxes/types/SampleEntryBox.ts'
 
 /**
  * Parse a SampleDescriptionBox from an IsoView

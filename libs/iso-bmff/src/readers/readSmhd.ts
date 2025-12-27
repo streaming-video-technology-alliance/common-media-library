@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SoundMediaHeaderBox } from '../boxes/types/SoundMediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

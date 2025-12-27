@@ -1,4 +1,5 @@
-import type { UrlBox } from '../boxes/UrlBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { UrlBox } from '../boxes/types/UrlBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeUrl(box: UrlBox): IsoBoxWriteView {
+export function writeUrl(box: Fields<UrlBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const locationSize = box.location.length + 1 // null-terminated

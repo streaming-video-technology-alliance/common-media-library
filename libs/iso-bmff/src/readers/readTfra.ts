@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
-import type { TrackFragmentRandomAccessEntry } from '../boxes/TrackFragmentRandomAccessEntry.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { TrackFragmentRandomAccessBox } from '../boxes/types/TrackFragmentRandomAccessBox.ts'
+import type { TrackFragmentRandomAccessEntry } from '../boxes/types/TrackFragmentRandomAccessEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

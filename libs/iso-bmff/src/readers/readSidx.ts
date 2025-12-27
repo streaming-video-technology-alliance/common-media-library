@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
-import type { SegmentIndexReference } from '../boxes/SegmentIndexReference.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SegmentIndexBox } from '../boxes/types/SegmentIndexBox.ts'
+import type { SegmentIndexReference } from '../boxes/types/SegmentIndexReference.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

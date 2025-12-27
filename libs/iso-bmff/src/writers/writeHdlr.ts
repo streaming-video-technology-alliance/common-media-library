@@ -1,4 +1,5 @@
-import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { HandlerReferenceBox } from '../boxes/types/HandlerReferenceBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
+export function writeHdlr(box: Fields<HandlerReferenceBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const preDefinedSize = 4

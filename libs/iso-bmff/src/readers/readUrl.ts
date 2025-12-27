@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { UrlBox } from '../boxes/UrlBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { UrlBox } from '../boxes/types/UrlBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

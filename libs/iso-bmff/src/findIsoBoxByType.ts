@@ -1,5 +1,5 @@
-import type { IsoBmffBox } from './boxes/IsoBmffBox.ts'
-import type { IsoBmffBoxMap } from './boxes/IsoBmffBoxMap.ts'
+import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
+import type { IsoBmffBoxMap } from './boxes/types/IsoBmffBoxMap.ts'
 import { findIsoBox } from './findIsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'

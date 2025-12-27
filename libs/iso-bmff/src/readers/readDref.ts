@@ -1,7 +1,7 @@
-import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
-import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts'
-import type { DataReferenceBox } from '../boxes/DataReferenceBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
+import type { DataEntryUrlBox } from '../boxes/types/DataEntryUrlBox.ts'
+import type { DataEntryUrnBox } from '../boxes/types/DataEntryUrnBox.ts'
+import type { DataReferenceBox } from '../boxes/types/DataReferenceBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

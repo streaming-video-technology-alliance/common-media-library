@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/types/MovieFragmentRandomAccessOffsetBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

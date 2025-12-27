@@ -1,5 +1,5 @@
-import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
+import type { EventMessageBox } from '../boxes/types/EventMessageBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

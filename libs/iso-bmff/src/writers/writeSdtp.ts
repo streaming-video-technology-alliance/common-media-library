@@ -1,4 +1,5 @@
-import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { SampleDependencyTypeBox } from '../boxes/types/SampleDependencyTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView {
+export function writeSdtp(box: Fields<SampleDependencyTypeBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleDependencyTableSize = box.sampleDependencyTable.length

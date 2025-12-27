@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/Fields.ts'
-import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { OriginalFormatBox } from '../boxes/types/OriginalFormatBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

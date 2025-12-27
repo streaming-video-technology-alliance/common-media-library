@@ -1,6 +1,6 @@
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { UrnBox } from '../boxes/types/UrnBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import type { Fields } from '../boxes/Fields.ts'
-import type { UrnBox } from '../boxes/UrnBox.ts'
 
 /**
  * Parse a UrnBox from an IsoView

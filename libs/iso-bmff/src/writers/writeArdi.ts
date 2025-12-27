@@ -1,4 +1,5 @@
-import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
+import type { AudioRenderingIndicationBox } from '../boxes/types/AudioRenderingIndicationBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -10,7 +11,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView {
+export function writeArdi(box: Fields<AudioRenderingIndicationBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const audioRenderingIndicationSize = 1

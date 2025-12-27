@@ -1,4 +1,5 @@
-import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { MediaHeaderBox } from '../boxes/types/MediaHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView {
+export function writeMdhd(box: Fields<MediaHeaderBox>): IsoBoxWriteView {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4

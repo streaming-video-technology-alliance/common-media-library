@@ -1,4 +1,5 @@
-import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { CompositionTimeToSampleBox } from '../boxes/types/CompositionTimeToSampleBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView {
+export function writeCtts(box: Fields<CompositionTimeToSampleBox>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

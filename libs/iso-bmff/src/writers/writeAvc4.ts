@@ -1,4 +1,5 @@
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { Fields } from '../boxes/types/Fields.ts'
+import type { VisualSampleEntryBox } from '../boxes/types/VisualSampleEntryBox.ts'
 import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
 
@@ -11,6 +12,6 @@ import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
  *
  * @public
  */
-export function writeAvc4(box: VisualSampleEntryBox<'avc4'>): IsoBoxWriteView {
+export function writeAvc4(box: Fields<VisualSampleEntryBox<'avc4'>>): IsoBoxWriteView {
 	return writeVisualSampleEntryBox(box, 'avc4')
 }
