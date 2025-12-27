@@ -8,8 +8,7 @@ import type { UserDataBox } from './UserDataBox.ts'
 /**
  * Track Box - 'trak' - Container
  *
- *
- * @beta
+ * @public
  */
 export type TrackBox = ContainerBox<TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox> & {
 	type: 'trak';

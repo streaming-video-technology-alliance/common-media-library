@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * ISO/IEC 23001-7:2011 - 8.2 Track Encryption Box
  *
- *
- * @beta
+ * @public
  */
 export type TrackEncryptionBox = FullBox & {
 	type: 'tenc';

@@ -1,8 +1,7 @@
 /**
  * Composition Time to Sample Entry
  *
- *
- * @beta
+ * @public
  */
 export type CompTimeToSampleEntry = {
 	sampleCount: number;

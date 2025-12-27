@@ -3,8 +3,7 @@ import type { SubsegmentRange } from './SubsegmentRange.ts'
 /**
  * Subsegment
  *
- *
- * @beta
+ * @public
  */
 export type Subsegment = {
 	rangesCount: number;

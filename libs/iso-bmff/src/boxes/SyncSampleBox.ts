@@ -4,8 +4,7 @@ import type { SyncSample } from './SyncSample.ts'
 /**
  * ISO/IEC 14496-12:2015 - 8.6.2 Sync Sample Box
  *
- *
- * @beta
+ * @public
  */
 export type SyncSampleBox = FullBox & {
 	type: 'stss';

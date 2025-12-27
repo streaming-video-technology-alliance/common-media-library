@@ -4,8 +4,7 @@ import type { ContainerBox } from './ContainerBox.ts'
 /**
  * User Data Box - 'udta' - Container
  *
- *
- * @beta
+ * @public
  */
 export type UserDataBox = ContainerBox<Box> & {
 	type: 'udta';

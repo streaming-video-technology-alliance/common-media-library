@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * ISO/IEC 23009-1:2014 - 5.10.3.3 Event Message Box
  *
- *
- * @beta
+ * @public
  */
 export type EventMessageBox = FullBox & {
 	type: 'emsg';

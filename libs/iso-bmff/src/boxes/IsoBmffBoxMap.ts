@@ -90,8 +90,7 @@ import type { WebVttSourceLabelBox } from './WebVttSourceLabelBox.ts'
 /**
  * Comprehensive mapping from box type strings to their corresponding TypeScript interfaces
  *
- *
- * @beta
+ * @public
  */
 export type IsoBmffBoxMap = {
 	ardi: AudioRenderingIndicationBox;

@@ -1,8 +1,7 @@
 /**
  * An edit list entry.
  *
- *
- * @beta
+ * @public
  */
 export type EditListEntry = {
 	segmentDuration: number;

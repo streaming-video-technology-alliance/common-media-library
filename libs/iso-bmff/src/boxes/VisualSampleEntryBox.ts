@@ -1,12 +1,12 @@
 import type { SampleEntryBox } from './SampleEntryBox.ts'
+import type { VisualSampleEntryType } from './VisualSampleEntryType.ts'
 
 /**
  * ISO/IEC 14496-15:2014 - 12.1.3.1 avc1/2/3/4, hev1, hvc1, encv
  *
- *
- * @beta
+ * @public
  */
-export type VisualSampleEntryBox<T extends 'avc1' | 'avc2' | 'avc3' | 'avc4' | 'hev1' | 'hvc1' | 'encv' = 'avc1' | 'avc2' | 'avc3' | 'avc4' | 'hev1' | 'hvc1' | 'encv'> = SampleEntryBox & {
+export type VisualSampleEntryBox<T extends VisualSampleEntryType> = SampleEntryBox & {
 	type: T;
 	preDefined1: number;
 	reserved2: number;

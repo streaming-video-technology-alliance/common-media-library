@@ -1,8 +1,7 @@
 /**
  * Subsample Encryption
  *
- *
- * @beta
+ * @public
  */
 export type SubsampleEncryption = {
 	bytesOfClearData: number;

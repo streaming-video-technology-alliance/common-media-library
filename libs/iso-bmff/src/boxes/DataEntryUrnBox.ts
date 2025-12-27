@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Data Entry Urn Box - 'urn '
  *
- *
- * @beta
+ * @public
  */
 export type DataEntryUrnBox = FullBox & {
 	type: 'urn ';

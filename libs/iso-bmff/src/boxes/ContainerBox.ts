@@ -3,8 +3,7 @@ import type { Box } from './Box.ts'
 /**
  * Container Box
  *
- *
- * @beta
+ * @public
  */
 export type ContainerBox<T> = Box & {
 	boxes: T[];

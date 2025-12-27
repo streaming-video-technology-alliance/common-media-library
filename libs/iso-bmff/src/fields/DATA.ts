@@ -1,7 +1,6 @@
 /**
  * The data field type
  *
- *
- * @beta
+ * @public
  */
 export const DATA = 'data'

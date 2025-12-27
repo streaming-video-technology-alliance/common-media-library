@@ -1,7 +1,6 @@
 /**
  * The unsigned integer field type
  *
- *
- * @beta
+ * @public
  */
 export const UINT = 'uint'

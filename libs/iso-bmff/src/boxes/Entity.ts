@@ -1,8 +1,7 @@
 /**
  * Entity
  *
- *
- * @beta
+ * @public
  */
 export type Entity = {
 	/** Entity ID */

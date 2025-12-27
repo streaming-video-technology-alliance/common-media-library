@@ -4,8 +4,7 @@ import type { SampleToChunkEntry } from './SampleToChunkEntry.ts'
 /**
  * Sample to Chunk Box - 'stsc'
  *
- *
- * @beta
+ * @public
  */
 export type SampleToChunkBox = FullBox & {
 	type: 'stsc';

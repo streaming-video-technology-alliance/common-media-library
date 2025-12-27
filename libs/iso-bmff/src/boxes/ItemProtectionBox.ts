@@ -4,8 +4,7 @@ import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformati
 /**
  * Item Protection Box - 'ipro' - Container
  *
- *
- * @beta
+ * @public
  */
 export type ItemProtectionBox = ContainerBox<ProtectionSchemeInformationBox> & {
 	type: 'ipro';

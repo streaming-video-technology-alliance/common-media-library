@@ -3,8 +3,7 @@ import type { ItemExtent } from './ItemExtent.ts'
 /**
  * Item Location
  *
- *
- * @beta
+ * @public
  */
 export type ItemLocation = {
 	itemId: number;

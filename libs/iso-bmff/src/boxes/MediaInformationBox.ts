@@ -9,8 +9,7 @@ import type { VideoMediaHeaderBox } from './VideoMediaHeaderBox.ts'
 /**
  * Media Information Box - 'minf' - Container
  *
- *
- * @beta
+ * @public
  */
 export type MediaInformationBox = ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox> & {
 	type: 'minf';

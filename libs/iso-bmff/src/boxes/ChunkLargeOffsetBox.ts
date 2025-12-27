@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Chunk Large Offset Box - 'co64'
  *
- *
- * @beta
+ * @public
  */
 export type ChunkLargeOffsetBox = FullBox & {
 	type: 'co64';

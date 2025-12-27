@@ -4,8 +4,7 @@ import type { SegmentIndexReference } from './SegmentIndexReference.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
  *
- *
- * @beta
+ * @public
  */
 export type SegmentIndexBox = FullBox & {
 	type: 'sidx';

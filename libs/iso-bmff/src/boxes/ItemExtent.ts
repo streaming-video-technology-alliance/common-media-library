@@ -1,8 +1,7 @@
 /**
  * Item Extent
  *
- *
- * @beta
+ * @public
  */
 export type ItemExtent = {
 	extentIndex?: number;

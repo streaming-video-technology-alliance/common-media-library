@@ -4,8 +4,7 @@ import type { SampleToGroupEntry } from './SampleToGroupEntry.ts'
 /**
  * Sample to Group Box - 'sbgp'
  *
- *
- * @beta
+ * @public
  */
 export type SampleToGroupBox = FullBox & {
 	type: 'sbgp';

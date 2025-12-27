@@ -4,8 +4,7 @@ import type { SubsampleEntry } from './SubsampleEntry.ts'
 /**
  * ISO/IEC 14496-12:2015 - 8.7.7 Sub-Sample Information Box
  *
- *
- * @beta
+ * @public
  */
 export type SubsampleInformationBox = FullBox & {
 	type: 'subs';

@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Sample Group Description Box - 'sgpd'
  *
- *
- * @beta
+ * @public
  */
 export type SampleGroupDescriptionBox = FullBox & {
 	type: 'sgpd';

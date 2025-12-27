@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
  *
- *
- * @beta
+ * @public
  */
 export type MovieHeaderBox = FullBox & {
 	type: 'mvhd';

@@ -74,8 +74,7 @@ import type { WebVttSourceLabelBox } from './WebVttSourceLabelBox.ts'
 /**
  * Non-container Box types
  *
- *
- * @beta
+ * @public
  */
 export type IsoBox =
 	| AudioRenderingIndicationBox

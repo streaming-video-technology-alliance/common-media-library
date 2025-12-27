@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.12.5 Scheme Type Box
  *
- *
- * @beta
+ * @public
  */
 export type SchemeTypeBox = FullBox & {
 	type: 'schm';

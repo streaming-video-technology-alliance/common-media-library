@@ -1,8 +1,7 @@
 /**
  * Subsegment range
  *
- *
- * @beta
+ * @public
  */
 export type SubsegmentRange = {
 	level: number;

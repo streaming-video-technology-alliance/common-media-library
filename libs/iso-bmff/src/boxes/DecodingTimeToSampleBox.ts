@@ -4,8 +4,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.6.1.2 Decoding Time To Sample Box
  *
- *
- * @beta
+ * @public
  */
 export type DecodingTimeToSampleBox = FullBox & {
 	type: 'stts';

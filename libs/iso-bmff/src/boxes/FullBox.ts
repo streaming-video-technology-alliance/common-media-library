@@ -3,8 +3,7 @@ import type { Box } from './Box.ts'
 /**
  * Full Box Type (has version and flags)
  *
- *
- * @beta
+ * @public
  */
 export type FullBox = Box & {
 	version: number;

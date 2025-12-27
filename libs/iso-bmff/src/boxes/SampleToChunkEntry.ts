@@ -1,8 +1,7 @@
 /**
  * Sample to Chunk Entry
  *
- *
- * @beta
+ * @public
  */
 export type SampleToChunkEntry = {
 	firstChunk: number;

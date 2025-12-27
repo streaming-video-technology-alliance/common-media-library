@@ -4,8 +4,7 @@ import type { ItemInfoEntry } from './ItemInfoEntry.ts'
 /**
  * Item Info Box - 'iinf' - Container
  *
- *
- * @beta
+ * @public
  */
 export type ItemInfoBox = ContainerBox<ItemInfoEntry> & {
 	type: 'iinf';

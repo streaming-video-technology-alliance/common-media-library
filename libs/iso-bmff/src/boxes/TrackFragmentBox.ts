@@ -9,8 +9,7 @@ import type { TrackRunBox } from './TrackRunBox.ts'
 /**
  * Track Fragment Box - 'traf' - Container
  *
- *
- * @beta
+ * @public
  */
 export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
 	type: 'traf';

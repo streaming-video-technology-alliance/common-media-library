@@ -4,8 +4,7 @@ import type { Subsegment } from './Subsegment.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
  *
- *
- * @beta
+ * @public
  */
 export type SubsegmentIndexBox = FullBox & {
 	type: 'ssix';

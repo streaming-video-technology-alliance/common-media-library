@@ -15,8 +15,7 @@ import type { SyncSampleBox } from './SyncSampleBox.ts'
 /**
  * Sample Table Box - 'stbl' - Container
  *
- *
- * @beta
+ * @public
  */
 export type SampleTableBox = ContainerBox<SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox> & {
 	type: 'stbl';
