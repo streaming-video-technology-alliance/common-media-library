@@ -459,7 +459,7 @@ export type IsoBoxReadViewConfig = {
 export type IsoBoxStreamable = IsoBox | Box | ArrayBufferView;
 
 // @public
-export type IsoBoxWriter<B> = (box: Fields<B>) => IsoBoxWriteView;
+export type IsoBoxWriter<B> = (box: Fields<B>) => ArrayBufferView;
 
 // @public
 export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
