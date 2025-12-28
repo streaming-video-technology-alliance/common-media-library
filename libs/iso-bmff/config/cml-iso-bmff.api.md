@@ -400,8 +400,8 @@ export type IsoBoxMap = {
     trex: TrackExtendsBox;
     trun: TrackRunBox;
     udta: UserDataBox;
-    url: DataEntryUrlBox;
-    urn: DataEntryUrnBox;
+    "url ": DataEntryUrlBox;
+    "urn ": DataEntryUrnBox;
     vlab: WebVttSourceLabelBox;
     vmhd: VideoMediaHeaderBox;
     vttC: WebVttConfigurationBox;
