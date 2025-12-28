@@ -1,8 +1,8 @@
-import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
+import type { IsoBox } from './boxes/IsoBox.ts'
 
 /**
  * Box filter function
  *
  * @public
  */
-export type IsoBoxFilter<T extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T);
+export type IsoBoxFilter<T extends IsoBox> = ((box: IsoBox) => boolean) | ((box: IsoBox) => box is T);

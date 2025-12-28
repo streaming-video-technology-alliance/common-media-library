@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { SubsegmentIndexBox } from '../boxes/types/SubsegmentIndexBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

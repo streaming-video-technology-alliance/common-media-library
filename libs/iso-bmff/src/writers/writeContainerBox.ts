@@ -1,7 +1,8 @@
-import type { Box } from '../boxes/types/Box.ts'
-import type { ContainerBox } from '../boxes/types/ContainerBox.ts'
+import type { ContainerBox } from '../boxes/ContainerBox.ts'
+import type { IsoBox } from '../boxes/IsoBox.ts'
+import type { IsoBoxWriterMap } from '../IsoBoxWriterMap.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import { isFullBox } from '../utils/isFullBox.ts'
+import { writeIsoBox } from '../writeIsoBox.ts'
 
 /**
  * Write a ContainerBox to an IsoBmffWriter.
@@ -15,41 +16,30 @@ import { isFullBox } from '../utils/isFullBox.ts'
  *
  * @public
  */
-export function writeContainerBox<T extends Box>(
-	box: ContainerBox<T> & Pick<Box, 'type' | 'largesize'>
+export function writeContainerBox<T extends IsoBox>(
+	box: ContainerBox<T>,
+	writers: IsoBoxWriterMap
 ): IsoBoxWriteView {
+	const children: Uint8Array[] = []
 	const headerSize = 8
-	const isFullContainerBox = isFullBox(box)
-	const fullBoxSize = isFullContainerBox ? 4 : 0
+	let childrenSize = 0
 
-	// Calculate total size of all child boxes
-	let childBoxesSize = 0
+	// TODO: Is there a way to avoid creating the intermediate Uint8Arrays?
 	for (const childBox of box.boxes) {
-		childBoxesSize += childBox.view.byteLength
+		const view = writeIsoBox(childBox, writers)
+		childrenSize += view.byteLength
+		children.push(view)
 	}
 
-	const totalSize = headerSize + fullBoxSize + childBoxesSize
+	const totalSize = headerSize + childrenSize
 
 	const writer = new IsoBoxWriteView(totalSize)
 
-	// Handle largesize if needed
-	if (box.largesize !== undefined) {
-		writer.writeBoxHeader(box.type, totalSize, box.largesize)
-	} else {
-		writer.writeBoxHeader(box.type, totalSize)
-	}
+	writer.writeBoxHeader(box.type, totalSize)
 
-	// Write FullBox header if applicable
-	if (isFullContainerBox) {
-		writer.writeFullBox(box.version, box.flags)
-	}
-
-	// Write all child boxes
-	for (const childBox of box.boxes) {
-		const view = childBox.view
-		writer.writeBytes(new Uint8Array(view.buffer, view.byteOffset, view.byteLength))
+	for (const child of children) {
+		writer.writeBytes(child)
 	}
 
 	return writer
 }
-

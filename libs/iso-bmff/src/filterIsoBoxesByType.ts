@@ -1,5 +1,5 @@
-import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
-import type { IsoBmffBoxMap } from './boxes/types/IsoBmffBoxMap.ts'
+import type { IsoBox } from './boxes/IsoBox.ts'
+import type { IsoBoxMap } from './boxes/IsoBoxMap.ts'
 import { filterIsoBoxes } from './filterIsoBoxes.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
@@ -15,13 +15,13 @@ import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
  *
  * @public
  */
-export function filterIsoBoxesByType<T extends keyof IsoBmffBoxMap>(
+export function filterIsoBoxesByType<T extends keyof IsoBoxMap>(
 	raw: IsoBoxData, type: T | T[],
 	config: IsoBoxReadViewConfig = {}
-): IsoBmffBoxMap[T][] {
+): IsoBoxMap[T][] {
 	if (!Array.isArray(type)) {
 		type = [type]
 	}
 
-	return filterIsoBoxes(raw, (box: IsoBmffBox): box is IsoBmffBoxMap[T] => type.includes(box.type as T), config)
+	return filterIsoBoxes(raw, (box: IsoBox): box is IsoBoxMap[T] => type.includes(box.type as T), config)
 }

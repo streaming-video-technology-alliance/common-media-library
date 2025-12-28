@@ -1,4 +1,5 @@
-import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
+import type { ContainerBox } from './boxes/ContainerBox.ts'
+import type { IsoBox } from './boxes/IsoBox.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
 import { isContainer } from './utils/isContainer.ts'
@@ -20,10 +21,18 @@ export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Ui
 		const { type } = box
 
 		if (isContainer(box)) {
-			view = writeContainerBox(box)
+			view = writeContainerBox(box as ContainerBox<IsoBox>, writers)
 		}
 		else {
-			view = writers[type]?.write(box as IsoBmffBox) ?? box.view
+			const writer = writers[type as IsoBox['type']]
+
+			if (writer) {
+				// TODO: Find a better way to do this without casting to any
+				view = writer(box as any)
+			}
+			else if ('view' in box) {
+				view = box.view
+			}
 		}
 
 		if (!view) {

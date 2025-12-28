@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { LabelBox } from '../boxes/types/LabelBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { LabelBox } from '../boxes/LabelBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

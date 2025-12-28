@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { MovieFragmentHeaderBox } from '../boxes/types/MovieFragmentHeaderBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

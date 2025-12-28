@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { IdentifiedMediaDataBox } from '../boxes/types/IdentifiedMediaDataBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

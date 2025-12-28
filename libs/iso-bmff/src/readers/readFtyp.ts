@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { FileTypeBox } from '../boxes/types/FileTypeBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
 import { STRING } from '../fields/STRING.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 

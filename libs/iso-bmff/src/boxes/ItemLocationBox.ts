@@ -1,0 +1,22 @@
+import type { FullBox } from './FullBox.ts'
+import type { ItemLocation } from './ItemLocation.ts'
+
+/**
+ * Item Location Box - 'iloc'
+ *
+ * @public
+ */
+export type ItemLocationBox = FullBox & {
+	type: 'iloc';
+	offsetSize: number;
+	lengthSize: number;
+	baseOffsetSize: number;
+	indexSize?: number;
+	itemCount: number;
+	items: ItemLocation[];
+};
+
+/**
+ * @public
+ */
+export type iloc = ItemLocationBox;

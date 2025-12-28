@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { SampleDependencyTypeBox } from '../boxes/types/SampleDependencyTypeBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 

@@ -1,7 +1,7 @@
-import type { Box } from './boxes/types/Box.ts'
-import type { Fields } from './boxes/types/Fields.ts'
-import type { FullBox } from './boxes/types/FullBox.ts'
-import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
+import type { Box } from './boxes/Box.ts'
+import type { Fields } from './boxes/Fields.ts'
+import type { FullBox } from './boxes/FullBox.ts'
+import type { IsoBox } from './boxes/IsoBox.ts'
 import { DATA } from './fields/DATA.ts'
 import { INT } from './fields/INT.ts'
 import { STRING } from './fields/STRING.ts'
@@ -305,7 +305,7 @@ export class IsoBoxReadView {
 	 * @param length - The number of boxes to read.
 	 * @returns The boxes.
 	 */
-	readBoxes = <T = IsoBmffBox>(length: number): T[] => {
+	readBoxes = <T = IsoBox>(length: number): T[] => {
 		const result: T[] = []
 
 		for (const box of this) {
@@ -341,17 +341,17 @@ export class IsoBoxReadView {
 	 *
 	 * @returns A generator of boxes.
 	 */
-	*[Symbol.iterator](): Generator<IsoBmffBox> {
+	*[Symbol.iterator](): Generator<IsoBox & Box> {
 		const { readers = {}, recursive = false } = this.config
 
 		while (!this.done) {
 			try {
-				const box = this.readBox() as IsoBmffBox
+				const box = this.readBox() as Box
 				const { type, view } = box
-				const parser = readers[type] || readers[type.trim()] // url and urn boxes have a trailing space in their type field
+				const parser = readers[type as keyof typeof readers] || readers[type.trim() as keyof typeof readers] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
-					Object.assign(box, parser.read(view, this.config))
+					Object.assign(box, parser(view, this.config))
 				}
 
 				if (isContainer(box)) {
@@ -368,7 +368,7 @@ export class IsoBoxReadView {
 					box.boxes = boxes
 				}
 
-				yield box
+				yield box as IsoBox & Box
 			}
 			catch (error) {
 				break

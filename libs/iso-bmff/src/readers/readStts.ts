@@ -1,5 +1,5 @@
-import type { DecodingTimeToSampleBox } from '../boxes/types/DecodingTimeToSampleBox.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
+import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

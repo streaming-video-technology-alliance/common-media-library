@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { SyncSampleBox } from '../boxes/types/SyncSampleBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { VisualSampleEntryBox } from '../boxes/types/VisualSampleEntryBox.ts'
-import type { VisualSampleEntryType } from '../boxes/types/VisualSampleEntryType.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

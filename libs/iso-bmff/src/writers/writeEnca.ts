@@ -1,5 +1,5 @@
-import type { AudioSampleEntryBox } from '../boxes/types/AudioSampleEntryBox.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
+import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

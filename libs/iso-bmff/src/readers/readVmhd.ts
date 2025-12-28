@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { VideoMediaHeaderBox } from '../boxes/types/VideoMediaHeaderBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 

@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { WebVttEmptySampleBox } from '../boxes/types/WebVttEmptySampleBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

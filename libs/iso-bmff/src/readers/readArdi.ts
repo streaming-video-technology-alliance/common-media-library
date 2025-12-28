@@ -1,5 +1,5 @@
-import type { AudioRenderingIndicationBox } from '../boxes/types/AudioRenderingIndicationBox.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
+import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

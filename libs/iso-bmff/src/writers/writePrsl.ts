@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { PreselectionGroupBox } from '../boxes/types/PreselectionGroupBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

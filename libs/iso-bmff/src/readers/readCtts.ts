@@ -1,6 +1,6 @@
-import type { CompositionTimeToSampleBox } from '../boxes/types/CompositionTimeToSampleBox.ts'
-import type { CompositionTimeToSampleEntry } from '../boxes/types/CompositionTimeToSampleEntry.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
+import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.ts'
+import type { CompositionTimeToSampleEntry } from '../boxes/CompositionTimeToSampleEntry.ts'
+import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

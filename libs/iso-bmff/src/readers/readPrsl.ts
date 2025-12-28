@@ -1,6 +1,6 @@
-import type { Entity } from '../boxes/types/Entity.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { PreselectionGroupBox } from '../boxes/types/PreselectionGroupBox.ts'
+import type { Entity } from '../boxes/Entity.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

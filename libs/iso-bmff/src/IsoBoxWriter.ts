@@ -1,5 +1,4 @@
-import type { Fields } from './boxes/types/Fields.ts'
-import type { IsoBox } from './boxes/types/IsoBox.ts'
+import type { Fields } from './boxes/Fields.ts'
 import type { IsoBoxWriteView } from './IsoBoxWriteView.ts'
 
 /**
@@ -7,6 +6,4 @@ import type { IsoBoxWriteView } from './IsoBoxWriteView.ts'
  *
  * @public
  */
-export type IsoBoxWriter<B extends IsoBox> = {
-	write: (box: Fields<B>) => IsoBoxWriteView;
-}
+export type IsoBoxWriter<B> = (box: Fields<B>) => IsoBoxWriteView;

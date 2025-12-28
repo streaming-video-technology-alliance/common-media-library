@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { WebVttSettingsBox } from '../boxes/types/WebVttSettingsBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { SchemeTypeBox } from '../boxes/types/SchemeTypeBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

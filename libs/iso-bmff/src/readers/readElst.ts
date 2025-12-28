@@ -1,6 +1,6 @@
-import type { EditListBox } from '../boxes/types/EditListBox.ts'
-import type { EditListEntry } from '../boxes/types/EditListEntry.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
+import type { EditListBox } from '../boxes/EditListBox.ts'
+import type { EditListEntry } from '../boxes/EditListEntry.ts'
+import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

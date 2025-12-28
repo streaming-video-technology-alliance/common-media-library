@@ -1,4 +1,4 @@
-import type { IsoBmffBox } from './boxes/types/IsoBmffBox.ts'
+import type { IsoBox } from './boxes/IsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import { IsoBoxReadView } from './IsoBoxReadView.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
@@ -16,7 +16,7 @@ import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
  *
  * @public
  */
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): IsoBmffBox[] {
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): IsoBox[] {
 	const boxes = []
 
 	for (const box of new IsoBoxReadView(raw, config)) {

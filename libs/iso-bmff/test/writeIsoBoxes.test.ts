@@ -4,27 +4,24 @@ import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Writable } from 'node:stream'
-import type { Fields } from '../src/boxes/types/Fields.ts'
-import { describe, ftyp, IsoBoxReadableStream, it, readIsoBoxes, type IsoBox } from './util/box.ts'
+import { describe, IsoBoxReadableStream, it, readFtyp, readIsoBoxes, writeFtyp, writeIsoBoxes } from './util/box.ts'
 
 describe('writeIsoBoxes', function () {
-	it('should create a stream from raw boxes', async function () {
-		const boxes: Fields<IsoBox>[] = [
-			{
-				type: 'ftyp',
-				majorBrand: 'isom',
-				minorVersion: 1,
-				compatibleBrands: ['isom'],
-			},
-		]
-		const stream = new IsoBoxReadableStream(boxes, { writers: { ftyp } })
-	})
-
 	it('should write to a stream', async function () {
 		// #region example
 		const isoFile = await readFile('test/fixtures/captions.mp4')
-		const boxes = readIsoBoxes(new Uint8Array(isoFile), { readers: { ftyp } })
-		const stream = new IsoBoxReadableStream(boxes, { writers: { ftyp } })
+
+		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
+			readers: {
+				ftyp: readFtyp,
+			}
+		})
+
+		const stream = writeIsoBoxes(boxes, {
+			writers: {
+				ftyp: writeFtyp,
+			}
+		})
 
 		const copy = join(tmpdir(), 'captions-copy.mp4')
 		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))

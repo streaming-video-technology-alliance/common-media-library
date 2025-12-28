@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { WebVttSourceLabelBox } from '../boxes/types/WebVttSourceLabelBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { ProducerReferenceTimeBox } from '../boxes/types/ProducerReferenceTimeBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

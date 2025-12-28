@@ -1,5 +1,5 @@
-import type { ExtendedLanguageBox } from '../boxes/types/ExtendedLanguageBox.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
+import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

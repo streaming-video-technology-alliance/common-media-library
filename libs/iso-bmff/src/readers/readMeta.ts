@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { MetaBox } from '../boxes/types/MetaBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { MetaBox } from '../boxes/MetaBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

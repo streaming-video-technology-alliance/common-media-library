@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { TrackEncryptionBox } from '../boxes/types/TrackEncryptionBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

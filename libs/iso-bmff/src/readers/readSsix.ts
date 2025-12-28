@@ -1,6 +1,6 @@
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { SubsegmentIndexBox } from '../boxes/types/SubsegmentIndexBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 
 /**
  * Parse a SubsegmentIndexBox from an IsoView

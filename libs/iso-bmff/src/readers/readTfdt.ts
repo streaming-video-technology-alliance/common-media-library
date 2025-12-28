@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/types/TrackFragmentBaseMediaDecodeTimeBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragmentBaseMediaDecodeTimeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

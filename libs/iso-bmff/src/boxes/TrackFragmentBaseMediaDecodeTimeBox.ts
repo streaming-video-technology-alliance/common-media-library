@@ -1,0 +1,16 @@
+import type { FullBox } from './FullBox.ts'
+
+/**
+ * ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Decode Time
+ *
+ * @public
+ */
+export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
+	type: 'tfdt';
+	baseMediaDecodeTime: number;
+};
+
+/**
+ * @public
+ */
+export type tfdt = TrackFragmentBaseMediaDecodeTimeBox;

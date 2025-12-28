@@ -1,6 +1,6 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { TrackRunBox } from '../boxes/types/TrackRunBox.ts'
-import type { TrackRunSample } from '../boxes/types/TrackRunSample.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
+import type { TrackRunSample } from '../boxes/TrackRunSample.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

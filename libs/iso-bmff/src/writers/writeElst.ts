@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { EditListBox } from '../boxes/types/EditListBox.ts'
+import type { EditListBox } from '../boxes/EditListBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**

@@ -4,18 +4,8 @@
 
 ```ts
 
-// @public
-export class ardi implements Fields<AudioRenderingIndicationBox> {
-    constructor(version: number, flags: number, audioRenderingIndication: number);
-    // (undocumented)
-    audioRenderingIndication: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<AudioRenderingIndicationBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<AudioRenderingIndicationBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type ardi = AudioRenderingIndicationBox;
 
 // @public
 export type AudioRenderingIndicationBox = FullBox & {
@@ -34,154 +24,6 @@ export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> =
     samplerate: number;
     esds: Uint8Array;
 };
-
-// @public
-export class avc1 implements Fields<VisualSampleEntryBox<"avc1">> {
-    constructor(dataReferenceIndex: number, compressorName: number[], config: Uint8Array, depth: number, frameCount: number, height: number, horizresolution: number, preDefined1: number, preDefined2: number[], preDefined3: number, reserved1: number[], reserved2: number, reserved3: number, vertresolution: number, width: number);
-    // (undocumented)
-    compressorName: number[];
-    // (undocumented)
-    config: Uint8Array;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    depth: number;
-    // (undocumented)
-    frameCount: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    horizresolution: number;
-    // (undocumented)
-    preDefined1: number;
-    // (undocumented)
-    preDefined2: number[];
-    // (undocumented)
-    preDefined3: number;
-    static read(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc1">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number;
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    vertresolution: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<VisualSampleEntryBox<"avc1">>): IsoBoxWriteView;
-}
-
-// @public
-export class avc2 implements Fields<VisualSampleEntryBox<"avc2">> {
-    constructor(dataReferenceIndex: number, compressorName: number[], config: Uint8Array, depth: number, frameCount: number, height: number, horizresolution: number, preDefined1: number, preDefined2: number[], preDefined3: number, reserved1: number[], reserved2: number, reserved3: number, vertresolution: number, width: number);
-    // (undocumented)
-    compressorName: number[];
-    // (undocumented)
-    config: Uint8Array;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    depth: number;
-    // (undocumented)
-    frameCount: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    horizresolution: number;
-    // (undocumented)
-    preDefined1: number;
-    // (undocumented)
-    preDefined2: number[];
-    // (undocumented)
-    preDefined3: number;
-    static read(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc2">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number;
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    vertresolution: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<VisualSampleEntryBox<"avc2">>): IsoBoxWriteView;
-}
-
-// @public
-export class avc3 implements Fields<VisualSampleEntryBox<"avc3">> {
-    constructor(dataReferenceIndex: number, compressorName: number[], config: Uint8Array, depth: number, frameCount: number, height: number, horizresolution: number, preDefined1: number, preDefined2: number[], preDefined3: number, reserved1: number[], reserved2: number, reserved3: number, vertresolution: number, width: number);
-    // (undocumented)
-    compressorName: number[];
-    // (undocumented)
-    config: Uint8Array;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    depth: number;
-    // (undocumented)
-    frameCount: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    horizresolution: number;
-    // (undocumented)
-    preDefined1: number;
-    // (undocumented)
-    preDefined2: number[];
-    // (undocumented)
-    preDefined3: number;
-    static read(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc3">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number;
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    vertresolution: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<VisualSampleEntryBox<"avc3">>): IsoBoxWriteView;
-}
-
-// @public
-export class avc4 implements Fields<VisualSampleEntryBox<"avc4">> {
-    constructor(dataReferenceIndex: number, compressorName: number[], config: Uint8Array, depth: number, frameCount: number, height: number, horizresolution: number, preDefined1: number, preDefined2: number[], preDefined3: number, reserved1: number[], reserved2: number, reserved3: number, vertresolution: number, width: number);
-    // (undocumented)
-    compressorName: number[];
-    // (undocumented)
-    config: Uint8Array;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    depth: number;
-    // (undocumented)
-    frameCount: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    horizresolution: number;
-    // (undocumented)
-    preDefined1: number;
-    // (undocumented)
-    preDefined2: number[];
-    // (undocumented)
-    preDefined3: number;
-    static read(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc4">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number;
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    vertresolution: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<VisualSampleEntryBox<"avc4">>): IsoBoxWriteView;
-}
 
 // @public
 export type Box = {
@@ -206,6 +48,9 @@ export type ChunkOffsetBox = FullBox & {
     chunkOffset: number[];
 };
 
+// @public (undocumented)
+export type co64 = ChunkLargeOffsetBox;
+
 // @public
 export type CompactSampleSizeBox = FullBox & {
     type: "stz2";
@@ -228,24 +73,13 @@ export type CompositionTimeToSampleEntry = {
 };
 
 // @public
-export type ContainerBox<T$1> = Box & {
+export type ContainerBox<T$1> = {
+    type: string;
     boxes: T$1[];
 };
 
-// @public
-export class ctts implements Fields<CompositionTimeToSampleBox> {
-    constructor(version: number, flags: number, entries: CompositionTimeToSampleEntry[], entryCount: number);
-    // (undocumented)
-    entries: CompositionTimeToSampleEntry[];
-    // (undocumented)
-    entryCount: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<CompositionTimeToSampleBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<CompositionTimeToSampleBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type ctts = CompositionTimeToSampleBox;
 
 // @public
 export const DATA = "data";
@@ -253,14 +87,14 @@ export const DATA = "data";
 // @public
 export type DataEntryUrlBox = FullBox & {
     type: "url ";
-    location?: string;
+    location: string;
 };
 
 // @public
 export type DataEntryUrnBox = FullBox & {
     type: "urn ";
-    name?: string;
-    location?: string;
+    name: string;
+    location: string;
 };
 
 // @public
@@ -294,6 +128,12 @@ export type DegradationPriorityBox = FullBox & {
     priority: number[];
 };
 
+// @public (undocumented)
+export type dinf = DataInformationBox;
+
+// @public (undocumented)
+export type dref = DataReferenceBox;
+
 // @public
 export type EditBox = ContainerBox<EditListBox> & {
     type: "edts";
@@ -314,128 +154,23 @@ export type EditListEntry = {
     mediaRateFraction: number;
 };
 
-// @public
-export class elng implements Fields<ExtendedLanguageBox> {
-    constructor(version: number, flags: number, extendedLanguage: string);
-    // (undocumented)
-    extendedLanguage: string;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<ExtendedLanguageBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<ExtendedLanguageBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type edts = EditBox;
 
-// @public
-export class elst implements Fields<EditListBox> {
-    constructor(version: number, flags: number, entries: EditListEntry[], entryCount: number);
-    // (undocumented)
-    entries: EditListEntry[];
-    // (undocumented)
-    entryCount: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<EditListBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<EditListBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type elng = ExtendedLanguageBox;
 
-// @public
-export class emsg implements Fields<EventMessageBox> {
-    constructor(version: number, flags: number, schemeIdUri: string, value: string, timescale: number, presentationTime: number, presentationTimeDelta: number, eventDuration: number, id: number, messageData: Uint8Array);
-    // (undocumented)
-    eventDuration: number;
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    id: number;
-    // (undocumented)
-    messageData: Uint8Array;
-    // (undocumented)
-    presentationTime: number;
-    // (undocumented)
-    presentationTimeDelta: number;
-    static read(view: IsoBoxReadView): Fields<EventMessageBox>;
-    // (undocumented)
-    schemeIdUri: string;
-    // (undocumented)
-    timescale: number;
-    // (undocumented)
-    value: string;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<EventMessageBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type elst = EditListBox;
 
-// @public
-export class enca implements Fields<AudioSampleEntryBox<"enca">> {
-    constructor(reserved1: number[], dataReferenceIndex: number, channelcount: number, esds: Uint8Array, preDefined: number, reserved2: number[], reserved3: number, samplerate: number, samplesize: number);
-    // (undocumented)
-    channelcount: number;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    esds: Uint8Array;
-    // (undocumented)
-    preDefined: number;
-    static read(view: IsoBoxReadView): Fields<AudioSampleEntryBox<"enca">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number[];
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    samplerate: number;
-    // (undocumented)
-    samplesize: number;
-    static write(fields: Fields<AudioSampleEntryBox<"enca">>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type emsg = EventMessageBox;
 
 // @public
 export type EncryptedSample = {
     initializationVector?: Uint8Array;
     subsampleEncryption?: SubsampleEncryption[];
 };
-
-// @public
-export class encv implements Fields<VisualSampleEntryBox<"encv">> {
-    constructor(dataReferenceIndex: number, compressorName: number[], config: Uint8Array, depth: number, frameCount: number, height: number, horizresolution: number, preDefined1: number, preDefined2: number[], preDefined3: number, reserved1: number[], reserved2: number, reserved3: number, vertresolution: number, width: number);
-    // (undocumented)
-    compressorName: number[];
-    // (undocumented)
-    config: Uint8Array;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    depth: number;
-    // (undocumented)
-    frameCount: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    horizresolution: number;
-    // (undocumented)
-    preDefined1: number;
-    // (undocumented)
-    preDefined2: number[];
-    // (undocumented)
-    preDefined3: number;
-    static read(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"encv">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number;
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    vertresolution: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<VisualSampleEntryBox<"encv">>): IsoBoxWriteView;
-}
 
 // @public
 export type Entity = {
@@ -462,62 +197,37 @@ export type ExtendedLanguageBox = FullBox & {
 };
 
 // @public
-export type Fields<T$1> = Omit<T$1, Exclude<keyof Box, "data"> | "boxes">;
+export type Fields<T$1> = Omit<T$1, "type" | "boxes">;
 
 // @public
 export type FileTypeBox = TypeBox<"ftyp">;
 
 // @public
-export function filterIsoBoxes<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoBoxData | Iterable<IsoBmffBox>, fn: IsoBoxFilter<T$1>, config?: IsoBoxReadViewConfig): T$1[];
+export function filterIsoBoxes<T$1 extends IsoBox = IsoBox>(raw: IsoBoxData | Iterable<IsoBox>, fn: IsoBoxFilter<T$1>, config?: IsoBoxReadViewConfig): T$1[];
 
 // @public
-export function filterIsoBoxesByType<T$1 extends keyof IsoBmffBoxMap>(raw: IsoBoxData, type: T$1 | T$1[], config?: IsoBoxReadViewConfig): IsoBmffBoxMap[T$1][];
+export function filterIsoBoxesByType<T$1 extends keyof IsoBoxMap>(raw: IsoBoxData, type: T$1 | T$1[], config?: IsoBoxReadViewConfig): IsoBoxMap[T$1][];
 
 // @public
-export function findIsoBox<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoBoxData | Iterable<IsoBmffBox>, fn: IsoBoxFilter<T$1>, config?: IsoBoxReadViewConfig): T$1 | null;
+export function findIsoBox<T$1 extends IsoBox = IsoBox>(raw: IsoBoxData | Iterable<IsoBox>, fn: IsoBoxFilter<T$1>, config?: IsoBoxReadViewConfig): T$1 | null;
 
 // @public
-export function findIsoBoxByType<T$1 extends keyof IsoBmffBoxMap>(raw: IsoBoxData, type: T$1, config?: IsoBoxReadViewConfig): IsoBmffBoxMap[T$1] | null;
+export function findIsoBoxByType<T$1 extends keyof IsoBoxMap>(raw: IsoBoxData, type: T$1, config?: IsoBoxReadViewConfig): IsoBoxMap[T$1] | null;
 
 // @public
-export class free implements Fields<FreeSpaceBox<"free">> {
-    constructor(data: Uint8Array);
-    // (undocumented)
-    data: Uint8Array;
-    static read(view: IsoBoxReadView): Fields<FreeSpaceBox<"free">>;
-    static write(fields: Fields<FreeSpaceBox<"free">>): IsoBoxWriteView;
-}
-
-// @public
-export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = Box & {
+export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
     type: T$1;
     data: Uint8Array;
 };
 
-// @public
-export class frma implements Fields<OriginalFormatBox> {
-    constructor(dataFormat: number);
-    // (undocumented)
-    dataFormat: number;
-    static read(view: IsoBoxReadView): Fields<OriginalFormatBox>;
-    static write(fields: Fields<OriginalFormatBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type frma = OriginalFormatBox;
+
+// @public (undocumented)
+export type ftyp = FileTypeBox;
 
 // @public
-export class ftyp implements Fields<FileTypeBox> {
-    constructor(majorBrand: string, minorVersion: number, compatibleBrands: string[]);
-    // (undocumented)
-    compatibleBrands: string[];
-    // (undocumented)
-    majorBrand: string;
-    // (undocumented)
-    minorVersion: number;
-    static read(view: IsoBoxReadView): Fields<FileTypeBox>;
-    static write(fields: Fields<FileTypeBox>): IsoBoxWriteView;
-}
-
-// @public
-export type FullBox = Box & {
+export type FullBox = {
     version: number;
     flags: number;
 };
@@ -531,61 +241,8 @@ export type HandlerReferenceBox = FullBox & {
     name: string;
 };
 
-// @public
-export class hdlr implements Fields<HandlerReferenceBox> {
-    constructor(version: number, flags: number, handlerType: string, name: string, preDefined: number, reserved: any[]);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    handlerType: string;
-    // (undocumented)
-    name: string;
-    // (undocumented)
-    preDefined: number;
-    static read(view: IsoBoxReadView): Fields<HandlerReferenceBox>;
-    // (undocumented)
-    reserved: any[];
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<HandlerReferenceBox>): IsoBoxWriteView;
-}
-
-// @public
-export class hev1 implements Fields<VisualSampleEntryBox<"hev1">> {
-    constructor(dataReferenceIndex: number, compressorName: number[], config: Uint8Array, depth: number, frameCount: number, height: number, horizresolution: number, preDefined1: number, preDefined2: number[], preDefined3: number, reserved1: number[], reserved2: number, reserved3: number, vertresolution: number, width: number);
-    // (undocumented)
-    compressorName: number[];
-    // (undocumented)
-    config: Uint8Array;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    depth: number;
-    // (undocumented)
-    frameCount: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    horizresolution: number;
-    // (undocumented)
-    preDefined1: number;
-    // (undocumented)
-    preDefined2: number[];
-    // (undocumented)
-    preDefined3: number;
-    static read(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"hev1">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number;
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    vertresolution: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<VisualSampleEntryBox<"hev1">>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type hdlr = HandlerReferenceBox;
 
 // @public
 export type HintMediaHeaderBox = FullBox & {
@@ -596,69 +253,30 @@ export type HintMediaHeaderBox = FullBox & {
     avgbitrate: number;
 };
 
-// @public
-export class hvc1 implements Fields<VisualSampleEntryBox<"hvc1">> {
-    constructor(dataReferenceIndex: number, compressorName: number[], config: Uint8Array, depth: number, frameCount: number, height: number, horizresolution: number, preDefined1: number, preDefined2: number[], preDefined3: number, reserved1: number[], reserved2: number, reserved3: number, vertresolution: number, width: number);
-    // (undocumented)
-    compressorName: number[];
-    // (undocumented)
-    config: Uint8Array;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    depth: number;
-    // (undocumented)
-    frameCount: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    horizresolution: number;
-    // (undocumented)
-    preDefined1: number;
-    // (undocumented)
-    preDefined2: number[];
-    // (undocumented)
-    preDefined3: number;
-    static read(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"hvc1">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number;
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    vertresolution: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<VisualSampleEntryBox<"hvc1">>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type hmhd = HintMediaHeaderBox;
+
+// @public (undocumented)
+export type iden = WebVttCueIdBox;
 
 // @public
-export class iden implements Fields<WebVttCueIdBox> {
-    constructor(cueId: string);
-    // (undocumented)
-    cueId: string;
-    static read(view: IsoBoxReadView): Fields<WebVttCueIdBox>;
-    static write(fields: Fields<WebVttCueIdBox>): IsoBoxWriteView;
-}
-
-// @public
-export type IdentifiedMediaDataBox = Box & {
+export type IdentifiedMediaDataBox = {
     type: "imda";
     imdaIdentifier: number;
     data: Uint8Array;
 };
 
-// @public
-export class imda implements Fields<IdentifiedMediaDataBox> {
-    constructor(data: Uint8Array, imdaIdentifier: number);
-    // (undocumented)
-    data: Uint8Array;
-    // (undocumented)
-    imdaIdentifier: number;
-    static read(view: IsoBoxReadView): Fields<IdentifiedMediaDataBox>;
-    static write(fields: Fields<IdentifiedMediaDataBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type iinf = ItemInfoBox;
+
+// @public (undocumented)
+export type iloc = ItemLocationBox;
+
+// @public (undocumented)
+export type imda = IdentifiedMediaDataBox;
+
+// @public (undocumented)
+export type imif = IpmpInfoBox;
 
 // @public
 export const INT = "int";
@@ -669,17 +287,29 @@ export type IpmpInfoBox = FullBox & {
     ipmpDescr: any[];
 };
 
-// @public
-export function isContainer(box: Box | ContainerBox<any>): box is ContainerBox<any>;
+// @public (undocumented)
+export type ipro = ItemProtectionBox;
+
+// @public (undocumented)
+export type iref = ItemReferenceBox;
 
 // @public
-export function isFullBox(box: Box): box is FullBox;
+export function isContainer(box: any): box is ContainerBox<IsoBox>;
 
 // @public
-export type IsoBmffBox = IsoBox | IsoContainerBox;
+export function isFullBox(box: any): box is FullBox;
 
 // @public
-export type IsoBmffBoxMap = {
+export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
+
+// @public
+export type IsoBoxData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
+
+// @public
+export type IsoBoxFilter<T$1 extends IsoBox> = ((box: IsoBox) => boolean) | ((box: IsoBox) => box is T$1);
+
+// @public
+export type IsoBoxMap = {
     ardi: AudioRenderingIndicationBox;
     avc1: VisualSampleEntryBox<"avc1">;
     avc2: VisualSampleEntryBox<"avc2">;
@@ -778,17 +408,6 @@ export type IsoBmffBoxMap = {
     vtte: WebVttEmptySampleBox;
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "IsoBox" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
-//
-// @public
-export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox<"enca"> | AudioSampleEntryBox<"mp4a"> | ChunkLargeOffsetBox | ChunkOffsetBox | CompactSampleSizeBox | CompositionTimeToSampleBox | DataEntryUrlBox | DataEntryUrnBox | DataReferenceBox | DecodingTimeToSampleBox | DegradationPriorityBox | EditListBox | EventMessageBox | ExtendedLanguageBox | FileTypeBox | FreeSpaceBox<"free"> | FreeSpaceBox<"skip"> | HandlerReferenceBox | HintMediaHeaderBox | IdentifiedMediaDataBox | IpmpInfoBox | ItemInfoEntry | ItemLocationBox | LabelBox | MediaDataBox | MediaHeaderBox | MovieExtendsHeaderBox | MovieFragmentHeaderBox | MovieFragmentRandomAccessOffsetBox | MovieHeaderBox | NullMediaHeaderBox | OriginalFormatBox | PrimaryItemBox | PreselectionGroupBox | ProducerReferenceTimeBox | ProtectionSystemSpecificHeaderBox | SampleAuxiliaryInformationOffsetsBox | SampleAuxiliaryInformationSizesBox | SampleDependencyTypeBox | SampleDescriptionBox | SampleEncryptionBox | SampleGroupDescriptionBox | SampleSizeBox | SampleToChunkBox | SampleToGroupBox | SchemeTypeBox | SegmentIndexBox | SegmentTypeBox | ShadowSyncSampleBox | SingleItemTypeReferenceBox | SoundMediaHeaderBox | SubsampleInformationBox | SubsegmentIndexBox | SubtitleMediaHeaderBox | SyncSampleBox | TrackEncryptionBox | TrackExtendsBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentHeaderBox | TrackFragmentRandomAccessBox | TrackHeaderBox | TrackKindBox | TrackRunBox | UrlBox | UrnBox | VideoMediaHeaderBox | VisualSampleEntryBox<"avc1"> | VisualSampleEntryBox<"avc2"> | VisualSampleEntryBox<"avc3"> | VisualSampleEntryBox<"avc4"> | VisualSampleEntryBox<"encv"> | VisualSampleEntryBox<"hev1"> | VisualSampleEntryBox<"hvc1"> | WebVttConfigurationBox | WebVttCueIdBox | WebVttCuePayloadBox | WebVttEmptySampleBox | WebVttSettingsBox | WebVttSourceLabelBox;
-
-// @public
-export type IsoBoxData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
-
-// @public
-export type IsoBoxFilter<T$1 extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T$1);
-
 // @public
 export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
     constructor(boxes: IsoBoxStreamable[], config?: IsoBoxReadableStreamConfig);
@@ -800,16 +419,14 @@ export type IsoBoxReadableStreamConfig = {
 };
 
 // @public
-export type IsoBoxReader<B extends IsoBox = IsoBox> = {
-    read: (view: IsoBoxReadView, config?: IsoBoxReadViewConfig) => Fields<B>;
-};
+export type IsoBoxReader<B extends IsoBox> = (view: IsoBoxReadView, config?: IsoBoxReadViewConfig) => Fields<B>;
 
 // @public
-export type IsoBoxReaderMap = Record<string, IsoBoxReader>;
+export type IsoBoxReaderMap = Partial<{ [P in IsoBox["type"]]: IsoBoxReader<Extract<IsoBox, Record<"type", P>>> }>;
 
 // @public
 export class IsoBoxReadView {
-    [Symbol.iterator](): Generator<IsoBmffBox>;
+    [Symbol.iterator](): Generator<IsoBox & Box>;
     constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig);
     get buffer(): ArrayBuffer;
     get byteLength(): number;
@@ -820,7 +437,7 @@ export class IsoBoxReadView {
     jump: (size: number) => void;
     readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
     readBox: () => Box;
-    readBoxes: <T = IsoBmffBox>(length: number) => T[];
+    readBoxes: <T = IsoBox>(length: number) => T[];
     readData: (size: number) => Uint8Array<ArrayBuffer>;
     readEntries: <T>(length: number, map: () => T) => T[];
     readFullBox: () => Fields<FullBox>;
@@ -839,15 +456,13 @@ export type IsoBoxReadViewConfig = {
 };
 
 // @public
-export type IsoBoxStreamable = Box | ArrayBufferView;
+export type IsoBoxStreamable = IsoBox | Box | ArrayBufferView;
 
 // @public
-export type IsoBoxWriter<B extends IsoBox> = {
-    write: (box: Fields<B>) => IsoBoxWriteView;
-};
+export type IsoBoxWriter<B> = (box: Fields<B>) => IsoBoxWriteView;
 
 // @public
-export type IsoBoxWriterMap = Record<string, IsoBoxWriter<IsoBox>>;
+export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
 
 // @public
 export class IsoBoxWriteView {
@@ -856,7 +471,7 @@ export class IsoBoxWriteView {
     get byteLength(): number;
     get byteOffset(): number;
     writeArray: <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number) => void;
-    writeBoxHeader: (type: string, size: number, largesize?: number) => void;
+    writeBoxHeader: (type: string, size: number) => void;
     writeBytes: (data: Uint8Array) => void;
     writeFullBox(version: number, flags: number): void;
     writeInt: (value: number, size: number) => void;
@@ -866,9 +481,6 @@ export class IsoBoxWriteView {
     writeUint: (value: number, size: number) => void;
     writeUtf8TerminatedString: (value: string) => void;
 }
-
-// @public
-export type IsoContainerBox = DataInformationBox | EditBox | ItemInfoBox | ItemProtectionBox | ItemReferenceBox | MediaBox | MediaInformationBox | MetaBox | MovieBox | MovieExtendsBox | MovieFragmentBox | MovieFragmentRandomAccessBox | ProtectionSchemeInformationBox | SampleTableBox | SchemeInformationBox | TrackBox | TrackFragmentBox | TrackReferenceBox | UserDataBox;
 
 // @public
 export type IsoFieldTypeMap = {
@@ -936,20 +548,8 @@ export type ItemReferenceBox = ContainerBox<SingleItemTypeReferenceBox> & {
     type: "iref";
 };
 
-// @public
-export class kind implements Fields<TrackKindBox> {
-    constructor(version: number, flags: number, schemeUri: string, value: string);
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<TrackKindBox>;
-    // (undocumented)
-    schemeUri: string;
-    // (undocumented)
-    value: string;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<TrackKindBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type kind = TrackKindBox;
 
 // @public
 export type LabelBox = FullBox & {
@@ -960,56 +560,17 @@ export type LabelBox = FullBox & {
     label: string;
 };
 
-// @public
-export class labl implements Fields<LabelBox> {
-    constructor(version: number, flags: number, isGroupLabel: any, label: string, labelId: number, language: string);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    isGroupLabel: any;
-    // (undocumented)
-    label: string;
-    // (undocumented)
-    labelId: number;
-    // (undocumented)
-    language: string;
-    static read(view: IsoBoxReadView): Fields<LabelBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<LabelBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type labl = LabelBox;
 
-// @public
-export class mdat implements Fields<MediaDataBox> {
-    constructor(data: any);
-    // (undocumented)
-    data: any;
-    static read(view: IsoBoxReadView): Fields<MediaDataBox>;
-    static write(fields: Fields<MediaDataBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type mdat = MediaDataBox;
 
-// @public
-export class mdhd implements Fields<MediaHeaderBox> {
-    constructor(version: number, flags: number, creationTime: number, duration: number, language: string, modificationTime: number, preDefined: number, timescale: number);
-    // (undocumented)
-    creationTime: number;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    language: string;
-    // (undocumented)
-    modificationTime: number;
-    // (undocumented)
-    preDefined: number;
-    static read(view: IsoBoxReadView): Fields<MediaHeaderBox>;
-    // (undocumented)
-    timescale: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<MediaHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type mdhd = MediaHeaderBox;
+
+// @public (undocumented)
+export type mdia = MediaBox;
 
 // @public
 export type MediaBox = ContainerBox<MediaHeaderBox | HandlerReferenceBox | MediaInformationBox> & {
@@ -1017,7 +578,7 @@ export type MediaBox = ContainerBox<MediaHeaderBox | HandlerReferenceBox | Media
 };
 
 // @public
-export type MediaDataBox = Box & {
+export type MediaDataBox = {
     type: "mdat";
     data: Uint8Array<ArrayBuffer>;
 };
@@ -1034,64 +595,38 @@ export type MediaHeaderBox = FullBox & {
 };
 
 // @public
-export type MediaInformationBox = ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox> & {
+export type MediaInformationBox = ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox | SubtitleMediaHeaderBox> & {
     type: "minf";
 };
 
-// @public
-export class mehd implements Fields<MovieExtendsHeaderBox> {
-    constructor(version: number, flags: number, fragmentDuration: number);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    fragmentDuration: number;
-    static read(view: IsoBoxReadView): Fields<MovieExtendsHeaderBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<MovieExtendsHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type mehd = MovieExtendsHeaderBox;
 
-// @public
-export class meta implements Fields<MetaBox> {
-    constructor(version: number, flags: number);
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<MetaBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<MetaBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type meta = MetaBox;
 
 // @public
 export type MetaBox = FullBox & ContainerBox<HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox> & {
     type: "meta";
 };
 
-// @public
-export class mfhd implements Fields<MovieFragmentHeaderBox> {
-    constructor(version: number, flags: number, sequenceNumber: number);
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<MovieFragmentHeaderBox>;
-    // (undocumented)
-    sequenceNumber: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<MovieFragmentHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type mfhd = MovieFragmentHeaderBox;
 
-// @public
-export class mfro implements Fields<MovieFragmentRandomAccessOffsetBox> {
-    constructor(version: number, flags: number, mfraSize: number);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    mfraSize: number;
-    static read(view: IsoBoxReadView): Fields<MovieFragmentRandomAccessOffsetBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<MovieFragmentRandomAccessOffsetBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type mfra = MovieFragmentRandomAccessBox;
+
+// @public (undocumented)
+export type mfro = MovieFragmentRandomAccessOffsetBox;
+
+// @public (undocumented)
+export type minf = MediaInformationBox;
+
+// @public (undocumented)
+export type moof = MovieFragmentBox;
+
+// @public (undocumented)
+export type moov = MovieBox;
 
 // @public
 export type MovieBox = ContainerBox<MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox> & {
@@ -1147,63 +682,14 @@ export type MovieHeaderBox = FullBox & {
     nextTrackId: number;
 };
 
-// @public
-export class mp4a implements Fields<AudioSampleEntryBox<"mp4a">> {
-    constructor(channelcount: number, esds: Uint8Array, preDefined: number, reserved1: number[], dataReferenceIndex: number, reserved2: number[], reserved3: number, samplerate: number, samplesize: number);
-    // (undocumented)
-    channelcount: number;
-    // (undocumented)
-    dataReferenceIndex: number;
-    // (undocumented)
-    esds: Uint8Array;
-    // (undocumented)
-    preDefined: number;
-    static read(view: IsoBoxReadView): Fields<AudioSampleEntryBox<"mp4a">>;
-    // (undocumented)
-    reserved1: number[];
-    // (undocumented)
-    reserved2: number[];
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    samplerate: number;
-    // (undocumented)
-    samplesize: number;
-    static write(fields: Fields<AudioSampleEntryBox<"mp4a">>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type mvex = MovieExtendsBox;
 
-// @public
-export class mvhd implements Fields<MovieHeaderBox> {
-    constructor(version: number, flags: number, creationTime: number, duration: number, matrix: number[], modificationTime: number, nextTrackId: number, preDefined: number[], rate: number, reserved1: number, reserved2: number[], timescale: number, volume: number);
-    // (undocumented)
-    creationTime: number;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    matrix: number[];
-    // (undocumented)
-    modificationTime: number;
-    // (undocumented)
-    nextTrackId: number;
-    // (undocumented)
-    preDefined: number[];
-    // (undocumented)
-    rate: number;
-    static read(view: IsoBoxReadView): Fields<MovieHeaderBox>;
-    // (undocumented)
-    reserved1: number;
-    // (undocumented)
-    reserved2: number[];
-    // (undocumented)
-    timescale: number;
-    // (undocumented)
-    version: number;
-    // (undocumented)
-    volume: number;
-    static write(fields: Fields<MovieHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type mvhd = MovieHeaderBox;
+
+// @public (undocumented)
+export type nmhd = NullMediaHeaderBox;
 
 // @public
 export type NullMediaHeaderBox = FullBox & {
@@ -1211,19 +697,16 @@ export type NullMediaHeaderBox = FullBox & {
 };
 
 // @public
-export type OriginalFormatBox = Box & {
+export type OriginalFormatBox = {
     type: "frma";
     dataFormat: number;
 };
 
-// @public
-export class payl implements Fields<WebVttCuePayloadBox> {
-    constructor(cueText: string);
-    // (undocumented)
-    cueText: string;
-    static read(view: IsoBoxReadView): Fields<WebVttCuePayloadBox>;
-    static write(fields: Fields<WebVttCuePayloadBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type payl = WebVttCuePayloadBox;
+
+// @public (undocumented)
+export type pitm = PrimaryItemBox;
 
 // @public
 export type PreselectionGroupBox = FullBox & {
@@ -1236,24 +719,8 @@ export type PreselectionGroupBox = FullBox & {
     interleavingTag?: string;
 };
 
-// @public
-export class prft implements Fields<ProducerReferenceTimeBox> {
-    constructor(version: number, flags: number, mediaTime: number, ntpTimestampFrac: number, ntpTimestampSec: number, referenceTrackId: number);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    mediaTime: number;
-    // (undocumented)
-    ntpTimestampFrac: number;
-    // (undocumented)
-    ntpTimestampSec: number;
-    static read(view: IsoBoxReadView): Fields<ProducerReferenceTimeBox>;
-    // (undocumented)
-    referenceTrackId: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<ProducerReferenceTimeBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type prft = ProducerReferenceTimeBox;
 
 // @public
 export type PrimaryItemBox = FullBox & {
@@ -1285,49 +752,11 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
     data: number[];
 };
 
-// @public
-export class prsl implements Fields<PreselectionGroupBox> {
-    constructor(version: number, flags: number, entities: Entity[], groupId: number, interleavingTag: string, numEntitiesInGroup: number, preselectionTag: string, selectionPriority: number);
-    // (undocumented)
-    entities: Entity[];
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    groupId: number;
-    // (undocumented)
-    interleavingTag?: string;
-    // (undocumented)
-    numEntitiesInGroup: number;
-    // (undocumented)
-    preselectionTag?: string;
-    static read(view: IsoBoxReadView): Fields<PreselectionGroupBox>;
-    // (undocumented)
-    selectionPriority?: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<PreselectionGroupBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type prsl = PreselectionGroupBox;
 
-// @public
-export class pssh implements Fields<ProtectionSystemSpecificHeaderBox> {
-    constructor(version: number, flags: number, data: number[], dataSize: number, kid: number[], kidCount: number, systemId: number[]);
-    // (undocumented)
-    data: number[];
-    // (undocumented)
-    dataSize: number;
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    kid: number[];
-    // (undocumented)
-    kidCount: number;
-    static read(view: IsoBoxReadView): Fields<ProtectionSystemSpecificHeaderBox>;
-    // (undocumented)
-    systemId: number[];
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<ProtectionSystemSpecificHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type pssh = ProtectionSystemSpecificHeaderBox;
 
 // @public
 export function readArdi(view: IsoBoxReadView): Fields<AudioRenderingIndicationBox>;
@@ -1390,7 +819,7 @@ export function readIden(view: IsoBoxReadView): Fields<WebVttCueIdBox>;
 export function readImda(view: IsoBoxReadView): Fields<IdentifiedMediaDataBox>;
 
 // @public
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): IsoBmffBox[];
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): IsoBox[];
 
 // @public
 export function readKind(view: IsoBoxReadView): Fields<TrackKindBox>;
@@ -1495,10 +924,10 @@ export function readTrex(view: IsoBoxReadView): Fields<TrackExtendsBox>;
 export function readTrun(view: IsoBoxReadView): Fields<TrackRunBox>;
 
 // @public
-export function readUrl(view: IsoBoxReadView): Fields<UrlBox>;
+export function readUrl(view: IsoBoxReadView): Fields<DataEntryUrlBox>;
 
 // @public
-export function readUrn(view: IsoBoxReadView): Fields<UrnBox>;
+export function readUrn(view: IsoBoxReadView): Fields<DataEntryUrnBox>;
 
 // @public
 export function readVlab(view: IsoBoxReadView): Fields<WebVttSourceLabelBox>;
@@ -1511,6 +940,12 @@ export function readVttC(view: IsoBoxReadView): Fields<WebVttConfigurationBox>;
 
 // @public
 export function readVtte(_: IsoBoxReadView): Fields<WebVttEmptySampleBox>;
+
+// @public (undocumented)
+export type saio = SampleAuxiliaryInformationOffsetsBox;
+
+// @public (undocumented)
+export type saiz = SampleAuxiliaryInformationSizesBox;
 
 // @public
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
@@ -1552,7 +987,7 @@ export type SampleEncryptionBox = FullBox & {
 };
 
 // @public
-export type SampleEntryBox = Box & {
+export type SampleEntryBox = {
     reserved1: number[];
     dataReferenceIndex: number;
 };
@@ -1610,6 +1045,9 @@ export type SampleToGroupEntry = {
     groupDescriptionIndex: number;
 };
 
+// @public (undocumented)
+export type sbgp = SampleToGroupBox;
+
 // @public
 export type SchemeInformationBox = ContainerBox<TrackEncryptionBox | Box> & {
     type: "schi";
@@ -1623,35 +1061,14 @@ export type SchemeTypeBox = FullBox & {
     schemeUri?: string;
 };
 
-// @public
-export class schm implements Fields<SchemeTypeBox> {
-    constructor(version: number, flags: number, schemeType: number, schemeVersion: number, schemeUri?: string);
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SchemeTypeBox>;
-    // (undocumented)
-    schemeType: number;
-    // (undocumented)
-    schemeUri?: string;
-    // (undocumented)
-    schemeVersion: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SchemeTypeBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type schi = SchemeInformationBox;
 
-// @public
-export class sdtp implements Fields<SampleDependencyTypeBox> {
-    constructor(version: number, flags: number, sampleDependencyTable: number[]);
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SampleDependencyTypeBox>;
-    // (undocumented)
-    sampleDependencyTable: number[];
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SampleDependencyTypeBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type schm = SchemeTypeBox;
+
+// @public (undocumented)
+export type sdtp = SampleDependencyTypeBox;
 
 // @public
 export type SegmentIndexBox = FullBox & {
@@ -1679,6 +1096,12 @@ export type SegmentIndexReference = {
 // @public
 export type SegmentTypeBox = TypeBox<"styp">;
 
+// @public (undocumented)
+export type senc = SampleEncryptionBox;
+
+// @public (undocumented)
+export type sgpd = SampleGroupDescriptionBox;
+
 // @public
 export type ShadowSyncEntry = {
     shadowedSampleNumber: number;
@@ -1692,59 +1115,21 @@ export type ShadowSyncSampleBox = FullBox & {
     entries: ShadowSyncEntry[];
 };
 
-// @public
-export class sidx implements Fields<SegmentIndexBox> {
-    constructor(version: number, flags: number, earliestPresentationTime: number, firstOffset: number, referenceId: number, references: any[], reserved: number, timescale: number);
-    // (undocumented)
-    earliestPresentationTime: number;
-    // (undocumented)
-    firstOffset: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SegmentIndexBox>;
-    // (undocumented)
-    referenceId: number;
-    // (undocumented)
-    references: any[];
-    // (undocumented)
-    reserved: number;
-    // (undocumented)
-    timescale: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SegmentIndexBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type sidx = SegmentIndexBox;
+
+// @public (undocumented)
+export type sinf = ProtectionSchemeInformationBox;
 
 // @public
-export type SingleItemTypeReferenceBox = Box & {
+export type SingleItemTypeReferenceBox = {
     fromItemId: number;
     referenceCount: number;
     toItemId: number[];
 };
 
-// @public
-export class skip implements Fields<FreeSpaceBox<"skip">> {
-    constructor(data: Uint8Array);
-    // (undocumented)
-    data: Uint8Array;
-    static read(view: IsoBoxReadView): Fields<FreeSpaceBox<"skip">>;
-    static write(fields: Fields<FreeSpaceBox<"skip">>): IsoBoxWriteView;
-}
-
-// @public
-export class smhd implements Fields<SoundMediaHeaderBox> {
-    constructor(version: number, flags: number, balance: number, reserved: number);
-    // (undocumented)
-    balance: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SoundMediaHeaderBox>;
-    // (undocumented)
-    reserved: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SoundMediaHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type smhd = SoundMediaHeaderBox;
 
 // @public
 export type SoundMediaHeaderBox = FullBox & {
@@ -1753,101 +1138,52 @@ export type SoundMediaHeaderBox = FullBox & {
     reserved: number;
 };
 
-// @public
-export class ssix implements Fields<SubsegmentIndexBox> {
-    constructor(version: number, flags: number, subsegmentCount: number, subsegments: Subsegment[]);
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SubsegmentIndexBox>;
-    // (undocumented)
-    subsegmentCount: number;
-    // (undocumented)
-    subsegments: Subsegment[];
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SubsegmentIndexBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type ssix = SubsegmentIndexBox;
 
-// @public
-export class sthd implements Fields<SubtitleMediaHeaderBox> {
-    constructor(version: number, flags: number);
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SubtitleMediaHeaderBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SubtitleMediaHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type stbl = SampleTableBox;
+
+// Warning: (ae-incompatible-release-tags) The symbol "stco" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
+//
+// @public (undocumented)
+export type stco = ChunkOffsetBox;
+
+// @public (undocumented)
+export type stdp = DegradationPriorityBox;
+
+// @public (undocumented)
+export type sthd = SubtitleMediaHeaderBox;
 
 // @public
 export const STRING = "string";
 
-// @public
-export class stss implements Fields<SyncSampleBox> {
-    constructor(version: number, flags: number, entries: SyncSample[], entryCount: number);
-    // (undocumented)
-    entries: SyncSample[];
-    // (undocumented)
-    entryCount: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SyncSampleBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SyncSampleBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type stsc = SampleToChunkBox;
 
-// @public
-export class sttg implements Fields<WebVttSettingsBox> {
-    constructor(settings: string);
-    static read(view: IsoBoxReadView): Fields<WebVttSettingsBox>;
-    // (undocumented)
-    settings: string;
-    static write(fields: Fields<WebVttSettingsBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type stsd = SampleDescriptionBox;
 
-// @public
-export class stts implements Fields<DecodingTimeToSampleBox> {
-    constructor(version: number, flags: number, entries: DecodingTimeSample[], entryCount: number);
-    // (undocumented)
-    entries: DecodingTimeSample[];
-    // (undocumented)
-    entryCount: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<DecodingTimeToSampleBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<DecodingTimeToSampleBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type stsh = ShadowSyncSampleBox;
 
-// @public
-export class styp implements Fields<SegmentTypeBox> {
-    constructor(majorBrand: string, minorVersion: number, compatibleBrands: string[]);
-    // (undocumented)
-    compatibleBrands: string[];
-    // (undocumented)
-    majorBrand: string;
-    // (undocumented)
-    minorVersion: number;
-    static read(view: IsoBoxReadView): Fields<SegmentTypeBox>;
-    static write(fields: Fields<SegmentTypeBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type stss = SyncSampleBox;
 
-// @public
-export class subs implements Fields<SubsampleInformationBox> {
-    constructor(version: number, flags: number, entries: any[], entryCount: number);
-    // (undocumented)
-    entries: any[];
-    // (undocumented)
-    entryCount: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<SubsampleInformationBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<SubsampleInformationBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type stsz = SampleSizeBox;
+
+// @public (undocumented)
+export type sttg = WebVttSettingsBox;
+
+// @public (undocumented)
+export type stts = DecodingTimeToSampleBox;
+
+// @public (undocumented)
+export type stz2 = CompactSampleSizeBox;
+
+// @public (undocumented)
+export type subs = SubsampleInformationBox;
 
 // @public
 export type Subsample = {
@@ -1916,120 +1252,20 @@ export type SyncSampleBox = FullBox & {
 // @public
 export const TEMPLATE = "template";
 
-// @public
-export class tenc implements Fields<TrackEncryptionBox> {
-    constructor(version: number, flags: number, defaultIsEncrypted: number, defaultIvSize: number, defaultKid: any[]);
-    // (undocumented)
-    defaultIsEncrypted: number;
-    // (undocumented)
-    defaultIvSize: number;
-    // (undocumented)
-    defaultKid: any[];
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<TrackEncryptionBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<TrackEncryptionBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type tenc = TrackEncryptionBox;
 
-// @public
-export class tfdt implements Fields<TrackFragmentBaseMediaDecodeTimeBox> {
-    constructor(version: number, flags: number, baseMediaDecodeTime: number);
-    // (undocumented)
-    baseMediaDecodeTime: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<TrackFragmentBaseMediaDecodeTimeBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<TrackFragmentBaseMediaDecodeTimeBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type tfdt = TrackFragmentBaseMediaDecodeTimeBox;
 
-// @public
-export class tfhd implements Fields<TrackFragmentHeaderBox> {
-    constructor(version: number, flags: number, baseDataOffset: any, defaultSampleDuration: any, defaultSampleFlags: any, defaultSampleSize: any, sampleDescriptionIndex: any, trackId: number);
-    // (undocumented)
-    baseDataOffset: any;
-    // (undocumented)
-    defaultSampleDuration: any;
-    // (undocumented)
-    defaultSampleFlags: any;
-    // (undocumented)
-    defaultSampleSize: any;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<TrackFragmentHeaderBox>;
-    // (undocumented)
-    sampleDescriptionIndex: any;
-    // (undocumented)
-    trackId: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<TrackFragmentHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type tfhd = TrackFragmentHeaderBox;
 
-// @public
-export class tfra implements Fields<TrackFragmentRandomAccessBox> {
-    constructor(version: number, flags: number, trackId: number, reserved: number, numberOfEntry: number, lengthSizeOfTrafNum: number, lengthSizeOfTrunNum: number, lengthSizeOfSampleNum: number, entries: any[]);
-    // (undocumented)
-    entries: any[];
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    lengthSizeOfSampleNum: number;
-    // (undocumented)
-    lengthSizeOfTrafNum: number;
-    // (undocumented)
-    lengthSizeOfTrunNum: number;
-    // (undocumented)
-    numberOfEntry: number;
-    static read(view: IsoBoxReadView): Fields<TrackFragmentRandomAccessBox>;
-    // (undocumented)
-    reserved: number;
-    // (undocumented)
-    trackId: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<TrackFragmentRandomAccessBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type tfra = TrackFragmentRandomAccessBox;
 
-// @public
-export class tkhd implements Fields<TrackHeaderBox> {
-    constructor(version: number, flags: number, alternateGroup: number, creationTime: number, duration: number, height: number, layer: number, matrix: any[], modificationTime: number, reserved1: number, reserved2: any[], reserved3: number, trackId: number, volume: number, width: number);
-    // (undocumented)
-    alternateGroup: number;
-    // (undocumented)
-    creationTime: number;
-    // (undocumented)
-    duration: number;
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    layer: number;
-    // (undocumented)
-    matrix: any[];
-    // (undocumented)
-    modificationTime: number;
-    static read(view: IsoBoxReadView): Fields<TrackHeaderBox>;
-    // (undocumented)
-    reserved1: number;
-    // (undocumented)
-    reserved2: any[];
-    // (undocumented)
-    reserved3: number;
-    // (undocumented)
-    trackId: number;
-    // (undocumented)
-    version: number;
-    // (undocumented)
-    volume: number;
-    // (undocumented)
-    width: number;
-    static write(fields: Fields<TrackHeaderBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type tkhd = TrackHeaderBox;
 
 // @public
 export type TrackBox = ContainerBox<TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox> & {
@@ -2128,7 +1364,7 @@ export type TrackReferenceBox = ContainerBox<TrackReferenceTypeBox> & {
 };
 
 // @public
-export type TrackReferenceTypeBox = Box & {
+export type TrackReferenceTypeBox = {
     type: "tref";
     trackIds: number[];
 };
@@ -2150,97 +1386,40 @@ export type TrackRunSample = {
     sampleCompositionTimeOffset?: number;
 };
 
-// @public
-export class trex implements Fields<TrackExtendsBox> {
-    constructor(version: number, flags: number, defaultSampleDescriptionIndex: number, defaultSampleDuration: number, defaultSampleFlags: number, defaultSampleSize: number, trackId: number);
-    // (undocumented)
-    defaultSampleDescriptionIndex: number;
-    // (undocumented)
-    defaultSampleDuration: number;
-    // (undocumented)
-    defaultSampleFlags: number;
-    // (undocumented)
-    defaultSampleSize: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<TrackExtendsBox>;
-    // (undocumented)
-    trackId: number;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<TrackExtendsBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type traf = TrackFragmentBox;
+
+// @public (undocumented)
+export type trak = TrackBox;
+
+// @public (undocumented)
+export type tref = TrackReferenceBox;
+
+// @public (undocumented)
+export type trex = TrackExtendsBox;
+
+// @public (undocumented)
+export type trun = TrackRunBox;
 
 // @public
-export class trun implements Fields<TrackRunBox> {
-    constructor(version: number, flags: number, sampleCount: number, samples: any[], dataOffset?: number, firstSampleFlags?: number);
-    // (undocumented)
-    dataOffset?: number;
-    // (undocumented)
-    firstSampleFlags?: number;
-    // (undocumented)
-    flags: number;
-    static read(view: IsoBoxReadView): Fields<TrackRunBox>;
-    // (undocumented)
-    sampleCount: number;
-    // (undocumented)
-    samples: any[];
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<TrackRunBox>): IsoBoxWriteView;
-}
-
-// @public
-export type TypeBox<T$1> = Box & {
+export type TypeBox<T$1> = {
     type: T$1;
     majorBrand: string;
     minorVersion: number;
     compatibleBrands: string[];
 };
 
+// @public (undocumented)
+export type udta = UserDataBox;
+
 // @public
 export const UINT = "uint";
 
-// @public
-export class url implements Fields<UrlBox> {
-    constructor(version: number, flags: number, location: string);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    location: string;
-    static read(view: IsoBoxReadView): Fields<UrlBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<UrlBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type url = DataEntryUrlBox;
 
-// @public
-export type UrlBox = FullBox & {
-    type: "url";
-    location: string;
-};
-
-// @public
-export class urn implements Fields<UrnBox> {
-    constructor(version: number, flags: number, location: string, name: string);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    location: string;
-    // (undocumented)
-    name: string;
-    static read(view: IsoBoxReadView): Fields<UrnBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<UrnBox>): IsoBoxWriteView;
-}
-
-// @public
-export type UrnBox = FullBox & {
-    type: "urn";
-    name: string;
-    location: string;
-};
+// @public (undocumented)
+export type urn = DataEntryUrnBox;
 
 // @public
 export type UserDataBox = ContainerBox<Box> & {
@@ -2278,77 +1457,49 @@ export type VisualSampleEntryBox<T$1 extends VisualSampleEntryType> = SampleEntr
 // @public
 export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv";
 
-// @public
-export class vlab implements Fields<WebVttSourceLabelBox> {
-    constructor(sourceLabel: string);
-    static read(view: IsoBoxReadView): Fields<WebVttSourceLabelBox>;
-    // (undocumented)
-    sourceLabel: string;
-    static write(fields: Fields<WebVttSourceLabelBox>): IsoBoxWriteView;
-}
+// @public (undocumented)
+export type vlab = WebVttSourceLabelBox;
+
+// @public (undocumented)
+export type vmhd = VideoMediaHeaderBox;
+
+// @public (undocumented)
+export type vttC = WebVttConfigurationBox;
+
+// @public (undocumented)
+export type vtte = WebVttEmptySampleBox;
 
 // @public
-export class vmhd implements Fields<VideoMediaHeaderBox> {
-    constructor(version: number, flags: number, graphicsmode: number, opcolor: number[]);
-    // (undocumented)
-    flags: number;
-    // (undocumented)
-    graphicsmode: number;
-    // (undocumented)
-    opcolor: number[];
-    static read(view: IsoBoxReadView): Fields<VideoMediaHeaderBox>;
-    // (undocumented)
-    version: number;
-    static write(fields: Fields<VideoMediaHeaderBox>): IsoBoxWriteView;
-}
-
-// @public
-export class vttC implements Fields<WebVttConfigurationBox> {
-    constructor(config: string);
-    // (undocumented)
-    config: string;
-    static read(view: IsoBoxReadView): Fields<WebVttConfigurationBox>;
-    static write(fields: Fields<WebVttConfigurationBox>): IsoBoxWriteView;
-}
-
-// @public
-export class vtte implements Fields<WebVttEmptySampleBox> {
-    constructor();
-    static read(_: IsoBoxReadView): Fields<WebVttEmptySampleBox>;
-    static write(_: Fields<WebVttEmptySampleBox>): IsoBoxWriteView;
-}
-
-// @public
-export type WebVttConfigurationBox = Box & {
+export type WebVttConfigurationBox = {
     type: "vttC";
     config: string;
 };
 
 // @public
-export type WebVttCueIdBox = Box & {
+export type WebVttCueIdBox = {
     type: "iden";
     cueId: string;
 };
 
 // @public
-export type WebVttCuePayloadBox = Box & {
+export type WebVttCuePayloadBox = {
     type: "payl";
     cueText: string;
 };
 
 // @public
-export type WebVttEmptySampleBox = Box & {
+export type WebVttEmptySampleBox = {
     type: "vtte";
 };
 
 // @public
-export type WebVttSettingsBox = Box & {
+export type WebVttSettingsBox = {
     type: "sttg";
     settings: string;
 };
 
 // @public
-export type WebVttSourceLabelBox = Box & {
+export type WebVttSourceLabelBox = {
     type: "vlab";
     sourceLabel: string;
 };
@@ -2369,7 +1520,7 @@ export function writeAvc3(box: Fields<VisualSampleEntryBox<"avc3">>): IsoBoxWrit
 export function writeAvc4(box: Fields<VisualSampleEntryBox<"avc4">>): IsoBoxWriteView;
 
 // @public
-export function writeContainerBox<T$1 extends Box>(box: ContainerBox<T$1> & Pick<Box, "type" | "largesize">): IsoBoxWriteView;
+export function writeContainerBox<T$1 extends IsoBox>(box: ContainerBox<T$1>, writers: IsoBoxWriterMap): IsoBoxWriteView;
 
 // @public
 export function writeCtts(box: Fields<CompositionTimeToSampleBox>): IsoBoxWriteView;
@@ -2519,10 +1670,10 @@ export function writeTrex(box: Fields<TrackExtendsBox>): IsoBoxWriteView;
 export function writeTrun(box: Fields<TrackRunBox>): IsoBoxWriteView;
 
 // @public
-export function writeUrl(box: Fields<UrlBox>): IsoBoxWriteView;
+export function writeUrl(box: Fields<DataEntryUrlBox>): IsoBoxWriteView;
 
 // @public
-export function writeUrn(box: Fields<UrnBox>): IsoBoxWriteView;
+export function writeUrn(box: Fields<DataEntryUrnBox>): IsoBoxWriteView;
 
 // @public
 export function writeVisualSampleEntryBox<T$1 extends VisualSampleEntryType>(box: Fields<VisualSampleEntryBox<T$1>>, type: T$1): IsoBoxWriteView;
@@ -2541,7 +1692,7 @@ export function writeVtte(_: Fields<WebVttEmptySampleBox>): IsoBoxWriteView;
 
 // Warnings were encountered during analysis:
 //
-// src/boxes/types/EditListBox.ts:9:1 - (ae-incompatible-release-tags) The symbol "stco" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
+// src/boxes/IdentifiedMediaDataBox.ts:15:1 - (ae-incompatible-release-tags) The symbol "stco" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
 
 // (No @packageDocumentation comment for this package)
 

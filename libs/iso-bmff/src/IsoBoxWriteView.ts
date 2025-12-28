@@ -212,11 +212,12 @@ export class IsoBoxWriteView {
 	 * @param size - The size, in bytes, of the box.
 	 * @param largesize - The size, in bytes, of the large size.
 	 */
-	writeBoxHeader = (type: string, size: number, largesize?: number): void => {
-		if (largesize !== undefined) {
+	writeBoxHeader = (type: string, size: number): void => {
+		const isLarge = size > 0xffffffff
+		if (isLarge) {
 			this.writeUint(1, 4) // size = 1 indicates largesize follows
 			this.writeString(type)
-			this.writeUint(largesize, 8)
+			this.writeUint(size, 8)
 		} else {
 			this.writeUint(size, 4)
 			this.writeString(type)

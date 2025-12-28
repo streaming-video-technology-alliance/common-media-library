@@ -1,5 +1,5 @@
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { WebVttCuePayloadBox } from '../boxes/types/WebVttCuePayloadBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**

@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/types/Fields.ts'
-import type { TrackKindBox } from '../boxes/types/TrackKindBox.ts'
+import type { Fields } from '../boxes/Fields.ts'
+import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
