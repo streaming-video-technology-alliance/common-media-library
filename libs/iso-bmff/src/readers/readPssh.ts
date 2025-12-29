@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readPssh(view: IsoBoxReadView): Fields<ProtectionSystemSpecificHeaderBox> {
+export function readPssh(view: IsoBoxReadView): ProtectionSystemSpecificHeaderBox {
 	const { readUint, readArray } = view
 	const { version, flags } = view.readFullBox()
 
@@ -30,6 +29,7 @@ export function readPssh(view: IsoBoxReadView): Fields<ProtectionSystemSpecificH
 	const data = readArray(UINT, 1, dataSize)
 
 	return {
+		type: 'pssh',
 		version,
 		flags,
 		systemId,

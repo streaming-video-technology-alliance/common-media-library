@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readVlab(view: IsoBoxReadView): Fields<WebVttSourceLabelBox> {
+export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox {
 	return {
+		type: 'vlab',
 		sourceLabel: view.readUtf8(-1),
 	}
 };

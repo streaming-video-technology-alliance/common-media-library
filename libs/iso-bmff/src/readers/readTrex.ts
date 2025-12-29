@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTrex(view: IsoBoxReadView): Fields<TrackExtendsBox> {
+export function readTrex(view: IsoBoxReadView): TrackExtendsBox {
 	return {
+		type: 'trex',
 		...view.readFullBox(),
 		trackId: view.readUint(4),
 		defaultSampleDescriptionIndex: view.readUint(4),

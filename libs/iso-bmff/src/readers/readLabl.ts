@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { LabelBox } from '../boxes/LabelBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,10 +10,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readLabl(view: IsoBoxReadView): Fields<LabelBox> {
+export function readLabl(view: IsoBoxReadView): LabelBox {
 	const { version, flags } = view.readFullBox()
 
 	return {
+		type: 'labl',
 		version,
 		flags,
 		isGroupLabel: (flags & 0x1) !== 0,

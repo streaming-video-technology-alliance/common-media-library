@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,7 +10,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMdhd(view: IsoBoxReadView): Fields<MediaHeaderBox> {
+export function readMdhd(view: IsoBoxReadView): MediaHeaderBox {
 	const { version, flags } = view.readFullBox()
 
 	const creationTime = view.readUint(version == 1 ? 8 : 4)
@@ -26,6 +25,7 @@ export function readMdhd(view: IsoBoxReadView): Fields<MediaHeaderBox> {
 	const preDefined = view.readUint(2)
 
 	return {
+		type: 'mdhd',
 		version,
 		flags,
 		creationTime,

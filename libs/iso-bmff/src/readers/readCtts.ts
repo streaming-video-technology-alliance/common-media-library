@@ -1,6 +1,5 @@
 import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.ts'
 import type { CompositionTimeToSampleEntry } from '../boxes/CompositionTimeToSampleEntry.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -12,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readCtts(view: IsoBoxReadView): Fields<CompositionTimeToSampleBox> {
+export function readCtts(view: IsoBoxReadView): CompositionTimeToSampleBox {
 	const { version, flags } = view.readFullBox()
 	const read = version === 1 ? view.readInt : view.readUint
 
@@ -23,6 +22,7 @@ export function readCtts(view: IsoBoxReadView): Fields<CompositionTimeToSampleBo
 	}))
 
 	return {
+		type: 'ctts',
 		version,
 		flags,
 		entryCount,

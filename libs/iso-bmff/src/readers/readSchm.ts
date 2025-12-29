@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,10 +10,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSchm(view: IsoBoxReadView): Fields<SchemeTypeBox> {
+export function readSchm(view: IsoBoxReadView): SchemeTypeBox {
 	const { version, flags } = view.readFullBox()
 
 	return {
+		type: 'schm',
 		version,
 		flags,
 		schemeType: view.readUint(4),

@@ -1,5 +1,4 @@
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 
 /**
@@ -11,7 +10,7 @@ import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
  *
  * @public
  */
-export function readSsix(view: IsoBoxReadView): Fields<SubsegmentIndexBox> {
+export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox {
 	const { version, flags } = view.readFullBox()
 	const subsegmentCount = view.readUint(4)
 	const subsegments = view.readEntries(subsegmentCount, () => {
@@ -24,6 +23,7 @@ export function readSsix(view: IsoBoxReadView): Fields<SubsegmentIndexBox> {
 	})
 
 	return {
+		type: 'ssix',
 		version,
 		flags,
 		subsegmentCount,

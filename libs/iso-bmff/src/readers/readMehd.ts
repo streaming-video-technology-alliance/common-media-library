@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,10 +10,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMehd(view: IsoBoxReadView): Fields<MovieExtendsHeaderBox> {
+export function readMehd(view: IsoBoxReadView): MovieExtendsHeaderBox {
 	const { version, flags } = view.readFullBox()
 
 	return {
+		type: 'mehd',
 		version,
 		flags,
 		fragmentDuration: view.readUint((version === 1) ? 8 : 4),

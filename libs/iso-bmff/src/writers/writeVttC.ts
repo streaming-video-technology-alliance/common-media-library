@@ -1,5 +1,4 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -12,7 +11,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeVttC(box: Fields<WebVttConfigurationBox>): IsoBoxWriteView {
+export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView {
 	const configBytes = encodeText(box.config)
 
 	const headerSize = 8

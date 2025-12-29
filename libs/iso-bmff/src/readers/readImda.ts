@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readImda(view: IsoBoxReadView): Fields<IdentifiedMediaDataBox> {
+export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox {
 	return {
+		type: 'imda',
 		imdaIdentifier: view.readUint(4),
 		data: view.readData(-1),
 	}

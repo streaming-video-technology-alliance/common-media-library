@@ -1,5 +1,4 @@
 import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readElng(view: IsoBoxReadView): Fields<ExtendedLanguageBox> {
+export function readElng(view: IsoBoxReadView): ExtendedLanguageBox {
 	return {
+		type: 'elng',
 		...view.readFullBox(),
 		extendedLanguage: view.readUtf8(-1),
 	}

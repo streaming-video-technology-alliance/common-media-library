@@ -1,8 +1,8 @@
-import { assert, describe, findBox, it, readEmsg, type EventMessageBox } from '../util/box.ts'
+import { assert, describe, findBox, it, readEmsg } from '../util/box.ts'
 
 describe('readEmsg', function () {
 	it('should correctly parse the box from sample data', function () {
-		const box = findBox<EventMessageBox>('emsg.m4s', [readEmsg])
+		const box = findBox('emsg.m4s', 'emsg', { emsg: readEmsg })
 
 		assert.strictEqual(box.type, 'emsg')
 		assert.strictEqual(box.size, 74)

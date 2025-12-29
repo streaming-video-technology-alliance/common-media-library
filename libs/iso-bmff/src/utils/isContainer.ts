@@ -1,5 +1,5 @@
 import type { ContainerBox } from '../boxes/ContainerBox.ts'
-import type { IsoBox } from '../boxes/IsoBox.ts'
+import type { ParsedBox } from '../ParsedBox.ts'
 import { CONTAINERS } from './CONTAINERS.ts'
 
 /**
@@ -11,6 +11,6 @@ import { CONTAINERS } from './CONTAINERS.ts'
  *
  * @public
  */
-export function isContainer(box: any): box is ContainerBox<IsoBox> {
+export function isContainer<T = ParsedBox>(box: any): box is ContainerBox<T> {
 	return 'boxes' in box || CONTAINERS.includes(box.type)
 }

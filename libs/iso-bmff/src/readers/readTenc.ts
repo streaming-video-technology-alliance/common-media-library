@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,8 +11,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTenc(view: IsoBoxReadView): Fields<TrackEncryptionBox> {
+export function readTenc(view: IsoBoxReadView): TrackEncryptionBox {
 	return {
+		type: 'tenc',
 		...view.readFullBox(),
 		defaultIsEncrypted: view.readUint(3),
 		defaultIvSize: view.readUint(1),

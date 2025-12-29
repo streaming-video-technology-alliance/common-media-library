@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -10,7 +9,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  * @public
  */
 // eslint-disable-next-line
-export function readVtte(_: IsoBoxReadView): Fields<WebVttEmptySampleBox> {
+export function readVtte(_: IsoBoxReadView): WebVttEmptySampleBox {
 	// Nothing should happen here.
-	return {}
+	return {
+		type: 'vtte',
+	}
 };

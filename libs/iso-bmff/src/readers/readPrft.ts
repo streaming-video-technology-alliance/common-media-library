@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,10 +10,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readPrft(view: IsoBoxReadView): Fields<ProducerReferenceTimeBox> {
+export function readPrft(view: IsoBoxReadView): ProducerReferenceTimeBox {
 	const { version, flags } = view.readFullBox()
 
 	return {
+		type: 'prft',
 		version,
 		flags,
 		referenceTrackId: view.readUint(4),

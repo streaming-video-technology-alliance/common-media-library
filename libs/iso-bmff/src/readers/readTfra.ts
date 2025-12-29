@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
 import type { TrackFragmentRandomAccessEntry } from '../boxes/TrackFragmentRandomAccessEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTfra(view: IsoBoxReadView): Fields<TrackFragmentRandomAccessBox> {
+export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox {
 	const { version, flags } = view.readFullBox()
 	const trackId = view.readUint(4)
 	const reserved = view.readUint(4)
@@ -32,6 +31,7 @@ export function readTfra(view: IsoBoxReadView): Fields<TrackFragmentRandomAccess
 	}))
 
 	return {
+		type: 'tfra',
 		version,
 		flags,
 		trackId,

@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readTrex } from '../util/box.ts'
 
 describe('readTrex', function () {
 	it('should correctly parse the box', function () {
-		const boxes = filterBoxes('test_frag.mp4', readTrex)
+		const boxes = filterBoxes('test_frag.mp4', 'trex', { trex: readTrex })
 
 		assert.strictEqual(boxes.length, 2)
 

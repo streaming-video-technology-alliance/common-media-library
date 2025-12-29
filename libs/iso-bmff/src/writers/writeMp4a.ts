@@ -1,5 +1,4 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -13,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMp4a(box: Fields<AudioSampleEntryBox<'mp4a'>>): IsoBoxWriteView {
+export function writeMp4a(box: AudioSampleEntryBox<'mp4a'>): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2

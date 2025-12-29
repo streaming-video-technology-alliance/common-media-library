@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSttg(view: IsoBoxReadView): Fields<WebVttSettingsBox> {
+export function readSttg(view: IsoBoxReadView): WebVttSettingsBox {
 	return {
+		type: 'sttg',
 		settings: view.readUtf8(-1),
 	}
 };

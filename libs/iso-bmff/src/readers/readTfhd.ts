@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,10 +10,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTfhd(view: IsoBoxReadView): Fields<TrackFragmentHeaderBox> {
+export function readTfhd(view: IsoBoxReadView): TrackFragmentHeaderBox {
 	const { version, flags } = view.readFullBox()
 
 	return {
+		type: 'tfhd',
 		version,
 		flags,
 		trackId: view.readUint(4),

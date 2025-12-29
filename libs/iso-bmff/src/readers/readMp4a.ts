@@ -1,5 +1,4 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -12,10 +11,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMp4a(view: IsoBoxReadView): Fields<AudioSampleEntryBox<'mp4a'>> {
+export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<'mp4a'> {
 	const { readArray, readUint, readTemplate, readData } = view
 
 	return {
+		type: 'mp4a',
 		reserved1: readArray(UINT, 1, 6),
 		dataReferenceIndex: readUint(2),
 		reserved2: readArray(UINT, 4, 2),

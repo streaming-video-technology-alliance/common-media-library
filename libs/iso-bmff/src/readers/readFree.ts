@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readFree(view: IsoBoxReadView): Fields<FreeSpaceBox> {
+export function readFree(view: IsoBoxReadView): FreeSpaceBox {
 	return {
+		type: 'free',
 		data: view.readData(-1),
 	}
 };

@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MediaDataBox } from '../boxes/MediaDataBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMdat(view: IsoBoxReadView): Fields<MediaDataBox> {
+export function readMdat(view: IsoBoxReadView): MediaDataBox {
 	return {
+		type: 'mdat',
 		data: view.readData(-1),
 	}
 };

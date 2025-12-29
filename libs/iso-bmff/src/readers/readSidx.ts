@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
 import type { SegmentIndexReference } from '../boxes/SegmentIndexReference.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSidx(view: IsoBoxReadView): Fields<SegmentIndexBox> {
+export function readSidx(view: IsoBoxReadView): SegmentIndexBox {
 	const { readUint } = view
 	const { version, flags } = view.readFullBox()
 	const v1 = version === 1
@@ -40,6 +39,7 @@ export function readSidx(view: IsoBoxReadView): Fields<SegmentIndexBox> {
 	})
 
 	return {
+		type: 'sidx',
 		version,
 		flags,
 		referenceId,

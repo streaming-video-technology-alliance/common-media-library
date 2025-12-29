@@ -1,5 +1,4 @@
 import type { Entity } from '../boxes/Entity.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -12,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readPrsl(view: IsoBoxReadView): Fields<PreselectionGroupBox> {
+export function readPrsl(view: IsoBoxReadView): PreselectionGroupBox {
 	const { version, flags } = view.readFullBox()
 	const groupId = view.readUint(4)
 	const numEntitiesInGroup = view.readUint(4)
@@ -24,6 +23,7 @@ export function readPrsl(view: IsoBoxReadView): Fields<PreselectionGroupBox> {
 	const interleavingTag = flags & 0x4000 ? view.readUtf8(-1) : undefined
 
 	return {
+		type: 'prsl',
 		version,
 		flags,
 		groupId,

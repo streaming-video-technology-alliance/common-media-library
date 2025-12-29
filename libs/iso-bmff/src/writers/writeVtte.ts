@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -10,7 +9,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 // eslint-disable-next-line
-export function writeVtte(_: Fields<WebVttEmptySampleBox>): IsoBoxWriteView {
+export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const totalSize = headerSize
 

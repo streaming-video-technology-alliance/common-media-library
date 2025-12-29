@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readDref, readUrl } from '../util/bo
 
 describe('readDref', function () {
 	it('should correctly parse the box from sample data', function () {
-		const boxes = filterBoxes<any>('captions.mp4', [readDref, readUrl])
+		const boxes = filterBoxes('captions.mp4', 'dref', { dref: readDref, 'url ': readUrl })
 		assert.strictEqual(boxes.length, 1)
 
 		const box = boxes[0]

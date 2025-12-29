@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSmhd(view: IsoBoxReadView): Fields<SoundMediaHeaderBox> {
+export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox {
 	return {
+		type: 'smhd',
 		...view.readFullBox(),
 		balance: view.readUint(2),
 		reserved: view.readUint(2),

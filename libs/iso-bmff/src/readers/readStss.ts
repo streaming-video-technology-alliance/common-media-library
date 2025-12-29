@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SyncSample } from '../boxes/SyncSample.ts'
 import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,11 +11,12 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readStss(view: IsoBoxReadView): Fields<SyncSampleBox> {
+export function readStss(view: IsoBoxReadView): SyncSampleBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 
 	return {
+		type: 'stss',
 		version,
 		flags,
 		entryCount,

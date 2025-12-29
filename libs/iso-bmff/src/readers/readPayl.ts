@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readPayl(view: IsoBoxReadView): Fields<WebVttCuePayloadBox> {
+export function readPayl(view: IsoBoxReadView): WebVttCuePayloadBox {
 	return {
+		type: 'payl',
 		cueText: view.readUtf8(-1),
 	}
 };

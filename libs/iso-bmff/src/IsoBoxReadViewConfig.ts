@@ -10,9 +10,4 @@ export type IsoBoxReadViewConfig = {
 	 * A map of box parsers to their box types
 	 */
 	readers?: IsoBoxReaderMap
-
-	/**
-	 * Whether to parse boxes recursively
-	 */
-	recursive?: boolean
 }

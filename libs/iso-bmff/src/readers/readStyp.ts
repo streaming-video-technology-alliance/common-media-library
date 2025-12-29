@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import { readFtyp } from './readFtyp.ts'
@@ -12,6 +11,9 @@ import { readFtyp } from './readFtyp.ts'
  *
  * @public
  */
-export function readStyp(view: IsoBoxReadView): Fields<SegmentTypeBox> {
-	return readFtyp(view)
+export function readStyp(view: IsoBoxReadView): SegmentTypeBox {
+	return {
+		...readFtyp(view),
+		type: 'styp',
+	}
 }

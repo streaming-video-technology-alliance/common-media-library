@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readMeta, readPrsl } from '../util/b
 
 describe('readPrsl', function () {
 	it('should correctly parse the readPrsl box from sample data', function () {
-		const boxes = filterBoxes<any>('SRMP_AC4.mp4', [readPrsl, readMeta])
+		const boxes = filterBoxes<any>('SRMP_AC4.mp4', 'prsl', { prsl: readPrsl, meta: readMeta })
 
 		assert.strictEqual(boxes.length, 6)
 		assert.strictEqual(boxes[1].type, 'prsl')

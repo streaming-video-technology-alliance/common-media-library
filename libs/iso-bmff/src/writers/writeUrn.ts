@@ -1,5 +1,4 @@
 import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -13,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeUrn(box: Fields<DataEntryUrnBox>): IsoBoxWriteView {
+export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const nameSize = box.name.length + 1 // null-terminated

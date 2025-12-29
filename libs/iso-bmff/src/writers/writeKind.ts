@@ -1,5 +1,4 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -12,7 +11,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeKind(box: Fields<TrackKindBox>): IsoBoxWriteView {
+export function writeKind(box: TrackKindBox): IsoBoxWriteView {
 	const schemeUriBytes = encodeText(box.schemeUri)
 	const valueBytes = encodeText(box.value)
 

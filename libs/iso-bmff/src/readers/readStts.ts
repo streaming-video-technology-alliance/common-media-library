@@ -1,5 +1,4 @@
 import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -11,7 +10,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readStts(view: IsoBoxReadView): Fields<DecodingTimeToSampleBox> {
+export function readStts(view: IsoBoxReadView): DecodingTimeToSampleBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 	const entries = view.readEntries(entryCount, () => ({
@@ -20,6 +19,7 @@ export function readStts(view: IsoBoxReadView): Fields<DecodingTimeToSampleBox> 
 	}))
 
 	return {
+		type: 'stts',
 		version,
 		flags,
 		entryCount,

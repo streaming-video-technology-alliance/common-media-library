@@ -1,8 +1,8 @@
-import { assert, describe, findBox, it, readMdhd, type MediaHeaderBox } from '../util/box.ts'
+import { assert, describe, findBox, it, readMdhd } from '../util/box.ts'
 
 describe('readMdhd', function () {
 	it('should correctly parse the box from sample data', function () {
-		const box = findBox<MediaHeaderBox>('captions.mp4', [readMdhd])
+		const box = findBox('captions.mp4', 'mdhd', { mdhd: readMdhd })
 
 		assert.strictEqual(box.creationTime, 3507186411)
 		assert.strictEqual(box.modificationTime, 3507186411)

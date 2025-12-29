@@ -1,8 +1,8 @@
-import { assert, readCtts, describe, filterBoxes, it } from '../util/box.ts'
+import { assert, describe, filterBoxes, it, readCtts } from '../util/box.ts'
 
 describe('readCtts', function () {
 	it('should correctly parse the box', function () {
-		const boxes = filterBoxes('time_to_sample.mp4', readCtts)
+		const boxes = filterBoxes('time_to_sample.mp4', 'ctts', { ctts: readCtts })
 		const box = boxes[0]
 
 		assert.strictEqual(boxes.length, 1)

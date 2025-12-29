@@ -1,4 +1,4 @@
-import type { IsoBox } from './boxes/IsoBox.ts'
+import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxReader } from './IsoBoxReader.ts'
 
 /**

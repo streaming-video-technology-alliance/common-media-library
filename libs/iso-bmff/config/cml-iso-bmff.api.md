@@ -197,22 +197,7 @@ export type ExtendedLanguageBox = FullBox & {
 };
 
 // @public
-export type Fields<T$1> = Omit<T$1, "type" | "boxes">;
-
-// @public
 export type FileTypeBox = TypeBox<"ftyp">;
-
-// @public
-export function filterIsoBoxes<T$1 extends IsoBox = IsoBox>(raw: IsoBoxData | Iterable<IsoBox>, fn: IsoBoxFilter<T$1>, config?: IsoBoxReadViewConfig): T$1[];
-
-// @public
-export function filterIsoBoxesByType<T$1 extends keyof IsoBoxMap>(raw: IsoBoxData, type: T$1 | T$1[], config?: IsoBoxReadViewConfig): IsoBoxMap[T$1][];
-
-// @public
-export function findIsoBox<T$1 extends IsoBox = IsoBox>(raw: IsoBoxData | Iterable<IsoBox>, fn: IsoBoxFilter<T$1>, config?: IsoBoxReadViewConfig): T$1 | null;
-
-// @public
-export function findIsoBoxByType<T$1 extends keyof IsoBoxMap>(raw: IsoBoxData, type: T$1, config?: IsoBoxReadViewConfig): IsoBoxMap[T$1] | null;
 
 // @public
 export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
@@ -231,6 +216,14 @@ export type FullBox = {
     version: number;
     flags: number;
 };
+
+// @public
+export type GroupsListBox = ContainerBox<any> & {
+    type: "grpl";
+};
+
+// @public (undocumented)
+export type grpl = GroupsListBox;
 
 // @public
 export type HandlerReferenceBox = FullBox & {
@@ -294,7 +287,7 @@ export type ipro = ItemProtectionBox;
 export type iref = ItemReferenceBox;
 
 // @public
-export function isContainer(box: any): box is ContainerBox<IsoBox>;
+export function isContainer<T$1 = ParsedBox>(box: any): box is ContainerBox<T$1>;
 
 // @public
 export function isFullBox(box: any): box is FullBox;
@@ -304,9 +297,6 @@ export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
 
 // @public
 export type IsoBoxData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
-
-// @public
-export type IsoBoxFilter<T$1 extends IsoBox> = ((box: IsoBox) => boolean) | ((box: IsoBox) => box is T$1);
 
 // @public
 export type IsoBoxMap = {
@@ -328,6 +318,7 @@ export type IsoBoxMap = {
     free: FreeSpaceBox<"free">;
     frma: OriginalFormatBox;
     ftyp: FileTypeBox;
+    grpl: GroupsListBox;
     hdlr: HandlerReferenceBox;
     hev1: VisualSampleEntryBox<"hev1">;
     hmhd: HintMediaHeaderBox;
@@ -419,14 +410,14 @@ export type IsoBoxReadableStreamConfig = {
 };
 
 // @public
-export type IsoBoxReader<B extends IsoBox> = (view: IsoBoxReadView, config?: IsoBoxReadViewConfig) => Fields<B>;
+export type IsoBoxReader<B extends IsoBox> = (view: IsoBoxReadView) => B;
 
 // @public
 export type IsoBoxReaderMap = Partial<{ [P in IsoBox["type"]]: IsoBoxReader<Extract<IsoBox, Record<"type", P>>> }>;
 
 // @public
 export class IsoBoxReadView {
-    [Symbol.iterator](): Generator<IsoBox & Box>;
+    [Symbol.iterator](): Generator<ParsedBox>;
     constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig);
     get buffer(): ArrayBuffer;
     get byteLength(): number;
@@ -437,10 +428,10 @@ export class IsoBoxReadView {
     jump: (size: number) => void;
     readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
     readBox: () => Box;
-    readBoxes: <T = IsoBox>(length: number) => T[];
+    readBoxes: <T = IsoBox>(length?: number) => T[];
     readData: (size: number) => Uint8Array<ArrayBuffer>;
     readEntries: <T>(length: number, map: () => T) => T[];
-    readFullBox: () => Fields<FullBox>;
+    readFullBox: () => FullBox;
     readInt: (size: number) => number;
     readString: (size: number) => string;
     readTemplate: (size: number) => number;
@@ -452,14 +443,13 @@ export class IsoBoxReadView {
 // @public
 export type IsoBoxReadViewConfig = {
     readers?: IsoBoxReaderMap;
-    recursive?: boolean;
 };
 
 // @public
 export type IsoBoxStreamable = IsoBox | Box | ArrayBufferView;
 
 // @public
-export type IsoBoxWriter<B> = (box: Fields<B>) => ArrayBufferView;
+export type IsoBoxWriter<B> = (box: B) => ArrayBufferView;
 
 // @public
 export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
@@ -492,6 +482,12 @@ export type IsoFieldTypeMap = {
     utf8: string;
     utf8string: string;
 };
+
+// @public
+export type IsoParsedBox<T$1 extends IsoBox = IsoBox> = T$1 & Omit<Box, "type">;
+
+// @public
+export type IsoTypedParsedBox<T$1 extends keyof IsoBoxMap> = IsoBoxMap[T$1] & Omit<Box, "type">;
 
 // @public
 export type ItemExtent = {
@@ -606,7 +602,7 @@ export type mehd = MovieExtendsHeaderBox;
 export type meta = MetaBox;
 
 // @public
-export type MetaBox = FullBox & ContainerBox<HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox> & {
+export type MetaBox = FullBox & ContainerBox<HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox | GroupsListBox> & {
     type: "meta";
 };
 
@@ -702,6 +698,9 @@ export type OriginalFormatBox = {
     dataFormat: number;
 };
 
+// @public
+export type ParsedBox = IsoParsedBox | Box;
+
 // @public (undocumented)
 export type payl = WebVttCuePayloadBox;
 
@@ -759,187 +758,187 @@ export type prsl = PreselectionGroupBox;
 export type pssh = ProtectionSystemSpecificHeaderBox;
 
 // @public
-export function readArdi(view: IsoBoxReadView): Fields<AudioRenderingIndicationBox>;
+export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
 
 // @public
-export function readAvc1(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc1">>;
+export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<"avc1">;
 
 // @public
-export function readAvc2(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc2">>;
+export function readAvc2(view: IsoBoxReadView): VisualSampleEntryBox<"avc2">;
 
 // @public
-export function readAvc3(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc3">>;
+export function readAvc3(view: IsoBoxReadView): VisualSampleEntryBox<"avc3">;
 
 // @public
-export function readAvc4(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc4">>;
+export function readAvc4(view: IsoBoxReadView): VisualSampleEntryBox<"avc4">;
 
 // @public
-export function readCtts(view: IsoBoxReadView): Fields<CompositionTimeToSampleBox>;
+export function readCtts(view: IsoBoxReadView): CompositionTimeToSampleBox;
 
 // @public
-export function readDref(view: IsoBoxReadView): Fields<DataReferenceBox>;
+export function readDref(view: IsoBoxReadView): DataReferenceBox;
 
 // @public
-export function readElng(view: IsoBoxReadView): Fields<ExtendedLanguageBox>;
+export function readElng(view: IsoBoxReadView): ExtendedLanguageBox;
 
 // @public
-export function readElst(view: IsoBoxReadView): Fields<EditListBox>;
+export function readElst(view: IsoBoxReadView): EditListBox;
 
 // @public
-export function readEmsg(view: IsoBoxReadView): Fields<EventMessageBox>;
+export function readEmsg(view: IsoBoxReadView): EventMessageBox;
 
 // @public
-export function readEnca(view: IsoBoxReadView): Fields<AudioSampleEntryBox<"enca">>;
+export function readEnca(view: IsoBoxReadView): AudioSampleEntryBox<"enca">;
 
 // @public
-export function readEncv(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"encv">>;
+export function readEncv(view: IsoBoxReadView): VisualSampleEntryBox<"encv">;
 
 // @public
-export function readFree(view: IsoBoxReadView): Fields<FreeSpaceBox>;
+export function readFree(view: IsoBoxReadView): FreeSpaceBox;
 
 // @public
-export function readFrma(view: IsoBoxReadView): Fields<OriginalFormatBox>;
+export function readFrma(view: IsoBoxReadView): OriginalFormatBox;
 
 // @public
-export function readFtyp(view: IsoBoxReadView): Fields<FileTypeBox>;
+export function readFtyp(view: IsoBoxReadView): FileTypeBox;
 
 // @public
-export function readHdlr(view: IsoBoxReadView): Fields<HandlerReferenceBox>;
+export function readHdlr(view: IsoBoxReadView): HandlerReferenceBox;
 
 // @public
-export function readHev1(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"hev1">>;
+export function readHev1(view: IsoBoxReadView): VisualSampleEntryBox<"hev1">;
 
 // @public
-export function readHvc1(view: IsoBoxReadView): Fields<VisualSampleEntryBox<"avc1">>;
+export function readHvc1(view: IsoBoxReadView): VisualSampleEntryBox<"hvc1">;
 
 // @public
-export function readIden(view: IsoBoxReadView): Fields<WebVttCueIdBox>;
+export function readIden(view: IsoBoxReadView): WebVttCueIdBox;
 
 // @public
-export function readImda(view: IsoBoxReadView): Fields<IdentifiedMediaDataBox>;
+export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox;
 
 // @public
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): IsoBox[];
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedBox[];
 
 // @public
-export function readKind(view: IsoBoxReadView): Fields<TrackKindBox>;
+export function readKind(view: IsoBoxReadView): TrackKindBox;
 
 // @public
-export function readLabl(view: IsoBoxReadView): Fields<LabelBox>;
+export function readLabl(view: IsoBoxReadView): LabelBox;
 
 // @public
-export function readMdat(view: IsoBoxReadView): Fields<MediaDataBox>;
+export function readMdat(view: IsoBoxReadView): MediaDataBox;
 
 // @public
-export function readMdhd(view: IsoBoxReadView): Fields<MediaHeaderBox>;
+export function readMdhd(view: IsoBoxReadView): MediaHeaderBox;
 
 // @public
-export function readMehd(view: IsoBoxReadView): Fields<MovieExtendsHeaderBox>;
+export function readMehd(view: IsoBoxReadView): MovieExtendsHeaderBox;
 
 // @public
-export function readMeta(view: IsoBoxReadView): Fields<MetaBox>;
+export function readMeta(view: IsoBoxReadView): MetaBox;
 
 // @public
-export function readMfhd(view: IsoBoxReadView): Fields<MovieFragmentHeaderBox>;
+export function readMfhd(view: IsoBoxReadView): MovieFragmentHeaderBox;
 
 // @public
-export function readMfro(view: IsoBoxReadView): Fields<MovieFragmentRandomAccessOffsetBox>;
+export function readMfro(view: IsoBoxReadView): MovieFragmentRandomAccessOffsetBox;
 
 // @public
-export function readMp4a(view: IsoBoxReadView): Fields<AudioSampleEntryBox<"mp4a">>;
+export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<"mp4a">;
 
 // @public
-export function readMvhd(view: IsoBoxReadView): Fields<MovieHeaderBox>;
+export function readMvhd(view: IsoBoxReadView): MovieHeaderBox;
 
 // @public
-export function readPayl(view: IsoBoxReadView): Fields<WebVttCuePayloadBox>;
+export function readPayl(view: IsoBoxReadView): WebVttCuePayloadBox;
 
 // @public
-export function readPrft(view: IsoBoxReadView): Fields<ProducerReferenceTimeBox>;
+export function readPrft(view: IsoBoxReadView): ProducerReferenceTimeBox;
 
 // @public
-export function readPrsl(view: IsoBoxReadView): Fields<PreselectionGroupBox>;
+export function readPrsl(view: IsoBoxReadView): PreselectionGroupBox;
 
 // @public
-export function readPssh(view: IsoBoxReadView): Fields<ProtectionSystemSpecificHeaderBox>;
+export function readPssh(view: IsoBoxReadView): ProtectionSystemSpecificHeaderBox;
 
 // @public
-export function readSchm(view: IsoBoxReadView): Fields<SchemeTypeBox>;
+export function readSchm(view: IsoBoxReadView): SchemeTypeBox;
 
 // @public
-export function readSdtp(view: IsoBoxReadView): Fields<SampleDependencyTypeBox>;
+export function readSdtp(view: IsoBoxReadView): SampleDependencyTypeBox;
 
 // @public
-export function readSidx(view: IsoBoxReadView): Fields<SegmentIndexBox>;
+export function readSidx(view: IsoBoxReadView): SegmentIndexBox;
 
 // @public
-export function readSkip(view: IsoBoxReadView): Fields<FreeSpaceBox<"skip">>;
+export function readSkip(view: IsoBoxReadView): FreeSpaceBox<"skip">;
 
 // @public
-export function readSmhd(view: IsoBoxReadView): Fields<SoundMediaHeaderBox>;
+export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox;
 
 // @public
-export function readSsix(view: IsoBoxReadView): Fields<SubsegmentIndexBox>;
+export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox;
 
 // @public
-export function readSthd(view: IsoBoxReadView): Fields<SubtitleMediaHeaderBox>;
+export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox;
 
 // @public
-export function readStsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoBoxReadView): Fields<SampleDescriptionBox<E>>;
+export function readStsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E>;
 
 // @public
-export function readStss(view: IsoBoxReadView): Fields<SyncSampleBox>;
+export function readStss(view: IsoBoxReadView): SyncSampleBox;
 
 // @public
-export function readSttg(view: IsoBoxReadView): Fields<WebVttSettingsBox>;
+export function readSttg(view: IsoBoxReadView): WebVttSettingsBox;
 
 // @public
-export function readStts(view: IsoBoxReadView): Fields<DecodingTimeToSampleBox>;
+export function readStts(view: IsoBoxReadView): DecodingTimeToSampleBox;
 
 // @public
-export function readStyp(view: IsoBoxReadView): Fields<SegmentTypeBox>;
+export function readStyp(view: IsoBoxReadView): SegmentTypeBox;
 
 // @public
-export function readSubs(view: IsoBoxReadView): Fields<SubsampleInformationBox>;
+export function readSubs(view: IsoBoxReadView): SubsampleInformationBox;
 
 // @public
-export function readTenc(view: IsoBoxReadView): Fields<TrackEncryptionBox>;
+export function readTenc(view: IsoBoxReadView): TrackEncryptionBox;
 
 // @public
-export function readTfdt(view: IsoBoxReadView): Fields<TrackFragmentBaseMediaDecodeTimeBox>;
+export function readTfdt(view: IsoBoxReadView): TrackFragmentBaseMediaDecodeTimeBox;
 
 // @public
-export function readTfhd(view: IsoBoxReadView): Fields<TrackFragmentHeaderBox>;
+export function readTfhd(view: IsoBoxReadView): TrackFragmentHeaderBox;
 
 // @public
-export function readTfra(view: IsoBoxReadView): Fields<TrackFragmentRandomAccessBox>;
+export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox;
 
 // @public
-export function readTkhd(view: IsoBoxReadView): Fields<TrackHeaderBox>;
+export function readTkhd(view: IsoBoxReadView): TrackHeaderBox;
 
 // @public
-export function readTrex(view: IsoBoxReadView): Fields<TrackExtendsBox>;
+export function readTrex(view: IsoBoxReadView): TrackExtendsBox;
 
 // @public
-export function readTrun(view: IsoBoxReadView): Fields<TrackRunBox>;
+export function readTrun(view: IsoBoxReadView): TrackRunBox;
 
 // @public
-export function readUrl(view: IsoBoxReadView): Fields<DataEntryUrlBox>;
+export function readUrl(view: IsoBoxReadView): DataEntryUrlBox;
 
 // @public
-export function readUrn(view: IsoBoxReadView): Fields<DataEntryUrnBox>;
+export function readUrn(view: IsoBoxReadView): DataEntryUrnBox;
 
 // @public
-export function readVlab(view: IsoBoxReadView): Fields<WebVttSourceLabelBox>;
+export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox;
 
 // @public
-export function readVmhd(view: IsoBoxReadView): Fields<VideoMediaHeaderBox>;
+export function readVmhd(view: IsoBoxReadView): VideoMediaHeaderBox;
 
 // @public
-export function readVttC(view: IsoBoxReadView): Fields<WebVttConfigurationBox>;
+export function readVttC(view: IsoBoxReadView): WebVttConfigurationBox;
 
 // @public
-export function readVtte(_: IsoBoxReadView): Fields<WebVttEmptySampleBox>;
+export function readVtte(_: IsoBoxReadView): WebVttEmptySampleBox;
 
 // @public (undocumented)
 export type saio = SampleAuxiliaryInformationOffsetsBox;
@@ -1422,7 +1421,7 @@ export type url = DataEntryUrlBox;
 export type urn = DataEntryUrnBox;
 
 // @public
-export type UserDataBox = ContainerBox<Box> & {
+export type UserDataBox = ContainerBox<any> & {
     type: "udta";
 };
 
@@ -1505,64 +1504,64 @@ export type WebVttSourceLabelBox = {
 };
 
 // @public
-export function writeArdi(box: Fields<AudioRenderingIndicationBox>): IsoBoxWriteView;
+export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView;
 
 // @public
-export function writeAvc1(box: Fields<VisualSampleEntryBox<"avc1">>): IsoBoxWriteView;
+export function writeAvc1(box: VisualSampleEntryBox<"avc1">): IsoBoxWriteView;
 
 // @public
-export function writeAvc2(box: Fields<VisualSampleEntryBox<"avc2">>): IsoBoxWriteView;
+export function writeAvc2(box: VisualSampleEntryBox<"avc2">): IsoBoxWriteView;
 
 // @public
-export function writeAvc3(box: Fields<VisualSampleEntryBox<"avc3">>): IsoBoxWriteView;
+export function writeAvc3(box: VisualSampleEntryBox<"avc3">): IsoBoxWriteView;
 
 // @public
-export function writeAvc4(box: Fields<VisualSampleEntryBox<"avc4">>): IsoBoxWriteView;
+export function writeAvc4(box: VisualSampleEntryBox<"avc4">): IsoBoxWriteView;
 
 // @public
 export function writeContainerBox<T$1 extends IsoBox>(box: ContainerBox<T$1>, writers: IsoBoxWriterMap): IsoBoxWriteView;
 
 // @public
-export function writeCtts(box: Fields<CompositionTimeToSampleBox>): IsoBoxWriteView;
+export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
 
 // @public
-export function writeElng(box: Fields<ExtendedLanguageBox>): IsoBoxWriteView;
+export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView;
 
 // @public
-export function writeElst(box: Fields<EditListBox>): IsoBoxWriteView;
+export function writeElst(box: EditListBox): IsoBoxWriteView;
 
 // @public
-export function writeEmsg(box: Fields<EventMessageBox>): IsoBoxWriteView;
+export function writeEmsg(box: EventMessageBox): IsoBoxWriteView;
 
 // @public
-export function writeEnca(box: Fields<AudioSampleEntryBox<"enca">>): IsoBoxWriteView;
+export function writeEnca(box: AudioSampleEntryBox<"enca">): IsoBoxWriteView;
 
 // @public
-export function writeEncv(box: Fields<VisualSampleEntryBox<"encv">>): IsoBoxWriteView;
+export function writeEncv(box: VisualSampleEntryBox<"encv">): IsoBoxWriteView;
 
 // @public
-export function writeFree(box: Fields<FreeSpaceBox<"free">>): IsoBoxWriteView;
+export function writeFree(box: FreeSpaceBox<"free">): IsoBoxWriteView;
 
 // @public
-export function writeFrma(box: Fields<OriginalFormatBox>): IsoBoxWriteView;
+export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView;
 
 // @public
-export function writeFtyp(box: Fields<FileTypeBox>): IsoBoxWriteView;
+export function writeFtyp(box: FileTypeBox): IsoBoxWriteView;
 
 // @public
-export function writeHdlr(box: Fields<HandlerReferenceBox>): IsoBoxWriteView;
+export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView;
 
 // @public
-export function writeHev1(box: Fields<VisualSampleEntryBox<"hev1">>): IsoBoxWriteView;
+export function writeHev1(box: VisualSampleEntryBox<"hev1">): IsoBoxWriteView;
 
 // @public
-export function writeHvc1(box: Fields<VisualSampleEntryBox<"hvc1">>): IsoBoxWriteView;
+export function writeHvc1(box: VisualSampleEntryBox<"hvc1">): IsoBoxWriteView;
 
 // @public
-export function writeIden(box: Fields<WebVttCueIdBox>): IsoBoxWriteView;
+export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
 
 // @public
-export function writeImda(box: Fields<IdentifiedMediaDataBox>): IsoBoxWriteView;
+export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 
 // @public
 export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Uint8Array;
@@ -1571,128 +1570,128 @@ export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Ui
 export function writeIsoBoxes(boxes: IsoBoxStreamable[], config: IsoBoxReadableStreamConfig): IsoBoxReadableStream;
 
 // @public
-export function writeKind(box: Fields<TrackKindBox>): IsoBoxWriteView;
+export function writeKind(box: TrackKindBox): IsoBoxWriteView;
 
 // @public
-export function writeLabl(box: Fields<LabelBox>): IsoBoxWriteView;
+export function writeLabl(box: LabelBox): IsoBoxWriteView;
 
 // @public
-export function writeMdat(box: Fields<MediaDataBox>): IsoBoxWriteView;
+export function writeMdat(box: MediaDataBox): IsoBoxWriteView;
 
 // @public
-export function writeMdhd(box: Fields<MediaHeaderBox>): IsoBoxWriteView;
+export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeMehd(box: Fields<MovieExtendsHeaderBox>): IsoBoxWriteView;
+export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeMeta(box: Fields<MetaBox>): IsoBoxWriteView;
+export function writeMeta(box: MetaBox): IsoBoxWriteView;
 
 // @public
-export function writeMfhd(box: Fields<MovieFragmentHeaderBox>): IsoBoxWriteView;
+export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeMfro(box: Fields<MovieFragmentRandomAccessOffsetBox>): IsoBoxWriteView;
+export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView;
 
 // @public
-export function writeMp4a(box: Fields<AudioSampleEntryBox<"mp4a">>): IsoBoxWriteView;
+export function writeMp4a(box: AudioSampleEntryBox<"mp4a">): IsoBoxWriteView;
 
 // @public
-export function writeMvhd(box: Fields<MovieHeaderBox>): IsoBoxWriteView;
+export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writePayl(box: Fields<WebVttCuePayloadBox>): IsoBoxWriteView;
+export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView;
 
 // @public
-export function writePrft(box: Fields<ProducerReferenceTimeBox>): IsoBoxWriteView;
+export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView;
 
 // @public
-export function writePrsl(box: Fields<PreselectionGroupBox>): IsoBoxWriteView;
+export function writePrsl(box: PreselectionGroupBox): IsoBoxWriteView;
 
 // @public
-export function writePssh(box: Fields<ProtectionSystemSpecificHeaderBox>): IsoBoxWriteView;
+export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeSchm(box: Fields<SchemeTypeBox>): IsoBoxWriteView;
+export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView;
 
 // @public
-export function writeSdtp(box: Fields<SampleDependencyTypeBox>): IsoBoxWriteView;
+export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView;
 
 // @public
-export function writeSidx(box: Fields<SegmentIndexBox>): IsoBoxWriteView;
+export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView;
 
 // @public
-export function writeSkip(box: Fields<FreeSpaceBox<"skip">>): IsoBoxWriteView;
+export function writeSkip(box: FreeSpaceBox<"skip">): IsoBoxWriteView;
 
 // @public
-export function writeSmhd(box: Fields<SoundMediaHeaderBox>): IsoBoxWriteView;
+export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeSsix(box: Fields<SubsegmentIndexBox>): IsoBoxWriteView;
+export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView;
 
 // @public
-export function writeSthd(box: Fields<SubtitleMediaHeaderBox>): IsoBoxWriteView;
+export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeStss(box: Fields<SyncSampleBox>): IsoBoxWriteView;
+export function writeStss(box: SyncSampleBox): IsoBoxWriteView;
 
 // @public
-export function writeSttg(box: Fields<WebVttSettingsBox>): IsoBoxWriteView;
+export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView;
 
 // @public
-export function writeStts(box: Fields<DecodingTimeToSampleBox>): IsoBoxWriteView;
+export function writeStts(box: DecodingTimeToSampleBox): IsoBoxWriteView;
 
 // @public
-export function writeStyp(box: Fields<SegmentTypeBox>): IsoBoxWriteView;
+export function writeStyp(box: SegmentTypeBox): IsoBoxWriteView;
 
 // @public
-export function writeSubs(box: Fields<SubsampleInformationBox>): IsoBoxWriteView;
+export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView;
 
 // @public
-export function writeTenc(box: Fields<TrackEncryptionBox>): IsoBoxWriteView;
+export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView;
 
 // @public
-export function writeTfdt(box: Fields<TrackFragmentBaseMediaDecodeTimeBox>): IsoBoxWriteView;
+export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWriteView;
 
 // @public
-export function writeTfhd(box: Fields<TrackFragmentHeaderBox>): IsoBoxWriteView;
+export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeTfra(box: Fields<TrackFragmentRandomAccessBox>): IsoBoxWriteView;
+export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView;
 
 // @public
-export function writeTkhd(box: Fields<TrackHeaderBox>): IsoBoxWriteView;
+export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeTrex(box: Fields<TrackExtendsBox>): IsoBoxWriteView;
+export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView;
 
 // @public
-export function writeTrun(box: Fields<TrackRunBox>): IsoBoxWriteView;
+export function writeTrun(box: TrackRunBox): IsoBoxWriteView;
 
 // @public
-export function writeUrl(box: Fields<DataEntryUrlBox>): IsoBoxWriteView;
+export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
 
 // @public
-export function writeUrn(box: Fields<DataEntryUrnBox>): IsoBoxWriteView;
+export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView;
 
 // @public
-export function writeVisualSampleEntryBox<T$1 extends VisualSampleEntryType>(box: Fields<VisualSampleEntryBox<T$1>>, type: T$1): IsoBoxWriteView;
+export function writeVisualSampleEntryBox<T$1 extends VisualSampleEntryType>(box: VisualSampleEntryBox<T$1>, type: T$1): IsoBoxWriteView;
 
 // @public
-export function writeVlab(box: Fields<WebVttSourceLabelBox>): IsoBoxWriteView;
+export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView;
 
 // @public
-export function writeVmhd(box: Fields<VideoMediaHeaderBox>): IsoBoxWriteView;
+export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeVttC(box: Fields<WebVttConfigurationBox>): IsoBoxWriteView;
+export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
 
 // @public
-export function writeVtte(_: Fields<WebVttEmptySampleBox>): IsoBoxWriteView;
+export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;
 
 // Warnings were encountered during analysis:
 //
-// src/boxes/IdentifiedMediaDataBox.ts:15:1 - (ae-incompatible-release-tags) The symbol "stco" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
+// src/IsoBoxMap.ts:164:2 - (ae-incompatible-release-tags) The symbol "stco" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
 
 // (No @packageDocumentation comment for this package)
 

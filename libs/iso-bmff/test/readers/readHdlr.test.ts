@@ -2,7 +2,7 @@ import { assert, describe, findBox, it, readHdlr } from '../util/box.ts'
 
 describe('readHdlr', function () {
 	it('should correctly parse the box', function () {
-		const box = findBox('captions.mp4', readHdlr)
+		const box = findBox('captions.mp4', 'hdlr', { hdlr: readHdlr })
 
 		assert.strictEqual(box.type, 'hdlr')
 		assert.strictEqual(box.size, 68)
@@ -14,7 +14,7 @@ describe('readHdlr', function () {
 	})
 
 	it('should handle null-terminated strings that are not null-terminated and might exceed box boundaries', function () {
-		const box = findBox('240fps_go_pro_hero_4.mp4', readHdlr)
+		const box = findBox('240fps_go_pro_hero_4.mp4', 'hdlr', { hdlr: readHdlr })
 
 		assert.ok(box)
 		assert.strictEqual(box.name, '\tGoPro AVC')

@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMfro(view: IsoBoxReadView): Fields<MovieFragmentRandomAccessOffsetBox> {
+export function readMfro(view: IsoBoxReadView): MovieFragmentRandomAccessOffsetBox {
 	return {
+		type: 'mfro',
 		...view.readFullBox(),
 		mfraSize: view.readUint(4),
 	}

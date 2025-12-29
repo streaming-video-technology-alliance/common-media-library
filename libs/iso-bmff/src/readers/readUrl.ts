@@ -1,5 +1,4 @@
 import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readUrl(view: IsoBoxReadView): Fields<DataEntryUrlBox> {
+export function readUrl(view: IsoBoxReadView): DataEntryUrlBox {
 	return {
+		type: 'url ',
 		...view.readFullBox(),
 		location: view.readString(-1),
 	}

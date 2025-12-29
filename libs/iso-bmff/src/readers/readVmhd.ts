@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,8 +11,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readVmhd(view: IsoBoxReadView): Fields<VideoMediaHeaderBox> {
+export function readVmhd(view: IsoBoxReadView): VideoMediaHeaderBox {
 	return {
+		type: 'vmhd',
 		...view.readFullBox(),
 		graphicsmode: view.readUint(2),
 		opcolor: view.readArray(UINT, 2, 3),

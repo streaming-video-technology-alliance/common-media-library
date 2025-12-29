@@ -1,5 +1,4 @@
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
 import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts'
 
@@ -12,11 +11,12 @@ import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts'
  *
  * @public
  */
-export function readStsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoBoxReadView): Fields<SampleDescriptionBox<E>> {
+export function readStsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E> {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 
 	return {
+		type: 'stsd',
 		version,
 		flags,
 		entryCount,

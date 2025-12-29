@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
@@ -12,6 +11,6 @@ import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
  *
  * @public
  */
-export function writeHev1(box: Fields<VisualSampleEntryBox<'hev1'>>): IsoBoxWriteView {
+export function writeHev1(box: VisualSampleEntryBox<'hev1'>): IsoBoxWriteView {
 	return writeVisualSampleEntryBox(box, 'hev1')
 }

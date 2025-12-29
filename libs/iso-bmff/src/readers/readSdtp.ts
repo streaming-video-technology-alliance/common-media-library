@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,8 +11,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSdtp(view: IsoBoxReadView): Fields<SampleDependencyTypeBox> {
+export function readSdtp(view: IsoBoxReadView): SampleDependencyTypeBox {
 	return {
+		type: 'sdtp',
 		...view.readFullBox(),
 		sampleDependencyTable: view.readArray(UINT, 1, view.bytesRemaining),
 	}

@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readStts } from '../util/box.ts'
 
 describe('readStts', function () {
 	it('should correctly parse the box', function () {
-		const boxes = filterBoxes('editlist.mp4', readStts)
+		const boxes = filterBoxes('editlist.mp4', 'stts', { stts: readStts })
 		const box = boxes[0]
 
 		assert.strictEqual(boxes.length, 1)

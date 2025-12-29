@@ -1,6 +1,5 @@
 import type { EditListBox } from '../boxes/EditListBox.ts'
 import type { EditListEntry } from '../boxes/EditListEntry.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -12,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readElst(view: IsoBoxReadView): Fields<EditListBox> {
+export function readElst(view: IsoBoxReadView): EditListBox {
 	const { version, flags } = view.readFullBox()
 	const v1 = version === 1
 	const size = v1 ? 8 : 4
@@ -26,6 +25,7 @@ export function readElst(view: IsoBoxReadView): Fields<EditListBox> {
 	}))
 
 	return {
+		type: 'elst',
 		version,
 		flags,
 		entryCount,

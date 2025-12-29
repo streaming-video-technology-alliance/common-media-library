@@ -1,11 +1,12 @@
-import { assert, describe, findBox, it, readLabl, readMeta, readPrsl, type Box } from '../util/box.ts'
+import { assert, describe, findBox, it, readLabl, readMeta, readPrsl, type Box, type ParsedBox } from '../util/box.ts'
 
 describe('readLabl', function () {
 	it('should correctly parse the box from sample data', function () {
-		const box = findBox('SRMP_AC4.mp4', [readMeta, readPrsl, readLabl])
-			.boxes?.filter((box: Box) => box.type === 'grpl')[0]
+		const box = findBox('SRMP_AC4.mp4', 'meta', { meta: readMeta, prsl: readPrsl, labl: readLabl })
+			// @ts-expect-error: Not sure why this is needed
+			.boxes?.filter((box: ParsedBox) => box.type === 'grpl')[0]
 			// @ts-expect-error: Add type for `boxes` and `groupId` in `grpl` box
-			.boxes?.filter((box: Box) => box.groupId === 234)[0]
+			.boxes?.filter((box: ParsedBox) => box.groupId === 234)[0]
 
 		assert.ok(box)
 		assert.ok(box.boxes)

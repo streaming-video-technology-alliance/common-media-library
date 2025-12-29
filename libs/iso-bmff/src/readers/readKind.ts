@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readKind(view: IsoBoxReadView): Fields<TrackKindBox> {
+export function readKind(view: IsoBoxReadView): TrackKindBox {
 	return {
+		type: 'kind',
 		...view.readFullBox(),
 		schemeUri: view.readUtf8(-1),
 		value: view.readUtf8(-1),

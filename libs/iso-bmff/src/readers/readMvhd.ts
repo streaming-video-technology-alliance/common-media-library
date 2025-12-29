@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,13 +11,14 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMvhd(view: IsoBoxReadView): Fields<MovieHeaderBox> {
+export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 	const { readUint, readTemplate, readArray } = view
 
 	const { version, flags } = view.readFullBox()
 	const size = (version == 1) ? 8 : 4
 
 	return {
+		type: 'mvhd',
 		version,
 		flags,
 		creationTime: readUint(size),

@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import { readAvc1 } from './readAvc1.ts'
@@ -12,6 +11,9 @@ import { readAvc1 } from './readAvc1.ts'
  *
  * @public
  */
-export function readHvc1(view: IsoBoxReadView): Fields<VisualSampleEntryBox<'avc1'>> {
-	return readAvc1(view)
+export function readHvc1(view: IsoBoxReadView): VisualSampleEntryBox<'hvc1'> {
+	return {
+		...readAvc1(view),
+		type: 'hvc1',
+	}
 }

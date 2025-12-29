@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,7 +10,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSubs(view: IsoBoxReadView): Fields<SubsampleInformationBox> {
+export function readSubs(view: IsoBoxReadView): SubsampleInformationBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 	const entries = view.readEntries(entryCount, () => {
@@ -32,6 +31,7 @@ export function readSubs(view: IsoBoxReadView): Fields<SubsampleInformationBox> 
 	})
 
 	return {
+		type: 'subs',
 		version,
 		flags,
 		entryCount,

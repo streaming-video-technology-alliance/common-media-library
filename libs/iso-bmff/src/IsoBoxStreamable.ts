@@ -1,5 +1,5 @@
 import type { Box } from './boxes/Box.ts'
-import type { IsoBox } from './boxes/IsoBox.ts'
+import type { IsoBox } from './IsoBox.ts'
 
 /**
  * A type that represents a streamable ISO BMFF box or array buffer view.

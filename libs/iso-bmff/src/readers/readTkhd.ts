@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
 import { TEMPLATE } from '../fields/TEMPLATE.ts'
 import { UINT } from '../fields/UINT.ts'
@@ -13,11 +12,12 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTkhd(view: IsoBoxReadView): Fields<TrackHeaderBox> {
+export function readTkhd(view: IsoBoxReadView): TrackHeaderBox {
 	const { version, flags } = view.readFullBox()
 	const size = version === 1 ? 8 : 4
 
 	return {
+		type: 'tkhd',
 		version,
 		flags,
 		creationTime: view.readUint(size),

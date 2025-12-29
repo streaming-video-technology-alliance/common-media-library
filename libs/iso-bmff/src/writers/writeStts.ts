@@ -1,5 +1,4 @@
 import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -13,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeStts(box: Fields<DecodingTimeToSampleBox>): IsoBoxWriteView {
+export function writeStts(box: DecodingTimeToSampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

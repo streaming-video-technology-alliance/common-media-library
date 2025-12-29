@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragmentBaseMediaDecodeTimeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,10 +10,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTfdt(view: IsoBoxReadView): Fields<TrackFragmentBaseMediaDecodeTimeBox> {
+export function readTfdt(view: IsoBoxReadView): TrackFragmentBaseMediaDecodeTimeBox {
 	const { version, flags } = view.readFullBox()
 
 	return {
+		type: 'tfdt',
 		version,
 		flags,
 		baseMediaDecodeTime: view.readUint((version == 1) ? 8 : 4),

@@ -1,10 +1,14 @@
-import { assert, describe, findBox, it, readMdat, readPayl, readIsoBoxes, type ContainerBox, type WebVttCuePayloadBox } from '../util/box.ts'
+import { assert, describe, findBox, isContainer, it, readIsoBoxes, readMdat, readPayl } from '../util/box.ts'
 
 describe('readPayl', function () {
 	it('should correctly parse the box from sample data', function () {
-		const { data } = findBox('webvtt.m4s', readMdat)
-		const boxes = readIsoBoxes(data, { readers: { payl: readPayl } }) as ContainerBox<WebVttCuePayloadBox>[]
-		const box = boxes[0].boxes?.[0]
+		const { data } = findBox('webvtt.m4s', 'mdat', { mdat: readMdat })
+		const boxes = readIsoBoxes(data, { readers: { payl: readPayl } })
+
+		const container = boxes[0]
+		assert(isContainer(container))
+
+		const box = container.boxes[0]
 
 		assert.ok(box)
 		assert.strictEqual(box.type, 'payl')

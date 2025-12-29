@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMfhd(view: IsoBoxReadView): Fields<MovieFragmentHeaderBox> {
+export function readMfhd(view: IsoBoxReadView): MovieFragmentHeaderBox {
 	return {
+		type: 'mfhd',
 		...view.readFullBox(),
 		sequenceNumber: view.readUint(4),
 	}

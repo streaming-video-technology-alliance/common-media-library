@@ -1,5 +1,4 @@
 import { encodeText } from '@svta/cml-utils'
-import type { Fields } from '../boxes/Fields.ts'
 import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -12,7 +11,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeIden(box: Fields<WebVttCueIdBox>): IsoBoxWriteView {
+export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView {
 	const cueIdBytes = encodeText(box.cueId)
 
 	const headerSize = 8

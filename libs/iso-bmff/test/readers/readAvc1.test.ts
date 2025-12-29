@@ -1,18 +1,15 @@
-import { assert, describe, filterBoxes, it, readAvc1, readStsd, type SampleDescriptionBox, type VisualSampleEntryBox } from '../util/box.ts'
+import { assert, describe, filterBoxes, it, readAvc1, readStsd, type VisualSampleEntryBox } from '../util/box.ts'
 
 type Avc1Box = VisualSampleEntryBox<'avc1'>;
 
 describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes<
-			SampleDescriptionBox<Avc1Box> | Avc1Box
-		>('240fps_go_pro_hero_4.mp4', [readStsd, readAvc1])
+		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { stsd: readStsd<Avc1Box>, avc1: readAvc1 })
 
 		assert.strictEqual(container[0].type, 'stsd')
 
-		const box = container[0].entries[0]
+		const box = container[0].entries[0] as Avc1Box
 		assert.strictEqual(box.type, 'avc1')
-		assert.strictEqual(box.size, 184)
 
 		assert.deepStrictEqual(box.reserved1, [0, 0, 0, 0, 0, 0])
 		assert.strictEqual(box.dataReferenceIndex, 1)

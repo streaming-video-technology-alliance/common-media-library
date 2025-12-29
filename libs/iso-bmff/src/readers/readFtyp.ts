@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
 import { STRING } from '../fields/STRING.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readFtyp(view: IsoBoxReadView): Fields<FileTypeBox> {
+export function readFtyp(view: IsoBoxReadView): FileTypeBox {
 	const size = 4
 	const majorBrand = view.readString(4)
 	const minorVersion = view.readUint(4)
@@ -20,6 +19,7 @@ export function readFtyp(view: IsoBoxReadView): Fields<FileTypeBox> {
 	const compatibleBrands = view.readArray(STRING, size, length)
 
 	return {
+		type: 'ftyp',
 		majorBrand,
 		minorVersion,
 		compatibleBrands,

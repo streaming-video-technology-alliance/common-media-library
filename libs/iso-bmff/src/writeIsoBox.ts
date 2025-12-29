@@ -1,5 +1,5 @@
 import type { ContainerBox } from './boxes/ContainerBox.ts'
-import type { IsoBox } from './boxes/IsoBox.ts'
+import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
 import { isContainer } from './utils/isContainer.ts'

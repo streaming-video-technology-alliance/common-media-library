@@ -1,7 +1,6 @@
 import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
 import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts'
 import type { DataReferenceBox } from '../boxes/DataReferenceBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -13,12 +12,13 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readDref(view: IsoBoxReadView): Fields<DataReferenceBox> {
+export function readDref(view: IsoBoxReadView): DataReferenceBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 	const entries = view.readBoxes<DataEntryUrlBox | DataEntryUrnBox>(entryCount)
 
 	return {
+		type: 'dref',
 		version,
 		flags,
 		entryCount,

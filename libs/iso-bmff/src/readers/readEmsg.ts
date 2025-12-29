@@ -1,5 +1,4 @@
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
-import type { Fields } from '../boxes/Fields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -11,10 +10,10 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readEmsg(view: IsoBoxReadView): Fields<EventMessageBox> {
+export function readEmsg(view: IsoBoxReadView): EventMessageBox {
 	const { readUint, readString, readData } = view
 
-	const result = { ...view.readFullBox() } as EventMessageBox
+	const result = { type: 'emsg', ...view.readFullBox() } as EventMessageBox
 
 	if (result.version == 1) {
 		result.timescale = readUint(4)

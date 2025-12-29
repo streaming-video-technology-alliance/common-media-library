@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,8 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readFrma(view: IsoBoxReadView): Fields<OriginalFormatBox> {
+export function readFrma(view: IsoBoxReadView): OriginalFormatBox {
 	return {
+		type: 'frma',
 		dataFormat: view.readUint(4),
 	}
 };

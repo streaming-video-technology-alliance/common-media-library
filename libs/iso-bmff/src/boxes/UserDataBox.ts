@@ -1,4 +1,3 @@
-import type { Box } from './Box.ts'
 import type { ContainerBox } from './ContainerBox.ts'
 
 /**
@@ -6,7 +5,7 @@ import type { ContainerBox } from './ContainerBox.ts'
  *
  * @public
  */
-export type UserDataBox = ContainerBox<Box> & {
+export type UserDataBox = ContainerBox<any> & {
 	type: 'udta';
 };
 

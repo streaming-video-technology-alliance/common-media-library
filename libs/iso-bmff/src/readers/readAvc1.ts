@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -12,10 +11,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readAvc1(view: IsoBoxReadView): Fields<VisualSampleEntryBox<'avc1'>> {
+export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<'avc1'> {
 	const { readArray, readUint, readInt, readTemplate, readData } = view
 
 	return {
+		type: 'avc1',
 		reserved1: readArray(UINT, 1, 6),
 		dataReferenceIndex: readUint(2),
 		preDefined1: readUint(2),

@@ -1,15 +1,15 @@
 import type { Box } from './boxes/Box.ts'
-import type { Fields } from './boxes/Fields.ts'
 import type { FullBox } from './boxes/FullBox.ts'
-import type { IsoBox } from './boxes/IsoBox.ts'
 import { DATA } from './fields/DATA.ts'
 import { INT } from './fields/INT.ts'
 import { STRING } from './fields/STRING.ts'
 import { TEMPLATE } from './fields/TEMPLATE.ts'
 import { UINT } from './fields/UINT.ts'
 import { UTF8 } from './fields/UTF8.ts'
+import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
+import type { ParsedBox } from './ParsedBox.ts'
 import { isContainer } from './utils/isContainer.ts'
 import { readData } from './utils/readData.ts'
 import { readInt } from './utils/readInt.ts'
@@ -43,7 +43,7 @@ export class IsoBoxReadView {
 	constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig) {
 		this.dataView = (raw instanceof ArrayBuffer) ? new DataView<ArrayBuffer>(raw) : (raw instanceof DataView) ? raw : new DataView<ArrayBuffer>(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
-		this.config = config || { recursive: false, readers: {} }
+		this.config = config || { readers: {} }
 	}
 
 	/**
@@ -225,7 +225,7 @@ export class IsoBoxReadView {
 	 *
 	 * @returns The full box.
 	 */
-	readFullBox = (): Fields<FullBox> => {
+	readFullBox = (): FullBox => {
 		return {
 			version: this.readUint(1),
 			flags: this.readUint(3),
@@ -305,7 +305,7 @@ export class IsoBoxReadView {
 	 * @param length - The number of boxes to read.
 	 * @returns The boxes.
 	 */
-	readBoxes = <T = IsoBox>(length: number): T[] => {
+	readBoxes = <T = IsoBox>(length: number = -1): T[] => {
 		const result: T[] = []
 
 		for (const box of this) {
@@ -341,8 +341,8 @@ export class IsoBoxReadView {
 	 *
 	 * @returns A generator of boxes.
 	 */
-	*[Symbol.iterator](): Generator<IsoBox & Box> {
-		const { readers = {}, recursive = false } = this.config
+	*[Symbol.iterator](): Generator<ParsedBox> {
+		const { readers = {} } = this.config
 
 		while (!this.done) {
 			try {
@@ -351,17 +351,14 @@ export class IsoBoxReadView {
 				const parser = readers[type as keyof typeof readers] || readers[type.trim() as keyof typeof readers] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
-					Object.assign(box, parser(view, this.config))
+					Object.assign(box, parser(view))
 				}
 
-				if (isContainer(box)) {
+				// Some boxes, like meta, parse their child boxes themselves.
+				if (isContainer(box) && !box.boxes) {
 					const boxes = []
 
 					for (const child of view) {
-						if (recursive) {
-							yield child
-						}
-
 						boxes.push(child)
 					}
 

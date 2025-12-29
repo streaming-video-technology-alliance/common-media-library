@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { SubtitleMediaHeaderBox } from '../boxes/SubtitleMediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -11,6 +10,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSthd(view: IsoBoxReadView): Fields<SubtitleMediaHeaderBox> {
-	return view.readFullBox()
+export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox {
+	return {
+		type: 'sthd',
+		...view.readFullBox(),
+	}
 };

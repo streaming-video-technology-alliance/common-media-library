@@ -1,5 +1,5 @@
 import type { ContainerBox } from '../boxes/ContainerBox.ts'
-import type { IsoBox } from '../boxes/IsoBox.ts'
+import type { IsoBox } from '../IsoBox.ts'
 import type { IsoBoxWriterMap } from '../IsoBoxWriterMap.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import { writeIsoBox } from '../writeIsoBox.ts'

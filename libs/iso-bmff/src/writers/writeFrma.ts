@@ -1,4 +1,3 @@
-import type { Fields } from '../boxes/Fields.ts'
 import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -13,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeFrma(box: Fields<OriginalFormatBox>): IsoBoxWriteView {
+export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView {
 	const headerSize = 8
 	const dataFormatSize = 4
 	const totalSize = headerSize + dataFormatSize
