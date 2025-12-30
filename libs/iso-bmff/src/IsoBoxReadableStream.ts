@@ -8,7 +8,6 @@ import { writeIsoBox } from './writeIsoBox.ts'
  * @public
  */
 export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
-
 	/**
 	 * Constructs a new IsoBoxReadableStream.
 	 *
@@ -16,16 +15,23 @@ export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
 	 * @param config - The configuration for the stream.
 	 */
 	constructor(boxes: IsoBoxStreamable[], config: IsoBoxReadableStreamConfig = {}) {
-		super({
-			start(controller) {
-				const { writers = {} } = config
+		const iterator = boxes[Symbol.iterator]()
+		const { writers = {} } = config
 
-				for (const box of boxes) {
-					controller.enqueue(writeIsoBox(box, writers))
+		function pull(controller: ReadableStreamDefaultController<Uint8Array>) {
+			const desiredSize = controller.desiredSize ?? 0
+
+			for (let i = 0; i < desiredSize; i++) {
+				const { value, done } = iterator.next()
+
+				if (done) {
+					controller.close()
+				} else {
+					controller.enqueue(writeIsoBox(value, writers))
 				}
-
-				controller.close()
 			}
-		})
+		}
+
+		super({ start: pull, pull })
 	}
 }
