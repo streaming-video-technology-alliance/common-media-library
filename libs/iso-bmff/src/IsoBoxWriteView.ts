@@ -210,7 +210,6 @@ export class IsoBoxWriteView {
 	 *
 	 * @param type - The type of the box.
 	 * @param size - The size, in bytes, of the box.
-	 * @param largesize - The size, in bytes, of the large size.
 	 */
 	writeBoxHeader = (type: string, size: number): void => {
 		const isLarge = size > 0xffffffff

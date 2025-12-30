@@ -1,6 +1,6 @@
+import type { IsoBoxContainer } from './IsoBoxContainer.ts'
 import type { IsoBoxReader } from './IsoBoxReader.ts'
 import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
-import type { IsoContainer } from './IsoContainer.ts'
 import type { IsoParsedBox } from './IsoParsedBox.ts'
 import type { ParsedBox } from './ParsedBox.ts'
 
@@ -18,7 +18,7 @@ export type BoxReturn<T extends IsoBoxReaderMap> = IsoParsedBox<{
  *
  * @public
  */
-export type ContainerReturn = IsoParsedBox<IsoContainer>;
+export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
 
 /**
  * Return type for the ISO box reader

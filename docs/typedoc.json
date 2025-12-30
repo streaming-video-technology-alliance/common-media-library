@@ -1,5 +1,6 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
+	"name": "CML",
 	"alwaysCreateEntryPointModule": false,
 	"groupReferencesByType": false,
 	"cleanOutputDir": true,
@@ -24,5 +25,6 @@
 	},
 	"out": "./dist",
 	"readme": "../README.md",
-	"searchInComments": true
+	"searchInComments": true,
+	"searchInDocuments": true
 }

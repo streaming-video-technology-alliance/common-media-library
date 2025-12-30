@@ -27,7 +27,7 @@ import type { vttc } from './boxes/WebVttCueBox.ts'
  *
  * @public
  */
-export type IsoContainerMap = {
+export type IsoBoxContainerMap = {
 	dinf: dinf
 	edts: edts
 	// enca: enca

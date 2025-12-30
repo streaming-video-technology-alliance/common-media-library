@@ -97,7 +97,7 @@ export type CompositionTimeToSampleEntry = {
 };
 
 // @public
-export type ContainerReturn = IsoParsedBox<IsoContainer>;
+export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
 
 // @public (undocumented)
 export type ctts = CompositionTimeToSampleBox;
@@ -332,13 +332,40 @@ export type ipro = ItemProtectionBox;
 export type iref = ItemReferenceBox;
 
 // @public
-export function isContainer(box: IsoBox | Box): box is IsoContainer;
+export function isContainer(box: IsoBox | Box): box is IsoBoxContainer;
 
 // @public
 export function isFullBox(box: any): box is FullBox;
 
 // @public
 export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
+
+// @public
+export type IsoBoxContainer = IsoBoxContainerMap[keyof IsoBoxContainerMap];
+
+// @public
+export type IsoBoxContainerMap = {
+    dinf: dinf;
+    edts: edts;
+    grpl: grpl;
+    mdia: mdia;
+    meco: meco;
+    meta: meta;
+    mfra: mfra;
+    minf: minf;
+    moof: moof;
+    moov: moov;
+    mvex: mvex;
+    schi: schi;
+    sinf: sinf;
+    stbl: stbl;
+    strk: strk;
+    traf: traf;
+    trak: trak;
+    tref: tref;
+    udta: udta;
+    vttc: vttc;
+};
 
 // @public
 export type IsoBoxData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
@@ -522,11 +549,6 @@ export class IsoBoxWriteView {
     writeUint: (value: number, size: number) => void;
     writeUtf8TerminatedString: (value: string) => void;
 }
-
-// Warning: (ae-forgotten-export) The symbol "IsoContainerMap" needs to be exported by the entry point index.d.ts
-//
-// @public
-export type IsoContainer = IsoContainerMap[keyof IsoContainerMap];
 
 // @public
 export type IsoFieldTypeMap = {
@@ -1673,7 +1695,7 @@ export function writeAvc3(box: VisualSampleEntryBox<"avc3">): IsoBoxWriteView;
 export function writeAvc4(box: VisualSampleEntryBox<"avc4">): IsoBoxWriteView;
 
 // @public
-export function writeContainerBox<T$1 extends IsoContainer>(box: T$1, writers: IsoBoxWriterMap): IsoBoxWriteView;
+export function writeContainerBox<T$1 extends IsoBoxContainer>(box: T$1, writers: IsoBoxWriterMap): IsoBoxWriteView;
 
 // @public
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
