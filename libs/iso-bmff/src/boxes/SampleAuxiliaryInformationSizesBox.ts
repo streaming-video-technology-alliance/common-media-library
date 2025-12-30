@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Sample Auxiliary Information Sizes Box - 'saiz'
  *
- *
- * @beta
+ * @public
  */
 export type SampleAuxiliaryInformationSizesBox = FullBox & {
 	type: 'saiz';

@@ -4,7 +4,7 @@ import type { FullBox } from './FullBox.ts'
  * Chunk Offset Box - 'stco'
  *
  *
- * @beta
+ * @public
  */
 export type ChunkOffsetBox = FullBox & {
 	type: 'stco';

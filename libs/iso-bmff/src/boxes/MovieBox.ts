@@ -1,15 +1,21 @@
-import type { ContainerBox } from './ContainerBox.ts'
 import type { MovieExtendsBox } from './MovieExtendsBox.ts'
 import type { MovieHeaderBox } from './MovieHeaderBox.ts'
 import type { TrackBox } from './TrackBox.ts'
 import type { UserDataBox } from './UserDataBox.ts'
 
 /**
+ * Child boxes of Movie Box
+ *
+ * @public
+ */
+export type MovieBoxChild = MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox;
+
+/**
  * Movie Box - 'moov' - Container
  *
- *
- * @beta
+ * @public
  */
-export type MovieBox = ContainerBox<MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox> & {
+export type MovieBox = {
 	type: 'moov';
+	boxes: MovieBoxChild[];
 };

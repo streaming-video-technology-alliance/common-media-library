@@ -1,12 +1,18 @@
-import type { ContainerBox } from './ContainerBox.ts'
 import type { TrackReferenceTypeBox } from './TrackReferenceTypeBox.ts'
+
+/**
+ * Child boxes of Track Reference Box
+ *
+ * @public
+ */
+export type TrackReferenceBoxChild = TrackReferenceTypeBox;
 
 /**
  * Track Reference Box - 'tref' - Container
  *
- *
- * @beta
+ * @public
  */
-export type TrackReferenceBox = ContainerBox<TrackReferenceTypeBox> & {
+export type TrackReferenceBox = {
 	type: 'tref';
+	boxes: TrackReferenceBoxChild[];
 };

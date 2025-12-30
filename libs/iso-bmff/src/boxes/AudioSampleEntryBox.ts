@@ -3,8 +3,7 @@ import type { SampleEntryBox } from './SampleEntryBox.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.5.2.2 mp4a box (use AudioSampleEntry definition and naming)
  *
- *
- * @beta
+ * @public
  */
 export type AudioSampleEntryBox<T extends 'mp4a' | 'enca' = 'mp4a' | 'enca'> = SampleEntryBox & {
 	type: T;

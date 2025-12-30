@@ -1,13 +1,18 @@
-import type { ContainerBox } from './ContainerBox.ts'
 import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformationBox.ts'
 
 /**
+ * Child boxes of Item Protection Box
+ *
+ * @public
+ */
+export type ItemProtectionBoxChild = ProtectionSchemeInformationBox;
+/**
  * Item Protection Box - 'ipro' - Container
  *
- *
- * @beta
+ * @public
  */
-export type ItemProtectionBox = ContainerBox<ProtectionSchemeInformationBox> & {
+export type ItemProtectionBox = {
 	type: 'ipro';
+	boxes: ItemProtectionBoxChild[];
 	protectionCount: number;
 };

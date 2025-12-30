@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time
  *
- *
- * @beta
+ * @public
  */
 export type ProducerReferenceTimeBox = FullBox & {
 	type: 'prft';

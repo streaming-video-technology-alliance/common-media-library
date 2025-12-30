@@ -1,12 +1,18 @@
-import type { ContainerBox } from './ContainerBox.ts'
 import type { EditListBox } from './EditListBox.ts'
+
+/**
+ * Child boxes of Edit Box
+ *
+ * @public
+ */
+export type EditBoxChild = EditListBox;
 
 /**
  * Edit Box - 'edts' - Container
  *
- *
- * @beta
+ * @public
  */
-export type EditBox = ContainerBox<EditListBox> & {
+export type EditBox = {
 	type: 'edts';
+	boxes: EditBoxChild[];
 };

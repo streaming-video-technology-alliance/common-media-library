@@ -1,12 +1,9 @@
-import type { Box } from './Box.ts'
-
 /**
  * ISO/IEC 14496-12:2012 - 8.12.2 Original Format Box
  *
- *
- * @beta
+ * @public
  */
-export type OriginalFormatBox = Box & {
+export type OriginalFormatBox = {
 	type: 'frma';
 	dataFormat: number;
 };

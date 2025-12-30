@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Item Info Entry - 'infe'
  *
- *
- * @beta
+ * @public
  */
 export type ItemInfoEntry = FullBox & {
 	type: 'infe';

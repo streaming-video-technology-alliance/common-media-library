@@ -1,7 +1,6 @@
 /**
  * The UTF8 field type
  *
- *
- * @beta
+ * @public
  */
 export const UTF8 = 'utf8'

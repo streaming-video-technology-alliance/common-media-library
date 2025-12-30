@@ -1,8 +1,7 @@
 /**
  * Sample to Group Entry
  *
- *
- * @beta
+ * @public
  */
 export type SampleToGroupEntry = {
 	sampleCount: number;

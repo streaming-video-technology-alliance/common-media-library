@@ -1,8 +1,7 @@
 /**
  * Track run sample
  *
- *
- * @beta
+ * @public
  */
 export type TrackRunSample = {
 	sampleDuration?: number;

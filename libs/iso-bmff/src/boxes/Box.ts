@@ -1,15 +1,15 @@
-import type { IsoView } from '../IsoView.ts'
+import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
  * Base Box Type
  *
- *
- * @beta
+ * @public
  */
 export type Box = {
-	type: string;
+	// TODO: This is a hack to get type discrimination to work
+	type: '';
 	size: number;
-	view: IsoView;
+	view: IsoBoxReadView;
 	largesize?: number;
 	usertype?: number[];
 };

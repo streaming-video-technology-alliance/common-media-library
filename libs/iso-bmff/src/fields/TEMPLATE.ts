@@ -1,7 +1,6 @@
 /**
  * The template field type
  *
- *
- * @beta
+ * @public
  */
 export const TEMPLATE = 'template'

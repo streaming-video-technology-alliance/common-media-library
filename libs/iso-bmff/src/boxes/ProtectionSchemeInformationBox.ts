@@ -1,15 +1,21 @@
-import type { ContainerBox } from './ContainerBox.ts'
 import type { IpmpInfoBox } from './IpmpInfoBox.ts'
 import type { OriginalFormatBox } from './OriginalFormatBox.ts'
 import type { SchemeInformationBox } from './SchemeInformationBox.ts'
 import type { SchemeTypeBox } from './SchemeTypeBox.ts'
 
 /**
+ * Child boxes of Protection Scheme Information Box
+ *
+ * @public
+ */
+export type ProtectionSchemeInformationBoxChild = OriginalFormatBox | IpmpInfoBox | SchemeTypeBox | SchemeInformationBox;
+
+/**
  * Protection Scheme Information Box - 'sinf' - Container
  *
- *
- * @beta
+ * @public
  */
-export type ProtectionSchemeInformationBox = ContainerBox<OriginalFormatBox | IpmpInfoBox | SchemeTypeBox | SchemeInformationBox> & {
+export type ProtectionSchemeInformationBox = {
 	type: 'sinf';
+	boxes: ProtectionSchemeInformationBoxChild[];
 };

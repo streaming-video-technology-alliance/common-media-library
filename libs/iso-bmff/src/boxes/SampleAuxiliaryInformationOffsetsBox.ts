@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Sample Auxiliary Information Offsets Box - 'saio'
  *
- *
- * @beta
+ * @public
  */
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
 	type: 'saio';

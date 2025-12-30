@@ -3,8 +3,7 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Compact Sample Size Box - 'stz2'
  *
- *
- * @beta
+ * @public
  */
 export type CompactSampleSizeBox = FullBox & {
 	type: 'stz2';
@@ -12,3 +11,8 @@ export type CompactSampleSizeBox = FullBox & {
 	sampleCount: number;
 	entrySize: number[];
 };
+
+/**
+ * @public
+ */
+export type stz2 = CompactSampleSizeBox;

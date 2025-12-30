@@ -1,12 +1,18 @@
-import type { ContainerBox } from './ContainerBox.ts'
 import type { SingleItemTypeReferenceBox } from './SingleItemTypeReferenceBox.ts'
+
+/**
+ * Child boxes of Item Reference Box
+ *
+ * @public
+ */
+export type ItemReferenceBoxChild = SingleItemTypeReferenceBox;
 
 /**
  * Item Reference Box - 'iref' - Container
  *
- *
- * @beta
+ * @public
  */
-export type ItemReferenceBox = ContainerBox<SingleItemTypeReferenceBox> & {
+export type ItemReferenceBox = {
 	type: 'iref';
+	boxes: ItemReferenceBoxChild[];
 };

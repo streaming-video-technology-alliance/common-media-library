@@ -1,8 +1,7 @@
 /**
  * Shadow Sync Entry
  *
- *
- * @beta
+ * @public
  */
 export type ShadowSyncEntry = {
 	shadowedSampleNumber: number;

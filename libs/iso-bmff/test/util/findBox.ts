@@ -1,13 +1,20 @@
-import { findBoxByType, type Box, type BoxParser } from '@svta/cml-iso-bmff'
+import { readIsoBoxes, traverseIsoBoxes, type IsoBoxMap, type IsoBoxReaderMap, type IsoTypedParsedBox } from '@svta/cml-iso-bmff'
 import assert from 'node:assert'
-import { createParsers } from './createParsers.ts'
 import { load } from './load.ts'
 
-export function findBox<T = Box>(file: string, boxParsers: BoxParser<T> | BoxParser<T>[]): T {
-	const { name, parsers } = createParsers(boxParsers)
-	const box = findBoxByType(load(file), name, { parsers, recursive: true })
+export function findBox<T extends keyof IsoBoxMap>(file: string, type: T, readers: IsoBoxReaderMap): IsoTypedParsedBox<T> {
+	const boxes = readIsoBoxes(load(file), { readers })
+	let found: IsoTypedParsedBox<T> | undefined
 
-	assert.ok(box)
+	for (const box of traverseIsoBoxes(boxes)) {
+		if (box.type === type) {
+			// TypeScript can't narrow ParsedBox to IsoTypedParsedBox<T> based on runtime type value,
+			// but we know at runtime that box.type === type, so the box matches IsoTypedParsedBox<T>
+			return box as unknown as IsoTypedParsedBox<T>
+		}
+	}
 
-	return box as T
+	assert.ok(found, `Box of type ${type} not found in file ${file}`)
+
+	return found
 }

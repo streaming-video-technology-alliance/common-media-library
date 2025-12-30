@@ -1,5 +1,6 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
+	"name": "CML",
 	"alwaysCreateEntryPointModule": false,
 	"groupReferencesByType": false,
 	"cleanOutputDir": true,
@@ -9,6 +10,7 @@
 		"../libs/*"
 	],
 	"packageOptions": {
+		"jsDocCompatibility": false,
 		"entryPoints": [
 			"src/index.ts"
 		]
@@ -16,13 +18,12 @@
 	"excludeInternal": true,
 	"excludePrivate": true,
 	"hideGenerator": true,
-	"jsDocCompatibility": {
-		"exampleTag": false
-	},
+	"jsDocCompatibility": false,
 	"navigation": {
 		"includeGroups": true
 	},
 	"out": "./dist",
 	"readme": "../README.md",
-	"searchInComments": true
+	"searchInComments": true,
+	"searchInDocuments": true
 }

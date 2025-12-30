@@ -1,8 +1,7 @@
 /**
  * Segment index reference
  *
- *
- * @beta
+ * @public
  */
 export type SegmentIndexReference = {
 	reference: number;

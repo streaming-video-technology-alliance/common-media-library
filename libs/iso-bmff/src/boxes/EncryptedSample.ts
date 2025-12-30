@@ -3,8 +3,7 @@ import type { SubsampleEncryption } from './SubsampleEncryption.ts'
 /**
  * Encrypted Sample
  *
- *
- * @beta
+ * @public
  */
 export type EncryptedSample = {
 	initializationVector?: Uint8Array;

@@ -1,12 +1,9 @@
-import type { Box } from './Box.ts'
-
 /**
  * Track Reference Type Box
  *
- *
- * @beta
+ * @public
  */
-export type TrackReferenceTypeBox = Box & {
+export type TrackReferenceTypeBox = {
 	type: 'tref';
 	trackIds: number[];
 };

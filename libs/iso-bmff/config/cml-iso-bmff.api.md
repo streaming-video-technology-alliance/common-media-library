@@ -4,16 +4,22 @@
 
 ```ts
 
-// @beta
-export function ardi(view: IsoView): Fields<AudioRenderingIndicationBox>;
+// @public
+export type AdditionalMetadataContainerBox = {
+    type: "meta";
+    boxes: AdditionalMetadataContainerBoxChild[];
+};
 
-// @beta
+// @public
+export type AdditionalMetadataContainerBoxChild = any;
+
+// @public
 export type AudioRenderingIndicationBox = FullBox & {
     type: "ardi";
     audioRenderingIndication: number;
 };
 
-// @beta
+// @public
 export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> = SampleEntryBox & {
     type: T$1;
     reserved2: number[];
@@ -25,51 +31,36 @@ export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> =
     esds: Uint8Array;
 };
 
-// @beta
-export function avc1(view: IsoView): Fields<VisualSampleEntryBox<"avc1">>;
-
-// @beta
-export function avc2(view: IsoView): Fields<VisualSampleEntryBox<"avc2">>;
-
-// @beta
-export function avc3(view: IsoView): Fields<VisualSampleEntryBox<"avc3">>;
-
-// @beta
-export function avc4(view: IsoView): Fields<VisualSampleEntryBox<"avc4">>;
-
-// @beta
+// @public
 export type Box = {
-    type: string;
+    type: "";
     size: number;
-    view: IsoView;
+    view: IsoBoxReadView;
     largesize?: number;
     usertype?: number[];
 };
 
-// @beta
-export type BoxFilter<T$1 extends IsoBmffBox> = ((box: IsoBmffBox) => boolean) | ((box: IsoBmffBox) => box is T$1);
+// @public
+export type BoxReturn<T$1 extends IsoBoxReaderMap> = IsoParsedBox<{ [K in keyof T$1]: T$1[K] extends IsoBoxReader<infer B> ? B : never }[keyof T$1]>;
 
-// @beta
-export type BoxParser<V = IsoBox> = (view: IsoView, config?: IsoViewConfig) => Fields<V>;
-
-// @beta
-export type BoxParserMap = Record<string, BoxParser>;
-
-// @beta
+// @public
 export type ChunkLargeOffsetBox = FullBox & {
     type: "co64";
     entryCount: number;
     chunkOffset: number[];
 };
 
-// @beta
+// @public
 export type ChunkOffsetBox = FullBox & {
     type: "stco";
     entryCount: number;
     chunkOffset: number[];
 };
 
-// @beta
+// @public (undocumented)
+export type co64 = ChunkLargeOffsetBox;
+
+// @public
 export type CompactSampleSizeBox = FullBox & {
     type: "stz2";
     fieldSize: number;
@@ -77,93 +68,93 @@ export type CompactSampleSizeBox = FullBox & {
     entrySize: number[];
 };
 
-// @beta
+// @public
 export type CompositionTimeToSampleBox = FullBox & {
     type: "ctts";
     entryCount: number;
     entries: CompositionTimeToSampleEntry[];
 };
 
-// @beta
+// @public
 export type CompositionTimeToSampleEntry = {
     sampleCount: number;
     sampleOffset: number;
 };
 
-// @beta
-export type ContainerBox<T$1> = Box & {
-    boxes: T$1[];
-};
+// @public
+export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
 
-// @beta
-export function createIsoView(raw: IsoData, config?: IsoViewConfig): IsoView;
+// @public
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig): ReadableStream<Uint8Array>;
 
-// @beta
-export function ctts(view: IsoView): Fields<CompositionTimeToSampleBox>;
-
-// @beta
+// @public
 export const DATA = "data";
 
-// @beta
+// @public
 export type DataEntryUrlBox = FullBox & {
     type: "url ";
-    location?: string;
+    location: string;
 };
 
-// @beta
+// @public
 export type DataEntryUrnBox = FullBox & {
     type: "urn ";
-    name?: string;
-    location?: string;
+    name: string;
+    location: string;
 };
 
-// @beta
-export type DataInformationBox = ContainerBox<DataReferenceBox> & {
+// @public
+export type DataInformationBox = {
     type: "dinf";
+    boxes: DataInformationBoxChild[];
 };
 
-// @beta
+// @public
+export type DataInformationBoxChild = DataReferenceBox;
+
+// @public
 export type DataReferenceBox = FullBox & {
     type: "dref";
     entryCount: number;
     entries: (DataEntryUrlBox | DataEntryUrnBox)[];
 };
 
-// @beta
+// @public
 export type DecodingTimeSample = {
     sampleCount: number;
     sampleDelta: number;
 };
 
-// @beta
+// @public
 export type DecodingTimeToSampleBox = FullBox & {
     type: "stts";
     entryCount: number;
     entries: DecodingTimeSample[];
 };
 
-// @beta
+// @public
 export type DegradationPriorityBox = FullBox & {
     type: "stdp";
     priority: number[];
 };
 
-// @beta
-export function dref(view: IsoView): Fields<DataReferenceBox>;
-
-// @beta
-export type EditBox = ContainerBox<EditListBox> & {
+// @public
+export type EditBox = {
     type: "edts";
+    boxes: EditBoxChild[];
 };
 
-// @beta
+// @public
+export type EditBoxChild = EditListBox;
+
+// @public
 export type EditListBox = FullBox & {
     type: "elst";
     entryCount: number;
     entries: EditListEntry[];
 };
 
-// @beta
+// @public
 export type EditListEntry = {
     segmentDuration: number;
     mediaTime: number;
@@ -171,33 +162,18 @@ export type EditListEntry = {
     mediaRateFraction: number;
 };
 
-// @beta
-export function elng(view: IsoView): Fields<ExtendedLanguageBox>;
-
-// @beta
-export function elst(view: IsoView): Fields<EditListBox>;
-
-// @beta
-export function emsg(view: IsoView): Fields<EventMessageBox>;
-
-// @beta
-export function enca(view: IsoView): Fields<AudioSampleEntryBox<"enca">>;
-
-// @beta
+// @public
 export type EncryptedSample = {
     initializationVector?: Uint8Array;
     subsampleEncryption?: SubsampleEncryption[];
 };
 
-// @beta
-export function encv(view: IsoView): Fields<VisualSampleEntryBox<"encv">>;
-
-// @beta
+// @public
 export type Entity = {
     entityId: number;
 };
 
-// @beta
+// @public
 export type EventMessageBox = FullBox & {
     type: "emsg";
     schemeIdUri: string;
@@ -210,52 +186,37 @@ export type EventMessageBox = FullBox & {
     messageData: Uint8Array;
 };
 
-// @beta
+// @public
 export type ExtendedLanguageBox = FullBox & {
     type: "elng";
     extendedLanguage: string;
 };
 
-// @beta
-export type Fields<T$1> = Omit<T$1, Exclude<keyof Box, "data"> | "boxes">;
-
-// @beta
+// @public
 export type FileTypeBox = TypeBox<"ftyp">;
 
-// @beta
-export function filterBoxes<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T$1>, config?: IsoViewConfig): T$1[];
-
-// @beta
-export function filterBoxesByType<T$1 extends keyof IsoBmffBoxMap>(raw: IsoData, type: T$1 | T$1[], config?: IsoViewConfig): IsoBmffBoxMap[T$1][];
-
-// @beta
-export function findBox<T$1 extends IsoBmffBox = IsoBmffBox>(raw: IsoData | Iterable<IsoBmffBox>, fn: BoxFilter<T$1>, config?: IsoViewConfig): T$1 | null;
-
-// @beta
-export function findBoxByType<T$1 extends keyof IsoBmffBoxMap>(raw: IsoData, type: T$1, config?: IsoViewConfig): IsoBmffBoxMap[T$1] | null;
-
-// @beta
-export function free(view: IsoView): Fields<FreeSpaceBox>;
-
-// @beta
-export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = Box & {
+// @public
+export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
     type: T$1;
     data: Uint8Array;
 };
 
-// @beta
-export function frma(view: IsoView): Fields<OriginalFormatBox>;
-
-// @beta
-export function ftyp(view: IsoView): Fields<FileTypeBox>;
-
-// @beta
-export type FullBox = Box & {
+// @public
+export type FullBox = {
     version: number;
     flags: number;
 };
 
-// @beta
+// @public
+export type GroupsListBox = {
+    type: "grpl";
+    boxes: GroupsListBoxChild[];
+};
+
+// @public
+export type GroupsListBoxChild = any;
+
+// @public
 export type HandlerReferenceBox = FullBox & {
     type: "hdlr";
     preDefined: number;
@@ -264,13 +225,7 @@ export type HandlerReferenceBox = FullBox & {
     name: string;
 };
 
-// @beta
-export function hdlr(view: IsoView): Fields<HandlerReferenceBox>;
-
-// @beta
-export function hev1(view: IsoView): Fields<VisualSampleEntryBox<"hev1">>;
-
-// @beta
+// @public
 export type HintMediaHeaderBox = FullBox & {
     type: "hmhd";
     maxPDUsize: number;
@@ -279,36 +234,63 @@ export type HintMediaHeaderBox = FullBox & {
     avgbitrate: number;
 };
 
-// @beta
-export function hvc1(view: IsoView): Fields<VisualSampleEntryBox<"avc1">>;
-
-// @beta
-export function iden(view: IsoView): Fields<WebVttCueIdBox>;
-
-// @beta
-export type IdentifiedMediaDataBox = Box & {
+// @public
+export type IdentifiedMediaDataBox = {
     type: "imda";
     imdaIdentifier: number;
     data: Uint8Array;
 };
 
-// @beta
-export function imda(view: IsoView): Fields<IdentifiedMediaDataBox>;
-
-// @beta
+// @public
 export const INT = "int";
 
-// @beta
+// @public
 export type IpmpInfoBox = FullBox & {
     type: "imif";
     ipmpDescr: any[];
 };
 
-// @beta
-export type IsoBmffBox = IsoBox | IsoContainerBox;
+// @public
+export function isContainer(box: IsoBox | Box): box is IsoBoxContainer;
 
-// @beta
-export type IsoBmffBoxMap = {
+// @public
+export function isFullBox(box: any): box is FullBox;
+
+// @public
+export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
+
+// @public
+export type IsoBoxContainer = IsoBoxContainerMap[keyof IsoBoxContainerMap];
+
+// @public
+export type IsoBoxContainerMap = {
+    dinf: DataInformationBox;
+    edts: EditBox;
+    grpl: GroupsListBox;
+    mdia: MediaBox;
+    meco: AdditionalMetadataContainerBox;
+    meta: MetaBox;
+    mfra: MovieFragmentRandomAccessBox;
+    minf: MediaInformationBox;
+    moof: MovieFragmentBox;
+    moov: MovieBox;
+    mvex: MovieExtendsBox;
+    schi: SchemeInformationBox;
+    sinf: ProtectionSchemeInformationBox;
+    stbl: SampleTableBox;
+    strk: SubTrackBox;
+    traf: TrackFragmentBox;
+    trak: TrackBox;
+    tref: TrackReferenceBox;
+    udta: UserDataBox;
+    vttc: WebVttCueBox;
+};
+
+// @public
+export type IsoBoxData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
+
+// @public
+export type IsoBoxMap = {
     ardi: AudioRenderingIndicationBox;
     avc1: VisualSampleEntryBox<"avc1">;
     avc2: VisualSampleEntryBox<"avc2">;
@@ -327,6 +309,7 @@ export type IsoBmffBoxMap = {
     free: FreeSpaceBox<"free">;
     frma: OriginalFormatBox;
     ftyp: FileTypeBox;
+    grpl: GroupsListBox;
     hdlr: HandlerReferenceBox;
     hev1: VisualSampleEntryBox<"hev1">;
     hmhd: HintMediaHeaderBox;
@@ -344,6 +327,7 @@ export type IsoBmffBoxMap = {
     mdat: MediaDataBox;
     mdhd: MediaHeaderBox;
     mdia: MediaBox;
+    meco: AdditionalMetadataContainerBox;
     mehd: MovieExtendsHeaderBox;
     meta: MetaBox;
     mfhd: MovieFragmentHeaderBox;
@@ -378,6 +362,7 @@ export type IsoBmffBoxMap = {
     stco: ChunkOffsetBox;
     stdp: DegradationPriorityBox;
     sthd: SubtitleMediaHeaderBox;
+    strk: SubTrackBox;
     stsc: SampleToChunkBox;
     stsd: SampleDescriptionBox;
     stsh: ShadowSyncSampleBox;
@@ -399,24 +384,92 @@ export type IsoBmffBoxMap = {
     trex: TrackExtendsBox;
     trun: TrackRunBox;
     udta: UserDataBox;
-    url: DataEntryUrlBox;
-    urn: DataEntryUrnBox;
+    "url ": DataEntryUrlBox;
+    "urn ": DataEntryUrnBox;
     vlab: WebVttSourceLabelBox;
     vmhd: VideoMediaHeaderBox;
+    vttc: WebVttCueBox;
     vttC: WebVttConfigurationBox;
     vtte: WebVttEmptySampleBox;
 };
 
-// @beta
-export type IsoBox = AudioRenderingIndicationBox | AudioSampleEntryBox<"enca"> | AudioSampleEntryBox<"mp4a"> | ChunkLargeOffsetBox | ChunkOffsetBox | CompactSampleSizeBox | CompositionTimeToSampleBox | DataEntryUrlBox | DataEntryUrnBox | DataReferenceBox | DecodingTimeToSampleBox | DegradationPriorityBox | EditListBox | EventMessageBox | ExtendedLanguageBox | FileTypeBox | FreeSpaceBox<"free"> | FreeSpaceBox<"skip"> | HandlerReferenceBox | HintMediaHeaderBox | IdentifiedMediaDataBox | IpmpInfoBox | ItemInfoEntry | ItemLocationBox | LabelBox | MediaDataBox | MediaHeaderBox | MovieExtendsHeaderBox | MovieFragmentHeaderBox | MovieFragmentRandomAccessOffsetBox | MovieHeaderBox | NullMediaHeaderBox | OriginalFormatBox | PrimaryItemBox | PreselectionGroupBox | ProducerReferenceTimeBox | ProtectionSystemSpecificHeaderBox | SampleAuxiliaryInformationOffsetsBox | SampleAuxiliaryInformationSizesBox | SampleDependencyTypeBox | SampleDescriptionBox | SampleEncryptionBox | SampleGroupDescriptionBox | SampleSizeBox | SampleToChunkBox | SampleToGroupBox | SchemeTypeBox | SegmentIndexBox | SegmentTypeBox | ShadowSyncSampleBox | SingleItemTypeReferenceBox | SoundMediaHeaderBox | SubsampleInformationBox | SubsegmentIndexBox | SubtitleMediaHeaderBox | SyncSampleBox | TrackEncryptionBox | TrackExtendsBox | TrackFragmentBaseMediaDecodeTimeBox | TrackFragmentHeaderBox | TrackFragmentRandomAccessBox | TrackHeaderBox | TrackKindBox | TrackRunBox | UrlBox | UrnBox | VideoMediaHeaderBox | VisualSampleEntryBox<"avc1"> | VisualSampleEntryBox<"avc2"> | VisualSampleEntryBox<"avc3"> | VisualSampleEntryBox<"avc4"> | VisualSampleEntryBox<"encv"> | VisualSampleEntryBox<"hev1"> | VisualSampleEntryBox<"hvc1"> | WebVttConfigurationBox | WebVttCueIdBox | WebVttCuePayloadBox | WebVttEmptySampleBox | WebVttSettingsBox | WebVttSourceLabelBox;
+// @public
+export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
+    constructor(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig);
+}
 
-// @beta
-export type IsoContainerBox = DataInformationBox | EditBox | ItemInfoBox | ItemProtectionBox | ItemReferenceBox | MediaBox | MediaInformationBox | MetaBox | MovieBox | MovieExtendsBox | MovieFragmentBox | MovieFragmentRandomAccessBox | ProtectionSchemeInformationBox | SampleTableBox | SchemeInformationBox | TrackBox | TrackFragmentBox | TrackReferenceBox | UserDataBox;
+// @public
+export type IsoBoxReadableStreamConfig = {
+    writers?: IsoBoxWriterMap;
+};
 
-// @beta
-export type IsoData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
+// @public
+export type IsoBoxReader<B$1 extends IsoBox> = (view: IsoBoxReadView) => B$1;
 
-// @beta
+// @public
+export type IsoBoxReaderMap = Partial<{ [P in IsoBox["type"]]: IsoBoxReader<Extract<IsoBox, Record<"type", P>>> }>;
+
+// @public
+export type IsoBoxReaderReturn<T$1 extends IsoBoxReaderMap> = BoxReturn<T$1> | ContainerReturn | ParsedBox;
+
+// @public
+export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
+    [Symbol.iterator](): Generator<ParsedBox>;
+    constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig<R>);
+    get buffer(): ArrayBuffer;
+    get byteLength(): number;
+    get byteOffset(): number;
+    get bytesRemaining(): number;
+    get cursor(): number;
+    get done(): boolean;
+    jump: (size: number) => void;
+    readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
+    readBox: () => Box;
+    readBoxes: <T = IsoBox>(length?: number) => T[];
+    readData: (size: number) => Uint8Array<ArrayBuffer>;
+    readEntries: <T>(length: number, map: () => T) => T[];
+    readFullBox: () => FullBox;
+    readInt: (size: number) => number;
+    readString: (size: number) => string;
+    readTemplate: (size: number) => number;
+    readUint: (size: number) => number;
+    readUtf8: (size?: number) => string;
+    slice: (offset: number, size: number) => IsoBoxReadView<R>;
+}
+
+// @public
+export type IsoBoxReadViewConfig<R extends IsoBoxReaderMap = IsoBoxReaderMap> = {
+    readers?: R;
+};
+
+// @public
+export type IsoBoxStreamable = IsoBox | Box | ArrayBufferView;
+
+// @public
+export type IsoBoxWriter<B$1> = (box: B$1) => ArrayBufferView;
+
+// @public
+export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
+
+// @public
+export class IsoBoxWriteView {
+    constructor(type: string, size: number);
+    get buffer(): ArrayBuffer;
+    get byteLength(): number;
+    get byteOffset(): number;
+    writeArray: <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number) => void;
+    writeBoxHeader: (type: string, size: number) => void;
+    writeBytes: (data: Uint8Array) => void;
+    writeFullBox(version: number, flags: number): void;
+    writeInt: (value: number, size: number) => void;
+    writeString: (value: string) => void;
+    writeTemplate: (value: number, size: number) => void;
+    writeTerminatedString: (value: string) => void;
+    writeUint: (value: number, size: number) => void;
+    writeUtf8TerminatedString: (value: string) => void;
+}
+
+// @public
 export type IsoFieldTypeMap = {
     uint: number;
     int: number;
@@ -427,47 +480,30 @@ export type IsoFieldTypeMap = {
     utf8string: string;
 };
 
-// @beta
-export class IsoView {
-    [Symbol.iterator](): Generator<IsoBmffBox>;
-    constructor(raw: ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>, config?: IsoViewConfig);
-    get bytesRemaining(): number;
-    get cursor(): number;
-    get done(): boolean;
-    readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
-    readBox: () => RawBox;
-    readBoxes: <T = IsoBmffBox>(length: number) => T[];
-    readData: (size: number) => Uint8Array<ArrayBuffer>;
-    readEntries: <T>(length: number, map: () => T) => T[];
-    readFullBox: () => Fields<FullBox>;
-    readInt: (size: number) => number;
-    readString: (size: number) => string;
-    readTemplate: (size: number) => number;
-    readUint: (size: number) => number;
-    readUtf8: (size?: number) => string;
-    slice: (size: number) => IsoView;
-}
+// @public
+export type IsoParsedBox<T$1 extends IsoBox = IsoBox> = T$1 & Omit<Box, "type">;
 
-// @beta
-export type IsoViewConfig = {
-    parsers?: BoxParserMap;
-    recursive?: boolean;
-};
+// @public
+export type IsoTypedParsedBox<T$1 extends keyof IsoBoxMap> = IsoBoxMap[T$1] & Omit<Box, "type">;
 
-// @beta
+// @public
 export type ItemExtent = {
     extentIndex?: number;
     extentOffset: number;
     extentLength: number;
 };
 
-// @beta
-export type ItemInfoBox = ContainerBox<ItemInfoEntry> & {
+// @public
+export type ItemInfoBox = {
     type: "iinf";
+    boxes: ItemInfoBoxChild[];
     entryCount: number;
 };
 
-// @beta
+// @public
+export type ItemInfoBoxChild = ItemInfoEntry;
+
+// @public
 export type ItemInfoEntry = FullBox & {
     type: "infe";
     itemId: number;
@@ -478,7 +514,7 @@ export type ItemInfoEntry = FullBox & {
     extensionType?: string;
 };
 
-// @beta
+// @public
 export type ItemLocation = {
     itemId: number;
     constructionMethod?: number;
@@ -487,7 +523,7 @@ export type ItemLocation = {
     extents: ItemExtent[];
 };
 
-// @beta
+// @public
 export type ItemLocationBox = FullBox & {
     type: "iloc";
     offsetSize: number;
@@ -498,21 +534,26 @@ export type ItemLocationBox = FullBox & {
     items: ItemLocation[];
 };
 
-// @beta
-export type ItemProtectionBox = ContainerBox<ProtectionSchemeInformationBox> & {
+// @public
+export type ItemProtectionBox = {
     type: "ipro";
+    boxes: ItemProtectionBoxChild[];
     protectionCount: number;
 };
 
-// @beta
-export type ItemReferenceBox = ContainerBox<SingleItemTypeReferenceBox> & {
+// @public
+export type ItemProtectionBoxChild = ProtectionSchemeInformationBox;
+
+// @public
+export type ItemReferenceBox = {
     type: "iref";
+    boxes: ItemReferenceBoxChild[];
 };
 
-// @beta
-export function kind(view: IsoView): Fields<TrackKindBox>;
+// @public
+export type ItemReferenceBoxChild = SingleItemTypeReferenceBox;
 
-// @beta
+// @public
 export type LabelBox = FullBox & {
     type: "labl";
     isGroupLabel: boolean;
@@ -521,27 +562,22 @@ export type LabelBox = FullBox & {
     label: string;
 };
 
-// @beta
-export function labl(view: IsoView): Fields<LabelBox>;
-
-// @beta
-export function mdat(view: IsoView): Fields<MediaDataBox>;
-
-// @beta
-export function mdhd(view: IsoView): Fields<MediaHeaderBox>;
-
-// @beta
-export type MediaBox = ContainerBox<MediaHeaderBox | HandlerReferenceBox | MediaInformationBox> & {
+// @public
+export type MediaBox = {
     type: "mdia";
+    boxes: MediaBoxChild[];
 };
 
-// @beta
-export type MediaDataBox = Box & {
+// @public
+export type MediaBoxChild = MediaHeaderBox | HandlerReferenceBox | MediaInformationBox;
+
+// @public
+export type MediaDataBox = {
     type: "mdat";
     data: Uint8Array<ArrayBuffer>;
 };
 
-// @beta
+// @public
 export type MediaHeaderBox = FullBox & {
     type: "mdhd";
     creationTime: number;
@@ -552,67 +588,79 @@ export type MediaHeaderBox = FullBox & {
     preDefined: number;
 };
 
-// @beta
-export type MediaInformationBox = ContainerBox<VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox> & {
+// @public
+export type MediaInformationBox = {
     type: "minf";
+    boxes: MediaInformationBoxChild[];
 };
 
-// @beta
-export function mehd(view: IsoView): Fields<MovieExtendsHeaderBox>;
+// @public
+export type MediaInformationBoxChild = VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox | SubtitleMediaHeaderBox;
 
-// @beta
-export function meta(view: IsoView): Fields<MetaBox>;
-
-// @beta
-export type MetaBox = FullBox & ContainerBox<HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox> & {
+// @public
+export type MetaBox = FullBox & {
     type: "meta";
+    boxes: MetaBoxChild[];
 };
 
-// @beta
-export function mfhd(view: IsoView): Fields<MovieFragmentHeaderBox>;
+// @public
+export type MetaBoxChild = HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox | GroupsListBox;
 
-// @beta
-export function mfro(view: IsoView): Fields<MovieFragmentRandomAccessOffsetBox>;
-
-// @beta
-export type MovieBox = ContainerBox<MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox> & {
+// @public
+export type MovieBox = {
     type: "moov";
+    boxes: MovieBoxChild[];
 };
 
-// @beta
-export type MovieExtendsBox = ContainerBox<MovieExtendsHeaderBox | TrackExtendsBox> & {
+// @public
+export type MovieBoxChild = MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox;
+
+// @public
+export type MovieExtendsBox = {
     type: "mvex";
+    boxes: MovieExtendsBoxChild[];
 };
 
-// @beta
+// @public
+export type MovieExtendsBoxChild = MovieExtendsHeaderBox | TrackExtendsBox;
+
+// @public
 export type MovieExtendsHeaderBox = FullBox & {
     type: "mehd";
     fragmentDuration: number;
 };
 
-// @beta
-export type MovieFragmentBox = ContainerBox<MovieFragmentHeaderBox | TrackFragmentBox> & {
+// @public
+export type MovieFragmentBox = {
     type: "moof";
+    boxes: MovieFragmentBoxChild[];
 };
 
-// @beta
+// @public
+export type MovieFragmentBoxChild = MovieFragmentHeaderBox | TrackFragmentBox;
+
+// @public
 export type MovieFragmentHeaderBox = FullBox & {
     type: "mfhd";
     sequenceNumber: number;
 };
 
-// @beta
-export type MovieFragmentRandomAccessBox = ContainerBox<TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox> & {
+// @public
+export type MovieFragmentRandomAccessBox = {
     type: "mfra";
+    boxes: MovieFragmentRandomAccessBoxChild[];
 };
 
-// @beta
+// @public
+export type MovieFragmentRandomAccessBoxChild = TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox;
+
+// @public
 export type MovieFragmentRandomAccessOffsetBox = FullBox & {
     type: "mfro";
     mfraSize: number;
 };
 
-// @beta
+// @public
 export type MovieHeaderBox = FullBox & {
     type: "mvhd";
     creationTime: number;
@@ -628,30 +676,21 @@ export type MovieHeaderBox = FullBox & {
     nextTrackId: number;
 };
 
-// @beta
-export function mp4a(view: IsoView): Fields<AudioSampleEntryBox<"mp4a">>;
-
-// @beta
-export function mvhd(view: IsoView): Fields<MovieHeaderBox>;
-
-// @beta
+// @public
 export type NullMediaHeaderBox = FullBox & {
     type: "nmhd";
 };
 
-// @beta
-export type OriginalFormatBox = Box & {
+// @public
+export type OriginalFormatBox = {
     type: "frma";
     dataFormat: number;
 };
 
-// @beta
-export function parseBoxes(raw: IsoData, config?: IsoViewConfig): IsoBmffBox[];
+// @public
+export type ParsedBox = IsoParsedBox | Box;
 
-// @beta
-export function payl(view: IsoView): Fields<WebVttCuePayloadBox>;
-
-// @beta
+// @public
 export type PreselectionGroupBox = FullBox & {
     type: "prsl";
     groupId: number;
@@ -662,16 +701,13 @@ export type PreselectionGroupBox = FullBox & {
     interleavingTag?: string;
 };
 
-// @beta
-export function prft(view: IsoView): Fields<ProducerReferenceTimeBox>;
-
-// @beta
+// @public
 export type PrimaryItemBox = FullBox & {
     type: "pitm";
     itemId: number;
 };
 
-// @beta
+// @public
 export type ProducerReferenceTimeBox = FullBox & {
     type: "prft";
     referenceTrackId: number;
@@ -680,12 +716,16 @@ export type ProducerReferenceTimeBox = FullBox & {
     mediaTime: number;
 };
 
-// @beta
-export type ProtectionSchemeInformationBox = ContainerBox<OriginalFormatBox | IpmpInfoBox | SchemeTypeBox | SchemeInformationBox> & {
+// @public
+export type ProtectionSchemeInformationBox = {
     type: "sinf";
+    boxes: ProtectionSchemeInformationBoxChild[];
 };
 
-// @beta
+// @public
+export type ProtectionSchemeInformationBoxChild = OriginalFormatBox | IpmpInfoBox | SchemeTypeBox | SchemeInformationBox;
+
+// @public
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
     type: "pssh";
     systemId: number[];
@@ -695,22 +735,190 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
     data: number[];
 };
 
-// @beta
-export function prsl(view: IsoView): Fields<PreselectionGroupBox>;
+// @public
+export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
 
-// @beta
-export function pssh(view: IsoView): Fields<ProtectionSystemSpecificHeaderBox>;
+// @public
+export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<"avc1">;
 
-// @beta
-export type RawBox = {
-    type: string;
-    size: number;
-    largesize?: number;
-    usertype?: number[];
-    data: IsoView;
-};
+// @public
+export function readAvc2(view: IsoBoxReadView): VisualSampleEntryBox<"avc2">;
 
-// @beta
+// @public
+export function readAvc3(view: IsoBoxReadView): VisualSampleEntryBox<"avc3">;
+
+// @public
+export function readAvc4(view: IsoBoxReadView): VisualSampleEntryBox<"avc4">;
+
+// @public
+export function readCtts(view: IsoBoxReadView): CompositionTimeToSampleBox;
+
+// @public
+export function readDref(view: IsoBoxReadView): DataReferenceBox;
+
+// @public
+export function readElng(view: IsoBoxReadView): ExtendedLanguageBox;
+
+// @public
+export function readElst(view: IsoBoxReadView): EditListBox;
+
+// @public
+export function readEmsg(view: IsoBoxReadView): EventMessageBox;
+
+// @public
+export function readEnca(view: IsoBoxReadView): AudioSampleEntryBox<"enca">;
+
+// @public
+export function readEncv(view: IsoBoxReadView): VisualSampleEntryBox<"encv">;
+
+// @public
+export function readFree(view: IsoBoxReadView): FreeSpaceBox;
+
+// @public
+export function readFrma(view: IsoBoxReadView): OriginalFormatBox;
+
+// @public
+export function readFtyp(view: IsoBoxReadView): FileTypeBox;
+
+// @public
+export function readHdlr(view: IsoBoxReadView): HandlerReferenceBox;
+
+// @public
+export function readHev1(view: IsoBoxReadView): VisualSampleEntryBox<"hev1">;
+
+// @public
+export function readHvc1(view: IsoBoxReadView): VisualSampleEntryBox<"hvc1">;
+
+// @public
+export function readIden(view: IsoBoxReadView): WebVttCueIdBox;
+
+// @public
+export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox;
+
+// @public
+export function readIsoBoxes<R extends IsoBoxReaderMap>(raw: IsoBoxData, config?: IsoBoxReadViewConfig<R>): IsoBoxReaderReturn<R>[];
+
+// @public
+export function readKind(view: IsoBoxReadView): TrackKindBox;
+
+// @public
+export function readLabl(view: IsoBoxReadView): LabelBox;
+
+// @public
+export function readMdat(view: IsoBoxReadView): MediaDataBox;
+
+// @public
+export function readMdhd(view: IsoBoxReadView): MediaHeaderBox;
+
+// @public
+export function readMehd(view: IsoBoxReadView): MovieExtendsHeaderBox;
+
+// @public
+export function readMeta(view: IsoBoxReadView): MetaBox;
+
+// @public
+export function readMfhd(view: IsoBoxReadView): MovieFragmentHeaderBox;
+
+// @public
+export function readMfro(view: IsoBoxReadView): MovieFragmentRandomAccessOffsetBox;
+
+// @public
+export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<"mp4a">;
+
+// @public
+export function readMvhd(view: IsoBoxReadView): MovieHeaderBox;
+
+// @public
+export function readPayl(view: IsoBoxReadView): WebVttCuePayloadBox;
+
+// @public
+export function readPrft(view: IsoBoxReadView): ProducerReferenceTimeBox;
+
+// @public
+export function readPrsl(view: IsoBoxReadView): PreselectionGroupBox;
+
+// @public
+export function readPssh(view: IsoBoxReadView): ProtectionSystemSpecificHeaderBox;
+
+// @public
+export function readSchm(view: IsoBoxReadView): SchemeTypeBox;
+
+// @public
+export function readSdtp(view: IsoBoxReadView): SampleDependencyTypeBox;
+
+// @public
+export function readSidx(view: IsoBoxReadView): SegmentIndexBox;
+
+// @public
+export function readSkip(view: IsoBoxReadView): FreeSpaceBox<"skip">;
+
+// @public
+export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox;
+
+// @public
+export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox;
+
+// @public
+export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox;
+
+// @public
+export function readStsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E>;
+
+// @public
+export function readStss(view: IsoBoxReadView): SyncSampleBox;
+
+// @public
+export function readSttg(view: IsoBoxReadView): WebVttSettingsBox;
+
+// @public
+export function readStts(view: IsoBoxReadView): DecodingTimeToSampleBox;
+
+// @public
+export function readStyp(view: IsoBoxReadView): SegmentTypeBox;
+
+// @public
+export function readSubs(view: IsoBoxReadView): SubsampleInformationBox;
+
+// @public
+export function readTenc(view: IsoBoxReadView): TrackEncryptionBox;
+
+// @public
+export function readTfdt(view: IsoBoxReadView): TrackFragmentBaseMediaDecodeTimeBox;
+
+// @public
+export function readTfhd(view: IsoBoxReadView): TrackFragmentHeaderBox;
+
+// @public
+export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox;
+
+// @public
+export function readTkhd(view: IsoBoxReadView): TrackHeaderBox;
+
+// @public
+export function readTrex(view: IsoBoxReadView): TrackExtendsBox;
+
+// @public
+export function readTrun(view: IsoBoxReadView): TrackRunBox;
+
+// @public
+export function readUrl(view: IsoBoxReadView): DataEntryUrlBox;
+
+// @public
+export function readUrn(view: IsoBoxReadView): DataEntryUrnBox;
+
+// @public
+export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox;
+
+// @public
+export function readVmhd(view: IsoBoxReadView): VideoMediaHeaderBox;
+
+// @public
+export function readVttC(view: IsoBoxReadView): WebVttConfigurationBox;
+
+// @public
+export function readVtte(_: IsoBoxReadView): WebVttEmptySampleBox;
+
+// @public
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
     type: "saio";
     auxInfoType?: number;
@@ -719,7 +927,7 @@ export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
     offset: number[];
 };
 
-// @beta
+// @public
 export type SampleAuxiliaryInformationSizesBox = FullBox & {
     type: "saiz";
     auxInfoType?: number;
@@ -729,33 +937,33 @@ export type SampleAuxiliaryInformationSizesBox = FullBox & {
     sampleInfoSize?: number[];
 };
 
-// @beta
+// @public
 export type SampleDependencyTypeBox = FullBox & {
     type: "sdtp";
     sampleDependencyTable: number[];
 };
 
-// @beta
+// @public
 export type SampleDescriptionBox<E extends SampleEntryBox = SampleEntryBox> = FullBox & {
     type: "stsd";
     entryCount: number;
     entries: E[];
 };
 
-// @beta
+// @public
 export type SampleEncryptionBox = FullBox & {
     type: "senc";
     sampleCount: number;
     samples: EncryptedSample[];
 };
 
-// @beta
-export type SampleEntryBox = Box & {
+// @public
+export type SampleEntryBox = {
     reserved1: number[];
     dataReferenceIndex: number;
 };
 
-// @beta
+// @public
 export type SampleGroupDescriptionBox = FullBox & {
     type: "sgpd";
     groupingType: number;
@@ -764,7 +972,7 @@ export type SampleGroupDescriptionBox = FullBox & {
     entries: any[];
 };
 
-// @beta
+// @public
 export type SampleSizeBox = FullBox & {
     type: "stsz";
     sampleSize: number;
@@ -772,26 +980,30 @@ export type SampleSizeBox = FullBox & {
     entrySize?: number[];
 };
 
-// @beta
-export type SampleTableBox = ContainerBox<SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox> & {
+// @public
+export type SampleTableBox = {
     type: "stbl";
+    boxes: SampleTableBoxChild[];
 };
 
-// @beta
+// @public
+export type SampleTableBoxChild = SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox;
+
+// @public
 export type SampleToChunkBox = FullBox & {
     type: "stsc";
     entryCount: number;
     entries: SampleToChunkEntry[];
 };
 
-// @beta
+// @public
 export type SampleToChunkEntry = {
     firstChunk: number;
     samplesPerChunk: number;
     sampleDescriptionIndex: number;
 };
 
-// @beta
+// @public
 export type SampleToGroupBox = FullBox & {
     type: "sbgp";
     groupingType: number;
@@ -800,18 +1012,22 @@ export type SampleToGroupBox = FullBox & {
     entries: SampleToGroupEntry[];
 };
 
-// @beta
+// @public
 export type SampleToGroupEntry = {
     sampleCount: number;
     groupDescriptionIndex: number;
 };
 
-// @beta
-export type SchemeInformationBox = ContainerBox<TrackEncryptionBox | Box> & {
+// @public
+export type SchemeInformationBox = {
     type: "schi";
+    boxes: SchemeInformationBoxChild[];
 };
 
-// @beta
+// @public
+export type SchemeInformationBoxChild = TrackEncryptionBox;
+
+// @public
 export type SchemeTypeBox = FullBox & {
     type: "schm";
     schemeType: number;
@@ -819,13 +1035,7 @@ export type SchemeTypeBox = FullBox & {
     schemeUri?: string;
 };
 
-// @beta
-export function schm(view: IsoView): Fields<SchemeTypeBox>;
-
-// @beta
-export function sdtp(view: IsoView): Fields<SampleDependencyTypeBox>;
-
-// @beta
+// @public
 export type SegmentIndexBox = FullBox & {
     type: "sidx";
     referenceId: number;
@@ -836,7 +1046,7 @@ export type SegmentIndexBox = FullBox & {
     references: SegmentIndexReference[];
 };
 
-// @beta
+// @public
 export type SegmentIndexReference = {
     reference: number;
     subsegmentDuration: number;
@@ -848,73 +1058,43 @@ export type SegmentIndexReference = {
     sapDeltaTime: number;
 };
 
-// @beta
+// @public
 export type SegmentTypeBox = TypeBox<"styp">;
 
-// @beta
+// @public
 export type ShadowSyncEntry = {
     shadowedSampleNumber: number;
     syncSampleNumber: number;
 };
 
-// @beta
+// @public
 export type ShadowSyncSampleBox = FullBox & {
     type: "stsh";
     entryCount: number;
     entries: ShadowSyncEntry[];
 };
 
-// @beta
-export function sidx(view: IsoView): Fields<SegmentIndexBox>;
-
-// @beta
-export type SingleItemTypeReferenceBox = Box & {
+// @public
+export type SingleItemTypeReferenceBox = {
     fromItemId: number;
     referenceCount: number;
     toItemId: number[];
 };
 
-// @beta
-export function skip(view: IsoView): Fields<FreeSpaceBox<"skip">>;
-
-// @beta
-export function smhd(view: IsoView): Fields<SoundMediaHeaderBox>;
-
-// @beta
+// @public
 export type SoundMediaHeaderBox = FullBox & {
     type: "smhd";
     balance: number;
     reserved: number;
 };
 
-// @beta
-export function ssix(view: IsoView): Fields<SubsegmentIndexBox>;
-
-// @beta
-export function sthd(view: IsoView): Fields<SubtitleMediaHeaderBox>;
-
-// @beta
+// @public
 export const STRING = "string";
 
-// @beta
-export function stsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoView): Fields<SampleDescriptionBox<E>>;
+// @public (undocumented)
+export type stz2 = CompactSampleSizeBox;
 
-// @beta
-export function stss(view: IsoView): Fields<SyncSampleBox>;
-
-// @beta
-export function sttg(view: IsoView): Fields<WebVttSettingsBox>;
-
-// @beta
-export function stts(view: IsoView): Fields<DecodingTimeToSampleBox>;
-
-// @beta
-export function styp(view: IsoView): Fields<SegmentTypeBox>;
-
-// @beta
-export function subs(view: IsoView): Fields<SubsampleInformationBox>;
-
-// @beta
+// @public
 export type Subsample = {
     subsampleSize: number;
     subsamplePriority: number;
@@ -922,86 +1102,84 @@ export type Subsample = {
     codecSpecificParameters: number;
 };
 
-// @beta
+// @public
 export type SubsampleEncryption = {
     bytesOfClearData: number;
     bytesOfProtectedData: number;
 };
 
-// @beta
+// @public
 export type SubsampleEntry = {
     sampleDelta: number;
     subsampleCount: number;
     subsamples: Subsample[];
 };
 
-// @beta
+// @public
 export type SubsampleInformationBox = FullBox & {
     type: "subs";
     entryCount: number;
     entries: SubsampleEntry[];
 };
 
-// @beta
+// @public
 export type Subsegment = {
     rangesCount: number;
     ranges: SubsegmentRange[];
 };
 
-// @beta
+// @public
 export type SubsegmentIndexBox = FullBox & {
     type: "ssix";
     subsegmentCount: number;
     subsegments: Subsegment[];
 };
 
-// @beta
+// @public
 export type SubsegmentRange = {
     level: number;
     rangeSize: number;
 };
 
-// @beta
+// @public
 export type SubtitleMediaHeaderBox = FullBox & {
     type: "sthd";
 };
 
-// @beta
+// @public
+export type SubTrackBox = {
+    type: "strk";
+    boxes: SubTrackBoxChild[];
+};
+
+// @public
+export type SubTrackBoxChild = any;
+
+// @public
 export type SyncSample = {
     sampleNumber: number;
 };
 
-// @beta
+// @public
 export type SyncSampleBox = FullBox & {
     type: "stss";
     entryCount: number;
     entries: SyncSample[];
 };
 
-// @beta
+// @public
 export const TEMPLATE = "template";
 
-// @beta
-export function tenc(view: IsoView): Fields<TrackEncryptionBox>;
-
-// @beta
-export function tfdt(view: IsoView): Fields<TrackFragmentBaseMediaDecodeTimeBox>;
-
-// @beta
-export function tfhd(view: IsoView): Fields<TrackFragmentHeaderBox>;
-
-// @beta
-export function tfra(view: IsoView): Fields<TrackFragmentRandomAccessBox>;
-
-// @beta
-export function tkhd(view: IsoView): Fields<TrackHeaderBox>;
-
-// @beta
-export type TrackBox = ContainerBox<TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox> & {
+// @public
+export type TrackBox = {
     type: "trak";
+    boxes: TrackBoxChild[];
 };
 
-// @beta
+// @public
+export type TrackBoxChild = TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox;
+
+// @public
 export type TrackEncryptionBox = FullBox & {
     type: "tenc";
     defaultIsEncrypted: number;
@@ -1009,7 +1187,7 @@ export type TrackEncryptionBox = FullBox & {
     defaultKid: number[];
 };
 
-// @beta
+// @public
 export type TrackExtendsBox = FullBox & {
     type: "trex";
     trackId: number;
@@ -1019,18 +1197,22 @@ export type TrackExtendsBox = FullBox & {
     defaultSampleFlags: number;
 };
 
-// @beta
+// @public
 export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
     type: "tfdt";
     baseMediaDecodeTime: number;
 };
 
-// @beta
-export type TrackFragmentBox = ContainerBox<TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox> & {
+// @public
+export type TrackFragmentBox = {
     type: "traf";
+    boxes: TrackFragmentBoxChild[];
 };
 
-// @beta
+// @public
+export type TrackFragmentBoxChild = TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox | SubsampleInformationBox;
+
+// @public
 export type TrackFragmentHeaderBox = FullBox & {
     type: "tfhd";
     trackId: number;
@@ -1041,7 +1223,7 @@ export type TrackFragmentHeaderBox = FullBox & {
     defaultSampleFlags?: number;
 };
 
-// @beta
+// @public
 export type TrackFragmentRandomAccessBox = FullBox & {
     type: "tfra";
     trackId: number;
@@ -1053,7 +1235,7 @@ export type TrackFragmentRandomAccessBox = FullBox & {
     entries: TrackFragmentRandomAccessEntry[];
 };
 
-// @beta
+// @public
 export type TrackFragmentRandomAccessEntry = {
     time: number;
     moofOffset: number;
@@ -1062,7 +1244,7 @@ export type TrackFragmentRandomAccessEntry = {
     sampleNumber: number;
 };
 
-// @beta
+// @public
 export type TrackHeaderBox = FullBox & {
     type: "tkhd";
     creationTime: number;
@@ -1080,25 +1262,29 @@ export type TrackHeaderBox = FullBox & {
     height: number;
 };
 
-// @beta
+// @public
 export type TrackKindBox = FullBox & {
     type: "kind";
     schemeUri: string;
     value: string;
 };
 
-// @beta
-export type TrackReferenceBox = ContainerBox<TrackReferenceTypeBox> & {
+// @public
+export type TrackReferenceBox = {
     type: "tref";
+    boxes: TrackReferenceBoxChild[];
 };
 
-// @beta
-export type TrackReferenceTypeBox = Box & {
+// @public
+export type TrackReferenceBoxChild = TrackReferenceTypeBox;
+
+// @public
+export type TrackReferenceTypeBox = {
     type: "tref";
     trackIds: number[];
 };
 
-// @beta
+// @public
 export type TrackRunBox = FullBox & {
     type: "trun";
     sampleCount: number;
@@ -1107,7 +1293,7 @@ export type TrackRunBox = FullBox & {
     samples: TrackRunSample[];
 };
 
-// @beta
+// @public
 export type TrackRunSample = {
     sampleDuration?: number;
     sampleSize?: number;
@@ -1115,59 +1301,47 @@ export type TrackRunSample = {
     sampleCompositionTimeOffset?: number;
 };
 
-// @beta
-export function trex(view: IsoView): Fields<TrackExtendsBox>;
+// @public
+export function traverseIsoBoxes(boxes: Iterable<ParsedBox>, depthFirst?: boolean, maxDepth?: number): Generator<ParsedBox>;
 
-// @beta
-export function trun(view: IsoView): Fields<TrackRunBox>;
-
-// @beta
-export type TypeBox<T$1> = Box & {
+// @public
+export type TypeBox<T$1> = {
     type: T$1;
     majorBrand: string;
     minorVersion: number;
     compatibleBrands: string[];
 };
 
-// @beta
+// @public
 export const UINT = "uint";
 
-// @beta
-export function url(view: IsoView): Fields<UrlBox>;
+// @public (undocumented)
+export type url = DataEntryUrlBox;
 
-// @beta
-export type UrlBox = FullBox & {
-    type: "url";
-    location: string;
-};
+// @public (undocumented)
+export type urn = DataEntryUrnBox;
 
-// @beta
-export function urn(view: IsoView): Fields<UrnBox>;
-
-// @beta
-export type UrnBox = FullBox & {
-    type: "urn";
-    name: string;
-    location: string;
-};
-
-// @beta
-export type UserDataBox = ContainerBox<Box> & {
+// @public
+export type UserDataBox = {
     type: "udta";
+    boxes: UserDataBoxChild[];
 };
 
-// @beta
+// @public
+export type UserDataBoxChild = any;
+
+// @public
 export const UTF8 = "utf8";
 
-// @beta
+// @public
 export type VideoMediaHeaderBox = FullBox & {
     type: "vmhd";
     graphicsmode: number;
     opcolor: number[];
 };
 
-// @beta
-export type VisualSampleEntryBox<T$1 extends "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv"> = SampleEntryBox & {
+// @public
+export type VisualSampleEntryBox<T$1 extends VisualSampleEntryType> = SampleEntryBox & {
     type: T$1;
     preDefined1: number;
     reserved2: number;
@@ -1184,52 +1358,235 @@ export type VisualSampleEntryBox<T$1 extends "avc1" | "avc2" | "avc3" | "avc4" |
     config: Uint8Array;
 };
 
-// @beta
-export function vlab(view: IsoView): Fields<WebVttSourceLabelBox>;
+// @public
+export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv";
 
-// @beta
-export function vmhd(view: IsoView): Fields<VideoMediaHeaderBox>;
-
-// @beta
-export function vttC(view: IsoView): Fields<WebVttConfigurationBox>;
-
-// @beta
-export function vtte(): Fields<WebVttEmptySampleBox>;
-
-// @beta
-export type WebVttConfigurationBox = Box & {
+// @public
+export type WebVttConfigurationBox = {
     type: "vttC";
     config: string;
 };
 
-// @beta
-export type WebVttCueIdBox = Box & {
+// @public
+export type WebVttCueBox = {
+    type: "vttc";
+    boxes: WebVttCueChild[];
+};
+
+// @public
+export type WebVttCueChild = WebVttCueIdBox | WebVttCuePayloadBox;
+
+// @public
+export type WebVttCueIdBox = {
     type: "iden";
     cueId: string;
 };
 
-// @beta
-export type WebVttCuePayloadBox = Box & {
+// @public
+export type WebVttCuePayloadBox = {
     type: "payl";
     cueText: string;
 };
 
-// @beta
-export type WebVttEmptySampleBox = Box & {
+// @public
+export type WebVttEmptySampleBox = {
     type: "vtte";
 };
 
-// @beta
-export type WebVttSettingsBox = Box & {
+// @public
+export type WebVttSettingsBox = {
     type: "sttg";
     settings: string;
 };
 
-// @beta
-export type WebVttSourceLabelBox = Box & {
+// @public
+export type WebVttSourceLabelBox = {
     type: "vlab";
     sourceLabel: string;
 };
+
+// @public
+export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView;
+
+// @public
+export function writeAvc1(box: VisualSampleEntryBox<"avc1">): IsoBoxWriteView;
+
+// @public
+export function writeAvc2(box: VisualSampleEntryBox<"avc2">): IsoBoxWriteView;
+
+// @public
+export function writeAvc3(box: VisualSampleEntryBox<"avc3">): IsoBoxWriteView;
+
+// @public
+export function writeAvc4(box: VisualSampleEntryBox<"avc4">): IsoBoxWriteView;
+
+// @public
+export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
+
+// @public
+export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView;
+
+// @public
+export function writeElst(box: EditListBox): IsoBoxWriteView;
+
+// @public
+export function writeEmsg(box: EventMessageBox): IsoBoxWriteView;
+
+// @public
+export function writeEnca(box: AudioSampleEntryBox<"enca">): IsoBoxWriteView;
+
+// @public
+export function writeEncv(box: VisualSampleEntryBox<"encv">): IsoBoxWriteView;
+
+// @public
+export function writeFree(box: FreeSpaceBox<"free">): IsoBoxWriteView;
+
+// @public
+export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView;
+
+// @public
+export function writeFtyp(box: FileTypeBox): IsoBoxWriteView;
+
+// @public
+export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView;
+
+// @public
+export function writeHev1(box: VisualSampleEntryBox<"hev1">): IsoBoxWriteView;
+
+// @public
+export function writeHvc1(box: VisualSampleEntryBox<"hvc1">): IsoBoxWriteView;
+
+// @public
+export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
+
+// @public
+export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
+
+// @public
+export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Uint8Array;
+
+// @public
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig): Uint8Array[];
+
+// @public
+export function writeKind(box: TrackKindBox): IsoBoxWriteView;
+
+// @public
+export function writeLabl(box: LabelBox): IsoBoxWriteView;
+
+// @public
+export function writeMdat(box: MediaDataBox): IsoBoxWriteView;
+
+// @public
+export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeMeta(box: MetaBox): IsoBoxWriteView;
+
+// @public
+export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView;
+
+// @public
+export function writeMp4a(box: AudioSampleEntryBox<"mp4a">): IsoBoxWriteView;
+
+// @public
+export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView;
+
+// @public
+export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView;
+
+// @public
+export function writePrsl(box: PreselectionGroupBox): IsoBoxWriteView;
+
+// @public
+export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView;
+
+// @public
+export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView;
+
+// @public
+export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView;
+
+// @public
+export function writeSkip(box: FreeSpaceBox<"skip">): IsoBoxWriteView;
+
+// @public
+export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView;
+
+// @public
+export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeStss(box: SyncSampleBox): IsoBoxWriteView;
+
+// @public
+export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView;
+
+// @public
+export function writeStts(box: DecodingTimeToSampleBox): IsoBoxWriteView;
+
+// @public
+export function writeStyp(box: SegmentTypeBox): IsoBoxWriteView;
+
+// @public
+export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView;
+
+// @public
+export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView;
+
+// @public
+export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWriteView;
+
+// @public
+export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView;
+
+// @public
+export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView;
+
+// @public
+export function writeTrun(box: TrackRunBox): IsoBoxWriteView;
+
+// @public
+export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
+
+// @public
+export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView;
+
+// @public
+export function writeVisualSampleEntryBox<T$1 extends VisualSampleEntryType>(box: VisualSampleEntryBox<T$1>, type: T$1): IsoBoxWriteView;
+
+// @public
+export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView;
+
+// @public
+export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
+
+// @public
+export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;
 
 // (No @packageDocumentation comment for this package)
 

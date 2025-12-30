@@ -3,10 +3,14 @@ import type { FullBox } from './FullBox.ts'
 /**
  * Data Entry Url Box - 'url '
  *
- *
- * @beta
+ * @public
  */
 export type DataEntryUrlBox = FullBox & {
 	type: 'url ';
-	location?: string;
+	location: string;
 };
+
+/**
+ * @public
+ */
+export type url = DataEntryUrlBox;

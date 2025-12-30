@@ -1,13 +1,19 @@
-import type { ContainerBox } from './ContainerBox.ts'
 import type { MovieFragmentRandomAccessOffsetBox } from './MovieFragmentRandomAccessOffsetBox.ts'
 import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBox.ts'
 
 /**
+ * Child boxes of Movie Fragment Random Access Box
+ *
+ * @public
+ */
+export type MovieFragmentRandomAccessBoxChild = TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox;
+
+/**
  * Movie Fragment Random Access Box - 'mfra' - Container
  *
- *
- * @beta
+ * @public
  */
-export type MovieFragmentRandomAccessBox = ContainerBox<TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox> & {
+export type MovieFragmentRandomAccessBox = {
 	type: 'mfra';
+	boxes: MovieFragmentRandomAccessBoxChild[];
 };

@@ -1,12 +1,9 @@
-import type { Box } from './Box.ts'
-
 /**
  * ISO/IEC 14496-30:2014 - WebVTT Configuration Box
  *
- *
- * @beta
+ * @public
  */
-export type WebVttConfigurationBox = Box & {
+export type WebVttConfigurationBox = {
 	type: 'vttC';
 	config: string;
 };

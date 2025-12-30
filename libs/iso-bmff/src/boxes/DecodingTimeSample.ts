@@ -1,8 +1,7 @@
 /**
  * Decoding time sample
  *
- *
- * @beta
+ * @public
  */
 export type DecodingTimeSample = {
 	/** A 32-bit integer that specifies the number of consecutive samples that have the same decoding time delta. */

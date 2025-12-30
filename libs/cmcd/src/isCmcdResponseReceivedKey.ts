@@ -13,7 +13,7 @@ import type { CmcdResponse } from './CmcdResponse.js'
  * @public
  *
  * @example
- * {@includeCode ../../test/cmcd/isCmcdResponseReceivedKey.test.ts#example}
+ * {@includeCode ../test/isCmcdResponseReceivedKey.test.ts#example}
  */
 export function isCmcdResponseReceivedKey(key: string): key is keyof CmcdResponse {
 	return CMCD_RESPONSE_KEYS.includes(key as any)
