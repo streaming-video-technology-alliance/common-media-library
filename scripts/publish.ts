@@ -75,17 +75,23 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 }
 
 const packages = await loadPackages()
-const needsPublish = await Promise.all(
+const needsPublish: [PackageJson, string][] = await Promise.all(
 	Object
 		.entries(packages)
-		.map(([name, pkg]) => processPackage(name, pkg, packages))
+		.map(async ([name, pkg]) => {
+			const result = await processPackage(name, pkg, packages)
+			return [pkg[2], result]
+		})
 )
 
 // Publish the packages
-for (const folder of needsPublish) {
+for (const pkg of needsPublish) {
+	const [json, folder] = pkg
+
 	if (!folder) {
 		continue
 	}
 
-	await cmd(`npm publish --provenance --access public -w ${folder}`)
+	const tag = json.version.replace(/^\d+\.\d+\.\d+(.*$)/, '$1')
+	await cmd(`npm publish --provenance --access public -w ${folder} ${tag ? `--tag prerelease` : ''}`)
 }
