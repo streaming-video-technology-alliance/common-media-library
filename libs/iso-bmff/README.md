@@ -18,8 +18,7 @@ Boxes can be read from a buffer using the `readIsoBoxes` function which returns 
 > Container boxes are automatically parsed and do not need a reader function. All known container types are listed in the `CONTAINERS` constant.
 
 ```typescript
-import { readIsoBoxes } from "@svta/cml-iso-bmff";
-import { readFtyp } from "./readers/readFtyp.ts";
+import { readFtyp, readIsoBoxes } from "@svta/cml-iso-bmff";
 
 const buffer = await fetch("https://example.com/bbb.mp4").then((r) =>
 	r.arrayBuffer()
@@ -77,6 +76,8 @@ const stream = writeIsoBoxes(boxes, {
 When working with raw box objects in TypeScript, cast the objects to a box type to ensure type safety. This can be done in two ways. Either by using a box type from the libray:
 
 ```typescript
+import type { FileTypeBox } from "@svta/cml-iso-bmff";
+
 const box: FileTypeBox = {
 	type: "ftyp",
 	majorBrand: "isom",
@@ -97,9 +98,11 @@ const box = {
 >
 ```
 
-Box types can also be accessed from the `IsoBoxMap` type using the box's FourCC:
+Box types can also be accessed from `IsoBoxMap` using the box's FourCC:
 
 ```typescript
+import type { IsoBoxMap } from "@svta/cml-iso-bmff";
+
 const box: IsoBoxMap["ftyp"] = {
 	type: "ftyp",
 	majorBrand: "isom",
