@@ -367,7 +367,11 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 				yield box as IsoBox & Box
 			}
 			catch (error) {
-				break
+				if (error instanceof Error && error.message === 'Truncated box') {
+					break
+				}
+
+				throw error
 			}
 		}
 	}

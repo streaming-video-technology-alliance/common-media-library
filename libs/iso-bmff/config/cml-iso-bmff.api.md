@@ -1299,6 +1299,9 @@ export type TrackRunSample = {
 };
 
 // @public
+export function traverseIsoBoxes(boxes: Iterable<ParsedBox>, depthFirst?: boolean, maxDepth?: number): Generator<ParsedBox>;
+
+// @public
 export type TypeBox<T$1> = {
     type: T$1;
     majorBrand: string;

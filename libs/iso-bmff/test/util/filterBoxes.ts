@@ -1,5 +1,4 @@
-import { readIsoBoxes, type IsoBoxMap, type IsoBoxReaderMap, type IsoParsedBox } from '@svta/cml-iso-bmff'
-import { boxIterator } from './boxIterator.ts'
+import { readIsoBoxes, traverseIsoBoxes, type IsoBoxMap, type IsoBoxReaderMap, type IsoParsedBox } from '@svta/cml-iso-bmff'
 import { load } from './load.ts'
 
 export function filterBoxes<T extends keyof IsoBoxMap>(file: string, type: T, readers: IsoBoxReaderMap): IsoParsedBox<IsoBoxMap[T]>[] {
@@ -7,7 +6,7 @@ export function filterBoxes<T extends keyof IsoBoxMap>(file: string, type: T, re
 
 	const found: IsoParsedBox<IsoBoxMap[T]>[] = []
 
-	for (const box of boxIterator(boxes)) {
+	for (const box of traverseIsoBoxes(boxes)) {
 		if (box.type === type) {
 			found.push(box as unknown as IsoParsedBox<IsoBoxMap[T]>)
 		}
