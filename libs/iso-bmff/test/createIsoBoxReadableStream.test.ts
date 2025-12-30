@@ -1,10 +1,13 @@
-import { deepEqual, equal } from 'node:assert'
+import { equal } from 'node:assert'
+import { createWriteStream } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { describe, it, readFtyp, readIsoBoxes, writeFtyp, writeIsoBoxes, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
-import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { Writable } from 'node:stream'
+import { createIsoBoxReadableStream, describe, it, readFtyp, readIsoBoxes, writeFtyp, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
 
-describe('writeIsoBoxes', function () {
-	it('should write to a parsed file', async function () {
+describe('createIsoBoxReadableStream', function () {
+	it('should write from a parsed file', async function () {
 		// #region example
 		const isoFile = await readFile('test/fixtures/captions.mp4')
 
@@ -14,13 +17,16 @@ describe('writeIsoBoxes', function () {
 			}
 		})
 
-		const bytes = writeIsoBoxes(boxes, {
+		const stream = createIsoBoxReadableStream(boxes, {
 			writers: {
 				ftyp: writeFtyp,
 			}
 		})
 
-		deepEqual(isoFile, reduceUint8Arrays(bytes))
+		const copy = join(tmpdir(), 'captions-copy.mp4')
+		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
+
+		equal(Buffer.compare(isoFile, await readFile(copy)), 0)
 		// #endregion example
 	})
 
@@ -107,7 +113,7 @@ describe('writeIsoBoxes', function () {
 			}
 		]
 
-		const bytes = writeIsoBoxes(boxes, {
+		const stream = createIsoBoxReadableStream(boxes, {
 			writers: {
 				styp: writeStyp,
 				mfhd: writeMfhd,
@@ -120,11 +126,20 @@ describe('writeIsoBoxes', function () {
 		})
 
 		const isoFile = await readFile('test/fixtures/subsample.m4s')
-		deepEqual(isoFile, reduceUint8Arrays(bytes))
+		const copy = join(tmpdir(), 'subsample.mp4')
+		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
+
+		equal(Buffer.compare(isoFile, await readFile(copy)), 0)
 	})
 
 	it('should exit if boxes are empty', async function () {
-		const bytes = writeIsoBoxes([])
-		equal(bytes.length, 0)
+		const stream = createIsoBoxReadableStream([])
+		const buffers = []
+
+		for await (const data of stream) {
+			buffers.push(data)
+		}
+
+		equal(buffers.length, 0)
 	})
 })

@@ -85,6 +85,9 @@ export type CompositionTimeToSampleEntry = {
 export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
 
 // @public
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig): ReadableStream<Uint8Array>;
+
+// @public
 export const DATA = "data";
 
 // @public
@@ -392,7 +395,7 @@ export type IsoBoxMap = {
 
 // @public
 export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
-    constructor(boxes: IsoBoxStreamable[], config?: IsoBoxReadableStreamConfig);
+    constructor(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig);
 }
 
 // @public
@@ -1418,9 +1421,6 @@ export function writeAvc3(box: VisualSampleEntryBox<"avc3">): IsoBoxWriteView;
 export function writeAvc4(box: VisualSampleEntryBox<"avc4">): IsoBoxWriteView;
 
 // @public
-export function writeContainerBox<T$1 extends IsoBoxContainer>(box: T$1, writers: IsoBoxWriterMap): IsoBoxWriteView;
-
-// @public
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
 
 // @public
@@ -1466,7 +1466,7 @@ export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Uint8Array;
 
 // @public
-export function writeIsoBoxes(boxes: IsoBoxStreamable[], config: IsoBoxReadableStreamConfig): IsoBoxReadableStream;
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig): Uint8Array[];
 
 // @public
 export function writeKind(box: TrackKindBox): IsoBoxWriteView;

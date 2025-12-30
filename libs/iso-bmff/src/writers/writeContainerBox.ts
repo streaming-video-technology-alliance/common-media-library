@@ -12,8 +12,6 @@ import { writeIsoBox } from '../writeIsoBox.ts'
  * @param box - The ContainerBox to write
  *
  * @returns An IsoBmffWriter containing the encoded box
- *
- * @public
  */
 export function writeContainerBox<T extends IsoBoxContainer>(
 	box: T,

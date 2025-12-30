@@ -10,6 +10,9 @@ import { isContainer } from './utils/isContainer.ts'
  *
  * @returns A generator of boxes
  *
+ * @example
+ * {@includeCode ../test/traverseIsoBoxes.test.ts#example}
+ *
  * @public
  */
 export function* traverseIsoBoxes(boxes: Iterable<ParsedBox>, depthFirst: boolean = true, maxDepth: number = Infinity): Generator<ParsedBox> {

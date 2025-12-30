@@ -10,6 +10,7 @@
 		"../libs/*"
 	],
 	"packageOptions": {
+		"jsDocCompatibility": false,
 		"entryPoints": [
 			"src/index.ts"
 		]
@@ -17,9 +18,7 @@
 	"excludeInternal": true,
 	"excludePrivate": true,
 	"hideGenerator": true,
-	"jsDocCompatibility": {
-		"exampleTag": false
-	},
+	"jsDocCompatibility": false,
 	"navigation": {
 		"includeGroups": true
 	},

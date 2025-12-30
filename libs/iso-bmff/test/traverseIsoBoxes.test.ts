@@ -1,4 +1,6 @@
-import { traverseIsoBoxes, type ParsedBox } from '@svta/cml-iso-bmff'
+import { readIsoBoxes, traverseIsoBoxes, type ParsedBox } from '@svta/cml-iso-bmff'
+import { equal } from 'assert'
+import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
 describe('traverseIsoBoxes', function () {
@@ -11,6 +13,18 @@ describe('traverseIsoBoxes', function () {
 	function createContainer(type: string, boxes: ParsedBox[]): ParsedBox {
 		return { type, size: 0, boxes } as ParsedBox
 	}
+
+	it('should provide an example', async function () {
+		// #region example
+		const isoFile = await readFile('test/fixtures/captions.mp4')
+		const boxes = readIsoBoxes(new Uint8Array(isoFile))
+
+		for (const box of traverseIsoBoxes(boxes)) {
+			equal(box.type, 'ftyp')
+			break
+		}
+		// #endregion example
+	})
 
 	it('should traverse empty boxes', function () {
 		const boxes: ParsedBox[] = []

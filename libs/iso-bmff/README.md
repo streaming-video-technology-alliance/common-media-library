@@ -63,12 +63,57 @@ const boxes = [
 	},
 ];
 
-const stream = writeIsoBoxes(boxes, {
+const byteArrays = writeIsoBoxes(boxes, {
 	writers: {
 		ftyp: writeFtyp,
 		mdat: writeMdat,
 	},
 });
+
+for (const byteArray of byteArrays) {
+	sourceBuffer.appendBuffer(byteArray.buffer);
+	// wait for updateend event
+}
+```
+
+Boxes can also be written to a readable stream using the `createIsoBoxReadableStream` function.
+
+```typescript
+import {
+	createIsoBoxReadableStreams,
+	writeFtyp,
+	writeMdat,
+} from "@svta/cml-iso-bmff";
+
+const boxes = [
+	{
+		type: "ftyp",
+		majorBrand: "isom",
+		minorVersion: 1,
+		compatibleBrands: ["isom"],
+	},
+	new Uint8Array([
+		0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d,
+		0x00, 0x00, 0x00, 0x01, 0x69, 0x73, 0x6f, 0x6d,
+	]),
+	{
+		type: "mdat",
+		data: new Uint8Array([
+			102, 105, 114, 115, 116, 115, 101, 99, 111, 110, 100, 116, 104, 105, 114,
+			100,
+		]),
+	},
+];
+
+const readableStream = createIsoBoxReadableStreams(boxes, {
+	writers: {
+		ftyp: writeFtyp,
+		mdat: writeMdat,
+	},
+});
+
+const stream = await webTransport.createBidirectionalStream();
+readableStream.pipeTo(transport.writable);
 ```
 
 #### Type safety

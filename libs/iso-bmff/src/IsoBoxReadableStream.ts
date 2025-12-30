@@ -14,7 +14,7 @@ export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
 	 * @param boxes - The boxes to stream.
 	 * @param config - The configuration for the stream.
 	 */
-	constructor(boxes: IsoBoxStreamable[], config: IsoBoxReadableStreamConfig = {}) {
+	constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxReadableStreamConfig = {}) {
 		const iterator = boxes[Symbol.iterator]()
 		const { writers = {} } = config
 
