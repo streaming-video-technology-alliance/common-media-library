@@ -7,6 +7,7 @@ import { TEMPLATE } from './fields/TEMPLATE.ts'
 import { UINT } from './fields/UINT.ts'
 import { UTF8 } from './fields/UTF8.ts'
 import type { IsoBox } from './IsoBox.ts'
+import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 import type { ParsedBox } from './ParsedBox.ts'
@@ -26,10 +27,10 @@ import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
  *
  * @public
  */
-export class IsoBoxReadView {
+export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 	private dataView: DataView<ArrayBuffer>
 	private offset: number
-	private config: IsoBoxReadViewConfig
+	private config: IsoBoxReadViewConfig<R>
 	private truncated: boolean = false
 
 	/**
@@ -40,10 +41,10 @@ export class IsoBoxReadView {
 	 * @param raw - The raw data to view.
 	 * @param config - The configuration for the IsoView.
 	 */
-	constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig) {
+	constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig<R>) {
 		this.dataView = (raw instanceof ArrayBuffer) ? new DataView<ArrayBuffer>(raw) : (raw instanceof DataView) ? raw : new DataView<ArrayBuffer>(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
-		this.config = config || { readers: {} }
+		this.config = config || { readers: {} as R }
 	}
 
 	/**
@@ -94,7 +95,7 @@ export class IsoBoxReadView {
 	 * @param size - The size of the slice.
 	 * @returns A new IsoView instance.
 	 */
-	slice = (offset: number, size: number): IsoBoxReadView => {
+	slice = (offset: number, size: number): IsoBoxReadView<R> => {
 		const dataView = new DataView(this.dataView.buffer, offset, size)
 		const isoView = new IsoBoxReadView(dataView, this.config)
 		const headerSize = this.offset - offset
@@ -340,13 +341,13 @@ export class IsoBoxReadView {
 	 * @returns A generator of boxes.
 	 */
 	*[Symbol.iterator](): Generator<ParsedBox> {
-		const { readers = {} } = this.config
+		const { readers = {} as R } = this.config
 
 		while (!this.done) {
 			try {
 				const box = this.readBox() as ParsedBox
 				const { type, view } = box
-				const parser = readers[type as keyof typeof readers] || readers[type.trim() as keyof typeof readers] // url and urn boxes have a trailing space in their type field
+				const parser = readers[type as keyof IsoBoxReaderMap] || readers[type.trim() as keyof IsoBoxReaderMap] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
 					Object.assign(box, parser(view))

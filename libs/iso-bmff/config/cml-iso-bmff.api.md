@@ -467,9 +467,9 @@ export type IsoBoxReaderMap = Partial<{ [P in IsoBox["type"]]: IsoBoxReader<Extr
 export type IsoBoxReaderReturn<T$1 extends IsoBoxReaderMap> = BoxReturn<T$1> | ContainerReturn | ParsedBox;
 
 // @public
-export class IsoBoxReadView {
+export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
     [Symbol.iterator](): Generator<ParsedBox>;
-    constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig);
+    constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig<R>);
     get buffer(): ArrayBuffer;
     get byteLength(): number;
     get byteOffset(): number;
@@ -488,7 +488,7 @@ export class IsoBoxReadView {
     readTemplate: (size: number) => number;
     readUint: (size: number) => number;
     readUtf8: (size?: number) => string;
-    slice: (offset: number, size: number) => IsoBoxReadView;
+    slice: (offset: number, size: number) => IsoBoxReadView<R>;
 }
 
 // @public
@@ -924,7 +924,7 @@ export function readIden(view: IsoBoxReadView): WebVttCueIdBox;
 export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox;
 
 // @public
-export function readIsoBoxes<R extends IsoBoxReaderMap, C extends IsoBoxReadViewConfig<R>>(raw: IsoBoxData, config?: C): IsoBoxReaderReturn<R>[];
+export function readIsoBoxes<R extends IsoBoxReaderMap>(raw: IsoBoxData, config?: IsoBoxReadViewConfig<R>): IsoBoxReaderReturn<R>[];
 
 // @public
 export function readKind(view: IsoBoxReadView): TrackKindBox;

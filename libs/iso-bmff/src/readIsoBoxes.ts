@@ -17,7 +17,7 @@ import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
  *
  * @public
  */
-export function readIsoBoxes<R extends IsoBoxReaderMap, C extends IsoBoxReadViewConfig<R>>(raw: IsoBoxData, config?: C): IsoBoxReaderReturn<R>[] {
+export function readIsoBoxes<R extends IsoBoxReaderMap>(raw: IsoBoxData, config?: IsoBoxReadViewConfig<R>): IsoBoxReaderReturn<R>[] {
 	const boxes = []
 
 	for (const box of new IsoBoxReadView(raw, config)) {

@@ -5,11 +5,11 @@ describe('parsing error tests', function () {
 
 	it('parsing error tests', async () => {
 		const testInfo = [{
-			file: './test/webvtt/file-layout/blank-file.vtt',
+			file: 'test/file-layout/blank-file.vtt',
 			name: 'WebVttParsingError',
 			code: 0,
 		}, {
-			file: './test/webvtt/cue-times/fraction-digits.vtt',
+			file: 'test/cue-times/fraction-digits.vtt',
 			name: 'WebVttParsingError',
 			code: 1,
 		}]
