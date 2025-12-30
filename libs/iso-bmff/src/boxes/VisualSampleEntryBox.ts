@@ -22,3 +22,38 @@ export type VisualSampleEntryBox<T extends VisualSampleEntryType> = SampleEntryB
 	preDefined3: number;
 	config: Uint8Array;
 };
+
+/**
+ * @public
+ */
+export type avc1 = VisualSampleEntryBox<'avc1'>;
+
+/**
+ * @public
+ */
+export type avc2 = VisualSampleEntryBox<'avc2'>;
+
+/**
+ * @public
+ */
+export type avc3 = VisualSampleEntryBox<'avc3'>;
+
+/**
+ * @public
+ */
+export type avc4 = VisualSampleEntryBox<'avc4'>;
+
+/**
+ * @public
+ */
+export type hev1 = VisualSampleEntryBox<'hev1'>;
+
+/**
+ * @public
+ */
+export type hvc1 = VisualSampleEntryBox<'hvc1'>;
+
+/**
+ * @public
+ */
+export type encv = VisualSampleEntryBox<'encv'>;

@@ -6,7 +6,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  * @public
  */
 export type Box = {
-	type: string;
+	type: ''; // NOTE: no type means the box is not parsed
 	size: number;
 	view: IsoBoxReadView;
 	largesize?: number;

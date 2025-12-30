@@ -1,4 +1,3 @@
-import type { ContainerBox } from './boxes/ContainerBox.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
@@ -20,8 +19,8 @@ export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Ui
 	if ('type' in box) {
 		const { type } = box
 
-		if (isContainer(box)) {
-			view = writeContainerBox(box as ContainerBox<IsoBox>, writers)
+		if (type !== '' && isContainer(box)) {
+			view = writeContainerBox(box, writers)
 		}
 		else {
 			const writer = writers[type as IsoBox['type']]

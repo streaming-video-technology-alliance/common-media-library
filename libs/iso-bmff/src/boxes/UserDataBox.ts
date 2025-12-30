@@ -1,12 +1,18 @@
-import type { ContainerBox } from './ContainerBox.ts'
+/**
+ * Child boxes of User Data Box
+ *
+ * @public
+ */
+export type UserDataBoxChild = any;
 
 /**
  * User Data Box - 'udta' - Container
  *
  * @public
  */
-export type UserDataBox = ContainerBox<any> & {
+export type UserDataBox = {
 	type: 'udta';
+	boxes: UserDataBoxChild[];
 };
 
 /**

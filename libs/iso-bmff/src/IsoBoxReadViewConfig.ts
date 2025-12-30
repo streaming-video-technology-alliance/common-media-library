@@ -5,9 +5,9 @@ import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
  *
  * @public
  */
-export type IsoBoxReadViewConfig = {
+export type IsoBoxReadViewConfig<R extends IsoBoxReaderMap = IsoBoxReaderMap> = {
 	/**
 	 * A map of box parsers to their box types
 	 */
-	readers?: IsoBoxReaderMap
+	readers?: R
 }

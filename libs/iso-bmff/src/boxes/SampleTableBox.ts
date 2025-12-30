@@ -1,6 +1,5 @@
 import type { ChunkOffsetBox } from './ChunkOffsetBox.ts'
 import type { CompositionTimeToSampleBox } from './CompositionTimeToSampleBox.ts'
-import type { ContainerBox } from './ContainerBox.ts'
 import type { DecodingTimeToSampleBox } from './DecodingTimeToSampleBox.ts'
 import type { DegradationPriorityBox } from './DegradationPriorityBox.ts'
 import type { SampleDependencyTypeBox } from './SampleDependencyTypeBox.ts'
@@ -13,12 +12,20 @@ import type { ShadowSyncSampleBox } from './ShadowSyncSampleBox.ts'
 import type { SyncSampleBox } from './SyncSampleBox.ts'
 
 /**
+ * Child boxes of Sample Table Box
+ *
+ * @public
+ */
+export type SampleTableBoxChild = SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox;
+
+/**
  * Sample Table Box - 'stbl' - Container
  *
  * @public
  */
-export type SampleTableBox = ContainerBox<SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox> & {
+export type SampleTableBox = {
 	type: 'stbl';
+	boxes: SampleTableBoxChild[];
 };
 
 /**

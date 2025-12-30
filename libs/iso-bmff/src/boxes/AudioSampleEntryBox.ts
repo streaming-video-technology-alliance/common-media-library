@@ -15,3 +15,13 @@ export type AudioSampleEntryBox<T extends 'mp4a' | 'enca' = 'mp4a' | 'enca'> = S
 	samplerate: number;
 	esds: Uint8Array;
 };
+
+/**
+ * @public
+ */
+export type mp4a = AudioSampleEntryBox<'mp4a'>;
+
+/**
+ * @public
+ */
+export type enca = AudioSampleEntryBox<'enca'>;

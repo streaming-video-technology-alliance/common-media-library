@@ -1,7 +1,6 @@
-import type { ContainerBox } from '../boxes/ContainerBox.ts'
-import type { IsoBox } from '../IsoBox.ts'
 import type { IsoBoxWriterMap } from '../IsoBoxWriterMap.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import type { IsoContainer } from '../IsoContainer.ts'
 import { writeIsoBox } from '../writeIsoBox.ts'
 
 /**
@@ -16,8 +15,8 @@ import { writeIsoBox } from '../writeIsoBox.ts'
  *
  * @public
  */
-export function writeContainerBox<T extends IsoBox>(
-	box: ContainerBox<T>,
+export function writeContainerBox<T extends IsoContainer>(
+	box: T,
 	writers: IsoBoxWriterMap
 ): IsoBoxWriteView {
 	const children: Uint8Array[] = []

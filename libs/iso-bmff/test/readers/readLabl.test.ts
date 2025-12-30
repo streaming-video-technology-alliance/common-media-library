@@ -1,4 +1,4 @@
-import { assert, describe, findBox, it, readLabl, readMeta, readPrsl, type Box, type ParsedBox } from '../util/box.ts'
+import { assert, describe, findBox, it, readLabl, readMeta, readPrsl, type ParsedBox } from '../util/box.ts'
 
 describe('readLabl', function () {
 	it('should correctly parse the box from sample data', function () {
@@ -11,7 +11,7 @@ describe('readLabl', function () {
 		assert.ok(box)
 		assert.ok(box.boxes)
 
-		const boxes = box.boxes.filter((box: Box) => box.type === 'labl')
+		const boxes = box.boxes.filter((box: ParsedBox) => box.type === 'labl')
 
 		assert.strictEqual(boxes[0].type, 'labl')
 		assert.strictEqual(boxes[0].isGroupLabel, false)

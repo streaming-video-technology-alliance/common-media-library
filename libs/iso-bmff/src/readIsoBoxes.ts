@@ -1,7 +1,8 @@
 import type { IsoBoxData } from './IsoBoxData.ts'
+import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
+import type { IsoBoxReaderReturn } from './IsoBoxReaderReturn.ts'
 import { IsoBoxReadView } from './IsoBoxReadView.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
-import type { ParsedBox } from './ParsedBox.ts'
 
 /**
  * Reads ISO boxes from a data source.
@@ -16,7 +17,7 @@ import type { ParsedBox } from './ParsedBox.ts'
  *
  * @public
  */
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedBox[] {
+export function readIsoBoxes<R extends IsoBoxReaderMap, C extends IsoBoxReadViewConfig<R>>(raw: IsoBoxData, config?: C): IsoBoxReaderReturn<R>[] {
 	const boxes = []
 
 	for (const box of new IsoBoxReadView(raw, config)) {

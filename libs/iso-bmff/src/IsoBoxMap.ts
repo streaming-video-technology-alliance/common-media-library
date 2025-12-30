@@ -1,3 +1,4 @@
+import type { AdditionalMetadataContainerBox } from './boxes/AdditionalMetadataContainerBox.ts'
 import type { AudioRenderingIndicationBox } from './boxes/AudioRenderingIndicationBox.ts'
 import type { AudioSampleEntryBox } from './boxes/AudioSampleEntryBox.ts'
 import type { ChunkLargeOffsetBox } from './boxes/ChunkLargeOffsetBox.ts'
@@ -66,6 +67,7 @@ import type { SoundMediaHeaderBox } from './boxes/SoundMediaHeaderBox.ts'
 import type { SubsampleInformationBox } from './boxes/SubsampleInformationBox.ts'
 import type { SubsegmentIndexBox } from './boxes/SubsegmentIndexBox.ts'
 import type { SubtitleMediaHeaderBox } from './boxes/SubtitleMediaHeaderBox.ts'
+import type { SubTrackBox } from './boxes/SubTrackBox.ts'
 import type { SyncSampleBox } from './boxes/SyncSampleBox.ts'
 import type { TrackBox } from './boxes/TrackBox.ts'
 import type { TrackEncryptionBox } from './boxes/TrackEncryptionBox.ts'
@@ -82,6 +84,7 @@ import type { UserDataBox } from './boxes/UserDataBox.ts'
 import type { VideoMediaHeaderBox } from './boxes/VideoMediaHeaderBox.ts'
 import type { VisualSampleEntryBox } from './boxes/VisualSampleEntryBox.ts'
 import type { WebVttConfigurationBox } from './boxes/WebVttConfigurationBox.ts'
+import type { WebVttCueBox } from './boxes/WebVttCueBox.ts'
 import type { WebVttCueIdBox } from './boxes/WebVttCueIdBox.ts'
 import type { WebVttCuePayloadBox } from './boxes/WebVttCuePayloadBox.ts'
 import type { WebVttEmptySampleBox } from './boxes/WebVttEmptySampleBox.ts'
@@ -130,6 +133,7 @@ export type IsoBoxMap = {
 	mdat: MediaDataBox;
 	mdhd: MediaHeaderBox;
 	mdia: MediaBox;
+	meco: AdditionalMetadataContainerBox;
 	mehd: MovieExtendsHeaderBox;
 	meta: MetaBox;
 	mfhd: MovieFragmentHeaderBox;
@@ -164,6 +168,7 @@ export type IsoBoxMap = {
 	stco: ChunkOffsetBox;
 	stdp: DegradationPriorityBox;
 	sthd: SubtitleMediaHeaderBox;
+	strk: SubTrackBox;
 	stsc: SampleToChunkBox;
 	stsd: SampleDescriptionBox;
 	stsh: ShadowSyncSampleBox;
@@ -189,6 +194,7 @@ export type IsoBoxMap = {
 	'urn ': DataEntryUrnBox;
 	vlab: WebVttSourceLabelBox;
 	vmhd: VideoMediaHeaderBox;
+	vttc: WebVttCueBox;
 	vttC: WebVttConfigurationBox;
 	vtte: WebVttEmptySampleBox;
 };

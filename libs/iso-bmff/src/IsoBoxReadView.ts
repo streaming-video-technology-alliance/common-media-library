@@ -269,11 +269,9 @@ export class IsoBoxReadView {
 
 		// read box size and type without advancing the cursor in case the box is truncated
 		let cursor = 0
-
-		const box = {
-			size: readUint(dataView, offset, 4),
-			type: readString(dataView, offset + 4, 4),
-		} as Box
+		const size = readUint(dataView, offset, 4)
+		const type = readString(dataView, offset + 4, 4)
+		const box = { size, type } as Box
 
 		cursor += 8
 
@@ -290,7 +288,7 @@ export class IsoBoxReadView {
 
 		this.jump(cursor)
 
-		if (box.type === 'uuid') {
+		if (type === 'uuid') {
 			box.usertype = this.readArray('uint', 1, 16)
 		}
 
@@ -346,7 +344,7 @@ export class IsoBoxReadView {
 
 		while (!this.done) {
 			try {
-				const box = this.readBox() as Box
+				const box = this.readBox() as ParsedBox
 				const { type, view } = box
 				const parser = readers[type as keyof typeof readers] || readers[type.trim() as keyof typeof readers] // url and urn boxes have a trailing space in their type field
 
