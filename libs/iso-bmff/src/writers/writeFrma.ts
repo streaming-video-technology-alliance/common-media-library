@@ -17,8 +17,7 @@ export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView {
 	const dataFormatSize = 4
 	const totalSize = headerSize + dataFormatSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('frma', totalSize)
+	const writer = new IsoBoxWriteView('frma', totalSize)
 	writer.writeUint(box.dataFormat, 4)
 
 	return writer

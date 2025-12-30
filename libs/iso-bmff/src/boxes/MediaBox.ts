@@ -18,8 +18,3 @@ export type MediaBox = {
 	type: 'mdia';
 	boxes: MediaBoxChild[];
 };
-
-/**
- * @public
- */
-export type mdia = MediaBox;

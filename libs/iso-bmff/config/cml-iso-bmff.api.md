@@ -13,9 +13,6 @@ export type AdditionalMetadataContainerBox = {
 // @public
 export type AdditionalMetadataContainerBoxChild = any;
 
-// @public (undocumented)
-export type ardi = AudioRenderingIndicationBox;
-
 // @public
 export type AudioRenderingIndicationBox = FullBox & {
     type: "ardi";
@@ -33,18 +30,6 @@ export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> =
     samplerate: number;
     esds: Uint8Array;
 };
-
-// @public (undocumented)
-export type avc1 = VisualSampleEntryBox<"avc1">;
-
-// @public (undocumented)
-export type avc2 = VisualSampleEntryBox<"avc2">;
-
-// @public (undocumented)
-export type avc3 = VisualSampleEntryBox<"avc3">;
-
-// @public (undocumented)
-export type avc4 = VisualSampleEntryBox<"avc4">;
 
 // @public
 export type Box = {
@@ -65,7 +50,7 @@ export type ChunkLargeOffsetBox = FullBox & {
     chunkOffset: number[];
 };
 
-// @beta
+// @public
 export type ChunkOffsetBox = FullBox & {
     type: "stco";
     entryCount: number;
@@ -98,9 +83,6 @@ export type CompositionTimeToSampleEntry = {
 
 // @public
 export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
-
-// @public (undocumented)
-export type ctts = CompositionTimeToSampleBox;
 
 // @public
 export const DATA = "data";
@@ -153,12 +135,6 @@ export type DegradationPriorityBox = FullBox & {
     priority: number[];
 };
 
-// @public (undocumented)
-export type dinf = DataInformationBox;
-
-// @public (undocumented)
-export type dref = DataReferenceBox;
-
 // @public
 export type EditBox = {
     type: "edts";
@@ -183,29 +159,11 @@ export type EditListEntry = {
     mediaRateFraction: number;
 };
 
-// @public (undocumented)
-export type edts = EditBox;
-
-// @public (undocumented)
-export type elng = ExtendedLanguageBox;
-
-// @public (undocumented)
-export type elst = EditListBox;
-
-// @public (undocumented)
-export type emsg = EventMessageBox;
-
-// @public (undocumented)
-export type enca = AudioSampleEntryBox<"enca">;
-
 // @public
 export type EncryptedSample = {
     initializationVector?: Uint8Array;
     subsampleEncryption?: SubsampleEncryption[];
 };
-
-// @public (undocumented)
-export type encv = VisualSampleEntryBox<"encv">;
 
 // @public
 export type Entity = {
@@ -240,12 +198,6 @@ export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
     data: Uint8Array;
 };
 
-// @public (undocumented)
-export type frma = OriginalFormatBox;
-
-// @public (undocumented)
-export type ftyp = FileTypeBox;
-
 // @public
 export type FullBox = {
     version: number;
@@ -261,9 +213,6 @@ export type GroupsListBox = {
 // @public
 export type GroupsListBoxChild = any;
 
-// @public (undocumented)
-export type grpl = GroupsListBox;
-
 // @public
 export type HandlerReferenceBox = FullBox & {
     type: "hdlr";
@@ -272,12 +221,6 @@ export type HandlerReferenceBox = FullBox & {
     reserved: number[];
     name: string;
 };
-
-// @public (undocumented)
-export type hdlr = HandlerReferenceBox;
-
-// @public (undocumented)
-export type hev1 = VisualSampleEntryBox<"hev1">;
 
 // @public
 export type HintMediaHeaderBox = FullBox & {
@@ -288,33 +231,12 @@ export type HintMediaHeaderBox = FullBox & {
     avgbitrate: number;
 };
 
-// @public (undocumented)
-export type hmhd = HintMediaHeaderBox;
-
-// @public (undocumented)
-export type hvc1 = VisualSampleEntryBox<"hvc1">;
-
-// @public (undocumented)
-export type iden = WebVttCueIdBox;
-
 // @public
 export type IdentifiedMediaDataBox = {
     type: "imda";
     imdaIdentifier: number;
     data: Uint8Array;
 };
-
-// @public (undocumented)
-export type iinf = ItemInfoBox;
-
-// @public (undocumented)
-export type iloc = ItemLocationBox;
-
-// @public (undocumented)
-export type imda = IdentifiedMediaDataBox;
-
-// @public (undocumented)
-export type imif = IpmpInfoBox;
 
 // @public
 export const INT = "int";
@@ -324,12 +246,6 @@ export type IpmpInfoBox = FullBox & {
     type: "imif";
     ipmpDescr: any[];
 };
-
-// @public (undocumented)
-export type ipro = ItemProtectionBox;
-
-// @public (undocumented)
-export type iref = ItemReferenceBox;
 
 // @public
 export function isContainer(box: IsoBox | Box): box is IsoBoxContainer;
@@ -345,26 +261,26 @@ export type IsoBoxContainer = IsoBoxContainerMap[keyof IsoBoxContainerMap];
 
 // @public
 export type IsoBoxContainerMap = {
-    dinf: dinf;
-    edts: edts;
-    grpl: grpl;
-    mdia: mdia;
-    meco: meco;
-    meta: meta;
-    mfra: mfra;
-    minf: minf;
-    moof: moof;
-    moov: moov;
-    mvex: mvex;
-    schi: schi;
-    sinf: sinf;
-    stbl: stbl;
-    strk: strk;
-    traf: traf;
-    trak: trak;
-    tref: tref;
-    udta: udta;
-    vttc: vttc;
+    dinf: DataInformationBox;
+    edts: EditBox;
+    grpl: GroupsListBox;
+    mdia: MediaBox;
+    meco: AdditionalMetadataContainerBox;
+    meta: MetaBox;
+    mfra: MovieFragmentRandomAccessBox;
+    minf: MediaInformationBox;
+    moof: MovieFragmentBox;
+    moov: MovieBox;
+    mvex: MovieExtendsBox;
+    schi: SchemeInformationBox;
+    sinf: ProtectionSchemeInformationBox;
+    stbl: SampleTableBox;
+    strk: SubTrackBox;
+    traf: TrackFragmentBox;
+    trak: TrackBox;
+    tref: TrackReferenceBox;
+    udta: UserDataBox;
+    vttc: WebVttCueBox;
 };
 
 // @public
@@ -534,7 +450,7 @@ export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extr
 
 // @public
 export class IsoBoxWriteView {
-    constructor(size: number);
+    constructor(type: string, size: number);
     get buffer(): ArrayBuffer;
     get byteLength(): number;
     get byteOffset(): number;
@@ -634,9 +550,6 @@ export type ItemReferenceBox = {
 // @public
 export type ItemReferenceBoxChild = SingleItemTypeReferenceBox;
 
-// @public (undocumented)
-export type kind = TrackKindBox;
-
 // @public
 export type LabelBox = FullBox & {
     type: "labl";
@@ -645,21 +558,6 @@ export type LabelBox = FullBox & {
     language: string;
     label: string;
 };
-
-// @public (undocumented)
-export type labl = LabelBox;
-
-// @public (undocumented)
-export type mdat = MediaDataBox;
-
-// @public (undocumented)
-export type mdhd = MediaHeaderBox;
-
-// @public (undocumented)
-export type mdia = MediaBox;
-
-// @public (undocumented)
-export type meco = AdditionalMetadataContainerBox;
 
 // @public
 export type MediaBox = {
@@ -696,12 +594,6 @@ export type MediaInformationBox = {
 // @public
 export type MediaInformationBoxChild = VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox | SubtitleMediaHeaderBox;
 
-// @public (undocumented)
-export type mehd = MovieExtendsHeaderBox;
-
-// @public (undocumented)
-export type meta = MetaBox;
-
 // @public
 export type MetaBox = FullBox & {
     type: "meta";
@@ -710,24 +602,6 @@ export type MetaBox = FullBox & {
 
 // @public
 export type MetaBoxChild = HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox | GroupsListBox;
-
-// @public (undocumented)
-export type mfhd = MovieFragmentHeaderBox;
-
-// @public (undocumented)
-export type mfra = MovieFragmentRandomAccessBox;
-
-// @public (undocumented)
-export type mfro = MovieFragmentRandomAccessOffsetBox;
-
-// @public (undocumented)
-export type minf = MediaInformationBox;
-
-// @public (undocumented)
-export type moof = MovieFragmentBox;
-
-// @public (undocumented)
-export type moov = MovieBox;
 
 // @public
 export type MovieBox = {
@@ -799,18 +673,6 @@ export type MovieHeaderBox = FullBox & {
     nextTrackId: number;
 };
 
-// @public (undocumented)
-export type mp4a = AudioSampleEntryBox<"mp4a">;
-
-// @public (undocumented)
-export type mvex = MovieExtendsBox;
-
-// @public (undocumented)
-export type mvhd = MovieHeaderBox;
-
-// @public (undocumented)
-export type nmhd = NullMediaHeaderBox;
-
 // @public
 export type NullMediaHeaderBox = FullBox & {
     type: "nmhd";
@@ -825,12 +687,6 @@ export type OriginalFormatBox = {
 // @public
 export type ParsedBox = IsoParsedBox | Box;
 
-// @public (undocumented)
-export type payl = WebVttCuePayloadBox;
-
-// @public (undocumented)
-export type pitm = PrimaryItemBox;
-
 // @public
 export type PreselectionGroupBox = FullBox & {
     type: "prsl";
@@ -841,9 +697,6 @@ export type PreselectionGroupBox = FullBox & {
     selectionPriority?: number;
     interleavingTag?: string;
 };
-
-// @public (undocumented)
-export type prft = ProducerReferenceTimeBox;
 
 // @public
 export type PrimaryItemBox = FullBox & {
@@ -879,12 +732,6 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
     data: number[];
 };
 
-// @public (undocumented)
-export type prsl = PreselectionGroupBox;
-
-// @public (undocumented)
-export type pssh = ProtectionSystemSpecificHeaderBox;
-
 // @public
 export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
 
@@ -916,7 +763,7 @@ export function readElst(view: IsoBoxReadView): EditListBox;
 export function readEmsg(view: IsoBoxReadView): EventMessageBox;
 
 // @public
-export function readEnca(view: IsoBoxReadView): enca;
+export function readEnca(view: IsoBoxReadView): AudioSampleEntryBox<"enca">;
 
 // @public
 export function readEncv(view: IsoBoxReadView): VisualSampleEntryBox<"encv">;
@@ -1068,12 +915,6 @@ export function readVttC(view: IsoBoxReadView): WebVttConfigurationBox;
 // @public
 export function readVtte(_: IsoBoxReadView): WebVttEmptySampleBox;
 
-// @public (undocumented)
-export type saio = SampleAuxiliaryInformationOffsetsBox;
-
-// @public (undocumented)
-export type saiz = SampleAuxiliaryInformationSizesBox;
-
 // @public
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
     type: "saio";
@@ -1142,8 +983,6 @@ export type SampleTableBox = {
     boxes: SampleTableBoxChild[];
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "SampleTableBoxChild" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
-//
 // @public
 export type SampleTableBoxChild = SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox;
 
@@ -1176,9 +1015,6 @@ export type SampleToGroupEntry = {
     groupDescriptionIndex: number;
 };
 
-// @public (undocumented)
-export type sbgp = SampleToGroupBox;
-
 // @public
 export type SchemeInformationBox = {
     type: "schi";
@@ -1195,15 +1031,6 @@ export type SchemeTypeBox = FullBox & {
     schemeVersion: number;
     schemeUri?: string;
 };
-
-// @public (undocumented)
-export type schi = SchemeInformationBox;
-
-// @public (undocumented)
-export type schm = SchemeTypeBox;
-
-// @public (undocumented)
-export type sdtp = SampleDependencyTypeBox;
 
 // @public
 export type SegmentIndexBox = FullBox & {
@@ -1231,12 +1058,6 @@ export type SegmentIndexReference = {
 // @public
 export type SegmentTypeBox = TypeBox<"styp">;
 
-// @public (undocumented)
-export type senc = SampleEncryptionBox;
-
-// @public (undocumented)
-export type sgpd = SampleGroupDescriptionBox;
-
 // @public
 export type ShadowSyncEntry = {
     shadowedSampleNumber: number;
@@ -1250,21 +1071,12 @@ export type ShadowSyncSampleBox = FullBox & {
     entries: ShadowSyncEntry[];
 };
 
-// @public (undocumented)
-export type sidx = SegmentIndexBox;
-
-// @public (undocumented)
-export type sinf = ProtectionSchemeInformationBox;
-
 // @public
 export type SingleItemTypeReferenceBox = {
     fromItemId: number;
     referenceCount: number;
     toItemId: number[];
 };
-
-// @public (undocumented)
-export type smhd = SoundMediaHeaderBox;
 
 // @public
 export type SoundMediaHeaderBox = FullBox & {
@@ -1273,55 +1085,11 @@ export type SoundMediaHeaderBox = FullBox & {
     reserved: number;
 };
 
-// @public (undocumented)
-export type ssix = SubsegmentIndexBox;
-
-// @public (undocumented)
-export type stbl = SampleTableBox;
-
-// Warning: (ae-incompatible-release-tags) The symbol "stco" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
-//
-// @public (undocumented)
-export type stco = ChunkOffsetBox;
-
-// @public (undocumented)
-export type stdp = DegradationPriorityBox;
-
-// @public (undocumented)
-export type sthd = SubtitleMediaHeaderBox;
-
 // @public
 export const STRING = "string";
 
 // @public (undocumented)
-export type strk = SubTrackBox;
-
-// @public (undocumented)
-export type stsc = SampleToChunkBox;
-
-// @public (undocumented)
-export type stsd = SampleDescriptionBox;
-
-// @public (undocumented)
-export type stsh = ShadowSyncSampleBox;
-
-// @public (undocumented)
-export type stss = SyncSampleBox;
-
-// @public (undocumented)
-export type stsz = SampleSizeBox;
-
-// @public (undocumented)
-export type sttg = WebVttSettingsBox;
-
-// @public (undocumented)
-export type stts = DecodingTimeToSampleBox;
-
-// @public (undocumented)
 export type stz2 = CompactSampleSizeBox;
-
-// @public (undocumented)
-export type subs = SubsampleInformationBox;
 
 // @public
 export type Subsample = {
@@ -1398,21 +1166,6 @@ export type SyncSampleBox = FullBox & {
 
 // @public
 export const TEMPLATE = "template";
-
-// @public (undocumented)
-export type tenc = TrackEncryptionBox;
-
-// @public (undocumented)
-export type tfdt = TrackFragmentBaseMediaDecodeTimeBox;
-
-// @public (undocumented)
-export type tfhd = TrackFragmentHeaderBox;
-
-// @public (undocumented)
-export type tfra = TrackFragmentRandomAccessBox;
-
-// @public (undocumented)
-export type tkhd = TrackHeaderBox;
 
 // @public
 export type TrackBox = {
@@ -1545,21 +1298,6 @@ export type TrackRunSample = {
     sampleCompositionTimeOffset?: number;
 };
 
-// @public (undocumented)
-export type traf = TrackFragmentBox;
-
-// @public (undocumented)
-export type trak = TrackBox;
-
-// @public (undocumented)
-export type tref = TrackReferenceBox;
-
-// @public (undocumented)
-export type trex = TrackExtendsBox;
-
-// @public (undocumented)
-export type trun = TrackRunBox;
-
 // @public
 export type TypeBox<T$1> = {
     type: T$1;
@@ -1567,9 +1305,6 @@ export type TypeBox<T$1> = {
     minorVersion: number;
     compatibleBrands: string[];
 };
-
-// @public (undocumented)
-export type udta = UserDataBox;
 
 // @public
 export const UINT = "uint";
@@ -1619,21 +1354,6 @@ export type VisualSampleEntryBox<T$1 extends VisualSampleEntryType> = SampleEntr
 
 // @public
 export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv";
-
-// @public (undocumented)
-export type vlab = WebVttSourceLabelBox;
-
-// @public (undocumented)
-export type vmhd = VideoMediaHeaderBox;
-
-// @public (undocumented)
-export type vttC = WebVttConfigurationBox;
-
-// @public (undocumented)
-export type vttc = WebVttCueBox;
-
-// @public (undocumented)
-export type vtte = WebVttEmptySampleBox;
 
 // @public
 export type WebVttConfigurationBox = {
@@ -1864,10 +1584,6 @@ export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
 
 // @public
 export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;
-
-// Warnings were encountered during analysis:
-//
-// src/boxes/HintMediaHeaderBox.ts:8:1 - (ae-incompatible-release-tags) The symbol "stco" is marked as @public, but its signature references "ChunkOffsetBox" which is marked as @beta
 
 // (No @packageDocumentation comment for this package)
 

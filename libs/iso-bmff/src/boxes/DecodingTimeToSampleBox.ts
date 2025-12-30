@@ -15,8 +15,3 @@ export type DecodingTimeToSampleBox = FullBox & {
 	/** An array of decoding time-to-sample entries. */
 	entries: DecodingTimeSample[];
 };
-
-/**
- * @public
- */
-export type stts = DecodingTimeToSampleBox;

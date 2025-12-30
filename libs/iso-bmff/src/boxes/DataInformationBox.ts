@@ -16,8 +16,3 @@ export type DataInformationBox = {
 	type: 'dinf';
 	boxes: DataInformationBoxChild[];
 };
-
-/**
- * @public
- */
-export type dinf = DataInformationBox;

@@ -16,8 +16,3 @@ export type TrackRunBox = FullBox & {
 	firstSampleFlags?: number;
 	samples: TrackRunSample[];
 };
-
-/**
- * @public
- */
-export type trun = TrackRunBox;

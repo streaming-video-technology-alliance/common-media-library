@@ -24,8 +24,7 @@ export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
 	const totalSize = headerSize + fullBoxSize + trackIdSize + baseDataOffsetSize +
 		sampleDescriptionIndexSize + defaultSampleDurationSize + defaultSampleSizeSize + defaultSampleFlagsSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('tfhd', totalSize)
+	const writer = new IsoBoxWriteView('tfhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.trackId, 4)

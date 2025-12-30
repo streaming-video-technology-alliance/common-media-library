@@ -12,8 +12,3 @@ export type LabelBox = FullBox & {
 	language: string;
 	label: string;
 };
-
-/**
- * @public
- */
-export type labl = LabelBox;

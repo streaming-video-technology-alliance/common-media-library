@@ -16,9 +16,10 @@ export class IsoBoxWriteView {
 	 *
 	 * @param size - The size of the data view.
 	 */
-	constructor(size: number) {
+	constructor(type: string, size: number) {
 		this.dataView = new DataView(new ArrayBuffer(size))
 		this.cursor = 0
+		this.writeBoxHeader(type, size)
 	}
 
 	/**

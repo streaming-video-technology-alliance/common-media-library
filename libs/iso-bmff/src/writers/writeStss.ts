@@ -19,8 +19,7 @@ export function writeStss(box: SyncSampleBox): IsoBoxWriteView {
 	const entriesSize = box.entryCount * 4
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('stss', totalSize)
+	const writer = new IsoBoxWriteView('stss', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.entryCount, 4)

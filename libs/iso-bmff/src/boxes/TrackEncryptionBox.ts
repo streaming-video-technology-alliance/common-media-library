@@ -11,8 +11,3 @@ export type TrackEncryptionBox = FullBox & {
 	defaultIvSize: number;
 	defaultKid: number[];
 };
-
-/**
- * @public
- */
-export type tenc = TrackEncryptionBox;

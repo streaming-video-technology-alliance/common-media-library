@@ -9,8 +9,3 @@ export type SampleDependencyTypeBox = FullBox & {
 	type: 'sdtp';
 	sampleDependencyTable: number[];
 };
-
-/**
- * @public
- */
-export type sdtp = SampleDependencyTypeBox;

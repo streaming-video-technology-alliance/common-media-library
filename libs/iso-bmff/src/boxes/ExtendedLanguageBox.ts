@@ -9,8 +9,3 @@ export type ExtendedLanguageBox = FullBox & {
 	type: 'elng';
 	extendedLanguage: string;
 };
-
-/**
- * @public
- */
-export type elng = ExtendedLanguageBox;

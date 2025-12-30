@@ -11,8 +11,3 @@ export type SchemeTypeBox = FullBox & {
 	schemeVersion: number;
 	schemeUri?: string;
 };
-
-/**
- * @public
- */
-export type schm = SchemeTypeBox;

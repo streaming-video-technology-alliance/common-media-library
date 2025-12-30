@@ -6,8 +6,3 @@ import type { TypeBox } from './TypeBox.ts'
  * @public
  */
 export type FileTypeBox = TypeBox<'ftyp'>;
-
-/**
- * @public
- */
-export type ftyp = FileTypeBox;

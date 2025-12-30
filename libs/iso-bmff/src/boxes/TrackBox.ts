@@ -20,8 +20,3 @@ export type TrackBox = {
 	type: 'trak';
 	boxes: TrackBoxChild[];
 };
-
-/**
- * @public
- */
-export type trak = TrackBox;

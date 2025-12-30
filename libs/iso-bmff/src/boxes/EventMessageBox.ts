@@ -16,8 +16,3 @@ export type EventMessageBox = FullBox & {
 	id: number,
 	messageData: Uint8Array,
 };
-
-/**
- * @public
- */
-export type emsg = EventMessageBox;

@@ -19,8 +19,7 @@ export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView {
 	const opcolorSize = 6 // 3 x 2 bytes
 	const totalSize = headerSize + fullBoxSize + graphicsmodeSize + opcolorSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('vmhd', totalSize)
+	const writer = new IsoBoxWriteView('vmhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.graphicsmode, 2)

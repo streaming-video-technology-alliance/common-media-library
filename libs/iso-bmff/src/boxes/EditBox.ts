@@ -16,8 +16,3 @@ export type EditBox = {
 	type: 'edts';
 	boxes: EditBoxChild[];
 };
-
-/**
- * @public
- */
-export type edts = EditBox;

@@ -17,8 +17,7 @@ export function writeMeta(box: MetaBox): IsoBoxWriteView {
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('meta', totalSize)
+	const writer = new IsoBoxWriteView('meta', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	return writer

@@ -19,8 +19,7 @@ export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWrite
 	const baseMediaDecodeTimeSize = size
 	const totalSize = headerSize + fullBoxSize + baseMediaDecodeTimeSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('tfdt', totalSize)
+	const writer = new IsoBoxWriteView('tfdt', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.baseMediaDecodeTime, size)
 

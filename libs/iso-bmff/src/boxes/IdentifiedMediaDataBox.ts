@@ -8,8 +8,3 @@ export type IdentifiedMediaDataBox = {
 	imdaIdentifier: number;
 	data: Uint8Array;
 };
-
-/**
- * @public
- */
-export type imda = IdentifiedMediaDataBox;

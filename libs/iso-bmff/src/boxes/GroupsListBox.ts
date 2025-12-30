@@ -15,8 +15,3 @@ export type GroupsListBox = {
 	type: 'grpl'
 	boxes: GroupsListBoxChild[];
 }
-
-/**
- * @public
- */
-export type grpl = GroupsListBox;

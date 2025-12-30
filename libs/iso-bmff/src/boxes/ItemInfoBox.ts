@@ -17,8 +17,3 @@ export type ItemInfoBox = {
 	boxes: ItemInfoBoxChild[];
 	entryCount: number;
 };
-
-/**
- * @public
- */
-export type iinf = ItemInfoBox;

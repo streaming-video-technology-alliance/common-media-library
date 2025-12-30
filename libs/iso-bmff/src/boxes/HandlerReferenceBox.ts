@@ -12,8 +12,3 @@ export type HandlerReferenceBox = FullBox & {
 	reserved: number[];
 	name: string;
 };
-
-/**
- * @public
- */
-export type hdlr = HandlerReferenceBox;

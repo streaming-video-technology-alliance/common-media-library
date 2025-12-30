@@ -12,8 +12,3 @@ export type HintMediaHeaderBox = FullBox & {
 	maxbitrate: number;
 	avgbitrate: number;
 };
-
-/**
- * @public
- */
-export type hmhd = HintMediaHeaderBox;

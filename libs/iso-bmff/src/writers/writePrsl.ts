@@ -31,8 +31,7 @@ export function writePrsl(box: PreselectionGroupBox): IsoBoxWriteView {
 	const totalSize = headerSize + fullBoxSize + groupIdSize + numEntitiesInGroupSize +
 		entitiesSize + preselectionTagSize + selectionPrioritySize + interleavingTagSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('prsl', totalSize)
+	const writer = new IsoBoxWriteView('prsl', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.groupId, 4)

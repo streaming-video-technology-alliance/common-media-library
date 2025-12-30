@@ -16,8 +16,7 @@ export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView {
 	const audioRenderingIndicationSize = 1
 	const totalSize = headerSize + fullBoxSize + audioRenderingIndicationSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('ardi', totalSize)
+	const writer = new IsoBoxWriteView('ardi', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.audioRenderingIndication, 1)
 

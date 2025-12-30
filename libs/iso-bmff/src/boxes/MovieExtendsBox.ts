@@ -17,8 +17,3 @@ export type MovieExtendsBox = {
 	type: 'mvex';
 	boxes: MovieExtendsBoxChild[];
 };
-
-/**
- * @public
- */
-export type mvex = MovieExtendsBox;

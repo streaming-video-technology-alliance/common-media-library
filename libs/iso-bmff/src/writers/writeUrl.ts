@@ -18,8 +18,7 @@ export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView {
 	const locationSize = box.location.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + locationSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('url ', totalSize)
+	const writer = new IsoBoxWriteView('url ', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeTerminatedString(box.location)
 

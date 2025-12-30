@@ -7,8 +7,3 @@ export type WebVttCuePayloadBox = {
 	type: 'payl';
 	cueText: string;
 };
-
-/**
- * @public
- */
-export type payl = WebVttCuePayloadBox;

@@ -26,8 +26,7 @@ export function writeMp4a(box: AudioSampleEntryBox<'mp4a'>): IsoBoxWriteView {
 	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + reserved2Size +
 		channelcountSize + samplesizeSize + preDefinedSize + reserved3Size + samplerateSize + esdsSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('mp4a', totalSize)
+	const writer = new IsoBoxWriteView('mp4a', totalSize)
 
 	for (let i = 0; i < 6; i++) {
 		writer.writeUint(box.reserved1[i] ?? 0, 1)

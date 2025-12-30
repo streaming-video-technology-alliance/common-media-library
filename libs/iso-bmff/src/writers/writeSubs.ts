@@ -28,8 +28,7 @@ export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView {
 	const entryCountSize = 4
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('subs', totalSize)
+	const writer = new IsoBoxWriteView('subs', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.entryCount, 4)

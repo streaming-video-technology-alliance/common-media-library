@@ -17,8 +17,3 @@ export type WebVttCueBox = {
 	type: 'vttc';
 	boxes: WebVttCueChild[];
 };
-
-/**
- * @public
- */
-export type vttc = WebVttCueBox;

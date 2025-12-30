@@ -13,8 +13,3 @@ export type SampleToGroupBox = FullBox & {
 	entryCount: number;
 	entries: SampleToGroupEntry[];
 };
-
-/**
- * @public
- */
-export type sbgp = SampleToGroupBox;

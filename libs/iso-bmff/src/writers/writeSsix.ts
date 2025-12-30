@@ -25,8 +25,7 @@ export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView {
 
 	const totalSize = headerSize + fullBoxSize + subsegmentCountSize + rangesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('ssix', totalSize)
+	const writer = new IsoBoxWriteView('ssix', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.subsegmentCount, 4)

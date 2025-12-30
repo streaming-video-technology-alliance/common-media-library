@@ -17,8 +17,7 @@ export function writeMdat(box: MediaDataBox): IsoBoxWriteView {
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('mdat', totalSize)
+	const writer = new IsoBoxWriteView('mdat', totalSize)
 	writer.writeBytes(box.data)
 
 	return writer

@@ -22,8 +22,3 @@ export type MediaInformationBox = {
 	type: 'minf';
 	boxes: MediaInformationBoxChild[];
 };
-
-/**
- * @public
- */
-export type minf = MediaInformationBox;

@@ -13,8 +13,6 @@ export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const totalSize = headerSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('vtte', totalSize)
-
+	const writer = new IsoBoxWriteView('vtte', totalSize)
 	return writer
 }

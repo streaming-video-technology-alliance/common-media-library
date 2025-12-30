@@ -13,8 +13,3 @@ export type TrackExtendsBox = FullBox & {
 	defaultSampleSize: number;
 	defaultSampleFlags: number;
 };
-
-/**
- * @public
- */
-export type trex = TrackExtendsBox;

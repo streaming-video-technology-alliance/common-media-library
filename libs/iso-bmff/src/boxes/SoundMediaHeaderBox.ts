@@ -10,8 +10,3 @@ export type SoundMediaHeaderBox = FullBox & {
 	balance: number;
 	reserved: number;
 };
-
-/**
- * @public
- */
-export type smhd = SoundMediaHeaderBox;

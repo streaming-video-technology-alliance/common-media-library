@@ -16,8 +16,3 @@ export type TrackReferenceBox = {
 	type: 'tref';
 	boxes: TrackReferenceBoxChild[];
 };
-
-/**
- * @public
- */
-export type tref = TrackReferenceBox;

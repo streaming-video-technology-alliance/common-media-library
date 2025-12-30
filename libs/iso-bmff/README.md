@@ -72,25 +72,38 @@ const stream = writeIsoBoxes(boxes, {
 });
 ```
 
-> [!NOTE]
-> When working with raw box objects in TypeScript, cast the objects to a box type to ensure type safety. This can be done in two ways. Either by using a box type from the libray:
+#### Type safety
+
+When working with raw box objects in TypeScript, cast the objects to a box type to ensure type safety. This can be done in two ways. Either by using a box type from the libray:
+
+```typescript
+const box: FileTypeBox = {
+	type: "ftyp",
+	majorBrand: "isom",
+	minorVersion: 1,
+	compatibleBrands: ["isom"],
+};
+```
+
+Or by using the `as const` operator on the `type` property:
+
+```typescript
+const box = {
+	type: "ftyp" as const,
+	majorBrand: "isom",
+	minorVersion: 1,
+	compatibleBrands: ["isom"],
+};
 >
-> ```typescript
-> const box: ftyp = {
-> 	type: "ftyp",
-> 	majorBrand: "isom",
-> 	minorVersion: 1,
-> 	compatibleBrands: ["isom"],
-> };
-> ```
->
-> Or by using the `as const` operator on the `type` property:
->
-> ```typescript
-> const box = {
-> 	type: "ftyp" as const,
-> 	majorBrand: "isom",
-> 	minorVersion: 1,
-> 	compatibleBrands: ["isom"],
-> };
-> ```
+```
+
+Box types can also be accessed from the `IsoBoxMap` type using the box's FourCC:
+
+```typescript
+const box: IsoBoxMap["ftyp"] = {
+	type: "ftyp",
+	majorBrand: "isom",
+	minorVersion: 1,
+	compatibleBrands: ["isom"],
+};
+```

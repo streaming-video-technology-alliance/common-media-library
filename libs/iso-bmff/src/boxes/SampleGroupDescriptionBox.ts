@@ -12,8 +12,3 @@ export type SampleGroupDescriptionBox = FullBox & {
 	entryCount: number;
 	entries: any[];
 };
-
-/**
- * @public
- */
-export type sgpd = SampleGroupDescriptionBox;

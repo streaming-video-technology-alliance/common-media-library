@@ -12,8 +12,3 @@ export type ProducerReferenceTimeBox = FullBox & {
 	ntpTimestampFrac: number;
 	mediaTime: number;
 };
-
-/**
- * @public
- */
-export type prft = ProducerReferenceTimeBox;

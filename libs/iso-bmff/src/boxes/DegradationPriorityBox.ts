@@ -9,8 +9,3 @@ export type DegradationPriorityBox = FullBox & {
 	type: 'stdp';
 	priority: number[];
 };
-
-/**
- * @public
- */
-export type stdp = DegradationPriorityBox;

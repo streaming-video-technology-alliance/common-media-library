@@ -12,8 +12,3 @@ export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
 	entryCount: number;
 	offset: number[];
 };
-
-/**
- * @public
- */
-export type saio = SampleAuxiliaryInformationOffsetsBox;

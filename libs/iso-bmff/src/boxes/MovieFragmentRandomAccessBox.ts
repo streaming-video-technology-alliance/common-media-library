@@ -17,8 +17,3 @@ export type MovieFragmentRandomAccessBox = {
 	type: 'mfra';
 	boxes: MovieFragmentRandomAccessBoxChild[];
 };
-
-/**
- * @public
- */
-export type mfra = MovieFragmentRandomAccessBox;

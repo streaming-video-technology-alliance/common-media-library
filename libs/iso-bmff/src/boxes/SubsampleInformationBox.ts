@@ -11,8 +11,3 @@ export type SubsampleInformationBox = FullBox & {
 	entryCount: number;
 	entries: SubsampleEntry[];
 };
-
-/**
- * @public
- */
-export type subs = SubsampleInformationBox;

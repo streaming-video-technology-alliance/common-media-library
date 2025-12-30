@@ -17,8 +17,7 @@ export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView {
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('sthd', totalSize)
+	const writer = new IsoBoxWriteView('sthd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	return writer

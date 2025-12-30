@@ -16,8 +16,7 @@ export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView {
 	const dataSize = box.data.length
 	const totalSize = headerSize + imdaIdentifierSize + dataSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('imda', totalSize)
+	const writer = new IsoBoxWriteView('imda', totalSize)
 	writer.writeUint(box.imdaIdentifier, 4)
 	writer.writeBytes(box.data)
 

@@ -11,8 +11,3 @@ export type CompositionTimeToSampleBox = FullBox & {
 	entryCount: number;
 	entries: CompositionTimeToSampleEntry[];
 };
-
-/**
- * @public
- */
-export type ctts = CompositionTimeToSampleBox;

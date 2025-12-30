@@ -11,8 +11,3 @@ export type SubsegmentIndexBox = FullBox & {
 	subsegmentCount: number;
 	subsegments: Subsegment[];
 };
-
-/**
- * @public
- */
-export type ssix = SubsegmentIndexBox;

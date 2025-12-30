@@ -9,8 +9,3 @@ export type AudioRenderingIndicationBox = FullBox & {
 	type: 'ardi';
 	audioRenderingIndication: number;
 };
-
-/**
- * @public
- */
-export type ardi = AudioRenderingIndicationBox;

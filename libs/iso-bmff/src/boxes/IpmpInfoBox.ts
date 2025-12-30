@@ -9,8 +9,3 @@ export type IpmpInfoBox = FullBox & {
 	type: 'imif';
 	ipmpDescr: any[];
 };
-
-/**
- * @public
- */
-export type imif = IpmpInfoBox;

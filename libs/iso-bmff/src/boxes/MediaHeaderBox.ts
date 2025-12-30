@@ -26,8 +26,3 @@ export type MediaHeaderBox = FullBox & {
 	/** A 16-bit value that is reserved for use in other specifications. */
 	preDefined: number;
 };
-
-/**
- * @public
- */
-export type mdhd = MediaHeaderBox;

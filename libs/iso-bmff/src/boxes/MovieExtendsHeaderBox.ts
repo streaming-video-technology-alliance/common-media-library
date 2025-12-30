@@ -9,8 +9,3 @@ export type MovieExtendsHeaderBox = FullBox & {
 	type: 'mehd';
 	fragmentDuration: number;
 };
-
-/**
- * @public
- */
-export type mehd = MovieExtendsHeaderBox;

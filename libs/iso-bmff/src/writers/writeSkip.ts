@@ -17,8 +17,7 @@ export function writeSkip(box: FreeSpaceBox<'skip'>): IsoBoxWriteView {
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('skip', totalSize)
+	const writer = new IsoBoxWriteView('skip', totalSize)
 	writer.writeBytes(box.data)
 
 	return writer

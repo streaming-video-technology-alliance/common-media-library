@@ -22,8 +22,7 @@ export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView {
 	const preDefined = 2
 	const totalSize = headerSize + fullBoxSize + timesSize + timescaleSize + languageSize + preDefined
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('mdhd', totalSize)
+	const writer = new IsoBoxWriteView('mdhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.creationTime, size)

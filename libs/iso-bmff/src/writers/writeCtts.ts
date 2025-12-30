@@ -19,8 +19,7 @@ export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView {
 	const entriesSize = box.entryCount * 8 // 4 bytes sampleCount + 4 bytes sampleOffset
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('ctts', totalSize)
+	const writer = new IsoBoxWriteView('ctts', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.entryCount, 4)

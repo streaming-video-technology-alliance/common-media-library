@@ -27,8 +27,3 @@ export type SampleTableBox = {
 	type: 'stbl';
 	boxes: SampleTableBoxChild[];
 };
-
-/**
- * @public
- */
-export type stbl = SampleTableBox;

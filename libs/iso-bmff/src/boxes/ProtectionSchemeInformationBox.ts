@@ -19,8 +19,3 @@ export type ProtectionSchemeInformationBox = {
 	type: 'sinf';
 	boxes: ProtectionSchemeInformationBoxChild[];
 };
-
-/**
- * @public
- */
-export type sinf = ProtectionSchemeInformationBox;

@@ -22,8 +22,7 @@ export function writeLabl(box: LabelBox): IsoBoxWriteView {
 	const labelSize = labelBytes.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + labelIdSize + languageSize + labelSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('labl', totalSize)
+	const writer = new IsoBoxWriteView('labl', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.labelId, 2)

@@ -16,8 +16,3 @@ export type ItemReferenceBox = {
 	type: 'iref';
 	boxes: ItemReferenceBoxChild[];
 };
-
-/**
- * @public
- */
-export type iref = ItemReferenceBox;

@@ -19,8 +19,7 @@ export function writeStts(box: DecodingTimeToSampleBox): IsoBoxWriteView {
 	const entriesSize = box.entryCount * 8 // 4 bytes sampleCount + 4 bytes sampleDelta
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('stts', totalSize)
+	const writer = new IsoBoxWriteView('stts', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.entryCount, 4)

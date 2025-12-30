@@ -24,8 +24,3 @@ export type MetaBox = FullBox & {
 	type: 'meta';
 	boxes: MetaBoxChild[];
 };
-
-/**
- * @public
- */
-export type meta = MetaBox;

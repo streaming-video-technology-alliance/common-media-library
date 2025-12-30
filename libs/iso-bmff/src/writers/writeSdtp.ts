@@ -18,8 +18,7 @@ export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView {
 	const sampleDependencyTableSize = box.sampleDependencyTable.length
 	const totalSize = headerSize + fullBoxSize + sampleDependencyTableSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('sdtp', totalSize)
+	const writer = new IsoBoxWriteView('sdtp', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	for (const entry of box.sampleDependencyTable) {

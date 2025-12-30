@@ -14,8 +14,3 @@ export type TrackFragmentHeaderBox = FullBox & {
 	defaultSampleSize?: number;
 	defaultSampleFlags?: number;
 };
-
-/**
- * @public
- */
-export type tfhd = TrackFragmentHeaderBox;

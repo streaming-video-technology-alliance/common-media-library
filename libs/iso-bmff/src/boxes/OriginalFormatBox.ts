@@ -7,8 +7,3 @@ export type OriginalFormatBox = {
 	type: 'frma';
 	dataFormat: number;
 };
-
-/**
- * @public
- */
-export type frma = OriginalFormatBox;

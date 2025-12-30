@@ -20,8 +20,7 @@ export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView {
 	const fragmentDurationSize = size
 	const totalSize = headerSize + fullBoxSize + fragmentDurationSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('mehd', totalSize)
+	const writer = new IsoBoxWriteView('mehd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.fragmentDuration, size)
 

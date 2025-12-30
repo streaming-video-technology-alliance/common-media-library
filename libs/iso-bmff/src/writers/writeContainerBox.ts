@@ -32,9 +32,7 @@ export function writeContainerBox<T extends IsoBoxContainer>(
 
 	const totalSize = headerSize + childrenSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-
-	writer.writeBoxHeader(box.type, totalSize)
+	const writer = new IsoBoxWriteView(box.type, totalSize)
 
 	for (const child of children) {
 		writer.writeBytes(child)

@@ -22,8 +22,7 @@ export function writeElst(box: EditListBox): IsoBoxWriteView {
 	const entriesSize = box.entryCount * entrySize
 	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('elst', totalSize)
+	const writer = new IsoBoxWriteView('elst', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.entryCount, 4)

@@ -21,8 +21,3 @@ export type TrackHeaderBox = FullBox & {
 	width: number;
 	height: number;
 };
-
-/**
- * @public
- */
-export type tkhd = TrackHeaderBox;

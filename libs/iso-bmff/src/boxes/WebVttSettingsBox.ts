@@ -7,8 +7,3 @@ export type WebVttSettingsBox = {
 	type: 'sttg';
 	settings: string;
 };
-
-/**
- * @public
- */
-export type sttg = WebVttSettingsBox;

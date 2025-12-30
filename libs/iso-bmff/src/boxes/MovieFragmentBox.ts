@@ -17,8 +17,3 @@ export type MovieFragmentBox = {
 	type: 'moof';
 	boxes: MovieFragmentBoxChild[];
 };
-
-/**
- * @public
- */
-export type moof = MovieFragmentBox;

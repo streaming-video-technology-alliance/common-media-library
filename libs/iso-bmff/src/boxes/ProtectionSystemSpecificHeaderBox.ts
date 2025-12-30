@@ -13,8 +13,3 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 	dataSize: number;
 	data: number[];
 };
-
-/**
- * @public
- */
-export type pssh = ProtectionSystemSpecificHeaderBox;

@@ -9,8 +9,3 @@ export type MovieFragmentRandomAccessOffsetBox = FullBox & {
 	type: 'mfro';
 	mfraSize: number;
 };
-
-/**
- * @public
- */
-export type mfro = MovieFragmentRandomAccessOffsetBox;

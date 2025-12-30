@@ -16,8 +16,3 @@ export type TrackFragmentRandomAccessBox = FullBox & {
 	lengthSizeOfSampleNum: number;
 	entries: TrackFragmentRandomAccessEntry[];
 };
-
-/**
- * @public
- */
-export type tfra = TrackFragmentRandomAccessBox;

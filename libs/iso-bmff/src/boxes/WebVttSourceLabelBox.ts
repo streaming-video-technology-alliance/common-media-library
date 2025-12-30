@@ -7,8 +7,3 @@ export type WebVttSourceLabelBox = {
 	type: 'vlab';
 	sourceLabel: string;
 };
-
-/**
- * @public
- */
-export type vlab = WebVttSourceLabelBox;

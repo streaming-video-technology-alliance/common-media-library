@@ -9,8 +9,3 @@ export type MovieFragmentHeaderBox = FullBox & {
 	type: 'mfhd';
 	sequenceNumber: number;
 };
-
-/**
- * @public
- */
-export type mfhd = MovieFragmentHeaderBox;

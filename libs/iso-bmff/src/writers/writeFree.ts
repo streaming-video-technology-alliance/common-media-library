@@ -17,8 +17,7 @@ export function writeFree(box: FreeSpaceBox<'free'>): IsoBoxWriteView {
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('free', totalSize)
+	const writer = new IsoBoxWriteView('free', totalSize)
 	writer.writeBytes(box.data)
 
 	return writer

@@ -13,8 +13,3 @@ export type SampleAuxiliaryInformationSizesBox = FullBox & {
 	sampleCount: number;
 	sampleInfoSize?: number[];
 };
-
-/**
- * @public
- */
-export type saiz = SampleAuxiliaryInformationSizesBox;

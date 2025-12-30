@@ -6,8 +6,3 @@
 export type WebVttEmptySampleBox = {
 	type: 'vtte';
 };
-
-/**
- * @public
- */
-export type vtte = WebVttEmptySampleBox;

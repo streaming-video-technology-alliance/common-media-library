@@ -27,8 +27,7 @@ export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
 	const totalSize = headerSize + fullBoxSize + referenceIdSize + timescaleSize +
 		earliestPresentationTimeSize + firstOffsetSize + reservedSize + referenceCountSize + referencesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('sidx', totalSize)
+	const writer = new IsoBoxWriteView('sidx', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.referenceId, 4)

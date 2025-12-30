@@ -22,8 +22,3 @@ export type PreselectionGroupBox = FullBox & {
 	selectionPriority?: number;
 	interleavingTag?: string;
 };
-
-/**
- * @public
- */
-export type prsl = PreselectionGroupBox;

@@ -19,8 +19,7 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView {
 	const reservedSize = 2
 	const totalSize = headerSize + fullBoxSize + balanceSize + reservedSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('smhd', totalSize)
+	const writer = new IsoBoxWriteView('smhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.balance, 2)

@@ -8,8 +8,3 @@ import type { FullBox } from './FullBox.ts'
 export type SubtitleMediaHeaderBox = FullBox & {
 	type: 'sthd';
 };
-
-/**
- * @public
- */
-export type sthd = SubtitleMediaHeaderBox;

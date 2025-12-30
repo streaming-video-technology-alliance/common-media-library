@@ -7,8 +7,3 @@ export type WebVttConfigurationBox = {
 	type: 'vttC';
 	config: string;
 };
-
-/**
- * @public
- */
-export type vttC = WebVttConfigurationBox;

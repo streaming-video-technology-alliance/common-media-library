@@ -19,8 +19,7 @@ export function writeFtyp(box: FileTypeBox): IsoBoxWriteView {
 	const compatibleBrandsSize = box.compatibleBrands.length * 4
 	const totalSize = headerSize + majorBrandSize + minorVersionSize + compatibleBrandsSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('ftyp', totalSize)
+	const writer = new IsoBoxWriteView('ftyp', totalSize)
 	writer.writeString(box.majorBrand)
 	writer.writeUint(box.minorVersion, 4)
 

@@ -21,8 +21,7 @@ export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView {
 	const extendedLanguageSize = extendedLanguageBytes.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + extendedLanguageSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('elng', totalSize)
+	const writer = new IsoBoxWriteView('elng', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUtf8TerminatedString(box.extendedLanguage)

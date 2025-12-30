@@ -11,8 +11,3 @@ export type ShadowSyncSampleBox = FullBox & {
 	entryCount: number;
 	entries: ShadowSyncEntry[];
 };
-
-/**
- * @public
- */
-export type stsh = ShadowSyncSampleBox;

@@ -7,8 +7,3 @@ export type MediaDataBox = {
 	type: 'mdat';
 	data: Uint8Array<ArrayBuffer>;
 };
-
-/**
- * @public
- */
-export type mdat = MediaDataBox;

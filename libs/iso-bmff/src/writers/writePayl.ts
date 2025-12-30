@@ -18,8 +18,7 @@ export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView {
 	const cueTextSize = cueTextBytes.length + 1 // null-terminated
 	const totalSize = headerSize + cueTextSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('payl', totalSize)
+	const writer = new IsoBoxWriteView('payl', totalSize)
 	writer.writeUtf8TerminatedString(box.cueText)
 
 	return writer

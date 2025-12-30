@@ -15,8 +15,3 @@ export type SegmentIndexBox = FullBox & {
 	reserved: number;
 	references: SegmentIndexReference[];
 };
-
-/**
- * @public
- */
-export type sidx = SegmentIndexBox;

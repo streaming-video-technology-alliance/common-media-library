@@ -28,8 +28,7 @@ export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
 
 	const totalSize = headerSize + fullBoxSize + contentSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('emsg', totalSize)
+	const writer = new IsoBoxWriteView('emsg', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	if (box.version === 0) {

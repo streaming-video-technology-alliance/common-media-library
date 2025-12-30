@@ -10,8 +10,3 @@ export type TrackKindBox = FullBox & {
 	schemeUri: string;
 	value: string;
 };
-
-/**
- * @public
- */
-export type kind = TrackKindBox;

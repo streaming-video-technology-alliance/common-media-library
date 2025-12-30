@@ -11,8 +11,3 @@ export type SyncSampleBox = FullBox & {
 	entryCount: number;
 	entries: SyncSample[];
 };
-
-/**
- * @public
- */
-export type stss = SyncSampleBox;

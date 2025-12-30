@@ -36,8 +36,7 @@ export function writeVisualSampleEntryBox<T extends VisualSampleEntryType>(box: 
 		vertresolutionSize + reserved3Size + frameCountSize + compressorNameSize +
 		depthSize + preDefined3Size + configSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader(type, totalSize)
+	const writer = new IsoBoxWriteView(type, totalSize)
 
 	for (let i = 0; i < 6; i++) {
 		writer.writeUint(box.reserved1[i] ?? 0, 1)

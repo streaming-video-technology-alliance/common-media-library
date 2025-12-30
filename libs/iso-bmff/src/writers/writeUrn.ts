@@ -19,8 +19,7 @@ export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView {
 	const locationSize = box.location.length + 1 // null-terminated
 	const totalSize = headerSize + fullBoxSize + nameSize + locationSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('urn ', totalSize)
+	const writer = new IsoBoxWriteView('urn ', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeTerminatedString(box.name)
 	writer.writeTerminatedString(box.location)

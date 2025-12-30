@@ -18,8 +18,7 @@ export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView {
 	const configSize = configBytes.length
 	const totalSize = headerSize + configSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('vttC', totalSize)
+	const writer = new IsoBoxWriteView('vttC', totalSize)
 	writer.writeBytes(configBytes)
 
 	return writer

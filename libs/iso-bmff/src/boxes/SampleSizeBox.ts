@@ -11,8 +11,3 @@ export type SampleSizeBox = FullBox & {
 	sampleCount: number;
 	entrySize?: number[];
 };
-
-/**
- * @public
- */
-export type stsz = SampleSizeBox;

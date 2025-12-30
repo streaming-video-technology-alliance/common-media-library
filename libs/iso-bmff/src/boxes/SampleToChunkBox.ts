@@ -11,8 +11,3 @@ export type SampleToChunkBox = FullBox & {
 	entryCount: number;
 	entries: SampleToChunkEntry[];
 };
-
-/**
- * @public
- */
-export type stsc = SampleToChunkBox;

@@ -8,8 +8,3 @@ import type { FullBox } from './FullBox.ts'
 export type NullMediaHeaderBox = FullBox & {
 	type: 'nmhd';
 };
-
-/**
- * @public
- */
-export type nmhd = NullMediaHeaderBox;

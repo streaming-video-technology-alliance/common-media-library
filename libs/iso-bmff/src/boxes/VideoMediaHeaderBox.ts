@@ -10,8 +10,3 @@ export type VideoMediaHeaderBox = FullBox & {
 	graphicsmode: number;
 	opcolor: number[];
 };
-
-/**
- * @public
- */
-export type vmhd = VideoMediaHeaderBox;

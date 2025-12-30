@@ -11,8 +11,3 @@ export type EditListBox = FullBox & {
 	entryCount: number;
 	entries: EditListEntry[];
 };
-
-/**
- * @public
- */
-export type elst = EditListBox;

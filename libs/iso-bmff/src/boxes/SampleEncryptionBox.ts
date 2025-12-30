@@ -11,8 +11,3 @@ export type SampleEncryptionBox = FullBox & {
 	sampleCount: number;
 	samples: EncryptedSample[];
 };
-
-/**
- * @public
- */
-export type senc = SampleEncryptionBox;

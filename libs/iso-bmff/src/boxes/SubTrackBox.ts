@@ -14,8 +14,3 @@ export type SubTrackBox = {
 	type: 'strk';
 	boxes: SubTrackBoxChild[];
 };
-
-/**
- * @public
- */
-export type strk = SubTrackBox;

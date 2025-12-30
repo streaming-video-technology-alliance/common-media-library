@@ -14,8 +14,3 @@ export type AdditionalMetadataContainerBox = {
 	type: 'meta';
 	boxes: AdditionalMetadataContainerBoxChild[];
 };
-
-/**
- * @public
- */
-export type meco = AdditionalMetadataContainerBox;

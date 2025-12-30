@@ -14,8 +14,3 @@ export type UserDataBox = {
 	type: 'udta';
 	boxes: UserDataBoxChild[];
 };
-
-/**
- * @public
- */
-export type udta = UserDataBox;

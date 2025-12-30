@@ -9,8 +9,3 @@ export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
 	type: 'tfdt';
 	baseMediaDecodeTime: number;
 };
-
-/**
- * @public
- */
-export type tfdt = TrackFragmentBaseMediaDecodeTimeBox;

@@ -19,8 +19,3 @@ export type MovieBox = {
 	type: 'moov';
 	boxes: MovieBoxChild[];
 };
-
-/**
- * @public
- */
-export type moov = MovieBox;

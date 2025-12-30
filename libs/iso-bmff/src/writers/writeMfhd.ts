@@ -18,8 +18,7 @@ export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView {
 	const sequenceNumberSize = 4
 	const totalSize = headerSize + fullBoxSize + sequenceNumberSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('mfhd', totalSize)
+	const writer = new IsoBoxWriteView('mfhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.sequenceNumber, 4)
 

@@ -28,8 +28,7 @@ export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
 	const samplesSize = sampleSize * box.sampleCount
 	const totalSize = headerSize + fullBoxSize + sampleCountSize + dataOffsetSize + firstSampleFlagsSize + samplesSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('trun', totalSize)
+	const writer = new IsoBoxWriteView('trun', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.sampleCount, 4)

@@ -16,8 +16,3 @@ export type SchemeInformationBox = {
 	type: 'schi';
 	boxes: SchemeInformationBoxChild[];
 };
-
-/**
- * @public
- */
-export type schi = SchemeInformationBox;

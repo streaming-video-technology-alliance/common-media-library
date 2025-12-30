@@ -19,8 +19,3 @@ export type MovieHeaderBox = FullBox & {
 	preDefined: number[];
 	nextTrackId: number;
 };
-
-/**
- * @public
- */
-export type mvhd = MovieHeaderBox;

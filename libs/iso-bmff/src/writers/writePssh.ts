@@ -22,8 +22,7 @@ export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteVi
 	const dataSize = box.dataSize
 	const totalSize = headerSize + fullBoxSize + systemIdSize + kidCountSize + kidSize + dataSizeField + dataSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('pssh', totalSize)
+	const writer = new IsoBoxWriteView('pssh', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
 	for (let i = 0; i < 16; i++) {

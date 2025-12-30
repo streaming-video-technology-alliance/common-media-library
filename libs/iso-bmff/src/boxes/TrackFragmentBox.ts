@@ -22,8 +22,3 @@ export type TrackFragmentBox = {
 	type: 'traf';
 	boxes: TrackFragmentBoxChild[];
 };
-
-/**
- * @public
- */
-export type traf = TrackFragmentBox;

@@ -15,8 +15,3 @@ export type ItemLocationBox = FullBox & {
 	itemCount: number;
 	items: ItemLocation[];
 };
-
-/**
- * @public
- */
-export type iloc = ItemLocationBox;

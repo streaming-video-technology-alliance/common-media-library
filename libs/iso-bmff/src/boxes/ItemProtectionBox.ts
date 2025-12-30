@@ -16,8 +16,3 @@ export type ItemProtectionBox = {
 	boxes: ItemProtectionBoxChild[];
 	protectionCount: number;
 };
-
-/**
- * @public
- */
-export type ipro = ItemProtectionBox;

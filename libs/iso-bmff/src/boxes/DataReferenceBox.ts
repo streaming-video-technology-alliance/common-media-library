@@ -12,8 +12,3 @@ export type DataReferenceBox = FullBox & {
 	entryCount: number;
 	entries: (DataEntryUrlBox | DataEntryUrnBox)[];
 };
-
-/**
- * @public
- */
-export type dref = DataReferenceBox;

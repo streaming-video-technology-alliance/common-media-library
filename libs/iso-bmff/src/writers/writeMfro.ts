@@ -18,8 +18,7 @@ export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteV
 	const mfraSizeSize = 4
 	const totalSize = headerSize + fullBoxSize + mfraSizeSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('mfro', totalSize)
+	const writer = new IsoBoxWriteView('mfro', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.mfraSize, 4)
 

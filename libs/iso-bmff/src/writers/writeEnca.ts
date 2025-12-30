@@ -24,8 +24,7 @@ export function writeEnca(box: AudioSampleEntryBox<'enca'>): IsoBoxWriteView {
 	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + reserved2Size +
 		channelcountSize + samplesizeSize + preDefinedSize + reserved3Size + samplerateSize + esdsSize
 
-	const writer = new IsoBoxWriteView(totalSize)
-	writer.writeBoxHeader('enca', totalSize)
+	const writer = new IsoBoxWriteView('enca', totalSize)
 
 	for (let i = 0; i < 6; i++) {
 		writer.writeUint(box.reserved1[i] ?? 0, 1)

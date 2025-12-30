@@ -11,8 +11,3 @@ export type SampleDescriptionBox<E extends SampleEntryBox = SampleEntryBox> = Fu
 	entryCount: number,
 	entries: E[],
 };
-
-/**
- * @public
- */
-export type stsd = SampleDescriptionBox;
