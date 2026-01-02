@@ -97,13 +97,13 @@ export const CMCD_SESSION = "CMCD-Session";
 export const CMCD_STATUS = "CMCD-Status";
 
 // @public
-export const CMCD_V1 = 1;
+export const CMCD_V1: 1;
 
 // @public
 export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", "nor", "nrr", "ot", "pr", "rtp", "sf", "sid", "st", "su", "tb", "v"];
 
 // @public
-export const CMCD_V2 = 2;
+export const CMCD_V2: 2;
 
 // @public
 export type CmcdCustomKey = `${string}-${string}`;
