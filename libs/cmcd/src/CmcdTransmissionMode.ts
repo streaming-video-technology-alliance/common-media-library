@@ -26,7 +26,6 @@ export const CMCD_JSON = 'json' as const
 /**
  * CMCD transmission modes.
  *
- *
  * @enum
  *
  * @public
