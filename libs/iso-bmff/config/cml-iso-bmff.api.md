@@ -85,6 +85,9 @@ export type CompositionTimeToSampleEntry = {
 export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
 
 // @public
+export const CONTAINERS: string[];
+
+// @public
 export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig): ReadableStream<Uint8Array>;
 
 // @public
