@@ -17,7 +17,6 @@ export const CMCD_REQUEST_MODE = 'request' as const
 /**
  * CMCD reporting mode types.
  *
- *
  * @enum
  *
  * @public
