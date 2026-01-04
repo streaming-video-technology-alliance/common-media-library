@@ -1,4 +1,3 @@
-import type { CommonMediaRequest } from '@svta/cml-request'
 import type { Request } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -30,7 +29,6 @@ type CmcdEventReportConfigNormalized = CmcdEventReportConfig & CmcdReportConfigN
 type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormalized & {
 	sid: string;
 	targets: CmcdEventReportConfigNormalized[];
-	requester: (request: Request) => Promise<{ status: number; }>;
 }
 
 function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig): CmcdEncodeOptions {
@@ -75,12 +73,12 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 			}
 			return acc
 		}, [] as CmcdEventReportConfigNormalized[]),
-		requester: config.requester || defaultRequester,
 	}
 }
 
 type CmcdEventTarget = {
 	intervalId: ReturnType<typeof setInterval>;
+	sn: number;
 	queue: CmcdData[];
 }
 
@@ -94,13 +92,17 @@ export class CmcdReporter {
 	private config: CmcdReporterConfigNormalized
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
 
+	// TODO: Should this be an event handler?
+	private requester: (request: Request) => Promise<{ status: number; }>
+
 	/**
 	 * Creates a new CMCD reporter.
 	 *
 	 * @param config - The configuration for the CMCD reporter.
 	 */
-	constructor(config: Partial<CmcdReporterConfig>) {
+	constructor(config: Partial<CmcdReporterConfig>, requester: (request: Request) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
+		this.requester = requester
 	}
 
 	/**
@@ -129,6 +131,7 @@ export class CmcdReporter {
 	 * @param data - The data to update.
 	 */
 	update(data: Partial<CmcdData>): void {
+		// TODO: May need a deep merge utility for this.
 		this.data = { ...this.data, ...data }
 	}
 
@@ -139,7 +142,12 @@ export class CmcdReporter {
 	 */
 	recordEvent(type: CmcdEventType): void {
 		this.eventTargets.forEach((target) => {
-			target.queue.push({ ...this.data, e: type, ts: Date.now() })
+			target.queue.push({
+				e: type,
+				ts: Date.now(),
+				sn: target.sn++,
+				...this.data
+			})
 		})
 		this.processEventTargets()
 	}
@@ -151,7 +159,7 @@ export class CmcdReporter {
 	 * @param req - The request to apply the CMCD request report to.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	applyRequestReport(req: CommonMediaRequest): CommonMediaRequest {
+	applyRequestReport(req: Request): Request {
 		if (!req || !req.url) {
 			return req
 		}
@@ -217,7 +225,7 @@ export class CmcdReporter {
 	 */
 	private async sendEventReport(target: CmcdEventReportConfigNormalized, data: CmcdData[]): Promise<void> {
 		const options = createEncodingOptions(CMCD_EVENT_MODE, target)
-		const response = await this.config.requester({
+		const response = await this.requester({
 			url: target.url,
 			method: 'POST',
 			headers: {

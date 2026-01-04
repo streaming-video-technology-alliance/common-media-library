@@ -1,4 +1,3 @@
-import type { Request } from '@svta/cml-utils'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
@@ -28,11 +27,4 @@ export type CmcdReporterConfig = CmcdRequestReportConfig & {
 	 * @defaultValue `undefined`
 	 */
 	targets: CmcdEventReportConfig[];
-
-	/**
-	 * The requester to use. If not provided, the default requester will be used.
-	 *
-	 * @defaultValue `undefined`
-	 */
-	requester?: (request: Request) => Promise<{ status: number; }>;
 }
