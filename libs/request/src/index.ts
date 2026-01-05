@@ -3,7 +3,6 @@
  *
  * @packageDocumentation
  */
-export type * from '../../utils/src/Requester.ts'
 export type * from './CommonMediaRequest.ts'
 export type * from './CommonMediaResponse.ts'
 export type * from './RequestInterceptor.ts'
