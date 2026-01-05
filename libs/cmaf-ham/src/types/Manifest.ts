@@ -5,6 +5,11 @@ import type { Duration } from './Duration.ts'
 import type { ManifestType } from './ManifestType.ts'
 import type { Presentation } from './Presentation.ts'
 
+/**
+ * CMAF-HAM Manifest type
+ *
+ * @alpha
+ */
 export type Manifest = Duration & Base & {
 	type: ManifestType;
 	format: CmcdStreamingFormat;

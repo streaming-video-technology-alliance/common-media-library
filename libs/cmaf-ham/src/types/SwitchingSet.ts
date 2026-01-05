@@ -4,6 +4,11 @@ import type { Protection } from './Protection.ts'
 import type { SelectionSet } from './SelectionSet.ts'
 import type { Track } from './Track.ts'
 
+/**
+ * CMAF-HAM Switching Set type
+ *
+ * @alpha
+ */
 export type SwitchingSet = Ham & Base & {
 	parent: SelectionSet;
 

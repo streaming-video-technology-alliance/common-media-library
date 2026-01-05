@@ -4,6 +4,11 @@ import type { Presentation } from './Presentation.ts'
 import type { SwitchingSet } from './SwitchingSet.ts'
 import type { TrackType } from './TrackType.ts'
 
+/**
+ * CMAF-HAM Selection Set type
+ *
+ * @alpha
+ */
 // TODO: Find a way to generalize these selection set types.
 export type SelectionSet = Ham & {
 	parent: Presentation;

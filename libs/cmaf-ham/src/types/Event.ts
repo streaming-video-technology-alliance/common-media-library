@@ -1,4 +1,8 @@
-
+/**
+ * CMAF-HAM Event type
+ *
+ * @alpha
+ */
 export type Event = {
 	messageData: string;
 	duration: number;
