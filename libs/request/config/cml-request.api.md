@@ -29,9 +29,6 @@ export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaReques
 };
 
 // @public
-export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResponse>;
-
-// @public
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
 export { RequestType }
