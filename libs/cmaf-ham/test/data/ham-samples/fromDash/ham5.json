@@ -27,22 +27,19 @@
                     "id": "segment-0",
                     "duration": 10,
                     "url": "testStream01bbb/video/72000/segment_0.m4s",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 10,
                     "url": "testStream01bbb/video/72000/segment_10417.m4s",
-                    "startTime": 10,
-                    "parent": null
+                    "startTime": 10
                   },
                   {
                     "id": "segment-2",
                     "duration": 10,
                     "url": "testStream01bbb/video/72000/segment_20833.m4s",
-                    "startTime": 20,
-                    "parent": null
+                    "startTime": 20
                   }
                 ],
                 "type": "video",
@@ -72,22 +69,19 @@
                     "id": "segment-0",
                     "duration": 10,
                     "url": "testStream01bbb/audio/72000/segment_0.m4s",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 10,
                     "url": "testStream01bbb/audio/72000/segment_10432.m4s",
-                    "startTime": 10,
-                    "parent": null
+                    "startTime": 10
                   },
                   {
                     "id": "segment-2",
                     "duration": 10,
                     "url": "testStream01bbb/audio/72000/segment_20864.m4s",
-                    "startTime": 20,
-                    "parent": null
+                    "startTime": 20
                   }
                 ],
                 "type": "audio",

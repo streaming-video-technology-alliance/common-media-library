@@ -44,7 +44,6 @@ export function mapSegmentTemplate(
 			url: getUrlFromTemplate(representation, segmentTemplate, id),
 			// byteRange not included - SegmentTemplate typically doesn't have byteRange
 			startTime,
-			parent: null as any, // Will be set by the caller after track is created
 		} as Segment)
 	}
 	return segments

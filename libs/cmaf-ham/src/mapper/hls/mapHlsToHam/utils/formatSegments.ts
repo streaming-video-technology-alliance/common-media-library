@@ -24,7 +24,6 @@ export function formatSegments(segments: SegmentHls[]): Segment[] {
 				duration: segment.duration,
 				url: segment.uri,
 				startTime,
-				parent: null as any, // Will be set by the caller after track is created
 			} as Segment
 
 			// Only include byteRange if it exists

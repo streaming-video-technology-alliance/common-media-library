@@ -64,7 +64,6 @@ describe('formatSegments', () => {
 				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4',
 				byteRange: { start: 34, end: 45 }, // length: 12, offset: 34 → start: 34, end: 34 + 12 - 1 = 45
 				startTime: 0,
-				parent: null,
 			},
 			{
 				id: 'segment-1',
@@ -72,7 +71,6 @@ describe('formatSegments', () => {
 				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
 				byteRange: { start: 78, end: 133 }, // length: 56, offset: 78 → start: 78, end: 78 + 56 - 1 = 133
 				startTime: 4.011,
-				parent: null,
 			},
 		])
 	})

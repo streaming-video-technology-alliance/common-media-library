@@ -11,35 +11,30 @@ export const videoSegments: Segment[] = [
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000001.cmfv',
 		startTime: 0,
-		parent: null as any,
 	},
 	{
 		id: 'video-segment-2',
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000002.cmfv',
 		startTime: 10,
-		parent: null as any,
 	},
 	{
 		id: 'video-segment-3',
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000003.cmfv',
 		startTime: 20,
-		parent: null as any,
 	},
 	{
 		id: 'video-segment-4',
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000004.cmfv',
 		startTime: 30,
-		parent: null as any,
 	},
 	{
 		id: 'video-segment-5',
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000005.cmfv',
 		startTime: 40,
-		parent: null as any,
 	},
 ]
 
@@ -49,35 +44,30 @@ export const audioSegments: Segment[] = [
 		duration: 18.75,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000001.cmfa',
 		startTime: 0,
-		parent: null as any,
 	},
 	{
 		id: 'audio-segment-2',
 		duration: 18.75,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000002.cmfa',
 		startTime: 18.75,
-		parent: null as any,
 	},
 	{
 		id: 'audio-segment-3',
 		duration: 18.75,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000003.cmfa',
 		startTime: 37.5,
-		parent: null as any,
 	},
 	{
 		id: 'audio-segment-4',
 		duration: 18.75,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000004.cmfa',
 		startTime: 56.25,
-		parent: null as any,
 	},
 	{
 		id: 'audio-segment-5',
 		duration: 18.75,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000005.cmfa',
 		startTime: 75,
-		parent: null as any,
 	},
 ]
 
@@ -87,35 +77,30 @@ export const invalidSegments: Segment[] = [
 		duration: parseInt(''),
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000001.cmfv',
 		startTime: 0,
-		parent: null as any,
 	},
 	{
 		id: 'invalid-segment-2',
 		duration: 0,
 		url: '',
 		startTime: 0,
-		parent: null as any,
 	},
 	{
 		id: 'invalid-segment-3',
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000003.cmfv',
 		startTime: 0,
-		parent: null as any,
 	},
 	{
 		id: 'invalid-segment-4',
 		duration: 10,
 		url: '',
 		startTime: 10,
-		parent: null as any,
 	},
 	{
 		id: 'invalid-segment-5',
 		duration: 10,
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000005.cmfv',
 		startTime: 20,
-		parent: null as any,
 	},
 ]
 

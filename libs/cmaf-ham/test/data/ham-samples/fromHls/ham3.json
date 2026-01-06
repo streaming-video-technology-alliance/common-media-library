@@ -21,106 +21,91 @@
                     "id": "segment-0",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4",
-                    "startTime": 4.011,
-                    "parent": null
+                    "startTime": 4.011
                   },
                   {
                     "id": "segment-2",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s3.mp4",
-                    "startTime": 8,
-                    "parent": null
+                    "startTime": 8
                   },
                   {
                     "id": "segment-3",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s4.mp4",
-                    "startTime": 12.011,
-                    "parent": null
+                    "startTime": 12.011
                   },
                   {
                     "id": "segment-4",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s5.mp4",
-                    "startTime": 16,
-                    "parent": null
+                    "startTime": 16
                   },
                   {
                     "id": "segment-5",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s6.mp4",
-                    "startTime": 20.011,
-                    "parent": null
+                    "startTime": 20.011
                   },
                   {
                     "id": "segment-6",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s7.mp4",
-                    "startTime": 24,
-                    "parent": null
+                    "startTime": 24
                   },
                   {
                     "id": "segment-7",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s8.mp4",
-                    "startTime": 28.011,
-                    "parent": null
+                    "startTime": 28.011
                   },
                   {
                     "id": "segment-8",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s9.mp4",
-                    "startTime": 32,
-                    "parent": null
+                    "startTime": 32
                   },
                   {
                     "id": "segment-9",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s10.mp4",
-                    "startTime": 36.011,
-                    "parent": null
+                    "startTime": 36.011
                   },
                   {
                     "id": "segment-10",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s11.mp4",
-                    "startTime": 40,
-                    "parent": null
+                    "startTime": 40
                   },
                   {
                     "id": "segment-11",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s12.mp4",
-                    "startTime": 44.011,
-                    "parent": null
+                    "startTime": 44.011
                   },
                   {
                     "id": "segment-12",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s13.mp4",
-                    "startTime": 48,
-                    "parent": null
+                    "startTime": 48
                   },
                   {
                     "id": "segment-13",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s14.mp4",
-                    "startTime": 52.011,
-                    "parent": null
+                    "startTime": 52.011
                   },
                   {
                     "id": "segment-14",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s15.mp4",
-                    "startTime": 56,
-                    "parent": null
+                    "startTime": 56
                   }
                 ],
                 "sampleRate": 0,
@@ -140,106 +125,91 @@
                     "id": "segment-0",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s1.mp4",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s2.mp4",
-                    "startTime": 4.011,
-                    "parent": null
+                    "startTime": 4.011
                   },
                   {
                     "id": "segment-2",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s3.mp4",
-                    "startTime": 8,
-                    "parent": null
+                    "startTime": 8
                   },
                   {
                     "id": "segment-3",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s4.mp4",
-                    "startTime": 12.011,
-                    "parent": null
+                    "startTime": 12.011
                   },
                   {
                     "id": "segment-4",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s5.mp4",
-                    "startTime": 16,
-                    "parent": null
+                    "startTime": 16
                   },
                   {
                     "id": "segment-5",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s6.mp4",
-                    "startTime": 20.011,
-                    "parent": null
+                    "startTime": 20.011
                   },
                   {
                     "id": "segment-6",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s7.mp4",
-                    "startTime": 24,
-                    "parent": null
+                    "startTime": 24
                   },
                   {
                     "id": "segment-7",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s8.mp4",
-                    "startTime": 28.011,
-                    "parent": null
+                    "startTime": 28.011
                   },
                   {
                     "id": "segment-8",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s9.mp4",
-                    "startTime": 32,
-                    "parent": null
+                    "startTime": 32
                   },
                   {
                     "id": "segment-9",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s10.mp4",
-                    "startTime": 36.011,
-                    "parent": null
+                    "startTime": 36.011
                   },
                   {
                     "id": "segment-10",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s11.mp4",
-                    "startTime": 40,
-                    "parent": null
+                    "startTime": 40
                   },
                   {
                     "id": "segment-11",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s12.mp4",
-                    "startTime": 44.011,
-                    "parent": null
+                    "startTime": 44.011
                   },
                   {
                     "id": "segment-12",
                     "duration": 4.011,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s13.mp4",
-                    "startTime": 48,
-                    "parent": null
+                    "startTime": 48
                   },
                   {
                     "id": "segment-13",
                     "duration": 3.989,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s14.mp4",
-                    "startTime": 52.011,
-                    "parent": null
+                    "startTime": 52.011
                   },
                   {
                     "id": "segment-14",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-s15.mp4",
-                    "startTime": 56,
-                    "parent": null
+                    "startTime": 56
                   }
                 ],
                 "sampleRate": 0,
@@ -269,113 +239,97 @@
                     "id": "segment-0",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s1.vtt",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s2.vtt",
-                    "startTime": 4,
-                    "parent": null
+                    "startTime": 4
                   },
                   {
                     "id": "segment-2",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s3.vtt",
-                    "startTime": 8,
-                    "parent": null
+                    "startTime": 8
                   },
                   {
                     "id": "segment-3",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s4.vtt",
-                    "startTime": 12,
-                    "parent": null
+                    "startTime": 12
                   },
                   {
                     "id": "segment-4",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s5.vtt",
-                    "startTime": 16,
-                    "parent": null
+                    "startTime": 16
                   },
                   {
                     "id": "segment-5",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s6.vtt",
-                    "startTime": 20,
-                    "parent": null
+                    "startTime": 20
                   },
                   {
                     "id": "segment-6",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s7.vtt",
-                    "startTime": 24,
-                    "parent": null
+                    "startTime": 24
                   },
                   {
                     "id": "segment-7",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s8.vtt",
-                    "startTime": 28,
-                    "parent": null
+                    "startTime": 28
                   },
                   {
                     "id": "segment-8",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s9.vtt",
-                    "startTime": 32,
-                    "parent": null
+                    "startTime": 32
                   },
                   {
                     "id": "segment-9",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s10.vtt",
-                    "startTime": 36,
-                    "parent": null
+                    "startTime": 36
                   },
                   {
                     "id": "segment-10",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s11.vtt",
-                    "startTime": 40,
-                    "parent": null
+                    "startTime": 40
                   },
                   {
                     "id": "segment-11",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s12.vtt",
-                    "startTime": 44,
-                    "parent": null
+                    "startTime": 44
                   },
                   {
                     "id": "segment-12",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s13.vtt",
-                    "startTime": 48,
-                    "parent": null
+                    "startTime": 48
                   },
                   {
                     "id": "segment-13",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s14.vtt",
-                    "startTime": 52,
-                    "parent": null
+                    "startTime": 52
                   },
                   {
                     "id": "segment-14",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s15.vtt",
-                    "startTime": 56,
-                    "parent": null
+                    "startTime": 56
                   },
                   {
                     "id": "segment-15",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-el-s16.vtt",
-                    "startTime": 60,
-                    "parent": null
+                    "startTime": 60
                   }
                 ]
               },
@@ -392,113 +346,97 @@
                     "id": "segment-0",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s1.vtt",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s2.vtt",
-                    "startTime": 4,
-                    "parent": null
+                    "startTime": 4
                   },
                   {
                     "id": "segment-2",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s3.vtt",
-                    "startTime": 8,
-                    "parent": null
+                    "startTime": 8
                   },
                   {
                     "id": "segment-3",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s4.vtt",
-                    "startTime": 12,
-                    "parent": null
+                    "startTime": 12
                   },
                   {
                     "id": "segment-4",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s5.vtt",
-                    "startTime": 16,
-                    "parent": null
+                    "startTime": 16
                   },
                   {
                     "id": "segment-5",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s6.vtt",
-                    "startTime": 20,
-                    "parent": null
+                    "startTime": 20
                   },
                   {
                     "id": "segment-6",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s7.vtt",
-                    "startTime": 24,
-                    "parent": null
+                    "startTime": 24
                   },
                   {
                     "id": "segment-7",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s8.vtt",
-                    "startTime": 28,
-                    "parent": null
+                    "startTime": 28
                   },
                   {
                     "id": "segment-8",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s9.vtt",
-                    "startTime": 32,
-                    "parent": null
+                    "startTime": 32
                   },
                   {
                     "id": "segment-9",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s10.vtt",
-                    "startTime": 36,
-                    "parent": null
+                    "startTime": 36
                   },
                   {
                     "id": "segment-10",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s11.vtt",
-                    "startTime": 40,
-                    "parent": null
+                    "startTime": 40
                   },
                   {
                     "id": "segment-11",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s12.vtt",
-                    "startTime": 44,
-                    "parent": null
+                    "startTime": 44
                   },
                   {
                     "id": "segment-12",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s13.vtt",
-                    "startTime": 48,
-                    "parent": null
+                    "startTime": 48
                   },
                   {
                     "id": "segment-13",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s14.vtt",
-                    "startTime": 52,
-                    "parent": null
+                    "startTime": 52
                   },
                   {
                     "id": "segment-14",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s15.vtt",
-                    "startTime": 56,
-                    "parent": null
+                    "startTime": 56
                   },
                   {
                     "id": "segment-15",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/s-en-s16.vtt",
-                    "startTime": 60,
-                    "parent": null
+                    "startTime": 60
                   }
                 ]
               }
@@ -525,106 +463,91 @@
                     "id": "segment-0",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s1.mp4",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s2.mp4",
-                    "startTime": 4,
-                    "parent": null
+                    "startTime": 4
                   },
                   {
                     "id": "segment-2",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s3.mp4",
-                    "startTime": 8,
-                    "parent": null
+                    "startTime": 8
                   },
                   {
                     "id": "segment-3",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s4.mp4",
-                    "startTime": 12,
-                    "parent": null
+                    "startTime": 12
                   },
                   {
                     "id": "segment-4",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s5.mp4",
-                    "startTime": 16,
-                    "parent": null
+                    "startTime": 16
                   },
                   {
                     "id": "segment-5",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s6.mp4",
-                    "startTime": 20,
-                    "parent": null
+                    "startTime": 20
                   },
                   {
                     "id": "segment-6",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s7.mp4",
-                    "startTime": 24,
-                    "parent": null
+                    "startTime": 24
                   },
                   {
                     "id": "segment-7",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s8.mp4",
-                    "startTime": 28,
-                    "parent": null
+                    "startTime": 28
                   },
                   {
                     "id": "segment-8",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s9.mp4",
-                    "startTime": 32,
-                    "parent": null
+                    "startTime": 32
                   },
                   {
                     "id": "segment-9",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s10.mp4",
-                    "startTime": 36,
-                    "parent": null
+                    "startTime": 36
                   },
                   {
                     "id": "segment-10",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s11.mp4",
-                    "startTime": 40,
-                    "parent": null
+                    "startTime": 40
                   },
                   {
                     "id": "segment-11",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s12.mp4",
-                    "startTime": 44,
-                    "parent": null
+                    "startTime": 44
                   },
                   {
                     "id": "segment-12",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s13.mp4",
-                    "startTime": 48,
-                    "parent": null
+                    "startTime": 48
                   },
                   {
                     "id": "segment-13",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s14.mp4",
-                    "startTime": 52,
-                    "parent": null
+                    "startTime": 52
                   },
                   {
                     "id": "segment-14",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0360p-0750k-libx264-s15.mp4",
-                    "startTime": 56,
-                    "parent": null
+                    "startTime": 56
                   }
                 ],
                 "width": 768,
@@ -651,106 +574,91 @@
                     "id": "segment-0",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s1.mp4",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s2.mp4",
-                    "startTime": 4,
-                    "parent": null
+                    "startTime": 4
                   },
                   {
                     "id": "segment-2",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s3.mp4",
-                    "startTime": 8,
-                    "parent": null
+                    "startTime": 8
                   },
                   {
                     "id": "segment-3",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s4.mp4",
-                    "startTime": 12,
-                    "parent": null
+                    "startTime": 12
                   },
                   {
                     "id": "segment-4",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s5.mp4",
-                    "startTime": 16,
-                    "parent": null
+                    "startTime": 16
                   },
                   {
                     "id": "segment-5",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s6.mp4",
-                    "startTime": 20,
-                    "parent": null
+                    "startTime": 20
                   },
                   {
                     "id": "segment-6",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s7.mp4",
-                    "startTime": 24,
-                    "parent": null
+                    "startTime": 24
                   },
                   {
                     "id": "segment-7",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s8.mp4",
-                    "startTime": 28,
-                    "parent": null
+                    "startTime": 28
                   },
                   {
                     "id": "segment-8",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s9.mp4",
-                    "startTime": 32,
-                    "parent": null
+                    "startTime": 32
                   },
                   {
                     "id": "segment-9",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s10.mp4",
-                    "startTime": 36,
-                    "parent": null
+                    "startTime": 36
                   },
                   {
                     "id": "segment-10",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s11.mp4",
-                    "startTime": 40,
-                    "parent": null
+                    "startTime": 40
                   },
                   {
                     "id": "segment-11",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s12.mp4",
-                    "startTime": 44,
-                    "parent": null
+                    "startTime": 44
                   },
                   {
                     "id": "segment-12",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s13.mp4",
-                    "startTime": 48,
-                    "parent": null
+                    "startTime": 48
                   },
                   {
                     "id": "segment-13",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s14.mp4",
-                    "startTime": 52,
-                    "parent": null
+                    "startTime": 52
                   },
                   {
                     "id": "segment-14",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0480p-1000k-libx264-s15.mp4",
-                    "startTime": 56,
-                    "parent": null
+                    "startTime": 56
                   }
                 ],
                 "width": 640,
@@ -777,106 +685,91 @@
                     "id": "segment-0",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s1.mp4",
-                    "startTime": 0,
-                    "parent": null
+                    "startTime": 0
                   },
                   {
                     "id": "segment-1",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s2.mp4",
-                    "startTime": 4,
-                    "parent": null
+                    "startTime": 4
                   },
                   {
                     "id": "segment-2",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s3.mp4",
-                    "startTime": 8,
-                    "parent": null
+                    "startTime": 8
                   },
                   {
                     "id": "segment-3",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s4.mp4",
-                    "startTime": 12,
-                    "parent": null
+                    "startTime": 12
                   },
                   {
                     "id": "segment-4",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s5.mp4",
-                    "startTime": 16,
-                    "parent": null
+                    "startTime": 16
                   },
                   {
                     "id": "segment-5",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s6.mp4",
-                    "startTime": 20,
-                    "parent": null
+                    "startTime": 20
                   },
                   {
                     "id": "segment-6",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s7.mp4",
-                    "startTime": 24,
-                    "parent": null
+                    "startTime": 24
                   },
                   {
                     "id": "segment-7",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s8.mp4",
-                    "startTime": 28,
-                    "parent": null
+                    "startTime": 28
                   },
                   {
                     "id": "segment-8",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s9.mp4",
-                    "startTime": 32,
-                    "parent": null
+                    "startTime": 32
                   },
                   {
                     "id": "segment-9",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s10.mp4",
-                    "startTime": 36,
-                    "parent": null
+                    "startTime": 36
                   },
                   {
                     "id": "segment-10",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s11.mp4",
-                    "startTime": 40,
-                    "parent": null
+                    "startTime": 40
                   },
                   {
                     "id": "segment-11",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s12.mp4",
-                    "startTime": 44,
-                    "parent": null
+                    "startTime": 44
                   },
                   {
                     "id": "segment-12",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s13.mp4",
-                    "startTime": 48,
-                    "parent": null
+                    "startTime": 48
                   },
                   {
                     "id": "segment-13",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s14.mp4",
-                    "startTime": 52,
-                    "parent": null
+                    "startTime": 52
                   },
                   {
                     "id": "segment-14",
                     "duration": 4,
                     "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-s15.mp4",
-                    "startTime": 56,
-                    "parent": null
+                    "startTime": 56
                   }
                 ],
                 "width": 480,

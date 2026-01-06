@@ -4,7 +4,11 @@
 
 ```ts
 
+import { CmcdStreamingFormat } from '@svta/cml-cmcd';
+import { FAIRPLAY_KEY_SYSTEM } from '@svta/cml-drm';
+import { PLAYREADY_KEY_SYSTEM } from '@svta/cml-drm';
 import { ValueOf } from '@svta/cml-utils';
+import { WIDEVINE_KEY_SYSTEM } from '@svta/cml-drm';
 
 // @alpha
 export type AdaptationSet = {
@@ -410,7 +414,6 @@ export type Role = {
 //
 // @alpha
 export type Segment = Ham & AddressableObject & Duration & {
-    parent: Track;
     startTime: number;
 };
 
@@ -491,9 +494,13 @@ export function setDashSerializer(serializer: DashSerializer): void;
 // @internal (undocumented)
 export function setHlsParser(parser: HlsParser): void;
 
+// Warning: (ae-forgotten-export) The symbol "Base" needs to be exported by the entry point index.d.ts
+//
 // @alpha
-export type SwitchingSet = Ham & {
-    tracks: Track[];
+export type SwitchingSet = Ham & Base & {
+    tracks: Track$1[];
+    protection?: Protection;
+    role?: string;
 };
 
 // @alpha
@@ -572,6 +579,11 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/types/model/content-protection/KeySystem.ts:8:32 - (ae-forgotten-export) The symbol "Track$1" needs to be exported by the entry point index.d.ts
+// src/types/model/content-protection/KeySystem.ts:8:61 - (ae-forgotten-export) The symbol "Protection" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

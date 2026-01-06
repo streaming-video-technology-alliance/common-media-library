@@ -22,7 +22,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-aac-64k.cmfa",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 704,
                       "end": 2211
@@ -46,7 +45,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-aac-128k.cmfa",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 704,
                       "end": 2211
@@ -86,7 +84,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-hev1-1100k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 2901,
                       "end": 4036
@@ -117,7 +114,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-hev1-1500k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 2901,
                       "end": 4036
@@ -148,7 +144,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-hev1-2200k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 2901,
                       "end": 4036
@@ -181,7 +176,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-en.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -208,7 +202,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-es.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778

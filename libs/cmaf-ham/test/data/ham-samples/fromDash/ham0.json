@@ -22,7 +22,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-aac-64k.cmfa",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 704,
                       "end": 2211
@@ -46,7 +45,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-aac-128k.cmfa",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 704,
                       "end": 2211
@@ -86,7 +84,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-avc1-400k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 761,
                       "end": 1896
@@ -117,7 +114,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-avc1-750k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 760,
                       "end": 1895
@@ -148,7 +144,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-avc1-1000k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 761,
                       "end": 1896
@@ -179,7 +174,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-avc1-1500k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 762,
                       "end": 1897
@@ -210,7 +204,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-avc1-2200k.cmfv",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 762,
                       "end": 1897
@@ -243,7 +236,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-en.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -270,7 +262,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-de.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -297,7 +288,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-es.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -324,7 +314,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-fr.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -351,7 +340,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-nl.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -378,7 +366,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-pt-br.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 625,
                       "end": 1796
@@ -405,7 +392,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-pt-pt.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 625,
                       "end": 1796
@@ -432,7 +418,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-ru.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -459,7 +444,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-zh.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 607,
                       "end": 1778
@@ -486,7 +470,6 @@
                     "duration": 734,
                     "url": "tears-of-steel-zh-hans.cmft",
                     "startTime": 0,
-                    "parent": null,
                     "byteRange": {
                       "start": 627,
                       "end": 1798
