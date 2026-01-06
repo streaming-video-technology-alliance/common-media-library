@@ -17,7 +17,7 @@ and this project adheres to
 
 ### Changed
 
-- Updated `README` code examples
+- Updated `README`
 - `IsoBoxWriter` signature now includes a required `config` parameter: `(box: B, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView`
 - `writeArray` method now requires a `length` parameter to specify the number of values to write
 - Renamed `IsoBoxReadableStreamConfig` to `IsoBoxWriteViewConfig`
