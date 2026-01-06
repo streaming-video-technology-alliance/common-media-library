@@ -1,5 +1,6 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -38,29 +39,18 @@ export function writeVisualSampleEntryBox<T extends VisualSampleEntryType>(box: 
 
 	const writer = new IsoBoxWriteView(type, totalSize)
 
-	for (let i = 0; i < 6; i++) {
-		writer.writeUint(box.reserved1[i] ?? 0, 1)
-	}
-
+	writer.writeArray(box.reserved1, UINT, 1, 6)
 	writer.writeUint(box.dataReferenceIndex, 2)
 	writer.writeUint(box.preDefined1, 2)
 	writer.writeUint(box.reserved2, 2)
-
-	for (let i = 0; i < 3; i++) {
-		writer.writeUint(box.preDefined2[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.preDefined2, UINT, 4, 3)
 	writer.writeUint(box.width, 2)
 	writer.writeUint(box.height, 2)
 	writer.writeTemplate(box.horizresolution, 4)
 	writer.writeTemplate(box.vertresolution, 4)
 	writer.writeUint(box.reserved3, 4)
 	writer.writeUint(box.frameCount, 2)
-
-	for (let i = 0; i < 32; i++) {
-		writer.writeUint(box.compressorName[i] ?? 0, 1)
-	}
-
+	writer.writeArray(box.compressorName, UINT, 1, 32)
 	writer.writeUint(box.depth, 2)
 	writer.writeUint(box.preDefined3 & 0xFFFF, 2)
 	writer.writeBytes(box.config)

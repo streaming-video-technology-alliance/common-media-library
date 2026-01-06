@@ -1,3 +1,8 @@
+/**
+ * List of container box types
+ *
+ * @public
+ */
 export const CONTAINERS: string[] = [
 	'dinf',
 	'edts',

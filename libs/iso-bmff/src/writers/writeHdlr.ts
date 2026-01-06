@@ -1,4 +1,5 @@
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -26,11 +27,7 @@ export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
 
 	writer.writeUint(box.preDefined, 4)
 	writer.writeString(box.handlerType)
-
-	for (let i = 0; i < 3; i++) {
-		writer.writeUint(box.reserved[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.reserved, UINT, 4, 3)
 	writer.writeTerminatedString(box.name)
 
 	return writer

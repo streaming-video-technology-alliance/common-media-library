@@ -1,4 +1,5 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -26,16 +27,9 @@ export function writeEnca(box: AudioSampleEntryBox<'enca'>): IsoBoxWriteView {
 
 	const writer = new IsoBoxWriteView('enca', totalSize)
 
-	for (let i = 0; i < 6; i++) {
-		writer.writeUint(box.reserved1[i] ?? 0, 1)
-	}
-
+	writer.writeArray(box.reserved1, UINT, 1, 6)
 	writer.writeUint(box.dataReferenceIndex, 2)
-
-	for (let i = 0; i < 2; i++) {
-		writer.writeUint(box.reserved2[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.reserved2, UINT, 4, 2)
 	writer.writeUint(box.channelcount, 2)
 	writer.writeUint(box.samplesize, 2)
 	writer.writeUint(box.preDefined, 2)
