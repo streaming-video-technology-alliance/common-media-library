@@ -1,4 +1,5 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
+import { TEMPLATE } from '../fields/TEMPLATE.ts'
 import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -41,7 +42,7 @@ export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView {
 	writer.writeTemplate(box.volume, 2)
 	writer.writeUint(box.reserved1, 2)
 	writer.writeArray(box.reserved2, UINT, 4, 2)
-	writer.writeArray(box.matrix, UINT, 4, 9)
+	writer.writeArray(box.matrix, TEMPLATE, 4, 9)
 	writer.writeArray(box.preDefined, UINT, 4, 6)
 	writer.writeUint(box.nextTrackId, 4)
 
