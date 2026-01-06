@@ -18,10 +18,10 @@ and this project adheres to
 ### Changed
 
 - Updated `README` code examples
-- **BREAKING**: `IsoBoxWriter` signature now includes a required `config` parameter: `(box: B, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView`
-- **BREAKING**: `writeArray` method now requires a `length` parameter to specify the number of values to write
-- **BREAKING**: Renamed `IsoBoxReadableStreamConfig` to `IsoBoxWriteViewConfig`
-- **BREAKING**: Removed `writeVisualSampleEntryBox` export (use specific visual sample entry writers like `writeAvc1`, `writeAvc3`, etc. instead)
+- `IsoBoxWriter` signature now includes a required `config` parameter: `(box: B, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView`
+- `writeArray` method now requires a `length` parameter to specify the number of values to write
+- Renamed `IsoBoxReadableStreamConfig` to `IsoBoxWriteViewConfig`
+- Removed `writeVisualSampleEntryBox` export (use specific visual sample entry writers like `writeAvc1`, `writeAvc3`, etc. instead)
 
 ## [1.0.0-alpha.1] - 2025-12-27
 
