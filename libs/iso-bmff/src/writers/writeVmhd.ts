@@ -1,4 +1,5 @@
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -23,10 +24,7 @@ export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView {
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.graphicsmode, 2)
-
-	for (let i = 0; i < 3; i++) {
-		writer.writeUint(box.opcolor[i] ?? 0, 2)
-	}
+	writer.writeArray(box.opcolor, UINT, 2, 3)
 
 	return writer
 }

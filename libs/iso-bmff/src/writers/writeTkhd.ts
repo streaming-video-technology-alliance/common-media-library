@@ -1,4 +1,6 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
+import { TEMPLATE } from '../fields/TEMPLATE.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -41,20 +43,12 @@ export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView {
 	writer.writeUint(box.trackId, 4)
 	writer.writeUint(box.reserved1, 4)
 	writer.writeUint(box.duration, size)
-
-	for (let i = 0; i < 2; i++) {
-		writer.writeUint(box.reserved2[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.reserved2, UINT, 4, 2)
 	writer.writeUint(box.layer, 2)
 	writer.writeUint(box.alternateGroup, 2)
 	writer.writeTemplate(box.volume, 2)
 	writer.writeUint(box.reserved3, 2)
-
-	for (let i = 0; i < 9; i++) {
-		writer.writeTemplate(box.matrix[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.matrix, TEMPLATE, 4, 9)
 	writer.writeTemplate(box.width, 4)
 	writer.writeTemplate(box.height, 4)
 

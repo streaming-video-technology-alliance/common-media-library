@@ -33,10 +33,10 @@ const boxes = readIsoBoxes(buffer, {
 
 ### Writing boxes
 
-Boxes can be written to using the `writeIsoBoxes` function. The function takes an array of streamable items and returns a readable stream. Streamable items include:
+Boxes can be written to using the `writeIsoBoxes` function. The function takes an array of streamable items and returns an array of `Uint8Array`s. Streamable items include:
 
 - Raw box objects (e.g. `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`)
-- ArrayBufferViews like `Uint8Array` and `DataView` as well as the box strutures returned by the `readIsoBoxes` function (they adhere to the `ArrayBufferView` interface).
+- ArrayBufferViews like `Uint8Array` and `DataView` as well as the box structures returned by the `readIsoBoxes` function (they adhere to the `ArrayBufferView` interface).
 
 When providing raw box objects, a configuration object must be provided to specify the writers for those box types.
 

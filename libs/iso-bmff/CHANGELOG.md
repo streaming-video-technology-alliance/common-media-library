@@ -8,6 +8,21 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-alpha.2] - 2025-01-05
+
+### Added
+
+- Add missing `stsd` and `dref` box writers
+- Add `CONTAINERS` export for the list of box types that are containers
+
+### Changed
+
+- Updated `README`
+- `IsoBoxWriter` signature now includes a required `config` parameter: `(box: B, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView`
+- `writeArray` method now requires a `length` parameter to specify the number of values to write
+- Renamed `IsoBoxReadableStreamConfig` to `IsoBoxWriteViewConfig`
+- Removed `writeVisualSampleEntryBox` export (use specific visual sample entry writers like `writeAvc1`, `writeAvc3`, etc. instead)
+
 ## [1.0.0-alpha.1] - 2025-12-27
 
 ### Added
