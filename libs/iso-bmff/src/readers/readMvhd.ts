@@ -1,4 +1,5 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
+import { TEMPLATE } from '../fields/TEMPLATE.ts'
 import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
@@ -29,7 +30,7 @@ export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 		volume: readTemplate(2),
 		reserved1: readUint(2),
 		reserved2: readArray(UINT, 4, 2),
-		matrix: readArray(UINT, 4, 9),
+		matrix: readArray(TEMPLATE, 4, 9),
 		preDefined: readArray(UINT, 4, 6),
 		nextTrackId: readUint(4),
 	}
