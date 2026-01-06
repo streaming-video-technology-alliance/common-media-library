@@ -1,4 +1,4 @@
-import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts';
+import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
 
 /**
  * ISO box writer.
