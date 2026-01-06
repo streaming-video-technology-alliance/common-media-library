@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-alpha.2] - 2025-01-05
+
+### Added
+
+- Add missing `stsd` and `dref` box writers
+
+### Changed
+
+- Updated `README` code examples
+
 ## [1.0.0-alpha.1] - 2025-12-27
 
 ### Added

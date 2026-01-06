@@ -1,8 +1,7 @@
-import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
-import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
-import { isContainer } from './utils/isContainer.ts'
-import { writeContainerBox } from './writers/writeContainerBox.ts'
+import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
+import { createWriterConfig } from './utils/createWriterConfig.ts'
+import { writeBox } from './writers/writeBox.ts'
 
 /**
  * Write an ISO box to a Uint8Array.
@@ -13,39 +12,6 @@ import { writeContainerBox } from './writers/writeContainerBox.ts'
  *
  * @public
  */
-export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Uint8Array {
-	let view: ArrayBufferView | null = null
-
-	if ('type' in box) {
-		const { type } = box
-
-		if (type !== '' && isContainer(box)) {
-			view = writeContainerBox(box, writers)
-		}
-		else {
-			const writer = writers[type as IsoBox['type']]
-
-			if (writer) {
-				// TODO: Find a better way to do this without casting to any
-				view = writer(box as any)
-			}
-			else if ('view' in box) {
-				view = box.view
-			}
-		}
-
-		if (!view) {
-			throw new Error(`No writer found for box type: ${type}`)
-		}
-	}
-
-	if ('buffer' in box) {
-		view = box
-	}
-
-	if (!view) {
-		throw new Error('Invalid box')
-	}
-
-	return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
+export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteViewConfig): Uint8Array {
+	return writeBox(box, createWriterConfig(config))
 }

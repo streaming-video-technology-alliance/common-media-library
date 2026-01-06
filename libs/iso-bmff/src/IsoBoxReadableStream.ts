@@ -1,5 +1,6 @@
-import type { IsoBoxReadableStreamConfig } from './IsoBoxReadableStreamConfig.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
+import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
+import { createWriterConfig } from './utils/createWriterConfig.ts'
 import { writeIsoBox } from './writeIsoBox.ts'
 
 /**
@@ -14,9 +15,9 @@ export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
 	 * @param boxes - The boxes to stream.
 	 * @param config - The configuration for the stream.
 	 */
-	constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxReadableStreamConfig = {}) {
+	constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig = {}) {
 		const iterator = boxes[Symbol.iterator]()
-		const { writers = {} } = config
+		const cfg = createWriterConfig(config)
 
 		function pull(controller: ReadableStreamDefaultController<Uint8Array>) {
 			const desiredSize = controller.desiredSize ?? 0
@@ -27,7 +28,7 @@ export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
 				if (done) {
 					controller.close()
 				} else {
-					controller.enqueue(writeIsoBox(value, writers))
+					controller.enqueue(writeIsoBox(value, cfg))
 				}
 			}
 		}

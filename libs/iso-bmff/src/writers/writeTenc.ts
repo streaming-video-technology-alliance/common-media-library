@@ -1,4 +1,5 @@
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -25,10 +26,7 @@ export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
 
 	writer.writeUint(box.defaultIsEncrypted, 3)
 	writer.writeUint(box.defaultIvSize, 1)
-
-	for (let i = 0; i < 16; i++) {
-		writer.writeUint(box.defaultKid[i] ?? 0, 1)
-	}
+	writer.writeArray(box.defaultKid, UINT, 1, 16)
 
 	return writer
 }

@@ -6,7 +6,7 @@ import type { VisualSampleEntryType } from './VisualSampleEntryType.ts'
  *
  * @public
  */
-export type VisualSampleEntryBox<T extends VisualSampleEntryType> = SampleEntryBox & {
+export type VisualSampleEntryBox<T extends VisualSampleEntryType = VisualSampleEntryType> = SampleEntryBox & {
 	type: T;
 	preDefined1: number;
 	reserved2: number;
