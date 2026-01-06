@@ -42,13 +42,13 @@ describe('writeStsd', function () {
 			109, 112, 52, 97, // type (mp4a)
 			0, 0, 0, 0, 0, 0, // reserved1
 			0, 1, // dataReferenceIndex
-			0, 0, 0, 0, // reserved2
-			0, 0, // channelcount
-			0, 0, // samplesize
-			0, 2, // preDefined
-			0, 16, // reserved3
-			255, 254, 0, 0, // samplerate
-			187, 128, 0, 0, 0, 0, 0, 50, 101, 115, 100, 115, 0, 0, 0, 0, 3, 128, 128, 34, 0, 0, 0, 4, 128, 128, 22, 64, 21, 0, 32, 0, 0, 1, 244, 0, 0, 1, 244, 0, 5, 128, 128, 5, 17, 144, 0, 0, 0, 6, 128, 128, 1, 2
+			0, 0, 0, 0, // reserved2 (first 4 bytes)
+			0, 0, 0, 0, // reserved2 (last 4 bytes)
+			0, 2, // channelcount
+			0, 16, // samplesize
+			255, 254, // preDefined
+			0, 0, // reserved3
+			187, 128, 0, 0, 0, 0, 0, 50, 101, 115, 100, 115, 0, 0, 0, 0, 3, 128, 128, 34, 0, 0, 0, 4, 128, 128, 22, 64, 21, 0, 32, 0, 0, 1, 244, 0, 0, 1, 244, 0, 5, 128, 128, 5, 17, 144, 0, 0, 0, 6, 128, 128, 1, 2 // samplerate + esds
 		])), 0)
 		// #endregion example
 	})
