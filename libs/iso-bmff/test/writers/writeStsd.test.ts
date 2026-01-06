@@ -34,8 +34,8 @@ describe('writeStsd', function () {
 		assert.strictEqual(Buffer.compare(buffer, new Uint8Array([
 			0, 0, 0, 102, // size
 			115, 116, 115, 100, // type (stsd)
-			0, 0, // version
-			0, 0, // flags
+			0, // version
+			0, 0, 0, // flags
 			0, 0, 0, 1, // entryCount
 			0, 0, 0, 86, // size
 
