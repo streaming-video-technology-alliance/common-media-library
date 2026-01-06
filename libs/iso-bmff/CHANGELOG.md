@@ -12,7 +12,7 @@ and this project adheres to
 
 ### Added
 
-- Add missing `stsd` and `dref` box writers
+- Add `stsd` and `dref` box writers
 - Add `CONTAINERS` export for the list of box types that are containers
 
 ### Changed
