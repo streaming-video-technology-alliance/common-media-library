@@ -1,4 +1,5 @@
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -25,23 +26,15 @@ export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteVi
 	const writer = new IsoBoxWriteView('pssh', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
-	for (let i = 0; i < 16; i++) {
-		writer.writeUint(box.systemId[i] ?? 0, 1)
-	}
+	writer.writeArray(box.systemId, UINT, 1, 16)
 
 	if (box.version > 0) {
 		writer.writeUint(box.kidCount, 4)
-
-		for (let i = 0; i < box.kidCount; i++) {
-			writer.writeUint(box.kid[i] ?? 0, 1)
-		}
+		writer.writeArray(box.kid, UINT, 1, box.kidCount)
 	}
 
 	writer.writeUint(box.dataSize, 4)
-
-	for (let i = 0; i < box.dataSize; i++) {
-		writer.writeUint(box.data[i] ?? 0, 1)
-	}
+	writer.writeArray(box.data, UINT, 1, box.dataSize)
 
 	return writer
 }

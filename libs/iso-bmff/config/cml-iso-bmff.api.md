@@ -85,7 +85,10 @@ export type CompositionTimeToSampleEntry = {
 export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig): ReadableStream<Uint8Array>;
+export const CONTAINERS: string[];
+
+// @public
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
 
 // @public
 export const DATA = "data";
@@ -395,13 +398,8 @@ export type IsoBoxMap = {
 
 // @public
 export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
-    constructor(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig);
+    constructor(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig);
 }
-
-// @public
-export type IsoBoxReadableStreamConfig = {
-    writers?: IsoBoxWriterMap;
-};
 
 // @public
 export type IsoBoxReader<B$1 extends IsoBox> = (view: IsoBoxReadView) => B$1;
@@ -446,7 +444,7 @@ export type IsoBoxReadViewConfig<R extends IsoBoxReaderMap = IsoBoxReaderMap> = 
 export type IsoBoxStreamable = IsoBox | Box | ArrayBufferView;
 
 // @public
-export type IsoBoxWriter<B$1> = (box: B$1) => ArrayBufferView;
+export type IsoBoxWriter<B$1> = (box: B$1, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView;
 
 // @public
 export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
@@ -457,7 +455,7 @@ export class IsoBoxWriteView {
     get buffer(): ArrayBuffer;
     get byteLength(): number;
     get byteOffset(): number;
-    writeArray: <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number) => void;
+    writeArray: <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number, length: number) => void;
     writeBoxHeader: (type: string, size: number) => void;
     writeBytes: (data: Uint8Array) => void;
     writeFullBox(version: number, flags: number): void;
@@ -468,6 +466,11 @@ export class IsoBoxWriteView {
     writeUint: (value: number, size: number) => void;
     writeUtf8TerminatedString: (value: string) => void;
 }
+
+// @public
+export type IsoBoxWriteViewConfig = {
+    writers?: IsoBoxWriterMap;
+};
 
 // @public
 export type IsoFieldTypeMap = {
@@ -944,7 +947,7 @@ export type SampleDependencyTypeBox = FullBox & {
 };
 
 // @public
-export type SampleDescriptionBox<E extends SampleEntryBox = SampleEntryBox> = FullBox & {
+export type SampleDescriptionBox<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox> = FullBox & {
     type: "stsd";
     entryCount: number;
     entries: E[];
@@ -1341,7 +1344,7 @@ export type VideoMediaHeaderBox = FullBox & {
 };
 
 // @public
-export type VisualSampleEntryBox<T$1 extends VisualSampleEntryType> = SampleEntryBox & {
+export type VisualSampleEntryBox<T$1 extends VisualSampleEntryType = VisualSampleEntryType> = SampleEntryBox & {
     type: T$1;
     preDefined1: number;
     reserved2: number;
@@ -1424,6 +1427,9 @@ export function writeAvc4(box: VisualSampleEntryBox<"avc4">): IsoBoxWriteView;
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
 
 // @public
+export function writeDref(box: DataReferenceBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView;
 
 // @public
@@ -1463,10 +1469,10 @@ export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
 export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 
 // @public
-export function writeIsoBox(box: IsoBoxStreamable, writers: IsoBoxWriterMap): Uint8Array;
+export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteViewConfig): Uint8Array;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxReadableStreamConfig): Uint8Array[];
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig): Uint8Array[];
 
 // @public
 export function writeKind(box: TrackKindBox): IsoBoxWriteView;
@@ -1532,6 +1538,9 @@ export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView;
 export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeStsd(box: SampleDescriptionBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeStss(box: SyncSampleBox): IsoBoxWriteView;
 
 // @public
@@ -1572,9 +1581,6 @@ export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
 
 // @public
 export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView;
-
-// @public
-export function writeVisualSampleEntryBox<T$1 extends VisualSampleEntryType>(box: VisualSampleEntryBox<T$1>, type: T$1): IsoBoxWriteView;
 
 // @public
 export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView;
