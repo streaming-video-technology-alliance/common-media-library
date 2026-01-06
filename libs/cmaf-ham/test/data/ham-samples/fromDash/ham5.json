@@ -1,84 +1,102 @@
 [
-	{
-		"id": "evo-dash",
-		"selectionSets": [
-			{
-				"id": "video",
-				"switchingSets": [
-					{
-						"id": "1",
-						"tracks": [
-							{
-								"bandwidth": 72000,
-								"codec": "avc1.42c01e",
-								"duration": 30,
-								"frameRate": {
-									"frameRateNumerator": 37,
-									"frameRateDenominator": 0
-								},
-								"height": 480,
-								"id": "testStream01bbbVideo72000",
-								"language": "und",
-								"par": "16:9",
-								"sar": "1:1",
-								"scanType": "",
-								"segments": [
-									{
-										"duration": 10,
-										"url": "testStream01bbb/video/72000/segment_0.m4s"
-									},
-									{
-										"duration": 10,
-										"url": "testStream01bbb/video/72000/segment_10417.m4s"
-									},
-									{
-										"duration": 10,
-										"url": "testStream01bbb/video/72000/segment_20833.m4s"
-									}
-								],
-								"type": "video",
-								"width": 854,
-								"urlInitialization": "testStream01bbb/video/72000/seg_init.mp4"
-							}
-						]
-					}
-				]
-			},
-			{
-				"id": "audio",
-				"switchingSets": [
-					{
-						"id": "2",
-						"tracks": [
-							{
-								"bandwidth": 72000,
-								"channels": 2,
-								"codec": "mp4a.40.2",
-								"duration": 30,
-								"id": "testStream01bbbAudio72000",
-								"language": "en",
-								"sampleRate": 48000,
-								"segments": [
-									{
-										"duration": 10,
-										"url": "testStream01bbb/audio/72000/segment_0.m4s"
-									},
-									{
-										"duration": 10,
-										"url": "testStream01bbb/audio/72000/segment_10432.m4s"
-									},
-									{
-										"duration": 10,
-										"url": "testStream01bbb/audio/72000/segment_20864.m4s"
-									}
-								],
-								"type": "audio",
-								"urlInitialization": "testStream01bbb/audio/72000/seg_init.mp4"
-							}
-						]
-					}
-				]
-			}
-		]
-	}
+  {
+    "id": "evo-dash",
+    "selectionSets": [
+      {
+        "id": "video",
+        "switchingSets": [
+          {
+            "id": "1",
+            "tracks": [
+              {
+                "bandwidth": 72000,
+                "codec": "avc1.42c01e",
+                "duration": 30,
+                "frameRate": {
+                  "frameRateNumerator": 37,
+                  "frameRateDenominator": 0
+                },
+                "height": 480,
+                "id": "testStream01bbbVideo72000",
+                "language": "und",
+                "par": "16:9",
+                "sar": "1:1",
+                "scanType": "",
+                "segments": [
+                  {
+                    "id": "segment-0",
+                    "duration": 10,
+                    "url": "testStream01bbb/video/72000/segment_0.m4s",
+                    "startTime": 0,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-1",
+                    "duration": 10,
+                    "url": "testStream01bbb/video/72000/segment_10417.m4s",
+                    "startTime": 10,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-2",
+                    "duration": 10,
+                    "url": "testStream01bbb/video/72000/segment_20833.m4s",
+                    "startTime": 20,
+                    "parent": null
+                  }
+                ],
+                "type": "video",
+                "width": 854,
+                "urlInitialization": "testStream01bbb/video/72000/seg_init.mp4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "audio",
+        "switchingSets": [
+          {
+            "id": "2",
+            "tracks": [
+              {
+                "bandwidth": 72000,
+                "channels": 2,
+                "codec": "mp4a.40.2",
+                "duration": 30,
+                "id": "testStream01bbbAudio72000",
+                "language": "en",
+                "sampleRate": 48000,
+                "segments": [
+                  {
+                    "id": "segment-0",
+                    "duration": 10,
+                    "url": "testStream01bbb/audio/72000/segment_0.m4s",
+                    "startTime": 0,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-1",
+                    "duration": 10,
+                    "url": "testStream01bbb/audio/72000/segment_10432.m4s",
+                    "startTime": 10,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-2",
+                    "duration": 10,
+                    "url": "testStream01bbb/audio/72000/segment_20864.m4s",
+                    "startTime": 20,
+                    "parent": null
+                  }
+                ],
+                "type": "audio",
+                "urlInitialization": "testStream01bbb/audio/72000/seg_init.mp4"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 ]

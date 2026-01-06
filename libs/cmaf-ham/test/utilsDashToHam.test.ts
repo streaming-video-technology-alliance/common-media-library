@@ -359,18 +359,18 @@ describe('getSar', () => {
 describe('getTrackDuration', () => {
 	it('returns the summation of the durations of an array of segments', () => {
 		const res = getTrackDuration([
-			{ duration: 1, url: '', byteRange: '' },
-			{ duration: 2, url: '', byteRange: '' },
-			{ duration: 3, url: '', byteRange: '' },
+			{ id: 'seg-1', duration: 1, url: '', byteRange: undefined, startTime: 0, parent: null as any },
+			{ id: 'seg-2', duration: 2, url: '', byteRange: undefined, startTime: 1, parent: null as any },
+			{ id: 'seg-3', duration: 3, url: '', byteRange: undefined, startTime: 3, parent: null as any },
 		])
 		equal(res, 6)
 	})
 
 	it('returns the summation of the bigger durations of an array of segments', () => {
 		const res = getTrackDuration([
-			{ duration: 4, url: '', byteRange: '' },
-			{ duration: 5, url: '', byteRange: '' },
-			{ duration: 6, url: '', byteRange: '' },
+			{ id: 'seg-1', duration: 4, url: '', byteRange: undefined, startTime: 0, parent: null as any },
+			{ id: 'seg-2', duration: 5, url: '', byteRange: undefined, startTime: 4, parent: null as any },
+			{ id: 'seg-3', duration: 6, url: '', byteRange: undefined, startTime: 9, parent: null as any },
 		])
 		equal(res, 15)
 	})

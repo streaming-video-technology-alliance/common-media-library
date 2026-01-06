@@ -4,6 +4,8 @@
 
 ```ts
 
+import { ValueOf } from '@svta/cml-utils';
+
 // @alpha
 export type AdaptationSet = {
     $: {
@@ -41,6 +43,9 @@ export type AlignedSwitchingSet = {
 };
 
 // @alpha
+export const AUDIO: "audio";
+
+// @alpha
 export type AudioChannelConfiguration = {
     $: {
         schemeIdUri: string;
@@ -59,6 +64,18 @@ export type Byterange = {
     length: number;
     offset: number;
 };
+
+// @alpha
+export type ByteRangeObject = {
+    start: number;
+    end: number;
+};
+
+// @alpha
+export function byteRangeToDashString(byteRange: ByteRangeObject | undefined): string;
+
+// @alpha
+export function byteRangeToHlsString(byteRange: ByteRangeObject | undefined): string;
 
 // Warning: (ae-internal-missing-underscore) The name "calculateDuration" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -232,6 +249,12 @@ export function hamToDash(presentation: Presentation[]): Manifest;
 export function hamToHls(presentation: Presentation[]): Manifest;
 
 // @alpha
+export function hlsByterangeToByteRangeObject(byterange: {
+    length: number;
+    offset: number;
+} | undefined): ByteRangeObject | undefined;
+
+// @alpha
 export type HlsManifest = {
     playlists: PlayList[];
     mediaGroups: MediaGroups;
@@ -248,6 +271,9 @@ export type HlsParser = (text: string) => HlsManifest;
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @alpha
+export const IMAGE: "image";
+
+// @alpha
 export type Initialization = {
     $: {
         range?: string;
@@ -262,10 +288,10 @@ export function iso8601DurationToNumber(isoDuration: string): number;
 
 // @alpha
 export type Manifest = {
+    type: ManifestFormat;
     manifest: string;
     fileName?: string;
     ancillaryManifests?: Manifest[];
-    type: ManifestFormat;
     metadata?: Map<string, string>;
 };
 
@@ -306,6 +332,9 @@ export type MediaGroups = {
 //
 // @internal (undocumented)
 export function numberToIso8601Duration(duration: number): string;
+
+// @alpha
+export function parseByteRangeString(byteRangeString: string | undefined): ByteRangeObject | undefined;
 
 // Warning: (ae-internal-missing-underscore) The name "parseDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -376,11 +405,13 @@ export type Role = {
     };
 };
 
+// Warning: (ae-forgotten-export) The symbol "AddressableObject" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Duration" needs to be exported by the entry point index.d.ts
+//
 // @alpha
-export type Segment = {
-    duration: number;
-    url: string;
-    byteRange?: string;
+export type Segment = Ham & AddressableObject & Duration & {
+    parent: Track;
+    startTime: number;
 };
 
 // @alpha
@@ -466,6 +497,9 @@ export type SwitchingSet = Ham & {
 };
 
 // @alpha
+export const TEXT: "text";
+
+// @alpha
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
@@ -483,7 +517,15 @@ export type Track = Ham & {
 };
 
 // @alpha
-export type TrackType = "audio" | "video" | "text";
+export const TrackType: {
+    readonly AUDIO: typeof AUDIO;
+    readonly VIDEO: typeof VIDEO;
+    readonly TEXT: typeof TEXT;
+    readonly IMAGE: typeof IMAGE;
+};
+
+// @alpha
+export type TrackType = ValueOf<typeof TrackType>;
 
 // @alpha
 export function validatePresentation(presentation: Presentation): Validation;
@@ -517,6 +559,9 @@ export type Validation = {
     status: boolean;
     errorMessages: string[];
 };
+
+// @alpha
+export const VIDEO: "video";
 
 // @alpha
 export type VideoTrack = Track & {

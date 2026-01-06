@@ -16,10 +16,15 @@ import {
  */
 export function encodeByteRange(track: VideoTrack | AudioTrack): string {
 	if (track.byteRange) {
+		// Track byteRange is still a string (will be migrated later)
 		return `BYTERANGE:${track.byteRange.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR)}\n`
 	}
 	else if (track.segments?.at(0)?.byteRange) {
-		return `BYTERANGE:0@${Number(track.segments.at(0)?.byteRange?.replace(HYPHEN_MINUS_SEPARATOR, AT_SEPARATOR).split(AT_SEPARATOR)[0]) - 1}\n`
+		// Segment byteRange is now an object {start, end}
+		const firstSegmentByteRange = track.segments.at(0)?.byteRange
+		if (firstSegmentByteRange) {
+			return `BYTERANGE:0@${firstSegmentByteRange.start - 1}\n`
+		}
 	}
 	return ''
 }

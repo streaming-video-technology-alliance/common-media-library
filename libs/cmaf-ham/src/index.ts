@@ -82,6 +82,7 @@ export * from './services/validators/validateSwitchingSets.ts'
 export * from './services/validators/validateTrack.ts'
 export * from './services/validators/validateTracks.ts'
 
+export * from './utils/byteRange.ts'
 export * from './utils/dash/iso8601DurationToNumber.ts'
 export * from './utils/dash/numberToIso8601Duration.ts'
 export * from './utils/dash/parseDashManifest.ts'

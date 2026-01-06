@@ -16,9 +16,9 @@ describe('getByterange', () => {
 
 	it('returns byteRange string if segment has byteRange', () => {
 		const track: AudioTrack = getAudioTrack({})
-		track.segments[0].byteRange = '123@456'
+		track.segments[0].byteRange = { start: 456, end: 578 } // 123 bytes starting at 456
 		const res = encodeByteRange(track)
-		equal(res, 'BYTERANGE:0@122\n')
+		equal(res, 'BYTERANGE:0@455\n')
 	})
 
 	it('returns empty string if track and segments have no byteRange', () => {
@@ -41,7 +41,7 @@ describe('getPlaylistData', () => {
 describe('getSegments', () => {
 	it('returns segments from track segments', () => {
 		const track: AudioTrack = getAudioTrack({})
-		track.segments[0].byteRange = '123@456'
+		track.segments[0].byteRange = { start: 456, end: 578 } // 123 bytes starting at 456
 		const res = getSegments(track.segments)
 		equal(
 			res,

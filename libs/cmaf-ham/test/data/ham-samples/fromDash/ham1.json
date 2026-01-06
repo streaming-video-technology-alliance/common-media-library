@@ -1,100 +1,130 @@
 [
-	{
-		"id": "1",
-		"selectionSets": [
-			{
-				"id": "video",
-				"switchingSets": [
-					{
-						"id": "video",
-						"tracks": [
-							{
-								"bandwidth": 2000000,
-								"codec": "avc1.640028",
-								"duration": 50,
-								"frameRate": {
-									"frameRateNumerator": 30,
-									"frameRateDenominator": 1
-								},
-								"height": 1080,
-								"id": "1",
-								"language": "und",
-								"par": "",
-								"sar": "",
-								"scanType": "",
-								"segments": [
-									{
-										"duration": 10,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000001.cmfv"
-									},
-									{
-										"duration": 10,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000002.cmfv"
-									},
-									{
-										"duration": 10,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000003.cmfv"
-									},
-									{
-										"duration": 10,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000004.cmfv"
-									},
-									{
-										"duration": 10,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000005.cmfv"
-									}
-								],
-								"type": "video",
-								"width": 1920,
-								"urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv"
-							}
-						]
-					}
-				]
-			},
-			{
-				"id": "audio",
-				"switchingSets": [
-					{
-						"id": "audio",
-						"tracks": [
-							{
-								"bandwidth": 96000,
-								"channels": 2,
-								"codec": "mp4a.40.2",
-								"duration": 93.75,
-								"id": "2",
-								"language": "und",
-								"sampleRate": 48000,
-								"segments": [
-									{
-										"duration": 18.75,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000001.cmfa"
-									},
-									{
-										"duration": 18.75,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000002.cmfa"
-									},
-									{
-										"duration": 18.75,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000003.cmfa"
-									},
-									{
-										"duration": 18.75,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000004.cmfa"
-									},
-									{
-										"duration": 18.75,
-										"url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000005.cmfa"
-									}
-								],
-								"type": "audio",
-								"urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa"
-							}
-						]
-					}
-				]
-			}
-		]
-	}
+  {
+    "id": "1",
+    "selectionSets": [
+      {
+        "id": "video",
+        "switchingSets": [
+          {
+            "id": "video",
+            "tracks": [
+              {
+                "bandwidth": 2000000,
+                "codec": "avc1.640028",
+                "duration": 50,
+                "frameRate": {
+                  "frameRateNumerator": 30,
+                  "frameRateDenominator": 1
+                },
+                "height": 1080,
+                "id": "1",
+                "language": "und",
+                "par": "",
+                "sar": "",
+                "scanType": "",
+                "segments": [
+                  {
+                    "id": "segment-0",
+                    "duration": 10,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000001.cmfv",
+                    "startTime": 0,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-1",
+                    "duration": 10,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000002.cmfv",
+                    "startTime": 10,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-2",
+                    "duration": 10,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000003.cmfv",
+                    "startTime": 20,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-3",
+                    "duration": 10,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000004.cmfv",
+                    "startTime": 30,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-4",
+                    "duration": 10,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-video_000000005.cmfv",
+                    "startTime": 40,
+                    "parent": null
+                  }
+                ],
+                "type": "video",
+                "width": 1920,
+                "urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "audio",
+        "switchingSets": [
+          {
+            "id": "audio",
+            "tracks": [
+              {
+                "bandwidth": 96000,
+                "channels": 2,
+                "codec": "mp4a.40.2",
+                "duration": 93.75,
+                "id": "2",
+                "language": "und",
+                "sampleRate": 48000,
+                "segments": [
+                  {
+                    "id": "segment-0",
+                    "duration": 18.75,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000001.cmfa",
+                    "startTime": 0,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-1",
+                    "duration": 18.75,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000002.cmfa",
+                    "startTime": 18.75,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-2",
+                    "duration": 18.75,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000003.cmfa",
+                    "startTime": 37.5,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-3",
+                    "duration": 18.75,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000004.cmfa",
+                    "startTime": 56.25,
+                    "parent": null
+                  },
+                  {
+                    "id": "segment-4",
+                    "duration": 18.75,
+                    "url": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audio_000000005.cmfa",
+                    "startTime": 75,
+                    "parent": null
+                  }
+                ],
+                "type": "audio",
+                "urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 ]

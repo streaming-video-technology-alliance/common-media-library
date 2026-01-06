@@ -2,7 +2,7 @@ import type { AddressableObject } from './model/AddressableObject.ts'
 import type { Base } from './model/Base.ts'
 import type { Duration } from './model/Duration.ts'
 import type { Ham } from './model/Ham.ts'
-import type { Segment } from './Segment.ts'
+import type { Segment } from './model/Segment.ts'
 import type { SwitchingSet } from './SwitchingSet.ts'
 import type { TrackType } from './model/TrackType.ts'
 

@@ -4,28 +4,29 @@ import type { Segment } from '../../../types/model/Segment.ts'
 import type { Track } from '../../../types/model/Track.ts'
 
 import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase.ts'
+import { byteRangeToDashString } from '../../../utils/byteRange.ts'
 
 export function trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = []
 	if (
 		track.segments.length > 0 &&
 		track.byteRange &&
-		track.segments[0].byteRange &&
-		track.segments[0].byteRange.includes('@')
+		track.segments[0].byteRange
 	) {
 		let firstSegment: SegmentBase | undefined = undefined
-		const initByteRange = track.byteRange.includes('-')
-			? track.byteRange.split('-')[1]
-			: track.byteRange.includes('@')
-				? track.byteRange.split('@')[0]
+		// Parse track byteRange (old string format for now, will be updated when Track is migrated)
+		const trackByteRangeStr = track.byteRange
+		const initByteRange = trackByteRangeStr.includes('-')
+			? trackByteRangeStr.split('-')[1]
+			: trackByteRangeStr.includes('@')
+				? trackByteRangeStr.split('@')[0]
 				: ''
 		const initRange: number = +initByteRange - 1
-		const byteFirstSegment = track.segments[0].byteRange.includes('-')
-			? track.segments[0].byteRange.split('-')[1]
-			: track.segments[0].byteRange.includes('@')
-				? track.segments[0].byteRange.split('@')[1]
-				: ''
-		const numberFirstByteRange: number = +byteFirstSegment - 1
+
+		// Use the new byteRange object format from segment
+		const segmentByteRange = track.segments[0].byteRange
+		const numberFirstByteRange: number = segmentByteRange.start - 1
+
 		firstSegment = {
 			$: {
 				indexRange: `${initByteRange}-${numberFirstByteRange}`,
@@ -45,10 +46,11 @@ export function trackToSegmentBase(track: Track): SegmentBase[] {
 		track.segments.forEach((segment: Segment) => {
 			let newSegment: SegmentBase | undefined
 			if (segment.byteRange) {
-				const initRange: number = +segment.byteRange.split('-')[0] - 1
+				const initRange: number = segment.byteRange.start - 1
+				const indexRange = byteRangeToDashString(segment.byteRange)
 				newSegment = {
 					$: {
-						indexRange: segment.byteRange,
+						indexRange,
 					},
 					Initialization: [{ $: { range: `0-${initRange}` } }],
 				} as SegmentBase

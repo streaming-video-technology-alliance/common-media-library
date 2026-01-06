@@ -80,7 +80,7 @@ describe('dashToHam', () => {
 
 describe('hamToDash', async () => {
 	it('converts ham1 to dash1', () => {
-		const presentations = jsonHam1 as Presentation[]
+		const presentations = jsonHam1 as unknown as Presentation[]
 		const convertedDash = hamToDash(presentations)
 		deepStrictEqual(convertedDash.manifest, dashFromHam1)
 		equal(convertedDash.type, 'dash')
@@ -88,7 +88,7 @@ describe('hamToDash', async () => {
 	})
 
 	it('converts ham2 to dash2', () => {
-		const presentations = jsonHam2 as Presentation[]
+		const presentations = jsonHam2 as unknown as Presentation[]
 		const convertedDash = hamToDash(presentations)
 		deepStrictEqual(convertedDash.manifest, dashFromHam2)
 		equal(convertedDash.type, 'dash')
@@ -96,7 +96,7 @@ describe('hamToDash', async () => {
 	})
 
 	it('converts ham3 to dash3', () => {
-		const presentations = jsonHam3 as Presentation[]
+		const presentations = jsonHam3 as unknown as Presentation[]
 		const convertedDash = hamToDash(presentations)
 		deepStrictEqual(convertedDash.manifest, dashFromHam3)
 		equal(convertedDash.type, 'dash')
@@ -104,7 +104,7 @@ describe('hamToDash', async () => {
 	})
 
 	it('converts ham4 to dash4', () => {
-		const presentations = jsonHam4 as Presentation[]
+		const presentations = jsonHam4 as unknown as Presentation[]
 		const convertedDash = hamToDash(presentations)
 		deepStrictEqual(convertedDash.manifest, dashFromHam4)
 		equal(convertedDash.type, 'dash')
@@ -112,7 +112,7 @@ describe('hamToDash', async () => {
 	})
 
 	it('converts ham5 to dash5', () => {
-		const presentations = jsonHam5 as Presentation[]
+		const presentations = jsonHam5 as unknown as Presentation[]
 		const convertedDash = hamToDash(presentations)
 		deepStrictEqual(convertedDash.manifest, dashFromHam5)
 		equal(convertedDash.type, 'dash')
