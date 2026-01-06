@@ -1,8 +1,8 @@
 import type { CmcdStreamingFormat } from '@svta/cml-cmcd'
-import type { Base } from './Base.ts'
-import type { ContentSteering } from './ContentSteering.ts'
-import type { Duration } from './Duration.ts'
-import type { ManifestType } from './ManifestType.ts'
+import type { Base } from './model/Base.ts'
+import type { ContentSteering } from './model/content-steering/ContentSteering.ts'
+import type { Duration } from './model/Duration.ts'
+import type { ManifestType } from './manifest/ManifestType.ts'
 import type { Presentation } from './Presentation.ts'
 
 /**

@@ -1,8 +1,8 @@
 
-import type { Base } from './Base.ts'
-import type { Duration } from './Duration.ts'
-import type { EventStream } from './EventStream.ts'
-import type { Ham } from './Ham.ts'
+import type { Base } from './model/Base.ts'
+import type { Duration } from './model/Duration.ts'
+import type { EventStream } from './model/timed-metadata/EventStream.ts'
+import type { Ham } from './model/Ham.ts'
 import type { Manifest } from './Manifest.ts'
 import type { SelectionSet } from './SelectionSet.ts'
 

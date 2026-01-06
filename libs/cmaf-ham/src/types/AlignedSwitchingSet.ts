@@ -1,4 +1,4 @@
-import type { SwitchingSet } from './SwitchingSet.ts';
+import type { SwitchingSet } from './SwitchingSet.ts'
 
 /**
  * CMAF-HAM Aligned Switching Set type

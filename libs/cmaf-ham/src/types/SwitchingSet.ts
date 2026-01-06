@@ -1,6 +1,6 @@
-import type { Base } from './Base.ts'
-import type { Ham } from './Ham.ts'
-import type { Protection } from './Protection.ts'
+import type { Base } from './model/Base.ts'
+import type { Protection } from './model/content-protection/Protection.ts'
+import type { Ham } from './model/Ham.ts'
 import type { SelectionSet } from './SelectionSet.ts'
 import type { Track } from './Track.ts'
 

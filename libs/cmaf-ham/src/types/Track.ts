@@ -1,10 +1,10 @@
-import type { AddressableObject } from './AddressableObject.ts'
-import type { Base } from './Base.ts'
-import type { Duration } from './Duration.ts'
-import type { Ham } from './Ham.ts'
+import type { AddressableObject } from './model/AddressableObject.ts'
+import type { Base } from './model/Base.ts'
+import type { Duration } from './model/Duration.ts'
+import type { Ham } from './model/Ham.ts'
 import type { Segment } from './Segment.ts'
 import type { SwitchingSet } from './SwitchingSet.ts'
-import type { TrackType } from './TrackType.ts'
+import type { TrackType } from './model/TrackType.ts'
 
 /**
  * CMAF-HAM Track type

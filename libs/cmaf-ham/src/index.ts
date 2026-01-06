@@ -30,7 +30,7 @@ export type * from './types/mapper/hls/HlsManifest.ts'
 export type * from './types/mapper/hls/MediaGroups.ts'
 export type * from './types/mapper/hls/Playlist.ts'
 export type * from './types/mapper/hls/SegmentHls.ts'
-export type * from './types/Validation.ts'
+export type * from './types/mapper/Validation.ts'
 
 export * from './mapper/dash/mapDashToHam/mapSegmentBase.ts'
 export * from './mapper/dash/mapDashToHam/mapSegmentList.ts'

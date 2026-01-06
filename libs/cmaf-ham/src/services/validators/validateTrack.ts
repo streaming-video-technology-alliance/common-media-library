@@ -3,7 +3,7 @@ import type { TextTrack } from '../../types/model/TextTrack.ts'
 import type { Track } from '../../types/model/Track.ts'
 import type { VideoTrack } from '../../types/model/VideoTrack.ts'
 
-import type { Validation } from '../../types/Validation.ts'
+import type { Validation } from '../../types/mapper/Validation.ts'
 
 import { validateSegments } from './validateSegments.ts'
 

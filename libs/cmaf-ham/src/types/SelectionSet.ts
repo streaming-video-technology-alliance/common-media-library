@@ -1,8 +1,8 @@
 import type { AlignedSwitchingSet } from './AlignedSwitchingSet.ts'
-import type { Ham } from './Ham.ts'
+import type { Ham } from './model/Ham.ts'
 import type { Presentation } from './Presentation.ts'
 import type { SwitchingSet } from './SwitchingSet.ts'
-import type { TrackType } from './TrackType.ts'
+import type { TrackType } from './model/TrackType.ts'
 
 /**
  * CMAF-HAM Selection Set type

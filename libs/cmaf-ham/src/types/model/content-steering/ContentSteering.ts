@@ -1,4 +1,4 @@
-import type { ContentSteeringPathway } from './ContentSteeringPathway.ts';
+import type { ContentSteeringPathway } from './ContentSteeringPathway.ts'
 
 /**
  * CMAF-HAM Content Steering type
