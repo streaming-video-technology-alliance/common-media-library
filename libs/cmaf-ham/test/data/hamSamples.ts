@@ -189,6 +189,10 @@ export const invalidAudioTrack: AudioTrack = {
 
 export const presentation: Presentation = {
 	id: '1',
+	duration: 50,
+	startTime: 0,
+	endTime: 50,
+	baseUrls: [],
 	selectionSets: [
 		{
 			id: 'video',
@@ -217,6 +221,10 @@ export const presentation: Presentation = {
 
 export const invalidPresentation: Presentation = {
 	id: '',
+	duration: 50,
+	startTime: 0,
+	endTime: 50,
+	baseUrls: [],
 	selectionSets: [
 		{
 			id: 'video',
