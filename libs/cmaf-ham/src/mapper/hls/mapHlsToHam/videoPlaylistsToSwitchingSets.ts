@@ -37,7 +37,7 @@ export function videoPlaylistsToSwitchingSets(
 			codecs: codec ? [codec] : [],
 			mimeType: 'video/mp4',
 			duration: getDuration(parsedHlsManifest, segments),
-			language: LANGUAGE,
+			...(LANGUAGE && { language: LANGUAGE }),
 			bandwidth: BANDWIDTH,
 			segments: segments,
 			width: playlist.attributes.RESOLUTION.width,

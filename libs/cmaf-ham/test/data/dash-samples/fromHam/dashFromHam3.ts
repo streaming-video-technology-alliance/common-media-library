@@ -37,16 +37,16 @@ export const dashFromHam3 = `<?xml version="1.0" encoding="UTF-8" standalone="ye
         <BaseURL>https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv</BaseURL>
       </Representation>
     </AdaptationSet>
-    <AdaptationSet id="2" group="3" contentType="text" mimeType="text/mp4" lang="en" codecs="wvtt">
-      <Representation id="textstream_eng=1000" bandwidth="1000" mimeType="text/mp4">
+    <AdaptationSet id="2" group="3" contentType="text" mimeType="application/mp4" lang="en" codecs="wvtt">
+      <Representation id="textstream_eng=1000" bandwidth="1000" mimeType="application/mp4">
         <SegmentBase indexRange="607-1778">
           <Initialization range="0-606"/>
         </SegmentBase>
         <BaseURL>https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-en.cmft</BaseURL>
       </Representation>
     </AdaptationSet>
-    <AdaptationSet id="4" group="3" contentType="text" mimeType="text/mp4" lang="es" codecs="wvtt">
-      <Representation id="textstream_spa=1000" bandwidth="1000" mimeType="text/mp4">
+    <AdaptationSet id="4" group="3" contentType="text" mimeType="application/mp4" lang="es" codecs="wvtt">
+      <Representation id="textstream_spa=1000" bandwidth="1000" mimeType="application/mp4">
         <SegmentBase indexRange="607-1778">
           <Initialization range="0-606"/>
         </SegmentBase>
