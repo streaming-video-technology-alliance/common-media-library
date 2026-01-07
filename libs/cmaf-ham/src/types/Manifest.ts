@@ -3,7 +3,7 @@ import type { Base } from './model/Base.ts'
 import type { ContentSteering } from './model/content-steering/ContentSteering.ts'
 import type { Duration } from './model/Duration.ts'
 import type { ManifestType } from './manifest/ManifestType.ts'
-import type { Presentation } from './Presentation.ts'
+import type { Presentation } from './model/Presentation.ts'
 
 /**
  * CMAF-HAM Manifest type

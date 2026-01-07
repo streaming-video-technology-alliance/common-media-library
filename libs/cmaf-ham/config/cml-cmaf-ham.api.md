@@ -4,7 +4,6 @@
 
 ```ts
 
-import { CmcdStreamingFormat } from '@svta/cml-cmcd';
 import { FAIRPLAY_KEY_SYSTEM } from '@svta/cml-drm';
 import { PLAYREADY_KEY_SYSTEM } from '@svta/cml-drm';
 import { ValueOf } from '@svta/cml-utils';
@@ -374,9 +373,15 @@ export type PlayList = {
     };
 };
 
+// Warning: (ae-forgotten-export) The symbol "Duration" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Base" needs to be exported by the entry point index.d.ts
+//
 // @alpha
-export type Presentation = Ham & {
+export type Presentation = Ham & Duration & Base & {
     selectionSets: SelectionSet[];
+    startTime: number;
+    endTime: number;
+    eventStreams?: EventStream[];
 };
 
 // @alpha
@@ -410,7 +415,6 @@ export type Role = {
 };
 
 // Warning: (ae-forgotten-export) The symbol "AddressableObject" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "Duration" needs to be exported by the entry point index.d.ts
 //
 // @alpha
 export type Segment = Ham & AddressableObject & Duration & {
@@ -472,6 +476,7 @@ export type SegmentURL = {
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
     alignedSwitchingSets?: AlignedSwitchingSet[];
+    type: TrackType;
 };
 
 // Warning: (ae-internal-missing-underscore) The name "serializeDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
@@ -494,11 +499,9 @@ export function setDashSerializer(serializer: DashSerializer): void;
 // @internal (undocumented)
 export function setHlsParser(parser: HlsParser): void;
 
-// Warning: (ae-forgotten-export) The symbol "Base" needs to be exported by the entry point index.d.ts
-//
 // @alpha
 export type SwitchingSet = Ham & Base & {
-    tracks: Track$1[];
+    tracks: Track[];
     protection?: Protection;
     role?: string;
 };
@@ -582,8 +585,8 @@ export type VideoTrack = Track & {
 
 // Warnings were encountered during analysis:
 //
-// src/types/model/content-protection/KeySystem.ts:8:32 - (ae-forgotten-export) The symbol "Track$1" needs to be exported by the entry point index.d.ts
-// src/types/model/content-protection/KeySystem.ts:8:61 - (ae-forgotten-export) The symbol "Protection" needs to be exported by the entry point index.d.ts
+// src/types/model/content-protection/KeySystem.ts:8:91 - (ae-forgotten-export) The symbol "EventStream" needs to be exported by the entry point index.d.ts
+// src/types/model/content-protection/KeySystem.ts:8:91 - (ae-forgotten-export) The symbol "Protection" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

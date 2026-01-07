@@ -57,6 +57,7 @@ export function videoPlaylistsToSwitchingSets(
 	switchingSetVideos.push({
 		id: `video`,
 		tracks: videoTracks,
+		baseUrls: [],
 	} as SwitchingSet)
 
 	return switchingSetVideos

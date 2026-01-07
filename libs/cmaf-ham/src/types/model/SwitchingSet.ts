@@ -1,7 +1,7 @@
 import type { Base } from './Base.ts'
 import type { Protection } from './content-protection/Protection.ts'
 import type { Ham } from './Ham.ts'
-import type { Track } from '../Track.ts'
+import type { Track } from './Track.ts'
 
 /**
  * CMAF-HAM Switching Set type

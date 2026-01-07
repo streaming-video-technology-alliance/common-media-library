@@ -37,6 +37,7 @@ export function mapHlsToHam(manifest: Manifest): Presentation[] {
 		selectionSets.push({
 			id: (selectionSetId++).toString(),
 			switchingSets: audioSwitchingSets,
+			type: 'audio',
 		} as SelectionSet)
 	}
 
@@ -44,6 +45,7 @@ export function mapHlsToHam(manifest: Manifest): Presentation[] {
 		selectionSets.push({
 			id: (selectionSetId++).toString(),
 			switchingSets: subtitleSwitchingSets,
+			type: 'text',
 		} as SelectionSet)
 	}
 
@@ -51,12 +53,32 @@ export function mapHlsToHam(manifest: Manifest): Presentation[] {
 		selectionSets.push({
 			id: (selectionSetId++).toString(),
 			switchingSets: videoSwitchingSets,
+			type: 'video',
 		} as SelectionSet)
+	}
+
+	// Calculate total duration from the longest track
+	let duration = 0
+	for (const selectionSet of selectionSets) {
+		for (const switchingSet of selectionSet.switchingSets) {
+			for (const track of switchingSet.tracks) {
+				if (track.duration > duration) {
+					duration = track.duration
+				}
+			}
+		}
 	}
 
 	let presentationId = 0
 
 	return [
-		{ id: (presentationId++).toString(), selectionSets: selectionSets },
+		{
+			id: (presentationId++).toString(),
+			selectionSets: selectionSets,
+			duration,
+			startTime: 0,
+			endTime: duration,
+			baseUrls: [],
+		},
 	]
 }
