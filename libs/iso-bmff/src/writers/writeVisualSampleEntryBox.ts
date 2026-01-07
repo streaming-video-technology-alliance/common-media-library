@@ -11,7 +11,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  * ISO/IEC 14496-12:2012 - 12.1.3 Visual Sample Entry
  *
  * @param box - The VisualSampleEntryBox fields to write
- * @param type - The box type
+ * @param config - The configuration for the writer
  *
  * @returns An IsoDataWriter containing the encoded box
  *

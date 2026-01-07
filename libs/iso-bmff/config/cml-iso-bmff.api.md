@@ -6,7 +6,7 @@
 
 // @public
 export type AdditionalMetadataContainerBox = {
-    type: "meta";
+    type: "meco";
     boxes: AdditionalMetadataContainerBoxChild[];
 };
 
@@ -19,8 +19,6 @@ export type AudioRenderingIndicationBox = FullBox & {
     audioRenderingIndication: number;
 };
 
-// Warning: (ae-forgotten-export) The symbol "AudioSampleEntryType" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type AudioSampleEntryBox<T$1 extends AudioSampleEntryType = AudioSampleEntryType> = SampleEntryBox & {
     type: T$1;
@@ -35,6 +33,9 @@ export type AudioSampleEntryBox<T$1 extends AudioSampleEntryType = AudioSampleEn
 
 // @public
 export type AudioSampleEntryBoxChild = any;
+
+// @public
+export type AudioSampleEntryType = "mp4a" | "enca";
 
 // @public
 export type Box = {
@@ -277,7 +278,6 @@ export type IsoBoxContainerMap = {
     grpl: GroupsListBox;
     mdia: MediaBox;
     meco: AdditionalMetadataContainerBox;
-    meta: MetaBox;
     mfra: MovieFragmentRandomAccessBox;
     minf: MediaInformationBox;
     moof: MovieFragmentBox;
@@ -1443,14 +1443,6 @@ export function writeAvc3(box: VisualSampleEntryBox<"avc3">, config: IsoBoxWrite
 
 // @public
 export function writeAvc4(box: VisualSampleEntryBox<"avc4">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
-
-// Warning: (ae-internal-missing-underscore) The name "writeChildBoxes" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export function writeChildBoxes(boxes: IsoBox[], config: IsoBoxWriteViewConfig): {
-    bytes: Uint8Array[];
-    size: number;
-};
 
 // @public
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
