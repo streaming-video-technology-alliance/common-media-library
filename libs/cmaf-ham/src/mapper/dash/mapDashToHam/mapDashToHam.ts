@@ -11,6 +11,7 @@ import type { Track } from '../../../types/model/Track.ts'
 
 import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts'
 
+import { getContentType } from './utils/getContentType.ts'
 import { getGroup } from './utils/getGroup.ts'
 import { getInitializationUrl } from './utils/getInitializationUrl.ts'
 import { getPresentationId } from './utils/getPresentationId.ts'
@@ -52,10 +53,12 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 			)
 
 			const group: string = getGroup(adaptationSet)
+			const contentType = getContentType(adaptationSet, adaptationSet.Representation[0])
 			if (!selectionSetGroups[group]) {
 				selectionSetGroups[group] = {
 					id: group,
 					switchingSets: [],
+					type: contentType,
 				} as SelectionSet
 			}
 
@@ -65,11 +68,19 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 					adaptationSet.ContentComponent?.at(0)?.$.id ??
 					group,
 				tracks,
+				baseUrls: [],
 			} as SwitchingSet)
 		})
 
 		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups)
 
-		return { id: presentationId, selectionSets } as Presentation
+		return {
+			id: presentationId,
+			selectionSets,
+			duration,
+			startTime: 0,
+			endTime: duration,
+			baseUrls: [],
+		} as Presentation
 	})
 }

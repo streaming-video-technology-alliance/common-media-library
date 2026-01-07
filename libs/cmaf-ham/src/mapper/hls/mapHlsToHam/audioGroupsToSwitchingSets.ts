@@ -1,7 +1,7 @@
 import type { AudioTrack } from '../../../types/model/AudioTrack.ts'
 import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 
-import type { Manifest } from '../../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../../types/manifest/ManifestFile.ts'
 
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts'
 
@@ -24,7 +24,7 @@ import { getHlsCodec } from './utils/getHlsCodec.ts'
  */
 export function audioGroupsToSwitchingSets(
 	mediaGroupsAudio: any,
-	manifestPlaylists: Manifest[],
+	manifestPlaylists: ManifestFile[],
 ): SwitchingSet[] {
 	const audioSwitchingSets: SwitchingSet[] = []
 	const audioTracks: AudioTrack[] = []
@@ -43,19 +43,24 @@ export function audioGroupsToSwitchingSets(
 			// TODO: channels, sampleRate, bandwith and codec need to be
 			// updated with real values. Right now we are using simple hardcoded values.
 			const byteRange = decodeByteRange(map?.byterange)
+			const codec = getHlsCodec('audio')
 			audioTracks.push({
 				id: audio,
 				type: 'audio',
-				fileName: uri,
-				codec: getHlsCodec('audio'),
+				url: uri,
+				codecs: codec ? [codec] : [],
+				mimeType: 'audio/mp4',
 				duration: getDuration(audioParsed, segments),
 				language: language,
 				bandwidth: 0,
 				segments: segments,
 				sampleRate: 0,
 				channels: 2,
-				...(byteRange && { byteRange }),
-				...(map?.uri && { urlInitialization: map?.uri }),
+				initialization: {
+					url: map?.uri ?? '',
+					...(byteRange && { byteRange }),
+				},
+				baseUrls: [],
 			} as AudioTrack)
 		}
 	}
@@ -63,6 +68,7 @@ export function audioGroupsToSwitchingSets(
 	audioSwitchingSets.push({
 		id: 'audio',
 		tracks: audioTracks,
+		baseUrls: [],
 	} as SwitchingSet)
 
 	return audioSwitchingSets

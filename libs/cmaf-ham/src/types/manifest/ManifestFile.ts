@@ -5,10 +5,10 @@ import type { ManifestFormat } from './ManifestFormat.ts'
  *
  * @alpha
  */
-export type Manifest = {
+export type ManifestFile = {
+	type: ManifestFormat;
 	manifest: string;
 	fileName?: string;
-	ancillaryManifests?: Manifest[];
-	type: ManifestFormat;
+	ancillaryManifests?: ManifestFile[];
 	metadata?: Map<string, string>;
 };

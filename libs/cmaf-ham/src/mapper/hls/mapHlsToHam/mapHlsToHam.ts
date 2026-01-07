@@ -1,7 +1,7 @@
 import type { Presentation } from '../../../types/model/Presentation.ts'
 import type { SelectionSet } from '../../../types/model/SelectionSet.ts'
 
-import type { Manifest } from '../../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../../types/manifest/ManifestFile.ts'
 
 import { audioGroupsToSwitchingSets } from './audioGroupsToSwitchingSets.ts'
 import { subtitleGroupsToSwitchingSets } from './subtitleGroupsToSwitchingSets.ts'
@@ -10,7 +10,7 @@ import { videoPlaylistsToSwitchingSets } from './videoPlaylistsToSwitchingSets.t
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts'
 import { addMetadataToHls } from '../../../utils/manifest/addMetadataToHls.ts'
 
-export function mapHlsToHam(manifest: Manifest): Presentation[] {
+export function mapHlsToHam(manifest: ManifestFile): Presentation[] {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest)
 	const manifestHls = addMetadataToHls(manifest, mainManifestParsed)
 	const selectionSets: SelectionSet[] = []
@@ -37,6 +37,7 @@ export function mapHlsToHam(manifest: Manifest): Presentation[] {
 		selectionSets.push({
 			id: (selectionSetId++).toString(),
 			switchingSets: audioSwitchingSets,
+			type: 'audio',
 		} as SelectionSet)
 	}
 
@@ -44,6 +45,7 @@ export function mapHlsToHam(manifest: Manifest): Presentation[] {
 		selectionSets.push({
 			id: (selectionSetId++).toString(),
 			switchingSets: subtitleSwitchingSets,
+			type: 'text',
 		} as SelectionSet)
 	}
 
@@ -51,12 +53,32 @@ export function mapHlsToHam(manifest: Manifest): Presentation[] {
 		selectionSets.push({
 			id: (selectionSetId++).toString(),
 			switchingSets: videoSwitchingSets,
+			type: 'video',
 		} as SelectionSet)
+	}
+
+	// Calculate total duration from the longest track
+	let duration = 0
+	for (const selectionSet of selectionSets) {
+		for (const switchingSet of selectionSet.switchingSets) {
+			for (const track of switchingSet.tracks) {
+				if (track.duration > duration) {
+					duration = track.duration
+				}
+			}
+		}
 	}
 
 	let presentationId = 0
 
 	return [
-		{ id: (presentationId++).toString(), selectionSets: selectionSets },
+		{
+			id: (presentationId++).toString(),
+			selectionSets: selectionSets,
+			duration,
+			startTime: 0,
+			endTime: duration,
+			baseUrls: [],
+		},
 	]
 }

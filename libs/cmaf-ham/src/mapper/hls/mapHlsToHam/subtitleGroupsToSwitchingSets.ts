@@ -1,7 +1,7 @@
 import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 import type { TextTrack } from '../../../types/model/TextTrack.ts'
 
-import type { Manifest } from '../../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../../types/manifest/ManifestFile.ts'
 
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts'
 
@@ -11,7 +11,7 @@ import { getHlsCodec } from './utils/getHlsCodec.ts'
 
 export function subtitleGroupsToSwitchingSets(
 	mediaGroupsSubtitles: any,
-	manifestPlaylists: Manifest[],
+	manifestPlaylists: ManifestFile[],
 ): SwitchingSet[] {
 	const subtitleSwitchingSets: SwitchingSet[] = []
 	const textTracks: TextTrack[] = []
@@ -27,15 +27,21 @@ export function subtitleGroupsToSwitchingSets(
 			)
 			const segments = formatSegments(subtitleParsed?.segments)
 
+			const codec = getHlsCodec('text')
 			textTracks.push({
 				id: subtitle,
 				type: 'text',
-				fileName: uri,
-				codec: getHlsCodec('text'),
+				url: uri,
+				codecs: codec ? [codec] : [],
+				mimeType: 'text/vtt',
 				duration: getDuration(subtitleParsed, segments),
 				language: language,
 				bandwidth: 0,
 				segments: segments,
+				initialization: {
+					url: '',
+				},
+				baseUrls: [],
 			} as TextTrack)
 		}
 	}
@@ -43,6 +49,7 @@ export function subtitleGroupsToSwitchingSets(
 	subtitleSwitchingSets.push({
 		id: 'text',
 		tracks: textTracks,
+		baseUrls: [],
 	} as SwitchingSet)
 
 	return subtitleSwitchingSets
