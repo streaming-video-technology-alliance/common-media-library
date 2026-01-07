@@ -1,4 +1,5 @@
 import type { SfInnerList } from '../SfInnerList.ts'
+import type { SfItem } from '../SfItem.ts'
 import { serializeItem } from './serializeItem.ts'
 import { serializeParams } from './serializeParams.ts'
 
@@ -24,9 +25,18 @@ import { serializeParams } from './serializeParams.ts'
 //     (Section 4.1.1.2) with list_parameters to output.
 //
 // 5.  Return output.
+
+/**
+ * Type for items that can be serialized as inner lists.
+ * Both SfItem (with array value) and SfInnerList are compatible.
+ *
+ * @public
+ */
+export type InnerListSerializable = SfInnerList | (SfItem & { value: SfItem[] })
+
 /**
  * @internal
  */
-export function serializeInnerList(value: SfInnerList) {
+export function serializeInnerList(value: InnerListSerializable) {
 	return `(${value.value.map(serializeItem).join(' ')})${serializeParams(value.params)}`
 }

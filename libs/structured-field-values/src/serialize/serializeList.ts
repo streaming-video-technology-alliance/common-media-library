@@ -41,17 +41,13 @@ export function serializeList(list: SfMember[], options: SfEncodeOptions = { whi
 
 	return list
 		.map(item => {
-			if (item instanceof SfItem === false) {
-				item = new SfItem(item)
+			const sfItem: SfItem = item instanceof SfItem ? item : new SfItem(item)
+
+			if (Array.isArray(sfItem.value)) {
+				return serializeInnerList(sfItem as SfItem & { value: SfItem[] })
 			}
 
-			// TODO: Fix this type assertion
-			const i = item as any
-			if (Array.isArray(i.value)) {
-				return serializeInnerList(i)
-			}
-
-			return serializeItem(i)
+			return serializeItem(sfItem)
 		})
 		.join(`,${optionalWhiteSpace}`)
 }

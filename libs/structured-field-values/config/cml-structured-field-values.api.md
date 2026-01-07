@@ -25,6 +25,11 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 // @public
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
+// @public
+export type InnerListSerializable = SfInnerList | (SfItem & {
+    value: SfItem[];
+});
+
 // Warning: (ae-internal-missing-underscore) The name "parseBareItem" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
@@ -146,7 +151,7 @@ export function serializeError(src: any, type: string, cause?: any): Error;
 // Warning: (ae-internal-missing-underscore) The name "serializeInnerList" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
-export function serializeInnerList(value: SfInnerList): string;
+export function serializeInnerList(value: InnerListSerializable): string;
 
 // Warning: (ae-internal-missing-underscore) The name "serializeInteger" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -211,7 +216,7 @@ export class SfItem {
     // (undocumented)
     params?: SfParameters;
     // (undocumented)
-    value: SfBareItem;
+    value: SfBareItem | SfItem[];
 }
 
 // @public

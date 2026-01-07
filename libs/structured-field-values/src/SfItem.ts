@@ -8,7 +8,7 @@ import type { SfParameters } from './SfParameters.ts'
  */
 export class SfItem {
 
-	value: SfBareItem
+	value: SfBareItem | SfItem[]
 
 	params?: SfParameters
 
