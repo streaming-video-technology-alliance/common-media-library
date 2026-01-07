@@ -1,6 +1,6 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import { readAvc1 } from './readAvc1.ts'
+import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
 
 /**
  * Parse a VisualSampleEntryBox from an IsoView
@@ -12,9 +12,6 @@ import { readAvc1 } from './readAvc1.ts'
  * @public
  */
 export function readAvc2(view: IsoBoxReadView): VisualSampleEntryBox<'avc2'> {
-	return {
-		...readAvc1(view),
-		type: 'avc2',
-	}
+	return readVisualSampleEntryBox('avc2', view)
 }
 

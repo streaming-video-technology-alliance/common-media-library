@@ -175,10 +175,16 @@ export class IsoBoxWriteView {
 	 *
 	 * @param data - The data to write.
 	 */
-	writeBytes = (data: Uint8Array): void => {
-		const uint8View = new Uint8Array(this.dataView.buffer)
-		uint8View.set(data, this.cursor)
-		this.cursor += data.length
+	writeBytes = (data: Uint8Array | Uint8Array[]): void => {
+		if (!Array.isArray(data)) {
+			data = [data]
+		}
+
+		for (const bytes of data) {
+			const uint8View = new Uint8Array(this.dataView.buffer)
+			uint8View.set(bytes, this.cursor)
+			this.cursor += bytes.length
+		}
 	}
 
 	/**

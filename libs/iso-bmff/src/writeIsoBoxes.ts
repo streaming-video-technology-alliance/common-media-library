@@ -1,7 +1,7 @@
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
 import { createWriterConfig } from './utils/createWriterConfig.ts'
-import { writeBox } from './writers/writeBox.ts'
+import { writeBoxes } from './utils/writeBoxes.ts'
 
 /**
  * Writes ISO boxes to a readable stream.
@@ -17,7 +17,5 @@ import { writeBox } from './writers/writeBox.ts'
  * @public
  */
 export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig): Uint8Array[] {
-	const cfg = createWriterConfig(config)
-
-	return Array.from(boxes, box => writeBox(box, cfg))
+	return writeBoxes(boxes, createWriterConfig(config))
 }

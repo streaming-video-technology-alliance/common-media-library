@@ -5,4 +5,4 @@ import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
  *
  * @public
  */
-export type IsoBoxWriter<B> = (box: B, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView;
+export type IsoBoxWriter<B> = (box: B, config: IsoBoxWriteViewConfig) => ArrayBufferView;
