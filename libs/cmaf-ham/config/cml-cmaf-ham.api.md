@@ -4,6 +4,11 @@
 
 ```ts
 
+import { FAIRPLAY_KEY_SYSTEM } from '@svta/cml-drm';
+import { PLAYREADY_KEY_SYSTEM } from '@svta/cml-drm';
+import { ValueOf } from '@svta/cml-utils';
+import { WIDEVINE_KEY_SYSTEM } from '@svta/cml-drm';
+
 // @alpha
 export type AdaptationSet = {
     $: {
@@ -41,6 +46,9 @@ export type AlignedSwitchingSet = {
 };
 
 // @alpha
+export const AUDIO: "audio";
+
+// @alpha
 export type AudioChannelConfiguration = {
     $: {
         schemeIdUri: string;
@@ -59,6 +67,18 @@ export type Byterange = {
     length: number;
     offset: number;
 };
+
+// @alpha
+export type ByteRangeObject = {
+    start: number;
+    end: number;
+};
+
+// @alpha
+export function byteRangeToDashString(byteRange: ByteRangeObject | undefined): string;
+
+// @alpha
+export function byteRangeToHlsString(byteRange: ByteRangeObject | undefined): string;
 
 // Warning: (ae-internal-missing-underscore) The name "calculateDuration" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -226,10 +246,16 @@ export type Ham = {
 };
 
 // @alpha
-export function hamToDash(presentation: Presentation[]): Manifest;
+export function hamToDash(presentation: Presentation[]): ManifestFile;
 
 // @alpha
-export function hamToHls(presentation: Presentation[]): Manifest;
+export function hamToHls(presentation: Presentation[]): ManifestFile;
+
+// @alpha
+export function hlsByterangeToByteRangeObject(byterange: {
+    length: number;
+    offset: number;
+} | undefined): ByteRangeObject | undefined;
 
 // @alpha
 export type HlsManifest = {
@@ -248,6 +274,9 @@ export type HlsParser = (text: string) => HlsManifest;
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @alpha
+export const IMAGE: "image";
+
+// @alpha
 export type Initialization = {
     $: {
         range?: string;
@@ -261,11 +290,11 @@ export type Initialization = {
 export function iso8601DurationToNumber(isoDuration: string): number;
 
 // @alpha
-export type Manifest = {
+export type ManifestFile = {
+    type: ManifestFormat;
     manifest: string;
     fileName?: string;
-    ancillaryManifests?: Manifest[];
-    type: ManifestFormat;
+    ancillaryManifests?: ManifestFile[];
     metadata?: Map<string, string>;
 };
 
@@ -307,6 +336,9 @@ export type MediaGroups = {
 // @internal (undocumented)
 export function numberToIso8601Duration(duration: number): string;
 
+// @alpha
+export function parseByteRangeString(byteRangeString: string | undefined): ByteRangeObject | undefined;
+
 // Warning: (ae-internal-missing-underscore) The name "parseDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -341,9 +373,15 @@ export type PlayList = {
     };
 };
 
+// Warning: (ae-forgotten-export) The symbol "Duration" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Base" needs to be exported by the entry point index.d.ts
+//
 // @alpha
-export type Presentation = Ham & {
+export type Presentation = Ham & Duration & Base & {
     selectionSets: SelectionSet[];
+    startTime: number;
+    endTime: number;
+    eventStreams?: EventStream[];
 };
 
 // @alpha
@@ -376,11 +414,11 @@ export type Role = {
     };
 };
 
+// Warning: (ae-forgotten-export) The symbol "AddressableObject" needs to be exported by the entry point index.d.ts
+//
 // @alpha
-export type Segment = {
-    duration: number;
-    url: string;
-    byteRange?: string;
+export type Segment = Ham & AddressableObject & Duration & {
+    startTime: number;
 };
 
 // @alpha
@@ -438,6 +476,7 @@ export type SegmentURL = {
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
     alignedSwitchingSets?: AlignedSwitchingSet[];
+    type: TrackType;
 };
 
 // Warning: (ae-internal-missing-underscore) The name "serializeDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
@@ -461,29 +500,44 @@ export function setDashSerializer(serializer: DashSerializer): void;
 export function setHlsParser(parser: HlsParser): void;
 
 // @alpha
-export type SwitchingSet = Ham & {
+export type SwitchingSet = Ham & Base & {
     tracks: Track[];
+    protection?: Protection;
+    role?: string;
 };
+
+// @alpha
+export const TEXT: "text";
 
 // @alpha
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
 // @alpha
-export type Track = Ham & {
+export type Track = Ham & Base & Duration & AddressableObject & {
     type: TrackType;
-    fileName?: string;
-    codec: string;
-    duration: number;
-    language: string;
+    codecs: string[];
+    mimeType: string;
+    language?: string;
     bandwidth: number;
-    byteRange?: string;
-    urlInitialization?: string;
+    initialization: AddressableObject;
     segments: Segment[];
+    segmentIndex?: AddressableObject & {
+        timescale: number;
+    };
+    presentationTimeOffset?: number;
 };
 
 // @alpha
-export type TrackType = "audio" | "video" | "text";
+export const TrackType: {
+    readonly AUDIO: typeof AUDIO;
+    readonly VIDEO: typeof VIDEO;
+    readonly TEXT: typeof TEXT;
+    readonly IMAGE: typeof IMAGE;
+};
+
+// @alpha
+export type TrackType = ValueOf<typeof TrackType>;
 
 // @alpha
 export function validatePresentation(presentation: Presentation): Validation;
@@ -519,6 +573,9 @@ export type Validation = {
 };
 
 // @alpha
+export const VIDEO: "video";
+
+// @alpha
 export type VideoTrack = Track & {
     width: number;
     height: number;
@@ -527,6 +584,11 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/types/model/content-protection/KeySystem.ts:8:91 - (ae-forgotten-export) The symbol "EventStream" needs to be exported by the entry point index.d.ts
+// src/types/model/content-protection/KeySystem.ts:8:91 - (ae-forgotten-export) The symbol "Protection" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

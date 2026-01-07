@@ -1,11 +1,11 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../types/manifest/ManifestFile.ts'
 
 //Add metadata to manifest.
 //In the future, if any other fields are wanted to be added, they can be added here.
 export function addMetadataToHls(
-	manifest: Manifest,
+	manifest: ManifestFile,
 	manifestParsed: any,
-): Manifest {
+): ManifestFile {
 	if (!manifest.metadata) {
 		manifest.metadata = new Map<string, string>()
 	}

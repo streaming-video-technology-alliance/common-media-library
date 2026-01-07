@@ -1,5 +1,5 @@
 import type { SelectionSet } from '../../types/model/SelectionSet.ts'
-import type { Validation } from '../../types/Validation.ts'
+import type { Validation } from '../../types/mapper/Validation.ts'
 
 import { validateSelectionSet } from './validateSelectionSet.ts'
 
