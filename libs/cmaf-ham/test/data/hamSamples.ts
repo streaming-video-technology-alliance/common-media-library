@@ -129,6 +129,8 @@ export const videoTrack: VideoTrack = {
 	baseUrls: [],
 } as VideoTrack
 
+
+// @ts-expect-error - Invalid video track
 export const invalidVideoTrack: VideoTrack = {
 	url: 'video/mp4',
 	bandwidth: 2000000,

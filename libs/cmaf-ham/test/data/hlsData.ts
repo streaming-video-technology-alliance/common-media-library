@@ -28,10 +28,14 @@ function getAudioTrack({
 		bandwidth: 0,
 		segments: [
 			{
+				id: 'audio-segment-1',
+				startTime: 0,
 				duration: 4.011,
 				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4',
 			},
 			{
+				id: 'audio-segment-2',
+				startTime: 4.011,
 				duration: 3.989,
 				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
 			},
