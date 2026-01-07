@@ -5,6 +5,7 @@ import type { Duration } from './model/Duration.ts'
 import type { ManifestType } from './manifest/ManifestType.ts'
 import type { Presentation } from './model/Presentation.ts'
 
+// NOTE: The old Manifest type is significantly different and appears to represent a very different concept. We'll need to discuss.
 /**
  * CMAF-HAM Manifest type
  *

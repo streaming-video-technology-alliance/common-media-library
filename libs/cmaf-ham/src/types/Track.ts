@@ -16,12 +16,20 @@ import type { TrackType } from './model/TrackType.ts'
 export type Track = Ham & Base & Duration & {
 	// parent: SwitchingSet;
 	type: TrackType;
-	bandwidth: number;
-	segments: Segment[];
-	index: number;
-	initialization: AddressableObject;
-	segmentIndex: AddressableObject & { timescale: number };
-	mimeType: string;
+	// NOTE: Missing in new definition
+	// fileName?: string;
+	// NOTE: Need to confirm differences with "codec" vs "codecs" + mimeType
 	codecs: string;
+	mimeType: string;
+	// NOTE: Missing in new definition (should possibly be moved to AudioTrack/TextTrack specific types)
+	// language: string;
+	bandwidth: number;
+	// NOTE: Confirm that byteRange + urlInitialization from old definition are equivalent to initialization AddressableObject
+	initialization: AddressableObject;
+	segments: Segment[];
+	// NOTE: Discuss these (not just MPEG-DASH specific, but a subset of DASH representations).
+	index: number;
+	segmentIndex: AddressableObject & { timescale: number };
+	// NOTE: DASH-specific concept
 	presentationTimeOffset: number;
 }

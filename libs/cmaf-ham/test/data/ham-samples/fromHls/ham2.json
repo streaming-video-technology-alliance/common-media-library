@@ -2498,18 +2498,22 @@
                 "byteRange": "704@0",
                 "urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       },
       {
         "id": "1",
         "switchingSets": [
           {
             "id": "text",
-            "tracks": []
+            "tracks": [],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "text"
       },
       {
         "id": "2",
@@ -5400,10 +5404,16 @@
                 "sar": "",
                 "scanType": ""
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       }
-    ]
+    ],
+    "duration": 738,
+    "startTime": 0,
+    "endTime": 738,
+    "baseUrls": []
   }
 ]

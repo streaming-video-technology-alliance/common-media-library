@@ -586,18 +586,22 @@
                 "channels": 2,
                 "urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/a-eng-0128k-aac-2c-init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       },
       {
         "id": "1",
         "switchingSets": [
           {
             "id": "text",
-            "tracks": []
+            "tracks": [],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "text"
       },
       {
         "id": "2",
@@ -4115,10 +4119,16 @@
                 "scanType": "",
                 "urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/v-0720p-2500k-libx264-init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       }
-    ]
+    ],
+    "duration": 470,
+    "startTime": 0,
+    "endTime": 470,
+    "baseUrls": []
   }
 ]

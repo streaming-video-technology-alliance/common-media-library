@@ -7876,7 +7876,8 @@
                 "width": 3840,
                 "urlInitialization": "7/init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           },
           {
             "id": "1",
@@ -15749,9 +15750,11 @@
                 "width": 3840,
                 "urlInitialization": "14/init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       },
       {
         "id": "2",
@@ -16882,9 +16885,11 @@
                 "type": "audio",
                 "urlInitialization": "15/init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       },
       {
         "id": "3",
@@ -18007,7 +18012,8 @@
                 "type": "text",
                 "urlInitialization": "18/init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           },
           {
             "id": "3",
@@ -19127,7 +19133,8 @@
                 "type": "text",
                 "urlInitialization": "19/init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           },
           {
             "id": "3",
@@ -20247,7 +20254,8 @@
                 "type": "text",
                 "urlInitialization": "26/init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           },
           {
             "id": "3",
@@ -21367,10 +21375,16 @@
                 "type": "text",
                 "urlInitialization": "27/init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "text"
       }
-    ]
+    ],
+    "duration": 734,
+    "startTime": 0,
+    "endTime": 734,
+    "baseUrls": []
   }
 ]

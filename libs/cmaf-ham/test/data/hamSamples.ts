@@ -192,19 +192,23 @@ export const presentation: Presentation = {
 	selectionSets: [
 		{
 			id: 'video',
+			type: 'video',
 			switchingSets: [
 				{
 					id: 'video',
 					tracks: [videoTrack],
+					baseUrls: [],
 				},
 			],
 		},
 		{
 			id: 'audio',
+			type: 'audio',
 			switchingSets: [
 				{
 					id: 'audio',
 					tracks: [audioTrack],
+					baseUrls: [],
 				},
 			],
 		},
@@ -216,19 +220,23 @@ export const invalidPresentation: Presentation = {
 	selectionSets: [
 		{
 			id: 'video',
+			type: 'video',
 			switchingSets: [
 				{
 					id: 'video',
 					tracks: [invalidVideoTrack, videoTrack],
+					baseUrls: [],
 				},
 			],
 		},
 		{
 			id: 'audio',
+			type: 'audio',
 			switchingSets: [
 				{
 					id: 'video',
 					tracks: [audioTrack, invalidAudioTrack],
+					baseUrls: [],
 				},
 			],
 		},

@@ -2318,9 +2318,11 @@
                 "width": 1280,
                 "urlInitialization": "BBB_720_4M_video_init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       },
       {
         "id": "text",
@@ -3103,11 +3105,17 @@
                 "type": "audio",
                 "urlInitialization": "BBB_32k_init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       }
-    ]
+    ],
+    "duration": 250,
+    "startTime": 0,
+    "endTime": 250,
+    "baseUrls": []
   },
   {
     "id": "1",
@@ -6274,9 +6282,11 @@
                 "width": 1280,
                 "urlInitialization": "BBB_720_4M_video_init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       },
       {
         "id": "text",
@@ -7347,10 +7357,16 @@
                 "type": "audio",
                 "urlInitialization": "BBB_32k_init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       }
-    ]
+    ],
+    "duration": 344,
+    "startTime": 0,
+    "endTime": 344,
+    "baseUrls": []
   }
 ]

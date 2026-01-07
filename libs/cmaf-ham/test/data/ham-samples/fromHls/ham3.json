@@ -216,9 +216,11 @@
                 "channels": 2,
                 "urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0128k-aac-2c-init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       },
       {
         "id": "1",
@@ -440,9 +442,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "text"
       },
       {
         "id": "2",
@@ -783,10 +787,16 @@
                 "scanType": "",
                 "urlInitialization": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/v-0576p-1400k-libx264-init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       }
-    ]
+    ],
+    "duration": 80,
+    "startTime": 0,
+    "endTime": 80,
+    "baseUrls": []
   }
 ]

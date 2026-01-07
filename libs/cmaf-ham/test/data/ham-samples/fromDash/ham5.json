@@ -46,9 +46,11 @@
                 "width": 854,
                 "urlInitialization": "testStream01bbb/video/72000/seg_init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       },
       {
         "id": "audio",
@@ -87,10 +89,16 @@
                 "type": "audio",
                 "urlInitialization": "testStream01bbb/audio/72000/seg_init.mp4"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       }
-    ]
+    ],
+    "duration": 31.296,
+    "startTime": 0,
+    "endTime": 31.296,
+    "baseUrls": []
   }
 ]

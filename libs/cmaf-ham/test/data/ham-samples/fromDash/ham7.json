@@ -54,9 +54,11 @@
                 "type": "audio",
                 "urlInitialization": "tears-of-steel-aac-128k.cmfa"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       },
       {
         "id": "2",
@@ -154,9 +156,11 @@
                 "width": 3360,
                 "urlInitialization": "tears-of-steel-hev1-2200k.cmfv"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       },
       {
         "id": "3",
@@ -185,7 +189,8 @@
                 "type": "text",
                 "urlInitialization": "tears-of-steel-en.cmft"
               }
-            ]
+            ],
+            "baseUrls": []
           },
           {
             "id": "4",
@@ -211,10 +216,16 @@
                 "type": "text",
                 "urlInitialization": "tears-of-steel-es.cmft"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "text"
       }
-    ]
+    ],
+    "duration": 734,
+    "startTime": 0,
+    "endTime": 734,
+    "baseUrls": []
   }
 ]

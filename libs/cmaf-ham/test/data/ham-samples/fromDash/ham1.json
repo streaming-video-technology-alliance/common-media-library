@@ -58,9 +58,11 @@
                 "width": 1920,
                 "urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "video"
       },
       {
         "id": "audio",
@@ -111,10 +113,16 @@
                 "type": "audio",
                 "urlInitialization": "https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa"
               }
-            ]
+            ],
+            "baseUrls": []
           }
-        ]
+        ],
+        "type": "audio"
       }
-    ]
+    ],
+    "duration": 50,
+    "startTime": 0,
+    "endTime": 50,
+    "baseUrls": []
   }
 ]
