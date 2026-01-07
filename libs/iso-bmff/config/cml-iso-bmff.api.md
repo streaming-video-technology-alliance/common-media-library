@@ -19,8 +19,10 @@ export type AudioRenderingIndicationBox = FullBox & {
     audioRenderingIndication: number;
 };
 
+// Warning: (ae-forgotten-export) The symbol "AudioSampleEntryType" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> = SampleEntryBox & {
+export type AudioSampleEntryBox<T$1 extends AudioSampleEntryType = AudioSampleEntryType> = SampleEntryBox & {
     type: T$1;
     reserved2: number[];
     channelcount: number;
@@ -28,8 +30,11 @@ export type AudioSampleEntryBox<T$1 extends "mp4a" | "enca" = "mp4a" | "enca"> =
     preDefined: number;
     reserved3: number;
     samplerate: number;
-    esds: Uint8Array;
+    boxes: AudioSampleEntryBoxChild[];
 };
+
+// @public
+export type AudioSampleEntryBoxChild = any;
 
 // @public
 export type Box = {
@@ -290,7 +295,7 @@ export type IsoBoxContainerMap = {
 };
 
 // @public
-export type IsoBoxData = ArrayBuffer | DataView<ArrayBuffer> | Uint8Array<ArrayBuffer>;
+export type IsoBoxData = ArrayBuffer | ArrayBufferView<ArrayBuffer>;
 
 // @public
 export type IsoBoxMap = {
@@ -413,7 +418,7 @@ export type IsoBoxReaderReturn<T$1 extends IsoBoxReaderMap> = BoxReturn<T$1> | C
 // @public
 export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
     [Symbol.iterator](): Generator<ParsedBox>;
-    constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig<R>);
+    constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig<R>);
     get buffer(): ArrayBuffer;
     get byteLength(): number;
     get byteOffset(): number;
@@ -444,7 +449,7 @@ export type IsoBoxReadViewConfig<R extends IsoBoxReaderMap = IsoBoxReaderMap> = 
 export type IsoBoxStreamable = IsoBox | Box | ArrayBufferView;
 
 // @public
-export type IsoBoxWriter<B$1> = (box: B$1, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView;
+export type IsoBoxWriter<B$1> = (box: B$1, config: IsoBoxWriteViewConfig) => ArrayBufferView;
 
 // @public
 export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
@@ -457,7 +462,7 @@ export class IsoBoxWriteView {
     get byteOffset(): number;
     writeArray: <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number, length: number) => void;
     writeBoxHeader: (type: string, size: number) => void;
-    writeBytes: (data: Uint8Array) => void;
+    writeBytes: (data: Uint8Array | Uint8Array[]) => void;
     writeFullBox(version: number, flags: number): void;
     writeInt: (value: number, size: number) => void;
     writeString: (value: string) => void;
@@ -702,7 +707,11 @@ export type PreselectionGroupBox = FullBox & {
     preselectionTag?: string;
     selectionPriority?: number;
     interleavingTag?: string;
+    boxes: PreselectionGroupBoxChild[];
 };
+
+// @public
+export type PreselectionGroupBoxChild = any;
 
 // @public
 export type PrimaryItemBox = FullBox & {
@@ -740,6 +749,9 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 
 // @public
 export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
+
+// @public
+export function readAudioSampleEntryBox<T$1 extends AudioSampleEntryType>(type: T$1, view: IsoBoxReadView): AudioSampleEntryBox<T$1>;
 
 // @public
 export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<"avc1">;
@@ -908,6 +920,9 @@ export function readUrl(view: IsoBoxReadView): DataEntryUrlBox;
 
 // @public
 export function readUrn(view: IsoBoxReadView): DataEntryUrnBox;
+
+// @public
+export function readVisualSampleEntryBox<T$1 extends VisualSampleEntryType>(type: T$1, view: IsoBoxReadView): VisualSampleEntryBox<T$1>;
 
 // @public
 export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox;
@@ -1358,8 +1373,11 @@ export type VisualSampleEntryBox<T$1 extends VisualSampleEntryType = VisualSampl
     compressorName: number[];
     depth: number;
     preDefined3: number;
-    config: Uint8Array;
+    boxes: VisualSampleEntryBoxChild[];
 };
+
+// @public
+export type VisualSampleEntryBoxChild = any;
 
 // @public
 export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv";
@@ -1412,16 +1430,27 @@ export type WebVttSourceLabelBox = {
 export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView;
 
 // @public
-export function writeAvc1(box: VisualSampleEntryBox<"avc1">): IsoBoxWriteView;
+export function writeAudioSampleEntryBox<T$1 extends AudioSampleEntryType = AudioSampleEntryType>(box: AudioSampleEntryBox<T$1>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeAvc2(box: VisualSampleEntryBox<"avc2">): IsoBoxWriteView;
+export function writeAvc1(box: VisualSampleEntryBox<"avc1">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeAvc3(box: VisualSampleEntryBox<"avc3">): IsoBoxWriteView;
+export function writeAvc2(box: VisualSampleEntryBox<"avc2">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeAvc4(box: VisualSampleEntryBox<"avc4">): IsoBoxWriteView;
+export function writeAvc3(box: VisualSampleEntryBox<"avc3">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeAvc4(box: VisualSampleEntryBox<"avc4">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// Warning: (ae-internal-missing-underscore) The name "writeChildBoxes" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function writeChildBoxes(boxes: IsoBox[], config: IsoBoxWriteViewConfig): {
+    bytes: Uint8Array[];
+    size: number;
+};
 
 // @public
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
@@ -1439,10 +1468,10 @@ export function writeElst(box: EditListBox): IsoBoxWriteView;
 export function writeEmsg(box: EventMessageBox): IsoBoxWriteView;
 
 // @public
-export function writeEnca(box: AudioSampleEntryBox<"enca">): IsoBoxWriteView;
+export function writeEnca(box: AudioSampleEntryBox<"enca">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeEncv(box: VisualSampleEntryBox<"encv">): IsoBoxWriteView;
+export function writeEncv(box: VisualSampleEntryBox<"encv">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeFree(box: FreeSpaceBox<"free">): IsoBoxWriteView;
@@ -1457,10 +1486,10 @@ export function writeFtyp(box: FileTypeBox): IsoBoxWriteView;
 export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView;
 
 // @public
-export function writeHev1(box: VisualSampleEntryBox<"hev1">): IsoBoxWriteView;
+export function writeHev1(box: VisualSampleEntryBox<"hev1">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeHvc1(box: VisualSampleEntryBox<"hvc1">): IsoBoxWriteView;
+export function writeHvc1(box: VisualSampleEntryBox<"hvc1">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
@@ -1490,7 +1519,7 @@ export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView;
 export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView;
 
 // @public
-export function writeMeta(box: MetaBox): IsoBoxWriteView;
+export function writeMeta(box: MetaBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView;
@@ -1499,7 +1528,7 @@ export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView;
 export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView;
 
 // @public
-export function writeMp4a(box: AudioSampleEntryBox<"mp4a">): IsoBoxWriteView;
+export function writeMp4a(box: AudioSampleEntryBox<"mp4a">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView;
@@ -1511,7 +1540,7 @@ export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView;
 export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView;
 
 // @public
-export function writePrsl(box: PreselectionGroupBox): IsoBoxWriteView;
+export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView;
@@ -1581,6 +1610,9 @@ export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
 
 // @public
 export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView;
+
+// @public
+export function writeVisualSampleEntryBox<T$1 extends VisualSampleEntryType = VisualSampleEntryType>(box: VisualSampleEntryBox<T$1>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView;

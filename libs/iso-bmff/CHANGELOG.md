@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-alpha.3] - 2025-01-07
+
+### Changed
+
+- Improved reading and writing of A/V sample entry boxes
+
 ## [1.0.0-alpha.2] - 2025-01-05
 
 ### Added

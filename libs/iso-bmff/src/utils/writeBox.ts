@@ -13,25 +13,22 @@ import { writeContainerBox } from './writeContainerBox.ts'
  *
  * @internal
  */
-export function writeBox(box: IsoBoxStreamable, config: Required<IsoBoxWriteViewConfig>): Uint8Array {
+export function writeBox(box: IsoBoxStreamable, config: IsoBoxWriteViewConfig): Uint8Array {
 	let view: ArrayBufferView | null = null
 
 	if ('type' in box) {
 		const { type } = box
+		const writer = config.writers?.[type as IsoBox['type']]
 
-		if (type !== '' && isContainer(box)) {
+		if (writer) {
+			// TODO: Find a better way to do this without casting to any
+			view = writer(box as any, config)
+		}
+		else if (isContainer(box)) {
 			view = writeContainerBox(box, config)
 		}
-		else {
-			const writer = config.writers[type as IsoBox['type']]
-
-			if (writer) {
-				// TODO: Find a better way to do this without casting to any
-				view = writer(box as any, config)
-			}
-			else if ('view' in box) {
-				view = box.view
-			}
+		else if ('view' in box) {
+			view = box.view
 		}
 
 		if (!view) {
