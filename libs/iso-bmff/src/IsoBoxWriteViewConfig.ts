@@ -5,7 +5,7 @@ import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
  *
  * @public
  */
-export type IsoBoxReadableStreamConfig = {
+export type IsoBoxWriteViewConfig = {
 	/**
 	 * A map of box writers to their box types
 	 */

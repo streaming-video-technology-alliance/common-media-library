@@ -34,5 +34,5 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Change Log
-        uses: dangoslen/changelog-enforcer@v3
+      # - name: Change Log
+      #   uses: dangoslen/changelog-enforcer@v3

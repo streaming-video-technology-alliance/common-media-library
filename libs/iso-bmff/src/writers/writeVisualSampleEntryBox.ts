@@ -1,6 +1,9 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
+import { UINT } from '../fields/UINT.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
  * Write a VisualSampleEntryBox to an IsoDataWriter.
@@ -8,13 +11,13 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * ISO/IEC 14496-12:2012 - 12.1.3 Visual Sample Entry
  *
  * @param box - The VisualSampleEntryBox fields to write
- * @param type - The box type
+ * @param config - The configuration for the writer
  *
  * @returns An IsoDataWriter containing the encoded box
  *
  * @public
  */
-export function writeVisualSampleEntryBox<T extends VisualSampleEntryType>(box: VisualSampleEntryBox<T>, type: T): IsoBoxWriteView {
+export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = VisualSampleEntryType>(box: VisualSampleEntryBox<T>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2
@@ -30,40 +33,29 @@ export function writeVisualSampleEntryBox<T extends VisualSampleEntryType>(box: 
 	const compressorNameSize = 32
 	const depthSize = 2
 	const preDefined3Size = 2
-	const configSize = box.config.length
+	const { bytes, size } = writeChildBoxes(box.boxes, config)
 	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + preDefined1Size +
 		reserved2Size + preDefined2Size + widthSize + heightSize + horizresolutionSize +
 		vertresolutionSize + reserved3Size + frameCountSize + compressorNameSize +
-		depthSize + preDefined3Size + configSize
+		depthSize + preDefined3Size + size
 
-	const writer = new IsoBoxWriteView(type, totalSize)
+	const writer = new IsoBoxWriteView(box.type, totalSize)
 
-	for (let i = 0; i < 6; i++) {
-		writer.writeUint(box.reserved1[i] ?? 0, 1)
-	}
-
+	writer.writeArray(box.reserved1, UINT, 1, 6)
 	writer.writeUint(box.dataReferenceIndex, 2)
 	writer.writeUint(box.preDefined1, 2)
 	writer.writeUint(box.reserved2, 2)
-
-	for (let i = 0; i < 3; i++) {
-		writer.writeUint(box.preDefined2[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.preDefined2, UINT, 4, 3)
 	writer.writeUint(box.width, 2)
 	writer.writeUint(box.height, 2)
 	writer.writeTemplate(box.horizresolution, 4)
 	writer.writeTemplate(box.vertresolution, 4)
 	writer.writeUint(box.reserved3, 4)
 	writer.writeUint(box.frameCount, 2)
-
-	for (let i = 0; i < 32; i++) {
-		writer.writeUint(box.compressorName[i] ?? 0, 1)
-	}
-
+	writer.writeArray(box.compressorName, UINT, 1, 32)
 	writer.writeUint(box.depth, 2)
 	writer.writeUint(box.preDefined3 & 0xFFFF, 2)
-	writer.writeBytes(box.config)
+	writer.writeBytes(bytes)
 
 	return writer
 }

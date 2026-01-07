@@ -7,6 +7,7 @@ import { TEMPLATE } from './fields/TEMPLATE.ts'
 import { UINT } from './fields/UINT.ts'
 import { UTF8 } from './fields/UTF8.ts'
 import type { IsoBox } from './IsoBox.ts'
+import type { IsoBoxData } from './IsoBoxData.ts'
 import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
@@ -41,7 +42,7 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 	 * @param raw - The raw data to view.
 	 * @param config - The configuration for the IsoView.
 	 */
-	constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig<R>) {
+	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig<R>) {
 		this.dataView = (raw instanceof ArrayBuffer) ? new DataView<ArrayBuffer>(raw) : (raw instanceof DataView) ? raw : new DataView<ArrayBuffer>(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || { readers: {} as R }

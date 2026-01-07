@@ -1,4 +1,5 @@
 import { encodeText } from '@svta/cml-utils'
+import { TEMPLATE } from './fields/TEMPLATE.ts'
 import { UINT } from './fields/UINT.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 
@@ -174,10 +175,16 @@ export class IsoBoxWriteView {
 	 *
 	 * @param data - The data to write.
 	 */
-	writeBytes = (data: Uint8Array): void => {
-		const uint8View = new Uint8Array(this.dataView.buffer)
-		uint8View.set(data, this.cursor)
-		this.cursor += data.length
+	writeBytes = (data: Uint8Array | Uint8Array[]): void => {
+		if (!Array.isArray(data)) {
+			data = [data]
+		}
+
+		for (const bytes of data) {
+			const uint8View = new Uint8Array(this.dataView.buffer)
+			uint8View.set(bytes, this.cursor)
+			this.cursor += bytes.length
+		}
 	}
 
 	/**
@@ -186,11 +193,13 @@ export class IsoBoxWriteView {
 	 * @param data - The data to write.
 	 * @param type - The type of the data.
 	 * @param size - The size, in bytes, of each data value.
+	 * @param length - The number of values to write. (optional)
 	 */
-	writeArray = <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number): void => {
-		const write = type === UINT ? this.writeUint : this.writeInt
-		for (const value of data) {
-			write(value, size)
+	writeArray = <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number, length: number): void => {
+		const write = type === UINT ? this.writeUint : type === TEMPLATE ? this.writeTemplate : this.writeInt
+
+		for (let i = 0; i < length; i++) {
+			write(data[i] ?? 0, size)
 		}
 	}
 
