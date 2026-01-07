@@ -16,6 +16,6 @@ describe('readMp4a', function () {
 		//assert.strictEqual(box.pre_defined, 0); // not conformed value in the file, not tested
 		assert.strictEqual(box.reserved3, 0)
 		assert.strictEqual(box.samplerate, 48000)
-		assert.strictEqual(box.esds.byteLength, 50)
+		assert.strictEqual(box.boxes.length, 1)
 	})
 })

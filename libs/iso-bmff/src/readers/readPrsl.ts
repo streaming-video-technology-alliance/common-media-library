@@ -1,5 +1,5 @@
 import type { Entity } from '../boxes/Entity.ts'
-import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
+import type { PreselectionGroupBox, PreselectionGroupBoxChild } from '../boxes/PreselectionGroupBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -32,5 +32,6 @@ export function readPrsl(view: IsoBoxReadView): PreselectionGroupBox {
 		preselectionTag,
 		selectionPriority,
 		interleavingTag,
+		boxes: view.readBoxes<PreselectionGroupBoxChild>(),
 	}
 }

@@ -28,6 +28,6 @@ describe('readHvc1', function () {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]) // length + 'HEVC Coding'
 		assert.strictEqual(box.depth, 24)
 		assert.strictEqual(box.preDefined3, -1)
-		assert.strictEqual(box.config.byteLength, 51)
+		assert.strictEqual(box.boxes.length, 2)
 	})
 })

@@ -6,11 +6,11 @@
 export type AdditionalMetadataContainerBoxChild = any;
 
 /**
- * Additional Metadata Container Box - 'meta' - Container
+ * Additional Metadata Container Box - 'meco' - Container - 8.11.7.1
  *
  * @public
  */
 export type AdditionalMetadataContainerBox = {
-	type: 'meta';
+	type: 'meco';
 	boxes: AdditionalMetadataContainerBoxChild[];
 };
