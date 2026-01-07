@@ -11,7 +11,7 @@ export type * from './types/model/Track.ts'
 export type * from './types/model/TrackType.ts'
 export type * from './types/model/VideoTrack.ts'
 
-export type * from './types/manifest/Manifest.ts'
+export type * from './types/manifest/ManifestFile.ts'
 export type * from './types/manifest/ManifestFormat.ts'
 export type * from './types/mapper/dash/AdaptationSet.ts'
 export type * from './types/mapper/dash/AudioChannelConfiguration.ts'

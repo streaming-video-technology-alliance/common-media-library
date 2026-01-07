@@ -1,4 +1,4 @@
-import type { Manifest } from '../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../types/manifest/ManifestFile.ts'
 import type { Presentation } from '../types/model/Presentation.ts'
 
 import type { Mapper } from './Mapper.ts'
@@ -19,11 +19,11 @@ export class MapperContext {
 		this.strategy = strategy
 	}
 
-	public getHamFormat(manifest: Manifest): Presentation[] {
+	public getHamFormat(manifest: ManifestFile): Presentation[] {
 		return this.strategy.toHam(manifest)
 	}
 
-	public getManifestFormat(presentation: Presentation[]): Manifest {
+	public getManifestFormat(presentation: Presentation[]): ManifestFile {
 		return this.strategy.toManifest(presentation)
 	}
 

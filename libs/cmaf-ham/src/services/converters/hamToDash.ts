@@ -1,4 +1,4 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../types/manifest/ManifestFile.ts'
 import type { Presentation } from '../../types/model/Presentation.ts'
 
 import { DashMapper } from '../../mapper/dash/DashMapper.ts'
@@ -21,7 +21,7 @@ import { MapperContext } from '../../mapper/MapperContext.ts'
  *
  * @alpha
  */
-export function hamToDash(presentation: Presentation[]): Manifest {
+export function hamToDash(presentation: Presentation[]): ManifestFile {
 	const mapperContext: MapperContext = MapperContext.getInstance()
 	mapperContext.setStrategy(new DashMapper())
 	return mapperContext.getManifestFormat(presentation)

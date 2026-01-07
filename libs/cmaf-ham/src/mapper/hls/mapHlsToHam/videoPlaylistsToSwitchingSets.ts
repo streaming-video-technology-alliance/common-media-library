@@ -2,7 +2,7 @@ import type { Segment } from '../../../types/model/Segment.ts'
 import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 import type { VideoTrack } from '../../../types/model/VideoTrack.ts'
 
-import type { Manifest } from '../../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../../types/manifest/ManifestFile.ts'
 import type { PlayList } from '../../../types/mapper/hls/Playlist.ts'
 
 import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../utils/constants.ts'
@@ -15,7 +15,7 @@ import { getHlsCodec } from './utils/getHlsCodec.ts'
 
 export function videoPlaylistsToSwitchingSets(
 	playlists: PlayList[],
-	manifestPlaylists: Manifest[],
+	manifestPlaylists: ManifestFile[],
 ): SwitchingSet[] {
 	const switchingSetVideos: SwitchingSet[] = []
 	const videoTracks: VideoTrack[] = []

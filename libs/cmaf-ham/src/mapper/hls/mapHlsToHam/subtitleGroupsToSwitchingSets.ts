@@ -1,7 +1,7 @@
 import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 import type { TextTrack } from '../../../types/model/TextTrack.ts'
 
-import type { Manifest } from '../../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../../types/manifest/ManifestFile.ts'
 
 import { parseHlsManifest } from '../../../utils/hls/parseHlsManifest.ts'
 
@@ -11,7 +11,7 @@ import { getHlsCodec } from './utils/getHlsCodec.ts'
 
 export function subtitleGroupsToSwitchingSets(
 	mediaGroupsSubtitles: any,
-	manifestPlaylists: Manifest[],
+	manifestPlaylists: ManifestFile[],
 ): SwitchingSet[] {
 	const subtitleSwitchingSets: SwitchingSet[] = []
 	const textTracks: TextTrack[] = []
