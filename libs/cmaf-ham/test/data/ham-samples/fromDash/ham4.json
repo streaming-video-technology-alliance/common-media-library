@@ -9,8 +9,12 @@
             "id": "video",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 980104,
-                "codec": "avc1.4d401f",
+                "codecs": [
+                  "avc1.4d401f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 250,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -776,11 +780,18 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_1M_video_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_1M_video_init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1950145,
-                "codec": "avc1.4d401f",
+                "codecs": [
+                  "avc1.4d401f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 250,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -1546,11 +1557,18 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_2M_video_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_2M_video_init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 3893089,
-                "codec": "avc1.4d401f",
+                "codecs": [
+                  "avc1.4d401f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 250,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -2316,7 +2334,10 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_4M_video_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_4M_video_init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -2331,9 +2352,13 @@
             "id": "text",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 33434,
                 "channels": 2,
-                "codec": "mp4a.40.29",
+                "codecs": [
+                  "mp4a.40.29"
+                ],
+                "mimeType": "audio/mp4",
                 "duration": 249.17135416666744,
                 "id": "4",
                 "language": "und",
@@ -3103,7 +3128,10 @@
                   }
                 ],
                 "type": "audio",
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_32k_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_32k_init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -3127,8 +3155,12 @@
             "id": "video",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 980104,
-                "codec": "avc1.4d401f",
+                "codecs": [
+                  "avc1.4d401f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 344,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -4176,11 +4208,18 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_1M_video_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_1M_video_init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1950145,
-                "codec": "avc1.4d401f",
+                "codecs": [
+                  "avc1.4d401f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 344,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -5228,11 +5267,18 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_2M_video_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_2M_video_init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 3893089,
-                "codec": "avc1.4d401f",
+                "codecs": [
+                  "avc1.4d401f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 344,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -6280,7 +6326,10 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_4M_video_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_720_4M_video_init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -6295,9 +6344,13 @@
             "id": "text",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 33434,
                 "channels": 2,
-                "codec": "mp4a.40.29",
+                "codecs": [
+                  "mp4a.40.29"
+                ],
+                "mimeType": "audio/mp4",
                 "duration": 343.3463541666668,
                 "id": "4",
                 "language": "und",
@@ -7355,7 +7408,10 @@
                   }
                 ],
                 "type": "audio",
-                "urlInitialization": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_32k_init.mp4"
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCases/5a/nomor/BBB_32k_init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []

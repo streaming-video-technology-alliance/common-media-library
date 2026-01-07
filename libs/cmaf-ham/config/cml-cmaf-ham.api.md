@@ -246,10 +246,10 @@ export type Ham = {
 };
 
 // @alpha
-export function hamToDash(presentation: Presentation[]): Manifest;
+export function hamToDash(presentation: Presentation[]): ManifestFile;
 
 // @alpha
-export function hamToHls(presentation: Presentation[]): Manifest;
+export function hamToHls(presentation: Presentation[]): ManifestFile;
 
 // @alpha
 export function hlsByterangeToByteRangeObject(byterange: {
@@ -290,11 +290,11 @@ export type Initialization = {
 export function iso8601DurationToNumber(isoDuration: string): number;
 
 // @alpha
-export type Manifest = {
+export type ManifestFile = {
     type: ManifestFormat;
     manifest: string;
     fileName?: string;
-    ancillaryManifests?: Manifest[];
+    ancillaryManifests?: ManifestFile[];
     metadata?: Map<string, string>;
 };
 
@@ -514,16 +514,18 @@ type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
 // @alpha
-export type Track = Ham & {
+export type Track = Ham & Base & Duration & AddressableObject & {
     type: TrackType;
-    fileName?: string;
-    codec: string;
-    duration: number;
-    language: string;
+    codecs: string[];
+    mimeType: string;
+    language?: string;
     bandwidth: number;
-    byteRange?: string;
-    urlInitialization?: string;
+    initialization: AddressableObject;
     segments: Segment[];
+    segmentIndex?: AddressableObject & {
+        timescale: number;
+    };
+    presentationTimeOffset?: number;
 };
 
 // @alpha

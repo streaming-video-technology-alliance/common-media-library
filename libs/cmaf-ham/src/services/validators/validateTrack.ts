@@ -107,10 +107,10 @@ function _validateVideoTrack(
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.'
 
-	if (!videoTrack.codec) {
+	if (!videoTrack.codecs || videoTrack.codecs.length === 0) {
 		validation.status = false
 		validation.errorMessages.push(
-			`VideoTrack with id: ${videoTrack.id} does not have codec${moreInformation}`,
+			`VideoTrack with id: ${videoTrack.id} does not have codecs${moreInformation}`,
 		)
 	}
 
@@ -144,10 +144,10 @@ function _validateAudioTrack(
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.'
 
-	if (!audioTrack.codec) {
+	if (!audioTrack.codecs || audioTrack.codecs.length === 0) {
 		validation.status = false
 		validation.errorMessages.push(
-			`AudioTrack with id: ${audioTrack.id} does not have codec${moreInformation}`,
+			`AudioTrack with id: ${audioTrack.id} does not have codecs${moreInformation}`,
 		)
 	}
 

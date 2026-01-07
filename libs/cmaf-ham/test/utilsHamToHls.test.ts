@@ -9,7 +9,7 @@ import { getAudioTrack } from './data/hlsData.ts'
 
 describe('getByterange', () => {
 	it('returns byteRange string if track has byteRange', () => {
-		const track: AudioTrack = getAudioTrack({ byteRange: '50379@2212' })
+		const track: AudioTrack = getAudioTrack({ byteRange: { start: 2212, end: 52590 } })
 		const res = encodeByteRange(track)
 		equal(res, 'BYTERANGE:50379@2212\n')
 	})

@@ -1,7 +1,7 @@
 import type { AudioTrack, SegmentHls } from '@svta/cml-cmaf-ham'
 
 export type AudioTrackInfo = {
-	byteRange?: string;
+	byteRange?: { start: number; end: number };
 	codec?: string;
 	duration?: number;
 	id?: string;
@@ -10,8 +10,8 @@ export type AudioTrackInfo = {
 };
 
 function getAudioTrack({
-	byteRange = '',
-	codec = '',
+	byteRange,
+	codec = 'mp4a.40.2',
 	duration = 5,
 	id = 'default-audio-group',
 	language = 'en',
@@ -19,11 +19,12 @@ function getAudioTrack({
 }: AudioTrackInfo): AudioTrack {
 	return {
 		id: id,
+		url: '',
 		type: 'audio',
-		codec: codec,
+		codecs: codec ? [codec] : [],
+		mimeType: 'audio/mp4',
 		duration: duration,
 		language: language,
-		byteRange: byteRange,
 		bandwidth: 0,
 		segments: [
 			{
@@ -37,7 +38,11 @@ function getAudioTrack({
 		],
 		sampleRate: 0,
 		channels: 0,
-		urlInitialization: urlInitialization,
+		initialization: {
+			url: urlInitialization,
+			...(byteRange && { byteRange }),
+		},
+		baseUrls: [],
 	} as AudioTrack
 }
 

@@ -27,15 +27,21 @@ export function subtitleGroupsToSwitchingSets(
 			)
 			const segments = formatSegments(subtitleParsed?.segments)
 
+			const codec = getHlsCodec('text')
 			textTracks.push({
 				id: subtitle,
 				type: 'text',
-				fileName: uri,
-				codec: getHlsCodec('text'),
+				url: uri,
+				codecs: codec ? [codec] : [],
+				mimeType: 'text/vtt',
 				duration: getDuration(subtitleParsed, segments),
 				language: language,
 				bandwidth: 0,
 				segments: segments,
+				initialization: {
+					url: '',
+				},
+				baseUrls: [],
 			} as TextTrack)
 		}
 	}

@@ -29,13 +29,15 @@ export function videoPlaylistsToSwitchingSets(
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes
 		const map = parsedHlsManifest?.segments?.at(0)?.map
 		const byteRange = decodeByteRange(map?.byterange)
+		const codec = getHlsCodec('video', CODECS)
 		videoTracks.push({
 			id: `video-${videoTrackId++}`,
 			type: 'video',
-			fileName: playlist.uri,
-			codec: getHlsCodec('video', CODECS),
+			url: playlist.uri,
+			codecs: codec ? [codec] : [],
+			mimeType: 'video/mp4',
 			duration: getDuration(parsedHlsManifest, segments),
-			language: LANGUAGE ?? 'und',
+			language: LANGUAGE,
 			bandwidth: BANDWIDTH,
 			segments: segments,
 			width: playlist.attributes.RESOLUTION.width,
@@ -49,8 +51,11 @@ export function videoPlaylistsToSwitchingSets(
 			par: '',
 			sar: '',
 			scanType: '',
-			...(byteRange && { byteRange }),
-			...(map?.uri && { urlInitialization: map?.uri }),
+			initialization: {
+				url: map?.uri ?? '',
+				...(byteRange && { byteRange }),
+			},
+			baseUrls: [],
 		} as VideoTrack)
 	})
 

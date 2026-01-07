@@ -43,19 +43,24 @@ export function audioGroupsToSwitchingSets(
 			// TODO: channels, sampleRate, bandwith and codec need to be
 			// updated with real values. Right now we are using simple hardcoded values.
 			const byteRange = decodeByteRange(map?.byterange)
+			const codec = getHlsCodec('audio')
 			audioTracks.push({
 				id: audio,
 				type: 'audio',
-				fileName: uri,
-				codec: getHlsCodec('audio'),
+				url: uri,
+				codecs: codec ? [codec] : [],
+				mimeType: 'audio/mp4',
 				duration: getDuration(audioParsed, segments),
 				language: language,
 				bandwidth: 0,
 				segments: segments,
 				sampleRate: 0,
 				channels: 2,
-				...(byteRange && { byteRange }),
-				...(map?.uri && { urlInitialization: map?.uri }),
+				initialization: {
+					url: map?.uri ?? '',
+					...(byteRange && { byteRange }),
+				},
+				baseUrls: [],
 			} as AudioTrack)
 		}
 	}

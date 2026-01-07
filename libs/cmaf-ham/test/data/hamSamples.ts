@@ -105,9 +105,10 @@ export const invalidSegments: Segment[] = [
 ]
 
 export const videoTrack: VideoTrack = {
-	fileName: 'video/mp4',
+	url: 'video/mp4',
 	bandwidth: 2000000,
-	codec: 'avc1.640028',
+	codecs: ['avc1.640028'],
+	mimeType: 'video/mp4',
 	duration: 50,
 	frameRate: {
 		frameRateNumerator: 25,
@@ -122,14 +123,17 @@ export const videoTrack: VideoTrack = {
 	segments: videoSegments,
 	type: 'video',
 	width: 1920,
-	urlInitialization:
-		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv',
+	initialization: {
+		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv',
+	},
+	baseUrls: [],
 } as VideoTrack
 
 export const invalidVideoTrack: VideoTrack = {
-	fileName: 'video/mp4',
+	url: 'video/mp4',
 	bandwidth: 2000000,
-	codec: 'avc1.640028',
+	codecs: ['avc1.640028'],
+	mimeType: 'video/mp4',
 	duration: 90000,
 	frameRate: {
 		frameRateNumerator: 25,
@@ -153,38 +157,46 @@ export const invalidVideoTrack: VideoTrack = {
 	],
 	type: 'video',
 	width: 1920,
-	urlInitialization:
-		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv',
+	initialization: {
+		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv',
+	},
+	baseUrls: [],
 } as VideoTrack
 
 export const audioTrack: AudioTrack = {
-	name: 'audio/mp4',
+	url: 'audio/mp4',
 	bandwidth: 96000,
 	channels: 2,
-	codec: 'mp4a.40.2',
+	codecs: ['mp4a.40.2'],
+	mimeType: 'audio/mp4',
 	duration: 93.75,
 	id: '1',
 	language: 'en',
 	sampleRate: 48000,
 	segments: audioSegments,
 	type: 'audio',
-	urlInitialization:
-		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
+	initialization: {
+		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
+	},
+	baseUrls: [],
 } as AudioTrack
 
 export const invalidAudioTrack: AudioTrack = {
-	name: 'audio/mp4',
+	url: 'audio/mp4',
 	bandwidth: 96000,
 	channels: 2,
-	codec: '',
+	codecs: [],
+	mimeType: 'audio/mp4',
 	duration: 93.75,
 	id: '1',
 	language: 'en',
 	sampleRate: 48000,
 	segments: audioSegments,
 	type: 'audio',
-	urlInitialization:
-		'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
+	initialization: {
+		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
+	},
+	baseUrls: [],
 } as AudioTrack
 
 export const presentation: Presentation = {

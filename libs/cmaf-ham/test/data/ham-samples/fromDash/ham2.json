@@ -9,8 +9,12 @@
             "id": "1",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 386437,
-                "codec": "avc1.64001f",
+                "codecs": [
+                  "avc1.64001f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 736,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -1130,11 +1134,18 @@
                 ],
                 "type": "video",
                 "width": 512,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/1/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/1/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 761570,
-                "codec": "avc1.64001f",
+                "codecs": [
+                  "avc1.64001f"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 736,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -2254,11 +2265,18 @@
                 ],
                 "type": "video",
                 "width": 640,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/2/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/2/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1117074,
-                "codec": "avc1.640028",
+                "codecs": [
+                  "avc1.640028"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 736,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -3378,11 +3396,18 @@
                 ],
                 "type": "video",
                 "width": 852,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/3/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/3/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1941893,
-                "codec": "avc1.640032",
+                "codecs": [
+                  "avc1.640032"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 736,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -4502,11 +4527,18 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/4/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/4/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 2723012,
-                "codec": "avc1.640033",
+                "codecs": [
+                  "avc1.640033"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 736,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -5626,11 +5658,18 @@
                 ],
                 "type": "video",
                 "width": 1920,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/5/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/5/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 4021190,
-                "codec": "avc1.640034",
+                "codecs": [
+                  "avc1.640034"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 736,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -6750,11 +6789,18 @@
                 ],
                 "type": "video",
                 "width": 2560,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/6/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/6/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 5134121,
-                "codec": "avc1.640034",
+                "codecs": [
+                  "avc1.640034"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 736,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -7874,7 +7920,10 @@
                 ],
                 "type": "video",
                 "width": 3840,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/7/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/7/init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -7883,8 +7932,12 @@
             "id": "1",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 395735,
-                "codec": "hev1.2.4.L63.90",
+                "codecs": [
+                  "hev1.2.4.L63.90"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 735.9973933333309,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -9004,11 +9057,18 @@
                 ],
                 "type": "video",
                 "width": 512,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/8/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/8/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 689212,
-                "codec": "hev1.2.4.L63.90",
+                "codecs": [
+                  "hev1.2.4.L63.90"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 735.9973933333309,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -10128,11 +10188,18 @@
                 ],
                 "type": "video",
                 "width": 640,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/9/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/9/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 885518,
-                "codec": "hev1.2.4.L90.90",
+                "codecs": [
+                  "hev1.2.4.L90.90"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 735.9973933333309,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -11252,11 +11319,18 @@
                 ],
                 "type": "video",
                 "width": 852,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/10/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/10/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1474186,
-                "codec": "hev1.2.4.L93.90",
+                "codecs": [
+                  "hev1.2.4.L93.90"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 735.9973933333309,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -12376,11 +12450,18 @@
                 ],
                 "type": "video",
                 "width": 1280,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/11/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/11/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1967542,
-                "codec": "hev1.2.4.L120.90",
+                "codecs": [
+                  "hev1.2.4.L120.90"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 735.9973933333309,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -13500,11 +13581,18 @@
                 ],
                 "type": "video",
                 "width": 1920,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/12/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/12/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 2954309,
-                "codec": "hev1.2.4.L150.90",
+                "codecs": [
+                  "hev1.2.4.L150.90"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 735.9973933333309,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -14624,11 +14712,18 @@
                 ],
                 "type": "video",
                 "width": 2560,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/13/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/13/init.mp4"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 4424584,
-                "codec": "hev1.2.4.L150.90",
+                "codecs": [
+                  "hev1.2.4.L150.90"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 735.9973933333309,
                 "frameRate": {
                   "frameRateNumerator": 24,
@@ -15748,7 +15843,10 @@
                 ],
                 "type": "video",
                 "width": 3840,
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/14/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/14/init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -15763,9 +15861,13 @@
             "id": "2",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 131351,
                 "channels": 2,
-                "codec": "mp4a.40.29",
+                "codecs": [
+                  "mp4a.40.29"
+                ],
+                "mimeType": "audio/mp4",
                 "duration": 734.0799999999987,
                 "id": "15",
                 "language": "en",
@@ -16883,7 +16985,10 @@
                   }
                 ],
                 "type": "audio",
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/15/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/15/init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -16898,8 +17003,12 @@
             "id": "3",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 428,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 736,
                 "id": "18",
                 "language": "en",
@@ -18010,7 +18119,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/18/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/18/init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -18019,8 +18131,12 @@
             "id": "3",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1095,
-                "codec": "stpp",
+                "codecs": [
+                  "stpp"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 736,
                 "id": "19",
                 "language": "en",
@@ -19131,7 +19247,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/19/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/19/init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -19140,8 +19259,12 @@
             "id": "3",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 430,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 736,
                 "id": "26",
                 "language": "es",
@@ -20252,7 +20375,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/26/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/26/init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -20261,8 +20387,12 @@
             "id": "3",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1102,
-                "codec": "stpp",
+                "codecs": [
+                  "stpp"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 736,
                 "id": "27",
                 "language": "es",
@@ -21373,7 +21503,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "https://media.axprod.net/TestVectors/v7-Clear/27/init.mp4"
+                "initialization": {
+                  "url": "https://media.axprod.net/TestVectors/v7-Clear/27/init.mp4"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []

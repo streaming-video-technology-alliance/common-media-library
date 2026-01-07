@@ -16,7 +16,7 @@ import {
  */
 export function getUrlInitialization(track: VideoTrack | AudioTrack): string {
 	return (
-		track.urlInitialization?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED) ??
+		track.initialization?.url?.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED) ??
 		''
 	)
 }

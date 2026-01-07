@@ -18,10 +18,10 @@ export function selectionSetsToAdaptationSet(
 					id: switchingSet.id,
 					group: selectionSet.id,
 					contentType: track?.type,
-					mimeType: `${track?.type}/mp4`,
+					mimeType: track?.mimeType ?? `${track?.type}/mp4`,
 					frameRate: getFrameRate(track),
 					lang: track?.language,
-					codecs: track?.codec,
+					codecs: track?.codecs?.join(','),
 				},
 				Representation: tracksToRepresentation(switchingSet.tracks),
 			} as AdaptationSet

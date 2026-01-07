@@ -9,9 +9,13 @@
             "id": "1",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 64349,
                 "channels": 2,
-                "codec": "mp4a.40.2",
+                "codecs": [
+                  "mp4a.40.2"
+                ],
+                "mimeType": "audio/mp4",
                 "duration": 734,
                 "id": "audio_eng=64349",
                 "language": "en",
@@ -29,12 +33,19 @@
                   }
                 ],
                 "type": "audio",
-                "urlInitialization": "tears-of-steel-aac-64k.cmfa"
+                "initialization": {
+                  "url": "tears-of-steel-aac-64k.cmfa"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 128407,
                 "channels": 2,
-                "codec": "mp4a.40.2",
+                "codecs": [
+                  "mp4a.40.2"
+                ],
+                "mimeType": "audio/mp4",
                 "duration": 734,
                 "id": "audio_eng=128407",
                 "language": "en",
@@ -52,7 +63,10 @@
                   }
                 ],
                 "type": "audio",
-                "urlInitialization": "tears-of-steel-aac-128k.cmfa"
+                "initialization": {
+                  "url": "tears-of-steel-aac-128k.cmfa"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -67,8 +81,12 @@
             "id": "12",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 405000,
-                "codec": "avc1.64001F",
+                "codecs": [
+                  "avc1.64001F"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 734,
                 "frameRate": {
                   "frameRateNumerator": 30,
@@ -94,11 +112,18 @@
                 ],
                 "type": "video",
                 "width": 224,
-                "urlInitialization": "tears-of-steel-avc1-400k.cmfv"
+                "initialization": {
+                  "url": "tears-of-steel-avc1-400k.cmfv"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 759000,
-                "codec": "avc1.64001F",
+                "codecs": [
+                  "avc1.64001F"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 734,
                 "frameRate": {
                   "frameRateNumerator": 30,
@@ -124,11 +149,18 @@
                 ],
                 "type": "video",
                 "width": 448,
-                "urlInitialization": "tears-of-steel-avc1-750k.cmfv"
+                "initialization": {
+                  "url": "tears-of-steel-avc1-750k.cmfv"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1026000,
-                "codec": "avc1.64001F",
+                "codecs": [
+                  "avc1.64001F"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 734,
                 "frameRate": {
                   "frameRateNumerator": 30,
@@ -154,11 +186,18 @@
                 ],
                 "type": "video",
                 "width": 784,
-                "urlInitialization": "tears-of-steel-avc1-1000k.cmfv"
+                "initialization": {
+                  "url": "tears-of-steel-avc1-1000k.cmfv"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 1501000,
-                "codec": "avc1.640028",
+                "codecs": [
+                  "avc1.640028"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 734,
                 "frameRate": {
                   "frameRateNumerator": 30,
@@ -184,11 +223,18 @@
                 ],
                 "type": "video",
                 "width": 1680,
-                "urlInitialization": "tears-of-steel-avc1-1500k.cmfv"
+                "initialization": {
+                  "url": "tears-of-steel-avc1-1500k.cmfv"
+                },
+                "baseUrls": []
               },
               {
+                "url": "",
                 "bandwidth": 2205000,
-                "codec": "avc1.640028",
+                "codecs": [
+                  "avc1.640028"
+                ],
+                "mimeType": "video/mp4",
                 "duration": 734,
                 "frameRate": {
                   "frameRateNumerator": 30,
@@ -214,7 +260,10 @@
                 ],
                 "type": "video",
                 "width": 1680,
-                "urlInitialization": "tears-of-steel-avc1-2200k.cmfv"
+                "initialization": {
+                  "url": "tears-of-steel-avc1-2200k.cmfv"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -229,8 +278,12 @@
             "id": "2",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_eng=1000",
                 "language": "en",
@@ -247,7 +300,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-en.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-en.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -256,8 +312,12 @@
             "id": "3",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_deu=1000",
                 "language": "de",
@@ -274,7 +334,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-de.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-de.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -283,8 +346,12 @@
             "id": "4",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_spa=1000",
                 "language": "es",
@@ -301,7 +368,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-es.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-es.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -310,8 +380,12 @@
             "id": "5",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_fra=1000",
                 "language": "fr",
@@ -328,7 +402,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-fr.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-fr.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -337,8 +414,12 @@
             "id": "6",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_nld=1000",
                 "language": "nl",
@@ -355,7 +436,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-nl.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-nl.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -364,8 +448,12 @@
             "id": "7",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_pt-br=1000",
                 "language": "pt-br",
@@ -382,7 +470,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-pt-br.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-pt-br.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -391,8 +482,12 @@
             "id": "8",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_pt-pt=1000",
                 "language": "pt-pt",
@@ -409,7 +504,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-pt-pt.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-pt-pt.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -418,8 +516,12 @@
             "id": "9",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_rus=1000",
                 "language": "ru",
@@ -436,7 +538,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-ru.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-ru.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -445,8 +550,12 @@
             "id": "10",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_zho=1000",
                 "language": "zh",
@@ -463,7 +572,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-zh.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-zh.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []
@@ -472,8 +584,12 @@
             "id": "11",
             "tracks": [
               {
+                "url": "",
                 "bandwidth": 1000,
-                "codec": "wvtt",
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
                 "duration": 734,
                 "id": "textstream_zh-hans=1000",
                 "language": "zh-hans",
@@ -490,7 +606,10 @@
                   }
                 ],
                 "type": "text",
-                "urlInitialization": "tears-of-steel-zh-hans.cmft"
+                "initialization": {
+                  "url": "tears-of-steel-zh-hans.cmft"
+                },
+                "baseUrls": []
               }
             ],
             "baseUrls": []

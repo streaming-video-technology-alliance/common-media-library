@@ -10,18 +10,13 @@ export function trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = []
 	if (
 		track.segments.length > 0 &&
-		track.byteRange &&
+		track.initialization.byteRange &&
 		track.segments[0].byteRange
 	) {
 		let firstSegment: SegmentBase | undefined = undefined
-		// Parse track byteRange (old string format for now, will be updated when Track is migrated)
-		const trackByteRangeStr = track.byteRange
-		const initByteRange = trackByteRangeStr.includes('-')
-			? trackByteRangeStr.split('-')[1]
-			: trackByteRangeStr.includes('@')
-				? trackByteRangeStr.split('@')[0]
-				: ''
-		const initRange: number = +initByteRange - 1
+		// Use the new byteRange object format from initialization
+		const initByteRange = track.initialization.byteRange
+		const initRange: number = initByteRange.end
 
 		// Use the new byteRange object format from segment
 		const segmentByteRange = track.segments[0].byteRange
@@ -29,7 +24,7 @@ export function trackToSegmentBase(track: Track): SegmentBase[] {
 
 		firstSegment = {
 			$: {
-				indexRange: `${initByteRange}-${numberFirstByteRange}`,
+				indexRange: `${initByteRange.end}-${numberFirstByteRange}`,
 			},
 			Initialization: [{ $: { range: `0-${initRange}` } }],
 		} as SegmentBase
