@@ -28,13 +28,22 @@ export function mapSegmentTemplate(
 	)
 	const init: number = +(segmentTemplate.$.startNumber ?? 0)
 	const segments: Segment[] = []
+	let cumulativeTime = 0
+
 	for (let id = init; id < numberOfSegments + init; id++) {
+		const segmentDuration = calculateDuration(
+			segmentTemplate.$.duration,
+			segmentTemplate.$.timescale,
+		)
+		const startTime = cumulativeTime
+		cumulativeTime += segmentDuration
+
 		segments.push({
-			duration: calculateDuration(
-				segmentTemplate.$.duration,
-				segmentTemplate.$.timescale,
-			),
+			id: `${representation.$.id}-segment-${id}`,
+			duration: segmentDuration,
 			url: getUrlFromTemplate(representation, segmentTemplate, id),
+			// byteRange not included - SegmentTemplate typically doesn't have byteRange
+			startTime,
 		} as Segment)
 	}
 	return segments

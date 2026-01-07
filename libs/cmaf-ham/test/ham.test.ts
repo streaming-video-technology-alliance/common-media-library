@@ -15,7 +15,7 @@ import jsonHam0 from './data/ham-samples/fromDash/ham0.json' with { type: 'json'
 describe('ham validation', () => {
 	let selectionSet: SelectionSet
 	beforeEach(() => {
-		selectionSet = (jsonHam0 as Presentation[])[0].selectionSets[0]
+		selectionSet = (jsonHam0 as unknown as Presentation[])[0].selectionSets[0]
 	})
 
 	it('returns true when track list is empty', () => {

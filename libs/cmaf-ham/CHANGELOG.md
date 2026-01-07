@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.24.0] - 2025-01-07
+
+### Changed
+
+- Update CMAF HAM model types
+
 ## [0.23.2] - 2025-12-26
 
 ### Changed

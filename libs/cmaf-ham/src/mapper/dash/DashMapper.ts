@@ -1,4 +1,4 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../types/manifest/ManifestFile.ts'
 import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts'
 import type { Presentation } from '../../types/model/Presentation.ts'
 
@@ -12,13 +12,13 @@ import { getMetadata } from '../../utils/manifest/getMetadata.ts'
 import type { Mapper } from '../Mapper.ts'
 
 export class DashMapper implements Mapper {
-	private manifest: Manifest | undefined
+	private manifest: ManifestFile | undefined
 
 	getManifestMetadata(): JSON | undefined {
 		return getMetadata(this.manifest)
 	}
 
-	toHam(manifest: Manifest): Presentation[] {
+	toHam(manifest: ManifestFile): Presentation[] {
 		const dashManifest: DashManifest | undefined = parseDashManifest(
 			manifest.manifest,
 		)
@@ -31,7 +31,7 @@ export class DashMapper implements Mapper {
 		return mapDashToHam(dashManifest)
 	}
 
-	toManifest(presentation: Presentation[]): Manifest {
+	toManifest(presentation: Presentation[]): ManifestFile {
 		const manifest = mapHamToDash(presentation)
 		return { manifest, ancillaryManifests: [], type: 'dash' }
 	}

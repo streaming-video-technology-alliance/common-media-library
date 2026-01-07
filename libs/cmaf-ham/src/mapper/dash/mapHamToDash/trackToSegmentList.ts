@@ -26,7 +26,7 @@ export function trackToSegmentList(track: Track): SegmentList[] {
 				).toString(),
 				timescale: timescale.toString(),
 			},
-			Initialization: [{ $: { sourceURL: track.urlInitialization } }],
+			Initialization: [{ $: { sourceURL: track.initialization.url } }],
 			SegmentURL: segmentURLs,
 		} as SegmentList)
 	}

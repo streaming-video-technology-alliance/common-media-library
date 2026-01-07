@@ -15,15 +15,25 @@ import { calculateDuration } from './utils/calculateDuration.ts'
  */
 export function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 	const segments: Segment[] = []
+	let segmentIndex = 0
+	let cumulativeTime = 0
+
 	segmentList.map((segment: SegmentList) => {
 		if (segment.SegmentURL) {
 			return segment.SegmentURL.forEach((segmentURL: SegmentURL) => {
+				const duration = calculateDuration(
+					segment.$.duration,
+					segment.$.timescale,
+				)
+				const startTime = cumulativeTime
+				cumulativeTime += duration
+
 				segments.push({
-					duration: calculateDuration(
-						segment.$.duration,
-						segment.$.timescale,
-					),
+					id: `segment-${segmentIndex++}`,
+					duration,
 					url: segmentURL.$.media ?? '',
+					// byteRange not included - SegmentList typically doesn't include byteRange info
+					startTime,
 				} as Segment)
 			})
 		}
