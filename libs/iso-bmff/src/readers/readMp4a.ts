@@ -1,6 +1,6 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import { UINT } from '../fields/UINT.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
 
 /**
  * Parse an AudioSampleEntry from an IsoView
@@ -12,18 +12,5 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  * @public
  */
 export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<'mp4a'> {
-	const { readArray, readUint, readTemplate, readData } = view
-
-	return {
-		type: 'mp4a',
-		reserved1: readArray(UINT, 1, 6),
-		dataReferenceIndex: readUint(2),
-		reserved2: readArray(UINT, 4, 2),
-		channelcount: readUint(2),
-		samplesize: readUint(2),
-		preDefined: readUint(2),
-		reserved3: readUint(2),
-		samplerate: readTemplate(4),
-		esds: readData(-1),
-	}
+	return readAudioSampleEntryBox('mp4a', view)
 };
