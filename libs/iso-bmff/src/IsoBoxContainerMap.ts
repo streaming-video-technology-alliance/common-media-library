@@ -4,7 +4,6 @@ import type { EditBox } from './boxes/EditBox.ts'
 import type { GroupsListBox } from './boxes/GroupsListBox.ts'
 import type { MediaBox } from './boxes/MediaBox.ts'
 import type { MediaInformationBox } from './boxes/MediaInformationBox.ts'
-import type { MetaBox } from './boxes/MetaBox.ts'
 import type { MovieBox } from './boxes/MovieBox.ts'
 import type { MovieExtendsBox } from './boxes/MovieExtendsBox.ts'
 import type { MovieFragmentBox } from './boxes/MovieFragmentBox.ts'
@@ -30,7 +29,6 @@ export type IsoBoxContainerMap = {
 	grpl: GroupsListBox
 	mdia: MediaBox
 	meco: AdditionalMetadataContainerBox
-	meta: MetaBox
 	mfra: MovieFragmentRandomAccessBox
 	minf: MediaInformationBox
 	moof: MovieFragmentBox
