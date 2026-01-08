@@ -1,4 +1,4 @@
-import { assert, describe, it, readFtyp, readIsoBoxes } from './util/box.ts'
+import { assert, describe, it, readFtyp, readIsoBoxes, type IsoBoxReadView } from './util/box.ts'
 
 describe('readIsoBoxes', function () {
 	it('should read a buffer', function () {
@@ -29,5 +29,23 @@ describe('readIsoBoxes', function () {
 		const boxes = readIsoBoxes(zero.buffer)
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].size, 0)
+	})
+
+	it('should allow custom box readers', function () {
+		const bytes = new Uint8Array([
+			0x00, 0x00, 0x00, 0x0C,
+			0x74, 0x65, 0x73, 0x74,
+			0xFF, 0xFF, 0xFF, 0xFF,
+		])
+
+		const boxes = readIsoBoxes(bytes.buffer, {
+			readers: {
+				test: (view: IsoBoxReadView) => ({ type: 'test', value: view.readUint(4) })
+			}
+		})
+
+		const box = boxes[0]
+		assert.strictEqual(box.type, 'test')
+		assert.strictEqual(box.value, 0xFFFFFFFF)
 	})
 })
