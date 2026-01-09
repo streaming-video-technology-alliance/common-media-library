@@ -41,6 +41,15 @@ export type AdaptationSet = {
 };
 
 // @alpha
+export type AddressableObject = {
+    url: string;
+    byteRange?: {
+        start: number;
+        end: number;
+    };
+};
+
+// @alpha
 export type AlignedSwitchingSet = {
     switchingSets: SwitchingSet[];
 };
@@ -60,6 +69,11 @@ export type AudioChannelConfiguration = {
 export type AudioTrack = Track & {
     sampleRate: number;
     channels: number;
+};
+
+// @alpha
+export type Base = {
+    baseUrls: string[];
 };
 
 // @alpha
@@ -84,6 +98,12 @@ export function byteRangeToHlsString(byteRange: ByteRangeObject | undefined): st
 //
 // @internal
 export function calculateDuration(duration: string | undefined, timescale: string | undefined): number;
+
+// @alpha
+export const CBCS: "cbcs";
+
+// @alpha
+export const CENC: "cenc";
 
 // @alpha (undocumented)
 export type ContentComponent = {
@@ -125,7 +145,34 @@ export function dashToHam(manifest: string): Presentation[];
 export function decodeByteRange(byteRange: Byterange | undefined): string;
 
 // @alpha
+export type Duration = {
+    duration: number;
+};
+
+// @alpha
+export const DYNAMIC: "dynamic";
+
+// @alpha
 export function encodeByteRange(track: VideoTrack | AudioTrack): string;
+
+// @alpha
+type Event_2 = {
+    messageData: string;
+    duration: number;
+    id: string;
+    presentationTime: number;
+    adjustedPresentationTime?: number;
+    schemeIdUri: string;
+};
+export { Event_2 as Event }
+
+// @alpha
+export type EventStream = {
+    schemeIdUri: string;
+    timescale: number;
+    events: Event_2[];
+    presentationTimeOffset: number;
+};
 
 // @alpha
 export function formatSegments(segments: SegmentHls[]): Segment[];
@@ -290,6 +337,14 @@ export type Initialization = {
 export function iso8601DurationToNumber(isoDuration: string): number;
 
 // @alpha
+export type KeySystem = typeof FAIRPLAY_KEY_SYSTEM | typeof PLAYREADY_KEY_SYSTEM | typeof WIDEVINE_KEY_SYSTEM;
+
+// @alpha
+export type KeySystemMap = Record<KeySystem, {
+    pssh: string;
+}>;
+
+// @alpha
 export type ManifestFile = {
     type: ManifestFormat;
     manifest: string;
@@ -300,6 +355,15 @@ export type ManifestFile = {
 
 // @alpha
 export type ManifestFormat = "hls" | "dash";
+
+// @alpha
+export const ManifestType: {
+    readonly DYNAMIC: typeof DYNAMIC;
+    readonly STATIC: typeof STATIC;
+};
+
+// @alpha
+export type ManifestType = ValueOf<typeof ManifestType>;
 
 // Warning: (ae-internal-missing-underscore) The name "mapSegmentBase" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -373,9 +437,6 @@ export type PlayList = {
     };
 };
 
-// Warning: (ae-forgotten-export) The symbol "Duration" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "Base" needs to be exported by the entry point index.d.ts
-//
 // @alpha
 export type Presentation = Ham & Duration & Base & {
     selectionSets: SelectionSet[];
@@ -383,6 +444,22 @@ export type Presentation = Ham & Duration & Base & {
     endTime: number;
     eventStreams?: EventStream[];
 };
+
+// @alpha
+export type Protection = {
+    defaultKid: string;
+    keySystems: KeySystemMap;
+    scheme: ProtectionScheme;
+};
+
+// @alpha
+export const ProtectionScheme: {
+    readonly CENC: typeof CENC;
+    readonly CBCS: typeof CBCS;
+};
+
+// @alpha
+export type ProtectionScheme = ValueOf<typeof ProtectionScheme>;
 
 // @alpha
 export type Representation = {
@@ -414,8 +491,6 @@ export type Role = {
     };
 };
 
-// Warning: (ae-forgotten-export) The symbol "AddressableObject" needs to be exported by the entry point index.d.ts
-//
 // @alpha
 export type Segment = Ham & AddressableObject & Duration & {
     startTime: number;
@@ -498,6 +573,9 @@ export function setDashSerializer(serializer: DashSerializer): void;
 //
 // @internal (undocumented)
 export function setHlsParser(parser: HlsParser): void;
+
+// @alpha
+export const STATIC: "static";
 
 // @alpha
 export type SwitchingSet = Ham & Base & {
@@ -584,11 +662,6 @@ export type VideoTrack = Track & {
     sar: string;
     scanType: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/types/model/content-protection/KeySystem.ts:8:91 - (ae-forgotten-export) The symbol "EventStream" needs to be exported by the entry point index.d.ts
-// src/types/model/content-protection/KeySystem.ts:8:91 - (ae-forgotten-export) The symbol "Protection" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -20,7 +20,8 @@
 	"hideGenerator": true,
 	"jsDocCompatibility": false,
 	"navigation": {
-		"includeGroups": true
+		"includeGroups": true,
+		"includeCategories": true
 	},
 	"out": "./dist",
 	"readme": "../README.md",

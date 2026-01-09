@@ -1,4 +1,3 @@
-import type { IsoBox } from '../IsoBox.ts'
 import type { IsoBoxStreamable } from '../IsoBoxStreamable.ts'
 import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { isContainer } from '../utils/isContainer.ts'
@@ -18,7 +17,7 @@ export function writeBox(box: IsoBoxStreamable, config: IsoBoxWriteViewConfig): 
 
 	if ('type' in box) {
 		const { type } = box
-		const writer = config.writers?.[type as IsoBox['type']]
+		const writer = config.writers?.[type]
 
 		if (writer) {
 			// TODO: Find a better way to do this without casting to any

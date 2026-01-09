@@ -4,7 +4,7 @@ type Hvc1Box = VisualSampleEntryBox<'hvc1'>;
 
 describe('readHvc1', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes('hvc1_init.mp4', 'stsd', { stsd: readStsd<Hvc1Box>, hvc1: readHvc1 })
+		const container = filterBoxes('hvc1_init.mp4', 'stsd', { readers: { stsd: readStsd<Hvc1Box>, hvc1: readHvc1 } })
 
 		assert.strictEqual(container[0].type, 'stsd')
 		const box = container[0].entries[0] as Hvc1Box

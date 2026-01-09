@@ -1,3 +1,4 @@
+import type { IsoBoxType } from '../IsoBoxType.ts'
 import type { SampleEntryBox } from './SampleEntryBox.ts'
 import type { VisualSampleEntryType } from './VisualSampleEntryType.ts'
 
@@ -13,7 +14,7 @@ export type VisualSampleEntryBoxChild = any;
  *
  * @public
  */
-export type VisualSampleEntryBox<T extends VisualSampleEntryType = VisualSampleEntryType> = SampleEntryBox & {
+export type VisualSampleEntryBox<T extends IsoBoxType = VisualSampleEntryType> = SampleEntryBox & {
 	type: T;
 	preDefined1: number;
 	reserved2: number;

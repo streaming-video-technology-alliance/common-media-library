@@ -1,17 +1,17 @@
-import { readIsoBoxes, traverseIsoBoxes, type ParsedBox } from '@svta/cml-iso-bmff'
+import { readIsoBoxes, traverseIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { equal } from 'assert'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
 describe('traverseIsoBoxes', function () {
 	// Helper function to create a simple box
-	function createBox(type: string): ParsedBox {
-		return { type, size: 0 } as ParsedBox
+	function createBox(type: string): ParsedIsoBox {
+		return { type, size: 0 } as ParsedIsoBox
 	}
 
 	// Helper function to create a container box
-	function createContainer(type: string, boxes: ParsedBox[]): ParsedBox {
-		return { type, size: 0, boxes } as ParsedBox
+	function createContainer(type: string, boxes: ParsedIsoBox[]): ParsedIsoBox {
+		return { type, size: 0, boxes } as ParsedIsoBox
 	}
 
 	it('should provide an example', async function () {
@@ -27,7 +27,7 @@ describe('traverseIsoBoxes', function () {
 	})
 
 	it('should traverse empty boxes', function () {
-		const boxes: ParsedBox[] = []
+		const boxes: ParsedIsoBox[] = []
 		const result = Array.from(traverseIsoBoxes(boxes))
 		assert.strictEqual(result.length, 0)
 	})
@@ -70,7 +70,7 @@ describe('traverseIsoBoxes', function () {
 		const child2 = createBox('child2')
 		const container = createContainer('meta', [child1, child2])
 		const root = createBox('root')
-		const result = Array.from(traverseIsoBoxes([root, container], false))
+		const result = Array.from(traverseIsoBoxes([root, container], { depthFirst: false }))
 
 		// Breadth-first: root -> container -> child1 -> child2
 		// Note: In this simple case, the order is the same, but let's verify
@@ -85,7 +85,7 @@ describe('traverseIsoBoxes', function () {
 		const deepChild = createBox('deep')
 		const midContainer = createContainer('trak', [deepChild])
 		const topContainer = createContainer('moov', [midContainer])
-		const result = Array.from(traverseIsoBoxes([topContainer], true))
+		const result = Array.from(traverseIsoBoxes([topContainer], { depthFirst: true }))
 
 		// Depth-first: moov -> trak -> deep
 		assert.strictEqual(result.length, 3)
@@ -100,7 +100,7 @@ describe('traverseIsoBoxes', function () {
 		const midContainer1 = createContainer('trak', [deepChild1])
 		const midContainer2 = createContainer('trak', [deepChild2])
 		const topContainer = createContainer('moov', [midContainer1, midContainer2])
-		const result = Array.from(traverseIsoBoxes([topContainer], false))
+		const result = Array.from(traverseIsoBoxes([topContainer], { depthFirst: false }))
 
 		// Breadth-first: moov -> trak -> trak -> deep1 -> deep2
 		assert.strictEqual(result.length, 5)
@@ -115,7 +115,7 @@ describe('traverseIsoBoxes', function () {
 		const deepChild = createBox('deep')
 		const midContainer = createContainer('trak', [deepChild])
 		const topContainer = createContainer('moov', [midContainer])
-		const result = Array.from(traverseIsoBoxes([topContainer], true, 1))
+		const result = Array.from(traverseIsoBoxes([topContainer], { maxDepth: 1 }))
 
 		// Should only traverse to depth 1: moov -> trak (but not deep)
 		assert.strictEqual(result.length, 2)
@@ -126,7 +126,7 @@ describe('traverseIsoBoxes', function () {
 	it('should respect maxDepth parameter with depth 0', function () {
 		const child = createBox('child')
 		const container = createContainer('meta', [child])
-		const result = Array.from(traverseIsoBoxes([container], true, 0))
+		const result = Array.from(traverseIsoBoxes([container], { maxDepth: 0 }))
 
 		// Should only return the root container, not its children
 		assert.strictEqual(result.length, 1)
@@ -138,7 +138,7 @@ describe('traverseIsoBoxes', function () {
 		const child2 = createBox('child2')
 		const container1 = createContainer('meta', [child1])
 		const container2 = createContainer('trak', [child2])
-		const result = Array.from(traverseIsoBoxes([container1, container2], true))
+		const result = Array.from(traverseIsoBoxes([container1, container2], { depthFirst: true }))
 
 		// Depth-first: meta -> child1 -> trak -> child2
 		assert.strictEqual(result.length, 4)
@@ -159,7 +159,7 @@ describe('traverseIsoBoxes', function () {
 		const child = createBox('child')
 		const container = createContainer('meta', [child])
 		const nonContainer = createBox('ftyp')
-		const result = Array.from(traverseIsoBoxes([nonContainer, container], true))
+		const result = Array.from(traverseIsoBoxes([nonContainer, container], { depthFirst: true }))
 
 		assert.strictEqual(result.length, 3)
 		assert.strictEqual(result[0].type, 'ftyp')
@@ -179,7 +179,7 @@ describe('traverseIsoBoxes', function () {
 		const level3 = createBox('level3')
 		const level2 = createContainer('trak', [level3])
 		const level1 = createContainer('moov', [level2])
-		const result = Array.from(traverseIsoBoxes([level1], true, 2))
+		const result = Array.from(traverseIsoBoxes([level1], { depthFirst: true, maxDepth: 2 }))
 
 		// Should traverse to depth 2: moov -> trak -> level3
 		assert.strictEqual(result.length, 3)
@@ -194,7 +194,7 @@ describe('traverseIsoBoxes', function () {
 		const mid1 = createContainer('trak', [deep1])
 		const mid2 = createContainer('trak', [deep2])
 		const top = createContainer('moov', [mid1, mid2])
-		const result = Array.from(traverseIsoBoxes([top], false, 1))
+		const result = Array.from(traverseIsoBoxes([top], { depthFirst: false, maxDepth: 1 }))
 
 		// Should only traverse to depth 1: moov -> trak -> trak (but not deep1, deep2)
 		assert.strictEqual(result.length, 3)

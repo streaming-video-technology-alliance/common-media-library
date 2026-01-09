@@ -2,7 +2,7 @@ import { assert, describe, findBox, it, readElst } from '../util/box.ts'
 
 describe('readElst', function () {
 	it('should correctly parse the box', function () {
-		const box = findBox('editlist.mp4', 'elst', { elst: readElst })
+		const box = findBox('editlist.mp4', 'elst', { readers: { elst: readElst } })
 
 		assert.strictEqual(box.size, 28)
 		assert.strictEqual(box.entryCount, 1)
