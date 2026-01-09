@@ -1,5 +1,5 @@
-import type { ParsedBox } from './ParsedBox.ts';
-import type { ParsedIsoBox } from './ParsedIsoBox.ts';
+import type { ParsedBox } from './ParsedBox.ts'
+import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 
 /**
  * Return type for the ISO box reader.
