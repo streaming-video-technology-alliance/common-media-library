@@ -1,6 +1,6 @@
 import { filterIsoBoxes, readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { readFile } from 'fs/promises'
-import { assert, describe, it } from './util/box.ts'
+import { assert, describe, it, readFtyp } from './util/box.ts'
 
 describe('filterIsoBoxes', function () {
 	// Helper function to create a simple box
@@ -16,13 +16,11 @@ describe('filterIsoBoxes', function () {
 	it('should provide an example', async function () {
 		// #region example
 		const isoFile = await readFile('test/fixtures/captions.mp4')
-		const boxes = readIsoBoxes(new Uint8Array(isoFile))
-
-		const traks = filterIsoBoxes(boxes, box => box.type === 'trak')
-		assert.ok(traks.length > 0)
-		for (const trak of traks) {
-			assert.strictEqual(trak.type, 'trak')
-		}
+		const boxes = readIsoBoxes(new Uint8Array(isoFile), { readers: { ftyp: readFtyp } })
+		const ftyp = filterIsoBoxes(boxes, box => box.type === 'ftyp')
+		assert.ok(ftyp.length > 0)
+		assert.strictEqual(ftyp[0].type, 'ftyp')
+		assert.strictEqual(ftyp[0].majorBrand, 'isom')
 		// #endregion example
 	})
 
