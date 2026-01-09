@@ -1,4 +1,5 @@
 import type { IsoBox } from './IsoBox.ts'
+import type { ParsedBox } from './ParsedBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 
 /**
@@ -6,4 +7,4 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  *
  * @public
  */
-export type IsoBoxStreamable = IsoBox | ParsedIsoBox | ArrayBufferView;
+export type IsoBoxStreamable = IsoBox | ParsedIsoBox | ParsedBox<unknown> | ArrayBufferView;

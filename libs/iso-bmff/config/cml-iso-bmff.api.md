@@ -448,7 +448,7 @@ export type IsoBoxReadViewConfig = {
 };
 
 // @public
-export type IsoBoxStreamable = IsoBox | ParsedIsoBox | ArrayBufferView;
+export type IsoBoxStreamable = IsoBox | ParsedIsoBox | ParsedBox<unknown> | ArrayBufferView;
 
 // @public
 export type IsoBoxType = `${string}${string}${string}${string}`;
@@ -892,7 +892,7 @@ export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox;
 export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox;
 
 // @public
-export function readStsd<E extends SampleEntryBox = SampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E>;
+export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E>;
 
 // @public
 export function readStss(view: IsoBoxReadView): SyncSampleBox;
