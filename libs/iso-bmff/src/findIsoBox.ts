@@ -1,4 +1,3 @@
-import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 import type { TraverseIsoBoxesConfig } from './TraverseIsoBoxesConfig.ts'
 import { traverseIsoBoxes } from './traverseIsoBoxes.ts'
 
@@ -19,10 +18,10 @@ import { traverseIsoBoxes } from './traverseIsoBoxes.ts'
  *
  * @public
  */
-export function findIsoBox<T extends ParsedIsoBox>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null {
-	for (const box of traverseIsoBoxes(boxes as Iterable<ParsedIsoBox>, config)) {
-		if (callback(box as T)) {
-			return box as T
+export function findIsoBox<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null {
+	for (const box of traverseIsoBoxes(boxes, config)) {
+		if (callback(box)) {
+			return box
 		}
 	}
 

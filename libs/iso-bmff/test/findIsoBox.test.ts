@@ -1,4 +1,4 @@
-import { findIsoBox, readFtyp, readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
+import { createAudioSampleEntryReader, createVisualSampleEntryReader, findIsoBox, readFtyp, readIsoBoxes, readStsd, type IsoBoxReadView, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
@@ -23,8 +23,10 @@ describe('findIsoBox', function () {
 		})
 
 		const ftyp = findIsoBox(boxes, box => box.type === 'ftyp')
-		assert.notStrictEqual(ftyp, null)
-		assert.strictEqual(ftyp?.type, 'ftyp')
+
+		assert.ok(ftyp)
+		assert.strictEqual(ftyp.type, 'ftyp')
+		assert.strictEqual(ftyp.majorBrand, 'isom')
 		// #endregion example
 	})
 
@@ -128,5 +130,20 @@ describe('findIsoBox', function () {
 		const result = findIsoBox(boxSet, box => box.type === 'mdat')
 		assert.notStrictEqual(result, null)
 		assert.strictEqual(result?.type, 'mdat')
+	})
+
+	it('should handle generic readers', async () => {
+		const isoFile = await readFile('test/fixtures/captions.mp4')
+		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
+			readers: {
+				stsd: readStsd,
+				test: (view: IsoBoxReadView) => ({ type: 'test', value: view.readUint(4) }),
+				dvh1: createVisualSampleEntryReader('dvh1'),
+				'ac-3': createAudioSampleEntryReader('ac-3'),
+			},
+		})
+
+		const stsd = findIsoBox(boxes, box => box.type === 'stsd')
+		assert.ok(stsd)
 	})
 })

@@ -201,10 +201,10 @@ export type ExtendedLanguageBox = FullBox & {
 export type FileTypeBox = TypeBox<"ftyp">;
 
 // @public
-export function filterIsoBoxes<T$1 extends ParsedIsoBox>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1[];
+export function filterIsoBoxes<T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1[];
 
 // @public
-export function findIsoBox<T$1 extends ParsedIsoBox>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1 | null;
+export function findIsoBox<T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1 | null;
 
 // @public
 export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
@@ -1335,7 +1335,7 @@ export type TrackRunSample = {
 };
 
 // @public
-export function traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, config?: TraverseIsoBoxesConfig): Generator<ParsedIsoBox>;
+export function traverseIsoBoxes<T$1>(boxes: Iterable<T$1>, config?: TraverseIsoBoxesConfig): Generator<T$1>;
 
 // @public
 export type TraverseIsoBoxesConfig = {
