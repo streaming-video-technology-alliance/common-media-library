@@ -26,5 +26,5 @@ import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
  * @public
  */
 export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView) => VisualSampleEntryBox<T> {
-	return (view: IsoBoxReadView) => readVisualSampleEntryBox(type, view)
+	return (view: IsoBoxReadView) => readVisualSampleEntryBox<T>(type, view)
 }

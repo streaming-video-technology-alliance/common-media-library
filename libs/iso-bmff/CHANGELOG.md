@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-alpha.6] - 2026-01-09
+
+### Fixed
+
+- Broken type inference for `createAudioSampleEntryReader` and `createVisualSampleEntryReader`
+- Broken type inference for `writeIsoBoxes`
+
 ## [1.0.0-alpha.5] - 2026-01-08
 
 ### Fixed
@@ -81,7 +88,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.5...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.6...HEAD
+[1.0.0-alpha.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.5...iso-bmff-v1.0.0-alpha.6
 [1.0.0-alpha.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.4...iso-bmff-v1.0.0-alpha.5
 [1.0.0-alpha.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.3...iso-bmff-v1.0.0-alpha.4
 [1.0.0-alpha.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.2...iso-bmff-v1.0.0-alpha.3
