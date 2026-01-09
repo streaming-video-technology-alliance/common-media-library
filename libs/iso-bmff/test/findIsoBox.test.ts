@@ -92,7 +92,7 @@ describe('findIsoBox', function () {
 		// maxDepth: 2 should find deep
 		const result2 = findIsoBox([topContainer], box => box.type === 'mdia', { maxDepth: 2 })
 		assert.notStrictEqual(result2, null)
-		assert.strictEqual(result2?.type, 'deep')
+		assert.strictEqual(result2?.type, 'mdia')
 	})
 
 	it('should respect depthFirst config', function () {
