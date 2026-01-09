@@ -1,5 +1,5 @@
-import type { Segment } from '../../types/model/Segment.ts'
 import type { Validation } from '../../types/mapper/Validation.ts'
+import type { Segment } from '../../types/model/Segment.ts'
 
 import { validateSegment } from './validateSegment.ts'
 

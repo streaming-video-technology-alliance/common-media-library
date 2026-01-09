@@ -1,3 +1,4 @@
+import type { IsoBoxType } from '../IsoBoxType.ts'
 import type { AudioSampleEntryType } from './AudioSampleEntryType.ts'
 import type { SampleEntryBox } from './SampleEntryBox.ts'
 
@@ -13,7 +14,7 @@ export type AudioSampleEntryBoxChild = any;
  *
  * @public
  */
-export type AudioSampleEntryBox<T extends AudioSampleEntryType = AudioSampleEntryType> = SampleEntryBox & {
+export type AudioSampleEntryBox<T extends IsoBoxType = AudioSampleEntryType> = SampleEntryBox & {
 	type: T;
 	reserved2: number[];
 	channelcount: number;

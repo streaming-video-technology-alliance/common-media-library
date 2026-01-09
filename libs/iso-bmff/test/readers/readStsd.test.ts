@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readStsd, type AudioSampleEntryBox, 
 
 describe('readStsd', function () {
 	it('should correctly parse the box', function () {
-		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { stsd: readStsd })
+		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { readers: { stsd: readStsd } })
 
 		assert.strictEqual(boxes.length, 3)
 		assert.strictEqual((boxes[0].entries[0] as VisualSampleEntryBox<'avc1'>).type, 'avc1')
