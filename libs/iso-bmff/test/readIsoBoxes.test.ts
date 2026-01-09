@@ -1,4 +1,4 @@
-import { assert, describe, it, readFtyp, readIsoBoxes, readStsd, type IsoBoxReadView } from './util/box.ts'
+import { assert, createAudioSampleEntryReader, describe, it, readFtyp, readIsoBoxes, readStsd, type IsoBoxReadView } from './util/box.ts'
 
 describe('readIsoBoxes', function () {
 	it('should read a buffer', function () {
@@ -40,7 +40,8 @@ describe('readIsoBoxes', function () {
 
 		const boxes = readIsoBoxes(bytes.buffer, {
 			readers: {
-				test: (view: IsoBoxReadView) => ({ type: 'test', value: view.readUint(4) })
+				test: (view: IsoBoxReadView) => ({ type: 'test', value: view.readUint(4) }),
+				'ac-4': createAudioSampleEntryReader('ac-4'),
 			}
 		})
 

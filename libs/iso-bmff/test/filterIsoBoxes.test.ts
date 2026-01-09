@@ -17,10 +17,12 @@ describe('filterIsoBoxes', function () {
 		// #region example
 		const isoFile = await readFile('test/fixtures/captions.mp4')
 		const boxes = readIsoBoxes(new Uint8Array(isoFile), { readers: { ftyp: readFtyp } })
-		const ftyp = filterIsoBoxes(boxes, box => box.type === 'ftyp')
-		assert.ok(ftyp.length > 0)
-		assert.strictEqual(ftyp[0].type, 'ftyp')
-		assert.strictEqual(ftyp[0].majorBrand, 'isom')
+		const filtered = filterIsoBoxes(boxes, box => box.type === 'ftyp')
+		const ftyp = filtered[0]
+
+		assert.ok(ftyp)
+		assert.strictEqual(ftyp.type, 'ftyp')
+		assert.strictEqual(ftyp.majorBrand, 'isom')
 		// #endregion example
 	})
 
