@@ -8,6 +8,22 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-alpha.4] - 2026-01-08
+
+### Added
+
+- Added ability to use generic reader functions with `readIsoBoxes`
+- Added `createAudioSampleEntryReader` and `createVisualSampleEntryReader` utility functions for custom audio and visual sample entry box types
+- Added `findIsoBox` utility function to find the first box matching a predicate
+- Added `filterIsoBoxes` utility function to filter boxes matching a predicate
+- Added `TraverseIsoBoxesConfig` type for configuring box traversal options
+
+### Changed
+
+- Improved type inference for reader return types
+- Changed `traverseIsoBoxes` to accept a config object instead of positional arguments for `depthFirst` and `maxDepth`
+- Expanded `AudioSampleEntryBox` and `VisualSampleEntryBox` type parameters to accept any `IsoBoxType`
+
 ## [1.0.0-alpha.3] - 2025-01-07
 
 ### Changed
@@ -59,7 +75,10 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-/iso-bmff-/iso-bmff-v1.0.0-alpha.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-/iso-bmff-/iso-bmff-/iso-bmff-v1.0.0-alpha.4...HEAD
+[1.0.0-alpha.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.3...iso-bmff-v1.0.0-alpha.4
+[1.0.0-alpha.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.2...iso-bmff-v1.0.0-alpha.3
+[1.0.0-alpha.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.1...iso-bmff-v1.0.0-alpha.2
 [1.0.0-alpha.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v0.23.2...iso-bmff-v1.0.0-alpha.1
 [0.23.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v0.23.1...iso-bmff-v0.23.2
 [0.23.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v0.23.0...iso-bmff-v0.23.1
