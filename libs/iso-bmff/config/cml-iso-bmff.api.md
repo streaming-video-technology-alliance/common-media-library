@@ -20,7 +20,7 @@ export type AudioRenderingIndicationBox = FullBox & {
 };
 
 // @public
-export type AudioSampleEntryBox<T$1 extends IsoBoxType = IsoBoxType> = SampleEntryBox & {
+export type AudioSampleEntryBox<T$1 extends IsoBoxType = AudioSampleEntryType> = SampleEntryBox & {
     type: T$1;
     reserved2: number[];
     channelcount: number;
@@ -87,7 +87,13 @@ export type CompositionTimeToSampleEntry = {
 export const CONTAINERS: string[];
 
 // @public
+export function createAudioSampleEntryReader<T$1 extends IsoBoxType>(type: T$1): (view: IsoBoxReadView) => AudioSampleEntryBox<T$1>;
+
+// @public
 export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
+
+// @public
+export function createVisualSampleEntryReader<T$1 extends IsoBoxType>(type: T$1): (view: IsoBoxReadView) => VisualSampleEntryBox<T$1>;
 
 // @public
 export const DATA = "data";
@@ -749,7 +755,7 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntryBox<T$1 extends IsoBoxType = IsoBoxType>(type: T$1, view: IsoBoxReadView): AudioSampleEntryBox<T$1>;
+export function readAudioSampleEntryBox<T$1 extends IsoBoxType>(type: T$1, view: IsoBoxReadView): AudioSampleEntryBox<T$1>;
 
 // @public
 export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<"avc1">;
@@ -925,7 +931,7 @@ export function readUrl(view: IsoBoxReadView): DataEntryUrlBox;
 export function readUrn(view: IsoBoxReadView): DataEntryUrnBox;
 
 // @public
-export function readVisualSampleEntryBox<T$1 extends VisualSampleEntryType>(type: T$1, view: IsoBoxReadView): VisualSampleEntryBox<T$1>;
+export function readVisualSampleEntryBox<T$1 extends IsoBoxType>(type: T$1, view: IsoBoxReadView): VisualSampleEntryBox<T$1>;
 
 // @public
 export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox;
@@ -1362,7 +1368,7 @@ export type VideoMediaHeaderBox = FullBox & {
 };
 
 // @public
-export type VisualSampleEntryBox<T$1 extends VisualSampleEntryType = VisualSampleEntryType> = SampleEntryBox & {
+export type VisualSampleEntryBox<T$1 extends IsoBoxType = VisualSampleEntryType> = SampleEntryBox & {
     type: T$1;
     preDefined1: number;
     reserved2: number;

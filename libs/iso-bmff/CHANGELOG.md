@@ -13,6 +13,7 @@ and this project adheres to
 ### Added
 
 - Added ability to use generic reader functions with `readIsoBoxes`
+- Added `createAudioSampleEntryReader` and `createVisualSampleEntryReader` utility functions to for custom audio and visual sample entry boxes
 
 ### Changed
 
