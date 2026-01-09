@@ -40,9 +40,6 @@ export type AudioSampleEntryType = "mp4a" | "enca";
 // @public
 export type Box<T$1 extends IsoBoxType = never> = {
     type: T$1;
-    size: number;
-    largesize?: number;
-    usertype?: number[];
 };
 
 // @public
@@ -202,6 +199,12 @@ export type ExtendedLanguageBox = FullBox & {
 
 // @public
 export type FileTypeBox = TypeBox<"ftyp">;
+
+// @public
+export function filterIsoBoxes<T$1 extends ParsedIsoBox>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1[];
+
+// @public
+export function findIsoBox<T$1 extends ParsedIsoBox>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1 | null;
 
 // @public
 export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
@@ -697,6 +700,9 @@ export type OriginalFormatBox = {
 // @public
 export type ParsedBox<T$1 = Box> = (T$1 extends IsoBox ? T$1 & Omit<Box, "type"> : T$1) & {
     view: IsoBoxReadView;
+    size: number;
+    largesize?: number;
+    usertype?: number[];
 };
 
 // @public
@@ -1329,7 +1335,13 @@ export type TrackRunSample = {
 };
 
 // @public
-export function traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, depthFirst?: boolean, maxDepth?: number): Generator<ParsedIsoBox>;
+export function traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, config?: TraverseIsoBoxesConfig): Generator<ParsedIsoBox>;
+
+// @public
+export type TraverseIsoBoxesConfig = {
+    depthFirst?: boolean;
+    maxDepth?: number;
+};
 
 // @public
 export type TypeBox<T$1> = {

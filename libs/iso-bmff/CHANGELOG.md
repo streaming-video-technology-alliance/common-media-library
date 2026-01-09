@@ -13,11 +13,16 @@ and this project adheres to
 ### Added
 
 - Added ability to use generic reader functions with `readIsoBoxes`
-- Added `createAudioSampleEntryReader` and `createVisualSampleEntryReader` utility functions to for custom audio and visual sample entry boxes
+- Added `createAudioSampleEntryReader` and `createVisualSampleEntryReader` utility functions for custom audio and visual sample entry box types
+- Added `findIsoBox` utility function to find the first box matching a predicate
+- Added `filterIsoBoxes` utility function to filter boxes matching a predicate
+- Added `TraverseIsoBoxesConfig` type for configuring box traversal options
 
 ### Changed
 
 - Improved type inference for reader return types
+- Changed `traverseIsoBoxes` to accept a config object instead of positional arguments for `depthFirst` and `maxDepth`
+- Expanded `AudioSampleEntryBox` and `VisualSampleEntryBox` type parameters to accept any `IsoBoxType`
 
 ## [1.0.0-alpha.3] - 2025-01-07
 

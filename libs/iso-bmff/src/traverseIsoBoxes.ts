@@ -1,12 +1,12 @@
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
+import type { TraverseIsoBoxesConfig } from './TraverseIsoBoxesConfig.ts'
 import { isContainer } from './utils/isContainer.ts'
 
 /**
  * Traverse ISO boxes
  *
  * @param boxes - The boxes to traverse
- * @param depthFirst - Whether to traverse the boxes depth-first or breadth-first
- * @param maxDepth - The maximum depth to traverse. A value of 0 will only traverse the root boxes.
+ * @param config - Configuration options for traversal
  *
  * @returns A generator of boxes
  *
@@ -15,7 +15,10 @@ import { isContainer } from './utils/isContainer.ts'
  *
  * @public
  */
-export function* traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, depthFirst: boolean = true, maxDepth: number = Infinity): Generator<ParsedIsoBox> {
+export function* traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, config?: TraverseIsoBoxesConfig): Generator<ParsedIsoBox> {
+	const depthFirst = config?.depthFirst ?? true
+	const maxDepth = config?.maxDepth ?? Infinity
+
 	if (maxDepth < 0 || typeof maxDepth !== 'number' || Number.isNaN(maxDepth)) {
 		return
 	}
@@ -40,7 +43,7 @@ export function* traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, depthFirst: boo
 				const next = child.boxes as ParsedIsoBox[]
 
 				if (depthFirst) {
-					yield* traverseIsoBoxes(next, depthFirst, maxDepth - 1)
+					yield* traverseIsoBoxes(next, { depthFirst, maxDepth: maxDepth - 1 })
 				}
 				else {
 					queue.push([next, depth + 1])

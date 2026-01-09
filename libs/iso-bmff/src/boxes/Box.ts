@@ -7,7 +7,4 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  */
 export type Box<T extends IsoBoxType = never> = {
 	type: T;
-	size: number;
-	largesize?: number;
-	usertype?: number[];
 };

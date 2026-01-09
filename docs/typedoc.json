@@ -13,11 +13,7 @@
 		"jsDocCompatibility": false,
 		"entryPoints": [
 			"src/index.ts"
-		],
-		"navigation": {
-			"includeGroups": true,
-			"includeCategories": true
-		}
+		]
 	},
 	"excludeInternal": true,
 	"excludePrivate": true,

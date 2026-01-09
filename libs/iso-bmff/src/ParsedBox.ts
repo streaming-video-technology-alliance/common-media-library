@@ -7,4 +7,9 @@ import type { IsoBoxReadView } from './IsoBoxReadView.ts'
  *
  * @public
  */
-export type ParsedBox<T = Box> = (T extends IsoBox ? T & Omit<Box, 'type'> : T) & { view: IsoBoxReadView }
+export type ParsedBox<T = Box> = (T extends IsoBox ? T & Omit<Box, 'type'> : T) & {
+	view: IsoBoxReadView
+	size: number;
+	largesize?: number;
+	usertype?: number[];
+}
