@@ -1,4 +1,4 @@
-import { assert, describe, it, readFtyp, readIsoBoxes, type IsoBoxReadView } from './util/box.ts'
+import { assert, describe, it, readFtyp, readIsoBoxes, readStsd, type IsoBoxReadView } from './util/box.ts'
 
 describe('readIsoBoxes', function () {
 	it('should read a buffer', function () {
@@ -11,7 +11,7 @@ describe('readIsoBoxes', function () {
 			0x00, 0x00, 0x00, 0x01,
 			0x69, 0x73, 0x6f, 0x6d
 		])
-		const boxes = readIsoBoxes(bytes.buffer, { readers: { ftyp: readFtyp } })
+		const boxes = readIsoBoxes(bytes.buffer, { readers: { ftyp: readFtyp, stsd: readStsd } })
 
 		assert.strictEqual(boxes.length, 1)
 

@@ -20,7 +20,7 @@ export type AudioRenderingIndicationBox = FullBox & {
 };
 
 // @public
-export type AudioSampleEntryBox<T$1 extends AudioSampleEntryType = AudioSampleEntryType> = SampleEntryBox & {
+export type AudioSampleEntryBox<T$1 extends IsoBoxType = IsoBoxType> = SampleEntryBox & {
     type: T$1;
     reserved2: number[];
     channelcount: number;
@@ -41,13 +41,9 @@ export type AudioSampleEntryType = "mp4a" | "enca";
 export type Box<T$1 extends IsoBoxType = never> = {
     type: T$1;
     size: number;
-    view: IsoBoxReadView;
     largesize?: number;
     usertype?: number[];
 };
-
-// @public
-export type BoxReturn<T$1 extends IsoBoxReaderMap> = IsoParsedBox<{ [K in keyof T$1]: ReaderReturnType<T$1[K]> }[keyof T$1]>;
 
 // @public
 export type ChunkLargeOffsetBox = FullBox & {
@@ -86,9 +82,6 @@ export type CompositionTimeToSampleEntry = {
     sampleCount: number;
     sampleOffset: number;
 };
-
-// @public
-export type ContainerReturn = IsoParsedBox<IsoBoxContainer>;
 
 // @public
 export const CONTAINERS: string[];
@@ -407,22 +400,18 @@ export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
 }
 
 // @public
-export type IsoBoxReader<B$1 extends IsoBox> = (view: IsoBoxReadView) => B$1;
+export type IsoBoxReader<B = unknown> = (view: IsoBoxReadView) => B;
 
 // @public
-export type IsoBoxReaderMap = { [P in IsoBox["type"]]?: IsoBoxReader<Extract<IsoBox, {
-        type: P;
-    }>> } & Record<IsoBoxType, ((view: IsoBoxReadView) => {
-    type: IsoBoxType;
-}) | undefined>;
+export type IsoBoxReaderMap = Record<string, IsoBoxReader>;
 
 // @public
-export type IsoBoxReaderReturn<T$1 extends IsoBoxReaderMap> = IsoBoxReaderMap extends T$1 ? ParsedBox : BoxReturn<T$1> | ContainerReturn | ParsedBox;
+export type IsoBoxReaderReturn<T$1> = { [K in keyof T$1]: T$1[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never }[keyof T$1] | ParsedIsoBox;
 
 // @public
-export class IsoBoxReadView<R$1 extends IsoBoxReaderMap = IsoBoxReaderMap> {
-    [Symbol.iterator](): Generator<ParsedBox>;
-    constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig<R$1>);
+export class IsoBoxReadView {
+    [Symbol.iterator](): Generator<ParsedIsoBox>;
+    constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig);
     get buffer(): ArrayBuffer;
     get byteLength(): number;
     get byteOffset(): number;
@@ -431,7 +420,7 @@ export class IsoBoxReadView<R$1 extends IsoBoxReaderMap = IsoBoxReaderMap> {
     get done(): boolean;
     jump: (size: number) => void;
     readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
-    readBox: () => Box;
+    readBox: () => ParsedBox;
     readBoxes: <T = IsoBox>(length?: number) => T[];
     readData: (size: number) => Uint8Array<ArrayBuffer>;
     readEntries: <T>(length: number, map: () => T) => T[];
@@ -441,22 +430,22 @@ export class IsoBoxReadView<R$1 extends IsoBoxReaderMap = IsoBoxReaderMap> {
     readTemplate: (size: number) => number;
     readUint: (size: number) => number;
     readUtf8: (size?: number) => string;
-    slice: (offset: number, size: number) => IsoBoxReadView<R$1>;
+    slice: (offset: number, size: number) => IsoBoxReadView;
 }
 
 // @public
-export type IsoBoxReadViewConfig<R$1 extends IsoBoxReaderMap = IsoBoxReaderMap> = {
-    readers?: R$1;
+export type IsoBoxReadViewConfig = {
+    readers?: IsoBoxReaderMap;
 };
 
 // @public
-export type IsoBoxStreamable = IsoBox | Box | ArrayBufferView;
+export type IsoBoxStreamable = IsoBox | ParsedIsoBox | ArrayBufferView;
 
 // @public
 export type IsoBoxType = `${string}${string}${string}${string}`;
 
 // @public
-export type IsoBoxWriter<B$1> = (box: B$1, config: IsoBoxWriteViewConfig) => ArrayBufferView;
+export type IsoBoxWriter<B> = (box: B, config: IsoBoxWriteViewConfig) => ArrayBufferView;
 
 // @public
 export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
@@ -496,10 +485,7 @@ export type IsoFieldTypeMap = {
 };
 
 // @public
-export type IsoParsedBox<T$1 extends IsoBox = IsoBox> = T$1 & Omit<Box, "type">;
-
-// @public
-export type IsoTypedParsedBox<T$1 extends keyof IsoBoxMap> = IsoBoxMap[T$1] & Omit<Box, "type">;
+export type IsoTypedParsedBox<T$1 extends keyof IsoBoxMap> = ParsedBox<IsoBoxMap[T$1]>;
 
 // @public
 export type ItemExtent = {
@@ -703,7 +689,12 @@ export type OriginalFormatBox = {
 };
 
 // @public
-export type ParsedBox = IsoParsedBox | Box;
+export type ParsedBox<T$1 = Box> = (T$1 extends IsoBox ? T$1 & Omit<Box, "type"> : T$1) & {
+    view: IsoBoxReadView;
+};
+
+// @public
+export type ParsedIsoBox = ParsedBox<IsoBox | Box>;
 
 // @public
 export type PreselectionGroupBox = FullBox & {
@@ -758,7 +749,7 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntryBox<T$1 extends AudioSampleEntryType>(type: T$1, view: IsoBoxReadView): AudioSampleEntryBox<T$1>;
+export function readAudioSampleEntryBox<T$1 extends IsoBoxType = IsoBoxType>(type: T$1, view: IsoBoxReadView): AudioSampleEntryBox<T$1>;
 
 // @public
 export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<"avc1">;
@@ -794,11 +785,6 @@ export function readEnca(view: IsoBoxReadView): AudioSampleEntryBox<"enca">;
 export function readEncv(view: IsoBoxReadView): VisualSampleEntryBox<"encv">;
 
 // @public
-export type ReaderReturnType<T$1> = T$1 extends IsoBoxReader<infer B> ? B : T$1 extends ((...args: never[]) => infer R) ? R extends {
-    type: string;
-} ? R : never : never;
-
-// @public
 export function readFree(view: IsoBoxReadView): FreeSpaceBox;
 
 // @public
@@ -823,12 +809,12 @@ export function readIden(view: IsoBoxReadView): WebVttCueIdBox;
 export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox;
 
 // @public
-export function readIsoBoxes<R$1 extends IsoBoxReaderMap>(raw: IsoBoxData, config: IsoBoxReadViewConfig<R$1> & {
+export function readIsoBoxes<const R$1 extends IsoBoxReaderMap>(raw: IsoBoxData, config: IsoBoxReadViewConfig & {
     readers: R$1;
 }): IsoBoxReaderReturn<R$1>[];
 
 // @public (undocumented)
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedBox[];
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[];
 
 // @public
 export function readKind(view: IsoBoxReadView): TrackKindBox;
@@ -1337,7 +1323,7 @@ export type TrackRunSample = {
 };
 
 // @public
-export function traverseIsoBoxes(boxes: Iterable<ParsedBox>, depthFirst?: boolean, maxDepth?: number): Generator<ParsedBox>;
+export function traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, depthFirst?: boolean, maxDepth?: number): Generator<ParsedIsoBox>;
 
 // @public
 export type TypeBox<T$1> = {

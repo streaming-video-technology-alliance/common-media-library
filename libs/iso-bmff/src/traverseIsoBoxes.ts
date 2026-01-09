@@ -1,4 +1,4 @@
-import type { ParsedBox } from './ParsedBox.ts'
+import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 import { isContainer } from './utils/isContainer.ts'
 
 /**
@@ -15,12 +15,12 @@ import { isContainer } from './utils/isContainer.ts'
  *
  * @public
  */
-export function* traverseIsoBoxes(boxes: Iterable<ParsedBox>, depthFirst: boolean = true, maxDepth: number = Infinity): Generator<ParsedBox> {
+export function* traverseIsoBoxes(boxes: Iterable<ParsedIsoBox>, depthFirst: boolean = true, maxDepth: number = Infinity): Generator<ParsedIsoBox> {
 	if (maxDepth < 0 || typeof maxDepth !== 'number' || Number.isNaN(maxDepth)) {
 		return
 	}
 
-	const queue: [Iterable<ParsedBox>, number][] = [[boxes, 0]]
+	const queue: [Iterable<ParsedIsoBox>, number][] = [[boxes, 0]]
 
 	while (queue.length > 0) {
 		const item = queue.shift()
@@ -37,7 +37,7 @@ export function* traverseIsoBoxes(boxes: Iterable<ParsedBox>, depthFirst: boolea
 			}
 
 			if (isContainer(child) && child.boxes) {
-				const next = child.boxes as ParsedBox[]
+				const next = child.boxes as ParsedIsoBox[]
 
 				if (depthFirst) {
 					yield* traverseIsoBoxes(next, depthFirst, maxDepth - 1)

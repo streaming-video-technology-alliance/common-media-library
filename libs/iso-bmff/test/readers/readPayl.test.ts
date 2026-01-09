@@ -2,7 +2,7 @@ import { assert, describe, findBox, isContainer, it, readIsoBoxes, readMdat, rea
 
 describe('readPayl', function () {
 	it('should correctly parse the box from sample data', function () {
-		const { data } = findBox('webvtt.m4s', 'mdat', { mdat: readMdat })
+		const { data } = findBox('webvtt.m4s', 'mdat', { readers: { mdat: readMdat } })
 		const boxes = readIsoBoxes(data, { readers: { payl: readPayl } })
 
 		const container = boxes[0]

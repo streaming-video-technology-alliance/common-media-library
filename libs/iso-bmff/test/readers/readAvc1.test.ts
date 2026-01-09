@@ -4,7 +4,7 @@ type Avc1Box = VisualSampleEntryBox<'avc1'>;
 
 describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { stsd: readStsd<Avc1Box>, avc1: readAvc1 })
+		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { readers: { stsd: readStsd<Avc1Box>, avc1: readAvc1 } })
 
 		assert.strictEqual(container[0].type, 'stsd')
 

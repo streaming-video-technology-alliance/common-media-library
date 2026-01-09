@@ -1,17 +1,17 @@
-import { readIsoBoxes, traverseIsoBoxes, type ParsedBox } from '@svta/cml-iso-bmff'
+import { readIsoBoxes, traverseIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { equal } from 'assert'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
 describe('traverseIsoBoxes', function () {
 	// Helper function to create a simple box
-	function createBox(type: string): ParsedBox {
-		return { type, size: 0 } as ParsedBox
+	function createBox(type: string): ParsedIsoBox {
+		return { type, size: 0 } as ParsedIsoBox
 	}
 
 	// Helper function to create a container box
-	function createContainer(type: string, boxes: ParsedBox[]): ParsedBox {
-		return { type, size: 0, boxes } as ParsedBox
+	function createContainer(type: string, boxes: ParsedIsoBox[]): ParsedIsoBox {
+		return { type, size: 0, boxes } as ParsedIsoBox
 	}
 
 	it('should provide an example', async function () {
@@ -27,7 +27,7 @@ describe('traverseIsoBoxes', function () {
 	})
 
 	it('should traverse empty boxes', function () {
-		const boxes: ParsedBox[] = []
+		const boxes: ParsedIsoBox[] = []
 		const result = Array.from(traverseIsoBoxes(boxes))
 		assert.strictEqual(result.length, 0)
 	})
