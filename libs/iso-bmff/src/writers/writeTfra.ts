@@ -2,13 +2,13 @@ import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomA
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a TrackFragmentRandomAccessBox to an IsoDataWriter.
+ * Write a `TrackFragmentRandomAccessBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
  *
- * @param box - The TrackFragmentRandomAccessBox fields to write
+ * @param box - The `TrackFragmentRandomAccessBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

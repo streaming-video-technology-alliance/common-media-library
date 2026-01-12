@@ -3,11 +3,11 @@ import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a WebVttSourceLabelBox to an IsoDataWriter.
+ * Write a `WebVttSourceLabelBox` to an `IsoBoxWriteView`.
  *
- * @param box - The WebVttSourceLabelBox fields to write
+ * @param box - The `WebVttSourceLabelBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

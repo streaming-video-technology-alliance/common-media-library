@@ -3,11 +3,11 @@ import type { PreselectionGroupBox, PreselectionGroupBoxChild } from '../boxes/P
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a PreselectionGroupBox from an IsoView
+ * Parse a `PreselectionGroupBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed PreselectionGroupBox
+ * @returns A parsed `PreselectionGroupBox`
  *
  * @public
  */

@@ -1,16 +1,15 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
-import { TEMPLATE } from '../fields/TEMPLATE.ts'
-import { UINT } from '../fields/UINT.ts'
+import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a TrackHeaderBox to an IsoDataWriter.
+ * Write a `TrackHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.3.2 Track Header Box
  *
- * @param box - The TrackHeaderBox fields to write
+ * @param box - The `TrackHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

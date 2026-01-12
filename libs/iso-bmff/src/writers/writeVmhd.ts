@@ -1,15 +1,15 @@
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a VideoMediaHeaderBox to an IsoDataWriter.
+ * Write a `VideoMediaHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 12.1.2 Video Media Header Box
  *
- * @param box - The VideoMediaHeaderBox fields to write
+ * @param box - The `VideoMediaHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

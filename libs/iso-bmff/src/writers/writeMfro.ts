@@ -2,13 +2,13 @@ import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentR
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a MovieFragmentRandomAccessOffsetBox to an IsoDataWriter.
+ * Write a `MovieFragmentRandomAccessOffsetBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.8.11 Movie Fragment Random Access Offset Box
  *
- * @param box - The MovieFragmentRandomAccessOffsetBox fields to write
+ * @param box - The `MovieFragmentRandomAccessOffsetBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

@@ -1,15 +1,15 @@
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a HandlerReferenceBox to an IsoDataWriter.
+ * Write a `HandlerReferenceBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
  *
- * @param box - The HandlerReferenceBox fields to write
+ * @param box - The `HandlerReferenceBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

@@ -1,12 +1,7 @@
 import type { FullBox } from './boxes/FullBox.ts'
-import { DATA } from './fields/DATA.ts'
-import { INT } from './fields/INT.ts'
-import { STRING } from './fields/STRING.ts'
-import { TEMPLATE } from './fields/TEMPLATE.ts'
-import { UINT } from './fields/UINT.ts'
-import { UTF8 } from './fields/UTF8.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
+import { DATA, INT, STRING, TEMPLATE, UINT, UTF8, type IsoBoxFields } from './IsoBoxFields.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 import type { ParsedBox } from './ParsedBox.ts'
@@ -107,7 +102,7 @@ export class IsoBoxReadView {
 		return isoView
 	}
 
-	private read = <T extends keyof IsoFieldTypeMap>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
+	private read = <T extends IsoBoxFields>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
 		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this
 

@@ -2,13 +2,13 @@ import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a MediaHeaderBox to an IsoDataWriter.
+ * Write a `MediaHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
  *
- * @param box - The MediaHeaderBox fields to write
+ * @param box - The `MediaHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

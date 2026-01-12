@@ -2,11 +2,11 @@ import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.t
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a DecodingTimeToSampleBox from an IsoView
+ * Parse a `DecodingTimeToSampleBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed DecodingTimeToSampleBox
+ * @returns A parsed `DecodingTimeToSampleBox`
  *
  * @public
  */
