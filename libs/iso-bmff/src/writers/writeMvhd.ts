@@ -1,16 +1,15 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
-import { TEMPLATE } from '../fields/TEMPLATE.ts'
-import { UINT } from '../fields/UINT.ts'
+import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a MovieHeaderBox to an IsoDataWriter.
+ * Write a `MovieHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
  *
- * @param box - The MovieHeaderBox fields to write
+ * @param box - The `MovieHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

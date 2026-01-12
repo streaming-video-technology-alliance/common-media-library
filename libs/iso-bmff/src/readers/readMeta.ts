@@ -2,11 +2,11 @@ import type { MetaBox, MetaBoxChild } from '../boxes/MetaBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a MetaBox from an IsoView
+ * Parse a `MetaBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed MetaBox
+ * @returns A parsed `MetaBox`
  *
  * @public
  */

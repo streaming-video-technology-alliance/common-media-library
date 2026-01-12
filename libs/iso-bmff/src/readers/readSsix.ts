@@ -2,11 +2,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 
 /**
- * Parse a SubsegmentIndexBox from an IsoView
+ * Parse a `SubsegmentIndexBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed SubsegmentIndexBox
+ * @returns A parsed `SubsegmentIndexBox`
  *
  * @public
  */

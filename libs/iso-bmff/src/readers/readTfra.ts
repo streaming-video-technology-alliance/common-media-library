@@ -3,11 +3,11 @@ import type { TrackFragmentRandomAccessEntry } from '../boxes/TrackFragmentRando
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a TrackFragmentRandomAccessBox from an IsoView
+ * Parse a `TrackFragmentRandomAccessBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed TrackFragmentRandomAccessBox
+ * @returns A parsed `TrackFragmentRandomAccessBox`
  *
  * @public
  */

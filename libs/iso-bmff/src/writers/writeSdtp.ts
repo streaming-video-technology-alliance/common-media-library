@@ -2,13 +2,13 @@ import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.t
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a SampleDependencyTypeBox to an IsoDataWriter.
+ * Write a `SampleDependencyTypeBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.6.4 Independent and Disposable Samples Box
  *
- * @param box - The SampleDependencyTypeBox fields to write
+ * @param box - The `SampleDependencyTypeBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

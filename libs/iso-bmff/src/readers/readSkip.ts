@@ -3,11 +3,11 @@ import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import { readFree } from './readFree.ts'
 
 /**
- * Parse a FreeSpaceBox from an IsoView
+ * Parse a `FreeSpaceBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed FreeSpaceBox
+ * @returns A parsed `FreeSpaceBox`
  *
  * @public
  */

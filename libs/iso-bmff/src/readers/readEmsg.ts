@@ -2,11 +2,11 @@ import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse an EventMessageBox from an IsoView
+ * Parse a `EventMessageBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed EventMessageBox
+ * @returns A parsed `EventMessageBox`
  *
  * @public
  */

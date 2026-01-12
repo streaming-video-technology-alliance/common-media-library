@@ -1,14 +1,15 @@
+import type { IsoBoxFields } from './IsoBoxFields.ts'
+
 /**
  * IsoFieldTypeMap is a map of ISO BMFF field types to their corresponding JavaScript types.
  *
  * @public
  */
 export type IsoFieldTypeMap = {
-	uint: number;
-	int: number;
-	template: number;
-	string: string;
-	data: Uint8Array<ArrayBuffer>;
-	utf8: string;
-	utf8string: string;
+	[IsoBoxFields.UINT]: number;
+	[IsoBoxFields.INT]: number;
+	[IsoBoxFields.TEMPLATE]: number;
+	[IsoBoxFields.STRING]: string;
+	[IsoBoxFields.DATA]: Uint8Array<ArrayBuffer>;
+	[IsoBoxFields.UTF8]: string;
 };

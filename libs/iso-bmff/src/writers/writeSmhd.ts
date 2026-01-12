@@ -2,13 +2,13 @@ import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a SoundMediaHeaderBox to an IsoDataWriter.
+ * Write a `SoundMediaHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 12.2.2 Sound Media Header Box
  *
- * @param box - The SoundMediaHeaderBox fields to write
+ * @param box - The `SoundMediaHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

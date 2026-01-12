@@ -2,11 +2,11 @@ import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicat
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write an AudioRenderingIndicationBox to an IsoDataWriter.
+ * Write an `AudioRenderingIndicationBox` to an `IsoBoxWriteView`.
  *
- * @param box - The AudioRenderingIndicationBox fields to write
+ * @param box - The `AudioRenderingIndicationBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

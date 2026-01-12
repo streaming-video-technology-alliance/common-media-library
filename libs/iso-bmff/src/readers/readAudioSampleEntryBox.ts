@@ -1,15 +1,15 @@
 import type { AudioSampleEntryBox, AudioSampleEntryBoxChild } from '../boxes/AudioSampleEntryBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
- * Parse a AudioSampleEntryBox from an IsoView
+ * Parse a `AudioSampleEntryBox` from an `IsoBoxReadView`.
  *
- * @param type - The type of AudioSampleEntryBox to read
- * @param view - The IsoView to read data from
+ * @param type - The type of `AudioSampleEntryBox` to read
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed AudioSampleEntryBox
+ * @returns A parsed `AudioSampleEntryBox`
  *
  * @public
  */

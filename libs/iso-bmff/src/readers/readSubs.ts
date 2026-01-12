@@ -2,11 +2,11 @@ import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.t
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a SubSampleInformationBox from an IsoView
+ * Parse a `SubsampleInformationBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed SubSampleInformationBox
+ * @returns A parsed `SubsampleInformationBox`
  *
  * @public
  */
