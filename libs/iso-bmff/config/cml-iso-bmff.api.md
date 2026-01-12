@@ -457,7 +457,7 @@ export type IsoBoxType = `${string}${string}${string}${string}`;
 export type IsoBoxWriter<B> = (box: B, config: IsoBoxWriteViewConfig) => ArrayBufferView;
 
 // @public
-export type IsoBoxWriterMap = Partial<{ [P in IsoBox["type"]]: IsoBoxWriter<Extract<IsoBox, Record<"type", P>>> }>;
+export type IsoBoxWriterMap = Record<string, IsoBoxWriter<any>>;
 
 // @public
 export class IsoBoxWriteView {
