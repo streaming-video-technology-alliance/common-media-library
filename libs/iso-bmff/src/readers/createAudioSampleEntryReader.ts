@@ -4,14 +4,14 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
 import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
 
 /**
- * Creates a reader function for AudioSampleEntryBox with a custom type.
+ * Creates a reader function for `AudioSampleEntryBox` with a custom type.
  *
  * This utility allows reading audio sample entry boxes with types that
- * aren't in the standard AudioSampleEntryType union (e.g., 'mp4a', 'enca').
+ * aren't in the standard `AudioSampleEntryType` union (e.g., `'mp4a'`, `'enca'`).
  *
  * @param type - The 4-character box type
  *
- * @returns A reader function that can be passed to readIsoBoxes
+ * @returns A reader function that can be passed to `readIsoBoxes`
  *
  * @example
  * ```ts

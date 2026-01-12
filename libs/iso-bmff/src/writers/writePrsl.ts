@@ -5,12 +5,12 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a PreselectionGroupBox to an IsoDataWriter.
+ * Write a `PreselectionGroupBox` to an `IsoBoxWriteView`.
  *
- * @param box - The PreselectionGroupBox fields to write
- * @param config - The IsoBoxWriteViewConfig to use
+ * @param box - The `PreselectionGroupBox` fields to write
+ * @param config - The `IsoBoxWriteViewConfig` to use
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

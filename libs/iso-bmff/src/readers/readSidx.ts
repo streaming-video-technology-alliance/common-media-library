@@ -3,11 +3,11 @@ import type { SegmentIndexReference } from '../boxes/SegmentIndexReference.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a SegmentIndexBox from an IsoView
+ * Parse a `SegmentIndexBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed SegmentIndexBox
+ * @returns A parsed `SegmentIndexBox`
  *
  * @public
  */

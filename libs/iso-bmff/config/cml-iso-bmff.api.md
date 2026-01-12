@@ -4,6 +4,8 @@
 
 ```ts
 
+import { ValueOf } from '@svta/cml-utils';
+
 // @public
 export type AdditionalMetadataContainerBox = {
     type: "meco";
@@ -93,7 +95,7 @@ export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, co
 export function createVisualSampleEntryReader<T$1 extends IsoBoxType>(type: T$1): (view: IsoBoxReadView) => VisualSampleEntryBox<T$1>;
 
 // @public
-export const DATA = "data";
+export const DATA: "data";
 
 // @public
 export type DataEntryUrlBox = FullBox & {
@@ -253,7 +255,7 @@ export type IdentifiedMediaDataBox = {
 };
 
 // @public
-export const INT = "int";
+export const INT: "int";
 
 // @public
 export type IpmpInfoBox = FullBox & {
@@ -298,6 +300,19 @@ export type IsoBoxContainerMap = {
 
 // @public
 export type IsoBoxData = ArrayBuffer | ArrayBufferView<ArrayBuffer>;
+
+// @public
+export const IsoBoxFields: {
+    DATA: typeof DATA;
+    INT: typeof INT;
+    STRING: typeof STRING;
+    TEMPLATE: typeof TEMPLATE;
+    UINT: typeof UINT;
+    UTF8: typeof UTF8;
+};
+
+// @public (undocumented)
+export type IsoBoxFields = ValueOf<typeof IsoBoxFields>;
 
 // @public
 export type IsoBoxMap = {
@@ -484,13 +499,12 @@ export type IsoBoxWriteViewConfig = {
 
 // @public
 export type IsoFieldTypeMap = {
-    uint: number;
-    int: number;
-    template: number;
-    string: string;
-    data: Uint8Array<ArrayBuffer>;
-    utf8: string;
-    utf8string: string;
+    [IsoBoxFields.UINT]: number;
+    [IsoBoxFields.INT]: number;
+    [IsoBoxFields.TEMPLATE]: number;
+    [IsoBoxFields.STRING]: string;
+    [IsoBoxFields.DATA]: Uint8Array<ArrayBuffer>;
+    [IsoBoxFields.UTF8]: string;
 };
 
 // @public
@@ -1122,7 +1136,7 @@ export type SoundMediaHeaderBox = FullBox & {
 };
 
 // @public
-export const STRING = "string";
+export const STRING: "string";
 
 // @public (undocumented)
 export type stz2 = CompactSampleSizeBox;
@@ -1201,7 +1215,7 @@ export type SyncSampleBox = FullBox & {
 };
 
 // @public
-export const TEMPLATE = "template";
+export const TEMPLATE: "template";
 
 // @public
 export type TrackBox = {
@@ -1352,7 +1366,7 @@ export type TypeBox<T$1> = {
 };
 
 // @public
-export const UINT = "uint";
+export const UINT: "uint";
 
 // @public (undocumented)
 export type url = DataEntryUrlBox;
@@ -1370,7 +1384,7 @@ export type UserDataBox = {
 export type UserDataBoxChild = any;
 
 // @public
-export const UTF8 = "utf8";
+export const UTF8: "utf8";
 
 // @public
 export type VideoMediaHeaderBox = FullBox & {

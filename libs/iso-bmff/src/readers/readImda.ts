@@ -2,11 +2,11 @@ import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a IdentifiedMediaDataBox from an IsoView
+ * Parse a `IdentifiedMediaDataBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed IdentifiedMediaDataBox
+ * @returns A parsed `IdentifiedMediaDataBox`
  *
  * @public
  */

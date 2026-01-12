@@ -2,13 +2,13 @@ import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a SegmentIndexBox to an IsoDataWriter.
+ * Write a `SegmentIndexBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
  *
- * @param box - The SegmentIndexBox fields to write
+ * @param box - The `SegmentIndexBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

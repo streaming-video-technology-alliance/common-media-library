@@ -2,11 +2,11 @@ import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a TrackFragmentHeaderBox from an IsoView
+ * Parse a `TrackFragmentHeaderBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed TrackFragmentHeaderBox
+ * @returns A parsed `TrackFragmentHeaderBox`
  *
  * @public
  */

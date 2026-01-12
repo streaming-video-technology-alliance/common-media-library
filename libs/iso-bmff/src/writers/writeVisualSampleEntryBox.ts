@@ -1,19 +1,19 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a VisualSampleEntryBox to an IsoDataWriter.
+ * Write a `VisualSampleEntryBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 12.1.3 Visual Sample Entry
  *
- * @param box - The VisualSampleEntryBox fields to write
+ * @param box - The `VisualSampleEntryBox` fields to write
  * @param config - The configuration for the writer
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

@@ -1,13 +1,13 @@
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a ProtectionSystemSpecificHeaderBox from an IsoView
+ * Parse a `ProtectionSystemSpecificHeaderBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed ProtectionSystemSpecificHeaderBox
+ * @returns A parsed `ProtectionSystemSpecificHeaderBox`
  *
  * @public
  */

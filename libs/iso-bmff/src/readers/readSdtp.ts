@@ -1,13 +1,13 @@
 import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a SampleDependencyTypeBox from an IsoView
+ * Parse a `SampleDependencyTypeBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed SampleDependencyTypeBox
+ * @returns A parsed `SampleDependencyTypeBox`
  *
  * @public
  */

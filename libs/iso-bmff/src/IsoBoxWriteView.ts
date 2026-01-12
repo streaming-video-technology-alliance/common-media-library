@@ -1,6 +1,5 @@
 import { encodeText } from '@svta/cml-utils'
-import { TEMPLATE } from './fields/TEMPLATE.ts'
-import { UINT } from './fields/UINT.ts'
+import { TEMPLATE, UINT } from './IsoBoxFields.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 
 /**
@@ -232,31 +231,6 @@ export class IsoBoxWriteView {
 			this.writeString(type)
 		}
 	}
-
-	// writeBoxHeader(type: string, extendedType?: number[]): void {
-	// 	const { size } = box
-	// 	const isLarge = size > 0xffffffff
-	// 	const isExtended = box.type === 'uuid' && extendedType
-	// 	let boxSize = size
-
-	// 	if (isLarge) {
-	// 		boxSize += 8
-	// 	}
-
-	// 	if (isExtended) {
-	// 		boxSize += 16
-	// 	}
-	// 	this.writeUint(isLarge ? 1 : boxSize, 4)
-	// 	this.writeString(box.type)
-
-	// 	if (isLarge) {
-	// 		this.writeUint(boxSize, 8)
-	// 	}
-
-	// 	if (isExtended) {
-	// 		this.writeArray(extendedType, UINT, 1)
-	// 	}
-	// }
 
 	/**
 	 * Writes a full box header to the data view.

@@ -4,14 +4,14 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a MetaBox to an IsoDataWriter.
+ * Write a `MetaBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.11.1 Meta Box
  *
- * @param box - The MetaBox fields to write
- * @param config - The IsoBoxWriteViewConfig to use
+ * @param box - The `MetaBox` fields to write
+ * @param config - The `IsoBoxWriteViewConfig` to use
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

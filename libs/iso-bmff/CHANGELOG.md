@@ -10,6 +10,15 @@ and this project adheres to
 
 ## [1.0.0-alpha.6] - 2026-01-09
 
+### Added
+
+- Added `IsoBoxFields` constant for all ISO BMFF field types
+- Exports for `IsoBoxReadView` and `IsoBoxWriteView`
+
+### Changed
+
+- Moved all field constants to `IsoBoxFields.ts`
+
 ### Fixed
 
 - Broken type inference for `createAudioSampleEntryReader` and `createVisualSampleEntryReader`

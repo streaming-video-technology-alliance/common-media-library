@@ -1,14 +1,13 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
-import { TEMPLATE } from '../fields/TEMPLATE.ts'
-import { UINT } from '../fields/UINT.ts'
+import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a Box from an IsoView
+ * Parse a `MovieHeaderBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed Box
+ * @returns A parsed `MovieHeaderBox`
  *
  * @public
  */

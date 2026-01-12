@@ -2,13 +2,13 @@ import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a TrackFragmentHeaderBox to an IsoDataWriter.
+ * Write a `TrackFragmentHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
  *
- * @param box - The TrackFragmentHeaderBox fields to write
+ * @param box - The `TrackFragmentHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

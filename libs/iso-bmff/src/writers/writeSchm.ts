@@ -2,13 +2,13 @@ import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a SchemeTypeBox to an IsoDataWriter.
+ * Write a `SchemeTypeBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.12.5 Scheme Type Box
  *
- * @param box - The SchemeTypeBox fields to write
+ * @param box - The `SchemeTypeBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

@@ -2,13 +2,13 @@ import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.t
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a DecodingTimeToSampleBox to an IsoDataWriter.
+ * Write a `DecodingTimeToSampleBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.6.1.2 Decoding Time to Sample Box
  *
- * @param box - The DecodingTimeToSampleBox fields to write
+ * @param box - The `DecodingTimeToSampleBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

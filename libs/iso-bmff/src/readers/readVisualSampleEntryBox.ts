@@ -1,15 +1,15 @@
 import type { VisualSampleEntryBox, VisualSampleEntryBoxChild } from '../boxes/VisualSampleEntryBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
- * Parse a VisualSampleEntryBox from an IsoView
+ * Parse a `VisualSampleEntryBox` from an `IsoBoxReadView`.
  *
- * @param type - The type of VisualSampleEntryBox to read
- * @param view - The IsoView to read data from
+ * @param type - The type of `VisualSampleEntryBox` to read
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed VisualSampleEntryBox
+ * @returns A parsed `VisualSampleEntryBox`
  *
  * @public
  */

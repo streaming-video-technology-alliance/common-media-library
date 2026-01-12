@@ -2,13 +2,13 @@ import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write an OriginalFormatBox to an IsoDataWriter.
+ * Write an `OriginalFormatBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.12.2 Original Format Box
  *
- * @param box - The OriginalFormatBox fields to write
+ * @param box - The `OriginalFormatBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
