@@ -1,4 +1,3 @@
-import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxWriter } from './IsoBoxWriter.ts'
 
 /**
@@ -6,6 +5,4 @@ import type { IsoBoxWriter } from './IsoBoxWriter.ts'
  *
  * @public
  */
-export type IsoBoxWriterMap = Partial<{
-	[P in IsoBox['type']]: IsoBoxWriter<Extract<IsoBox, Record<'type', P>>>
-}>
+export type IsoBoxWriterMap = Record<string, IsoBoxWriter<any>>
