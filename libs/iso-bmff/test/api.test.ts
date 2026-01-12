@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises'
-import { assert, createAudioSampleEntryReader, createVisualSampleEntryReader, describe, findIsoBox, it, readIsoBoxes, readStsd, writeIsoBoxes, writeStsd, writeVisualSampleEntryBox, type IsoBoxReadView } from './util/box.ts'
+import { assert, createAudioSampleEntryReader, createVisualSampleEntryReader, describe, filterIsoBoxes, findIsoBox, IsoBoxWriteView, it, readIsoBoxes, readStsd, writeIsoBoxes, writeStsd, writeVisualSampleEntryBox, type IsoBoxReadView } from './util/box.ts'
 
 describe('API', function () {
 	it('should handle advanced use cases', async () => {
@@ -12,6 +12,10 @@ describe('API', function () {
 				'ac-3': createAudioSampleEntryReader('ac-3'),
 			},
 		})
+
+		const moov = filterIsoBoxes(boxes, box => box.type === 'moov')
+		assert.ok(moov[0])
+		assert.strictEqual(moov[0].type, 'moov')
 
 		const stsd = findIsoBox(boxes, box => box.type === 'stsd')
 		assert.ok(stsd)
@@ -26,6 +30,12 @@ describe('API', function () {
 		const stream = writeIsoBoxes(boxes, {
 			writers: {
 				hvc1: writeVisualSampleEntryBox,
+				dvh1: writeVisualSampleEntryBox,
+				test: (box: any) => {
+					const view = new IsoBoxWriteView(box.type, 4)
+					view.writeUint(box.value, 4)
+					return view
+				},
 				stsd: writeStsd,
 			}
 		})
