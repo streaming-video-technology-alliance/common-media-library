@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added `fourCcToUint32` utility function to convert FourCC strings to uint32
+
 ## [1.0.0-alpha.8] - 2026-01-12
 
 ### Added

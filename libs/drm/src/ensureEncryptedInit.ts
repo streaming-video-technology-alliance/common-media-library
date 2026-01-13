@@ -1,19 +1,4 @@
-import { createAudioSampleEntryReader, createVisualSampleEntryReader, findIsoBox, readIsoBoxes, readStsd, writeAudioSampleEntryBox, writeFrma, writeIsoBoxes, writeSchm, writeStsd, writeTenc, writeVisualSampleEntryBox, type AudioSampleEntryBox, type VisualSampleEntryBox } from '@svta/cml-iso-bmff'
-// import { writeFileSync } from 'fs';
-
-/**
- * Converts a 4-character string (e.g., FourCC code) to a uint32 number.
- * Each character's code point is treated as a byte in big-endian order.
- */
-// TODO: Move to iso-bmff library
-function stringToUint32(str: string): number {
-	return (
-		(str.charCodeAt(0) << 24) |
-		(str.charCodeAt(1) << 16) |
-		(str.charCodeAt(2) << 8) |
-		str.charCodeAt(3)
-	) >>> 0
-}
+import { createAudioSampleEntryReader, createVisualSampleEntryReader, findIsoBox, fourCcToUint32, readIsoBoxes, readStsd, writeAudioSampleEntryBox, writeFrma, writeIsoBoxes, writeSchm, writeStsd, writeTenc, writeVisualSampleEntryBox, type AudioSampleEntryBox, type VisualSampleEntryBox } from '@svta/cml-iso-bmff'
 
 const audioTypes = [
 	'mp4a',
@@ -43,7 +28,6 @@ const readers = {
 audioTypes.forEach(type => (readers as any)[type] = createAudioSampleEntryReader(type))
 videoTypes.forEach(type => (readers as any)[type] = createVisualSampleEntryReader(type))
 
-
 const writers = {
 	stsd: writeStsd,
 	frma: writeFrma,
@@ -68,7 +52,7 @@ videoTypes.forEach(type => (writers as any)[type] = writeVisualSampleEntryBox)
  * @public
  *
  * @example
- * {@includeCode ../../test/ensureEncryptedInit.test.ts#example}
+ * {@includeCode ../test/ensureEncryptedInit.test.ts#example}
  */
 export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend = true, includeOriginal = true): Uint8Array<ArrayBuffer> {
 	const boxes = readIsoBoxes(init, { readers })
@@ -102,7 +86,7 @@ export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend = tru
 			type: 'sinf',
 			boxes: [{
 				type: 'frma',
-				dataFormat: stringToUint32(entry.type),
+				dataFormat: fourCcToUint32(entry.type),
 			}, {
 				type: 'schm',
 				version: 0,
