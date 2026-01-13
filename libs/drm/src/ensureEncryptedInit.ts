@@ -40,12 +40,46 @@ audioTypes.forEach(type => (writers as any)[type] = writeAudioSampleEntryBox)
 videoTypes.forEach(type => (writers as any)[type] = writeVisualSampleEntryBox)
 
 /**
+ * Options for the `ensureEncryptedInit` function.
+ *
+ * @public
+ */
+export type EnsureEncryptedInitOptions = {
+	/**
+	 * Whether to prepend the encrypted entries to the sample table.
+	 *
+	 * @defaultValue `true`
+	 */
+	prepend: boolean;
+
+	/**
+	 * Whether to include the original init segment in the result.
+	 *
+	 * @defaultValue `true`
+	 */
+	includeOriginal: boolean;
+
+	/**
+	 * The scheme type to use for the encryption. Defaults to `cenc`.
+	 *
+	 * @defaultValue `1667591779`
+	 */
+	schemeType: number;
+
+	/**
+	 * The default KID to use for the encryption.
+	 *
+	 * @defaultValue `[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]`
+	 */
+	defaultKid: number[];
+}
+
+/**
  * Ensures that the init segment is encrypted. Used on platforms that have issues playing unencrypted
  * content before playing encrypted content. Both prepend and includeOriginal are optional.
  *
  * @param init - The init segment to ensure is encrypted.
- * @param prepend - Whether to prepend the encrypted entries to the init segment.
- * @param includeOriginal - Whether to include the original init segment in the result.
+ * @param options - The options for the encryption.
  *
  * @returns The encrypted init segment.
  *
@@ -54,7 +88,8 @@ videoTypes.forEach(type => (writers as any)[type] = writeVisualSampleEntryBox)
  * @example
  * {@includeCode ../test/ensureEncryptedInit.test.ts#example}
  */
-export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend = true, includeOriginal = true): Uint8Array<ArrayBuffer> {
+export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array<ArrayBuffer> {
+	const { prepend = true, includeOriginal = true, schemeType = 1667591779, defaultKid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } = options ?? {}
 	const boxes = readIsoBoxes(init, { readers })
 	const stsd = findIsoBox(boxes, box => box.type === 'stsd')
 
@@ -91,7 +126,7 @@ export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend = tru
 				type: 'schm',
 				version: 0,
 				flags: 0,
-				schemeType: 1667591779, // cenc
+				schemeType,
 				schemeVersion: 65536,
 			}, {
 				type: 'schi',
@@ -101,7 +136,7 @@ export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend = tru
 					flags: 0,
 					defaultIsEncrypted: 1,
 					defaultIvSize: 8,
-					defaultKid: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					defaultKid,
 				}],
 			}],
 		})
