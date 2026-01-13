@@ -71,6 +71,48 @@ export const CMCD_EVENT_PLAYER_COLLAPSE = 'pc' as const
 export const CMCD_EVENT_RESPONSE_RECEIVED = 'rr' as const
 
 /**
+ * CMCD event type for the 'as' key (ad start).
+ *
+ * @public
+ */
+export const CMCD_EVENT_AD_START = 'as' as const
+
+/**
+ * CMCD event type for the 'ae' key (ad end).
+ *
+ * @public
+ */
+export const CMCD_EVENT_AD_END = 'ae' as const
+
+/**
+ * CMCD event type for the 'abs' key (ad break start).
+ *
+ * @public
+ */
+export const CMCD_EVENT_AD_BREAK_START = 'abs' as const
+
+/**
+ * CMCD event type for the 'abe' key (ad break end).
+ *
+ * @public
+ */
+export const CMCD_EVENT_AD_BREAK_END = 'abe' as const
+
+/**
+ * CMCD event type for the 'sk' key (skip).
+ *
+ * @public
+ */
+export const CMCD_EVENT_SKIP = 'sk' as const
+
+/**
+ * CMCD event type for the 'ce' key (custom event).
+ *
+ * @public
+ */
+export const CMCD_EVENT_CUSTOM_EVENT = 'ce' as const
+
+/**
  * CMCD event types for the 'e' key (event mode).
  *
  *
@@ -128,6 +170,36 @@ export const CmcdEventType = {
 	 * The receipt of a response.
 	 */
 	RESPONSE_RECEIVED: CMCD_EVENT_RESPONSE_RECEIVED as typeof CMCD_EVENT_RESPONSE_RECEIVED,
+
+	/**
+	 * The start of an ad.
+	 */
+	AD_START: CMCD_EVENT_AD_START as typeof CMCD_EVENT_AD_START,
+
+	/**
+	 * The end of an ad.
+	 */
+	AD_END: CMCD_EVENT_AD_END as typeof CMCD_EVENT_AD_END,
+
+	/**
+	 * The start of an ad break.
+	 */
+	AD_BREAK_START: CMCD_EVENT_AD_BREAK_START as typeof CMCD_EVENT_AD_BREAK_START,
+
+	/**
+	 * The end of an ad break.
+	 */
+	AD_BREAK_END: CMCD_EVENT_AD_BREAK_END as typeof CMCD_EVENT_AD_BREAK_END,
+
+	/**
+	 * The user skipped an ad.
+	 */
+	SKIP: CMCD_EVENT_SKIP as typeof CMCD_EVENT_SKIP,
+
+	/**
+	 * A custom event.
+	 */
+	CUSTOM_EVENT: CMCD_EVENT_CUSTOM_EVENT as typeof CMCD_EVENT_CUSTOM_EVENT,
 } as const
 
 /**
