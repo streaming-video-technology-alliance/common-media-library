@@ -70,7 +70,7 @@ videoTypes.forEach(type => (writers as any)[type] = writeVisualSampleEntryBox)
  * @example
  * {@includeCode ../../test/ensureEncryptedInit.test.ts#example}
  */
-export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend = true, includeOriginal = true): Uint8Array {
+export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend = true, includeOriginal = true): Uint8Array<ArrayBuffer> {
 	const boxes = readIsoBoxes(init, { readers })
 	const stsd = findIsoBox(boxes, box => box.type === 'stsd')
 
