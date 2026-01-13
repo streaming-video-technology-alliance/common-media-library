@@ -58,6 +58,26 @@ export const CmcdEventType = {
 	 * The receipt of a response.
 	 */
 	RESPONSE_RECEIVED: 'rr',
+
+	/**
+	 * Ad playback started.
+	 */
+	AD_START: 'as',
+
+	/**
+	 * Ad playback ended.
+	 */
+	AD_END: 'ae',
+
+	/**
+	 * Ad break (pod) started.
+	 */
+	AD_BREAK_START: 'abs',
+
+	/**
+	 * Ad break (pod) ended.
+	 */
+	AD_BREAK_END: 'abe',
 } as const
 
 /**

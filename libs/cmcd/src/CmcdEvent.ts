@@ -39,10 +39,20 @@ export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
 	 * pe - playerExpand. The user activated a control to extend the player to a larger size. The definition of this event is intended to be
 	 * compliant with the VAST [VAST] Player Operation Metrics.
 	 *
-	 * c - playerCollapse: the user activated a control to reduce the player to a smaller size. The definition of this event is intended to be
+	 * pc - playerCollapse: the user activated a control to reduce the player to a smaller size. The definition of this event is intended to be
 	 * compliant with the VAST [VAST] Player Operation Metrics.
 	 *
-	 * Token - one of [ps,e,t,c,b,m,u m, abs, abe, as, ae]
+	 * rr - responseReceived. The receipt of a response from the server.
+	 *
+	 * as - adStart. Ad playback started.
+	 *
+	 * ae - adEnd. Ad playback ended.
+	 *
+	 * abs - adBreakStart. Ad break (pod) started.
+	 *
+	 * abe - adBreakEnd. Ad break (pod) ended.
+	 *
+	 * Token - one of [ps, e, t, c, b, m, um, pe, pc, rr, as, ae, abs, abe]
 	 */
 	e?: CmcdEventType;
 };

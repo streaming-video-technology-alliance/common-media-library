@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add ad-related event types: `AD_START` (as), `AD_END` (ae), `AD_BREAK_START` (abs), `AD_BREAK_END` (abe)
+
+### Fixed
+
+- Fix documentation in `CmcdEvent.ts`: corrected `c` to `pc` for playerCollapse event
+- Fix typo in event token list: `u m` changed to `um`
+- Add missing event types to documentation: `rr`, `as`, `ae`, `abs`, `abe`
+
 ## [1.0.2] - 2025-12-26
 
 ### Changed
