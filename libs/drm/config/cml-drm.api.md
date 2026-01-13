@@ -54,6 +54,9 @@ export const EncryptionScheme: {
 export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;
 
 // @public
+export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, prepend?: boolean, includeOriginal?: boolean): Uint8Array;
+
+// @public
 export const EXPIRED = "expired";
 
 // @public

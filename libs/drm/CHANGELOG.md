@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-01-13
+
+### Added
+
+- Added `ensureEncryptedInit` utility
+
 ## [1.0.2] - 2025-12-26
 
 ### Changed
@@ -28,7 +34,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-/drm-v1.0.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-/drm-/drm-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.0.2...drm-v1.1.0
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.0.1...drm-v1.0.2
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.0.0...drm-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/drm-v1.0.0
