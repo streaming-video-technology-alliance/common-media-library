@@ -1,18 +1,19 @@
+/**
+ * List of container box types
+ *
+ * @public
+ */
 export const CONTAINERS: string[] = [
 	'dinf',
 	'edts',
-	'enca',
-	'encv',
 	'grpl',
 	'mdia',
 	'meco',
-	'meta',
 	'mfra',
 	'minf',
 	'moof',
 	'moov',
 	'mvex',
-	'prsl',
 	'schi',
 	'sinf',
 	'stbl',

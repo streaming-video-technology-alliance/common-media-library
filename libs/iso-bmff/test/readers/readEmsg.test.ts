@@ -2,7 +2,7 @@ import { assert, describe, findBox, it, readEmsg } from '../util/box.ts'
 
 describe('readEmsg', function () {
 	it('should correctly parse the box from sample data', function () {
-		const box = findBox('emsg.m4s', 'emsg', { emsg: readEmsg })
+		const box = findBox('emsg.m4s', 'emsg', { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(box.type, 'emsg')
 		assert.strictEqual(box.size, 74)

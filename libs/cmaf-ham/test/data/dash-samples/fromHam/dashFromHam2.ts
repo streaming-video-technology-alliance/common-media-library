@@ -2844,8 +2844,8 @@ export const dashFromHam2 = `<?xml version="1.0" encoding="UTF-8" standalone="ye
         <AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>
       </Representation>
     </AdaptationSet>
-    <AdaptationSet id="3" group="3" contentType="text" mimeType="text/mp4" lang="en" codecs="wvtt">
-      <Representation id="18" bandwidth="428" mimeType="text/mp4">
+    <AdaptationSet id="3" group="3" contentType="text" mimeType="application/mp4" lang="en" codecs="wvtt">
+      <Representation id="18" bandwidth="428" mimeType="application/mp4">
         <SegmentList duration="4000" timescale="1000">
           <Initialization sourceURL="https://media.axprod.net/TestVectors/v7-Clear/18/init.mp4"/>
           <SegmentURL media="https://media.axprod.net/TestVectors/v7-Clear/18/0001.m4s"/>
@@ -3035,8 +3035,8 @@ export const dashFromHam2 = `<?xml version="1.0" encoding="UTF-8" standalone="ye
         </SegmentList>
       </Representation>
     </AdaptationSet>
-    <AdaptationSet id="3" group="3" contentType="text" mimeType="text/mp4" lang="en" codecs="stpp">
-      <Representation id="19" bandwidth="1095" mimeType="text/mp4">
+    <AdaptationSet id="3" group="3" contentType="text" mimeType="application/mp4" lang="en" codecs="stpp">
+      <Representation id="19" bandwidth="1095" mimeType="application/mp4">
         <SegmentList duration="4000" timescale="1000">
           <Initialization sourceURL="https://media.axprod.net/TestVectors/v7-Clear/19/init.mp4"/>
           <SegmentURL media="https://media.axprod.net/TestVectors/v7-Clear/19/0001.m4s"/>
@@ -3226,8 +3226,8 @@ export const dashFromHam2 = `<?xml version="1.0" encoding="UTF-8" standalone="ye
         </SegmentList>
       </Representation>
     </AdaptationSet>
-    <AdaptationSet id="3" group="3" contentType="text" mimeType="text/mp4" lang="es" codecs="wvtt">
-      <Representation id="26" bandwidth="430" mimeType="text/mp4">
+    <AdaptationSet id="3" group="3" contentType="text" mimeType="application/mp4" lang="es" codecs="wvtt">
+      <Representation id="26" bandwidth="430" mimeType="application/mp4">
         <SegmentList duration="4000" timescale="1000">
           <Initialization sourceURL="https://media.axprod.net/TestVectors/v7-Clear/26/init.mp4"/>
           <SegmentURL media="https://media.axprod.net/TestVectors/v7-Clear/26/0001.m4s"/>
@@ -3417,8 +3417,8 @@ export const dashFromHam2 = `<?xml version="1.0" encoding="UTF-8" standalone="ye
         </SegmentList>
       </Representation>
     </AdaptationSet>
-    <AdaptationSet id="3" group="3" contentType="text" mimeType="text/mp4" lang="es" codecs="stpp">
-      <Representation id="27" bandwidth="1102" mimeType="text/mp4">
+    <AdaptationSet id="3" group="3" contentType="text" mimeType="application/mp4" lang="es" codecs="stpp">
+      <Representation id="27" bandwidth="1102" mimeType="application/mp4">
         <SegmentList duration="4000" timescale="1000">
           <Initialization sourceURL="https://media.axprod.net/TestVectors/v7-Clear/27/init.mp4"/>
           <SegmentURL media="https://media.axprod.net/TestVectors/v7-Clear/27/0001.m4s"/>

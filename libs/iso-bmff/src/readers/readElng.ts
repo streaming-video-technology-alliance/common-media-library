@@ -2,11 +2,11 @@ import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a ExtendedLanguageBox from an IsoView
+ * Parse a `ExtendedLanguageBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed ExtendedLanguageBox
+ * @returns A parsed `ExtendedLanguageBox`
  *
  * @public
  */

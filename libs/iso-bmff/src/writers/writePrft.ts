@@ -2,13 +2,13 @@ import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a ProducerReferenceTimeBox to an IsoDataWriter.
+ * Write a `ProducerReferenceTimeBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time Box
  *
- * @param box - The ProducerReferenceTimeBox fields to write
+ * @param box - The `ProducerReferenceTimeBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

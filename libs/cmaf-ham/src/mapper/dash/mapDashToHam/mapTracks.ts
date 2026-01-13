@@ -37,10 +37,15 @@ export function mapTracks(
 		throw new Error('Error: AdaptationSet is undefined')
 	}
 	const type = getContentType(adaptationSet, representation)
+	const codec = getCodec(adaptationSet, representation)
+	const mimeType = representation.$.mimeType ?? adaptationSet.$.mimeType ?? ''
+
 	if (type === 'video') {
 		return {
+			url: '',
 			bandwidth: +(representation.$.bandwidth ?? 0),
-			codec: getCodec(adaptationSet, representation),
+			codecs: codec ? [codec] : [],
+			mimeType,
 			duration: getTrackDuration(segments),
 			frameRate: getFrameRate(adaptationSet, representation),
 			height: +(representation.$.height ?? 0),
@@ -52,34 +57,47 @@ export function mapTracks(
 			segments,
 			type,
 			width: +(representation.$.width ?? 0),
-			urlInitialization: initializationUrl,
+			initialization: {
+				url: initializationUrl ?? '',
+			},
+			baseUrls: [],
 		} as VideoTrack
 	}
 	else if (type === 'audio') {
 		return {
+			url: '',
 			bandwidth: +(representation.$.bandwidth ?? 0),
 			channels: getChannels(adaptationSet, representation),
-			codec: getCodec(adaptationSet, representation),
+			codecs: codec ? [codec] : [],
+			mimeType,
 			duration: getTrackDuration(segments),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
 			sampleRate: getSampleRate(adaptationSet, representation),
 			segments,
 			type,
-			urlInitialization: initializationUrl,
+			initialization: {
+				url: initializationUrl ?? '',
+			},
+			baseUrls: [],
 		} as AudioTrack
 	}
 	else {
 		// if (type === 'text')
 		return {
+			url: '',
 			bandwidth: +(representation.$.bandwidth ?? 0),
-			codec: getCodec(adaptationSet, representation),
+			codecs: codec ? [codec] : [],
+			mimeType,
 			duration: getTrackDuration(segments),
 			id: representation.$.id ?? '',
 			language: getLanguage(adaptationSet),
 			segments,
 			type,
-			urlInitialization: initializationUrl,
+			initialization: {
+				url: initializationUrl ?? '',
+			},
+			baseUrls: [],
 		} as TextTrack
 	}
 }

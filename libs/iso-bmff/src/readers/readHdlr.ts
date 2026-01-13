@@ -1,13 +1,13 @@
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a HandlerReferenceBox from an IsoView
+ * Parse a `HandlerReferenceBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed HandlerReferenceBox
+ * @returns A parsed `HandlerReferenceBox`
  *
  * @public
  */

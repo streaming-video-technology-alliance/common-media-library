@@ -4,6 +4,11 @@
 
 ```ts
 
+import { FAIRPLAY_KEY_SYSTEM } from '@svta/cml-drm';
+import { PLAYREADY_KEY_SYSTEM } from '@svta/cml-drm';
+import { ValueOf } from '@svta/cml-utils';
+import { WIDEVINE_KEY_SYSTEM } from '@svta/cml-drm';
+
 // @alpha
 export type AdaptationSet = {
     $: {
@@ -36,9 +41,21 @@ export type AdaptationSet = {
 };
 
 // @alpha
+export type AddressableObject = {
+    url: string;
+    byteRange?: {
+        start: number;
+        end: number;
+    };
+};
+
+// @alpha
 export type AlignedSwitchingSet = {
     switchingSets: SwitchingSet[];
 };
+
+// @alpha
+export const AUDIO: "audio";
 
 // @alpha
 export type AudioChannelConfiguration = {
@@ -55,15 +72,38 @@ export type AudioTrack = Track & {
 };
 
 // @alpha
+export type Base = {
+    baseUrls: string[];
+};
+
+// @alpha
 export type Byterange = {
     length: number;
     offset: number;
 };
 
+// @alpha
+export type ByteRangeObject = {
+    start: number;
+    end: number;
+};
+
+// @alpha
+export function byteRangeToDashString(byteRange: ByteRangeObject | undefined): string;
+
+// @alpha
+export function byteRangeToHlsString(byteRange: ByteRangeObject | undefined): string;
+
 // Warning: (ae-internal-missing-underscore) The name "calculateDuration" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
 export function calculateDuration(duration: string | undefined, timescale: string | undefined): number;
+
+// @alpha
+export const CBCS: "cbcs";
+
+// @alpha
+export const CENC: "cenc";
 
 // @alpha (undocumented)
 export type ContentComponent = {
@@ -105,7 +145,34 @@ export function dashToHam(manifest: string): Presentation[];
 export function decodeByteRange(byteRange: Byterange | undefined): string;
 
 // @alpha
+export type Duration = {
+    duration: number;
+};
+
+// @alpha
+export const DYNAMIC: "dynamic";
+
+// @alpha
 export function encodeByteRange(track: VideoTrack | AudioTrack): string;
+
+// @alpha
+type Event_2 = {
+    messageData: string;
+    duration: number;
+    id: string;
+    presentationTime: number;
+    adjustedPresentationTime?: number;
+    schemeIdUri: string;
+};
+export { Event_2 as Event }
+
+// @alpha
+export type EventStream = {
+    schemeIdUri: string;
+    timescale: number;
+    events: Event_2[];
+    presentationTimeOffset: number;
+};
 
 // @alpha
 export function formatSegments(segments: SegmentHls[]): Segment[];
@@ -226,10 +293,16 @@ export type Ham = {
 };
 
 // @alpha
-export function hamToDash(presentation: Presentation[]): Manifest;
+export function hamToDash(presentation: Presentation[]): ManifestFile;
 
 // @alpha
-export function hamToHls(presentation: Presentation[]): Manifest;
+export function hamToHls(presentation: Presentation[]): ManifestFile;
+
+// @alpha
+export function hlsByterangeToByteRangeObject(byterange: {
+    length: number;
+    offset: number;
+} | undefined): ByteRangeObject | undefined;
 
 // @alpha
 export type HlsManifest = {
@@ -248,6 +321,9 @@ export type HlsParser = (text: string) => HlsManifest;
 export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[];
 
 // @alpha
+export const IMAGE: "image";
+
+// @alpha
 export type Initialization = {
     $: {
         range?: string;
@@ -261,16 +337,33 @@ export type Initialization = {
 export function iso8601DurationToNumber(isoDuration: string): number;
 
 // @alpha
-export type Manifest = {
+export type KeySystem = typeof FAIRPLAY_KEY_SYSTEM | typeof PLAYREADY_KEY_SYSTEM | typeof WIDEVINE_KEY_SYSTEM;
+
+// @alpha
+export type KeySystemMap = Record<KeySystem, {
+    pssh: string;
+}>;
+
+// @alpha
+export type ManifestFile = {
+    type: ManifestFormat;
     manifest: string;
     fileName?: string;
-    ancillaryManifests?: Manifest[];
-    type: ManifestFormat;
+    ancillaryManifests?: ManifestFile[];
     metadata?: Map<string, string>;
 };
 
 // @alpha
 export type ManifestFormat = "hls" | "dash";
+
+// @alpha
+export const ManifestType: {
+    readonly DYNAMIC: typeof DYNAMIC;
+    readonly STATIC: typeof STATIC;
+};
+
+// @alpha
+export type ManifestType = ValueOf<typeof ManifestType>;
 
 // Warning: (ae-internal-missing-underscore) The name "mapSegmentBase" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -307,6 +400,9 @@ export type MediaGroups = {
 // @internal (undocumented)
 export function numberToIso8601Duration(duration: number): string;
 
+// @alpha
+export function parseByteRangeString(byteRangeString: string | undefined): ByteRangeObject | undefined;
+
 // Warning: (ae-internal-missing-underscore) The name "parseDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -342,9 +438,28 @@ export type PlayList = {
 };
 
 // @alpha
-export type Presentation = Ham & {
+export type Presentation = Ham & Duration & Base & {
     selectionSets: SelectionSet[];
+    startTime: number;
+    endTime: number;
+    eventStreams?: EventStream[];
 };
+
+// @alpha
+export type Protection = {
+    defaultKid: string;
+    keySystems: KeySystemMap;
+    scheme: ProtectionScheme;
+};
+
+// @alpha
+export const ProtectionScheme: {
+    readonly CENC: typeof CENC;
+    readonly CBCS: typeof CBCS;
+};
+
+// @alpha
+export type ProtectionScheme = ValueOf<typeof ProtectionScheme>;
 
 // @alpha
 export type Representation = {
@@ -377,10 +492,8 @@ export type Role = {
 };
 
 // @alpha
-export type Segment = {
-    duration: number;
-    url: string;
-    byteRange?: string;
+export type Segment = Ham & AddressableObject & Duration & {
+    startTime: number;
 };
 
 // @alpha
@@ -438,6 +551,7 @@ export type SegmentURL = {
 export type SelectionSet = Ham & {
     switchingSets: SwitchingSet[];
     alignedSwitchingSets?: AlignedSwitchingSet[];
+    type: TrackType;
 };
 
 // Warning: (ae-internal-missing-underscore) The name "serializeDashManifest" should be prefixed with an underscore because the declaration is marked as @internal
@@ -461,29 +575,47 @@ export function setDashSerializer(serializer: DashSerializer): void;
 export function setHlsParser(parser: HlsParser): void;
 
 // @alpha
-export type SwitchingSet = Ham & {
+export const STATIC: "static";
+
+// @alpha
+export type SwitchingSet = Ham & Base & {
     tracks: Track[];
+    protection?: Protection;
+    role?: string;
 };
+
+// @alpha
+export const TEXT: "text";
 
 // @alpha
 type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
 // @alpha
-export type Track = Ham & {
+export type Track = Ham & Base & Duration & AddressableObject & {
     type: TrackType;
-    fileName?: string;
-    codec: string;
-    duration: number;
-    language: string;
+    codecs: string[];
+    mimeType: string;
+    language?: string;
     bandwidth: number;
-    byteRange?: string;
-    urlInitialization?: string;
+    initialization: AddressableObject;
     segments: Segment[];
+    segmentIndex?: AddressableObject & {
+        timescale: number;
+    };
+    presentationTimeOffset?: number;
 };
 
 // @alpha
-export type TrackType = "audio" | "video" | "text";
+export const TrackType: {
+    readonly AUDIO: typeof AUDIO;
+    readonly VIDEO: typeof VIDEO;
+    readonly TEXT: typeof TEXT;
+    readonly IMAGE: typeof IMAGE;
+};
+
+// @alpha
+export type TrackType = ValueOf<typeof TrackType>;
 
 // @alpha
 export function validatePresentation(presentation: Presentation): Validation;
@@ -517,6 +649,9 @@ export type Validation = {
     status: boolean;
     errorMessages: string[];
 };
+
+// @alpha
+export const VIDEO: "video";
 
 // @alpha
 export type VideoTrack = Track & {

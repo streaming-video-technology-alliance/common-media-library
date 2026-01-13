@@ -1,6 +1,7 @@
 export type * from './AdditionalMetadataContainerBox.ts'
 export type * from './AudioRenderingIndicationBox.ts'
 export type * from './AudioSampleEntryBox.ts'
+export type * from './AudioSampleEntryType.ts'
 export type * from './Box.ts'
 export type * from './ChunkLargeOffsetBox.ts'
 export type * from './ChunkOffsetBox.ts'

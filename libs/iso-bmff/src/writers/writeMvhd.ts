@@ -1,14 +1,15 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
+import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a MovieHeaderBox to an IsoDataWriter.
+ * Write a `MovieHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
  *
- * @param box - The MovieHeaderBox fields to write
+ * @param box - The `MovieHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
@@ -39,19 +40,9 @@ export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView {
 	writer.writeTemplate(box.rate, 4)
 	writer.writeTemplate(box.volume, 2)
 	writer.writeUint(box.reserved1, 2)
-
-	for (let i = 0; i < 2; i++) {
-		writer.writeUint(box.reserved2[i] ?? 0, 4)
-	}
-
-	for (let i = 0; i < 9; i++) {
-		writer.writeTemplate(box.matrix[i] ?? 0, 4)
-	}
-
-	for (let i = 0; i < 6; i++) {
-		writer.writeUint(box.preDefined[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.reserved2, UINT, 4, 2)
+	writer.writeArray(box.matrix, TEMPLATE, 4, 9)
+	writer.writeArray(box.preDefined, UINT, 4, 6)
 	writer.writeUint(box.nextTrackId, 4)
 
 	return writer

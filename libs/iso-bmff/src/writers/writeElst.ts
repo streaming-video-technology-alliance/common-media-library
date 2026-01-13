@@ -2,13 +2,13 @@ import type { EditListBox } from '../boxes/EditListBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write an EditListBox to an IsoDataWriter.
+ * Write an `EditListBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.6.6 Edit List Box
  *
- * @param box - The EditListBox fields to write
+ * @param box - The `EditListBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

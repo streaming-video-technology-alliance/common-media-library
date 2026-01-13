@@ -23,7 +23,7 @@ const sections = changelog.split(/^## /m)
 sections.splice(2, 0, `[${ver}] - ????-??-??\n\n`)
 
 const version = `${pkg}-v${ver}`
-const head = /v([0-9.]+)...HEAD/
+const head = /v([0-9a-zA-Z.-]+)...HEAD/
 const linkBreak = '\n'
 const last = sections.length - 1
 const links = sections[last].split(linkBreak)

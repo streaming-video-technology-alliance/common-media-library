@@ -2,6 +2,7 @@ import type { Representation } from '../../../types/mapper/dash/Representation.t
 import type { SegmentBase } from '../../../types/mapper/dash/SegmentBase.ts'
 
 import type { Segment } from '../../../types/model/Segment.ts'
+import { parseByteRangeString } from '../../../utils/byteRange.ts'
 
 /**
  * @internal
@@ -16,11 +17,24 @@ export function mapSegmentBase(
 	representation: Representation,
 	duration: number,
 ): Segment[] {
-	return representation.SegmentBase?.map((segment: SegmentBase) => {
-		return {
+	let cumulativeTime = 0
+	return representation.SegmentBase?.map((segment: SegmentBase, index: number) => {
+		const startTime = cumulativeTime
+		cumulativeTime += duration
+		const byteRange = parseByteRangeString(segment.$.indexRange)
+
+		const result: Segment = {
+			id: `${representation.$.id}-segment-${index}`,
 			duration,
 			url: representation.BaseURL?.[0] ?? '',
-			byteRange: segment.$.indexRange,
+			startTime,
 		} as Segment
+
+		// Only include byteRange if it exists
+		if (byteRange !== undefined) {
+			result.byteRange = byteRange
+		}
+
+		return result
 	}) ?? []
 }

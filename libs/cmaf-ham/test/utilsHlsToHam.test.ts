@@ -59,14 +59,18 @@ describe('formatSegments', () => {
 		const res = formatSegments(getSegments())
 		deepStrictEqual(res, [
 			{
+				id: 'segment-0',
 				duration: 4.011,
 				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4',
-				byteRange: '12@34',
+				byteRange: { start: 34, end: 45 }, // length: 12, offset: 34 → start: 34, end: 34 + 12 - 1 = 45
+				startTime: 0,
 			},
 			{
+				id: 'segment-1',
 				duration: 3.989,
 				url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
-				byteRange: '56@78',
+				byteRange: { start: 78, end: 133 }, // length: 56, offset: 78 → start: 78, end: 78 + 56 - 1 = 133
+				startTime: 4.011,
 			},
 		])
 	})

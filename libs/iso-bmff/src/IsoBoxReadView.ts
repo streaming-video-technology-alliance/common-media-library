@@ -1,16 +1,11 @@
-import type { Box } from './boxes/Box.ts'
 import type { FullBox } from './boxes/FullBox.ts'
-import { DATA } from './fields/DATA.ts'
-import { INT } from './fields/INT.ts'
-import { STRING } from './fields/STRING.ts'
-import { TEMPLATE } from './fields/TEMPLATE.ts'
-import { UINT } from './fields/UINT.ts'
-import { UTF8 } from './fields/UTF8.ts'
 import type { IsoBox } from './IsoBox.ts'
-import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
+import type { IsoBoxData } from './IsoBoxData.ts'
+import { DATA, INT, STRING, TEMPLATE, UINT, UTF8, type IsoBoxFields } from './IsoBoxFields.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 import type { ParsedBox } from './ParsedBox.ts'
+import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 import { isContainer } from './utils/isContainer.ts'
 import { readData } from './utils/readData.ts'
 import { readInt } from './utils/readInt.ts'
@@ -27,10 +22,10 @@ import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
  *
  * @public
  */
-export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
+export class IsoBoxReadView {
 	private dataView: DataView<ArrayBuffer>
 	private offset: number
-	private config: IsoBoxReadViewConfig<R>
+	private config: IsoBoxReadViewConfig
 	private truncated: boolean = false
 
 	/**
@@ -41,10 +36,10 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 	 * @param raw - The raw data to view.
 	 * @param config - The configuration for the IsoView.
 	 */
-	constructor(raw: ArrayBuffer | ArrayBufferView<ArrayBuffer>, config?: IsoBoxReadViewConfig<R>) {
+	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
 		this.dataView = (raw instanceof ArrayBuffer) ? new DataView<ArrayBuffer>(raw) : (raw instanceof DataView) ? raw : new DataView<ArrayBuffer>(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
-		this.config = config || { readers: {} as R }
+		this.config = config || {}
 	}
 
 	/**
@@ -95,7 +90,7 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 	 * @param size - The size of the slice.
 	 * @returns A new IsoView instance.
 	 */
-	slice = (offset: number, size: number): IsoBoxReadView<R> => {
+	slice = (offset: number, size: number): IsoBoxReadView => {
 		const dataView = new DataView(this.dataView.buffer, offset, size)
 		const isoView = new IsoBoxReadView(dataView, this.config)
 		const headerSize = this.offset - offset
@@ -107,7 +102,7 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 		return isoView
 	}
 
-	private read = <T extends keyof IsoFieldTypeMap>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
+	private read = <T extends IsoBoxFields>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
 		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this
 
@@ -265,14 +260,14 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 	 *
 	 * @returns The box.
 	 */
-	readBox = (): Box => {
+	readBox = (): ParsedBox => {
 		const { dataView, offset } = this
 
 		// read box size and type without advancing the cursor in case the box is truncated
 		let cursor = 0
 		const size = readUint(dataView, offset, 4)
 		const type = readString(dataView, offset + 4, 4)
-		const box = { size, type } as Box
+		const box = { size, type } as ParsedBox
 
 		cursor += 8
 
@@ -340,14 +335,14 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 	 *
 	 * @returns A generator of boxes.
 	 */
-	*[Symbol.iterator](): Generator<ParsedBox> {
-		const { readers = {} as R } = this.config
+	*[Symbol.iterator](): Generator<ParsedIsoBox> {
+		const { readers = {} } = this.config
 
 		while (!this.done) {
 			try {
-				const box = this.readBox() as ParsedBox
+				const box = this.readBox() as ParsedIsoBox
 				const { type, view } = box
-				const parser = readers[type as keyof IsoBoxReaderMap] || readers[type.trim() as keyof IsoBoxReaderMap] // url and urn boxes have a trailing space in their type field
+				const parser = readers[type] || readers[type.trim()] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
 					Object.assign(box, parser(view))
@@ -364,7 +359,7 @@ export class IsoBoxReadView<R extends IsoBoxReaderMap = IsoBoxReaderMap> {
 					box.boxes = boxes
 				}
 
-				yield box as IsoBox & Box
+				yield box
 			}
 			catch (error) {
 				if (error instanceof Error && error.message === 'Truncated box') {

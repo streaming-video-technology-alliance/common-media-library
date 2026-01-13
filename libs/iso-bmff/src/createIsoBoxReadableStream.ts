@@ -1,6 +1,6 @@
 import { IsoBoxReadableStream } from './IsoBoxReadableStream.ts'
-import type { IsoBoxReadableStreamConfig } from './IsoBoxReadableStreamConfig.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
+import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
 
 /**
  * Creates a ReadableStream of ISO BMFF boxes as Uint8Arrays.
@@ -15,6 +15,6 @@ import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
  *
  * @public
  */
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxReadableStreamConfig = {}): ReadableStream<Uint8Array> {
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig = {}): ReadableStream<Uint8Array> {
 	return new IsoBoxReadableStream(boxes, config)
 }

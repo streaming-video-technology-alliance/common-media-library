@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readMp4a, readStsd } from '../util/b
 
 describe('readMp4a', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes<any>('240fps_go_pro_hero_4.mp4', 'stsd', { stsd: readStsd, mp4a: readMp4a })
+		const container = filterBoxes<any>('240fps_go_pro_hero_4.mp4', 'stsd', { readers: { stsd: readStsd, mp4a: readMp4a } })
 		const box = container[1].entries[0]
 
 		assert.strictEqual(box.type, 'mp4a')
@@ -16,6 +16,6 @@ describe('readMp4a', function () {
 		//assert.strictEqual(box.pre_defined, 0); // not conformed value in the file, not tested
 		assert.strictEqual(box.reserved3, 0)
 		assert.strictEqual(box.samplerate, 48000)
-		assert.strictEqual(box.esds.byteLength, 50)
+		assert.strictEqual(box.boxes.length, 1)
 	})
 })

@@ -2,13 +2,13 @@ import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a MovieFragmentHeaderBox to an IsoDataWriter.
+ * Write a `MovieFragmentHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.8.5 Movie Fragment Header Box
  *
- * @param box - The MovieFragmentHeaderBox fields to write
+ * @param box - The `MovieFragmentHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

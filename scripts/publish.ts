@@ -30,6 +30,8 @@ async function loadPackages(): Promise<Packages> {
 		}, {} as Packages)
 }
 
+const tagRegex = /^\d+\.\d+\.\d+(.*$)/
+
 // Check for updates and resolve wildcard dependencies
 async function processPackage(name: PackageName, pkg: Package, packages: Packages): Promise<string> {
 	console.log(`Processing ${name}...`)
@@ -50,7 +52,9 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 		await writeFile(file, JSON.stringify(packageJson, null, '\t') + '\n')
 	}
 
-	const latest = await exec(`npm view ${name} version`)
+	const tag = version.replace(tagRegex, '$1')
+	const prop = tag ? 'dist-tags.prerelease' : 'version'
+	const latest = await exec(`npm view ${name} ${prop}`)
 	const updated = latest.trim() !== version
 	const deps = await exec(`npm view ${name} peerDependencies --json`)
 
@@ -92,6 +96,6 @@ for (const pkg of needsPublish) {
 		continue
 	}
 
-	const tag = json.version.replace(/^\d+\.\d+\.\d+(.*$)/, '$1')
+	const tag = json.version.replace(tagRegex, '$1')
 	await cmd(`npm publish --provenance --access public -w ${folder} ${tag ? `--tag prerelease` : ''}`)
 }

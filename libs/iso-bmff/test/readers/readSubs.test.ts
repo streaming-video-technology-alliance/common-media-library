@@ -2,7 +2,7 @@ import { assert, describe, filterBoxes, it, readSubs } from '../util/box.ts'
 
 describe('readSubs', function () {
 	it('should correctly parse the box from sample data', function () {
-		const boxes = filterBoxes('subsample.m4s', 'subs', { subs: readSubs })
+		const boxes = filterBoxes('subsample.m4s', 'subs', { readers: { subs: readSubs } })
 
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].type, 'subs')

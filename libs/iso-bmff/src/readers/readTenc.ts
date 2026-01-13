@@ -1,13 +1,13 @@
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a TrackEncryptionBox from an IsoView
+ * Parse a `TrackEncryptionBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed TrackEncryptionBox
+ * @returns A parsed `TrackEncryptionBox`
  *
  * @public
  */

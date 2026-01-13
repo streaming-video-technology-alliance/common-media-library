@@ -4,4 +4,3 @@
  * @public
  */
 export { RequestType } from '@svta/cml-utils'
-

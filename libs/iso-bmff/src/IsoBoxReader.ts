@@ -1,4 +1,3 @@
-import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxReadView } from './IsoBoxReadView.ts'
 
 /**
@@ -6,4 +5,4 @@ import type { IsoBoxReadView } from './IsoBoxReadView.ts'
  *
  * @public
  */
-export type IsoBoxReader<B extends IsoBox> = (view: IsoBoxReadView) => B;
+export type IsoBoxReader<B = unknown> = (view: IsoBoxReadView) => B;

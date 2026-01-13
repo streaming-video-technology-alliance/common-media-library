@@ -1,32 +1,25 @@
+import type { AddressableObject } from './AddressableObject.ts'
+import type { Base } from './Base.ts'
+import type { Duration } from './Duration.ts'
 import type { Ham } from './Ham.ts'
 import type { Segment } from './Segment.ts'
 import type { TrackType } from './TrackType.ts'
 
 /**
  * CMAF-HAM Track type
- * Used as a base for the audio, video and text tracks
- *
- * type - The TrackType
- * fileName - File name of the track.
- * codec - Codec of the track.
- * duration - Duration of the track in seconds
- * language - Language of the track.
- * bandwidth - Bandwidth of the track.
- * byteRange - Byte range of the track.
- * segments - List of segments of the track.
  *
  * @alpha
  */
-export type Track = Ham & {
-	/** Track type */
+// TODO: Tracks should have generics to allow for media specific fields, i.e VideoTrack, AudioTrack, TextTrack, ImageTrack, etc.
+// TODO: Duration is just for convenience. The duration should match the presentation duration.
+export type Track = Ham & Base & Duration & AddressableObject & {
 	type: TrackType;
-	fileName?: string;
-	codec: string;
-	duration: number;
-	language: string;
+	codecs: string[];
+	mimeType: string;
+	language?: string;
 	bandwidth: number;
-	byteRange?: string;
-	/** URL of the initialization segment */
-	urlInitialization?: string;
+	initialization: AddressableObject;
 	segments: Segment[];
-};
+	segmentIndex?: AddressableObject & { timescale: number };
+	presentationTimeOffset?: number;
+}

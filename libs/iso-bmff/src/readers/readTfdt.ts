@@ -2,11 +2,11 @@ import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragment
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a TrackFragmentDecodeTimeBox from an IsoView
+ * Parse a `TrackFragmentBaseMediaDecodeTimeBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed TrackFragmentDecodeTimeBox
+ * @returns A parsed `TrackFragmentBaseMediaDecodeTimeBox`
  *
  * @public
  */

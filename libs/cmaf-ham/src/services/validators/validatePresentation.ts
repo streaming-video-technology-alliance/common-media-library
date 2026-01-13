@@ -1,4 +1,4 @@
-import type { Validation } from '../../types/Validation.ts'
+import type { Validation } from '../../types/mapper/Validation.ts'
 import type { Presentation } from '../../types/model/Presentation.ts'
 
 import { validateSelectionSets } from './validateSelectionSets.ts'

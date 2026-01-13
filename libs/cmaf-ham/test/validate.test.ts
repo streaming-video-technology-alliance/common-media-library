@@ -33,7 +33,7 @@ describe('validatePresentation', () => {
 			'Track id is undefined in the switching set with id = video',
 			'Segment url is undefined.',
 			'All the tracks must have the same duration in the switching set with id = video',
-			'AudioTrack with id: 1 does not have codec in the switching set with id = video',
+			'AudioTrack with id: 1 does not have codecs in the switching set with id = video',
 		])
 	})
 })
@@ -68,7 +68,7 @@ describe('validateTrack', () => {
 
 		equal(validate.status, false)
 		deepEqual(validate.errorMessages, [
-			'AudioTrack with id: 1 does not have codec.',
+			'AudioTrack with id: 1 does not have codecs.',
 		])
 	})
 })

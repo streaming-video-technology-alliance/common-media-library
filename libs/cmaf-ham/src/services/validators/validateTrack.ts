@@ -3,7 +3,7 @@ import type { TextTrack } from '../../types/model/TextTrack.ts'
 import type { Track } from '../../types/model/Track.ts'
 import type { VideoTrack } from '../../types/model/VideoTrack.ts'
 
-import type { Validation } from '../../types/Validation.ts'
+import type { Validation } from '../../types/mapper/Validation.ts'
 
 import { validateSegments } from './validateSegments.ts'
 
@@ -107,10 +107,10 @@ function _validateVideoTrack(
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.'
 
-	if (!videoTrack.codec) {
+	if (!videoTrack.codecs || videoTrack.codecs.length === 0) {
 		validation.status = false
 		validation.errorMessages.push(
-			`VideoTrack with id: ${videoTrack.id} does not have codec${moreInformation}`,
+			`VideoTrack with id: ${videoTrack.id} does not have codecs${moreInformation}`,
 		)
 	}
 
@@ -144,10 +144,10 @@ function _validateAudioTrack(
 		? ` in the switching set with id = ${switchingSetId}`
 		: '.'
 
-	if (!audioTrack.codec) {
+	if (!audioTrack.codecs || audioTrack.codecs.length === 0) {
 		validation.status = false
 		validation.errorMessages.push(
-			`AudioTrack with id: ${audioTrack.id} does not have codec${moreInformation}`,
+			`AudioTrack with id: ${audioTrack.id} does not have codecs${moreInformation}`,
 		)
 	}
 

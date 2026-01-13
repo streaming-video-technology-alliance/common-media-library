@@ -1,13 +1,13 @@
 import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
-import { STRING } from '../fields/STRING.ts'
+import { STRING } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a FileTypeBox from an IsoView
+ * Parse a `FileTypeBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed FileTypeBox
+ * @returns A parsed `FileTypeBox`
  *
  * @public
  */

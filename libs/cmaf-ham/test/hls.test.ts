@@ -35,7 +35,7 @@ describe.skip('hamToHls', () => {
 	// FIXME: the manifest is missing some of the original metadata
 
 	it('converts ham1 to hls', () => {
-		const presentations = ham1 as Presentation[]
+		const presentations = ham1 as unknown as Presentation[]
 		const convertedHls = hamToHls(presentations)
 		deepStrictEqual(convertedHls.manifest, hlsMain1)
 		equal(convertedHls.type, 'hls')
@@ -43,7 +43,7 @@ describe.skip('hamToHls', () => {
 	})
 
 	it('converts ham2 to hls', () => {
-		const presentations = ham2 as Presentation[]
+		const presentations = ham2 as unknown as Presentation[]
 		const convertedHls = hamToHls(presentations)
 		deepStrictEqual(convertedHls.manifest, hlsMain2)
 		equal(convertedHls.type, 'hls')
@@ -51,7 +51,7 @@ describe.skip('hamToHls', () => {
 	})
 
 	it('converts ham3 to hls', () => {
-		const presentations = ham3 as Presentation[]
+		const presentations = ham3 as unknown as Presentation[]
 		const convertedHls = hamToHls(presentations)
 		deepStrictEqual(convertedHls.manifest, hlsMain3)
 		equal(convertedHls.type, 'hls')

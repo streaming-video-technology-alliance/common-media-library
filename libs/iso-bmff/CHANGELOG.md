@@ -8,6 +8,75 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-alpha.7] - 2026-01-12
+
+### Fix
+
+- Bad publish
+
+## [1.0.0-alpha.6] - 2026-01-09
+
+### Added
+
+- Added `IsoBoxFields` constant for all ISO BMFF field types
+- Exports for `IsoBoxReadView` and `IsoBoxWriteView`
+
+### Changed
+
+- Moved all field constants to `IsoBoxFields.ts`
+
+### Fixed
+
+- Broken type inference for `createAudioSampleEntryReader` and `createVisualSampleEntryReader`
+- Broken type inference for `writeIsoBoxes`
+
+## [1.0.0-alpha.5] - 2026-01-08
+
+### Fixed
+
+- Broken type inference for `traverseIsoBoxes`, `findIsoBox`, and `filterIsoBoxes`
+
+## [1.0.0-alpha.4] - 2026-01-08
+
+### Added
+
+- Added ability to use generic reader functions with `readIsoBoxes`
+- Added `createAudioSampleEntryReader` and `createVisualSampleEntryReader` utility functions for custom audio and visual sample entry box types
+- Added `findIsoBox` utility function to find the first box matching a predicate
+- Added `filterIsoBoxes` utility function to filter boxes matching a predicate
+- Added `TraverseIsoBoxesConfig` type for configuring box traversal options
+
+### Changed
+
+- Improved type inference for reader return types
+- Changed `traverseIsoBoxes` to accept a config object instead of positional arguments for `depthFirst` and `maxDepth`
+- Expanded `AudioSampleEntryBox` and `VisualSampleEntryBox` type parameters to accept any `IsoBoxType`
+
+## [1.0.0-alpha.3] - 2025-01-07
+
+### Changed
+
+- Improved reading and writing of A/V sample entry boxes
+
+### Fixed
+
+- Incorrect FourCC for Additional Metadata Container Box (`meco`) box
+
+## [1.0.0-alpha.2] - 2025-01-05
+
+### Added
+
+- Add `stsd` and `dref` box writers
+- Add `CONTAINERS` export for the list of box types that are containers
+
+### Changed
+
+- Updated `README`
+- `IsoBoxWriter` signature now includes a required `config` parameter: `(box: B, config: Required<IsoBoxWriteViewConfig>) => ArrayBufferView`
+- `writeArray` method now requires a `length` parameter to specify the number of values to write
+- Renamed `IsoBoxReadableStreamConfig` to `IsoBoxWriteViewConfig`
+- Removed `writeVisualSampleEntryBox` export (use specific visual sample entry writers like `writeAvc1`, `writeAvc3`, etc. instead)
+
 ## [1.0.0-alpha.1] - 2025-12-27
 
 ### Added
@@ -34,7 +103,13 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-/iso-bmff-/iso-bmff-v1.0.0-alpha.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-/iso-bmff-v1.0.0-alpha.7...HEAD
+[1.0.0-alpha.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.6...iso-bmff-v1.0.0-alpha.7
+[1.0.0-alpha.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.5...iso-bmff-v1.0.0-alpha.6
+[1.0.0-alpha.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.4...iso-bmff-v1.0.0-alpha.5
+[1.0.0-alpha.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.3...iso-bmff-v1.0.0-alpha.4
+[1.0.0-alpha.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.2...iso-bmff-v1.0.0-alpha.3
+[1.0.0-alpha.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.1...iso-bmff-v1.0.0-alpha.2
 [1.0.0-alpha.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v0.23.2...iso-bmff-v1.0.0-alpha.1
 [0.23.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v0.23.1...iso-bmff-v0.23.2
 [0.23.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v0.23.0...iso-bmff-v0.23.1

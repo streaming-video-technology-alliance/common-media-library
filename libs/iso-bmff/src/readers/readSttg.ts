@@ -2,11 +2,11 @@ import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a WebVTTSettingsBox from an IsoView
+ * Parse a `WebVttSettingsBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed WebVTTSettingsBox
+ * @returns A parsed `WebVttSettingsBox`
  *
  * @public
  */

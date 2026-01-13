@@ -2,13 +2,13 @@ import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampl
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a CompositionTimeToSampleBox to an IsoDataWriter.
+ * Write a `CompositionTimeToSampleBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.6.1.3 Composition Time to Sample Box
  *
- * @param box - The CompositionTimeToSampleBox fields to write
+ * @param box - The `CompositionTimeToSampleBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

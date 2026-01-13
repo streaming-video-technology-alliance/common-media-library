@@ -1,10 +1,10 @@
-import type { Manifest } from '../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../types/manifest/ManifestFile.ts'
 import type { Presentation } from '../types/model/Presentation.ts'
 
 export type Mapper = {
-	toHam(manifest: Manifest): Presentation[];
+	toHam(manifest: ManifestFile): Presentation[];
 
-	toManifest(presentation: Presentation[]): Manifest;
+	toManifest(presentation: Presentation[]): ManifestFile;
 
 	getManifestMetadata(): any | undefined;
 };

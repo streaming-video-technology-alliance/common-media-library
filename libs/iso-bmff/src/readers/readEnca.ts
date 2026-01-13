@@ -1,19 +1,16 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
-import { readMp4a } from './readMp4a.ts'
+import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
 
 /**
- * Parse an AudioSampleEntry from an IsoView
+ * Parse an `AudioSampleEntryBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed AudioSampleEntry
+ * @returns A parsed `AudioSampleEntryBox`
  *
  * @public
  */
 export function readEnca(view: IsoBoxReadView): AudioSampleEntryBox<'enca'> {
-	return {
-		...readMp4a(view),
-		type: 'enca',
-	}
+	return readAudioSampleEntryBox('enca', view)
 }

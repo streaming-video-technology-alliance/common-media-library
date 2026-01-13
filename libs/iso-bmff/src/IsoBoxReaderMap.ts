@@ -1,4 +1,3 @@
-import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxReader } from './IsoBoxReader.ts'
 
 /**
@@ -6,7 +5,4 @@ import type { IsoBoxReader } from './IsoBoxReader.ts'
  *
  * @public
  */
-export type IsoBoxReaderMap = Partial<{
-	[P in IsoBox['type']]: IsoBoxReader<Extract<IsoBox, Record<'type', P>>>
-}>
-
+export type IsoBoxReaderMap = Record<string, IsoBoxReader>

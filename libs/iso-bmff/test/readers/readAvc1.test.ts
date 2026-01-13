@@ -4,7 +4,7 @@ type Avc1Box = VisualSampleEntryBox<'avc1'>;
 
 describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { stsd: readStsd<Avc1Box>, avc1: readAvc1 })
+		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { readers: { stsd: readStsd<Avc1Box>, avc1: readAvc1 } })
 
 		assert.strictEqual(container[0].type, 'stsd')
 
@@ -28,6 +28,6 @@ describe('readAvc1', function () {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]) // length + 'GoPro AVC encoder'
 		assert.strictEqual(box.depth, 24)
 		assert.strictEqual(box.preDefined3, -1)
-		assert.strictEqual(box.config.byteLength, 98)
+		assert.strictEqual(box.boxes.length, 2)
 	})
 })

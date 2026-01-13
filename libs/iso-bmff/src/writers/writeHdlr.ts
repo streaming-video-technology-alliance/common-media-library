@@ -1,14 +1,15 @@
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a HandlerReferenceBox to an IsoDataWriter.
+ * Write a `HandlerReferenceBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
  *
- * @param box - The HandlerReferenceBox fields to write
+ * @param box - The `HandlerReferenceBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
@@ -26,11 +27,7 @@ export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
 
 	writer.writeUint(box.preDefined, 4)
 	writer.writeString(box.handlerType)
-
-	for (let i = 0; i < 3; i++) {
-		writer.writeUint(box.reserved[i] ?? 0, 4)
-	}
-
+	writer.writeArray(box.reserved, UINT, 4, 3)
 	writer.writeTerminatedString(box.name)
 
 	return writer

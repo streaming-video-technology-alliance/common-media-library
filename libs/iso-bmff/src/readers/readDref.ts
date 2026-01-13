@@ -4,11 +4,11 @@ import type { DataReferenceBox } from '../boxes/DataReferenceBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a DataReferenceBox from an IsoView
+ * Parse a `DataReferenceBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed DataReferenceBox
+ * @returns A parsed `DataReferenceBox`
  *
  * @public
  */

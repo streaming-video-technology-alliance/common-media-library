@@ -1,4 +1,4 @@
-import type { Manifest } from '../../types/manifest/Manifest.ts'
+import type { ManifestFile } from '../../types/manifest/ManifestFile.ts'
 import type { Presentation } from '../../types/model/Presentation.ts'
 
 import { HlsMapper } from '../../mapper/hls/HlsMapper.ts'
@@ -21,7 +21,7 @@ import { MapperContext } from '../../mapper/MapperContext.ts'
  *
  * @alpha
  */
-export function hamToHls(presentation: Presentation[]): Manifest {
+export function hamToHls(presentation: Presentation[]): ManifestFile {
 	const mapperContext = MapperContext.getInstance()
 	mapperContext.setStrategy(new HlsMapper())
 	return mapperContext.getManifestFormat(presentation)

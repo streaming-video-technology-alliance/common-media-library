@@ -3,11 +3,11 @@ import type { TrackRunSample } from '../boxes/TrackRunSample.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a TrackRunBox from an IsoView
+ * Parse a `TrackRunBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed TrackRunBox
+ * @returns A parsed `TrackRunBox`
  *
  * @public
  */

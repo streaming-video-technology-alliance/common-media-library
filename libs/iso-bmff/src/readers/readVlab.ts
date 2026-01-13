@@ -2,11 +2,11 @@ import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a WebVTTSourceLabelBox from an IsoView
+ * Parse a `WebVttSourceLabelBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed WebVTTSourceLabelBox
+ * @returns A parsed `WebVttSourceLabelBox`
  *
  * @public
  */

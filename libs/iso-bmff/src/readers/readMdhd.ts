@@ -2,11 +2,11 @@ import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a MediaHeaderBox from an IsoView
+ * Parse a `MediaHeaderBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed MediaHeaderBox
+ * @returns A parsed `MediaHeaderBox`
  *
  * @public
  */

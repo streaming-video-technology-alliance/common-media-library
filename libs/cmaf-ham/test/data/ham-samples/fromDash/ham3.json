@@ -1,185 +1,280 @@
 [
-	{
-		"id": "presentation-id-734",
-		"selectionSets": [
-			{
-				"id": "1",
-				"switchingSets": [
-					{
-						"id": "1",
-						"tracks": [
-							{
-								"bandwidth": 64349,
-								"channels": 2,
-								"codec": "mp4a.40.2",
-								"duration": 734,
-								"id": "audio_eng=64349",
-								"language": "en",
-								"sampleRate": 48000,
-								"segments": [
-									{
-										"duration": 734,
-										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
-										"byteRange": "704-2211"
-									}
-								],
-								"type": "audio",
-								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa"
-							},
-							{
-								"bandwidth": 128407,
-								"channels": 2,
-								"codec": "mp4a.40.2",
-								"duration": 734,
-								"id": "audio_eng=128407",
-								"language": "en",
-								"sampleRate": 48000,
-								"segments": [
-									{
-										"duration": 734,
-										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
-										"byteRange": "704-2211"
-									}
-								],
-								"type": "audio",
-								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa"
-							}
-						]
-					}
-				]
-			},
-			{
-				"id": "2",
-				"switchingSets": [
-					{
-						"id": "12",
-						"tracks": [
-							{
-								"bandwidth": 1032000,
-								"codec": "hev1.1.6.H150.90",
-								"duration": 734,
-								"frameRate": {
-									"frameRateNumerator": 24,
-									"frameRateDenominator": 0
-								},
-								"height": 750,
-								"id": "video_eng=1032000",
-								"language": "en",
-								"par": "56:25",
-								"sar": "1:1",
-								"scanType": "progressive",
-								"segments": [
-									{
-										"duration": 734,
-										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
-										"byteRange": "2901-4036"
-									}
-								],
-								"type": "video",
-								"width": 1680,
-								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv"
-							},
-							{
-								"bandwidth": 1250000,
-								"codec": "hev1.1.6.H150.90",
-								"duration": 734,
-								"frameRate": {
-									"frameRateNumerator": 24,
-									"frameRateDenominator": 0
-								},
-								"height": 1150,
-								"id": "video_eng=1250000",
-								"language": "en",
-								"par": "56:25",
-								"sar": "1:1",
-								"scanType": "progressive",
-								"segments": [
-									{
-										"duration": 734,
-										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
-										"byteRange": "2901-4036"
-									}
-								],
-								"type": "video",
-								"width": 2576,
-								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv"
-							},
-							{
-								"bandwidth": 1600000,
-								"codec": "hev1.1.6.H150.90",
-								"duration": 734,
-								"frameRate": {
-									"frameRateNumerator": 24,
-									"frameRateDenominator": 0
-								},
-								"height": 1500,
-								"id": "video_eng=1600000",
-								"language": "en",
-								"par": "56:25",
-								"sar": "1:1",
-								"scanType": "progressive",
-								"segments": [
-									{
-										"duration": 734,
-										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
-										"byteRange": "2901-4036"
-									}
-								],
-								"type": "video",
-								"width": 3360,
-								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv"
-							}
-						]
-					}
-				]
-			},
-			{
-				"id": "3",
-				"switchingSets": [
-					{
-						"id": "2",
-						"tracks": [
-							{
-								"bandwidth": 1000,
-								"codec": "wvtt",
-								"duration": 734,
-								"id": "textstream_eng=1000",
-								"language": "en",
-								"segments": [
-									{
-										"duration": 734,
-										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-en.cmft",
-										"byteRange": "607-1778"
-									}
-								],
-								"type": "text",
-								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-en.cmft"
-							}
-						]
-					},
-					{
-						"id": "4",
-						"tracks": [
-							{
-								"bandwidth": 1000,
-								"codec": "wvtt",
-								"duration": 734,
-								"id": "textstream_spa=1000",
-								"language": "es",
-								"segments": [
-									{
-										"duration": 734,
-										"url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-es.cmft",
-										"byteRange": "607-1778"
-									}
-								],
-								"type": "text",
-								"urlInitialization": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-es.cmft"
-							}
-						]
-					}
-				]
-			}
-		]
-	}
+  {
+    "id": "presentation-id-734",
+    "selectionSets": [
+      {
+        "id": "1",
+        "switchingSets": [
+          {
+            "id": "1",
+            "tracks": [
+              {
+                "url": "",
+                "bandwidth": 64349,
+                "channels": 2,
+                "codecs": [
+                  "mp4a.40.2"
+                ],
+                "mimeType": "audio/mp4",
+                "duration": 734,
+                "id": "audio_eng=64349",
+                "language": "en",
+                "sampleRate": 48000,
+                "segments": [
+                  {
+                    "id": "audio_eng=64349-segment-0",
+                    "duration": 734,
+                    "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa",
+                    "startTime": 0,
+                    "byteRange": {
+                      "start": 704,
+                      "end": 2211
+                    }
+                  }
+                ],
+                "type": "audio",
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-64k.cmfa"
+                },
+                "baseUrls": []
+              },
+              {
+                "url": "",
+                "bandwidth": 128407,
+                "channels": 2,
+                "codecs": [
+                  "mp4a.40.2"
+                ],
+                "mimeType": "audio/mp4",
+                "duration": 734,
+                "id": "audio_eng=128407",
+                "language": "en",
+                "sampleRate": 48000,
+                "segments": [
+                  {
+                    "id": "audio_eng=128407-segment-0",
+                    "duration": 734,
+                    "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa",
+                    "startTime": 0,
+                    "byteRange": {
+                      "start": 704,
+                      "end": 2211
+                    }
+                  }
+                ],
+                "type": "audio",
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-aac-128k.cmfa"
+                },
+                "baseUrls": []
+              }
+            ],
+            "baseUrls": []
+          }
+        ],
+        "type": "audio"
+      },
+      {
+        "id": "2",
+        "switchingSets": [
+          {
+            "id": "12",
+            "tracks": [
+              {
+                "url": "",
+                "bandwidth": 1032000,
+                "codecs": [
+                  "hev1.1.6.H150.90"
+                ],
+                "mimeType": "video/mp4",
+                "duration": 734,
+                "frameRate": {
+                  "frameRateNumerator": 24,
+                  "frameRateDenominator": 0
+                },
+                "height": 750,
+                "id": "video_eng=1032000",
+                "language": "en",
+                "par": "56:25",
+                "sar": "1:1",
+                "scanType": "progressive",
+                "segments": [
+                  {
+                    "id": "video_eng=1032000-segment-0",
+                    "duration": 734,
+                    "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv",
+                    "startTime": 0,
+                    "byteRange": {
+                      "start": 2901,
+                      "end": 4036
+                    }
+                  }
+                ],
+                "type": "video",
+                "width": 1680,
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1100k.cmfv"
+                },
+                "baseUrls": []
+              },
+              {
+                "url": "",
+                "bandwidth": 1250000,
+                "codecs": [
+                  "hev1.1.6.H150.90"
+                ],
+                "mimeType": "video/mp4",
+                "duration": 734,
+                "frameRate": {
+                  "frameRateNumerator": 24,
+                  "frameRateDenominator": 0
+                },
+                "height": 1150,
+                "id": "video_eng=1250000",
+                "language": "en",
+                "par": "56:25",
+                "sar": "1:1",
+                "scanType": "progressive",
+                "segments": [
+                  {
+                    "id": "video_eng=1250000-segment-0",
+                    "duration": 734,
+                    "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv",
+                    "startTime": 0,
+                    "byteRange": {
+                      "start": 2901,
+                      "end": 4036
+                    }
+                  }
+                ],
+                "type": "video",
+                "width": 2576,
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-1500k.cmfv"
+                },
+                "baseUrls": []
+              },
+              {
+                "url": "",
+                "bandwidth": 1600000,
+                "codecs": [
+                  "hev1.1.6.H150.90"
+                ],
+                "mimeType": "video/mp4",
+                "duration": 734,
+                "frameRate": {
+                  "frameRateNumerator": 24,
+                  "frameRateDenominator": 0
+                },
+                "height": 1500,
+                "id": "video_eng=1600000",
+                "language": "en",
+                "par": "56:25",
+                "sar": "1:1",
+                "scanType": "progressive",
+                "segments": [
+                  {
+                    "id": "video_eng=1600000-segment-0",
+                    "duration": 734,
+                    "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv",
+                    "startTime": 0,
+                    "byteRange": {
+                      "start": 2901,
+                      "end": 4036
+                    }
+                  }
+                ],
+                "type": "video",
+                "width": 3360,
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-hev1-2200k.cmfv"
+                },
+                "baseUrls": []
+              }
+            ],
+            "baseUrls": []
+          }
+        ],
+        "type": "video"
+      },
+      {
+        "id": "3",
+        "switchingSets": [
+          {
+            "id": "2",
+            "tracks": [
+              {
+                "url": "",
+                "bandwidth": 1000,
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
+                "duration": 734,
+                "id": "textstream_eng=1000",
+                "language": "en",
+                "segments": [
+                  {
+                    "id": "textstream_eng=1000-segment-0",
+                    "duration": 734,
+                    "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-en.cmft",
+                    "startTime": 0,
+                    "byteRange": {
+                      "start": 607,
+                      "end": 1778
+                    }
+                  }
+                ],
+                "type": "text",
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-en.cmft"
+                },
+                "baseUrls": []
+              }
+            ],
+            "baseUrls": []
+          },
+          {
+            "id": "4",
+            "tracks": [
+              {
+                "url": "",
+                "bandwidth": 1000,
+                "codecs": [
+                  "wvtt"
+                ],
+                "mimeType": "application/mp4",
+                "duration": 734,
+                "id": "textstream_spa=1000",
+                "language": "es",
+                "segments": [
+                  {
+                    "id": "textstream_spa=1000-segment-0",
+                    "duration": 734,
+                    "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-es.cmft",
+                    "startTime": 0,
+                    "byteRange": {
+                      "start": 607,
+                      "end": 1778
+                    }
+                  }
+                ],
+                "type": "text",
+                "initialization": {
+                  "url": "https://dash.akamaized.net/dash264/TestCasesIOP41/CMAF/UnifiedStreaming/tears-of-steel-es.cmft"
+                },
+                "baseUrls": []
+              }
+            ],
+            "baseUrls": []
+          }
+        ],
+        "type": "text"
+      }
+    ],
+    "duration": 734,
+    "startTime": 0,
+    "endTime": 734,
+    "baseUrls": []
+  }
 ]

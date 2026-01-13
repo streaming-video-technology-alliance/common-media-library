@@ -2,11 +2,11 @@ import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a ProducerReferenceTimeBox from an IsoView
+ * Parse a `ProducerReferenceTimeBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed ProducerReferenceTimeBox
+ * @returns A parsed `ProducerReferenceTimeBox`
  *
  * @public
  */

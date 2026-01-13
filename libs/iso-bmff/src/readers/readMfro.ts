@@ -2,11 +2,11 @@ import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentR
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a MovieFragmentRandomAccessBox from an IsoView
+ * Parse a `MovieFragmentRandomAccessOffsetBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed MovieFragmentRandomAccessBox
+ * @returns A parsed `MovieFragmentRandomAccessOffsetBox`
  *
  * @public
  */

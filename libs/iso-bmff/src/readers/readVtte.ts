@@ -2,9 +2,9 @@ import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a WebVTT Empty Sample Box from an IsoView
+ * Parse a `WebVttEmptySampleBox` from an `IsoBoxReadView`.
  *
- * @returns A parsed WebVTT Empty Sample Box
+ * @returns A parsed `WebVttEmptySampleBox`
  *
  * @public
  */

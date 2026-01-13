@@ -3,11 +3,11 @@ import type { LabelBox } from '../boxes/LabelBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a LabelBox to an IsoDataWriter.
+ * Write a `LabelBox` to an `IsoBoxWriteView`.
  *
- * @param box - The LabelBox fields to write
+ * @param box - The `LabelBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

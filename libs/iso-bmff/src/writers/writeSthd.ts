@@ -2,13 +2,13 @@ import type { SubtitleMediaHeaderBox } from '../boxes/SubtitleMediaHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a SubtitleMediaHeaderBox to an IsoDataWriter.
+ * Write a `SubtitleMediaHeaderBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 12.6.2 Subtitle Media Header Box
  *
- * @param box - The SubtitleMediaHeaderBox fields to write
+ * @param box - The `SubtitleMediaHeaderBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

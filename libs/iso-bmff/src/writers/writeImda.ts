@@ -2,11 +2,11 @@ import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write an IdentifiedMediaDataBox to an IsoDataWriter.
+ * Write an `IdentifiedMediaDataBox` to an `IsoBoxWriteView`.
  *
- * @param box - The IdentifiedMediaDataBox fields to write
+ * @param box - The `IdentifiedMediaDataBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

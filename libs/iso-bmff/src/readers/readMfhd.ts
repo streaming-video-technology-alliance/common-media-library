@@ -2,11 +2,11 @@ import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a MovieFragmentHeaderBox from an IsoView
+ * Parse a `MovieFragmentHeaderBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed MovieFragmentHeaderBox
+ * @returns A parsed `MovieFragmentHeaderBox`
  *
  * @public
  */

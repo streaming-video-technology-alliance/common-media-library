@@ -2,11 +2,11 @@ import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a TrackKinBox from an IsoView
+ * Parse a `TrackKindBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed TrackKindBox
+ * @returns A parsed `TrackKindBox`
  *
  * @public
  */

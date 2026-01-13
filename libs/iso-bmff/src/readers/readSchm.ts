@@ -2,11 +2,11 @@ import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a SchemeTypeBox from an IsoView
+ * Parse a `SchemeTypeBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed SchemeTypeBox
+ * @returns A parsed `SchemeTypeBox`
  *
  * @public
  */

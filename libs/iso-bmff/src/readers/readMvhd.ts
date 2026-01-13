@@ -1,13 +1,13 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
-import { UINT } from '../fields/UINT.ts'
+import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a Box from an IsoView
+ * Parse a `MovieHeaderBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed Box
+ * @returns A parsed `MovieHeaderBox`
  *
  * @public
  */
@@ -29,7 +29,7 @@ export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 		volume: readTemplate(2),
 		reserved1: readUint(2),
 		reserved2: readArray(UINT, 4, 2),
-		matrix: readArray(UINT, 4, 9),
+		matrix: readArray(TEMPLATE, 4, 9),
 		preDefined: readArray(UINT, 4, 6),
 		nextTrackId: readUint(4),
 	}

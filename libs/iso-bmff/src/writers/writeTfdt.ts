@@ -2,13 +2,13 @@ import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragment
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a TrackFragmentBaseMediaDecodeTimeBox to an IsoDataWriter.
+ * Write a `TrackFragmentBaseMediaDecodeTimeBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Base Media Decode Time Box
  *
- * @param box - The TrackFragmentBaseMediaDecodeTimeBox fields to write
+ * @param box - The `TrackFragmentBaseMediaDecodeTimeBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */

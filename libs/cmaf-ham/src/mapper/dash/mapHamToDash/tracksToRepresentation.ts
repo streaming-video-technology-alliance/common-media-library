@@ -21,7 +21,7 @@ export function tracksToRepresentation(tracks: Track[]): Representation[] {
 			SegmentBase: trackToSegmentBase(track),
 			SegmentList: trackToSegmentList(track),
 		} as Representation
-		representation.$.mimeType = `${track.type}/mp4` //Harcoded value
+		representation.$.mimeType = track.mimeType ?? `${track.type}/mp4`
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack
 			representation.$ = {
@@ -29,7 +29,7 @@ export function tracksToRepresentation(tracks: Track[]): Representation[] {
 				frameRate: getFrameRate(track),
 				width: videoTrack.width.toString(),
 				height: videoTrack.height.toString(),
-				codecs: videoTrack.codec,
+				codecs: videoTrack.codecs?.join(','),
 			}
 			if (videoTrack.scanType) {
 				representation.$.scanType = videoTrack.scanType
@@ -40,7 +40,7 @@ export function tracksToRepresentation(tracks: Track[]): Representation[] {
 			representation.$ = {
 				...representation.$,
 				audioSamplingRate: audioTrack.sampleRate.toString(),
-				codecs: audioTrack.codec,
+				codecs: audioTrack.codecs?.join(','),
 			}
 			representation.AudioChannelConfiguration = [
 				{

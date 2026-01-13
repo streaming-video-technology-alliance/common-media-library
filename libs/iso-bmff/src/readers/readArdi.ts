@@ -2,11 +2,11 @@ import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicat
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a AudioRenderingIndicationBox from an IsoView
+ * Parse a `AudioRenderingIndicationBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed AudioRenderingIndicationBox
+ * @returns A parsed `AudioRenderingIndicationBox`
  *
  * @public
  */

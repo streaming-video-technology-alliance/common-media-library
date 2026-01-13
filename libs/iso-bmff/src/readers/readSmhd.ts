@@ -2,11 +2,11 @@ import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a SoundMediaHeaderBox from an IsoView
+ * Parse a `SoundMediaHeaderBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed SoundMediaHeaderBox
+ * @returns A parsed `SoundMediaHeaderBox`
  *
  * @public
  */

@@ -2,11 +2,11 @@ import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
- * Parse a UrlBox from an IsoView
+ * Parse a `DataEntryUrlBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed UrlBox
+ * @returns A parsed `DataEntryUrlBox`
  *
  * @public
  */

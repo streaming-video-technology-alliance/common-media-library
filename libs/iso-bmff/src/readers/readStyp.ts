@@ -3,11 +3,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import { readFtyp } from './readFtyp.ts'
 
 /**
- * Parse a SegmentTypeBox from an IsoView
+ * Parse a `SegmentTypeBox` from an `IsoBoxReadView`.
  *
- * @param view - The IsoView to read data from
+ * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed SegmentTypeBox
+ * @returns A parsed `SegmentTypeBox`
  *
  * @public
  */

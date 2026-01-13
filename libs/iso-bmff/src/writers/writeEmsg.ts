@@ -2,13 +2,13 @@ import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write an EventMessageBox to an IsoDataWriter.
+ * Write an `EventMessageBox` to an `IsoBoxWriteView`.
  *
  * ISO/IEC 23009-1 - 5.10.3.3 Event Message Box
  *
- * @param box - The EventMessageBox fields to write
+ * @param box - The `EventMessageBox` fields to write
  *
- * @returns An IsoDataWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
