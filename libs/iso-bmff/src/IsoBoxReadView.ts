@@ -345,7 +345,7 @@ export class IsoBoxReadView {
 				const parser = readers[type] || readers[type.trim()] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
-					Object.assign(box, parser(view))
+					Object.assign(box, parser(view, type))
 				}
 
 				// Some boxes, like meta, parse their child boxes themselves.
