@@ -152,6 +152,11 @@ export class CmcdReporter {
 	 * @param data - The data to update.
 	 */
 	update(data: Partial<CmcdData>): void {
+		if (data.sid && data.sid !== this.data.sid) {
+			this.resetSession()
+			return
+		}
+
 		// TODO: May need a deep merge utility for this.
 		this.data = { ...this.data, ...data }
 	}
@@ -164,10 +169,10 @@ export class CmcdReporter {
 	recordEvent(type: CmcdEventType): void {
 		this.eventTargets.forEach((target) => {
 			target.queue.push({
+				...this.data,
 				e: type,
 				ts: Date.now(),
 				sn: target.sn++,
-				...this.data
 			})
 		})
 		this.processEventTargets()
@@ -258,7 +263,8 @@ export class CmcdReporter {
 			body: data.reduce((acc, item) => acc += `${encodeCmcd(item, options)}\n`, ''),
 		})
 
-		switch (response.status) {
+		const { status } = response
+		switch (status) {
 			case 410:
 				this.eventTargets.delete(target)
 				break
@@ -268,7 +274,17 @@ export class CmcdReporter {
 				break
 
 			default:
+				if (status > 499 && status < 600) {
+					// retry logic
+				}
 				break
 		}
+	}
+
+	/**
+	 * Resets the session related data. Called when the session ID changes.
+	 */
+	private resetSession(): void {
+		this.eventTargets.forEach(target => target.sn = 0)
 	}
 }

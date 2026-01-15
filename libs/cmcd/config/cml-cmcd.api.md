@@ -48,10 +48,25 @@ export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "c
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
 
 // @public
+export const CMCD_EVENT_AD_BREAK_END: "abe";
+
+// @public
+export const CMCD_EVENT_AD_BREAK_START: "abs";
+
+// @public
+export const CMCD_EVENT_AD_END: "ae";
+
+// @public
+export const CMCD_EVENT_AD_START: "as";
+
+// @public
 export const CMCD_EVENT_BACKGROUNDED_MODE: "b";
 
 // @public
 export const CMCD_EVENT_CONTENT_ID: "c";
+
+// @public
+export const CMCD_EVENT_CUSTOM_EVENT: "ce";
 
 // @public
 export const CMCD_EVENT_ERROR: "e";
@@ -76,6 +91,9 @@ export const CMCD_EVENT_PLAYER_EXPAND: "pe";
 
 // @public
 export const CMCD_EVENT_RESPONSE_RECEIVED: "rr";
+
+// @public
+export const CMCD_EVENT_SKIP: "sk";
 
 // @public
 export const CMCD_EVENT_TIME_INTERVAL: "t";
@@ -174,6 +192,12 @@ export const CmcdEventType: {
     readonly PLAYER_EXPAND: typeof CMCD_EVENT_PLAYER_EXPAND;
     readonly PLAYER_COLLAPSE: typeof CMCD_EVENT_PLAYER_COLLAPSE;
     readonly RESPONSE_RECEIVED: typeof CMCD_EVENT_RESPONSE_RECEIVED;
+    readonly AD_START: typeof CMCD_EVENT_AD_START;
+    readonly AD_END: typeof CMCD_EVENT_AD_END;
+    readonly AD_BREAK_START: typeof CMCD_EVENT_AD_BREAK_START;
+    readonly AD_BREAK_END: typeof CMCD_EVENT_AD_BREAK_END;
+    readonly SKIP: typeof CMCD_EVENT_SKIP;
+    readonly CUSTOM_EVENT: typeof CMCD_EVENT_CUSTOM_EVENT;
 };
 
 // @public (undocumented)
