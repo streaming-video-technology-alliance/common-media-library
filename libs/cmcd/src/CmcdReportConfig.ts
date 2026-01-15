@@ -20,5 +20,7 @@ export type CmcdReportConfig = {
 	 *
 	 * @defaultValue `undefined`
 	 */
+	// TODO: How should an undefined enabledKeys array be handled?
+	//       Does that represent no key to report, or reporting all keys?
 	enabledKeys?: CmcdKey[];
 }

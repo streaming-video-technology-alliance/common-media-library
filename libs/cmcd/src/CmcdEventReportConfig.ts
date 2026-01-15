@@ -1,3 +1,4 @@
+import type { CMCD_V2 } from './CMCD_V2.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 
@@ -7,6 +8,14 @@ import type { CmcdReportConfig } from './CmcdReportConfig.ts'
  * @public
  */
 export type CmcdEventReportConfig = CmcdReportConfig & {
+	/**
+	 * The version of the CMCD protocol to use. Must be
+	 * version 2 or higher for event reporting.
+	 *
+	 * @defaultValue `CMCD_V2`
+	 */
+	version?: typeof CMCD_V2
+
 	/**
 	 * The URL to which the CMCD event should be sent.
 	 */

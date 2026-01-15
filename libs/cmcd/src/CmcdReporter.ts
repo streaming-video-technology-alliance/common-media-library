@@ -61,13 +61,15 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 		sid,
 		// Apply target config defaults
 		targets: targets.reduce((acc, target) => {
+			// TODO: How should an undefined events array be handled?
+			//       Does that represent no events to report, or reporting all events?
 			if (target && target.url && target.events?.length) {
 				acc.push({
 					version: target.version || CMCD_V2,
 					enabledKeys: target.enabledKeys?.slice(),
 					url: target.url,
-					events: target.events?.slice(),
-					interval: target.interval || CMCD_DEFAULT_TIME_INTERVAL,
+					events: target.events.slice(),
+					interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
 					batchSize: target.batchSize || 1,
 				})
 			}
@@ -102,6 +104,11 @@ export class CmcdReporter {
 	 */
 	constructor(config: Partial<CmcdReporterConfig>, requester: (request: Request) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
+		this.data = {
+			cid: config.cid,
+			sid: config.sid,
+			v: config.version,
+		}
 		this.requester = requester
 	}
 
@@ -110,6 +117,11 @@ export class CmcdReporter {
 	 */
 	start(): void {
 		this.eventTargets.forEach((target, config) => {
+			// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
+			if (config.interval === 0 || !config.events.includes(CmcdEventType.TIME_INTERVAL)) {
+				return
+			}
+
 			target.intervalId = setInterval(() => {
 				this.recordEvent(CMCD_EVENT_TIME_INTERVAL)
 			}, config.interval * 1000)
@@ -123,6 +135,15 @@ export class CmcdReporter {
 		this.eventTargets.forEach((target) => {
 			clearInterval(target.intervalId)
 		})
+	}
+
+	/**
+	 * Forces the sending of all event reports, regardless of the batch size or interval.
+	 * Useful for sending outstanding reports when the player is destroyed or a playback
+	 * session ends.
+	 */
+	flush(): void {
+		this.processEventTargets(true)
 	}
 
 	/**
@@ -191,8 +212,10 @@ export class CmcdReporter {
 
 	/**
 	 * Processes the event targets. Called by the reporter when an event occurs.
+	 *
+	 * @param flush - Whether to flush the event targets.
 	 */
-	private processEventTargets(): void {
+	private processEventTargets(flush: boolean = false): void {
 		let reprocess = false
 
 		this.eventTargets.forEach((target, config) => {
@@ -202,11 +225,12 @@ export class CmcdReporter {
 				return
 			}
 
-			if (config.batchSize < queue.length) {
+			if (config.batchSize < queue.length && !flush) {
 				return
 			}
 
-			const events = queue.splice(0, config.batchSize)
+			const deleteCount = flush ? queue.length : config.batchSize
+			const events = queue.splice(0, deleteCount)
 			this.sendEventReport(config, events)
 
 			reprocess ||= queue.length > 0
