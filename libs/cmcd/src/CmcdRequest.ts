@@ -91,17 +91,6 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	pb?: number;
 
 	/**
-	 * Timestamp (ms since UNIX epoch, required for event mode)
-	 *
-	 * The timestamp at which the associated event occurred, expressed as milliseconds since the UNIX epoch.
-	 * When the event is a request for a media object the time SHOULD reference when the request was first initiated.
-	 * When used with Response Mode, the timestamp should indicate the time at which the object was first requested and not when it was received.
-	 *
-	 * Integer milliseconds
-	*/
-	ts?: number;
-
-	/**
 	 * Top playable bitrate (kbps)
 	 *
 	 * The highest bitrate rendition that the player is currently capable of playing for reasons other than bandwidth limitations.
@@ -207,6 +196,17 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	sn?: number;
 
 	/**
+	 * Buffer starvation absolute
+	 *
+	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
+	 *
+	 * If the object type 'ot' key is sent along with this key, then the 'bsd' key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
+	 *
+	 * Integer milliseconds
+	 */
+	bsa?: number[];
+
+	/**
 	 * Buffer starvation duration
 	 *
 	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
@@ -225,7 +225,7 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 *
 	 * Integer
 	*/
-	df?: number;
+	dfa?: number;
 
 	/**
 	 * Content Signature
