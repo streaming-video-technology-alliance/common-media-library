@@ -8,11 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-alpha.9] - 2026-01-16
+
 ### Added
 
-- Added `fourCcToUint32` utility function to convert FourCC strings to uint32
+- Added `fourCcToUint32` utility function to convert FourCC strings to Uint32
 
-## [1.0.0-alpha.8] - 2026-01-12
+## [1.0.0-alpha.8] - 2026-01-16
 
 ### Added
 
@@ -120,7 +122,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-/iso-bmff-/iso-bmff-v1.0.0-alpha.8...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.9...HEAD
+[1.0.0-alpha.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.8...iso-bmff-v1.0.0-alpha.9
 [1.0.0-alpha.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.7...iso-bmff-v1.0.0-alpha.8
 [1.0.0-alpha.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.6...iso-bmff-v1.0.0-alpha.7
 [1.0.0-alpha.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.0-alpha.5...iso-bmff-v1.0.0-alpha.6
