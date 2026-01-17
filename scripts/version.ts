@@ -30,7 +30,7 @@ const links = sections[last].split(linkBreak)
 const index = links.findIndex((link) => head.test(link))
 const unreleased = links[index]
 const previous = unreleased.match(head)?.[1]
-links[index] = unreleased.replace(head, `/${version}...HEAD`)
+links[index] = unreleased.replace(/\/[0-9a-z-]+v[0-9a-zA-Z.-]+...HEAD/, `/${version}...HEAD`)
 links.splice(index + 1, 0, `[${ver}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/${pkg}-v${previous}...${version}`)
 sections[last] = links.join(linkBreak)
 

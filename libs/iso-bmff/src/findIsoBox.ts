@@ -18,6 +18,12 @@ import { traverseIsoBoxes } from './traverseIsoBoxes.ts'
  *
  * @public
  */
+export function findIsoBox<T, S extends T>(boxes: Iterable<T>, callback: (box: T) => box is S, config?: TraverseIsoBoxesConfig): S | null;
+
+/**
+ * @public
+ */
+export function findIsoBox<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null;
 export function findIsoBox<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null {
 	for (const box of traverseIsoBoxes(boxes, config)) {
 		if (callback(box)) {
