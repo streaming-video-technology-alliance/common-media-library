@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-drm",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"description": "Digital Rights Management (DRM) functionality",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -54,6 +54,7 @@
 		}
 	},
 	"peerDependencies": {
+		"@svta/cml-iso-bmff": "*",
 		"@svta/cml-utils": "*",
 		"@svta/cml-xml": "*"
 	}

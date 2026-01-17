@@ -215,6 +215,9 @@ export function findIsoBox<T$1, S extends T$1>(boxes: Iterable<T$1>, callback: (
 export function findIsoBox<T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1 | null;
 
 // @public
+export function fourCcToUint32(str: string): number;
+
+// @public
 export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
     type: T$1;
     data: Uint8Array;

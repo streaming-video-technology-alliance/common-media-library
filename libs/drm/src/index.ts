@@ -81,3 +81,4 @@ export * from './common/WIDEVINE_KEY_SYSTEM.ts'
 export * from './common/WIDEVINE_UUID.ts'
 export * from './common/WidevineRobustness.ts'
 
+export * from './ensureEncryptedInit.ts'
