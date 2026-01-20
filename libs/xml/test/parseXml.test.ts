@@ -98,6 +98,24 @@ describe('parseXml', () => {
 			strictEqual(textNode.parentElement, root)
 		})
 
+		it('sets parentElement correctly for CDATA nodes', () => {
+			const doc = parseXml('<root><![CDATA[some data]]></root>', { includeParentElement: true })
+			const root = doc.childNodes[0]
+			const cdataNode = root.childNodes[0]
+
+			equal(cdataNode.nodeName, '#cdata')
+			strictEqual(cdataNode.parentElement, root)
+		})
+
+		it('sets parentElement correctly for comment nodes', () => {
+			const doc = parseXml('<root><!-- comment --></root>', { includeParentElement: true, keepComments: true })
+			const root = doc.childNodes[0]
+			const commentNode = root.childNodes[0]
+
+			equal(commentNode.nodeName, '#comment')
+			strictEqual(commentNode.parentElement, root)
+		})
+
 		it('sets parentElement to null for doctype nodes (parent is #document)', () => {
 			const doc = parseXml('<!DOCTYPE html><root/>', { includeParentElement: true })
 			const doctype = doc.childNodes[0]
