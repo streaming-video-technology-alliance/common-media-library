@@ -8,11 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-20
+
 ### Added
 
 - Add `includeParentElement` option to `parseXml()` that adds `parentElement` property to each node following DOM spec
-
-## [1.1.0] - ????-??-??
 
 ## [1.0.2] - 2025-12-26
 
