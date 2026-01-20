@@ -17,7 +17,9 @@
 - Always run the typechecker against the entire project
 - Prefer running builds and tests at the workspace level
 - Always create tests for new members of a package's public API
+- Always update the package's version in the package.json file using semantic versioning based on the changes made
 - Always update the package's CHANGELOG.md when making changes
+- When a package's version changes, always create a patch version change to any other packages that depend on it
 
 # Documentation
 
