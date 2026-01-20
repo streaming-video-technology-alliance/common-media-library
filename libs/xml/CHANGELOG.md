@@ -14,6 +14,10 @@ and this project adheres to
 
 - Add `includeParentElement` option to `parseXml()` that adds `parentElement` property to each node following DOM spec
 
+### Changed
+
+- Improve `parseXml()` performance by moving constants to module scope, using `Set` for delimiter lookups, and optimizing bounds checks
+
 ## [1.0.2] - 2025-12-26
 
 ### Changed
