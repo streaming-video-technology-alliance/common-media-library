@@ -11,4 +11,5 @@ export type XmlNode = {
 	childNodes: XmlNode[];
 	prefix?: string | null;
 	localName?: string;
+	parentElement?: XmlNode | null;
 };

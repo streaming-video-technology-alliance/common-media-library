@@ -20,6 +20,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	const length = input.length
 	const keepComments = !!options.keepComments
 	const keepWhitespace = !!options.keepWhitespace
+	const includeParentElement = !!options.includeParentElement
 
 	const openBracket = '<'
 	const openBracketCC = '<'.charCodeAt(0)
@@ -35,6 +36,9 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	const closeCornerBracketCC = ']'.charCodeAt(0)
 	const nameSpacer = '\r\n\t>/= '
 
+	/**
+	 * Creates a text node
+	 */
 	function createTextNode(value: string, nodeName = '#text'): XmlNode {
 		return {
 			nodeName,
@@ -45,7 +49,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * parsing a list of entries
+	 * Parses a list of entries
 	 */
 	function parseChildren(tagName: string = ''): XmlNode[] {
 		const children: any[] = []
@@ -150,7 +154,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * returns the text outside of texts until the first '&lt;'
+	 * Returns the text outside of texts until the first '&lt;'
 	 */
 	function parseText(): string {
 		const start = pos
@@ -163,7 +167,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * returns text until the first nonAlphabetic letter
+	 * Returns text until the first nonAlphabetic letter
 	 */
 	function parseName(): string {
 		const start = pos
@@ -174,7 +178,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * parses the attributes of a node
+	 * Parses the attributes of a node
 	 */
 	function parseAttributes(): Record<string, string> {
 		const attributes: Record<string, string> = {}
@@ -211,7 +215,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * parses a node
+	 * Parses a node
 	 */
 	function parseNode(): XmlNode {
 		pos++
@@ -248,7 +252,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * is parsing a string, that starts with a char and with the same usually ' or "
+	 * Parses a string, that starts with a char and with the same usually ' or "
 	 */
 	function parseString(): string {
 		const startChar = input[pos]
@@ -257,10 +261,26 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 		return input.slice(startpos, pos)
 	}
 
-	return {
+	/**
+	 * Recursively sets parentElement on all nodes in the tree
+	 */
+	function setParentElements(node: XmlNode, parent: XmlNode | null): void {
+		node.parentElement = parent?.nodeName.startsWith('#') ? null : parent
+		for (const child of node.childNodes) {
+			setParentElements(child, node)
+		}
+	}
+
+	const document: XmlNode = {
 		nodeName: '#document',
 		nodeValue: null,
 		childNodes: parseChildren(''),
 		attributes: {},
 	}
+
+	if (includeParentElement) {
+		setParentElements(document, null)
+	}
+
+	return document
 }
