@@ -119,7 +119,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 						const startDoctype = pos + 1
 						pos += 2
 						let encapsuled = false
-						while ((input.charCodeAt(pos) !== CLOSE_BRACKET_CC || encapsuled) && pos < length) {
+						while (pos < length && (input.charCodeAt(pos) !== CLOSE_BRACKET_CC || encapsuled)) {
 							const cc = input.charCodeAt(pos)
 							if (cc === OPEN_CORNER_BRACKET_CC) {
 								encapsuled = true

@@ -3,6 +3,7 @@
 - npm run build -w <workspace>: Build the a module
 - npm run typecheck: Run the typechecker
 - npm test -w <workspace>: Run the tests for a module
+- npm run format: Run the formatter
 - npm run ver <package> <version>: Update the version for a package. The package identifier is the name of the package folder minus the `libs/` prefix, e.g. `iso-bmff`. The version should be in semver format `x.x.x` or `x.x.x-alpha.x`.
 
 # Code style
