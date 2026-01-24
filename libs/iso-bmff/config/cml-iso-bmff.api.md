@@ -1605,13 +1605,22 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView;
 export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView;
 
 // @public
+export function writeStco(box: ChunkOffsetBox): IsoBoxWriteView;
+
+// @public
 export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeStsc(box: SampleToChunkBox): IsoBoxWriteView;
 
 // @public
 export function writeStsd(box: SampleDescriptionBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeStss(box: SyncSampleBox): IsoBoxWriteView;
+
+// @public
+export function writeStsz(box: SampleSizeBox): IsoBoxWriteView;
 
 // @public
 export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView;
