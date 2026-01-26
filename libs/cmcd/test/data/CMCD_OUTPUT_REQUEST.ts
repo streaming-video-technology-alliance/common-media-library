@@ -14,7 +14,7 @@ export const CMCD_OUTPUT_REQUEST = {
 	'com.example-token': 's',
 	cs: 123456,
 	d: 325,
-	df: 5,
+	dfa: 5,
 	dl: 10000,
 	ec: ['ERR001', 'ERR002'] as const,
 	lab: 200,
