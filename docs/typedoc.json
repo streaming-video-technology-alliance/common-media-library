@@ -13,6 +13,9 @@
 		"jsDocCompatibility": false,
 		"entryPoints": [
 			"src/index.ts"
+		],
+		"projectDocuments": [
+			"docs/*.md"
 		]
 	},
 	"excludeInternal": true,

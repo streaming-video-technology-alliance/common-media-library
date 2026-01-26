@@ -1,8 +1,6 @@
 /**
  * A collection of tools for working with Common Media Client Data (CMCD).
  *
- * @packageDocumentation
- *
  * @public
  */
 export * from './appendCmcdHeaders.ts'
