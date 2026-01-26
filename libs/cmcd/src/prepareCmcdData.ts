@@ -47,6 +47,10 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		keys = keys.filter(filter)
 	}
 
+	if (keys.length === 0) {
+		return results
+	}
+
 	// Ensure all required keys are present before sorting
 	const needsTimestamp = reportingMode === CMCD_EVENT_MODE
 	if (needsTimestamp && !keys.includes('ts')) {

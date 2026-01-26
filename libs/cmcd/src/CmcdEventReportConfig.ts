@@ -22,9 +22,12 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
 	url: string;
 
 	/**
-	 * The events to report.
+	 * The events to report. If no events are provided,
+	 * the event target will be effectively disabled.
+	 *
+	 * @defaultValue `undefined`
 	 */
-	events: CmcdEventType[];
+	events?: CmcdEventType[];
 
 	/**
 	 * When the time interval event is sent, the interval at which the

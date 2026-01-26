@@ -22,6 +22,7 @@ type CmcdReportConfigNormalized = CmcdReportConfig & {
 }
 
 type CmcdEventReportConfigNormalized = CmcdEventReportConfig & CmcdReportConfigNormalized & {
+	events: CmcdEventType[];
 	interval: number;
 	batchSize: number;
 }
@@ -32,12 +33,12 @@ type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormali
 }
 
 function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig): CmcdEncodeOptions {
-	const { enabledKeys } = config
+	const { enabledKeys = [] } = config
 
 	return {
 		version: config.version || CMCD_V2,
 		reportingMode,
-		filter: enabledKeys ? (key: CmcdKey) => enabledKeys.includes(key) : undefined,
+		filter: (key: CmcdKey) => enabledKeys.includes(key),
 	}
 }
 
@@ -122,9 +123,12 @@ export class CmcdReporter {
 				return
 			}
 
-			target.intervalId = setInterval(() => {
+			const timeIntervalEvent = () => {
 				this.recordEvent(CMCD_EVENT_TIME_INTERVAL)
-			}, config.interval * 1000)
+			}
+
+			target.intervalId = setInterval(timeIntervalEvent, config.interval * 1000)
+			timeIntervalEvent()
 		})
 	}
 
@@ -165,8 +169,14 @@ export class CmcdReporter {
 	 * Records an event. Called by the player when an event occurs.
 	 *
 	 * @param type - The type of event to record.
+	 * @param data - Additional data to record with the event. This is
+	 *               the same as calling `update()` with the same data.
 	 */
-	recordEvent(type: CmcdEventType): void {
+	recordEvent(type: CmcdEventType, data?: Partial<CmcdData>): void {
+		if (data) {
+			this.update(data)
+		}
+
 		this.eventTargets.forEach((target) => {
 			target.queue.push({
 				...this.data,

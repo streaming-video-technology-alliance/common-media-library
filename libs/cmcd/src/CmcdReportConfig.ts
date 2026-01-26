@@ -16,11 +16,9 @@ export type CmcdReportConfig = {
 
 	/**
 	 * The list of CMCD keys to include in the report. If not provided,
-	 * all keys will be reported.
+	 * no keys will be reported.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	// TODO: How should an undefined enabledKeys array be handled?
-	//       Does that represent no key to report, or reporting all keys?
 	enabledKeys?: CmcdKey[];
 }

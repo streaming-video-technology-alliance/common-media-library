@@ -38,7 +38,7 @@ export const CMCD_HEADER_MAP: Record<CmcdKey, CmcdHeaderField> = {
 	cmsdd: CMCD_REQUEST,
 	cmsds: CMCD_REQUEST,
 	smrt: CMCD_REQUEST,
-	df: CMCD_REQUEST,
+	dfa: CMCD_REQUEST,
 	cs: CMCD_REQUEST,
 
 	// TODO: Which header to put the `ts` field is not defined yet.
@@ -52,6 +52,7 @@ export const CMCD_HEADER_MAP: Record<CmcdKey, CmcdHeaderField> = {
 	st: CMCD_SESSION,
 	v: CMCD_SESSION,
 	msd: CMCD_SESSION,
+	bsa: CMCD_SESSION,
 
 	// Status
 	bs: CMCD_STATUS,

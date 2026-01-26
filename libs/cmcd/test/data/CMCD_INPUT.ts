@@ -19,7 +19,7 @@ export const CMCD_INPUT: CmcdData = {
 	st: CmcdStreamType.VOD,
 	bsd: 2000,
 	cs: 123456,
-	df: 5,
+	dfa: 5,
 	ec: ['ERR001', 'ERR002'],
 	lab: 200,
 	lb: 100,

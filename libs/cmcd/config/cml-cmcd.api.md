@@ -153,7 +153,7 @@ export const CMCD_V2: 2;
 export type CmcdCustomKey = `${string}-${string}`;
 
 // @public
-export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
+export type CmcdData = Cmcd & CmcdRequest & CmcdResponse & CmcdEvent;
 
 // @public
 export type CmcdEncodeOptions = {
@@ -175,6 +175,7 @@ export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 // @public
 export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
     e?: CmcdEventType;
+    ts?: number;
 };
 
 // @public
@@ -280,7 +281,6 @@ export type CmcdRequest = Omit<Cmcd, "nrr"> & {
     bg?: boolean;
     sta?: CmcdPlayerState;
     pb?: number;
-    ts?: number;
     tpb?: number;
     lb?: number;
     tab?: number;
@@ -289,8 +289,9 @@ export type CmcdRequest = Omit<Cmcd, "nrr"> & {
     ec?: string | string[];
     msd?: number;
     sn?: number;
+    bsa?: number[];
     bsd?: number;
-    df?: number;
+    dfa?: number;
     cs?: number;
 };
 
