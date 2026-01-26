@@ -3,6 +3,7 @@
 - npm run build -w <workspace>: Build the a module
 - npm run typecheck: Run the typechecker
 - npm test -w <workspace>: Run the tests for a module
+- npm run format: Run the formatter
 - npm run ver <package> <version>: Update the version for a package. The package identifier is the name of the package folder minus the `libs/` prefix, e.g. `iso-bmff`. The version should be in semver format `x.x.x` or `x.x.x-alpha.x`.
 
 # Code style
@@ -17,7 +18,9 @@
 - Always run the typechecker against the entire project
 - Prefer running builds and tests at the workspace level
 - Always create tests for new members of a package's public API
+- Always update the package's version in the package.json file using semantic versioning based on the changes made
 - Always update the package's CHANGELOG.md when making changes
+- When a package's version changes, always create a patch version change to any other packages that depend on it
 
 # Documentation
 
