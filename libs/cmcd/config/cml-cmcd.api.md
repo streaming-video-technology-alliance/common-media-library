@@ -67,6 +67,9 @@ export const CMCD_EVENT_AD_START: "as";
 export const CMCD_EVENT_BACKGROUNDED_MODE: "b";
 
 // @public
+export const CMCD_EVENT_BITRATE_CHANGE: "br";
+
+// @public
 export const CMCD_EVENT_CONTENT_ID: "c";
 
 // @public
@@ -180,12 +183,14 @@ export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 export type CmcdEvent = CmcdRequest & {
     cen?: string;
     e?: CmcdEventType;
+    h?: string;
     sn?: number;
     ts?: number;
 };
 
 // @public
 export const CmcdEventType: {
+    readonly BITRATE_CHANGE: typeof CMCD_EVENT_BITRATE_CHANGE;
     readonly PLAY_STATE: typeof CMCD_EVENT_PLAY_STATE;
     readonly ERROR: typeof CMCD_EVENT_ERROR;
     readonly TIME_INTERVAL: typeof CMCD_EVENT_TIME_INTERVAL;
@@ -235,7 +240,7 @@ export const CmcdHeaderField: {
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
 // @public
-export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
+export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdRequestKey[]>;
 
 // @public @deprecated
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
@@ -286,7 +291,7 @@ export type CmcdRequest = Omit<Cmcd, "nrr"> & {
     bsd?: CmcdObjectTypeList;
     bsda?: CmcdObjectTypeList;
     cdn?: string;
-    cs?: number;
+    cs?: string;
     dfa?: number;
     ec?: string[];
     lab?: CmcdObjectTypeList;
@@ -299,20 +304,26 @@ export type CmcdRequest = Omit<Cmcd, "nrr"> & {
     sn?: number;
     sta?: CmcdPlayerState;
     tab?: CmcdObjectTypeList;
-    tbl?: number;
+    tbl?: CmcdObjectTypeList;
     tpb?: CmcdObjectTypeList;
 };
 
 // @public
+export type CmcdRequestData = Cmcd & CmcdRequest;
+
+// @public
+export type CmcdRequestKey = keyof CmcdRequestData;
+
+// @public
 export type CmcdResponse = CmcdRequest & {
+    cmsdd?: string;
+    cmsds?: string;
     rc?: number;
+    smrt?: string;
     ttfb?: number;
     ttfbb?: number;
     ttlb?: number;
     url?: string;
-    cmsdd?: string;
-    cmsds?: string;
-    smrt?: number;
 };
 
 // @public
@@ -356,7 +367,7 @@ export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
 export function fromCmcdUrl(url: string): Cmcd;
 
 // @public
-export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData>;
+export function groupCmcdHeaders(cmcd: CmcdRequestData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdRequestData>;
 
 // @public
 export function isCmcdCustomKey(key: CmcdKey): boolean;

@@ -15,59 +15,74 @@ import type { CmcdRequest } from './CmcdRequest.ts'
 export type CmcdEvent = CmcdRequest & {
 	/**
 	 * Custom Event Name
+	 *
+	 * Used to define a custom event name. A maximum length of 64 characters is allowed. This key MUST be sent when the event type is
+	 * 'ce' (custom event) and MUST NOT be sent when the event type is any other value. A custom key-value pair MAY be used to transfer
+	 * a custom value associated with this event. The names chosen SHOULD associate the custom event name with the custom key name.
+	 *
+	 * String
 	 */
 	cen?: string;
 
 	/**
-	 * Event (event mode; e.g. "e", "t", "ps")
+	 * Event
 	 *
-	 * This key MUST only be used in Event mode.
+	 * This key MUST only be used in Event mode and MUST be present on all reports. The minimum recommended set of supported events
+	 * are: `ps`, `e`, `t`, and `rr`.
 	 *
-	 * ps - play state change. This token MUST be accompanied by a 'sta' key carrying the new state.
+	 * - `abs` - ad break start: The start of an ad break or ad pod which would contain 1 or more sequential ads.
+	 * - `abe` - ad break end: This signals the end of an ad break or ad pod.
+	 * - `ae` - ad end: This token should be used at the end of the current playing ad but before exiting the ad.
+	 * - `as` - ad start: This token should be used when a new ad begins playing within an ad break pod.
+	 * - `b` - The player has entered backgrounded mode if this event is accompanied by the 'bg' key and exited backgrounded mode if not.
+	 * - `bc` - The bitrate being requested by the player, for any object type, has changed.
+	 * - `c` - content ID has changed.
+	 * - `ce` - custom event.
+	 * - `e` - the player has experienced an error. This token MUST be accompanied by a 'ec' key defining the player error code.
+	 * - `h` - hostname has changed.
+	 * - `m` - mute. The user activated the mute control or set the volume to zero.
+	 * - `pc` - playerCollapse: the user activated a control to reduce the player to a smaller size.
+	 * - `pe` - playerExpand: The user activated a control to extend the player to a larger size.
+	 * - `pr` - playback rate change. This event only triggers while the state is playing ('p').
+	 * - `ps` - play state change. This token MUST be accompanied by a 'sta' key carrying the new state.
+	 * - `rr` - response received: This signals the receipt of a response. This event SHOULD be accompanied with the url key.
+	 * - `sk` - skip: the user activated a control to skip an advertisement.
+	 * - `t` - time interval. A default interval of 30 seconds SHOULD be used. This event MUST be supported by all players that support Event mode.
+	 * - `um` - unmute. The user deactivated the mute control or raised the volume above zero if it was previously set to zero.
 	 *
-	 * e - the player has experienced an error. This token MUST be accompanied by a 'ec' key defining the player error code.
-	 *
-	 * t - time interval. The interval at which these reports are made is application-defined. A default interval of 30 seconds SHOULD
-	 * be used if no explicit application interval is provided. Short form content may wish to use a shorter interval.
-	 * An application-defined interval of zero should be interpreted as turning off interval event reporting.
-	 * This event MUST be supported by all players that support Event mode.
-	 *
-	 * c - content ID has changed. This token MUST be accompanied by a 'cid' key defining the new content ID.
-	 *
-	 * b - the player has entered backgrounded mode if this event is accompanied by the ‘bg’ key and exited backgrounded mode if not.
-	 *
-	 * m - mute. The user activated the mute control or set the volume to zero.
-	 *
-	 * um - unmute. The user deactivated the mute control or raised the volume above zero if it was previously set to zero.
-	 *
-	 * pe - playerExpand. The user activated a control to extend the player to a larger size. The definition of this event is intended to be
-	 * compliant with the VAST [VAST] Player Operation Metrics.
-	 *
-	 * c - playerCollapse: the user activated a control to reduce the player to a smaller size. The definition of this event is intended to be
-	 * compliant with the VAST [VAST] Player Operation Metrics.
-	 *
-	 * Token - one of [ps,e,t,c,b,m,u m, abs, abe, as, ae]
+	 * Token - one of [abs,abe,ae,as,b,bc,c,ce,e,h,m,pc,pe,ps,rr,sk,t,um]
 	 */
 	e?: CmcdEventType;
 
 	/**
-	 * Host name
+	 * Hostname
+	 *
+	 * A string identifying the current hostname from which the player is retrieving content. Maximum length is 128 characters.
+	 *
+	 * String
 	 */
-	h?: string
+	h?: string;
 
 	/**
 	 * Sequence Number
+	 *
+	 * A monotonically increasing integer to identify the sequence of a CMCD report to a target within a session. This MUST be reset to
+	 * zero on the start of a new session-id. Sequence numbers increase independently per each combination of mode and target.
+	 *
+	 * Integer
 	 */
 	sn?: number;
 
 	/**
-	 * Timestamp (ms since UNIX epoch, required for event mode)
+	 * Timestamp
 	 *
-	 * The timestamp at which the associated event occurred, expressed as milliseconds since the UNIX epoch.
-	 * When the event is a request for a media object the time SHOULD reference when the request was first initiated.
-	 * When used with Response Mode, the timestamp should indicate the time at which the object was first requested and not when it was received.
+	 * The timestamp at which the associated event occurred, expressed as the number of milliseconds that have elapsed since the Unix
+	 * Epoch (January 1, 1970, at 00:00:00 UTC), excluding leap seconds. When the event is a request for a media object the time SHOULD
+	 * reference when the request was first initiated.
+	 *
+	 * This key MUST be included with all Event reports.
 	 *
 	 * Integer milliseconds
-	*/
+	 */
 	ts?: number;
 };

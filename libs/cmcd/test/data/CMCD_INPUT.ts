@@ -18,7 +18,7 @@ export const CMCD_INPUT: CmcdData = {
 	sf: CmcdStreamingFormat.DASH,
 	st: CmcdStreamType.VOD,
 	bsd: 2000,
-	cs: 123456,
+	cs: '123456',
 	dfa: 5,
 	ec: ['ERR001', 'ERR002'],
 	lab: 200,
@@ -54,7 +54,7 @@ export const CMCD_INPUT: CmcdData = {
 	url: 'https://example.com/media/segment.m4s',
 	cmsdd: 'base64-encoded-cmsd-dynamic-data',
 	cmsds: 'base64-encoded-cmsd-static-data',
-	smrt: 12345,
+	smrt: '12345',
 
 	// custom keys
 	['com.example-hello']: 'world',
