@@ -1,13 +1,12 @@
-import type { Cmcd } from './Cmcd.ts'
 import { type CmcdHeaderField, CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS } from './CmcdHeaderField.ts'
-import type { CmcdRequest } from './CmcdRequest.ts'
+import type { CmcdRequestKey } from './CmcdRequestKey.ts'
 
 /**
  * The map of CMCD keys to their appropriate header shard.
  *
  * @internal
  */
-export const CMCD_HEADER_MAP: Record<keyof Cmcd | keyof CmcdRequest, CmcdHeaderField> = {
+export const CMCD_HEADER_MAP: Record<CmcdRequestKey, CmcdHeaderField> = {
 	// Object
 	ab: CMCD_OBJECT,
 	br: CMCD_OBJECT,
