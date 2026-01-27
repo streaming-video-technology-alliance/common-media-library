@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added writers: `stsc`, `stsz`, `stco`.
+
 ## [1.0.0-alpha.9] - 2026-01-16
 
 ### Added
