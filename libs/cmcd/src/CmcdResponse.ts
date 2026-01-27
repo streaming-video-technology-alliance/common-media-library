@@ -9,6 +9,26 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  */
 export type CmcdResponse = CmcdRequest & {
 	/**
+	 * CMSD Dynamic Header (response mode)
+	 *
+	 * Holds a Base64 [base64] encoded copy of the CMSD data received on the CMSD-Dynamic response header.
+	 * This key MUST only be used in RESPONSE mode.
+	 *
+	 * String
+	*/
+	cmsdd?: string;
+
+	/**
+	 * CMSD Static Header (response mode)
+	 *
+	 * Holds a Base64 [base64] encoded copy of the CMSD data received on the CMSD-Static response header.
+	 * This key MUST only be used in RESPONSE mode.
+	 *
+	 * String
+	*/
+	cmsds?: string;
+
+	/**
 	 * Response code for object request (response mode)
 	 *
 	 * The response code received when requesting a media object. In a redirect scenario, this would be the final response code received.
@@ -17,6 +37,14 @@ export type CmcdResponse = CmcdRequest & {
 	 * Integer
 	*/
 	rc?: number;
+
+	/**
+	 * SMRT Header
+	 *
+	 * Holds a Base64 [base64] encoded copy of the streaming media response tracing data received on the SMRT-Data header.
+	 * This key MUST only be used in RESPONSE mode.
+	 */
+	smrt?: number;
 
 	/**
 	 * Time to first byte (ms; response mode)
@@ -59,32 +87,4 @@ export type CmcdResponse = CmcdRequest & {
 	 * String
 	*/
 	url?: string;
-
-	/**
-	 * CMSD Dynamic Header (response mode)
-	 *
-	 * Holds a Base64 [base64] encoded copy of the CMSD data received on the CMSD-Dynamic response header.
-	 * This key MUST only be used in RESPONSE mode.
-	 *
-	 * String
-	*/
-	cmsdd?: string;
-
-	/**
-	 * CMSD Static Header (response mode)
-	 *
-	 * Holds a Base64 [base64] encoded copy of the CMSD data received on the CMSD-Static response header.
-	 * This key MUST only be used in RESPONSE mode.
-	 *
-	 * String
-	*/
-	cmsds?: string;
-
-	/**
-	 * SMRT Header
-
-	 * Holds a Base64 [base64] encoded copy of the streaming media response tracing data received on the SMRT-Data header.
-	 * This key MUST only be used in RESPONSE mode.
-	 */
-	smrt?: number;
 };

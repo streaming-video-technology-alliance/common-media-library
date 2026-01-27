@@ -1,4 +1,3 @@
-import type { CmcdEventExcludedKeys } from './CmcdEventExcludedKeys.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdRequest } from './CmcdRequest.ts'
 
@@ -13,7 +12,12 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  *
  * @public
  */
-export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
+export type CmcdEvent = CmcdRequest & {
+	/**
+	 * Custom Event Name
+	 */
+	cen?: string;
+
 	/**
 	 * Event (event mode; e.g. "e", "t", "ps")
 	 *
@@ -45,6 +49,16 @@ export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
 	 * Token - one of [ps,e,t,c,b,m,u m, abs, abe, as, ae]
 	 */
 	e?: CmcdEventType;
+
+	/**
+	 * Host name
+	 */
+	h?: string
+
+	/**
+	 * Sequence Number
+	 */
+	sn?: number;
 
 	/**
 	 * Timestamp (ms since UNIX epoch, required for event mode)

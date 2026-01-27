@@ -2,6 +2,7 @@ import type { SfItem } from '@svta/cml-structured-field-values'
 import type { ValueOrArray } from '@svta/cml-utils'
 import type { CmcdCustomKey } from './CmcdCustomKey.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
+import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdStreamType } from './CmcdStreamType.ts'
 import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
 import type { CmcdValue } from './CmcdValue.ts'
@@ -34,7 +35,7 @@ export type Cmcd = {
 	 *
 	 * Integer kbps
 	 */
-	br?: number;
+	br?: CmcdObjectTypeList;
 
 	/**
 	 * Object duration
@@ -73,7 +74,7 @@ export type Cmcd = {
 	 *
 	 * Integer Kbps
 	 */
-	tb?: number;
+	tb?: CmcdObjectTypeList;
 
 	//////////////////
 	// CMCD Request //
@@ -86,7 +87,7 @@ export type Cmcd = {
 	 *
 	 * Integer milliseconds
 	 */
-	bl?: number;
+	bl?: CmcdObjectTypeList;
 
 	/**
 	 * Deadline
@@ -109,7 +110,7 @@ export type Cmcd = {
 	 *
 	 * Integer kbps
 	 */
-	mtp?: number;
+	mtp?: CmcdObjectTypeList;
 
 	/**
 	 * Next object request
@@ -120,7 +121,7 @@ export type Cmcd = {
 	 *
 	 * String
 	 */
-	nor?: ValueOrArray<string | SfItem>;
+	nor?: ValueOrArray<string | SfItem<string, { r: string }>>;
 
 	/**
 	 * Next range request

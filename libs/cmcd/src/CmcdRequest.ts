@@ -1,4 +1,5 @@
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdPlayerState } from './CmcdPlayerState.ts'
 
 /**
@@ -17,18 +18,45 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 *
 	 * Integer kbps
 	*/
-	ab?: number;
+	ab?: CmcdObjectTypeList;
 
 	/**
-	 * Target buffer length (ms)
+	 * Backgrounded (all players in session not visible, boolean)
 	 *
-	 * The target buffer length associated with the media object being requested at the time of the request.
-	 * This value SHOULD be rounded to the nearest 100 ms. This value MUST NOT be sent for objects which do not have an object
-	 * type of 'a', 'v', 'av', 'tt', 'c', or 'o'
+	 * All players in a session are currently in a state that is not visible to the user.
+	 * This key SHOULD only be sent if it is TRUE.
+	 * If the visibility state of the player is not known this key SHOULD NOT be reported
+	 *
+	 * Bool
+	*/
+	bg?: boolean;
+
+	/**
+	 * Buffer starvation absolute
+	 *
+	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
+	 *
+	 * If the object type 'ot' key is sent along with this key, then the 'bsd' key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
 	 *
 	 * Integer milliseconds
-	*/
-	tbl?: number;
+	 */
+	bsa?: CmcdObjectTypeList;
+
+	/**
+	 * Buffer starvation duration
+	 *
+	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
+	 *
+	 * If the object type 'ot' key is sent along with this key, then the 'bsd' key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
+	 *
+	 * Integer milliseconds
+	 */
+	bsd?: CmcdObjectTypeList;
+
+	/**
+	 *
+	 */
+	bsda?: CmcdObjectTypeList;
 
 	/**
 	 * CDN ID (string, max 128 chars)
@@ -38,6 +66,67 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * String
 	*/
 	cdn?: string;
+
+	/**
+	 * Content Signature
+	 *
+	 * A string representing a signature of the content being played. This field SHOULD vary with content ID and be bound by some mechanism to the content.
+	 * For example, this field may be used to transmit the C2PA signature associated with the content being viewed.
+	 *
+	 * Integer bytes
+	*/
+	cs?: number;
+
+	/**
+	 * Dropped Frames
+	 *
+	 * An absolute count of dropped frames since session initiation. This key should only be sent for content types of 'v','av' or 'o'.
+	 * Note that this value will be driven by the content being rendered rather than the content being retrieved, therefore it is beneficial if accompanied by the playhead time 'pt' key to allow for correct interpretation.
+	 *
+	 * Integer
+	*/
+	dfa?: number;
+
+	/**
+	 * Error code(s), application-defined
+	 *
+	 * A string defining an error code produced by the player.
+	 * The namespace and formatting of this error code is left to the application.
+	 * Use of standardized error codes is recommended.
+	 * Errors should be buffered per report destination as they occur and reported along with the next CMCD report.
+	 * With Event mode there is the option to report errors as they occur.
+	 *
+	 * An Inner List of Strings
+	*/
+	ec?: string[];
+
+	/**
+	 * Lowest aggregated encoded bitrate (kbps)
+	 *
+	 * The lowest aggregated bitrate rendition in the manifest or playlist.
+	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
+	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
+	 * The aggregate encoded bitrate is of the complete media object including all object types.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
+	 * This value MUST NOT be sent if the lowest encoded bitrate is known.
+	 *
+	 * Integer Kbps
+	 */
+	lab?: CmcdObjectTypeList;
+
+	/**
+	 * Lowest encoded bitrate (kbps)
+	 *
+	 * The lowest bitrate rendition in the manifest or playlist.
+	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
+	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
+	 * This lowest bitrate MUST apply to the object type being requested.
+	 * Requests for video objects MUST specify the lowest video bitrate and requests for audio objects MUST specify the lowest audio bitrate.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
+	 *
+	 * Integer Kbps
+	*/
+	lb?: CmcdObjectTypeList;
 
 	/**
 	 * Live stream latency (ms)
@@ -50,15 +139,49 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	ltc?: number;
 
 	/**
-	 * Backgrounded (all players in session not visible, boolean)
+	 * Media Start Delay (ms)
 	 *
-	 * All players in a session are currently in a state that is not visible to the user.
-	 * This key SHOULD only be sent if it is TRUE.
-	 * If the visibility state of the player is not known this key SHOULD NOT be reported
+	 * Measures the initial delay in wall-clock time from when a player is instructed to play media for a given session to when any media begins playback,
+	 * whether it be primary content or interstitial content.
+	 * This value SHOULD be the time difference between the "starting" and "playing" states.
+	 * This key MUST only be sent once per Session ID and MUST be sent for each reporting mode which is active within the player.
+	 * For request and response reporting modes, this key SHOULD be sent on the next media object request following successful startup.
 	 *
-	 * Bool
+	 * Integer milliseconds
 	*/
-	bg?: boolean;
+	msd?: number;
+
+	/**
+	 *
+	 */
+	nr?: boolean;
+
+	/**
+	 * The encoded bitrate of the audio or video object being shown to the end user.
+	 *
+	 * Integer Kbps
+	 */
+	pb?: CmcdObjectTypeList;
+
+	/**
+	 * Playhead time (ms)
+	 *
+	 * The playhead time, expressed in milliseconds, which is being rendered to the viewer when the report is made.
+	 * For Response and State-Interval modes, this corresponds to the playhead time that was rendered at the wallclock time reported by the timestamp field.
+	 *
+	 * Integer milliseconds
+	*/
+	pt?: number;
+
+	/**
+	 * Sequence Number
+	 *
+	 * A monotonically increasing integer to identify the sequence of a CMCD report to a target within a session. This MUST be reset to zero on the start of
+	 * a new session-id. Sequence numbers increase independently per each combination of mode and target.
+	 *
+	 * Integer
+	*/
+	sn?: number;
 
 	/**
 	 * State (player state, e.g. "s", "p", etc.)
@@ -84,11 +207,29 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	sta?: CmcdPlayerState;
 
 	/**
-	 * The encoded bitrate of the audio or video object being shown to the end user.
+	 * Top aggregated encoded bitrate (kbps)
+	 *
+	 * The highest aggregated bitrate rendition in the manifest or playlist.
+	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
+	 * If the playlist declares both peak and average bitrate values,the peak value MUST be transmitted.
+	 * The aggregate encoded bitrate is of the complete media object including all object types.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
+	 * This value MUST NOT be sent if the top encoded bitrate is known
 	 *
 	 * Integer Kbps
-	 */
-	pb?: number;
+	*/
+	tab?: CmcdObjectTypeList;
+
+	/**
+	 * Target buffer length (ms)
+	 *
+	 * The target buffer length associated with the media object being requested at the time of the request.
+	 * This value SHOULD be rounded to the nearest 100 ms. This value MUST NOT be sent for objects which do not have an object
+	 * type of 'a', 'v', 'av', 'tt', 'c', or 'o'
+	 *
+	 * Integer milliseconds
+	*/
+	tbl?: number;
 
 	/**
 	 * Top playable bitrate (kbps)
@@ -105,135 +246,5 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 *
 	 * Integer Kbps
 	*/
-	tpb?: number;
-
-	/**
-	 * Lowest encoded bitrate (kbps)
-	 *
-	 * The lowest bitrate rendition in the manifest or playlist.
-	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
-	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
-	 * This lowest bitrate MUST apply to the object type being requested.
-	 * Requests for video objects MUST specify the lowest video bitrate and requests for audio objects MUST specify the lowest audio bitrate.
-	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
-	 *
-	 * Integer Kbps
-	*/
-	lb?: number;
-
-	/**
-	 * Top aggregated encoded bitrate (kbps)
-	 *
-	 * The highest aggregated bitrate rendition in the manifest or playlist.
-	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
-	 * If the playlist declares both peak and average bitrate values,the peak value MUST be transmitted.
-	 * The aggregate encoded bitrate is of the complete media object including all object types.
-	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
-	 * This value MUST NOT be sent if the top encoded bitrate is known
-	 *
-	 * Integer Kbps
-	*/
-	tab?: number;
-
-	/**
-	 * Lowest aggregated encoded bitrate (kbps)
-	 *
-	 * The lowest aggregated bitrate rendition in the manifest or playlist.
-	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
-	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
-	 * The aggregate encoded bitrate is of the complete media object including all object types.
-	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av' or 'c'.
-	 * This value MUST NOT be sent if the lowest encoded bitrate is known.
-	 *
-	 * Integer Kbps
-	 */
-	lab?: number;
-
-	/**
-	 * Playhead time (ms)
-	 *
-	 * The playhead time, expressed in milliseconds, which is being rendered to the viewer when the report is made.
-	 * For Response and State-Interval modes, this corresponds to the playhead time that was rendered at the wallclock time reported by the timestamp field.
-	 *
-	 * Integer milliseconds
-	*/
-	pt?: number;
-
-	/**
-	 * Error code(s), application-defined
-	 *
-	 * A string defining an error code produced by the player.
-	 * The namespace and formatting of this error code is left to the application.
-	 * Use of standardized error codes is recommended.
-	 * Errors should be buffered per report destination as they occur and reported along with the next CMCD report.
-	 * With Event mode there is the option to report errors as they occur.
-	 *
-	 * An Inner List of Strings
-	*/
-	ec?: string | string[];
-
-	/**
-	 * Media Start Delay (ms)
-	 *
-	 * Measures the initial delay in wall-clock time from when a player is instructed to play media for a given session to when any media begins playback,
-	 * whether it be primary content or interstitial content.
-	 * This value SHOULD be the time difference between the "starting" and "playing" states.
-	 * This key MUST only be sent once per Session ID and MUST be sent for each reporting mode which is active within the player.
-	 * For request and response reporting modes, this key SHOULD be sent on the next media object request following successful startup.
-	 *
-	 * Integer milliseconds
-	*/
-	msd?: number;
-
-	/**
-	 * Sequence Number
-	 *
-	 * A monotonically increasing integer to identify the sequence of a CMCD report to a target within a session. This MUST be reset to zero on the start of
-	 * a new session-id. Sequence numbers increase independently per each combination of mode and target.
-	 *
-	 * Integer
-	*/
-	sn?: number;
-
-	/**
-	 * Buffer starvation absolute
-	 *
-	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
-	 *
-	 * If the object type 'ot' key is sent along with this key, then the 'bsd' key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
-	 *
-	 * Integer milliseconds
-	 */
-	bsa?: number[];
-
-	/**
-	 * Buffer starvation duration
-	 *
-	 * Duration of the latest rebuffering period reported once the rebuffering has completed. This value MUST only be reported once per rebuffering incident, per object type.
-	 *
-	 * If the object type 'ot' key is sent along with this key, then the 'bsd' key refers to the buffer associated with the particular object type. If no object type is communicated, then the buffer state applies to the current session.
-	 *
-	 * Integer milliseconds
-	 */
-	bsd?: number;
-
-	/**
-	 * Dropped Frames
-	 *
-	 * An absolute count of dropped frames since session initiation. This key should only be sent for content types of 'v','av' or 'o'.
-	 * Note that this value will be driven by the content being rendered rather than the content being retrieved, therefore it is beneficial if accompanied by the playhead time 'pt' key to allow for correct interpretation.
-	 *
-	 * Integer
-	*/
-	dfa?: number;
-
-	/**
-	 * Content Signature
-	 *
-	 * A string representing a signature of the content being played. This field SHOULD vary with content ID and be bound by some mechanism to the content.
-	 * For example, this field may be used to transmit the C2PA signature associated with the content being viewed.
-	 *
-	 * Integer bytes
-	*/
-	cs?: number;
+	tpb?: CmcdObjectTypeList;
 };

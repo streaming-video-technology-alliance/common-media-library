@@ -7,6 +7,8 @@
 import { CmObjectType } from '@svta/cml-cta';
 import { CmStreamingFormat } from '@svta/cml-cta';
 import { CmStreamType } from '@svta/cml-cta';
+import { ExclusiveRecord } from '@svta/cml-utils';
+import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
@@ -21,14 +23,16 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 // @public
 export type Cmcd = {
     [index: CmcdCustomKey]: CmcdValue | undefined;
-    br?: number;
+    br?: CmcdObjectTypeList;
     d?: number;
     ot?: CmcdObjectType;
-    tb?: number;
-    bl?: number;
+    tb?: CmcdObjectTypeList;
+    bl?: CmcdObjectTypeList;
     dl?: number;
-    mtp?: number;
-    nor?: ValueOrArray<string | SfItem>;
+    mtp?: CmcdObjectTypeList;
+    nor?: ValueOrArray<string | SfItem<string, {
+        r: string;
+    }>>;
     nrr?: string;
     su?: boolean;
     cid?: string;
@@ -42,7 +46,7 @@ export type Cmcd = {
 };
 
 // @public
-export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
+export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "bsd", "cdn", "cid", "cs", "dfa", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
 
 // @public
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
@@ -173,13 +177,12 @@ export const CmcdEncoding: typeof CmcdTransmissionMode;
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
 // @public
-export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
+export type CmcdEvent = CmcdRequest & {
+    cen?: string;
     e?: CmcdEventType;
+    sn?: number;
     ts?: number;
 };
-
-// @public
-export type CmcdEventExcludedKeys = "bsd" | "d" | "dl" | "nor" | "ot" | "rtp" | "sid" | "su";
 
 // @public
 export const CmcdEventType: {
@@ -247,6 +250,9 @@ export const CmcdObjectType: typeof CmObjectType;
 export type CmcdObjectType = CmObjectType;
 
 // @public
+export type CmcdObjectTypeList = ValueOrArray<number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>>;
+
+// @public
 export const CmcdPlayerState: {
     readonly STARTING: "s";
     readonly PLAYING: "p";
@@ -274,25 +280,27 @@ export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 
 // @public
 export type CmcdRequest = Omit<Cmcd, "nrr"> & {
-    ab?: number;
-    tbl?: number;
-    cdn?: string;
-    ltc?: number;
+    ab?: CmcdObjectTypeList;
     bg?: boolean;
-    sta?: CmcdPlayerState;
-    pb?: number;
-    tpb?: number;
-    lb?: number;
-    tab?: number;
-    lab?: number;
-    pt?: number;
-    ec?: string | string[];
-    msd?: number;
-    sn?: number;
-    bsa?: number[];
-    bsd?: number;
-    dfa?: number;
+    bsa?: CmcdObjectTypeList;
+    bsd?: CmcdObjectTypeList;
+    bsda?: CmcdObjectTypeList;
+    cdn?: string;
     cs?: number;
+    dfa?: number;
+    ec?: string[];
+    lab?: CmcdObjectTypeList;
+    lb?: CmcdObjectTypeList;
+    ltc?: number;
+    msd?: number;
+    nr?: boolean;
+    pb?: CmcdObjectTypeList;
+    pt?: number;
+    sn?: number;
+    sta?: CmcdPlayerState;
+    tab?: CmcdObjectTypeList;
+    tbl?: number;
+    tpb?: CmcdObjectTypeList;
 };
 
 // @public
@@ -379,6 +387,9 @@ export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
 export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+
+// @public
+export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfItem<V, P>;
 
 // (No @packageDocumentation comment for this package)
 
