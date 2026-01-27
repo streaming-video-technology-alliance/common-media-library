@@ -2,6 +2,7 @@
 	"$schema": "https://typedoc.org/schema.json",
 	"name": "CML",
 	"alwaysCreateEntryPointModule": false,
+	"favicon": "./favicon3-150x150.png",
 	"groupReferencesByType": false,
 	"cleanOutputDir": true,
 	"customCss": "./styles.css",

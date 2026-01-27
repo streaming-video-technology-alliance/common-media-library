@@ -2,6 +2,21 @@ import { unescapeHtml } from '@svta/cml-utils'
 import type { XmlNode } from './XmlNode.ts'
 import type { XmlParseOptions } from './XmlParseOptions.ts'
 
+// Character code constants (computed once at module load)
+const OPEN_BRACKET_CC = 60            // '<'
+const CLOSE_BRACKET_CC = 62           // '>'
+const MINUS_CC = 45                   // '-'
+const SLASH_CC = 47                   // '/'
+const QUESTION_CC = 63                // '?'
+const EXCLAMATION_CC = 33             // '!'
+const SINGLE_QUOTE_CC = 39            // "'"
+const DOUBLE_QUOTE_CC = 34            // '"'
+const OPEN_CORNER_BRACKET_CC = 91     // '['
+const CLOSE_CORNER_BRACKET_CC = 93    // ']'
+
+// Set for fast name delimiter lookup: \r \n \t > / = space
+const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
+
 /**
  * Parse XML into a JS object with no validation and some failure tolerance
  *
@@ -20,21 +35,11 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	const length = input.length
 	const keepComments = !!options.keepComments
 	const keepWhitespace = !!options.keepWhitespace
+	const includeParentElement = !!options.includeParentElement
 
-	const openBracket = '<'
-	const openBracketCC = '<'.charCodeAt(0)
-	const closeBracket = '>'
-	const closeBracketCC = '>'.charCodeAt(0)
-	const minusCC = '-'.charCodeAt(0)
-	const slashCC = '/'.charCodeAt(0)
-	const questionCC = '?'.charCodeAt(0)
-	const exclamationCC = '!'.charCodeAt(0)
-	const singleQuoteCC = "'".charCodeAt(0)
-	const doubleQuoteCC = '"'.charCodeAt(0)
-	const openCornerBracketCC = '['.charCodeAt(0)
-	const closeCornerBracketCC = ']'.charCodeAt(0)
-	const nameSpacer = '\r\n\t>/= '
-
+	/**
+	 * Creates a text node
+	 */
 	function createTextNode(value: string, nodeName = '#text'): XmlNode {
 		return {
 			nodeName,
@@ -45,15 +50,17 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * parsing a list of entries
+	 * Parses a list of entries
 	 */
 	function parseChildren(tagName: string = ''): XmlNode[] {
-		const children: any[] = []
-		while (input[pos]) {
-			if (input.charCodeAt(pos) == openBracketCC) {
-				if (input.charCodeAt(pos + 1) === slashCC) {
+		const children: XmlNode[] = []
+		while (pos < length) {
+			const c = input.charCodeAt(pos)
+			if (c === OPEN_BRACKET_CC) {
+				const next = input.charCodeAt(pos + 1)
+				if (next === SLASH_CC) {
 					const closeStart = pos + 2
-					pos = input.indexOf(closeBracket, pos)
+					pos = input.indexOf('>', pos)
 					if (!input.startsWith(tagName, closeStart)) {
 						const parsedText = input.substring(0, pos).split('\n')
 						throw new Error(
@@ -69,18 +76,19 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 
 					return children
 				}
-				else if (input.charCodeAt(pos + 1) === questionCC) {
+				else if (next === QUESTION_CC) {
 					// xml declaration
-					pos = input.indexOf(closeBracket, pos)
+					pos = input.indexOf('>', pos)
 					pos++
 					continue
 				}
-				else if (input.charCodeAt(pos + 1) === exclamationCC) {
-					if (input.charCodeAt(pos + 2) == minusCC) {
+				else if (next === EXCLAMATION_CC) {
+					const third = input.charCodeAt(pos + 2)
+					if (third === MINUS_CC) {
 						// comment support
 						const startCommentPos = pos
-						while (pos !== -1 && !(input.charCodeAt(pos) === closeBracketCC && input.charCodeAt(pos - 1) == minusCC && input.charCodeAt(pos - 2) == minusCC && pos != -1)) {
-							pos = input.indexOf(closeBracket, pos + 1)
+						while (pos !== -1 && !(input.charCodeAt(pos) === CLOSE_BRACKET_CC && input.charCodeAt(pos - 1) === MINUS_CC && input.charCodeAt(pos - 2) === MINUS_CC)) {
+							pos = input.indexOf('>', pos + 1)
 						}
 						if (pos === -1) {
 							pos = length
@@ -90,13 +98,13 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 						}
 					}
 					else if (
-						input.charCodeAt(pos + 2) === openCornerBracketCC &&
-						input.charCodeAt(pos + 8) === openCornerBracketCC &&
+						third === OPEN_CORNER_BRACKET_CC &&
+						input.charCodeAt(pos + 8) === OPEN_CORNER_BRACKET_CC &&
 						input.startsWith('CDATA', pos + 3)
 					) {
 						// cdata
 						const cdataEndIndex = input.indexOf(']]>', pos)
-						if (cdataEndIndex == -1) {
+						if (cdataEndIndex === -1) {
 							children.push(createTextNode(input.substr(pos + 9), '#cdata'))
 							pos = length
 						}
@@ -111,11 +119,12 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 						const startDoctype = pos + 1
 						pos += 2
 						let encapsuled = false
-						while ((input.charCodeAt(pos) !== closeBracketCC || encapsuled === true) && input[pos]) {
-							if (input.charCodeAt(pos) === openCornerBracketCC) {
+						while (pos < length && (input.charCodeAt(pos) !== CLOSE_BRACKET_CC || encapsuled)) {
+							const cc = input.charCodeAt(pos)
+							if (cc === OPEN_CORNER_BRACKET_CC) {
 								encapsuled = true
 							}
-							else if (encapsuled === true && input.charCodeAt(pos) === closeCornerBracketCC) {
+							else if (encapsuled && cc === CLOSE_CORNER_BRACKET_CC) {
 								encapsuled = false
 							}
 							pos++
@@ -150,11 +159,11 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * returns the text outside of texts until the first '&lt;'
+	 * Returns the text outside of texts until the first '&lt;'
 	 */
 	function parseText(): string {
 		const start = pos
-		pos = input.indexOf(openBracket, pos) - 1
+		pos = input.indexOf('<', pos) - 1
 		if (pos === -2) {
 			pos = length
 		}
@@ -163,36 +172,36 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * returns text until the first nonAlphabetic letter
+	 * Returns text until the first nonAlphabetic letter
 	 */
 	function parseName(): string {
 		const start = pos
-		while (nameSpacer.indexOf(input[pos]) === -1 && input[pos]) {
+		while (pos < length && !NAME_SPACER_SET.has(input.charCodeAt(pos))) {
 			pos++
 		}
 		return input.slice(start, pos)
 	}
 
 	/**
-	 * parses the attributes of a node
+	 * Parses the attributes of a node
 	 */
 	function parseAttributes(): Record<string, string> {
 		const attributes: Record<string, string> = {}
 
 		// parsing attributes
-		while (input.charCodeAt(pos) !== closeBracketCC && input[pos]) {
+		while (pos < length && input.charCodeAt(pos) !== CLOSE_BRACKET_CC) {
 			const c = input.charCodeAt(pos)
 			if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
 				const name = parseName()
 				let value: string = ''
 				// search beginning of the string
 				let code = input.charCodeAt(pos)
-				while (code !== singleQuoteCC && code !== doubleQuoteCC) {
+				while (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
 					pos++
 					code = input.charCodeAt(pos)
 				}
 
-				if (code === singleQuoteCC || code === doubleQuoteCC) {
+				if (code === SINGLE_QUOTE_CC || code === DOUBLE_QUOTE_CC) {
 					value = parseString()
 					if (pos === -1) {
 						throw new Error('Missing closing quote')
@@ -211,7 +220,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * parses a node
+	 * Parses a node
 	 */
 	function parseNode(): XmlNode {
 		pos++
@@ -233,7 +242,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 		const prev = input.charCodeAt(pos - 1)
 		pos++
 
-		if (prev !== slashCC) {
+		if (prev !== SLASH_CC) {
 			childNodes = parseChildren(nodeName)
 		}
 
@@ -248,7 +257,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * is parsing a string, that starts with a char and with the same usually ' or "
+	 * Parses a string, that starts with a char and with the same usually ' or "
 	 */
 	function parseString(): string {
 		const startChar = input[pos]
@@ -257,10 +266,26 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 		return input.slice(startpos, pos)
 	}
 
-	return {
+	/**
+	 * Recursively sets parentElement on all nodes in the tree
+	 */
+	function setParentElements(node: XmlNode, parent: XmlNode | null): void {
+		node.parentElement = parent?.nodeName.startsWith('#') ? null : parent
+		for (const child of node.childNodes) {
+			setParentElements(child, node)
+		}
+	}
+
+	const document: XmlNode = {
 		nodeName: '#document',
 		nodeValue: null,
 		childNodes: parseChildren(''),
 		attributes: {},
 	}
+
+	if (includeParentElement) {
+		setParentElements(document, null)
+	}
+
+	return document
 }

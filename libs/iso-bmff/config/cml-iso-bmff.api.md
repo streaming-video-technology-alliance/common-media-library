@@ -203,10 +203,19 @@ export type ExtendedLanguageBox = FullBox & {
 export type FileTypeBox = TypeBox<"ftyp">;
 
 // @public
+export function filterIsoBoxes<T$1, S extends T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => box is S, config?: TraverseIsoBoxesConfig): S[];
+
+// @public (undocumented)
 export function filterIsoBoxes<T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1[];
 
 // @public
+export function findIsoBox<T$1, S extends T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => box is S, config?: TraverseIsoBoxesConfig): S | null;
+
+// @public (undocumented)
 export function findIsoBox<T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1 | null;
+
+// @public
+export function fourCcToUint32(str: string): number;
 
 // @public
 export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
@@ -268,6 +277,9 @@ export function isContainer<T$1 extends IsoBox | Box<IsoBox["type"]>>(box: T$1):
 
 // @public
 export function isFullBox(box: any): box is FullBox;
+
+// @public
+export function isIsoBoxType<T$1 extends keyof IsoBoxMap>(type: T$1, box: any): box is IsoBoxMap[T$1];
 
 // @public
 export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
@@ -424,10 +436,10 @@ export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
 }
 
 // @public
-export type IsoBoxReader<B = unknown> = (view: IsoBoxReadView) => B;
+export type IsoBoxReader<B = unknown, T$1 extends IsoBoxType = IsoBoxType> = (view: IsoBoxReadView, type: T$1) => B;
 
 // @public
-export type IsoBoxReaderMap = Record<string, IsoBoxReader>;
+export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
 
 // @public
 export type IsoBoxReaderReturn<T$1> = { [K in keyof T$1]: T$1[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never }[keyof T$1] | ParsedIsoBox;
@@ -1005,9 +1017,11 @@ export type SampleEncryptionBox = FullBox & {
 };
 
 // @public
-export type SampleEntryBox = {
+export type SampleEntryBox<T$1 extends IsoBoxType = IsoBoxType, C = any> = {
+    type: T$1;
     reserved1: number[];
     dataReferenceIndex: number;
+    boxes: C[];
 };
 
 // @public
