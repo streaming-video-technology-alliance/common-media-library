@@ -124,15 +124,15 @@ const reporter = new CmcdReporter({
 // Using CmcdItem to add byte-range parameters to next object requests
 reporter.update({
 	nor: [
-		new CmcdItem("segment_002.m4s", { r: "0-50000" }),
-		new CmcdItem("segment_003.m4s", { r: "0-50000" }),
+		toCmcdValue("segment_002.m4s", { r: "0-50000" }),
+		toCmcdValue("segment_003.m4s", { r: "0-50000" }),
 	],
 });
 
 // This encodes to: nor=("segment_002.m4s";r="0-50000" "segment_003.m4s";r="0-50000")
 ```
 
-The `CmcdItem` constructor accepts two arguments:
+The `toCmcdValue` factory function accepts two arguments:
 
 1. **value** - The bare item value (string, number, boolean, etc.)
 2. **params** - An object containing key-value pairs for parameters
@@ -140,20 +140,20 @@ The `CmcdItem` constructor accepts two arguments:
 ```typescript
 // Single parameterized value
 reporter.update({
-	nor: new CmcdItem("next-segment.m4s", { r: "0-102400" }),
+	nor: toCmcdValue("next-segment.m4s", { r: "0-102400" }),
 });
 
 // Array of parameterized values
 reporter.update({
 	nor: [
-		new CmcdItem("seg1.m4s", { r: "0-50000" }),
-		new CmcdItem("seg2.m4s", { r: "0-50000" }),
+		toCmcdValue("seg1.m4s", { r: "0-50000" }),
+		toCmcdValue("seg2.m4s", { r: "0-50000" }),
 	],
 });
 
 // Mix of plain strings and parameterized values
 reporter.update({
-	nor: ["seg1.m4s", new CmcdItem("seg2.m4s", { r: "0-50000" })],
+	nor: ["seg1.m4s", toCmcdValue("seg2.m4s", { r: "0-50000" })],
 });
 ```
 
@@ -161,7 +161,7 @@ Many keys allow for a list of numeric values with an associated object type, rep
 
 ```typescript
 reporter.update({
-	br: [new CmcdItem(5000, { v: true }), new CmcdItem(3000, { a: true })],
+	br: [toCmcdValue(5000, { v: true }), toCmcdValue(3000, { a: true })],
 });
 
 // This encodes to: br=("5000";v "3000";a)
