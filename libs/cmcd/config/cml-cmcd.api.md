@@ -7,7 +7,8 @@
 import { CmObjectType } from '@svta/cml-cta';
 import { CmStreamingFormat } from '@svta/cml-cta';
 import { CmStreamType } from '@svta/cml-cta';
-import { Request as Request_2 } from '@svta/cml-utils';
+import { ExclusiveRecord } from '@svta/cml-utils';
+import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
@@ -21,15 +22,17 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 
 // @public
 export type Cmcd = {
-    [index: CmcdCustomKey]: CmcdValue;
-    br?: number;
+    [index: CmcdCustomKey]: CmcdValue | undefined;
+    br?: CmcdObjectTypeList;
     d?: number;
     ot?: CmcdObjectType;
-    tb?: number;
-    bl?: number;
+    tb?: CmcdObjectTypeList;
+    bl?: CmcdObjectTypeList;
     dl?: number;
-    mtp?: number;
-    nor?: ValueOrArray<string | SfItem>;
+    mtp?: CmcdObjectTypeList;
+    nor?: ValueOrArray<string | SfItem<string, {
+        r: string;
+    }>>;
     nrr?: string;
     su?: boolean;
     cid?: string;
@@ -43,73 +46,121 @@ export type Cmcd = {
 };
 
 // @public
-export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsd", "cdn", "cid", "cs", "df", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
+export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "bsd", "cdn", "cid", "cs", "dfa", "ec", "lab", "lb", "ltc", "msd", "mtp", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
 
 // @public
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
 
 // @public
+export const CMCD_EVENT_AD_BREAK_END: "abe";
+
+// @public
+export const CMCD_EVENT_AD_BREAK_START: "abs";
+
+// @public
+export const CMCD_EVENT_AD_END: "ae";
+
+// @public
+export const CMCD_EVENT_AD_START: "as";
+
+// @public
+export const CMCD_EVENT_BACKGROUNDED_MODE: "b";
+
+// @public
+export const CMCD_EVENT_BITRATE_CHANGE: "br";
+
+// @public
+export const CMCD_EVENT_CONTENT_ID: "c";
+
+// @public
+export const CMCD_EVENT_CUSTOM_EVENT: "ce";
+
+// @public
+export const CMCD_EVENT_ERROR: "e";
+
+// @public
 export const CMCD_EVENT_KEYS: readonly ["e"];
 
 // @public
-export const CMCD_EVENT_MODE = "event";
+export const CMCD_EVENT_MODE: "event";
+
+// @public
+export const CMCD_EVENT_MUTE: "m";
+
+// @public
+export const CMCD_EVENT_PLAY_STATE: "ps";
+
+// @public
+export const CMCD_EVENT_PLAYER_COLLAPSE: "pc";
+
+// @public
+export const CMCD_EVENT_PLAYER_EXPAND: "pe";
+
+// @public
+export const CMCD_EVENT_RESPONSE_RECEIVED: "rr";
+
+// @public
+export const CMCD_EVENT_SKIP: "sk";
+
+// @public
+export const CMCD_EVENT_TIME_INTERVAL: "t";
+
+// @public
+export const CMCD_EVENT_UNMUTE: "um";
 
 // @public
 export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
 
 // @public
-export const CMCD_HEADERS = "headers";
+export const CMCD_HEADERS: "headers";
 
 // @public @deprecated
-export const CMCD_JSON = "json";
+export const CMCD_JSON: "json";
 
 // @public
 export const CMCD_KEYS: CmcdKey[];
 
 // @public
-export const CMCD_OBJECT = "CMCD-Object";
+export const CMCD_OBJECT: "CMCD-Object";
 
 // @public
 export const CMCD_PARAM = "CMCD";
 
 // @public
-export const CMCD_QUERY = "query";
+export const CMCD_QUERY: "query";
 
 // @public
-export const CMCD_REQUEST = "CMCD-Request";
+export const CMCD_REQUEST: "CMCD-Request";
 
 // @public
 export const CMCD_REQUEST_KEYS: readonly ["d", "dl", "nor", "ot", "rtp", "su"];
 
 // @public
-export const CMCD_REQUEST_MODE = "request";
+export const CMCD_REQUEST_MODE: "request";
 
 // @public
 export const CMCD_RESPONSE_KEYS: readonly ["cmsdd", "cmsds", "rc", "smrt", "ttfb", "ttfbb", "ttlb", "url"];
 
 // @public
-export const CMCD_RESPONSE_MODE = "response";
+export const CMCD_SESSION: "CMCD-Session";
 
 // @public
-export const CMCD_SESSION = "CMCD-Session";
+export const CMCD_STATUS: "CMCD-Status";
 
 // @public
-export const CMCD_STATUS = "CMCD-Status";
-
-// @public
-export const CMCD_V1 = 1;
+export const CMCD_V1: 1;
 
 // @public
 export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", "nor", "nrr", "ot", "pr", "rtp", "sf", "sid", "st", "su", "tb", "v"];
 
 // @public
-export const CMCD_V2 = 2;
+export const CMCD_V2: 2;
 
 // @public
 export type CmcdCustomKey = `${string}-${string}`;
 
 // @public
-export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
+export type CmcdData = Cmcd & CmcdRequest & CmcdResponse & CmcdEvent;
 
 // @public
 export type CmcdEncodeOptions = {
@@ -129,25 +180,33 @@ export const CmcdEncoding: typeof CmcdTransmissionMode;
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
 // @public
-export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
+export type CmcdEvent = CmcdRequest & {
+    cen?: string;
     e?: CmcdEventType;
+    h?: string;
+    sn?: number;
+    ts?: number;
 };
 
 // @public
-export type CmcdEventExcludedKeys = "bsd" | "d" | "dl" | "nor" | "ot" | "rtp" | "sid" | "su";
-
-// @public
 export const CmcdEventType: {
-    readonly PLAY_STATE: "ps";
-    readonly ERROR: "e";
-    readonly TIME_INTERVAL: "t";
-    readonly CONTENT_ID: "c";
-    readonly BACKGROUNDED_MODE: "b";
-    readonly MUTE: "m";
-    readonly UNMUTE: "um";
-    readonly PLAYER_EXPAND: "pe";
-    readonly PLAYER_COLLAPSE: "pc";
-    readonly RESPONSE_RECEIVED: "rr";
+    readonly BITRATE_CHANGE: typeof CMCD_EVENT_BITRATE_CHANGE;
+    readonly PLAY_STATE: typeof CMCD_EVENT_PLAY_STATE;
+    readonly ERROR: typeof CMCD_EVENT_ERROR;
+    readonly TIME_INTERVAL: typeof CMCD_EVENT_TIME_INTERVAL;
+    readonly CONTENT_ID: typeof CMCD_EVENT_CONTENT_ID;
+    readonly BACKGROUNDED_MODE: typeof CMCD_EVENT_BACKGROUNDED_MODE;
+    readonly MUTE: typeof CMCD_EVENT_MUTE;
+    readonly UNMUTE: typeof CMCD_EVENT_UNMUTE;
+    readonly PLAYER_EXPAND: typeof CMCD_EVENT_PLAYER_EXPAND;
+    readonly PLAYER_COLLAPSE: typeof CMCD_EVENT_PLAYER_COLLAPSE;
+    readonly RESPONSE_RECEIVED: typeof CMCD_EVENT_RESPONSE_RECEIVED;
+    readonly AD_START: typeof CMCD_EVENT_AD_START;
+    readonly AD_END: typeof CMCD_EVENT_AD_END;
+    readonly AD_BREAK_START: typeof CMCD_EVENT_AD_BREAK_START;
+    readonly AD_BREAK_END: typeof CMCD_EVENT_AD_BREAK_END;
+    readonly SKIP: typeof CMCD_EVENT_SKIP;
+    readonly CUSTOM_EVENT: typeof CMCD_EVENT_CUSTOM_EVENT;
 };
 
 // @public (undocumented)
@@ -181,7 +240,7 @@ export const CmcdHeaderField: {
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
 // @public
-export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
+export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdRequestKey[]>;
 
 // @public @deprecated
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
@@ -194,6 +253,9 @@ export const CmcdObjectType: typeof CmObjectType;
 
 // @public (undocumented)
 export type CmcdObjectType = CmObjectType;
+
+// @public
+export type CmcdObjectTypeList = ValueOrArray<number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>>;
 
 // @public
 export const CmcdPlayerState: {
@@ -222,48 +284,46 @@ export const CmcdReportingMode: {
 export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 
 // @public
-export type CmcdReportTarget = {
-    url: string;
-    reportingMode?: CmcdReportingMode;
-    method?: "GET" | "POST";
-    version?: number;
-    transmissionMode?: CmcdTransmissionMode;
-    enabledKeys?: CmcdKey[];
+export type CmcdRequest = Omit<Cmcd, "nrr"> & {
+    ab?: CmcdObjectTypeList;
+    bg?: boolean;
+    bsa?: CmcdObjectTypeList;
+    bsd?: CmcdObjectTypeList;
+    bsda?: CmcdObjectTypeList;
+    cdn?: string;
+    cs?: string;
+    dfa?: number;
+    ec?: string[];
+    lab?: CmcdObjectTypeList;
+    lb?: CmcdObjectTypeList;
+    ltc?: number;
+    msd?: number;
+    nr?: boolean;
+    pb?: CmcdObjectTypeList;
+    pt?: number;
+    sn?: number;
+    sta?: CmcdPlayerState;
+    tab?: CmcdObjectTypeList;
+    tbl?: CmcdObjectTypeList;
+    tpb?: CmcdObjectTypeList;
 };
 
 // @public
-export type CmcdRequest = Omit<Cmcd, "nrr"> & {
-    ab?: number;
-    tbl?: number;
-    cdn?: string;
-    ltc?: number;
-    bg?: boolean;
-    sta?: CmcdPlayerState;
-    pb?: number;
-    ts?: number;
-    tpb?: number;
-    lb?: number;
-    tab?: number;
-    lab?: number;
-    pt?: number;
-    ec?: string | string[];
-    msd?: number;
-    sn?: number;
-    bsd?: number;
-    df?: number;
-    cs?: number;
-};
+export type CmcdRequestData = Cmcd & CmcdRequest;
+
+// @public
+export type CmcdRequestKey = keyof CmcdRequestData;
 
 // @public
 export type CmcdResponse = CmcdRequest & {
+    cmsdd?: string;
+    cmsds?: string;
     rc?: number;
+    smrt?: string;
     ttfb?: number;
     ttfbb?: number;
     ttlb?: number;
     url?: string;
-    cmsdd?: string;
-    cmsds?: string;
-    smrt?: number;
 };
 
 // @public
@@ -307,7 +367,7 @@ export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
 export function fromCmcdUrl(url: string): Cmcd;
 
 // @public
-export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData>;
+export function groupCmcdHeaders(cmcd: CmcdRequestData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdRequestData>;
 
 // @public
 export function isCmcdCustomKey(key: CmcdKey): boolean;
@@ -337,12 +397,10 @@ export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
-export function toCmcdReport(data: CmcdData, target: CmcdReportTarget): Request_2<{
-    cmcd: Cmcd;
-}> | null;
+export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
-export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfItem<V, P>;
 
 // (No @packageDocumentation comment for this package)
 

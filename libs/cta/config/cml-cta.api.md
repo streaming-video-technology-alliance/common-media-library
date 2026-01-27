@@ -48,6 +48,7 @@ export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;
 export const CmStreamType: {
     readonly VOD: "v";
     readonly LIVE: "l";
+    readonly LOW_LATENCY: "ll";
 };
 
 // @internal

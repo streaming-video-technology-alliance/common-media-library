@@ -1,10 +1,21 @@
 import type { ValueOf } from '@svta/cml-utils'
-import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts'
-import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts'
+
+/**
+ * CMCD event mode variable name.
+ *
+ * @public
+ */
+export const CMCD_EVENT_MODE = 'event' as const
+
+/**
+ * CMCD request mode variable name.
+ *
+ * @public
+ */
+export const CMCD_REQUEST_MODE = 'request' as const
 
 /**
  * CMCD reporting mode types.
- *
  *
  * @enum
  *

@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-27
+
+### Added
+
+- Add optional generic type parameters to `SfItem` class for improved type inference
+
 ## [1.0.2] - 2025-12-26
 
 ### Changed
@@ -28,7 +34,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.0.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.0.2...structured-field-values-v1.1.0
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.0.1...structured-field-values-v1.0.2
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.0.0...structured-field-values-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/structured-field-values-v1.0.0

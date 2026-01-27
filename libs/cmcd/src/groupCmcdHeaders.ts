@@ -1,15 +1,15 @@
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
-import type { CmcdData } from './CmcdData.ts'
 import { CmcdHeaderField } from './CmcdHeaderField.ts'
 import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
-import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdRequestData } from './CmcdRequestData.ts'
+import type { CmcdRequestKey } from './CmcdRequestKey.ts'
 
-function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, CmcdHeaderField> {
+function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdRequestKey, CmcdHeaderField> {
 	return Object.keys(headerMap)
 		.reduce((acc, field) => {
 			headerMap[field as CmcdHeaderField]?.forEach(key => acc[key] = field as CmcdHeaderField)
 			return acc
-		}, {} as Record<CmcdKey, CmcdHeaderField>)
+		}, {} as Record<CmcdRequestKey, CmcdHeaderField>)
 }
 
 /**
@@ -22,20 +22,20 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, Cmc
  *
  * @public
  */
-export function groupCmcdHeaders(cmcd: CmcdData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdData> {
-	const result = {} as Record<CmcdHeaderField, CmcdData>
+export function groupCmcdHeaders(cmcd: CmcdRequestData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdRequestData> {
+	const result = {} as Record<CmcdHeaderField, CmcdRequestData>
 
 	if (!cmcd) {
 		return result
 	}
 
-	const keys = Object.keys(cmcd) as CmcdKey[]
-	const custom = customHeaderMap ? createHeaderMap(customHeaderMap) : {} as Record<CmcdKey, CmcdHeaderField>
+	const keys = Object.keys(cmcd) as CmcdRequestKey[]
+	const custom: Partial<Record<CmcdRequestKey, CmcdHeaderField>> = customHeaderMap ? createHeaderMap(customHeaderMap) : {}
 
-	return keys.reduce((acc: Record<CmcdHeaderField, CmcdData>, key: CmcdKey) => {
+	return keys.reduce((acc: Record<CmcdHeaderField, CmcdRequestData>, key: CmcdRequestKey) => {
 		const field = CMCD_HEADER_MAP[key] || custom[key] || CmcdHeaderField.REQUEST
-		const data = acc[field] ??= {};
-		(data as any)[key] = cmcd[key]
+		const data = acc[field] ??= {}
+		data[key] = (cmcd as any)[key]
 		return acc
 	}, result)
 }

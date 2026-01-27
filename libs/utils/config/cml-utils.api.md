@@ -48,6 +48,9 @@ export const Encoding: {
 export type Encoding = ValueOf<typeof Encoding>;
 
 // @public
+export type ExclusiveRecord<K extends PropertyKey, V> = { [P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, never>> extends infer O ? { [Q in keyof O]: O[Q] } : never }[K];
+
+// @public
 export function getBandwidthBps(sample: ResourceTiming): number;
 
 // @public
@@ -56,7 +59,7 @@ export function hexToArrayBuffer(hex: string): ArrayBuffer;
 // @public
 type Request_2<D = any> = {
     url: string;
-    method?: string;
+    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD";
     body?: BodyInit;
     responseType?: RequestType;
     headers?: Record<string, string>;
@@ -74,6 +77,7 @@ export const RequestType: {
     readonly BLOB: "blob";
     readonly ARRAY_BUFFER: "arrayBuffer";
     readonly DOCUMENT: "document";
+    readonly STREAM: "stream";
 };
 
 // @public (undocumented)

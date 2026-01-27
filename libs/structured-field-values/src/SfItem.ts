@@ -1,18 +1,32 @@
 import type { SfBareItem } from './SfBareItem.ts'
-import type { SfParameters } from './SfParameters.ts'
 
 /**
  * Structured Field Item
  *
  * @public
  */
-export class SfItem {
+export class SfItem<
+	V extends SfBareItem = SfBareItem,
+	P = Record<string, any>
+> {
 
-	value: SfBareItem
+	/**
+	 * The value of the item.
+	 */
+	value: V
 
-	params?: SfParameters
+	/**
+	 * The parameters of the item.
+	 */
+	params?: P
 
-	constructor(value: any, params?: SfParameters) {
+	/**
+	 * Creates a new structured field item.
+	 *
+	 * @param value - The value of the item.
+	 * @param params - The parameters of the item.
+	 */
+	constructor(value: any, params?: P) {
 		if (Array.isArray(value)) {
 			value = value.map((v) => (v instanceof SfItem) ? v : new SfItem(v))
 		}
