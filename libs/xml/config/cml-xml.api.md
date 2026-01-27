@@ -21,6 +21,7 @@ export type XmlNode = {
     childNodes: XmlNode[];
     prefix?: string | null;
     localName?: string;
+    parentElement?: XmlNode | null;
 };
 
 // @public
@@ -28,6 +29,7 @@ export type XmlParseOptions = {
     pos?: number;
     keepWhitespace?: boolean;
     keepComments?: boolean;
+    includeParentElement?: boolean;
 };
 
 // (No @packageDocumentation comment for this package)

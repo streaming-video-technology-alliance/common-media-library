@@ -7,4 +7,5 @@ export type XmlParseOptions = {
 	pos?: number;
 	keepWhitespace?: boolean;
 	keepComments?: boolean;
+	includeParentElement?: boolean;
 };

@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-20
+
+### Added
+
+- Add `includeParentElement` option to `parseXml()` that adds `parentElement` property to each node following DOM spec
+
+### Changed
+
+- Improve `parseXml()` performance by moving constants to module scope, using `Set` for delimiter lookups, and optimizing bounds checks
+
 ## [1.0.2] - 2025-12-26
 
 ### Changed
@@ -28,7 +38,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.0.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.0.2...xml-v1.1.0
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.0.1...xml-v1.0.2
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.0.0...xml-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/xml-v1.0.0
