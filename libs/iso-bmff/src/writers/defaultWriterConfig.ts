@@ -63,6 +63,13 @@ import { writeVmhd } from './writeVmhd.ts'
 import { writeVttC } from './writeVttC.ts'
 import { writeVtte } from './writeVtte.ts'
 
+/**
+ * Create a default writer configuration with all available writers pre-configured.
+ *
+ * @returns An `IsoBoxWriteViewConfig` with all available writers pre-configured
+ *
+ * @public
+ */
 export function defaultWriterConfig(): IsoBoxWriteViewConfig {
 	return {
 		writers: {

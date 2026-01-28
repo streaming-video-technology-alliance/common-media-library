@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Writable } from 'node:stream'
-import { createIsoBoxReadableStream, describe, it, readFtyp, readIsoBoxes, writeFtyp, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
+import { createIsoBoxReadableStream, defaultWriterConfig, describe, it, readFtyp, readIsoBoxes, writeFtyp, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
 
 describe('createIsoBoxReadableStream', function () {
 	it('should write from a parsed file', async function () {
@@ -133,7 +133,7 @@ describe('createIsoBoxReadableStream', function () {
 	})
 
 	it('should exit if boxes are empty', async function () {
-		const stream = createIsoBoxReadableStream([])
+		const stream = createIsoBoxReadableStream([], defaultWriterConfig())
 		const buffers = []
 
 		for await (const data of stream) {

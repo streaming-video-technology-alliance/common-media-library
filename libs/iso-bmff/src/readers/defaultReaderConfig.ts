@@ -60,6 +60,13 @@ import { readVmhd } from './readVmhd.ts'
 import { readVttC } from './readVttC.ts'
 import { readVtte } from './readVtte.ts'
 
+/**
+ * Create a default reader configuration with all available readers pre-configured.
+ *
+ * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ *
+ * @public
+ */
 export function defaultReaderConfig(): IsoBoxReadViewConfig {
 	return {
 		readers: {

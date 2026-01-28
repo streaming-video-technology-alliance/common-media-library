@@ -140,6 +140,12 @@ export type DecodingTimeToSampleBox = FullBox & {
 };
 
 // @public
+export function defaultReaderConfig(): IsoBoxReadViewConfig;
+
+// @public
+export function defaultWriterConfig(): IsoBoxWriteViewConfig;
+
+// @public
 export type DegradationPriorityBox = FullBox & {
     type: "stdp";
     priority: number[];
