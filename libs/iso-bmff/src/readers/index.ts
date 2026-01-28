@@ -1,5 +1,6 @@
 export * from './createAudioSampleEntryReader.ts'
 export * from './createVisualSampleEntryReader.ts'
+export * from './defaultReaderConfig.ts'
 export * from './readArdi.ts'
 export * from './readAudioSampleEntryBox.ts'
 export * from './readAvc1.ts'

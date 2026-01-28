@@ -1,6 +1,6 @@
 import { deepEqual, equal } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it, readFtyp, readIsoBoxes, writeFtyp, writeIsoBoxes, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
+import { describe, it, defaultWriterConfig, readFtyp, readIsoBoxes, writeFtyp, writeIsoBoxes, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 
 describe('writeIsoBoxes', function () {
@@ -124,7 +124,7 @@ describe('writeIsoBoxes', function () {
 	})
 
 	it('should exit if boxes are empty', async function () {
-		const bytes = writeIsoBoxes([])
+		const bytes = writeIsoBoxes([], defaultWriterConfig())
 		equal(bytes.length, 0)
 	})
 })
