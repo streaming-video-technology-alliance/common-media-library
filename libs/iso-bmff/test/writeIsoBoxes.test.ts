@@ -1,7 +1,6 @@
 import { deepEqual, equal } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { defaultWriterConfig } from '../src/writers/defaultWriterConfig.ts'
-import { describe, it, readFtyp, readIsoBoxes, writeFtyp, writeIsoBoxes, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
+import { describe, it, defaultWriterConfig, readFtyp, readIsoBoxes, writeFtyp, writeIsoBoxes, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 
 describe('writeIsoBoxes', function () {
