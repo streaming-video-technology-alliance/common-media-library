@@ -89,7 +89,7 @@ export const CONTAINERS: string[];
 export function createAudioSampleEntryReader<T$1 extends IsoBoxType>(type: T$1): (view: IsoBoxReadView) => AudioSampleEntryBox<T$1>;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
 
 // @public
 export function createVisualSampleEntryReader<T$1 extends IsoBoxType>(type: T$1): (view: IsoBoxReadView) => VisualSampleEntryBox<T$1>;
@@ -432,7 +432,7 @@ export type IsoBoxMap = {
 
 // @public
 export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
-    constructor(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig);
+    constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig);
 }
 
 // @public
@@ -506,7 +506,7 @@ export class IsoBoxWriteView {
 
 // @public
 export type IsoBoxWriteViewConfig = {
-    writers?: IsoBoxWriterMap;
+    writers: IsoBoxWriterMap;
 };
 
 // @public
@@ -1542,7 +1542,7 @@ export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteViewConfig): Uint8Array;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig): Uint8Array[];
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): Uint8Array[];
 
 // @public
 export function writeKind(box: TrackKindBox): IsoBoxWriteView;
