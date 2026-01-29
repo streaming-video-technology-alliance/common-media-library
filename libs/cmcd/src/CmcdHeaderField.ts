@@ -1,8 +1,32 @@
 import type { ValueOf } from '@svta/cml-utils'
-import { CMCD_OBJECT } from './CMCD_OBJECT.ts'
-import { CMCD_REQUEST } from './CMCD_REQUEST.ts'
-import { CMCD_SESSION } from './CMCD_SESSION.ts'
-import { CMCD_STATUS } from './CMCD_STATUS.ts'
+
+/**
+ * CMCD object header name.
+ *
+ * @public
+ */
+export const CMCD_OBJECT = 'CMCD-Object' as const
+
+/**
+ * CMCD request header name.
+ *
+ * @public
+ */
+export const CMCD_REQUEST = 'CMCD-Request' as const
+
+/**
+ * CMCD session header name.
+ *
+ * @public
+ */
+export const CMCD_SESSION = 'CMCD-Session' as const
+
+/**
+ * CMCD status header name.
+ *
+ * @public
+ */
+export const CMCD_STATUS = 'CMCD-Status' as const
 
 /**
  * CMCD header fields.
