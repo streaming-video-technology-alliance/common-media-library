@@ -223,7 +223,7 @@ export const CmcdEventType: {
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
 // @public
-export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => number | ValueOrArray<string> | ValueOrArray<SfItem>;
+export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => ValueOrArray<number> | ValueOrArray<string> | ValueOrArray<SfItem> | ValueOrArray<number | SfItem>;
 
 // @public
 export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
@@ -390,7 +390,7 @@ export const CmcdTransmissionMode: {
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
 
 // @public
-export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
+export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[] | (number | SfItem)[];
 
 // @public
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T;
