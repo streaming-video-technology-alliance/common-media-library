@@ -1,14 +1,14 @@
 import type { CmcdEncodeOptions } from '@svta/cml-cmcd'
-import { CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
-import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { CmcdEventType, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
+import { SfToken } from '@svta/cml-structured-field-values'
 import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
+import { toCmcdValue } from '../src/toCmcdValue.ts'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
 import { CMCD_STRING_EVENT } from './data/CMCD_STRING_EVENT.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
 import { CMCD_STRING_RESPONSE } from './data/CMCD_STRING_RESPONSE.ts'
 import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts'
-import { CmcdEventType } from '@svta/cml-cmcd'
 
 describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
@@ -25,14 +25,13 @@ describe('encodeCmcd', () => {
 
 	it('ignore invalid values', () => {
 		// @ts-expect-error - This is a test
-		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), '')
+		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), 'nor=(""),v=2')
 	})
 
 	describe('version 1', () => {
-		it('returns encoded v1 string when no version is provided', () => {
-			 
+		it('returns encoded v1 string when version option is set to 1', () => {
 			const { v, ...input } = CMCD_INPUT
-			equal(encodeCmcd(input), CMCD_STRING_V1)
+			equal(encodeCmcd(input, { version: 1 }), CMCD_STRING_V1)
 		})
 
 		it('returns encoded v1 string when encoding options version is set to 1', () => {
@@ -42,7 +41,7 @@ describe('encodeCmcd', () => {
 
 	describe('filtering', () => {
 		it('filters keys', () => {
-			equal(encodeCmcd({ cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' }), 'cid="content-id"')
+			equal(encodeCmcd({ cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' }), 'cid="content-id",v=2')
 		})
 
 		it('doesn\'t filter version key', () => {
@@ -55,6 +54,11 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input, { version: 1 }), CMCD_STRING_V1)
 	})
 
+	it('returns encoded string when Symbol is used', () => {
+		const input = Object.assign({}, CMCD_INPUT, { 'com.example-token': Symbol('s') })
+		equal(encodeCmcd(input, { version: 1 }), CMCD_STRING_V1)
+	})
+
 	it('returns converts to relative path when baseUrl is provided', () => {
 		const input = {
 			nor: 'http://test.com/base/segments/video/1.mp4',
@@ -62,7 +66,7 @@ describe('encodeCmcd', () => {
 		const options: CmcdEncodeOptions = {
 			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
 		}
-		equal(encodeCmcd(input, options), 'nor="..%2Fsegments%2Fvideo%2F1.mp4"')
+		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4"),v=2')
 
 		options.version = 2
 		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4"),v=2')
@@ -114,7 +118,7 @@ describe('encodeCmcd', () => {
 			const input = {
 				nor: '1.mp4',
 			}
-			equal(encodeCmcd(input), 'nor="1.mp4"')
+			equal(encodeCmcd(input), 'nor=("1.mp4"),v=2')
 		})
 
 		it('returns encoded inner list for request mode with nor list of strings', () => {
@@ -124,17 +128,36 @@ describe('encodeCmcd', () => {
 					'2.mp4',
 				],
 			}
-			equal(encodeCmcd(input), 'nor=("1.mp4" "2.mp4")')
+			equal(encodeCmcd(input), 'nor=("1.mp4" "2.mp4"),v=2')
 		})
 
-		it('returns encoded inner list for request mode with nor list of SfItem', () => {
+		it('returns encoded inner list for request mode with nor list of CmcdItem', () => {
 			const input = {
 				nor: [
-					new SfItem('1.mp4', { r: '0-100' }),
-					new SfItem('2.mp4', { r: '101-200' }),
+					toCmcdValue('1.mp4', { r: '0-100' }),
+					toCmcdValue('2.mp4', { r: '101-200' }),
 				],
 			}
-			equal(encodeCmcd(input), 'nor=("1.mp4";r="0-100" "2.mp4";r="101-200")')
+			equal(encodeCmcd(input), 'nor=("1.mp4";r="0-100" "2.mp4";r="101-200"),v=2')
+		})
+	})
+
+	describe('CmcdObjectTypeList', () => {
+		it.todo('returns encoded inner list with object type parameters', () => {
+			const input = {
+				br: [
+					toCmcdValue(5000, { v: true }),
+					toCmcdValue(128, { a: true }),
+				],
+			}
+			equal(encodeCmcd(input), 'br=(5000;v 128;a),v=2')
+		})
+
+		it.todo('returns encoded inner list for array of plain numbers', () => {
+			const input = {
+				br: [5000, 128],
+			}
+			equal(encodeCmcd(input), 'br=(5000 128),v=2')
 		})
 	})
 })

@@ -206,12 +206,10 @@ export type SfInnerList = {
 };
 
 // @public
-export class SfItem {
-    constructor(value: any, params?: SfParameters);
-    // (undocumented)
-    params?: SfParameters;
-    // (undocumented)
-    value: SfBareItem;
+export class SfItem<V extends SfBareItem = SfBareItem, P = Record<string, any>> {
+    constructor(value: any, params?: P);
+    params?: P;
+    value: V;
 }
 
 // @public

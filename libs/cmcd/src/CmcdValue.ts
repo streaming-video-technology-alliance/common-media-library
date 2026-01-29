@@ -20,4 +20,5 @@ export type CmcdValue =
 	| symbol
 	| SfToken
 	| SfItem
-	| SfItem[];
+	| SfItem[]
+	| (number | SfItem)[];

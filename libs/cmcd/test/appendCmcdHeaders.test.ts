@@ -24,6 +24,7 @@ describe('appendCmcdHeaders', () => {
 		deepEqual(appendCmcdHeaders(headers, data), {
 			hello: 'world',
 			['CMCD-Object']: 'br=1000',
+			['CMCD-Session']: 'v=2',
 		})
 		//#endregion example
 	})
@@ -36,6 +37,7 @@ describe('appendCmcdHeaders', () => {
 		deepEqual(appendCmcdHeaders(headers, data), {
 			...headers,
 			['CMCD-Object']: 'br=1000',
+			['CMCD-Session']: 'v=2',
 		})
 	})
 })

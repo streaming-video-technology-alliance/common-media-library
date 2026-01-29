@@ -1,11 +1,11 @@
 import { isTokenField, isValid } from '@svta/cml-cta'
 import { SfToken } from '@svta/cml-structured-field-values'
-import { CMCD_EVENT_MODE } from './CMCD_EVENT_MODE.ts'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
-import { CMCD_REQUEST_MODE } from './CMCD_REQUEST_MODE.ts'
+import { CMCD_V2 } from './CMCD_V2.ts'
 import type { CmcdData } from './CmcdData.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
+import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
@@ -32,7 +32,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results
 	}
 
-	const version = options.version || (obj['v'] as number) || 1
+	const version = options.version || (obj['v'] as number) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
@@ -46,6 +46,10 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const filter = options.filter
 	if (typeof filter === 'function') {
 		keys = keys.filter(filter)
+	}
+
+	if (keys.length === 0) {
+		return results
 	}
 
 	// Ensure all required keys are present before sorting

@@ -48,6 +48,7 @@ export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;
 export const CmStreamType: {
     readonly VOD: "v";
     readonly LIVE: "l";
+    readonly LOW_LATENCY: "ll";
 };
 
 // @internal
@@ -58,7 +59,7 @@ export type CmStreamType = ValueOf<typeof CmStreamType>;
 // Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmStreamType" which is marked as @internal
 //
 // @public
-export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
+export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[] | (number | SfItem)[];
 
 // Warning: (ae-internal-missing-underscore) The name "isTokenField" should be prefixed with an underscore because the declaration is marked as @internal
 //
