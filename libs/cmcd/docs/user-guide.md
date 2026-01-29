@@ -92,6 +92,18 @@ reporter.update({ pr: 1.5 }); // Playback rate changed
 reporter.update({ bs: true }); // Buffer starvation occurred
 ```
 
+### Value Formatting
+
+The CMCD specification requires certain keys to be formatted before transmission. The `CmcdReporter` handles this automatically, so always pass raw, unformatted values in their base units. Do not round or truncate values yourself. For example, pass the exact buffer length in milliseconds:
+
+```typescript
+// Correct: pass the raw value, the reporter rounds to nearest 100
+reporter.update({ bl: 25432 }); // encoded as bl=25400
+
+// Incorrect: do not pre-round the value
+reporter.update({ bl: 25400 });
+```
+
 ### Parameterized Values with CmcdItem
 
 Some CMCD keys like `nor` (next object request) and `br` (encoded bitrate) support parameterized values in CMCD v2. Use the `toCmcdValue` helper function to attach parameters to values:
