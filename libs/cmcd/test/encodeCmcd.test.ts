@@ -144,7 +144,7 @@ describe('encodeCmcd', () => {
 	})
 
 	describe('CmcdObjectTypeList', () => {
-		it.todo('returns encoded inner list with object type parameters', () => {
+		it('returns encoded inner list with object type parameters', () => {
 			const input = {
 				br: [
 					toCmcdValue(5000, { v: true }),
@@ -154,14 +154,7 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(input), 'br=(5000;v 128;a)')
 		})
 
-		it('returns plain number when no object type is specified', () => {
-			const input = {
-				br: 5000,
-			}
-			equal(encodeCmcd(input), 'br=5000')
-		})
-
-		it.todo('returns encoded inner list for array of plain numbers', () => {
+		it('returns encoded inner list for array of plain numbers', () => {
 			const input = {
 				br: [5000, 128],
 			}

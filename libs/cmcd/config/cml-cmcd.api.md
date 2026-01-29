@@ -8,6 +8,7 @@ import { CmObjectType } from '@svta/cml-cta';
 import { CmStreamingFormat } from '@svta/cml-cta';
 import { CmStreamType } from '@svta/cml-cta';
 import { ExclusiveRecord } from '@svta/cml-utils';
+import { Request as Request_2 } from '@svta/cml-utils';
 import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
@@ -189,6 +190,15 @@ export type CmcdEvent = CmcdRequest & {
 };
 
 // @public
+export type CmcdEventReportConfig = CmcdReportConfig & {
+    version?: typeof CMCD_V2;
+    url: string;
+    events?: CmcdEventType[];
+    interval?: number;
+    batchSize?: number;
+};
+
+// @public
 export const CmcdEventType: {
     readonly BITRATE_CHANGE: typeof CMCD_EVENT_BITRATE_CHANGE;
     readonly PLAY_STATE: typeof CMCD_EVENT_PLAY_STATE;
@@ -275,6 +285,32 @@ export const CmcdPlayerState: {
 export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
 
 // @public
+export type CmcdReportConfig = {
+    version?: CmcdVersion;
+    enabledKeys?: CmcdKey[];
+};
+
+// @public
+export class CmcdReporter {
+    constructor(config: Partial<CmcdReporterConfig>, requester?: (request: Request_2) => Promise<{
+        status: number;
+    }>);
+    applyRequestReport(req: Request_2): Request_2;
+    flush(): void;
+    recordEvent(type: CmcdEventType, data?: Partial<CmcdData>): void;
+    start(): void;
+    stop(): void;
+    update(data: Partial<CmcdData>): void;
+}
+
+// @public
+export type CmcdReporterConfig = CmcdRequestReportConfig & {
+    sid?: string;
+    cid?: string;
+    eventTargets?: CmcdEventReportConfig[];
+};
+
+// @public
 export const CmcdReportingMode: {
     readonly REQUEST: typeof CMCD_REQUEST_MODE;
     readonly EVENT: typeof CMCD_EVENT_MODE;
@@ -313,6 +349,11 @@ export type CmcdRequestData = Cmcd & CmcdRequest;
 
 // @public
 export type CmcdRequestKey = keyof CmcdRequestData;
+
+// @public
+export type CmcdRequestReportConfig = CmcdReportConfig & {
+    transmissionMode?: CmcdTransmissionMode;
+};
 
 // @public
 export type CmcdResponse = CmcdRequest & {
@@ -401,6 +442,10 @@ export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
 export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfItem<V, P>;
+
+// Warnings were encountered during analysis:
+//
+// src/CmcdObjectType.ts:15:1 - (ae-forgotten-export) The symbol "CmcdVersion" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
