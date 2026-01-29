@@ -16,6 +16,6 @@ import { writeBoxes } from './utils/writeBoxes.ts'
  *
  * @public
  */
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteViewConfig): Uint8Array[] {
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): Uint8Array[] {
 	return writeBoxes(boxes, createWriterConfig(config))
 }

@@ -11,9 +11,13 @@
 		"../libs/*"
 	],
 	"packageOptions": {
-		"jsDocCompatibility": false,
+		"alwaysCreateEntryPointModule": false,
 		"entryPoints": [
 			"src/index.ts"
+		],
+		"jsDocCompatibility": false,
+		"projectDocuments": [
+			"docs/*.md"
 		]
 	},
 	"excludeInternal": true,

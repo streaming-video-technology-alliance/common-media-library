@@ -9,5 +9,5 @@ export type IsoBoxWriteViewConfig = {
 	/**
 	 * A map of box writers to their box types
 	 */
-	writers?: IsoBoxWriterMap;
+	writers: IsoBoxWriterMap;
 };
