@@ -39,7 +39,7 @@ const reporter = new CmcdReporter({
 	enabledKeys: ["br", "bl", "d", "ot", "sid", "cid", "mtp", "sf", "st"],
 
 	// Event reporting targets
-	targets: [
+	eventTargets: [
 		{
 			url: "https://analytics.example.com/cmcd",
 			events: [
@@ -92,27 +92,9 @@ reporter.update({ pr: 1.5 }); // Playback rate changed
 reporter.update({ bs: true }); // Buffer starvation occurred
 ```
 
-### Common CMCD Fields
-
-| Key   | Description              | Type                                                            |
-| ----- | ------------------------ | --------------------------------------------------------------- |
-| `br`  | Encoded bitrate          | Integer kbps                                                    |
-| `bl`  | Buffer length            | Integer ms                                                      |
-| `d`   | Object duration          | Integer ms                                                      |
-| `mtp` | Measured throughput      | Integer kbps                                                    |
-| `ot`  | Object type              | `'m'`, `'a'`, `'v'`, `'av'`, `'i'`, `'c'`, `'tt'`, `'k'`, `'o'` |
-| `sf`  | Streaming format         | `'d'` (DASH), `'h'` (HLS), `'s'` (Smooth), `'o'` (other)        |
-| `st`  | Stream type              | `'v'` (VOD), `'l'` (Live)                                       |
-| `su`  | Startup flag             | Boolean                                                         |
-| `bs`  | Buffer starvation        | Boolean                                                         |
-| `pr`  | Playback rate            | Decimal                                                         |
-| `tb`  | Top bitrate              | Integer kbps                                                    |
-| `dl`  | Deadline                 | Integer ms                                                      |
-| `rtp` | Requested max throughput | Integer kbps                                                    |
-
 ### Parameterized Values with CmcdItem
 
-Some CMCD keys like `nor` (next object request) and `nrr` (next range request) support parameterized values in CMCD v2. Use the `CmcdItem` class to attach parameters to values:
+Some CMCD keys like `nor` (next object request) and `br` (encoded bitrate) support parameterized values in CMCD v2. Use the `toCmcdValue` helper function to attach parameters to values:
 
 ```typescript
 import { CmcdReporter, CmcdItem } from "@svta/cml-cmcd";
@@ -132,29 +114,20 @@ reporter.update({
 // This encodes to: nor=("segment_002.m4s";r="0-50000" "segment_003.m4s";r="0-50000")
 ```
 
-The `toCmcdValue` factory function accepts two arguments:
+The `toCmcdValue` utility accepts two arguments:
 
 1. **value** - The bare item value (string, number, boolean, etc.)
 2. **params** - An object containing key-value pairs for parameters
 
 ```typescript
-// Single parameterized value
-reporter.update({
-	nor: toCmcdValue("next-segment.m4s", { r: "0-102400" }),
-});
-
-// Array of parameterized values
 reporter.update({
 	nor: [
-		toCmcdValue("seg1.m4s", { r: "0-50000" }),
-		toCmcdValue("seg2.m4s", { r: "0-50000" }),
+		toCmcdValue("seg1.m4s", { r: "0-5000" }),
+		toCmcdValue("seg1.m4s", { r: "5000-10000" }),
 	],
 });
 
-// Mix of plain strings and parameterized values
-reporter.update({
-	nor: ["seg1.m4s", toCmcdValue("seg2.m4s", { r: "0-50000" })],
-});
+// This encodes to: nor=("seg1.m4s";r="0-5000" "seg1.m4s";r="5000-10000")
 ```
 
 Many keys allow for a list of numeric values with an associated object type, represented by a boolean flag.
@@ -169,7 +142,7 @@ reporter.update({
 
 ## Recording Events
 
-Use the `recordEvent()` method to record player events for event-mode reporting:
+Use the `recordEvent()` method to record player events for event-mode reporting. The second argument is an optional object of data to include in the event report:
 
 ```typescript
 import { CmcdEventType } from "@svta/cml-cmcd";
@@ -182,43 +155,20 @@ reporter.recordEvent(CmcdEventType.ERROR);
 
 // Record user interactions
 reporter.recordEvent(CmcdEventType.MUTE);
-reporter.recordEvent(CmcdEventType.UNMUTE);
 reporter.recordEvent(CmcdEventType.PLAYER_EXPAND);
-reporter.recordEvent(CmcdEventType.PLAYER_COLLAPSE);
 
 // Record ad events
+reporter.recordEvent(CmcdEventType.AD_BREAK_START);
 reporter.recordEvent(CmcdEventType.AD_START);
 reporter.recordEvent(CmcdEventType.AD_END);
-reporter.recordEvent(CmcdEventType.AD_BREAK_START);
 reporter.recordEvent(CmcdEventType.AD_BREAK_END);
 
 // Record skip event
 reporter.recordEvent(CmcdEventType.SKIP);
 
 // Record custom events
-reporter.recordEvent(CmcdEventType.CUSTOM_EVENT);
+reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "custom-event-name" });
 ```
-
-### Available Event Types
-
-| Event Type          | Description                      |
-| ------------------- | -------------------------------- |
-| `PLAY_STATE`        | Player state changed             |
-| `ERROR`             | An error occurred                |
-| `TIME_INTERVAL`     | Periodic report (auto-triggered) |
-| `CONTENT_ID`        | Content ID changed               |
-| `BACKGROUNDED_MODE` | App backgrounded state changed   |
-| `MUTE`              | Player muted                     |
-| `UNMUTE`            | Player unmuted                   |
-| `PLAYER_EXPAND`     | Player view expanded             |
-| `PLAYER_COLLAPSE`   | Player view collapsed            |
-| `RESPONSE_RECEIVED` | Response received                |
-| `AD_START`          | Ad started                       |
-| `AD_END`            | Ad ended                         |
-| `AD_BREAK_START`    | Ad break started                 |
-| `AD_BREAK_END`      | Ad break ended                   |
-| `SKIP`              | User skipped content             |
-| `CUSTOM_EVENT`      | Custom application event         |
 
 ## Decorating Segment Requests
 
@@ -235,7 +185,7 @@ const reporter = new CmcdReporter({
 
 // Update CMCD data before the request
 reporter.update({
-	br: 5000,
+	br: [5000],
 	bl: 25000,
 	d: 4000,
 	ot: "v",
@@ -252,7 +202,7 @@ const request = {
 const decoratedRequest = reporter.applyRequestReport(request);
 
 // decoratedRequest.url will be:
-// https://cdn.example.com/video/segment_001.m4s?CMCD=br%3D5000%2Cbl%3D25000%2Cd%3D4000%2Cot%3Dv
+// https://cdn.example.com/video/segment_001.m4s?CMCD=br%3D(%225000%22%3Bv)%26bl%3D25000%26d%3D4000%26ot%3Dv
 
 // Use the decorated request with your HTTP client
 fetch(decoratedRequest.url, decoratedRequest);

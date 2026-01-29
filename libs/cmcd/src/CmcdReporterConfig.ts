@@ -26,5 +26,5 @@ export type CmcdReporterConfig = CmcdRequestReportConfig & {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	targets: CmcdEventReportConfig[];
+	eventTargets?: CmcdEventReportConfig[];
 }

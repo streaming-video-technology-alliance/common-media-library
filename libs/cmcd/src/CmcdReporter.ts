@@ -29,7 +29,7 @@ type CmcdEventReportConfigNormalized = CmcdEventReportConfig & CmcdReportConfigN
 
 type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormalized & {
 	sid: string;
-	targets: CmcdEventReportConfigNormalized[];
+	eventTargets: CmcdEventReportConfigNormalized[];
 }
 
 function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig): CmcdEncodeOptions {
@@ -51,17 +51,19 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 	// Apply top-level config defaults
 	const {
 		version = CMCD_V2,
-		targets = [],
+		eventTargets = [],
 		sid = uuid(),
+		transmissionMode = CMCD_QUERY,
 		...rest
 	} = config
 
 	return {
 		...rest,
 		version,
+		transmissionMode,
 		sid,
 		// Apply target config defaults
-		targets: targets.reduce((acc, target) => {
+		eventTargets: eventTargets.reduce((acc, target) => {
 			// TODO: How should an undefined events array be handled?
 			//       Does that represent no events to report, or reporting all events?
 			if (target && target.url && target.events?.length) {
@@ -80,8 +82,9 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 }
 
 type CmcdEventTarget = {
-	intervalId: ReturnType<typeof setInterval>;
+	intervalId: ReturnType<typeof setInterval> | undefined;
 	sn: number;
+	msdSent: boolean;
 	queue: CmcdData[];
 }
 
@@ -93,6 +96,9 @@ type CmcdEventTarget = {
 export class CmcdReporter {
 	private data: CmcdData = {}
 	private config: CmcdReporterConfigNormalized
+	private requestEncodingOptions: CmcdEncodeOptions
+	private msd: number = NaN
+	private msdSent: boolean = false
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
 
 	// TODO: Should this be an event handler?
@@ -107,10 +113,20 @@ export class CmcdReporter {
 		this.config = createCmcdReporterConfig(config)
 		this.data = {
 			cid: config.cid,
-			sid: config.sid,
+			sid: this.config.sid,
 			v: config.version,
 		}
+		this.requestEncodingOptions = createEncodingOptions(CMCD_REQUEST_MODE, this.config)
 		this.requester = requester
+
+		for (const target of this.config.eventTargets) {
+			this.eventTargets.set(target, {
+				intervalId: undefined,
+				sn: 0,
+				msdSent: false,
+				queue: [],
+			})
+		}
 	}
 
 	/**
@@ -161,8 +177,12 @@ export class CmcdReporter {
 			return
 		}
 
+		if (data.msd && !isNaN(data.msd)) {
+			this.msd = data.msd
+		}
+
 		// TODO: May need a deep merge utility for this.
-		this.data = { ...this.data, ...data }
+		this.data = { ...this.data, ...data, msd: undefined }
 	}
 
 	/**
@@ -173,18 +193,32 @@ export class CmcdReporter {
 	 *               the same as calling `update()` with the same data.
 	 */
 	recordEvent(type: CmcdEventType, data?: Partial<CmcdData>): void {
-		if (data) {
-			this.update(data)
+		const { cen, ...rest } = data || {}
+
+		if (rest) {
+			this.update(rest)
 		}
 
 		this.eventTargets.forEach((target) => {
-			target.queue.push({
+			const item = {
 				...this.data,
 				e: type,
 				ts: Date.now(),
 				sn: target.sn++,
-			})
+			}
+
+			if (type === CmcdEventType.CUSTOM_EVENT && cen) {
+				item.cen = cen
+			}
+
+			if (!isNaN(this.msd) && !target.msdSent) {
+				item.msd = this.msd
+				target.msdSent = true
+			}
+
+			target.queue.push(item)
 		})
+
 		this.processEventTargets()
 	}
 
@@ -196,25 +230,29 @@ export class CmcdReporter {
 	 * @returns The request with the CMCD request report applied.
 	 */
 	applyRequestReport(req: Request): Request {
-		if (!req || !req.url) {
+		if (!req || !req.url || !this.config.enabledKeys?.length) {
 			return req
 		}
 
 		const url = new URL(req.url)
 		const headers = Object.assign({}, req.headers)
-		const transimissionMode = this.config.transmissionMode || CMCD_QUERY
-		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config)
+		const data = { ...this.data }
 
-		switch (transimissionMode) {
+		if (!isNaN(this.msd) && !this.msdSent) {
+			data.msd = this.msd
+			this.msdSent = true
+		}
+
+		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
-				const param = encodeCmcd(this.data, options)
+				const param = encodeCmcd(data, this.requestEncodingOptions)
 				if (param) {
 					url.searchParams.set(CMCD_PARAM, param)
 				}
 				break
 
 			case CMCD_HEADERS:
-				Object.assign(headers, toCmcdHeaders(this.data, options))
+				Object.assign(headers, toCmcdHeaders(data, this.requestEncodingOptions))
 				break
 		}
 
@@ -240,7 +278,7 @@ export class CmcdReporter {
 				return
 			}
 
-			if (config.batchSize < queue.length && !flush) {
+			if (queue.length < config.batchSize && !flush) {
 				return
 			}
 

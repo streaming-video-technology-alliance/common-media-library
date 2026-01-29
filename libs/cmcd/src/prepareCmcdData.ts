@@ -1,6 +1,7 @@
 import { isTokenField, isValid } from '@svta/cml-cta'
 import { SfToken } from '@svta/cml-structured-field-values'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
+import { CMCD_V2 } from './CMCD_V2.ts'
 import type { CmcdData } from './CmcdData.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
@@ -31,7 +32,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results
 	}
 
-	const version = options.version || (obj['v'] as number) || 1
+	const version = options.version || (obj['v'] as number) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
