@@ -1,8 +1,3 @@
-/**
- * A collection of tools for working with ISO Base Media File Format (ISOBMFF).
- *
- * @packageDocumentation
- */
 export type * from './boxes/index.ts'
 export type * from './IsoBox.ts'
 export type * from './IsoBoxContainer.ts'
