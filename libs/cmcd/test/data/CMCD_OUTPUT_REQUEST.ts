@@ -12,7 +12,7 @@ export const CMCD_OUTPUT_REQUEST = {
 	'com.example-quote': '"Quote"',
 	'com.example-testing': 1234,
 	'com.example-token': 's',
-	cs: 123456,
+	cs: '123456',
 	d: 325,
 	dfa: 5,
 	dl: 10000,
