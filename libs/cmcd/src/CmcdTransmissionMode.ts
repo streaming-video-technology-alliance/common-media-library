@@ -1,11 +1,30 @@
 import type { ValueOf } from '@svta/cml-utils'
-import { CMCD_HEADERS } from './CMCD_HEADERS.ts'
-import { CMCD_JSON } from './CMCD_JSON.ts'
-import { CMCD_QUERY } from './CMCD_QUERY.ts'
+
+/**
+ * CMCD `query` transmission mode.
+ *
+ * @public
+ */
+export const CMCD_QUERY = 'query' as const
+
+/**
+ * CMCD `headers` transmission mode.
+ *
+ * @public
+ */
+export const CMCD_HEADERS = 'headers' as const
+
+/**
+ * CMCD `json` transmission mode.
+ *
+ * @public
+ *
+ * @deprecated JSON transmission mode is deprecated and will be removed in future versions.
+ */
+export const CMCD_JSON = 'json' as const
 
 /**
  * CMCD transmission modes.
- *
  *
  * @enum
  *

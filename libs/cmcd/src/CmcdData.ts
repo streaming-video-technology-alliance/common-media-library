@@ -8,4 +8,4 @@ import type { CmcdResponse } from './CmcdResponse.ts'
  *
  * @public
  */
-export type CmcdData = Cmcd & CmcdRequest & CmcdEvent & CmcdResponse;
+export type CmcdData = Cmcd & CmcdRequest & CmcdResponse & CmcdEvent;

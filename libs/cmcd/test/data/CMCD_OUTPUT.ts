@@ -13,7 +13,7 @@ export const CMCD_OUTPUT = {
 	'com.example-quote': '"Quote"',
 	'com.example-token': 's',
 	cs: 123456,
-	df: 5,
+	dfa: 5,
 	dl: 10000,
 	ltc: 1500,
 	mtp: 10000,
