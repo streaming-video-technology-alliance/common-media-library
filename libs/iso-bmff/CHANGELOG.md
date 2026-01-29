@@ -8,14 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.0-beta.1] - 2026-01-29
+
 ### Added
 
 - Added writers: `stsc`, `stsz`, `stco`.
-
-## [1.0.0-beta.1] - 2026-01-28
-
-### Added
-
 - Added `defaultReaderConfig` and `defaultWriterConfig` functions to create default reader and writer configurations ([#298](https://github.com/streaming-video-technology-alliance/common-media-library/issues/298))
 
 ### Changed
