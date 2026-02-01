@@ -15,8 +15,12 @@ and this project adheres to
 - `CmcdRequest` contains the common, object, request, session, and status keys
 - `CmcdEvent` extends `CmcdRequest` with event-specific keys (`cen`, `e`, `h`, `ts`)
 - `CmcdResponse` extends `CmcdRequest` with response-specific keys (`cmsdd`, `cmsds`, `rc`, `smrt`, `ttfb`, `ttfbb`, `ttlb`, `url`)
-- Updated `CmcdRequestData` to alias `CmcdRequest` instead of `Cmcd`
 - Updated `CmcdRequestKey` to use `keyof CmcdRequest` instead of `keyof Cmcd`
+
+### Removed
+
+- Removed deprecated `CmcdData` type alias (use `Cmcd` instead)
+- Removed deprecated `CmcdRequestData` type alias (use `CmcdRequest` instead)
 
 ## [2.0.0] - 2026-01-27
 

@@ -138,9 +138,6 @@ export const CMCD_V2: 2;
 // @public
 export type CmcdCustomKey = `${string}-${string}`;
 
-// @public @deprecated
-export type CmcdData = Cmcd;
-
 // @public
 export type CmcdEncodeOptions = {
     version?: number;
@@ -340,9 +337,6 @@ export type CmcdRequest = {
     pt?: number;
     rtp?: number;
 };
-
-// @public @deprecated
-export type CmcdRequestData = CmcdRequest;
 
 // @public @deprecated
 export type CmcdRequestKey = keyof CmcdRequest;
