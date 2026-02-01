@@ -100,6 +100,7 @@ export class CmcdReporter {
 	private msd: number = NaN
 	private msdSent: boolean = false
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
+	private requestSn: number = 0
 
 	// TODO: Should this be an event handler?
 	private requester: (request: Request) => Promise<{ status: number; }>
@@ -112,9 +113,9 @@ export class CmcdReporter {
 	constructor(config: Partial<CmcdReporterConfig>, requester: (request: Request) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
 		this.data = {
-			cid: config.cid,
+			cid: this.config.cid,
 			sid: this.config.sid,
-			v: config.version,
+			v: this.config.version,
 		}
 		this.requestEncodingOptions = createEncodingOptions(CMCD_REQUEST_MODE, this.config)
 		this.requester = requester
@@ -199,7 +200,11 @@ export class CmcdReporter {
 			this.update(rest)
 		}
 
-		this.eventTargets.forEach((target) => {
+		this.eventTargets.forEach((target, config) => {
+			if (!config.events.includes(type)) {
+				return
+			}
+
 			const item = {
 				...this.data,
 				e: type,
@@ -236,7 +241,7 @@ export class CmcdReporter {
 
 		const url = new URL(req.url)
 		const headers = Object.assign({}, req.headers)
-		const data = { ...this.data }
+		const data = { ...this.data, sn: this.requestSn++ }
 
 		if (!isNaN(this.msd) && !this.msdSent) {
 			data.msd = this.msd
@@ -334,5 +339,6 @@ export class CmcdReporter {
 	 */
 	private resetSession(): void {
 		this.eventTargets.forEach(target => target.sn = 0)
+		this.requestSn = 0
 	}
 }
