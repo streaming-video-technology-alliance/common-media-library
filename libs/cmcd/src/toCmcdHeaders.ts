@@ -1,5 +1,5 @@
 import { encodeSfDict } from '@svta/cml-structured-field-values'
-import type { CmcdData } from './CmcdData.ts'
+import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdHeaderField } from './CmcdHeaderField.ts'
 import { groupCmcdHeaders } from './groupCmcdHeaders.ts'
@@ -18,7 +18,7 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
  * @example
  * {@includeCode ../test/toCmcdHeaders.test.ts#example}
  */
-export function toCmcdHeaders(cmcd: CmcdData, options: CmcdEncodeOptions = {}): Record<CmcdHeaderField, string> {
+export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}): Record<CmcdHeaderField, string> {
 	const result = {} as Record<CmcdHeaderField, string>
 
 	if (!cmcd) {

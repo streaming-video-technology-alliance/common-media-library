@@ -1,5 +1,5 @@
 import { encodeSfDict } from '@svta/cml-structured-field-values'
-import type { CmcdData } from './CmcdData.ts'
+import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
 
@@ -16,7 +16,7 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
  * @example
  * {@includeCode ../test/encodeCmcd.test.ts#example}
  */
-export function encodeCmcd(cmcd: CmcdData, options: CmcdEncodeOptions = {}): string {
+export function encodeCmcd(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
 		return ''
 	}

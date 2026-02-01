@@ -1,15 +1,15 @@
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
 import { CmcdHeaderField } from './CmcdHeaderField.ts'
+import type { Cmcd } from './Cmcd.ts'
 import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
-import type { CmcdRequestData } from './CmcdRequestData.ts'
-import type { CmcdRequestKey } from './CmcdRequestKey.ts'
+import type { CmcdKey } from './CmcdKey.ts'
 
-function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdRequestKey, CmcdHeaderField> {
+function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, CmcdHeaderField> {
 	return Object.keys(headerMap)
 		.reduce((acc, field) => {
 			headerMap[field as CmcdHeaderField]?.forEach(key => acc[key] = field as CmcdHeaderField)
 			return acc
-		}, {} as Record<CmcdRequestKey, CmcdHeaderField>)
+		}, {} as Record<CmcdKey, CmcdHeaderField>)
 }
 
 /**
@@ -22,20 +22,20 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdRequestK
  *
  * @public
  */
-export function groupCmcdHeaders(cmcd: CmcdRequestData, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdRequestData> {
-	const result = {} as Record<CmcdHeaderField, CmcdRequestData>
+export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, Cmcd> {
+	const result = {} as Record<CmcdHeaderField, Cmcd>
 
 	if (!cmcd) {
 		return result
 	}
 
-	const keys = Object.keys(cmcd) as CmcdRequestKey[]
-	const custom: Partial<Record<CmcdRequestKey, CmcdHeaderField>> = customHeaderMap ? createHeaderMap(customHeaderMap) : {}
+	const keys = Object.keys(cmcd) as CmcdKey[]
+	const custom: Partial<Record<CmcdKey, CmcdHeaderField>> = customHeaderMap ? createHeaderMap(customHeaderMap) : {}
 
-	return keys.reduce((acc: Record<CmcdHeaderField, CmcdRequestData>, key: CmcdRequestKey) => {
+	return keys.reduce((acc: Record<CmcdHeaderField, Cmcd>, key: CmcdKey) => {
 		const field = CMCD_HEADER_MAP[key] || custom[key] || CmcdHeaderField.REQUEST
 		const data = acc[field] ??= {}
-		data[key] = (cmcd as any)[key]
+		;(data as any)[key] = (cmcd as any)[key]
 		return acc
 	}, result)
 }

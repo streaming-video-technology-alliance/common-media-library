@@ -1,6 +1,6 @@
 import type { SfBareItem } from '@svta/cml-structured-field-values'
 import { decodeSfDict, SfItem, symbolToStr } from '@svta/cml-structured-field-values'
-import type { CmcdData } from './CmcdData.ts'
+import type { Cmcd } from './Cmcd.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 
 // Define the input type for reduceValue
@@ -41,7 +41,7 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  * @example
  * {@includeCode ../test/decodeCmcd.test.ts#example}
  */
-export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string): T {
+export function decodeCmcd<T extends Cmcd = Cmcd>(cmcd: string): T {
 	if (!cmcd) {
 		return {} as T
 	}
