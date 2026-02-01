@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Refactored `Cmcd` type to be the intersection `CmcdRequest & CmcdResponse & CmcdEvent`
+- Restored `CmcdRequest`, `CmcdResponse`, and `CmcdEvent` as separate, standalone types
+- `CmcdRequest` contains the common, object, request, session, and status keys
+- `CmcdEvent` extends `CmcdRequest` with event-specific keys (`cen`, `e`, `h`, `ts`)
+- `CmcdResponse` extends `CmcdRequest` with response-specific keys (`cmsdd`, `cmsds`, `rc`, `smrt`, `ttfb`, `ttfbb`, `ttlb`, `url`)
+- Updated `CmcdRequestData` to alias `CmcdRequest` instead of `Cmcd`
+- Updated `CmcdRequestKey` to use `keyof CmcdRequest` instead of `keyof Cmcd`
+
 ## [2.0.0] - 2026-01-27
 
 ### Added

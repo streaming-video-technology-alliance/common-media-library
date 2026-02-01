@@ -22,61 +22,7 @@ export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, o
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
-export type Cmcd = {
-    [index: CmcdCustomKey]: CmcdValue | undefined;
-    ab?: CmcdObjectTypeList;
-    br?: CmcdObjectTypeList;
-    d?: number;
-    lab?: CmcdObjectTypeList;
-    lb?: CmcdObjectTypeList;
-    ot?: CmcdObjectType;
-    tab?: CmcdObjectTypeList;
-    tb?: CmcdObjectTypeList;
-    tpb?: CmcdObjectTypeList;
-    bl?: CmcdObjectTypeList;
-    cs?: string;
-    dfa?: number;
-    dl?: number;
-    ltc?: number;
-    mtp?: CmcdObjectTypeList;
-    nor?: ValueOrArray<string | SfItem<string, {
-        r: string;
-    }>>;
-    pb?: CmcdObjectTypeList;
-    sn?: number;
-    sta?: CmcdPlayerState;
-    su?: boolean;
-    tbl?: CmcdObjectTypeList;
-    cid?: string;
-    msd?: number;
-    pr?: number;
-    sf?: CmcdStreamingFormat;
-    sid?: string;
-    st?: CmcdStreamType;
-    v?: number;
-    bg?: boolean;
-    bs?: boolean;
-    bsa?: CmcdObjectTypeList;
-    bsd?: CmcdObjectTypeList;
-    bsda?: CmcdObjectTypeList;
-    cdn?: string;
-    ec?: string[];
-    nr?: boolean;
-    pt?: number;
-    rtp?: number;
-    cen?: string;
-    e?: CmcdEventType;
-    h?: string;
-    ts?: number;
-    cmsdd?: string;
-    cmsds?: string;
-    rc?: number;
-    smrt?: string;
-    ttfb?: number;
-    ttfbb?: number;
-    ttlb?: number;
-    url?: string;
-};
+export type Cmcd = CmcdRequest & CmcdResponse & CmcdEvent;
 
 // @public
 export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "bsd", "bsda", "cdn", "cid", "cs", "dfa", "ec", "h", "lab", "lb", "ltc", "msd", "mtp", "nr", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
@@ -212,8 +158,13 @@ export const CmcdEncoding: typeof CmcdTransmissionMode;
 // @public (undocumented)
 export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
 
-// @public @deprecated
-export type CmcdEvent = Cmcd;
+// @public
+export type CmcdEvent = CmcdRequest & {
+    cen?: string;
+    e?: CmcdEventType;
+    h?: string;
+    ts?: number;
+};
 
 // @public
 export type CmcdEventReportConfig = CmcdReportConfig & {
@@ -345,22 +296,73 @@ export const CmcdReportingMode: {
 // @public (undocumented)
 export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 
-// @public @deprecated
-export type CmcdRequest = Cmcd;
+// @public
+export type CmcdRequest = {
+    [index: CmcdCustomKey]: CmcdValue | undefined;
+    ab?: CmcdObjectTypeList;
+    br?: CmcdObjectTypeList;
+    d?: number;
+    lab?: CmcdObjectTypeList;
+    lb?: CmcdObjectTypeList;
+    ot?: CmcdObjectType;
+    tab?: CmcdObjectTypeList;
+    tb?: CmcdObjectTypeList;
+    tpb?: CmcdObjectTypeList;
+    bl?: CmcdObjectTypeList;
+    cs?: string;
+    dfa?: number;
+    dl?: number;
+    ltc?: number;
+    mtp?: CmcdObjectTypeList;
+    nor?: ValueOrArray<string | SfItem<string, {
+        r: string;
+    }>>;
+    pb?: CmcdObjectTypeList;
+    sn?: number;
+    sta?: CmcdPlayerState;
+    su?: boolean;
+    tbl?: CmcdObjectTypeList;
+    cid?: string;
+    msd?: number;
+    pr?: number;
+    sf?: CmcdStreamingFormat;
+    sid?: string;
+    st?: CmcdStreamType;
+    v?: number;
+    bg?: boolean;
+    bs?: boolean;
+    bsa?: CmcdObjectTypeList;
+    bsd?: CmcdObjectTypeList;
+    bsda?: CmcdObjectTypeList;
+    cdn?: string;
+    ec?: string[];
+    nr?: boolean;
+    pt?: number;
+    rtp?: number;
+};
 
 // @public @deprecated
-export type CmcdRequestData = Cmcd;
+export type CmcdRequestData = CmcdRequest;
 
 // @public @deprecated
-export type CmcdRequestKey = keyof Cmcd;
+export type CmcdRequestKey = keyof CmcdRequest;
 
 // @public
 export type CmcdRequestReportConfig = CmcdReportConfig & {
     transmissionMode?: CmcdTransmissionMode;
 };
 
-// @public @deprecated
-export type CmcdResponse = Cmcd;
+// @public
+export type CmcdResponse = CmcdRequest & {
+    cmsdd?: string;
+    cmsds?: string;
+    rc?: number;
+    smrt?: string;
+    ttfb?: number;
+    ttfbb?: number;
+    ttlb?: number;
+    url?: string;
+};
 
 // @public
 export const CmcdStreamingFormat: typeof CmStreamingFormat;
@@ -440,7 +442,7 @@ export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfIt
 
 // Warnings were encountered during analysis:
 //
-// src/CmcdEventType.ts:36:1 - (ae-forgotten-export) The symbol "CmcdVersion" needs to be exported by the entry point index.d.ts
+// src/CmcdEventType.ts:64:1 - (ae-forgotten-export) The symbol "CmcdVersion" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

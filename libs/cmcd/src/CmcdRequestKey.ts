@@ -1,9 +1,10 @@
-import type { Cmcd } from './Cmcd.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 
 /**
  * A CMCD request key.
  *
- * @deprecated Use `keyof Cmcd` instead.
+ * @deprecated Use `keyof CmcdRequest` instead.
+ *
  * @public
  */
-export type CmcdRequestKey = keyof Cmcd;
+export type CmcdRequestKey = keyof CmcdRequest;
