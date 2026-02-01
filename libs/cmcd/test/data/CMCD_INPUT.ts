@@ -1,12 +1,11 @@
-import type { CmcdData } from '@svta/cml-cmcd'
+import type { Cmcd } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType } from '@svta/cml-cmcd'
 
-export const CMCD_INPUT: CmcdData = {
+export const CMCD_INPUT: Cmcd = {
 	// common keys
 	sid: 'session-id',
 	cid: 'content-id',
 	cdn: 'cdn-provider',
-	nrr: '0-99',
 	mtp: 10049,
 	bs: true,
 	br: 200,

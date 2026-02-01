@@ -113,6 +113,23 @@ describe('encodeCmcd', () => {
 		})
 	})
 
+	describe('V1 down-conversion', () => {
+		it('extracts nrr from nor SfItem with r parameter', () => {
+			const input = { nor: toCmcdValue('../testing/3.m4v', { r: '0-99' }) }
+			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v",nrr="0-99"')
+		})
+
+		it('unwraps inner-list values to plain scalars for V1', () => {
+			const input = { br: [5000], mtp: [10000] }
+			equal(encodeCmcd(input, { version: 1 }), 'br=5000,mtp=10000')
+		})
+
+		it('preserves plain nor string in V1', () => {
+			const input = { nor: '../testing/3.m4v' }
+			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v"')
+		})
+	})
+
 	describe('nor', () => {
 		it('returns encoded string for request mode with nor string', () => {
 			const input = {
