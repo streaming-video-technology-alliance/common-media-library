@@ -1,7 +1,7 @@
 import type { CmcdEncodeOptions } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
 import { SfToken } from '@svta/cml-structured-field-values'
-import { equal } from 'node:assert'
+import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { toCmcdValue } from '../src/toCmcdValue.ts'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
@@ -46,6 +46,27 @@ describe('encodeCmcd', () => {
 
 		it('doesn\'t filter version key', () => {
 			equal(encodeCmcd({ v: 2, cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' }), 'cid="content-id",v=2')
+		})
+
+		it('doesn\'t filter e key in event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.TIME_INTERVAL, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('e=t'), 'e key must not be filtered out in event mode')
+		})
+
+		it('doesn\'t filter ts key in event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.TIME_INTERVAL, ts: 1640995200000, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('ts='), 'ts key must not be filtered out in event mode')
+		})
+
+		it('doesn\'t filter cen key in event mode when event type is ce', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.CUSTOM_EVENT, cen: 'my-custom-event', cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('cen="my-custom-event"'), 'cen key must not be filtered out in event mode when e=ce')
 		})
 	})
 
