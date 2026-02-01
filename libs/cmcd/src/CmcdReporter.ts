@@ -81,10 +81,13 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 	}
 }
 
-type CmcdEventTarget = {
-	intervalId: ReturnType<typeof setInterval> | undefined;
+type CmcdTarget = {
 	sn: number;
 	msdSent: boolean;
+}
+
+type CmcdEventTarget = CmcdTarget & {
+	intervalId: ReturnType<typeof setInterval> | undefined;
 	queue: CmcdData[];
 }
 
@@ -98,9 +101,11 @@ export class CmcdReporter {
 	private config: CmcdReporterConfigNormalized
 	private requestEncodingOptions: CmcdEncodeOptions
 	private msd: number = NaN
-	private msdSent: boolean = false
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
-	private requestSn: number = 0
+	private requestTarget: CmcdTarget = {
+		sn: 0,
+		msdSent: false,
+	}
 
 	// TODO: Should this be an event handler?
 	private requester: (request: Request) => Promise<{ status: number; }>
@@ -241,11 +246,11 @@ export class CmcdReporter {
 
 		const url = new URL(req.url)
 		const headers = Object.assign({}, req.headers)
-		const data = { ...this.data, sn: this.requestSn++ }
+		const data = { ...this.data, sn: this.requestTarget.sn++ }
 
-		if (!isNaN(this.msd) && !this.msdSent) {
+		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
 			data.msd = this.msd
-			this.msdSent = true
+			this.requestTarget.msdSent = true
 		}
 
 		switch (this.config.transmissionMode) {
@@ -339,6 +344,6 @@ export class CmcdReporter {
 	 */
 	private resetSession(): void {
 		this.eventTargets.forEach(target => target.sn = 0)
-		this.requestSn = 0
+		this.requestTarget.sn = 0
 	}
 }
