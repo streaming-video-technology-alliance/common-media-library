@@ -3,7 +3,7 @@ import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
-import type { CmcdData } from './CmcdData.ts'
+import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
 import { CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
@@ -88,7 +88,7 @@ type CmcdTarget = {
 
 type CmcdEventTarget = CmcdTarget & {
 	intervalId: ReturnType<typeof setInterval> | undefined;
-	queue: CmcdData[];
+	queue: Cmcd[];
 }
 
 /**
@@ -97,7 +97,7 @@ type CmcdEventTarget = CmcdTarget & {
  * @public
  */
 export class CmcdReporter {
-	private data: CmcdData = {}
+	private data: Cmcd = {}
 	private config: CmcdReporterConfigNormalized
 	private requestEncodingOptions: CmcdEncodeOptions
 	private msd: number = NaN
@@ -177,7 +177,7 @@ export class CmcdReporter {
 	 *
 	 * @param data - The data to update.
 	 */
-	update(data: Partial<CmcdData>): void {
+	update(data: Partial<Cmcd>): void {
 		if (data.sid && data.sid !== this.data.sid) {
 			this.resetSession()
 			return
@@ -198,7 +198,7 @@ export class CmcdReporter {
 	 * @param data - Additional data to record with the event. This is
 	 *               the same as calling `update()` with the same data.
 	 */
-	recordEvent(type: CmcdEventType, data?: Partial<CmcdData>): void {
+	recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void {
 		const { cen, ...rest } = data || {}
 
 		if (rest) {
@@ -310,7 +310,7 @@ export class CmcdReporter {
 	 * @param target - The target to send the event report to.
 	 * @param data - The data to send in the event report.
 	 */
-	private async sendEventReport(target: CmcdEventReportConfigNormalized, data: CmcdData[]): Promise<void> {
+	private async sendEventReport(target: CmcdEventReportConfigNormalized, data: Cmcd[]): Promise<void> {
 		const options = createEncodingOptions(CMCD_EVENT_MODE, target)
 		const response = await this.requester({
 			url: target.url,
