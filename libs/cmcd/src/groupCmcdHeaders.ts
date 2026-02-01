@@ -1,10 +1,12 @@
+import type { Cmcd } from './Cmcd.ts'
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
 import { CmcdHeaderField } from './CmcdHeaderField.ts'
-import type { Cmcd } from './Cmcd.ts'
+import type { CmcdHeaderKey } from './CmcdHeaderKey.ts'
 import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
+import type { CmcdHeaderValue } from './CmcdHeaderValue.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 
-function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, CmcdHeaderField> {
+function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdHeaderKey, CmcdHeaderField> {
 	return Object.keys(headerMap)
 		.reduce((acc, field) => {
 			headerMap[field as CmcdHeaderField]?.forEach(key => acc[key] = field as CmcdHeaderField)
@@ -22,20 +24,20 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdKey, Cmc
  *
  * @public
  */
-export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, Cmcd> {
-	const result = {} as Record<CmcdHeaderField, Cmcd>
+export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdHeaderValue> {
+	const result = {} as Record<CmcdHeaderField, CmcdHeaderValue>
 
 	if (!cmcd) {
 		return result
 	}
 
-	const keys = Object.keys(cmcd) as CmcdKey[]
-	const custom: Partial<Record<CmcdKey, CmcdHeaderField>> = customHeaderMap ? createHeaderMap(customHeaderMap) : {}
+	const keys = Object.keys(cmcd) as CmcdHeaderKey[]
+	const custom: Partial<Record<CmcdHeaderKey, CmcdHeaderField>> = customHeaderMap ? createHeaderMap(customHeaderMap) : {}
 
-	return keys.reduce((acc: Record<CmcdHeaderField, Cmcd>, key: CmcdKey) => {
+	return keys.reduce((acc: Record<CmcdHeaderField, CmcdHeaderValue>, key: CmcdHeaderKey) => {
 		const field = CMCD_HEADER_MAP[key] || custom[key] || CmcdHeaderField.REQUEST
 		const data = acc[field] ??= {}
-		;(data as any)[key] = (cmcd as any)[key]
+			; (data as any)[key] = (cmcd as any)[key]
 		return acc
 	}, result)
 }

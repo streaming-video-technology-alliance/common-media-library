@@ -5,6 +5,7 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
+import type { CmcdKey } from './CmcdKey.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
@@ -96,7 +97,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
 	// Filter keys based on the version, reporting mode and options
-	let keys = Object.keys(data).filter(keyFilter)
+	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
 
 	if (data['e'] && data['e'] !== 'rr') {
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
