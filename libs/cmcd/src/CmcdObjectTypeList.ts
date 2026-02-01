@@ -1,5 +1,5 @@
 import type { SfItem } from '@svta/cml-structured-field-values'
-import type { ExclusiveRecord, ValueOrArray } from '@svta/cml-utils'
+import type { ExclusiveRecord } from '@svta/cml-utils'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
 
 /**
@@ -7,4 +7,4 @@ import type { CmcdObjectType } from './CmcdObjectType.ts'
  *
  * @public
  */
-export type CmcdObjectTypeList = ValueOrArray<number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>>
+export type CmcdObjectTypeList = (number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>)[];

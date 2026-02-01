@@ -35,7 +35,7 @@ const reporter = new CmcdReporter({
 	// Optional: Transmission mode for request reports (defaults to 'query')
 	transmissionMode: CMCD_QUERY,
 
-	// Optional: Keys to include in request reports (if not provided, target is disabled)
+	// Optional: Keys to include in request reports (if not provided, request reporting is disabled)
 	enabledKeys: ["br", "bl", "d", "ot", "sid", "cid", "mtp", "sf", "st"],
 
 	// Event reporting targets
@@ -47,9 +47,9 @@ const reporter = new CmcdReporter({
 				CmcdEventType.ERROR,
 				CmcdEventType.TIME_INTERVAL,
 			],
-			interval: 10, // seconds between TIME_INTERVAL reports
+			interval: 30, // seconds between TIME_INTERVAL reports
 			batchSize: 5, // number of events to batch before sending
-			enabledKeys: ["br", "bl", "sid", "cid", "e", "ts", "sn"],
+			enabledKeys: ["br", "bl", "sid", "cid"],
 		},
 	],
 });
@@ -77,20 +77,23 @@ Use the `update()` method to set or update CMCD data. The reporter maintains an 
 ```typescript
 // Update multiple fields at once
 reporter.update({
-	br: 5000, // Encoded bitrate (kbps)
+	br: [5000], // Encoded bitrate (kbps)
 	d: 4000, // Segment duration (ms)
 	ot: "v", // Object type: video
-	bl: 25000, // Buffer length (ms)
-	mtp: 12000, // Measured throughput (kbps)
+	bl: [25000], // Buffer length (ms)
+	mtp: [12000], // Measured throughput (kbps)
 	sf: "d", // Streaming format: DASH
 	st: "v", // Stream type: VOD
 });
 
 // Update individual fields as playback state changes
-reporter.update({ bl: 30000 }); // Buffer increased
+reporter.update({ bl: [30000] }); // Buffer increased
 reporter.update({ pr: 1.5 }); // Playback rate changed
 reporter.update({ bs: true }); // Buffer starvation occurred
 ```
+
+> [!NOTE]
+> In CMCD v2, several keys that were previously plain numbers are now typed as `CmcdObjectTypeList` — an inner list that supports per-object-type annotations. Keys like `br`, `bl`, `mtp`, `tb`, `lb`, `ab`, `tab`, `lab`, `tbl`, `pb`, `bsa`, `bsd`, `bsda`, and `tpb` must be passed as arrays (e.g., `br: [5000]`).
 
 ### Value Formatting
 
@@ -98,24 +101,24 @@ The CMCD specification requires certain keys to be formatted before transmission
 
 ```typescript
 // Correct: pass the raw value, the reporter rounds to nearest 100
-reporter.update({ bl: 25432 }); // encoded as bl=25400
+reporter.update({ bl: [25432] }); // encoded as bl=(25400)
 
 // Incorrect: do not pre-round the value
-reporter.update({ bl: 25400 });
+reporter.update({ bl: [25400] });
 ```
 
-### Parameterized Values with CmcdItem
+### Parameterized Values with toCmcdValue
 
 Some CMCD keys like `nor` (next object request) and `br` (encoded bitrate) support parameterized values in CMCD v2. Use the `toCmcdValue` helper function to attach parameters to values:
 
 ```typescript
-import { CmcdReporter, CmcdItem } from "@svta/cml-cmcd";
+import { CmcdReporter, toCmcdValue } from "@svta/cml-cmcd";
 
 const reporter = new CmcdReporter({
 	cid: "video-123",
 });
 
-// Using CmcdItem to add byte-range parameters to next object requests
+// Using toCmcdValue to add byte-range parameters to next object requests
 reporter.update({
 	nor: [
 		toCmcdValue("segment_002.m4s", { r: "0-50000" }),
@@ -149,7 +152,7 @@ reporter.update({
 	br: [toCmcdValue(5000, { v: true }), toCmcdValue(3000, { a: true })],
 });
 
-// This encodes to: br=("5000";v "3000";a)
+// This encodes to: br=(5000;v 3000;a)
 ```
 
 ## Recording Events
@@ -198,7 +201,7 @@ const reporter = new CmcdReporter({
 // Update CMCD data before the request
 reporter.update({
 	br: [5000],
-	bl: 25000,
+	bl: [25000],
 	d: 4000,
 	ot: "v",
 });
@@ -212,9 +215,6 @@ const request = {
 
 // Apply CMCD data to the request
 const decoratedRequest = reporter.applyRequestReport(request);
-
-// decoratedRequest.url will be:
-// https://cdn.example.com/video/segment_001.m4s?CMCD=br%3D(%225000%22%3Bv)%26bl%3D25000%26d%3D4000%26ot%3Dv
 
 // Use the decorated request with your HTTP client
 fetch(decoratedRequest.url, decoratedRequest);
@@ -230,8 +230,8 @@ const reporter = new CmcdReporter({
 });
 
 reporter.update({
-	br: 5000,
-	bl: 25000,
+	br: [5000],
+	bl: [25000],
 	d: 4000,
 	ot: "v",
 	sid: "session-123",
@@ -247,8 +247,8 @@ const decoratedRequest = reporter.applyRequestReport(request);
 
 // decoratedRequest.headers will contain:
 // {
-//   'CMCD-Object': 'br=5000,d=4000,ot=v',
-//   'CMCD-Request': 'bl=25000',
+//   'CMCD-Object': 'br=(5000),d=4000,ot=v',
+//   'CMCD-Request': 'bl=(25000)',
 //   'CMCD-Session': 'sid="session-123"',
 // }
 ```
@@ -263,7 +263,7 @@ class VideoPlayer {
 		this.reporter = new CmcdReporter({
 			cid: "video-content-id",
 			transmissionMode: CMCD_QUERY,
-			targets: [
+			eventTargets: [
 				{
 					url: "https://analytics.example.com/cmcd",
 					events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR],
@@ -275,11 +275,11 @@ class VideoPlayer {
 	async fetchSegment(url: string, segmentInfo: SegmentInfo): Promise<Response> {
 		// Update CMCD data based on current player state
 		this.reporter.update({
-			br: segmentInfo.bitrate,
+			br: [segmentInfo.bitrate],
 			d: segmentInfo.duration,
 			ot: segmentInfo.type,
-			bl: this.getBufferLength(),
-			mtp: this.getMeasuredThroughput(),
+			bl: [this.getBufferLength()],
+			mtp: [this.getMeasuredThroughput()],
 		});
 
 		// Create and decorate the request
@@ -290,13 +290,14 @@ class VideoPlayer {
 	}
 
 	play() {
-		this.reporter.recordEvent(CmcdEventType.PLAY_STATE);
+		this.reporter.recordEvent(CmcdEventType.PLAY_STATE, {
+			sta: CmcdPlayerState.PLAYING,
+		});
 		// ... player logic
 	}
 
 	onError(error: Error) {
-		this.reporter.update({ ec: error.code });
-		this.reporter.recordEvent(CmcdEventType.ERROR);
+		this.reporter.recordEvent(CmcdEventType.ERROR, { ec: [error.code] });
 	}
 }
 ```
@@ -335,11 +336,11 @@ reporter.flush();
 ```typescript
 const reporter = new CmcdReporter({
 	cid: "video-123",
-	targets: [
+	eventTargets: [
 		{
 			url: "https://analytics.example.com/cmcd",
 			events: [CmcdEventType.TIME_INTERVAL, CmcdEventType.PLAY_STATE],
-			interval: 10,
+			interval: 30,
 			batchSize: 3,
 		},
 	],
@@ -384,7 +385,7 @@ const customRequester = async (request) => {
 const reporter = new CmcdReporter(
 	{
 		cid: "video-123",
-		targets: [
+		eventTargets: [
 			{
 				url: "https://analytics.example.com/cmcd",
 				events: [CmcdEventType.TIME_INTERVAL],
@@ -406,12 +407,12 @@ const reporter = new CmcdReporter({
 	cid: "video-123",
 	// Only include these keys in request reports
 	enabledKeys: ["br", "bl", "d", "ot", "sid", "cid"],
-	targets: [
+	eventTargets: [
 		{
 			url: "https://analytics.example.com/cmcd",
 			events: [CmcdEventType.TIME_INTERVAL],
 			// Override enabled keys for this specific target
-			enabledKeys: ["br", "bl", "sid", "cid", "e", "ts", "sn"],
+			enabledKeys: ["br", "bl", "sid", "cid"],
 		},
 	],
 });
@@ -421,22 +422,22 @@ const reporter = new CmcdReporter({
 
 ### CmcdReporterConfig
 
-| Property           | Type                      | Default             | Description                                                                         |
-| ------------------ | ------------------------- | ------------------- | ----------------------------------------------------------------------------------- |
-| `sid`              | `string`                  | Auto-generated UUID | Session ID                                                                          |
-| `cid`              | `string`                  | `undefined`         | Content ID                                                                          |
-| `version`          | `CmcdVersion`             | `CMCD_V2`           | CMCD protocol version                                                               |
-| `transmissionMode` | `CmcdTransmissionMode`    | `'query'`           | How to transmit CMCD data                                                           |
-| `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, request reporting is disabled. |
-| `targets`          | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                             |
+| Property           | Type                      | Default             | Description                                                                    |
+| ------------------ | ------------------------- | ------------------- | ------------------------------------------------------------------------------ |
+| `sid`              | `string`                  | Auto-generated UUID | Session ID                                                                     |
+| `cid`              | `string`                  | `undefined`         | Content ID                                                                     |
+| `version`          | `CmcdVersion`             | `CMCD_V2`           | CMCD protocol version                                                          |
+| `transmissionMode` | `CmcdTransmissionMode`    | `'query'`           | How to transmit CMCD data in request mode                                      |
+| `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. |
+| `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
 
 ### CmcdEventReportConfig
 
-| Property      | Type              | Default     | Description                                                               |
-| ------------- | ----------------- | ----------- | ------------------------------------------------------------------------- |
-| `url`         | `string`          | Required    | Analytics endpoint URL                                                    |
-| `events`      | `CmcdEventType[]` | `undefined` | Events to report. If no events are provided, the target is disabled.      |
-| `interval`    | `number`          | `10`        | Seconds between TIME_INTERVAL reports                                     |
-| `batchSize`   | `number`          | `1`         | Events to batch before sending                                            |
-| `version`     | `CmcdVersion`     | `CMCD_V2`   | CMCD version for this target                                              |
-| `enabledKeys` | `CmcdKey[]`       | `undefined` | Keys to include for this target. If not provided, the target is disabled. |
+| Property      | Type              | Default     | Description                                                                 |
+| ------------- | ----------------- | ----------- | --------------------------------------------------------------------------- |
+| `url`         | `string`          | Required    | Analytics endpoint URL                                                      |
+| `events`      | `CmcdEventType[]` | `undefined` | Events to report. If no events are provided, the target is disabled.        |
+| `interval`    | `number`          | `30`        | Seconds between TIME_INTERVAL reports                                       |
+| `batchSize`   | `number`          | `1`         | Events to batch before sending                                              |
+| `version`     | `CmcdVersion`     | `CMCD_V2`   | CMCD version for this target (must be v2 or higher)                         |
+| `enabledKeys` | `CmcdKey[]`       | `undefined` | Keys to include for this target. If not provided, no keys will be reported. |

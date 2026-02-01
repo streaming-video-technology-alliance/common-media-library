@@ -1,5 +1,4 @@
 import type { SfItem } from '@svta/cml-structured-field-values'
-import type { ValueOrArray } from '@svta/cml-utils'
 import type { CmcdCustomKey } from './CmcdCustomKey.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
@@ -265,7 +264,7 @@ export type CmcdRequest = {
 	 *
 	 * Inner list of strings
 	 */
-	nor?: ValueOrArray<string | SfItem<string, { r: string }>>;
+	nor?: (string | SfItem<string, { r: string }>)[];
 
 	/**
 	 * Non rendered
