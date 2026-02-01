@@ -1,8 +1,8 @@
 import { isTokenField, isValid } from '@svta/cml-cta'
-import { SfToken } from '@svta/cml-structured-field-values'
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
-import type { CmcdData } from './CmcdData.ts'
+import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
@@ -12,9 +12,64 @@ import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
 import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
 
-const filterMap = {
+const filterMap: Record<string, (key: string) => boolean> = {
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
+}
+
+/**
+ * V1 keys that use inner lists in V2 but plain numbers in V1.
+ */
+const INNER_LIST_V1_KEYS = new Set(['br', 'bl', 'dl', 'mtp', 'rtp', 'tb'])
+
+/**
+ * Unwrap an inner list or SfItem value to a plain scalar.
+ */
+function unwrapValue(value: any): any {
+	if (Array.isArray(value)) {
+		return unwrapValue(value[0])
+	}
+	if (value instanceof SfItem) {
+		return value.value
+	}
+	return value
+}
+
+/**
+ * Down-convert V2 CMCD data to V1 format.
+ *
+ * - Extracts `nrr` from `nor` SfItem `r` parameter.
+ * - Unwraps inner-list values to plain scalars.
+ */
+function downConvertToV1(obj: Record<string, any>): Record<string, any> {
+	const result: Record<string, any> = {}
+
+	for (const [key, value] of Object.entries(obj)) {
+		if (value == null) {
+			result[key] = value
+			continue
+		}
+
+		if (key === 'nor') {
+			const items = Array.isArray(value) ? value : [value]
+			const first = items[0]
+
+			if (first instanceof SfItem) {
+				result['nor'] = first.value
+				if (first.params?.r) {
+					result['nrr'] = first.params.r
+				}
+			} else {
+				result['nor'] = first
+			}
+		} else if (INNER_LIST_V1_KEYS.has(key)) {
+			result[key] = unwrapValue(value)
+		} else {
+			result[key] = value
+		}
+	}
+
+	return result
 }
 
 /**
@@ -25,8 +80,8 @@ const filterMap = {
  *
  * @public
  */
-export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): CmcdData {
-	const results: CmcdData = {}
+export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): Cmcd {
+	const results: Cmcd = {}
 
 	if (obj == null || typeof obj !== 'object') {
 		return results
@@ -34,12 +89,16 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	const version = options.version || (obj['v'] as number) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
+
+	// Down-convert V2 data to V1 format if needed
+	const data = version === 1 ? downConvertToV1(obj) : obj
+
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
 	// Filter keys based on the version, reporting mode and options
-	let keys = Object.keys(obj).filter(keyFilter)
+	let keys = Object.keys(data).filter(keyFilter)
 
-	if (obj['e'] && obj['e'] !== 'rr') {
+	if (data['e'] && data['e'] !== 'rr') {
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
 	}
 
@@ -70,7 +129,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	}
 
 	keys.sort().forEach(key => {
-		let value = obj[key] as CmcdValue
+		let value = data[key] as CmcdValue
 
 		const formatter = formatters[key]
 		if (typeof formatter === 'function') {
