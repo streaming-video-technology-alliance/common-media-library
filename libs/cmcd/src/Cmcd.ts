@@ -1,16 +1,21 @@
 import type { SfItem } from '@svta/cml-structured-field-values'
 import type { ValueOrArray } from '@svta/cml-utils'
 import type { CmcdCustomKey } from './CmcdCustomKey.ts'
+import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
+import type { CmcdPlayerState } from './CmcdPlayerState.ts'
 import type { CmcdStreamType } from './CmcdStreamType.ts'
 import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 
 /**
- * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.
+ * Common Media Client Data (CMCD) version 2.
  *
- * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD Spec}
+ * A standardized set of HTTP request header fields, query string parameters,
+ * and event reporting fields for communicating media playback metrics.
+ *
+ * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD v1 Spec}
  *
  * @public
  */
@@ -25,6 +30,18 @@ export type Cmcd = {
 	/////////////////
 	// CMCD Object //
 	/////////////////
+
+	/**
+	 * Aggregate encoded bitrate
+	 *
+	 * The aggregate encoded bitrate across a playable combination of tracks. This metric SHOULD NOT be used when the individual bitrates
+	 * of the tracks are known. This value SHOULD be derived from a playlist/manifest declaration, or it MAY be estimated by the player.
+	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted. This value MUST NOT be sent if
+	 * the encoded bitrate is known.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	ab?: CmcdObjectTypeList;
 
 	/**
 	 * Encoded bitrate
@@ -51,6 +68,30 @@ export type Cmcd = {
 	d?: number;
 
 	/**
+	 * Lowest aggregated encoded bitrate
+	 *
+	 * The lowest aggregated bitrate rendition in the manifest or playlist. This SHOULD be derived from playlist/manifest declarations,
+	 * or it MAY be estimated by the player. If the playlist declares both peak and average bitrate values, the peak value MUST be
+	 * transmitted. The aggregate encoded bitrate is of the complete media object including all object types. This value MUST NOT be
+	 * sent if the lowest encoded bitrate is known.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	lab?: CmcdObjectTypeList;
+
+	/**
+	 * Lowest encoded bitrate
+	 *
+	 * The lowest bitrate rendition in the manifest or playlist. This SHOULD be derived from playlist/manifest declarations, or it MAY be
+	 * estimated by the player. If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted. This
+	 * lowest bitrate MUST apply to the object type being requested. Requests for video objects MUST specify the lowest video bitrate and
+	 * requests for audio objects MUST specify the lowest audio bitrate.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	lb?: CmcdObjectTypeList;
+
+	/**
 	 * Object type
 	 *
 	 * The media type of the current object being requested:
@@ -73,6 +114,18 @@ export type Cmcd = {
 	ot?: CmcdObjectType;
 
 	/**
+	 * Top aggregated encoded bitrate
+	 *
+	 * The highest aggregated bitrate rendition in the manifest or playlist. This SHOULD be derived from playlist/manifest declarations,
+	 * or it MAY be estimated by the player. If the playlist declares both peak and average bitrate values, the peak value MUST be
+	 * transmitted. The aggregate encoded bitrate is of the complete media object including all object types. This value MUST NOT be
+	 * sent if the top encoded bitrate is known.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	tab?: CmcdObjectTypeList;
+
+	/**
 	 * Top encoded bitrate
 	 *
 	 * The highest bitrate rendition in the manifest or playlist. This SHOULD be derived from playlist/manifest declarations,
@@ -84,9 +137,29 @@ export type Cmcd = {
 	 */
 	tb?: CmcdObjectTypeList;
 
+	/**
+	 * Top playable bitrate
+	 *
+	 * The highest bitrate rendition that the player is currently capable of playing for reasons other than bandwidth limitations. This
+	 * key captures the cases in which, for example, screen resolution, DRM, or performance constraints limit the player's topmost choice
+	 * of bitrate. These constraints are intentionally obfuscated for privacy reasons.
+	 *
+	 * This key can increase the fingerprinting surface exposed by CMCD transmission and SHOULD NOT be transmitted in a default player
+	 * configuration.
+	 *
+	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted. This top playable bitrate MUST
+	 * apply to the object type being requested. Requests for video objects MUST specify the top playable video bitrate and requests for
+	 * audio objects MUST specify the top playable audio bitrate. This value MUST NOT be sent for objects which do not have an object type
+	 * of 'a', 'v', 'av' or 'c'.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	tpb?: CmcdObjectTypeList;
+
 	//////////////////
 	// CMCD Request //
 	//////////////////
+
 	/**
 	 * Buffer length
 	 *
@@ -95,6 +168,27 @@ export type Cmcd = {
 	 * Inner list of integer milliseconds with token identifiers
 	 */
 	bl?: CmcdObjectTypeList;
+
+	/**
+	 * Content Signature
+	 *
+	 * A string representing a signature of the content being played. This field SHOULD vary with content ID and be bound by some mechanism
+	 * to the content. For example, this field may be used to transmit the C2PA signature associated with the content being viewed.
+	 *
+	 * String
+	 */
+	cs?: string;
+
+	/**
+	 * Dropped Frames Absolute
+	 *
+	 * An absolute count of dropped frames since session initiation. This key SHOULD only be sent for content types of 'v', 'av' or 'o'.
+	 * Note that this value will be driven by the content being rendered rather than the content being retrieved, therefore it is
+	 * beneficial if accompanied by the playhead time 'pt' key to allow for correct interpretation.
+	 *
+	 * Integer
+	 */
+	dfa?: number;
 
 	/**
 	 * Deadline
@@ -106,6 +200,16 @@ export type Cmcd = {
 	 * Integer milliseconds
 	 */
 	dl?: number;
+
+	/**
+	 * Live stream latency
+	 *
+	 * The time delta between when a given media timestamp was made available at the origin and when it was rendered by the player. The
+	 * accuracy of this estimate is dependent on synchronization between the packager and the player clocks.
+	 *
+	 * Integer milliseconds
+	 */
+	ltc?: number;
 
 	/**
 	 * Measured throughput
@@ -144,13 +248,42 @@ export type Cmcd = {
 	nor?: ValueOrArray<string | SfItem<string, { r: string }>>;
 
 	/**
-	 * Next range request
+	 * Playhead bitrate
 	 *
-	 * @deprecated Use 'nor' with the 'r' parameter instead.
+	 * The encoded bitrate of the media object(s) being shown to the end user.
 	 *
-	 * String
+	 * Inner list of integer kbps with token identifiers
 	 */
-	nrr?: string;
+	pb?: CmcdObjectTypeList;
+
+	/**
+	 * Sequence Number
+	 *
+	 * A monotonically increasing integer to identify the sequence of a CMCD report to a target within a session. This MUST be reset to
+	 * zero on the start of a new session-id. Sequence numbers increase independently per each combination of mode and target.
+	 *
+	 * Integer
+	 */
+	sn?: number;
+
+	/**
+	 * State
+	 *
+	 * A token describing the current playback state of the player as perceived by the end user, one of:
+	 *
+	 * - `s` - starting: the player has been instructed to play media for a given session, either by a user interaction or by an autoplay action.
+	 * - `p` - playing: Media is being rendered.
+	 * - `k` - seeking: The start of the action of moving the playhead position after starting.
+	 * - `r` - rebuffering: Media has stopped being rendered due to an insufficient buffer. This state is not reported during startup or seeking.
+	 * - `a` - paused: Playback has been intentionally paused by either the user or the player.
+	 * - `e` - ended: Rendering has ended due to completion of the media asset playback.
+	 * - `f` - fatal error: Rendering has ended due to an irrecoverable error.
+	 * - `q` - quit: User initiated end of playback before media asset completion.
+	 * - `d` - preloading: the player is loading, or has loaded, assets ahead of starting in order to provide a fast startup. The expectation is that playback will commence at a future time.
+	 *
+	 * Token - one of [s,p,k,r,a,e,f,q,d]
+	 */
+	sta?: CmcdPlayerState;
 
 	/**
 	 * Startup
@@ -158,12 +291,19 @@ export type Cmcd = {
 	 * Key is included without a value if the object is needed urgently due to startup, seeking or recovery after a buffer-empty event. The player
 	 * reports this key as true until its buffer first reaches the target buffer for stable playback.
 	 *
-	 * Note: the starting State 's' is valid until the player renders media for the end user, which may be different from when the target buffer
-	 * has been reached. As a result, 'su' = TRUE and 'sta' = 's' are not expected to align on a timeline.
-	 *
 	 * Boolean
 	 */
 	su?: boolean;
+
+	/**
+	 * Target Buffer length
+	 *
+	 * The target buffer length associated with the media object being requested at the time of the request. This value SHOULD be rounded
+	 * to the nearest 100 ms.
+	 *
+	 * Inner list of integer milliseconds with token identifiers
+	 */
+	tbl?: CmcdObjectTypeList;
 
 	//////////////////
 	// CMCD Session //
@@ -178,6 +318,19 @@ export type Cmcd = {
 	 * String
 	 */
 	cid?: string;
+
+	/**
+	 * Media Start Delay
+	 *
+	 * Measures the initial delay in wall-clock time from when a player is instructed to play media for a given session to when any media
+	 * begins playback, whether it be primary content or interstitial content. This value SHOULD be the time difference between the
+	 * "starting" and "playing" states.
+	 *
+	 * This key MUST only be sent once per Session ID and MUST be sent for each reporting mode which is active within the player.
+	 *
+	 * Integer milliseconds
+	 */
+	msd?: number;
 
 	/**
 	 * Playback rate
@@ -218,8 +371,8 @@ export type Cmcd = {
 	/**
 	 * Stream type
 	 *
-	 * - `v` = all segments are available – e.g., VOD
-	 * - `l` = segments become available over time – e.g., LIVE
+	 * - `v` = all segments are available - e.g., VOD
+	 * - `l` = segments become available over time - e.g., LIVE
 	 * - `ll` = low latency LIVE
 	 *
 	 * Token
@@ -242,29 +395,99 @@ export type Cmcd = {
 	/////////////////
 
 	/**
+	 * Backgrounded
+	 *
+	 * All players in a session are currently in a state that is not visible to the user due to a user interaction. This key SHOULD only
+	 * be sent if it is TRUE. If the visibility state of the player is not known this key SHOULD NOT be reported.
+	 *
+	 * Boolean
+	 */
+	bg?: boolean;
+
+	/**
 	 * Buffer starvation
 	 *
 	 * TRUE if the player buffer was starved at some point between the prior report and this report per reporting destination, resulting in
 	 * the player entering a rebuffering state or remaining in a rebuffering state. Note that if the player begins requesting data from a
 	 * new CDN, then this key might initially report buffering caused by the prior CDN. This key SHOULD NOT be reported if it is FALSE.
 	 *
-	 * If the object type 'ot' key is sent along with this key, then the 'bs' key refers to the buffer count associated with the particular
-	 * object type. If no object type is communicated, then the buffer state applies to the current session.
-	 *
 	 * Boolean
 	 */
 	bs?: boolean;
 
 	/**
+	 * Buffer Starvation Absolute
+	 *
+	 * An absolute count of buffer starvation events since session initiation. A buffer starvation event occurs when the state changes
+	 * to rebuffering. Token identifier MAY be omitted if the cause of the rebuffering is unknown.
+	 *
+	 * Inner list of integers with optional token identifiers
+	 */
+	bsa?: CmcdObjectTypeList;
+
+	/**
+	 * Buffer Starvation Duration
+	 *
+	 * A list of durations of each buffer starvation period reported once the rebuffering has completed. This value MUST only be reported
+	 * once per reporting mode and report destination. Token identifier MAY be omitted if the cause of the rebuffering is unknown.
+	 *
+	 * Inner list of integer milliseconds with optional token identifiers
+	 */
+	bsd?: CmcdObjectTypeList;
+
+	/**
+	 * Buffer Starvation Duration Absolute
+	 *
+	 * An absolute count of buffer starvation duration since session initiation. Token identifier MAY be omitted if the cause of the
+	 * rebuffering is unknown.
+	 *
+	 * Inner list of integer milliseconds with optional token identifiers
+	 */
+	bsda?: CmcdObjectTypeList;
+
+	/**
+	 * CDN ID
+	 *
+	 * A string identifying the current delivery network from which the player is retrieving content. Maximum length is 128 characters.
+	 *
+	 * String
+	 */
+	cdn?: string;
+
+	/**
+	 * Player Error Code
+	 *
+	 * A string defining an error code produced by the player. The namespace and formatting of this error code is left to the application.
+	 *
+	 * Even if only one error code is being specified, the list notation MUST still be used.
+	 *
+	 * Inner list of strings
+	 */
+	ec?: string[];
+
+	/**
+	 * Non rendered
+	 *
+	 * True when the content being retrieved by a player is not rendered as audio or video. The key SHOULD only be sent when it is TRUE.
+	 *
+	 * Boolean
+	 */
+	nr?: boolean;
+
+	/**
+	 * Playhead time
+	 *
+	 * The playhead time, expressed in milliseconds, which is being rendered to the viewer when the report is made.
+	 *
+	 * Integer milliseconds
+	 */
+	pt?: number;
+
+	/**
 	 * Requested maximum throughput
 	 *
 	 * The requested maximum throughput that the player considers sufficient for delivery of the asset. Values MUST be rounded to the
-	 * nearest 100kbps. For example, a player would indicate that the current segment, encoded at 2Mbps, is to be delivered at no more
-	 * than 10Mbps, by using rtp=10000.
-	 *
-	 * Note: This can benefit players by preventing buffer saturation through over-delivery and can also deliver a community benefit
-	 * through fair-share delivery. The concept is that each player receives the throughput necessary for great performance, but no more.
-	 * The CDN may not support the rtp feature.
+	 * nearest 100kbps.
 	 *
 	 * Integer kbps
 	 */
