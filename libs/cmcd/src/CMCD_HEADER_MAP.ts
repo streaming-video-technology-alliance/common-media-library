@@ -1,12 +1,12 @@
 import { type CmcdHeaderField, CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS } from './CmcdHeaderField.ts'
-import type { CmcdRequestKey } from './CmcdRequestKey.ts'
+import type { CmcdKey } from './CmcdKey.ts'
 
 /**
  * The map of CMCD keys to their appropriate header shard.
  *
  * @internal
  */
-export const CMCD_HEADER_MAP: Record<CmcdRequestKey, CmcdHeaderField> = {
+export const CMCD_HEADER_MAP: Record<CmcdKey, CmcdHeaderField> = {
 	// Object
 	ab: CMCD_OBJECT,
 	br: CMCD_OBJECT,
@@ -20,9 +20,11 @@ export const CMCD_HEADER_MAP: Record<CmcdRequestKey, CmcdHeaderField> = {
 
 	// Request
 	bl: CMCD_REQUEST,
+	cen: CMCD_REQUEST,
 	cs: CMCD_REQUEST,
 	dfa: CMCD_REQUEST,
 	dl: CMCD_REQUEST,
+	e: CMCD_REQUEST,
 	ltc: CMCD_REQUEST,
 	mtp: CMCD_REQUEST,
 	nor: CMCD_REQUEST,
@@ -32,10 +34,14 @@ export const CMCD_HEADER_MAP: Record<CmcdRequestKey, CmcdHeaderField> = {
 	sta: CMCD_REQUEST,
 	su: CMCD_REQUEST,
 	tbl: CMCD_REQUEST,
+	ts: CMCD_REQUEST,
+	url: CMCD_REQUEST,
 
 	// Session
 	cid: CMCD_SESSION,
+	h: CMCD_SESSION,
 	msd: CMCD_SESSION,
+	pr: CMCD_SESSION,
 	sf: CMCD_SESSION,
 	sid: CMCD_SESSION,
 	st: CMCD_SESSION,
@@ -48,9 +54,15 @@ export const CMCD_HEADER_MAP: Record<CmcdRequestKey, CmcdHeaderField> = {
 	bsd: CMCD_STATUS,
 	bsda: CMCD_STATUS,
 	cdn: CMCD_STATUS,
+	cmsdd: CMCD_STATUS,
+	cmsds: CMCD_STATUS,
 	ec: CMCD_STATUS,
 	nr: CMCD_STATUS,
-	pr: CMCD_STATUS,
 	pt: CMCD_STATUS,
+	rc: CMCD_STATUS,
 	rtp: CMCD_STATUS,
+	smrt: CMCD_STATUS,
+	ttfb: CMCD_STATUS,
+	ttfbb: CMCD_STATUS,
+	ttlb: CMCD_STATUS,
 }

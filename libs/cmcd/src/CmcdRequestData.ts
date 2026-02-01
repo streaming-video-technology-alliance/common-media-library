@@ -1,9 +1,9 @@
 import type { Cmcd } from './Cmcd.ts'
-import type { CmcdRequest } from './CmcdRequest.ts'
 
 /**
  * CMCD request data.
  *
+ * @deprecated Use {@link Cmcd} instead.
  * @public
  */
-export type CmcdRequestData = Cmcd & CmcdRequest
+export type CmcdRequestData = Cmcd;

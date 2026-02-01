@@ -492,4 +492,157 @@ export type Cmcd = {
 	 * Integer kbps
 	 */
 	rtp?: number;
+
+	////////////////
+	// CMCD Event //
+	////////////////
+
+	/**
+	 * Custom Event Name
+	 *
+	 * Used to define a custom event name. A maximum length of 64 characters is allowed. This key MUST be sent when the event type is
+	 * 'ce' (custom event) and MUST NOT be sent when the event type is any other value. A custom key-value pair MAY be used to transfer
+	 * a custom value associated with this event. The names chosen SHOULD associate the custom event name with the custom key name.
+	 *
+	 * String
+	 */
+	cen?: string;
+
+	/**
+	 * Event
+	 *
+	 * This key MUST only be used in Event mode and MUST be present on all reports. The minimum recommended set of supported events
+	 * are: `ps`, `e`, `t`, and `rr`.
+	 *
+	 * - `abs` - ad break start
+	 * - `abe` - ad break end
+	 * - `ae` - ad end
+	 * - `as` - ad start
+	 * - `b` - backgrounded mode
+	 * - `bc` - bitrate change
+	 * - `c` - content ID changed
+	 * - `ce` - custom event
+	 * - `e` - error
+	 * - `h` - hostname changed
+	 * - `m` - mute
+	 * - `pc` - player collapse
+	 * - `pe` - player expand
+	 * - `pr` - playback rate change
+	 * - `ps` - play state change
+	 * - `rr` - response received
+	 * - `sk` - skip
+	 * - `t` - time interval
+	 * - `um` - unmute
+	 *
+	 * Token
+	 */
+	e?: CmcdEventType;
+
+	/**
+	 * Hostname
+	 *
+	 * A string identifying the current hostname from which the player is retrieving content. Maximum length is 128 characters.
+	 *
+	 * String
+	 */
+	h?: string;
+
+	/**
+	 * Timestamp
+	 *
+	 * The timestamp at which the associated event occurred, expressed as the number of milliseconds that have elapsed since the Unix
+	 * Epoch (January 1, 1970, at 00:00:00 UTC), excluding leap seconds. When the event is a request for a media object the time SHOULD
+	 * reference when the request was first initiated.
+	 *
+	 * This key MUST be included with all Event reports.
+	 *
+	 * Integer milliseconds
+	 */
+	ts?: number;
+
+	///////////////////
+	// CMCD Response //
+	///////////////////
+
+	/**
+	 * CMSD Dynamic Header
+	 *
+	 * Holds a Base64 encoded copy of the CMSD data received on the CMSD-Dynamic response header. This key MUST only be reported on
+	 * events of type `rr` (response received).
+	 *
+	 * String
+	 */
+	cmsdd?: string;
+
+	/**
+	 * CMSD Static Header
+	 *
+	 * Holds a Base64 encoded copy of the CMSD data received on the CMSD-Static response header. This key MUST only be reported on
+	 * events of type `rr` (response received).
+	 *
+	 * String
+	 */
+	cmsds?: string;
+
+	/**
+	 * Response code
+	 *
+	 * The response code received when requesting a media object. In a redirect scenario, this would be the final response code received.
+	 * A value of 0 SHOULD be used to indicate that a response was not received.
+	 *
+	 * This key MUST only be reported on events of type `rr` (response received).
+	 *
+	 * Integer
+	 */
+	rc?: number;
+
+	/**
+	 * SMRT-Data Header
+	 *
+	 * Holds a Base64 encoded copy of the streaming media response tracing data received on the Request Tracing header. This key MUST
+	 * only be reported on events of type `rr` (response received).
+	 *
+	 * String
+	 */
+	smrt?: string;
+
+	/**
+	 * Time to first byte
+	 *
+	 * The elapsed time between when the request was first initiated (captured in ts) and the time when the first byte of the response
+	 * was received. This key MUST only be reported on events of type `rr` (response received).
+	 *
+	 * Integer milliseconds
+	 */
+	ttfb?: number;
+
+	/**
+	 * Time to first body byte
+	 *
+	 * The elapsed time between when the request was first initiated (captured in ts) and the time the first bytes of the response body
+	 * are received. This key MUST only be reported on events of type `rr` (response received).
+	 *
+	 * Integer milliseconds
+	 */
+	ttfbb?: number;
+
+	/**
+	 * Time to last byte
+	 *
+	 * The elapsed time between when the request was first initiated (captured in ts) and the time the response body is fully received.
+	 * This key MUST only be reported on events of type `rr` (response received).
+	 *
+	 * Integer milliseconds
+	 */
+	ttlb?: number;
+
+	/**
+	 * Request URL
+	 *
+	 * The URL used to request the media object. If the request is redirected, this key MUST report the initial requested URL. This key
+	 * MUST be reported on events of type `rr` (response received).
+	 *
+	 * String
+	 */
+	url?: string;
 };
