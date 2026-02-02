@@ -48,7 +48,6 @@ export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;
 export const CmStreamType: {
     readonly VOD: "v";
     readonly LIVE: "l";
-    readonly LOW_LATENCY: "ll";
 };
 
 // @internal
@@ -59,7 +58,7 @@ export type CmStreamType = ValueOf<typeof CmStreamType>;
 // Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmStreamType" which is marked as @internal
 //
 // @public
-export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | (string | SfItem<string>)[] | number | (number | SfItem<number>)[] | boolean | symbol | SfToken | SfItem | SfItem[];
+export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // Warning: (ae-internal-missing-underscore) The name "isTokenField" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -69,7 +68,7 @@ export function isTokenField(key: string): boolean;
 // Warning: (ae-internal-missing-underscore) The name "isValid" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function isValid(value: unknown): boolean;
+export function isValid(value: CmValue): boolean;
 
 // (No @packageDocumentation comment for this package)
 

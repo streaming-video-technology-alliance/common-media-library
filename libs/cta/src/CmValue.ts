@@ -13,9 +13,9 @@ export type CmValue =
 	| CmStreamingFormat
 	| CmStreamType
 	| string
-	| (string | SfItem<string>)[]
+	| string[]
 	| number
-	| (number | SfItem<number>)[]
+	| number[]
 	| boolean
 	| symbol
 	| SfToken

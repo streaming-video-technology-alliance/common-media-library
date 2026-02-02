@@ -1,3 +1,4 @@
+import type { CmValue } from './CmValue.ts'
 
 /**
  * Checks if the given value is valid
@@ -8,7 +9,7 @@
  *
  * @internal
  */
-export function isValid(value: unknown): boolean {
+export function isValid(value: CmValue): boolean {
 	if (typeof value === 'number') {
 		return Number.isFinite(value)
 	}
