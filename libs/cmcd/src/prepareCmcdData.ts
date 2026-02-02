@@ -126,12 +126,12 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		}
 	}
 
-	if (version > 1 && !keys.includes('v')) {
-		keys.push('v')
-	}
-
 	if (keys.length === 0) {
 		return results
+	}
+
+	if (version > 1 && !keys.includes('v')) {
+		keys.push('v')
 	}
 
 	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters)
