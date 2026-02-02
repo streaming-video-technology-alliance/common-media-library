@@ -1,7 +1,7 @@
 import type { CmcdEncodeOptions } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
 import { SfToken } from '@svta/cml-structured-field-values'
-import { equal } from 'node:assert'
+import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { toCmcdValue } from '../src/toCmcdValue.ts'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
@@ -13,9 +13,9 @@ import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts'
 describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
 		//#region example
-		const input = { br: 1000, 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true }
+		const input = { br: [1000], 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true }
 		const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST }
-		equal(encodeCmcd(input, options), 'br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2')
+		equal(encodeCmcd(input, options), 'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2')
 		//#endregion example
 	})
 
@@ -47,6 +47,27 @@ describe('encodeCmcd', () => {
 		it('doesn\'t filter version key', () => {
 			equal(encodeCmcd({ v: 2, cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' }), 'cid="content-id",v=2')
 		})
+
+		it('doesn\'t filter e key in event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.TIME_INTERVAL, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('e=t'), 'e key must not be filtered out in event mode')
+		})
+
+		it('doesn\'t filter ts key in event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.TIME_INTERVAL, ts: 1640995200000, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('ts='), 'ts key must not be filtered out in event mode')
+		})
+
+		it('doesn\'t filter cen key in event mode when event type is ce', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.CUSTOM_EVENT, cen: 'my-custom-event', cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('cen="my-custom-event"'), 'cen key must not be filtered out in event mode when e=ce')
+		})
 	})
 
 	it('returns encoded string when SfToken is used', () => {
@@ -61,7 +82,7 @@ describe('encodeCmcd', () => {
 
 	it('returns converts to relative path when baseUrl is provided', () => {
 		const input = {
-			nor: 'http://test.com/base/segments/video/1.mp4',
+			nor: ['http://test.com/base/segments/video/1.mp4'],
 		}
 		const options: CmcdEncodeOptions = {
 			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
@@ -113,10 +134,27 @@ describe('encodeCmcd', () => {
 		})
 	})
 
+	describe('V1 down-conversion', () => {
+		it('extracts nrr from nor SfItem with r parameter', () => {
+			const input = { nor: [toCmcdValue('../testing/3.m4v', { r: '0-99' })] }
+			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v",nrr="0-99"')
+		})
+
+		it('unwraps inner-list values to plain scalars for V1', () => {
+			const input = { br: [5000], mtp: [10000] }
+			equal(encodeCmcd(input, { version: 1 }), 'br=5000,mtp=10000')
+		})
+
+		it('preserves plain nor string in V1', () => {
+			const input = { nor: ['../testing/3.m4v'] }
+			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v"')
+		})
+	})
+
 	describe('nor', () => {
 		it('returns encoded string for request mode with nor string', () => {
 			const input = {
-				nor: '1.mp4',
+				nor: ['1.mp4'],
 			}
 			equal(encodeCmcd(input), 'nor=("1.mp4"),v=2')
 		})

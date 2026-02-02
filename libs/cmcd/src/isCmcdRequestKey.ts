@@ -1,6 +1,6 @@
 import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.ts'
 import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.ts'
-import type { CmcdRequest } from './CmcdRequest.ts'
+import type { Cmcd } from './Cmcd.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
 /**
@@ -15,7 +15,7 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  * @example
  * {@includeCode ../test/isCmcdRequestKey.test.ts#example}
  */
-export function isCmcdRequestKey(key: string): key is keyof CmcdRequest {
+export function isCmcdRequestKey(key: string): key is keyof Cmcd {
 	return CMCD_COMMON_KEYS.includes(key as any) ||
 		CMCD_REQUEST_KEYS.includes(key as any) ||
 		isCmcdCustomKey(key as any)

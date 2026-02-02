@@ -8,7 +8,7 @@ describe('toCmcdQuery', () => {
 	it('provides a valid example', () => {
 		//#region example
 		const data = {
-			br: 1000,
+			br: [1000],
 			'com.example-hello': 'world',
 			ec: ['ERR001', 'ERR002'],
 			su: true,
@@ -19,7 +19,7 @@ describe('toCmcdQuery', () => {
 			reportingMode: CmcdReportingMode.REQUEST,
 		}
 
-		equal(toCmcdQuery(data, options), 'CMCD=br%3D1000%2Ccom.example-hello%3D%22world%22%2Cec%3D(%22ERR001%22%20%22ERR002%22)%2Csu%2Cv%3D2')
+		equal(toCmcdQuery(data, options), 'CMCD=br%3D(1000)%2Ccom.example-hello%3D%22world%22%2Cec%3D(%22ERR001%22%20%22ERR002%22)%2Csu%2Cv%3D2')
 		//#endregion example
 	})
 

@@ -6,7 +6,7 @@ import type { CmcdRequestKey } from './CmcdRequestKey.ts'
  *
  * @internal
  */
-export const CMCD_HEADER_MAP: Record<CmcdRequestKey, CmcdHeaderField> = {
+export const CMCD_HEADER_MAP: Record<CmcdRequestKey | 'nrr', CmcdHeaderField> = {
 	// Object
 	ab: CMCD_OBJECT,
 	br: CMCD_OBJECT,

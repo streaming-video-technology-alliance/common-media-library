@@ -52,7 +52,6 @@
 		}
 	},
 	"peerDependencies": {
-		"@svta/cml-cta": "*",
 		"@svta/cml-structured-field-values": "*",
 		"@svta/cml-utils": "*"
 	}

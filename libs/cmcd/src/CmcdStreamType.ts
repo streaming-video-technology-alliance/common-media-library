@@ -1,4 +1,4 @@
-import { CmStreamType } from '@svta/cml-cta'
+import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * Common Media Client Data Stream Type
@@ -8,9 +8,24 @@ import { CmStreamType } from '@svta/cml-cta'
  *
  * @public
  */
-export const CmcdStreamType = CmStreamType as typeof CmStreamType
+export const CmcdStreamType = {
+	/**
+	 *  All segments are available – e.g., VOD
+	 */
+	VOD: 'v',
+
+	/**
+	 * Segments become available over time – e.g., LIVE
+	 */
+	LIVE: 'l',
+
+	/**
+	 * Low latency stream
+	 */
+	LOW_LATENCY: 'll',
+} as const
 
 /**
  * @public
  */
-export type CmcdStreamType = CmStreamType;
+export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;

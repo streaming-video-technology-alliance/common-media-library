@@ -53,7 +53,7 @@ describe('CmcdReporter', () => {
 			],
 		}, requester)
 
-		reporter.update({ br: 5000 })
+		reporter.update({ br: [5000] })
 
 		const req = reporter.applyRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
 
@@ -92,10 +92,10 @@ describe('CmcdReporter', () => {
 				enabledKeys: ['br'],
 			}, requester)
 
-			reporter.update({ br: 3000 })
+			reporter.update({ br: [3000] })
 
 			const req = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
-			ok(req.url.includes('br%3D3000'))
+			ok(req.url.includes('br%3D%283000%29'))
 		})
 
 		it('merges data with existing data', () => {
@@ -105,19 +105,19 @@ describe('CmcdReporter', () => {
 				enabledKeys: ['br', 'bl'],
 			}, requester)
 
-			reporter.update({ br: 3000 })
-			reporter.update({ bl: 5000 })
+			reporter.update({ br: [3000] })
+			reporter.update({ bl: [5000] })
 
 			const req = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
-			ok(req.url.includes('bl%3D5000'))
-			ok(req.url.includes('br%3D3000'))
+			ok(req.url.includes('bl%3D%285000%29'))
+			ok(req.url.includes('br%3D%283000%29'))
 		})
 
 		it('resets session when sid changes', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
-			reporter.update({ br: 3000 })
+			reporter.update({ br: [3000] })
 			reporter.update({ sid: 'new-session' })
 		})
 	})
@@ -153,7 +153,7 @@ describe('CmcdReporter', () => {
 				enabledKeys: ['br', 'v'],
 			}, requester)
 
-			reporter.update({ br: 5000 })
+			reporter.update({ br: [5000] })
 
 			const result = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
 			const url = new URL(result.url)
@@ -168,7 +168,7 @@ describe('CmcdReporter', () => {
 				transmissionMode: CmcdTransmissionMode.HEADERS,
 			}, requester)
 
-			reporter.update({ br: 5000 })
+			reporter.update({ br: [5000] })
 
 			const result = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(result.headers)
@@ -235,11 +235,11 @@ describe('CmcdReporter', () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
-			reporter.recordEvent(CmcdEventType.ERROR, { br: 5000 })
+			reporter.recordEvent(CmcdEventType.ERROR, { br: [5000] })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			ok((requests[0].body as string)?.includes('br=5000'))
+			ok((requests[0].body as string)?.includes('br=(5000)'))
 		})
 
 		it('sends custom events with event type', async () => {

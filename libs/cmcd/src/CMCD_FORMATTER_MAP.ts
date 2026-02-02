@@ -4,7 +4,7 @@ import type { CmcdFormatter } from './CmcdFormatter.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 
-const roundValue = (value: CmcdValue): number | SfItem => {
+const roundValue = (value: CmcdValue): number | SfItem<number> => {
 	if (value instanceof SfItem) {
 		return new SfItem(Math.round(value.value as number), value.params)
 	}
@@ -18,7 +18,7 @@ const toRounded = (value: CmcdValue) => {
 	return roundValue(value)
 }
 
-const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string> | ValueOrArray<SfItem> => {
+const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string | SfItem<string>> => {
 	if (Array.isArray(value)) {
 		return value.map(item => toUrlSafe(item, options) as string)
 	}
@@ -34,7 +34,7 @@ const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArra
 	}
 }
 
-const hundredValue = (value: CmcdValue): number | SfItem => {
+const hundredValue = (value: CmcdValue): number | SfItem<number> => {
 	if (value instanceof SfItem) {
 		return new SfItem(Math.round((value.value as number) / 100) * 100, value.params)
 	}

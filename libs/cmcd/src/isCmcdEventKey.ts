@@ -1,7 +1,7 @@
 import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.ts'
 import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.js'
-import type { CmcdEvent } from './CmcdEvent.ts'
+import type { Cmcd } from './Cmcd.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
 /**
@@ -16,7 +16,7 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  * @example
  * {@includeCode ../test/isCmcdEventKey.test.ts#example}
  */
-export function isCmcdEventKey(key: string): key is keyof CmcdEvent {
+export function isCmcdEventKey(key: string): key is keyof Cmcd {
 	return CMCD_COMMON_KEYS.includes(key as any) ||
 		CMCD_EVENT_KEYS.includes(key as any) ||
 		CMCD_RESPONSE_KEYS.includes(key as any) ||

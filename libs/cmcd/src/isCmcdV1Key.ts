@@ -1,5 +1,5 @@
 import { CMCD_V1_KEYS } from './CMCD_V1_KEYS.ts'
-import type { Cmcd } from './Cmcd.ts'
+import type { CmcdKey } from './CmcdKey.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
 /**
@@ -14,6 +14,6 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  * @example
  * {@includeCode ../test/isCmcdV1Key.test.ts#example}
  */
-export function isCmcdV1Key(key: string): key is keyof Cmcd {
+export function isCmcdV1Key(key: string): key is CmcdKey {
 	return CMCD_V1_KEYS.includes(key as any) || isCmcdCustomKey(key as any)
 }

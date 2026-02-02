@@ -1,8 +1,8 @@
-import type { CmcdRequestData } from './CmcdRequestData.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 
 /**
  * A CMCD request key.
  *
  * @public
  */
-export type CmcdRequestKey = keyof CmcdRequestData;
+export type CmcdRequestKey = keyof CmcdRequest | 'nrr';
