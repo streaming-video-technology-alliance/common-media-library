@@ -234,8 +234,6 @@ export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
 // @public @deprecated
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
-// Warning: (ae-forgotten-export) The symbol "CmcdV1" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type CmcdHeaderValue = CmcdRequest | CmcdV1;
 
@@ -408,6 +406,16 @@ export const CmcdTransmissionMode: {
 
 // @public (undocumented)
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
+
+// @public
+export type CmcdV1 = {
+    bl?: number;
+    br?: number;
+    mtp?: number;
+    nor?: string;
+    nrr?: string;
+    tb?: number;
+};
 
 // @public
 export type CmcdValue = ValueOf<Cmcd>;
