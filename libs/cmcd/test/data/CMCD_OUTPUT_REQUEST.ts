@@ -39,6 +39,5 @@ export const CMCD_OUTPUT_REQUEST: Cmcd = {
 	tb: [5000],
 	tbl: [8000],
 	tpb: [4000],
-	ts: 1640995200000,
 	v: 2,
 }

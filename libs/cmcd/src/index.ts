@@ -6,7 +6,6 @@
 export * from './appendCmcdHeaders.ts'
 export * from './appendCmcdQuery.ts'
 export type * from './Cmcd.ts'
-export * from './CMCD_COMMON_KEYS.ts'
 export * from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 export * from './CMCD_EVENT_KEYS.ts'
 export * from './CMCD_FORMATTER_MAP.ts'

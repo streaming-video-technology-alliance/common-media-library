@@ -5,6 +5,7 @@ import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdObjectType } from './CmcdObjectType.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
@@ -27,13 +28,25 @@ const INNER_LIST_V1_KEYS = new Set(['ab', 'bl', 'br', 'bsa', 'bsd', 'bsda', 'lab
 /**
  * Unwrap an inner list or SfItem value to a plain scalar.
  */
-function unwrapValue(value: any): any {
+function unwrapValue(value: any, ot?: CmcdObjectType): any {
 	if (Array.isArray(value)) {
-		return unwrapValue(value[0])
+		let item: any
+
+		if (ot) {
+			item = value.find(item => item.params?.ot === ot)
+		}
+
+		if (!item) {
+			item = value[0]
+		}
+
+		return unwrapValue(item)
 	}
+
 	if (value instanceof SfItem) {
 		return value.value
 	}
+
 	return value
 }
 
@@ -61,12 +74,15 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 				if (first.params?.r) {
 					result['nrr'] = first.params.r
 				}
-			} else {
+			}
+			else {
 				result['nor'] = first
 			}
-		} else if (INNER_LIST_V1_KEYS.has(key)) {
-			result[key] = unwrapValue(value)
-		} else {
+		}
+		else if (INNER_LIST_V1_KEYS.has(key)) {
+			result[key] = unwrapValue(value, obj['ot'])
+		}
+		else {
 			result[key] = value
 		}
 	}

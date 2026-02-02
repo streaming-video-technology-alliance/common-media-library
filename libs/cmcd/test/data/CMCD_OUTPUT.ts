@@ -25,7 +25,6 @@ export const CMCD_OUTPUT: Cmcd = {
 	sta: 'p',
 	su: true,
 	tbl: [8000],
-	ts: 1640995200000,
 	cid: 'content-id',
 	'com.example-testing': 1234,
 	msd: 2500,

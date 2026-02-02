@@ -22,9 +22,6 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 export type Cmcd = CmcdRequest & CmcdResponse & CmcdEvent;
 
 // @public
-export const CMCD_COMMON_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "bsd", "bsda", "cdn", "cid", "cs", "dfa", "ec", "h", "lab", "lb", "ltc", "msd", "mtp", "nr", "pb", "pr", "pt", "sf", "sid", "sn", "st", "sta", "tab", "tb", "tbl", "tpb", "ts", "v"];
-
-// @public
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
 
 // @public
@@ -55,7 +52,7 @@ export const CMCD_EVENT_CUSTOM_EVENT: "ce";
 export const CMCD_EVENT_ERROR: "e";
 
 // @public
-export const CMCD_EVENT_KEYS: readonly ["cen", "e"];
+export const CMCD_EVENT_KEYS: readonly ["cen", "e", "h", "ts"];
 
 // @public
 export const CMCD_EVENT_MODE: "event";
@@ -109,7 +106,7 @@ export const CMCD_QUERY: "query";
 export const CMCD_REQUEST: "CMCD-Request";
 
 // @public
-export const CMCD_REQUEST_KEYS: readonly ["d", "dl", "nor", "ot", "rtp", "su"];
+export const CMCD_REQUEST_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "bsd", "bsda", "cdn", "cid", "cs", "d", "dfa", "dl", "ec", "lab", "lb", "ltc", "msd", "mtp", "nor", "nr", "ot", "pb", "pr", "pt", "rtp", "sf", "sid", "sn", "st", "sta", "su", "tab", "tb", "tbl", "tpb", "v"];
 
 // @public
 export const CMCD_REQUEST_MODE: "request";
