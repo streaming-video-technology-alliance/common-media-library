@@ -1,3 +1,4 @@
+import type { CmValue } from '@svta/cml-cta'
 import type { SfItem } from '@svta/cml-structured-field-values'
 import type { CmcdCustomKey } from './CmcdCustomKey.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
@@ -5,7 +6,6 @@ import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdPlayerState } from './CmcdPlayerState.ts'
 import type { CmcdStreamType } from './CmcdStreamType.ts'
 import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
-import type { CmcdValue } from './CmcdValue.ts'
 
 /**
  * Common Media Client Data (CMCD) version 2 - Request Mode.
@@ -23,7 +23,7 @@ export type CmcdRequest = {
 	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
 	 * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
 	 */
-	[index: CmcdCustomKey]: CmcdValue | undefined;
+	[index: CmcdCustomKey]: CmValue | undefined;
 
 	/**
 	 * Aggregate encoded bitrate

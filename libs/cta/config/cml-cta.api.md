@@ -7,7 +7,6 @@
 import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
-import { ValueOrArray } from '@svta/cml-utils';
 
 // @public
 export type CmCustomKey = `${string}-${string}`;
@@ -60,7 +59,7 @@ export type CmStreamType = ValueOf<typeof CmStreamType>;
 // Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmStreamType" which is marked as @internal
 //
 // @public
-export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | ValueOrArray<string | SfItem<string>> | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[] | (number | SfItem)[];
+export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | (string | SfItem<string>)[] | number | (number | SfItem<number>)[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // Warning: (ae-internal-missing-underscore) The name "isTokenField" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -70,7 +69,7 @@ export function isTokenField(key: string): boolean;
 // Warning: (ae-internal-missing-underscore) The name "isValid" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function isValid(value: CmValue): boolean;
+export function isValid(value: unknown): boolean;
 
 // (No @packageDocumentation comment for this package)
 

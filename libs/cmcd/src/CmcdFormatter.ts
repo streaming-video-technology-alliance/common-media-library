@@ -12,4 +12,4 @@ import type { CmcdValue } from './CmcdValue.ts'
  *
  * @public
  */
-export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => ValueOrArray<number> | ValueOrArray<string> | ValueOrArray<SfItem> | ValueOrArray<number | SfItem>;
+export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => ValueOrArray<number | SfItem<number>> | ValueOrArray<string | SfItem<string>>;

@@ -7,11 +7,11 @@
 import { CmObjectType } from '@svta/cml-cta';
 import { CmStreamingFormat } from '@svta/cml-cta';
 import { CmStreamType } from '@svta/cml-cta';
+import { CmValue } from '@svta/cml-cta';
 import { ExclusiveRecord } from '@svta/cml-utils';
 import { Request as Request_2 } from '@svta/cml-utils';
 import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
-import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
 import { ValueOrArray } from '@svta/cml-utils';
 
@@ -197,7 +197,7 @@ export const CmcdEventType: {
 export type CmcdEventType = ValueOf<typeof CmcdEventType>;
 
 // @public
-export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => ValueOrArray<number> | ValueOrArray<string> | ValueOrArray<SfItem> | ValueOrArray<number | SfItem>;
+export type CmcdFormatter = (value: CmcdValue, options: CmcdFormatterOptions) => ValueOrArray<number | SfItem<number>> | ValueOrArray<string | SfItem<string>>;
 
 // @public
 export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
@@ -223,14 +223,24 @@ export const CmcdHeaderField: {
 // @public (undocumented)
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
+// Warning: (ae-forgotten-export) The symbol "CMCD_HEADER_MAP" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type CmcdHeaderKey = keyof typeof CMCD_HEADER_MAP;
+
 // @public
 export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
 
 // @public @deprecated
 export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
+// Warning: (ae-forgotten-export) The symbol "CmcdV1" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type CmcdKey = keyof Cmcd | "nrr";
+export type CmcdHeaderValue = CmcdRequest | CmcdV1;
+
+// @public
+export type CmcdKey = keyof Cmcd | keyof CmcdV1;
 
 // @public
 export const CmcdObjectType: typeof CmObjectType;
@@ -239,7 +249,7 @@ export const CmcdObjectType: typeof CmObjectType;
 export type CmcdObjectType = CmObjectType;
 
 // @public
-export type CmcdObjectTypeList = ValueOrArray<number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>>;
+export type CmcdObjectTypeList = (number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>)[];
 
 // @public
 export const CmcdPlayerState: {
@@ -295,7 +305,7 @@ export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 
 // @public
 export type CmcdRequest = {
-    [index: CmcdCustomKey]: CmcdValue | undefined;
+    [index: CmcdCustomKey]: CmValue | undefined;
     ab?: CmcdObjectTypeList;
     bg?: boolean;
     bl?: CmcdObjectTypeList;
@@ -316,9 +326,9 @@ export type CmcdRequest = {
     ltc?: number;
     msd?: number;
     mtp?: CmcdObjectTypeList;
-    nor?: ValueOrArray<string | SfItem<string, {
+    nor?: (string | SfItem<string, {
         r: string;
-    }>>;
+    }>)[];
     nr?: boolean;
     ot?: CmcdObjectType;
     pb?: CmcdObjectTypeList;
@@ -338,8 +348,8 @@ export type CmcdRequest = {
     v?: number;
 };
 
-// @public @deprecated
-export type CmcdRequestKey = keyof CmcdRequest;
+// @public
+export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 
 // @public
 export type CmcdRequestReportConfig = CmcdReportConfig & {
@@ -381,7 +391,7 @@ export const CmcdTransmissionMode: {
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
 
 // @public
-export type CmcdValue = CmcdObjectType | CmcdStreamingFormat | CmcdStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[] | (number | SfItem)[];
+export type CmcdValue = ValueOf<Cmcd>;
 
 // @public
 export function decodeCmcd<T extends Cmcd = Cmcd>(cmcd: string): T;
@@ -399,7 +409,7 @@ export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
 export function fromCmcdUrl(url: string): Cmcd;
 
 // @public
-export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, Cmcd>;
+export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdHeaderValue>;
 
 // @public
 export function isCmcdCustomKey(key: CmcdKey): boolean;
