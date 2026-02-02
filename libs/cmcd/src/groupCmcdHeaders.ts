@@ -36,8 +36,8 @@ export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeade
 
 	return keys.reduce((acc: Record<CmcdHeaderField, CmcdHeaderValue>, key: CmcdHeaderKey) => {
 		const field = CMCD_HEADER_MAP[key] || custom[key] || CmcdHeaderField.REQUEST
-		const data = acc[field] ??= {}
-			; (data as any)[key] = (cmcd as any)[key]
+		const data = acc[field] ??= {};
+		(data as any)[key] = (cmcd as any)[key]
 		return acc
 	}, result)
 }
