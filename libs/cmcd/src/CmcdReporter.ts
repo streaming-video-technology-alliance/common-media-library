@@ -66,10 +66,10 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 		eventTargets: eventTargets.reduce((acc, target) => {
 			// TODO: How should an undefined events array be handled?
 			//       Does that represent no events to report, or reporting all events?
-			if (target && target.url && target.events?.length) {
+			if (target?.url && target.events?.length && target.enabledKeys?.length) {
 				acc.push({
 					version: target.version || CMCD_V2,
-					enabledKeys: target.enabledKeys?.slice(),
+					enabledKeys: target.enabledKeys.slice(),
 					url: target.url,
 					events: target.events.slice(),
 					interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
