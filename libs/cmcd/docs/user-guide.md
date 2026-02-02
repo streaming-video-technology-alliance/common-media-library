@@ -42,6 +42,7 @@ const reporter = new CmcdReporter({
 	eventTargets: [
 		{
 			url: "https://analytics.example.com/cmcd",
+			// Optional: The events to report. If not provided, no events will be reported.
 			events: [
 				CmcdEventType.PLAY_STATE,
 				CmcdEventType.ERROR,

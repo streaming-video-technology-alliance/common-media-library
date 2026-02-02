@@ -16,7 +16,8 @@ export type CmcdReportConfig = {
 
 	/**
 	 * The list of CMCD keys to include in the report. If not provided,
-	 * no keys will be reported.
+	 * no keys will be reported, unless there are other configuration
+	 * options that require keys to be reported, specifically in event mode.
 	 *
 	 * @defaultValue `undefined`
 	 */

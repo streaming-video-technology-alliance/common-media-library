@@ -64,12 +64,10 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 		sid,
 		// Apply target config defaults
 		eventTargets: eventTargets.reduce((acc, target) => {
-			// TODO: How should an undefined events array be handled?
-			//       Does that represent no events to report, or reporting all events?
-			if (target?.url && target.events?.length && target.enabledKeys?.length) {
+			if (target?.url && target.events?.length) {
 				acc.push({
 					version: target.version || CMCD_V2,
-					enabledKeys: target.enabledKeys.slice(),
+					enabledKeys: target.enabledKeys?.slice() || [],
 					url: target.url,
 					events: target.events.slice(),
 					interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
@@ -114,6 +112,9 @@ export class CmcdReporter {
 	 * Creates a new CMCD reporter.
 	 *
 	 * @param config - The configuration for the CMCD reporter.
+	 * @param requester - The function to use to send the request.
+	 *                    The default is a simple wrapper around the
+	 *                    native `fetch` API.
 	 */
 	constructor(config: Partial<CmcdReporterConfig>, requester: (request: Request) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
@@ -187,7 +188,6 @@ export class CmcdReporter {
 			this.msd = data.msd
 		}
 
-		// TODO: May need a deep merge utility for this.
 		this.data = { ...this.data, ...data, msd: undefined }
 	}
 
