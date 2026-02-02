@@ -9,7 +9,7 @@ This is a monorepo containing multiple TypeScript libraries for media playback f
 - `libs/*` - Individual library packages published to npm under `@svta/cml-*` namespace
 - `docs` - Documentation site published to GitHub Pages
 - `dev` - Development workspace
-- Each library has its own `src/`, `test/`, and `dist/` directories
+- Each library has its own `src/`, `test/`, `docs/`, and `dist/` directories
 
 ## Build Commands
 
@@ -26,7 +26,7 @@ This is a monorepo containing multiple TypeScript libraries for media playback f
 - Use ES modules (import/export) syntax, not CommonJS (require)
 - Destructure imports when possible (e.g., `import { foo } from 'bar'`)
 - Follow existing naming conventions in the codebase
-- Use JSDoc/TSDoc comments for public APIs
+- Use TSDoc comments for public APIs
 
 ## Development Workflow
 
