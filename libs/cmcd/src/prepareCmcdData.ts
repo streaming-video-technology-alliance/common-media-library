@@ -109,10 +109,6 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		keys = keys.filter(filter)
 	}
 
-	if (keys.length === 0) {
-		return results
-	}
-
 	// Ensure all required event keys are present before sorting
 	const needsTimestamp = reportingMode === CMCD_EVENT_MODE
 
@@ -132,6 +128,10 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	if (version > 1 && !keys.includes('v')) {
 		keys.push('v')
+	}
+
+	if (keys.length === 0) {
+		return results
 	}
 
 	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters)
