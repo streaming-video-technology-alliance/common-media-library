@@ -418,6 +418,9 @@ const reporter = new CmcdReporter({
 });
 ```
 
+> [!NOTE]
+> Certain keys, such as `v` (version), are required by the CMCD specification and will always be included in reports regardless of the `enabledKeys` setting. The `enabledKeys` property cannot be used to disable these keys.
+
 ## Configuration Reference
 
 ### CmcdReporterConfig
