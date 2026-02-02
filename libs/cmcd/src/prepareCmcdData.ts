@@ -22,7 +22,7 @@ const filterMap: Record<string, (key: string) => boolean> = {
 /**
  * V1 keys that use inner lists in V2 but plain numbers in V1.
  */
-const INNER_LIST_V1_KEYS = new Set(['br', 'bl', 'dl', 'mtp', 'rtp', 'tb'])
+const INNER_LIST_V1_KEYS = new Set(['ab', 'bl', 'br', 'bsa', 'bsd', 'bsda', 'lab', 'lb', 'mtp', 'pb', 'tab', 'tb', 'tbl', 'tpb'])
 
 /**
  * Unwrap an inner list or SfItem value to a plain scalar.
