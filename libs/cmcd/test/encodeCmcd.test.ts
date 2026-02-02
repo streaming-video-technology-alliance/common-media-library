@@ -13,9 +13,9 @@ import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts'
 describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
 		//#region example
-		const input = { br: 1000, 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true }
+		const input = { br: [1000], 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true }
 		const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST }
-		equal(encodeCmcd(input, options), 'br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2')
+		equal(encodeCmcd(input, options), 'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2')
 		//#endregion example
 	})
 
@@ -82,7 +82,7 @@ describe('encodeCmcd', () => {
 
 	it('returns converts to relative path when baseUrl is provided', () => {
 		const input = {
-			nor: 'http://test.com/base/segments/video/1.mp4',
+			nor: ['http://test.com/base/segments/video/1.mp4'],
 		}
 		const options: CmcdEncodeOptions = {
 			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
@@ -136,7 +136,7 @@ describe('encodeCmcd', () => {
 
 	describe('V1 down-conversion', () => {
 		it('extracts nrr from nor SfItem with r parameter', () => {
-			const input = { nor: toCmcdValue('../testing/3.m4v', { r: '0-99' }) }
+			const input = { nor: [toCmcdValue('../testing/3.m4v', { r: '0-99' })] }
 			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v",nrr="0-99"')
 		})
 
@@ -146,7 +146,7 @@ describe('encodeCmcd', () => {
 		})
 
 		it('preserves plain nor string in V1', () => {
-			const input = { nor: '../testing/3.m4v' }
+			const input = { nor: ['../testing/3.m4v'] }
 			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v"')
 		})
 	})
@@ -154,7 +154,7 @@ describe('encodeCmcd', () => {
 	describe('nor', () => {
 		it('returns encoded string for request mode with nor string', () => {
 			const input = {
-				nor: '1.mp4',
+				nor: ['1.mp4'],
 			}
 			equal(encodeCmcd(input), 'nor=("1.mp4"),v=2')
 		})

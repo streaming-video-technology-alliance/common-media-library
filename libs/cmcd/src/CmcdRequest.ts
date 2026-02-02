@@ -1,6 +1,6 @@
-import type { CmValue } from '@svta/cml-cta'
 import type { SfItem } from '@svta/cml-structured-field-values'
 import type { CmcdCustomKey } from './CmcdCustomKey.ts'
+import type { CmcdCustomValue } from './CmcdCustomValue.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdPlayerState } from './CmcdPlayerState.ts'
@@ -23,7 +23,7 @@ export type CmcdRequest = {
 	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
 	 * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
 	 */
-	[index: CmcdCustomKey]: CmValue | undefined;
+	[index: CmcdCustomKey]: CmcdCustomValue | undefined;
 
 	/**
 	 * Aggregate encoded bitrate

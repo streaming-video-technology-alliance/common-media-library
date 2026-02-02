@@ -8,7 +8,7 @@ describe('appendCmcdHeaders', () => {
 	}
 
 	const data = {
-		br: 1000,
+		br: [1000],
 	}
 
 	it('provides a valid example', () => {
@@ -18,12 +18,12 @@ describe('appendCmcdHeaders', () => {
 		}
 
 		const data = {
-			br: 1000,
+			br: [1000],
 		}
 
 		deepEqual(appendCmcdHeaders(headers, data), {
 			hello: 'world',
-			['CMCD-Object']: 'br=1000',
+			['CMCD-Object']: 'br=(1000)',
 			['CMCD-Session']: 'v=2',
 		})
 		//#endregion example
@@ -36,7 +36,7 @@ describe('appendCmcdHeaders', () => {
 	it('appends headers', () => {
 		deepEqual(appendCmcdHeaders(headers, data), {
 			...headers,
-			['CMCD-Object']: 'br=1000',
+			['CMCD-Object']: 'br=(1000)',
 			['CMCD-Session']: 'v=2',
 		})
 	})

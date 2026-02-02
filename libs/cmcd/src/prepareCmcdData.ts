@@ -1,4 +1,3 @@
-import { isTokenField, isValid } from '@svta/cml-cta'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
@@ -12,6 +11,8 @@ import { isCmcdEventKey } from './isCmcdEventKey.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
 import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
+import { isTokenField } from './isTokenField.ts'
+import { isValid } from './isValid.ts'
 
 const filterMap: Record<string, (key: string) => boolean> = {
 	[CMCD_EVENT_MODE]: isCmcdEventKey,

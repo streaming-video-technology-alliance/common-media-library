@@ -4,14 +4,11 @@
 
 ```ts
 
-import { CmObjectType } from '@svta/cml-cta';
-import { CmStreamingFormat } from '@svta/cml-cta';
-import { CmStreamType } from '@svta/cml-cta';
-import { CmValue } from '@svta/cml-cta';
 import { ExclusiveRecord } from '@svta/cml-utils';
 import { Request as Request_2 } from '@svta/cml-utils';
 import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
+import { SfToken } from '@svta/cml-structured-field-values';
 import { ValueOf } from '@svta/cml-utils';
 import { ValueOrArray } from '@svta/cml-utils';
 
@@ -139,6 +136,9 @@ export const CMCD_V2: 2;
 export type CmcdCustomKey = `${string}-${string}`;
 
 // @public
+export type CmcdCustomValue = string | SfItem<string> | (string | SfItem<string>)[] | number | SfItem<number> | (number | SfItem<number>)[] | boolean | SfItem<boolean> | (boolean | SfItem<boolean>)[] | symbol | SfItem<symbol> | (symbol | SfItem<symbol>)[] | SfToken | SfItem<SfToken> | (SfToken | SfItem<SfToken>)[];
+
+// @public
 export type CmcdEncodeOptions = {
     version?: number;
     reportingMode?: CmcdReportingMode;
@@ -243,10 +243,20 @@ export type CmcdHeaderValue = CmcdRequest | CmcdV1;
 export type CmcdKey = keyof Cmcd | keyof CmcdV1;
 
 // @public
-export const CmcdObjectType: typeof CmObjectType;
+export const CmcdObjectType: {
+    readonly MANIFEST: "m";
+    readonly AUDIO: "a";
+    readonly VIDEO: "v";
+    readonly MUXED: "av";
+    readonly INIT: "i";
+    readonly CAPTION: "c";
+    readonly TIMED_TEXT: "tt";
+    readonly KEY: "k";
+    readonly OTHER: "o";
+};
 
 // @public (undocumented)
-export type CmcdObjectType = CmObjectType;
+export type CmcdObjectType = ValueOf<typeof CmcdObjectType>;
 
 // @public
 export type CmcdObjectTypeList = (number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>)[];
@@ -305,7 +315,7 @@ export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
 
 // @public
 export type CmcdRequest = {
-    [index: CmcdCustomKey]: CmValue | undefined;
+    [index: CmcdCustomKey]: CmcdCustomValue | undefined;
     ab?: CmcdObjectTypeList;
     bg?: boolean;
     bl?: CmcdObjectTypeList;
@@ -369,16 +379,25 @@ export type CmcdResponse = CmcdRequest & {
 };
 
 // @public
-export const CmcdStreamingFormat: typeof CmStreamingFormat;
+export const CmcdStreamingFormat: {
+    readonly DASH: "d";
+    readonly HLS: "h";
+    readonly SMOOTH: "s";
+    readonly OTHER: "o";
+};
 
 // @public (undocumented)
-export type CmcdStreamingFormat = CmStreamingFormat;
+export type CmcdStreamingFormat = ValueOf<typeof CmcdStreamingFormat>;
 
 // @public
-export const CmcdStreamType: typeof CmStreamType;
+export const CmcdStreamType: {
+    readonly VOD: "v";
+    readonly LIVE: "l";
+    readonly LOW_LATENCY: "ll";
+};
 
 // @public (undocumented)
-export type CmcdStreamType = CmStreamType;
+export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;
 
 // @public
 export const CmcdTransmissionMode: {
@@ -446,7 +465,7 @@ export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfIt
 
 // Warnings were encountered during analysis:
 //
-// src/CmcdEventType.ts:64:1 - (ae-forgotten-export) The symbol "CmcdVersion" needs to be exported by the entry point index.d.ts
+// src/CmcdEventType.ts:71:1 - (ae-forgotten-export) The symbol "CmcdVersion" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
