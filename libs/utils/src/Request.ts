@@ -15,7 +15,7 @@ export type Request<D = any> = {
 	/**
 	 * The request's method (GET, POST, etc).
 	 */
-	method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD';
+	method?: string;
 
 	/**
 	 * The body of the request.

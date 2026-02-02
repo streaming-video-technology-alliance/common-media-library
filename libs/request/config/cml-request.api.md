@@ -29,6 +29,9 @@ export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaReques
 };
 
 // @public
+export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResponse>;
+
+// @public
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
 export { RequestType }
@@ -39,7 +42,7 @@ export { ResourceTiming }
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
 
 // @public
-export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;
+export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : unknown;
 
 // (No @packageDocumentation comment for this package)
 

@@ -451,9 +451,6 @@ export function prepareCmcdData(obj: Record<string, any>, options?: CmcdEncodeOp
 // @public
 export function toCmcdHeaders(cmcd: Cmcd, options?: CmcdEncodeOptions): Record<CmcdHeaderField, string>;
 
-// @public @deprecated
-export function toCmcdJson(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
-
 // @public
 export function toCmcdQuery(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
