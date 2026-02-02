@@ -1,24 +1,9 @@
-import type { SfItem, SfToken } from '@svta/cml-structured-field-values'
-import type { CmcdObjectType } from './CmcdObjectType.ts'
-import type { CmcdStreamType } from './CmcdStreamType.ts'
-import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
+import type { ValueOf } from '@svta/cml-utils'
+import type { Cmcd } from './Cmcd.ts'
 
 /**
  * CMCD Value
  *
  * @public
  */
-export type CmcdValue =
-	| CmcdObjectType
-	| CmcdStreamingFormat
-	| CmcdStreamType
-	| string
-	| string[]
-	| number
-	| number[]
-	| boolean
-	| symbol
-	| SfToken
-	| SfItem
-	| SfItem[]
-	| (number | SfItem)[];
+export type CmcdValue = ValueOf<Cmcd>

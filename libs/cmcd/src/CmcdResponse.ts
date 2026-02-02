@@ -1,13 +1,15 @@
 import type { CmcdRequest } from './CmcdRequest.ts'
 
 /**
- * CMCD Response Mode.
+ * Common Media Client Data (CMCD) version 2 - Response Mode.
  *
- * Defines the keys for the CMCD (Common Media Client Data) v2 Response group.
+ * Extends {@link CmcdRequest} with response-specific keys for reporting
+ * response data according to the CMCD version 2 specification.
  *
  * @public
  */
 export type CmcdResponse = CmcdRequest & {
+
 	/**
 	 * CMSD Dynamic Header
 	 *
@@ -54,8 +56,7 @@ export type CmcdResponse = CmcdRequest & {
 	 * Time to first byte
 	 *
 	 * The elapsed time between when the request was first initiated (captured in ts) and the time when the first byte of the response
-	 * was received. This value should only be reported if it is known. Absence of this key does not indicate that the response was not
-	 * received. This key MUST only be reported on events of type `rr` (response received).
+	 * was received. This key MUST only be reported on events of type `rr` (response received).
 	 *
 	 * Integer milliseconds
 	 */
@@ -65,8 +66,7 @@ export type CmcdResponse = CmcdRequest & {
 	 * Time to first body byte
 	 *
 	 * The elapsed time between when the request was first initiated (captured in ts) and the time the first bytes of the response body
-	 * are received. This value should only be reported if it is known. Absence of this key does not indicate that the body was not
-	 * received. This key MUST only be reported on events of type `rr` (response received).
+	 * are received. This key MUST only be reported on events of type `rr` (response received).
 	 *
 	 * Integer milliseconds
 	 */
@@ -76,7 +76,6 @@ export type CmcdResponse = CmcdRequest & {
 	 * Time to last byte
 	 *
 	 * The elapsed time between when the request was first initiated (captured in ts) and the time the response body is fully received.
-	 * This value should only be reported if it is known. Absence of this key does not indicate that the response was not fully received.
 	 * This key MUST only be reported on events of type `rr` (response received).
 	 *
 	 * Integer milliseconds

@@ -1,13 +1,30 @@
-import type { Cmcd } from './Cmcd.ts'
+import type { SfItem } from '@svta/cml-structured-field-values'
+import type { CmcdCustomKey } from './CmcdCustomKey.ts'
+import type { CmcdCustomValue } from './CmcdCustomValue.ts'
+import type { CmcdObjectType } from './CmcdObjectType.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdPlayerState } from './CmcdPlayerState.ts'
+import type { CmcdStreamType } from './CmcdStreamType.ts'
+import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
 
 /**
- * Common Media Client Data (CMCD) is a standardized set of HTTP request header fields and query string parameters.
+ * Common Media Client Data (CMCD) version 2 - Request Mode.
+ *
+ * A standardized set of HTTP request header fields and query string parameters
+ * for communicating media playback metrics in request mode.
+ *
+ * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD v1 Spec}
  *
  * @public
  */
-export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
+export type CmcdRequest = {
+
+	/**
+	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
+	 * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
+	 */
+	[index: CmcdCustomKey]: CmcdCustomValue | undefined;
+
 	/**
 	 * Aggregate encoded bitrate
 	 *
@@ -29,6 +46,38 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * Boolean
 	 */
 	bg?: boolean;
+
+	/**
+	 * Buffer length
+	 *
+	 * The buffer length associated with the media object being requested. This value SHOULD be rounded to the nearest 100 ms.
+	 *
+	 * Inner list of integer milliseconds with token identifiers
+	 */
+	bl?: CmcdObjectTypeList;
+
+	/**
+	 * Encoded bitrate
+	 *
+	 * The encoded bitrate. In request mode, this refers to the encoded bitrate of the requested representation.
+	 * In event mode this refers to the encoded bitrate of the currently selected representation.
+	 * This SHOULD be derived from playlist/manifest declarations, or it MAY be estimated by the player.
+	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	br?: CmcdObjectTypeList;
+
+	/**
+	 * Buffer starvation
+	 *
+	 * TRUE if the player buffer was starved at some point between the prior report and this report per reporting destination, resulting in
+	 * the player entering a rebuffering state or remaining in a rebuffering state. Note that if the player begins requesting data from a
+	 * new CDN, then this key might initially report buffering caused by the prior CDN. This key SHOULD NOT be reported if it is FALSE.
+	 *
+	 * Boolean
+	 */
+	bs?: boolean;
 
 	/**
 	 * Buffer Starvation Absolute
@@ -70,6 +119,16 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	cdn?: string;
 
 	/**
+	 * Content ID
+	 *
+	 * A unique string identifying the current content. The maximum length is 128 characters. This value is consistent across multiple different
+	 * sessions and devices and is defined and updated at the discretion of the service provider.
+	 *
+	 * String
+	 */
+	cid?: string;
+
+	/**
 	 * Content Signature
 	 *
 	 * A string representing a signature of the content being played. This field SHOULD vary with content ID and be bound by some mechanism
@@ -78,6 +137,18 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * String
 	 */
 	cs?: string;
+
+	/**
+	 * Object duration
+	 *
+	 * The playback duration in milliseconds of the object being requested. If a partial segment is being requested,
+	 * then this value MUST indicate the playback duration of that part and not that of its parent segment.
+	 * This value can be an approximation of the estimated duration if the explicit value is not known.
+	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av', 'tt', 'c', or 'o'.
+	 *
+	 * Integer milliseconds
+	 */
+	d?: number;
 
 	/**
 	 * Dropped Frames Absolute
@@ -91,14 +162,22 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	dfa?: number;
 
 	/**
+	 * Deadline
+	 *
+	 * Deadline from the request time until the first sample of this Segment/Object needs to be available in order to not create a buffer underrun
+	 * or any other playback problems. This value MUST be rounded to the nearest 100ms. For a playback rate of 1, this may be equivalent to the
+	 * player's remaining buffer length.
+	 *
+	 * Integer milliseconds
+	 */
+	dl?: number;
+
+	/**
 	 * Player Error Code
 	 *
 	 * A string defining an error code produced by the player. The namespace and formatting of this error code is left to the application.
 	 *
 	 * Even if only one error code is being specified, the list notation MUST still be used.
-	 *
-	 * Errors should be buffered per report destination as they occur and reported along with the next CMCD report. With Event mode there
-	 * is the option to report errors as they occur.
 	 *
 	 * Inner list of strings
 	 */
@@ -147,22 +226,76 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 *
 	 * This key MUST only be sent once per Session ID and MUST be sent for each reporting mode which is active within the player.
 	 *
-	 * For request reporting mode, this key SHOULD be sent on the next media object request following successful startup.
-	 *
 	 * Integer milliseconds
 	 */
 	msd?: number;
 
 	/**
+	 * Measured throughput
+	 *
+	 * The throughput between player and server, as measured by the player. Throughput MUST be rounded to the nearest 100 kbps. This value, however
+	 * derived, SHOULD be the value that the player is using to make its next Adaptive Bitrate switching decision. If the player is requesting
+	 * different object types from different providers then it SHOULD take care to match the throughput measured against that provider with each
+	 * object type request. It is acceptable to report aggregate information if objects of the same type are requested from different providers.
+	 * If the player has multiple concurrent connections to the provider, then the intent is that this value communicates the aggregate throughput
+	 * the player sees across all those connections. If this key is sent on an interval report, the value transmitted should be the last throughput
+	 * estimate made by the player prior to making the report. There is no requirement for the player to calculate the average measured throughput
+	 * since the prior interval report.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	mtp?: CmcdObjectTypeList;
+
+	/**
+	 * Next object request
+	 *
+	 * The relative path, as defined by RFC 3986, to one or more objects which can reasonably be expected to be requested by the player making
+	 * the current request. Each object SHOULD be fetched in its entirety unless there is a range associated with the future request. Even if
+	 * only one object is being specified, the list notation MUST still be used. If there is a range associated with the future request, then
+	 * the range is communicated as the parameter 'r' with a String value. The formatting of the String value is similar to the HTTP Range
+	 * header, except that the unit MUST be 'byte', the 'Range:' prefix is NOT permitted, specifying multiple ranges is NOT allowed and the
+	 * only valid combinations are:
+	 *
+	 * - `"<range-start>-"`
+	 * - `"<range-start>-<range-end>"`
+	 * - `"-<suffix-length>"`
+	 *
+	 * The player SHOULD NOT depend upon any pre-fetch action being taken - it is merely a request for such a pre-fetch to take place.
+	 *
+	 * Inner list of strings
+	 */
+	nor?: (string | SfItem<string, { r: string }>)[];
+
+	/**
 	 * Non rendered
 	 *
 	 * True when the content being retrieved by a player is not rendered as audio or video. The key SHOULD only be sent when it is TRUE.
-	 * The purpose of this key is to disambiguate active background players from foreground players which may be rendering interstitial
-	 * content.
 	 *
 	 * Boolean
 	 */
 	nr?: boolean;
+
+	/**
+	 * Object type
+	 *
+	 * The media type of the current object being requested:
+	 * - `m` = text file, such as a manifest or playlist
+	 * - `a` = audio only
+	 * - `v` = video only
+	 * - `av` = muxed audio and video
+	 * - `i` = init segment
+	 * - `c` = caption or subtitle
+	 * - `tt` = ISOBMFF timed text track
+	 * - `k` = cryptographic key, license or certificate.
+	 * - `o` = other
+	 *
+	 * If the object type being requested is unknown, then this key MUST NOT be used.
+	 *
+	 * This key is also used as a token parameter for other keys.
+	 *
+	 * Token
+	 */
+	ot?: CmcdObjectType;
 
 	/**
 	 * Playhead bitrate
@@ -174,18 +307,59 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	pb?: CmcdObjectTypeList;
 
 	/**
+	 * Playback rate
+	 *
+	 * 1.0 if real-time, 2.0 if double speed, 0 if not playing. SHOULD only be sent if not equal to 1.0.
+	 *
+	 * Decimal
+	 */
+	pr?: number;
+
+	/**
 	 * Playhead time
 	 *
-	 * The playhead time, expressed in milliseconds, which is being rendered to the viewer when the report is made. For Event mode, this
-	 * corresponds to the playhead time that was rendered at the wallclock time reported by the timestamp field.
-	 *
-	 * For VOD, this MUST be milliseconds offset from the beginning of the media asset. For live streams with a playhead date time, this
-	 * field MUST be expressed as the number of milliseconds that have elapsed since the Unix Epoch (January 1, 1970, at 00:00:00 UTC),
-	 * excluding leap seconds.
+	 * The playhead time, expressed in milliseconds, which is being rendered to the viewer when the report is made.
 	 *
 	 * Integer milliseconds
 	 */
 	pt?: number;
+
+	/**
+	 * Requested maximum throughput
+	 *
+	 * The requested maximum throughput that the player considers sufficient for delivery of the asset. Values MUST be rounded to the
+	 * nearest 100kbps.
+	 *
+	 * Integer kbps
+	 */
+	rtp?: number;
+
+	/**
+	 * Streaming format
+	 *
+	 * The streaming format that defines the current request.
+	 *
+	 * - `d` = MPEG DASH
+	 * - `h` = HTTP Live Streaming (HLS)
+	 * - `e` = HESP
+	 * - `s` = Smooth Streaming
+	 * - `o` = other
+	 *
+	 * Token
+	 */
+	sf?: CmcdStreamingFormat;
+
+	/**
+	 * Session ID
+	 *
+	 * A GUID identifying the current playback session. A playback session typically consists of the playback of a single media asset along
+	 * with accompanying content such as advertisements. This session may comprise the playback of primary content combined with interstitial
+	 * content. This session is being played on a single device. The maximum length is 64 characters. It is RECOMMENDED to conform to the
+	 * UUID specification.
+	 *
+	 * String
+	 */
+	sid?: string;
 
 	/**
 	 * Sequence Number
@@ -196,6 +370,17 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * Integer
 	 */
 	sn?: number;
+
+	/**
+	 * Stream type
+	 *
+	 * - `v` = all segments are available - e.g., VOD
+	 * - `l` = segments become available over time - e.g., LIVE
+	 * - `ll` = low latency LIVE
+	 *
+	 * Token
+	 */
+	st?: CmcdStreamType;
 
 	/**
 	 * State
@@ -212,13 +397,19 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * - `q` - quit: User initiated end of playback before media asset completion.
 	 * - `d` - preloading: the player is loading, or has loaded, assets ahead of starting in order to provide a fast startup. The expectation is that playback will commence at a future time.
 	 *
-	 * Note: if used with Request Mode, then this key represents a snapshot of the state at request time, which may obscure prior state
-	 * changes since the last request. For most accurate state tracking in players, use Event mode. The addition of a timestamp in Request
-	 * Mode might be useful in correctly placing the state change on a timeline.
-	 *
 	 * Token - one of [s,p,k,r,a,e,f,q,d]
 	 */
 	sta?: CmcdPlayerState;
+
+	/**
+	 * Startup
+	 *
+	 * Key is included without a value if the object is needed urgently due to startup, seeking or recovery after a buffer-empty event. The player
+	 * reports this key as true until its buffer first reaches the target buffer for stable playback.
+	 *
+	 * Boolean
+	 */
+	su?: boolean;
 
 	/**
 	 * Top aggregated encoded bitrate
@@ -231,6 +422,18 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * Inner list of integer kbps with token identifiers
 	 */
 	tab?: CmcdObjectTypeList;
+
+	/**
+	 * Top encoded bitrate
+	 *
+	 * The highest bitrate rendition in the manifest or playlist. This SHOULD be derived from playlist/manifest declarations,
+	 * or it MAY be estimated by the player. If the playlist declares both peak and average bitrate values, the peak value
+	 * MUST be transmitted. This top bitrate MUST apply to the object type being requested. Requests for video objects MUST
+	 * specify the top video bitrate and requests for audio objects MUST specify the top audio bitrate.
+	 *
+	 * Inner list of integer kbps with token identifiers
+	 */
+	tb?: CmcdObjectTypeList;
 
 	/**
 	 * Target Buffer length
@@ -260,4 +463,15 @@ export type CmcdRequest = Omit<Cmcd, 'nrr'> & {
 	 * Inner list of integer kbps with token identifiers
 	 */
 	tpb?: CmcdObjectTypeList;
+
+	/**
+	 * Version
+	 *
+	 * The version of this specification used for interpreting the defined key names and values. If this key is omitted, the player and server
+	 * MUST interpret the values as being defined by version 1. Player SHOULD omit this field if the version is 1 and MUST include this field
+	 * if the version is not 1.
+	 *
+	 * Integer
+	 */
+	v?: number;
 };

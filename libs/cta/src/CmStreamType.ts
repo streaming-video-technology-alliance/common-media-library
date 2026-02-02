@@ -15,11 +15,6 @@ export const CmStreamType = {
 	 * Segments become available over time – e.g., LIVE
 	 */
 	LIVE: 'l',
-
-	/**
-	 * Low latency stream
-	 */
-	LOW_LATENCY: 'll',
 } as const
 
 /**

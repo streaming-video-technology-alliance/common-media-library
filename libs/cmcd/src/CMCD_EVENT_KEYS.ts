@@ -4,5 +4,6 @@
  * @public
  */
 export const CMCD_EVENT_KEYS = [
+	'cen',
 	'e',
 ] as const
