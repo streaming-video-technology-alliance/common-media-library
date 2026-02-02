@@ -59,7 +59,7 @@ export function hexToArrayBuffer(hex: string): ArrayBuffer;
 // @public
 type Request_2<D = any> = {
     url: string;
-    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD";
+    method?: string;
     body?: BodyInit;
     responseType?: RequestType;
     headers?: Record<string, string>;
@@ -77,7 +77,6 @@ export const RequestType: {
     readonly BLOB: "blob";
     readonly ARRAY_BUFFER: "arrayBuffer";
     readonly DOCUMENT: "document";
-    readonly STREAM: "stream";
 };
 
 // @public (undocumented)

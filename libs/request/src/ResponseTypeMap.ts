@@ -11,5 +11,4 @@ export type ResponseTypeMap<T extends string | undefined> =
 	T extends 'blob' ? Blob :
 	T extends 'arraybuffer' ? ArrayBuffer :
 	T extends 'document' ? XmlNode :
-	T extends 'stream' ? ReadableStream :
 	unknown;

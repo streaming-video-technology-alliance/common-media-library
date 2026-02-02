@@ -14,7 +14,6 @@ export const RequestType = {
 	BLOB: 'blob' as const,
 	ARRAY_BUFFER: 'arrayBuffer' as const,
 	DOCUMENT: 'document' as const,
-	STREAM: 'stream' as const,
 } as const
 
 /**
