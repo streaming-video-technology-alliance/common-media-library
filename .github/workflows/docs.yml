@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Build Docs
-        run: npm run build
+        run: npm run build -w docs
 
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v3
