@@ -18,14 +18,12 @@ describe('decodeCmcd', () => {
 	})
 
 	it('version 1', () => {
-		//#region example
 		deepEqual(decodeCmcd('br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su'), {
 			br: 1000,
 			'com.example-hello': 'world',
 			ec: ['ERR001', 'ERR002'],
 			su: true,
 		})
-		//#endregion example
 	})
 
 	it('handles null data object', () => {
