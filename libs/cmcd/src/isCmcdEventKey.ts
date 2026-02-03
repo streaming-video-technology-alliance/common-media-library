@@ -1,8 +1,7 @@
-import { CMCD_COMMON_KEYS } from './CMCD_COMMON_KEYS.ts'
 import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
-import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.js'
-import type { CmcdEvent } from './CmcdEvent.ts'
-import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
+import type { Cmcd } from './Cmcd.ts'
+import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
+import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 
 /**
  * Check if a key is a valid CMCD event key.
@@ -16,9 +15,8 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  * @example
  * {@includeCode ../test/isCmcdEventKey.test.ts#example}
  */
-export function isCmcdEventKey(key: string): key is keyof CmcdEvent {
-	return CMCD_COMMON_KEYS.includes(key as any) ||
-		CMCD_EVENT_KEYS.includes(key as any) ||
-		CMCD_RESPONSE_KEYS.includes(key as any) ||
-		isCmcdCustomKey(key as any)
+export function isCmcdEventKey(key: string): key is keyof Cmcd {
+	return isCmcdRequestKey(key) ||
+		isCmcdResponseReceivedKey(key) ||
+		CMCD_EVENT_KEYS.includes(key as any)
 }

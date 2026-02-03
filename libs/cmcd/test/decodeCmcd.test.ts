@@ -7,6 +7,18 @@ import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
 describe('decodeCmcd', () => {
 	it('provides a valid example', () => {
 		//#region example
+		deepEqual(decodeCmcd('br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2'), {
+			br: [1000],
+			'com.example-hello': 'world',
+			ec: ['ERR001', 'ERR002'],
+			su: true,
+			v: 2,
+		})
+		//#endregion example
+	})
+
+	it('version 1', () => {
+		//#region example
 		deepEqual(decodeCmcd('br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su'), {
 			br: 1000,
 			'com.example-hello': 'world',

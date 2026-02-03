@@ -8,6 +8,26 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Refactored `Cmcd` type to be the intersection `CmcdRequest & CmcdResponse & CmcdEvent`
+- Restored `CmcdRequest`, `CmcdResponse`, and `CmcdEvent` as separate, standalone types
+- `CmcdRequest` contains the common, object, request, session, and status keys
+- `CmcdEvent` extends `CmcdRequest` with event-specific keys (`cen`, `e`, `h`, `ts`)
+- `CmcdResponse` extends `CmcdRequest` with response-specific keys (`cmsdd`, `cmsds`, `rc`, `smrt`, `ttfb`, `ttfbb`, `ttlb`, `url`)
+- Updated `CmcdRequestKey` to use `keyof CmcdRequest` instead of `keyof Cmcd`
+
+### Removed
+
+- Removed deprecated `CmcdData` type alias (use `Cmcd` instead)
+- Removed deprecated `CmcdRequestData` type alias (use `CmcdRequest` instead)
+
+## [2.0.0] - 2026-02-03
+
+### Added
+
+- CMCD Version 2 support ([#143](https://github.com/streaming-video-technology-alliance/common-media-library/issues/143))
+
 ## [1.0.2] - 2025-12-26
 
 ### Changed
@@ -33,7 +53,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v1.0.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.0...HEAD
+[2.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v1.0.2...cmcd-v2.0.0
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v1.0.1...cmcd-v1.0.2
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v1.0.0...cmcd-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/cmcd-v1.0.0

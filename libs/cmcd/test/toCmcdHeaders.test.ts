@@ -16,7 +16,7 @@ describe('toCmcdHeaders', () => {
 	it('provides a valid example', () => {
 		//#region example
 		const data = {
-			br: 1000,
+			br: [1000],
 			'com.example-hello': 'world',
 			ec: ['ERR001', 'ERR002'],
 			su: true,
@@ -31,7 +31,7 @@ describe('toCmcdHeaders', () => {
 		}
 
 		deepEqual(toCmcdHeaders(data, options), {
-			'CMCD-Object': 'br=1000,com.example-hello="world"',
+			'CMCD-Object': 'br=(1000),com.example-hello="world"',
 			'CMCD-Request': 'su',
 			'CMCD-Session': 'v=2',
 			'CMCD-Status': 'ec=("ERR001" "ERR002")',
@@ -44,7 +44,7 @@ describe('toCmcdHeaders', () => {
 	})
 
 	it('ignores empty shards', () => {
-		let headers = toCmcdHeaders({ br: 200, pb: 1000 }, { version: 1 })
+		let headers = toCmcdHeaders({ br: [200], pb: [1000] }, { version: 1 })
 
 		deepEqual(headers, {
 			'CMCD-Object': 'br=200',
@@ -54,11 +54,11 @@ describe('toCmcdHeaders', () => {
 		equal(headers['CMCD-Session'], undefined)
 		equal(headers['CMCD-Status'], undefined)
 
-		headers = toCmcdHeaders({ br: 200, pb: 1000 }, { version: 2 })
+		headers = toCmcdHeaders({ br: [200], pb: [1000] }, { version: 2 })
 
 		deepEqual(headers, {
-			'CMCD-Object': 'br=200',
-			'CMCD-Request': 'pb=1000',
+			'CMCD-Object': 'br=(200)',
+			'CMCD-Request': 'pb=(1000)',
 			'CMCD-Session': 'v=2',
 		})
 

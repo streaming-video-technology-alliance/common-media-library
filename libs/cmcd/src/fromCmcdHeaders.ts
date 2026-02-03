@@ -1,8 +1,5 @@
-import { CMCD_OBJECT } from './CMCD_OBJECT.ts'
-import { CMCD_REQUEST } from './CMCD_REQUEST.ts'
-import { CMCD_SESSION } from './CMCD_SESSION.ts'
-import { CMCD_STATUS } from './CMCD_STATUS.ts'
-import type { CmcdData } from './CmcdData.ts'
+import type { Cmcd } from './Cmcd.ts'
+import { CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS } from './CmcdHeaderField.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 
 const keys = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS]
@@ -19,7 +16,7 @@ const keys = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS]
  * @example
  * {@includeCode ../test/fromCmcdHeaders.test.ts#example}
  */
-export function fromCmcdHeaders(headers: Record<string, string> | Headers): CmcdData {
+export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd {
 	if (!(headers instanceof Headers)) {
 		headers = new Headers(headers)
 	}
@@ -27,5 +24,5 @@ export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd
 	return keys.reduce((acc, key) => {
 		const value = headers.get(key)
 		return Object.assign(acc, decodeCmcd(value as string))
-	}, {} as CmcdData)
+	}, {} as Cmcd)
 }

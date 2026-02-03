@@ -5,18 +5,18 @@ import { describe, it } from 'node:test'
 describe('appendCmcdQuery', () => {
 	const url = 'https://test.com'
 	const data = {
-		br: 1000,
+		br: [1000],
 	}
 
 	it('provides a valid example', () => {
 		//#region example
 		const url = 'https://test.com'
 		const data = {
-			br: 1000,
+			br: [1000],
 		}
 
-		equal(appendCmcdQuery(url, data), `${url}?CMCD=br%3D1000`)
-		equal(appendCmcdQuery(`${url}?hello=world`, data), `${url}?hello=world&CMCD=br%3D1000`)
+		equal(appendCmcdQuery(url, data), `${url}?CMCD=br%3D(1000)%2Cv%3D2`)
+		equal(appendCmcdQuery(`${url}?hello=world`, data), `${url}?hello=world&CMCD=br%3D(1000)%2Cv%3D2`)
 		//#endregion example
 	})
 
@@ -25,17 +25,17 @@ describe('appendCmcdQuery', () => {
 	})
 
 	it('add ? when query does not exist', () => {
-		equal(appendCmcdQuery(url, data), `${url}?CMCD=br%3D1000`)
+		equal(appendCmcdQuery(url, data), `${url}?CMCD=br%3D(1000)%2Cv%3D2`)
 	})
 
 	it('add & when query does exist', () => {
-		equal(appendCmcdQuery(`${url}?hello=world`, data), `${url}?hello=world&CMCD=br%3D1000`)
+		equal(appendCmcdQuery(`${url}?hello=world`, data), `${url}?hello=world&CMCD=br%3D(1000)%2Cv%3D2`)
 	})
 
 	it('replaces CMCD param if it already exists', () => {
-		equal(appendCmcdQuery(`${url}?CMCD=su`, data), `${url}?CMCD=br%3D1000`)
-		equal(appendCmcdQuery(`${url}?CMCD=sf%3Dh&hello=world`, data), `${url}?CMCD=br%3D1000&hello=world`)
-		equal(appendCmcdQuery(`${url}?hello=world&CMCD=sf%3Dh`, data), `${url}?hello=world&CMCD=br%3D1000`)
-		equal(appendCmcdQuery(`${url}?CMCD=su#test`, data), `${url}?CMCD=br%3D1000#test`)
+		equal(appendCmcdQuery(`${url}?CMCD=su`, data), `${url}?CMCD=br%3D(1000)%2Cv%3D2`)
+		equal(appendCmcdQuery(`${url}?CMCD=sf%3Dh&hello=world`, data), `${url}?CMCD=br%3D(1000)%2Cv%3D2&hello=world`)
+		equal(appendCmcdQuery(`${url}?hello=world&CMCD=sf%3Dh`, data), `${url}?hello=world&CMCD=br%3D(1000)%2Cv%3D2`)
+		equal(appendCmcdQuery(`${url}?CMCD=su#test`, data), `${url}?CMCD=br%3D(1000)%2Cv%3D2#test`)
 	})
 })

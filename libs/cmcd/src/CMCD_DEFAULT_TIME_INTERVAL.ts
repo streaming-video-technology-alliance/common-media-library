@@ -1,5 +1,5 @@
 /**
- * The default time interval in secondswhen using using event mode
+ * The default time interval in seconds when using using event mode
  *
  * @public
  */

@@ -1,48 +1,76 @@
-import type { CmcdEventExcludedKeys } from './CmcdEventExcludedKeys.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdRequest } from './CmcdRequest.ts'
 
 /**
- * CMCD v2 - Event Mode.
+ * Common Media Client Data (CMCD) version 2 - Event Mode.
  *
- * Represents the event and keys for CMCD v2.
- *
- * This type is used to structure the data for reporting events according to the
- * Common Media Client Data (CMCD) version 2 specification. It encapsulates
- * the reporting event token.
+ * Extends {@link CmcdRequest} with event-specific keys for reporting events
+ * according to the CMCD version 2 specification.
  *
  * @public
  */
-export type CmcdEvent = Omit<CmcdRequest, CmcdEventExcludedKeys> & {
+export type CmcdEvent = CmcdRequest & {
+
 	/**
-	 * Event (event mode; e.g. "e", "t", "ps")
+	 * Custom Event Name
 	 *
-	 * This key MUST only be used in Event mode.
+	 * Used to define a custom event name. A maximum length of 64 characters is allowed. This key MUST be sent when the event type is
+	 * 'ce' (custom event) and MUST NOT be sent when the event type is any other value. A custom key-value pair MAY be used to transfer
+	 * a custom value associated with this event. The names chosen SHOULD associate the custom event name with the custom key name.
 	 *
-	 * ps - play state change. This token MUST be accompanied by a 'sta' key carrying the new state.
+	 * String
+	 */
+	cen?: string;
+
+	/**
+	 * Event
 	 *
-	 * e - the player has experienced an error. This token MUST be accompanied by a 'ec' key defining the player error code.
+	 * This key MUST only be used in Event mode and MUST be present on all reports. The minimum recommended set of supported events
+	 * are: `ps`, `e`, `t`, and `rr`.
 	 *
-	 * t - time interval. The interval at which these reports are made is application-defined. A default interval of 30 seconds SHOULD
-	 * be used if no explicit application interval is provided. Short form content may wish to use a shorter interval.
-	 * An application-defined interval of zero should be interpreted as turning off interval event reporting.
-	 * This event MUST be supported by all players that support Event mode.
+	 * - `abs` - ad break start
+	 * - `abe` - ad break end
+	 * - `ae` - ad end
+	 * - `as` - ad start
+	 * - `b` - backgrounded mode
+	 * - `bc` - bitrate change
+	 * - `c` - content ID changed
+	 * - `ce` - custom event
+	 * - `e` - error
+	 * - `h` - hostname changed
+	 * - `m` - mute
+	 * - `pc` - player collapse
+	 * - `pe` - player expand
+	 * - `pr` - playback rate change
+	 * - `ps` - play state change
+	 * - `rr` - response received
+	 * - `sk` - skip
+	 * - `t` - time interval
+	 * - `um` - unmute
 	 *
-	 * c - content ID has changed. This token MUST be accompanied by a 'cid' key defining the new content ID.
-	 *
-	 * b - the player has entered backgrounded mode if this event is accompanied by the ‘bg’ key and exited backgrounded mode if not.
-	 *
-	 * m - mute. The user activated the mute control or set the volume to zero.
-	 *
-	 * um - unmute. The user deactivated the mute control or raised the volume above zero if it was previously set to zero.
-	 *
-	 * pe - playerExpand. The user activated a control to extend the player to a larger size. The definition of this event is intended to be
-	 * compliant with the VAST [VAST] Player Operation Metrics.
-	 *
-	 * c - playerCollapse: the user activated a control to reduce the player to a smaller size. The definition of this event is intended to be
-	 * compliant with the VAST [VAST] Player Operation Metrics.
-	 *
-	 * Token - one of [ps,e,t,c,b,m,u m, abs, abe, as, ae]
+	 * Token
 	 */
 	e?: CmcdEventType;
+
+	/**
+	 * Hostname
+	 *
+	 * A string identifying the current hostname from which the player is retrieving content. Maximum length is 128 characters.
+	 *
+	 * String
+	 */
+	h?: string;
+
+	/**
+	 * Timestamp
+	 *
+	 * The timestamp at which the associated event occurred, expressed as the number of milliseconds that have elapsed since the Unix
+	 * Epoch (January 1, 1970, at 00:00:00 UTC), excluding leap seconds. When the event is a request for a media object the time SHOULD
+	 * reference when the request was first initiated.
+	 *
+	 * This key MUST be included with all Event reports.
+	 *
+	 * Integer milliseconds
+	 */
+	ts?: number;
 };
