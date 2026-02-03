@@ -146,12 +146,6 @@ export type CmcdEncodeOptions = {
     events?: string[];
 };
 
-// @public @deprecated
-export const CmcdEncoding: typeof CmcdTransmissionMode;
-
-// @public (undocumented)
-export type CmcdEncoding = ValueOf<typeof CmcdEncoding>;
-
 // @public
 export type CmcdEvent = CmcdRequest & {
     cen?: string;
@@ -206,9 +200,6 @@ export type CmcdFormatterOptions = {
     baseUrl?: string;
 };
 
-// @public @deprecated
-export const CmcdFormatters: Record<string, CmcdFormatter>;
-
 // @public
 export const CmcdHeaderField: {
     readonly OBJECT: typeof CMCD_OBJECT;
@@ -227,9 +218,6 @@ export type CmcdHeaderKey = keyof typeof CMCD_HEADER_MAP;
 
 // @public
 export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
-
-// @public @deprecated
-export type CmcdHeadersMap = Record<CmcdHeaderField, CmcdKey[]>;
 
 // @public
 export type CmcdHeaderValue = CmcdRequest | CmcdV1;
