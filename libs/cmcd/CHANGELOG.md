@@ -22,7 +22,7 @@ and this project adheres to
 - Removed deprecated `CmcdData` type alias (use `Cmcd` instead)
 - Removed deprecated `CmcdRequestData` type alias (use `CmcdRequest` instead)
 
-## [2.0.0] - 2026-02-02
+## [2.0.0] - 2026-02-03
 
 ### Added
 
