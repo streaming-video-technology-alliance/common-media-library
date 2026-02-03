@@ -1,3 +1,8 @@
+---
+title: User Guide
+description: How to use the CMCD reporter
+---
+
 # CMCD User Guide
 
 The `CmcdReporter` class provides a centralized way to manage CMCD (Common Media Client Data) reporting in a video player. It handles both request-mode reporting (adding CMCD data to segment requests) and event-mode reporting (sending periodic reports to analytics endpoints).
@@ -393,7 +398,7 @@ const reporter = new CmcdReporter(
 			},
 		],
 	},
-	customRequester,
+	customRequester
 );
 ```
 
