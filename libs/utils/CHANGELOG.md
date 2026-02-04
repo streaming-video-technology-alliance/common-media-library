@@ -12,11 +12,11 @@ and this project adheres to
 
 ### Changed
 
-- Rename `RequestType` to `ResponseType`
+- Rename `RequestType` to `RequestResponseType`
 
 ### Added
 
-- Add `stream` response type to `ResponseType`
+- Add `stream` response type to `RequestResponseType`
 
 ## [1.2.0] - 2026-02-03
 

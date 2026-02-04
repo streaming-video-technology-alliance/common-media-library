@@ -12,7 +12,7 @@ and this project adheres to
 
 ### Changed
 
-- Rename `RequestType` re-export to `ResponseType`
+- Rename `RequestType` re-export to `RequestResponseType`
 - Add `stream` type to `ResponseTypeMap`
 - Update `@svta/cml-utils` to 1.3.0
 
