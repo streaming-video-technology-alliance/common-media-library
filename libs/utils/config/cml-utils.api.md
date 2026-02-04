@@ -92,6 +92,19 @@ export type ResourceTiming = {
 };
 
 // @public
+type Response_2<R extends Request_2 = Request_2, D = unknown> = {
+    request: R;
+    url?: string;
+    redirected?: boolean;
+    status?: number;
+    statusText?: string;
+    type?: string;
+    headers?: Record<string, string>;
+    data?: D;
+};
+export { Response_2 as Response }
+
+// @public
 export function roundToEven(value: number, precision: number): number;
 
 // @public
@@ -132,6 +145,17 @@ export type ValueOf<T> = T[keyof T];
 
 // @public
 export type ValueOrArray<T> = T | T[];
+
+// @public
+export type XmlNode = {
+    nodeName: string;
+    nodeValue: string | null;
+    attributes: Record<string, string>;
+    childNodes: XmlNode[];
+    prefix?: string | null;
+    localName?: string;
+    parentElement?: XmlNode | null;
+};
 
 // (No @packageDocumentation comment for this package)
 

@@ -8,6 +8,7 @@ import { Cmcd } from '@svta/cml-cmcd';
 import { Request as Request_2 } from '@svta/cml-utils';
 import { RequestResponseType } from '@svta/cml-utils';
 import { ResourceTiming } from '@svta/cml-utils';
+import { Response as Response_2 } from '@svta/cml-utils';
 import { XmlNode } from '@svta/cml-xml';
 
 // @public
@@ -16,15 +17,7 @@ export type CommonMediaRequest = Request_2<{
 }>;
 
 // @public
-export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = {
-    request: R;
-    url?: string;
-    redirected?: boolean;
-    status?: number;
-    statusText?: string;
-    type?: string;
-    headers?: Record<string, string>;
-    data?: ResponseTypeMap<R["responseType"]>;
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = Response_2<R, ResponseTypeMap<R["responseType"]>> & {
     resourceTiming?: ResourceTiming;
 };
 
