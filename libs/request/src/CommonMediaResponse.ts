@@ -1,4 +1,4 @@
-import type { Response } from '@svta/cml-utils'
+import type { HttpResponse } from '@svta/cml-utils'
 import type { CommonMediaRequest } from './CommonMediaRequest.ts'
 
 /**
@@ -7,4 +7,4 @@ import type { CommonMediaRequest } from './CommonMediaRequest.ts'
  * @public
  */
 
-export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = Response<R>;
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = HttpResponse<R>;

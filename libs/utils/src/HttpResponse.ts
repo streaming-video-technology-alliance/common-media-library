@@ -1,4 +1,4 @@
-import type { Request } from './Request.ts'
+import type { HttpRequest } from './HttpRequest.ts'
 import type { ResourceTiming } from './ResourceTiming.ts'
 import type { ResponseTypeMap } from './ResponseTypeMap.ts'
 
@@ -7,7 +7,7 @@ import type { ResponseTypeMap } from './ResponseTypeMap.ts'
  *
  * @public
  */
-export type Response<R extends Request = Request> = {
+export type HttpResponse<R extends HttpRequest = HttpRequest> = {
 
 	/**
 	 * The origin request.

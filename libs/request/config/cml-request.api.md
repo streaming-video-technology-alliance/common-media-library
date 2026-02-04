@@ -5,19 +5,19 @@
 ```ts
 
 import { Cmcd } from '@svta/cml-cmcd';
-import { Request as Request_2 } from '@svta/cml-utils';
+import { HttpRequest } from '@svta/cml-utils';
+import { HttpResponse } from '@svta/cml-utils';
 import { RequestResponseType } from '@svta/cml-utils';
 import { ResourceTiming } from '@svta/cml-utils';
-import { Response as Response_2 } from '@svta/cml-utils';
 import { ResponseTypeMap } from '@svta/cml-utils';
 
 // @public
-export type CommonMediaRequest = Request_2<{
+export type CommonMediaRequest = HttpRequest<{
     cmcd: Cmcd;
 }>;
 
 // @public
-export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = Response_2<R>;
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = HttpResponse<R>;
 
 // @public
 export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResponse>;

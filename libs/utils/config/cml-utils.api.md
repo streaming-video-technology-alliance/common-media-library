@@ -57,7 +57,7 @@ export function getBandwidthBps(sample: ResourceTiming): number;
 export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
 // @public
-type Request_2<D = any> = {
+export type HttpRequest<D = any> = {
     url: string;
     method?: string;
     body?: BodyInit;
@@ -68,7 +68,19 @@ type Request_2<D = any> = {
     timeout?: number;
     customData?: D;
 };
-export { Request_2 as Request }
+
+// @public
+export type HttpResponse<R extends HttpRequest = HttpRequest> = {
+    request: R;
+    url?: string;
+    redirected?: boolean;
+    status?: number;
+    statusText?: string;
+    type?: string;
+    headers?: Record<string, string>;
+    data?: ResponseTypeMap<R["responseType"]>;
+    resourceTiming?: ResourceTiming;
+};
 
 // @public
 export const RequestResponseType: {
@@ -90,20 +102,6 @@ export type ResourceTiming = {
     responseStart?: number;
     duration: number;
 };
-
-// @public
-type Response_2<R extends Request_2 = Request_2> = {
-    request: R;
-    url?: string;
-    redirected?: boolean;
-    status?: number;
-    statusText?: string;
-    type?: string;
-    headers?: Record<string, string>;
-    data?: ResponseTypeMap<R["responseType"]>;
-    resourceTiming?: ResourceTiming;
-};
-export { Response_2 as Response }
 
 // @public
 export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;

@@ -5,7 +5,7 @@ import type { RequestResponseType } from './RequestResponseType.ts'
  *
  * @public
  */
-export type Request<D = any> = {
+export type HttpRequest<D = any> = {
 
 	/**
 	 * The URL of the request.

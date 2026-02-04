@@ -5,7 +5,7 @@
 ```ts
 
 import { ExclusiveRecord } from '@svta/cml-utils';
-import { Request as Request_2 } from '@svta/cml-utils';
+import { HttpRequest } from '@svta/cml-utils';
 import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
@@ -269,10 +269,10 @@ export type CmcdReportConfig = {
 
 // @public
 export class CmcdReporter {
-    constructor(config: Partial<CmcdReporterConfig>, requester?: (request: Request_2) => Promise<{
+    constructor(config: Partial<CmcdReporterConfig>, requester?: (request: HttpRequest) => Promise<{
         status: number;
     }>);
-    applyRequestReport(req: Request_2): Request_2;
+    applyRequestReport(req: HttpRequest): HttpRequest;
     flush(): void;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     start(): void;
