@@ -1,7 +1,6 @@
 import type { Response } from '@svta/cml-utils'
 import type { CommonMediaRequest } from './CommonMediaRequest.ts'
 import type { ResourceTiming } from './ResourceTiming.ts'
-import type { ResponseTypeMap } from './ResponseTypeMap.ts'
 
 /**
  * Common response API.
@@ -10,7 +9,7 @@ import type { ResponseTypeMap } from './ResponseTypeMap.ts'
  */
 
 export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> =
-	Response<R, ResponseTypeMap<R['responseType']>> & {
+	Response<R> & {
 	/**
 	 * The network timing of the request/response.
 	 */

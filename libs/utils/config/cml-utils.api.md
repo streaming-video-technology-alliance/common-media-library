@@ -92,7 +92,7 @@ export type ResourceTiming = {
 };
 
 // @public
-type Response_2<R extends Request_2 = Request_2, D = unknown> = {
+type Response_2<R extends Request_2 = Request_2> = {
     request: R;
     url?: string;
     redirected?: boolean;
@@ -100,7 +100,7 @@ type Response_2<R extends Request_2 = Request_2, D = unknown> = {
     statusText?: string;
     type?: string;
     headers?: Record<string, string>;
-    data?: D;
+    data?: ResponseTypeMap<R["responseType"]>;
 };
 export { Response_2 as Response }
 

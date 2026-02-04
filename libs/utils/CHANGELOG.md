@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-02-04
+
+### Changed
+
+- Update `Response` data property type to use `ResponseTypeMap`
+
 ## [1.6.0] - 2026-02-04
 
 ### Added
@@ -62,7 +68,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...HEAD
+[1.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.7.0
 [1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...utils-v1.6.0
 [1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...utils-v1.5.0
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.3.0...utils-v1.4.0

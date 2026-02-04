@@ -17,7 +17,7 @@ export type CommonMediaRequest = Request_2<{
 }>;
 
 // @public
-export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = Response_2<R, ResponseTypeMap<R["responseType"]>> & {
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = Response_2<R> & {
     resourceTiming?: ResourceTiming;
 };
 

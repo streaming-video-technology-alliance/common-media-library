@@ -1,11 +1,12 @@
 import type { Request } from './Request.ts'
+import type { ResponseTypeMap } from './ResponseTypeMap.ts'
 
 /**
  * Generic response API.
  *
  * @public
  */
-export type Response<R extends Request = Request, D = unknown> = {
+export type Response<R extends Request = Request> = {
 
 	/**
 	 * The origin request.
@@ -45,5 +46,5 @@ export type Response<R extends Request = Request, D = unknown> = {
 	/**
 	 * The response data.
 	 */
-	data?: D;
+	data?: ResponseTypeMap<R['responseType']>;
 };
