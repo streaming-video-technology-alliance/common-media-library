@@ -7,7 +7,7 @@ import type { ValueOf } from './ValueOf.ts'
  *
  * @public
  */
-export const ResponseType = {
+export const RequestResponseType = {
 	TEXT: 'text' as const,
 	JSON: 'json' as const,
 	BLOB: 'blob' as const,
@@ -19,4 +19,4 @@ export const ResponseType = {
 /**
  * @public
  */
-export type ResponseType = ValueOf<typeof ResponseType>;
+export type RequestResponseType = ValueOf<typeof RequestResponseType>;

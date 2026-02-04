@@ -3,4 +3,4 @@
  *
  * @public
  */
-export { ResponseType } from '@svta/cml-utils'
+export { RequestResponseType } from '@svta/cml-utils'
