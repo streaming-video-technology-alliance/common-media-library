@@ -16,6 +16,7 @@ and this project adheres to
 - Add `stream` type to `ResponseTypeMap`
 - Re-export `ResponseTypeMap` type from `@svta/cml-utils`
 - Refactor `CommonMediaResponse` to extend generic `Response` from `@svta/cml-utils`
+- Move `resourceTiming` property from `CommonMediaResponse` to `Response` in `@svta/cml-utils`
 - Update `@svta/cml-utils` to 1.3.0
 - Update `@svta/cml-xml` to 1.1.2
 

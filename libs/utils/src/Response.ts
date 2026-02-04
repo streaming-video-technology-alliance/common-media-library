@@ -1,4 +1,5 @@
 import type { Request } from './Request.ts'
+import type { ResourceTiming } from './ResourceTiming.ts'
 import type { ResponseTypeMap } from './ResponseTypeMap.ts'
 
 /**
@@ -47,4 +48,9 @@ export type Response<R extends Request = Request> = {
 	 * The response data.
 	 */
 	data?: ResponseTypeMap<R['responseType']>;
+
+	/**
+	 * The network timing of the request/response.
+	 */
+	resourceTiming?: ResourceTiming;
 };

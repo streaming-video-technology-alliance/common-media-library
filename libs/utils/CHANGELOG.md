@@ -12,7 +12,7 @@ and this project adheres to
 
 ### Added
 
-- Add `Response` type
+- Add `Response` type with `resourceTiming` property
 - Add `ResponseTypeMap` type
 - Add `XmlNode` type
 - Add `stream` response type to `RequestResponseType`

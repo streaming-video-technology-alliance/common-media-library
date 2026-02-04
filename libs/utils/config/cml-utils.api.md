@@ -101,6 +101,7 @@ type Response_2<R extends Request_2 = Request_2> = {
     type?: string;
     headers?: Record<string, string>;
     data?: ResponseTypeMap<R["responseType"]>;
+    resourceTiming?: ResourceTiming;
 };
 export { Response_2 as Response }
 
