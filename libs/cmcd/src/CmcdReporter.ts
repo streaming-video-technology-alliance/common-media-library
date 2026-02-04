@@ -32,13 +32,14 @@ type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormali
 	eventTargets: CmcdEventReportConfigNormalized[];
 }
 
-function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig): CmcdEncodeOptions {
+function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig, baseUrl?: string): CmcdEncodeOptions {
 	const { enabledKeys = [] } = config
 
 	return {
 		version: config.version || CMCD_V2,
 		reportingMode,
 		filter: (key: CmcdKey) => enabledKeys.includes(key),
+		baseUrl,
 	}
 }
 
@@ -97,7 +98,6 @@ type CmcdEventTarget = CmcdTarget & {
 export class CmcdReporter {
 	private data: Cmcd = {}
 	private config: CmcdReporterConfigNormalized
-	private requestEncodingOptions: CmcdEncodeOptions
 	private msd: number = NaN
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
 	private requestTarget: CmcdTarget = {
@@ -123,7 +123,6 @@ export class CmcdReporter {
 			sid: this.config.sid,
 			v: this.config.version,
 		}
-		this.requestEncodingOptions = createEncodingOptions(CMCD_REQUEST_MODE, this.config)
 		this.requester = requester
 
 		for (const target of this.config.eventTargets) {
@@ -158,7 +157,11 @@ export class CmcdReporter {
 	/**
 	 * Stops the CMCD reporter. Called by the player when the reporter is disabled.
 	 */
-	stop(): void {
+	stop(flush: boolean = false): void {
+		if (flush) {
+			this.flush()
+		}
+
 		this.eventTargets.forEach((target) => {
 			clearInterval(target.intervalId)
 		})
@@ -195,16 +198,11 @@ export class CmcdReporter {
 	 * Records an event. Called by the player when an event occurs.
 	 *
 	 * @param type - The type of event to record.
-	 * @param data - Additional data to record with the event. This is
-	 *               the same as calling `update()` with the same data.
+	 * @param data - Additional data to record with the event. This data
+	 *               only applies to this event report. Persistent data should
+	 *               be updated using `update()`.
 	 */
-	recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void {
-		const { cen, ...rest } = data || {}
-
-		if (rest) {
-			this.update(rest)
-		}
-
+	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
 		this.eventTargets.forEach((target, config) => {
 			if (!config.events.includes(type)) {
 				return
@@ -212,13 +210,10 @@ export class CmcdReporter {
 
 			const item = {
 				...this.data,
+				...data,
 				e: type,
 				ts: Date.now(),
 				sn: target.sn++,
-			}
-
-			if (type === CmcdEventType.CUSTOM_EVENT && cen) {
-				item.cen = cen
 			}
 
 			if (!isNaN(this.msd) && !target.msdSent) {
@@ -237,32 +232,36 @@ export class CmcdReporter {
 	 * before sending the request.
 	 *
 	 * @param req - The request to apply the CMCD request report to.
+	 * @param data - The data to apply to the request. This data only
+	 *               applies to this request report. Persistent data
+	 *               should be updated using `update()`.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	applyRequestReport(req: Request): Request {
+	applyRequestReport(req: Request, data?: Partial<Cmcd>): Request {
 		if (!req || !req.url || !this.config.enabledKeys?.length) {
 			return req
 		}
 
 		const url = new URL(req.url)
 		const headers = Object.assign({}, req.headers)
-		const data = { ...this.data, sn: this.requestTarget.sn++ }
+		const cmcdData = { ...this.data, ...data, sn: this.requestTarget.sn++ }
+		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, url.origin)
 
 		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
-			data.msd = this.msd
+			cmcdData.msd = this.msd
 			this.requestTarget.msdSent = true
 		}
 
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
-				const param = encodeCmcd(data, this.requestEncodingOptions)
+				const param = encodeCmcd(cmcdData, options)
 				if (param) {
 					url.searchParams.set(CMCD_PARAM, param)
 				}
 				break
 
 			case CMCD_HEADERS:
-				Object.assign(headers, toCmcdHeaders(data, this.requestEncodingOptions))
+				Object.assign(headers, toCmcdHeaders(cmcdData, options))
 				break
 		}
 

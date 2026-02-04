@@ -168,26 +168,11 @@ Use the `recordEvent()` method to record player events for event-mode reporting.
 ```typescript
 import { CmcdEventType } from "@svta/cml-cmcd";
 
-// Record a play state change
+// Persistent data should be updated using `update()` before recording events
+reporter.update({ sta: "p" });
 reporter.recordEvent(CmcdEventType.PLAY_STATE);
 
-// Record an error
-reporter.recordEvent(CmcdEventType.ERROR);
-
-// Record user interactions
-reporter.recordEvent(CmcdEventType.MUTE);
-reporter.recordEvent(CmcdEventType.PLAYER_EXPAND);
-
-// Record ad events
-reporter.recordEvent(CmcdEventType.AD_BREAK_START);
-reporter.recordEvent(CmcdEventType.AD_START);
-reporter.recordEvent(CmcdEventType.AD_END);
-reporter.recordEvent(CmcdEventType.AD_BREAK_END);
-
-// Record skip event
-reporter.recordEvent(CmcdEventType.SKIP);
-
-// Record custom events
+// Event specific data should be passed as the second argument to `recordEvent()`
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "custom-event-name" });
 ```
 
@@ -239,8 +224,6 @@ reporter.update({
 	br: [5000],
 	bl: [25000],
 	d: 4000,
-	ot: "v",
-	sid: "session-123",
 });
 
 const request = {
@@ -249,13 +232,12 @@ const request = {
 	headers: {},
 };
 
-const decoratedRequest = reporter.applyRequestReport(request);
+const decoratedRequest = reporter.applyRequestReport(request, { ot: "v" });
 
 // decoratedRequest.headers will contain:
 // {
 //   'CMCD-Object': 'br=(5000),d=4000,ot=v',
 //   'CMCD-Request': 'bl=(25000)',
-//   'CMCD-Session': 'sid="session-123"',
 // }
 ```
 
@@ -278,27 +260,34 @@ class VideoPlayer {
 		});
 	}
 
+	destroy() {
+		// Stop the reporter and flush any remaining events
+		this.reporter.stop(true);
+	}
+
 	async fetchSegment(url: string, segmentInfo: SegmentInfo): Promise<Response> {
 		// Update CMCD data based on current player state
 		this.reporter.update({
-			br: [segmentInfo.bitrate],
-			d: segmentInfo.duration,
-			ot: segmentInfo.type,
 			bl: [this.getBufferLength()],
 			mtp: [this.getMeasuredThroughput()],
 		});
 
 		// Create and decorate the request
-		const request = { url, method: "GET", headers: {} };
-		const cmcdRequest = this.reporter.applyRequestReport(request);
+		const request = this.reporter.applyRequestReport(
+			{ url },
+			{
+				br: [segmentInfo.bitrate],
+				ot: segmentInfo.type,
+				d: segmentInfo.duration,
+			}
+		);
 
-		return fetch(cmcdRequest.url, cmcdRequest);
+		return fetch(request.url, request);
 	}
 
 	play() {
-		this.reporter.recordEvent(CmcdEventType.PLAY_STATE, {
-			sta: CmcdPlayerState.PLAYING,
-		});
+		this.reporter.update({ sta: CmcdPlayerState.PLAYING });
+		this.reporter.recordEvent(CmcdEventType.PLAY_STATE);
 		// ... player logic
 	}
 

@@ -272,11 +272,11 @@ export class CmcdReporter {
     constructor(config: Partial<CmcdReporterConfig>, requester?: (request: Request_2) => Promise<{
         status: number;
     }>);
-    applyRequestReport(req: Request_2): Request_2;
+    applyRequestReport(req: Request_2, data?: Partial<Cmcd>): Request_2;
     flush(): void;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     start(): void;
-    stop(): void;
+    stop(flush?: boolean): void;
     update(data: Partial<Cmcd>): void;
 }
 
