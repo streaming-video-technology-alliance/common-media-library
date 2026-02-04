@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { cmd } from './cmd.ts'
 import { exec } from './exec.ts'
@@ -31,6 +32,25 @@ async function loadPackages(): Promise<Packages> {
 }
 
 const tagRegex = /^\d+\.\d+\.\d+(.*$)/
+
+async function getChanges(folder: string, version: string): Promise<string> {
+	const changelog = await readFile(path.resolve(folder, 'CHANGELOG.md'), 'utf8')
+	const sections = changelog.split(/^## /m)
+	const match = `[${version}]`
+	const section = sections.find(s => s.includes(match)) || ''
+	return section.split('\n\n').slice(1).join('\n\n')
+}
+
+async function createRelease(folder: string, json: PackageJson): Promise<void> {
+	const folderName = path.basename(folder)
+	const tag = `${folderName}-v${json.version}`
+	const title = `${json.name} v${json.version}`
+	const notes = await getChanges(folder, json.version)
+	const notesFile = path.join(tmpdir(), `release-notes-${folderName}.md`)
+	await writeFile(notesFile, notes)
+	const prerelease = json.version.replace(tagRegex, '$1') ? '--prerelease' : ''
+	await cmd(`gh release create "${tag}" --draft --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`)
+}
 
 // Check for updates and resolve wildcard dependencies
 async function processPackage(name: PackageName, pkg: Package, packages: Packages): Promise<string> {
@@ -98,4 +118,5 @@ for (const pkg of needsPublish) {
 
 	const tag = json.version.replace(tagRegex, '$1')
 	await cmd(`npm publish --provenance --access public -w ${folder} ${tag ? `--tag prerelease` : ''}`)
+	await createRelease(folder, json)
 }

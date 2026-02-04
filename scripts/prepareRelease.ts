@@ -14,7 +14,7 @@ type PackageInfo = {
 	folder: string;
 	name: string;
 	current: PackageJson;
-	main: PackageJson | undefined;
+	published: string | undefined;
 };
 
 async function loadCurrentPackage(folder: string): Promise<PackageJson> {
@@ -22,10 +22,10 @@ async function loadCurrentPackage(folder: string): Promise<PackageJson> {
 	return JSON.parse(await readFile(file, 'utf8'))
 }
 
-async function loadMainPackage(folder: string): Promise<PackageJson | undefined> {
+async function loadPublishedVersion(name: string): Promise<string | undefined> {
 	try {
-		const json = await exec(`git show main:${folder}/package.json`)
-		return JSON.parse(json)
+		const version = await exec(`npm view ${name} version`)
+		return version.trim()
 	}
 	catch {
 		return undefined
@@ -35,8 +35,8 @@ async function loadMainPackage(folder: string): Promise<PackageJson | undefined>
 async function loadPackages(): Promise<PackageInfo[]> {
 	return Promise.all(projects.map(async (folder) => {
 		const current = await loadCurrentPackage(folder)
-		const main = await loadMainPackage(folder)
-		return { folder, name: current.name, current, main }
+		const published = await loadPublishedVersion(current.name)
+		return { folder, name: current.name, current, published }
 	}))
 }
 
@@ -81,7 +81,7 @@ const packagesByName = new Map(packages.map(p => [p.name, p]))
 // Determine which packages have already changed their version in this branch
 const changed = new Set<string>()
 for (const pkg of packages) {
-	if (!pkg.main || pkg.current.version !== pkg.main.version) {
+	if (!pkg.published || pkg.current.version !== pkg.published) {
 		changed.add(pkg.name)
 	}
 }
@@ -93,7 +93,7 @@ for (const name of changed) {
 		continue
 	}
 
-	console.log(`  ${name}: ${pkg.main?.version ?? 'new'} → ${pkg.current.version}`)
+	console.log(`  ${name}: ${pkg.published ?? 'new'} → ${pkg.current.version}`)
 }
 
 // Cascading patch loop
