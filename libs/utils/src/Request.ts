@@ -1,4 +1,4 @@
-import type { RequestType } from './RequestType.ts'
+import type { ResponseType } from './ResponseType.ts'
 
 /**
  * Generic request API.
@@ -25,7 +25,7 @@ export type Request<D = any> = {
 	/**
 	 * The response type with which the response from the server shall be compatible.
 	 */
-	responseType?: RequestType;
+	responseType?: ResponseType;
 
 	/**
 	 * The headers object associated with the request.

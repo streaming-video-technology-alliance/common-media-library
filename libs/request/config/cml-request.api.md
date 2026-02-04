@@ -6,8 +6,8 @@
 
 import { Cmcd } from '@svta/cml-cmcd';
 import { Request as Request_2 } from '@svta/cml-utils';
-import { RequestType } from '@svta/cml-utils';
 import { ResourceTiming } from '@svta/cml-utils';
+import { ResponseType as ResponseType_2 } from '@svta/cml-utils';
 import { XmlNode } from '@svta/cml-xml';
 
 // @public
@@ -34,15 +34,15 @@ export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResp
 // @public
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
-export { RequestType }
-
 export { ResourceTiming }
 
 // @public
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
 
+export { ResponseType_2 as ResponseType }
+
 // @public
-export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : unknown;
+export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;
 
 // (No @packageDocumentation comment for this package)
 

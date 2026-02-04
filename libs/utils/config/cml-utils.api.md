@@ -61,7 +61,7 @@ type Request_2<D = any> = {
     url: string;
     method?: string;
     body?: BodyInit;
-    responseType?: RequestType;
+    responseType?: ResponseType_2;
     headers?: Record<string, string>;
     credentials?: RequestCredentials;
     mode?: RequestMode;
@@ -71,24 +71,26 @@ type Request_2<D = any> = {
 export { Request_2 as Request }
 
 // @public
-export const RequestType: {
-    readonly TEXT: "text";
-    readonly JSON: "json";
-    readonly BLOB: "blob";
-    readonly ARRAY_BUFFER: "arrayBuffer";
-    readonly DOCUMENT: "document";
-};
-
-// @public (undocumented)
-export type RequestType = ValueOf<typeof RequestType>;
-
-// @public
 export type ResourceTiming = {
     startTime: number;
     encodedBodySize: number;
     responseStart?: number;
     duration: number;
 };
+
+// @public
+const ResponseType_2: {
+    readonly TEXT: "text";
+    readonly JSON: "json";
+    readonly BLOB: "blob";
+    readonly ARRAY_BUFFER: "arrayBuffer";
+    readonly DOCUMENT: "document";
+    readonly STREAM: "stream";
+};
+
+// @public (undocumented)
+type ResponseType_2 = ValueOf<typeof ResponseType_2>;
+export { ResponseType_2 as ResponseType }
 
 // @public
 export function roundToEven(value: number, precision: number): number;
