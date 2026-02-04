@@ -9,7 +9,7 @@ import { Request as Request_2 } from '@svta/cml-utils';
 import { RequestResponseType } from '@svta/cml-utils';
 import { ResourceTiming } from '@svta/cml-utils';
 import { Response as Response_2 } from '@svta/cml-utils';
-import { XmlNode } from '@svta/cml-xml';
+import { ResponseTypeMap } from '@svta/cml-utils';
 
 // @public
 export type CommonMediaRequest = Request_2<{
@@ -34,8 +34,7 @@ export { ResourceTiming }
 // @public
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
 
-// @public
-export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;
+export { ResponseTypeMap }
 
 // (No @packageDocumentation comment for this package)
 

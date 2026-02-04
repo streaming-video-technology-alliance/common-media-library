@@ -105,6 +105,9 @@ type Response_2<R extends Request_2 = Request_2, D = unknown> = {
 export { Response_2 as Response }
 
 // @public
+export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;
+
+// @public
 export function roundToEven(value: number, precision: number): number;
 
 // @public
