@@ -8,41 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.0.9] - 2026-02-04
-
-### Changed
-
-- Simplify `CommonMediaResponse` to use updated `Response` type from `@svta/cml-utils`
-- Update `@svta/cml-utils` to 1.7.0
-
-## [1.0.8] - 2026-02-04
-
-### Changed
-
-- Re-export `ResponseTypeMap` type from `@svta/cml-utils`
-- Update `@svta/cml-utils` to 1.6.0
-
-## [1.0.7] - 2026-02-04
-
-### Changed
-
-- Update `@svta/cml-utils` to 1.5.0
-- Update `@svta/cml-xml` to 1.1.2
-
-## [1.0.6] - 2026-02-04
-
-### Changed
-
-- Refactor `CommonMediaResponse` to extend generic `Response` from `@svta/cml-utils`
-- Update `@svta/cml-utils` to 1.4.0
-
 ## [1.0.5] - 2026-02-04
 
 ### Changed
 
 - Rename `RequestType` re-export to `RequestResponseType`
 - Add `stream` type to `ResponseTypeMap`
+- Re-export `ResponseTypeMap` type from `@svta/cml-utils`
+- Refactor `CommonMediaResponse` to extend generic `Response` from `@svta/cml-utils`
 - Update `@svta/cml-utils` to 1.3.0
+- Update `@svta/cml-xml` to 1.1.2
 
 ## [1.0.4] - 2026-02-03
 
@@ -76,11 +51,7 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.9...HEAD
-[1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.8...request-v1.0.9
-[1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.7...request-v1.0.8
-[1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.6...request-v1.0.7
-[1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.5...request-v1.0.6
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.5...HEAD
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.4...request-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.3...request-v1.0.4
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.2...request-v1.0.3

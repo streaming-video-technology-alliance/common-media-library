@@ -13,7 +13,7 @@ and this project adheres to
 ### Changed
 
 - Re-export `XmlNode` type from `@svta/cml-utils`
-- Update `@svta/cml-utils` to 1.5.0
+- Update `@svta/cml-utils` to 1.3.0
 
 ## [1.1.1] - 2026-02-03
 
