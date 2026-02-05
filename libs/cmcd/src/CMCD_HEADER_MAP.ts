@@ -4,7 +4,7 @@ import type { CmcdRequestKey } from './CmcdRequestKey.ts'
 /**
  * The map of CMCD keys to their appropriate header shard.
  *
- * @internal
+ * @public
  */
 export const CMCD_HEADER_MAP: Record<CmcdRequestKey | 'nrr', CmcdHeaderField> = {
 	// Object

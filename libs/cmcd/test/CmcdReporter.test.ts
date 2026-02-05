@@ -1,13 +1,13 @@
 import type { CmcdReporterConfig } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
-import type { Request } from '@svta/cml-utils'
+import type { HttpRequest } from '@svta/cml-utils'
 import { equal, ok } from 'node:assert'
 import { describe, it, mock } from 'node:test'
 
 function createMockRequester(status: number = 200) {
-	const requests: Request[] = []
+	const requests: HttpRequest[] = []
 
-	const requester = async (request: Request): Promise<{ status: number; }> => {
+	const requester = async (request: HttpRequest): Promise<{ status: number; }> => {
 		requests.push(request)
 		return { status }
 	}

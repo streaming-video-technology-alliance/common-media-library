@@ -57,30 +57,47 @@ export function getBandwidthBps(sample: ResourceTiming): number;
 export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
 // @public
-type Request_2<D = any> = {
+export type HttpRequest<D = any> = {
     url: string;
     method?: string;
     body?: BodyInit;
-    responseType?: RequestType;
+    responseType?: RequestResponseType;
     headers?: Record<string, string>;
     credentials?: RequestCredentials;
     mode?: RequestMode;
     timeout?: number;
     customData?: D;
 };
+
+// @public
+export type HttpResponse<R extends HttpRequest = HttpRequest> = {
+    request: R;
+    url?: string;
+    redirected?: boolean;
+    status: number;
+    statusText?: string;
+    type?: string;
+    headers?: Record<string, string>;
+    data?: ResponseTypeMap<R["responseType"]>;
+    resourceTiming?: ResourceTiming;
+};
+
+// @public @deprecated
+type Request_2 = HttpRequest;
 export { Request_2 as Request }
 
 // @public
-export const RequestType: {
+export const RequestResponseType: {
     readonly TEXT: "text";
     readonly JSON: "json";
     readonly BLOB: "blob";
     readonly ARRAY_BUFFER: "arrayBuffer";
     readonly DOCUMENT: "document";
+    readonly STREAM: "stream";
 };
 
 // @public (undocumented)
-export type RequestType = ValueOf<typeof RequestType>;
+export type RequestResponseType = ValueOf<typeof RequestResponseType>;
 
 // @public
 export type ResourceTiming = {
@@ -89,6 +106,9 @@ export type ResourceTiming = {
     responseStart?: number;
     duration: number;
 };
+
+// @public
+export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;
 
 // @public
 export function roundToEven(value: number, precision: number): number;
@@ -131,6 +151,17 @@ export type ValueOf<T> = T[keyof T];
 
 // @public
 export type ValueOrArray<T> = T | T[];
+
+// @public
+export type XmlNode = {
+    nodeName: string;
+    nodeValue: string | null;
+    attributes: Record<string, string>;
+    childNodes: XmlNode[];
+    prefix?: string | null;
+    localName?: string;
+    parentElement?: XmlNode | null;
+};
 
 // (No @packageDocumentation comment for this package)
 

@@ -8,6 +8,19 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-02-04
+
+### Changed
+
+- Rename `RequestType` re-export to `RequestResponseType`
+- Add `stream` type to `ResponseTypeMap`
+- Re-export `ResponseTypeMap` type from `@svta/cml-utils`
+- Refactor `CommonMediaRequest` to extend `HttpRequest` from `@svta/cml-utils`
+- Refactor `CommonMediaResponse` to extend `HttpResponse` from `@svta/cml-utils`
+- Move `resourceTiming` property from `CommonMediaResponse` to `HttpResponse` in `@svta/cml-utils`
+- Update `@svta/cml-utils` to 1.3.0
+- Update `@svta/cml-xml` to 1.1.2
+
 ## [1.0.4] - 2026-02-03
 
 ### Changed
@@ -40,7 +53,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.5...HEAD
+[1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.4...request-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.3...request-v1.0.4
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.2...request-v1.0.3
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.1...request-v1.0.2

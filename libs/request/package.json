@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-request",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "Common Media Request and Response types",
 	"license": "Apache-2.0",
 	"type": "module",
