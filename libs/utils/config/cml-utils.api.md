@@ -74,13 +74,17 @@ export type HttpResponse<R extends HttpRequest = HttpRequest> = {
     request: R;
     url?: string;
     redirected?: boolean;
-    status?: number;
+    status: number;
     statusText?: string;
     type?: string;
     headers?: Record<string, string>;
     data?: ResponseTypeMap<R["responseType"]>;
     resourceTiming?: ResourceTiming;
 };
+
+// @public @deprecated
+type Request_2 = HttpRequest;
+export { Request_2 as Request }
 
 // @public
 export const RequestResponseType: {

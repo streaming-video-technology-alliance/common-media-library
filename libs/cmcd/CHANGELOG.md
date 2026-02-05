@@ -30,6 +30,10 @@ and this project adheres to
 - Update `@svta/cml-structured-field-values` to 1.1.1
 - Update `@svta/cml-utils` to 1.3.0
 
+### Fixed
+
+- Missing `CmcdVersion` and `CMCD_HEADER_MAP` exports
+
 ## [2.0.0] - 2026-02-03
 
 ### Added

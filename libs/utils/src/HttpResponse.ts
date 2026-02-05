@@ -27,7 +27,7 @@ export type HttpResponse<R extends HttpRequest = HttpRequest> = {
 	/**
 	 * The HTTP status code of the response.
 	 */
-	status?: number;
+	status: number;
 
 	/**
 	 * The status message corresponding to the HTTP status code.
