@@ -10,7 +10,6 @@ and this project adheres to
 
 ### Changed
 
-- Update `CmcdReporter` to use `HttpRequest` from `@svta/cml-utils` (renamed from `Request`)
 - Refactored `Cmcd` type to be the intersection `CmcdRequest & CmcdResponse & CmcdEvent`
 - Restored `CmcdRequest`, `CmcdResponse`, and `CmcdEvent` as separate, standalone types
 - `CmcdRequest` contains the common, object, request, session, and status keys
@@ -29,6 +28,7 @@ and this project adheres to
 
 - Update `@svta/cml-structured-field-values` to 1.1.1
 - Update `@svta/cml-utils` to 1.3.0
+- Update `CmcdReporter` to use `HttpRequest` from `@svta/cml-utils` (renamed from `Request`)
 
 ### Fixed
 

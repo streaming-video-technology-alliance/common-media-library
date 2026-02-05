@@ -12,7 +12,7 @@ and this project adheres to
 
 ### Added
 
-- Add `HttpResponse` type with `resourceTiming` property
+- Add `HttpResponse` type
 - Add `HttpRequest` type
 - Add `ResponseTypeMap` type
 - Add `XmlNode` type
@@ -22,7 +22,7 @@ and this project adheres to
 
 - Rename `RequestType` to `RequestResponseType`
 - Rename `Request` to `HttpRequest`
-- Rename `Response` to `HttpResponse`
+- Deprecate `Request` type
 
 ## [1.2.0] - 2026-02-03
 
