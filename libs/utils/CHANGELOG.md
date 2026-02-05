@@ -24,6 +24,11 @@ and this project adheres to
 - Rename `Request` to `HttpRequest`
 - Rename `Response` to `HttpResponse`
 
+### Deprecated
+
+- Deprecate `Request` type (use `HttpRequest` instead)
+- Deprecate `Response` type (use `HttpResponse` instead)
+
 ## [1.2.0] - 2026-02-03
 
 ### Added
