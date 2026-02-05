@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `CmcdReporter.applyRequestReport` now stores prepared CMCD data on `request.customData.cmcd`
 - Refactored `Cmcd` type to be the intersection `CmcdRequest & CmcdResponse & CmcdEvent`
 - Restored `CmcdRequest`, `CmcdResponse`, and `CmcdEvent` as separate, standalone types
 - `CmcdRequest` contains the common, object, request, session, and status keys

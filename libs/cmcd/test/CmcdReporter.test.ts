@@ -174,6 +174,50 @@ describe('CmcdReporter', () => {
 			ok(result.headers)
 		})
 
+		it('stores prepared CMCD data on customData.cmcd', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['br', 'v'],
+			}, requester)
+
+			reporter.update({ br: [5000] })
+
+			const result = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(result.customData)
+			ok(result.customData.cmcd)
+			ok('br' in result.customData.cmcd)
+			ok('v' in result.customData.cmcd)
+		})
+
+		it('preserves existing customData', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['br'],
+			}, requester)
+
+			reporter.update({ br: [5000] })
+
+			const result = reporter.applyRequestReport({
+				url: 'https://example.com/video.mp4',
+				customData: { foo: 'bar' },
+			})
+			equal(result.customData.foo, 'bar')
+			ok(result.customData.cmcd)
+		})
+
+		it('does not add customData when request is returned unchanged', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+			}, requester)
+
+			const req = { url: 'https://example.com/video.mp4' }
+			const result = reporter.applyRequestReport(req)
+			equal(result, req)
+		})
+
 		it('includes msd only once in request reports', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({

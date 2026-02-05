@@ -15,7 +15,9 @@ import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
-import { toCmcdHeaders } from './toCmcdHeaders.ts'
+import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
+import { prepareCmcdData } from './prepareCmcdData.ts'
+import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
 type CmcdReportConfigNormalized = CmcdReportConfig & {
 	version: CmcdVersion;
@@ -252,16 +254,18 @@ export class CmcdReporter {
 			this.requestTarget.msdSent = true
 		}
 
+		const cmcd = prepareCmcdData(cmcdData, options)
+
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
-				const param = encodeCmcd(cmcdData, options)
+				const param = encodePreparedCmcd(cmcd)
 				if (param) {
 					url.searchParams.set(CMCD_PARAM, param)
 				}
 				break
 
 			case CMCD_HEADERS:
-				Object.assign(headers, toCmcdHeaders(cmcdData, options))
+				Object.assign(headers, toPreparedCmcdHeaders(cmcd, options.customHeaderMap))
 				break
 		}
 
@@ -269,6 +273,10 @@ export class CmcdReporter {
 			...req,
 			url: url.toString(),
 			headers,
+			customData: {
+				...req.customData,
+				cmcd,
+			},
 		}
 	}
 
