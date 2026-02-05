@@ -273,7 +273,7 @@ export class CmcdReporter {
     constructor(config: Partial<CmcdReporterConfig>, requester?: (request: HttpRequest) => Promise<{
         status: number;
     }>);
-    applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): Request_2;
+    applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): HttpRequest;
     flush(): void;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     start(): void;

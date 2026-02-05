@@ -237,7 +237,7 @@ export class CmcdReporter {
 	 *               should be updated using `update()`.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): Request {
+	applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): HttpRequest {
 		if (!req || !req.url || !this.config.enabledKeys?.length) {
 			return req
 		}
