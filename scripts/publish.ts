@@ -49,7 +49,7 @@ async function createRelease(folder: string, json: PackageJson): Promise<void> {
 	const notesFile = path.join(tmpdir(), `release-notes-${folderName}.md`)
 	await writeFile(notesFile, notes)
 	const prerelease = json.version.replace(tagRegex, '$1') ? '--prerelease' : ''
-	await cmd(`gh release create "${tag}" --draft --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`)
+	await cmd(`gh release create "${tag}" --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`)
 }
 
 // Check for updates and resolve wildcard dependencies
