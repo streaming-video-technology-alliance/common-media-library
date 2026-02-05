@@ -4,6 +4,8 @@
 
 ```ts
 
+import { XmlNode } from '@svta/cml-utils';
+
 // @public
 export function getElementsByName(node: XmlNode, name: string, found?: XmlNode[]): XmlNode[];
 
@@ -13,16 +15,7 @@ export function parseXml(input: string, options?: XmlParseOptions): XmlNode;
 // @public
 export function serializeXml(xml: XmlNode): string;
 
-// @public
-export type XmlNode = {
-    nodeName: string;
-    nodeValue: string | null;
-    attributes: Record<string, string>;
-    childNodes: XmlNode[];
-    prefix?: string | null;
-    localName?: string;
-    parentElement?: XmlNode | null;
-};
+export { XmlNode }
 
 // @public
 export type XmlParseOptions = {

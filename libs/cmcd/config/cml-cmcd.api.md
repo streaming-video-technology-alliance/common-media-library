@@ -5,7 +5,7 @@
 ```ts
 
 import { ExclusiveRecord } from '@svta/cml-utils';
-import { Request as Request_2 } from '@svta/cml-utils';
+import { HttpRequest } from '@svta/cml-utils';
 import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
@@ -83,6 +83,9 @@ export const CMCD_EVENT_UNMUTE: "um";
 
 // @public
 export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
+
+// @public
+export const CMCD_HEADER_MAP: Record<CmcdRequestKey | "nrr", CmcdHeaderField>;
 
 // @public
 export const CMCD_HEADERS: "headers";
@@ -211,8 +214,6 @@ export const CmcdHeaderField: {
 // @public (undocumented)
 export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
 
-// Warning: (ae-forgotten-export) The symbol "CMCD_HEADER_MAP" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type CmcdHeaderKey = keyof typeof CMCD_HEADER_MAP;
 
@@ -269,10 +270,10 @@ export type CmcdReportConfig = {
 
 // @public
 export class CmcdReporter {
-    constructor(config: Partial<CmcdReporterConfig>, requester?: (request: Request_2) => Promise<{
+    constructor(config: Partial<CmcdReporterConfig>, requester?: (request: HttpRequest) => Promise<{
         status: number;
     }>);
-    applyRequestReport(req: Request_2, data?: Partial<Cmcd>): Request_2;
+    applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): Request_2;
     flush(): void;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     start(): void;
@@ -406,6 +407,9 @@ export type CmcdV1 = {
 export type CmcdValue = ValueOf<Cmcd>;
 
 // @public
+export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
+
+// @public
 export function decodeCmcd<T extends Cmcd = Cmcd>(cmcd: string): T;
 
 // @public
@@ -452,10 +456,6 @@ export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
 export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfItem<V, P>;
-
-// Warnings were encountered during analysis:
-//
-// src/CmcdEventType.ts:71:1 - (ae-forgotten-export) The symbol "CmcdVersion" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

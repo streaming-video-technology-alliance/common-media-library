@@ -1,4 +1,4 @@
-import type { Request } from '@svta/cml-utils'
+import type { HttpRequest } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
@@ -43,7 +43,7 @@ function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdRep
 	}
 }
 
-function defaultRequester(request: Request): Promise<{ status: number; }> {
+function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
 	return fetch(url, init)
 }
@@ -106,7 +106,7 @@ export class CmcdReporter {
 	}
 
 	// TODO: Should this be an event handler?
-	private requester: (request: Request) => Promise<{ status: number; }>
+	private requester: (request: HttpRequest) => Promise<{ status: number; }>
 
 	/**
 	 * Creates a new CMCD reporter.
@@ -116,7 +116,7 @@ export class CmcdReporter {
 	 *                    The default is a simple wrapper around the
 	 *                    native `fetch` API.
 	 */
-	constructor(config: Partial<CmcdReporterConfig>, requester: (request: Request) => Promise<{ status: number; }> = defaultRequester) {
+	constructor(config: Partial<CmcdReporterConfig>, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
 		this.data = {
 			cid: this.config.cid,
@@ -237,7 +237,7 @@ export class CmcdReporter {
 	 *               should be updated using `update()`.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	applyRequestReport(req: Request, data?: Partial<Cmcd>): Request {
+	applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): Request {
 		if (!req || !req.url || !this.config.enabledKeys?.length) {
 			return req
 		}

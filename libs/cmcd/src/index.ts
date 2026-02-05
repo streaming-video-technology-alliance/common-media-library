@@ -1,3 +1,4 @@
+
 /**
  * A collection of tools for working with Common Media Client Data (CMCD).
  *
@@ -9,6 +10,7 @@ export type * from './Cmcd.ts'
 export * from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 export * from './CMCD_EVENT_KEYS.ts'
 export * from './CMCD_FORMATTER_MAP.ts'
+export * from './CMCD_HEADER_MAP.ts'
 export * from './CMCD_KEYS.ts'
 export * from './CMCD_PARAM.ts'
 export * from './CMCD_REQUEST_KEYS.ts'
@@ -46,6 +48,7 @@ export * from './CmcdStreamType.ts'
 export * from './CmcdTransmissionMode.ts'
 export type * from './CmcdV1.ts'
 export type * from './CmcdValue.ts'
+export type * from './CmcdVersion.ts'
 export * from './decodeCmcd.ts'
 export * from './encodeCmcd.ts'
 export * from './fromCmcdHeaders.ts'
@@ -62,3 +65,4 @@ export * from './toCmcdHeaders.ts'
 export * from './toCmcdQuery.ts'
 export * from './toCmcdUrl.ts'
 export * from './toCmcdValue.ts'
+

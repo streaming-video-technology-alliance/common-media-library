@@ -5,28 +5,19 @@
 ```ts
 
 import { Cmcd } from '@svta/cml-cmcd';
-import { Request as Request_2 } from '@svta/cml-utils';
-import { RequestType } from '@svta/cml-utils';
+import { HttpRequest } from '@svta/cml-utils';
+import { HttpResponse } from '@svta/cml-utils';
+import { RequestResponseType } from '@svta/cml-utils';
 import { ResourceTiming } from '@svta/cml-utils';
-import { XmlNode } from '@svta/cml-xml';
+import { ResponseTypeMap } from '@svta/cml-utils';
 
 // @public
-export type CommonMediaRequest = Request_2<{
+export type CommonMediaRequest = HttpRequest<{
     cmcd: Cmcd;
 }>;
 
 // @public
-export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = {
-    request: R;
-    url?: string;
-    redirected?: boolean;
-    status?: number;
-    statusText?: string;
-    type?: string;
-    headers?: Record<string, string>;
-    data?: ResponseTypeMap<R["responseType"]>;
-    resourceTiming?: ResourceTiming;
-};
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = HttpResponse<R>;
 
 // @public
 export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResponse>;
@@ -34,15 +25,14 @@ export type Requester = (request: CommonMediaRequest) => Promise<CommonMediaResp
 // @public
 export type RequestInterceptor = (request: CommonMediaRequest) => Promise<CommonMediaRequest>;
 
-export { RequestType }
+export { RequestResponseType }
 
 export { ResourceTiming }
 
 // @public
 export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
 
-// @public
-export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : unknown;
+export { ResponseTypeMap }
 
 // (No @packageDocumentation comment for this package)
 

@@ -38,6 +38,7 @@
 		"pretest": "npm run lint && npm run build && npm run typecheck",
 		"test": "npm test --workspaces --if-present",
 		"start": "npm start -w dev",
+		"prepare-release": "node scripts/prepareRelease.ts",
 		"pub": "node scripts/publish.ts",
 		"clean": "node scripts/clean.ts",
 		"ver": "node scripts/version.ts",

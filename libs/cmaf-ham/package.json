@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-cmaf-ham",
-	"version": "0.24.1",
+	"version": "0.24.2",
 	"description": "CMAF Hypothetical Application Model (HAM) functionality",
 	"license": "Apache-2.0",
 	"type": "module",
