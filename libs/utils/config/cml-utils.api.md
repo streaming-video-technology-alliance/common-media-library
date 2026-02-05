@@ -74,7 +74,7 @@ export type HttpResponse<R extends HttpRequest = HttpRequest> = {
     request: R;
     url?: string;
     redirected?: boolean;
-    status: number;
+    status?: number;
     statusText?: string;
     type?: string;
     headers?: Record<string, string>;
@@ -108,7 +108,7 @@ export type ResourceTiming = {
 };
 
 // @public
-export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arraybuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;
+export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? any : T extends "text" ? string : T extends "blob" ? Blob : T extends "arrayBuffer" ? ArrayBuffer : T extends "document" ? XmlNode : T extends "stream" ? ReadableStream : unknown;
 
 // @public
 export function roundToEven(value: number, precision: number): number;
