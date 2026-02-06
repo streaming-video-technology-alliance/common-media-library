@@ -253,15 +253,17 @@ export class CmcdReporter {
 	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
 
-		if (!data.url && !request?.url) {
+		const url = data.url ?? request?.url
+
+		if (!url) {
 			return
 		}
 
-		const url = new URL(request.url)
-		url.searchParams.delete(CMCD_PARAM)
+		const urlObj = new URL(url)
+		urlObj.searchParams.delete(CMCD_PARAM)
 
 		const derived: Partial<Cmcd> = {
-			url: url.toString(),
+			url: urlObj.toString(),
 			rc: response.status,
 		}
 
