@@ -12,6 +12,7 @@ import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
+import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
@@ -291,18 +292,42 @@ export class CmcdReporter {
 	 * before sending the request.
 	 *
 	 * @param req - The request to apply the CMCD request report to.
+	 * @returns The request with the CMCD request report applied.
+	 *
+	 * @deprecated Use {@link CmcdReporter.createRequestReport} instead.
+	 */
+	applyRequestReport(req: HttpRequest): HttpRequest {
+		return this.createRequestReport(req) ?? req
+	}
+
+	/**
+	 * Creates a new request with the CMCD request report data applied. Called by the player
+	 * before sending the request.
+	 *
+	 * @param req - The request to apply the CMCD request report to.
 	 * @param data - The data to apply to the request. This data only
 	 *               applies to this request report. Persistent data
 	 *               should be updated using `update()`.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	applyRequestReport<D = unknown>(req: HttpRequest<D>, data?: Partial<Cmcd>): HttpRequest<D & { cmcd?: Cmcd }> {
-		if (!this.config.enabledKeys?.length || !req || !req.url) {
-			return req as HttpRequest<D & { cmcd?: Cmcd }>
+	createRequestReport<R extends HttpRequest = HttpRequest>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R['customData']> {
+		const { customData = {}, headers = {}, ...rest } = request
+		const report = {
+			...rest,
+			headers: {
+				...headers,
+			},
+			customData: {
+				...customData,
+				cmcd: {},
+			},
+		} as R & CmcdRequestReport<R['customData']>
+
+		if (!this.config.enabledKeys?.length) {
+			return report
 		}
 
-		const url = new URL(req.url)
-		const headers = Object.assign({}, req.headers)
+		const url = new URL(report.url)
 		const cmcdData = { ...this.data, ...data, sn: this.requestTarget.sn++ }
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, url.origin)
 
@@ -318,23 +343,16 @@ export class CmcdReporter {
 				const param = encodePreparedCmcd(cmcd)
 				if (param) {
 					url.searchParams.set(CMCD_PARAM, param)
+					report.url = url.toString()
 				}
 				break
 
 			case CMCD_HEADERS:
-				Object.assign(headers, toPreparedCmcdHeaders(cmcd, options.customHeaderMap))
+				Object.assign(report.headers, toPreparedCmcdHeaders(cmcd, options.customHeaderMap))
 				break
 		}
 
-		return {
-			...req,
-			url: url.toString(),
-			headers,
-			customData: {
-				...req.customData,
-				cmcd,
-			} as D & { cmcd: Cmcd },
-		}
+		return report
 	}
 
 	/**

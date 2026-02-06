@@ -56,7 +56,7 @@ describe('CmcdReporter', () => {
 
 		reporter.update({ br: [5000] })
 
-		const req = reporter.applyRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
+		const req = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
 
 		ok(req.url.includes('CMCD='))
 		// #endregion example

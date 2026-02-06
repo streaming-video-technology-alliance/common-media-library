@@ -12,9 +12,11 @@ import { ResourceTiming } from '@svta/cml-utils';
 import { ResponseTypeMap } from '@svta/cml-utils';
 
 // @public
-export type CommonMediaRequest = HttpRequest<{
+export type CommonMediaRequest<C extends {
     cmcd: Cmcd;
-}>;
+} = {
+    cmcd: Cmcd;
+}> = HttpRequest<C>;
 
 // @public
 export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = HttpResponse<R>;

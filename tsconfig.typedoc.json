@@ -1,0 +1,30 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"paths": {
+			"@svta/cml-608": ["./libs/608/src/index.ts"],
+			"@svta/cml-cmaf-ham": ["./libs/cmaf-ham/src/index.ts"],
+			"@svta/cml-cmcd": ["./libs/cmcd/src/index.ts"],
+			"@svta/cml-cmsd": ["./libs/cmsd/src/index.ts"],
+			"@svta/cml-content-steering": ["./libs/content-steering/src/index.ts"],
+			"@svta/cml-cta": ["./libs/cta/src/index.ts"],
+			"@svta/cml-dash": ["./libs/dash/src/index.ts"],
+			"@svta/cml-drm": ["./libs/drm/src/index.ts"],
+			"@svta/cml-id3": ["./libs/id3/src/index.ts"],
+			"@svta/cml-iso-8601": ["./libs/iso-8601/src/index.ts"],
+			"@svta/cml-iso-bmff": ["./libs/iso-bmff/src/index.ts"],
+			"@svta/cml-mse": ["./libs/mse/src/index.ts"],
+			"@svta/cml-request": ["./libs/request/src/index.ts"],
+			"@svta/cml-structured-field-values": ["./libs/structured-field-values/src/index.ts"],
+			"@svta/cml-throughput": ["./libs/throughput/src/index.ts"],
+			"@svta/cml-utils": ["./libs/utils/src/index.ts"],
+			"@svta/cml-webvtt": ["./libs/webvtt/src/index.ts"],
+			"@svta/cml-xml": ["./libs/xml/src/index.ts"]
+		}
+	},
+	"include": [
+		"libs/*/src/**/*.ts"
+	]
+}

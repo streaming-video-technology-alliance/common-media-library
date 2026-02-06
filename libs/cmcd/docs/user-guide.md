@@ -236,7 +236,7 @@ async function fetchSegment(url: string, segmentInfo: SegmentInfo) {
 	});
 
 	// Decorate the request with CMCD data
-	const request = reporter.applyRequestReport(
+	const request = reporter.createRequestReport(
 		{ url, method: "GET" },
 		{
 			br: [segmentInfo.bitrate],
