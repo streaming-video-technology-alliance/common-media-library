@@ -407,13 +407,20 @@ class VideoPlayer {
 		const fetchResponse = await fetch(request.url, request);
 		const endTime = performance.now();
 
+		// Derive responseStart from PerformanceResourceTiming when available, otherwise fall back
+		const resourceEntries = performance.getEntriesByName(request.url, "resource");
+		const responseStart =
+			resourceEntries && resourceEntries.length > 0
+				? (resourceEntries[0] as PerformanceResourceTiming).responseStart
+				: startTime + 50;
+
 		// Record the response received event with timing data
 		this.reporter.recordResponseReceived({
 			status: fetchResponse.status,
 			request: request,
 			resourceTiming: {
 				startTime: startTime,
-				responseStart: startTime + 50, // From PerformanceResourceTiming if available
+				responseStart: responseStart, // From PerformanceResourceTiming when available
 				duration: endTime - startTime,
 			},
 		});
