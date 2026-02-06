@@ -225,7 +225,7 @@ reporter.recordResponseReceived(response);
 
 #### Complete Request/Response Flow
 
-For full request/response tracking, use `applyRequestReport()` before the request and `recordResponseReceived()` after the response. The CMCD data from the original request is automatically included in the response event:
+For full request/response tracking, use `createRequestReport()` before the request and `recordResponseReceived()` after the response. The CMCD data from the original request is automatically included in the response event. The older `applyRequestReport()` helper is deprecated and should only be used for backwards compatibility:
 
 ```typescript
 async function fetchSegment(url: string, segmentInfo: SegmentInfo) {
