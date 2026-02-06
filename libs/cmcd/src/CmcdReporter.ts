@@ -260,7 +260,6 @@ export class CmcdReporter {
 		const url = new URL(request.url)
 		url.searchParams.delete(CMCD_PARAM)
 
-
 		const derived: Partial<Cmcd> = {
 			url: url.toString(),
 			rc: response.status,
