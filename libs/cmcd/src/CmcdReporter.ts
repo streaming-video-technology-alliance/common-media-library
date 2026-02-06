@@ -331,7 +331,7 @@ export class CmcdReporter {
 			},
 		} as R & CmcdRequestReport<R['customData']>
 
-		if (!this.config.enabledKeys?.length) {
+		if (!this.config.enabledKeys?.length || !report.url) {
 			return report
 		}
 
