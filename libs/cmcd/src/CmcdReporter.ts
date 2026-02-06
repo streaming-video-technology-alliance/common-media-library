@@ -300,6 +300,15 @@ export class CmcdReporter {
 	}
 
 	/**
+	 * Checks if the request reporting is enabled.
+	 *
+	 * @returns `true` if the request reporting is enabled, `false` otherwise.
+	 */
+	isRequestReportingEnabled(): boolean {
+		return !!this.config.enabledKeys?.length
+	}
+
+	/**
 	 * Creates a new request with the CMCD request report data applied. Called by the player
 	 * before sending the request.
 	 *

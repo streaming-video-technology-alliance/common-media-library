@@ -14,6 +14,7 @@ and this project adheres to
 
 - Add `CmcdReporter.recordResponseReceived(response, data?)` method for automated `rr` event reporting
 - Add `CmcdReporter.createRequestReport(request, data?)` method with generic type support and per-request CMCD data
+- Add `CmcdReporter.isRequestReportingEnabled()` method to check if request reporting is enabled
 - Add `CmcdRequestReport` type
 
 ### Changed

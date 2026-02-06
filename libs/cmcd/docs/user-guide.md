@@ -228,7 +228,10 @@ reporter.recordResponseReceived(response);
 For full request/response tracking, use `createRequestReport()` before the request and `recordResponseReceived()` after the response. The CMCD data from the original request is automatically included in the response event:
 
 ```typescript
-async function fetchSegment(url: string, segmentInfo: SegmentInfo) {
+async function fetchSegment(
+	url: string,
+	segmentInfo: SegmentInfo,
+): Promise<ArrayBuffer> {
 	// Update player state
 	reporter.update({
 		bl: [this.getBufferLength()],
@@ -252,19 +255,16 @@ async function fetchSegment(url: string, segmentInfo: SegmentInfo) {
 	const buffer = await response.arrayBuffer();
 	const duration = performance.now() - startTime;
 
-	// Build the CommonMediaResponse with timing data
-	const commonMediaResponse = {
+	// Record the response received event
+	reporter.recordResponseReceived({
 		status: response.status,
-		request: request,
+		request,
 		resourceTiming: {
 			startTime,
 			responseStart,
 			duration,
 		},
-	};
-
-	// Record the response received event
-	reporter.recordResponseReceived(commonMediaResponse);
+	});
 
 	return buffer;
 }
@@ -292,7 +292,7 @@ Values provided in the `data` parameter override any auto-derived values.
 
 ## Decorating Segment Requests
 
-Use the `createRequestReport()` method to add CMCD data to segment requests. This method returns a modified request object with CMCD data added via query parameters or headers (depending on configuration).
+Use the `createRequestReport()` method to add CMCD data to segment requests. This method returns a new request object with CMCD data added via query parameters or headers (depending on configuration).
 
 ### Query Parameter Mode (Default)
 
@@ -353,94 +353,6 @@ const decoratedRequest = reporter.createRequestReport(request, { ot: "v" });
 //   'CMCD-Object': 'br=(5000),d=4000,ot=v',
 //   'CMCD-Request': 'bl=(25000)',
 // }
-```
-
-### Integration with a Video Player
-
-```typescript
-class VideoPlayer {
-	private reporter: CmcdReporter;
-
-	constructor() {
-		this.reporter = new CmcdReporter({
-			cid: "video-content-id",
-			transmissionMode: CMCD_QUERY,
-			enabledKeys: ["br", "bl", "d", "ot", "mtp", "sid", "cid"],
-			eventTargets: [
-				{
-					url: "https://analytics.example.com/cmcd",
-					events: [
-						CmcdEventType.PLAY_STATE,
-						CmcdEventType.ERROR,
-						CmcdEventType.RESPONSE_RECEIVED,
-					],
-					enabledKeys: ["url", "rc", "ttfb", "ttlb", "br", "d", "ot"],
-				},
-			],
-		});
-	}
-
-	destroy() {
-		// Stop the reporter and flush any remaining events
-		this.reporter.stop(true);
-	}
-
-	async fetchSegment(url: string, segmentInfo: SegmentInfo): Promise<Response> {
-		// Update CMCD data based on current player state
-		this.reporter.update({
-			bl: [this.getBufferLength()],
-			mtp: [this.getMeasuredThroughput()],
-		});
-
-		// Create and decorate the request
-		const request = this.reporter.createRequestReport(
-			{ url, method: "GET" },
-			{
-				br: [segmentInfo.bitrate],
-				ot: segmentInfo.type,
-				d: segmentInfo.duration,
-			},
-		);
-
-		// Fetch the segment and capture timing
-		const startTime = performance.now();
-		const fetchResponse = await fetch(request.url, request);
-		const endTime = performance.now();
-
-		// Derive responseStart from PerformanceResourceTiming when available, otherwise fall back
-		const resourceEntries = performance.getEntriesByName(
-			request.url,
-			"resource",
-		);
-		const responseStart =
-			resourceEntries && resourceEntries.length > 0
-				? (resourceEntries[0] as PerformanceResourceTiming).responseStart
-				: startTime + 50;
-
-		// Record the response received event with timing data
-		this.reporter.recordResponseReceived({
-			status: fetchResponse.status,
-			request: request,
-			resourceTiming: {
-				startTime: startTime,
-				responseStart: responseStart, // From PerformanceResourceTiming when available
-				duration: endTime - startTime,
-			},
-		});
-
-		return fetchResponse;
-	}
-
-	play() {
-		this.reporter.update({ sta: CmcdPlayerState.PLAYING });
-		this.reporter.recordEvent(CmcdEventType.PLAY_STATE);
-		// ... player logic
-	}
-
-	onError(error: Error) {
-		this.reporter.recordEvent(CmcdEventType.ERROR, { ec: [error.code] });
-	}
-}
 ```
 
 ## Lifecycle Management

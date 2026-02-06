@@ -123,6 +123,37 @@ describe('CmcdReporter', () => {
 		})
 	})
 
+	describe('isRequestEnabled', () => {
+		it('returns true when enabledKeys are configured', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['br', 'v'],
+			}, requester)
+
+			equal(reporter.isRequestReportingEnabled(), true)
+		})
+
+		it('returns false when no enabledKeys are configured', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+			}, requester)
+
+			equal(reporter.isRequestReportingEnabled(), false)
+		})
+
+		it('returns false when enabledKeys is empty', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: [],
+			}, requester)
+
+			equal(reporter.isRequestReportingEnabled(), false)
+		})
+	})
+
 	describe('createRequestReport', () => {
 		it('returns the request unchanged if no enabled keys', () => {
 			const { requester } = createMockRequester()

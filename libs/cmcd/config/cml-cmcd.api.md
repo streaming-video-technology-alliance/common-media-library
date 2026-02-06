@@ -278,6 +278,7 @@ export class CmcdReporter {
     applyRequestReport(req: HttpRequest): HttpRequest;
     createRequestReport<R extends HttpRequest = HttpRequest>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R["customData"]>;
     flush(): void;
+    isRequestReportingEnabled(): boolean;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     recordResponseReceived(response: HttpResponse<HttpRequest<{
         cmcd?: Cmcd;
