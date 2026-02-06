@@ -8,19 +8,24 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-02-06
+
+### Added
+
+- Add `CmcdReporter.recordResponseReceived(response, data?)` method for automated `rr` event reporting
+- Add `CmcdReporter.createRequestReport(request, data?)` method with generic type support and per-request CMCD data
+- Add `CmcdReporter.isRequestReportingEnabled()` method to check if request reporting is enabled
+- Add `CmcdRequestReport` type
+
 ### Changed
 
-- Refactored `Cmcd` type to be the intersection `CmcdRequest & CmcdResponse & CmcdEvent`
-- Restored `CmcdRequest`, `CmcdResponse`, and `CmcdEvent` as separate, standalone types
-- `CmcdRequest` contains the common, object, request, session, and status keys
-- `CmcdEvent` extends `CmcdRequest` with event-specific keys (`cen`, `e`, `h`, `ts`)
-- `CmcdResponse` extends `CmcdRequest` with response-specific keys (`cmsdd`, `cmsds`, `rc`, `smrt`, `ttfb`, `ttfbb`, `ttlb`, `url`)
-- Updated `CmcdRequestKey` to use `keyof CmcdRequest` instead of `keyof Cmcd`
+- `CmcdReporter.recordEvent` data parameter is now scoped to the event instead of being persisted via `update()`
+- `CmcdReporter.recordEvent` now respects caller-supplied `ts` values instead of always overriding with `Date.now()`
+- `CmcdReporter.stop` now accepts an optional `flush` parameter
 
-### Removed
+### Deprecated
 
-- Removed deprecated `CmcdData` type alias (use `Cmcd` instead)
-- Removed deprecated `CmcdRequestData` type alias (use `CmcdRequest` instead)
+- `CmcdReporter.applyRequestReport` in favor of `CmcdReporter.createRequestReport`
 
 ## [2.0.1] - 2026-02-04
 
@@ -65,7 +70,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.0...HEAD
+[2.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.1...cmcd-v2.1.0
 [2.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.0...cmcd-v2.0.1
 [2.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v1.0.2...cmcd-v2.0.0
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v1.0.1...cmcd-v1.0.2

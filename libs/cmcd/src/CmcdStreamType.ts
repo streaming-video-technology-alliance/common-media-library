@@ -3,7 +3,6 @@ import type { ValueOf } from '@svta/cml-utils'
 /**
  * Common Media Client Data Stream Type
  *
- *
  * @enum
  *
  * @public

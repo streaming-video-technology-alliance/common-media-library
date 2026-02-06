@@ -6,4 +6,4 @@ import type { HttpRequest } from '@svta/cml-utils'
  *
  * @public
  */
-export type CommonMediaRequest = HttpRequest<{ cmcd: Cmcd }>;
+export type CommonMediaRequest<C extends { cmcd: Cmcd } = { cmcd: Cmcd }> = HttpRequest<C>;

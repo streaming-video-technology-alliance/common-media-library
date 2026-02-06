@@ -168,32 +168,131 @@ Use the `recordEvent()` method to record player events for event-mode reporting.
 ```typescript
 import { CmcdEventType } from "@svta/cml-cmcd";
 
-// Record a play state change
+// Persistent data should be updated using `update()` before recording events
+reporter.update({ sta: "p" });
 reporter.recordEvent(CmcdEventType.PLAY_STATE);
 
-// Record an error
-reporter.recordEvent(CmcdEventType.ERROR);
-
-// Record user interactions
-reporter.recordEvent(CmcdEventType.MUTE);
-reporter.recordEvent(CmcdEventType.PLAYER_EXPAND);
-
-// Record ad events
-reporter.recordEvent(CmcdEventType.AD_BREAK_START);
-reporter.recordEvent(CmcdEventType.AD_START);
-reporter.recordEvent(CmcdEventType.AD_END);
-reporter.recordEvent(CmcdEventType.AD_BREAK_END);
-
-// Record skip event
-reporter.recordEvent(CmcdEventType.SKIP);
-
-// Record custom events
+// Event specific data should be passed as the second argument to `recordEvent()`
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "custom-event-name" });
 ```
 
+### Recording Response Received Events
+
+The `recordResponseReceived()` method provides a convenient way to record `RESPONSE_RECEIVED` events with automatic derivation of timing metrics from the HTTP response. This method is typically called after a segment request completes.
+
+```typescript
+import { CmcdReporter, CmcdEventType } from "@svta/cml-cmcd";
+
+const reporter = new CmcdReporter({
+	cid: "video-123",
+	enabledKeys: ["br", "d", "ot", "url", "rc", "ttfb", "ttlb"],
+	eventTargets: [
+		{
+			url: "https://analytics.example.com/cmcd",
+			events: [CmcdEventType.RESPONSE_RECEIVED],
+			enabledKeys: ["url", "rc", "ttfb", "ttlb", "br", "d", "ot"],
+		},
+	],
+});
+```
+
+#### Basic Usage
+
+The method accepts a `CommonMediaResponse` object and automatically derives the following keys:
+
+| Key    | Description                      | Source                                             |
+| ------ | -------------------------------- | -------------------------------------------------- |
+| `url`  | The requested URL (without CMCD) | `response.request.url` (CMCD query param stripped) |
+| `rc`   | HTTP response status code        | `response.status`                                  |
+| `ts`   | Request initiation timestamp     | `response.resourceTiming.startTime`                |
+| `ttfb` | Time to first byte (ms)          | `responseStart - startTime`                        |
+| `ttlb` | Time to last byte (ms)           | `response.resourceTiming.duration`                 |
+
+```typescript
+// After receiving a response
+const response = {
+	status: 200,
+	request: decoratedRequest,
+	resourceTiming: {
+		startTime: performance.now(),
+		responseStart: performance.now() + 50,
+		duration: 150,
+	},
+};
+
+reporter.recordResponseReceived(response);
+```
+
+#### Complete Request/Response Flow
+
+For full request/response tracking, use `createRequestReport()` before the request and `recordResponseReceived()` after the response. The CMCD data from the original request is automatically included in the response event:
+
+```typescript
+async function fetchSegment(
+	url: string,
+	segmentInfo: SegmentInfo,
+): Promise<ArrayBuffer> {
+	// Update player state
+	reporter.update({
+		bl: [this.getBufferLength()],
+		mtp: [this.getMeasuredThroughput()],
+	});
+
+	// Decorate the request with CMCD data
+	const request = reporter.createRequestReport(
+		{ url, method: "GET" },
+		{
+			br: [segmentInfo.bitrate],
+			d: segmentInfo.duration,
+			ot: segmentInfo.type,
+		},
+	);
+
+	// Fetch the segment and capture timing
+	const startTime = performance.now();
+	const response = await fetch(request.url, request);
+	const responseStart = performance.now();
+	const buffer = await response.arrayBuffer();
+	const duration = performance.now() - startTime;
+
+	// Record the response received event
+	reporter.recordResponseReceived({
+		status: response.status,
+		request,
+		resourceTiming: {
+			startTime,
+			responseStart,
+			duration,
+		},
+	});
+
+	return buffer;
+}
+```
+
+#### Providing Additional Data
+
+You can supply additional CMCD keys that cannot be auto-derived, such as server-provided metrics:
+
+```typescript
+// Include server-reported metrics from response headers
+const serverDeliveryDuration = parseFloat(
+	fetchResponse.headers.get("X-Server-Duration") || "0",
+);
+
+reporter.recordResponseReceived(response, {
+	ttfbb: 25, // Time to first body byte (player-measured)
+	cmsdd: serverDeliveryDuration, // CMS delivery duration (from server)
+	cmsds: 1500, // CMS delivery speed (from server)
+	smrt: 2000, // Server measured round-trip time (from server)
+});
+```
+
+Values provided in the `data` parameter override any auto-derived values.
+
 ## Decorating Segment Requests
 
-Use the `applyRequestReport()` method to add CMCD data to segment requests. This method returns a modified request object with CMCD data added via query parameters or headers (depending on configuration).
+Use the `createRequestReport()` method to add CMCD data to segment requests. This method returns a new request object with CMCD data added via query parameters or headers (depending on configuration).
 
 ### Query Parameter Mode (Default)
 
@@ -219,8 +318,8 @@ const request = {
 	headers: {},
 };
 
-// Apply CMCD data to the request
-const decoratedRequest = reporter.applyRequestReport(request);
+// Create the decorated request
+const decoratedRequest = reporter.createRequestReport(request);
 
 // Use the decorated request with your HTTP client
 fetch(decoratedRequest.url, decoratedRequest);
@@ -239,8 +338,6 @@ reporter.update({
 	br: [5000],
 	bl: [25000],
 	d: 4000,
-	ot: "v",
-	sid: "session-123",
 });
 
 const request = {
@@ -249,63 +346,13 @@ const request = {
 	headers: {},
 };
 
-const decoratedRequest = reporter.applyRequestReport(request);
+const decoratedRequest = reporter.createRequestReport(request, { ot: "v" });
 
 // decoratedRequest.headers will contain:
 // {
 //   'CMCD-Object': 'br=(5000),d=4000,ot=v',
 //   'CMCD-Request': 'bl=(25000)',
-//   'CMCD-Session': 'sid="session-123"',
 // }
-```
-
-### Integration with a Video Player
-
-```typescript
-class VideoPlayer {
-	private reporter: CmcdReporter;
-
-	constructor() {
-		this.reporter = new CmcdReporter({
-			cid: "video-content-id",
-			transmissionMode: CMCD_QUERY,
-			eventTargets: [
-				{
-					url: "https://analytics.example.com/cmcd",
-					events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR],
-				},
-			],
-		});
-	}
-
-	async fetchSegment(url: string, segmentInfo: SegmentInfo): Promise<Response> {
-		// Update CMCD data based on current player state
-		this.reporter.update({
-			br: [segmentInfo.bitrate],
-			d: segmentInfo.duration,
-			ot: segmentInfo.type,
-			bl: [this.getBufferLength()],
-			mtp: [this.getMeasuredThroughput()],
-		});
-
-		// Create and decorate the request
-		const request = { url, method: "GET", headers: {} };
-		const cmcdRequest = this.reporter.applyRequestReport(request);
-
-		return fetch(cmcdRequest.url, cmcdRequest);
-	}
-
-	play() {
-		this.reporter.recordEvent(CmcdEventType.PLAY_STATE, {
-			sta: CmcdPlayerState.PLAYING,
-		});
-		// ... player logic
-	}
-
-	onError(error: Error) {
-		this.reporter.recordEvent(CmcdEventType.ERROR, { ec: [error.code] });
-	}
-}
 ```
 
 ## Lifecycle Management
@@ -398,7 +445,7 @@ const reporter = new CmcdReporter(
 			},
 		],
 	},
-	customRequester
+	customRequester,
 );
 ```
 
