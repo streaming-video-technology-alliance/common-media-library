@@ -225,7 +225,7 @@ reporter.recordResponseReceived(response);
 
 #### Complete Request/Response Flow
 
-For full request/response tracking, use `createRequestReport()` before the request and `recordResponseReceived()` after the response. The CMCD data from the original request is automatically included in the response event. The older `applyRequestReport()` helper is deprecated and should only be used for backwards compatibility:
+For full request/response tracking, use `createRequestReport()` before the request and `recordResponseReceived()` after the response. The CMCD data from the original request is automatically included in the response event:
 
 ```typescript
 async function fetchSegment(url: string, segmentInfo: SegmentInfo) {
@@ -253,7 +253,7 @@ async function fetchSegment(url: string, segmentInfo: SegmentInfo) {
 	const duration = performance.now() - startTime;
 
 	// Build the CommonMediaResponse with timing data
-	const response = {
+	const commonMediaResponse = {
 		status: response.status,
 		request: request,
 		resourceTiming: {
@@ -264,7 +264,7 @@ async function fetchSegment(url: string, segmentInfo: SegmentInfo) {
 	};
 
 	// Record the response received event
-	reporter.recordResponseReceived(response);
+	reporter.recordResponseReceived(commonMediaResponse);
 
 	return buffer;
 }
@@ -292,7 +292,7 @@ Values provided in the `data` parameter override any auto-derived values.
 
 ## Decorating Segment Requests
 
-Use the `applyRequestReport()` method to add CMCD data to segment requests. This method returns a modified request object with CMCD data added via query parameters or headers (depending on configuration).
+Use the `createRequestReport()` method to add CMCD data to segment requests. This method returns a modified request object with CMCD data added via query parameters or headers (depending on configuration).
 
 ### Query Parameter Mode (Default)
 
@@ -318,8 +318,8 @@ const request = {
 	headers: {},
 };
 
-// Apply CMCD data to the request
-const decoratedRequest = reporter.applyRequestReport(request);
+// Create the decorated request
+const decoratedRequest = reporter.createRequestReport(request);
 
 // Use the decorated request with your HTTP client
 fetch(decoratedRequest.url, decoratedRequest);
@@ -346,7 +346,7 @@ const request = {
 	headers: {},
 };
 
-const decoratedRequest = reporter.applyRequestReport(request, { ot: "v" });
+const decoratedRequest = reporter.createRequestReport(request, { ot: "v" });
 
 // decoratedRequest.headers will contain:
 // {
@@ -393,7 +393,7 @@ class VideoPlayer {
 		});
 
 		// Create and decorate the request
-		const request = this.reporter.applyRequestReport(
+		const request = this.reporter.createRequestReport(
 			{ url, method: "GET" },
 			{
 				br: [segmentInfo.bitrate],
@@ -408,7 +408,10 @@ class VideoPlayer {
 		const endTime = performance.now();
 
 		// Derive responseStart from PerformanceResourceTiming when available, otherwise fall back
-		const resourceEntries = performance.getEntriesByName(request.url, "resource");
+		const resourceEntries = performance.getEntriesByName(
+			request.url,
+			"resource",
+		);
 		const responseStart =
 			resourceEntries && resourceEntries.length > 0
 				? (resourceEntries[0] as PerformanceResourceTiming).responseStart

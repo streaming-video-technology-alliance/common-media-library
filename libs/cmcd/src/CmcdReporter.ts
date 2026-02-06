@@ -99,7 +99,7 @@ type CmcdEventTarget = CmcdTarget & {
  * @public
  */
 export class CmcdReporter {
-	private timeOrigin = performance.timeOrigin || performance.timing.fetchStart
+	private timeOrigin = performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
 	private data: Cmcd = {}
 	private config: CmcdReporterConfigNormalized
 	private msd: number = NaN
