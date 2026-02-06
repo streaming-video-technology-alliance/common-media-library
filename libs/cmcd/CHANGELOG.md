@@ -16,6 +16,7 @@ and this project adheres to
 
 - `CmcdReporter.recordEvent` now respects caller-supplied `ts` values instead of always overriding with `Date.now()`
 - `CmcdReporter.applyRequestReport` now stores prepared CMCD data on `request.customData.cmcd`
+- `CmcdReporter.stop` now accepts an optional `flush?: boolean` parameter
 
 ## [2.0.1] - 2026-02-04
 
