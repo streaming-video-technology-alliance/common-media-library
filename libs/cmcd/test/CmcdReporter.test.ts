@@ -69,7 +69,7 @@ describe('CmcdReporter', () => {
 				enabledKeys: ['sid'],
 			}, requester)
 
-			const req = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(req.url.includes('sid%3D%22'))
 		})
 
@@ -80,7 +80,7 @@ describe('CmcdReporter', () => {
 				enabledKeys: ['sid'],
 			}, requester)
 
-			const req = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(req.url.includes('sid%3D%22my-session%22'))
 		})
 	})
@@ -95,7 +95,7 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ br: [3000] })
 
-			const req = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(req.url.includes('br%3D%283000%29'))
 		})
 
@@ -109,7 +109,7 @@ describe('CmcdReporter', () => {
 			reporter.update({ br: [3000] })
 			reporter.update({ bl: [5000] })
 
-			const req = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(req.url.includes('bl%3D%285000%29'))
 			ok(req.url.includes('br%3D%283000%29'))
 		})
