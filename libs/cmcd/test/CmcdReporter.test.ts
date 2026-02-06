@@ -575,6 +575,35 @@ describe('CmcdReporter', () => {
 			reporter.stop()
 			timers.reset()
 		})
+
+		it('flushes pending events when stop(true) is called', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR, CmcdEventType.PLAY_STATE],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 10,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			reporter.recordEvent(CmcdEventType.PLAY_STATE)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// Batch size is 10, so nothing should have been sent yet
+			equal(requests.length, 0)
+
+			reporter.stop(true)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// stop(true) should flush all pending events
+			equal(requests.length, 1)
+		})
 	})
 
 	describe('event target response handling', () => {
