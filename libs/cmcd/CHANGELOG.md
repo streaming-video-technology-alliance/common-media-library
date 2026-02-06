@@ -15,7 +15,6 @@ and this project adheres to
 - Add `CmcdReporter.recordResponseReceived(response, data?)` method for automated `rr` event reporting
 - Add `CmcdReporter.createRequestReport(request, data?)` method with generic type support and per-request CMCD data
 - Add `CmcdRequestReport` type
-- Add `CmcdReporter.flush()` method to force-send all queued event reports
 
 ### Changed
 
