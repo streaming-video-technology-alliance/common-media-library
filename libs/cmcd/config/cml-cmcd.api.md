@@ -4,6 +4,7 @@
 
 ```ts
 
+import { CommonMediaResponse } from '@svta/cml-request';
 import { ExclusiveRecord } from '@svta/cml-utils';
 import { HttpRequest } from '@svta/cml-utils';
 import { SfBareItem } from '@svta/cml-structured-field-values';
@@ -273,9 +274,12 @@ export class CmcdReporter {
     constructor(config: Partial<CmcdReporterConfig>, requester?: (request: HttpRequest) => Promise<{
         status: number;
     }>);
-    applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): HttpRequest;
+    applyRequestReport<D = unknown>(req: HttpRequest<D>, data?: Partial<Cmcd>): HttpRequest<D & {
+        cmcd?: Cmcd;
+    }>;
     flush(): void;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
+    recordResponseReceived(response: CommonMediaResponse, data?: Partial<Cmcd>): void;
     start(): void;
     stop(flush?: boolean): void;
     update(data: Partial<Cmcd>): void;

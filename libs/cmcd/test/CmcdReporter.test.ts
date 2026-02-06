@@ -1,6 +1,6 @@
 import type { CmcdReporterConfig } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
-import type { HttpRequest } from '@svta/cml-utils'
+import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { equal, ok } from 'node:assert'
 import { describe, it, mock } from 'node:test'
 
@@ -16,6 +16,7 @@ function createMockRequester(status: number = 200) {
 }
 
 const EVENT_KEYS = ['br', 'sid', 'cid', 'v', 'e', 'ts', 'sn', 'msd', 'cen'] as const
+const RR_KEYS = ['url', 'rc', 'ttfb', 'ttfbb', 'ttlb', 'cmsdd', 'cmsds', 'smrt', 'sid', 'cid', 'v', 'e', 'ts', 'sn'] as const
 
 function createConfig(overrides: Partial<CmcdReporterConfig> = {}): Partial<CmcdReporterConfig> {
 	return {
@@ -203,6 +204,8 @@ describe('CmcdReporter', () => {
 				url: 'https://example.com/video.mp4',
 				customData: { foo: 'bar' },
 			})
+
+			ok(result.customData)
 			equal(result.customData.foo, 'bar')
 			ok(result.customData.cmcd)
 		})
@@ -319,6 +322,158 @@ describe('CmcdReporter', () => {
 
 			ok((requests[0].body as string)?.includes('msd=500'))
 			ok(!(requests[1].body as string)?.includes('msd'))
+		})
+	})
+
+	describe('recordResponseReceived', () => {
+		function createRrConfig(overrides: Partial<CmcdReporterConfig> = {}): Partial<CmcdReporterConfig> {
+			return {
+				sid: 'test-session',
+				cid: 'test-content',
+				enabledKeys: [...RR_KEYS],
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.RESPONSE_RECEIVED],
+						enabledKeys: [...RR_KEYS],
+						batchSize: 1,
+					},
+				],
+				...overrides,
+			}
+		}
+
+		function createResponse(overrides: Partial<HttpResponse> = {}): HttpResponse {
+			return {
+				request: { url: 'https://cdn.example.com/segment.mp4' },
+				status: 200,
+				resourceTiming: {
+					startTime: 1000,
+					responseStart: 1050,
+					duration: 200,
+					encodedBodySize: 1024,
+				},
+				...overrides,
+			}
+		}
+
+		it('provides a valid example', async () => {
+			// #region example-rr
+			const { requester, requests } = createMockRequester()
+
+			const reporter = new CmcdReporter({
+				sid: 'session-id',
+				cid: 'content-id',
+				enabledKeys: [...RR_KEYS],
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.RESPONSE_RECEIVED],
+						enabledKeys: [...RR_KEYS],
+						batchSize: 1,
+					},
+				],
+			}, requester)
+
+			reporter.recordResponseReceived({
+				request: { url: 'https://cdn.example.com/segment.mp4' },
+				status: 200,
+				resourceTiming: {
+					startTime: 1000,
+					responseStart: 1050,
+					duration: 200,
+					encodedBodySize: 1024,
+				},
+			})
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+			ok((requests[0].body as string)?.includes('e=rr'))
+			// #endregion example-rr
+		})
+
+		it('derives timing values from resourceTiming', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+
+			reporter.recordResponseReceived(createResponse())
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			const body = requests[0].body as string
+			ok(body.includes('e=rr'))
+			ok(body.includes('rc=200'))
+			ok(body.includes('ttfb=50'))
+			ok(body.includes('ttlb=200'))
+			ok(body.includes('ts='))
+			ok(body.includes('url="https://cdn.example.com/segment.mp4"'))
+		})
+
+		it('falls back to Date.now() when resourceTiming is missing', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+			const before = Date.now()
+
+			reporter.recordResponseReceived(createResponse({
+				resourceTiming: undefined,
+			}))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			const body = requests[0].body as string
+			ok(body.includes('e=rr'))
+			ok(!body.includes('ttfb='))
+			ok(!body.includes('ttlb='))
+
+			const tsMatch = body.match(/ts=(\d+)/)
+			ok(tsMatch)
+			const ts = Number(tsMatch?.[1])
+			ok(ts >= before)
+		})
+
+		it('omits ttfb when responseStart is missing', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+
+			reporter.recordResponseReceived(createResponse({
+				resourceTiming: {
+					startTime: 1000,
+					duration: 200,
+					encodedBodySize: 1024,
+				},
+			}))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			const body = requests[0].body as string
+			ok(!body.includes('ttfb='))
+			ok(body.includes('ttlb=200'))
+		})
+
+		it('allows player-supplied overrides via data parameter', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+
+			reporter.recordResponseReceived(createResponse(), {
+				ttfbb: 60,
+				cmsdd: 'abc123',
+			})
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			const body = requests[0].body as string
+			ok(body.includes('ttfbb=60'))
+			ok(body.includes('cmsdd="abc123"'))
+		})
+
+		it('does not send if no event target is configured for rr', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordResponseReceived(createResponse())
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 0)
 		})
 	})
 

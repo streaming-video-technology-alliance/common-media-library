@@ -1,4 +1,4 @@
-import type { HttpRequest } from '@svta/cml-utils'
+import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
@@ -6,7 +6,7 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
@@ -98,6 +98,7 @@ type CmcdEventTarget = CmcdTarget & {
  * @public
  */
 export class CmcdReporter {
+	private timeOrigin = performance.timeOrigin || performance.timing.fetchStart
 	private data: Cmcd = {}
 	private config: CmcdReporterConfigNormalized
 	private msd: number = NaN
@@ -214,7 +215,7 @@ export class CmcdReporter {
 				...this.data,
 				...data,
 				e: type,
-				ts: Date.now(),
+				ts: data.ts ?? Date.now(),
 				sn: target.sn++,
 			}
 
@@ -230,6 +231,62 @@ export class CmcdReporter {
 	}
 
 	/**
+	 * Records a response-received event. Called by the player when a media
+	 * request response has been fully received.
+	 *
+	 * This method automatically derives the `rr` event keys from the
+	 *
+	 * - `url` - the original requested URL (before any redirects)
+	 * - `rc` - the HTTP response status code
+	 * - `ts` - the request initiation time (from `resourceTiming.startTime`)
+	 * - `ttfb` - time to first byte (from `resourceTiming.responseStart`)
+	 * - `ttlb` - time to last byte (from `resourceTiming.duration`)
+	 *
+	 * Additional keys like `ttfbb`, `cmsdd`, `cmsds`, and `smrt` can be
+	 * supplied via the `data` parameter if the player has access to them.
+	 *
+	 * @param response - The HTTP response received.
+	 * @param data - Additional CMCD data to include with the event.
+	 *               Values provided here override any auto-derived values.
+	 */
+	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+		const { request } = response
+
+		if (!data.url && !request?.url) {
+			return
+		}
+
+		const url = new URL(request.url)
+		url.searchParams.delete(CMCD_PARAM)
+
+
+		const derived: Partial<Cmcd> = {
+			url: url.toString(),
+			rc: response.status,
+		}
+
+		const timing = response.resourceTiming
+
+		if (timing) {
+			if (timing.startTime != null) {
+				derived.ts = Math.round(this.timeOrigin + timing.startTime)
+
+				if (timing.responseStart != null) {
+					derived.ttfb = Math.round(timing.responseStart - timing.startTime)
+				}
+			}
+
+			if (timing.duration != null) {
+				derived.ttlb = Math.round(timing.duration)
+			}
+		}
+
+		const cmcd = request.customData?.cmcd ?? {}
+
+		this.recordEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data })
+	}
+
+	/**
 	 * Applies the CMCD request report data to the request. Called by the player
 	 * before sending the request.
 	 *
@@ -239,9 +296,9 @@ export class CmcdReporter {
 	 *               should be updated using `update()`.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	applyRequestReport(req: HttpRequest, data?: Partial<Cmcd>): HttpRequest {
-		if (!req || !req.url || !this.config.enabledKeys?.length) {
-			return req
+	applyRequestReport<D = unknown>(req: HttpRequest<D>, data?: Partial<Cmcd>): HttpRequest<D & { cmcd?: Cmcd }> {
+		if (!this.config.enabledKeys?.length || !req || !req.url) {
+			return req as HttpRequest<D & { cmcd?: Cmcd }>
 		}
 
 		const url = new URL(req.url)
@@ -276,7 +333,7 @@ export class CmcdReporter {
 			customData: {
 				...req.customData,
 				cmcd,
-			},
+			} as D & { cmcd: Cmcd },
 		}
 	}
 
