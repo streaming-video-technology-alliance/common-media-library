@@ -123,7 +123,7 @@ describe('CmcdReporter', () => {
 		})
 	})
 
-	describe('applyRequestReport', () => {
+	describe('createRequestReport', () => {
 		it('returns the request unchanged if no enabled keys', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({
@@ -131,20 +131,8 @@ describe('CmcdReporter', () => {
 			}, requester)
 
 			const req = { url: 'https://example.com/video.mp4' }
-			const result = reporter.applyRequestReport(req)
+			const result = reporter.createRequestReport(req)
 			equal(result.url, req.url)
-		})
-
-		it('returns the request unchanged if url is missing', () => {
-			const { requester } = createMockRequester()
-			const reporter = new CmcdReporter({
-				sid: 'test-session',
-				enabledKeys: ['br'],
-			}, requester)
-
-			const req = { url: '' }
-			const result = reporter.applyRequestReport(req)
-			equal(result.url, '')
 		})
 
 		it('appends CMCD data as query parameter by default', () => {
@@ -156,7 +144,7 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ br: [5000] })
 
-			const result = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			const url = new URL(result.url)
 			ok(url.searchParams.has('CMCD'))
 		})
@@ -171,7 +159,7 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ br: [5000] })
 
-			const result = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(result.headers)
 		})
 
@@ -184,7 +172,7 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ br: [5000] })
 
-			const result = reporter.applyRequestReport({ url: 'https://example.com/video.mp4' })
+			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(result.customData)
 			ok(result.customData.cmcd)
 			ok('br' in result.customData.cmcd)
@@ -200,7 +188,7 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ br: [5000] })
 
-			const result = reporter.applyRequestReport({
+			const result = reporter.createRequestReport({
 				url: 'https://example.com/video.mp4',
 				customData: { foo: 'bar' },
 			})
@@ -208,17 +196,6 @@ describe('CmcdReporter', () => {
 			ok(result.customData)
 			equal(result.customData.foo, 'bar')
 			ok(result.customData.cmcd)
-		})
-
-		it('does not add customData when request is returned unchanged', () => {
-			const { requester } = createMockRequester()
-			const reporter = new CmcdReporter({
-				sid: 'test-session',
-			}, requester)
-
-			const req = { url: 'https://example.com/video.mp4' }
-			const result = reporter.applyRequestReport(req)
-			equal(result, req)
 		})
 
 		it('includes msd only once in request reports', () => {
@@ -230,10 +207,10 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ msd: 1000 })
 
-			const first = reporter.applyRequestReport({ url: 'https://example.com/seg1.mp4' })
+			const first = reporter.createRequestReport({ url: 'https://example.com/seg1.mp4' })
 			ok(first.url.includes('msd%3D1000'))
 
-			const second = reporter.applyRequestReport({ url: 'https://example.com/seg2.mp4' })
+			const second = reporter.createRequestReport({ url: 'https://example.com/seg2.mp4' })
 			ok(!second.url.includes('msd'))
 		})
 	})

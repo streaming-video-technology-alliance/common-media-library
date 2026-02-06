@@ -336,7 +336,7 @@ export class CmcdReporter {
 			this.requestTarget.msdSent = true
 		}
 
-		const cmcd = prepareCmcdData(cmcdData, options)
+		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
 
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
