@@ -68,6 +68,13 @@ describe('encodeCmcd', () => {
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
 			ok(output.includes('cen="my-custom-event"'), 'cen key must not be filtered out in event mode when e=ce')
 		})
+
+		it('filters cen key in event mode when event type is not ce', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.TIME_INTERVAL, cen: 'my-custom-event', cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
+			ok(!output.includes('cen'), 'cen key must be filtered out in event mode when e is not ce')
+		})
 	})
 
 	it('returns encoded string when SfToken is used', () => {

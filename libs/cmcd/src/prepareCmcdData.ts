@@ -121,6 +121,11 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
 	}
 
+	// Filter out 'cen' for non-custom events
+	if (data['e'] && data['e'] !== CMCD_EVENT_CUSTOM_EVENT) {
+		keys = keys.filter(key => key !== 'cen')
+	}
+
 	const filter = options.filter
 	if (typeof filter === 'function') {
 		keys = keys.filter(filter)
