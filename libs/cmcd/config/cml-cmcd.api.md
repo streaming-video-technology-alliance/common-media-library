@@ -6,6 +6,7 @@
 
 import { ExclusiveRecord } from '@svta/cml-utils';
 import { HttpRequest } from '@svta/cml-utils';
+import { HttpResponse } from '@svta/cml-utils';
 import { SfBareItem } from '@svta/cml-structured-field-values';
 import { SfItem } from '@svta/cml-structured-field-values';
 import { SfToken } from '@svta/cml-structured-field-values';
@@ -273,11 +274,17 @@ export class CmcdReporter {
     constructor(config: Partial<CmcdReporterConfig>, requester?: (request: HttpRequest) => Promise<{
         status: number;
     }>);
+    // @deprecated
     applyRequestReport(req: HttpRequest): HttpRequest;
+    createRequestReport<R extends HttpRequest = HttpRequest>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R["customData"]>;
     flush(): void;
+    isRequestReportingEnabled(): boolean;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
+    recordResponseReceived(response: HttpResponse<HttpRequest<{
+        cmcd?: Cmcd;
+    }>>, data?: Partial<Cmcd>): void;
     start(): void;
-    stop(): void;
+    stop(flush?: boolean): void;
     update(data: Partial<Cmcd>): void;
 }
 
@@ -344,6 +351,14 @@ export type CmcdRequest = {
 
 // @public
 export type CmcdRequestKey = keyof CmcdRequest | "nrr";
+
+// @public
+export type CmcdRequestReport<D = unknown> = HttpRequest & {
+    customData: {
+        cmcd: Cmcd;
+    } & D;
+    headers: Record<string, string>;
+};
 
 // @public
 export type CmcdRequestReportConfig = CmcdReportConfig & {

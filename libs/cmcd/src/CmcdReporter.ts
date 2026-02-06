@@ -1,4 +1,4 @@
-import type { HttpRequest } from '@svta/cml-utils'
+import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
@@ -6,16 +6,19 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
+import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
-import { toCmcdHeaders } from './toCmcdHeaders.ts'
+import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
+import { prepareCmcdData } from './prepareCmcdData.ts'
+import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
 type CmcdReportConfigNormalized = CmcdReportConfig & {
 	version: CmcdVersion;
@@ -32,13 +35,14 @@ type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormali
 	eventTargets: CmcdEventReportConfigNormalized[];
 }
 
-function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig): CmcdEncodeOptions {
+function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig, baseUrl?: string): CmcdEncodeOptions {
 	const { enabledKeys = [] } = config
 
 	return {
 		version: config.version || CMCD_V2,
 		reportingMode,
 		filter: (key: CmcdKey) => enabledKeys.includes(key),
+		baseUrl,
 	}
 }
 
@@ -95,9 +99,9 @@ type CmcdEventTarget = CmcdTarget & {
  * @public
  */
 export class CmcdReporter {
+	private timeOrigin = performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
 	private data: Cmcd = {}
 	private config: CmcdReporterConfigNormalized
-	private requestEncodingOptions: CmcdEncodeOptions
 	private msd: number = NaN
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
 	private requestTarget: CmcdTarget = {
@@ -123,7 +127,6 @@ export class CmcdReporter {
 			sid: this.config.sid,
 			v: this.config.version,
 		}
-		this.requestEncodingOptions = createEncodingOptions(CMCD_REQUEST_MODE, this.config)
 		this.requester = requester
 
 		for (const target of this.config.eventTargets) {
@@ -158,7 +161,11 @@ export class CmcdReporter {
 	/**
 	 * Stops the CMCD reporter. Called by the player when the reporter is disabled.
 	 */
-	stop(): void {
+	stop(flush: boolean = false): void {
+		if (flush) {
+			this.flush()
+		}
+
 		this.eventTargets.forEach((target) => {
 			clearInterval(target.intervalId)
 		})
@@ -195,16 +202,11 @@ export class CmcdReporter {
 	 * Records an event. Called by the player when an event occurs.
 	 *
 	 * @param type - The type of event to record.
-	 * @param data - Additional data to record with the event. This is
-	 *               the same as calling `update()` with the same data.
+	 * @param data - Additional data to record with the event. This data
+	 *               only applies to this event report. Persistent data should
+	 *               be updated using `update()`.
 	 */
-	recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void {
-		const { cen, ...rest } = data || {}
-
-		if (rest) {
-			this.update(rest)
-		}
-
+	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
 		this.eventTargets.forEach((target, config) => {
 			if (!config.events.includes(type)) {
 				return
@@ -212,13 +214,10 @@ export class CmcdReporter {
 
 			const item = {
 				...this.data,
+				...data,
 				e: type,
-				ts: Date.now(),
+				ts: data.ts ?? Date.now(),
 				sn: target.sn++,
-			}
-
-			if (type === CmcdEventType.CUSTOM_EVENT && cen) {
-				item.cen = cen
 			}
 
 			if (!isNaN(this.msd) && !target.msdSent) {
@@ -233,44 +232,137 @@ export class CmcdReporter {
 	}
 
 	/**
+	 * Records a response-received event. Called by the player when a media
+	 * request response has been fully received.
+	 *
+	 * This method automatically derives the `rr` event keys from the
+	 *
+	 * - `url` - the original requested URL (before any redirects)
+	 * - `rc` - the HTTP response status code
+	 * - `ts` - the request initiation time (from `resourceTiming.startTime`)
+	 * - `ttfb` - time to first byte (from `resourceTiming.responseStart`)
+	 * - `ttlb` - time to last byte (from `resourceTiming.duration`)
+	 *
+	 * Additional keys like `ttfbb`, `cmsdd`, `cmsds`, and `smrt` can be
+	 * supplied via the `data` parameter if the player has access to them.
+	 *
+	 * @param response - The HTTP response received.
+	 * @param data - Additional CMCD data to include with the event.
+	 *               Values provided here override any auto-derived values.
+	 */
+	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+		const { request } = response
+
+		const url = data.url ?? request?.url
+
+		if (!url) {
+			return
+		}
+
+		const urlObj = new URL(url)
+		urlObj.searchParams.delete(CMCD_PARAM)
+
+		const derived: Partial<Cmcd> = {
+			url: urlObj.toString(),
+			rc: response.status,
+		}
+
+		const timing = response.resourceTiming
+
+		if (timing) {
+			if (timing.startTime != null) {
+				derived.ts = Math.round(this.timeOrigin + timing.startTime)
+
+				if (timing.responseStart != null) {
+					derived.ttfb = Math.round(timing.responseStart - timing.startTime)
+				}
+			}
+
+			if (timing.duration != null) {
+				derived.ttlb = Math.round(timing.duration)
+			}
+		}
+
+		const cmcd = request.customData?.cmcd ?? {}
+
+		this.recordEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data })
+	}
+
+	/**
 	 * Applies the CMCD request report data to the request. Called by the player
 	 * before sending the request.
 	 *
 	 * @param req - The request to apply the CMCD request report to.
 	 * @returns The request with the CMCD request report applied.
+	 *
+	 * @deprecated Use {@link CmcdReporter.createRequestReport} instead.
 	 */
 	applyRequestReport(req: HttpRequest): HttpRequest {
-		if (!req || !req.url || !this.config.enabledKeys?.length) {
-			return req
+		return this.createRequestReport(req) ?? req
+	}
+
+	/**
+	 * Checks if the request reporting is enabled.
+	 *
+	 * @returns `true` if the request reporting is enabled, `false` otherwise.
+	 */
+	isRequestReportingEnabled(): boolean {
+		return !!this.config.enabledKeys?.length
+	}
+
+	/**
+	 * Creates a new request with the CMCD request report data applied. Called by the player
+	 * before sending the request.
+	 *
+	 * @param req - The request to apply the CMCD request report to.
+	 * @param data - The data to apply to the request. This data only
+	 *               applies to this request report. Persistent data
+	 *               should be updated using `update()`.
+	 * @returns The request with the CMCD request report applied.
+	 */
+	createRequestReport<R extends HttpRequest = HttpRequest>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R['customData']> {
+		const { customData = {}, headers = {}, ...rest } = request
+		const report = {
+			...rest,
+			headers: {
+				...headers,
+			},
+			customData: {
+				...customData,
+				cmcd: {},
+			},
+		} as R & CmcdRequestReport<R['customData']>
+
+		if (!this.config.enabledKeys?.length || !report.url) {
+			return report
 		}
 
-		const url = new URL(req.url)
-		const headers = Object.assign({}, req.headers)
-		const data = { ...this.data, sn: this.requestTarget.sn++ }
+		const url = new URL(report.url)
+		const cmcdData = { ...this.data, ...data, sn: this.requestTarget.sn++ }
+		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, url.origin)
 
 		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
-			data.msd = this.msd
+			cmcdData.msd = this.msd
 			this.requestTarget.msdSent = true
 		}
 
+		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
+
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
-				const param = encodeCmcd(data, this.requestEncodingOptions)
+				const param = encodePreparedCmcd(cmcd)
 				if (param) {
 					url.searchParams.set(CMCD_PARAM, param)
+					report.url = url.toString()
 				}
 				break
 
 			case CMCD_HEADERS:
-				Object.assign(headers, toCmcdHeaders(data, this.requestEncodingOptions))
+				Object.assign(report.headers, toPreparedCmcdHeaders(cmcd, options.customHeaderMap))
 				break
 		}
 
-		return {
-			...req,
-			url: url.toString(),
-			headers,
-		}
+		return report
 	}
 
 	/**

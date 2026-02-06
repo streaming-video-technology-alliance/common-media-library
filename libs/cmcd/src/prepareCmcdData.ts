@@ -3,6 +3,7 @@ import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
@@ -116,7 +117,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	// Filter keys based on the version, reporting mode and options
 	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
 
-	if (data['e'] && data['e'] !== 'rr') {
+	if (data['e'] && data['e'] !== CMCD_EVENT_RESPONSE_RECEIVED) {
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
 	}
 
@@ -126,10 +127,12 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	}
 
 	// Ensure all required event keys are present before sorting
-	const needsTimestamp = reportingMode === CMCD_EVENT_MODE
+	const isEventMode = reportingMode === CMCD_EVENT_MODE
 
-	if (needsTimestamp) {
-		if (!keys.includes('e') && data['e'] != null) {
+	if (isEventMode) {
+		const eventType = data['e']
+
+		if (!keys.includes('e') && eventType != null) {
 			keys.push('e')
 		}
 
@@ -137,7 +140,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			keys.push('ts')
 		}
 
-		if (!keys.includes('cen') && data['cen'] != null) {
+		if (!keys.includes('cen') && data['cen'] != null && eventType === CMCD_EVENT_CUSTOM_EVENT) {
 			keys.push('cen')
 		}
 	}
@@ -180,8 +183,8 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			return
 		}
 
-		// Ensure a timestamp is set for response and event modes
-		if (needsTimestamp && key === 'ts' && !Number.isFinite(value)) {
+		// Ensure a timestamp is set for event mode
+		if (isEventMode && key === 'ts' && !Number.isFinite(value)) {
 			value = Date.now()
 		}
 
