@@ -48,6 +48,22 @@ export function handleReports(
 }
 
 /**
+ * Respond with a list of all session IDs.
+ */
+export function handleSessions(
+	res: ServerResponse,
+	store: Store,
+): void {
+	const sessionIds = store.getSessionIds()
+
+	res.writeHead(200, {
+		'Content-Type': 'application/json',
+		'Access-Control-Allow-Origin': '*',
+	})
+	res.end(JSON.stringify({ sessionIds }, null, 2))
+}
+
+/**
  * Clear all reports.
  */
 export function handleDeleteReports(

@@ -2,7 +2,7 @@ import { createServer } from 'node:http'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { handleEvent } from './events.ts'
 import { handleProxy } from './proxy.ts'
-import { handleDeleteReports, handleReports } from './reports.ts'
+import { handleDeleteReports, handleReports, handleSessions } from './reports.ts'
 import { Store } from './store.ts'
 import type { ServerConfig } from './types.ts'
 
@@ -39,6 +39,11 @@ export function startServer(config: ServerConfig): void {
 
 			if (pathname === '/cmcd/event' && req.method === 'POST') {
 				await handleEvent(req, res, store)
+				return
+			}
+
+			if (pathname === '/sessions' && req.method === 'GET') {
+				handleSessions(res, store)
 				return
 			}
 
