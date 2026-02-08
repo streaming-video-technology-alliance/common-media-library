@@ -5,7 +5,7 @@ import type { IncomingMessage, Server, ServerResponse } from 'node:http'
 import { existsSync, unlinkSync } from 'node:fs'
 import { Store } from '../src/store.ts'
 import { handleEvent } from '../src/events.ts'
-import { handleDeleteReports, handleReports } from '../src/reports.ts'
+import { handleDeleteReports, handleReports, handleSessions } from '../src/reports.ts'
 
 const TEST_DB = './test-server.jsonl'
 
@@ -16,6 +16,11 @@ function startTestServer(store: Store): Promise<{ server: Server; port: number }
 
 			const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`)
 			const pathname = url.pathname
+
+			if (pathname === '/sessions' && req.method === 'GET') {
+				handleSessions(res, store)
+				return
+			}
 
 			if (pathname === '/cmcd/event' && req.method === 'POST') {
 				await handleEvent(req, res, store)
@@ -135,6 +140,32 @@ describe('Server integration', () => {
 		assert.ok(data.summary.keysObserved.includes('bl'))
 		assert.ok(data.summary.keysObserved.includes('sid'))
 		assert.ok(data.summary.keysObserved.includes('e'))
+	})
+
+	it('should return all session IDs', async () => {
+		await fetch(`http://localhost:${port}/cmcd/event`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=ps,sid="session-a",ts=1700000000000\n',
+		})
+
+		await fetch(`http://localhost:${port}/cmcd/event`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=t,sid="session-b",ts=1700000001000\n',
+		})
+
+		await fetch(`http://localhost:${port}/cmcd/event`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=bc,sid="session-a",ts=1700000002000\n',
+		})
+
+		const res = await fetch(`http://localhost:${port}/sessions`)
+		assert.equal(res.status, 200)
+
+		const data = await res.json() as { sessionIds: string[] }
+		assert.deepEqual(data.sessionIds, ['session-a', 'session-b'])
 	})
 
 	it('should filter reports by type query parameter', async () => {

@@ -41,6 +41,15 @@ export class Store {
 		return reports
 	}
 
+	getSessionIds(): string[] {
+		const reports = this.getAll()
+		const ids = new Set<string>()
+		for (const report of reports) {
+			ids.add(report.sessionId)
+		}
+		return [...ids].sort()
+	}
+
 	clear(): void {
 		writeFileSync(this.filePath, '')
 	}
