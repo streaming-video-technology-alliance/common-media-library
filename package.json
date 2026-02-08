@@ -49,7 +49,8 @@
 	"workspaces": [
 		"docs",
 		"dev",
-		"libs/*"
+		"libs/*",
+		"services/*"
 	],
 	"engines": {
 		"node": ">=20"

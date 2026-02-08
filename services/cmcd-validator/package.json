@@ -1,0 +1,26 @@
+{
+	"name": "@svta/cmcd-validator",
+	"version": "0.1.0",
+	"description": "CMCD verification proxy for validating Common Media Client Data",
+	"license": "Apache-2.0",
+	"type": "module",
+	"bin": {
+		"cmcd-validator": "bin/cmcd-validator.js"
+	},
+	"files": [
+		"dist/**/*",
+		"bin/**/*"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"test": "node --no-warnings --test test/**/*.test.ts"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"dependencies": {
+		"@svta/cml-cmcd": "*",
+		"@svta/cml-structured-field-values": "*",
+		"@svta/cml-utils": "*"
+	}
+}
