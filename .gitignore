@@ -5,3 +5,6 @@ temp
 .idea
 RELEASE.md
 .claude
+*.db
+*.db-wal
+*.db-shm
