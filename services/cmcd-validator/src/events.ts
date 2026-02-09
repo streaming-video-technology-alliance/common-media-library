@@ -25,6 +25,7 @@ export async function handleEvent(
 	req: IncomingMessage,
 	res: ServerResponse,
 	store: Store,
+	targetId: string,
 ): Promise<void> {
 	const body = await readBody(req)
 	const contentType = (req.headers['content-type'] || '').toLowerCase()
@@ -56,14 +57,14 @@ export async function handleEvent(
 			type: 'event',
 			timestamp: new Date().toISOString(),
 			data: event,
+			targetId,
 			eventType: typeof event.e === 'string' ? event.e : undefined,
 		}
 		store.insert(report)
 	}
 
-	res.writeHead(201, {
-		'Content-Type': 'application/json',
+	res.writeHead(204, {
 		'Access-Control-Allow-Origin': '*',
 	})
-	res.end(JSON.stringify({ received: events.length }))
+	res.end()
 }

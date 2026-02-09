@@ -41,7 +41,7 @@ if (!values.upstream) {
 }
 
 startServer({
-	port: parseInt(values.port!, 10),
+	port: parseInt(values.port, 10),
 	upstream: values.upstream,
-	dbPath: values.db!,
+	dbPath: values.db,
 })

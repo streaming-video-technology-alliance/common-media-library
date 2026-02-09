@@ -3,13 +3,15 @@ import type { Store } from './store.ts'
 import type { CmcdReport } from './types.ts'
 
 /**
- * Respond with reports, optionally filtered by session ID and/or type.
+ * Respond with reports, optionally filtered by session ID, type, event type, and/or target ID.
  */
 export function handleReports(
 	res: ServerResponse,
 	store: Store,
 	sessionId?: string,
 	typeFilter?: string,
+	eventTypeFilter?: string,
+	targetIdFilter?: string,
 ): void {
 	let reports: CmcdReport[]
 
@@ -20,6 +22,14 @@ export function handleReports(
 		}
 	} else {
 		reports = store.getAll(typeFilter || undefined)
+	}
+
+	if (eventTypeFilter) {
+		reports = reports.filter(r => r.eventType === eventTypeFilter)
+	}
+
+	if (targetIdFilter) {
+		reports = reports.filter(r => r.targetId === targetIdFilter)
 	}
 
 	const keysObserved = new Set<string>()

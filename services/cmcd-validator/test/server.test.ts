@@ -31,21 +31,27 @@ function startTestServer(store: Store): Promise<{ server: Server; port: number }
 				return
 			}
 
-			if (pathname === '/cmcd/event' && req.method === 'POST') {
-				await handleEvent(req, res, store)
+			const eventMatch = pathname.match(/^\/cmcd\/event\/([^/]+)\/?$/)
+			if (eventMatch && req.method === 'POST') {
+				const targetId = decodeURIComponent(eventMatch[1])
+				await handleEvent(req, res, store, targetId)
 				return
 			}
 
 			const match = pathname.match(/^\/reports\/(.+)$/)
 			if (match && req.method === 'GET') {
 				const typeFilter = url.searchParams.get('type') || undefined
-				handleReports(res, store, decodeURIComponent(match[1]), typeFilter)
+				const eventTypeFilter = url.searchParams.get('eventType') || undefined
+				const targetIdFilter = url.searchParams.get('targetId') || undefined
+				handleReports(res, store, decodeURIComponent(match[1]), typeFilter, eventTypeFilter, targetIdFilter)
 				return
 			}
 
 			if (pathname === '/reports' && req.method === 'GET') {
 				const typeFilter = url.searchParams.get('type') || undefined
-				handleReports(res, store, undefined, typeFilter)
+				const eventTypeFilter = url.searchParams.get('eventType') || undefined
+				const targetIdFilter = url.searchParams.get('targetId') || undefined
+				handleReports(res, store, undefined, typeFilter, eventTypeFilter, targetIdFilter)
 				return
 			}
 
@@ -86,19 +92,19 @@ describe('Server integration', () => {
 
 	it('should collect events and retrieve by session ID', async () => {
 		// Post events for two sessions
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=ps,sid="session-a",ts=1700000000000\n',
 		})
 
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=t,sid="session-b",ts=1700000001000\n',
 		})
 
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=bc,sid="session-a",ts=1700000002000,br=3000\n',
@@ -118,7 +124,7 @@ describe('Server integration', () => {
 	})
 
 	it('should clear reports via DELETE', async () => {
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=ps,sid="session-x",ts=1700000000000\n',
@@ -137,7 +143,7 @@ describe('Server integration', () => {
 	})
 
 	it('should return summary with observed keys', async () => {
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=ps,sid="s1",ts=1700000000000,br=1000,bl=5000\n',
@@ -153,19 +159,19 @@ describe('Server integration', () => {
 	})
 
 	it('should return all session IDs', async () => {
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=ps,sid="session-a",ts=1700000000000\n',
 		})
 
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=t,sid="session-b",ts=1700000001000\n',
 		})
 
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=bc,sid="session-a",ts=1700000002000\n',
@@ -176,6 +182,85 @@ describe('Server integration', () => {
 
 		const data = await res.json() as { sessionIds: string[] }
 		assert.deepEqual(data.sessionIds, ['session-a', 'session-b'])
+	})
+
+	it('should filter reports by eventType query parameter', async () => {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=ps,sid="session-et",ts=1700000000000\n',
+		})
+
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=t,sid="session-et",ts=1700000001000\n',
+		})
+
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=bc,sid="session-et",ts=1700000002000,br=3000\n',
+		})
+
+		// Filter by eventType=ps
+		const psRes = await fetch(`http://localhost:${port}/reports?eventType=ps`)
+		const psData = await psRes.json() as { count: number }
+		assert.equal(psData.count, 1)
+
+		// Filter by eventType=t
+		const tRes = await fetch(`http://localhost:${port}/reports?eventType=t`)
+		const tData = await tRes.json() as { count: number }
+		assert.equal(tData.count, 1)
+
+		// Combine eventType with session filter
+		const sessionRes = await fetch(`http://localhost:${port}/reports/session-et?eventType=bc`)
+		const sessionData = await sessionRes.json() as { count: number }
+		assert.equal(sessionData.count, 1)
+
+		// Non-matching eventType returns empty
+		const emptyRes = await fetch(`http://localhost:${port}/reports?eventType=xyz`)
+		const emptyData = await emptyRes.json() as { count: number }
+		assert.equal(emptyData.count, 0)
+	})
+
+	it('should filter reports by targetId query parameter', async () => {
+		await fetch(`http://localhost:${port}/cmcd/event/target-a`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=ps,sid="session-tid",ts=1700000000000\n',
+		})
+
+		await fetch(`http://localhost:${port}/cmcd/event/target-b`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=t,sid="session-tid",ts=1700000001000\n',
+		})
+
+		await fetch(`http://localhost:${port}/cmcd/event/target-a`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'text/cmcd' },
+			body: 'e=bc,sid="session-tid",ts=1700000002000\n',
+		})
+
+		// Filter by targetId on /reports
+		const aRes = await fetch(`http://localhost:${port}/reports?targetId=target-a`)
+		const aData = await aRes.json() as { count: number }
+		assert.equal(aData.count, 2)
+
+		const bRes = await fetch(`http://localhost:${port}/reports?targetId=target-b`)
+		const bData = await bRes.json() as { count: number }
+		assert.equal(bData.count, 1)
+
+		// Filter by targetId on /reports/:sessionId
+		const sessionRes = await fetch(`http://localhost:${port}/reports/session-tid?targetId=target-a`)
+		const sessionData = await sessionRes.json() as { count: number }
+		assert.equal(sessionData.count, 2)
+
+		// Non-matching targetId returns empty
+		const emptyRes = await fetch(`http://localhost:${port}/reports/session-tid?targetId=unknown`)
+		const emptyData = await emptyRes.json() as { count: number }
+		assert.equal(emptyData.count, 0)
 	})
 
 	it('should filter reports by type query parameter', async () => {
@@ -191,7 +276,7 @@ describe('Server integration', () => {
 		})
 
 		// Post an event
-		await fetch(`http://localhost:${port}/cmcd/event`, {
+		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body: 'e=ps,sid="session-mixed",ts=1700000000000\n',

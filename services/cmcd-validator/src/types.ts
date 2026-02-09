@@ -9,6 +9,7 @@ export interface CmcdReport {
 	type: 'request' | 'event';
 	timestamp: string;
 	data: Cmcd;
+	targetId?: string;
 	requestUrl?: string;
 	method?: string;
 	eventType?: string;
