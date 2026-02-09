@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-request",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "Common Media Request and Response types",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -50,6 +50,7 @@
 		}
 	},
 	"peerDependencies": {
+		"@svta/cml-cmcd": "*",
 		"@svta/cml-xml": "*",
 		"@svta/cml-utils": "*"
 	}
