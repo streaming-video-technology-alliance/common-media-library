@@ -37,8 +37,10 @@ export function startServer(config: ServerConfig): void {
 				return
 			}
 
-			if (pathname === '/cmcd/event' && req.method === 'POST') {
-				await handleEvent(req, res, store)
+			const eventMatch = pathname.match(/^\/cmcd\/event\/([^/]+)\/?$/)
+			if (eventMatch && req.method === 'POST') {
+				const targetId = decodeURIComponent(eventMatch[1])
+				await handleEvent(req, res, store, targetId)
 				return
 			}
 
@@ -51,13 +53,17 @@ export function startServer(config: ServerConfig): void {
 			if (reportsMatch && req.method === 'GET') {
 				const sessionId = decodeURIComponent(reportsMatch[1])
 				const typeFilter = url.searchParams.get('type') || undefined
-				handleReports(res, store, sessionId, typeFilter)
+				const eventTypeFilter = url.searchParams.get('eventType') || undefined
+				const targetIdFilter = url.searchParams.get('targetId') || undefined
+				handleReports(res, store, sessionId, typeFilter, eventTypeFilter, targetIdFilter)
 				return
 			}
 
 			if (pathname === '/reports' && req.method === 'GET') {
 				const typeFilter = url.searchParams.get('type') || undefined
-				handleReports(res, store, undefined, typeFilter)
+				const eventTypeFilter = url.searchParams.get('eventType') || undefined
+				const targetIdFilter = url.searchParams.get('targetId') || undefined
+				handleReports(res, store, undefined, typeFilter, eventTypeFilter, targetIdFilter)
 				return
 			}
 
@@ -86,7 +92,7 @@ export function startServer(config: ServerConfig): void {
 	server.listen(config.port, () => {
 		console.log(`CMCD Validator running on http://localhost:${config.port}`)
 		console.log(`  Proxy:    http://localhost:${config.port}/proxy/`)
-		console.log(`  Events:   POST http://localhost:${config.port}/cmcd/event`)
+		console.log(`  Events:   POST http://localhost:${config.port}/cmcd/event/:id`)
 		console.log(`  Reports:  http://localhost:${config.port}/reports`)
 		console.log(`  Upstream: ${config.upstream}`)
 		console.log(`  Database: ${config.dbPath}`)

@@ -39,7 +39,7 @@ curl http://localhost:8080/reports/<session-id>
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/proxy/*` | Proxy requests to upstream, capturing CMCD data |
-| `POST` | `/cmcd/event` | Collect CMCD v2 event reports |
+| `POST` | `/cmcd/event/:id` | Collect CMCD v2 event reports for a target |
 | `GET` | `/sessions` | List all session IDs |
 | `GET` | `/reports` | List all reports |
 | `GET` | `/reports/:sessionId` | List reports for a specific session |
@@ -49,9 +49,11 @@ curl http://localhost:8080/reports/<session-id>
 ### Query Parameters
 
 - `GET /reports?type=request` — Filter by report type (`request` or `event`)
-- `GET /reports/:sessionId?type=event` — Combine session and type filters
+- `GET /reports?eventType=ps` — Filter by CMCD event type (e.g. `ps`, `t`, `bc`)
+- `GET /reports?targetId=my-target` — Filter by target ID
+- `GET /reports/:sessionId?type=event&eventType=t&targetId=my-target` — Combine session, type, event type, and target ID filters
 
-### POST /cmcd/event
+### POST /cmcd/event/:id
 
 Accepts CMCD v2 event reports in two formats:
 
@@ -95,7 +97,7 @@ e=t,sid="session-1",ts=1700000001000,bl=5000
 
 ### Event Mode
 
-1. Players using CMCD v2 event reporting send POST requests to `/cmcd/event`
+1. Players using CMCD v2 event reporting send POST requests to `/cmcd/event/:id`
 2. The payload is decoded using `decodeCmcd()` from `@svta/cml-cmcd`
 3. Events are stored with their session ID and event type
 

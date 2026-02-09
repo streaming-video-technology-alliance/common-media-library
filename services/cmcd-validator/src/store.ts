@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3'
+import { DatabaseSync } from 'node:sqlite'
 import type { CmcdReport } from './types.ts'
 
 interface ReportRow {
@@ -7,6 +7,7 @@ interface ReportRow {
 	type: string;
 	timestamp: string;
 	data: string;
+	target_id: string | null;
 	request_url: string | null;
 	method: string | null;
 	event_type: string | null;
@@ -19,6 +20,7 @@ function toReport(row: ReportRow): CmcdReport {
 		type: row.type as 'request' | 'event',
 		timestamp: row.timestamp,
 		data: JSON.parse(row.data),
+		targetId: row.target_id ?? undefined,
 		requestUrl: row.request_url ?? undefined,
 		method: row.method ?? undefined,
 		eventType: row.event_type ?? undefined,
@@ -29,11 +31,11 @@ function toReport(row: ReportRow): CmcdReport {
  * SQLite store for CMCD reports.
  */
 export class Store {
-	private db: Database.Database
+	private db: DatabaseSync
 
 	constructor(dbPath: string) {
-		this.db = new Database(dbPath)
-		this.db.pragma('journal_mode = WAL')
+		this.db = new DatabaseSync(dbPath)
+		this.db.exec('PRAGMA journal_mode = WAL')
 		this.db.exec(`
 			CREATE TABLE IF NOT EXISTS reports (
 				id TEXT PRIMARY KEY,
@@ -41,11 +43,13 @@ export class Store {
 				type TEXT NOT NULL,
 				timestamp TEXT NOT NULL,
 				data TEXT NOT NULL,
+				target_id TEXT,
 				request_url TEXT,
 				method TEXT,
 				event_type TEXT
 			)
 		`)
+		this.migrate()
 		this.db.exec(`
 			CREATE INDEX IF NOT EXISTS idx_session_id ON reports (session_id)
 		`)
@@ -54,16 +58,28 @@ export class Store {
 		`)
 	}
 
+	private migrate(): void {
+		const columns = this.db
+			.prepare('SELECT name FROM pragma_table_info(\'reports\')')
+			.all() as unknown as Array<{ name: string }>
+		const columnNames = new Set(columns.map(c => c.name))
+
+		if (!columnNames.has('target_id')) {
+			this.db.exec('ALTER TABLE reports ADD COLUMN target_id TEXT')
+		}
+	}
+
 	insert(report: CmcdReport): void {
 		this.db.prepare(`
-			INSERT INTO reports (id, session_id, type, timestamp, data, request_url, method, event_type)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+			INSERT INTO reports (id, session_id, type, timestamp, data, target_id, request_url, method, event_type)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`).run(
 			report.id,
 			report.sessionId,
 			report.type,
 			report.timestamp,
 			JSON.stringify(report.data),
+			report.targetId ?? null,
 			report.requestUrl ?? null,
 			report.method ?? null,
 			report.eventType ?? null,
@@ -73,7 +89,7 @@ export class Store {
 	getBySessionId(sessionId: string): CmcdReport[] {
 		const rows = this.db
 			.prepare('SELECT * FROM reports WHERE session_id = ? ORDER BY timestamp')
-			.all(sessionId) as ReportRow[]
+			.all(sessionId) as unknown as ReportRow[]
 		return rows.map(toReport)
 	}
 
@@ -81,20 +97,20 @@ export class Store {
 		if (type) {
 			const rows = this.db
 				.prepare('SELECT * FROM reports WHERE type = ? ORDER BY timestamp')
-				.all(type) as ReportRow[]
+				.all(type) as unknown as ReportRow[]
 			return rows.map(toReport)
 		}
 
 		const rows = this.db
 			.prepare('SELECT * FROM reports ORDER BY timestamp')
-			.all() as ReportRow[]
+			.all() as unknown as ReportRow[]
 		return rows.map(toReport)
 	}
 
 	getSessionIds(): string[] {
 		const rows = this.db
 			.prepare('SELECT DISTINCT session_id FROM reports ORDER BY session_id')
-			.all() as Array<{ session_id: string }>
+			.all() as unknown as Array<{ session_id: string }>
 		return rows.map(r => r.session_id)
 	}
 

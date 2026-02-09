@@ -13,18 +13,16 @@
 	],
 	"scripts": {
 		"build": "tsdown",
+		"dev": "node services/cmcd-validator/bin/cmcd-validator.js --upstream",
+		"delete": "curl -X DELETE http://localhost:2623/reports",
 		"test": "node --no-warnings --test test/**/*.test.ts"
 	},
 	"engines": {
-		"node": ">=20"
+		"node": ">=22.13.0"
 	},
 	"dependencies": {
 		"@svta/cml-cmcd": "*",
 		"@svta/cml-structured-field-values": "*",
-		"@svta/cml-utils": "*",
-		"better-sqlite3": "^11.9.1"
-	},
-	"devDependencies": {
-		"@types/better-sqlite3": "^7.6.13"
+		"@svta/cml-utils": "*"
 	}
 }

@@ -19,7 +19,15 @@ function cleanupDb(path: string): void {
 function startTestServer(store: Store): Promise<{ server: Server; port: number }> {
 	return new Promise((resolve) => {
 		const server = createServer(async (req, res) => {
-			await handleEvent(req, res, store)
+			const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`)
+			const match = url.pathname.match(/^\/cmcd\/event\/([^/]+)\/?$/)
+			if (match && req.method === 'POST') {
+				const targetId = decodeURIComponent(match[1])
+				await handleEvent(req, res, store, targetId)
+				return
+			}
+			res.writeHead(404)
+			res.end()
 		})
 		server.listen(0, () => {
 			const addr = server.address()
@@ -52,20 +60,18 @@ describe('handleEvent', () => {
 	it('should accept text/cmcd event reports', async () => {
 		const body = 'e=ps,sid="session-1",ts=1700000000000,sta=p\ne=t,sid="session-1",ts=1700000001000,bl=5000\n'
 
-		const response = await fetch(`http://localhost:${port}/cmcd/event`, {
+		const response = await fetch(`http://localhost:${port}/cmcd/event/target-1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body,
 		})
 
-		assert.equal(response.status, 201)
-
-		const result = await response.json() as { received: number }
-		assert.equal(result.received, 2)
+		assert.equal(response.status, 204)
 
 		const reports = store.getAll()
 		assert.equal(reports.length, 2)
 		assert.equal(reports[0].sessionId, 'session-1')
+		assert.equal(reports[0].targetId, 'target-1')
 		assert.equal(reports[0].type, 'event')
 		assert.equal(reports[0].eventType, 'ps')
 	})
@@ -76,13 +82,13 @@ describe('handleEvent', () => {
 			{ sid: 'session-2', e: 'bc', ts: 1700000000000, br: 2000 },
 		])
 
-		const response = await fetch(`http://localhost:${port}/cmcd/event`, {
+		const response = await fetch(`http://localhost:${port}/cmcd/event/target-2`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body,
 		})
 
-		assert.equal(response.status, 201)
+		assert.equal(response.status, 204)
 
 		const reports = store.getAll()
 		assert.equal(reports.length, 1)
@@ -93,13 +99,13 @@ describe('handleEvent', () => {
 	it('should handle events without a session ID', async () => {
 		const body = 'e=t,ts=1700000000000\n'
 
-		const response = await fetch(`http://localhost:${port}/cmcd/event`, {
+		const response = await fetch(`http://localhost:${port}/cmcd/event/target-3`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
 			body,
 		})
 
-		assert.equal(response.status, 201)
+		assert.equal(response.status, 204)
 
 		const reports = store.getAll()
 		assert.equal(reports[0].sessionId, 'unknown')
