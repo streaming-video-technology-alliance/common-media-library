@@ -3,7 +3,7 @@ import { startServer } from './server.ts'
 
 const { values } = parseArgs({
 	options: {
-		port: { type: 'string', short: 'p', default: '3000' },
+		port: { type: 'string', short: 'p', default: '2623' },
 		upstream: { type: 'string', short: 'u' },
 		db: { type: 'string', default: './cmcd-reports.jsonl' },
 		help: { type: 'boolean', short: 'h', default: false },
@@ -16,7 +16,7 @@ if (values.help) {
 Usage: cmcd-validator [options]
 
 Options:
-  -p, --port <port>       Server port (default: 3000)
+  -p, --port <port>       Server port (default: 2623)
   -u, --upstream <url>    Upstream base URL (required)
       --db <path>         Database file path (default: ./cmcd-reports.jsonl)
   -h, --help              Show this help message
