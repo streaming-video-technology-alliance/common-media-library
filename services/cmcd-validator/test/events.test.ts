@@ -6,7 +6,15 @@ import { existsSync, unlinkSync } from 'node:fs'
 import { Store } from '../src/store.ts'
 import { handleEvent } from '../src/events.ts'
 
-const TEST_DB = './test-events.jsonl'
+const TEST_DB = './test-events.db'
+
+function cleanupDb(path: string): void {
+	for (const suffix of ['', '-wal', '-shm']) {
+		if (existsSync(path + suffix)) {
+			unlinkSync(path + suffix)
+		}
+	}
+}
 
 function startTestServer(store: Store): Promise<{ server: Server; port: number }> {
 	return new Promise((resolve) => {
@@ -27,7 +35,7 @@ describe('handleEvent', () => {
 	let port: number
 
 	beforeEach(async () => {
-		if (existsSync(TEST_DB)) unlinkSync(TEST_DB)
+		cleanupDb(TEST_DB)
 		store = new Store(TEST_DB)
 		const result = await startTestServer(store)
 		server = result.server
@@ -36,7 +44,8 @@ describe('handleEvent', () => {
 
 	afterEach(() => {
 		server.close()
-		if (existsSync(TEST_DB)) unlinkSync(TEST_DB)
+		store.close()
+		cleanupDb(TEST_DB)
 	})
 
 	// #region example

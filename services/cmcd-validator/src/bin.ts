@@ -5,7 +5,7 @@ const { values } = parseArgs({
 	options: {
 		port: { type: 'string', short: 'p', default: '2623' },
 		upstream: { type: 'string', short: 'u' },
-		db: { type: 'string', default: './cmcd-reports.jsonl' },
+		db: { type: 'string', default: './cmcd-reports.db' },
 		help: { type: 'boolean', short: 'h', default: false },
 	},
 })
@@ -18,7 +18,7 @@ Usage: cmcd-validator [options]
 Options:
   -p, --port <port>       Server port (default: 2623)
   -u, --upstream <url>    Upstream base URL (required)
-      --db <path>         Database file path (default: ./cmcd-reports.jsonl)
+      --db <path>         Database file path (default: ./cmcd-reports.db)
   -h, --help              Show this help message
 
 Endpoints:
