@@ -581,6 +581,95 @@ describe('CmcdReporter', () => {
 			timers.reset()
 		})
 
+		it('sends time interval events only to the target that owns the timer', () => {
+			const timers = mock.timers
+			timers.enable({ apis: ['setInterval'] })
+
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd-ti-1',
+						events: [CmcdEventType.TIME_INTERVAL],
+						enabledKeys: [...EVENT_KEYS],
+						interval: 30,
+						batchSize: 1,
+					},
+					{
+						url: 'https://example.com/cmcd-ti-2',
+						events: [CmcdEventType.TIME_INTERVAL],
+						enabledKeys: [...EVENT_KEYS],
+						interval: 30,
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.start()
+
+			// Each target should fire exactly once on start (not duplicated)
+			equal(requests.length, 2)
+			equal(requests[0].url, 'https://example.com/cmcd-ti-1')
+			equal(requests[1].url, 'https://example.com/cmcd-ti-2')
+
+			// After one interval tick, each target fires once more
+			timers.tick(30_000)
+			equal(requests.length, 4)
+			equal(requests[2].url, 'https://example.com/cmcd-ti-1')
+			equal(requests[3].url, 'https://example.com/cmcd-ti-2')
+
+			// Verify sequence numbers: each target should have its own independent counter
+			ok((requests[0].body as string)?.includes('sn=0'))
+			ok((requests[1].body as string)?.includes('sn=0'))
+			ok((requests[2].body as string)?.includes('sn=1'))
+			ok((requests[3].body as string)?.includes('sn=1'))
+
+			reporter.stop()
+			timers.reset()
+		})
+
+		it('does not send time interval events to targets without TIME_INTERVAL configured', () => {
+			const timers = mock.timers
+			timers.enable({ apis: ['setInterval'] })
+
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd-ti',
+						events: [CmcdEventType.TIME_INTERVAL],
+						enabledKeys: [...EVENT_KEYS],
+						interval: 30,
+						batchSize: 1,
+					},
+					{
+						url: 'https://example.com/cmcd-other',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.start()
+
+			// Only the TIME_INTERVAL target should receive events
+			equal(requests.length, 1)
+			equal(requests[0].url, 'https://example.com/cmcd-ti')
+
+			timers.tick(30_000)
+			equal(requests.length, 2)
+			equal(requests[1].url, 'https://example.com/cmcd-ti')
+
+			// The other target should still be functional for its own events
+			reporter.recordEvent(CmcdEventType.ERROR)
+			equal(requests.length, 3)
+			equal(requests[2].url, 'https://example.com/cmcd-other')
+
+			reporter.stop()
+			timers.reset()
+		})
+
 		it('does not start interval if TIME_INTERVAL event is not configured', () => {
 			const timers = mock.timers
 			timers.enable({ apis: ['setInterval'] })
