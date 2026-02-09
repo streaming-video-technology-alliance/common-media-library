@@ -3,11 +3,20 @@ import assert from 'node:assert/strict'
 import { createServer } from 'node:http'
 import type { IncomingMessage, Server, ServerResponse } from 'node:http'
 import { existsSync, unlinkSync } from 'node:fs'
+import type { Cmcd } from '@svta/cml-cmcd'
 import { Store } from '../src/store.ts'
 import { handleEvent } from '../src/events.ts'
 import { handleDeleteReports, handleReports, handleSessions } from '../src/reports.ts'
 
-const TEST_DB = './test-server.jsonl'
+const TEST_DB = './test-server.db'
+
+function cleanupDb(path: string): void {
+	for (const suffix of ['', '-wal', '-shm']) {
+		if (existsSync(path + suffix)) {
+			unlinkSync(path + suffix)
+		}
+	}
+}
 
 function startTestServer(store: Store): Promise<{ server: Server; port: number }> {
 	return new Promise((resolve) => {
@@ -62,7 +71,7 @@ describe('Server integration', () => {
 	let port: number
 
 	beforeEach(async () => {
-		if (existsSync(TEST_DB)) unlinkSync(TEST_DB)
+		cleanupDb(TEST_DB)
 		store = new Store(TEST_DB)
 		const result = await startTestServer(store)
 		server = result.server
@@ -71,7 +80,8 @@ describe('Server integration', () => {
 
 	afterEach(() => {
 		server.close()
-		if (existsSync(TEST_DB)) unlinkSync(TEST_DB)
+		store.close()
+		cleanupDb(TEST_DB)
 	})
 
 	it('should collect events and retrieve by session ID', async () => {
@@ -175,7 +185,7 @@ describe('Server integration', () => {
 			sessionId: 'session-mixed',
 			type: 'request',
 			timestamp: new Date().toISOString(),
-			data: { sid: 'session-mixed', br: 1000 },
+			data: { sid: 'session-mixed', br: 1000 } as unknown as Cmcd,
 			requestUrl: 'https://example.com/video.mp4',
 			method: 'GET',
 		})

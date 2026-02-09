@@ -14,9 +14,9 @@ npx @svta/cmcd-validator --upstream https://cdn.example.com
 cmcd-validator [options]
 
 Options:
-  -p, --port <port>       Server port (default: 3000)
+  -p, --port <port>       Server port (default: 2623)
   -u, --upstream <url>    Upstream base URL (required)
-      --db <path>         Database file path (default: ./cmcd-reports.jsonl)
+      --db <path>         Database file path (default: ./cmcd-reports.db)
   -h, --help              Show help
 ```
 
@@ -40,6 +40,7 @@ curl http://localhost:8080/reports/<session-id>
 |--------|------|-------------|
 | `GET` | `/proxy/*` | Proxy requests to upstream, capturing CMCD data |
 | `POST` | `/cmcd/event` | Collect CMCD v2 event reports |
+| `GET` | `/sessions` | List all session IDs |
 | `GET` | `/reports` | List all reports |
 | `GET` | `/reports/:sessionId` | List reports for a specific session |
 | `DELETE` | `/reports` | Clear all reports |
@@ -100,7 +101,7 @@ e=t,sid="session-1",ts=1700000001000,bl=5000
 
 ### Storage
 
-Reports are stored in a JSONL (JSON Lines) flat file, one report per line. The default location is `./cmcd-reports.jsonl`. Use `DELETE /reports` to clear all data.
+Reports are stored in a local SQLite database. The default location is `./cmcd-reports.db`, configurable via `--db`. Use `DELETE /reports` to clear all data.
 
 ## Development
 

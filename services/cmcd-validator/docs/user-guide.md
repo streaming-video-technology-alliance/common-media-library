@@ -139,6 +139,6 @@ Each report contains:
 
 ## Storage
 
-Reports are stored in a JSONL flat file (one JSON object per line). The default path is `./cmcd-reports.jsonl`, configurable via `--db`.
+Reports are stored in a local SQLite database (via `better-sqlite3`). The default path is `./cmcd-reports.db`, configurable via `--db`. WAL mode is enabled for concurrent read performance.
 
-The file is append-only during normal operation. Use `DELETE /reports` to clear all data.
+Use `DELETE /reports` to clear all data.

@@ -21,6 +21,10 @@
 	"dependencies": {
 		"@svta/cml-cmcd": "*",
 		"@svta/cml-structured-field-values": "*",
-		"@svta/cml-utils": "*"
+		"@svta/cml-utils": "*",
+		"better-sqlite3": "^11.9.1"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "^7.6.13"
 	}
 }
