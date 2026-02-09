@@ -150,7 +150,8 @@ export class CmcdReporter {
 			}
 
 			const timeIntervalEvent = () => {
-				this.recordEvent(CMCD_EVENT_TIME_INTERVAL)
+				this.recordTargetEvent(target, config, CMCD_EVENT_TIME_INTERVAL)
+				this.processEventTargets()
 			}
 
 			target.intervalId = setInterval(timeIntervalEvent, config.interval * 1000)
@@ -208,27 +209,31 @@ export class CmcdReporter {
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
 		this.eventTargets.forEach((target, config) => {
-			if (!config.events.includes(type)) {
-				return
-			}
-
-			const item = {
-				...this.data,
-				...data,
-				e: type,
-				ts: data.ts ?? Date.now(),
-				sn: target.sn++,
-			}
-
-			if (!isNaN(this.msd) && !target.msdSent) {
-				item.msd = this.msd
-				target.msdSent = true
-			}
-
-			target.queue.push(item)
+			this.recordTargetEvent(target, config, type, data)
 		})
 
 		this.processEventTargets()
+	}
+
+	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+		if (!config.events.includes(type)) {
+			return
+		}
+
+		const item = {
+			...this.data,
+			...data,
+			e: type,
+			ts: data.ts ?? Date.now(),
+			sn: target.sn++,
+		}
+
+		if (!isNaN(this.msd) && !target.msdSent) {
+			item.msd = this.msd
+			target.msdSent = true
+		}
+
+		target.queue.push(item)
 	}
 
 	/**
