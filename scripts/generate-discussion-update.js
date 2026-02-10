@@ -85,13 +85,15 @@ function generateUpdate(sinceDate) {
 
     // Calculate next meeting (second Tuesday of next month)
     const now = new Date();
-    let nextMonth = now.getMonth() + 1; // Get next month (0-indexed)
+    // getMonth() returns 0-11, add 1 to get next month (still 0-indexed, so Feb=2, Mar=3, etc.)
+    let nextMonth = now.getMonth() + 1;
     let nextYear = now.getFullYear();
     if (nextMonth > 11) { // JavaScript months are 0-11
       nextMonth = 0; // January of next year
       nextYear++;
     }
-    const nextMeeting = getSecondTuesday(nextYear, nextMonth + 1); // getSecondTuesday expects 1-indexed month
+    // getSecondTuesday expects 1-indexed month (1-12), so add 1 to convert from 0-indexed
+    const nextMeeting = getSecondTuesday(nextYear, nextMonth + 1);
 
     // Generate markdown
     console.log('# Monthly Meeting Discussion Update');
