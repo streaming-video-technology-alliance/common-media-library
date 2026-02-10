@@ -7,27 +7,62 @@ import { detectManifestType, rewriteManifestUrls } from './manifest.ts'
 import type { Store } from './store.ts'
 import type { CmcdReport } from './types.ts'
 
-const PROXY_PREFIX = '/proxy'
-
 const CMCD_HEADER_KEYS = ['cmcd-object', 'cmcd-request', 'cmcd-session', 'cmcd-status']
 
 /**
+ * Extract the upstream target URL from an incoming proxy request.
+ *
+ * Supports two routing modes:
+ * - Query-based: `/proxy?url=<encoded-url>` (primary)
+ * - Path-based: `/proxy/<absolute-url>` (fallback for DASH template resolution)
+ *
+ * @returns The decoded upstream URL, or `null` if not found
+ */
+export function extractTargetUrl(reqUrl: string, host: string): string | null {
+	const parsed = new URL(reqUrl, `http://${host}`)
+
+	// Query-based: /proxy?url=<encoded-url>
+	const urlParam = parsed.searchParams.get('url')
+	if (urlParam) {
+		return urlParam
+	}
+
+	// Path-based: /proxy/<absolute-url>
+	const pathAfterProxy = parsed.pathname.replace(/^\/proxy\//, '')
+	if (pathAfterProxy && pathAfterProxy.startsWith('http')) {
+		// Re-append any query string (excluding our own params)
+		const qs = parsed.search
+		return pathAfterProxy + qs
+	}
+
+	return null
+}
+
+/**
  * Handle a proxied request: extract CMCD, forward to upstream, rewrite manifests.
+ *
+ * Accepts requests in two forms:
+ * - `/proxy?url=<encoded-url>` — primary, used by players and HLS manifests
+ * - `/proxy/<absolute-url>` — fallback, used by DASH BaseURL template resolution
  */
 export async function handleProxy(
 	req: IncomingMessage,
 	res: ServerResponse,
-	upstream: string,
 	store: Store,
 ): Promise<void> {
-	const path = req.url!.slice(PROXY_PREFIX.length)
-	const upstreamBase = upstream.replace(/\/$/, '')
+	const host = req.headers.host || 'localhost'
+	const targetUrl = extractTargetUrl(req.url || '/', host)
 
-	// Build upstream URL preserving query params (minus CMCD)
-	const upstreamUrl = new URL(path, upstreamBase + '/')
+	if (!targetUrl) {
+		res.writeHead(400, { 'Content-Type': 'application/json' })
+		res.end(JSON.stringify({ error: 'Missing url parameter. Use /proxy?url=<encoded-url>' }))
+		return
+	}
+
+	const upstreamUrl = new URL(targetUrl)
 
 	// Extract CMCD data from original request
-	const requestUrl = new URL(req.url!, `http://${req.headers.host || 'localhost'}`)
+	const requestUrl = new URL(req.url || '/', `http://${host}`)
 	const requestHeaders = new Headers()
 	for (const [key, value] of Object.entries(req.headers)) {
 		if (typeof value === 'string') {
@@ -93,7 +128,7 @@ export async function handleProxy(
 
 	if (manifestType && upstreamResponse.body) {
 		const body = await upstreamResponse.text()
-		const rewritten = rewriteManifestUrls(body, upstream, PROXY_PREFIX)
+		const rewritten = rewriteManifestUrls(body, upstreamUrl.toString(), manifestType)
 		responseHeaders['content-length'] = Buffer.byteLength(rewritten).toString()
 		res.writeHead(upstreamResponse.status, responseHeaders)
 		res.end(rewritten)

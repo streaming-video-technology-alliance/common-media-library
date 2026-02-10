@@ -4,7 +4,6 @@ import { startServer } from './server.ts'
 const { values } = parseArgs({
 	options: {
 		port: { type: 'string', short: 'p', default: '2623' },
-		upstream: { type: 'string', short: 'u' },
 		db: { type: 'string', default: './cmcd-reports.db' },
 		help: { type: 'boolean', short: 'h', default: false },
 	},
@@ -17,31 +16,28 @@ Usage: cmcd-validator [options]
 
 Options:
   -p, --port <port>       Server port (default: 2623)
-  -u, --upstream <url>    Upstream base URL (required)
       --db <path>         Database file path (default: ./cmcd-reports.db)
   -h, --help              Show this help message
 
 Endpoints:
-  GET    /proxy/*            Proxy requests to upstream, capture CMCD data
-  POST   /cmcd/event         Collect CMCD v2 event reports
-  GET    /reports             List all reports
-  GET    /reports/:sessionId  List reports for a session
-  DELETE /reports             Clear all reports
-  GET    /health              Health check
+  GET    /proxy?url=<url>     Proxy requests, capture CMCD data
+  POST   /cmcd/event/:id      Collect CMCD v2 event reports
+  GET    /sessions             List all session IDs
+  GET    /reports              List all reports
+  GET    /reports/:sessionId   List reports for a session
+  DELETE /reports              Clear all reports
+  GET    /health               Health check
 
 Example:
-  cmcd-validator --upstream https://cdn.example.com --port 8080
+  cmcd-validator --port 8080
+
+  # Then point your player at:
+  #   http://localhost:8080/proxy?url=https%3A%2F%2Fcdn.example.com%2Fstream%2Fmaster.m3u8
 `)
 	process.exit(0)
 }
 
-if (!values.upstream) {
-	console.error('Error: --upstream <url> is required')
-	process.exit(1)
-}
-
 startServer({
 	port: parseInt(values.port, 10),
-	upstream: values.upstream,
 	dbPath: values.db,
 })

@@ -118,7 +118,7 @@ describe('Server integration', () => {
 
 		// Get reports for session-a
 		const sessionRes = await fetch(`http://localhost:${port}/reports/session-a`)
-		const sessionData = await sessionRes.json() as { count: number; sessionId: string; reports: Array<{ data: { br?: number } }> }
+		const sessionData = await sessionRes.json() as { count: number; sessionId: string; reports: { data: { br?: number } }[] }
 		assert.equal(sessionData.count, 2)
 		assert.equal(sessionData.sessionId, 'session-a')
 	})

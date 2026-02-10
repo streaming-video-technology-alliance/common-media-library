@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite'
 import type { CmcdReport } from './types.ts'
 
-interface ReportRow {
+type ReportRow = {
 	id: string;
 	session_id: string;
 	type: string;
@@ -61,7 +61,7 @@ export class Store {
 	private migrate(): void {
 		const columns = this.db
 			.prepare('SELECT name FROM pragma_table_info(\'reports\')')
-			.all() as unknown as Array<{ name: string }>
+			.all() as unknown as { name: string }[]
 		const columnNames = new Set(columns.map(c => c.name))
 
 		if (!columnNames.has('target_id')) {
@@ -110,7 +110,7 @@ export class Store {
 	getSessionIds(): string[] {
 		const rows = this.db
 			.prepare('SELECT DISTINCT session_id FROM reports ORDER BY session_id')
-			.all() as unknown as Array<{ session_id: string }>
+			.all() as unknown as { session_id: string }[]
 		return rows.map(r => r.session_id)
 	}
 
