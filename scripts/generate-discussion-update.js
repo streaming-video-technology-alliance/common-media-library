@@ -26,6 +26,8 @@ function getSecondTuesday(year, month) {
   const firstDayOfWeek = firstDay.getDay();
   
   // Calculate days until first Tuesday (Tuesday = 2)
+  // If the 1st is already a Tuesday, daysUntilTuesday will be 0, 
+  // making the 1st the first Tuesday of the month
   const daysUntilTuesday = (2 - firstDayOfWeek + 7) % 7;
   const firstTuesday = new Date(year, month - 1, 1 + daysUntilTuesday);
   
@@ -81,15 +83,15 @@ function generateUpdate(sinceDate) {
       byDate[date].push(release);
     });
 
-    // Calculate next meeting
+    // Calculate next meeting (second Tuesday of next month)
     const now = new Date();
-    let nextMonth = now.getMonth() + 2; // Next month (0-indexed, so +2)
+    let nextMonth = now.getMonth() + 1; // Get next month (0-indexed)
     let nextYear = now.getFullYear();
-    if (nextMonth > 12) {
-      nextMonth = 1;
+    if (nextMonth > 11) { // JavaScript months are 0-11
+      nextMonth = 0; // January of next year
       nextYear++;
     }
-    const nextMeeting = getSecondTuesday(nextYear, nextMonth);
+    const nextMeeting = getSecondTuesday(nextYear, nextMonth + 1); // getSecondTuesday expects 1-indexed month
 
     // Generate markdown
     console.log('# Monthly Meeting Discussion Update');
