@@ -3,7 +3,7 @@ import type { Cmcd } from '@svta/cml-cmcd'
 /**
  * A recorded CMCD report from either a proxied request or an event POST.
  */
-export interface CmcdReport {
+export type CmcdReport = {
 	id: string;
 	sessionId: string;
 	type: 'request' | 'event';
@@ -18,8 +18,7 @@ export interface CmcdReport {
 /**
  * Server configuration.
  */
-export interface ServerConfig {
+export type ServerConfig = {
 	port: number;
-	upstream: string;
 	dbPath: string;
 }

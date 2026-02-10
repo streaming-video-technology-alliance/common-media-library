@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cmcd-validator",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "CMCD verification proxy for validating Common Media Client Data",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -13,7 +13,7 @@
 	],
 	"scripts": {
 		"build": "tsdown",
-		"dev": "node services/cmcd-validator/bin/cmcd-validator.js --upstream",
+		"dev": "node services/cmcd-validator/bin/cmcd-validator.js",
 		"delete": "curl -X DELETE http://localhost:2623/reports",
 		"test": "node --no-warnings --test test/**/*.test.ts"
 	},

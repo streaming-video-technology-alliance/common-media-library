@@ -4,7 +4,7 @@ import { CMCD_PARAM, fromCmcdHeaders, fromCmcdQuery, CMCD_OBJECT, CMCD_REQUEST, 
 /**
  * Result of extracting CMCD data from a request.
  */
-export interface ExtractedCmcd {
+export type ExtractedCmcd = {
 	data: Cmcd;
 	sessionId: string | undefined;
 	source: 'query' | 'headers';

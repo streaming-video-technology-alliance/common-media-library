@@ -32,8 +32,8 @@ export function startServer(config: ServerConfig): void {
 		const pathname = url.pathname
 
 		try {
-			if (pathname.startsWith('/proxy/') && req.method === 'GET') {
-				await handleProxy(req, res, config.upstream, store)
+			if (pathname.startsWith('/proxy') && req.method === 'GET') {
+				await handleProxy(req, res, store)
 				return
 			}
 
@@ -91,10 +91,9 @@ export function startServer(config: ServerConfig): void {
 
 	server.listen(config.port, () => {
 		console.log(`CMCD Validator running on http://localhost:${config.port}`)
-		console.log(`  Proxy:    http://localhost:${config.port}/proxy/`)
+		console.log(`  Proxy:    http://localhost:${config.port}/proxy?url=<encoded-url>`)
 		console.log(`  Events:   POST http://localhost:${config.port}/cmcd/event/:id`)
 		console.log(`  Reports:  http://localhost:${config.port}/reports`)
-		console.log(`  Upstream: ${config.upstream}`)
 		console.log(`  Database: ${config.dbPath}`)
 	})
 }

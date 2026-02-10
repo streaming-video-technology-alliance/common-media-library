@@ -5,7 +5,7 @@ A verification proxy for validating [Common Media Client Data (CMCD)](https://cd
 ## Quick Start
 
 ```bash
-npx @svta/cmcd-validator --upstream https://cdn.example.com
+npx @svta/cmcd-validator
 ```
 
 ## Usage
@@ -15,7 +15,6 @@ cmcd-validator [options]
 
 Options:
   -p, --port <port>       Server port (default: 2623)
-  -u, --upstream <url>    Upstream base URL (required)
       --db <path>         Database file path (default: ./cmcd-reports.db)
   -h, --help              Show help
 ```
@@ -23,11 +22,11 @@ Options:
 ### Example
 
 ```bash
-# Start the proxy pointing at a CDN
-cmcd-validator --upstream https://cdn.example.com --port 8080
+# Start the validator
+cmcd-validator --port 8080
 
-# Configure your player to use:
-#   http://localhost:8080/proxy/ as the base URL
+# Point your player at a proxied stream URL:
+#   http://localhost:8080/proxy?url=https%3A%2F%2Fcdn.example.com%2Fstream%2Fmaster.m3u8
 #
 # Then retrieve captured reports:
 curl http://localhost:8080/reports
@@ -38,7 +37,8 @@ curl http://localhost:8080/reports/<session-id>
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/proxy/*` | Proxy requests to upstream, capturing CMCD data |
+| `GET` | `/proxy?url=<encoded-url>` | Proxy a request, capturing CMCD data |
+| `GET` | `/proxy/<absolute-url>` | Path-based proxy (used by DASH template resolution) |
 | `POST` | `/cmcd/event/:id` | Collect CMCD v2 event reports for a target |
 | `GET` | `/sessions` | List all session IDs |
 | `GET` | `/reports` | List all reports |
@@ -89,11 +89,17 @@ e=t,sid="session-1",ts=1700000001000,bl=5000
 
 ### Proxy Mode
 
-1. Player requests are directed to `/proxy/*` instead of the CDN
+1. Pass a stream URL to the proxy via query parameter: `/proxy?url=<encoded-url>`
 2. The proxy extracts CMCD data from query parameters (`?CMCD=...`) or HTTP headers (`CMCD-Object`, `CMCD-Request`, `CMCD-Session`, `CMCD-Status`)
 3. CMCD data is decoded using `@svta/cml-cmcd` and stored
-4. The request is forwarded to the upstream (with CMCD stripped)
-5. For manifest responses (HLS `.m3u8`, DASH `.mpd`), absolute URLs matching the upstream are rewritten to route back through the proxy
+4. The request is forwarded to the upstream origin (with CMCD stripped)
+5. For manifest responses (HLS `.m3u8`, DASH `.mpd`), all URLs are resolved to absolute form and rewritten to route back through the proxy
+
+The proxy supports any origin — no pre-configuration is needed. Simply encode the full upstream URL as a query parameter.
+
+### DASH Template Support
+
+DASH manifests using `<BaseURL>` and `$Variable$` template patterns are handled via a path-based fallback. The `<BaseURL>` is rewritten to `/proxy/<absolute-url>`, allowing DASH players to resolve template URLs relative to the proxied base. The path-based proxy route (`/proxy/<absolute-url>`) is also available for direct use.
 
 ### Event Mode
 
@@ -103,7 +109,7 @@ e=t,sid="session-1",ts=1700000001000,bl=5000
 
 ### Storage
 
-Reports are stored in a local SQLite database. The default location is `./cmcd-reports.db`, configurable via `--db`. Use `DELETE /reports` to clear all data.
+Reports are stored in a local SQLite database (via Node.js built-in `node:sqlite`). The default location is `./cmcd-reports.db`, configurable via `--db`. Use `DELETE /reports` to clear all data.
 
 ## Development
 
