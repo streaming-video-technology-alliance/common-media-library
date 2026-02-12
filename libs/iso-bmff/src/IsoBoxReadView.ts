@@ -1,3 +1,4 @@
+import { isArrayBufferLike } from '@svta/cml-utils'
 import type { FullBox } from './boxes/FullBox.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
@@ -37,7 +38,7 @@ export class IsoBoxReadView {
 	 * @param config - The configuration for the IsoView.
 	 */
 	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
-		this.dataView = (raw instanceof ArrayBuffer || raw instanceof SharedArrayBuffer) ? new DataView(raw) : (raw instanceof DataView) ? raw : new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+		this.dataView = isArrayBufferLike(raw) ? new DataView(raw) : (raw instanceof DataView) ? raw : new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
 	}

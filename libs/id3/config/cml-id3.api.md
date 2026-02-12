@@ -73,7 +73,7 @@ export function readId3Size(data: Uint8Array, offset: number): number;
 // Warning: (ae-internal-missing-underscore) The name "toArrayBuffer" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
-export function toArrayBuffer(view: ArrayBuffer | TypedArray): ArrayBuffer;
+export function toArrayBuffer(view: ArrayBufferLike | TypedArray): ArrayBufferLike;
 
 // Warning: (ae-internal-missing-underscore) The name "toUint8" should be prefixed with an underscore because the declaration is marked as @internal
 //

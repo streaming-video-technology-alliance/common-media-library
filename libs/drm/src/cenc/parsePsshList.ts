@@ -1,3 +1,5 @@
+import { isArrayBufferLike } from '@svta/cml-utils'
+
 /**
  * Parses a list of PSSH boxes into keysystem-specific PSSH data.
  *
@@ -12,14 +14,14 @@
  * @example
  * {@includeCode ../../test/cenc/parsePsshList.test.ts#example}
  */
-export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer> {
+export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike> {
 	if (!data) {
 		return {}
 	}
 
 	// data.buffer first for Uint8Array support
-	const dv = new DataView(data instanceof ArrayBuffer ? data : (data as Uint8Array).buffer)
-	const pssh: Record<string, ArrayBuffer> = {}
+	const dv = new DataView(isArrayBufferLike(data) ? data : (data as Uint8Array).buffer)
+	const pssh: Record<string, ArrayBufferLike> = {}
 	let byteCursor = 0
 
 	while (true) {

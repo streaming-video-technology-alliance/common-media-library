@@ -1,3 +1,5 @@
+import { isArrayBufferLike } from '@svta/cml-utils'
+
 /**
  * @internal
  */
@@ -13,7 +15,7 @@ function view<T extends ArrayBufferView>(
 	data: BufferSource,
 	offset: number,
 	length: number,
-	Type: new (buffer: ArrayBuffer, byteOffset: number, length: number) => T,
+	Type: new (buffer: ArrayBufferLike, byteOffset: number, length: number) => T,
 ): T {
 	const buffer = unsafeGetArrayBuffer(data)
 	let bytesPerElement: any = 1
@@ -32,7 +34,7 @@ function view<T extends ArrayBufferView>(
 }
 
 function unsafeGetArrayBuffer(view: BufferSource) {
-	if (view instanceof ArrayBuffer) {
+	if (isArrayBufferLike(view)) {
 		return view
 	}
 	else {
@@ -41,5 +43,5 @@ function unsafeGetArrayBuffer(view: BufferSource) {
 }
 
 function isArrayBufferView(obj: any): obj is ArrayBufferView {
-	return obj && obj.buffer instanceof ArrayBuffer && obj.byteLength !== undefined && obj.byteOffset !== undefined
+	return obj && isArrayBufferLike(obj.buffer) && obj.byteLength !== undefined && obj.byteOffset !== undefined
 }

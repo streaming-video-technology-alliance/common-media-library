@@ -13,7 +13,7 @@ and this project adheres to
 ### Changed
 
 - Improve TSDoc for `CmcdReporter` methods
-- Update `@svta/cml-utils` to 1.3.1
+- Update `@svta/cml-utils` to 1.4.0
 
 ## [2.1.1] - 2026-02-09
 

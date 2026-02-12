@@ -14,7 +14,7 @@ and this project adheres to
 
 - Update `@svta/cml-cmcd` to 2.1.2
 - Update `@svta/cml-xml` to 1.1.3
-- Update `@svta/cml-utils` to 1.3.1
+- Update `@svta/cml-utils` to 1.4.0
 
 ## [1.0.7] - 2026-02-09
 

@@ -82,6 +82,9 @@ export type HttpResponse<R extends HttpRequest = HttpRequest> = {
     resourceTiming?: ResourceTiming;
 };
 
+// @public
+export function isArrayBufferLike(value: unknown): value is ArrayBufferLike;
+
 // @public @deprecated
 type Request_2 = HttpRequest;
 export { Request_2 as Request }

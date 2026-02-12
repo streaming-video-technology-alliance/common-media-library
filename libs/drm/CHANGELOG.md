@@ -17,7 +17,7 @@ and this project adheres to
 ### Changed
 
 - Update `@svta/cml-iso-bmff` to 1.0.1
-- Update `@svta/cml-utils` to 1.3.1
+- Update `@svta/cml-utils` to 1.4.0
 
 ## [1.1.4] - 2026-02-09
 

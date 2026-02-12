@@ -14,7 +14,7 @@ and this project adheres to
 
 - Update `@svta/cml-cta` to 1.0.5
 - Update `@svta/cml-structured-field-values` to 1.1.2
-- Update `@svta/cml-utils` to 1.3.1
+- Update `@svta/cml-utils` to 1.4.0
 
 ## [1.0.4] - 2026-02-04
 
