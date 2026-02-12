@@ -1,3 +1,4 @@
+import type { DecodedId3Frame } from './DecodedId3Frame.ts'
 import type { Id3Frame } from './Id3Frame.ts'
 
 /**
@@ -10,7 +11,7 @@ import type { Id3Frame } from './Id3Frame.ts'
  * @internal
  *
  */
-export function isId3TimestampFrame(frame: Id3Frame): boolean {
+export function isId3TimestampFrame(frame: Id3Frame): frame is DecodedId3Frame<ArrayBufferLike> {
 	return (
 		frame &&
 		frame.key === 'PRIV' &&

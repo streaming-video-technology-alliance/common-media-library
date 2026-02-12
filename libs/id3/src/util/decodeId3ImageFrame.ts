@@ -7,7 +7,7 @@ import { utf8ArrayToStr } from './utf8ArrayToStr.ts'
 type MetadataFrame = {
 	key: string;
 	description: string;
-	data: string | ArrayBuffer;
+	data: string | ArrayBufferLike;
 	mimeType: string | null;
 	pictureType: number | null;
 };
@@ -23,7 +23,7 @@ type MetadataFrame = {
  */
 export function decodeId3ImageFrame(
 	frame: RawId3Frame,
-): DecodedId3Frame<string | ArrayBuffer> | undefined {
+): DecodedId3Frame<string | ArrayBufferLike> | undefined {
 	const metadataFrame: MetadataFrame = {
 		key: frame.type,
 		description: '',

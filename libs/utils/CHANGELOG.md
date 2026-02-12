@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-02-11
+
+### Added
+
+- Add `isArrayBufferLike` type guard utility function
+
+### Fixed
+
+- Loosen typed array generic parameters in `decodeText` and `stringToUint16`
+
 ## [1.3.0] - 2026-02-04
 
 ### Added
@@ -50,7 +60,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.3.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...HEAD
+[1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.3.0...utils-v1.4.0
 [1.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.2.0...utils-v1.3.0
 [1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.1.0...utils-v1.2.0
 [1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.0.1...utils-v1.1.0

@@ -1,3 +1,4 @@
+import { isArrayBufferLike } from '@svta/cml-utils'
 import type { FullBox } from './boxes/FullBox.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
@@ -23,7 +24,7 @@ import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
  * @public
  */
 export class IsoBoxReadView {
-	private dataView: DataView<ArrayBuffer>
+	private dataView: DataView
 	private offset: number
 	private config: IsoBoxReadViewConfig
 	private truncated: boolean = false
@@ -37,7 +38,7 @@ export class IsoBoxReadView {
 	 * @param config - The configuration for the IsoView.
 	 */
 	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
-		this.dataView = (raw instanceof ArrayBuffer) ? new DataView<ArrayBuffer>(raw) : (raw instanceof DataView) ? raw : new DataView<ArrayBuffer>(raw.buffer, raw.byteOffset, raw.byteLength)
+		this.dataView = isArrayBufferLike(raw) ? new DataView(raw) : (raw instanceof DataView) ? raw : new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
 	}
@@ -45,7 +46,7 @@ export class IsoBoxReadView {
 	/**
 	 * The buffer of the data view.
 	 */
-	get buffer(): ArrayBuffer {
+	get buffer(): ArrayBufferLike {
 		return this.dataView.buffer
 	}
 
@@ -202,7 +203,7 @@ export class IsoBoxReadView {
 	 * @param size - The size of the data in bytes.
 	 * @returns The data.
 	 */
-	readData = (size: number): Uint8Array<ArrayBuffer> => {
+	readData = (size: number): Uint8Array => {
 		return this.read(DATA, size)
 	}
 

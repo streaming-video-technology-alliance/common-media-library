@@ -12,7 +12,7 @@ function createId3Size(size: number) {
 	]
 }
 
-export function createId3(type: string, data: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> {
+export function createId3(type: string, data: Uint8Array): Uint8Array {
 	const id3 = new Uint8Array([
 		////////////
 		// Header //

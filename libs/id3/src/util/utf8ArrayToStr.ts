@@ -11,11 +11,11 @@ import { decodeText, UTF_8 } from '@svta/cml-utils'
  * @internal
  */
 export function utf8ArrayToStr(
-	array: Uint8Array<ArrayBuffer>,
+	array: Uint8Array,
 	exitOnNull: boolean = false,
 ): string {
 	const byteLength = exitOnNull ? array.indexOf(0) : array.length
-	const view = new DataView<ArrayBuffer>(array.buffer, array.byteOffset, byteLength)
+	const view = new DataView(array.buffer, array.byteOffset, byteLength)
 	const result = decodeText(view, { encoding: UTF_8 })
 
 	return exitOnNull ? result : result.replace(/\0/g, '')

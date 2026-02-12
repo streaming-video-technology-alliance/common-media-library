@@ -10,7 +10,7 @@ import { readId3Size } from './readId3Size.ts'
  *
  * @internal
  */
-export function getId3FrameData(data: Uint8Array<ArrayBuffer>): RawId3Frame {
+export function getId3FrameData(data: Uint8Array): RawId3Frame {
 	/*
 	Frame ID       $xx xx xx xx (four characters)
 	Size           $xx xx xx xx

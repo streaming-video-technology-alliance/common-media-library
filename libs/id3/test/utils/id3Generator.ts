@@ -1,9 +1,9 @@
 import { toUint8 } from '@svta/cml-id3'
 
 export function generateId3(
-	frames: Uint8Array<ArrayBuffer>,
+	frames: Uint8Array,
 	extendedHeader: boolean = false,
-): Uint8Array<ArrayBuffer> {
+): Uint8Array {
 	let result = concat(
 		stringToInts('ID3'),
 		new Uint8Array([
@@ -56,7 +56,7 @@ export function generateId3(
 	return result
 }
 
-export function generateId3Frame(type: string, value: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> {
+export function generateId3Frame(type: string, value: Uint8Array): Uint8Array {
 	const result = concat(
 		stringToInts(type),
 		new Uint8Array([

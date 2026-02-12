@@ -8,6 +8,17 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-02-11
+
+### Fixed
+
+- Loosen typed array generic parameters in frame parsing functions
+- Add type predicate to `isId3TimestampFrame`
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.4.0
+
 ## [1.0.4] - 2026-02-04
 
 ### Changed
@@ -40,7 +51,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.5...HEAD
+[1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.4...id3-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.3...id3-v1.0.4
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.2...id3-v1.0.3
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.1...id3-v1.0.2

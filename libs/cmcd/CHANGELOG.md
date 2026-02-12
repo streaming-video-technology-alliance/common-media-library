@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-02-11
+
+### Changed
+
+- Improve TSDoc for `CmcdReporter` methods
+- Update `@svta/cml-utils` to 1.4.0
+
 ## [2.1.1] - 2026-02-09
 
 ### Fixed
@@ -76,7 +83,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.2...HEAD
+[2.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.1...cmcd-v2.1.2
 [2.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.0...cmcd-v2.1.1
 [2.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.1...cmcd-v2.1.0
 [2.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.0...cmcd-v2.0.1

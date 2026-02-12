@@ -23,7 +23,7 @@ export function convertUint8ToUint16(input: Uint8Array): Uint16Array;
 export function decodeBase64(str: string): Uint8Array;
 
 // @public
-export function decodeText(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>, options?: DecodeTextOptions): string;
+export function decodeText(data: ArrayBufferLike | ArrayBufferView, options?: DecodeTextOptions): string;
 
 // @public
 export type DecodeTextOptions = {
@@ -82,6 +82,9 @@ export type HttpResponse<R extends HttpRequest = HttpRequest> = {
     resourceTiming?: ResourceTiming;
 };
 
+// @public
+export function isArrayBufferLike(value: unknown): value is ArrayBufferLike;
+
 // @public @deprecated
 type Request_2 = HttpRequest;
 export { Request_2 as Request }
@@ -114,7 +117,7 @@ export type ResponseTypeMap<T extends string | undefined> = T extends "json" ? a
 export function roundToEven(value: number, precision: number): number;
 
 // @public
-export function stringToUint16(str: string): Uint16Array<ArrayBuffer>;
+export function stringToUint16(str: string): Uint16Array;
 
 // @public
 export type TypedResult<T, D> = {

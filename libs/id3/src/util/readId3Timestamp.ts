@@ -10,7 +10,7 @@ import type { DecodedId3Frame } from '../DecodedId3Frame.ts'
  * @internal
  */
 export function readId3Timestamp(
-	timeStampFrame: DecodedId3Frame<ArrayBuffer>,
+	timeStampFrame: DecodedId3Frame<ArrayBufferLike>,
 ): number | undefined {
 	if (timeStampFrame.data.byteLength === 8) {
 		const data = new Uint8Array(timeStampFrame.data)
