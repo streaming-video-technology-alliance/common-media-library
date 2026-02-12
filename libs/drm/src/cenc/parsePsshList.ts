@@ -22,7 +22,9 @@ export function parsePsshList(data: ArrayBufferLike | Uint8Array): Record<string
 	}
 
 	// data.buffer first for Uint8Array support
-	const dv = new DataView(isArrayBufferLike(data) ? data : (data as Uint8Array).buffer)
+	const dv = isArrayBufferLike(data)
+		? new DataView(data)
+		: new DataView((data as Uint8Array).buffer, data.byteOffset, data.byteLength)
 	const pssh: Record<string, ArrayBufferLike | Uint8Array> = {}
 	let byteCursor = 0
 
