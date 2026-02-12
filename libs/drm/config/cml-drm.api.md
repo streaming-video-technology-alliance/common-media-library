@@ -98,7 +98,7 @@ export function getLicenseServerUrl(initData: Uint16Array): string;
 export function getLicenseServerUrlFromContentProtection(contentProtectionElements: ContentProtection[], schemeIdUri: string): string | null;
 
 // @public
-export function getPsshData(pssh: ArrayBuffer): ArrayBuffer;
+export function getPsshData(pssh: ArrayBufferLike): ArrayBufferLike;
 
 // @public
 export function getPsshForKeySystem(uuid: string, initData: ArrayBufferLike): ArrayBufferLike | null;
@@ -217,6 +217,9 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 
 // @public
 export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>;
+
+// @public (undocumented)
+export function parsePsshList(data: Uint8Array): Record<string, Uint8Array>;
 
 // @public
 export const PLAYREADY_KEY_MESSAGE = "PlayReadyKeyMessage";

@@ -14,14 +14,16 @@ import { isArrayBufferLike } from '@svta/cml-utils'
  * @example
  * {@includeCode ../../test/cenc/parsePsshList.test.ts#example}
  */
-export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike> {
+export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>
+export function parsePsshList(data: Uint8Array): Record<string, Uint8Array>
+export function parsePsshList(data: ArrayBufferLike | Uint8Array): Record<string, ArrayBufferLike | Uint8Array> {
 	if (!data) {
 		return {}
 	}
 
 	// data.buffer first for Uint8Array support
 	const dv = new DataView(isArrayBufferLike(data) ? data : (data as Uint8Array).buffer)
-	const pssh: Record<string, ArrayBufferLike> = {}
+	const pssh: Record<string, ArrayBufferLike | Uint8Array> = {}
 	let byteCursor = 0
 
 	while (true) {
