@@ -17,8 +17,8 @@ import { UTF_8 } from './UTF_8.ts'
  * @example
  * {@includeCode ../test/decodeText.test.ts#example}
  */
-export function decodeText(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>, options: DecodeTextOptions = {}): string {
-	let view: DataView<ArrayBuffer>
+export function decodeText(data: ArrayBuffer | ArrayBufferView, options: DecodeTextOptions = {}): string {
+	let view: DataView
 
 	if (data instanceof ArrayBuffer) {
 		view = new DataView(data)

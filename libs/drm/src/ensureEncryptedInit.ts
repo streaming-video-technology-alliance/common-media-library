@@ -88,7 +88,7 @@ export type EnsureEncryptedInitOptions = {
  * @example
  * {@includeCode ../test/ensureEncryptedInit.test.ts#example}
  */
-export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array<ArrayBuffer> {
+export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array {
 	const { prepend = true, includeOriginal = true, schemeType = 1667591779, defaultKid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } = options ?? {}
 	const boxes = readIsoBoxes(init, { readers })
 	const stsd = findIsoBox(boxes, box => box.type === 'stsd')

@@ -109,7 +109,6 @@ export class CmcdReporter {
 		msdSent: false,
 	}
 
-	// TODO: Should this be an event handler?
 	private requester: (request: HttpRequest) => Promise<{ status: number; }>
 
 	/**
@@ -161,6 +160,8 @@ export class CmcdReporter {
 
 	/**
 	 * Stops the CMCD reporter. Called by the player when the reporter is disabled.
+	 *
+	 * @param flush - Whether to flush the event targets.
 	 */
 	stop(flush: boolean = false): void {
 		if (flush) {
@@ -215,6 +216,16 @@ export class CmcdReporter {
 		this.processEventTargets()
 	}
 
+	/**
+	 * Records an event for a target. Called by the reporter when an event occurs.
+	 *
+	 * @param target - The target to record the event for.
+	 * @param config - The configuration for the target.
+	 * @param type - The type of event to record.
+	 * @param data - Additional data to record with the event. This data
+	 *               only applies to this event report. Persistent data should
+	 *               be updated using `update()`.
+	 */
 	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}): void {
 		if (!config.events.includes(type)) {
 			return

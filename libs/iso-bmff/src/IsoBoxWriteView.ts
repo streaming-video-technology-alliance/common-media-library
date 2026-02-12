@@ -8,7 +8,7 @@ import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
  * @public
  */
 export class IsoBoxWriteView {
-	private dataView: DataView<ArrayBuffer>
+	private dataView: DataView
 	private cursor: number
 
 	/**
@@ -27,7 +27,7 @@ export class IsoBoxWriteView {
 	 *
 	 * @returns The buffer of the data view.
 	 */
-	get buffer(): ArrayBuffer {
+	get buffer(): ArrayBufferLike {
 		return this.dataView.buffer
 	}
 

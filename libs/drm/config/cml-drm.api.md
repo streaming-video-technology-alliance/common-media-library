@@ -54,7 +54,7 @@ export const EncryptionScheme: {
 export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;
 
 // @public
-export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array<ArrayBuffer>;
+export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array;
 
 // @public
 export type EnsureEncryptedInitOptions = {

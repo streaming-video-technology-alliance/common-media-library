@@ -317,7 +317,7 @@ export type IsoBoxContainerMap = {
 };
 
 // @public
-export type IsoBoxData = ArrayBuffer | ArrayBufferView<ArrayBuffer>;
+export type IsoBoxData = ArrayBuffer | ArrayBufferView;
 
 // @public
 export const IsoBoxFields: {
@@ -454,7 +454,7 @@ export type IsoBoxReaderReturn<T$1> = { [K in keyof T$1]: T$1[K] extends ((...ar
 export class IsoBoxReadView {
     [Symbol.iterator](): Generator<ParsedIsoBox>;
     constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig);
-    get buffer(): ArrayBuffer;
+    get buffer(): ArrayBufferLike;
     get byteLength(): number;
     get byteOffset(): number;
     get bytesRemaining(): number;
@@ -464,7 +464,7 @@ export class IsoBoxReadView {
     readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
     readBox: () => ParsedBox;
     readBoxes: <T = IsoBox>(length?: number) => T[];
-    readData: (size: number) => Uint8Array<ArrayBuffer>;
+    readData: (size: number) => Uint8Array;
     readEntries: <T>(length: number, map: () => T) => T[];
     readFullBox: () => FullBox;
     readInt: (size: number) => number;
@@ -495,7 +495,7 @@ export type IsoBoxWriterMap = Record<string, IsoBoxWriter<any>>;
 // @public
 export class IsoBoxWriteView {
     constructor(type: string, size: number);
-    get buffer(): ArrayBuffer;
+    get buffer(): ArrayBufferLike;
     get byteLength(): number;
     get byteOffset(): number;
     writeArray: <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number, length: number) => void;
@@ -521,7 +521,7 @@ export type IsoFieldTypeMap = {
     [IsoBoxFields.INT]: number;
     [IsoBoxFields.TEMPLATE]: number;
     [IsoBoxFields.STRING]: string;
-    [IsoBoxFields.DATA]: Uint8Array<ArrayBuffer>;
+    [IsoBoxFields.DATA]: Uint8Array;
     [IsoBoxFields.UTF8]: string;
 };
 
@@ -616,7 +616,7 @@ export type MediaBoxChild = MediaHeaderBox | HandlerReferenceBox | MediaInformat
 // @public
 export type MediaDataBox = {
     type: "mdat";
-    data: Uint8Array<ArrayBuffer>;
+    data: Uint8Array;
 };
 
 // @public

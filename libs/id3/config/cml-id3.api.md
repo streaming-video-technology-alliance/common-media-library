@@ -30,10 +30,10 @@ export function decodeId3TextFrame(frame: RawId3Frame): DecodedId3Frame<string> 
 export function getId3Data(data: Uint8Array, offset: number): Uint8Array | undefined;
 
 // @public
-export function getId3Frames(id3Data: Uint8Array<ArrayBuffer>): Id3Frame[];
+export function getId3Frames(id3Data: Uint8Array): Id3Frame[];
 
 // @public
-export function getId3Timestamp(data: Uint8Array<ArrayBuffer>): number | undefined;
+export function getId3Timestamp(data: Uint8Array): number | undefined;
 
 // @public
 export const ID3_SCHEME_ID_URI = "https://aomedia.org/emsg/ID3";
@@ -54,7 +54,7 @@ export function isId3Header(data: Uint8Array, offset: number): boolean;
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function isId3TimestampFrame(frame: Id3Frame): boolean;
+export function isId3TimestampFrame(frame: Id3Frame): frame is DecodedId3Frame<ArrayBuffer>;
 
 // Warning: (ae-internal-missing-underscore) The name "RawId3Frame" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -62,7 +62,7 @@ export function isId3TimestampFrame(frame: Id3Frame): boolean;
 export type RawId3Frame = {
     type: string;
     size: number;
-    data: Uint8Array<ArrayBuffer>;
+    data: Uint8Array;
 };
 
 // Warning: (ae-internal-missing-underscore) The name "readId3Size" should be prefixed with an underscore because the declaration is marked as @internal
@@ -78,7 +78,7 @@ export function toArrayBuffer(view: ArrayBuffer | TypedArray): ArrayBuffer;
 // Warning: (ae-internal-missing-underscore) The name "toUint8" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
-export function toUint8(data: BufferSource, offset?: number, length?: number): Uint8Array<ArrayBuffer>;
+export function toUint8(data: BufferSource, offset?: number, length?: number): Uint8Array;
 
 // Warning: (ae-internal-missing-underscore) The name "TypedArray" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -88,7 +88,7 @@ export type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int
 // Warning: (ae-internal-missing-underscore) The name "utf8ArrayToStr" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function utf8ArrayToStr(array: Uint8Array<ArrayBuffer>, exitOnNull?: boolean): string;
+export function utf8ArrayToStr(array: Uint8Array, exitOnNull?: boolean): string;
 
 // (No @packageDocumentation comment for this package)
 

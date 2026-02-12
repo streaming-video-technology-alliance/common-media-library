@@ -5,5 +5,5 @@
  */
 export type MediaDataBox = {
 	type: 'mdat';
-	data: Uint8Array<ArrayBuffer>;
+	data: Uint8Array;
 };
