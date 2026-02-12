@@ -5,4 +5,4 @@ import type { DecodedId3Frame } from './DecodedId3Frame.ts'
  *
  * @public
  */
-export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
+export type Id3Frame = DecodedId3Frame<ArrayBufferLike | string | number>;

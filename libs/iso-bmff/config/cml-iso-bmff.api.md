@@ -317,7 +317,7 @@ export type IsoBoxContainerMap = {
 };
 
 // @public
-export type IsoBoxData = ArrayBuffer | ArrayBufferView;
+export type IsoBoxData = ArrayBufferLike | ArrayBufferView;
 
 // @public
 export const IsoBoxFields: {

@@ -14,7 +14,7 @@ import { extractContentId } from './extractContentId.ts'
  * {@includeCode ../../test/fairplay/getId.test.ts#example}
  */
 
-export function getId(licenseServerUrl: string, initData: ArrayBuffer, queryParam: string = 'ContentId'): string {
+export function getId(licenseServerUrl: string, initData: ArrayBufferLike, queryParam: string = 'ContentId'): string {
 	try {
 		const url = new URL(licenseServerUrl)
 		const params = new URLSearchParams(url.search)

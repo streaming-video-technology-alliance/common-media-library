@@ -37,7 +37,7 @@ export class IsoBoxReadView {
 	 * @param config - The configuration for the IsoView.
 	 */
 	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
-		this.dataView = (raw instanceof ArrayBuffer) ? new DataView(raw) : (raw instanceof DataView) ? raw : new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+		this.dataView = (raw instanceof ArrayBuffer || raw instanceof SharedArrayBuffer) ? new DataView(raw) : (raw instanceof DataView) ? raw : new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
 	}

@@ -39,7 +39,7 @@ export function getId3Timestamp(data: Uint8Array): number | undefined;
 export const ID3_SCHEME_ID_URI = "https://aomedia.org/emsg/ID3";
 
 // @public
-export type Id3Frame = DecodedId3Frame<ArrayBuffer | string | number>;
+export type Id3Frame = DecodedId3Frame<ArrayBufferLike | string | number>;
 
 // Warning: (ae-internal-missing-underscore) The name "isId3Footer" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -54,7 +54,7 @@ export function isId3Header(data: Uint8Array, offset: number): boolean;
 // Warning: (ae-internal-missing-underscore) The name "isId3TimestampFrame" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function isId3TimestampFrame(frame: Id3Frame): frame is DecodedId3Frame<ArrayBuffer>;
+export function isId3TimestampFrame(frame: Id3Frame): frame is DecodedId3Frame<ArrayBufferLike>;
 
 // Warning: (ae-internal-missing-underscore) The name "RawId3Frame" should be prefixed with an underscore because the declaration is marked as @internal
 //

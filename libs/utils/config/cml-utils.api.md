@@ -23,7 +23,7 @@ export function convertUint8ToUint16(input: Uint8Array): Uint16Array;
 export function decodeBase64(str: string): Uint8Array;
 
 // @public
-export function decodeText(data: ArrayBuffer | ArrayBufferView, options?: DecodeTextOptions): string;
+export function decodeText(data: ArrayBufferLike | ArrayBufferView, options?: DecodeTextOptions): string;
 
 // @public
 export type DecodeTextOptions = {

@@ -68,7 +68,7 @@ export type EnsureEncryptedInitOptions = {
 export const EXPIRED = "expired";
 
 // @public
-export function extractContentId(initData: ArrayBuffer, encoding?: Encoding): string;
+export function extractContentId(initData: ArrayBufferLike, encoding?: Encoding): string;
 
 // @public
 export const FAIRPLAY_KEY_SYSTEM = "com.apple.fps.1_0";
@@ -80,7 +80,7 @@ export const FAIRPLAY_UUID = "29701fe4-3cc7-4a34-8c5b-ae90c7439a47";
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
 
 // @public
-export function getId(licenseServerUrl: string, initData: ArrayBuffer, queryParam?: string): string;
+export function getId(licenseServerUrl: string, initData: ArrayBufferLike, queryParam?: string): string;
 
 // @public
 export function getKeySystemAccess(requests: MediaKeySystemAccessRequest[]): Promise<MediaKeySystemAccess | null>;

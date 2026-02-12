@@ -17,10 +17,10 @@ import { UTF_8 } from './UTF_8.ts'
  * @example
  * {@includeCode ../test/decodeText.test.ts#example}
  */
-export function decodeText(data: ArrayBuffer | ArrayBufferView, options: DecodeTextOptions = {}): string {
+export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: DecodeTextOptions = {}): string {
 	let view: DataView
 
-	if (data instanceof ArrayBuffer) {
+	if (data instanceof ArrayBuffer || data instanceof SharedArrayBuffer) {
 		view = new DataView(data)
 	}
 	else {
