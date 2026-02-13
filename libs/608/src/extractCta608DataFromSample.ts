@@ -19,7 +19,8 @@ export function extractCta608DataFromSample(raw: DataView, startPos: number, sam
 	let nalSize: number = 0
 	const fieldData: number[][] = [[], []]
 
-	for (let cursor = startPos; cursor < startPos + sampleSize - 5; cursor++) {
+	// Loop needs to account for maximum NALU header size (H.265/H.266 = 6 bytes: 4-byte size + 2-byte header)
+	for (let cursor = startPos; cursor < startPos + sampleSize - 6; cursor++) {
 		nalSize = raw.getUint32(cursor)
 
 		const nalUnitInfo = extractNalUnitType(raw, cursor)

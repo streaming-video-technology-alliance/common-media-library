@@ -113,7 +113,7 @@ export function extractNalUnitType(raw: DataView, cursor: number): { nalType: nu
 	
 	// If not an H.264 SEI, try H.265/H.266 format (2-byte header): type is in bits 1-6 of first byte
 	// Only accept the H.265/H.266 extraction if it results in a valid SEI type
-	if (!isSeiNalUnitType(nalType) && cursor + 5 < raw.byteLength) {
+	if (!isSeiNalUnitType(nalType) && cursor + 6 <= raw.byteLength) {
 		const naluHeader = raw.getUint16(cursor + 4)
 		const h265Type = (naluHeader >> 9) & 0x3F
 		if (isSeiNalUnitType(h265Type)) {
