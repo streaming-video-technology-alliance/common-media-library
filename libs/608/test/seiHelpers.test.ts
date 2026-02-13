@@ -58,7 +58,8 @@ describe('extractNalUnitType Tests', () => {
 		const buffer = new ArrayBuffer(10)
 		const view = new DataView(buffer)
 		view.setUint32(0, 6) // NAL size = 6
-		// H.265 type 39 in bits 1-6: (39 << 9) = 0x4E00
+		// H.265 type 39: In the 2-byte header, type is in bits 9-14 of the 16-bit word
+		// Type 39 shifted left 9 bits: (39 << 9) = 0x4E00
 		view.setUint16(4, 0x4E00)
 
 		const result = extractNalUnitType(view, 0)
@@ -70,7 +71,8 @@ describe('extractNalUnitType Tests', () => {
 		const buffer = new ArrayBuffer(10)
 		const view = new DataView(buffer)
 		view.setUint32(0, 6) // NAL size = 6
-		// H.265 type 40 in bits 1-6: (40 << 9) = 0x5000
+		// H.265 type 40: In the 2-byte header, type is in bits 9-14 of the 16-bit word
+		// Type 40 shifted left 9 bits: (40 << 9) = 0x5000
 		view.setUint16(4, 0x5000)
 
 		const result = extractNalUnitType(view, 0)
@@ -82,7 +84,8 @@ describe('extractNalUnitType Tests', () => {
 		const buffer = new ArrayBuffer(10)
 		const view = new DataView(buffer)
 		view.setUint32(0, 6) // NAL size = 6
-		// H.266 type 23 in bits 1-6: (23 << 9) = 0x2E00
+		// H.266 type 23: In the 2-byte header, type is in bits 9-14 of the 16-bit word
+		// Type 23 shifted left 9 bits: (23 << 9) = 0x2E00
 		view.setUint16(4, 0x2E00)
 
 		const result = extractNalUnitType(view, 0)
@@ -94,7 +97,8 @@ describe('extractNalUnitType Tests', () => {
 		const buffer = new ArrayBuffer(10)
 		const view = new DataView(buffer)
 		view.setUint32(0, 6) // NAL size = 6
-		// H.266 type 24 in bits 1-6: (24 << 9) = 0x3000
+		// H.266 type 24: In the 2-byte header, type is in bits 9-14 of the 16-bit word
+		// Type 24 shifted left 9 bits: (24 << 9) = 0x3000
 		view.setUint16(4, 0x3000)
 
 		const result = extractNalUnitType(view, 0)
