@@ -42,77 +42,71 @@ describe('isSeiNalUnitType Tests', () => {
 })
 
 describe('extractNalUnitType Tests', () => {
-	it('should extract H.264 SEI NAL unit type (6) with 1-byte header', () => {
-		// Create a DataView with H.264 NAL unit: size (4 bytes) + header (1 byte with type 6)
-		const buffer = new ArrayBuffer(10)
+	// #region example
+	it('should detect H.264 SEI NAL unit type (6) with 1-byte header', () => {
+		// H.264 NAL header: type in bits 0-4 of byte 0
+		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
-		view.setUint32(0, 5) // NAL size = 5
-		view.setUint8(4, 0x06) // H.264 SEI type (bits 0-4 = 6)
+		view.setUint8(0, 0x06) // H.264 SEI type = 6
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 6, headerSize: 1 })
 	})
 
-	it('should extract H.265 prefix SEI NAL unit type (39) with 2-byte header', () => {
-		// Create a DataView with H.265 NAL unit: size (4 bytes) + header (2 bytes with type 39)
-		const buffer = new ArrayBuffer(10)
+	it('should detect H.265 prefix SEI NAL unit type (39) with 2-byte header', () => {
+		// H.265 NAL header: type in bits 1-6 of byte 0
+		// Type 39 shifted left 1 bit: (39 << 1) = 0x4E
+		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
-		view.setUint32(0, 6) // NAL size = 6
-		// H.265 type 39: In the 2-byte header, type is in bits 9-14 of the 16-bit word
-		// Type 39 shifted left 9 bits: (39 << 9) = 0x4E00
-		view.setUint16(4, 0x4E00)
+		view.setUint8(0, 0x4E)
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 39, headerSize: 2 })
 	})
 
-	it('should extract H.265 suffix SEI NAL unit type (40) with 2-byte header', () => {
-		// Create a DataView with H.265 NAL unit: size (4 bytes) + header (2 bytes with type 40)
-		const buffer = new ArrayBuffer(10)
+	it('should detect H.265 suffix SEI NAL unit type (40) with 2-byte header', () => {
+		// H.265 NAL header: type in bits 1-6 of byte 0
+		// Type 40 shifted left 1 bit: (40 << 1) = 0x50
+		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
-		view.setUint32(0, 6) // NAL size = 6
-		// H.265 type 40: In the 2-byte header, type is in bits 9-14 of the 16-bit word
-		// Type 40 shifted left 9 bits: (40 << 9) = 0x5000
-		view.setUint16(4, 0x5000)
+		view.setUint8(0, 0x50)
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 40, headerSize: 2 })
 	})
+	// #endregion example
 
-	it('should extract H.266 prefix SEI NAL unit type (23) with 2-byte header', () => {
-		// Create a DataView with H.266 NAL unit: size (4 bytes) + header (2 bytes with type 23)
-		const buffer = new ArrayBuffer(10)
+	it('should detect H.266 prefix SEI NAL unit type (23) with 2-byte header', () => {
+		// H.266 NAL header: type in bits 3-7 of byte 1
+		// Type 23 shifted left 3 bits: (23 << 3) = 0xB8
+		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
-		view.setUint32(0, 6) // NAL size = 6
-		// H.266 type 23: In the 2-byte header, type is in bits 9-14 of the 16-bit word
-		// Type 23 shifted left 9 bits: (23 << 9) = 0x2E00
-		view.setUint16(4, 0x2E00)
+		view.setUint8(0, 0x00)
+		view.setUint8(1, 0xB8)
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 23, headerSize: 2 })
 	})
 
-	it('should extract H.266 suffix SEI NAL unit type (24) with 2-byte header', () => {
-		// Create a DataView with H.266 NAL unit: size (4 bytes) + header (2 bytes with type 24)
-		const buffer = new ArrayBuffer(10)
+	it('should detect H.266 suffix SEI NAL unit type (24) with 2-byte header', () => {
+		// H.266 NAL header: type in bits 3-7 of byte 1
+		// Type 24 shifted left 3 bits: (24 << 3) = 0xC0
+		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
-		view.setUint32(0, 6) // NAL size = 6
-		// H.266 type 24: In the 2-byte header, type is in bits 9-14 of the 16-bit word
-		// Type 24 shifted left 9 bits: (24 << 9) = 0x3000
-		view.setUint16(4, 0x3000)
+		view.setUint8(0, 0x00)
+		view.setUint8(1, 0xC0)
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 24, headerSize: 2 })
 	})
 
-	it('should extract non-SEI H.264 NAL unit type with 1-byte header', () => {
-		// Create a DataView with H.264 NAL unit: type 5 (IDR slice)
-		const buffer = new ArrayBuffer(10)
+	it('should return null for non-SEI NAL unit types', () => {
+		// H.264 NAL header with type 5 (IDR slice) — not an SEI
+		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
-		view.setUint32(0, 5) // NAL size = 5
-		view.setUint8(4, 0x05) // H.264 IDR type (bits 0-4 = 5)
+		view.setUint8(0, 0x05)
 
 		const result = extractNalUnitType(view, 0)
-		deepEqual(result, { nalType: 5, headerSize: 1 })
+		equal(result, null)
 	})
 })

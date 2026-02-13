@@ -1,4 +1,4 @@
-import { extractNalUnitType, isSeiNalUnitType } from './utils/seiHelpers.ts'
+import { extractNalUnitType } from './utils/seiHelpers.ts'
 
 /**
  * Find CTA-608 NAL units in a video stream
@@ -29,17 +29,10 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 	while (cursor < startPos + size) {
 		nalSize = raw.getUint32(cursor)
 
-		const nalUnitInfo = extractNalUnitType(raw, cursor)
-		if (!nalUnitInfo) {
-			cursor += nalSize + 4
-			continue
-		}
-
-		const { nalType, headerSize } = nalUnitInfo
-
-		if (isSeiNalUnitType(nalType)) {
+		const seiInfo = extractNalUnitType(raw, cursor + 4)
+		if (seiInfo) {
 			// SEI NAL Unit. The NAL header is 1 byte (H.264) or 2 bytes (H.265/H.266)
-			let pos = cursor + 4 + headerSize
+			let pos = cursor + 4 + seiInfo.headerSize
 			let payloadType = -1
 			while (pos < cursor + 4 + nalSize - 1) { // The last byte should be rbsp_trailing_bits
 				payloadType = 0
@@ -57,7 +50,6 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 					pos++
 				}
 				if (isCTA608SEI(payloadType, payloadSize, raw, pos)) {
-					//console.log("CTA608 SEI " + time + " " + payloadSize);
 					cta608NaluRanges.push([pos, payloadSize])
 				}
 				pos += payloadSize

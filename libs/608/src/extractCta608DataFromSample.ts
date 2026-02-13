@@ -1,7 +1,6 @@
 import {
 	extractNalUnitType,
 	getSeiData,
-	isSeiNalUnitType,
 	parseCta608DataFromSei,
 } from './utils/seiHelpers.ts'
 
@@ -23,13 +22,6 @@ export function extractCta608DataFromSample(raw: DataView, startPos: number, sam
 	for (let cursor = startPos; cursor < startPos + sampleSize - 6; cursor++) {
 		nalSize = raw.getUint32(cursor)
 
-		const nalUnitInfo = extractNalUnitType(raw, cursor)
-		if (!nalUnitInfo) {
-			continue
-		}
-
-		const { nalType, headerSize } = nalUnitInfo
-
 		// The NAL unit data (nalSize bytes) starts after the 4-byte length prefix
 		const nalEnd = cursor + 4 + nalSize
 
@@ -39,8 +31,9 @@ export function extractCta608DataFromSample(raw: DataView, startPos: number, sam
 		}
 
 		// Only process Supplemental Enhancement Information (SEI) NAL units
-		if (isSeiNalUnitType(nalType)) {
-			const seiStart = cursor + 4 + headerSize
+		const seiInfo = extractNalUnitType(raw, cursor + 4)
+		if (seiInfo) {
+			const seiStart = cursor + 4 + seiInfo.headerSize
 			if (nalEnd <= raw.byteLength) {
 				const seiData = getSeiData(raw, seiStart, nalEnd)
 				parseCta608DataFromSei(seiData, fieldData)
