@@ -91,6 +91,40 @@ export function isSeiNalUnitType(unitType: number): boolean {
 		unitType === H266_SUFFIX_SEI_TYPE
 }
 
+/**
+ * Extracts the NAL unit type from a DataView and determines the header size.
+ * 
+ * This function supports auto-detection of H.264, H.265, and H.266 NAL unit types:
+ * - H.264 uses a 1-byte NAL header with type in bits 0-4 (max value 31)
+ * - H.265/H.266 use a 2-byte NAL header with type in bits 1-6 of the first byte
+ * 
+ * Since H.265/H.266 SEI types (23, 24, 39, 40) produce different values when 
+ * extracted using H.264 format, we can safely try H.264 first and fall back to 
+ * H.265/H.266 if no SEI type match is found.
+ *
+ * @param raw - The DataView containing the NAL unit data
+ * @param cursor - The cursor position pointing to the NAL size field (4 bytes before NAL header)
+ * @returns An object containing the NAL unit type and header size, or null if bounds check fails
+ */
+export function extractNalUnitType(raw: DataView, cursor: number): { nalType: number; headerSize: number } | null {
+	// Try H.264 format first (1-byte header): type is in bits 0-4
+	let nalType = raw.getUint8(cursor + 4) & 0x1F
+	let headerSize = 1
+	
+	// If not an H.264 SEI, try H.265/H.266 format (2-byte header): type is in bits 1-6 of first byte
+	// Only accept the H.265/H.266 extraction if it results in a valid SEI type
+	if (!isSeiNalUnitType(nalType) && cursor + 5 < raw.byteLength) {
+		const naluHeader = raw.getUint16(cursor + 4)
+		const h265Type = (naluHeader >> 9) & 0x3F
+		if (isSeiNalUnitType(h265Type)) {
+			nalType = h265Type
+			headerSize = 2
+		}
+	}
+	
+	return { nalType, headerSize }
+}
+
 export function parseCta608DataFromSei(sei: DataView, fieldData: number[][]): void {
 	let cursor = 0
 	while (cursor < sei.byteLength) {

@@ -1,4 +1,4 @@
-import { isSeiNalUnitType } from './utils/seiHelpers.ts'
+import { extractNalUnitType, isSeiNalUnitType } from './utils/seiHelpers.ts'
 
 /**
  * Find CTA-608 NAL units in a video stream
@@ -11,7 +11,7 @@ import { isSeiNalUnitType } from './utils/seiHelpers.ts'
  * @public
  */
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): number[][] {
-	let nalSize = 0, cursor = startPos, nalType = 0
+	let nalSize = 0, cursor = startPos
 	const cta608NaluRanges = []
 
 	// Check SEI data according to ANSI-SCTE 128
@@ -28,20 +28,18 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 
 	while (cursor < startPos + size) {
 		nalSize = raw.getUint32(cursor)
-		
-		// Try H.264 format first (1-byte header): type is in bits 0-4
-		nalType = raw.getUint8(cursor + 4) & 31
-		
-		// If not an H.264 SEI, try H.265/H.266 format (2-byte header): type is in bits 1-6 of first byte
-		if (!isSeiNalUnitType(nalType) && cursor + 5 < raw.byteLength) {
-			const naluHeader = raw.getUint16(cursor + 4)
-			nalType = (naluHeader >> 9) & 0x3F
+
+		const nalUnitInfo = extractNalUnitType(raw, cursor)
+		if (!nalUnitInfo) {
+			cursor += nalSize + 4
+			continue
 		}
-		
+
+		const { nalType, headerSize } = nalUnitInfo
+
 		if (isSeiNalUnitType(nalType)) {
-			// SEI NAL Unit. The NAL header is the first byte (H.264) or first two bytes (H.265/H.266)
-			//console.log("SEI NALU of size " + nalSize + " at time " + time);
-			let pos = cursor + 5
+			// SEI NAL Unit. The NAL header is 1 byte (H.264) or 2 bytes (H.265/H.266)
+			let pos = cursor + 4 + headerSize
 			let payloadType = -1
 			while (pos < cursor + 4 + nalSize - 1) { // The last byte should be rbsp_trailing_bits
 				payloadType = 0
