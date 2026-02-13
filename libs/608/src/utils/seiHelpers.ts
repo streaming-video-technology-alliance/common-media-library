@@ -127,7 +127,8 @@ export function extractNalUnitType(raw: DataView, cursor: number): { nalType: nu
 
 export function parseCta608DataFromSei(sei: DataView, fieldData: number[][]): void {
 	let cursor = 0
-	while (cursor < sei.byteLength) {
+	// The last byte is rbsp_trailing_bits, so stop before it
+	while (cursor < sei.byteLength - 1) {
 		let payloadType = 0
 		let payloadSize = 0
 		let now

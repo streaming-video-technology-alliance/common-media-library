@@ -30,16 +30,19 @@ export function extractCta608DataFromSample(raw: DataView, startPos: number, sam
 
 		const { nalType, headerSize } = nalUnitInfo
 
+		// The NAL unit data (nalSize bytes) starts after the 4-byte length prefix
+		const nalEnd = cursor + 4 + nalSize
+
 		// Make sure that we don't go out of bounds
-		if (cursor + 4 + headerSize + nalSize > startPos + sampleSize) {
+		if (nalEnd > startPos + sampleSize) {
 			break
 		}
 
 		// Only process Supplemental Enhancement Information (SEI) NAL units
 		if (isSeiNalUnitType(nalType)) {
 			const seiStart = cursor + 4 + headerSize
-			if (seiStart + nalSize <= raw.byteLength) {
-				const seiData = getSeiData(raw, seiStart, seiStart + nalSize)
+			if (nalEnd <= raw.byteLength) {
+				const seiData = getSeiData(raw, seiStart, nalEnd)
 				parseCta608DataFromSei(seiData, fieldData)
 			}
 		}
