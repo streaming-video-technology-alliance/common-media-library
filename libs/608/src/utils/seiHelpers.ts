@@ -120,6 +120,9 @@ export function extractNalUnitType(raw: DataView, pos: number): { nalType: numbe
 	}
 
 	// H.266: 2-byte header, type in bits 3-7 of byte 1
+	if (pos + 1 >= raw.byteLength) {
+		return null
+	}
 	const byte1 = raw.getUint8(pos + 1)
 	const h266Type = (byte1 >> 3) & 0x1F
 	if (h266Type === H266_PREFIX_SEI_TYPE || h266Type === H266_SUFFIX_SEI_TYPE) {
