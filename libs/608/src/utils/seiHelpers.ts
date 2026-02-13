@@ -51,8 +51,44 @@ export function isNonEmptyCCData(ccData1: number, ccData2: number): boolean {
 	return (ccData1 & 0x7F) > 0 || (ccData2 & 0x7F) > 0
 }
 
+/**
+ * H.264 SEI NAL unit type
+ */
+const H264_SEI_TYPE = 0x06
+
+/**
+ * H.265 prefix SEI NAL unit type
+ */
+const H265_PREFIX_SEI_TYPE = 39
+
+/**
+ * H.265 suffix SEI NAL unit type
+ */
+const H265_SUFFIX_SEI_TYPE = 40
+
+/**
+ * H.266 prefix SEI NAL unit type
+ */
+const H266_PREFIX_SEI_TYPE = 23
+
+/**
+ * H.266 suffix SEI NAL unit type
+ */
+const H266_SUFFIX_SEI_TYPE = 24
+
+/**
+ * Check if a NAL unit type is an SEI (Supplemental Enhancement Information) unit
+ * for H.264, H.265, or H.266 codecs.
+ *
+ * @param unitType - The NAL unit type to check
+ * @returns true if the unit type is an SEI NAL unit type for any supported codec
+ */
 export function isSeiNalUnitType(unitType: number): boolean {
-	return unitType === 0x06
+	return unitType === H264_SEI_TYPE ||
+		unitType === H265_PREFIX_SEI_TYPE ||
+		unitType === H265_SUFFIX_SEI_TYPE ||
+		unitType === H266_PREFIX_SEI_TYPE ||
+		unitType === H266_SUFFIX_SEI_TYPE
 }
 
 export function parseCta608DataFromSei(sei: DataView, fieldData: number[][]): void {

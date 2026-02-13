@@ -23,13 +23,26 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 		const userDataTypeCode = raw.getUint8(pos + 7)
 		return countryCode == 181 && providerCode == 49 && userIdentifier == 1195456820 && userDataTypeCode == 3
 	}
+	
+	// Check if a NAL unit type is an SEI type (H.264, H.265, or H.266)
+	const isSEINalType = (type: number): boolean => {
+		return type === 6 || type === 39 || type === 40 || type === 23 || type === 24
+	}
 
 	while (cursor < startPos + size) {
 		nalSize = raw.getUint32(cursor)
+		
+		// Try H.264 format first (1-byte header): type is in bits 0-4
 		nalType = raw.getUint8(cursor + 4) & 31
-		//console.log(time + "  NAL " + nalType);
-		if (nalType === 6) {
-			// SEI NAL Unit. The NAL header is the first byte
+		
+		// If not an H.264 SEI, try H.265/H.266 format (2-byte header): type is in bits 1-6 of first byte
+		if (!isSEINalType(nalType) && cursor + 5 < raw.byteLength) {
+			const naluHeader = raw.getUint16(cursor + 4)
+			nalType = (naluHeader >> 9) & 0x3F
+		}
+		
+		if (isSEINalType(nalType)) {
+			// SEI NAL Unit. The NAL header is the first byte (H.264) or first two bytes (H.265/H.266)
 			//console.log("SEI NALU of size " + nalSize + " at time " + time);
 			let pos = cursor + 5
 			let payloadType = -1
