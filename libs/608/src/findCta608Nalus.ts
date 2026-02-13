@@ -1,5 +1,10 @@
+import { detectSeiNalu } from './utils/seiHelpers.ts'
+
 /**
  * Find CTA-608 NAL units in a video stream
+ *
+ * Supports H.264, H.265, and H.266 bitstreams by auto-detecting the NAL unit
+ * header format and SEI type.
  *
  * @param raw - The DataView to extract the data from
  * @param startPos - The start position of the data
@@ -9,7 +14,7 @@
  * @public
  */
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): number[][] {
-	let nalSize = 0, cursor = startPos, nalType = 0
+	let nalSize = 0, cursor = startPos
 	const cta608NaluRanges = []
 
 	// Check SEI data according to ANSI-SCTE 128
@@ -26,12 +31,13 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 
 	while (cursor < startPos + size) {
 		nalSize = raw.getUint32(cursor)
-		nalType = raw.getUint8(cursor + 4) & 31
-		//console.log(time + "  NAL " + nalType);
-		if (nalType === 6) {
-			// SEI NAL Unit. The NAL header is the first byte
-			//console.log("SEI NALU of size " + nalSize + " at time " + time);
-			let pos = cursor + 5
+
+		// Detect SEI NAL unit type across H.264, H.265, and H.266
+		const seiInfo = detectSeiNalu(raw, cursor + 4)
+
+		if (seiInfo) {
+			// SEI NAL Unit - skip the NAL header (1 byte for H.264, 2 bytes for H.265/H.266)
+			let pos = cursor + 4 + seiInfo.headerSize
 			let payloadType = -1
 			while (pos < cursor + 4 + nalSize - 1) { // The last byte should be rbsp_trailing_bits
 				payloadType = 0
@@ -49,7 +55,6 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 					pos++
 				}
 				if (isCTA608SEI(payloadType, payloadSize, raw, pos)) {
-					//console.log("CTA608 SEI " + time + " " + payloadSize);
 					cta608NaluRanges.push([pos, payloadSize])
 				}
 				pos += payloadSize

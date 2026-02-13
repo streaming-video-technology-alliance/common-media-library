@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-13
+
+### Added
+
+- Add H.265 (HEVC) and H.266 (VVC) SEI NAL unit type support to `extractCta608DataFromSample` and `findCta608Nalus` ([#321](https://github.com/streaming-video-technology-alliance/common-media-library/issues/321))
+
+### Fixed
+
+- Fix RBSP trailing bits being included in SEI payload data passed to the parser in `extractCta608DataFromSample`
+
 ## [1.0.1] - 2025-12-22
 
 ### Fixed
@@ -23,6 +33,7 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.1...608-v1.1.0
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.0...608-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/608-v1.0.0

@@ -1,11 +1,14 @@
 import {
+	detectSeiNalu,
 	getSeiData,
-	isSeiNalUnitType,
 	parseCta608DataFromSei,
 } from './utils/seiHelpers.ts'
 
 /**
  * Extracts CEA-608 data from a given sample.
+ *
+ * Supports H.264, H.265, and H.266 bitstreams by auto-detecting the NAL unit
+ * header format and SEI type.
  *
  * @param raw - The DataView with media data
  * @param startPos - The start position within the DataView
@@ -16,22 +19,25 @@ import {
  */
 export function extractCta608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {
 	let nalSize: number = 0
-	let nalType: number = 0
 	const fieldData: number[][] = [[], []]
 
 	for (let cursor = startPos; cursor < startPos + sampleSize - 5; cursor++) {
 		nalSize = raw.getUint32(cursor)
-		nalType = raw.getUint8(cursor + 4) & 0x1F
 
 		// Make sure that we don't go out of bounds
-		if (cursor + 5 + nalSize > startPos + sampleSize) {
+		if (cursor + 4 + nalSize > startPos + sampleSize) {
 			break
 		}
 
-		// Only process Supplemental Enhancement Information (SEI) NAL units
-		if (isSeiNalUnitType(nalType)) {
-			if (cursor + 5 + nalSize <= raw.byteLength) {
-				const seiData = getSeiData(raw, cursor + 5, cursor + 5 + nalSize)
+		// Detect SEI NAL unit type across H.264, H.265, and H.266
+		const seiInfo = detectSeiNalu(raw, cursor + 4)
+
+		if (seiInfo) {
+			const seiStart = cursor + 4 + seiInfo.headerSize
+			// Exclude the last byte (RBSP trailing bits) from the SEI payload
+			const seiEnd = cursor + 4 + nalSize - 1
+			if (seiEnd <= raw.byteLength && seiStart < seiEnd) {
+				const seiData = getSeiData(raw, seiStart, seiEnd)
 				parseCta608DataFromSei(seiData, fieldData)
 			}
 		}

@@ -51,8 +51,73 @@ export function isNonEmptyCCData(ccData1: number, ccData2: number): boolean {
 	return (ccData1 & 0x7F) > 0 || (ccData2 & 0x7F) > 0
 }
 
+/**
+ * H.264 SEI NAL unit type.
+ */
+const H264_SEI = 0x06
+
+/**
+ * H.265 SEI prefix NAL unit type.
+ */
+const H265_PREFIX_SEI = 0x27
+
+/**
+ * H.265 SEI suffix NAL unit type.
+ */
+const H265_SUFFIX_SEI = 0x28
+
+/**
+ * H.266 SEI prefix NAL unit type.
+ */
+const H266_PREFIX_SEI = 0x17
+
+/**
+ * H.266 SEI suffix NAL unit type.
+ */
+const H266_SUFFIX_SEI = 0x18
+
+/**
+ * Determines the NAL unit type and header size from a raw data view at a given position.
+ *
+ * This function attempts to detect the codec format (H.264, H.265, or H.266) by
+ * extracting the NAL unit type using each format's header layout and checking
+ * whether it corresponds to an SEI NAL unit type for that format.
+ *
+ * @param raw - The DataView containing the NAL unit data
+ * @param pos - The position of the first byte of the NAL unit header (after the length prefix)
+ * @returns An object with `nalType` and `headerSize`, or `null` if no SEI type was detected
+ *
+ * @public
+ */
+export function detectSeiNalu(raw: DataView, pos: number): { nalType: number, headerSize: number } | null {
+	const byte0 = raw.getUint8(pos)
+
+	// H.264: 1-byte header, type in bits 0-4
+	const h264Type = byte0 & 0x1F
+	if (h264Type === H264_SEI) {
+		return { nalType: h264Type, headerSize: 1 }
+	}
+
+	// H.265: 2-byte header, type in bits 1-6 of byte 0
+	const h265Type = (byte0 >> 1) & 0x3F
+	if (h265Type === H265_PREFIX_SEI || h265Type === H265_SUFFIX_SEI) {
+		return { nalType: h265Type, headerSize: 2 }
+	}
+
+	// H.266: 2-byte header, type in bits 3-7 of byte 1
+	const byte1 = raw.getUint8(pos + 1)
+	const h266Type = (byte1 >> 3) & 0x1F
+	if (h266Type === H266_PREFIX_SEI || h266Type === H266_SUFFIX_SEI) {
+		return { nalType: h266Type, headerSize: 2 }
+	}
+
+	return null
+}
+
 export function isSeiNalUnitType(unitType: number): boolean {
-	return unitType === 0x06
+	return unitType === H264_SEI
+		|| unitType === H265_PREFIX_SEI || unitType === H265_SUFFIX_SEI
+		|| unitType === H266_PREFIX_SEI || unitType === H266_SUFFIX_SEI
 }
 
 export function parseCta608DataFromSei(sei: DataView, fieldData: number[][]): void {
