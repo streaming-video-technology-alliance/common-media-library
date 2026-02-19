@@ -19,6 +19,10 @@ and this project adheres to
 - Add `validateCmcdHeaders(headers)` to validate keys are placed in the correct header shards
 - Add `CmcdValidationResult`, `CmcdValidationIssue`, `CmcdValidationOptions`, and `CmcdValidationSeverity` types
 
+### Fixed
+
+- Fix `CMCD_EVENT_BITRATE_CHANGE` value from `'br'` to `'bc'`
+
 ## [2.1.2] - 2026-02-11
 
 ### Changed
