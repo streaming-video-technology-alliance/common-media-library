@@ -9,16 +9,13 @@ The `@svta/cml-cmcd` library provides a set of composable validation functions f
 
 ## Overview
 
-There are six validation functions, each targeting a different aspect of CMCD compliance:
+There are three main validation functions, each targeting a different aspect of CMCD compliance:
 
-| Function              | Purpose                                                            |
-| --------------------- | ------------------------------------------------------------------ |
-| `validateCmcd`        | Orchestrator — runs key, value, and structure checks               |
-| `validateCmcdKeys`    | Checks that all keys are recognized spec keys or valid custom keys |
-| `validateCmcdValues`  | Checks that values conform to expected types and constraints       |
-| `validateCmcdHeaders` | Checks header shard placement and validates the merged payload     |
-| `validateCmcdRequest` | Validates a `Request` or `HttpRequest` as request-mode data        |
-| `validateCmcdEvent`   | Validates a multi-line `text/cmcd` body as event-mode data         |
+| Function              | Purpose                                                     |
+| --------------------- | ----------------------------------------------------------- |
+| `validateCmcd`        | Orchestrator — runs key, value, and structure checks        |
+| `validateCmcdRequest` | Validates a `Request` or `HttpRequest` as request-mode data |
+| `validateCmcdEvent`   | Validates a multi-line `text/cmcd` body as event-mode data  |
 
 All validators return a `CmcdValidationResult`:
 
