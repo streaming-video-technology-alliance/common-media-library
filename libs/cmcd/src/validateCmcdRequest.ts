@@ -29,7 +29,7 @@ import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
  * @public
  */
 export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdValidationResult {
-	const headers = request.headers instanceof Headers ? extractHeaderRecord(request.headers) : request.headers
+	const headers = extractHeaderRecord(request.headers)
 
 	if (headers) {
 		return validateCmcdHeaders(headers, options)
@@ -41,16 +41,22 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 	return validateCmcd(data, { ...options, reportingMode: CMCD_REQUEST_MODE })
 }
 
-function extractHeaderRecord(headers: Headers): Partial<Record<CmcdHeaderField, string>> {
+function extractHeaderRecord(headers: Headers | Record<string, string> | undefined): Partial<Record<CmcdHeaderField, string>> | undefined {
+	if (!headers) {
+		return undefined
+	}
+
 	const result: Partial<Record<CmcdHeaderField, string>> = {}
+	let found = false
 
 	for (const field of CMCD_HEADER_FIELDS) {
-		const value = headers.get(field)
+		const value = headers instanceof Headers ? headers.get(field) : headers[field]
 
 		if (value) {
 			result[field] = value
+			found = true
 		}
 	}
 
-	return result
+	return found ? result : undefined
 }
