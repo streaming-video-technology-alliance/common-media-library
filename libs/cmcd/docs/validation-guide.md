@@ -45,7 +45,7 @@ import { decodeCmcd, validateCmcd } from "@svta/cml-cmcd";
 
 // Simulated POST body (text/cmcd)
 const body = `e=ps,sid="session-1",ts=1700000000000,sta=p,v=2
-'e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2'`;
+e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`;
 
 // Parse each line and validate
 const lines = body.split("\n");

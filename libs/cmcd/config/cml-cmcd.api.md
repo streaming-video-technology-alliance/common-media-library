@@ -41,7 +41,7 @@ export const CMCD_EVENT_AD_START: "as";
 export const CMCD_EVENT_BACKGROUNDED_MODE: "b";
 
 // @public
-export const CMCD_EVENT_BITRATE_CHANGE: "br";
+export const CMCD_EVENT_BITRATE_CHANGE: "bc";
 
 // @public
 export const CMCD_EVENT_CONTENT_ID: "c";

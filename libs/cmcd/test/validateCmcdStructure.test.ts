@@ -116,4 +116,10 @@ describe('validateCmcdStructure', () => {
 		equal(result.valid, true)
 		equal(result.issues.length, 0)
 	})
+
+	it('reports error for unsupported v value', () => {
+		const result = validateCmcdStructure({ v: 3, br: 3000 })
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.key === 'v' && i.severity === 'error'), true)
+	})
 })

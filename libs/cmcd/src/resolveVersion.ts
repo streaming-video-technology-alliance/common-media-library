@@ -7,12 +7,13 @@ import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
  * @internal
  */
 export function resolveVersion(data: Record<string, unknown>, options?: CmcdValidationOptions): number {
-	if (options?.version != null) {
+	if (options?.version === 1 || options?.version === 2) {
 		return options.version
 	}
 
-	if (typeof data['v'] === 'number') {
-		return data['v']
+	const payloadVersion = data['v']
+	if (payloadVersion === 1 || payloadVersion === 2) {
+		return payloadVersion
 	}
 
 	return CMCD_V1

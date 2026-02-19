@@ -1,7 +1,8 @@
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
 import { type CmcdHeaderField, CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS } from './CmcdHeaderField.ts'
-import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdValidationResult } from './CmcdValidationResult.ts'
+import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
 const HEADER_FIELDS: CmcdHeaderField[] = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS]
@@ -21,17 +22,21 @@ export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, Rec
 
 	for (const headerField of HEADER_FIELDS) {
 		const shard = headers[headerField]
-		if (!shard) continue
+		if (!shard) {
+			continue
+		}
 
 		for (const key of Object.keys(shard)) {
-			if (isCmcdCustomKey(key as CmcdKey)) continue
+			if (isCmcdCustomKey(key as CmcdKey)) {
+				continue
+			}
 
 			const expectedHeader = CMCD_HEADER_MAP[key as keyof typeof CMCD_HEADER_MAP]
 			if (expectedHeader && expectedHeader !== headerField) {
 				issues.push({
 					key,
 					message: `Key "${key}" is in "${headerField}" but should be in "${expectedHeader}".`,
-					severity: 'error',
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
 				})
 			}
 		}

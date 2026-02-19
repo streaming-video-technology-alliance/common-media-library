@@ -4,6 +4,7 @@ import { CMCD_V1_KEYS } from './CMCD_V1_KEYS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
+import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
 
@@ -24,12 +25,15 @@ export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdVa
 	const issues: CmcdValidationResult['issues'] = []
 
 	for (const key of Object.keys(data)) {
-		if (isCmcdCustomKey(key as CmcdKey)) continue
+		if (isCmcdCustomKey(key as CmcdKey)) {
+			continue
+		}
+
 		if (!validKeys.includes(key)) {
 			issues.push({
 				key,
 				message: `Unknown CMCD key "${key}" for version ${version}.`,
-				severity: 'error',
+				severity: CMCD_VALIDATION_SEVERITY_ERROR,
 			})
 		}
 	}

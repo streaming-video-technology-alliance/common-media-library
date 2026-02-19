@@ -127,7 +127,14 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 	}
 
 	// Version key checks
-	if (version > 1 && !('v' in data)) {
+	if ('v' in data && data['v'] !== 1 && data['v'] !== 2) {
+		issues.push({
+			key: 'v',
+			message: `Unsupported CMCD version "${String(data['v'])}". Expected 1 or 2.`,
+			severity: CMCD_VALIDATION_SEVERITY_ERROR
+		})
+	}
+	else if (version > 1 && !('v' in data)) {
 		issues.push({
 			key: 'v',
 			message: 'Version 2 payloads require the "v" key to be present.',
