@@ -1,7 +1,7 @@
 {
 	"name": "@svta/cmcd-validator",
 	"version": "0.2.0",
-	"description": "CMCD verification proxy for validating Common Media Client Data",
+	"description": "CMCD validation service for Common Media Client Data",
 	"license": "Apache-2.0",
 	"type": "module",
 	"bin": {
@@ -21,8 +21,6 @@
 		"node": ">=22.13.0"
 	},
 	"dependencies": {
-		"@svta/cml-cmcd": "*",
-		"@svta/cml-structured-field-values": "*",
-		"@svta/cml-utils": "*"
+		"@svta/cml-cmcd": "*"
 	}
 }

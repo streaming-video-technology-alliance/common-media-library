@@ -1,7 +1,6 @@
 import { createServer } from 'node:http'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { handleEvent } from './events.ts'
-import { handleProxy } from './proxy.ts'
 import { handleDeleteReports, handleReports, handleSessions } from './reports.ts'
 import { Store } from './store.ts'
 import type { ServerConfig } from './types.ts'
@@ -32,11 +31,6 @@ export function startServer(config: ServerConfig): void {
 		const pathname = url.pathname
 
 		try {
-			if (pathname.startsWith('/proxy') && req.method === 'GET') {
-				await handleProxy(req, res, store)
-				return
-			}
-
 			const eventMatch = pathname.match(/^\/cmcd\/event\/([^/]+)\/?$/)
 			if (eventMatch && req.method === 'POST') {
 				const targetId = decodeURIComponent(eventMatch[1])
@@ -91,7 +85,6 @@ export function startServer(config: ServerConfig): void {
 
 	server.listen(config.port, () => {
 		console.log(`CMCD Validator running on http://localhost:${config.port}`)
-		console.log(`  Proxy:    http://localhost:${config.port}/proxy?url=<encoded-url>`)
 		console.log(`  Events:   POST http://localhost:${config.port}/cmcd/event/:id`)
 		console.log(`  Reports:  http://localhost:${config.port}/reports`)
 		console.log(`  Database: ${config.dbPath}`)

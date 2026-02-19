@@ -44,8 +44,7 @@ export function handleReports(
 		count: reports.length,
 		reports,
 		summary: {
-			totalRequests: reports.filter(r => r.type === 'request').length,
-			totalEvents: reports.filter(r => r.type === 'event').length,
+			totalEvents: reports.length,
 			keysObserved: [...keysObserved].sort(),
 		},
 	}

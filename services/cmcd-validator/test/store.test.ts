@@ -19,11 +19,11 @@ function createReport(overrides: Partial<CmcdReport> = {}): CmcdReport {
 	return {
 		id: crypto.randomUUID(),
 		sessionId: 'test-session',
-		type: 'request',
+		type: 'event',
 		timestamp: new Date().toISOString(),
-		data: { sid: 'test-session', br: 1000 } as unknown as Cmcd,
-		requestUrl: 'https://example.com/video.mp4',
-		method: 'GET',
+		data: { sid: 'test-session', e: 'ps' } as unknown as Cmcd,
+		targetId: 't1',
+		eventType: 'ps',
 		...overrides,
 	}
 }
@@ -66,15 +66,12 @@ describe('Store', () => {
 	})
 
 	it('should filter reports by type', () => {
-		store.insert(createReport({ type: 'request' }))
-		store.insert(createReport({ type: 'event' }))
-		store.insert(createReport({ type: 'request' }))
-
-		const requests = store.getAll('request')
-		assert.equal(requests.length, 2)
+		store.insert(createReport())
+		store.insert(createReport())
+		store.insert(createReport())
 
 		const events = store.getAll('event')
-		assert.equal(events.length, 1)
+		assert.equal(events.length, 3)
 	})
 
 	it('should clear all reports', () => {

@@ -10,7 +10,7 @@ const { values } = parseArgs({
 })
 
 if (values.help) {
-	console.log(`CMCD Validator - A verification proxy for Common Media Client Data
+	console.log(`CMCD Validator - A validation service for Common Media Client Data
 
 Usage: cmcd-validator [options]
 
@@ -20,7 +20,6 @@ Options:
   -h, --help              Show this help message
 
 Endpoints:
-  GET    /proxy?url=<url>     Proxy requests, capture CMCD data
   POST   /cmcd/event/:id      Collect CMCD v2 event reports
   GET    /sessions             List all session IDs
   GET    /reports              List all reports
@@ -30,9 +29,6 @@ Endpoints:
 
 Example:
   cmcd-validator --port 8080
-
-  # Then point your player at:
-  #   http://localhost:8080/proxy?url=https%3A%2F%2Fcdn.example.com%2Fstream%2Fmaster.m3u8
 `)
 	process.exit(0)
 }

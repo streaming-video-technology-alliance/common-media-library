@@ -3,7 +3,6 @@ import assert from 'node:assert/strict'
 import { createServer } from 'node:http'
 import type { IncomingMessage, Server, ServerResponse } from 'node:http'
 import { existsSync, unlinkSync } from 'node:fs'
-import type { Cmcd } from '@svta/cml-cmcd'
 import { Store } from '../src/store.ts'
 import { handleEvent } from '../src/events.ts'
 import { handleDeleteReports, handleReports, handleSessions } from '../src/reports.ts'
@@ -264,18 +263,6 @@ describe('Server integration', () => {
 	})
 
 	it('should filter reports by type query parameter', async () => {
-		// Insert a request report directly
-		store.insert({
-			id: crypto.randomUUID(),
-			sessionId: 'session-mixed',
-			type: 'request',
-			timestamp: new Date().toISOString(),
-			data: { sid: 'session-mixed', br: 1000 } as unknown as Cmcd,
-			requestUrl: 'https://example.com/video.mp4',
-			method: 'GET',
-		})
-
-		// Post an event
 		await fetch(`http://localhost:${port}/cmcd/event/t1`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'text/cmcd' },
@@ -285,9 +272,5 @@ describe('Server integration', () => {
 		const eventsRes = await fetch(`http://localhost:${port}/reports?type=event`)
 		const eventsData = await eventsRes.json() as { count: number }
 		assert.equal(eventsData.count, 1)
-
-		const requestsRes = await fetch(`http://localhost:${port}/reports?type=request`)
-		const requestsData = await requestsRes.json() as { count: number }
-		assert.equal(requestsData.count, 1)
 	})
 })
