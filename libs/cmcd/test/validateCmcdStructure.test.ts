@@ -90,6 +90,27 @@ describe('validateCmcdStructure', () => {
 		equal(result.issues.some(i => i.key === 'v' && i.severity === 'warning'), true)
 	})
 
+	it('reports error for event key in request mode', () => {
+		const result = validateCmcdStructure({ e: 'br', ts: 123, br: 3000 }, { reportingMode: 'request' })
+		equal(result.valid, false)
+		const errorKeys = result.issues.filter(i => i.severity === 'error').map(i => i.key)
+		equal(errorKeys.includes('e'), true)
+		equal(errorKeys.includes('ts'), true)
+	})
+
+	it('reports error for response key in request mode', () => {
+		const result = validateCmcdStructure({ rc: 200, ttfb: 100, br: 3000 }, { reportingMode: 'request' })
+		equal(result.valid, false)
+		const errorKeys = result.issues.filter(i => i.severity === 'error').map(i => i.key)
+		equal(errorKeys.includes('rc'), true)
+		equal(errorKeys.includes('ttfb'), true)
+	})
+
+	it('accepts request mode payload without event or response keys', () => {
+		const result = validateCmcdStructure({ br: 3000 }, { reportingMode: 'request' })
+		equal(result.valid, true)
+	})
+
 	it('does not warn for v2 payload with v key', () => {
 		const result = validateCmcdStructure({ v: 2, br: 3000 }, { version: 2 })
 		equal(result.valid, true)

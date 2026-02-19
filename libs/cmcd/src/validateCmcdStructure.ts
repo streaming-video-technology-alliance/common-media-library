@@ -1,7 +1,8 @@
+import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
 import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAY_STATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
-import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
+import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
@@ -22,6 +23,28 @@ import { resolveVersion } from './resolveVersion.ts'
 export function validateCmcdStructure(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult {
 	const version = resolveVersion(data, options)
 	const issues: CmcdValidationIssue[] = []
+
+	// Request mode checks
+	if (options?.reportingMode === CMCD_REQUEST_MODE) {
+		for (const key of CMCD_EVENT_KEYS) {
+			if (key in data) {
+				issues.push({
+					key,
+					message: `Event key "${key}" must not be present in request mode.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR
+				})
+			}
+		}
+		for (const key of CMCD_RESPONSE_KEYS) {
+			if (key in data) {
+				issues.push({
+					key,
+					message: `Response key "${key}" must not be present in request mode.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR
+				})
+			}
+		}
+	}
 
 	// Event mode checks
 	if (options?.reportingMode === CMCD_EVENT_MODE) {
