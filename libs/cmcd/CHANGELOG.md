@@ -8,6 +8,17 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-02-18
+
+### Added
+
+- Add `validateCmcd(data, options?)` orchestrator that runs key, value, and structure validation
+- Add `validateCmcdKeys(data, options?)` to check keys against recognized v1/v2 spec keys
+- Add `validateCmcdValues(data, options?)` to validate value types, constraints, and rounding rules
+- Add `validateCmcdStructure(data, options?)` to validate structural rules (event mode, version key, response-received keys)
+- Add `validateCmcdHeaders(headers)` to validate keys are placed in the correct header shards
+- Add `CmcdValidationResult`, `CmcdValidationIssue`, `CmcdValidationOptions`, and `CmcdValidationSeverity` types
+
 ## [2.1.0] - 2026-02-06
 
 ### Added
@@ -70,7 +81,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.2.0...HEAD
+[2.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.0...cmcd-v2.2.0
 [2.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.1...cmcd-v2.1.0
 [2.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.0.0...cmcd-v2.0.1
 [2.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v1.0.2...cmcd-v2.0.0
