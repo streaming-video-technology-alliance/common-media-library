@@ -12,7 +12,7 @@
 		"bin/**/*"
 	],
 	"scripts": {
-		"build": "tsdown",
+		"build": "tsdown src/bin.ts --format esm --platform node --clean",
 		"dev": "node services/cmcd-validator/bin/cmcd-validator.js",
 		"delete": "curl -X DELETE http://localhost:2623/reports",
 		"test": "node --no-warnings --test test/**/*.test.ts"
