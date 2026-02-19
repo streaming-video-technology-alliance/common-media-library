@@ -109,7 +109,6 @@ export class CmcdReporter {
 		msdSent: false,
 	}
 
-	// TODO: Should this be an event handler?
 	private requester: (request: HttpRequest) => Promise<{ status: number; }>
 
 	/**
@@ -150,7 +149,8 @@ export class CmcdReporter {
 			}
 
 			const timeIntervalEvent = () => {
-				this.recordEvent(CMCD_EVENT_TIME_INTERVAL)
+				this.recordTargetEvent(target, config, CMCD_EVENT_TIME_INTERVAL)
+				this.processEventTargets()
 			}
 
 			target.intervalId = setInterval(timeIntervalEvent, config.interval * 1000)
@@ -160,6 +160,8 @@ export class CmcdReporter {
 
 	/**
 	 * Stops the CMCD reporter. Called by the player when the reporter is disabled.
+	 *
+	 * @param flush - Whether to flush the event targets.
 	 */
 	stop(flush: boolean = false): void {
 		if (flush) {
@@ -208,27 +210,98 @@ export class CmcdReporter {
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
 		this.eventTargets.forEach((target, config) => {
-			if (!config.events.includes(type)) {
-				return
-			}
-
-			const item = {
-				...this.data,
-				...data,
-				e: type,
-				ts: data.ts ?? Date.now(),
-				sn: target.sn++,
-			}
-
-			if (!isNaN(this.msd) && !target.msdSent) {
-				item.msd = this.msd
-				target.msdSent = true
-			}
-
-			target.queue.push(item)
+			this.recordTargetEvent(target, config, type, data)
 		})
 
 		this.processEventTargets()
+	}
+
+	/**
+	 * Records an event for a target. Called by the reporter when an event occurs.
+	 *
+	 * @param target - The target to record the event for.
+	 * @param config - The configuration for the target.
+	 * @param type - The type of event to record.
+	 * @param data - Additional data to record with the event. This data
+	 *               only applies to this event report. Persistent data should
+	 *               be updated using `update()`.
+	 */
+	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+		if (!config.events.includes(type)) {
+			return
+		}
+
+		const item = {
+			...this.data,
+			...data,
+			e: type,
+			ts: data.ts ?? Date.now(),
+			sn: target.sn++,
+		}
+
+		if (!isNaN(this.msd) && !target.msdSent) {
+			item.msd = this.msd
+			target.msdSent = true
+		}
+
+		target.queue.push(item)
+	}
+
+	/**
+	 * Records a response-received event. Called by the player when a media
+	 * request response has been fully received.
+	 *
+	 * This method automatically derives the `rr` event keys from the
+	 *
+	 * - `url` - the original requested URL (before any redirects)
+	 * - `rc` - the HTTP response status code
+	 * - `ts` - the request initiation time (from `resourceTiming.startTime`)
+	 * - `ttfb` - time to first byte (from `resourceTiming.responseStart`)
+	 * - `ttlb` - time to last byte (from `resourceTiming.duration`)
+	 *
+	 * Additional keys like `ttfbb`, `cmsdd`, `cmsds`, and `smrt` can be
+	 * supplied via the `data` parameter if the player has access to them.
+	 *
+	 * @param response - The HTTP response received.
+	 * @param data - Additional CMCD data to include with the event.
+	 *               Values provided here override any auto-derived values.
+	 */
+	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+		const { request } = response
+
+		const url = data.url ?? request?.url
+
+		if (!url) {
+			return
+		}
+
+		const urlObj = new URL(url)
+		urlObj.searchParams.delete(CMCD_PARAM)
+
+		const derived: Partial<Cmcd> = {
+			url: urlObj.toString(),
+			rc: response.status,
+		}
+
+		const timing = response.resourceTiming
+
+		if (timing) {
+			if (timing.startTime != null) {
+				derived.ts = Math.round(this.timeOrigin + timing.startTime)
+
+				if (timing.responseStart != null) {
+					derived.ttfb = Math.round(timing.responseStart - timing.startTime)
+				}
+			}
+
+			if (timing.duration != null) {
+				derived.ttlb = Math.round(timing.duration)
+			}
+		}
+
+		const cmcd = request.customData?.cmcd ?? {}
+
+		this.recordEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data })
 	}
 
 	/**

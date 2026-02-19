@@ -1,4 +1,5 @@
 import type { DecodeTextOptions } from './DecodeTextOptions.ts'
+import { isArrayBufferLike } from './isArrayBufferLike.ts'
 import { UTF_16 } from './UTF_16.ts'
 import { UTF_16_BE } from './UTF_16_BE.ts'
 import { UTF_16_LE } from './UTF_16_LE.ts'
@@ -17,10 +18,10 @@ import { UTF_8 } from './UTF_8.ts'
  * @example
  * {@includeCode ../test/decodeText.test.ts#example}
  */
-export function decodeText(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>, options: DecodeTextOptions = {}): string {
-	let view: DataView<ArrayBuffer>
+export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: DecodeTextOptions = {}): string {
+	let view: DataView
 
-	if (data instanceof ArrayBuffer) {
+	if (isArrayBufferLike(data)) {
 		view = new DataView(data)
 	}
 	else {

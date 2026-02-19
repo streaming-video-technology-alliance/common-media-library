@@ -12,7 +12,7 @@ import { decodeText, UTF_16 } from '@svta/cml-utils'
  * @example
  * {@includeCode ../../test/fairplay/extractContentId.test.ts#example}
  */
-export function extractContentId(initData: ArrayBuffer, encoding: Encoding = UTF_16): string {
+export function extractContentId(initData: ArrayBufferLike, encoding: Encoding = UTF_16): string {
 	const initDataString = decodeText(initData, { encoding })
 
 	// Try extracting skd:// content ID

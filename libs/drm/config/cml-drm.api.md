@@ -54,7 +54,7 @@ export const EncryptionScheme: {
 export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;
 
 // @public
-export function ensureEncryptedInit(init: Uint8Array<ArrayBuffer>, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array<ArrayBuffer>;
+export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array;
 
 // @public
 export type EnsureEncryptedInitOptions = {
@@ -68,7 +68,7 @@ export type EnsureEncryptedInitOptions = {
 export const EXPIRED = "expired";
 
 // @public
-export function extractContentId(initData: ArrayBuffer, encoding?: Encoding): string;
+export function extractContentId(initData: ArrayBufferLike, encoding?: Encoding): string;
 
 // @public
 export const FAIRPLAY_KEY_SYSTEM = "com.apple.fps.1_0";
@@ -80,7 +80,7 @@ export const FAIRPLAY_UUID = "29701fe4-3cc7-4a34-8c5b-ae90c7439a47";
 export function findCencContentProtection(cpArray: ContentProtection[]): ContentProtection | null;
 
 // @public
-export function getId(licenseServerUrl: string, initData: ArrayBuffer, queryParam?: string): string;
+export function getId(licenseServerUrl: string, initData: ArrayBufferLike, queryParam?: string): string;
 
 // @public
 export function getKeySystemAccess(requests: MediaKeySystemAccessRequest[]): Promise<MediaKeySystemAccess | null>;
@@ -98,10 +98,10 @@ export function getLicenseServerUrl(initData: Uint16Array): string;
 export function getLicenseServerUrlFromContentProtection(contentProtectionElements: ContentProtection[], schemeIdUri: string): string | null;
 
 // @public
-export function getPsshData(pssh: ArrayBuffer): ArrayBuffer;
+export function getPsshData(pssh: ArrayBufferLike): ArrayBufferLike;
 
 // @public
-export function getPsshForKeySystem(uuid: string, initData: ArrayBuffer): ArrayBuffer | null;
+export function getPsshForKeySystem(uuid: string, initData: ArrayBufferLike): ArrayBufferLike | null;
 
 // @public
 export function getRequestHeadersFromMessage(message: ArrayBuffer, encoding?: typeof UTF_8 | typeof UTF_16): Record<string, string>;
@@ -216,7 +216,10 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 }): ArrayBuffer | null;
 
 // @public
-export function parsePsshList(data: ArrayBuffer): Record<string, ArrayBuffer>;
+export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>;
+
+// @public (undocumented)
+export function parsePsshList(data: Uint8Array): Record<string, Uint8Array>;
 
 // @public
 export const PLAYREADY_KEY_MESSAGE = "PlayReadyKeyMessage";

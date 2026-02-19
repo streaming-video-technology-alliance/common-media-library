@@ -2,7 +2,7 @@ import { getId3Frames, type Id3Frame } from '@svta/cml-id3'
 import { strToCodes } from '../utils/strToCodes.ts'
 import { createId3 } from './createId3.ts'
 
-export const PTS: Uint8Array<ArrayBuffer> = createId3('PRIV', new Uint8Array([
+export const PTS: Uint8Array = createId3('PRIV', new Uint8Array([
 	...strToCodes('com.apple.streaming.transportStreamTimestamp'),
 	0x00,
 

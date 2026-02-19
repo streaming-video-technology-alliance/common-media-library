@@ -9,7 +9,7 @@ import { decodeText, UTF_8 } from '@svta/cml-utils'
  *
  * @internal
  */
-export function readUtf8TerminatedString(dataView: DataView<ArrayBuffer>, offset: number): string {
+export function readUtf8TerminatedString(dataView: DataView, offset: number): string {
 	const length = dataView.byteLength - (offset - dataView.byteOffset)
 
 	let data = ''

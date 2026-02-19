@@ -15,8 +15,8 @@ import { parsePsshList } from './parsePsshList.ts'
  */
 export function getPsshForKeySystem(
 	uuid: string,
-	initData: ArrayBuffer,
-): ArrayBuffer | null {
+	initData: ArrayBufferLike,
+): ArrayBufferLike | null {
 	if (!initData || !uuid) {
 		return null
 	}

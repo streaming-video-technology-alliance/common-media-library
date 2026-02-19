@@ -8,6 +8,23 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.5] - 2026-02-11
+
+### Fixed
+
+- Loosen `Uint8Array` type parameter in `ensureEncryptedInit`
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.1
+- Update `@svta/cml-utils` to 1.4.0
+
+## [1.1.4] - 2026-02-09
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.0
+
 ## [1.1.3] - 2026-02-04
 
 ### Changed
@@ -54,7 +71,9 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.3...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.5...HEAD
+[1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.4...drm-v1.1.5
+[1.1.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.3...drm-v1.1.4
 [1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.2...drm-v1.1.3
 [1.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.1...drm-v1.1.2
 [1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.0...drm-v1.1.1

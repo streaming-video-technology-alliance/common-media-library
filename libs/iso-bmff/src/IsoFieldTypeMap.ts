@@ -10,6 +10,6 @@ export type IsoFieldTypeMap = {
 	[IsoBoxFields.INT]: number;
 	[IsoBoxFields.TEMPLATE]: number;
 	[IsoBoxFields.STRING]: string;
-	[IsoBoxFields.DATA]: Uint8Array<ArrayBuffer>;
+	[IsoBoxFields.DATA]: Uint8Array;
 	[IsoBoxFields.UTF8]: string;
 };

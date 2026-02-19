@@ -1,3 +1,5 @@
+import { isArrayBufferLike } from '@svta/cml-utils'
+
 /**
  * @internal
  */
@@ -15,8 +17,8 @@ export type TypedArray =
 /**
  * @internal
  */
-export function toArrayBuffer(view: ArrayBuffer | TypedArray): ArrayBuffer {
-	if (view instanceof ArrayBuffer) {
+export function toArrayBuffer(view: ArrayBufferLike | TypedArray): ArrayBufferLike {
+	if (isArrayBufferLike(view)) {
 		return view
 	}
 	else {
