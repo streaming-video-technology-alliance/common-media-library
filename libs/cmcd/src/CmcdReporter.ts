@@ -305,63 +305,6 @@ export class CmcdReporter {
 	}
 
 	/**
-	 * Records a response-received event. Called by the player when a media
-	 * request response has been fully received.
-	 *
-	 * This method automatically derives the `rr` event keys from the
-	 *
-	 * - `url` - the original requested URL (before any redirects)
-	 * - `rc` - the HTTP response status code
-	 * - `ts` - the request initiation time (from `resourceTiming.startTime`)
-	 * - `ttfb` - time to first byte (from `resourceTiming.responseStart`)
-	 * - `ttlb` - time to last byte (from `resourceTiming.duration`)
-	 *
-	 * Additional keys like `ttfbb`, `cmsdd`, `cmsds`, and `smrt` can be
-	 * supplied via the `data` parameter if the player has access to them.
-	 *
-	 * @param response - The HTTP response received.
-	 * @param data - Additional CMCD data to include with the event.
-	 *               Values provided here override any auto-derived values.
-	 */
-	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
-		const { request } = response
-
-		const url = data.url ?? request?.url
-
-		if (!url) {
-			return
-		}
-
-		const urlObj = new URL(url)
-		urlObj.searchParams.delete(CMCD_PARAM)
-
-		const derived: Partial<Cmcd> = {
-			url: urlObj.toString(),
-			rc: response.status,
-		}
-
-		const timing = response.resourceTiming
-
-		if (timing) {
-			if (timing.startTime != null) {
-				derived.ts = Math.round(this.timeOrigin + timing.startTime)
-
-				if (timing.responseStart != null) {
-					derived.ttfb = Math.round(timing.responseStart - timing.startTime)
-				}
-			}
-
-			if (timing.duration != null) {
-				derived.ttlb = Math.round(timing.duration)
-			}
-		}
-
-		const cmcd = request.customData?.cmcd ?? {}
-
-		this.recordEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data })
-	}
-
-	/**
 	 * Applies the CMCD request report data to the request. Called by the player
 	 * before sending the request.
 	 *

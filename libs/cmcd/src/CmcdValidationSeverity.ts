@@ -2,11 +2,15 @@ import type { ValueOf } from '@svta/cml-utils'
 
 /**
  * CMCD validation severity level: error.
+ *
+ * @public
  */
 export const CMCD_VALIDATION_SEVERITY_ERROR = 'error'
 
 /**
  * CMCD validation severity level: warning.
+ *
+ * @public
  */
 export const CMCD_VALIDATION_SEVERITY_WARNING = 'warning'
 

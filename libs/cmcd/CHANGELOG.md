@@ -18,6 +18,7 @@ and this project adheres to
 - Add `validateCmcdStructure(data, options?)` to validate structural rules (event mode, version key, response-received keys)
 - Add `validateCmcdHeaders(headers)` to validate keys are placed in the correct header shards
 - Add `CmcdValidationResult`, `CmcdValidationIssue`, `CmcdValidationOptions`, and `CmcdValidationSeverity` types
+
 ## [2.1.2] - 2026-02-11
 
 ### Changed
