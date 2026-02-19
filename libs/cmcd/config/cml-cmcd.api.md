@@ -86,6 +86,9 @@ export const CMCD_EVENT_UNMUTE: "um";
 export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
 
 // @public
+export const CMCD_HEADER_FIELDS: readonly CmcdHeaderField[];
+
+// @public
 export const CMCD_HEADER_MAP: Record<CmcdRequestKey | "nrr", CmcdHeaderField>;
 
 // @public
@@ -510,10 +513,16 @@ export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfIt
 export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
 
 // @public
-export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, Record<string, unknown>>>): CmcdValidationResult;
+export function validateCmcdEvent(cmcd: string, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
+
+// @public
+export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, string>>, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
 
 // @public
 export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
 
 // @public
 export function validateCmcdStructure(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;

@@ -16,7 +16,7 @@ and this project adheres to
 - Add `validateCmcdKeys(data, options?)` to check keys against recognized v1/v2 spec keys
 - Add `validateCmcdValues(data, options?)` to validate value types, constraints, and rounding rules
 - Add `validateCmcdStructure(data, options?)` to validate structural rules (event mode, version key, response-received keys)
-- Add `validateCmcdHeaders(headers)` to validate keys are placed in the correct header shards
+- Add `validateCmcdHeaders(headers)` to validate keys are placed in the correct header shards in addition to the other validation steps
 - Add `CmcdValidationResult`, `CmcdValidationIssue`, `CmcdValidationOptions`, and `CmcdValidationSeverity` types
 
 ### Fixed

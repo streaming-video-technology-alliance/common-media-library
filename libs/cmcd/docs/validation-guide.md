@@ -9,15 +9,16 @@ The `@svta/cml-cmcd` library provides a set of composable validation functions f
 
 ## Overview
 
-There are five validation functions, each targeting a different aspect of CMCD compliance:
+There are six validation functions, each targeting a different aspect of CMCD compliance:
 
-| Function                | Purpose                                                            |
-| ----------------------- | ------------------------------------------------------------------ |
-| `validateCmcd`          | Orchestrator — runs key, value, and structure checks               |
-| `validateCmcdKeys`      | Checks that all keys are recognized spec keys or valid custom keys |
-| `validateCmcdValues`    | Checks that values conform to expected types and constraints       |
-| `validateCmcdStructure` | Checks structural rules (event mode, version key, reporting mode)  |
-| `validateCmcdHeaders`   | Checks that keys are placed in the correct header shards           |
+| Function              | Purpose                                                            |
+| --------------------- | ------------------------------------------------------------------ |
+| `validateCmcd`        | Orchestrator — runs key, value, and structure checks               |
+| `validateCmcdKeys`    | Checks that all keys are recognized spec keys or valid custom keys |
+| `validateCmcdValues`  | Checks that values conform to expected types and constraints       |
+| `validateCmcdHeaders` | Checks header shard placement and validates the merged payload     |
+| `validateCmcdRequest` | Validates a `Request` or `HttpRequest` as request-mode data        |
+| `validateCmcdEvent`   | Validates a multi-line `text/cmcd` body as event-mode data         |
 
 All validators return a `CmcdValidationResult`:
 
@@ -38,7 +39,37 @@ type CmcdValidationIssue = {
 
 A common use case is validating CMCD v2 event reports received via POST. The payload is typically a `text/cmcd` body containing newline-separated CMCD-encoded strings, or `application/json`.
 
-### Parsing and Validating `text/cmcd`
+### Using `validateCmcdEvent`
+
+The `validateCmcdEvent` function accepts a raw CMCD string and validates it as an event-mode payload. It supports multi-line `text/cmcd` bodies directly — each non-empty line is validated independently and the results are merged. An empty payload (no non-empty lines) is treated as an error.
+
+```typescript
+import { validateCmcdEvent } from "@svta/cml-cmcd";
+
+// Validate a complete text/cmcd POST body
+const body = `e=ps,sid="session-1",ts=1700000000000,sta=p,v=2
+e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`;
+
+const result = validateCmcdEvent(body);
+
+if (!result.valid) {
+	console.error("Invalid CMCD event:", result.issues);
+}
+```
+
+A single-line string works as well:
+
+```typescript
+import { validateCmcdEvent } from "@svta/cml-cmcd";
+
+const result = validateCmcdEvent(
+	'e=ps,sid="session-1",ts=1700000000000,sta=p,v=2',
+);
+```
+
+### Parsing and Validating `text/cmcd` manually
+
+The `validateCmcdEvent` function is designed to validate multi-line `text/cmcd` bodies directly. However, if you need to validate a single-line string, you can decode the CMCD string and validate the data manually (this is what `validateCmcdRequest` does internally).
 
 ```typescript
 import { decodeCmcd, validateCmcd } from "@svta/cml-cmcd";
@@ -60,34 +91,42 @@ for (const line of lines) {
 }
 ```
 
-### Event Mode Structural Rules
-
-When `reportingMode: 'event'` is specified, the structure validator enforces:
-
-- The `e` (event type) key must be present
-- The `ts` (timestamp) key must be present
-- Custom events (`e="ce"`) require the `cen` (custom event name) key
-- Play state events (`e="ps"`) require the `sta` (player state) key
-- Error events (`e="e"`) require the `ec` (error codes) key
-- Response received events (`e="rr"`) require the `url` key
-- Response keys (`rc`, `ttfb`, `ttlb`, etc.) must only appear with `e="rr"`
-
-```typescript
-import { decodeCmcd, validateCmcdStructure } from "@svta/cml-cmcd";
-
-const data = decodeCmcd('e=ps,sid="s1",ts=1700000000000');
-const result = validateCmcdStructure(data, { reportingMode: "event" });
-
-// result.valid === false
-// result.issues:
-//   { key: 'sta', message: 'Play state event (e="ps") requires the "sta" key...', severity: 'error' }
-```
-
 ## Validating Request Mode Data
 
 In request mode, CMCD data is attached to segment requests via query parameters or HTTP headers. The validator ensures that event-only and response-only keys are not present.
 
-### From Query Parameters
+### Using `validateCmcdRequest`
+
+The `validateCmcdRequest` function accepts a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) object or an `HttpRequest` object from `@svta/cml-utils`. It checks for CMCD headers first — if any CMCD header shards are found, it delegates to `validateCmcdHeaders` for shard-placement verification. Otherwise, it extracts the `CMCD` query parameter from the URL.
+
+```typescript
+import { validateCmcdRequest } from "@svta/cml-cmcd";
+
+// From a Request with CMCD headers
+const request = new Request("https://cdn.example.com/seg.mp4", {
+	headers: {
+		"CMCD-Object": "br=5000,d=4000,ot=v",
+		"CMCD-Request": "bl=25000",
+		"CMCD-Session": 'sid="abc"',
+	},
+});
+const headerResult = validateCmcdRequest(request);
+
+// From a Request with CMCD in the query parameter
+const queryRequest = new Request(
+	"https://cdn.example.com/seg.mp4?CMCD=br%3D5000%2Cbl%3D25000",
+);
+const queryResult = validateCmcdRequest(queryRequest);
+
+// From an HttpRequest object
+const httpRequestResult = validateCmcdRequest({
+	url: "https://cdn.example.com/seg.mp4?CMCD=br%3D5000%2Cbl%3D25000",
+});
+```
+
+### From Query Parameters manually
+
+The `validateCmcdRequest` function is designed to validate the `CMCD` query parameter from the URL. However, if you need to validate the `CMCD` query parameter manually, you can extract it from the URL and validate the data using the `validateCmcd` function.
 
 ```typescript
 import { fromCmcdQuery, validateCmcd } from "@svta/cml-cmcd";
@@ -105,65 +144,25 @@ if (!result.valid) {
 }
 ```
 
-### From HTTP Headers
+### From HTTP Headers manually
+
+When CMCD is transmitted via HTTP headers, you can validate the headers manually using the `validateCmcdHeaders` function.
 
 ```typescript
-import { fromCmcdHeaders, validateCmcd } from "@svta/cml-cmcd";
+import { validateCmcdHeaders } from "@svta/cml-cmcd";
 
-// Extract CMCD from request headers
-const headers = {
+// Pass raw header strings directly — decoding is handled internally.
+// Request mode validation is applied automatically since headers are
+// only used in request mode.
+const result = validateCmcdHeaders({
 	"CMCD-Object": "br=5000,d=4000,ot=v",
-	"CMCD-Request": "bl=25000,dl=20000",
+	"CMCD-Request": "bl=25000",
 	"CMCD-Session": 'sid="abc",sf=d,st=v',
-	"CMCD-Status": "bs",
-};
-
-const data = fromCmcdHeaders(headers);
-const result = validateCmcd(data, { reportingMode: "request" });
+});
 
 if (!result.valid) {
-	console.error("Invalid CMCD request data:", result.issues);
-}
-```
-
-### Request Mode Structural Rules
-
-When `reportingMode: 'request'` is specified, the structure validator enforces:
-
-- Event keys (`e`, `ts`, `cen`, `h`) must not be present
-- Response keys (`rc`, `ttfb`, `ttfbb`, `ttlb`, `url`, `cmsdd`, `cmsds`, `smrt`) must not be present
-
-```typescript
-import { validateCmcdStructure } from "@svta/cml-cmcd";
-
-const data = { br: 5000, e: "ps", ts: 1700000000000 };
-const result = validateCmcdStructure(data, { reportingMode: "request" });
-
-// result.valid === false
-// result.issues:
-//   { key: 'e', message: 'Event key "e" must not be present in request mode.', severity: 'error' }
-//   { key: 'ts', message: 'Event key "ts" must not be present in request mode.', severity: 'error' }
-```
-
-## Validating Header Shard Placement
-
-When CMCD is transmitted via HTTP headers, each key must be placed in its correct header shard (`CMCD-Object`, `CMCD-Request`, `CMCD-Session`, or `CMCD-Status`). Use `validateCmcdHeaders` to check this.
-
-```typescript
-import { decodeCmcd, validateCmcdHeaders } from "@svta/cml-cmcd";
-
-// Decode each header shard individually
-const headers = {
-	"CMCD-Object": decodeCmcd("br=5000,d=4000,ot=v"),
-	"CMCD-Request": decodeCmcd("bl=25000"),
-	"CMCD-Session": decodeCmcd('sid="abc"'),
-};
-
-const result = validateCmcdHeaders(headers);
-
-if (!result.valid) {
-	// e.g., { key: 'sid', message: 'Key "sid" is in "CMCD-Object" but should be in "CMCD-Session".', severity: 'error' }
-	console.error("Misplaced keys:", result.issues);
+	// Issues may include shard placement errors and/or payload validation errors
+	console.error("Validation issues:", result.issues);
 }
 ```
 
@@ -186,32 +185,6 @@ const v1Result = validateCmcd({ br: 5000, sid: "abc" }, { version: 1 });
 - **Key validation**: v2-only keys (e.g., `sta`, `ec`, `ab`) are rejected when validating as v1
 - **Type validation**: Some keys have different types between versions. For example, `bl` is an integer in v1 but an inner list (array) in v2
 - **Version key**: v2 payloads must include the `v` key; v1 payloads should omit it
-
-## Using Individual Validators
-
-You can run individual validators when you only need specific checks:
-
-```typescript
-import {
-	validateCmcdKeys,
-	validateCmcdValues,
-	validateCmcdStructure,
-} from "@svta/cml-cmcd";
-
-const data = { v: 2, br: [5000], bl: [25432], sid: "abc" };
-
-// Check only key validity
-const keysResult = validateCmcdKeys(data);
-// keysResult.valid === true
-
-// Check only value types and constraints
-const valuesResult = validateCmcdValues(data);
-// valuesResult.issues might include a warning: bl should be rounded to nearest 100
-
-// Check only structural rules
-const structureResult = validateCmcdStructure(data, { reportingMode: "event" });
-// structureResult.valid === false (missing 'e' and 'ts')
-```
 
 ## Handling Validation Results
 
@@ -242,11 +215,10 @@ console.log(`Errors: ${errors.length}, Warnings: ${warnings.length}`);
 ### Logging Issues
 
 ```typescript
-import { decodeCmcd, validateCmcd } from "@svta/cml-cmcd";
+import { validateCmcdEvent } from "@svta/cml-cmcd";
 
-function validateAndLog(cmcdString: string): boolean {
-	const data = decodeCmcd(cmcdString);
-	const result = validateCmcd(data, { reportingMode: "event" });
+function validateAndLog(body: string): boolean {
+	const result = validateCmcdEvent(body);
 
 	for (const issue of result.issues) {
 		const level = issue.severity === "error" ? "ERROR" : "WARN";

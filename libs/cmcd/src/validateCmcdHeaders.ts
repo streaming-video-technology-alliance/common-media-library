@@ -1,30 +1,43 @@
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
-import { type CmcdHeaderField, CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS } from './CmcdHeaderField.ts'
+import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
 import type { CmcdKey } from './CmcdKey.ts'
+import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
+import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
+import { decodeCmcd } from './decodeCmcd.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
-
-const HEADER_FIELDS: CmcdHeaderField[] = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS]
+import { mergeValidationResults } from './mergeValidationResults.ts'
+import { validateCmcd } from './validateCmcd.ts'
 
 /**
- * Validates that CMCD keys are placed in the correct header shards.
+ * Validates CMCD HTTP headers by checking shard placement and payload validity.
+ *
+ * This function accepts raw CMCD header strings, decodes each shard
+ * internally, verifies that each key is placed in its correct header shard,
+ * then merges all shards and runs full payload validation (keys, values, and
+ * structure) on the merged data.
  *
  * {@includeCode ../test/validateCmcdHeaders.test.ts#example}
  *
- * @param headers - A record of CMCD header fields to their decoded key-value maps.
+ * @param headers - A record of CMCD header fields to their raw encoded string values.
+ * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result.
  *
  * @public
  */
-export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, Record<string, unknown>>>): CmcdValidationResult {
+export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, string>>, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdValidationResult {
 	const issues: CmcdValidationResult['issues'] = []
+	const decoded: Partial<Record<CmcdHeaderField, Record<string, unknown>>> = {}
 
-	for (const headerField of HEADER_FIELDS) {
-		const shard = headers[headerField]
-		if (!shard) {
+	for (const headerField of CMCD_HEADER_FIELDS) {
+		const raw = headers[headerField]
+		if (!raw) {
 			continue
 		}
+
+		const shard = decodeCmcd(raw)
+		decoded[headerField] = shard
 
 		for (const key of Object.keys(shard)) {
 			if (isCmcdCustomKey(key as CmcdKey)) {
@@ -42,8 +55,13 @@ export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, Rec
 		}
 	}
 
-	return {
+	const shardResult: CmcdValidationResult = {
 		valid: issues.length === 0,
 		issues,
 	}
+
+	const merged: Record<string, unknown> = Object.assign({}, ...CMCD_HEADER_FIELDS.map(f => decoded[f]).filter(Boolean))
+	const payloadResult = validateCmcd(merged, { ...options, reportingMode: CMCD_REQUEST_MODE })
+
+	return mergeValidationResults(shardResult, payloadResult)
 }
