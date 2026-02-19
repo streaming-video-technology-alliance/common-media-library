@@ -134,6 +134,12 @@ export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", 
 export const CMCD_V2: 2;
 
 // @public
+export const CMCD_VALIDATION_SEVERITY_ERROR = "error";
+
+// @public
+export const CMCD_VALIDATION_SEVERITY_WARNING = "warning";
+
+// @public
 export type CmcdCustomKey = `${string}-${string}`;
 
 // @public
@@ -419,6 +425,34 @@ export type CmcdV1 = {
 };
 
 // @public
+export type CmcdValidationIssue = {
+    key?: string;
+    message: string;
+    severity: CmcdValidationSeverity;
+};
+
+// @public
+export type CmcdValidationOptions = {
+    version?: CmcdVersion;
+    reportingMode?: CmcdReportingMode;
+};
+
+// @public
+export type CmcdValidationResult = {
+    valid: boolean;
+    issues: CmcdValidationIssue[];
+};
+
+// @public
+export const CmcdValidationSeverity: {
+    readonly ERROR: typeof CMCD_VALIDATION_SEVERITY_ERROR;
+    readonly WARNING: typeof CMCD_VALIDATION_SEVERITY_WARNING;
+};
+
+// @public
+export type CmcdValidationSeverity = ValueOf<typeof CmcdValidationSeverity>;
+
+// @public
 export type CmcdValue = ValueOf<Cmcd>;
 
 // @public
@@ -471,6 +505,21 @@ export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
 export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfItem<V, P>;
+
+// @public
+export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, Record<string, unknown>>>): CmcdValidationResult;
+
+// @public
+export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdStructure(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdValues(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
 
 // (No @packageDocumentation comment for this package)
 
