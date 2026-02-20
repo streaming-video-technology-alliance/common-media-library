@@ -149,6 +149,14 @@ export type CmcdCustomKey = `${string}-${string}`;
 export type CmcdCustomValue = string | SfItem<string> | (string | SfItem<string>)[] | number | SfItem<number> | (number | SfItem<number>)[] | boolean | SfItem<boolean> | (boolean | SfItem<boolean>)[] | symbol | SfItem<symbol> | (symbol | SfItem<symbol>)[] | SfToken | SfItem<SfToken> | (SfToken | SfItem<SfToken>)[];
 
 // @public
+export type CmcdData = CmcdV1Data | CmcdV2Data;
+
+// @public
+export type CmcdDecodeOptions = {
+    convertToLatest?: boolean;
+};
+
+// @public
 export type CmcdEncodeOptions = {
     version?: number;
     reportingMode?: CmcdReportingMode;
@@ -428,6 +436,16 @@ export type CmcdV1 = {
 };
 
 // @public
+export type CmcdV1Data = Omit<CmcdRequest, keyof CmcdV1 | "v"> & CmcdV1 & {
+    v?: 1;
+};
+
+// @public
+export type CmcdV2Data = Omit<Cmcd, "v"> & {
+    v: 2;
+};
+
+// @public
 export type CmcdValidationIssue = {
     key?: string;
     message: string;
@@ -461,20 +479,40 @@ export type CmcdValue = ValueOf<Cmcd>;
 // @public
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
-// @public
-export function decodeCmcd<T extends Cmcd = Cmcd>(cmcd: string): T;
+// @public (undocumented)
+export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
+
+// @public (undocumented)
+export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T;
 
 // @public
 export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @public
-export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
+// @public (undocumented)
+export function fromCmcdHeaders(headers: Record<string, string> | Headers, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
 
-// @public
-export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
+// @public (undocumented)
+export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData;
 
-// @public
-export function fromCmcdUrl(url: string): Cmcd;
+// @public (undocumented)
+export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
+
+// @public (undocumented)
+export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData;
+
+// @public (undocumented)
+export function fromCmcdUrl(url: string, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
+
+// @public (undocumented)
+export function fromCmcdUrl(url: string, options?: CmcdDecodeOptions): CmcdData;
 
 // @public
 export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdHeaderValue>;
@@ -492,7 +530,13 @@ export function isCmcdRequestKey(key: string): key is keyof Cmcd;
 export function isCmcdResponseReceivedKey(key: string): key is keyof Cmcd;
 
 // @public
+export function isCmcdV1Data(data: CmcdData): data is CmcdV1Data;
+
+// @public
 export function isCmcdV1Key(key: string): key is CmcdKey;
+
+// @public
+export function isCmcdV2Data(data: CmcdData): data is CmcdV2Data;
 
 // @public
 export function prepareCmcdData(obj: Record<string, any>, options?: CmcdEncodeOptions): Cmcd;

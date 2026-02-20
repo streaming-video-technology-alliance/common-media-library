@@ -8,6 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add `CmcdData`, `CmcdV1Data`, and `CmcdV2Data` discriminated union types using `v` as the discriminator property
+- Add `isCmcdV1Data(data)` type guard to narrow `CmcdData` to `CmcdV1Data`
+- Add `isCmcdV2Data(data)` type guard to narrow `CmcdData` to `CmcdV2Data`
+- Add `CmcdDecodeOptions` type with `convertToLatest` option to up-convert v1 data to v2 format during decoding
+
+### Changed
+
+- Change `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl` return type from `Cmcd` to `CmcdData`
+- Add optional `options` parameter to `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
+
 ## [2.2.0] - 2026-02-18
 
 ### Added

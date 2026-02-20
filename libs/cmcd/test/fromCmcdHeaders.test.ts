@@ -39,4 +39,29 @@ describe('fromCmcdHeaders', () => {
 			su: true,
 		})
 	})
+
+	it('up-converts v1 data across shards with convertToLatest', () => {
+		const headers = {
+			'CMCD-Object': 'br=3000',
+			'CMCD-Request': 'bl=2000,su',
+			'CMCD-Session': 'sid="abc"',
+		}
+		deepEqual(fromCmcdHeaders(headers, { convertToLatest: true }), {
+			br: [3000],
+			bl: [2000],
+			su: true,
+			sid: 'abc',
+		})
+	})
+
+	it('does not modify v2 header data with convertToLatest', () => {
+		const headers = {
+			'CMCD-Object': 'br=(3000)',
+			'CMCD-Session': 'v=2',
+		}
+		deepEqual(fromCmcdHeaders(headers, { convertToLatest: true }), {
+			br: [3000],
+			v: 2,
+		})
+	})
 })
