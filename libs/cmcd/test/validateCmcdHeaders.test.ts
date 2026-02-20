@@ -83,4 +83,22 @@ describe('validateCmcdHeaders', () => {
 		equal(result.valid, false)
 		equal(result.issues.some(i => i.key === 'e'), true)
 	})
+
+	it('handles lowercase header names', () => {
+		const result = validateCmcdHeaders({
+			'cmcd-object': 'br=3000,d=4004',
+			'cmcd-request': 'bl=21600',
+		})
+		equal(result.valid, true)
+		deepStrictEqual(result.issues, [])
+	})
+
+	it('handles mixed-case header names', () => {
+		const result = validateCmcdHeaders({
+			'Cmcd-Object': 'br=3000',
+			'CMCD-SESSION': 'sid="abc"',
+		})
+		equal(result.valid, true)
+		deepStrictEqual(result.issues, [])
+	})
 })

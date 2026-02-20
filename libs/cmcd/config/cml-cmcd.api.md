@@ -516,7 +516,7 @@ export function validateCmcd(data: Record<string, unknown>, options?: CmcdValida
 export function validateCmcdEvent(cmcd: string, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
 
 // @public
-export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, string>>, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
+export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
 
 // @public
 export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;

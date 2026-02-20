@@ -124,5 +124,16 @@ describe('validateCmcdRequest', () => {
 			}, { version: 2 })
 			equal(result.valid, true)
 		})
+
+		it('handles lowercase header names', () => {
+			const result = validateCmcdRequest({
+				url: 'https://cdn.example.com/seg.mp4',
+				headers: {
+					'cmcd-object': 'br=3000,d=4004',
+					'cmcd-request': 'bl=21600',
+				},
+			})
+			equal(result.valid, true)
+		})
 	})
 })

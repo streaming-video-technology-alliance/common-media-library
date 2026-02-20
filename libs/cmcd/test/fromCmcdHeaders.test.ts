@@ -28,4 +28,15 @@ describe('fromCmcdHeaders', () => {
 	it('produces CMCD object', () => {
 		deepEqual(fromCmcdHeaders(CMCD_HEADERS), CMCD_OUTPUT)
 	})
+
+	it('handles lowercase header names', () => {
+		const headers = {
+			'cmcd-object': 'br=200',
+			'cmcd-request': 'su',
+		}
+		deepEqual(fromCmcdHeaders(headers), {
+			br: 200,
+			su: true,
+		})
+	})
 })

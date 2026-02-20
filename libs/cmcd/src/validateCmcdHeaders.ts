@@ -1,5 +1,6 @@
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
 import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
+import { ensureHeaders } from './ensureHeaders.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
@@ -20,18 +21,19 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * {@includeCode ../test/validateCmcdHeaders.test.ts#example}
  *
- * @param headers - A record of CMCD header fields to their raw encoded string values.
+ * @param headers - A `Headers` instance or a record of CMCD header fields to their raw encoded string values.
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result.
  *
  * @public
  */
-export function validateCmcdHeaders(headers: Partial<Record<CmcdHeaderField, string>>, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdValidationResult {
+export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdValidationResult {
+	const h = ensureHeaders(headers)
 	const issues: CmcdValidationResult['issues'] = []
 	const decoded: Partial<Record<CmcdHeaderField, Record<string, unknown>>> = {}
 
 	for (const headerField of CMCD_HEADER_FIELDS) {
-		const raw = headers[headerField]
+		const raw = h.get(headerField)
 		if (!raw) {
 			continue
 		}

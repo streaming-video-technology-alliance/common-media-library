@@ -22,6 +22,7 @@ and this project adheres to
 ### Fixed
 
 - Fix `CMCD_EVENT_BITRATE_CHANGE` value from `'br'` to `'bc'`
+- Make `validateCmcdHeaders` and `validateCmcdRequest` case-insensitive for header names
 
 ## [2.1.2] - 2026-02-11
 

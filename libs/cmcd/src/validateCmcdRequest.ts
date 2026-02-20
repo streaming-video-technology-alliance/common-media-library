@@ -1,6 +1,7 @@
 import type { HttpRequest } from '@svta/cml-utils'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
+import { ensureHeaders } from './ensureHeaders.ts'
 import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
@@ -46,11 +47,12 @@ function extractHeaderRecord(headers: Headers | Record<string, string> | undefin
 		return undefined
 	}
 
+	const h = ensureHeaders(headers)
 	const result: Partial<Record<CmcdHeaderField, string>> = {}
 	let found = false
 
 	for (const field of CMCD_HEADER_FIELDS) {
-		const value = headers instanceof Headers ? headers.get(field) : headers[field]
+		const value = h.get(field)
 
 		if (value) {
 			result[field] = value
