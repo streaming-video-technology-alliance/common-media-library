@@ -5,6 +5,6 @@
  *
  * @internal
  */
-export const CMCD_INNER_LIST_KEYS = new Set([
+export const CMCD_INNER_LIST_KEYS: Set<string> = new Set([
 	'ab', 'bl', 'br', 'bsa', 'bsd', 'bsda', 'lab', 'lb', 'mtp', 'pb', 'tab', 'tb', 'tbl', 'tpb',
 ])
