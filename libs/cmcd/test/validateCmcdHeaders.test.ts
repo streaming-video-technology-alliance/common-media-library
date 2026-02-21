@@ -11,7 +11,6 @@ describe('validateCmcdHeaders', () => {
 		})
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
-		deepStrictEqual(result.data, { br: 3000, d: 4004, bl: 21600 })
 		// #endregion example
 	})
 
@@ -24,11 +23,6 @@ describe('validateCmcdHeaders', () => {
 		})
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
-
-		const data = result.data as Record<string, unknown>
-		equal(data['br'], 3000)
-		equal(data['sid'], 'abc')
-		equal(data['bs'], true)
 	})
 
 	it('reports error for key in wrong shard', () => {
@@ -53,7 +47,6 @@ describe('validateCmcdHeaders', () => {
 		const result = validateCmcdHeaders({})
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
-		deepStrictEqual(result.data, {})
 	})
 
 	it('detects unknown keys across shards', () => {

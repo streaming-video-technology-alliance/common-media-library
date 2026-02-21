@@ -17,13 +17,9 @@ import { validateCmcdValues } from './validateCmcdValues.ts'
  * @public
  */
 export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult {
-	const result = mergeValidationResults(
+	return mergeValidationResults(
 		validateCmcdKeys(data, options),
 		validateCmcdValues(data, options),
 		validateCmcdStructure(data, options),
 	)
-
-	result.data = data
-
-	return result
 }

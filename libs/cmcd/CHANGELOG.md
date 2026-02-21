@@ -19,7 +19,6 @@ and this project adheres to
 
 - Change `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl` return type from `Cmcd` to `CmcdData`
 - Add optional `options` parameter to `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
-- Add optional `data` property to `CmcdValidationResult` containing the decoded CMCD payload from `validateCmcd`, `validateCmcdHeaders`, `validateCmcdEvent`, and `validateCmcdRequest`
 
 ## [2.2.0] - 2026-02-18
 

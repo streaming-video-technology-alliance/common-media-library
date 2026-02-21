@@ -1,23 +1,19 @@
 import { validateCmcd } from '@svta/cml-cmcd'
-import { deepStrictEqual, equal } from 'node:assert'
+import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('validateCmcd', () => {
 	it('provides a valid example', () => {
 		// #region example
-		const data = { br: 3000, bl: 21600, d: 4004, ot: 'v', sid: 'abc' }
-		const result = validateCmcd(data)
+		const result = validateCmcd({ br: 3000, bl: 21600, d: 4004, ot: 'v', sid: 'abc' })
 		equal(result.valid, true)
-		deepStrictEqual(result.data, data)
 		// #endregion example
 	})
 
 	it('returns valid for a fully valid v2 payload', () => {
-		const data = { br: [3000], bl: [21600], d: 4004, ot: 'v', v: 2 }
-		const result = validateCmcd(data)
+		const result = validateCmcd({ br: [3000], bl: [21600], d: 4004, ot: 'v', v: 2 })
 		equal(result.valid, true)
 		equal(result.issues.length, 0)
-		deepStrictEqual(result.data, data)
 	})
 
 	it('collects mixed errors and warnings', () => {

@@ -15,16 +15,4 @@ export type CmcdValidationResult = {
 	 * The list of validation issues found.
 	 */
 	issues: CmcdValidationIssue[]
-
-	/**
-	 * The decoded CMCD data object. Present when validation is
-	 * performed by a function that decodes the input internally
-	 * ({@link validateCmcd}, {@link validateCmcdHeaders},
-	 * {@link validateCmcdEvent}, {@link validateCmcdRequest}).
-	 *
-	 * For multi-line event payloads validated by
-	 * {@link validateCmcdEvent}, this is an array of decoded objects,
-	 * one per event line.
-	 */
-	data?: Record<string, unknown> | Record<string, unknown>[]
 }

@@ -11,7 +11,6 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 		const result = validateCmcdEvent(body)
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
-		equal(Array.isArray(result.data), true)
 		// #endregion example
 	})
 
@@ -19,8 +18,6 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 		const result = validateCmcdEvent('e=ps,sid="session-1",ts=1700000000000,sta=p,v=2')
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
-		equal(Array.isArray(result.data), false)
-		deepStrictEqual(result.data, { e: 'ps', sid: 'session-1', ts: 1700000000000, sta: 'p', v: 2 })
 	})
 
 	it('reports errors for missing e and ts', () => {
@@ -72,23 +69,5 @@ e=t,sid="s1",ts=1700000001000,bl=(5000),v=2
 		const result = validateCmcdEvent(body)
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
-	})
-
-	it('returns decoded data array for multi-line events', () => {
-		const body = `e=ps,sid="s1",ts=1700000000000,sta=p,v=2
-e=t,sid="s1",ts=1700000001000,bl=(5000),v=2`
-
-		const result = validateCmcdEvent(body)
-		equal(Array.isArray(result.data), true)
-
-		const data = result.data as Record<string, unknown>[]
-		equal(data.length, 2)
-		equal(data[0]['e'], 'ps')
-		equal(data[1]['e'], 't')
-	})
-
-	it('does not include data for empty payload', () => {
-		const result = validateCmcdEvent('')
-		equal(result.data, undefined)
 	})
 })

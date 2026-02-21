@@ -462,7 +462,6 @@ export type CmcdValidationOptions = {
 export type CmcdValidationResult = {
     valid: boolean;
     issues: CmcdValidationIssue[];
-    data?: Record<string, unknown> | Record<string, unknown>[];
 };
 
 // @public
