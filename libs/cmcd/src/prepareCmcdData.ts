@@ -12,6 +12,7 @@ import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
 import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
+import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
 import { isTokenField } from './isTokenField.ts'
 import { isValid } from './isValid.ts'
@@ -20,11 +21,6 @@ const filterMap: Record<string, (key: string) => boolean> = {
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
 }
-
-/**
- * V1 keys that use inner lists in V2 but plain numbers in V1.
- */
-const INNER_LIST_V1_KEYS = new Set(['ab', 'bl', 'br', 'bsa', 'bsd', 'bsda', 'lab', 'lb', 'mtp', 'pb', 'tab', 'tb', 'tbl', 'tpb'])
 
 /**
  * Unwrap an inner list or SfItem value to a plain scalar.
@@ -80,7 +76,7 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 				result['nor'] = first
 			}
 		}
-		else if (INNER_LIST_V1_KEYS.has(key)) {
+		else if (CMCD_INNER_LIST_KEYS.has(key)) {
 			result[key] = unwrapValue(value, obj['ot'])
 		}
 		else {

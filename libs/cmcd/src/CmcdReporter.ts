@@ -330,7 +330,7 @@ export class CmcdReporter {
 	 * Creates a new request with the CMCD request report data applied. Called by the player
 	 * before sending the request.
 	 *
-	 * @param req - The request to apply the CMCD request report to.
+	 * @param request - The request to apply the CMCD request report to.
 	 * @param data - The data to apply to the request. This data only
 	 *               applies to this request report. Persistent data
 	 *               should be updated using `update()`.
