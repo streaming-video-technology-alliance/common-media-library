@@ -1,10 +1,10 @@
 import type { HttpRequest } from '@svta/cml-utils'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
+import type { CmcdDataValidationResult } from './CmcdDataValidationResult.ts'
 import { ensureHeaders } from './ensureHeaders.ts'
 import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
-import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { validateCmcd } from './validateCmcd.ts'
 import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
@@ -25,11 +25,11 @@ import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
  *
  * @param request - A `Request` or `HttpRequest` to validate.
  * @param options - Validation options (excluding `reportingMode`).
- * @returns The validation result.
+ * @returns The validation result including decoded data.
  *
  * @public
  */
-export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdValidationResult {
+export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdDataValidationResult {
 	const headers = extractHeaderRecord(request.headers)
 
 	if (headers) {
@@ -39,7 +39,8 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 	const param = new URL(request.url).searchParams.get(CMCD_PARAM)
 	const data = decodeCmcd(param as string)
 
-	return validateCmcd(data, { ...options, reportingMode: CMCD_REQUEST_MODE })
+	const result = validateCmcd(data, { ...options, reportingMode: CMCD_REQUEST_MODE })
+	return { ...result, data }
 }
 
 function extractHeaderRecord(headers: Headers | Record<string, string> | undefined): Partial<Record<CmcdHeaderField, string>> | undefined {

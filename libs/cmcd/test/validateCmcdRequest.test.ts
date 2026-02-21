@@ -136,4 +136,24 @@ describe('validateCmcdRequest', () => {
 			equal(result.valid, true)
 		})
 	})
+
+	it('returns decoded data from headers path', () => {
+		const result = validateCmcdRequest({
+			url: 'https://cdn.example.com/seg.mp4',
+			headers: {
+				'CMCD-Object': 'br=3000,d=4004',
+				'CMCD-Request': 'bl=21600',
+			},
+		})
+		equal(result.data['br'], 3000)
+		equal(result.data['bl'], 21600)
+	})
+
+	it('returns decoded data from query path', () => {
+		const result = validateCmcdRequest({
+			url: 'https://cdn.example.com/seg.mp4?CMCD=br%3D3000%2Cbl%3D21600',
+		})
+		equal(result.data['br'], 3000)
+		equal(result.data['bl'], 21600)
+	})
 })

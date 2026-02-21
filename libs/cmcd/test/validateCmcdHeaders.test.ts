@@ -101,4 +101,19 @@ describe('validateCmcdHeaders', () => {
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
 	})
+
+	it('returns decoded data on the result', () => {
+		const result = validateCmcdHeaders({
+			'CMCD-Object': 'br=3000,d=4004',
+			'CMCD-Request': 'bl=21600',
+		})
+		equal(result.data['br'], 3000)
+		equal(result.data['d'], 4004)
+		equal(result.data['bl'], 21600)
+	})
+
+	it('returns empty object as data for empty headers', () => {
+		const result = validateCmcdHeaders({})
+		deepStrictEqual(result.data, {})
+	})
 })

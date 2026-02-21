@@ -1,6 +1,6 @@
 import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
-import type { CmcdValidationResult } from './CmcdValidationResult.ts'
+import type { CmcdEventsValidationResult } from './CmcdEventsValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { mergeValidationResults } from './mergeValidationResults.ts'
@@ -14,16 +14,16 @@ import { validateCmcd } from './validateCmcd.ts'
  * newline-separated events (e.g. a `text/cmcd` POST body), in which
  * case each line is validated independently and the results are merged.
  *
- * {@includeCode ../test/validateCmcdEvent.test.ts#example}
+ * {@includeCode ../test/validateCmcdEvents.test.ts#example}
  *
  * @param cmcd - The raw CMCD-encoded string to validate. May contain
  *   multiple newline-separated event lines.
  * @param options - Validation options (excluding `reportingMode`).
- * @returns The validation result.
+ * @returns The validation result including decoded data per event line.
  *
  * @public
  */
-export function validateCmcdEvent(cmcd: string, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdValidationResult {
+export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdEventsValidationResult {
 	const opts = { ...options, reportingMode: CMCD_EVENT_MODE } as const
 	const lines = cmcd.split('\n').filter(line => line.length > 0)
 
@@ -34,8 +34,11 @@ export function validateCmcdEvent(cmcd: string, options?: Omit<CmcdValidationOpt
 				message: 'Empty event mode payload. At least one event line is required.',
 				severity: CMCD_VALIDATION_SEVERITY_ERROR,
 			}],
+			data: [],
 		}
 	}
 
-	return mergeValidationResults(...lines.map(line => validateCmcd(decodeCmcd(line), opts)))
+	const decodedLines = lines.map(line => decodeCmcd(line))
+	const result = mergeValidationResults(...decodedLines.map(data => validateCmcd(data, opts)))
+	return { ...result, data: decodedLines }
 }

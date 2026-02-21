@@ -152,6 +152,11 @@ export type CmcdCustomValue = string | SfItem<string> | (string | SfItem<string>
 export type CmcdData = CmcdV1Data | CmcdV2Data;
 
 // @public
+export type CmcdDataValidationResult = CmcdValidationResult & {
+    data: CmcdData;
+};
+
+// @public
 export type CmcdDecodeOptions = {
     convertToLatest?: boolean;
 };
@@ -182,6 +187,11 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
     events?: CmcdEventType[];
     interval?: number;
     batchSize?: number;
+};
+
+// @public
+export type CmcdEventsValidationResult = CmcdValidationResult & {
+    data: CmcdData[];
 };
 
 // @public
@@ -557,16 +567,16 @@ export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfIt
 export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
 
 // @public
-export function validateCmcdEvent(cmcd: string, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
+export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdEventsValidationResult;
 
 // @public
-export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
+export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdDataValidationResult;
 
 // @public
 export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
 
 // @public
-export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdValidationResult;
+export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdDataValidationResult;
 
 // @public
 export function validateCmcdStructure(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;

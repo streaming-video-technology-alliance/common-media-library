@@ -1,4 +1,6 @@
 import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
+import type { CmcdData } from './CmcdData.ts'
+import type { CmcdDataValidationResult } from './CmcdDataValidationResult.ts'
 import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
 import { ensureHeaders } from './ensureHeaders.ts'
 import type { CmcdKey } from './CmcdKey.ts'
@@ -23,11 +25,11 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * @param headers - A `Headers` instance or a record of CMCD header fields to their raw encoded string values.
  * @param options - Validation options (excluding `reportingMode`).
- * @returns The validation result.
+ * @returns The validation result including decoded data.
  *
  * @public
  */
-export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdValidationResult {
+export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdDataValidationResult {
 	const h = ensureHeaders(headers)
 	const issues: CmcdValidationResult['issues'] = []
 	const decoded: Partial<Record<CmcdHeaderField, Record<string, unknown>>> = {}
@@ -65,5 +67,6 @@ export function validateCmcdHeaders(headers: Record<string, string> | Headers, o
 	const merged: Record<string, unknown> = Object.assign({}, ...CMCD_HEADER_FIELDS.map(f => decoded[f]).filter(Boolean))
 	const payloadResult = validateCmcd(merged, { ...options, reportingMode: CMCD_REQUEST_MODE })
 
-	return mergeValidationResults(shardResult, payloadResult)
+	const result = mergeValidationResults(shardResult, payloadResult)
+	return { ...result, data: merged as CmcdData }
 }

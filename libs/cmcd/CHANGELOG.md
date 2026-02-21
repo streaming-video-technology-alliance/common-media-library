@@ -8,18 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-### Added
-
-- Add `CmcdData`, `CmcdV1Data`, and `CmcdV2Data` discriminated union types using `v` as the discriminator property
-- Add `isCmcdV1Data(data)` type guard to narrow `CmcdData` to `CmcdV1Data`
-- Add `isCmcdV2Data(data)` type guard to narrow `CmcdData` to `CmcdV2Data`
-- Add `CmcdDecodeOptions` type with `convertToLatest` option to up-convert v1 data to v2 format during decoding
-
-### Changed
-
-- Change `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl` return type from `Cmcd` to `CmcdData`
-- Add optional `options` parameter to `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
-
 ## [2.2.0] - 2026-02-18
 
 ### Added
@@ -28,13 +16,23 @@ and this project adheres to
 - Add `validateCmcdKeys(data, options?)` to check keys against recognized v1/v2 spec keys
 - Add `validateCmcdValues(data, options?)` to validate value types, constraints, and rounding rules
 - Add `validateCmcdStructure(data, options?)` to validate structural rules (event mode, version key, response-received keys)
-- Add `validateCmcdHeaders(headers)` to validate keys are placed in the correct header shards in addition to the other validation steps
-- Add `CmcdValidationResult`, `CmcdValidationIssue`, `CmcdValidationOptions`, and `CmcdValidationSeverity` types
+- Add `validateCmcdHeaders(headers)` to validate CMCD HTTP headers including shard placement
+- Add `validateCmcdEvents(cmcd)` to validate multi-line event-mode payloads
+- Add `validateCmcdRequest(request)` to validate CMCD data from a `Request` or `HttpRequest`
+- Add `CmcdValidationResult`, `CmcdDataValidationResult`, `CmcdEventsValidationResult`, `CmcdValidationIssue`, `CmcdValidationOptions`, and `CmcdValidationSeverity` types
+- Add `CmcdData`, `CmcdV1Data`, and `CmcdV2Data` discriminated union types using `v` as the discriminator property
+- Add `isCmcdV1Data(data)` type guard to narrow `CmcdData` to `CmcdV1Data`
+- Add `isCmcdV2Data(data)` type guard to narrow `CmcdData` to `CmcdV2Data`
+- Add `CmcdDecodeOptions` type with `convertToLatest` option to up-convert v1 data to v2 format during decoding
+- Add optional `options` parameter to `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
+
+### Changed
+
+- Change `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl` return type from `Cmcd` to `CmcdData`
 
 ### Fixed
 
 - Fix `CMCD_EVENT_BITRATE_CHANGE` value from `'br'` to `'bc'`
-- Make `validateCmcdHeaders` and `validateCmcdRequest` case-insensitive for header names
 
 ## [2.1.2] - 2026-02-11
 
