@@ -15,6 +15,7 @@ describe('validateCmcdRequest', () => {
 		const result = validateCmcdRequest(request)
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
+		deepStrictEqual(result.data, { br: 3000, d: 4004, bl: 21600 })
 		// #endregion example
 	})
 
@@ -29,6 +30,11 @@ describe('validateCmcdRequest', () => {
 			})
 			const result = validateCmcdRequest(request)
 			equal(result.valid, true)
+
+			const data = result.data as Record<string, unknown>
+			equal(data['br'], 3000)
+			equal(data['ot'], 'v')
+			equal(data['sid'], 'abc')
 		})
 
 		it('detects shard placement errors from headers', () => {
@@ -46,6 +52,7 @@ describe('validateCmcdRequest', () => {
 			const request = new Request('https://cdn.example.com/seg.mp4?CMCD=br%3D3000%2Cbl%3D21600')
 			const result = validateCmcdRequest(request)
 			equal(result.valid, true)
+			deepStrictEqual(result.data, { br: 3000, bl: 21600 })
 		})
 
 		it('reports errors from query parameter data', () => {

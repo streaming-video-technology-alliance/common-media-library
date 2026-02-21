@@ -37,5 +37,9 @@ export function validateCmcdEvent(cmcd: string, options?: Omit<CmcdValidationOpt
 		}
 	}
 
-	return mergeValidationResults(...lines.map(line => validateCmcd(decodeCmcd(line), opts)))
+	const decoded = lines.map(line => decodeCmcd(line) as Record<string, unknown>)
+	const result = mergeValidationResults(...decoded.map(data => validateCmcd(data, opts)))
+	result.data = decoded.length === 1 ? decoded[0] : decoded
+
+	return result
 }

@@ -65,5 +65,8 @@ export function validateCmcdHeaders(headers: Record<string, string> | Headers, o
 	const merged: Record<string, unknown> = Object.assign({}, ...CMCD_HEADER_FIELDS.map(f => decoded[f]).filter(Boolean))
 	const payloadResult = validateCmcd(merged, { ...options, reportingMode: CMCD_REQUEST_MODE })
 
-	return mergeValidationResults(shardResult, payloadResult)
+	const result = mergeValidationResults(shardResult, payloadResult)
+	result.data = merged
+
+	return result
 }
