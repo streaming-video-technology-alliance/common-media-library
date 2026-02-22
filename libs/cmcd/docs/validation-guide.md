@@ -245,3 +245,8 @@ const result = validateCmcdValues({
 
 // result.valid === true
 ```
+
+## References
+
+- [CTA-5004-A: Common Media Client Data v2](https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html)
+- [CTA-5004: Common Media Client Data v1 (PDF)](https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf)
