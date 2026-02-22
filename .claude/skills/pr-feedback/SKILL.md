@@ -150,13 +150,13 @@ After approval:
 
 **Ask the user for confirmation before pushing.**
 
-### Step 7: Resolve review threads
+### Step 7: Reply to and resolve review threads
 
-For each addressed thread, reply and resolve.
+For each addressed thread, reply **and then immediately resolve** it. Both actions are required per thread.
 
 **Important:** Write GraphQL mutations to temp files and use `-F query=@file` to avoid `$` being consumed by the shell.
 
-1. **Reply to the thread** explaining what was done:
+First, write both mutation files (do this once, before the loop):
 
 ```graphql
 # /tmp/reply-thread.graphql
@@ -167,12 +167,6 @@ mutation($threadId: ID!, $body: String!) {
 }
 ```
 
-```bash
-gh api graphql -F query=@/tmp/reply-thread.graphql -f threadId='THREAD_ID' -f body='MESSAGE'
-```
-
-2. **Resolve the thread**:
-
 ```graphql
 # /tmp/resolve-thread.graphql
 mutation($threadId: ID!) {
@@ -182,16 +176,21 @@ mutation($threadId: ID!) {
 }
 ```
 
+Then, for **each** thread that should be resolved, run both commands sequentially:
+
 ```bash
+# Step A: Reply
+gh api graphql -F query=@/tmp/reply-thread.graphql -f threadId='THREAD_ID' -f body='MESSAGE'
+# Step B: Resolve (must run after reply succeeds)
 gh api graphql -F query=@/tmp/resolve-thread.graphql -f threadId='THREAD_ID'
 ```
 
-Reply guidelines:
-- For **valid concerns** that were fixed: briefly describe the fix (e.g., "Added null guard at line 42. Good catch!")
-- For **disagreements**: explain the reasoning respectfully, referencing project conventions or spec requirements. Do NOT resolve these -- leave them for the reviewer to resolve after reading the reply.
-- For **questions**: answer the question clearly. Do NOT resolve these -- let the reviewer resolve after reading.
-- For **already addressed**: note that the code has been updated and the concern is no longer applicable.
-- For **nitpicks** that were adopted: acknowledge and note the change.
+**Which threads to resolve vs. leave open:**
+- **Valid concerns** that were fixed: reply with a brief description of the fix, then **resolve**.
+- **Nitpicks** that were adopted: acknowledge the change, then **resolve**.
+- **Already addressed**: note the code has been updated, then **resolve**.
+- **Disagreements**: reply explaining the reasoning respectfully. Do **NOT** resolve -- leave for the reviewer.
+- **Questions**: answer clearly. Do **NOT** resolve -- leave for the reviewer.
 
 ### Step 8: Summary
 
