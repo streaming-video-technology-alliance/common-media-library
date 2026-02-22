@@ -54,7 +54,6 @@ This is a monorepo containing multiple TypeScript libraries for media playback f
 ## Git Commit Guidelines
 
 - **Always use `git commit -s`** to add the DCO sign-off (`Signed-off-by:` line). Every commit must have this.
-- Always include `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>` in the commit message body.
 - Follow the conventional commit format (e.g., `feat:`, `fix:`, `refactor:`, `chore:`).
 
 ## Important notes
