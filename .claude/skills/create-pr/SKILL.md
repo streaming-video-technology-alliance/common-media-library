@@ -17,7 +17,7 @@ Validate that all tests and documentation pass, then create a well-formatted Git
 
 **Repository:**
 
-!`gh repo view --json nameWithOwner,defaultBranchRef -q '.nameWithOwner + " (default: " + .defaultBranchRef.name + ")"' 2>&1`
+!`git remote get-url origin 2>&1`
 
 **Commits on this branch (vs main):**
 
