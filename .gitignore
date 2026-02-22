@@ -4,4 +4,4 @@ temp
 .vscode
 .idea
 RELEASE.md
-.claude
+.claude/settings.local.json
