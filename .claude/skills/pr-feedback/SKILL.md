@@ -17,7 +17,7 @@ Fetch all unresolved review comments from the GitHub PR associated with the curr
 
 **Repository:**
 
-!`gh repo view --json nameWithOwner -q '.nameWithOwner' 2>&1`
+!`git remote get-url origin 2>&1`
 
 **PR info:**
 
