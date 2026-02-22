@@ -5,14 +5,14 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @public
  */
-export const CMCD_VALIDATION_SEVERITY_ERROR = 'error'
+export const CMCD_VALIDATION_SEVERITY_ERROR = 'error' as const
 
 /**
  * CMCD validation severity level: warning.
  *
  * @public
  */
-export const CMCD_VALIDATION_SEVERITY_WARNING = 'warning'
+export const CMCD_VALIDATION_SEVERITY_WARNING = 'warning' as const
 
 /**
  * CMCD validation severity level.

@@ -8,6 +8,7 @@ import { validateCmcdValues } from './validateCmcdValues.ts'
 /**
  * Validates a CMCD payload by checking keys, values, and structure.
  *
+ * @example
  * {@includeCode ../test/validateCmcd.test.ts#example}
  *
  * @param data - The CMCD payload to validate.

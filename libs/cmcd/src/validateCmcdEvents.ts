@@ -16,6 +16,7 @@ import { validateCmcd } from './validateCmcd.ts'
  * newline-separated events (e.g. a `text/cmcd` POST body), in which
  * case each line is validated independently and the results are merged.
  *
+ * @example
  * {@includeCode ../test/validateCmcdEvents.test.ts#example}
  *
  * @param cmcd - The raw CMCD-encoded string to validate. May contain
@@ -27,7 +28,7 @@ import { validateCmcd } from './validateCmcd.ts'
  */
 export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdEventsValidationResult {
 	const opts = { ...options, reportingMode: CMCD_EVENT_MODE } as const
-	const lines = cmcd.split('\n').filter(line => line.length > 0)
+	const lines = cmcd.split(/\r?\n/).filter(line => line.length > 0)
 
 	if (lines.length === 0) {
 		return {

@@ -23,6 +23,7 @@ import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
  * {@link validateCmcdHeaders}. Otherwise, the CMCD query parameter is
  * extracted from the URL and validated.
  *
+ * @example
  * {@includeCode ../test/validateCmcdRequest.test.ts#example}
  *
  * @param request - A `Request` or `HttpRequest` to validate.
@@ -39,9 +40,21 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 	}
 
 	const param = new URL(request.url).searchParams.get(CMCD_PARAM)
+
+	if (!param) {
+		return {
+			valid: false,
+			issues: [{
+				message: 'No CMCD data found in request headers or query parameters.',
+				severity: CMCD_VALIDATION_SEVERITY_ERROR,
+			}],
+			data: {} as CmcdData,
+		}
+	}
+
 	let data: CmcdData
 	try {
-		data = decodeCmcd(param as string)
+		data = decodeCmcd(param)
 	} catch {
 		return {
 			valid: false,

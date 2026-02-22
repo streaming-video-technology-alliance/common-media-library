@@ -26,7 +26,7 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
 	}
 
 	if (typeof value === 'string') {
-		return decodeURIComponent(value)
+		return value
 	}
 
 	return value as ReduceValueOutput
@@ -45,9 +45,7 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  * @example
  * {@includeCode ../test/decodeCmcd.test.ts#example}
  */
-/** @public */
 export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
-/** @public */
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T
 export function decodeCmcd(cmcd: string, options?: CmcdDecodeOptions): CmcdData | Cmcd {
 	if (!cmcd) {
@@ -56,12 +54,10 @@ export function decodeCmcd(cmcd: string, options?: CmcdDecodeOptions): CmcdData 
 
 	const sfDict = decodeSfDict(cmcd)
 
-	const result = Object
-		.entries<SfItem>(sfDict as any)
-		.reduce((acc, [key, item]) => {
-			acc[key] = reduceValue(item.value) as any
-			return acc
-		}, {} as Record<string, any>)
+	const result: Record<string, unknown> = {}
+	for (const [key, item] of Object.entries(sfDict as Record<string, SfItem>)) {
+		result[key] = reduceValue(item.value)
+	}
 
 	if (options?.convertToLatest) {
 		return upConvertToV2(result) as Cmcd

@@ -12,6 +12,7 @@ import { resolveVersion } from './resolveVersion.ts'
 /**
  * Validates the structural rules of a CMCD payload.
  *
+ * @example
  * {@includeCode ../test/validateCmcdStructure.test.ts#example}
  *
  * @param data - The CMCD payload to validate.

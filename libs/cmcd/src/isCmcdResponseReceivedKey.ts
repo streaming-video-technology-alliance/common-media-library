@@ -1,5 +1,7 @@
-import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.js'
+import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import type { Cmcd } from './Cmcd.ts'
+
+const CMCD_RESPONSE_KEY_SET: ReadonlySet<string> = new Set(CMCD_RESPONSE_KEYS)
 
 /**
  * Check if a key is a valid CMCD response key.
@@ -14,5 +16,5 @@ import type { Cmcd } from './Cmcd.ts'
  * {@includeCode ../test/isCmcdResponseReceivedKey.test.ts#example}
  */
 export function isCmcdResponseReceivedKey(key: string): key is keyof Cmcd {
-	return CMCD_RESPONSE_KEYS.includes(key as any)
+	return CMCD_RESPONSE_KEY_SET.has(key)
 }

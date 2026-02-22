@@ -149,17 +149,18 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		keys.push('v')
 	}
 
-	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters)
 	const formatterOptions: CmcdFormatterOptions = {
 		version,
 		reportingMode,
 		baseUrl: options.baseUrl,
 	}
 
-	keys.sort().forEach(key => {
+	keys.sort()
+
+	for (const key of keys) {
 		let value = data[key] as CmcdValue
 
-		const formatter = formatters[key]
+		const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
 		if (typeof formatter === 'function') {
 			value = formatter(value, formatterOptions)
 		}
@@ -167,7 +168,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		// Version should only be reported if not equal to 1.
 		if (key === 'v') {
 			if (version === 1) {
-				return
+				continue
 			}
 			else {
 				value = version
@@ -175,8 +176,8 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		}
 
 		// Playback rate should only be sent if not equal to 1.
-		if (key == 'pr' && value === 1) {
-			return
+		if (key === 'pr' && value === 1) {
+			continue
 		}
 
 		// Ensure a timestamp is set for event mode
@@ -186,7 +187,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		// ignore invalid values
 		if (!isValid(value)) {
-			return
+			continue
 		}
 
 		if (isTokenField(key) && typeof value === 'string') {
@@ -194,7 +195,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		}
 
 		(results as any)[key] = value
-	})
+	}
 
 	return results
 }

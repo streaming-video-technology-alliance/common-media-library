@@ -8,9 +8,13 @@ import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
 
+const CMCD_V1_KEY_SET: ReadonlySet<string> = new Set(CMCD_V1_KEYS)
+const CMCD_KEY_SET: ReadonlySet<string> = new Set(CMCD_KEYS)
+
 /**
  * Validates that all keys in a CMCD payload are recognized spec keys or valid custom keys.
  *
+ * @example
  * {@includeCode ../test/validateCmcdKeys.test.ts#example}
  *
  * @param data - The CMCD payload to validate.
@@ -21,7 +25,7 @@ import { resolveVersion } from './resolveVersion.ts'
  */
 export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult {
 	const version = resolveVersion(data, options)
-	const validKeys = version === CMCD_V1 ? CMCD_V1_KEYS as readonly string[] : CMCD_KEYS as readonly string[]
+	const validKeySet = version === CMCD_V1 ? CMCD_V1_KEY_SET : CMCD_KEY_SET
 	const issues: CmcdValidationResult['issues'] = []
 
 	for (const key of Object.keys(data)) {
@@ -29,7 +33,7 @@ export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdVa
 			continue
 		}
 
-		if (!validKeys.includes(key)) {
+		if (!validKeySet.has(key)) {
 			issues.push({
 				key,
 				message: `Unknown CMCD key "${key}" for version ${version}.`,

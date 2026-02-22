@@ -18,12 +18,12 @@ export function toPreparedCmcdHeaders(data: Cmcd, customHeaderMap?: Partial<Cmcd
 	const result = {} as Record<CmcdHeaderField, string>
 	const shards = groupCmcdHeaders(data, customHeaderMap)
 
-	return Object.entries(shards)
-		.reduce((acc, [field, value]) => {
-			const shard = encodeSfDict(value as CmcdHeaderValue, { whitespace: false })
-			if (shard) {
-				acc[field as CmcdHeaderField] = shard
-			}
-			return acc
-		}, result)
+	for (const [field, value] of Object.entries(shards)) {
+		const shard = encodeSfDict(value as CmcdHeaderValue, { whitespace: false })
+		if (shard) {
+			result[field as CmcdHeaderField] = shard
+		}
+	}
+
+	return result
 }

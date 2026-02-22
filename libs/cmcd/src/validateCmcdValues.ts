@@ -81,6 +81,7 @@ function validateStringArrayValue(key: string, value: unknown, issues: CmcdValid
 /**
  * Validates that all values in a CMCD payload conform to the expected types and constraints.
  *
+ * @example
  * {@includeCode ../test/validateCmcdValues.test.ts#example}
  *
  * @param data - The CMCD payload to validate.

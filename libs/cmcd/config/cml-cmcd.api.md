@@ -137,10 +137,10 @@ export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", 
 export const CMCD_V2: 2;
 
 // @public
-export const CMCD_VALIDATION_SEVERITY_ERROR = "error";
+export const CMCD_VALIDATION_SEVERITY_ERROR: "error";
 
 // @public
-export const CMCD_VALIDATION_SEVERITY_WARNING = "warning";
+export const CMCD_VALIDATION_SEVERITY_WARNING: "warning";
 
 // @public
 export type CmcdCustomKey = `${string}-${string}`;
@@ -163,7 +163,7 @@ export type CmcdDecodeOptions = {
 
 // @public
 export type CmcdEncodeOptions = {
-    version?: number;
+    version?: CmcdVersion;
     reportingMode?: CmcdReportingMode;
     formatters?: Partial<CmcdFormatterMap>;
     customHeaderMap?: Partial<CmcdHeaderMap>;
@@ -226,7 +226,7 @@ export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
 
 // @public
 export type CmcdFormatterOptions = {
-    version: number;
+    version: CmcdVersion;
     reportingMode: CmcdReportingMode;
     baseUrl?: string;
 };
@@ -489,7 +489,7 @@ export type CmcdValue = ValueOf<Cmcd>;
 // @public
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
-// @public (undocumented)
+// @public
 export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
     convertToLatest: true;
 }): Cmcd;
@@ -500,7 +500,7 @@ export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?
 // @public
 export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
-// @public (undocumented)
+// @public
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options: CmcdDecodeOptions & {
     convertToLatest: true;
 }): Cmcd;
@@ -508,7 +508,7 @@ export function fromCmcdHeaders(headers: Record<string, string> | Headers, optio
 // @public (undocumented)
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData;
 
-// @public (undocumented)
+// @public
 export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDecodeOptions & {
     convertToLatest: true;
 }): Cmcd;
@@ -516,7 +516,7 @@ export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDeco
 // @public (undocumented)
 export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData;
 
-// @public (undocumented)
+// @public
 export function fromCmcdUrl(url: string, options: CmcdDecodeOptions & {
     convertToLatest: true;
 }): Cmcd;

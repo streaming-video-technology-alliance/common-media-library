@@ -21,6 +21,7 @@ import { validateCmcd } from './validateCmcd.ts'
  * then merges all shards and runs full payload validation (keys, values, and
  * structure) on the merged data.
  *
+ * @example
  * {@includeCode ../test/validateCmcdHeaders.test.ts#example}
  *
  * @param headers - A `Headers` instance or a record of CMCD header fields to their raw encoded string values.
