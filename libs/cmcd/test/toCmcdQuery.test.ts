@@ -15,7 +15,7 @@ describe('toCmcdQuery', () => {
 		}
 
 		const options = {
-			version: 2,
+			version: 2 as const,
 			reportingMode: CmcdReportingMode.REQUEST,
 		}
 

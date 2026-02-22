@@ -19,21 +19,22 @@ import { upConvertToV2 } from './upConvertToV2.ts'
  * @example
  * {@includeCode ../test/fromCmcdHeaders.test.ts#example}
  */
-/** @public */
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
-/** @public */
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData | Cmcd {
 	const h = ensureHeaders(headers)
 
-	const result = CMCD_HEADER_FIELDS.reduce((acc, key) => {
-		const value = h.get(key)
-		return Object.assign(acc, decodeCmcd(value as string))
-	}, {} as CmcdData)
+	const result: Record<string, unknown> = {}
+	for (const field of CMCD_HEADER_FIELDS) {
+		const value = h.get(field)
+		if (value) {
+			Object.assign(result, decodeCmcd(value))
+		}
+	}
 
 	if (options?.convertToLatest) {
 		return upConvertToV2(result) as Cmcd
 	}
 
-	return result
+	return result as CmcdData
 }

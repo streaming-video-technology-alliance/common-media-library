@@ -2,6 +2,7 @@ import type { CmcdFormatterMap } from './CmcdFormatterMap.ts'
 import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
+import type { CmcdVersion } from './CmcdVersion.ts'
 
 /**
  * Options for encoding CMCD values.
@@ -14,7 +15,7 @@ export type CmcdEncodeOptions = {
 	 *
 	 * @defaultValue `1`
 	 */
-	version?: number;
+	version?: CmcdVersion;
 
 	/**
 	 * The reporting mode to use.

@@ -1,6 +1,9 @@
 import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.ts'
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdKey } from './CmcdKey.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
+
+const CMCD_REQUEST_KEY_SET: ReadonlySet<string> = new Set(CMCD_REQUEST_KEYS)
 
 /**
  * Check if a key is a valid CMCD request key.
@@ -15,6 +18,6 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
  * {@includeCode ../test/isCmcdRequestKey.test.ts#example}
  */
 export function isCmcdRequestKey(key: string): key is keyof Cmcd {
-	return CMCD_REQUEST_KEYS.includes(key as any) ||
-		isCmcdCustomKey(key as any)
+	return CMCD_REQUEST_KEY_SET.has(key) ||
+		isCmcdCustomKey(key as CmcdKey)
 }

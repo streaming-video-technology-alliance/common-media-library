@@ -1,4 +1,5 @@
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
+import type { CmcdVersion } from './CmcdVersion.ts'
 
 /**
  * Options for formatting CMCD data values.
@@ -9,7 +10,7 @@ export type CmcdFormatterOptions = {
 	/**
 	 * The version of the CMCD specification to use.
 	 */
-	version: number;
+	version: CmcdVersion;
 
 	/**
 	 * The reporting mode to use.

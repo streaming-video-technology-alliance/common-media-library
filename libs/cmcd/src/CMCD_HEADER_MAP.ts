@@ -4,6 +4,10 @@ import type { CmcdRequestKey } from './CmcdRequestKey.ts'
 /**
  * The map of CMCD keys to their appropriate header shard.
  *
+ * Note: Event-only keys (e, ts, cen, h) and response-received keys
+ * (rc, ttfb, ttlb, url, etc.) are intentionally absent. They are
+ * transmitted via the event-mode POST body, not HTTP headers.
+ *
  * @public
  */
 export const CMCD_HEADER_MAP: Record<CmcdRequestKey | 'nrr', CmcdHeaderField> = {

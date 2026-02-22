@@ -36,12 +36,12 @@ type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormali
 }
 
 function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig, baseUrl?: string): CmcdEncodeOptions {
-	const { enabledKeys = [] } = config
+	const enabledKeySet = new Set(config.enabledKeys ?? [])
 
 	return {
 		version: config.version || CMCD_V2,
 		reportingMode,
-		filter: (key: CmcdKey) => enabledKeys.includes(key),
+		filter: (key: CmcdKey) => enabledKeySet.has(key),
 		baseUrl,
 	}
 }
@@ -140,6 +140,10 @@ export class CmcdReporter {
 
 	/**
 	 * Starts the CMCD reporter. Called by the player when the reporter is enabled.
+	 *
+	 * Note: This fires an initial time-interval event immediately (synchronously)
+	 * before the first interval elapses. Ensure CMCD data (sid, cid, etc.) is
+	 * populated before calling start().
 	 */
 	start(): void {
 		this.eventTargets.forEach((target, config) => {
@@ -190,13 +194,14 @@ export class CmcdReporter {
 	update(data: Partial<Cmcd>): void {
 		if (data.sid && data.sid !== this.data.sid) {
 			this.resetSession()
-			return
 		}
 
 		if (data.msd && !isNaN(data.msd)) {
 			this.msd = data.msd
 		}
 
+		// msd is tracked separately via this.msd and sent once per target,
+		// so it is stripped from the persistent data store after each update.
 		this.data = { ...this.data, ...data, msd: undefined }
 	}
 
@@ -402,7 +407,10 @@ export class CmcdReporter {
 
 			const deleteCount = flush ? queue.length : config.batchSize
 			const events = queue.splice(0, deleteCount)
-			this.sendEventReport(config, events)
+			this.sendEventReport(config, events).catch(() => {
+				// Re-queue events that failed to send
+				target.queue.unshift(...events)
+			})
 
 			reprocess ||= queue.length > 0
 		})
@@ -426,24 +434,15 @@ export class CmcdReporter {
 			headers: {
 				'Content-Type': 'text/cmcd',
 			},
-			body: data.reduce((acc, item) => acc += `${encodeCmcd(item, options)}\n`, ''),
+			body: data.map(item => encodeCmcd(item, options)).join('\n') + '\n',
 		})
 
 		const { status } = response
-		switch (status) {
-			case 410:
-				this.eventTargets.delete(target)
-				break
 
-			case 429:
-				// Needs clarification
-				break
-
-			default:
-				if (status > 499 && status < 600) {
-					// retry logic
-				}
-				break
+		if (status === 410) {
+			this.eventTargets.delete(target)
+		} else if (status === 429 || (status > 499 && status < 600)) {
+			throw new Error(`Event report failed with status ${status}`)
 		}
 	}
 

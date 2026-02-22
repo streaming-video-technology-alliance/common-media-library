@@ -17,9 +17,7 @@ import { decodeCmcd } from './decodeCmcd.ts'
  * @example
  * {@includeCode ../test/fromCmcdQuery.test.ts#example}
  */
-/** @public */
 export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
-/** @public */
 export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData
 export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData | Cmcd {
 	if (typeof query === 'string') {
@@ -28,5 +26,5 @@ export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDec
 
 	const value = query.get(CMCD_PARAM)
 
-	return decodeCmcd(value as string, options as any)
+	return decodeCmcd(value ?? '', options as CmcdDecodeOptions)
 }

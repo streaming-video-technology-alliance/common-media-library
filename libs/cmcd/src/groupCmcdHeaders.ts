@@ -34,10 +34,11 @@ export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeade
 	const keys = Object.keys(cmcd) as CmcdHeaderKey[]
 	const custom: Partial<Record<CmcdHeaderKey, CmcdHeaderField>> = customHeaderMap ? createHeaderMap(customHeaderMap) : {}
 
-	return keys.reduce((acc: Record<CmcdHeaderField, CmcdHeaderValue>, key: CmcdHeaderKey) => {
+	for (const key of keys) {
 		const field = CMCD_HEADER_MAP[key] || custom[key] || CmcdHeaderField.REQUEST
-		const data = acc[field] ??= {};
-		(data as any)[key] = (cmcd as any)[key]
-		return acc
-	}, result)
+		const data = result[field] ??= {};
+		(data as Record<string, unknown>)[key] = (cmcd as Record<string, unknown>)[key]
+	}
+
+	return result
 }

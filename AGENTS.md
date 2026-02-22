@@ -53,8 +53,8 @@ This is a monorepo containing multiple TypeScript libraries for media playback f
 
 ## Git Commit Guidelines
 
-- All commits must be signed off by the author (DCO).
-- Follow the conventional commit format (e.g., `feat:`, `fix:`).
+- **Always use `git commit -s`** to add the DCO sign-off (`Signed-off-by:` line). Every commit must have this.
+- Follow the conventional commit format (e.g., `feat:`, `fix:`, `refactor:`, `chore:`).
 
 ## Important notes
 
