@@ -14,7 +14,7 @@ describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
 		//#region example
 		const input = { br: [1000], 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true }
-		const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST }
+		const options = { version: 2 as const, reportingMode: CmcdReportingMode.REQUEST }
 		equal(encodeCmcd(input, options), 'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2')
 		//#endregion example
 	})

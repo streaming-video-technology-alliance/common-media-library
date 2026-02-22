@@ -1,5 +1,6 @@
 import { CMCD_REQUEST_KEYS } from './CMCD_REQUEST_KEYS.ts'
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdKey } from './CmcdKey.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
 const CMCD_REQUEST_KEY_SET: ReadonlySet<string> = new Set(CMCD_REQUEST_KEYS)

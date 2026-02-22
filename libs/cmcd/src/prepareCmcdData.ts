@@ -6,6 +6,7 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdVersion } from './CmcdVersion.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
@@ -102,7 +103,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results
 	}
 
-	const version = options.version || (obj['v'] as number) || CMCD_V2
+	const version = options.version || (obj['v'] as CmcdVersion) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
 
 	// Down-convert V2 data to V1 format if needed
