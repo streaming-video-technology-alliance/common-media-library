@@ -6,7 +6,7 @@ describe('validateCmcdStructure', () => {
 	it('provides a valid example', () => {
 		// #region example
 		const result = validateCmcdStructure(
-			{ e: 'br', ts: 1234567890 },
+			{ e: 'bc', ts: 1234567890 },
 			{ reportingMode: 'event' },
 		)
 		equal(result.valid, true)

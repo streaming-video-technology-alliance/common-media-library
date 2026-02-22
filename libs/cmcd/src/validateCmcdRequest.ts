@@ -1,10 +1,12 @@
 import type { HttpRequest } from '@svta/cml-utils'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
+import type { CmcdData } from './CmcdData.ts'
 import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
 import type { CmcdDataValidationResult } from './CmcdDataValidationResult.ts'
 import { ensureHeaders } from './ensureHeaders.ts'
 import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
+import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { validateCmcd } from './validateCmcd.ts'
 import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
@@ -37,7 +39,19 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 	}
 
 	const param = new URL(request.url).searchParams.get(CMCD_PARAM)
-	const data = decodeCmcd(param as string)
+	let data: CmcdData
+	try {
+		data = decodeCmcd(param as string)
+	} catch {
+		return {
+			valid: false,
+			issues: [{
+				message: 'Failed to decode CMCD query parameter: invalid structured field syntax.',
+				severity: CMCD_VALIDATION_SEVERITY_ERROR,
+			}],
+			data: {} as CmcdData,
+		}
+	}
 
 	const result = validateCmcd(data, { ...options, reportingMode: CMCD_REQUEST_MODE })
 	return { ...result, data }

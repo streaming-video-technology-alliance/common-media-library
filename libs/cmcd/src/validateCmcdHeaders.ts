@@ -40,7 +40,17 @@ export function validateCmcdHeaders(headers: Record<string, string> | Headers, o
 			continue
 		}
 
-		const shard = decodeCmcd(raw)
+		let shard: Record<string, unknown>
+		try {
+			shard = decodeCmcd(raw)
+		} catch {
+			issues.push({
+				key: headerField,
+				message: `Failed to decode "${headerField}" header: invalid structured field syntax.`,
+				severity: CMCD_VALIDATION_SEVERITY_ERROR,
+			})
+			continue
+		}
 		decoded[headerField] = shard
 
 		for (const key of Object.keys(shard)) {

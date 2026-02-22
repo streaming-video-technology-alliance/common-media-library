@@ -1,6 +1,8 @@
 import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
+import type { CmcdData } from './CmcdData.ts'
 import type { CmcdEventsValidationResult } from './CmcdEventsValidationResult.ts'
+import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { mergeValidationResults } from './mergeValidationResults.ts'
@@ -38,7 +40,26 @@ export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOp
 		}
 	}
 
-	const decodedLines = lines.map(line => decodeCmcd(line))
-	const result = mergeValidationResults(...decodedLines.map(data => validateCmcd(data, opts)))
+	const decodedLines: CmcdData[] = []
+	const lineResults: CmcdValidationResult[] = []
+
+	for (let i = 0; i < lines.length; i++) {
+		try {
+			const data = decodeCmcd(lines[i])
+			decodedLines.push(data)
+			lineResults.push(validateCmcd(data, opts))
+		} catch {
+			decodedLines.push({} as CmcdData)
+			lineResults.push({
+				valid: false,
+				issues: [{
+					message: `Failed to decode event line ${i + 1}: invalid structured field syntax.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
+				}],
+			})
+		}
+	}
+
+	const result = mergeValidationResults(...lineResults)
 	return { ...result, data: decodedLines }
 }
