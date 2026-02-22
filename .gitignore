@@ -4,4 +4,7 @@ temp
 .vscode
 .idea
 RELEASE.md
+*.db
+*.db-wal
+*.db-shm
 .claude/settings.local.json

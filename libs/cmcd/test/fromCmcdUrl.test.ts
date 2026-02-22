@@ -20,4 +20,13 @@ describe('fromCmcdUrl', () => {
 	it('produces CMCD object', () => {
 		deepEqual(fromCmcdUrl(CMCD_QUERY), CMCD_OUTPUT)
 	})
+
+	it('up-converts v1 data with convertToLatest', () => {
+		const url = 'bl%3D2000%2Cbr%3D3000%2Csu'
+		deepEqual(fromCmcdUrl(url, { convertToLatest: true }), {
+			bl: [2000],
+			br: [3000],
+			su: true,
+		})
+	})
 })

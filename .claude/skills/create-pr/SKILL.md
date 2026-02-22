@@ -46,6 +46,21 @@ Follow these steps in strict order. Do NOT skip ahead.
 - Verify the current branch is NOT `main`. If it is, stop and tell the user to create a feature branch first.
 - If a PR already exists for this branch, inform the user and ask whether to update the existing PR description or stop.
 - Ensure all changes are committed. If there are uncommitted changes, inform the user and stop.
+- **DCO sign-off check**: Verify that every commit on this branch has a `Signed-off-by:` line:
+
+```bash
+git log main..HEAD --format="%h %s" --no-merges | while read hash rest; do
+  if ! git log -1 --format="%b" "$hash" | grep -q "^Signed-off-by:"; then
+    echo "MISSING DCO: $hash $rest"
+  fi
+done
+```
+
+If any commits are missing DCO sign-off, report them and stop. Instruct the user to fix with:
+```bash
+git rebase main --exec "git commit --amend --signoff --no-edit"
+```
+Do NOT create the PR until all commits have DCO sign-off.
 
 ### Step 1: Identify affected packages
 
@@ -192,3 +207,4 @@ EOF
 - The summary bullets should explain **why** the changes were made, not just what files changed.
 - If builds are slow, only build packages that are directly affected by the changes and their dependents.
 - Always push with `-u` to set up tracking if not already configured.
+- **Every commit must have DCO sign-off.** Always use `git commit -s` and include `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>` in the message body. If you need to fix issues discovered during validation (Steps 2-5), commit the fixes with these requirements before proceeding.

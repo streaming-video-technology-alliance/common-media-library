@@ -3,6 +3,8 @@ import type { Cmcd } from './Cmcd.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
 import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 
+const CMCD_EVENT_KEY_SET: ReadonlySet<string> = new Set(CMCD_EVENT_KEYS)
+
 /**
  * Check if a key is a valid CMCD event key.
  *
@@ -18,5 +20,5 @@ import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 export function isCmcdEventKey(key: string): key is keyof Cmcd {
 	return isCmcdRequestKey(key) ||
 		isCmcdResponseReceivedKey(key) ||
-		CMCD_EVENT_KEYS.includes(key as any)
+		CMCD_EVENT_KEY_SET.has(key)
 }

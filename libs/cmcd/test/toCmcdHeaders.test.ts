@@ -23,7 +23,7 @@ describe('toCmcdHeaders', () => {
 		}
 
 		const options = {
-			version: 2,
+			version: 2 as const,
 			reportingMode: CmcdReportingMode.REQUEST,
 			customHeaderMap: {
 				[CmcdHeaderField.OBJECT]: ['com.example-hello' as CmcdCustomKey],

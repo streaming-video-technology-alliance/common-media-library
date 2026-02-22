@@ -41,7 +41,7 @@ export const CMCD_EVENT_AD_START: "as";
 export const CMCD_EVENT_BACKGROUNDED_MODE: "b";
 
 // @public
-export const CMCD_EVENT_BITRATE_CHANGE: "br";
+export const CMCD_EVENT_BITRATE_CHANGE: "bc";
 
 // @public
 export const CMCD_EVENT_CONTENT_ID: "c";
@@ -84,6 +84,9 @@ export const CMCD_EVENT_UNMUTE: "um";
 
 // @public
 export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter>;
+
+// @public
+export const CMCD_HEADER_FIELDS: readonly CmcdHeaderField[];
 
 // @public
 export const CMCD_HEADER_MAP: Record<CmcdRequestKey | "nrr", CmcdHeaderField>;
@@ -134,14 +137,33 @@ export const CMCD_V1_KEYS: readonly ["bl", "br", "bs", "cid", "d", "dl", "mtp", 
 export const CMCD_V2: 2;
 
 // @public
+export const CMCD_VALIDATION_SEVERITY_ERROR: "error";
+
+// @public
+export const CMCD_VALIDATION_SEVERITY_WARNING: "warning";
+
+// @public
 export type CmcdCustomKey = `${string}-${string}`;
 
 // @public
 export type CmcdCustomValue = string | SfItem<string> | (string | SfItem<string>)[] | number | SfItem<number> | (number | SfItem<number>)[] | boolean | SfItem<boolean> | (boolean | SfItem<boolean>)[] | symbol | SfItem<symbol> | (symbol | SfItem<symbol>)[] | SfToken | SfItem<SfToken> | (SfToken | SfItem<SfToken>)[];
 
 // @public
+export type CmcdData = CmcdV1Data | CmcdV2Data;
+
+// @public
+export type CmcdDataValidationResult = CmcdValidationResult & {
+    data: CmcdData;
+};
+
+// @public
+export type CmcdDecodeOptions = {
+    convertToLatest?: boolean;
+};
+
+// @public
 export type CmcdEncodeOptions = {
-    version?: number;
+    version?: CmcdVersion;
     reportingMode?: CmcdReportingMode;
     formatters?: Partial<CmcdFormatterMap>;
     customHeaderMap?: Partial<CmcdHeaderMap>;
@@ -165,6 +187,11 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
     events?: CmcdEventType[];
     interval?: number;
     batchSize?: number;
+};
+
+// @public
+export type CmcdEventsValidationResult = CmcdValidationResult & {
+    data: CmcdData[];
 };
 
 // @public
@@ -199,7 +226,7 @@ export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
 
 // @public
 export type CmcdFormatterOptions = {
-    version: number;
+    version: CmcdVersion;
     reportingMode: CmcdReportingMode;
     baseUrl?: string;
 };
@@ -419,25 +446,83 @@ export type CmcdV1 = {
 };
 
 // @public
+export type CmcdV1Data = Omit<CmcdRequest, keyof CmcdV1 | "v"> & CmcdV1 & {
+    v?: 1;
+};
+
+// @public
+export type CmcdV2Data = Omit<Cmcd, "v"> & {
+    v: 2;
+};
+
+// @public
+export type CmcdValidationIssue = {
+    key?: string;
+    message: string;
+    severity: CmcdValidationSeverity;
+};
+
+// @public
+export type CmcdValidationOptions = {
+    version?: CmcdVersion;
+    reportingMode?: CmcdReportingMode;
+};
+
+// @public
+export type CmcdValidationResult = {
+    valid: boolean;
+    issues: CmcdValidationIssue[];
+};
+
+// @public
+export const CmcdValidationSeverity: {
+    readonly ERROR: typeof CMCD_VALIDATION_SEVERITY_ERROR;
+    readonly WARNING: typeof CMCD_VALIDATION_SEVERITY_WARNING;
+};
+
+// @public
+export type CmcdValidationSeverity = ValueOf<typeof CmcdValidationSeverity>;
+
+// @public
 export type CmcdValue = ValueOf<Cmcd>;
 
 // @public
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
 // @public
-export function decodeCmcd<T extends Cmcd = Cmcd>(cmcd: string): T;
+export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
+
+// @public (undocumented)
+export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T;
 
 // @public
 export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
-export function fromCmcdHeaders(headers: Record<string, string> | Headers): Cmcd;
+export function fromCmcdHeaders(headers: Record<string, string> | Headers, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
+
+// @public (undocumented)
+export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData;
 
 // @public
-export function fromCmcdQuery(query: string | URLSearchParams): Cmcd;
+export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
+
+// @public (undocumented)
+export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData;
 
 // @public
-export function fromCmcdUrl(url: string): Cmcd;
+export function fromCmcdUrl(url: string, options: CmcdDecodeOptions & {
+    convertToLatest: true;
+}): Cmcd;
+
+// @public (undocumented)
+export function fromCmcdUrl(url: string, options?: CmcdDecodeOptions): CmcdData;
 
 // @public
 export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdHeaderValue>;
@@ -455,7 +540,13 @@ export function isCmcdRequestKey(key: string): key is keyof Cmcd;
 export function isCmcdResponseReceivedKey(key: string): key is keyof Cmcd;
 
 // @public
+export function isCmcdV1Data(data: CmcdData): data is CmcdV1Data;
+
+// @public
 export function isCmcdV1Key(key: string): key is CmcdKey;
+
+// @public
+export function isCmcdV2Data(data: CmcdData): data is CmcdV2Data;
 
 // @public
 export function prepareCmcdData(obj: Record<string, any>, options?: CmcdEncodeOptions): Cmcd;
@@ -471,6 +562,27 @@ export function toCmcdUrl(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
 
 // @public
 export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfItem<V, P>;
+
+// @public
+export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdEventsValidationResult;
+
+// @public
+export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdDataValidationResult;
+
+// @public
+export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdDataValidationResult;
+
+// @public
+export function validateCmcdStructure(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdValues(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
 
 // (No @packageDocumentation comment for this package)
 

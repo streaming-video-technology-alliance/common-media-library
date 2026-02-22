@@ -6,12 +6,14 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdVersion } from './CmcdVersion.ts'
 import type { CmcdObjectType } from './CmcdObjectType.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
 import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
+import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
 import { isTokenField } from './isTokenField.ts'
 import { isValid } from './isValid.ts'
@@ -20,11 +22,6 @@ const filterMap: Record<string, (key: string) => boolean> = {
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
 }
-
-/**
- * V1 keys that use inner lists in V2 but plain numbers in V1.
- */
-const INNER_LIST_V1_KEYS = new Set(['ab', 'bl', 'br', 'bsa', 'bsd', 'bsda', 'lab', 'lb', 'mtp', 'pb', 'tab', 'tb', 'tbl', 'tpb'])
 
 /**
  * Unwrap an inner list or SfItem value to a plain scalar.
@@ -80,7 +77,7 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 				result['nor'] = first
 			}
 		}
-		else if (INNER_LIST_V1_KEYS.has(key)) {
+		else if (CMCD_INNER_LIST_KEYS.has(key)) {
 			result[key] = unwrapValue(value, obj['ot'])
 		}
 		else {
@@ -106,7 +103,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results
 	}
 
-	const version = options.version || (obj['v'] as number) || CMCD_V2
+	const version = options.version || (obj['v'] as CmcdVersion) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
 
 	// Down-convert V2 data to V1 format if needed
@@ -153,17 +150,18 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		keys.push('v')
 	}
 
-	const formatters = Object.assign({}, CMCD_FORMATTER_MAP, options.formatters)
 	const formatterOptions: CmcdFormatterOptions = {
 		version,
 		reportingMode,
 		baseUrl: options.baseUrl,
 	}
 
-	keys.sort().forEach(key => {
+	keys.sort()
+
+	for (const key of keys) {
 		let value = data[key] as CmcdValue
 
-		const formatter = formatters[key]
+		const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
 		if (typeof formatter === 'function') {
 			value = formatter(value, formatterOptions)
 		}
@@ -171,7 +169,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		// Version should only be reported if not equal to 1.
 		if (key === 'v') {
 			if (version === 1) {
-				return
+				continue
 			}
 			else {
 				value = version
@@ -179,8 +177,8 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		}
 
 		// Playback rate should only be sent if not equal to 1.
-		if (key == 'pr' && value === 1) {
-			return
+		if (key === 'pr' && value === 1) {
+			continue
 		}
 
 		// Ensure a timestamp is set for event mode
@@ -190,7 +188,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		// ignore invalid values
 		if (!isValid(value)) {
-			return
+			continue
 		}
 
 		if (isTokenField(key) && typeof value === 'string') {
@@ -198,7 +196,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		}
 
 		(results as any)[key] = value
-	})
+	}
 
 	return results
 }

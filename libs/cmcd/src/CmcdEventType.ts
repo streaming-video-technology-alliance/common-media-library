@@ -1,11 +1,11 @@
 import type { ValueOf } from '@svta/cml-utils'
 
 /**
- * CMCD event type for the 'br' key (bitrate change).
+ * CMCD event type for the 'bc' key (bitrate change).
  *
  * @public
  */
-export const CMCD_EVENT_BITRATE_CHANGE = 'br' as const
+export const CMCD_EVENT_BITRATE_CHANGE = 'bc' as const
 
 /**
  * CMCD event type for the 'ps' key (play state change).

@@ -3,7 +3,7 @@ import { CmcdEventType, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
 import { SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
-import { toCmcdValue } from '../src/toCmcdValue.ts'
+import { toCmcdValue } from '@svta/cml-cmcd'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
 import { CMCD_STRING_EVENT } from './data/CMCD_STRING_EVENT.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
@@ -14,7 +14,7 @@ describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
 		//#region example
 		const input = { br: [1000], 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true }
-		const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST }
+		const options = { version: 2 as const, reportingMode: CmcdReportingMode.REQUEST }
 		equal(encodeCmcd(input, options), 'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2')
 		//#endregion example
 	})
