@@ -438,21 +438,11 @@ export class CmcdReporter {
 		})
 
 		const { status } = response
-		switch (status) {
-			case 410:
-				this.eventTargets.delete(target)
-				break
 
-			case 429:
-			default:
-				if (status === 429 || (status > 499 && status < 600)) {
-					// Re-queue failed events so the next interval or flush can retry
-					const eventTarget = this.eventTargets.get(target)
-					if (eventTarget) {
-						eventTarget.queue.unshift(...data)
-					}
-				}
-				break
+		if (status === 410) {
+			this.eventTargets.delete(target)
+		} else if (status === 429 || (status > 499 && status < 600)) {
+			throw new Error(`Event report failed with status ${status}`)
 		}
 	}
 
