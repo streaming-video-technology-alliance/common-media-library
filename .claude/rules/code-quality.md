@@ -20,6 +20,7 @@ When writing or modifying code in this project, always apply these standards. Th
 - Keep functions small and focused -- single responsibility.
 - Avoid pulling in large dependencies for small tasks.
 - Regex patterns used in repeatedly-called functions should be module-level constants.
+- New code is fine as long as it tree-shakes cleanly; adopters should never pay for code they do not import.
 
 ## TypeScript
 
@@ -36,6 +37,8 @@ When writing or modifying code in this project, always apply these standards. Th
 - Use options objects for 3+ optional parameters.
 - Prefer `readonly` properties on types where mutation is not intended.
 - New APIs must follow naming patterns of existing APIs in the same package.
+- Prefer union/literal types over broad `string`/`number` for autocomplete and misuse prevention.
+- Error messages must include the parameter name, expected value(s), and the value that was actually received.
 
 ## Documentation
 

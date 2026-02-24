@@ -1,6 +1,6 @@
 # Claude Code Configuration
 
-General project instructions are in [AGENTS.md](AGENTS.md), which is auto-loaded by Claude Code.
+Common Media Library is optimized for adoption by web video players — performance, tree-shakeability, developer experience, and documentation quality are the top priorities. General project instructions are in [AGENTS.md](AGENTS.md), which is auto-loaded by Claude Code.
 
 ## Skills
 
