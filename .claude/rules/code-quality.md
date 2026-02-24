@@ -5,8 +5,6 @@ paths:
 
 # Code Quality Standards
 
-When writing or modifying code in this project, always apply these standards. This is a library consumed by video players where bundle size and tree-shaking directly impact end users.
-
 ## Tree-Shaking
 
 - Group related exports in a single file (e.g., a function and its options type, related constants). Keep unrelated exports in separate files to preserve tree-shaking granularity.
@@ -24,7 +22,6 @@ When writing or modifying code in this project, always apply these standards. Th
 ## TypeScript
 
 - Use `type` not `interface` for type definitions.
-- Use `export type` for pure type exports and `export type *` in barrels for type-only files.
 - Use bracket notation for index signature access (`obj['key']`).
 - Use `as const` assertions for literal values.
 - Avoid `any` -- prefer `unknown` with narrowing or generics.
@@ -45,6 +42,4 @@ When writing or modifying code in this project, always apply these standards. Th
 
 ## Style
 
-- No semicolons, single quotes, tabs for indentation.
-- File extensions in imports (e.g., `'./foo.ts'`).
 - Tests import from the package name, not relative paths.
