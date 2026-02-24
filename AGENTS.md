@@ -4,95 +4,50 @@
 
 Common Media Library (CML) is a collection of TypeScript libraries implementing media specifications (CMCD, CMSD, ID3, ISO BMFF, WebVTT, DASH, and more) for use by web video players such as hls.js, dash.js, and shaka-player.
 
-The strategic goal is **widespread adoption** across the web video player ecosystem. Every decision should be evaluated against these priorities, in order:
+The strategic goal is **widespread adoption**. Evaluate every decision against these priorities, in order:
 
-1. **Performance** — Avoid unnecessary runtime overhead, memory leaks, and GC thrashing. Code in this library runs on every video playback.
-2. **Tree-shakeability** — Adopters' final bundle size is what matters. Everything must tree-shake cleanly so users only pay for what they import.
+1. **Performance** — Avoid unnecessary runtime overhead, memory leaks, and GC thrashing. This code runs on every video playback.
+2. **Tree-shakeability** — Adopters' final bundle size is what matters. Users must only pay for what they import.
 3. **Developer experience** — Correct usage should be obvious; incorrect usage should fail at compile time.
 4. **Documentation quality** — Adopters evaluate libraries by their docs before reading source code.
 5. **Minimal barriers to entry** — Zero config, no peer dependencies, copy-pasteable examples.
-6. **Spec compliance** — Implementations must be accurate to the relevant specification.
+6. **Spec compliance** — Implementations must be accurate to the relevant specification. Do not invent extensions.
 
 ## Build Commands
 
-- `npm run build -w <workspace>`: Build the a module
+- `npm run build -w <workspace>`: Build a module
 - `npm run typecheck`: Run the typechecker
-- `npm test -w <workspace>`: Run the tests for a module
+- `npm test -w <workspace>`: Run the tests for a module (build first — tests use bundled output)
 - `npm run format`: Run the formatter
-- `npm run ver <package> <version>`: Update the version for a package. The package identifier is the name of the package folder minus the `libs/` prefix, e.g. `iso-bmff`. The version should be in semver format `x.x.x` or `x.x.x-alpha.x`.
-
-## Code Style and Conventions
-
-- Use TypeScript strict mode
-- Use ES modules (import/export) syntax, not CommonJS (require)
-- Destructure imports when possible (e.g., `import { foo } from 'bar'`)
-- Follow existing naming conventions in the codebase
-- Use TSDoc comments for public APIs
+- `npm run ver <package> <version>`: Update version for a package (`<package>` is the folder name without `libs/` prefix)
 
 ## Developer Experience
 
 APIs are the product. Design them so adopters fall into the pit of success:
 
-- **Type-driven discoverability** — Use union and literal types instead of broad `string` or `number` so autocomplete guides users to valid values.
-- **Pit of success** — Correct usage should be the most obvious path. Incorrect usage should produce a compile-time type error, not a runtime surprise.
-- **Actionable error messages** — Runtime validation errors must include the parameter name, expected value(s), and the value that was actually received.
-- **Minimal API surface** — Fewer exports means less to learn. Do not add a public export unless it serves a clear use case.
-- **Consistent patterns** — Follow the naming and structural patterns already established across packages (e.g., `encode`/`decode`, options objects, const enum pattern).
+- Use union and literal types so autocomplete guides users to valid values.
+- Actionable error messages: include parameter name, expected value(s), and received value.
+- Minimal API surface — do not add a public export unless it serves a clear use case.
+- Follow established naming and structural patterns across packages (e.g., `encode`/`decode`, options objects, const enum pattern).
 
 ## Workflow
 
-- Be sure to typecheck when you're done making a series of code changes
-- Always run the typechecker against the entire project
-- Prefer running builds and tests at the workspace level
-- Always create tests for new members of a package's public API
-- Always update the package's version in the package.json file using semantic versioning based on the changes made
-- Always update the package's CHANGELOG.md when making changes
-- When a package's version changes, always create a patch version change to any other packages that depend on it
+- Typecheck the entire project after code changes
+- Prefer builds and tests at the workspace level
+- Create tests for new public API members
+- Update `package.json` version (semver) and `CHANGELOG.md` for every change
+- When a package's version changes, patch-bump any packages that depend on it
+- Avoid breaking changes; when unavoidable, provide migration guidance in changelog and docs
 
 ## Documentation
 
-Documentation is a critical adoption driver. Adopters evaluate a library by its README and examples before reading source code.
-
-**Package-level requirements:**
-
-- Every package must have a `README.md` with a one-line description, install instructions, and a quick-start example.
-- Public API changes are tracked in `config/cml-*.api.md` (regenerated by build).
-- Package documentation lives in `<package>/docs/` and should include user guides and migration guides where applicable.
-
-**Code-level requirements:**
-
+- Every package needs a `README.md` with description, install instructions, and a quick-start example.
 - Use `{@includeCode ../test/<file>.test.ts#example}` in TSDoc to reference test examples.
 - Mark example regions in tests with `// #region example` and `// #endregion example`.
-- Use GitHub Flavored Markdown (GFM) for all documentation.
-
-**Example quality:**
-
 - All code examples must be complete and runnable — no pseudocode, no elided imports.
-- Examples should demonstrate the most common use case first, then edge cases.
-
-## Testing
-
-- Tests are located in `<package>/test/`
-- Test use the bundled module, not the source code, so build the necessary package before running tests
-- Include an example test case with `#region example` for documentation purposes
-- Run tests at workspace level: `npm test -w libs/<workspace>`
-
-## Dependencies
-
-- Node.js >= 20 required
-- All packages use TypeScript 5.8+
-- Uses npm workspaces for monorepo management
+- Public API changes are tracked in `config/cml-*.api.md` (regenerated by build).
 
 ## Git Commit Guidelines
 
-- **Always use `git commit -s`** to add the DCO sign-off (`Signed-off-by:` line). Every commit must have this.
-- Follow the conventional commit format (e.g., `feat:`, `fix:`, `refactor:`, `chore:`).
-
-## Guiding Principles
-
-These principles guide trade-off decisions when priorities conflict:
-
-- **Spec compliance is non-negotiable.** If a specification defines behavior, implement it faithfully. Do not invent extensions.
-- **Tree-shaking is the strategy.** The library can grow, but adopters' bundles must not. Every export must be independently tree-shakeable so users only pay for what they import.
-- **Think like an adopter.** Before designing an API, imagine you are a developer using hls.js or dash.js who needs this functionality. What would you search for? What would you expect the function signature to look like?
-- **Stability matters.** Avoid breaking changes. When they are unavoidable, provide clear migration guidance in the changelog and package docs.
+- **Always use `git commit -s`** to add the DCO sign-off. Every commit must have this.
+- Follow conventional commit format (`feat:`, `fix:`, `refactor:`, `chore:`, etc.).
