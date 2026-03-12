@@ -101,6 +101,9 @@ export const CMCD_JSON: "json";
 export const CMCD_KEYS: CmcdKey[];
 
 // @public
+export const CMCD_MIME_TYPE = "application/cmcd";
+
+// @public
 export const CMCD_OBJECT: "CMCD-Object";
 
 // @public
@@ -565,6 +568,9 @@ export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfIt
 
 // @public
 export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
+
+// @public
+export function validateCmcdEventReport(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdEventsValidationResult;
 
 // @public
 export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdEventsValidationResult;

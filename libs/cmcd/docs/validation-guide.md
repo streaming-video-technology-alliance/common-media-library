@@ -15,7 +15,7 @@ There are three main validation functions, each targeting a different aspect of 
 | --------------------- | ----------------------------------------------------------- |
 | `validateCmcd`        | Orchestrator — runs key, value, and structure checks        |
 | `validateCmcdRequest` | Validates a `Request` or `HttpRequest` as request-mode data |
-| `validateCmcdEvents`   | Validates a multi-line `text/cmcd` body as event-mode data  |
+| `validateCmcdEvents`   | Validates a multi-line `application/cmcd` body as event-mode data  |
 
 All validators return a `CmcdValidationResult`:
 
@@ -34,16 +34,16 @@ type CmcdValidationIssue = {
 
 ## Validating Event Report Payloads
 
-A common use case is validating CMCD v2 event reports received via POST. The payload is typically a `text/cmcd` body containing newline-separated CMCD-encoded strings, or `application/json`.
+A common use case is validating CMCD v2 event reports received via POST. The payload is typically a `application/cmcd` body containing newline-separated CMCD-encoded strings, or `application/json`.
 
 ### Using `validateCmcdEvents`
 
-The `validateCmcdEvents` function accepts a raw CMCD string and validates it as an event-mode payload. It supports multi-line `text/cmcd` bodies directly — each non-empty line is validated independently and the results are merged. An empty payload (no non-empty lines) is treated as an error.
+The `validateCmcdEvents` function accepts a raw CMCD string and validates it as an event-mode payload. It supports multi-line `application/cmcd` bodies directly — each non-empty line is validated independently and the results are merged. An empty payload (no non-empty lines) is treated as an error.
 
 ```typescript
 import { validateCmcdEvents } from "@svta/cml-cmcd";
 
-// Validate a complete text/cmcd POST body
+// Validate a complete application/cmcd POST body
 const body = `e=ps,sid="session-1",ts=1700000000000,sta=p,v=2
 e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`;
 
@@ -64,14 +64,14 @@ const result = validateCmcdEvents(
 );
 ```
 
-### Parsing and Validating `text/cmcd` manually
+### Parsing and Validating `application/cmcd` manually
 
-The `validateCmcdEvents` function is designed to validate multi-line `text/cmcd` bodies directly. However, if you need to validate a single-line string, you can decode the CMCD string and validate the data manually (this is what `validateCmcdRequest` does internally).
+The `validateCmcdEvents` function is designed to validate multi-line `application/cmcd` bodies directly. However, if you need to validate a single-line string, you can decode the CMCD string and validate the data manually (this is what `validateCmcdRequest` does internally).
 
 ```typescript
 import { decodeCmcd, validateCmcd } from "@svta/cml-cmcd";
 
-// Simulated POST body (text/cmcd)
+// Simulated POST body (application/cmcd)
 const body = `e=ps,sid="session-1",ts=1700000000000,sta=p,v=2
 e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`;
 

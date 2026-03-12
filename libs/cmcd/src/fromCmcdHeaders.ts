@@ -14,6 +14,8 @@ import { upConvertToV2 } from './upConvertToV2.ts'
  *
  * @returns The decoded CMCD data.
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#header-field-definition | CTA-5004-A Header Field Definition}
+ *
  * @public
  *
  * @example

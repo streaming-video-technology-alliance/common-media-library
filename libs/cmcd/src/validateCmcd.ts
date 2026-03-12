@@ -15,6 +15,8 @@ import { validateCmcdValues } from './validateCmcdValues.ts'
  * @param options - Validation options.
  * @returns The validation result.
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#data-payload-definition-what-data-to-send | CTA-5004-A Data Payload Definition}
+ *
  * @public
  */
 export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult {

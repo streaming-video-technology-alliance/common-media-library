@@ -1,7 +1,7 @@
-import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
-import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdData } from './CmcdData.ts'
 import type { CmcdEventsValidationResult } from './CmcdEventsValidationResult.ts'
+import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
+import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
@@ -13,16 +13,18 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * This function decodes the string internally and validates it with
  * `reportingMode` set to `'event'`. The input may contain multiple
- * newline-separated events (e.g. a `text/cmcd` POST body), in which
+ * newline-separated events (e.g. an `application/cmcd` POST body), in which
  * case each line is validated independently and the results are merged.
- *
- * @example
- * {@includeCode ../test/validateCmcdEvents.test.ts#example}
  *
  * @param cmcd - The raw CMCD-encoded string to validate. May contain
  *   multiple newline-separated event lines.
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result including decoded data per event line.
+ *
+ * @example
+ * {@includeCode ../test/validateCmcdEvents.test.ts#example}
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#body-definition | CTA-5004-A Body Definition}
  *
  * @public
  */
