@@ -258,7 +258,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			equal(requests[0].url, 'https://example.com/cmcd')
 			equal(requests[0].method, 'POST')
-			equal(requests[0].headers?.['Content-Type'], 'text/cmcd')
+			equal(requests[0].headers?.['Content-Type'], 'application/cmcd')
 		})
 
 		it('includes event type and timestamp in the report', async () => {

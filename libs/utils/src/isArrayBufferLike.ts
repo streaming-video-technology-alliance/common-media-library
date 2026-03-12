@@ -1,6 +1,6 @@
 /**
- * Checks if the given value is {@link ArrayBufferLike}
- * (i.e. an `ArrayBuffer` or a `SharedArrayBuffer`).
+ * Checks if the given value is `ArrayBufferLike` (i.e. an `ArrayBuffer`
+ * or a `SharedArrayBuffer`).
  *
  * This function safely handles environments where
  * `SharedArrayBuffer` is not defined, such as non-cross-origin

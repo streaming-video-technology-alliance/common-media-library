@@ -13,7 +13,7 @@ import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
  * A standardized set of HTTP request header fields and query string parameters
  * for communicating media playback metrics in request mode.
  *
- * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD v1 Spec}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#request-mode | CTA-5004-A Request Mode}
  *
  * @public
  */
@@ -34,6 +34,8 @@ export type CmcdRequest = {
 	 * the encoded bitrate is known.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#aggregate-encoded-bitrate | CTA-5004-A Aggregate Encoded Bitrate}
 	 */
 	ab?: CmcdObjectTypeList;
 
@@ -44,6 +46,8 @@ export type CmcdRequest = {
 	 * be sent if it is TRUE. If the visibility state of the player is not known this key SHOULD NOT be reported.
 	 *
 	 * Boolean
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#backgrounded | CTA-5004-A Backgrounded}
 	 */
 	bg?: boolean;
 
@@ -53,6 +57,8 @@ export type CmcdRequest = {
 	 * The buffer length associated with the media object being requested. This value SHOULD be rounded to the nearest 100 ms.
 	 *
 	 * Inner list of integer milliseconds with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#buffer-length | CTA-5004-A Buffer Length}
 	 */
 	bl?: CmcdObjectTypeList;
 
@@ -65,6 +71,8 @@ export type CmcdRequest = {
 	 * If the playlist declares both peak and average bitrate values, the peak value MUST be transmitted.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#encoded-bitrate | CTA-5004-A Encoded Bitrate}
 	 */
 	br?: CmcdObjectTypeList;
 
@@ -76,6 +84,8 @@ export type CmcdRequest = {
 	 * new CDN, then this key might initially report buffering caused by the prior CDN. This key SHOULD NOT be reported if it is FALSE.
 	 *
 	 * Boolean
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#buffer-starvation | CTA-5004-A Buffer Starvation}
 	 */
 	bs?: boolean;
 
@@ -86,6 +96,8 @@ export type CmcdRequest = {
 	 * to rebuffering. Token identifier MAY be omitted if the cause of the rebuffering is unknown.
 	 *
 	 * Inner list of integers with optional token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#buffer-starvation-absolute | CTA-5004-A Buffer Starvation Absolute}
 	 */
 	bsa?: CmcdObjectTypeList;
 
@@ -96,6 +108,8 @@ export type CmcdRequest = {
 	 * once per reporting mode and report destination. Token identifier MAY be omitted if the cause of the rebuffering is unknown.
 	 *
 	 * Inner list of integer milliseconds with optional token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#buffer-starvation-duration | CTA-5004-A Buffer Starvation Duration}
 	 */
 	bsd?: CmcdObjectTypeList;
 
@@ -106,6 +120,8 @@ export type CmcdRequest = {
 	 * rebuffering is unknown.
 	 *
 	 * Inner list of integer milliseconds with optional token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#buffer-starvation-duration-absolute | CTA-5004-A Buffer Starvation Duration Absolute}
 	 */
 	bsda?: CmcdObjectTypeList;
 
@@ -115,6 +131,8 @@ export type CmcdRequest = {
 	 * A string identifying the current delivery network from which the player is retrieving content. Maximum length is 128 characters.
 	 *
 	 * String
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#cdn-id | CTA-5004-A CDN ID}
 	 */
 	cdn?: string;
 
@@ -125,6 +143,8 @@ export type CmcdRequest = {
 	 * sessions and devices and is defined and updated at the discretion of the service provider.
 	 *
 	 * String
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#content-id | CTA-5004-A Content ID}
 	 */
 	cid?: string;
 
@@ -135,6 +155,8 @@ export type CmcdRequest = {
 	 * to the content. For example, this field may be used to transmit the C2PA signature associated with the content being viewed.
 	 *
 	 * String
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#content-signature | CTA-5004-A Content Signature}
 	 */
 	cs?: string;
 
@@ -147,6 +169,8 @@ export type CmcdRequest = {
 	 * This value MUST NOT be sent for objects which do not have an object type of 'a', 'v', 'av', 'tt', 'c', or 'o'.
 	 *
 	 * Integer milliseconds
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#object-duration | CTA-5004-A Object Duration}
 	 */
 	d?: number;
 
@@ -158,6 +182,8 @@ export type CmcdRequest = {
 	 * beneficial if accompanied by the playhead time 'pt' key to allow for correct interpretation.
 	 *
 	 * Integer
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#dropped-frames-absolute | CTA-5004-A Dropped Frames Absolute}
 	 */
 	dfa?: number;
 
@@ -169,6 +195,8 @@ export type CmcdRequest = {
 	 * player's remaining buffer length.
 	 *
 	 * Integer milliseconds
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#deadline | CTA-5004-A Deadline}
 	 */
 	dl?: number;
 
@@ -180,6 +208,8 @@ export type CmcdRequest = {
 	 * Even if only one error code is being specified, the list notation MUST still be used.
 	 *
 	 * Inner list of strings
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#player-error-code | CTA-5004-A Player Error Code}
 	 */
 	ec?: string[];
 
@@ -192,6 +222,8 @@ export type CmcdRequest = {
 	 * sent if the lowest encoded bitrate is known.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#lowest-aggregated-encoded-bitrate | CTA-5004-A Lowest Aggregated Encoded Bitrate}
 	 */
 	lab?: CmcdObjectTypeList;
 
@@ -204,6 +236,8 @@ export type CmcdRequest = {
 	 * requests for audio objects MUST specify the lowest audio bitrate.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#lowest-encoded-bitrate | CTA-5004-A Lowest Encoded Bitrate}
 	 */
 	lb?: CmcdObjectTypeList;
 
@@ -214,6 +248,8 @@ export type CmcdRequest = {
 	 * accuracy of this estimate is dependent on synchronization between the packager and the player clocks.
 	 *
 	 * Integer milliseconds
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#live-stream-latency | CTA-5004-A Live Stream Latency}
 	 */
 	ltc?: number;
 
@@ -227,6 +263,8 @@ export type CmcdRequest = {
 	 * This key MUST only be sent once per Session ID and MUST be sent for each reporting mode which is active within the player.
 	 *
 	 * Integer milliseconds
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#media-start-delay | CTA-5004-A Media Start Delay}
 	 */
 	msd?: number;
 
@@ -243,6 +281,8 @@ export type CmcdRequest = {
 	 * since the prior interval report.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#measured-throughput | CTA-5004-A Measured Throughput}
 	 */
 	mtp?: CmcdObjectTypeList;
 
@@ -263,6 +303,8 @@ export type CmcdRequest = {
 	 * The player SHOULD NOT depend upon any pre-fetch action being taken - it is merely a request for such a pre-fetch to take place.
 	 *
 	 * Inner list of strings
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#next-object-request | CTA-5004-A Next Object Request}
 	 */
 	nor?: (string | SfItem<string, { r: string }>)[];
 
@@ -272,6 +314,8 @@ export type CmcdRequest = {
 	 * True when the content being retrieved by a player is not rendered as audio or video. The key SHOULD only be sent when it is TRUE.
 	 *
 	 * Boolean
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#non-rendered | CTA-5004-A Non Rendered}
 	 */
 	nr?: boolean;
 
@@ -294,6 +338,8 @@ export type CmcdRequest = {
 	 * This key is also used as a token parameter for other keys.
 	 *
 	 * Token
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#object-type | CTA-5004-A Object Type}
 	 */
 	ot?: CmcdObjectType;
 
@@ -303,6 +349,8 @@ export type CmcdRequest = {
 	 * The encoded bitrate of the media object(s) being shown to the end user.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#playhead-bitrate | CTA-5004-A Playhead Bitrate}
 	 */
 	pb?: CmcdObjectTypeList;
 
@@ -312,6 +360,8 @@ export type CmcdRequest = {
 	 * 1.0 if real-time, 2.0 if double speed, 0 if not playing. SHOULD only be sent if not equal to 1.0.
 	 *
 	 * Decimal
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#playback-rate | CTA-5004-A Playback Rate}
 	 */
 	pr?: number;
 
@@ -321,6 +371,8 @@ export type CmcdRequest = {
 	 * The playhead time, expressed in milliseconds, which is being rendered to the viewer when the report is made.
 	 *
 	 * Integer milliseconds
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#playhead-time | CTA-5004-A Playhead Time}
 	 */
 	pt?: number;
 
@@ -331,6 +383,8 @@ export type CmcdRequest = {
 	 * nearest 100kbps.
 	 *
 	 * Integer kbps
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#requested-maximum-throughput | CTA-5004-A Requested Maximum Throughput}
 	 */
 	rtp?: number;
 
@@ -346,6 +400,8 @@ export type CmcdRequest = {
 	 * - `o` = other
 	 *
 	 * Token
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#streaming-format | CTA-5004-A Streaming Format}
 	 */
 	sf?: CmcdStreamingFormat;
 
@@ -358,6 +414,8 @@ export type CmcdRequest = {
 	 * UUID specification.
 	 *
 	 * String
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#session-id | CTA-5004-A Session ID}
 	 */
 	sid?: string;
 
@@ -368,6 +426,8 @@ export type CmcdRequest = {
 	 * zero on the start of a new session-id. Sequence numbers increase independently per each combination of mode and target.
 	 *
 	 * Integer
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#sequence-number | CTA-5004-A Sequence Number}
 	 */
 	sn?: number;
 
@@ -379,6 +439,8 @@ export type CmcdRequest = {
 	 * - `ll` = low latency LIVE
 	 *
 	 * Token
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#stream-type | CTA-5004-A Stream Type}
 	 */
 	st?: CmcdStreamType;
 
@@ -398,6 +460,8 @@ export type CmcdRequest = {
 	 * - `d` - preloading: the player is loading, or has loaded, assets ahead of starting in order to provide a fast startup. The expectation is that playback will commence at a future time.
 	 *
 	 * Token - one of [s,p,k,r,a,e,f,q,d]
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#state | CTA-5004-A State}
 	 */
 	sta?: CmcdPlayerState;
 
@@ -408,6 +472,8 @@ export type CmcdRequest = {
 	 * reports this key as true until its buffer first reaches the target buffer for stable playback.
 	 *
 	 * Boolean
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#startup | CTA-5004-A Startup}
 	 */
 	su?: boolean;
 
@@ -420,6 +486,8 @@ export type CmcdRequest = {
 	 * sent if the top encoded bitrate is known.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#top-aggregated-encoded-bitrate | CTA-5004-A Top Aggregated Encoded Bitrate}
 	 */
 	tab?: CmcdObjectTypeList;
 
@@ -432,6 +500,8 @@ export type CmcdRequest = {
 	 * specify the top video bitrate and requests for audio objects MUST specify the top audio bitrate.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#top-encoded-bitrate | CTA-5004-A Top Encoded Bitrate}
 	 */
 	tb?: CmcdObjectTypeList;
 
@@ -442,6 +512,8 @@ export type CmcdRequest = {
 	 * to the nearest 100 ms.
 	 *
 	 * Inner list of integer milliseconds with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#target-buffer-length | CTA-5004-A Target Buffer Length}
 	 */
 	tbl?: CmcdObjectTypeList;
 
@@ -461,6 +533,8 @@ export type CmcdRequest = {
 	 * of 'a', 'v', 'av' or 'c'.
 	 *
 	 * Inner list of integer kbps with token identifiers
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#top-playable-bitrate | CTA-5004-A Top Playable Bitrate}
 	 */
 	tpb?: CmcdObjectTypeList;
 
@@ -472,6 +546,8 @@ export type CmcdRequest = {
 	 * if the version is not 1.
 	 *
 	 * Integer
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#version | CTA-5004-A Version}
 	 */
 	v?: number;
 };

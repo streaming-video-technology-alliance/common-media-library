@@ -14,6 +14,7 @@ import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
+import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -95,6 +96,8 @@ type CmcdEventTarget = CmcdTarget & {
 
 /**
  * The CMCD reporter.
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#reporting-modes-when-we-send-data | CTA-5004-A Reporting Modes}
  *
  * @public
  */
@@ -432,7 +435,7 @@ export class CmcdReporter {
 			url: target.url,
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/cmcd',
+				'Content-Type': CMCD_MIME_TYPE,
 			},
 			body: data.map(item => encodeCmcd(item, options)).join('\n') + '\n',
 		})
