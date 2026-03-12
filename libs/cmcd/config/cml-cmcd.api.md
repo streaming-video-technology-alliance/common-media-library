@@ -570,7 +570,7 @@ export function toCmcdValue<V extends SfBareItem, P>(value: V, params?: P): SfIt
 export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult;
 
 // @public
-export function validateCmcdEventReport(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdEventsValidationResult;
+export function validateCmcdEventReport(request: HttpRequest, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdEventsValidationResult;
 
 // @public
 export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOptions, "reportingMode">): CmcdEventsValidationResult;

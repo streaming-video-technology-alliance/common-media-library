@@ -9,14 +9,13 @@ import { validateCmcdEvents } from './validateCmcdEvents.ts'
 /**
  * Validates a full HTTP request as an event-mode payload.
  *
- * Accepts a {@link https://developer.mozilla.org/en-US/docs/Web/API/Request | Request}
- * object or an {@link @svta/cml-utils!HttpRequest | HttpRequest} object.
+ * Accepts an {@link @svta/cml-utils!HttpRequest | HttpRequest} object.
  *
  * This function validates that the request uses the POST method and has
  * the correct `Content-Type` header (`application/cmcd`) in addition to
  * validating the body content via {@link validateCmcdEvents}.
  *
- * @param request - A `Request` or `HttpRequest` to validate.
+ * @param request - An `HttpRequest` to validate.
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result including decoded data per event line.
  *
@@ -26,19 +25,17 @@ import { validateCmcdEvents } from './validateCmcdEvents.ts'
  *
  * @public
  */
-export function validateCmcdEventReport(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdEventsValidationResult {
+export function validateCmcdEventReport(request: HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdEventsValidationResult {
 	const issues: CmcdEventsValidationResult['issues'] = []
 
-	const method = request instanceof Request ? request.method : request.method
-	if (method !== 'POST') {
+	if (request.method !== 'POST') {
 		issues.push({
-			message: `Invalid HTTP method '${method ?? 'GET'}'. Event reports must use POST.`,
+			message: `Invalid HTTP method '${request.method ?? 'GET'}'. Event reports must use POST.`,
 			severity: CMCD_VALIDATION_SEVERITY_ERROR,
 		})
 	}
 
-	const headers = request instanceof Request ? request.headers : request.headers
-	const contentType = headers ? ensureHeaders(headers).get('Content-Type') : undefined
+	const contentType = request.headers ? ensureHeaders(request.headers).get('Content-Type') : undefined
 
 	if (!contentType) {
 		issues.push({
@@ -55,7 +52,7 @@ export function validateCmcdEventReport(request: Request | HttpRequest, options?
 		}
 	}
 
-	const body = request instanceof Request ? undefined : request.body
+	const body = request.body
 	if (body === undefined || body === null) {
 		issues.push({
 			message: 'Missing request body. Event reports must include a body.',

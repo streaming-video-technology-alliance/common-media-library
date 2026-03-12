@@ -9,13 +9,14 @@ The `@svta/cml-cmcd` library provides a set of composable validation functions f
 
 ## Overview
 
-There are three main validation functions, each targeting a different aspect of CMCD compliance:
+There are four main validation functions, each targeting a different aspect of CMCD compliance:
 
-| Function              | Purpose                                                     |
-| --------------------- | ----------------------------------------------------------- |
-| `validateCmcd`        | Orchestrator — runs key, value, and structure checks        |
-| `validateCmcdRequest` | Validates a `Request` or `HttpRequest` as request-mode data |
-| `validateCmcdEvents`   | Validates a multi-line `application/cmcd` body as event-mode data  |
+| Function                   | Purpose                                                            |
+| -------------------------- | ------------------------------------------------------------------ |
+| `validateCmcd`             | Orchestrator — runs key, value, and structure checks               |
+| `validateCmcdRequest`      | Validates a `Request` or `HttpRequest` as request-mode data        |
+| `validateCmcdEvents`       | Validates a multi-line `application/cmcd` body as event-mode data  |
+| `validateCmcdEventReport`  | Validates a full `HttpRequest` as an event-mode payload            |
 
 All validators return a `CmcdValidationResult`:
 
@@ -34,7 +35,7 @@ type CmcdValidationIssue = {
 
 ## Validating Event Report Payloads
 
-A common use case is validating CMCD v2 event reports received via POST. The payload is typically a `application/cmcd` body containing newline-separated CMCD-encoded strings, or `application/json`.
+A common use case is validating CMCD v2 event reports received via POST. The payload is typically an `application/cmcd` body containing newline-separated CMCD-encoded strings, or `application/json`.
 
 ### Using `validateCmcdEvents`
 
