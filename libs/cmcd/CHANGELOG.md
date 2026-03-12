@@ -18,7 +18,7 @@ and this project adheres to
 
 ### Changed
 
-- Update event report MIME type from `text/cmcd` to `application/cmcd` per CTA-5004-A spec
+- Update event report MIME type from `text/cmcd` to `application/cmcd` per CTA-5004-A spec ([#332](https://github.com/streaming-video-technology-alliance/common-media-library/issues/332))
 
 ## [2.2.0] - 2026-02-18
 
