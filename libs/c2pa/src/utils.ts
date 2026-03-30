@@ -1,6 +1,16 @@
 import type { IsoBoxReadView, ParsedIsoBox } from '@svta/cml-iso-bmff'
 
 const MILLISECONDS_PER_SECOND = 1000
+const SHA_ALGORITHM_PATTERN = /^sha(\d+)$/i
+
+/**
+ * Normalizes hash algorithm names to WebCrypto format (e.g. `sha256` → `SHA-256`).
+ *
+ * @internal
+ */
+export function normalizeAlgorithmName(rawAlg: string): string {
+	return rawAlg.replace(SHA_ALGORITHM_PATTERN, 'SHA-$1')
+}
 
 /**
  * Converts a Uint8Array to a lowercase hex string.
