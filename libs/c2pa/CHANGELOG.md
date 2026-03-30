@@ -14,5 +14,9 @@ and this project adheres to
 - `LiveVideoStatusCode` — standardized C2PA §19.7 error code constants
 - JUMBF box parsing (ISO 19566-5)
 - COSE_Sign1 cryptographic support (RFC 9052): decoding, signature verification, key conversion, signer binding
+- X.509 certificate parsing (issuer, validity period)
+- BMFF content hash computation and validation
+- `readC2paManifest(bytes)` — read a C2PA manifest store from raw BMFF bytes
+- `extractManifestCertificate(bytes)` — extract the signing certificate from a BMFF container
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/main...HEAD
