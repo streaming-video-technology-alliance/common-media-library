@@ -43,6 +43,26 @@ export const LiveVideoStatusCode: {
 // @public
 export type LiveVideoStatusCode = typeof LiveVideoStatusCode.INIT_INVALID | typeof LiveVideoStatusCode.MANIFEST_INVALID | typeof LiveVideoStatusCode.SEGMENT_INVALID | typeof LiveVideoStatusCode.ASSERTION_INVALID | typeof LiveVideoStatusCode.CONTINUITY_METHOD_INVALID | typeof LiveVideoStatusCode.SESSIONKEY_INVALID;
 
+// @public
+export type SequenceState = {
+    readonly lastSequenceNumber: number | null;
+    readonly seenSequences: ReadonlySet<number>;
+};
+
+// @public
+export type SequenceValidationResult = {
+    readonly isValid: true;
+    readonly reason: "valid";
+} | {
+    readonly isValid: false;
+    readonly reason: "sequence_number_below_minimum" | "duplicate" | "out_of_order";
+} | {
+    readonly isValid: false;
+    readonly reason: "gap_detected";
+    readonly missingFrom: number;
+    readonly missingTo: number;
+};
+
 // (No @packageDocumentation comment for this package)
 
 ```
