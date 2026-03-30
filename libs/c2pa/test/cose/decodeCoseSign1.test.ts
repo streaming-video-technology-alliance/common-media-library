@@ -1,11 +1,6 @@
 import { decodeCoseSign1 } from '../../src/cose/decodeCoseSign1.ts'
 import { ok, strictEqual, throws } from 'node:assert'
-import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
-
-function loadFixture(name: string): Uint8Array {
-	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
-}
 
 describe('decodeCoseSign1', () => {
 	// #region example
@@ -46,11 +41,5 @@ describe('decodeCoseSign1', () => {
 		// Not an array
 		const invalid = new Uint8Array([0xa0]) // CBOR empty map
 		throws(() => decodeCoseSign1(invalid), /Failed to decode COSE_Sign1/)
-	})
-
-	it('parses COSE_Sign1 from a real segment fixture', () => {
-		// This test validates real-world data end-to-end via the init segment
-		void loadFixture // fixture available but tested via readC2paManifest integration test
-		ok(true)
 	})
 })
