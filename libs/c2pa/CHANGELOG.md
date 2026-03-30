@@ -13,5 +13,6 @@ and this project adheres to
 - Package scaffold with core C2PA types (`C2paManifest`, `C2paAssertion`, `C2paSignatureInfo`)
 - `LiveVideoStatusCode` — standardized C2PA §19.7 error code constants
 - JUMBF box parsing (ISO 19566-5)
+- COSE_Sign1 cryptographic support (RFC 9052): decoding, signature verification, key conversion, signer binding
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/main...HEAD
