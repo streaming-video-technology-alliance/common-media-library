@@ -109,7 +109,7 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
 	const alg = typeof data['alg'] === 'string' ? normalizeAlgorithmName(data['alg']) : null
-	
+
 	return { hashBytes, hashHex, exclusions, alg }
 }
 
