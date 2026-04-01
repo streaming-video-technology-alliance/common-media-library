@@ -1,4 +1,5 @@
 import type { C2paManifestStore } from '../C2paManifest.ts'
+import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 
 /**
@@ -17,7 +18,7 @@ export type ManifestBoxValidationResult = {
   readonly continuityMethod: string | null
   readonly bmffHashHex: string | null
   readonly isValid: boolean
-  readonly errorCodes: readonly LiveVideoStatusCode[]
+  readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[]
 }
 
 /**

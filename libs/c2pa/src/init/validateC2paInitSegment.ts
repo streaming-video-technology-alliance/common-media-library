@@ -1,11 +1,13 @@
 import { decode, encode } from 'cbor-x'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import type { C2paAssertion } from '../C2paAssertion.ts'
+import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
-import { readC2paManifest } from '../readC2paManifest.ts'
+import { readC2paManifestInternal } from '../readC2paManifest.ts'
 import { extractManifestCertificate } from '../extractManifestCertificate.ts'
 import { validateBmffHash } from '../bmff/validateBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
@@ -179,8 +181,10 @@ async function validateSessionKeys(
 
 /**
  * Validates a C2PA init segment: parses the manifest, extracts and verifies
- * the certificate, validates the BMFF hard binding hash, and verifies all
- * session keys from the `c2pa.session-keys` assertion.
+ * the certificate, validates the BMFF hard binding hash, verifies all
+ * session keys from the `c2pa.session-keys` assertion, and performs
+ * manifest integrity checks (assertion hashes, missing assertions,
+ * action ingredients, and claim signature verification).
  *
  * Only session keys with a valid signer binding and an unexpired validity period
  * are included in the result.
@@ -207,7 +211,8 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		}
 	}
 
-	const { activeManifest } = readC2paManifest(bytes)
+	const internalData = readC2paManifestInternal(bytes)
+	const { manifest: activeManifest } = internalData
 	const certificate = extractManifestCertificate(bytes)
 
 	const bmffHashAssertion =
@@ -222,9 +227,12 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 			? await validateSessionKeys(sessionKeysAssertion, certificate)
 			: []
 
-	const codes = new Set<LiveVideoStatusCode>()
+	const integrityCodes = await validateManifestIntegrity(internalData, certificate)
+
+	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
 	if (sessionKeys.length === 0) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	for (const code of integrityCodes) codes.add(code)
 	const errorCodes = [...codes]
 
 	return {

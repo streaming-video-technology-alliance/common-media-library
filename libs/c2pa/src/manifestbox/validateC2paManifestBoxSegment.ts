@@ -1,7 +1,11 @@
 import type { C2paAssertion } from '../C2paAssertion.ts'
-import type { C2paManifestStore } from '../C2paManifest.ts'
+import type { C2paManifest } from '../C2paManifest.ts'
+import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
-import { readC2paManifest } from '../readC2paManifest.ts'
+import type { InternalManifestData } from '../claim/InternalManifestData.ts'
+import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
+import { decodeCoseSign1 } from '../cose/decodeCoseSign1.ts'
+import { readC2paManifestInternal } from '../readC2paManifest.ts'
 import { bytesToHex, normalizeAlgorithmName } from '../utils.ts'
 import { validateBmffHash } from '../bmff/validateBmffHash.ts'
 import type { BmffHashConstraint, BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
@@ -12,6 +16,7 @@ const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
 const SUPPORTED_CONTINUITY_METHODS = new Set([CONTINUITY_METHOD_MANIFEST_ID])
+const X5CHAIN_COSE_HEADER = 33
 
 function normalizeManifestId(id: string | null): string | null {
 	if (!id) return null
@@ -109,31 +114,52 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
 	const alg = typeof data['alg'] === 'string' ? normalizeAlgorithmName(data['alg']) : null
-	
+
 	return { hashBytes, hashHex, exclusions, alg }
+}
+
+// --- Certificate extraction from signature ---
+
+function extractCertificateFromSignature(signatureBytes: Uint8Array | null): Uint8Array | null {
+	if (!signatureBytes) return null
+	try {
+		const cose = decodeCoseSign1(signatureBytes)
+		const x5chain = (cose.protectedHeader[X5CHAIN_COSE_HEADER] ??
+			cose.unprotectedHeader[X5CHAIN_COSE_HEADER]) as Uint8Array | Uint8Array[] | null | undefined
+		if (!x5chain) return null
+
+		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
+		return certDER instanceof Uint8Array ? certDER : null
+	} catch {
+		return null
+	}
 }
 
 // --- Manifest parsing ---
 
-function parseManifest(bytes: Uint8Array): {
-	manifest: C2paManifestStore | null
+type ParsedManifest = {
+	internalData: InternalManifestData | null
+	manifest: C2paManifest | null
 	issuer: string | null
 	liveVideo: LiveVideoFields | null
 	bmff: BmffHashFields
-} {
+}
+
+function parseManifest(bytes: Uint8Array): ParsedManifest {
 	try {
-		const manifest = readC2paManifest(bytes)
-		const activeManifest = manifest?.activeManifest
-		if (!activeManifest) return { manifest, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		const internalData = readC2paManifestInternal(bytes)
+		const activeManifest = internalData.manifest
+		if (!activeManifest) return { internalData, manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
 
 		return {
-			manifest,
+			internalData,
+			manifest: activeManifest,
 			issuer: activeManifest.signatureInfo?.issuer ?? null,
 			liveVideo: parseLiveVideoAssertion(activeManifest.assertions),
 			bmff: parseBmffHashAssertion(activeManifest.assertions),
 		}
 	} catch {
-		return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		return { internalData: null, manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
 	}
 }
 
@@ -177,7 +203,9 @@ function collectErrorCodes(
  *
  * Parses the C2PA manifest embedded in the segment and validates per §19.7.1 and §19.7.2.
  * Recomputes the `c2pa.hash.bmff.v3` content hash from the raw segment bytes and compares
- * it against the expected hash in the manifest assertion.
+ * it against the expected hash in the manifest assertion. Also performs manifest integrity
+ * checks: assertion hashes, missing assertions, action ingredients, and claim signature
+ * verification (§15.7, §15.10.3.1, §18.15.4.7).
  *
  * This function is **pure** — it does not access any external state. The
  * caller is responsible for persisting `nextManifestId` and `nextState`
@@ -202,7 +230,7 @@ export async function validateC2paManifestBoxSegment(
 	readonly nextManifestId: string | null
 	readonly nextState: ManifestBoxValidationState
 }> {
-	const { manifest, issuer, liveVideo, bmff } = parseManifest(bytes)
+	const { internalData, manifest, issuer, liveVideo, bmff } = parseManifest(bytes)
 
 	const sequenceNumber = liveVideo?.sequenceNumber ?? null
 	const previousManifestId = liveVideo?.previousManifestId ?? null
@@ -222,17 +250,25 @@ export async function validateC2paManifestBoxSegment(
 		})
 	}
 
-	const errorCodes = collectErrorCodes(
+	const liveVideoCodes = collectErrorCodes(
 		manifest !== null, liveVideo !== null,
 		streamIdValid, sequenceNumberValid, bmffHashMatches,
 		continuityMethod, previousManifestId, lastManifestId,
 	)
 
-	const currentManifestId = manifest?.activeManifest?.instanceId ?? null
+	let integrityCodes: readonly C2paStatusCode[] = []
+	if (internalData) {
+		const certificate = extractCertificateFromSignature(internalData.signatureBytes)
+		integrityCodes = await validateManifestIntegrity(internalData, certificate)
+	}
+
+	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
+
+	const currentManifestId = manifest?.instanceId ?? null
 
 	return {
 		result: {
-			manifest,
+			manifest: manifest ? { activeManifest: manifest } : null,
 			issuer,
 			sequenceNumber,
 			previousManifestId,

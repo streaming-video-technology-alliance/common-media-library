@@ -22,3 +22,4 @@ export type * from './C2paManifest.ts'
 
 // Error codes
 export * from './LiveVideoStatusCode.ts'
+export * from './C2paStatusCode.ts'
