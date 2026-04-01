@@ -1,4 +1,4 @@
-import { readElement, readLength, ASN1_TAG_SEQUENCE } from './asn1.ts'
+import { readElement, ASN1_TAG_SEQUENCE } from './asn1.ts'
 
 // OID 1.2.840.113549.1.1.10 (rsassaPss)
 const OID_RSASSA_PSS = new Uint8Array([0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0a])

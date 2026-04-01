@@ -25,13 +25,24 @@ export type C2paManifestStore = {
 };
 
 // @public
+export const C2paStatusCode: {
+    readonly ASSERTION_HASHEDURI_MISMATCH: "assertion.hashedURI.mismatch";
+    readonly ASSERTION_MISSING: "assertion.missing";
+    readonly ASSERTION_ACTION_INGREDIENT_MISMATCH: "assertion.action.ingredientMismatch";
+    readonly CLAIM_SIGNATURE_MISMATCH: "claim.signature.mismatch";
+};
+
+// @public
+export type C2paStatusCode = typeof C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH | typeof C2paStatusCode.ASSERTION_MISSING | typeof C2paStatusCode.ASSERTION_ACTION_INGREDIENT_MISMATCH | typeof C2paStatusCode.CLAIM_SIGNATURE_MISMATCH;
+
+// @public
 export type InitSegmentValidation = {
     readonly activeManifest: C2paManifest | null;
     readonly certificate: Uint8Array | null;
     readonly manifestId: string | null;
     readonly sessionKeys: readonly ValidatedSessionKey[];
     readonly isValid: boolean;
-    readonly errorCodes: readonly LiveVideoStatusCode[];
+    readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[];
 };
 
 // @public
@@ -57,7 +68,7 @@ export type ManifestBoxValidationResult = {
     readonly continuityMethod: string | null;
     readonly bmffHashHex: string | null;
     readonly isValid: boolean;
-    readonly errorCodes: readonly LiveVideoStatusCode[];
+    readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[];
 };
 
 // @public
@@ -125,7 +136,7 @@ export type ValidatedSessionKey = {
 // Warnings were encountered during analysis:
 //
 // src/C2paManifest.ts:23:27 - (ae-forgotten-export) The symbol "C2paSignatureInfo" needs to be exported by the entry point index.d.ts
-// src/init/InitSegmentValidation.ts:13:13 - (ae-forgotten-export) The symbol "CoseKeyJwk" needs to be exported by the entry point index.d.ts
+// src/C2paStatusCode.ts:9:1 - (ae-forgotten-export) The symbol "CoseKeyJwk" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
