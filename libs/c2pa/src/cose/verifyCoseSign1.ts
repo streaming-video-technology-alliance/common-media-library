@@ -3,12 +3,20 @@ import { buildSigStructure } from './buildSigStructure.ts'
 
 const ECDSA_ALGORITHM = 'ECDSA'
 const ED25519_ALGORITHM = 'Ed25519'
+const RSA_PSS_ALGORITHM = 'RSA-PSS'
 const DER_SEQUENCE_TAG = 0x30
 const DER_INTEGER_TAG = 0x02
 const RAW_ECDSA_SIGNATURE_COMPONENT_BYTES = 32
 const RAW_ECDSA_P256_SIGNATURE_LENGTH = 64
 
 type EcKeyAlgorithm = KeyAlgorithm & { readonly namedCurve: string }
+type RsaHashedKeyAlgorithm = KeyAlgorithm & { readonly hash: { readonly name: string } }
+
+const RSA_PSS_SALT_LENGTH: Record<string, number> = {
+	'SHA-256': 32,
+	'SHA-384': 48,
+	'SHA-512': 64,
+}
 
 function isDerEncoded(signature: Uint8Array): boolean {
 	return signature.length > 2 && signature[0] === DER_SEQUENCE_TAG
@@ -47,6 +55,10 @@ function resolveVerifyAlgorithm(publicKey: CryptoKey) {
 		const curve = (publicKey.algorithm as EcKeyAlgorithm).namedCurve
 		const hash = curve === 'P-384' ? 'SHA-384' : curve === 'P-521' ? 'SHA-512' : 'SHA-256'
 		return { name: ECDSA_ALGORITHM, hash: { name: hash } }
+	}
+	if (name === RSA_PSS_ALGORITHM) {
+		const hashName = (publicKey.algorithm as RsaHashedKeyAlgorithm).hash.name
+		return { name: RSA_PSS_ALGORITHM, saltLength: RSA_PSS_SALT_LENGTH[hashName] ?? 32 }
 	}
 	throw new Error(`Unsupported public key algorithm: ${name}`)
 }

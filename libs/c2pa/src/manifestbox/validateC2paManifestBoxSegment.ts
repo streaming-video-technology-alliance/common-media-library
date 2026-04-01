@@ -2,10 +2,7 @@ import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paManifest } from '../C2paManifest.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
-import type { InternalManifestData } from '../claim/InternalManifestData.ts'
-import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
-import { decodeCoseSign1 } from '../cose/decodeCoseSign1.ts'
-import { readC2paManifestInternal } from '../readC2paManifest.ts'
+import { readC2paManifest } from '../readC2paManifest.ts'
 import { bytesToHex, normalizeAlgorithmName } from '../utils.ts'
 import { validateBmffHash } from '../bmff/validateBmffHash.ts'
 import type { BmffHashConstraint, BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
@@ -16,8 +13,6 @@ const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
 const SUPPORTED_CONTINUITY_METHODS = new Set([CONTINUITY_METHOD_MANIFEST_ID])
-const X5CHAIN_COSE_HEADER = 33
-
 function normalizeManifestId(id: string | null): string | null {
 	if (!id) return null
 	return id.replace(MANIFEST_ID_PREFIX_PATTERN, '').toLowerCase()
@@ -118,27 +113,9 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	return { hashBytes, hashHex, exclusions, alg }
 }
 
-// --- Certificate extraction from signature ---
-
-function extractCertificateFromSignature(signatureBytes: Uint8Array | null): Uint8Array | null {
-	if (!signatureBytes) return null
-	try {
-		const cose = decodeCoseSign1(signatureBytes)
-		const x5chain = (cose.protectedHeader[X5CHAIN_COSE_HEADER] ??
-			cose.unprotectedHeader[X5CHAIN_COSE_HEADER]) as Uint8Array | Uint8Array[] | null | undefined
-		if (!x5chain) return null
-
-		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
-		return certDER instanceof Uint8Array ? certDER : null
-	} catch {
-		return null
-	}
-}
-
 // --- Manifest parsing ---
 
 type ParsedManifest = {
-	internalData: InternalManifestData | null
 	manifest: C2paManifest | null
 	issuer: string | null
 	liveVideo: LiveVideoFields | null
@@ -147,19 +124,17 @@ type ParsedManifest = {
 
 function parseManifest(bytes: Uint8Array): ParsedManifest {
 	try {
-		const internalData = readC2paManifestInternal(bytes)
-		const activeManifest = internalData.manifest
-		if (!activeManifest) return { internalData, manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		const { activeManifest } = readC2paManifest(bytes)
+		if (!activeManifest) return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
 
 		return {
-			internalData,
 			manifest: activeManifest,
 			issuer: activeManifest.signatureInfo?.issuer ?? null,
 			liveVideo: parseLiveVideoAssertion(activeManifest.assertions),
 			bmff: parseBmffHashAssertion(activeManifest.assertions),
 		}
 	} catch {
-		return { internalData: null, manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
 	}
 }
 
@@ -230,7 +205,7 @@ export async function validateC2paManifestBoxSegment(
 	readonly nextManifestId: string | null
 	readonly nextState: ManifestBoxValidationState
 }> {
-	const { internalData, manifest, issuer, liveVideo, bmff } = parseManifest(bytes)
+	const { manifest, issuer, liveVideo, bmff } = parseManifest(bytes)
 
 	const sequenceNumber = liveVideo?.sequenceNumber ?? null
 	const previousManifestId = liveVideo?.previousManifestId ?? null
@@ -256,13 +231,7 @@ export async function validateC2paManifestBoxSegment(
 		continuityMethod, previousManifestId, lastManifestId,
 	)
 
-	let integrityCodes: readonly C2paStatusCode[] = []
-	if (internalData) {
-		const certificate = extractCertificateFromSignature(internalData.signatureBytes)
-		integrityCodes = await validateManifestIntegrity(internalData, certificate)
-	}
-
-	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
+	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes]
 
 	const currentManifestId = manifest?.instanceId ?? null
 

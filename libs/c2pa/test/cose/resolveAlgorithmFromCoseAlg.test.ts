@@ -21,6 +21,30 @@ describe('resolveAlgorithmFromCoseAlg', () => {
 		deepStrictEqual(resolveAlgorithmFromCoseAlg(-8), { name: 'Ed25519' })
 	})
 
+	it('maps PS256 (-37) to RSA-PSS SHA-256', () => {
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-37), { name: 'RSA-PSS', hash: { name: 'SHA-256' } })
+	})
+
+	it('maps PS384 (-38) to RSA-PSS SHA-384', () => {
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-38), { name: 'RSA-PSS', hash: { name: 'SHA-384' } })
+	})
+
+	it('maps PS512 (-39) to RSA-PSS SHA-512', () => {
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-39), { name: 'RSA-PSS', hash: { name: 'SHA-512' } })
+	})
+
+	it('maps PS256 (-37) to RSA-PSS SHA-256', () => {
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-37), { name: 'RSA-PSS', hash: { name: 'SHA-256' } })
+	})
+
+	it('maps PS384 (-38) to RSA-PSS SHA-384', () => {
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-38), { name: 'RSA-PSS', hash: { name: 'SHA-384' } })
+	})
+
+	it('maps PS512 (-39) to RSA-PSS SHA-512', () => {
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-39), { name: 'RSA-PSS', hash: { name: 'SHA-512' } })
+	})
+
 	it('throws for unsupported algorithm', () => {
 		throws(() => resolveAlgorithmFromCoseAlg(999), /Unsupported COSE algorithm/)
 	})

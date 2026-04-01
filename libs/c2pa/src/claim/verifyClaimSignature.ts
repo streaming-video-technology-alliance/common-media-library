@@ -2,6 +2,7 @@ import { decodeCoseSign1 } from '../cose/decodeCoseSign1.ts'
 import { resolveAlgorithmFromCoseAlg } from '../cose/resolveAlgorithmFromCoseAlg.ts'
 import { verifyCoseSign1 } from '../cose/verifyCoseSign1.ts'
 import { extractCertificateSpki } from '../x509/extractCertificateSpki.ts'
+import { normalizeRsaPssSpki } from '../x509/normalizeRsaPssSpki.ts'
 
 /**
  * Verifies the claim signature of a C2PA manifest per §15.7.
@@ -25,15 +26,17 @@ export async function verifyClaimSignature(
 	try {
 		const coseSign1 = decodeCoseSign1(signatureBytes)
 
-		const spkiBytes = extractCertificateSpki(certificateDER)
-		if (!spkiBytes) return false
+		const rawSpki = extractCertificateSpki(certificateDER)
+		if (!rawSpki) return false
+		const spkiBytes = normalizeRsaPssSpki(rawSpki)
 
 		if (coseSign1.alg == null) return false
+
 		const importAlgorithm = resolveAlgorithmFromCoseAlg(coseSign1.alg)
 
 		const publicKey = await crypto.subtle.importKey(
 			'spki',
-			spkiBytes,
+			new Uint8Array(spkiBytes) as BufferSource,
 			importAlgorithm,
 			true,
 			['verify'],
