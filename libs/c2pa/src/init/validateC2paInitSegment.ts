@@ -20,6 +20,8 @@ const COSE_KEY_ID_LABEL = 2
 function normalizeToUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
 	if (Array.isArray(value)) return new Uint8Array(value as number[])
+	const obj = value as Record<string, unknown>
+	if (typeof obj['tag'] === 'number' && 'value' in obj) return encode(value) as Uint8Array
 	const ctor = (value as { constructor?: { name?: string } }).constructor
 	if (ctor?.name === 'Tag') return encode(value) as Uint8Array
 	throw new Error('Cannot convert value to Uint8Array')
