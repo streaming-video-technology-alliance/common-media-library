@@ -16,7 +16,7 @@ const LABEL_FLAG_EXPECTED = 0x03
  * @example
  * {@includeCode ../../test/jumbf/parseJumbfLabel.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function parseJumbfLabel(jumdData: Uint8Array): string | null {
 	if (jumdData.length < JUMD_UUID_SIZE + 1) return null

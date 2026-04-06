@@ -4,6 +4,8 @@
 
 ```ts
 
+import { ValueOf } from '@svta/cml-utils';
+
 // @public
 export type C2paAssertion = {
     readonly label: string;
@@ -40,8 +42,8 @@ export const LiveVideoStatusCode: {
     readonly SESSIONKEY_INVALID: "livevideo.sessionkey.invalid";
 };
 
-// @public
-export type LiveVideoStatusCode = typeof LiveVideoStatusCode.INIT_INVALID | typeof LiveVideoStatusCode.MANIFEST_INVALID | typeof LiveVideoStatusCode.SEGMENT_INVALID | typeof LiveVideoStatusCode.ASSERTION_INVALID | typeof LiveVideoStatusCode.CONTINUITY_METHOD_INVALID | typeof LiveVideoStatusCode.SESSIONKEY_INVALID;
+// @public (undocumented)
+export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // (No @packageDocumentation comment for this package)
 
