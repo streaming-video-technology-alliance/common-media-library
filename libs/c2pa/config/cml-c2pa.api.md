@@ -86,6 +86,36 @@ export type SegmentValidationResult = {
 };
 
 // @public
+export type ManifestBoxValidationResult = {
+    readonly manifest: C2paManifestStore | null;
+    readonly issuer: string | null;
+    readonly sequenceNumber: number | null;
+    readonly previousManifestId: string | null;
+    readonly streamId: string | null;
+    readonly continuityMethod: string | null;
+    readonly bmffHashHex: string | null;
+    readonly isValid: boolean;
+    readonly errorCodes: readonly LiveVideoStatusCode[];
+};
+
+// @public
+export type ManifestBoxValidationState = {
+    readonly lastStreamId?: string | null;
+    readonly lastSequenceNumber?: number | null;
+};
+
+// @public
+export type SegmentValidationResult = {
+    readonly sequenceNumber: number;
+    readonly manifestId: Uint8Array;
+    readonly bmffHashHex: string | null;
+    readonly kidHex: string | null;
+    readonly sequenceResult: SequenceValidationResult;
+    readonly isValid: boolean;
+    readonly errorCodes: readonly LiveVideoStatusCode[];
+};
+
+// @public
 export type SequenceState = {
     readonly lastSequenceNumber: number | null;
     readonly seenSequences: ReadonlySet<number>;
@@ -129,10 +159,6 @@ export type ValidatedSessionKey = {
     readonly validityPeriod: number;
     readonly createdAt: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/init/InitSegmentValidation.ts:13:13 - (ae-forgotten-export) The symbol "CoseKeyJwk" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
