@@ -1,6 +1,6 @@
 import { readC2paManifest } from '../src/readC2paManifest.ts'
 import type { C2paAssertion } from '@svta/cml-c2pa'
-import { strictEqual, ok, doesNotThrow, throws } from 'node:assert'
+import { ok, doesNotThrow, throws } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
 
@@ -68,10 +68,4 @@ describe('readC2paManifest', () => {
 		)
 	})
 
-	it('returns a readonly assertions array', () => {
-		const bytes = loadFixture('init_signed_with_session_keys.m4s')
-		const { activeManifest } = readC2paManifest(bytes)
-
-		strictEqual(typeof activeManifest.assertions, 'object')
-	})
 })

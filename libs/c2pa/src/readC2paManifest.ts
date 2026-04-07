@@ -118,7 +118,7 @@ function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string
  * @example
  * {@includeCode ../test/readC2paManifest.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 	const boxes = readIsoBoxes(bytes)
@@ -130,6 +130,9 @@ export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 
 	const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
 	const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
+	if (!jumbfPayload) {
+		throw new Error('Invalid JUMBF UUID prefix in C2PA box')
+	}
 	const jumbfBoxes = parseJumbfBoxes(jumbfPayload)
 
 	if (jumbfBoxes.length === 0) {
@@ -183,7 +186,7 @@ export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 		label,
 		instanceId,
 		claimGenerator,
-		signatureInfo: { issuer, time: signingTime },
+		signatureInfo: { issuer, certNotBefore: signingTime },
 		assertions,
 	}
 

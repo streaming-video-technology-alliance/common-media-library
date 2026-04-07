@@ -39,7 +39,7 @@ function findSignatureContentBytes(boxes: JumbfBox[]): Uint8Array | null {
  * @example
  * {@includeCode ../test/c2pa/extractManifestCertificate.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function extractManifestCertificate(mp4Bytes: Uint8Array): Uint8Array | null {
 	try {
@@ -49,6 +49,7 @@ export function extractManifestCertificate(mp4Bytes: Uint8Array): Uint8Array | n
 
 		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
 		const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
+		if (!jumbfPayload) return null
 		const signatureBytes = findSignatureContentBytes(parseJumbfBoxes(jumbfPayload))
 		if (!signatureBytes) return null
 
