@@ -33,6 +33,14 @@ export type C2paSignatureInfo = {
 };
 
 // @public
+export type CoseKeyJwk = {
+    readonly kty: string;
+    readonly crv: string;
+    readonly x: string;
+    readonly y?: string;
+};
+
+// @public
 export type InitSegmentValidation = {
     readonly activeManifest: C2paManifest | null;
     readonly certificate: Uint8Array | null;
@@ -54,36 +62,6 @@ export const LiveVideoStatusCode: {
 
 // @public (undocumented)
 export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
-
-// @public
-export type ManifestBoxValidationResult = {
-    readonly manifest: C2paManifestStore | null;
-    readonly issuer: string | null;
-    readonly sequenceNumber: number | null;
-    readonly previousManifestId: string | null;
-    readonly streamId: string | null;
-    readonly continuityMethod: string | null;
-    readonly bmffHashHex: string | null;
-    readonly isValid: boolean;
-    readonly errorCodes: readonly LiveVideoStatusCode[];
-};
-
-// @public
-export type ManifestBoxValidationState = {
-    readonly lastStreamId?: string | null;
-    readonly lastSequenceNumber?: number | null;
-};
-
-// @public
-export type SegmentValidationResult = {
-    readonly sequenceNumber: number;
-    readonly manifestId: Uint8Array;
-    readonly bmffHashHex: string | null;
-    readonly kidHex: string | null;
-    readonly sequenceResult: SequenceValidationResult;
-    readonly isValid: boolean;
-    readonly errorCodes: readonly LiveVideoStatusCode[];
-};
 
 // @public
 export type ManifestBoxValidationResult = {

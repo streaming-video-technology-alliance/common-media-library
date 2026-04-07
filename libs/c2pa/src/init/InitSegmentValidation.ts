@@ -11,11 +11,11 @@ import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
  * @public
  */
 export type ValidatedSessionKey = {
-  readonly kid: string
-  readonly jwk: CoseKeyJwk
-  readonly minSequenceNumber: number
-  readonly validityPeriod: number
-  readonly createdAt: string
+	readonly kid: string
+	readonly jwk: CoseKeyJwk
+	readonly minSequenceNumber: number
+	readonly validityPeriod: number
+	readonly createdAt: string
 }
 
 /**
@@ -26,10 +26,10 @@ export type ValidatedSessionKey = {
  * @public
  */
 export type InitSegmentValidation = {
-  readonly activeManifest: C2paManifest | null
-  readonly certificate: Uint8Array | null
-  readonly manifestId: string | null
-  readonly sessionKeys: readonly ValidatedSessionKey[]
-  readonly isValid: boolean
-  readonly errorCodes: readonly LiveVideoStatusCode[]
+	readonly activeManifest: C2paManifest | null
+	readonly certificate: Uint8Array | null
+	readonly manifestId: string | null
+	readonly sessionKeys: readonly ValidatedSessionKey[]
+	readonly isValid: boolean
+	readonly errorCodes: readonly LiveVideoStatusCode[]
 }
