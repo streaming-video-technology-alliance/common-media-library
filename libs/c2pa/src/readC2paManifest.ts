@@ -85,21 +85,21 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 	return assertions
 }
 
-function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; signingTime: string | null } {
-	if (!signatureBytes) return { issuer: null, signingTime: null }
+function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; certNotBefore: string | null } {
+	if (!signatureBytes) return { issuer: null, certNotBefore: null }
 	try {
 		const cose = decodeCoseSign1(signatureBytes)
 		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ?? cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as Uint8Array | Uint8Array[] | null | undefined
-		if (!x5chain) return { issuer: null, signingTime: null }
+		if (!x5chain) return { issuer: null, certNotBefore: null }
 
 		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
-		if (!(certDER instanceof Uint8Array)) return { issuer: null, signingTime: null }
+		if (!(certDER instanceof Uint8Array)) return { issuer: null, certNotBefore: null }
 
 		const certInfo = extractCertificateInfo(certDER)
-		return { issuer: certInfo?.issuer ?? null, signingTime: certInfo?.notBefore ?? null }
+		return { issuer: certInfo?.issuer ?? null, certNotBefore: certInfo?.notBefore ?? null }
 	} catch {
 		// signature parsing failed — continue without signature info
-		return { issuer: null, signingTime: null }
+		return { issuer: null, certNotBefore: null }
 	}
 }
 
@@ -184,7 +184,7 @@ export function readC2paManifestInternal(bytes: Uint8Array): InternalManifestDat
 		}
 	}
 
-	const { issuer, signingTime } = parseSignatureInfo(signatureBytes)
+	const { issuer, certNotBefore } = parseSignatureInfo(signatureBytes)
 
 	const instanceId = (claimData?.['instanceID'] ?? claimData?.['instance_id'] ?? null) as string | null
 	const claimGenerator = (claimData?.['claim_generator'] ?? claimData?.['claimGenerator'] ?? null) as string | null
@@ -203,7 +203,7 @@ export function readC2paManifestInternal(bytes: Uint8Array): InternalManifestDat
 		label: resolvedLabel,
 		instanceId,
 		claimGenerator,
-		signatureInfo: { issuer, time: signingTime },
+		signatureInfo: { issuer, certNotBefore },
 		assertions,
 	}
 
@@ -233,7 +233,7 @@ export function readC2paManifestInternal(bytes: Uint8Array): InternalManifestDat
  * @example
  * {@includeCode ../test/readC2paManifest.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 	const { manifest } = readC2paManifestInternal(bytes)

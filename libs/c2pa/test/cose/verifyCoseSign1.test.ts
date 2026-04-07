@@ -30,22 +30,66 @@ describe('verifyCoseSign1', () => {
 			['sign', 'verify'],
 		)
 
-		// Build a Sig_Structure manually and sign it, then verify via verifyCoseSign1
 		const { buildSigStructure } = await import('../../src/cose/buildSigStructure.ts')
 		const protectedBytes = new Uint8Array([0xa1, 0x01, 0x26]) // {1: -7} = ECDSA
 		const payload = new TextEncoder().encode('test payload')
 
 		const sigStructure = buildSigStructure(protectedBytes, payload)
-		const rawSignature = await crypto.subtle.sign(
-			{ name: 'ECDSA', hash: { name: 'SHA-256' } },
-			keyPair.privateKey,
-			sigStructure,
+		const rawSignature = new Uint8Array(
+			await crypto.subtle.sign(
+				{ name: 'ECDSA', hash: { name: 'SHA-256' } },
+				keyPair.privateKey,
+				sigStructure,
+			),
 		)
 
-		// Construct a minimal valid CoseSign1 by using decodeCoseSign1 on crafted bytes
-		// This is an integration test — just verify the function accepts a CryptoKey
-		ok(typeof verifyCoseSign1 === 'function')
-		ok(rawSignature instanceof ArrayBuffer)
+		const coseSign1 = {
+			protectedBytes,
+			protectedHeader: { 1: -7 } as Readonly<Record<number, unknown>>,
+			unprotectedHeader: {} as Readonly<Record<number, unknown>>,
+			payload,
+			signature: rawSignature,
+			kid: null,
+			alg: -7,
+		}
+
+		const isValid = await verifyCoseSign1(coseSign1, payload, keyPair.publicKey)
+		strictEqual(isValid, true)
+	})
+
+	it('returns false for a mutated payload', async () => {
+		const keyPair = await crypto.subtle.generateKey(
+			{ name: 'ECDSA', namedCurve: 'P-256' },
+			false,
+			['sign', 'verify'],
+		)
+
+		const { buildSigStructure } = await import('../../src/cose/buildSigStructure.ts')
+		const protectedBytes = new Uint8Array([0xa1, 0x01, 0x26])
+		const payload = new TextEncoder().encode('original payload')
+
+		const sigStructure = buildSigStructure(protectedBytes, payload)
+		const rawSignature = new Uint8Array(
+			await crypto.subtle.sign(
+				{ name: 'ECDSA', hash: { name: 'SHA-256' } },
+				keyPair.privateKey,
+				sigStructure,
+			),
+		)
+
+		const coseSign1 = {
+			protectedBytes,
+			protectedHeader: { 1: -7 } as Readonly<Record<number, unknown>>,
+			unprotectedHeader: {} as Readonly<Record<number, unknown>>,
+			payload,
+			signature: rawSignature,
+			kid: null,
+			alg: -7,
+		}
+
+		const tampered = new TextEncoder().encode('tampered payload')
+		const isValid = await verifyCoseSign1(coseSign1, tampered, keyPair.publicKey)
+		strictEqual(isValid, false)
 	})
 
 	it('throws for unsupported key algorithm', async () => {

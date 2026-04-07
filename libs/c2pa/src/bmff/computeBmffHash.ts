@@ -8,7 +8,7 @@ const DEFAULT_HASH_ALG = 'SHA-256'
 /**
  * Options for BMFF content hash computation.
  *
- * @public
+ * @internal
  */
 export type BmffHashOptions = {
 	readonly exclusions?: readonly BmffHashExclusion[]
@@ -30,40 +30,46 @@ function buildHashInput(
 	exclusions: readonly BmffHashExclusion[],
 	offsetPrefixSize: number,
 ): Uint8Array {
-	const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-	const parts: Uint8Array[] = []
-	let offset = 0
+	if (offsetPrefixSize !== 0 && offsetPrefixSize !== 8) {
+		throw new Error(`offsetPrefixSize must be 0 or 8, got ${offsetPrefixSize}`)
+	}
 
+	const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+
+	// First pass: calculate total size
+	let totalLength = 0
+	let offset = 0
 	while (offset + MINIMUM_BOX_SIZE <= bytes.length) {
 		const boxSize = view.getUint32(offset, false)
 		if (boxSize < MINIMUM_BOX_SIZE || offset + boxSize > bytes.length) break
-
 		const boxType = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
 		const boxData = bytes.subarray(offset, offset + boxSize)
-
 		if (!shouldExcludeBox(boxType, boxData, exclusions)) {
-			if (offsetPrefixSize > 0) {
-				const prefix = new Uint8Array(offsetPrefixSize)
-				writeUint64BigEndian(prefix, offset)
-				const combined = new Uint8Array(offsetPrefixSize + boxData.length)
-				combined.set(prefix, 0)
-				combined.set(boxData, offsetPrefixSize)
-				parts.push(combined)
-			} else {
-				parts.push(boxData)
-			}
+			totalLength += offsetPrefixSize + boxSize
 		}
-
 		offset += boxSize
 	}
 
-	const totalLength = parts.reduce((sum, part) => sum + part.length, 0)
+	// Second pass: write directly into pre-sized buffer
 	const hashInput = new Uint8Array(totalLength)
 	let writeOffset = 0
-	for (const part of parts) {
-		hashInput.set(part, writeOffset)
-		writeOffset += part.length
+	offset = 0
+	while (offset + MINIMUM_BOX_SIZE <= bytes.length) {
+		const boxSize = view.getUint32(offset, false)
+		if (boxSize < MINIMUM_BOX_SIZE || offset + boxSize > bytes.length) break
+		const boxType = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
+		const boxData = bytes.subarray(offset, offset + boxSize)
+		if (!shouldExcludeBox(boxType, boxData, exclusions)) {
+			if (offsetPrefixSize > 0) {
+				writeUint64BigEndian(hashInput.subarray(writeOffset, writeOffset + offsetPrefixSize), offset)
+				writeOffset += offsetPrefixSize
+			}
+			hashInput.set(boxData, writeOffset)
+			writeOffset += boxSize
+		}
+		offset += boxSize
 	}
+
 	return hashInput
 }
 
@@ -81,7 +87,7 @@ function buildHashInput(
  * @example
  * {@includeCode ../../test/bmff/computeBmffHash.test.ts#example}
  *
- * @public
+ * @internal
  */
 export async function computeBmffHash(segmentBytes: Uint8Array, options?: BmffHashOptions): Promise<Uint8Array> {
 	const exclusions = options?.exclusions ?? []

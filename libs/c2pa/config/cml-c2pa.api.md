@@ -4,6 +4,8 @@
 
 ```ts
 
+import { ValueOf } from '@svta/cml-utils';
+
 // @public
 export type C2paAssertion = {
     readonly label: string;
@@ -25,6 +27,12 @@ export type C2paManifestStore = {
 };
 
 // @public
+export type C2paSignatureInfo = {
+    readonly issuer: string | null;
+    readonly certNotBefore: string | null;
+};
+
+// @public
 export const C2paStatusCode: {
     readonly ASSERTION_HASHEDURI_MISMATCH: "assertion.hashedURI.mismatch";
     readonly ASSERTION_MISSING: "assertion.missing";
@@ -34,6 +42,14 @@ export const C2paStatusCode: {
 
 // @public
 export type C2paStatusCode = typeof C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH | typeof C2paStatusCode.ASSERTION_MISSING | typeof C2paStatusCode.ASSERTION_ACTION_INGREDIENT_MISMATCH | typeof C2paStatusCode.CLAIM_SIGNATURE_MISMATCH;
+
+// @public
+export type CoseKeyJwk = {
+    readonly kty: string;
+    readonly crv: string;
+    readonly x: string;
+    readonly y?: string;
+};
 
 // @public
 export type InitSegmentValidation = {
@@ -55,8 +71,8 @@ export const LiveVideoStatusCode: {
     readonly SESSIONKEY_INVALID: "livevideo.sessionkey.invalid";
 };
 
-// @public
-export type LiveVideoStatusCode = typeof LiveVideoStatusCode.INIT_INVALID | typeof LiveVideoStatusCode.MANIFEST_INVALID | typeof LiveVideoStatusCode.SEGMENT_INVALID | typeof LiveVideoStatusCode.ASSERTION_INVALID | typeof LiveVideoStatusCode.CONTINUITY_METHOD_INVALID | typeof LiveVideoStatusCode.SESSIONKEY_INVALID;
+// @public (undocumented)
+export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // @public
 export type ManifestBoxValidationResult = {
@@ -132,11 +148,6 @@ export type ValidatedSessionKey = {
     readonly validityPeriod: number;
     readonly createdAt: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/C2paManifest.ts:23:27 - (ae-forgotten-export) The symbol "C2paSignatureInfo" needs to be exported by the entry point index.d.ts
-// src/C2paStatusCode.ts:9:1 - (ae-forgotten-export) The symbol "CoseKeyJwk" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

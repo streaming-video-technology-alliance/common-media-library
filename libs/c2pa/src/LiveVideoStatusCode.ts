@@ -1,3 +1,5 @@
+import type { ValueOf } from '@svta/cml-utils'
+
 /**
  * Standard C2PA failure status codes for live video validation,
  * as defined in the C2PA specification section 19.7.
@@ -24,14 +26,6 @@ export const LiveVideoStatusCode = {
 } as const
 
 /**
- * A C2PA live video failure status code string.
- *
  * @public
  */
-export type LiveVideoStatusCode =
-	| typeof LiveVideoStatusCode.INIT_INVALID
-	| typeof LiveVideoStatusCode.MANIFEST_INVALID
-	| typeof LiveVideoStatusCode.SEGMENT_INVALID
-	| typeof LiveVideoStatusCode.ASSERTION_INVALID
-	| typeof LiveVideoStatusCode.CONTINUITY_METHOD_INVALID
-	| typeof LiveVideoStatusCode.SESSIONKEY_INVALID
+export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>

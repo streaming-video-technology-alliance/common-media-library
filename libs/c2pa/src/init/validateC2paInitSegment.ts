@@ -11,7 +11,7 @@ import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
-import { bytesToHex, isKeyExpired } from '../utils.ts'
+import { bytesToHex, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
@@ -92,8 +92,7 @@ async function validateBmffHashAssertion(
 	if (!rawHash) return true
 	const expectedHash =
 		rawHash instanceof Uint8Array ? rawHash : new Uint8Array(rawHash as number[])
-	let alg = (data['alg'] as string | undefined) ?? 'SHA-256'
-	if (alg.toLowerCase() === 'sha256') alg = 'SHA-256'
+	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
 	return validateBmffHash(bytes, expectedHash, { exclusions, alg })
 }
@@ -240,7 +239,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	return {
 		activeManifest,
 		certificate,
-		manifestId: activeManifest.label,
+		manifestId: activeManifest.instanceId,
 		sessionKeys,
 		isValid: errorCodes.length === 0,
 		errorCodes,

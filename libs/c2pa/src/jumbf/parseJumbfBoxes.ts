@@ -13,7 +13,7 @@ import type { JumbfBox } from './JumbfBox.ts'
  * @example
  * {@includeCode ../../test/jumbf/parseJumbfBoxes.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function parseJumbfBoxes(bytes: Uint8Array): JumbfBox[] {
 	return readIsoBoxes(bytes).map(box => ({

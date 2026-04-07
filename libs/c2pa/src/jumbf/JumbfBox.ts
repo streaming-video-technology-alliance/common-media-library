@@ -1,7 +1,7 @@
 /**
  * A parsed JUMBF box (ISO 19566-5)
  *
- * @public
+ * @internal
  */
 export type JumbfBox = {
 	readonly type: string

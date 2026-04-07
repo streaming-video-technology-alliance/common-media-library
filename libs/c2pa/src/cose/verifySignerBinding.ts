@@ -20,7 +20,7 @@ import { verifyCoseSign1 } from './verifyCoseSign1.ts'
  * @example
  * {@includeCode ../../test/cose/verifySignerBinding.test.ts#example}
  *
- * @public
+ * @internal
  */
 export async function verifySignerBinding(
 	signerBindingBytes: Uint8Array,

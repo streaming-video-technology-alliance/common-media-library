@@ -1,7 +1,7 @@
 /**
  * A decoded COSE_Sign1 structure (RFC 9052)
  *
- * @public
+ * @internal
  */
 export type CoseSign1 = {
 	readonly protectedBytes: Uint8Array

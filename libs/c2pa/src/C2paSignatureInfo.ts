@@ -5,5 +5,5 @@
  */
 export type C2paSignatureInfo = {
 	readonly issuer: string | null
-	readonly time: string | null
+	readonly certNotBefore: string | null
 }

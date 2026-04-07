@@ -8,6 +8,13 @@ const COSE_SIGN1_ARRAY_LENGTH = 4
 const COSE_KEY_KID = 4
 const COSE_KEY_ALG = 1
 
+type CoseHeader = Map<number, unknown> | Record<number | string, unknown>
+
+function coseGet(header: CoseHeader, key: number): unknown {
+	if (header instanceof Map) return header.get(key)
+	return (header as Record<number | string, unknown>)[key]
+}
+
 function stripCoseTag(bytes: Uint8Array): Uint8Array {
 	if (bytes[0] === COSE_SIGN1_TAG_SINGLE_BYTE) return bytes.slice(1)
 	if (bytes[0] === COSE_SIGN1_TAG_TWO_BYTE_FIRST && bytes[1] === COSE_SIGN1_TAG_TWO_BYTE_SECOND) return bytes.slice(2)
@@ -17,14 +24,13 @@ function stripCoseTag(bytes: Uint8Array): Uint8Array {
 function toUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
 	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	return new Uint8Array()
+	throw new Error(`Expected Uint8Array or number[], got ${typeof value}`)
 }
 
 /**
  * Decodes a `COSE_Sign1` structure from raw bytes (RFC 9052).
  *
- * Handles CBOR tag 18 in both single-byte (0xD2) and two-byte (0xD8 0x12) form,
- * and strips null-byte padding that some encoders append.
+ * Handles CBOR tag 18 in both single-byte (0xD2) and two-byte (0xD8 0x12) form.
  *
  * @param coseBytes - Raw COSE_Sign1 bytes, optionally prefixed with CBOR tag 18
  * @returns The decoded COSE_Sign1 structure
@@ -33,7 +39,7 @@ function toUint8Array(value: unknown): Uint8Array {
  * @example
  * {@includeCode ../../test/cose/decodeCoseSign1.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 	try {
@@ -47,20 +53,20 @@ export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 		const [protectedRaw, unprotectedRaw, payloadRaw, signatureRaw] = coseArray as unknown[]
 
 		const protectedBytes = toUint8Array(protectedRaw)
-		let protectedHeader: Record<number, unknown> = {}
+		let protectedHeader: CoseHeader = {}
 		if (protectedBytes.length > 0) {
-			protectedHeader = decode(protectedBytes) as Record<number, unknown>
+			protectedHeader = decode(protectedBytes) as CoseHeader
 		}
 
-		const unprotectedHeader = (unprotectedRaw ?? {}) as Record<number, unknown>
-		const kidRaw = protectedHeader[COSE_KEY_KID] ?? unprotectedHeader[COSE_KEY_KID] ?? null
+		const unprotectedHeader = (unprotectedRaw ?? {}) as CoseHeader
+		const kidRaw = coseGet(protectedHeader, COSE_KEY_KID) ?? coseGet(unprotectedHeader, COSE_KEY_KID) ?? null
 		const kid = kidRaw != null ? toUint8Array(kidRaw) : null
-		const alg = (protectedHeader[COSE_KEY_ALG] ?? unprotectedHeader[COSE_KEY_ALG] ?? null) as number | null
+		const alg = (coseGet(protectedHeader, COSE_KEY_ALG) ?? coseGet(unprotectedHeader, COSE_KEY_ALG) ?? null) as number | null
 
 		return {
 			protectedBytes,
-			protectedHeader,
-			unprotectedHeader,
+			protectedHeader: protectedHeader as Readonly<Record<number, unknown>>,
+			unprotectedHeader: unprotectedHeader as Readonly<Record<number, unknown>>,
 			payload: toUint8Array(payloadRaw),
 			signature: toUint8Array(signatureRaw),
 			kid,

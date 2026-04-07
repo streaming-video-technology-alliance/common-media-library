@@ -42,4 +42,12 @@ describe('decodeCoseSign1', () => {
 		const invalid = new Uint8Array([0xa0]) // CBOR empty map
 		throws(() => decodeCoseSign1(invalid), /Failed to decode COSE_Sign1/)
 	})
+
+	it('throws on non-Uint8Array fields in COSE_Sign1', () => {
+		// CBOR: [protected="", {}, "not-bytes", ""]
+		// 0x84 = 4-element array, 0x40 = empty bstr, 0xa0 = empty map,
+		// 0x65 = text(5) "hello", 0x40 = empty bstr
+		const withTextPayload = new Uint8Array([0x84, 0x40, 0xa0, 0x65, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
+		throws(() => decodeCoseSign1(withTextPayload), /Failed to decode COSE_Sign1/)
+	})
 })

@@ -6,10 +6,12 @@ const SHA_ALGORITHM_PATTERN = /^sha(\d+)$/i
 /**
  * Normalizes hash algorithm names to WebCrypto format (e.g. `sha256` → `SHA-256`).
  *
+ * Defaults to `'SHA-256'` when no algorithm is provided.
+ *
  * @internal
  */
-export function normalizeAlgorithmName(rawAlg: string): string {
-	return rawAlg.replace(SHA_ALGORITHM_PATTERN, 'SHA-$1')
+export function normalizeAlgorithmName(rawAlg?: string): string {
+	return (rawAlg ?? 'SHA-256').replace(SHA_ALGORITHM_PATTERN, 'SHA-$1')
 }
 
 /**
@@ -35,7 +37,9 @@ export function bytesToHex(bytes: Uint8Array): string {
  * @internal
  */
 export function isKeyExpired(createdAt: string, validityPeriodSeconds: number, now: Date = new Date()): boolean {
-	const validityEnd = new Date(new Date(createdAt).getTime() + validityPeriodSeconds * MILLISECONDS_PER_SECOND)
+	const createdAtMs = new Date(createdAt).getTime()
+	if (Number.isNaN(createdAtMs)) return true
+	const validityEnd = new Date(createdAtMs + validityPeriodSeconds * MILLISECONDS_PER_SECOND)
 	return now > validityEnd
 }
 
@@ -99,13 +103,19 @@ const AUX_UUID_OFFSET_SIZE = 8
  * Structure per ISO 19566-5 / C2PA BMFF storage:
  *   version(1) + flags(3) + purpose(null-terminated) + aux_offset(8) + JUMBF data
  *
+ * Returns `null` if the payload does not contain a valid JUMBF UUID prefix.
+ *
  * @internal
  */
-export function stripJumbfUuidPrefix(payload: Uint8Array): Uint8Array {
+export function stripJumbfUuidPrefix(payload: Uint8Array): Uint8Array | null {
+	if (payload.length < FULLBOX_HEADER_SIZE) return null
+
 	let offset = FULLBOX_HEADER_SIZE
 	// Skip null-terminated purpose string (e.g. "manifest\0")
 	while (offset < payload.length && payload[offset] !== 0) offset++
+	if (offset >= payload.length) return null
 	offset++ // skip the null terminator
 	offset += AUX_UUID_OFFSET_SIZE
+	if (offset > payload.length) return null
 	return payload.subarray(offset)
 }

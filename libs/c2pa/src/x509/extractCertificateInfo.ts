@@ -78,7 +78,7 @@ function findRDNValue(issuerValue: Uint8Array, targetOID: Uint8Array): string | 
  * @example
  * {@includeCode ../../test/x509/extractCertificateInfo.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function extractCertificateInfo(certDER: Uint8Array): CertificateInfo | null {
 	try {

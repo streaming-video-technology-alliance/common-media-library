@@ -11,6 +11,7 @@ const V1_FIXED_FIELDS_SIZE = 20 // timescale(4) + presentationTime(8) + eventDur
 function readNullTerminatedString(bytes: Uint8Array, offset: number): { value: string; nextOffset: number } {
 	let end = offset
 	while (end < bytes.length && bytes[end] !== 0x00) end++
+	if (end >= bytes.length) throw new Error('EMSG payload missing null terminator')
 	const value = new TextDecoder('utf-8').decode(bytes.subarray(offset, end))
 	return { value, nextOffset: end + 1 }
 }
@@ -45,7 +46,11 @@ function parseEmsgV1(payload: Uint8Array, view: DataView, flags: number): EmsgBo
 	if (offset + V1_FIXED_FIELDS_SIZE > payload.length) throw new Error('EMSG v1 payload truncated')
 
 	const timescale = view.getUint32(offset, false)
-	const presentationTime = Number(view.getBigUint64(offset + 4, false))
+	const presentationTimeRaw = view.getBigUint64(offset + 4, false)
+	if (presentationTimeRaw > BigInt(Number.MAX_SAFE_INTEGER)) {
+		throw new Error('EMSG v1 presentationTime exceeds Number.MAX_SAFE_INTEGER')
+	}
+	const presentationTime = Number(presentationTimeRaw)
 	const eventDuration = view.getUint32(offset + 12, false)
 	const id = view.getUint32(offset + 16, false)
 	offset += V1_FIXED_FIELDS_SIZE
@@ -82,7 +87,7 @@ function parseEmsgV1(payload: Uint8Array, view: DataView, flags: number): EmsgBo
  * @example
  * {@includeCode ../../test/emsg/parseEmsgBox.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function parseEmsgBox(payload: Uint8Array): EmsgBox {
 	if (payload.length < MINIMUM_EMSG_PAYLOAD_SIZE) throw new Error('EMSG payload too small')
@@ -107,7 +112,7 @@ export function parseEmsgBox(payload: Uint8Array): EmsgBox {
  * @example
  * {@includeCode ../../test/emsg/parseEmsgBox.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function extractVsiEmsgBox(segmentBytes: Uint8Array): EmsgBox | null {
 	for (const box of readIsoBoxes(segmentBytes)) {

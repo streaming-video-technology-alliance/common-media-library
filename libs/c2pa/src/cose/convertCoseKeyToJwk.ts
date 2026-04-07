@@ -36,7 +36,7 @@ function toBase64Url(value: unknown): string {
  * @example
  * {@includeCode ../../test/cose/convertCoseKeyToJwk.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function convertCoseKeyToJwk(coseKey: unknown): CoseKeyJwk {
 	const key = coseKey as CoseKeyLike
@@ -47,7 +47,10 @@ export function convertCoseKeyToJwk(coseKey: unknown): CoseKeyJwk {
 	if (kty === EC2_KEY_TYPE) {
 		const curveName = EC_CURVE_NAMES[crv]
 		if (!curveName) throw new Error(`Unsupported EC curve: ${crv}`)
-		return { kty: 'EC', crv: curveName, x: toBase64Url(x), y: toBase64Url(coseGet(key, -3)) }
+		const y = coseGet(key, -3)
+		if (!(x instanceof Uint8Array)) throw new Error('EC2 key missing or invalid x coordinate')
+		if (!(y instanceof Uint8Array)) throw new Error('EC2 key missing or invalid y coordinate')
+		return { kty: 'EC', crv: curveName, x: toBase64Url(x), y: toBase64Url(y) }
 	}
 
 	if (kty === OKP_KEY_TYPE) {

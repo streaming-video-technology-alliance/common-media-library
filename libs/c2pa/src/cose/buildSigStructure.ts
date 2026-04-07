@@ -49,7 +49,7 @@ function writeByteStringHeader(output: Uint8Array, offset: number, length: numbe
  * @example
  * {@includeCode ../../test/cose/buildSigStructure.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function buildSigStructure(
 	protectedBytes: Uint8Array,

@@ -19,6 +19,8 @@ export type * from './manifestbox/ManifestBoxValidation.ts'
 export type * from './vsi/SequenceState.ts'
 export type * from './C2paAssertion.ts'
 export type * from './C2paManifest.ts'
+export type * from './C2paSignatureInfo.ts'
+export type * from './cose/CoseKeyJwk.ts'
 
 // Error codes
 export * from './LiveVideoStatusCode.ts'

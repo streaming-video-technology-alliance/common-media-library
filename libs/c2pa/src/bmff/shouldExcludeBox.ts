@@ -1,7 +1,5 @@
 import type { BmffHashConstraint, BmffHashExclusion } from './BmffHashExclusion.ts'
 
-const FULL_BOX_HEADER_OFFSET = 12 // size(4) + type(4) + version(1) + flags(3)
-
 function bytesMatchAt(boxData: Uint8Array, offset: number, expected: Uint8Array | readonly number[]): boolean {
 	const bytes = expected instanceof Uint8Array ? expected : new Uint8Array(expected as number[])
 	if (offset + bytes.length > boxData.length) return false
@@ -12,9 +10,7 @@ function bytesMatchAt(boxData: Uint8Array, offset: number, expected: Uint8Array 
 }
 
 function constraintMatches(boxData: Uint8Array, constraint: BmffHashConstraint): boolean {
-	const { offset, value } = constraint
-	// Support both absolute offset (from box start) and FullBox-payload-relative offset
-	return bytesMatchAt(boxData, offset, value) || bytesMatchAt(boxData, offset + FULL_BOX_HEADER_OFFSET, value)
+	return bytesMatchAt(boxData, constraint.offset, constraint.value)
 }
 
 /**
@@ -32,7 +28,7 @@ function constraintMatches(boxData: Uint8Array, constraint: BmffHashConstraint):
  * @example
  * {@includeCode ../../test/bmff/shouldExcludeBox.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function shouldExcludeBox(
 	boxType: string,
