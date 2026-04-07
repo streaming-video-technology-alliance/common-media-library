@@ -1,5 +1,17 @@
 import type { SequenceState, SequenceValidationResult } from './SequenceState.ts'
 
+const SEEN_SEQUENCES_WINDOW_SIZE = 32
+
+function pruneSeenSequences(seen: Set<number>, lastSequenceNumber: number): Set<number> {
+	if (seen.size <= SEEN_SEQUENCES_WINDOW_SIZE) return seen
+	const threshold = lastSequenceNumber - SEEN_SEQUENCES_WINDOW_SIZE
+	const pruned = new Set<number>()
+	for (const seq of seen) {
+		if (seq >= threshold) pruned.add(seq)
+	}
+	return pruned
+}
+
 /**
  * Validates a segment's sequence number against the current stream state
  * per C2PA Live Streaming Specification §18.4.
@@ -11,6 +23,9 @@ import type { SequenceState, SequenceValidationResult } from './SequenceState.ts
  * Detects: `duplicate`, `out_of_order`, `gap_detected`, and
  * `sequence_number_below_minimum`.
  *
+ * Internally uses a sliding window of the last 1 000 sequence numbers
+ * to bound memory usage during long-running streams.
+ *
  * @param state - Current stream state (from {@link createSequenceState} or previous `nextState`)
  * @param sequenceNumber - Sequence number from the segment's VSI map
  * @param minSequenceNumber - Minimum accepted sequence number (from the session key, default 0)
@@ -19,7 +34,7 @@ import type { SequenceState, SequenceValidationResult } from './SequenceState.ts
  * @example
  * {@includeCode ../../test/vsi/validateSequenceNumber.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function validateSequenceNumber(
 	state: SequenceState,
@@ -46,7 +61,10 @@ export function validateSequenceNumber(
 	if (state.lastSequenceNumber !== null && sequenceNumber < state.lastSequenceNumber) {
 		return {
 			result: { isValid: false, reason: 'out_of_order' },
-			nextState: { lastSequenceNumber: state.lastSequenceNumber, seenSequences: nextSeenSequences },
+			nextState: {
+				lastSequenceNumber: state.lastSequenceNumber,
+				seenSequences: pruneSeenSequences(nextSeenSequences, state.lastSequenceNumber),
+			},
 		}
 	}
 
@@ -55,12 +73,18 @@ export function validateSequenceNumber(
 		const missingTo = sequenceNumber - 1
 		return {
 			result: { isValid: false, reason: 'gap_detected', missingFrom, missingTo },
-			nextState: { lastSequenceNumber: sequenceNumber, seenSequences: nextSeenSequences },
+			nextState: {
+				lastSequenceNumber: sequenceNumber,
+				seenSequences: pruneSeenSequences(nextSeenSequences, sequenceNumber),
+			},
 		}
 	}
 
 	return {
 		result: { isValid: true, reason: 'valid' },
-		nextState: { lastSequenceNumber: sequenceNumber, seenSequences: nextSeenSequences },
+		nextState: {
+			lastSequenceNumber: sequenceNumber,
+			seenSequences: pruneSeenSequences(nextSeenSequences, sequenceNumber),
+		},
 	}
 }

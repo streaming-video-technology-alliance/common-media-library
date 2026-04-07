@@ -7,7 +7,7 @@ import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
  * used to authenticate DASH segments in live streaming
  * (C2PA Live Video Streaming Specification §5).
  *
- * @public
+ * @internal
  */
 export type VsiMap = {
 	readonly sequenceNumber: number

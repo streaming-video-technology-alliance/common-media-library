@@ -28,7 +28,7 @@ function constraintMatches(boxData: Uint8Array, constraint: BmffHashConstraint):
  * @example
  * {@includeCode ../../test/bmff/shouldExcludeBox.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function shouldExcludeBox(
 	boxType: string,

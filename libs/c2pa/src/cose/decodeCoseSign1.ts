@@ -39,7 +39,7 @@ function toUint8Array(value: unknown): Uint8Array {
  * @example
  * {@includeCode ../../test/cose/decodeCoseSign1.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 	try {

@@ -1,7 +1,7 @@
 /**
  * A parsed EMSG (Event Message) box, version 0 (ISO 14496-12 §12.6.2).
  *
- * @public
+ * @internal
  */
 export type EmsgBoxV0 = {
 	readonly version: 0
@@ -20,7 +20,7 @@ export type EmsgBoxV0 = {
  *
  * Version 1 uses a 64-bit absolute presentation time instead of a delta.
  *
- * @public
+ * @internal
  */
 export type EmsgBoxV1 = {
 	readonly version: 1
@@ -40,6 +40,6 @@ export type EmsgBoxV1 = {
  * Use the `version` discriminant to access version-specific fields
  * ({@link EmsgBoxV0} or {@link EmsgBoxV1}).
  *
- * @public
+ * @internal
  */
 export type EmsgBox = EmsgBoxV0 | EmsgBoxV1

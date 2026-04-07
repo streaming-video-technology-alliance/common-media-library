@@ -6,7 +6,7 @@ const OFFSET_PREFIX_SIZES_TO_TRY = [8, 0] as const
 /**
  * Options for BMFF hash validation.
  *
- * @public
+ * @internal
  */
 export type BmffHashValidationOptions = {
 	readonly exclusions?: readonly BmffHashExclusion[]
@@ -38,7 +38,7 @@ function hashesEqual(a: Uint8Array, b: Uint8Array): boolean {
  * @example
  * {@includeCode ../../test/bmff/validateBmffHash.test.ts#example}
  *
- * @public
+ * @internal
  */
 export async function validateBmffHash(
 	segmentBytes: Uint8Array,

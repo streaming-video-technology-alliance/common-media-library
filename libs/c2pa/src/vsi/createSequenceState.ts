@@ -8,7 +8,7 @@ import type { SequenceState } from './SequenceState.ts'
  * @example
  * {@includeCode ../../test/vsi/validateSequenceNumber.test.ts#example}
  *
- * @public
+ * @internal
  */
 export function createSequenceState(): SequenceState {
 	return { lastSequenceNumber: null, seenSequences: new Set() }
