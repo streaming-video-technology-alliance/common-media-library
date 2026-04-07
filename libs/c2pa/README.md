@@ -63,7 +63,7 @@ let lastManifestId = null
 let lastState = undefined
 
 for (const segmentBytes of mediaSegments) {
-  const { result, nextManifestId, nextState } = validateC2paManifestBoxSegment(
+  const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
     segmentBytes, lastManifestId, lastState,
   )
   lastManifestId = nextManifestId

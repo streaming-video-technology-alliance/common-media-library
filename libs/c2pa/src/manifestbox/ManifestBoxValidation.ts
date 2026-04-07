@@ -9,15 +9,15 @@ import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
  * @public
  */
 export type ManifestBoxValidationResult = {
-  readonly manifest: C2paManifestStore | null
-  readonly issuer: string | null
-  readonly sequenceNumber: number | null
-  readonly previousManifestId: string | null
-  readonly streamId: string | null
-  readonly continuityMethod: string | null
-  readonly bmffHashHex: string | null
-  readonly isValid: boolean
-  readonly errorCodes: readonly LiveVideoStatusCode[]
+	readonly manifest: C2paManifestStore | null
+	readonly issuer: string | null
+	readonly sequenceNumber: number | null
+	readonly previousManifestId: string | null
+	readonly streamId: string | null
+	readonly continuityMethod: string | null
+	readonly bmffHashHex: string | null
+	readonly isValid: boolean
+	readonly errorCodes: readonly LiveVideoStatusCode[]
 }
 
 /**
@@ -29,6 +29,6 @@ export type ManifestBoxValidationResult = {
  * @public
  */
 export type ManifestBoxValidationState = {
-  readonly lastStreamId?: string | null
-  readonly lastSequenceNumber?: number | null
+	readonly lastStreamId?: string | null
+	readonly lastSequenceNumber?: number | null
 }

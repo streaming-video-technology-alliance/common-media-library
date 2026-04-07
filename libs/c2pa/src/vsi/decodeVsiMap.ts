@@ -3,8 +3,6 @@ import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'
 
-const DEFAULT_HASH_ALG = 'sha256'
-
 /**
  * Decodes a C2PA Verifiable Segment Info (VSI) CBOR map from raw bytes.
  *
@@ -41,7 +39,7 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 	const manifestId = raw['manifestId']
 	if (!(manifestId instanceof Uint8Array)) throw new Error('VSI map missing or invalid manifestId')
 
-	const alg = normalizeAlgorithmName((bmffHashRaw['alg'] as string | undefined) ?? DEFAULT_HASH_ALG)
+	const alg = normalizeAlgorithmName(bmffHashRaw['alg'] as string | undefined)
 
 	return {
 		sequenceNumber,

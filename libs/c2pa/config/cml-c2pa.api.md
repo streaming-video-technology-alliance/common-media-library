@@ -27,6 +27,20 @@ export type C2paManifestStore = {
 };
 
 // @public
+export type C2paSignatureInfo = {
+    readonly issuer: string | null;
+    readonly certNotBefore: string | null;
+};
+
+// @public
+export type CoseKeyJwk = {
+    readonly kty: string;
+    readonly crv: string;
+    readonly x: string;
+    readonly y?: string;
+};
+
+// @public
 export type InitSegmentValidation = {
     readonly activeManifest: C2paManifest | null;
     readonly certificate: Uint8Array | null;
@@ -123,11 +137,6 @@ export type ValidatedSessionKey = {
     readonly validityPeriod: number;
     readonly createdAt: string;
 };
-
-// Warnings were encountered during analysis:
-//
-// src/C2paManifest.ts:9:1 - (ae-forgotten-export) The symbol "C2paSignatureInfo" needs to be exported by the entry point index.d.ts
-// src/C2paManifest.ts:22:13 - (ae-forgotten-export) The symbol "CoseKeyJwk" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
