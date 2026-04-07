@@ -103,7 +103,7 @@ function normalizeSignature(signature: Uint8Array, publicKey: CryptoKey): Uint8A
  * DER-encoded ECDSA signatures to raw format if needed, and delegates
  * verification to the WebCrypto API.
  *
- * Supports `Ed25519` and `ECDSA` keys (P-256, P-384, P-521).
+ * Supports `ECDSA` (P-256, P-384, P-521), `Ed25519`, and `RSA-PSS` (PS256, PS384, PS512) keys.
  *
  * @param coseSign1 - Decoded COSE_Sign1 structure (from {@link decodeCoseSign1})
  * @param payload - Payload bytes to verify. May differ from `coseSign1.payload` for detached payloads.

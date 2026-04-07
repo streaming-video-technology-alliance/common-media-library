@@ -177,9 +177,8 @@ function collectErrorCodes(
  *
  * Parses the C2PA manifest embedded in the segment and validates per §19.7.1 and §19.7.2.
  * Recomputes the `c2pa.hash.bmff.v3` content hash from the raw segment bytes and compares
- * it against the expected hash in the manifest assertion. Also performs manifest integrity
- * checks: assertion hashes, missing assertions, action ingredients, and claim signature
- * verification (§15.7, §15.10.3.1, §18.15.4.7).
+ * it against the expected hash in the manifest assertion. Checks live-video assertions
+ * (sequenceNumber, streamId, continuityMethod) and manifest-ID chain continuity.
  *
  * This function is **pure** — it does not access any external state. The
  * caller is responsible for persisting `nextManifestId` and `nextState`
