@@ -1,5 +1,5 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
-import { decode } from 'cbor-x'
+import { decode } from 'cbor-x/decode'
 import type { C2paAssertion } from './C2paAssertion.ts'
 import type { C2paManifest, C2paManifestStore } from './C2paManifest.ts'
 import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
