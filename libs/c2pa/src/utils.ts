@@ -3,17 +3,6 @@ import type { IsoBoxReadView, ParsedIsoBox } from '@svta/cml-iso-bmff'
 const MILLISECONDS_PER_SECOND = 1000
 
 /**
- * Converts a Uint8Array to a lowercase hex string.
- *
- * @internal
- */
-export function bytesToHex(bytes: Uint8Array): string {
-	return Array.from(bytes)
-		.map(b => b.toString(16).padStart(2, '0'))
-		.join('')
-}
-
-/**
  * Checks whether a session key has expired based on its creation time
  * and validity period.
  *
