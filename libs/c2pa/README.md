@@ -5,10 +5,10 @@ C2PA (Coalition for Content Provenance and Authenticity) live video validation f
 ## Installation
 
 ```bash
-npm i @svta/cml-c2pa @svta/cml-iso-bmff
+npm i @svta/cml-c2pa @svta/cml-iso-bmff cbor-x
 ```
 
-> **Note:** `@svta/cml-iso-bmff` is a peer dependency.
+> **Note:** `@svta/cml-iso-bmff` and `cbor-x` are peer dependencies.
 
 ## Available exports
 
