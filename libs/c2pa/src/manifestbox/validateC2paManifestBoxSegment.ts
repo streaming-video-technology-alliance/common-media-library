@@ -13,6 +13,7 @@ const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
 const SUPPORTED_CONTINUITY_METHODS = new Set([CONTINUITY_METHOD_MANIFEST_ID])
+
 function normalizeManifestId(id: string | null): string | null {
 	if (!id) return null
 	return id.replace(MANIFEST_ID_PREFIX_PATTERN, '').toLowerCase()
