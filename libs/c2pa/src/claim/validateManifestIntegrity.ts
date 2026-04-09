@@ -24,15 +24,12 @@ export async function validateManifestIntegrity(
 	internal: InternalManifestData,
 	certificateDER: Uint8Array | null,
 ): Promise<readonly C2paStatusCode[]> {
-	const canVerifySignature =
-		internal.signatureBytes != null &&
-		internal.claimCborBytes != null &&
-		certificateDER != null
+	const { signatureBytes, claimCborBytes } = internal
 
 	const [assertionHashCodes, signatureValid] = await Promise.all([
 		validateAssertionHashes(internal.claimAssertionRefs, internal.assertions),
-		canVerifySignature
-			? verifyClaimSignature(internal.signatureBytes!, internal.claimCborBytes!, certificateDER!)
+		signatureBytes && claimCborBytes && certificateDER
+			? verifyClaimSignature(signatureBytes, claimCborBytes, certificateDER)
 			: Promise.resolve(true),
 	])
 
