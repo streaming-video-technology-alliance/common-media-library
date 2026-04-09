@@ -43,6 +43,9 @@ export const LiveVideoStatusCode: {
 };
 
 // @public
+export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
+
+// @public
 export type SequenceState = {
     readonly lastSequenceNumber: number | null;
     readonly seenSequences: ReadonlySet<number>;
@@ -61,9 +64,6 @@ export type SequenceValidationResult = {
     readonly missingFrom: number;
     readonly missingTo: number;
 };
-
-// @public
-export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // (No @packageDocumentation comment for this package)
 
