@@ -1,6 +1,6 @@
 import { verifyClaimSignature } from '../../src/claim/verifyClaimSignature.ts'
 import { extractManifestCertificate } from '../../src/extractManifestCertificate.ts'
-import { readC2paManifestInternal } from '../../src/readC2paManifest.ts'
+import { readC2paManifest } from '../../src/readC2paManifest.ts'
 import { strictEqual, ok } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
@@ -32,7 +32,7 @@ describe('verifyClaimSignature', () => {
 
 	it('attempts verification with real init segment data', async () => {
 		const initBytes = loadFixture('init_signed_with_session_keys.m4s')
-		const internalData = readC2paManifestInternal(initBytes)
+		const internalData = readC2paManifest(initBytes)
 		const certificate = extractManifestCertificate(initBytes)
 
 		ok(internalData.signatureBytes, 'signature bytes should be present')

@@ -1,6 +1,6 @@
 import { C2paStatusCode } from '@svta/cml-c2pa'
 import { validateManifestIntegrity } from '../../src/claim/validateManifestIntegrity.ts'
-import { readC2paManifestInternal } from '../../src/readC2paManifest.ts'
+import { readC2paManifest } from '../../src/readC2paManifest.ts'
 import { extractManifestCertificate } from '../../src/extractManifestCertificate.ts'
 import type { InternalManifestData } from '../../src/claim/InternalManifestData.ts'
 import { ok, strictEqual } from 'node:assert'
@@ -35,7 +35,7 @@ describe('validateManifestIntegrity', () => {
 
 	it('reports errors from real init segment fixture', async () => {
 		const initBytes = loadFixture('init_signed_with_session_keys.m4s')
-		const internalData = readC2paManifestInternal(initBytes)
+		const internalData = readC2paManifest(initBytes)
 		const certificate = extractManifestCertificate(initBytes)
 
 		const codes = await validateManifestIntegrity(internalData, certificate)

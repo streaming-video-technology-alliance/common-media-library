@@ -22,11 +22,6 @@ export type C2paManifest = {
 };
 
 // @public
-export type C2paManifestStore = {
-    readonly activeManifest: C2paManifest;
-};
-
-// @public
 export type C2paSignatureInfo = {
     readonly issuer: string | null;
     readonly certNotBefore: string | null;
@@ -53,7 +48,7 @@ export type CoseKeyJwk = {
 
 // @public
 export type InitSegmentValidation = {
-    readonly activeManifest: C2paManifest | null;
+    readonly manifest: C2paManifest | null;
     readonly certificate: Uint8Array | null;
     readonly manifestId: string | null;
     readonly sessionKeys: readonly ValidatedSessionKey[];
@@ -71,12 +66,12 @@ export const LiveVideoStatusCode: {
     readonly SESSIONKEY_INVALID: "livevideo.sessionkey.invalid";
 };
 
-// @public (undocumented)
+// @public
 export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // @public
 export type ManifestBoxValidationResult = {
-    readonly manifest: C2paManifestStore | null;
+    readonly manifest: C2paManifest | null;
     readonly issuer: string | null;
     readonly sequenceNumber: number | null;
     readonly previousManifestId: string | null;

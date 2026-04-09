@@ -123,14 +123,14 @@ type ParsedManifest = {
 
 function parseManifest(bytes: Uint8Array): ParsedManifest {
 	try {
-		const { activeManifest } = readC2paManifest(bytes)
-		if (!activeManifest) return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		const { manifest } = readC2paManifest(bytes)
+		if (!manifest) return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
 
 		return {
-			manifest: activeManifest,
-			issuer: activeManifest.signatureInfo?.issuer ?? null,
-			liveVideo: parseLiveVideoAssertion(activeManifest.assertions),
-			bmff: parseBmffHashAssertion(activeManifest.assertions),
+			manifest,
+			issuer: manifest.signatureInfo?.issuer ?? null,
+			liveVideo: parseLiveVideoAssertion(manifest.assertions),
+			bmff: parseBmffHashAssertion(manifest.assertions),
 		}
 	} catch {
 		return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
@@ -235,7 +235,7 @@ export async function validateC2paManifestBoxSegment(
 
 	return {
 		result: {
-			manifest: manifest ? { activeManifest: manifest } : null,
+			manifest: manifest ?? null,
 			issuer,
 			sequenceNumber,
 			previousManifestId,

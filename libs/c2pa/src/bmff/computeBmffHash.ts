@@ -8,7 +8,7 @@ const DEFAULT_HASH_ALG = 'SHA-256'
 /**
  * Options for BMFF content hash computation.
  *
- * @internal
+ * @public
  */
 export type BmffHashOptions = {
 	readonly exclusions?: readonly BmffHashExclusion[]
@@ -87,7 +87,7 @@ function buildHashInput(
  * @example
  * {@includeCode ../../test/bmff/computeBmffHash.test.ts#example}
  *
- * @internal
+ * @public
  */
 export async function computeBmffHash(segmentBytes: Uint8Array, options?: BmffHashOptions): Promise<Uint8Array> {
 	const exclusions = options?.exclusions ?? []

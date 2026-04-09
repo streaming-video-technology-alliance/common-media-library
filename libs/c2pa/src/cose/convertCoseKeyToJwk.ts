@@ -36,7 +36,7 @@ function toBase64Url(value: unknown): string {
  * @example
  * {@includeCode ../../test/cose/convertCoseKeyToJwk.test.ts#example}
  *
- * @internal
+ * @public
  */
 export function convertCoseKeyToJwk(coseKey: unknown): CoseKeyJwk {
 	const key = coseKey as CoseKeyLike

@@ -2,7 +2,7 @@
  * A byte-level constraint used to match specific BMFF box content
  * within a C2PA BMFF hash exclusion.
  *
- * @internal
+ * @public
  */
 export type BmffHashConstraint = {
 	readonly offset: number
@@ -16,7 +16,7 @@ export type BmffHashConstraint = {
  * Optional `data` constraints narrow the match to specific box content
  * by byte offset within the box.
  *
- * @internal
+ * @public
  */
 export type BmffHashExclusion = {
 	readonly xpath: string

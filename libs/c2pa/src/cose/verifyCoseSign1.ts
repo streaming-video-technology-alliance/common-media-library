@@ -114,7 +114,7 @@ function normalizeSignature(signature: Uint8Array, publicKey: CryptoKey): Uint8A
  * @example
  * {@includeCode ../../test/cose/verifyCoseSign1.test.ts#example}
  *
- * @internal
+ * @public
  */
 export async function verifyCoseSign1(
 	coseSign1: CoseSign1,

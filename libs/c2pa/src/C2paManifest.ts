@@ -13,12 +13,3 @@ export type C2paManifest = {
 	readonly signatureInfo: C2paSignatureInfo
 	readonly assertions: readonly C2paAssertion[]
 }
-
-/**
- * A C2PA manifest store parsed from a BMFF container
- *
- * @public
- */
-export type C2paManifestStore = {
-	readonly activeManifest: C2paManifest
-}

@@ -27,7 +27,7 @@ export type ValidatedSessionKey = {
  * @public
  */
 export type InitSegmentValidation = {
-	readonly activeManifest: C2paManifest | null
+	readonly manifest: C2paManifest | null
 	readonly certificate: Uint8Array | null
 	readonly manifestId: string | null
 	readonly sessionKeys: readonly ValidatedSessionKey[]

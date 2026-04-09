@@ -1,4 +1,4 @@
-import type { C2paManifestStore } from '../C2paManifest.ts'
+import type { C2paManifest } from '../C2paManifest.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 
@@ -10,7 +10,7 @@ import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
  * @public
  */
 export type ManifestBoxValidationResult = {
-	readonly manifest: C2paManifestStore | null
+	readonly manifest: C2paManifest | null
 	readonly issuer: string | null
 	readonly sequenceNumber: number | null
 	readonly previousManifestId: string | null

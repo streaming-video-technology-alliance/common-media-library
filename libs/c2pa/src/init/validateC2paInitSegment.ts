@@ -3,7 +3,7 @@ import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
-import { readC2paManifestInternal } from '../readC2paManifest.ts'
+import { readC2paManifest } from '../readC2paManifest.ts'
 import { extractManifestCertificate } from '../extractManifestCertificate.ts'
 import { validateBmffHash } from '../bmff/validateBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
@@ -203,7 +203,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const boxes = readIsoBoxes(bytes)
 	if (findIsoBox(boxes, box => box.type === 'mdat')) {
 		return {
-			activeManifest: null,
+			manifest: null,
 			certificate: null,
 			manifestId: null,
 			sessionKeys: [],
@@ -212,15 +212,15 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		}
 	}
 
-	const internalData = readC2paManifestInternal(bytes)
-	const { manifest: activeManifest } = internalData
+	const internalData = readC2paManifest(bytes)
+	const { manifest } = internalData
 	const certificate = extractManifestCertificate(bytes)
 
 	const bmffHashAssertion =
-		activeManifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
+		manifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
 	const bmffHashValid = await validateBmffHashAssertion(bytes, bmffHashAssertion)
 
-	const sessionKeysAssertion = activeManifest.assertions.find(
+	const sessionKeysAssertion = manifest.assertions.find(
 		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
 	)
 	const sessionKeys =
@@ -237,9 +237,9 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const errorCodes = [...codes]
 
 	return {
-		activeManifest,
+		manifest,
 		certificate,
-		manifestId: activeManifest.instanceId,
+		manifestId: manifest.instanceId,
 		sessionKeys,
 		isValid: errorCodes.length === 0,
 		errorCodes,

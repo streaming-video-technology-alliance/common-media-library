@@ -1,7 +1,7 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
-import { decode } from 'cbor-x'
+import { decode } from 'cbor-x/decode'
 import type { C2paAssertion } from './C2paAssertion.ts'
-import type { C2paManifest, C2paManifestStore } from './C2paManifest.ts'
+import type { C2paManifest } from './C2paManifest.ts'
 import type { ClaimAssertionRef } from './claim/ClaimAssertionRef.ts'
 import type { InternalAssertionData, InternalManifestData } from './claim/InternalManifestData.ts'
 import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
@@ -85,21 +85,21 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 	return assertions
 }
 
-function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; certNotBefore: string | null } {
-	if (!signatureBytes) return { issuer: null, certNotBefore: null }
+function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; signingTime: string | null } {
+	if (!signatureBytes) return { issuer: null, signingTime: null }
 	try {
 		const cose = decodeCoseSign1(signatureBytes)
 		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ?? cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as Uint8Array | Uint8Array[] | null | undefined
-		if (!x5chain) return { issuer: null, certNotBefore: null }
+		if (!x5chain) return { issuer: null, signingTime: null }
 
 		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
-		if (!(certDER instanceof Uint8Array)) return { issuer: null, certNotBefore: null }
+		if (!(certDER instanceof Uint8Array)) return { issuer: null, signingTime: null }
 
 		const certInfo = extractCertificateInfo(certDER)
-		return { issuer: certInfo?.issuer ?? null, certNotBefore: certInfo?.notBefore ?? null }
+		return { issuer: certInfo?.issuer ?? null, signingTime: certInfo?.notBefore ?? null }
 	} catch {
 		// signature parsing failed — continue without signature info
-		return { issuer: null, certNotBefore: null }
+		return { issuer: null, signingTime: null }
 	}
 }
 
@@ -129,12 +129,25 @@ function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAss
 }
 
 /**
- * Internal manifest reader that preserves raw assertion bytes and claim
- * assertion references needed for Chapter 15 / Chapter 18 validation checks.
+ * Reads a C2PA manifest from raw BMFF bytes.
+ *
+ * Locates the C2PA UUID box (`d8fec3d6-1a96-4f32-a0f6-f3ecf96c10ea`), navigates
+ * the JUMBF manifest store structure (ISO 19566-5), and returns the parsed active
+ * manifest with its claims, assertions, and signature information.
+ *
+ * This function performs structural parsing only. It does not verify the
+ * cryptographic signature of the claim.
+ *
+ * @param bytes - Raw BMFF bytes (e.g. an MP4 init segment or media segment)
+ * @returns The parsed manifest data including claim, assertions, and signature bytes
+ * @throws If no C2PA UUID box is found, or the JUMBF structure is invalid
+ *
+ * @example
+ * {@includeCode ../test/readC2paManifest.test.ts#example}
  *
  * @internal
  */
-export function readC2paManifestInternal(bytes: Uint8Array): InternalManifestData {
+export function readC2paManifest(bytes: Uint8Array): InternalManifestData {
 	const boxes = readIsoBoxes(bytes)
 	const uuidBox = findC2paUuidBox(boxes)
 
@@ -144,6 +157,9 @@ export function readC2paManifestInternal(bytes: Uint8Array): InternalManifestDat
 
 	const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
 	const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
+	if (!jumbfPayload) {
+		throw new Error('Invalid JUMBF UUID prefix in C2PA box')
+	}
 	const jumbfBoxes = parseJumbfBoxes(jumbfPayload)
 
 	if (jumbfBoxes.length === 0) {
@@ -216,26 +232,3 @@ export function readC2paManifestInternal(bytes: Uint8Array): InternalManifestDat
 	}
 }
 
-/**
- * Reads a C2PA manifest store from raw BMFF bytes.
- *
- * Locates the C2PA UUID box (`d8fec3d6-1a96-4f32-a0f6-f3ecf96c10ea`), navigates
- * the JUMBF manifest store structure (ISO 19566-5), and returns the parsed active
- * manifest with its claims, assertions, and signature information.
- *
- * This function performs structural parsing only. It does not verify the
- * cryptographic signature of the claim.
- *
- * @param bytes - Raw BMFF bytes (e.g. an MP4 init segment or media segment)
- * @returns The parsed C2PA manifest store
- * @throws If no C2PA UUID box is found, or the JUMBF structure is invalid
- *
- * @example
- * {@includeCode ../test/readC2paManifest.test.ts#example}
- *
- * @internal
- */
-export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
-	const { manifest } = readC2paManifestInternal(bytes)
-	return { activeManifest: manifest }
-}

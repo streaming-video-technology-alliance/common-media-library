@@ -26,6 +26,8 @@ export const LiveVideoStatusCode = {
 } as const
 
 /**
+ * Union type of all {@link (LiveVideoStatusCode:variable)} values.
+ *
  * @public
  */
 export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>
