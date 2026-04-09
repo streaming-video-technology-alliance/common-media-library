@@ -42,9 +42,6 @@ export const LiveVideoStatusCode: {
     readonly SESSIONKEY_INVALID: "livevideo.sessionkey.invalid";
 };
 
-// @public (undocumented)
-export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
-
 // @public
 export type SequenceState = {
     readonly lastSequenceNumber: number | null;
@@ -64,6 +61,9 @@ export type SequenceValidationResult = {
     readonly missingFrom: number;
     readonly missingTo: number;
 };
+
+// @public
+export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // (No @packageDocumentation comment for this package)
 

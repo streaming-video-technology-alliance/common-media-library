@@ -1,7 +1,7 @@
 /**
  * Information extracted from an X.509 DER certificate
  *
- * @internal
+ * @public
  */
 export type CertificateInfo = {
 	readonly issuer: string

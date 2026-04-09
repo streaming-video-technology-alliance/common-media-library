@@ -1,4 +1,4 @@
-import { encode } from 'cbor-x'
+import { encode } from 'cbor-x/encode'
 import { convertCoseKeyToJwk } from './convertCoseKeyToJwk.ts'
 import { decodeCoseSign1 } from './decodeCoseSign1.ts'
 import { resolveImportAlgorithm } from './resolveImportAlgorithm.ts'
@@ -20,7 +20,7 @@ import { verifyCoseSign1 } from './verifyCoseSign1.ts'
  * @example
  * {@includeCode ../../test/cose/verifySignerBinding.test.ts#example}
  *
- * @internal
+ * @public
  */
 export async function verifySignerBinding(
 	signerBindingBytes: Uint8Array,

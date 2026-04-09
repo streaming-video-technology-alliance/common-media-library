@@ -1,5 +1,5 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
-import { decode } from 'cbor-x'
+import { decode } from 'cbor-x/decode'
 import type { C2paAssertion } from './C2paAssertion.ts'
 import type { C2paManifest, C2paManifestStore } from './C2paManifest.ts'
 import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
@@ -83,21 +83,21 @@ function parseAssertions(assertionStoreBoxes: JumbfBox[]): C2paAssertion[] {
 	return assertions
 }
 
-function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; certNotBefore: string | null } {
-	if (!signatureBytes) return { issuer: null, certNotBefore: null }
+function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; signingTime: string | null } {
+	if (!signatureBytes) return { issuer: null, signingTime: null }
 	try {
 		const cose = decodeCoseSign1(signatureBytes)
 		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ?? cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as Uint8Array | Uint8Array[] | null | undefined
-		if (!x5chain) return { issuer: null, certNotBefore: null }
+		if (!x5chain) return { issuer: null, signingTime: null }
 
 		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
-		if (!(certDER instanceof Uint8Array)) return { issuer: null, certNotBefore: null }
+		if (!(certDER instanceof Uint8Array)) return { issuer: null, signingTime: null }
 
 		const certInfo = extractCertificateInfo(certDER)
-		return { issuer: certInfo?.issuer ?? null, certNotBefore: certInfo?.notBefore ?? null }
+		return { issuer: certInfo?.issuer ?? null, signingTime: certInfo?.notBefore ?? null }
 	} catch {
 		// signature parsing failed — continue without signature info
-		return { issuer: null, certNotBefore: null }
+		return { issuer: null, signingTime: null }
 	}
 }
 
@@ -171,7 +171,7 @@ export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 		}
 	}
 
-	const { issuer, certNotBefore } = parseSignatureInfo(signatureBytes)
+	const { issuer, signingTime } = parseSignatureInfo(signatureBytes)
 
 	const instanceId = (claimData?.['instanceID'] ?? claimData?.['instance_id'] ?? null) as string | null
 	const claimGenerator = (claimData?.['claim_generator'] ?? claimData?.['claimGenerator'] ?? null) as string | null
@@ -186,7 +186,7 @@ export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 		label,
 		instanceId,
 		claimGenerator,
-		signatureInfo: { issuer, certNotBefore },
+		signatureInfo: { issuer, certNotBefore: signingTime },
 		assertions,
 	}
 
