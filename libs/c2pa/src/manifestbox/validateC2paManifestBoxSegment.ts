@@ -1,5 +1,6 @@
 import type { C2paAssertion } from '../C2paAssertion.ts'
-import type { C2paManifestStore } from '../C2paManifest.ts'
+import type { C2paManifest } from '../C2paManifest.ts'
+import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { bytesToHex, normalizeAlgorithmName } from '../utils.ts'
@@ -114,22 +115,23 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 
 // --- Manifest parsing ---
 
-function parseManifest(bytes: Uint8Array): {
-	manifest: C2paManifestStore | null
+type ParsedManifest = {
+	manifest: C2paManifest | null
 	issuer: string | null
 	liveVideo: LiveVideoFields | null
 	bmff: BmffHashFields
-} {
+}
+
+function parseManifest(bytes: Uint8Array): ParsedManifest {
 	try {
-		const manifest = readC2paManifest(bytes)
-		const activeManifest = manifest?.activeManifest
-		if (!activeManifest) return { manifest, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		const { manifest } = readC2paManifest(bytes)
+		if (!manifest) return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
 
 		return {
 			manifest,
-			issuer: activeManifest.signatureInfo?.issuer ?? null,
-			liveVideo: parseLiveVideoAssertion(activeManifest.assertions),
-			bmff: parseBmffHashAssertion(activeManifest.assertions),
+			issuer: manifest.signatureInfo?.issuer ?? null,
+			liveVideo: parseLiveVideoAssertion(manifest.assertions),
+			bmff: parseBmffHashAssertion(manifest.assertions),
 		}
 	} catch {
 		return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
@@ -176,7 +178,8 @@ function collectErrorCodes(
  *
  * Parses the C2PA manifest embedded in the segment and validates per §19.7.1 and §19.7.2.
  * Recomputes the `c2pa.hash.bmff.v3` content hash from the raw segment bytes and compares
- * it against the expected hash in the manifest assertion.
+ * it against the expected hash in the manifest assertion. Checks live-video assertions
+ * (sequenceNumber, streamId, continuityMethod) and manifest-ID chain continuity.
  *
  * This function is **pure** — it does not access any external state. The
  * caller is responsible for persisting `nextManifestId` and `nextState`
@@ -221,17 +224,19 @@ export async function validateC2paManifestBoxSegment(
 		})
 	}
 
-	const errorCodes = collectErrorCodes(
+	const liveVideoCodes = collectErrorCodes(
 		manifest !== null, liveVideo !== null,
 		streamIdValid, sequenceNumberValid, bmffHashMatches,
 		continuityMethod, previousManifestId, lastManifestId,
 	)
 
-	const currentManifestId = manifest?.activeManifest?.instanceId ?? null
+	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes]
+
+	const currentManifestId = manifest?.instanceId ?? null
 
 	return {
 		result: {
-			manifest,
+			manifest: manifest ?? null,
 			issuer,
 			sequenceNumber,
 			previousManifestId,

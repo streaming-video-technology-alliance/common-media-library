@@ -1,11 +1,13 @@
 import { decode, encode } from 'cbor-x'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import type { C2paAssertion } from '../C2paAssertion.ts'
+import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { extractManifestCertificate } from '../extractManifestCertificate.ts'
 import { validateBmffHash } from '../bmff/validateBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
@@ -15,11 +17,25 @@ const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
 const COSE_KEY_ID_LABEL = 2
 
+// cbor-x represents CBOR tagged values in multiple ways depending on version/config:
+// - { tag: number, value: unknown } (structured)
+// - Tag class instance with constructor name 'Tag'
+// - { '@@TAGGED@@': [tag, value] } (internal key)
+const CBOR_TAGGED_KEY = '@@TAGGED@@'
+
+function extractCborTaggedValue(value: unknown): unknown | null {
+	if (typeof value !== 'object' || value === null) return null
+	const obj = value as Record<string, unknown>
+	if (typeof obj['tag'] === 'number' && 'value' in obj) return obj['value']
+	const tagged = obj[CBOR_TAGGED_KEY]
+	if (Array.isArray(tagged) && tagged.length === 2) return tagged[1]
+	return null
+}
+
 function normalizeToUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
 	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	const ctor = (value as { constructor?: { name?: string } }).constructor
-	if (ctor?.name === 'Tag') return encode(value) as Uint8Array
+	if (extractCborTaggedValue(value) !== null) return encode(value) as Uint8Array
 	throw new Error('Cannot convert value to Uint8Array')
 }
 
@@ -31,19 +47,10 @@ function ensureDecodedCbor(value: unknown): unknown {
 	return value
 }
 
-// cbor-x uses this key for CBOR tagged values (e.g., tag 0 for date-time)
-const CBOR_TAGGED_KEY = '@@TAGGED@@'
-
 function parseCreatedAt(value: unknown): string | null {
-	if (typeof value === 'string') return value
-	if (value instanceof Date) return value.toISOString()
-	if (typeof value === 'object' && value !== null) {
-		const obj = value as Record<string, unknown>
-		const tagged = obj[CBOR_TAGGED_KEY]
-		if (Array.isArray(tagged) && tagged.length === 2) return String(tagged[1])
-		const direct = obj['value'] ?? (obj as unknown as Record<number, unknown>)[1]
-		if (typeof direct === 'string') return direct
-	}
+	const resolved = extractCborTaggedValue(value) ?? value
+	if (typeof resolved === 'string') return resolved
+	if (resolved instanceof Date) return resolved.toISOString()
 	return null
 }
 
@@ -178,8 +185,10 @@ async function validateSessionKeys(
 
 /**
  * Validates a C2PA init segment: parses the manifest, extracts and verifies
- * the certificate, validates the BMFF hard binding hash, and verifies all
- * session keys from the `c2pa.session-keys` assertion.
+ * the certificate, validates the BMFF hard binding hash, verifies all
+ * session keys from the `c2pa.session-keys` assertion, and performs
+ * manifest integrity checks (assertion hashes, missing assertions,
+ * action ingredients, and claim signature verification).
  *
  * Only session keys with a valid signer binding and an unexpired validity period
  * are included in the result.
@@ -197,7 +206,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const boxes = readIsoBoxes(bytes)
 	if (findIsoBox(boxes, box => box.type === 'mdat')) {
 		return {
-			activeManifest: null,
+			manifest: null,
 			certificate: null,
 			manifestId: null,
 			sessionKeys: [],
@@ -206,14 +215,15 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		}
 	}
 
-	const { activeManifest } = readC2paManifest(bytes)
+	const internalData = readC2paManifest(bytes)
+	const { manifest } = internalData
 	const certificate = extractManifestCertificate(bytes)
 
 	const bmffHashAssertion =
-		activeManifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
+		manifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
 	const bmffHashValid = await validateBmffHashAssertion(bytes, bmffHashAssertion)
 
-	const sessionKeysAssertion = activeManifest.assertions.find(
+	const sessionKeysAssertion = manifest.assertions.find(
 		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
 	)
 	const sessionKeys =
@@ -221,15 +231,18 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 			? await validateSessionKeys(sessionKeysAssertion, certificate)
 			: []
 
-	const codes = new Set<LiveVideoStatusCode>()
+	const integrityCodes = await validateManifestIntegrity(internalData, certificate)
+
+	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
 	if (sessionKeys.length === 0) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	for (const code of integrityCodes) codes.add(code)
 	const errorCodes = [...codes]
 
 	return {
-		activeManifest,
+		manifest,
 		certificate,
-		manifestId: activeManifest.instanceId,
+		manifestId: manifest.instanceId,
 		sessionKeys,
 		isValid: errorCodes.length === 0,
 		errorCodes,

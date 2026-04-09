@@ -14,24 +14,24 @@ describe('readC2paManifest', () => {
 		const bytes = loadFixture('init_signed_with_session_keys.m4s')
 		const manifestStore = readC2paManifest(bytes)
 
-		ok(manifestStore.activeManifest, 'activeManifest should be present')
-		ok(typeof manifestStore.activeManifest.label === 'string', 'label should be a string')
+		ok(manifestStore.manifest, 'manifest should be present')
+		ok(typeof manifestStore.manifest.label === 'string', 'label should be a string')
 	})
 	// #endregion example
 
 	it('returns assertions array', () => {
 		const bytes = loadFixture('init_signed_with_session_keys.m4s')
-		const { activeManifest } = readC2paManifest(bytes)
+		const { manifest } = readC2paManifest(bytes)
 
-		ok(Array.isArray(activeManifest.assertions), 'assertions should be an array')
+		ok(Array.isArray(manifest.assertions), 'assertions should be an array')
 	})
 
 	it('returns signatureInfo with issuer', () => {
 		const bytes = loadFixture('init_signed_with_session_keys.m4s')
-		const { activeManifest } = readC2paManifest(bytes)
+		const { manifest } = readC2paManifest(bytes)
 
 		ok(
-			typeof activeManifest.signatureInfo.issuer === 'string' || activeManifest.signatureInfo.issuer === null,
+			typeof manifest.signatureInfo.issuer === 'string' || manifest.signatureInfo.issuer === null,
 			'issuer should be string or null',
 		)
 	})
@@ -41,8 +41,8 @@ describe('readC2paManifest', () => {
 
 		doesNotThrow(() => readC2paManifest(bytes))
 
-		const { activeManifest } = readC2paManifest(bytes)
-		const liveVideoAssertion = activeManifest.assertions.find((a: C2paAssertion) => a.label === 'c2pa.livevideo.segment')
+		const { manifest } = readC2paManifest(bytes)
+		const liveVideoAssertion = manifest.assertions.find((a: C2paAssertion) => a.label === 'c2pa.livevideo.segment')
 
 		ok(liveVideoAssertion !== undefined, 'c2pa.livevideo.segment assertion should be present')
 	})
@@ -60,10 +60,10 @@ describe('readC2paManifest', () => {
 
 	it('returns instanceId when present in the claim', () => {
 		const bytes = loadFixture('init_signed_with_session_keys.m4s')
-		const { activeManifest } = readC2paManifest(bytes)
+		const { manifest } = readC2paManifest(bytes)
 
 		ok(
-			typeof activeManifest.instanceId === 'string' || activeManifest.instanceId === null,
+			typeof manifest.instanceId === 'string' || manifest.instanceId === null,
 			'instanceId should be string or null',
 		)
 	})

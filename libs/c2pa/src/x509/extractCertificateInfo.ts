@@ -1,49 +1,18 @@
 import type { CertificateInfo } from './CertificateInfo.ts'
+import {
+	ASN1_TAG_CONTEXT_0,
+	ASN1_TAG_GENERALIZED_TIME,
+	ASN1_TAG_INTEGER,
+	ASN1_TAG_OBJECT_IDENTIFIER,
+	ASN1_TAG_SEQUENCE,
+	ASN1_TAG_SET,
+	ASN1_TAG_UTC_TIME,
+	readElement,
+	type Asn1Element,
+} from './asn1.ts'
 
 const OID_COMMON_NAME = new Uint8Array([0x55, 0x04, 0x03])
 const OID_ORG_NAME = new Uint8Array([0x55, 0x04, 0x0a])
-
-const ASN1_TAG_INTEGER = 0x02
-const ASN1_TAG_OBJECT_IDENTIFIER = 0x06
-const ASN1_TAG_SEQUENCE = 0x30
-const ASN1_TAG_SET = 0x31
-const ASN1_TAG_UTC_TIME = 0x17
-const ASN1_TAG_GENERALIZED_TIME = 0x18
-const ASN1_TAG_CONTEXT_0 = 0xa0
-const ASN1_LONG_FORM_FLAG = 0x80
-const ASN1_LONG_FORM_MASK = 0x7f
-
-type Asn1Element = {
-	tag: number
-	value: Uint8Array
-	totalSize: number
-}
-
-function readLength(bytes: Uint8Array, offset: number): { length: number, bytesRead: number } {
-	if (offset >= bytes.length) return { length: 0, bytesRead: 0 }
-	const first = bytes[offset] ?? 0
-	if (first < ASN1_LONG_FORM_FLAG) return { length: first, bytesRead: 1 }
-	const count = first & ASN1_LONG_FORM_MASK
-	let length = 0
-	for (let i = 0; i < count; i++) {
-		length = (length << 8) | (bytes[offset + 1 + i] ?? 0)
-	}
-	return { length, bytesRead: 1 + count }
-}
-
-function readElement(bytes: Uint8Array, offset: number): Asn1Element | null {
-	if (offset + 2 > bytes.length) return null
-	const tag = bytes[offset] ?? 0
-	const { length, bytesRead } = readLength(bytes, offset + 1)
-	const headerSize = 1 + bytesRead
-	const valueEnd = offset + headerSize + length
-	if (valueEnd > bytes.length) return null
-	return {
-		tag,
-		value: bytes.subarray(offset + headerSize, valueEnd),
-		totalSize: headerSize + length,
-	}
-}
 
 function matchesOID(value: Uint8Array, oid: Uint8Array): boolean {
 	if (value.length < oid.length) return false

@@ -22,15 +22,21 @@ export type C2paManifest = {
 };
 
 // @public
-export type C2paManifestStore = {
-    readonly activeManifest: C2paManifest;
-};
-
-// @public
 export type C2paSignatureInfo = {
     readonly issuer: string | null;
     readonly certNotBefore: string | null;
 };
+
+// @public
+export const C2paStatusCode: {
+    readonly ASSERTION_HASHEDURI_MISMATCH: "assertion.hashedURI.mismatch";
+    readonly ASSERTION_MISSING: "assertion.missing";
+    readonly ASSERTION_ACTION_INGREDIENT_MISMATCH: "assertion.action.ingredientMismatch";
+    readonly CLAIM_SIGNATURE_MISMATCH: "claim.signature.mismatch";
+};
+
+// @public
+export type C2paStatusCode = ValueOf<typeof C2paStatusCode>;
 
 // @public
 export type CoseKeyJwk = {
@@ -42,12 +48,12 @@ export type CoseKeyJwk = {
 
 // @public
 export type InitSegmentValidation = {
-    readonly activeManifest: C2paManifest | null;
+    readonly manifest: C2paManifest | null;
     readonly certificate: Uint8Array | null;
     readonly manifestId: string | null;
     readonly sessionKeys: readonly ValidatedSessionKey[];
     readonly isValid: boolean;
-    readonly errorCodes: readonly LiveVideoStatusCode[];
+    readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[];
 };
 
 // @public
@@ -65,7 +71,7 @@ export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // @public
 export type ManifestBoxValidationResult = {
-    readonly manifest: C2paManifestStore | null;
+    readonly manifest: C2paManifest | null;
     readonly issuer: string | null;
     readonly sequenceNumber: number | null;
     readonly previousManifestId: string | null;
@@ -73,7 +79,7 @@ export type ManifestBoxValidationResult = {
     readonly continuityMethod: string | null;
     readonly bmffHashHex: string | null;
     readonly isValid: boolean;
-    readonly errorCodes: readonly LiveVideoStatusCode[];
+    readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[];
 };
 
 // @public

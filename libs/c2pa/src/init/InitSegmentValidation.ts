@@ -1,4 +1,5 @@
 import type { C2paManifest } from '../C2paManifest.ts'
+import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import type { CoseKeyJwk } from '../cose/CoseKeyJwk.ts'
 import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 
@@ -26,10 +27,10 @@ export type ValidatedSessionKey = {
  * @public
  */
 export type InitSegmentValidation = {
-	readonly activeManifest: C2paManifest | null
+	readonly manifest: C2paManifest | null
 	readonly certificate: Uint8Array | null
 	readonly manifestId: string | null
 	readonly sessionKeys: readonly ValidatedSessionKey[]
 	readonly isValid: boolean
-	readonly errorCodes: readonly LiveVideoStatusCode[]
+	readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[]
 }

@@ -1,14 +1,30 @@
 import type { CoseSign1 } from './CoseSign1.ts'
 import { buildSigStructure } from './buildSigStructure.ts'
+import {
+	CURVE_P256, 
+	CURVE_P384, 
+	CURVE_P521,
+	ECDSA_ALGORITHM, 
+	ED25519_ALGORITHM, 
+	RSA_PSS_ALGORITHM,
+	HASH_SHA256, 
+	HASH_SHA384, 
+	HASH_SHA512,
+} from './constants.ts'
 
-const ECDSA_ALGORITHM = 'ECDSA'
-const ED25519_ALGORITHM = 'Ed25519'
 const DER_SEQUENCE_TAG = 0x30
 const DER_INTEGER_TAG = 0x02
 
-const CURVE_COMPONENT_BYTES: Record<string, number> = { 'P-256': 32, 'P-384': 48, 'P-521': 66 }
+const CURVE_COMPONENT_BYTES: Record<string, number> = { [CURVE_P256]: 32, [CURVE_P384]: 48, [CURVE_P521]: 66 }
 
 type EcKeyAlgorithm = KeyAlgorithm & { readonly namedCurve: string }
+type RsaHashedKeyAlgorithm = KeyAlgorithm & { readonly hash: { readonly name: string } }
+
+const RSA_PSS_SALT_LENGTH: Record<string, number> = {
+	[HASH_SHA256]: 32,
+	[HASH_SHA384]: 48,
+	[HASH_SHA512]: 64,
+}
 
 function getComponentSize(publicKey: CryptoKey): number {
 	const curve = (publicKey.algorithm as EcKeyAlgorithm).namedCurve
@@ -69,8 +85,12 @@ function resolveVerifyAlgorithm(publicKey: CryptoKey) {
 	if (name === ED25519_ALGORITHM) return { name: ED25519_ALGORITHM }
 	if (name === ECDSA_ALGORITHM) {
 		const curve = (publicKey.algorithm as EcKeyAlgorithm).namedCurve
-		const hash = curve === 'P-384' ? 'SHA-384' : curve === 'P-521' ? 'SHA-512' : 'SHA-256'
+		const hash = curve === CURVE_P384 ? HASH_SHA384 : curve === CURVE_P521 ? HASH_SHA512 : HASH_SHA256
 		return { name: ECDSA_ALGORITHM, hash: { name: hash } }
+	}
+	if (name === RSA_PSS_ALGORITHM) {
+		const hashName = (publicKey.algorithm as RsaHashedKeyAlgorithm).hash.name
+		return { name: RSA_PSS_ALGORITHM, saltLength: RSA_PSS_SALT_LENGTH[hashName] ?? 32 }
 	}
 	throw new Error(`Unsupported public key algorithm: ${name}`)
 }
@@ -91,7 +111,7 @@ function normalizeSignature(signature: Uint8Array, publicKey: CryptoKey): Uint8A
  * DER-encoded ECDSA signatures to raw format if needed, and delegates
  * verification to the WebCrypto API.
  *
- * Supports `Ed25519` and `ECDSA` keys (P-256, P-384, P-521).
+ * Supports `ECDSA` (P-256, P-384, P-521), `Ed25519`, and `RSA-PSS` (PS256, PS384, PS512) keys.
  *
  * @param coseSign1 - Decoded COSE_Sign1 structure (from {@link decodeCoseSign1})
  * @param payload - Payload bytes to verify. May differ from `coseSign1.payload` for detached payloads.

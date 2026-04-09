@@ -1,7 +1,9 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
 import { decode } from 'cbor-x/decode'
 import type { C2paAssertion } from './C2paAssertion.ts'
-import type { C2paManifest, C2paManifestStore } from './C2paManifest.ts'
+import type { C2paManifest } from './C2paManifest.ts'
+import type { ClaimAssertionRef } from './claim/ClaimAssertionRef.ts'
+import type { InternalAssertionData, InternalManifestData } from './claim/InternalManifestData.ts'
 import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
 import type { JumbfBox } from './jumbf/JumbfBox.ts'
 import { parseJumbfBoxes } from './jumbf/parseJumbfBoxes.ts'
@@ -47,8 +49,8 @@ function extractManifestLabel(jumbfBoxes: JumbfBox[]): string | null {
 	return null
 }
 
-function parseAssertions(assertionStoreBoxes: JumbfBox[]): C2paAssertion[] {
-	const assertions: C2paAssertion[] = []
+function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAssertionData[] {
+	const assertions: InternalAssertionData[] = []
 
 	for (const box of assertionStoreBoxes) {
 		if (box.type !== 'jumb') continue
@@ -77,32 +79,57 @@ function parseAssertions(assertionStoreBoxes: JumbfBox[]): C2paAssertion[] {
 			}
 		}
 
-		assertions.push({ label, data })
+		assertions.push({ label, data, rawBoxPayload: box.data })
 	}
 
 	return assertions
 }
 
-function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; signingTime: string | null } {
-	if (!signatureBytes) return { issuer: null, signingTime: null }
+function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; certNotBefore: string | null } {
+	if (!signatureBytes) return { issuer: null, certNotBefore: null }
 	try {
 		const cose = decodeCoseSign1(signatureBytes)
 		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ?? cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as Uint8Array | Uint8Array[] | null | undefined
-		if (!x5chain) return { issuer: null, signingTime: null }
+		if (!x5chain) return { issuer: null, certNotBefore: null }
 
 		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
-		if (!(certDER instanceof Uint8Array)) return { issuer: null, signingTime: null }
+		if (!(certDER instanceof Uint8Array)) return { issuer: null, certNotBefore: null }
 
 		const certInfo = extractCertificateInfo(certDER)
-		return { issuer: certInfo?.issuer ?? null, signingTime: certInfo?.notBefore ?? null }
+		return { issuer: certInfo?.issuer ?? null, certNotBefore: certInfo?.notBefore ?? null }
 	} catch {
 		// signature parsing failed — continue without signature info
-		return { issuer: null, signingTime: null }
+		return { issuer: null, certNotBefore: null }
 	}
 }
 
+function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAssertionRef[] {
+	const created = claimData['created_assertions'] as unknown[] | undefined
+	const gathered = claimData['gathered_assertions'] as unknown[] | undefined
+	const v1 = claimData['assertions'] as unknown[] | undefined
+
+	const sources = [...(created ?? []), ...(gathered ?? []), ...(v1 ?? [])]
+	const refs: ClaimAssertionRef[] = []
+
+	for (const entry of sources) {
+		if (!entry || typeof entry !== 'object') continue
+		const e = entry as Record<string, unknown>
+		const url = e['url'] as string | undefined
+		const hash = e['hash']
+		if (!url || !hash) continue
+
+		refs.push({
+			url,
+			hash: hash instanceof Uint8Array ? hash : new Uint8Array(hash as number[]),
+			alg: (e['alg'] as string | undefined) ?? null,
+		})
+	}
+
+	return refs
+}
+
 /**
- * Reads a C2PA manifest store from raw BMFF bytes.
+ * Reads a C2PA manifest from raw BMFF bytes.
  *
  * Locates the C2PA UUID box (`d8fec3d6-1a96-4f32-a0f6-f3ecf96c10ea`), navigates
  * the JUMBF manifest store structure (ISO 19566-5), and returns the parsed active
@@ -112,7 +139,7 @@ function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string
  * cryptographic signature of the claim.
  *
  * @param bytes - Raw BMFF bytes (e.g. an MP4 init segment or media segment)
- * @returns The parsed C2PA manifest store
+ * @returns The parsed manifest data including claim, assertions, and signature bytes
  * @throws If no C2PA UUID box is found, or the JUMBF structure is invalid
  *
  * @example
@@ -120,7 +147,7 @@ function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string
  *
  * @internal
  */
-export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
+export function readC2paManifest(bytes: Uint8Array): InternalManifestData {
 	const boxes = readIsoBoxes(bytes)
 	const uuidBox = findC2paUuidBox(boxes)
 
@@ -143,7 +170,8 @@ export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 	const manifestBoxes = resolveManifestBoxes(jumbfBoxes)
 
 	let claimData: Record<string, unknown> | null = null
-	let assertions: C2paAssertion[] = []
+	let claimCborBytes: Uint8Array | null = null
+	let internalAssertions: InternalAssertionData[] = []
 	let signatureBytes: Uint8Array | null = null
 
 	for (const box of manifestBoxes) {
@@ -159,11 +187,12 @@ export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 		if (label === 'c2pa.claim' || label === 'c2pa.claim.v2') {
 			const contentBox = inner.find(b => b.type === 'cbor')
 			if (contentBox) {
+				claimCborBytes = contentBox.data
 				try { claimData = decode(contentBox.data) as Record<string, unknown> } catch { /* malformed claim — continue */ }
 			}
 		}
 		else if (label === 'c2pa.assertions') {
-			assertions = parseAssertions(inner)
+			internalAssertions = parseAssertionsInternal(inner)
 		}
 		else if (label === 'c2pa.signature') {
 			const contentBox = inner.find(b => b.type === 'cbor' || b.type === 'jumc')
@@ -171,24 +200,35 @@ export function readC2paManifest(bytes: Uint8Array): C2paManifestStore {
 		}
 	}
 
-	const { issuer, signingTime } = parseSignatureInfo(signatureBytes)
+	const { issuer, certNotBefore } = parseSignatureInfo(signatureBytes)
 
 	const instanceId = (claimData?.['instanceID'] ?? claimData?.['instance_id'] ?? null) as string | null
 	const claimGenerator = (claimData?.['claim_generator'] ?? claimData?.['claimGenerator'] ?? null) as string | null
-	const label =
+	const resolvedLabel =
 		manifestLabel ??
 		(claimData?.['dc:title'] as string | undefined) ??
 		(claimData?.['title'] as string | undefined) ??
 		instanceId ??
 		'unknown'
 
-	const activeManifest: C2paManifest = {
-		label,
+	const claimAssertionRefs = claimData ? extractClaimAssertionRefs(claimData) : []
+
+	const assertions: C2paAssertion[] = internalAssertions.map(a => ({ label: a.label, data: a.data }))
+
+	const manifest: C2paManifest = {
+		label: resolvedLabel,
 		instanceId,
 		claimGenerator,
-		signatureInfo: { issuer, certNotBefore: signingTime },
+		signatureInfo: { issuer, certNotBefore },
 		assertions,
 	}
 
-	return { activeManifest }
+	return {
+		manifest,
+		claimAssertionRefs,
+		claimCborBytes,
+		signatureBytes,
+		assertions: internalAssertions,
+	}
 }
+

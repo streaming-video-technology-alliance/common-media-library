@@ -26,3 +26,4 @@ export type * from './vsi/SequenceState.ts'
 
 // Error codes
 export * from './LiveVideoStatusCode.ts'
+export * from './C2paStatusCode.ts'

@@ -21,7 +21,7 @@ describe('validateC2paInitSegment', () => {
 
 		const result = await validateC2paInitSegment(segment)
 		strictEqual(result.isValid, false)
-		strictEqual(result.activeManifest, null)
+		strictEqual(result.manifest, null)
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
 	})
 })
