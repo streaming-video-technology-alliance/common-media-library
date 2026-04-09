@@ -1,6 +1,6 @@
 import { verifyCoseSign1 } from '../cose/verifyCoseSign1.ts'
 import { decodeCoseSign1 } from '../cose/decodeCoseSign1.ts'
-import { extractVsiEmsgBox } from '../emsg/parseEmsgBox.ts'
+import { extractVsiEmsgBox } from '../emsg/extractVsiEmsgBox.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { decodeVsiMap } from '../vsi/decodeVsiMap.ts'
 import type { SequenceState } from '../vsi/SequenceState.ts'
