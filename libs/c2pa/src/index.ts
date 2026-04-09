@@ -13,14 +13,16 @@ export * from './segment/validateC2paSegment.ts'
 export * from './manifestbox/validateC2paManifestBoxSegment.ts'
 
 // Result types
-export type * from './init/InitSegmentValidation.ts'
-export type * from './segment/SegmentValidation.ts'
-export type * from './manifestbox/ManifestBoxValidation.ts'
-export type * from './vsi/SequenceState.ts'
 export type * from './C2paAssertion.ts'
 export type * from './C2paManifest.ts'
 export type * from './C2paSignatureInfo.ts'
+export type * from './init/InitSegmentValidation.ts'
+export type * from './segment/SegmentValidation.ts'
+export type * from './manifestbox/ManifestBoxValidation.ts'
 export type * from './cose/CoseKeyJwk.ts'
+
+// Sequence state
+export type * from './vsi/SequenceState.ts'
 
 // Error codes
 export * from './LiveVideoStatusCode.ts'

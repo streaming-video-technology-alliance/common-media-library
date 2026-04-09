@@ -7,6 +7,7 @@ Supports both segment validation methods defined in the C2PA specification:
 - **§19.3 — Per-segment C2PA Manifest Box**: each segment embeds a full C2PA manifest with COSE signature
 - **§19.4 — Verifiable Segment Info (VSI/EMSG)**: the init segment carries the manifest and session keys; each media segment carries a lightweight signed EMSG box
 
+
 ## Installation
 
 ```bash
@@ -77,12 +78,15 @@ for (const segmentBytes of mediaSegments) {
 
 ## Public API
 
-| Function | Description |
+| Export | Description |
 |---|---|
 | `validateC2paInitSegment(bytes)` | Validate init segment: manifest, certificate, BMFF hash, session keys |
 | `validateC2paSegment(bytes, sessionKeys, state?)` | Validate media segment via VSI/EMSG (returns `null` if no EMSG box) |
 | `validateC2paManifestBoxSegment(bytes, lastId, state?)` | Validate manifest-box segment: parse, chain, assertions |
 | `LiveVideoStatusCode` | C2PA §19.7 error code constants |
+| `C2paManifest` | Type: parsed C2PA manifest structure |
+| `C2paAssertion` | Type: assertion within a manifest |
+| `C2paSignatureInfo` | Type: signature metadata (issuer, time) |
 
 ## Error codes
 

@@ -12,27 +12,33 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  */
 export function readEmsg(view: IsoBoxReadView): EventMessageBox {
 	const { readUint, readString, readData } = view
+	const { version, flags } = view.readFullBox()
 
-	const result = { type: 'emsg', ...view.readFullBox() } as EventMessageBox
-
-	if (result.version == 1) {
-		result.timescale = readUint(4)
-		result.presentationTime = readUint(8)
-		result.eventDuration = readUint(4)
-		result.id = readUint(4)
-		result.schemeIdUri = readString(-1)
-		result.value = readString(-1)
-	}
-	else {
-		result.schemeIdUri = readString(-1)
-		result.value = readString(-1)
-		result.timescale = readUint(4)
-		result.presentationTimeDelta = readUint(4)
-		result.eventDuration = readUint(4)
-		result.id = readUint(4)
+	if (version === 1) {
+		return {
+			type: 'emsg',
+			version: 1,
+			flags,
+			timescale: readUint(4),
+			presentationTime: readUint(8),
+			eventDuration: readUint(4),
+			id: readUint(4),
+			schemeIdUri: readString(-1),
+			value: readString(-1),
+			messageData: readData(-1),
+		}
 	}
 
-	result.messageData = readData(-1)
-
-	return result
+	return {
+		type: 'emsg',
+		version: 0,
+		flags,
+		schemeIdUri: readString(-1),
+		value: readString(-1),
+		timescale: readUint(4),
+		presentationTimeDelta: readUint(4),
+		eventDuration: readUint(4),
+		id: readUint(4),
+		messageData: readData(-1),
+	}
 }

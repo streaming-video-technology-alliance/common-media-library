@@ -1,4 +1,4 @@
-import { decode } from 'cbor-x'
+import { decode } from 'cbor-x/decode'
 import type { CoseSign1 } from './CoseSign1.ts'
 
 const COSE_SIGN1_TAG_SINGLE_BYTE = 0xd2
@@ -16,8 +16,8 @@ function coseGet(header: CoseHeader, key: number): unknown {
 }
 
 function stripCoseTag(bytes: Uint8Array): Uint8Array {
-	if (bytes[0] === COSE_SIGN1_TAG_SINGLE_BYTE) return bytes.slice(1)
-	if (bytes[0] === COSE_SIGN1_TAG_TWO_BYTE_FIRST && bytes[1] === COSE_SIGN1_TAG_TWO_BYTE_SECOND) return bytes.slice(2)
+	if (bytes[0] === COSE_SIGN1_TAG_SINGLE_BYTE) return bytes.subarray(1)
+	if (bytes[0] === COSE_SIGN1_TAG_TWO_BYTE_FIRST && bytes[1] === COSE_SIGN1_TAG_TWO_BYTE_SECOND) return bytes.subarray(2)
 	return bytes
 }
 
@@ -39,7 +39,7 @@ function toUint8Array(value: unknown): Uint8Array {
  * @example
  * {@includeCode ../../test/cose/decodeCoseSign1.test.ts#example}
  *
- * @internal
+ * @public
  */
 export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 	try {

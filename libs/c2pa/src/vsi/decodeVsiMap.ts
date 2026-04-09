@@ -1,7 +1,8 @@
-import { decode } from 'cbor-x'
+import { decode } from 'cbor-x/decode'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'
+
 
 /**
  * Decodes a C2PA Verifiable Segment Info (VSI) CBOR map from raw bytes.
