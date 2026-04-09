@@ -1,7 +1,7 @@
 import { assert, describe, findBox, it, readEmsg } from '../util/box.ts'
 
 describe('readEmsg', function () {
-	it('should correctly parse the box from sample data', function () {
+	it('should correctly parse a version 0 box from sample data', function () {
 		const box = findBox('emsg.m4s', 'emsg', { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(box.type, 'emsg')
@@ -14,5 +14,16 @@ describe('readEmsg', function () {
 		assert.strictEqual(box.timescale, 1)
 		assert.strictEqual(box.presentationTimeDelta, 1)
 		assert.deepEqual(box.messageData, new Uint8Array([50, 48, 49, 52, 45, 48, 54, 45, 49, 49, 84, 49, 51, 58, 48, 54, 58, 50, 52]))
+	})
+	
+	it('should expose version-specific fields via discriminated union', function () {
+		const box = findBox('emsg.m4s', 'emsg', { readers: { emsg: readEmsg } })
+
+		if (box.version === 0) {
+			assert.strictEqual(typeof box.presentationTimeDelta, 'number')
+		} else {
+			assert.strictEqual(box.version, 1)
+			assert.strictEqual(typeof box.presentationTime, 'number')
+		}
 	})
 })
