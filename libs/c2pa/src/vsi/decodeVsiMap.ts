@@ -1,13 +1,8 @@
 import { decode } from 'cbor-x/decode'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'
 
-const SHA_ALGORITHM_PATTERN = /^sha(\d+)$/i
-const DEFAULT_HASH_ALG = 'sha256'
-
-function normalizeAlgorithmName(rawAlg: string): string {
-	return rawAlg.replace(SHA_ALGORITHM_PATTERN, 'SHA-$1')
-}
 
 /**
  * Decodes a C2PA Verifiable Segment Info (VSI) CBOR map from raw bytes.
@@ -45,7 +40,7 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 	const manifestId = raw['manifestId']
 	if (!(manifestId instanceof Uint8Array)) throw new Error('VSI map missing or invalid manifestId')
 
-	const alg = normalizeAlgorithmName((bmffHashRaw['alg'] as string | undefined) ?? DEFAULT_HASH_ALG)
+	const alg = normalizeAlgorithmName(bmffHashRaw['alg'] as string | undefined)
 
 	return {
 		sequenceNumber,

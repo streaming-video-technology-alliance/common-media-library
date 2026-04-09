@@ -33,6 +33,24 @@ export type C2paSignatureInfo = {
 };
 
 // @public
+export type CoseKeyJwk = {
+    readonly kty: string;
+    readonly crv: string;
+    readonly x: string;
+    readonly y?: string;
+};
+
+// @public
+export type InitSegmentValidation = {
+    readonly activeManifest: C2paManifest | null;
+    readonly certificate: Uint8Array | null;
+    readonly manifestId: string | null;
+    readonly sessionKeys: readonly ValidatedSessionKey[];
+    readonly isValid: boolean;
+    readonly errorCodes: readonly LiveVideoStatusCode[];
+};
+
+// @public
 export const LiveVideoStatusCode: {
     readonly INIT_INVALID: "livevideo.init.invalid";
     readonly MANIFEST_INVALID: "livevideo.manifest.invalid";
@@ -44,6 +62,36 @@ export const LiveVideoStatusCode: {
 
 // @public
 export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
+
+// @public
+export type ManifestBoxValidationResult = {
+    readonly manifest: C2paManifestStore | null;
+    readonly issuer: string | null;
+    readonly sequenceNumber: number | null;
+    readonly previousManifestId: string | null;
+    readonly streamId: string | null;
+    readonly continuityMethod: string | null;
+    readonly bmffHashHex: string | null;
+    readonly isValid: boolean;
+    readonly errorCodes: readonly LiveVideoStatusCode[];
+};
+
+// @public
+export type ManifestBoxValidationState = {
+    readonly lastStreamId?: string | null;
+    readonly lastSequenceNumber?: number | null;
+};
+
+// @public
+export type SegmentValidationResult = {
+    readonly sequenceNumber: number;
+    readonly manifestId: Uint8Array;
+    readonly bmffHashHex: string | null;
+    readonly kidHex: string | null;
+    readonly sequenceResult: SequenceValidationResult;
+    readonly isValid: boolean;
+    readonly errorCodes: readonly LiveVideoStatusCode[];
+};
 
 // @public
 export type SequenceState = {
@@ -63,6 +111,31 @@ export type SequenceValidationResult = {
     readonly reason: "gap_detected";
     readonly missingFrom: number;
     readonly missingTo: number;
+};
+
+// @public
+export function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSegmentValidation>;
+
+// @public
+export function validateC2paManifestBoxSegment(bytes: Uint8Array, lastManifestId: string | null, state?: ManifestBoxValidationState): Promise<{
+    readonly result: ManifestBoxValidationResult;
+    readonly nextManifestId: string | null;
+    readonly nextState: ManifestBoxValidationState;
+}>;
+
+// @public
+export function validateC2paSegment(segmentBytes: Uint8Array, sessionKeys: readonly ValidatedSessionKey[], sequenceState?: SequenceState): Promise<{
+    readonly result: SegmentValidationResult;
+    readonly nextSequenceState: SequenceState;
+} | null>;
+
+// @public
+export type ValidatedSessionKey = {
+    readonly kid: string;
+    readonly jwk: CoseKeyJwk;
+    readonly minSequenceNumber: number;
+    readonly validityPeriod: number;
+    readonly createdAt: string;
 };
 
 // (No @packageDocumentation comment for this package)
