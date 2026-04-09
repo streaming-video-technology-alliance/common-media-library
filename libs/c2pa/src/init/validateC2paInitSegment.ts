@@ -17,13 +17,25 @@ const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
 const COSE_KEY_ID_LABEL = 2
 
+// cbor-x represents CBOR tagged values in multiple ways depending on version/config:
+// - { tag: number, value: unknown } (structured)
+// - Tag class instance with constructor name 'Tag'
+// - { '@@TAGGED@@': [tag, value] } (internal key)
+const CBOR_TAGGED_KEY = '@@TAGGED@@'
+
+function extractCborTaggedValue(value: unknown): unknown | null {
+	if (typeof value !== 'object' || value === null) return null
+	const obj = value as Record<string, unknown>
+	if (typeof obj['tag'] === 'number' && 'value' in obj) return obj['value']
+	const tagged = obj[CBOR_TAGGED_KEY]
+	if (Array.isArray(tagged) && tagged.length === 2) return tagged[1]
+	return null
+}
+
 function normalizeToUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
 	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	const obj = value as Record<string, unknown>
-	if (typeof obj['tag'] === 'number' && 'value' in obj) return encode(value) as Uint8Array
-	const ctor = (value as { constructor?: { name?: string } }).constructor
-	if (ctor?.name === 'Tag') return encode(value) as Uint8Array
+	if (extractCborTaggedValue(value) !== null) return encode(value) as Uint8Array
 	throw new Error('Cannot convert value to Uint8Array')
 }
 
@@ -35,19 +47,10 @@ function ensureDecodedCbor(value: unknown): unknown {
 	return value
 }
 
-// cbor-x uses this key for CBOR tagged values (e.g., tag 0 for date-time)
-const CBOR_TAGGED_KEY = '@@TAGGED@@'
-
 function parseCreatedAt(value: unknown): string | null {
-	if (typeof value === 'string') return value
-	if (value instanceof Date) return value.toISOString()
-	if (typeof value === 'object' && value !== null) {
-		const obj = value as Record<string, unknown>
-		const tagged = obj[CBOR_TAGGED_KEY]
-		if (Array.isArray(tagged) && tagged.length === 2) return String(tagged[1])
-		const direct = obj['value'] ?? (obj as unknown as Record<number, unknown>)[1]
-		if (typeof direct === 'string') return direct
-	}
+	const resolved = extractCborTaggedValue(value) ?? value
+	if (typeof resolved === 'string') return resolved
+	if (resolved instanceof Date) return resolved.toISOString()
 	return null
 }
 

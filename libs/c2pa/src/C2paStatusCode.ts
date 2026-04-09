@@ -1,8 +1,12 @@
+import type { ValueOf } from '@svta/cml-utils'
+
 /**
  * Standard C2PA validation status codes for manifest integrity checks,
  * as defined in the C2PA specification chapters 15 and 18.
  *
  * @see {@link https://c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html#_claim_validation | C2PA Spec §15.10.3}
+ *
+ * @enum
  *
  * @public
  */
@@ -18,12 +22,8 @@ export const C2paStatusCode = {
 } as const
 
 /**
- * A C2PA standard validation status code string.
+ * Union type of all {@link (C2paStatusCode:variable)} values.
  *
  * @public
  */
-export type C2paStatusCode =
-	| typeof C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH
-	| typeof C2paStatusCode.ASSERTION_MISSING
-	| typeof C2paStatusCode.ASSERTION_ACTION_INGREDIENT_MISMATCH
-	| typeof C2paStatusCode.CLAIM_SIGNATURE_MISMATCH
+export type C2paStatusCode = ValueOf<typeof C2paStatusCode>

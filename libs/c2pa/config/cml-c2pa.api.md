@@ -36,7 +36,7 @@ export const C2paStatusCode: {
 };
 
 // @public
-export type C2paStatusCode = typeof C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH | typeof C2paStatusCode.ASSERTION_MISSING | typeof C2paStatusCode.ASSERTION_ACTION_INGREDIENT_MISMATCH | typeof C2paStatusCode.CLAIM_SIGNATURE_MISMATCH;
+export type C2paStatusCode = ValueOf<typeof C2paStatusCode>;
 
 // @public
 export type CoseKeyJwk = {
