@@ -1,18 +1,26 @@
 /**
- * A parsed EMSG (Event Message) box, version 0 (ISO 14496-12 §12.6.2).
+ * Common fields shared by all EMSG box versions (ISO 14496-12 §12.6.2).
  *
  * @internal
  */
-export type EmsgBoxV0 = {
-	readonly version: 0
+type EmsgBoxBase = {
 	readonly flags: number
 	readonly schemeIdUri: string
 	readonly value: string
 	readonly timescale: number
-	readonly presentationTimeDelta: number
 	readonly eventDuration: number
 	readonly id: number
 	readonly messageData: Uint8Array
+}
+
+/**
+ * A parsed EMSG (Event Message) box, version 0 (ISO 14496-12 §12.6.2).
+ *
+ * @internal
+ */
+export type EmsgBoxV0 = EmsgBoxBase & {
+	readonly version: 0
+	readonly presentationTimeDelta: number
 }
 
 /**
@@ -22,16 +30,9 @@ export type EmsgBoxV0 = {
  *
  * @internal
  */
-export type EmsgBoxV1 = {
+export type EmsgBoxV1 = EmsgBoxBase & {
 	readonly version: 1
-	readonly flags: number
-	readonly schemeIdUri: string
-	readonly value: string
-	readonly timescale: number
 	readonly presentationTime: number
-	readonly eventDuration: number
-	readonly id: number
-	readonly messageData: Uint8Array
 }
 
 /**
