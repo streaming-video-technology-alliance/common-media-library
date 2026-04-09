@@ -60,7 +60,7 @@ export const LiveVideoStatusCode: {
     readonly SESSIONKEY_INVALID: "livevideo.sessionkey.invalid";
 };
 
-// @public (undocumented)
+// @public
 export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // @public
@@ -137,7 +137,6 @@ export type ValidatedSessionKey = {
     readonly validityPeriod: number;
     readonly createdAt: string;
 };
-
 
 // (No @packageDocumentation comment for this package)
 
