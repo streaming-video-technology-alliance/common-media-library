@@ -28,6 +28,8 @@ import { validateCmcd } from './validateCmcd.ts'
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result including decoded data.
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#header-field-definition | CTA-5004-A Header Field Definition}
+ *
  * @public
  */
 export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdDataValidationResult {

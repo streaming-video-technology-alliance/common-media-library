@@ -6,6 +6,8 @@ import type { ValueOf } from '@svta/cml-utils'
  * @public
  *
  * @enum
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#object-type | CTA-5004-A Object Type}
  */
 export const CmcdObjectType = {
 	/**

@@ -17,6 +17,8 @@ const REGEX = /CMCD=[^&#]+/
  *
  * @example
  * {@includeCode ../test/appendCmcdQuery.test.ts#example}
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#query-argument-definition | CTA-5004-A Query Argument Definition}
  */
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string {
 	const query = toCmcdQuery(cmcd, options)
