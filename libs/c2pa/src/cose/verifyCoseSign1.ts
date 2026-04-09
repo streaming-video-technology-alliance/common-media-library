@@ -1,21 +1,29 @@
 import type { CoseSign1 } from './CoseSign1.ts'
 import { buildSigStructure } from './buildSigStructure.ts'
+import {
+	CURVE_P256, 
+	CURVE_P384, 
+	CURVE_P521,
+	ECDSA_ALGORITHM, 
+	ED25519_ALGORITHM, 
+	RSA_PSS_ALGORITHM,
+	HASH_SHA256, 
+	HASH_SHA384, 
+	HASH_SHA512,
+} from './constants.ts'
 
-const ECDSA_ALGORITHM = 'ECDSA'
-const ED25519_ALGORITHM = 'Ed25519'
-const RSA_PSS_ALGORITHM = 'RSA-PSS'
 const DER_SEQUENCE_TAG = 0x30
 const DER_INTEGER_TAG = 0x02
 
-const CURVE_COMPONENT_BYTES: Record<string, number> = { 'P-256': 32, 'P-384': 48, 'P-521': 66 }
+const CURVE_COMPONENT_BYTES: Record<string, number> = { [CURVE_P256]: 32, [CURVE_P384]: 48, [CURVE_P521]: 66 }
 
 type EcKeyAlgorithm = KeyAlgorithm & { readonly namedCurve: string }
 type RsaHashedKeyAlgorithm = KeyAlgorithm & { readonly hash: { readonly name: string } }
 
 const RSA_PSS_SALT_LENGTH: Record<string, number> = {
-	'SHA-256': 32,
-	'SHA-384': 48,
-	'SHA-512': 64,
+	[HASH_SHA256]: 32,
+	[HASH_SHA384]: 48,
+	[HASH_SHA512]: 64,
 }
 
 function getComponentSize(publicKey: CryptoKey): number {
@@ -77,7 +85,7 @@ function resolveVerifyAlgorithm(publicKey: CryptoKey) {
 	if (name === ED25519_ALGORITHM) return { name: ED25519_ALGORITHM }
 	if (name === ECDSA_ALGORITHM) {
 		const curve = (publicKey.algorithm as EcKeyAlgorithm).namedCurve
-		const hash = curve === 'P-384' ? 'SHA-384' : curve === 'P-521' ? 'SHA-512' : 'SHA-256'
+		const hash = curve === CURVE_P384 ? HASH_SHA384 : curve === CURVE_P521 ? HASH_SHA512 : HASH_SHA256
 		return { name: ECDSA_ALGORITHM, hash: { name: hash } }
 	}
 	if (name === RSA_PSS_ALGORITHM) {

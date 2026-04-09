@@ -45,7 +45,9 @@ export async function validateC2paSegment(
 	if (!emsgBox) return null
 
 	const coseSign1 = decodeCoseSign1(emsgBox.messageData)
-	const vsi = decodeVsiMap(coseSign1.payload)
+	const { payload } = coseSign1
+	if (!payload) throw new Error('COSE_Sign1 payload is empty — cannot decode VSI map')
+	const vsi = decodeVsiMap(payload)
 
 	const kidHex = coseSign1.kid ? bytesToHex(coseSign1.kid) : null
 	const sessionKey = findSessionKey(sessionKeys, kidHex)
@@ -87,7 +89,7 @@ export async function validateC2paSegment(
 	)
 
 	const [signatureValid, hashValid] = await Promise.all([
-		verifyCoseSign1(coseSign1, coseSign1.payload, publicKey),
+		verifyCoseSign1(coseSign1, payload, publicKey),
 		validateBmffHash(segmentBytes, vsi.bmffHash.hash, {
 			exclusions: vsi.bmffHash.exclusions,
 			alg: vsi.bmffHash.alg,
