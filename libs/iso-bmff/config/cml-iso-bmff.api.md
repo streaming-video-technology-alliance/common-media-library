@@ -187,16 +187,29 @@ export type Entity = {
 };
 
 // @public
-export type EventMessageBox = FullBox & {
+export type EventMessageBox = EventMessageBoxV0 | EventMessageBoxV1;
+
+// @public
+export type EventMessageBoxBase = FullBox & {
     type: "emsg";
     schemeIdUri: string;
     value: string;
     timescale: number;
-    presentationTime: number;
-    presentationTimeDelta: number;
     eventDuration: number;
     id: number;
     messageData: Uint8Array;
+};
+
+// @public
+export type EventMessageBoxV0 = EventMessageBoxBase & {
+    version: 0;
+    presentationTimeDelta: number;
+};
+
+// @public
+export type EventMessageBoxV1 = EventMessageBoxBase & {
+    version: 1;
+    presentationTime: number;
 };
 
 // @public

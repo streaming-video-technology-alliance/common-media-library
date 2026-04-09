@@ -12,5 +12,8 @@ export type * from './C2paAssertion.ts'
 export type * from './C2paManifest.ts'
 export type * from './C2paSignatureInfo.ts'
 
+// Sequence state
+export type * from './vsi/SequenceState.ts'
+
 // Error codes
 export * from './LiveVideoStatusCode.ts'
