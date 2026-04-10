@@ -106,15 +106,27 @@ export type SequenceState = {
 };
 
 // @public
+export const SequenceValidationReason: {
+    readonly VALID: "valid";
+    readonly DUPLICATE: "duplicate";
+    readonly GAP_DETECTED: "gap_detected";
+    readonly OUT_OF_ORDER: "out_of_order";
+    readonly SEQUENCE_NUMBER_BELOW_MINIMUM: "sequence_number_below_minimum";
+};
+
+// @public
+export type SequenceValidationReason = ValueOf<typeof SequenceValidationReason>;
+
+// @public
 export type SequenceValidationResult = {
     readonly isValid: true;
-    readonly reason: "valid";
+    readonly reason: typeof SequenceValidationReason.VALID;
 } | {
     readonly isValid: false;
-    readonly reason: "sequence_number_below_minimum" | "duplicate" | "out_of_order";
+    readonly reason: typeof SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM | typeof SequenceValidationReason.DUPLICATE | typeof SequenceValidationReason.OUT_OF_ORDER;
 } | {
     readonly isValid: false;
-    readonly reason: "gap_detected";
+    readonly reason: typeof SequenceValidationReason.GAP_DETECTED;
     readonly missingFrom: number;
     readonly missingTo: number;
 };

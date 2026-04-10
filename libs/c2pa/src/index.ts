@@ -22,7 +22,8 @@ export type * from './manifestbox/ManifestBoxValidation.ts'
 export type * from './cose/CoseKeyJwk.ts'
 
 // Sequence state
-export type * from './vsi/SequenceState.ts'
+export { SequenceValidationReason } from './vsi/SequenceState.ts'
+export type { SequenceState, SequenceValidationResult } from './vsi/SequenceState.ts'
 
 // Error codes
 export * from './LiveVideoStatusCode.ts'
