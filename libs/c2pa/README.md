@@ -11,95 +11,16 @@ Supports both segment validation methods defined in the C2PA specification:
 ## Installation
 
 ```bash
-npm i @svta/cml-c2pa @svta/cml-iso-bmff cbor-x
+npm i @svta/cml-c2pa
 ```
 
-> **Note:** `@svta/cml-iso-bmff` and `cbor-x` are peer dependencies.
+> **Note:** `@svta/cml-iso-bmff`, `@svta/cml-utils`, and `cbor-x` are peer dependencies. Most package managers install them automatically, but you may need to add them explicitly.
 
-## Usage
+## Docs
 
-### §19.4 — Verifiable Segment Info method
-
-The init segment contains the C2PA manifest and session keys. Each media segment contains an EMSG box with a signed VSI map that is verified against the session keys.
-
-```typescript
-import { validateC2paInitSegment, validateC2paSegment } from '@svta/cml-c2pa'
-
-// 1. Validate the init segment to extract session keys
-const init = await validateC2paInitSegment(initBytes)
-// init.isValid      — all checks passed
-// init.errorCodes   — [] if valid, or C2PA failure codes
-// init.sessionKeys  — validated session keys (kid, JWK, validity period)
-
-// 2. Validate each media segment with the session keys
-let sequenceState = undefined
-for (const segmentBytes of mediaSegments) {
-  const validated = await validateC2paSegment(segmentBytes, init.sessionKeys, sequenceState)
-
-  if (!validated) {
-    // No C2PA EMSG box found in this segment
-    continue
-  }
-
-  const { result, nextSequenceState } = validated
-  sequenceState = nextSequenceState
-
-  // result.isValid        — all crypto checks passed
-  // result.errorCodes     — C2PA failure codes (e.g. 'livevideo.segment.invalid')
-  // result.sequenceNumber — segment sequence number
-  // result.sequenceResult — { reason: 'valid' | 'duplicate' | 'gap_detected' | ... }
-  // result.bmffHashHex    — BMFF content hash
-  // result.kidHex         — session key ID used
-}
-```
-
-### §19.3 — Per-segment C2PA Manifest Box method
-
-Each segment embeds a full C2PA manifest. No init segment or session keys are needed.
-
-```typescript
-import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
-
-let lastManifestId = null
-let lastState = undefined
-
-for (const segmentBytes of mediaSegments) {
-  const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
-    segmentBytes, lastManifestId, lastState,
-  )
-  lastManifestId = nextManifestId
-  lastState = nextState
-
-  // result.isValid    — manifest parsed + all §19.7.2 checks passed
-  // result.errorCodes — C2PA failure codes (e.g. 'livevideo.continuityMethod.invalid')
-  // result.sequenceNumber, result.streamId, result.previousManifestId — parsed assertion data
-}
-```
-
-## Public API
-
-| Export | Description |
-|---|---|
-| `validateC2paInitSegment(bytes)` | Validate init segment: manifest, certificate, BMFF hash, session keys |
-| `validateC2paSegment(bytes, sessionKeys, state?)` | Validate media segment via VSI/EMSG (returns `null` if no EMSG box) |
-| `validateC2paManifestBoxSegment(bytes, lastId, state?)` | Validate manifest-box segment: parse, chain, assertions |
-| `LiveVideoStatusCode` | C2PA §19.7 error code constants |
-| `C2paManifest` | Type: parsed C2PA manifest structure |
-| `C2paAssertion` | Type: assertion within a manifest |
-| `C2paSignatureInfo` | Type: signature metadata (issuer, time) |
-
-## Error codes
-
-All validation results include an `errorCodes` array with standardized C2PA failure codes (§19.7):
-
-| Code | Meaning |
-|---|---|
-| `livevideo.init.invalid` | Init segment contains an `mdat` box |
-| `livevideo.manifest.invalid` | C2PA Manifest Box failed validation |
-| `livevideo.segment.invalid` | Crypto failure: signature, hash, or key |
-| `livevideo.assertion.invalid` | sequenceNumber or streamId mismatch |
-| `livevideo.continuityMethod.invalid` | Continuity chain broken |
-| `livevideo.sessionkey.invalid` | Session key invalid or expired |
+- [VSI/EMSG Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/vsi-validation.md) — Validate using Verifiable Segment Info (§19.4)
+- [Manifest Box Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/manifest-box-validation.md) — Validate using per-segment manifests (§19.3)
+- [Results and Error Codes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/results-and-error-codes.md) — Interpret results, error codes, and manifest data
 
 ## References
 
