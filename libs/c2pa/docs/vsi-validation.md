@@ -70,6 +70,7 @@ Each `ValidatedSessionKey` contains:
 import { validateC2paSegment } from '@svta/cml-c2pa'
 import type { SequenceState } from '@svta/cml-c2pa'
 
+// undefined on first call — the function creates a fresh state internally
 let sequenceState: SequenceState | undefined
 
 for (const segmentUrl of segmentUrls) {
@@ -137,6 +138,7 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
   console.log('Session keys:', init.sessionKeys.length)
 
   // Phase 2: Validate each media segment
+  // undefined on first call — the function creates a fresh state internally
   let sequenceState: SequenceState | undefined
 
   for (const segmentUrl of segmentUrls) {

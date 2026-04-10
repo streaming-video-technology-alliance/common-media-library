@@ -14,13 +14,13 @@ Supports both segment validation methods defined in the C2PA specification:
 npm i @svta/cml-c2pa
 ```
 
-> **Note:** `@svta/cml-iso-bmff`, `@svta/cml-utils`, and `cbor-x` are peer dependencies and will be installed automatically.
+> **Note:** `@svta/cml-iso-bmff`, `@svta/cml-utils`, and `cbor-x` are peer dependencies. Most package managers install them automatically, but you may need to add them explicitly.
 
 ## Docs
 
-- [VSI/EMSG Validation](docs/vsi-validation.md) — Validate using Verifiable Segment Info (§19.4)
-- [Manifest Box Validation](docs/manifest-box-validation.md) — Validate using per-segment manifests (§19.3)
-- [Results and Error Codes](docs/results-and-error-codes.md) — Interpret results, error codes, and manifest data
+- [VSI/EMSG Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/vsi-validation.md) — Validate using Verifiable Segment Info (§19.4)
+- [Manifest Box Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/manifest-box-validation.md) — Validate using per-segment manifests (§19.3)
+- [Results and Error Codes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/results-and-error-codes.md) — Interpret results, error codes, and manifest data
 
 ## References
 

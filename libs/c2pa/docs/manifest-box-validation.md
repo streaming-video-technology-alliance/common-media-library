@@ -53,7 +53,7 @@ The function returns an object with:
 - `nextState` — the updated state to pass into the next call
 
 > [!NOTE]
-> For the first segment, pass `null` as `lastManifestId` and `undefined` (or omit) for `state`. Continuity checks are skipped when there is no previous segment to compare against.
+> For the first segment, pass `null` as `lastManifestId` and `undefined` (or omit) for `state`. The chain comparison against the previous segment is skipped when `lastManifestId` is `null`, but the validator still checks that the segment itself declares a valid `continuityMethod` and a non-empty `previousManifestId`.
 
 ## Complete Example
 
@@ -123,10 +123,13 @@ When `state` is omitted or `undefined`, the function skips streamId consistency 
 Each segment's `c2pa.livevideo.segment` assertion includes a `previousManifestId` field that must match the manifest ID of the preceding segment. This creates a verifiable chain:
 
 ```
-Segment 1: manifestId = "abc-123", previousManifestId = null
+Segment 1: manifestId = "abc-123", previousManifestId = "initial-manifest"
 Segment 2: manifestId = "def-456", previousManifestId = "abc-123"  // must match segment 1
 Segment 3: manifestId = "ghi-789", previousManifestId = "def-456"  // must match segment 2
 ```
+
+> [!NOTE]
+> Every segment must declare a `previousManifestId`, including the first one. The first segment typically references the initial static manifest. When `lastManifestId` is `null` (first call), the chain comparison is skipped — the validator only checks that `previousManifestId` is present.
 
 The `continuityMethod` field indicates how continuity is verified. The currently supported method is `c2pa.manifestId`.
 
