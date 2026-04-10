@@ -1,4 +1,5 @@
 import { createSequenceState } from '../../src/vsi/createSequenceState.ts'
+import { SequenceValidationReason } from '../../src/vsi/SequenceState.ts'
 import { validateSequenceNumber } from '../../src/vsi/validateSequenceNumber.ts'
 import { strictEqual } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -10,12 +11,12 @@ describe('validateSequenceNumber', () => {
 
 		let { result, nextState } = validateSequenceNumber(state, 1, 0)
 		strictEqual(result.isValid, true)
-		strictEqual(result.reason, 'valid')
+		strictEqual(result.reason, SequenceValidationReason.VALID)
 		state = nextState
 
 		;({ result, nextState } = validateSequenceNumber(state, 2, 0))
 		strictEqual(result.isValid, true)
-		strictEqual(result.reason, 'valid')
+		strictEqual(result.reason, SequenceValidationReason.VALID)
 	})
 	// #endregion example
 
@@ -23,7 +24,7 @@ describe('validateSequenceNumber', () => {
 		const state = createSequenceState()
 		const { result, nextState } = validateSequenceNumber(state, 3, 5)
 		strictEqual(result.isValid, false)
-		strictEqual(result.reason, 'sequence_number_below_minimum')
+		strictEqual(result.reason, SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM)
 		strictEqual(nextState, state)
 	})
 
@@ -33,7 +34,7 @@ describe('validateSequenceNumber', () => {
 
 		const { result, nextState } = validateSequenceNumber(state, 5, 0)
 		strictEqual(result.isValid, false)
-		strictEqual(result.reason, 'duplicate')
+		strictEqual(result.reason, SequenceValidationReason.DUPLICATE)
 		strictEqual(nextState, state)
 	})
 
@@ -43,7 +44,7 @@ describe('validateSequenceNumber', () => {
 
 		const { result } = validateSequenceNumber(state, 3, 0)
 		strictEqual(result.isValid, false)
-		strictEqual(result.reason, 'out_of_order')
+		strictEqual(result.reason, SequenceValidationReason.OUT_OF_ORDER)
 	})
 
 	it('detects gap and reports missing range', () => {
@@ -52,8 +53,8 @@ describe('validateSequenceNumber', () => {
 
 		const { result } = validateSequenceNumber(state, 4, 0)
 		strictEqual(result.isValid, false)
-		strictEqual(result.reason, 'gap_detected')
-		if (result.reason === 'gap_detected') {
+		strictEqual(result.reason, SequenceValidationReason.GAP_DETECTED)
+		if (result.reason === SequenceValidationReason.GAP_DETECTED) {
 			strictEqual(result.missingFrom, 2)
 			strictEqual(result.missingTo, 3)
 		}
@@ -78,8 +79,8 @@ describe('validateSequenceNumber', () => {
 
 		const { result } = validateSequenceNumber(state, 10, 0)
 		strictEqual(result.isValid, false)
-		strictEqual(result.reason, 'gap_detected')
-		if (result.reason === 'gap_detected') {
+		strictEqual(result.reason, SequenceValidationReason.GAP_DETECTED)
+		if (result.reason === SequenceValidationReason.GAP_DETECTED) {
 			strictEqual(result.missingFrom, 2)
 			strictEqual(result.missingTo, 9)
 		}
@@ -91,8 +92,8 @@ describe('validateSequenceNumber', () => {
 
 		const { result } = validateSequenceNumber(state, 3, 0)
 		strictEqual(result.isValid, false)
-		strictEqual(result.reason, 'gap_detected')
-		if (result.reason === 'gap_detected') {
+		strictEqual(result.reason, SequenceValidationReason.GAP_DETECTED)
+		if (result.reason === SequenceValidationReason.GAP_DETECTED) {
 			strictEqual(result.missingFrom, 2)
 			strictEqual(result.missingTo, 2)
 		}
@@ -104,6 +105,6 @@ describe('validateSequenceNumber', () => {
 
 		const { result } = validateSequenceNumber(state, 3, 4)
 		strictEqual(result.isValid, false)
-		strictEqual(result.reason, 'sequence_number_below_minimum')
+		strictEqual(result.reason, SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM)
 	})
 })

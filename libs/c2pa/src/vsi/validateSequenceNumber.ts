@@ -1,3 +1,4 @@
+import { SequenceValidationReason } from './SequenceState.ts'
 import type { SequenceState, SequenceValidationResult } from './SequenceState.ts'
 
 const SEEN_SEQUENCES_WINDOW_SIZE = 32
@@ -43,14 +44,14 @@ export function validateSequenceNumber(
 ): { readonly result: SequenceValidationResult; readonly nextState: SequenceState } {
 	if (sequenceNumber < minSequenceNumber) {
 		return {
-			result: { isValid: false, reason: 'sequence_number_below_minimum' },
+			result: { isValid: false, reason: SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM },
 			nextState: state,
 		}
 	}
 
 	if (state.seenSequences.has(sequenceNumber)) {
 		return {
-			result: { isValid: false, reason: 'duplicate' },
+			result: { isValid: false, reason: SequenceValidationReason.DUPLICATE },
 			nextState: state,
 		}
 	}
@@ -60,7 +61,7 @@ export function validateSequenceNumber(
 
 	if (state.lastSequenceNumber !== null && sequenceNumber < state.lastSequenceNumber) {
 		return {
-			result: { isValid: false, reason: 'out_of_order' },
+			result: { isValid: false, reason: SequenceValidationReason.OUT_OF_ORDER },
 			nextState: {
 				lastSequenceNumber: state.lastSequenceNumber,
 				seenSequences: pruneSeenSequences(nextSeenSequences, state.lastSequenceNumber),
@@ -72,7 +73,7 @@ export function validateSequenceNumber(
 		const missingFrom = state.lastSequenceNumber + 1
 		const missingTo = sequenceNumber - 1
 		return {
-			result: { isValid: false, reason: 'gap_detected', missingFrom, missingTo },
+			result: { isValid: false, reason: SequenceValidationReason.GAP_DETECTED, missingFrom, missingTo },
 			nextState: {
 				lastSequenceNumber: sequenceNumber,
 				seenSequences: pruneSeenSequences(nextSeenSequences, sequenceNumber),
@@ -81,7 +82,7 @@ export function validateSequenceNumber(
 	}
 
 	return {
-		result: { isValid: true, reason: 'valid' },
+		result: { isValid: true, reason: SequenceValidationReason.VALID },
 		nextState: {
 			lastSequenceNumber: sequenceNumber,
 			seenSequences: pruneSeenSequences(nextSeenSequences, sequenceNumber),
