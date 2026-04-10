@@ -91,7 +91,7 @@ export type ManifestBoxValidationState = {
 // @public
 export type SegmentValidationResult = {
     readonly sequenceNumber: number;
-    readonly manifestId: Uint8Array;
+    readonly manifestId: string;
     readonly bmffHashHex: string | null;
     readonly kidHex: string | null;
     readonly sequenceResult: SequenceValidationResult;
