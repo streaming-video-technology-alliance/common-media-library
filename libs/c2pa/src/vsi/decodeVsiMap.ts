@@ -38,7 +38,7 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 	if (exclusions !== undefined && !Array.isArray(exclusions)) throw new Error('VSI map bmffHash.exclusions must be an array')
 
 	const manifestId = raw['manifestId']
-	if (!(manifestId instanceof Uint8Array)) throw new Error('VSI map missing or invalid manifestId')
+	if (typeof manifestId !== 'string') throw new Error('VSI map missing or invalid manifestId')
 
 	const alg = normalizeAlgorithmName(bmffHashRaw['alg'] as string | undefined)
 

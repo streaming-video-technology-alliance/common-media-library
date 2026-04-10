@@ -16,5 +16,5 @@ export type VsiMap = {
 		readonly alg: string
 		readonly exclusions: readonly BmffHashExclusion[]
 	}
-	readonly manifestId: Uint8Array
+	readonly manifestId: string
 }
