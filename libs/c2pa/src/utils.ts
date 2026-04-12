@@ -14,15 +14,17 @@ export function normalizeAlgorithmName(rawAlg?: string): string {
 	return (rawAlg ?? 'SHA-256').replace(SHA_ALGORITHM_PATTERN, 'SHA-$1')
 }
 
+const HEX_TABLE: readonly string[] = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0'))
+
 /**
  * Converts a Uint8Array to a lowercase hex string.
  *
  * @internal
  */
 export function bytesToHex(bytes: Uint8Array): string {
-	return Array.from(bytes)
-		.map(b => b.toString(16).padStart(2, '0'))
-		.join('')
+	let hex = ''
+	for (const byte of bytes) hex += HEX_TABLE[byte]
+	return hex
 }
 
 /**
@@ -41,6 +43,18 @@ export function isKeyExpired(createdAt: string, validityPeriodSeconds: number, n
 	if (Number.isNaN(createdAtMs)) return true
 	const validityEnd = new Date(createdAtMs + validityPeriodSeconds * MILLISECONDS_PER_SECOND)
 	return now > validityEnd
+}
+
+/**
+ * Constant-time comparison of two hash byte arrays.
+ *
+ * @internal
+ */
+export function hashesEqual(a: Uint8Array, b: Uint8Array): boolean {
+	if (a.length !== b.length) return false
+	let diff = 0
+	for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i]
+	return diff === 0
 }
 
 // C2PA manifest store UUID per C2PA specification

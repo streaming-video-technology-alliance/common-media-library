@@ -24,7 +24,7 @@ function pruneSeenSequences(seen: Set<number>, lastSequenceNumber: number): Set<
  * Detects: `duplicate`, `out_of_order`, `gap_detected`, and
  * `sequence_number_below_minimum`.
  *
- * Internally uses a sliding window of the last 1 000 sequence numbers
+ * Internally uses a sliding window of the last 32 sequence numbers
  * to bound memory usage during long-running streams.
  *
  * @param state - Current stream state (from {@link createSequenceState} or previous `nextState`)

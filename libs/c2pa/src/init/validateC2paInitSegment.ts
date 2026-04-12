@@ -1,10 +1,11 @@
-import { decode, encode } from 'cbor-x'
+import { decode } from 'cbor-x/decode'
+import { encode } from 'cbor-x/encode'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { extractManifestCertificate } from '../extractManifestCertificate.ts'
+import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
 import { validateBmffHash } from '../bmff/validateBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
@@ -215,9 +216,11 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		}
 	}
 
-	const internalData = readC2paManifest(bytes)
+	const internalData = readC2paManifest(bytes, boxes)
 	const { manifest } = internalData
-	const certificate = extractManifestCertificate(bytes)
+	const certificate = internalData.signatureBytes
+		? extractCertificateFromSignatureBytes(internalData.signatureBytes)
+		: null
 
 	const bmffHashAssertion =
 		manifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null

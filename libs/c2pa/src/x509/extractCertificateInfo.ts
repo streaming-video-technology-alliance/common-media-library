@@ -1,3 +1,5 @@
+const TEXT_DECODER = new TextDecoder()
+
 import type { CertificateInfo } from './CertificateInfo.ts'
 import {
 	ASN1_TAG_CONTEXT_0,
@@ -23,7 +25,7 @@ function matchesOID(value: Uint8Array, oid: Uint8Array): boolean {
 }
 
 function parseTime(element: Asn1Element): string | null {
-	const text = new TextDecoder().decode(element.value)
+	const text = TEXT_DECODER.decode(element.value)
 	if (element.tag === ASN1_TAG_UTC_TIME) {
 		const yy = parseInt(text.substring(0, 2), 10)
 		const year = yy >= 50 ? 1900 + yy : 2000 + yy
@@ -41,7 +43,7 @@ function findOidValueInSequence(seqValue: Uint8Array, targetOID: Uint8Array): st
 	if (!matchesOID(oidEl.value, targetOID)) return null
 
 	const valEl = readElement(seqValue, oidEl.totalSize)
-	return valEl ? new TextDecoder().decode(valEl.value) : null
+	return valEl ? TEXT_DECODER.decode(valEl.value) : null
 }
 
 function findRDNValue(issuerValue: Uint8Array, targetOID: Uint8Array): string | null {

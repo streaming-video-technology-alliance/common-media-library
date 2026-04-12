@@ -7,7 +7,7 @@ const CBOR_UINT32_LENGTH_INDICATOR = 0x5a
 const CBOR_INLINE_MAX = 23
 const CBOR_UINT8_MAX = 255
 const CBOR_UINT16_MAX = 65535
-const COSE_SIG1_CONTEXT = 'Signature1'
+const COSE_SIG1_CONTEXT_BYTES = new TextEncoder().encode('Signature1')
 
 function byteStringHeaderSize(length: number): number {
 	if (length <= CBOR_INLINE_MAX) return 1
@@ -56,11 +56,9 @@ export function buildSigStructure(
 	payload: Uint8Array,
 	externalAad: Uint8Array = new Uint8Array(0),
 ): Uint8Array {
-	const contextBytes = new TextEncoder().encode(COSE_SIG1_CONTEXT)
-
 	const totalLength =
 		1 // array header
-		+ 1 + contextBytes.length // context string (length < 24, fits inline)
+		+ 1 + COSE_SIG1_CONTEXT_BYTES.length // context string (length < 24, fits inline)
 		+ byteStringHeaderSize(protectedBytes.length) + protectedBytes.length
 		+ byteStringHeaderSize(externalAad.length) + externalAad.length
 		+ byteStringHeaderSize(payload.length) + payload.length
@@ -69,9 +67,9 @@ export function buildSigStructure(
 	let offset = 0
 
 	result[offset++] = CBOR_ARRAY_FOUR_ITEMS
-	result[offset++] = CBOR_TEXT_MAJOR_TYPE_BASE + contextBytes.length
-	result.set(contextBytes, offset)
-	offset += contextBytes.length
+	result[offset++] = CBOR_TEXT_MAJOR_TYPE_BASE + COSE_SIG1_CONTEXT_BYTES.length
+	result.set(COSE_SIG1_CONTEXT_BYTES, offset)
+	offset += COSE_SIG1_CONTEXT_BYTES.length
 
 	offset = writeByteStringHeader(result, offset, protectedBytes.length)
 	result.set(protectedBytes, offset)

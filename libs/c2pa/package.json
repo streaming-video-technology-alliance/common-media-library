@@ -1,7 +1,7 @@
 {
 	"name": "@svta/cml-c2pa",
 	"version": "0.1.0",
-	"description": "C2PA (Coalition for Content Provenance and Authenticity) manifest parsing",
+	"description": "C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF/MP4 containers",
 	"license": "Apache-2.0",
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/c2pa",
@@ -20,7 +20,7 @@
 	},
 	"files": [
 		"dist/**/*",
-		"NOTICE"
+		"NOTICE.md"
 	],
 	"exports": {
 		".": {
