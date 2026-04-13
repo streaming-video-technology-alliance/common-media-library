@@ -1,3 +1,4 @@
+const TEXT_DECODER = new TextDecoder()
 const JUMD_UUID_SIZE = 16
 const JUMD_TOGGLES_OFFSET = 16
 const JUMD_LABEL_START = 17
@@ -28,5 +29,5 @@ export function parseJumbfLabel(jumdData: Uint8Array): string | null {
 	while (end < jumdData.length && jumdData[end] !== 0) end++
 	if (end >= jumdData.length) return null
 
-	return new TextDecoder().decode(jumdData.subarray(JUMD_LABEL_START, end))
+	return TEXT_DECODER.decode(jumdData.subarray(JUMD_LABEL_START, end))
 }

@@ -1,5 +1,6 @@
 import type { BmffHashExclusion } from './BmffHashExclusion.ts'
 import { computeBmffHash } from './computeBmffHash.ts'
+import { hashesEqual } from '../utils.ts'
 
 const OFFSET_PREFIX_SIZES_TO_TRY = [8, 0] as const
 
@@ -11,15 +12,6 @@ const OFFSET_PREFIX_SIZES_TO_TRY = [8, 0] as const
 export type BmffHashValidationOptions = {
 	readonly exclusions?: readonly BmffHashExclusion[]
 	readonly alg?: string
-}
-
-function hashesEqual(a: Uint8Array, b: Uint8Array): boolean {
-	if (a.length !== b.length) return false
-	let diff = 0
-	for (let i = 0; i < a.length; i++) {
-		diff |= a[i] ^ b[i]
-	}
-	return diff === 0
 }
 
 /**

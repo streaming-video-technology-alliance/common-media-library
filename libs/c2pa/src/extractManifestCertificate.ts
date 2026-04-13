@@ -8,6 +8,25 @@ import { parseJumbfLabel } from './jumbf/parseJumbfLabel.ts'
 const C2PA_SIGNATURE_LABEL = 'c2pa.signature'
 const X5CHAIN_COSE_HEADER = 33
 
+/**
+ * Extracts the end-entity certificate from raw COSE_Sign1 signature bytes.
+ *
+ * @internal
+ */
+export function extractCertificateFromSignatureBytes(signatureBytes: Uint8Array): Uint8Array | null {
+	try {
+		const cose = decodeCoseSign1(signatureBytes)
+		const x5chain = (cose.protectedHeader[X5CHAIN_COSE_HEADER] ??
+			cose.unprotectedHeader[X5CHAIN_COSE_HEADER]) as Uint8Array | Uint8Array[] | null | undefined
+		if (!x5chain) return null
+
+		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
+		return certDER instanceof Uint8Array ? certDER : null
+	} catch {
+		return null
+	}
+}
+
 function findSignatureContentBytes(boxes: JumbfBox[]): Uint8Array | null {
 	for (const box of boxes) {
 		if (box.type !== 'jumb') continue
@@ -53,13 +72,7 @@ export function extractManifestCertificate(mp4Bytes: Uint8Array): Uint8Array | n
 		const signatureBytes = findSignatureContentBytes(parseJumbfBoxes(jumbfPayload))
 		if (!signatureBytes) return null
 
-		const cose = decodeCoseSign1(signatureBytes)
-		const x5chain = (cose.protectedHeader[X5CHAIN_COSE_HEADER] ??
-			cose.unprotectedHeader[X5CHAIN_COSE_HEADER]) as Uint8Array | Uint8Array[] | null | undefined
-		if (!x5chain) return null
-
-		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
-		return certDER instanceof Uint8Array ? certDER : null
+		return extractCertificateFromSignatureBytes(signatureBytes)
 	} catch {
 		return null
 	}

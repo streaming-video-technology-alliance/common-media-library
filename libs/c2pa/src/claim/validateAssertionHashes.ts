@@ -1,5 +1,5 @@
 import { C2paStatusCode } from '../C2paStatusCode.ts'
-import { normalizeAlgorithmName } from '../utils.ts'
+import { hashesEqual, normalizeAlgorithmName } from '../utils.ts'
 import type { ClaimAssertionRef } from './ClaimAssertionRef.ts'
 import type { InternalAssertionData } from './InternalManifestData.ts'
 
@@ -14,14 +14,6 @@ function extractLabelFromUrl(url: string): string {
 	const path = fragmentIndex >= 0 ? url.substring(fragmentIndex + 7) : url
 	const lastSlash = path.lastIndexOf('/')
 	return lastSlash >= 0 ? path.substring(lastSlash + 1) : path
-}
-
-function compareHashes(a: Uint8Array, b: Uint8Array): boolean {
-	if (a.length !== b.length) return false
-	for (let i = 0; i < a.length; i++) {
-		if (a[i] !== b[i]) return false
-	}
-	return true
 }
 
 /**
@@ -64,7 +56,7 @@ export async function validateAssertionHashes(
 			await crypto.subtle.digest(alg, assertion.rawBoxPayload),
 		)
 
-		if (!compareHashes(computedHash, ref.hash)) {
+		if (!hashesEqual(computedHash, ref.hash)) {
 			return C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH
 		}
 

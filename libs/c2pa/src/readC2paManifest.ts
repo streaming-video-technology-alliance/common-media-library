@@ -1,4 +1,6 @@
-import { readIsoBoxes } from '@svta/cml-iso-bmff'
+const TEXT_DECODER = new TextDecoder()
+
+import { readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { decode } from 'cbor-x/decode'
 import type { C2paAssertion } from './C2paAssertion.ts'
 import type { C2paManifest } from './C2paManifest.ts'
@@ -72,7 +74,7 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 				try { data = decode(contentBox.data) as unknown } catch { data = contentBox.data }
 			}
 			else if (contentBox.type === 'json') {
-				try { data = JSON.parse(new TextDecoder().decode(contentBox.data)) as unknown } catch { data = contentBox.data }
+				try { data = JSON.parse(TEXT_DECODER.decode(contentBox.data)) as unknown } catch { data = contentBox.data }
 			}
 			else {
 				data = contentBox.data
@@ -139,6 +141,7 @@ function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAss
  * cryptographic signature of the claim.
  *
  * @param bytes - Raw BMFF bytes (e.g. an MP4 init segment or media segment)
+ * @param preParsedBoxes - Optional pre-parsed ISO boxes to avoid redundant parsing
  * @returns The parsed manifest data including claim, assertions, and signature bytes
  * @throws If no C2PA UUID box is found, or the JUMBF structure is invalid
  *
@@ -147,8 +150,8 @@ function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAss
  *
  * @internal
  */
-export function readC2paManifest(bytes: Uint8Array): InternalManifestData {
-	const boxes = readIsoBoxes(bytes)
+export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBox[]): InternalManifestData {
+	const boxes = preParsedBoxes ?? readIsoBoxes(bytes)
 	const uuidBox = findC2paUuidBox(boxes)
 
 	if (!uuidBox) {
