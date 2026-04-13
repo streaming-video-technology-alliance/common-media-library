@@ -67,12 +67,13 @@ Builds the steering server request URL from the base URL and query parameters. H
 ### `parseSteeringResponse(status: number, body: string, headers: { get(name: string): string | null }): SteeringResponseResult`
 
 Parses the HTTP response into a discriminated result:
-- `{ type: 'success', manifest: SteeringManifest }` — valid response, VERSION === 1
+- `{ type: 'success', manifest: SteeringManifest }` — HTTP 200, valid JSON, VERSION === 1
 - `{ type: 'gone' }` — HTTP 410
 - `{ type: 'throttled', retryAfter: number | null }` — HTTP 429 with optional Retry-After
-- `{ type: 'error', status: number }` — all other failures
+- `{ type: 'error', status: number }` — non-2xx status (except 410/429)
+- `{ type: 'invalid' }` — HTTP 200 but body is unparseable JSON or VERSION !== 1
 
-This keeps HTTP status code interpretation (spec Step 7) in a pure function.
+This keeps HTTP status code interpretation (spec Step 7) and manifest validation in a pure function.
 
 ## Layer 2: SteeringProcessor
 
@@ -107,6 +108,7 @@ Main entry point after a fetch. Calls `parseSteeringResponse`, then:
 - **success:** Validates manifest if configured, updates priority/clones/ttl/reloadUri/lastUpdated. Returns `{ type: 'success', pathwayChanged: boolean, preferredPathway: string | undefined }`.
 - **gone:** Sets `enabled = false`. Returns `{ type: 'gone' }`.
 - **throttled:** Updates TTL from Retry-After if present. Returns `{ type: 'throttled', retryAfter: number }`.
+- **invalid:** State unchanged (bad payload, keep previous priorities per spec Step 7C). Returns `{ type: 'error', status: 200 }`.
 - **error:** State unchanged. Returns `{ type: 'error', status: number }`.
 
 **`getPreferredPathway(now?: number): string | undefined`**
@@ -295,7 +297,8 @@ type SteeringResponseResult =
   | { type: 'success'; manifest: SteeringManifest }
   | { type: 'gone' }
   | { type: 'throttled'; retryAfter: number | null }
-  | { type: 'error'; status: number };
+  | { type: 'error'; status: number }
+  | { type: 'invalid' };
 
 // Pathway clone result
 interface PathwayCloneResult {
@@ -448,8 +451,8 @@ test/
 
 **parseSteeringResponse:**
 - 200 with valid manifest → success
-- 200 with invalid JSON → error
-- 200 with wrong VERSION → error
+- 200 with invalid JSON → invalid
+- 200 with wrong VERSION → invalid
 - 410 → gone
 - 429 with Retry-After → throttled with value
 - 429 without Retry-After → throttled with null
