@@ -1,5 +1,5 @@
-import type { CmcdEventType } from './CmcdEventType.ts'
-import type { CmcdRequest } from './CmcdRequest.ts'
+import type { CmcdEventType } from './CmcdEventType.ts';
+import type { CmcdRequest } from './CmcdRequest.ts';
 
 /**
  * Common Media Client Data (CMCD) version 2 - Event Mode.
@@ -7,7 +7,7 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  * Extends {@link CmcdRequest} with event-specific keys for reporting events
  * according to the CMCD version 2 specification.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#event-mode | CTA-5004-A Event Mode}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event-mode | CTA-5004-A Event Mode}
  *
  * @public
  */
@@ -22,7 +22,7 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * String
 	 *
-	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#custom-event-name | CTA-5004-A Custom Event Name}
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#custom-event-name | CTA-5004-A Custom Event Name}
 	 */
 	cen?: string;
 
@@ -54,7 +54,7 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * Token
 	 *
-	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#event | CTA-5004-A Event}
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event | CTA-5004-A Event}
 	 */
 	e?: CmcdEventType;
 
@@ -65,7 +65,7 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * String
 	 *
-	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#hostname | CTA-5004-A Hostname}
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#hostname | CTA-5004-A Hostname}
 	 */
 	h?: string;
 
@@ -80,7 +80,7 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * Integer milliseconds
 	 *
-	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#timestamp | CTA-5004-A Timestamp}
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#timestamp | CTA-5004-A Timestamp}
 	 */
 	ts?: number;
 };

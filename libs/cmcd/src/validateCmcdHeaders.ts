@@ -2,13 +2,13 @@ import { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
 import type { CmcdData } from './CmcdData.ts'
 import type { CmcdDataValidationResult } from './CmcdDataValidationResult.ts'
 import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
-import { ensureHeaders } from './ensureHeaders.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
+import { ensureHeaders } from './ensureHeaders.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { mergeValidationResults } from './mergeValidationResults.ts'
 import { validateCmcd } from './validateCmcd.ts'
@@ -28,7 +28,7 @@ import { validateCmcd } from './validateCmcd.ts'
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result including decoded data.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#header-field-definition | CTA-5004-A Header Field Definition}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#header-field-definition | CTA-5004-A Header Field Definition}
  *
  * @public
  */

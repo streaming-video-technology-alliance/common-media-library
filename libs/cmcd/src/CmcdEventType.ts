@@ -124,7 +124,7 @@ export const CMCD_EVENT_CUSTOM_EVENT = 'ce' as const
  *
  * @enum
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#event | CTA-5004-A Event}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event | CTA-5004-A Event}
  *
  * @public
  */

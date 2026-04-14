@@ -21,7 +21,7 @@ const CMCD_KEY_SET: ReadonlySet<string> = new Set(CMCD_KEYS)
  * @param options - Validation options.
  * @returns The validation result.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#reserved-keys | CTA-5004-A Reserved Keys}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#reserved-keys | CTA-5004-A Reserved Keys}
  *
  * @public
  */

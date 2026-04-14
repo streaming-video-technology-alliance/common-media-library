@@ -1,4 +1,4 @@
-import type { ValueOf } from '@svta/cml-utils'
+import type { ValueOf } from '@svta/cml-utils';
 
 /**
  * Common Media Client Data Object Type
@@ -7,7 +7,7 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @enum
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#object-type | CTA-5004-A Object Type}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#object-type | CTA-5004-A Object Type}
  */
 export const CmcdObjectType = {
 	/**

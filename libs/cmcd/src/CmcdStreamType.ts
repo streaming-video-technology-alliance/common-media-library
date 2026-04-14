@@ -1,11 +1,11 @@
-import type { ValueOf } from '@svta/cml-utils'
+import type { ValueOf } from '@svta/cml-utils';
 
 /**
  * Common Media Client Data Stream Type
  *
  * @enum
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#stream-type | CTA-5004-A Stream Type}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#stream-type | CTA-5004-A Stream Type}
  *
  * @public
  */

@@ -11,7 +11,7 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
  *
  * @returns The encoded CMCD string.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#payload-definition-for-headers-and-query-argument-transmission | CTA-5004-A Payload Definition}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#payload-definition-for-headers-and-query-argument-transmission | CTA-5004-A Payload Definition}
  *
  * @public
  *

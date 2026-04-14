@@ -11,12 +11,12 @@ The `@svta/cml-cmcd` library provides a set of composable validation functions f
 
 There are four main validation functions, each targeting a different aspect of CMCD compliance:
 
-| Function                   | Purpose                                                            |
-| -------------------------- | ------------------------------------------------------------------ |
-| `validateCmcd`             | Orchestrator — runs key, value, and structure checks               |
-| `validateCmcdRequest`      | Validates a `Request` or `HttpRequest` as request-mode data        |
-| `validateCmcdEvents`       | Validates a multi-line `application/cmcd` body as event-mode data  |
-| `validateCmcdEventReport`  | Validates a full `HttpRequest` as an event-mode payload            |
+| Function                  | Purpose                                                           |
+| ------------------------- | ----------------------------------------------------------------- |
+| `validateCmcd`            | Orchestrator — runs key, value, and structure checks              |
+| `validateCmcdRequest`     | Validates a `Request` or `HttpRequest` as request-mode data       |
+| `validateCmcdEvents`      | Validates a multi-line `application/cmcd` body as event-mode data |
+| `validateCmcdEventReport` | Validates a full `HttpRequest` as an event-mode payload           |
 
 All validators return a `CmcdValidationResult`:
 
@@ -249,5 +249,5 @@ const result = validateCmcdValues({
 
 ## References
 
-- [CTA-5004-A: Common Media Client Data v2](https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html)
+- [CTA-5004-A: Common Media Client Data v2](https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html)
 - [CTA-5004: Common Media Client Data v1 (PDF)](https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf)

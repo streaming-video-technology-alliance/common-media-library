@@ -21,7 +21,7 @@ import { validateCmcdEvents } from './validateCmcdEvents.ts'
  *
  * @example {@includeCode ../test/validateCmcdEventReport.test.ts#example}
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-a.html#event-mode | CTA-5004-A Event Mode}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event-mode | CTA-5004-A Event Mode}
  *
  * @public
  */
