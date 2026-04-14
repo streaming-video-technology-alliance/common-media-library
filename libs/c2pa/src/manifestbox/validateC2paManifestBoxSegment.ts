@@ -6,6 +6,9 @@ import { readC2paManifest } from '../readC2paManifest.ts'
 import { bytesToHex, normalizeAlgorithmName } from '../utils.ts'
 import { validateBmffHash } from '../bmff/validateBmffHash.ts'
 import type { BmffHashConstraint, BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import type { InternalManifestData } from '../claim/InternalManifestData.ts'
+import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
+import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
 import type { ManifestBoxValidationResult, ManifestBoxValidationState } from './ManifestBoxValidation.ts'
 
 const LIVE_VIDEO_ASSERTION_LABEL = 'c2pa.livevideo.segment'
@@ -120,21 +123,24 @@ type ParsedManifest = {
 	issuer: string | null
 	liveVideo: LiveVideoFields | null
 	bmff: BmffHashFields
+	internalData: InternalManifestData | null
 }
 
 function parseManifest(bytes: Uint8Array): ParsedManifest {
 	try {
-		const { manifest } = readC2paManifest(bytes)
-		if (!manifest) return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		const internalData = readC2paManifest(bytes)
+		const { manifest } = internalData
+		if (!manifest) return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH, internalData: null }
 
 		return {
 			manifest,
 			issuer: manifest.signatureInfo?.issuer ?? null,
 			liveVideo: parseLiveVideoAssertion(manifest.assertions),
 			bmff: parseBmffHashAssertion(manifest.assertions),
+			internalData,
 		}
 	} catch {
-		return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH }
+		return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH, internalData: null }
 	}
 }
 
@@ -204,7 +210,7 @@ export async function validateC2paManifestBoxSegment(
 	readonly nextManifestId: string | null
 	readonly nextState: ManifestBoxValidationState
 }> {
-	const { manifest, issuer, liveVideo, bmff } = parseManifest(bytes)
+	const { manifest, issuer, liveVideo, bmff, internalData } = parseManifest(bytes)
 
 	const sequenceNumber = liveVideo?.sequenceNumber ?? null
 	const previousManifestId = liveVideo?.previousManifestId ?? null
@@ -230,7 +236,14 @@ export async function validateC2paManifestBoxSegment(
 		continuityMethod, previousManifestId, lastManifestId,
 	)
 
-	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes]
+	const integrityCodes: readonly C2paStatusCode[] = internalData
+		? await validateManifestIntegrity(
+			internalData,
+			internalData.signatureBytes ? extractCertificateFromSignatureBytes(internalData.signatureBytes) : null,
+		)
+		: []
+
+	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
 
 	const currentManifestId = manifest?.instanceId ?? null
 

@@ -18,8 +18,6 @@ and this project adheres to
 - COSE_Sign1 cryptographic support (RFC 9052): decoding, signature verification, key conversion, signer binding
 - X.509 certificate parsing (issuer, validity period)
 - BMFF content hash computation and validation
-- `readC2paManifest(bytes)` — read a C2PA manifest store from raw BMFF bytes
-- `extractManifestCertificate(bytes)` — extract the signing certificate from a BMFF container
 - EMSG box parsing (ISO 14496-12, v0 and v1)
 - VSI (Verifiable Segment Info) CBOR map decoding
 - Sequence number validation (monotonic, gap/duplicate detection)

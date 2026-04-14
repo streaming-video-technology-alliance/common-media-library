@@ -3,6 +3,11 @@
 	"version": "0.1.0",
 	"description": "C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF/MP4 containers",
 	"license": "Apache-2.0",
+	"authors": [
+		"Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
+		"Nicolás Caballero <8515648+N1Knight@users.noreply.github.com>",
+		"Valentina Giusti <234478367+valentinamgiusti@users.noreply.github.com>"
+	],
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/c2pa",
 	"repository": {
