@@ -1,0 +1,59 @@
+{
+	"name": "@svta/cml-c2pa",
+	"version": "0.1.0",
+	"description": "C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF/MP4 containers",
+	"license": "Apache-2.0",
+	"type": "module",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/c2pa",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
+	},
+	"bugs": {
+		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org",
+		"provenance": true,
+		"scope": "svta"
+	},
+	"files": [
+		"dist/**/*",
+		"NOTICE.md"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"keywords": [
+		"Common Media Library",
+		"CML",
+		"C2PA",
+		"content provenance",
+		"JUMBF",
+		"COSE"
+	],
+	"scripts": {
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24",
+			"onFail": "error"
+		}
+	},
+	"peerDependencies": {
+		"@svta/cml-iso-bmff": ">=1.0.1",
+		"@svta/cml-utils": ">=1.0.0",
+		"cbor-x": "^1.6.4"
+	}
+}
