@@ -16,3 +16,5 @@ Please add entries to the bottom of the list in the following format:
 - @cotid-qualabs [Constanza Dibueno, Qualabs]
 - @juanmanuel-qualabs [Juan Manuel Gonzalez, Qualabs]
 - @dsilhavy [Daniel Silhavy, Fraunhofer FOKUS]
+- @N1Knight [Nicolás Caballero, Qualabs]
+- @valentinamgiusti [Valentina Giusti, Qualabs]
