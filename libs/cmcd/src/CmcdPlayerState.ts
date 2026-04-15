@@ -8,7 +8,7 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @public
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#state | CTA-5004-A State}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#state | CTA-5004-B State}
  */
 export const CmcdPlayerState = {
 	/**

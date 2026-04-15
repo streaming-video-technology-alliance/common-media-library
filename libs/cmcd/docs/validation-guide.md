@@ -5,7 +5,7 @@ description: How to validate CMCD payloads
 
 # CMCD Validation Guide
 
-The `@svta/cml-cmcd` library provides a set of composable validation functions for verifying that CMCD payloads conform to the CTA-5004 (v1) and CTA-5004-A (v2) specifications. These are useful for validating payloads on the receiving end — for example, in an analytics server that collects CMCD event reports, or in a CDN log processor that inspects CMCD request data.
+The `@svta/cml-cmcd` library provides a set of composable validation functions for verifying that CMCD payloads conform to the CTA-5004 (v1) and CTA-5004-B (v2) specifications. These are useful for validating payloads on the receiving end — for example, in an analytics server that collects CMCD event reports, or in a CDN log processor that inspects CMCD request data.
 
 ## Overview
 
@@ -249,5 +249,5 @@ const result = validateCmcdValues({
 
 ## References
 
-- [CTA-5004-A: Common Media Client Data v2](https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html)
+- [CTA-5004-B: Common Media Client Data v2](https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html)
 - [CTA-5004: Common Media Client Data v1 (PDF)](https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf)

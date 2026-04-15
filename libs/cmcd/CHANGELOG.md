@@ -14,11 +14,11 @@ and this project adheres to
 
 - Add `CMCD_MIME_TYPE` constant for the CMCD event report MIME type
 - Add `validateCmcdEventReport(request, options?)` to validate full HTTP requests as event-mode payloads
-- Add `@see` links to JSDoc comments referencing CTA-5004-A spec sections
+- Add `@see` links to JSDoc comments referencing CTA-5004-B spec sections
 
 ### Changed
 
-- Update event report MIME type from `text/cmcd` to `application/cmcd` per CTA-5004-A spec ([#332](https://github.com/streaming-video-technology-alliance/common-media-library/issues/332))
+- Update event report MIME type from `text/cmcd` to `application/cmcd` per CTA-5004-B spec ([#332](https://github.com/streaming-video-technology-alliance/common-media-library/issues/332))
 
 ## [2.2.0] - 2026-02-18
 

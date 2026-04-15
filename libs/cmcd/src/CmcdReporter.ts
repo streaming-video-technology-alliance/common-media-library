@@ -97,7 +97,7 @@ type CmcdEventTarget = CmcdTarget & {
 /**
  * The CMCD reporter.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#reporting-modes-when-we-send-data | CTA-5004-A Reporting Modes}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#reporting-modes-when-we-send-data | CTA-5004-B Reporting Modes}
  *
  * @public
  */

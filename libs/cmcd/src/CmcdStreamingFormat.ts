@@ -5,7 +5,7 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @enum
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#streaming-format | CTA-5004-A Streaming Format}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#streaming-format | CTA-5004-B Streaming Format}
  *
  * @public
  */
