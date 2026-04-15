@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-c2pa",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF/MP4 containers",
 	"license": "Apache-2.0",
 	"authors": [

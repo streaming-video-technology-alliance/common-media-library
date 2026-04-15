@@ -8,7 +8,7 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-03-26
+## [1.0.0] - 2026-04-14
 
 ### Added
 
@@ -26,5 +26,5 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v0.1.0...HEAD
-[0.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/c2pa-v0.1.0
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.0...HEAD
+[1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/c2pa-v1.0.0
