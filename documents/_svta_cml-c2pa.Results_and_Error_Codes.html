@@ -1,0 +1,260 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>Results and Error Codes | CML</title><link rel="icon" href="../assets/favicon.png" type="image/png"/><meta name="description" content="Documentation for CML"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="../index.html" class="title">CML</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb" aria-label="Breadcrumb"><li><a href="../modules/_svta_cml-c2pa.html">@svta/cml-c2pa</a></li><li><a href="" aria-current="page">Results and Error Codes</a></li></ul></div><div class="tsd-panel tsd-typography"><h1 id="results-and-error-codes" class="tsd-anchor-link">Results and Error Codes<a href="#results-and-error-codes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p>All validation functions in <code>@svta/cml-c2pa</code> return structured results with an <code>isValid</code> boolean and an <code>errorCodes</code> array. This guide covers how to interpret these results, understand error codes, and work with manifest data.</p>
+<h2 id="checking-validation-results" class="tsd-anchor-link">Checking Validation Results<a href="#checking-validation-results" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Every validation result follows the same pattern:</p>
+<pre><code class="typescript"><span class="hl-3">if</span><span class="hl-1"> (!</span><span class="hl-4">result</span><span class="hl-1">.</span><span class="hl-4">isValid</span><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">for</span><span class="hl-1"> (</span><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">code</span><span class="hl-1"> </span><span class="hl-5">of</span><span class="hl-1"> </span><span class="hl-4">result</span><span class="hl-1">.</span><span class="hl-4">errorCodes</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">error</span><span class="hl-1">(</span><span class="hl-2">`Validation failure: </span><span class="hl-5">${</span><span class="hl-4">code</span><span class="hl-5">}</span><span class="hl-2">`</span><span class="hl-1">)</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<p>The <code>errorCodes</code> array may contain multiple codes when several checks fail simultaneously. When <code>isValid</code> is <code>true</code>, the array is empty.</p>
+<h2 id="live-video-error-codes" class="tsd-anchor-link">Live Video Error Codes<a href="#live-video-error-codes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The <code>LiveVideoStatusCode</code> constants represent failures specific to live video validation, as defined in C2PA specification section 19.7.</p>
+<pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@svta/cml-c2pa&#39;</span>
+</code><button type="button">Copy</button></pre>
+
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>INIT_INVALID</code></td>
+<td><code>livevideo.init.invalid</code></td>
+<td>Init segment contains an <code>mdat</code> box or BMFF hash mismatch</td>
+</tr>
+<tr>
+<td><code>MANIFEST_INVALID</code></td>
+<td><code>livevideo.manifest.invalid</code></td>
+<td>C2PA Manifest Box failed standard validation</td>
+</tr>
+<tr>
+<td><code>SEGMENT_INVALID</code></td>
+<td><code>livevideo.segment.invalid</code></td>
+<td>Crypto failure: signature, hash, or key mismatch</td>
+</tr>
+<tr>
+<td><code>ASSERTION_INVALID</code></td>
+<td><code>livevideo.assertion.invalid</code></td>
+<td>sequenceNumber or streamId mismatch</td>
+</tr>
+<tr>
+<td><code>CONTINUITY_METHOD_INVALID</code></td>
+<td><code>livevideo.continuityMethod.invalid</code></td>
+<td>Continuity chain broken or method unsupported</td>
+</tr>
+<tr>
+<td><code>SESSIONKEY_INVALID</code></td>
+<td><code>livevideo.sessionkey.invalid</code></td>
+<td>Session key invalid or expired</td>
+</tr>
+</tbody>
+</table>
+<p>Example of handling specific error codes:</p>
+<pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@svta/cml-c2pa&#39;</span><br/><br/><span class="hl-3">for</span><span class="hl-1"> (</span><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">code</span><span class="hl-1"> </span><span class="hl-5">of</span><span class="hl-1"> </span><span class="hl-4">result</span><span class="hl-1">.</span><span class="hl-4">errorCodes</span><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">switch</span><span class="hl-1"> (</span><span class="hl-4">code</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-3">case</span><span class="hl-1"> </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1">.</span><span class="hl-6">SEGMENT_INVALID</span><span class="hl-1">:</span><br/><span class="hl-1">      </span><span class="hl-8">// Cryptographic check failed (signature, hash, or key)</span><br/><span class="hl-1">      </span><span class="hl-3">break</span><br/><span class="hl-1">    </span><span class="hl-3">case</span><span class="hl-1"> </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1">.</span><span class="hl-6">SESSIONKEY_INVALID</span><span class="hl-1">:</span><br/><span class="hl-1">      </span><span class="hl-8">// Session key expired — may need a fresh init segment</span><br/><span class="hl-1">      </span><span class="hl-3">break</span><br/><span class="hl-1">    </span><span class="hl-3">case</span><span class="hl-1"> </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1">.</span><span class="hl-6">ASSERTION_INVALID</span><span class="hl-1">:</span><br/><span class="hl-1">      </span><span class="hl-8">// Sequence number or stream ID problem</span><br/><span class="hl-1">      </span><span class="hl-3">break</span><br/><span class="hl-1">    </span><span class="hl-3">case</span><span class="hl-1"> </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1">.</span><span class="hl-6">CONTINUITY_METHOD_INVALID</span><span class="hl-1">:</span><br/><span class="hl-1">      </span><span class="hl-8">// Manifest ID chain is broken</span><br/><span class="hl-1">      </span><span class="hl-3">break</span><br/><span class="hl-1">    </span><span class="hl-3">case</span><span class="hl-1"> </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1">.</span><span class="hl-6">INIT_INVALID</span><span class="hl-1">:</span><br/><span class="hl-1">      </span><span class="hl-8">// Init segment structure is invalid</span><br/><span class="hl-1">      </span><span class="hl-3">break</span><br/><span class="hl-1">    </span><span class="hl-3">case</span><span class="hl-1"> </span><span class="hl-4">LiveVideoStatusCode</span><span class="hl-1">.</span><span class="hl-6">MANIFEST_INVALID</span><span class="hl-1">:</span><br/><span class="hl-1">      </span><span class="hl-8">// Embedded manifest failed validation</span><br/><span class="hl-1">      </span><span class="hl-3">break</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="c2pa-status-codes" class="tsd-anchor-link">C2PA Status Codes<a href="#c2pa-status-codes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The <code>C2paStatusCode</code> constants represent manifest integrity failures defined in C2PA specification sections 15 and 18.</p>
+<pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">C2paStatusCode</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@svta/cml-c2pa&#39;</span>
+</code><button type="button">Copy</button></pre>
+
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ASSERTION_HASHEDURI_MISMATCH</code></td>
+<td><code>assertion.hashedURI.mismatch</code></td>
+<td>Assertion hash does not match the claim reference</td>
+</tr>
+<tr>
+<td><code>ASSERTION_MISSING</code></td>
+<td><code>assertion.missing</code></td>
+<td>Referenced assertion not found in the assertion store</td>
+</tr>
+<tr>
+<td><code>ASSERTION_ACTION_INGREDIENT_MISMATCH</code></td>
+<td><code>assertion.action.ingredientMismatch</code></td>
+<td>Action requires an ingredient reference but none is present</td>
+</tr>
+<tr>
+<td><code>CLAIM_SIGNATURE_MISMATCH</code></td>
+<td><code>claim.signature.mismatch</code></td>
+<td>Claim signature verification failed</td>
+</tr>
+</tbody>
+</table>
+<div class="tsd-alert tsd-alert-note"><div class="tsd-alert-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><use href="../assets/icons.svg#icon-alertNote"></use></svg><span>Note</span></div><p>
+<code>C2paStatusCode</code> values appear in <code>InitSegmentValidation.errorCodes</code> and <code>ManifestBoxValidationResult.errorCodes</code> (which perform manifest integrity checks). They do not appear in <code>SegmentValidationResult.errorCodes</code> — the VSI/EMSG segment validation uses only <code>LiveVideoStatusCode</code>.</p>
+</div>
+<h2 id="working-with-manifest-data" class="tsd-anchor-link">Working with Manifest Data<a href="#working-with-manifest-data" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The <code>C2paManifest</code> type represents a parsed C2PA manifest. It is available through <code>InitSegmentValidation.manifest</code> (VSI method) and <code>ManifestBoxValidationResult.manifest</code> (Manifest Box method).</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>label</code></td>
+<td><code>string</code></td>
+<td>Manifest label (identifier within the manifest store)</td>
+</tr>
+<tr>
+<td><code>instanceId</code></td>
+<td><code>string | null</code></td>
+<td>Unique instance ID</td>
+</tr>
+<tr>
+<td><code>claimGenerator</code></td>
+<td><code>string | null</code></td>
+<td>Tool that generated the claim</td>
+</tr>
+<tr>
+<td><code>signatureInfo</code></td>
+<td><code>C2paSignatureInfo</code></td>
+<td>Signature metadata</td>
+</tr>
+<tr>
+<td><code>assertions</code></td>
+<td><code>readonly C2paAssertion[]</code></td>
+<td>All assertions in the manifest</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>signatureInfo</code> object contains:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>issuer</code></td>
+<td><code>string | null</code></td>
+<td>Certificate issuer (Common Name or Organization)</td>
+</tr>
+<tr>
+<td><code>certNotBefore</code></td>
+<td><code>string | null</code></td>
+<td>Certificate validity start (ISO 8601)</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="typescript"><span class="hl-5">const</span><span class="hl-1"> { </span><span class="hl-6">manifest</span><span class="hl-1"> } = </span><span class="hl-4">init</span><span class="hl-1"> </span><span class="hl-8">// or result.manifest for the Manifest Box method</span><br/><br/><span class="hl-3">if</span><span class="hl-1"> (</span><span class="hl-4">manifest</span><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Label:&#39;</span><span class="hl-1">, </span><span class="hl-4">manifest</span><span class="hl-1">.</span><span class="hl-4">label</span><span class="hl-1">)</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Instance ID:&#39;</span><span class="hl-1">, </span><span class="hl-4">manifest</span><span class="hl-1">.</span><span class="hl-4">instanceId</span><span class="hl-1">)</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Claim generator:&#39;</span><span class="hl-1">, </span><span class="hl-4">manifest</span><span class="hl-1">.</span><span class="hl-4">claimGenerator</span><span class="hl-1">)</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Issuer:&#39;</span><span class="hl-1">, </span><span class="hl-4">manifest</span><span class="hl-1">.</span><span class="hl-4">signatureInfo</span><span class="hl-1">.</span><span class="hl-4">issuer</span><span class="hl-1">)</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Cert not before:&#39;</span><span class="hl-1">, </span><span class="hl-4">manifest</span><span class="hl-1">.</span><span class="hl-4">signatureInfo</span><span class="hl-1">.</span><span class="hl-4">certNotBefore</span><span class="hl-1">)</span><br/><br/><span class="hl-1">  </span><span class="hl-3">for</span><span class="hl-1"> (</span><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">assertion</span><span class="hl-1"> </span><span class="hl-5">of</span><span class="hl-1"> </span><span class="hl-4">manifest</span><span class="hl-1">.</span><span class="hl-4">assertions</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">`Assertion [</span><span class="hl-5">${</span><span class="hl-4">assertion</span><span class="hl-11">.</span><span class="hl-4">label</span><span class="hl-5">}</span><span class="hl-2">]:`</span><span class="hl-1">, </span><span class="hl-4">assertion</span><span class="hl-1">.</span><span class="hl-4">data</span><span class="hl-1">)</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="sequence-validation-reasons" class="tsd-anchor-link">Sequence Validation Reasons<a href="#sequence-validation-reasons" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>When using the <a href="_svta_cml-c2pa.VSI_EMSG_Validation.html">VSI/EMSG method</a>, each segment's <code>SegmentValidationResult</code> includes a <code>sequenceResult</code> field. This is a discriminated union on <code>reason</code>, using <code>SequenceValidationReason</code> constants:</p>
+<pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">SequenceValidationReason</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@svta/cml-c2pa&#39;</span>
+</code><button type="button">Copy</button></pre>
+
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+<th>Valid</th>
+<th>Additional Fields</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>VALID</code></td>
+<td><code>valid</code></td>
+<td><code>true</code></td>
+<td>—</td>
+<td>Sequence number is the next expected value</td>
+</tr>
+<tr>
+<td><code>DUPLICATE</code></td>
+<td><code>duplicate</code></td>
+<td><code>false</code></td>
+<td>—</td>
+<td>Sequence number was already seen</td>
+</tr>
+<tr>
+<td><code>GAP_DETECTED</code></td>
+<td><code>gap_detected</code></td>
+<td><code>false</code></td>
+<td><code>missingFrom</code>, <code>missingTo</code></td>
+<td>One or more sequence numbers were skipped</td>
+</tr>
+<tr>
+<td><code>OUT_OF_ORDER</code></td>
+<td><code>out_of_order</code></td>
+<td><code>false</code></td>
+<td>—</td>
+<td>Sequence number is less than the last seen</td>
+</tr>
+<tr>
+<td><code>SEQUENCE_NUMBER_BELOW_MINIMUM</code></td>
+<td><code>sequence_number_below_minimum</code></td>
+<td><code>false</code></td>
+<td>—</td>
+<td>Below the session key's <code>minSequenceNumber</code></td>
+</tr>
+</tbody>
+</table>
+<p>Narrow the type to access the <code>GAP_DETECTED</code> fields:</p>
+<pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">SequenceValidationReason</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@svta/cml-c2pa&#39;</span><br/><br/><span class="hl-3">if</span><span class="hl-1"> (</span><span class="hl-4">result</span><span class="hl-1">.</span><span class="hl-4">sequenceResult</span><span class="hl-1">.</span><span class="hl-4">reason</span><span class="hl-1"> === </span><span class="hl-4">SequenceValidationReason</span><span class="hl-1">.</span><span class="hl-6">GAP_DETECTED</span><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">warn</span><span class="hl-1">(</span><br/><span class="hl-1">    </span><span class="hl-2">`Missing segments </span><span class="hl-5">${</span><span class="hl-4">result</span><span class="hl-11">.</span><span class="hl-4">sequenceResult</span><span class="hl-11">.</span><span class="hl-4">missingFrom</span><span class="hl-5">}</span><span class="hl-2">`</span><span class="hl-1"> +</span><br/><span class="hl-1">    </span><span class="hl-2">` through </span><span class="hl-5">${</span><span class="hl-4">result</span><span class="hl-11">.</span><span class="hl-4">sequenceResult</span><span class="hl-11">.</span><span class="hl-4">missingTo</span><span class="hl-5">}</span><span class="hl-2">`</span><span class="hl-1">,</span><br/><span class="hl-1">  )</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="choosing-a-validation-method" class="tsd-anchor-link">Choosing a Validation Method<a href="#choosing-a-validation-method" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The two validation methods serve different use cases:</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>VSI/EMSG (section 19.4)</th>
+<th>Manifest Box (section 19.3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Init segment required</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Per-segment overhead</td>
+<td>Low (EMSG box only)</td>
+<td>High (full manifest per segment)</td>
+</tr>
+<tr>
+<td>Session keys</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Manifest access</td>
+<td>Init segment only</td>
+<td>Every segment</td>
+</tr>
+<tr>
+<td>Continuity mechanism</td>
+<td>Sequence numbers</td>
+<td>Manifest ID chaining</td>
+</tr>
+<tr>
+<td>Functions</td>
+<td><code>validateC2paInitSegment</code> + <code>validateC2paSegment</code></td>
+<td><code>validateC2paManifestBoxSegment</code></td>
+</tr>
+</tbody>
+</table>
+<p>The VSI/EMSG method is designed for low-overhead real-time streaming where bandwidth matters. The Manifest Box method provides self-contained segments that can be independently verified without prior context.</p>
+<h2 id="references" class="tsd-anchor-link">References<a href="#references" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><a href="https://c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html">C2PA Specification v2.3</a></li>
+<li><a href="https://c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html#_live_video_validation_process">C2PA Live Video Validation (section 19.7)</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc9052">COSE — RFC 9052</a></li>
+</ul>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#results-and-error-codes"><span>Results and <wbr/>Error <wbr/>Codes</span></a><ul><li><a href="#checking-validation-results"><span>Checking <wbr/>Validation <wbr/>Results</span></a></li><li><a href="#live-video-error-codes"><span>Live <wbr/>Video <wbr/>Error <wbr/>Codes</span></a></li><li><a href="#c2pa-status-codes"><span>C2<wbr/>PA <wbr/>Status <wbr/>Codes</span></a></li><li><a href="#working-with-manifest-data"><span>Working with <wbr/>Manifest <wbr/>Data</span></a></li><li><a href="#sequence-validation-reasons"><span>Sequence <wbr/>Validation <wbr/>Reasons</span></a></li><li><a href="#choosing-a-validation-method"><span>Choosing a <wbr/>Validation <wbr/>Method</span></a></li><li><a href="#references"><span>References</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">CML</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer></footer><div class="overlay"></div></body></html>
