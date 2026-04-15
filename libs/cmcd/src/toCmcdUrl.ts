@@ -10,7 +10,7 @@ import { encodeCmcd } from './encodeCmcd.ts'
  *
  * @returns The URL encoded CMCD data.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#query-argument-definition | CTA-5004-A Query Argument Definition}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#query-argument-definition | CTA-5004-B Query Argument Definition}
  *
  * @public
  */

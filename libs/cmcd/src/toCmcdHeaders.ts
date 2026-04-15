@@ -12,7 +12,7 @@ import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
  *
  * @returns The CMCD header shards.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#header-field-definition | CTA-5004-A Header Field Definition}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#header-field-definition | CTA-5004-B Header Field Definition}
  *
  * @public
  *

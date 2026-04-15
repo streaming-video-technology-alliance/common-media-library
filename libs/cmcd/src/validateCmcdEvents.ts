@@ -24,7 +24,7 @@ import { validateCmcd } from './validateCmcd.ts'
  * @example
  * {@includeCode ../test/validateCmcdEvents.test.ts#example}
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#body-definition | CTA-5004-A Body Definition}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#body-definition | CTA-5004-B Body Definition}
  *
  * @public
  */
