@@ -2,6 +2,10 @@ name: Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      package:
+        description: "The package short name to publish (i.e utils for @svta/cml-utils)"
+        required: true
 
 jobs:
   publish:
@@ -29,8 +33,8 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Publish
-        run: npm run pub
+      - name: Publish Package
+        run: npm publish --provenance --access public -w libs/${{ inputs.package }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
