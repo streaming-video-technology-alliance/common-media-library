@@ -6,10 +6,18 @@
 			"extensions": []
 		}
 	},
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+	"secrets": {
+		"GH_TOKEN": {
+			"description": "GitHub personal access token for gh CLI"
+		}
 	},
+	"remoteEnv": {
+		"GH_TOKEN": "${localEnv:GH_TOKEN}"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {}
+	},
+	"postCreateCommand": "npm ci",
 	"forwardPorts": [
 		3000
 	]

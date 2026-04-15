@@ -122,8 +122,9 @@ export const CMCD_EVENT_CUSTOM_EVENT = 'ce' as const
 /**
  * CMCD event types for the 'e' key (event mode).
  *
- *
  * @enum
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event | CTA-5004-A Event}
  *
  * @public
  */

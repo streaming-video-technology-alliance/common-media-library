@@ -1,7 +1,7 @@
-import { CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdData } from './CmcdData.ts'
 import type { CmcdDecodeOptions } from './CmcdDecodeOptions.ts'
+import { CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { ensureHeaders } from './ensureHeaders.ts'
 import { upConvertToV2 } from './upConvertToV2.ts'
@@ -13,6 +13,8 @@ import { upConvertToV2 } from './upConvertToV2.ts'
  * @param options - Options for decoding.
  *
  * @returns The decoded CMCD data.
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#header-field-definition | CTA-5004-A Header Field Definition}
  *
  * @public
  *

@@ -15,6 +15,8 @@ import { toCmcdHeaders } from './toCmcdHeaders.ts'
  *
  * @example
  * {@includeCode ../test/appendCmcdHeaders.test.ts#example}
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#header-field-definition | CTA-5004-A Header Field Definition}
  */
 export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string> {
 	return Object.assign(headers, toCmcdHeaders(cmcd, options))

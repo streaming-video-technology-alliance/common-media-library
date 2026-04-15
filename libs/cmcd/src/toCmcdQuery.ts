@@ -11,6 +11,8 @@ import { toCmcdUrl } from './toCmcdUrl.ts'
  *
  * @returns The CMCD query arg.
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#query-argument-definition | CTA-5004-A Query Argument Definition}
+ *
  * @public
  *
  * @example

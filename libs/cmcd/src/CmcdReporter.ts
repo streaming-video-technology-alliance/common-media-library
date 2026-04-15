@@ -1,6 +1,7 @@
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
+import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
@@ -95,6 +96,8 @@ type CmcdEventTarget = CmcdTarget & {
 
 /**
  * The CMCD reporter.
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#reporting-modes-when-we-send-data | CTA-5004-A Reporting Modes}
  *
  * @public
  */
@@ -432,7 +435,7 @@ export class CmcdReporter {
 			url: target.url,
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/cmcd',
+				'Content-Type': CMCD_MIME_TYPE,
 			},
 			body: data.map(item => encodeCmcd(item, options)).join('\n') + '\n',
 		})

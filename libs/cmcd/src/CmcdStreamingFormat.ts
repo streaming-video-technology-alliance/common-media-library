@@ -3,8 +3,9 @@ import type { ValueOf } from '@svta/cml-utils'
 /**
  * Common Media Client Data Streaming Format
  *
- *
  * @enum
+ *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#streaming-format | CTA-5004-A Streaming Format}
  *
  * @public
  */

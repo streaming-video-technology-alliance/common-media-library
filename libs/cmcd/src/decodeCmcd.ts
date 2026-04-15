@@ -40,6 +40,8 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
  *
  * @returns The decoded CMCD object.
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#payload-definition-for-headers-and-query-argument-transmission | CTA-5004-A Payload Definition}
+ *
  * @public
  *
  * @example

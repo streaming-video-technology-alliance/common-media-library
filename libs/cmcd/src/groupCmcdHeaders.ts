@@ -22,6 +22,8 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdHeaderKe
  *
  * @returns The CMCD header shards.
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#header-field-definition | CTA-5004-A Header Field Definition}
+ *
  * @public
  */
 export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdHeaderValue> {

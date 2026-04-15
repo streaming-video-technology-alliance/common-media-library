@@ -8,6 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-03-12
+
+### Added
+
+- Add `CMCD_MIME_TYPE` constant for the CMCD event report MIME type
+- Add `validateCmcdEventReport(request, options?)` to validate full HTTP requests as event-mode payloads
+- Add `@see` links to JSDoc comments referencing CTA-5004-A spec sections
+
+### Changed
+
+- Update event report MIME type from `text/cmcd` to `application/cmcd` per CTA-5004-A spec ([#332](https://github.com/streaming-video-technology-alliance/common-media-library/issues/332))
+
 ## [2.2.0] - 2026-02-18
 
 ### Added
@@ -109,7 +121,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.2.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.0...HEAD
+[2.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.2.0...cmcd-v2.3.0
 [2.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.2...cmcd-v2.2.0
 [2.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.1...cmcd-v2.1.2
 [2.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.0...cmcd-v2.1.1

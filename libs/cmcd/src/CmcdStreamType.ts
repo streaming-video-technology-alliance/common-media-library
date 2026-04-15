@@ -5,6 +5,8 @@ import type { ValueOf } from '@svta/cml-utils'
  *
  * @enum
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#stream-type | CTA-5004-A Stream Type}
+ *
  * @public
  */
 export const CmcdStreamType = {

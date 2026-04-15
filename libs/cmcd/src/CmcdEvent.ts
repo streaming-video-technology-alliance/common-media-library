@@ -7,6 +7,8 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  * Extends {@link CmcdRequest} with event-specific keys for reporting events
  * according to the CMCD version 2 specification.
  *
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event-mode | CTA-5004-A Event Mode}
+ *
  * @public
  */
 export type CmcdEvent = CmcdRequest & {
@@ -19,6 +21,8 @@ export type CmcdEvent = CmcdRequest & {
 	 * a custom value associated with this event. The names chosen SHOULD associate the custom event name with the custom key name.
 	 *
 	 * String
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#custom-event-name | CTA-5004-A Custom Event Name}
 	 */
 	cen?: string;
 
@@ -49,6 +53,8 @@ export type CmcdEvent = CmcdRequest & {
 	 * - `um` - unmute
 	 *
 	 * Token
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event | CTA-5004-A Event}
 	 */
 	e?: CmcdEventType;
 
@@ -58,6 +64,8 @@ export type CmcdEvent = CmcdRequest & {
 	 * A string identifying the current hostname from which the player is retrieving content. Maximum length is 128 characters.
 	 *
 	 * String
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#hostname | CTA-5004-A Hostname}
 	 */
 	h?: string;
 
@@ -71,6 +79,8 @@ export type CmcdEvent = CmcdRequest & {
 	 * This key MUST be included with all Event reports.
 	 *
 	 * Integer milliseconds
+	 *
+	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#timestamp | CTA-5004-A Timestamp}
 	 */
 	ts?: number;
 };
