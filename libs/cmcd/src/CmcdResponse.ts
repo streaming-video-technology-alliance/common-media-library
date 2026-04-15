@@ -1,4 +1,4 @@
-import type { CmcdRequest } from './CmcdRequest.ts';
+import type { CmcdRequest } from './CmcdRequest.ts'
 
 /**
  * Common Media Client Data (CMCD) version 2 - Response Mode.
