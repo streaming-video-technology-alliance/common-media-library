@@ -12,6 +12,7 @@ This project is a mono-repo with the following workspaces: `libs` and `docs`. Th
 - `@svta/cml-cmsd`
 - `@svta/cml-content-steering`
 - `@svta/cml-cta`
+- `@svta/cml-c2pa`
 - `@svta/cml-dash`
 - `@svta/cml-drm`
 - `@svta/cml-id3`
