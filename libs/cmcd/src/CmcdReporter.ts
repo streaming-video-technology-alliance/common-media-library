@@ -179,7 +179,7 @@ export class CmcdReporter {
 		}
 
 		this.eventTargets.forEach((target) => {
-			clearInterval(target.intervalId)
+			this.disarmInterval(target)
 		})
 	}
 
