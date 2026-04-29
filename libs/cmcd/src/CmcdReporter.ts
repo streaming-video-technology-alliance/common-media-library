@@ -443,10 +443,32 @@ export class CmcdReporter {
 		const { status } = response
 
 		if (status === 410) {
-			this.eventTargets.delete(target)
+			this.disposeEventTarget(target)
 		} else if (status === 429 || (status > 499 && status < 600)) {
 			throw new Error(`Event report failed with status ${status}`)
 		}
+	}
+
+	/**
+	 * Cancels the time-interval timer for an event target and clears the stored id.
+	 * Safe to call when no timer is armed (clearInterval(undefined) is a no-op).
+	 */
+	private disarmInterval(target: CmcdEventTarget): void {
+		clearInterval(target.intervalId)
+		target.intervalId = undefined
+	}
+
+	/**
+	 * Permanently removes an event target: cancels its timer and removes it from the
+	 * eventTargets map. Used when the collector signals the target is gone (HTTP 410).
+	 */
+	private disposeEventTarget(config: CmcdEventReportConfigNormalized): void {
+		const target = this.eventTargets.get(config)
+		if (!target) {
+			return
+		}
+		this.disarmInterval(target)
+		this.eventTargets.delete(config)
 	}
 
 	/**

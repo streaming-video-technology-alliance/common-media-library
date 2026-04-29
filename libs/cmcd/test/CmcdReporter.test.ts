@@ -742,6 +742,30 @@ describe('CmcdReporter', () => {
 			// Target was removed, so second event should not be sent
 			equal(requests.length, 1)
 		})
+
+		it('clears the interval when target is removed via 410', async (t) => {
+			const setIntervalSpy = t.mock.method(globalThis, 'setInterval')
+			const clearIntervalSpy = t.mock.method(globalThis, 'clearInterval')
+			const { requester, requests } = createMockRequester(410)
+
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 60,
+					batchSize: 1,
+				}],
+			}), requester)
+
+			reporter.start()
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			equal(setIntervalSpy.mock.calls.length, 1)
+			const intervalId = setIntervalSpy.mock.calls[0].result
+			ok(clearIntervalSpy.mock.calls.some(c => c.arguments[0] === intervalId))
+		})
 	})
 
 	describe('multiple event targets', () => {
