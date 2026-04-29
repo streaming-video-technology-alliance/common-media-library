@@ -124,7 +124,7 @@ it('clears the interval when target is removed via 410', async (t) => {
       url: 'https://example.com/cmcd',
       events: [CmcdEventType.TIME_INTERVAL],
       enabledKeys: [...EVENT_KEYS],
-      interval: 1,
+      interval: 60,
       batchSize: 1,
     }],
   }), requester)
