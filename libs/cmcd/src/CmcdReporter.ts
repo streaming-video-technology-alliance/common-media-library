@@ -150,6 +150,9 @@ export class CmcdReporter {
 	 */
 	start(): void {
 		this.eventTargets.forEach((target, config) => {
+			// Disarm any existing timer so repeated start() calls do not leak intervals.
+			this.disarmInterval(target)
+
 			// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
 			if (config.interval === 0 || !config.events.includes(CmcdEventType.TIME_INTERVAL)) {
 				return

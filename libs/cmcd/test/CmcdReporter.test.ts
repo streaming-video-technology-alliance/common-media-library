@@ -768,6 +768,33 @@ describe('CmcdReporter', () => {
 		})
 	})
 
+	describe('start lifecycle', () => {
+		it('disarms existing intervals when start() is called multiple times', (t) => {
+			const setIntervalSpy = t.mock.method(globalThis, 'setInterval')
+			const clearIntervalSpy = t.mock.method(globalThis, 'clearInterval')
+			const { requester } = createMockRequester()
+
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 60,
+					batchSize: 1,
+				}],
+			}), requester)
+
+			reporter.start()
+			equal(setIntervalSpy.mock.calls.length, 1)
+			const firstId = setIntervalSpy.mock.calls[0].result
+
+			reporter.start()
+			ok(clearIntervalSpy.mock.calls.some(c => c.arguments[0] === firstId))
+
+			reporter.stop()
+		})
+	})
+
 	describe('multiple event targets', () => {
 		it('sends events to all configured targets', async () => {
 			const { requester, requests } = createMockRequester()
