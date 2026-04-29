@@ -429,13 +429,13 @@ export class CmcdReporter {
 	/**
 	 * Sends an event report. Called by the reporter when a batch is ready to be sent.
 	 *
-	 * @param target - The target to send the event report to.
+	 * @param config - The target config to send the event report to.
 	 * @param data - The data to send in the event report.
 	 */
-	private async sendEventReport(target: CmcdEventReportConfigNormalized, data: Cmcd[]): Promise<void> {
-		const options = createEncodingOptions(CMCD_EVENT_MODE, target)
+	private async sendEventReport(config: CmcdEventReportConfigNormalized, data: Cmcd[]): Promise<void> {
+		const options = createEncodingOptions(CMCD_EVENT_MODE, config)
 		const response = await this.requester({
-			url: target.url,
+			url: config.url,
 			method: 'POST',
 			headers: {
 				'Content-Type': CMCD_MIME_TYPE,
@@ -446,7 +446,7 @@ export class CmcdReporter {
 		const { status } = response
 
 		if (status === 410) {
-			this.disposeEventTarget(target)
+			this.disposeEventTarget(config)
 		} else if (status === 429 || (status > 499 && status < 600)) {
 			throw new Error(`Event report failed with status ${status}`)
 		}
