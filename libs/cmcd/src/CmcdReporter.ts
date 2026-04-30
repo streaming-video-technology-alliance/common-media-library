@@ -150,6 +150,9 @@ export class CmcdReporter {
 	 */
 	start(): void {
 		this.eventTargets.forEach((target, config) => {
+			// Disarm any existing timer so repeated start() calls do not leak intervals.
+			this.disarmInterval(target)
+
 			// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
 			if (config.interval === 0 || !config.events.includes(CmcdEventType.TIME_INTERVAL)) {
 				return
@@ -176,7 +179,7 @@ export class CmcdReporter {
 		}
 
 		this.eventTargets.forEach((target) => {
-			clearInterval(target.intervalId)
+			this.disarmInterval(target)
 		})
 	}
 
@@ -426,13 +429,13 @@ export class CmcdReporter {
 	/**
 	 * Sends an event report. Called by the reporter when a batch is ready to be sent.
 	 *
-	 * @param target - The target to send the event report to.
+	 * @param config - The target config to send the event report to.
 	 * @param data - The data to send in the event report.
 	 */
-	private async sendEventReport(target: CmcdEventReportConfigNormalized, data: Cmcd[]): Promise<void> {
-		const options = createEncodingOptions(CMCD_EVENT_MODE, target)
+	private async sendEventReport(config: CmcdEventReportConfigNormalized, data: Cmcd[]): Promise<void> {
+		const options = createEncodingOptions(CMCD_EVENT_MODE, config)
 		const response = await this.requester({
-			url: target.url,
+			url: config.url,
 			method: 'POST',
 			headers: {
 				'Content-Type': CMCD_MIME_TYPE,
@@ -443,10 +446,32 @@ export class CmcdReporter {
 		const { status } = response
 
 		if (status === 410) {
-			this.eventTargets.delete(target)
+			this.disposeEventTarget(config)
 		} else if (status === 429 || (status > 499 && status < 600)) {
 			throw new Error(`Event report failed with status ${status}`)
 		}
+	}
+
+	/**
+	 * Cancels the time-interval timer for an event target and clears the stored id.
+	 * Safe to call when no timer is armed (clearInterval(undefined) is a no-op).
+	 */
+	private disarmInterval(target: CmcdEventTarget): void {
+		clearInterval(target.intervalId)
+		target.intervalId = undefined
+	}
+
+	/**
+	 * Permanently removes an event target: cancels its timer and removes it from the
+	 * eventTargets map. Used when the collector signals the target is gone (HTTP 410).
+	 */
+	private disposeEventTarget(config: CmcdEventReportConfigNormalized): void {
+		const target = this.eventTargets.get(config)
+		if (!target) {
+			return
+		}
+		this.disarmInterval(target)
+		this.eventTargets.delete(config)
 	}
 
 	/**
