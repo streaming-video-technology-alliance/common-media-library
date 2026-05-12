@@ -96,7 +96,7 @@ export class CmcdRequestCollector {
 
 		this.#notifyWaiters()
 
-		return undefined
+		return isEventTarget ? new Response(null, { status: 204 }) : undefined
 	}
 
 	#notifyWaiters(): void {

@@ -252,6 +252,62 @@ describe('CmcdRequestCollector', () => {
 		})
 	})
 
+	describe('event-target stubbing', () => {
+		it('returns a 204 Response from deliver when URL matches', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				transports: [t],
+				eventTargetUrls: ['https://events.example.com'],
+			})
+			const response = t.simulate({
+				url: 'https://events.example.com/cmcd',
+				method: 'POST',
+				headers: {},
+				body: 'sid="abc"',
+			})
+			ok(response instanceof Response)
+			equal(response?.status, 204)
+			equal(collector.getRequests(CmcdRequestType.EVENT).length, 1)
+			collector.detach()
+		})
+
+		it('returns undefined for non-event-target requests', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				transports: [t],
+				eventTargetUrls: ['https://events.example.com'],
+			})
+			const response = t.simulate({
+				url: 'https://e.com/seg.m4s?CMCD=x',
+				method: 'GET',
+				headers: {},
+			})
+			equal(response, undefined)
+			collector.detach()
+		})
+
+		it('does not stub POSTs that do not match eventTargetUrls', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				transports: [t],
+				eventTargetUrls: ['https://events.example.com'],
+			})
+			const response = t.simulate({
+				url: 'https://other.com/somewhere',
+				method: 'POST',
+				headers: {},
+				body: 'data',
+			})
+			// Method=POST classifies as event but URL doesn't match the
+			// stub list — should NOT return synthetic Response.
+			equal(response, undefined)
+			collector.detach()
+		})
+	})
+
 	describe('waitForRequests', () => {
 		it('resolves immediately when count already met', async () => {
 			const t = new FakeTransport()
