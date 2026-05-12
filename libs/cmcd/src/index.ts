@@ -65,7 +65,7 @@ export * from './CmcdValidationSeverity.ts'
 export type * from './CmcdValue.ts'
 export type * from './CmcdVersion.ts'
 // export * from './createFetchTransport.ts' // TODO Task 10
-// export * from './createXhrTransport.ts' // TODO Task 12
+export * from './createXhrTransport.ts'
 export * from './decodeCmcd.ts'
 export * from './encodeCmcd.ts'
 export * from './fromCmcdHeaders.ts'

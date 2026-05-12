@@ -1,5 +1,5 @@
 import type { CmcdTransportAdapter, CmcdRequestDeliver } from '@svta/cml-cmcd'
-import { CmcdRequestCollector, CmcdRequestType } from '@svta/cml-cmcd'
+import { createXhrTransport, CmcdRequestCollector, CmcdRequestType } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -400,5 +400,91 @@ describe('CmcdRequestCollector', () => {
 			equal(result.length, 2)
 			collector.detach()
 		})
+	})
+})
+
+describe('createXhrTransport', () => {
+	let origXhr: typeof globalThis.XMLHttpRequest
+
+	function installXhrShim(): void {
+		origXhr = globalThis.XMLHttpRequest
+		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = MockXhr
+	}
+
+	function restoreXhrShim(): void {
+		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
+	}
+
+	it('captures an XHR request that carries CMCD-* headers', () => {
+		installXhrShim()
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [createXhrTransport()] })
+
+			const xhr = new MockXhr()
+			xhr.open('GET', 'https://e.com/seg.m4s')
+			xhr.setRequestHeader('CMCD-Request', 'sid="abc"')
+			xhr.send()
+
+			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			equal(captured.length, 1)
+			equal(captured[0].reportingMode, 'header')
+			equal(captured[0].request.url, 'https://e.com/seg.m4s')
+			equal(captured[0].request.method, 'GET')
+			equal(captured[0].request.headers?.['cmcd-request'], 'sid="abc"')
+			collector.detach()
+		} finally {
+			restoreXhrShim()
+		}
+	})
+
+	it('captures an XHR request with CMCD query parameter', () => {
+		installXhrShim()
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [createXhrTransport()] })
+
+			const xhr = new MockXhr()
+			xhr.open('GET', 'https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
+			xhr.send()
+
+			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			equal(captured.length, 1)
+			equal(captured[0].reportingMode, 'query')
+			collector.detach()
+		} finally {
+			restoreXhrShim()
+		}
+	})
+
+	it('detach restores the original XHR prototype methods', () => {
+		installXhrShim()
+		try {
+			const origOpen = MockXhr.prototype.open
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [createXhrTransport()] })
+			ok(MockXhr.prototype.open !== origOpen, 'open should have been patched')
+			collector.detach()
+			equal(MockXhr.prototype.open, origOpen, 'open should be restored')
+		} finally {
+			restoreXhrShim()
+		}
+	})
+
+	it('does not capture non-CMCD XHR requests', () => {
+		installXhrShim()
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [createXhrTransport()] })
+
+			const xhr = new MockXhr()
+			xhr.open('GET', 'https://e.com/seg.m4s')
+			xhr.send()
+
+			equal(collector.getRequests().length, 0)
+			collector.detach()
+		} finally {
+			restoreXhrShim()
+		}
 	})
 })

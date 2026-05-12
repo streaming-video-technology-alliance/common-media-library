@@ -567,6 +567,9 @@ export type CmcdValue = ValueOf<Cmcd>;
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
 // @public
+export function createXhrTransport(): CmcdTransportAdapter;
+
+// @public
 export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
     convertToLatest: true;
 }): Cmcd;
