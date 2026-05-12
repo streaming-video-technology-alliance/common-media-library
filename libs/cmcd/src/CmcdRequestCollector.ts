@@ -183,7 +183,7 @@ export class CmcdRequestCollector {
 	 * filtered by classification.
 	 *
 	 * @param type - When provided, only requests with a matching
-	 *   {@link CmcdRequestType} are included in the result.
+	 *   {@link CmcdRequestType:type} are included in the result.
 	 *
 	 * @public
 	 */

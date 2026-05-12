@@ -52,9 +52,6 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
  * capture CMCD-bearing requests. Returns the adapter object expected by
  * `CmcdRequestCollector`.
  *
- * @example
- * {@includeCode ../test/CmcdRequestCollector.test.ts#example-xhr}
- *
  * @public
  */
 export function createXhrTransport(): CmcdTransportAdapter {
