@@ -22,10 +22,10 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 			Object.defineProperty(xhr, 'responseText', { value: text, configurable: true })
 
 			if (typeof xhr.onload === 'function') {
-				xhr.onload.call(xhr, new ProgressEventCtor('load'))
+				xhr.onload.call(xhr, new ProgressEventCtor('load') as ProgressEvent<EventTarget>)
 			}
 			if (typeof xhr.onloadend === 'function') {
-				xhr.onloadend.call(xhr, new ProgressEventCtor('loadend'))
+				xhr.onloadend.call(xhr, new ProgressEventCtor('loadend') as ProgressEvent<EventTarget>)
 			}
 		} catch {
 			// MockXhr may not allow defineProperty on some properties;
@@ -38,10 +38,10 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 			target['response'] = text
 			target['responseText'] = text
 			if (typeof xhr.onload === 'function') {
-				xhr.onload.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('load'))
+				xhr.onload.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('load') as ProgressEvent<EventTarget>)
 			}
 			if (typeof xhr.onloadend === 'function') {
-				xhr.onloadend.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('loadend'))
+				xhr.onloadend.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('loadend') as ProgressEvent<EventTarget>)
 			}
 		}
 	})
@@ -85,7 +85,7 @@ export function createXhrTransport(): CmcdTransportAdapter {
 					url: this._cmcdUrl ?? '',
 					method: (this._cmcdMethod ?? 'GET').toUpperCase(),
 					headers: this._cmcdHeaders ?? {},
-					body: body ?? undefined,
+					body: (typeof Document !== 'undefined' && body instanceof Document ? undefined : body as BodyInit | null | undefined) ?? undefined,
 				}
 
 				const synthetic = deliver(httpRequest)

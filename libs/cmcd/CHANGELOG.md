@@ -17,6 +17,20 @@ and this project adheres to
 - `CmcdReporter` now uses the current request URL's directory (via `getBaseUrl`) as the base for `nor` relative-path conversion, producing sibling-relative paths per the CMCD specification (previously the origin was used, yielding root-relative paths)
 - Clarify TSDoc for `nor` and `CmcdEncodeOptions.baseUrl` / `CmcdFormatterOptions.baseUrl` to document the absolute-URL convenience conversion
 
+## [2.4.0] - 2026-05-12
+
+### Added
+
+- `CmcdRequestCollector` — test helper that captures CMCD-bearing
+  requests across XHR and fetch transports for assertion in e2e tests.
+  Includes `waitForRequests` (rejects on timeout) and `collectFor`
+  (always resolves) wait primitives, plus event-target POST stubbing.
+- `CmcdRequestType` const-enum and supporting types
+  (`CmcdCollectedRequest`, `CmcdCollectedRequestMode`, `CmcdTransportAdapter`,
+  `CmcdRequestCollectorOptions`).
+- `createXhrTransport` and `createFetchTransport` default adapter
+  factories.
+
 ## [2.3.1] - 2026-04-30
 
 ### Fixed
@@ -137,7 +151,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...HEAD
+[2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.4.0
 [2.3.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.0...cmcd-v2.3.1
 [2.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.2.0...cmcd-v2.3.0
 [2.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.2...cmcd-v2.2.0

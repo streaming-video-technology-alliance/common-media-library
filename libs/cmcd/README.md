@@ -23,3 +23,33 @@ const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST };
 const result = encodeCmcd(input, options);
 // result === 'br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2'
 ```
+
+## Testing CMCD output with `CmcdRequestCollector`
+
+`CmcdRequestCollector` captures CMCD-bearing requests emitted by a
+player under test, regardless of whether the player uses
+`XMLHttpRequest` or `fetch`. Each capture is normalized to
+[`HttpRequest`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/utils),
+so tests work identically across transports.
+
+````ts
+import { CmcdRequestCollector, CmcdRequestType, validateCmcdRequest } from '@svta/cml-cmcd'
+
+const collector = new CmcdRequestCollector()
+collector.attach({ eventTargetUrls: ['https://events.example.com'] })
+
+// ... configure and start the player under test ...
+
+const segments = await collector.waitForRequests(CmcdRequestType.SEGMENT, 3)
+for (const r of segments) {
+  const result = validateCmcdRequest(r.request)
+  if (!result.valid) {
+    console.error(result.issues)
+  }
+}
+
+collector.detach()
+````
+
+Use `collectFor(timeout, type?)` instead of `waitForRequests` when you
+need to verify that requests did *not* arrive within a window.

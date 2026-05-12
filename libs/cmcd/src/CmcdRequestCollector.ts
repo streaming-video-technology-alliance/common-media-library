@@ -76,7 +76,7 @@ type CmcdRequestCollectorEntry = {
  */
 export class CmcdRequestCollector {
 	#requests: CmcdCollectedRequest[] = []
-	#detachers: Array<() => void> = []
+	#detachers: (() => void)[] = []
 	#attached = false
 	#eventTargetUrls: readonly string[] = []
 	#waiters: CmcdRequestWaiter[] = []
