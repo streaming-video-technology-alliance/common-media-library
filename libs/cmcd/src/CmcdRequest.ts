@@ -304,6 +304,10 @@ export type CmcdRequest = {
 	 *
 	 * Inner list of strings
 	 *
+	 * @remarks
+	 * Values may be provided as absolute URLs for convenience; when {@link CmcdEncodeOptions.baseUrl} is set,
+	 * same-origin URLs are converted to paths relative to that base. Already-relative values are emitted unchanged.
+	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#next-object-request | CTA-5004-B Next Object Request}
 	 */
 	nor?: (string | SfItem<string, { r: string }>)[];

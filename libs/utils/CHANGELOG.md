@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add `getBaseUrl(fullUrl)` to extract the origin and directory path from a full URL
+
+### Fixed
+
+- `urlToRelativePath` now returns the input unchanged when it is already a relative path, instead of throwing `TypeError: Invalid URL` ([#364](https://github.com/streaming-video-technology-alliance/common-media-library/issues/364))
+
 ## [1.4.0] - 2026-02-11
 
 ### Added
