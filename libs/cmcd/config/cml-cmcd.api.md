@@ -423,7 +423,7 @@ export class CmcdRequestCollector {
     attach(options?: CmcdRequestCollectorOptions): void;
     clear(): void;
     detach(): void;
-    getRequests(): CmcdCollectedRequest[];
+    getRequests(type?: CmcdRequestType): CmcdCollectedRequest[];
 }
 
 // @public

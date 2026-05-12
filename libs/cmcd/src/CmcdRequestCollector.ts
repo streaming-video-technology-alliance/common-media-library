@@ -69,11 +69,15 @@ export class CmcdRequestCollector {
 	}
 
 	/**
-	 * Return a defensive copy of the captured requests.
+	 * Return a defensive copy of the captured requests, optionally
+	 * filtered by classification.
 	 *
 	 * @public
 	 */
-	getRequests(): CmcdCollectedRequest[] {
-		return [...this.#requests]
+	getRequests(type?: CmcdRequestType): CmcdCollectedRequest[] {
+		if (type === undefined) {
+			return [...this.#requests]
+		}
+		return this.#requests.filter((r) => r.type === type)
 	}
 }

@@ -1,5 +1,5 @@
 import type { CmcdTransportAdapter, CmcdRequestDeliver } from '@svta/cml-cmcd'
-import { CmcdRequestCollector } from '@svta/cml-cmcd'
+import { CmcdRequestCollector, CmcdRequestType } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -109,6 +109,19 @@ describe('CmcdRequestCollector', () => {
 			const a = collector.getRequests()
 			const b = collector.getRequests()
 			ok(a !== b)
+		})
+
+		it('getRequests(type) filters by classification', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
+			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
+			// Both stubbed as UNKNOWN until Task 5; this test will be updated
+			// once classification lands. For now, assert filter mechanics work:
+			equal(collector.getRequests(CmcdRequestType.UNKNOWN).length, 2)
+			equal(collector.getRequests(CmcdRequestType.SEGMENT).length, 0)
+			collector.detach()
 		})
 	})
 })
