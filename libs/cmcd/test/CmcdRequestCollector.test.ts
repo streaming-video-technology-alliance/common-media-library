@@ -606,4 +606,30 @@ describe('createFetchTransport', () => {
 			restoreFetchStub()
 		}
 	})
+
+	it('returns a synthetic 204 when URL matches eventTargetUrls and does not call the underlying fetch', async () => {
+		let underlyingCalls = 0
+		const origFetch = globalThis.fetch
+		globalThis.fetch = async () => { underlyingCalls += 1; return new Response('', { status: 200 }) }
+
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				transports: [createFetchTransport()],
+				eventTargetUrls: ['https://events.example.com'],
+			})
+
+			const response = await fetch('https://events.example.com/cmcd', {
+				method: 'POST',
+				body: 'sid="abc"',
+			})
+
+			equal(response.status, 204)
+			equal(underlyingCalls, 0, 'underlying fetch should not have been invoked')
+			equal(collector.getRequests(CmcdRequestType.EVENT).length, 1)
+			collector.detach()
+		} finally {
+			globalThis.fetch = origFetch
+		}
+	})
 })
