@@ -218,6 +218,40 @@ describe('CmcdRequestCollector', () => {
 		})
 	})
 
+	describe('collectFor', () => {
+		it('resolves after the timeout with whatever was collected', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			setTimeout(() => {
+				t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			}, 10)
+			const result = await collector.collectFor(50)
+			equal(result.length, 1)
+			collector.detach()
+		})
+
+		it('resolves with zero when nothing matches', async () => {
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [new FakeTransport()] })
+			const result = await collector.collectFor(50, CmcdRequestType.EVENT)
+			equal(result.length, 0)
+			collector.detach()
+		})
+
+		it('filters by type', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
+			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
+			const result = await collector.collectFor(50, CmcdRequestType.SEGMENT)
+			equal(result.length, 1)
+			equal(result[0].type, CmcdRequestType.SEGMENT)
+			collector.detach()
+		})
+	})
+
 	describe('waitForRequests', () => {
 		it('resolves immediately when count already met', async () => {
 			const t = new FakeTransport()

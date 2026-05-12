@@ -422,6 +422,7 @@ export type CmcdRequest = {
 export class CmcdRequestCollector {
     attach(options?: CmcdRequestCollectorOptions): void;
     clear(): void;
+    collectFor(timeout: number, type?: CmcdRequestType): Promise<CmcdCollectedRequest[]>;
     detach(): void;
     getRequests(type?: CmcdRequestType): CmcdCollectedRequest[];
     waitForRequests(type: CmcdRequestType | undefined, count: number, timeout?: number): Promise<CmcdCollectedRequest[]>;

@@ -55,6 +55,12 @@ type CmcdRequestWaiter = {
 	timer: ReturnType<typeof setTimeout>
 }
 
+type CmcdRequestCollectorEntry = {
+	type: CmcdRequestType | undefined
+	resolve: (r: CmcdCollectedRequest[]) => void
+	timer: ReturnType<typeof setTimeout>
+}
+
 /**
  * Test helper that captures CMCD-bearing requests across XHR and fetch
  * transports for assertion in e2e tests. Each captured request is
@@ -69,6 +75,7 @@ export class CmcdRequestCollector {
 	#attached = false
 	#eventTargetUrls: readonly string[] = []
 	#waiters: CmcdRequestWaiter[] = []
+	#collectors: CmcdRequestCollectorEntry[] = []
 
 	readonly #deliver = (request: HttpRequest): Response | undefined => {
 		const url = request.url
@@ -195,6 +202,30 @@ export class CmcdRequestCollector {
 			}, timeout)
 
 			this.#waiters.push({ type, count, resolve, reject, timer })
+		})
+	}
+
+	/**
+	 * Wait for the given duration, then resolve with all captures of the
+	 * given type collected so far. Never rejects on timeout (use this for
+	 * negative or upper-bound assertions: "no events should fire",
+	 * "exactly N segments and no more").
+	 *
+	 * @public
+	 */
+	collectFor(
+		timeout: number,
+		type?: CmcdRequestType,
+	): Promise<CmcdCollectedRequest[]> {
+		return new Promise<CmcdCollectedRequest[]>((resolve) => {
+			const timer = setTimeout(() => {
+				const idx = this.#collectors.findIndex((c) => c.timer === timer)
+				if (idx >= 0) {
+					this.#collectors.splice(idx, 1)
+				}
+				resolve(this.getRequests(type))
+			}, timeout)
+			this.#collectors.push({ type, resolve, timer })
 		})
 	}
 }
