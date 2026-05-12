@@ -298,12 +298,13 @@ describe('CmcdRequestCollector', () => {
 			const response = t.simulate({
 				url: 'https://other.com/somewhere',
 				method: 'POST',
-				headers: {},
+				headers: { 'cmcd-request': 'sid="abc"' },
 				body: 'data',
 			})
-			// Method=POST classifies as event but URL doesn't match the
-			// stub list — should NOT return synthetic Response.
+			// Request carries CMCD data so it IS captured, but URL doesn't
+			// match the stub list — must NOT return a synthetic Response.
 			equal(response, undefined)
+			equal(collector.getRequests().length, 1)
 			collector.detach()
 		})
 	})
