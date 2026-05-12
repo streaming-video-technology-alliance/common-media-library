@@ -47,14 +47,6 @@ function detectReportingMode(
 	return url.includes(`${CMCD_PARAM}=`) ? 'query' : null
 }
 
-/**
- * Test helper that captures CMCD-bearing requests across XHR and fetch
- * transports for assertion in e2e tests. Each captured request is
- * normalized to {@link @svta/cml-utils!HttpRequest | HttpRequest} so
- * tests are identical regardless of which transport the player uses.
- *
- * @public
- */
 type CmcdRequestWaiter = {
 	type: CmcdRequestType | undefined
 	count: number
@@ -63,6 +55,14 @@ type CmcdRequestWaiter = {
 	timer: ReturnType<typeof setTimeout>
 }
 
+/**
+ * Test helper that captures CMCD-bearing requests across XHR and fetch
+ * transports for assertion in e2e tests. Each captured request is
+ * normalized to {@link @svta/cml-utils!HttpRequest | HttpRequest} so
+ * tests are identical regardless of which transport the player uses.
+ *
+ * @public
+ */
 export class CmcdRequestCollector {
 	#requests: CmcdCollectedRequest[] = []
 	#detachers: Array<() => void> = []
@@ -190,8 +190,7 @@ export class CmcdRequestCollector {
 				}
 				const current = this.getRequests(type)
 				reject(new Error(
-					`Timeout waiting for ${count} ${type ?? 'any'} CMCD request(s). ` +
-					`Got ${current.length}. Total collected: ${this.#requests.length}.`,
+					`Timeout waiting for ${count} ${type ?? 'any'} CMCD request(s). Got ${current.length}. Total collected: ${this.#requests.length}.`,
 				))
 			}, timeout)
 

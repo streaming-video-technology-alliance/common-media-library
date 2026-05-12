@@ -418,7 +418,7 @@ export type CmcdRequest = {
     v?: number;
 };
 
-// @public (undocumented)
+// @public
 export class CmcdRequestCollector {
     attach(options?: CmcdRequestCollectorOptions): void;
     clear(): void;
