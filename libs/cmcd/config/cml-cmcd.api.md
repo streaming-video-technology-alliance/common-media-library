@@ -419,6 +419,14 @@ export type CmcdRequest = {
 };
 
 // @public
+export class CmcdRequestCollector {
+    attach(options?: CmcdRequestCollectorOptions): void;
+    clear(): void;
+    detach(): void;
+    getRequests(): CmcdCollectedRequest[];
+}
+
+// @public
 export type CmcdRequestCollectorOptions = {
     eventTargetUrls?: readonly string[];
     transports?: readonly CmcdTransportAdapter[];

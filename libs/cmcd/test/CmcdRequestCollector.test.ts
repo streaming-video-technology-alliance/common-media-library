@@ -1,5 +1,7 @@
 import type { CmcdTransportAdapter, CmcdRequestDeliver } from '@svta/cml-cmcd'
+import { CmcdRequestCollector } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
+import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 
 /**
@@ -63,7 +65,50 @@ class FakeTransport implements CmcdTransportAdapter {
 }
 
 describe('CmcdRequestCollector', () => {
-	it('test scaffolding compiles', () => {
-		// placeholder; real tests follow in later tasks
+	describe('lifecycle', () => {
+		it('starts empty', () => {
+			const collector = new CmcdRequestCollector()
+			deepEqual(collector.getRequests(), [])
+		})
+
+		it('attach() calls each supplied transport adapter', () => {
+			const t1 = new FakeTransport()
+			const t2 = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t1, t2] })
+			ok(t1.attached)
+			ok(t2.attached)
+			collector.detach()
+		})
+
+		it('detach() invokes the detach functions returned by each transport', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			collector.detach()
+			ok(t.detached)
+		})
+
+		it('clear() empties the captured requests', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({
+				url: 'https://example.com/seg.m4s?CMCD=sid%3D%22abc%22',
+				method: 'GET',
+				headers: {},
+			})
+			equal(collector.getRequests().length, 1)
+			collector.clear()
+			equal(collector.getRequests().length, 0)
+			collector.detach()
+		})
+
+		it('getRequests() returns a defensive copy', () => {
+			const collector = new CmcdRequestCollector()
+			const a = collector.getRequests()
+			const b = collector.getRequests()
+			ok(a !== b)
+		})
 	})
 })

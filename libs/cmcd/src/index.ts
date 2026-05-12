@@ -46,7 +46,7 @@ export * from './CmcdReporter.ts'
 export type * from './CmcdReporterConfig.ts'
 export * from './CmcdReportingMode.ts'
 export type * from './CmcdRequest.ts'
-// export * from './CmcdRequestCollector.ts' // TODO Task 5
+export * from './CmcdRequestCollector.ts'
 export type * from './CmcdRequestCollectorOptions.ts'
 export type * from './CmcdRequestKey.ts'
 export type * from './CmcdRequestReport.ts'
