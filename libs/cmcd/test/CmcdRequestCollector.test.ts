@@ -122,6 +122,42 @@ describe('CmcdRequestCollector', () => {
 			equal(collector.getRequests().length, 2)
 			collector.detach()
 		})
+
+		it('attach() is a no-op when already attached', () => {
+			const t1 = new FakeTransport()
+			const t2 = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t1] })
+			collector.attach({ transports: [t2] })
+			ok(t1.attached)
+			ok(!t2.attached, 't2 should not have been attached')
+			collector.detach()
+		})
+
+		it('detach() rejects pending waitForRequests promises', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			const promise = collector.waitForRequests(CmcdRequestType.SEGMENT, 5, 60000)
+			setTimeout(() => collector.detach(), 10)
+			try {
+				await promise
+				ok(false, 'should have rejected')
+			} catch (err) {
+				ok((err as Error).message.includes('detached'))
+			}
+		})
+
+		it('detach() resolves pending collectFor promises with whatever was collected', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			const promise = collector.collectFor(60000)
+			setTimeout(() => collector.detach(), 10)
+			const result = await promise
+			equal(result.length, 1)
+		})
 	})
 
 	describe('classification', () => {

@@ -133,7 +133,10 @@ export class CmcdRequestCollector {
 	}
 
 	/**
-	 * Remove transport patches and stop collecting.
+	 * Remove transport patches and stop collecting. Rejects any pending
+	 * `waitForRequests` promises with `Error('Collector detached while waiting')`
+	 * and resolves any pending `collectFor` promises with whatever was
+	 * collected up to that point.
 	 *
 	 * @public
 	 */
@@ -147,6 +150,18 @@ export class CmcdRequestCollector {
 		this.#detachers = []
 		this.#attached = false
 		this.#eventTargetUrls = []
+
+		for (const waiter of this.#waiters) {
+			clearTimeout(waiter.timer)
+			waiter.reject(new Error('Collector detached while waiting'))
+		}
+		this.#waiters = []
+
+		for (const entry of this.#collectors) {
+			clearTimeout(entry.timer)
+			entry.resolve(this.getRequests(entry.type))
+		}
+		this.#collectors = []
 	}
 
 	/**
