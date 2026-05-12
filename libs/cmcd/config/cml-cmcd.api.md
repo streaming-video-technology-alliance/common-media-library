@@ -23,6 +23,15 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 export type Cmcd = CmcdRequest & CmcdResponse & CmcdEvent;
 
 // @public
+export const CMCD_COLLECTED_REQUEST_MODE_EVENT: "event";
+
+// @public
+export const CMCD_COLLECTED_REQUEST_MODE_HEADER: "header";
+
+// @public
+export const CMCD_COLLECTED_REQUEST_MODE_QUERY: "query";
+
+// @public
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
 
 // @public
@@ -166,7 +175,14 @@ export type CmcdCollectedRequest = {
 };
 
 // @public
-export type CmcdCollectedRequestMode = "query" | "header" | "event";
+export const CmcdCollectedRequestMode: {
+    readonly QUERY: typeof CMCD_COLLECTED_REQUEST_MODE_QUERY;
+    readonly HEADER: typeof CMCD_COLLECTED_REQUEST_MODE_HEADER;
+    readonly EVENT: typeof CMCD_COLLECTED_REQUEST_MODE_EVENT;
+};
+
+// @public (undocumented)
+export type CmcdCollectedRequestMode = ValueOf<typeof CmcdCollectedRequestMode>;
 
 // @public
 export type CmcdCustomKey = `${string}-${string}`;

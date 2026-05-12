@@ -1,12 +1,6 @@
 import type { HttpRequest } from '@svta/cml-utils'
+import type { CmcdCollectedRequestMode } from './CmcdCollectedRequestMode.ts'
 import type { CmcdRequestType } from './CmcdRequestType.ts'
-
-/**
- * Reporting mode under which a captured request was observed.
- *
- * @public
- */
-export type CmcdCollectedRequestMode = 'query' | 'header' | 'event'
 
 /**
  * A request captured by `CmcdRequestCollector`, normalized to
