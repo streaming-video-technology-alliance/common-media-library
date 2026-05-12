@@ -9,6 +9,8 @@ type XhrInstance = XMLHttpRequest & {
 
 async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<void> {
 	const text = await response.clone().text().catch(() => '')
+	const ProgressEventCtor: typeof ProgressEvent | typeof Event =
+		typeof ProgressEvent !== 'undefined' ? ProgressEvent : Event
 
 	queueMicrotask(() => {
 		try {
@@ -20,10 +22,10 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 			Object.defineProperty(xhr, 'responseText', { value: text, configurable: true })
 
 			if (typeof xhr.onload === 'function') {
-				xhr.onload.call(xhr, new Event('load'))
+				xhr.onload.call(xhr, new ProgressEventCtor('load'))
 			}
 			if (typeof xhr.onloadend === 'function') {
-				xhr.onloadend.call(xhr, new Event('loadend'))
+				xhr.onloadend.call(xhr, new ProgressEventCtor('loadend'))
 			}
 		} catch {
 			// MockXhr may not allow defineProperty on some properties;
@@ -36,10 +38,10 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 			target['response'] = text
 			target['responseText'] = text
 			if (typeof xhr.onload === 'function') {
-				xhr.onload.call(xhr as unknown as XMLHttpRequest, new Event('load'))
+				xhr.onload.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('load'))
 			}
 			if (typeof xhr.onloadend === 'function') {
-				xhr.onloadend.call(xhr as unknown as XMLHttpRequest, new Event('loadend'))
+				xhr.onloadend.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('loadend'))
 			}
 		}
 	})
