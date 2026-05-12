@@ -30,9 +30,6 @@ async function toHttpRequest(request: Request): Promise<HttpRequest> {
  * headers, body read as UTF-8 string). Returns the adapter object
  * expected by `CmcdRequestCollector`.
  *
- * @example
- * {@includeCode ../test/CmcdRequestCollector.test.ts#example-fetch}
- *
  * @public
  */
 export function createFetchTransport(): CmcdTransportAdapter {
@@ -44,7 +41,7 @@ export function createFetchTransport(): CmcdTransportAdapter {
 				input: RequestInfo | URL,
 				init?: RequestInit,
 			): Promise<Response> => {
-				const inspect = new Request(input as RequestInfo, init)
+				const inspect = new Request(input, init)
 				const httpRequest = await toHttpRequest(inspect.clone())
 				const synthetic = deliver(httpRequest)
 				if (synthetic) {
