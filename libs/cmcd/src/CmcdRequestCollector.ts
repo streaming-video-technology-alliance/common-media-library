@@ -18,6 +18,8 @@ export class CmcdRequestCollector {
 	/**
 	 * Install transport patches and begin collecting CMCD requests.
 	 * No-op if already attached.
+	 *
+	 * @public
 	 */
 	attach(options: CmcdRequestCollectorOptions = {}): void {
 		if (this.#attached) {
@@ -43,6 +45,8 @@ export class CmcdRequestCollector {
 
 	/**
 	 * Remove transport patches and stop collecting.
+	 *
+	 * @public
 	 */
 	detach(): void {
 		if (!this.#attached) {
@@ -57,14 +61,17 @@ export class CmcdRequestCollector {
 
 	/**
 	 * Discard all captured requests. Does not affect the attached state.
+	 *
+	 * @public
 	 */
 	clear(): void {
 		this.#requests = []
 	}
 
 	/**
-	 * Return a defensive copy of the captured requests, optionally
-	 * filtered by type.
+	 * Return a defensive copy of the captured requests.
+	 *
+	 * @public
 	 */
 	getRequests(): CmcdCollectedRequest[] {
 		return [...this.#requests]
