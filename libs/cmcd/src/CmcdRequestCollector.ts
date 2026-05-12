@@ -2,6 +2,8 @@ import type { HttpRequest } from '@svta/cml-utils'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import type { CmcdCollectedRequest } from './CmcdCollectedRequest.ts'
 import type { CmcdCollectedRequestMode } from './CmcdCollectedRequestMode.ts'
+import { createFetchTransport } from './createFetchTransport.ts'
+import { createXhrTransport } from './createXhrTransport.ts'
 import type { CmcdRequestCollectorOptions } from './CmcdRequestCollectorOptions.ts'
 import { CmcdRequestType } from './CmcdRequestType.ts'
 
@@ -67,6 +69,9 @@ type CmcdRequestCollectorEntry = {
  * normalized to {@link @svta/cml-utils!HttpRequest | HttpRequest} so
  * tests are identical regardless of which transport the player uses.
  *
+ * @example
+ * {@includeCode ../test/CmcdRequestCollector.test.ts#example}
+ *
  * @public
  */
 export class CmcdRequestCollector {
@@ -126,7 +131,7 @@ export class CmcdRequestCollector {
 		this.#attached = true
 		this.#eventTargetUrls = options.eventTargetUrls ?? []
 
-		const transports = options.transports ?? []
+		const transports = options.transports ?? [createXhrTransport(), createFetchTransport()]
 		for (const transport of transports) {
 			this.#detachers.push(transport.attach(this.#deliver))
 		}
@@ -176,6 +181,9 @@ export class CmcdRequestCollector {
 	/**
 	 * Return a defensive copy of the captured requests, optionally
 	 * filtered by classification.
+	 *
+	 * @param type - When provided, only requests with a matching
+	 *   {@link CmcdRequestType} are included in the result.
 	 *
 	 * @public
 	 */

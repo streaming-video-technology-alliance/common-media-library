@@ -520,6 +520,58 @@ describe('createXhrTransport', () => {
 	})
 })
 
+describe('default transports', () => {
+	it('uses both XHR and fetch when no transports option is supplied', async () => {
+		const origXhr = globalThis.XMLHttpRequest
+		const origFetch = globalThis.fetch
+		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = MockXhr
+		globalThis.fetch = async () => new Response('', { status: 200 })
+
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach()
+
+			const xhr = new MockXhr()
+			xhr.open('GET', 'https://e.com/a.m4s?CMCD=sid%3D%22x%22')
+			xhr.send()
+
+			await fetch('https://e.com/b.m4s?CMCD=sid%3D%22y%22')
+
+			equal(collector.getRequests(CmcdRequestType.SEGMENT).length, 2)
+			collector.detach()
+		} finally {
+			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
+			globalThis.fetch = origFetch
+		}
+	})
+
+	it('provides a valid example', async () => {
+		const origXhr = globalThis.XMLHttpRequest
+		const origFetch = globalThis.fetch
+		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = MockXhr
+		globalThis.fetch = async () => new Response('', { status: 200 })
+
+		try {
+			//#region example
+			const collector = new CmcdRequestCollector()
+			collector.attach({ eventTargetUrls: ['https://events.example.com'] })
+
+			// ... player runs, emits CMCD requests ...
+			await fetch('https://cdn.example.com/seg1.m4s?CMCD=sid%3D%22abc%22')
+			await fetch('https://cdn.example.com/seg2.m4s?CMCD=sid%3D%22abc%22')
+
+			const segments = collector.getRequests(CmcdRequestType.SEGMENT)
+			equal(segments.length, 2)
+
+			collector.detach()
+			//#endregion example
+		} finally {
+			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
+			globalThis.fetch = origFetch
+		}
+	})
+})
+
 describe('createFetchTransport', () => {
 	let origFetch: typeof globalThis.fetch
 
