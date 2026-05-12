@@ -7,6 +7,44 @@ type XhrInstance = XMLHttpRequest & {
 	_cmcdHeaders?: Record<string, string>;
 }
 
+async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<void> {
+	const text = await response.clone().text().catch(() => '')
+
+	queueMicrotask(() => {
+		try {
+			Object.defineProperty(xhr, 'status', { value: response.status, configurable: true })
+			Object.defineProperty(xhr, 'statusText', { value: response.statusText, configurable: true })
+			Object.defineProperty(xhr, 'readyState', { value: 4, configurable: true })
+			Object.defineProperty(xhr, 'responseURL', { value: xhr._cmcdUrl ?? '', configurable: true })
+			Object.defineProperty(xhr, 'response', { value: text, configurable: true })
+			Object.defineProperty(xhr, 'responseText', { value: text, configurable: true })
+
+			if (typeof xhr.onload === 'function') {
+				xhr.onload.call(xhr, new Event('load'))
+			}
+			if (typeof xhr.onloadend === 'function') {
+				xhr.onloadend.call(xhr, new Event('loadend'))
+			}
+		} catch {
+			// MockXhr may not allow defineProperty on some properties;
+			// for shim simplicity we set them directly as a fallback.
+			const target = xhr as unknown as Record<string, unknown>
+			target['status'] = response.status
+			target['statusText'] = response.statusText
+			target['readyState'] = 4
+			target['responseURL'] = xhr._cmcdUrl ?? ''
+			target['response'] = text
+			target['responseText'] = text
+			if (typeof xhr.onload === 'function') {
+				xhr.onload.call(xhr as unknown as XMLHttpRequest, new Event('load'))
+			}
+			if (typeof xhr.onloadend === 'function') {
+				xhr.onloadend.call(xhr as unknown as XMLHttpRequest, new Event('loadend'))
+			}
+		}
+	})
+}
+
 /**
  * Create a transport adapter that patches `XMLHttpRequest.prototype` to
  * capture CMCD-bearing requests. Returns the adapter object expected by
@@ -48,7 +86,12 @@ export function createXhrTransport(): CmcdTransportAdapter {
 					body: body ?? undefined,
 				}
 
-				deliver(httpRequest)
+				const synthetic = deliver(httpRequest)
+
+				if (synthetic) {
+					completeXhrWith(this, synthetic)
+					return
+				}
 
 				return origSend.apply(this, [body])
 			}

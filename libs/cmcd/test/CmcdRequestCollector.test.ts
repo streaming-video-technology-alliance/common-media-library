@@ -487,4 +487,35 @@ describe('createXhrTransport', () => {
 			restoreXhrShim()
 		}
 	})
+
+	it('completes the XHR with synthetic 204 when URL matches eventTargetUrls', async () => {
+		installXhrShim()
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				transports: [createXhrTransport()],
+				eventTargetUrls: ['https://events.example.com'],
+			})
+
+			const xhr = new MockXhr()
+			let loaded = false
+			let loadEnded = false
+			xhr.onload = () => { loaded = true }
+			xhr.onloadend = () => { loadEnded = true }
+			xhr.open('POST', 'https://events.example.com/cmcd')
+			xhr.send('sid="abc"')
+
+			// Wait one microtask for the synthetic completion to fire
+			await new Promise((r) => setTimeout(r, 0))
+
+			ok(loaded, 'onload should have fired')
+			ok(loadEnded, 'onloadend should have fired')
+			equal(xhr.status, 204)
+			equal(xhr.readyState, 4)
+			equal(collector.getRequests(CmcdRequestType.EVENT).length, 1)
+			collector.detach()
+		} finally {
+			restoreXhrShim()
+		}
+	})
 })
