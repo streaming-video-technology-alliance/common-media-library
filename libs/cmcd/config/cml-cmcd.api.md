@@ -418,12 +418,13 @@ export type CmcdRequest = {
     v?: number;
 };
 
-// @public
+// @public (undocumented)
 export class CmcdRequestCollector {
     attach(options?: CmcdRequestCollectorOptions): void;
     clear(): void;
     detach(): void;
     getRequests(type?: CmcdRequestType): CmcdCollectedRequest[];
+    waitForRequests(type: CmcdRequestType | undefined, count: number, timeout?: number): Promise<CmcdCollectedRequest[]>;
 }
 
 // @public

@@ -55,11 +55,20 @@ function detectReportingMode(
  *
  * @public
  */
+type CmcdRequestWaiter = {
+	type: CmcdRequestType | undefined
+	count: number
+	resolve: (r: CmcdCollectedRequest[]) => void
+	reject: (e: Error) => void
+	timer: ReturnType<typeof setTimeout>
+}
+
 export class CmcdRequestCollector {
 	#requests: CmcdCollectedRequest[] = []
 	#detachers: Array<() => void> = []
 	#attached = false
 	#eventTargetUrls: readonly string[] = []
+	#waiters: CmcdRequestWaiter[] = []
 
 	readonly #deliver = (request: HttpRequest): Response | undefined => {
 		const url = request.url
@@ -78,7 +87,23 @@ export class CmcdRequestCollector {
 			timestamp: Date.now(),
 		})
 
+		this.#notifyWaiters()
+
 		return undefined
+	}
+
+	#notifyWaiters(): void {
+		const remaining: CmcdRequestWaiter[] = []
+		for (const waiter of this.#waiters) {
+			const matching = this.getRequests(waiter.type)
+			if (matching.length >= waiter.count) {
+				clearTimeout(waiter.timer)
+				waiter.resolve(matching)
+			} else {
+				remaining.push(waiter)
+			}
+		}
+		this.#waiters = remaining
 	}
 
 	/**
@@ -137,5 +162,40 @@ export class CmcdRequestCollector {
 			return [...this.#requests]
 		}
 		return this.#requests.filter((r) => r.type === type)
+	}
+
+	/**
+	 * Wait until at least `count` requests of the given type are captured.
+	 * Resolves with all matching captures; rejects with a diagnostic error
+	 * on timeout (default 15000 ms). Use for positive assertions
+	 * ("expect N to happen").
+	 *
+	 * @public
+	 */
+	waitForRequests(
+		type: CmcdRequestType | undefined,
+		count: number,
+		timeout = 15000,
+	): Promise<CmcdCollectedRequest[]> {
+		const matching = this.getRequests(type)
+		if (matching.length >= count) {
+			return Promise.resolve(matching)
+		}
+
+		return new Promise<CmcdCollectedRequest[]>((resolve, reject) => {
+			const timer = setTimeout(() => {
+				const idx = this.#waiters.findIndex((w) => w.timer === timer)
+				if (idx >= 0) {
+					this.#waiters.splice(idx, 1)
+				}
+				const current = this.getRequests(type)
+				reject(new Error(
+					`Timeout waiting for ${count} ${type ?? 'any'} CMCD request(s). ` +
+					`Got ${current.length}. Total collected: ${this.#requests.length}.`,
+				))
+			}, timeout)
+
+			this.#waiters.push({ type, count, resolve, reject, timer })
+		})
 	}
 }

@@ -217,4 +217,61 @@ describe('CmcdRequestCollector', () => {
 			collector.detach()
 		})
 	})
+
+	describe('waitForRequests', () => {
+		it('resolves immediately when count already met', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
+			t.simulate({ url: 'https://e.com/b.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
+			const result = await collector.waitForRequests(CmcdRequestType.SEGMENT, 2, 1000)
+			equal(result.length, 2)
+			collector.detach()
+		})
+
+		it('resolves when threshold is reached after the call', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			const promise = collector.waitForRequests(CmcdRequestType.SEGMENT, 2, 1000)
+			setTimeout(() => {
+				t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+				t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
+			}, 10)
+			const result = await promise
+			equal(result.length, 2)
+			collector.detach()
+		})
+
+		it('rejects with a diagnostic error on timeout', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			try {
+				await collector.waitForRequests(CmcdRequestType.SEGMENT, 3, 50)
+				ok(false, 'should have rejected')
+			} catch (err) {
+				const e = err as Error
+				ok(e.message.includes('Timeout'))
+				ok(e.message.includes('3'))
+				ok(e.message.includes('segment'))
+				ok(e.message.includes('Got 1'))
+			}
+			collector.detach()
+		})
+
+		it('waits across any type when type is undefined', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			const promise = collector.waitForRequests(undefined, 2, 1000)
+			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
+			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
+			const result = await promise
+			equal(result.length, 2)
+			collector.detach()
+		})
+	})
 })
