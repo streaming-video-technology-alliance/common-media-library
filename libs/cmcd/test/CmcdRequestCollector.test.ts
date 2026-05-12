@@ -6,7 +6,7 @@ import { describe, it } from 'node:test'
  * Minimal XMLHttpRequest shim sufficient for createXhrTransport tests.
  * Installed as `globalThis.XMLHttpRequest` for the duration of a test.
  */
-export class MockXhr {
+class MockXhr {
 	_method = 'GET'
 	_url = ''
 	_headers: Record<string, string> = {}
@@ -43,7 +43,7 @@ export class MockXhr {
  * any globals. Exposes `.deliver()` so tests can simulate intercepted
  * requests directly.
  */
-export class FakeTransport implements CmcdTransportAdapter {
+class FakeTransport implements CmcdTransportAdapter {
 	deliver: CmcdRequestDeliver = () => undefined
 	attached = false
 	detached = false
