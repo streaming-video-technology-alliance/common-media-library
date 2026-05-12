@@ -567,6 +567,9 @@ export type CmcdValue = ValueOf<Cmcd>;
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
 // @public
+export function createFetchTransport(): CmcdTransportAdapter;
+
+// @public
 export function createXhrTransport(): CmcdTransportAdapter;
 
 // @public

@@ -1,5 +1,5 @@
 import type { CmcdTransportAdapter, CmcdRequestDeliver } from '@svta/cml-cmcd'
-import { createXhrTransport, CmcdRequestCollector, CmcdRequestType } from '@svta/cml-cmcd'
+import { createFetchTransport, createXhrTransport, CmcdRequestCollector, CmcdRequestType } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -516,6 +516,94 @@ describe('createXhrTransport', () => {
 			collector.detach()
 		} finally {
 			restoreXhrShim()
+		}
+	})
+})
+
+describe('createFetchTransport', () => {
+	let origFetch: typeof globalThis.fetch
+
+	function installFetchStub(): void {
+		origFetch = globalThis.fetch
+		globalThis.fetch = async () => new Response('', { status: 200 })
+	}
+
+	function restoreFetchStub(): void {
+		globalThis.fetch = origFetch
+	}
+
+	it('captures a fetch request with CMCD query parameter', async () => {
+		installFetchStub()
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [createFetchTransport()] })
+
+			await fetch('https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
+
+			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			equal(captured.length, 1)
+			equal(captured[0].reportingMode, 'query')
+			equal(captured[0].request.url, 'https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
+			collector.detach()
+		} finally {
+			restoreFetchStub()
+		}
+	})
+
+	it('captures a fetch request with CMCD-* headers and lowercases header names', async () => {
+		installFetchStub()
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [createFetchTransport()] })
+
+			await fetch('https://e.com/seg.m4s', {
+				headers: { 'CMCD-Request': 'sid="abc"' },
+			})
+
+			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			equal(captured.length, 1)
+			equal(captured[0].reportingMode, 'header')
+			equal(captured[0].request.headers?.['cmcd-request'], 'sid="abc"')
+			collector.detach()
+		} finally {
+			restoreFetchStub()
+		}
+	})
+
+	it('normalizes a POST body to a string', async () => {
+		installFetchStub()
+		try {
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				transports: [createFetchTransport()],
+				eventTargetUrls: ['https://events.example.com'],
+			})
+
+			await fetch('https://events.example.com/cmcd', {
+				method: 'POST',
+				body: 'sid="abc",ts=1234',
+			})
+
+			const captured = collector.getRequests(CmcdRequestType.EVENT)
+			equal(captured.length, 1)
+			equal(captured[0].request.body, 'sid="abc",ts=1234')
+			collector.detach()
+		} finally {
+			restoreFetchStub()
+		}
+	})
+
+	it('detach restores the original fetch reference', () => {
+		installFetchStub()
+		try {
+			const beforeAttach = globalThis.fetch
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [createFetchTransport()] })
+			ok(globalThis.fetch !== beforeAttach, 'fetch should have been wrapped')
+			collector.detach()
+			equal(globalThis.fetch, beforeAttach, 'fetch should be restored')
+		} finally {
+			restoreFetchStub()
 		}
 	})
 })
