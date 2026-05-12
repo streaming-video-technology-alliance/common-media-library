@@ -8,8 +8,8 @@ import { CmcdRequestType } from './CmcdRequestType.ts'
 const MANIFEST_EXTENSIONS = /\.(m3u8|mpd)(\?|$|\/)/i
 const SEGMENT_EXTENSIONS = /\.(m4s|m4v|m4a|mp4|ts|aac)(\?|$|\/)/i
 
-function classifyUrl(url: string, method: string, isEventTarget: boolean): CmcdRequestType {
-	if (isEventTarget || method === 'POST') {
+function classifyUrl(url: string, method: string): CmcdRequestType {
+	if (method === 'POST') {
 		return CmcdRequestType.EVENT
 	}
 	if (MANIFEST_EXTENSIONS.test(url)) {
@@ -73,7 +73,7 @@ export class CmcdRequestCollector {
 
 		this.#requests.push({
 			request,
-			type: classifyUrl(url, method, isEventTarget),
+			type: classifyUrl(url, method),
 			reportingMode,
 			timestamp: Date.now(),
 		})
