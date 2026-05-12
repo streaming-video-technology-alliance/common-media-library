@@ -18,7 +18,9 @@ export type CmcdFormatterOptions = {
 	reportingMode: CmcdReportingMode;
 
 	/**
-	 * The base URL to use for relative URLs.
+	 * Base URL (typically the manifest or current request URL) used to convert absolute `nor` values
+	 * into paths relative to this base, per the CMCD specification. Values that are already relative
+	 * paths are passed through unchanged. When omitted, `nor` values are emitted as-is.
 	 */
 	baseUrl?: string;
 };

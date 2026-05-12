@@ -1,5 +1,5 @@
 import { SfItem } from '@svta/cml-structured-field-values'
-import { urlToRelativePath, type ValueOrArray } from '@svta/cml-utils'
+import { getBaseUrl, urlToRelativePath, type ValueOrArray } from '@svta/cml-utils'
 import type { CmcdFormatter } from './CmcdFormatter.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdValue } from './CmcdValue.ts'
@@ -28,7 +28,7 @@ const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArra
 	}
 	else {
 		if (options.baseUrl) {
-			value = urlToRelativePath(value as string, options.baseUrl)
+			value = urlToRelativePath(value as string, getBaseUrl(options.baseUrl))
 		}
 		return options.version === 1 ? encodeURIComponent(value as string) : (value as string)
 	}

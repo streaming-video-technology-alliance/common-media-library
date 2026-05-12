@@ -54,6 +54,9 @@ export type ExclusiveRecord<K extends PropertyKey, V> = { [P in K]: Record<P, V>
 export function getBandwidthBps(sample: ResourceTiming): number;
 
 // @public
+export function getBaseUrl(fullUrl: string | URL): string;
+
+// @public
 export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
 // @public

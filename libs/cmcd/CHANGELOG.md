@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `nor` formatter crash (`TypeError: Invalid URL`) when the value is already a relative path and `baseUrl` is configured ([#364](https://github.com/streaming-video-technology-alliance/common-media-library/issues/364))
+
+### Changed
+
+- `CmcdReporter` now uses the current request URL's directory (via `getBaseUrl`) as the base for `nor` relative-path conversion, producing sibling-relative paths per the CMCD specification (previously the origin was used, yielding root-relative paths)
+- Clarify TSDoc for `nor` and `CmcdEncodeOptions.baseUrl` / `CmcdFormatterOptions.baseUrl` to document the absolute-URL convenience conversion
+
 ## [2.3.1] - 2026-04-30
 
 ### Fixed

@@ -366,7 +366,7 @@ export class CmcdReporter {
 
 		const url = new URL(report.url)
 		const cmcdData = { ...this.data, ...data, sn: this.requestTarget.sn++ }
-		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, url.origin)
+		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
 		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
 			cmcdData.msd = this.msd
