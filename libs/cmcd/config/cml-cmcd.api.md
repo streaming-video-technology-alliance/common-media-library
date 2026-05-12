@@ -122,6 +122,18 @@ export const CMCD_REQUEST_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "
 export const CMCD_REQUEST_MODE: "request";
 
 // @public
+export const CMCD_REQUEST_TYPE_EVENT: "event";
+
+// @public
+export const CMCD_REQUEST_TYPE_MANIFEST: "manifest";
+
+// @public
+export const CMCD_REQUEST_TYPE_SEGMENT: "segment";
+
+// @public
+export const CMCD_REQUEST_TYPE_UNKNOWN: "unknown";
+
+// @public
 export const CMCD_RESPONSE_KEYS: readonly ["cmsdd", "cmsds", "rc", "smrt", "ttfb", "ttfbb", "ttlb", "url"];
 
 // @public
@@ -144,6 +156,17 @@ export const CMCD_VALIDATION_SEVERITY_ERROR: "error";
 
 // @public
 export const CMCD_VALIDATION_SEVERITY_WARNING: "warning";
+
+// @public
+export type CmcdCollectedRequest = {
+    readonly request: HttpRequest;
+    readonly type: CmcdRequestType;
+    readonly reportingMode: CmcdCollectedRequestMode;
+    readonly timestamp: number;
+};
+
+// @public
+export type CmcdCollectedRequestMode = "query" | "header" | "event";
 
 // @public
 export type CmcdCustomKey = `${string}-${string}`;
@@ -380,6 +403,15 @@ export type CmcdRequest = {
 };
 
 // @public
+export type CmcdRequestCollectorOptions = {
+    eventTargetUrls?: readonly string[];
+    transports?: readonly CmcdTransportAdapter[];
+};
+
+// @public
+export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined;
+
+// @public
 export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 
 // @public
@@ -394,6 +426,17 @@ export type CmcdRequestReport<D = unknown> = HttpRequest & {
 export type CmcdRequestReportConfig = CmcdReportConfig & {
     transmissionMode?: CmcdTransmissionMode;
 };
+
+// @public
+export const CmcdRequestType: {
+    readonly MANIFEST: typeof CMCD_REQUEST_TYPE_MANIFEST;
+    readonly SEGMENT: typeof CMCD_REQUEST_TYPE_SEGMENT;
+    readonly EVENT: typeof CMCD_REQUEST_TYPE_EVENT;
+    readonly UNKNOWN: typeof CMCD_REQUEST_TYPE_UNKNOWN;
+};
+
+// @public (undocumented)
+export type CmcdRequestType = ValueOf<typeof CmcdRequestType>;
 
 // @public
 export type CmcdResponse = CmcdRequest & {
@@ -437,6 +480,11 @@ export const CmcdTransmissionMode: {
 
 // @public (undocumented)
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
+
+// @public
+export type CmcdTransportAdapter = {
+    attach(deliver: CmcdRequestDeliver): () => void;
+};
 
 // @public
 export type CmcdV1 = {
