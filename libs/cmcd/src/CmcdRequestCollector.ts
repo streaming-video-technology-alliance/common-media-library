@@ -1,6 +1,51 @@
+import type { HttpRequest } from '@svta/cml-utils'
+import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import type { CmcdCollectedRequest } from './CmcdCollectedRequest.ts'
+import type { CmcdCollectedRequestMode } from './CmcdCollectedRequestMode.ts'
 import type { CmcdRequestCollectorOptions } from './CmcdRequestCollectorOptions.ts'
 import { CmcdRequestType } from './CmcdRequestType.ts'
+
+const MANIFEST_EXTENSIONS = /\.(m3u8|mpd)(\?|$|\/)/i
+const SEGMENT_EXTENSIONS = /\.(m4s|m4v|m4a|mp4|ts|aac)(\?|$|\/)/i
+
+function classifyUrl(url: string, method: string, isEventTarget: boolean): CmcdRequestType {
+	if (isEventTarget || method === 'POST') {
+		return CmcdRequestType.EVENT
+	}
+	if (MANIFEST_EXTENSIONS.test(url)) {
+		return CmcdRequestType.MANIFEST
+	}
+	if (SEGMENT_EXTENSIONS.test(url)) {
+		return CmcdRequestType.SEGMENT
+	}
+	return CmcdRequestType.UNKNOWN
+}
+
+function hasCmcdHeader(headers: Record<string, string> | undefined): boolean {
+	if (!headers) {
+		return false
+	}
+	for (const name in headers) {
+		if (name.toLowerCase().startsWith('cmcd-')) {
+			return true
+		}
+	}
+	return false
+}
+
+function detectReportingMode(
+	url: string,
+	headers: Record<string, string> | undefined,
+	isEventTarget: boolean,
+): CmcdCollectedRequestMode | null {
+	if (isEventTarget) {
+		return 'event'
+	}
+	if (hasCmcdHeader(headers)) {
+		return 'header'
+	}
+	return url.includes(`${CMCD_PARAM}=`) ? 'query' : null
+}
 
 /**
  * Test helper that captures CMCD-bearing requests across XHR and fetch
@@ -14,6 +59,27 @@ export class CmcdRequestCollector {
 	#requests: CmcdCollectedRequest[] = []
 	#detachers: Array<() => void> = []
 	#attached = false
+	#eventTargetUrls: readonly string[] = []
+
+	readonly #deliver = (request: HttpRequest): Response | undefined => {
+		const url = request.url
+		const method = (request.method ?? 'GET').toUpperCase()
+		const isEventTarget = method === 'POST' && this.#eventTargetUrls.some((t) => url.startsWith(t))
+
+		const reportingMode = detectReportingMode(url, request.headers, isEventTarget)
+		if (reportingMode === null) {
+			return undefined
+		}
+
+		this.#requests.push({
+			request,
+			type: classifyUrl(url, method, isEventTarget),
+			reportingMode,
+			timestamp: Date.now(),
+		})
+
+		return undefined
+	}
 
 	/**
 	 * Install transport patches and begin collecting CMCD requests.
@@ -26,20 +92,11 @@ export class CmcdRequestCollector {
 			return
 		}
 		this.#attached = true
+		this.#eventTargetUrls = options.eventTargetUrls ?? []
 
 		const transports = options.transports ?? []
-		const deliver = (request: import('@svta/cml-utils').HttpRequest): Response | undefined => {
-			this.#requests.push({
-				request,
-				type: CmcdRequestType.UNKNOWN,
-				reportingMode: 'query',
-				timestamp: Date.now(),
-			})
-			return undefined
-		}
-
 		for (const transport of transports) {
-			this.#detachers.push(transport.attach(deliver))
+			this.#detachers.push(transport.attach(this.#deliver))
 		}
 	}
 
@@ -57,6 +114,7 @@ export class CmcdRequestCollector {
 		}
 		this.#detachers = []
 		this.#attached = false
+		this.#eventTargetUrls = []
 	}
 
 	/**

@@ -117,10 +117,103 @@ describe('CmcdRequestCollector', () => {
 			collector.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
-			// Both stubbed as UNKNOWN until Task 5; this test will be updated
-			// once classification lands. For now, assert filter mechanics work:
-			equal(collector.getRequests(CmcdRequestType.UNKNOWN).length, 2)
-			equal(collector.getRequests(CmcdRequestType.SEGMENT).length, 0)
+			equal(collector.getRequests(CmcdRequestType.MANIFEST).length, 1)
+			equal(collector.getRequests(CmcdRequestType.SEGMENT).length, 1)
+			equal(collector.getRequests().length, 2)
+			collector.detach()
+		})
+	})
+
+	describe('classification', () => {
+		it('classifies a .m3u8 GET as manifest with reportingMode=query', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({
+				url: 'https://e.com/index.m3u8?CMCD=sid%3D%22abc%22',
+				method: 'GET',
+				headers: {},
+			})
+			const captured = collector.getRequests()
+			equal(captured.length, 1)
+			equal(captured[0].type, CmcdRequestType.MANIFEST)
+			equal(captured[0].reportingMode, 'query')
+			collector.detach()
+		})
+
+		it('classifies a .mpd GET as manifest', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({
+				url: 'https://e.com/index.mpd?CMCD=sid%3D%22abc%22',
+				method: 'GET',
+				headers: {},
+			})
+			equal(collector.getRequests()[0].type, CmcdRequestType.MANIFEST)
+			collector.detach()
+		})
+
+		it('classifies a .m4s GET as segment with reportingMode=header when CMCD headers present', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({
+				url: 'https://e.com/seg1.m4s',
+				method: 'GET',
+				headers: { 'cmcd-request': 'sid="abc"' },
+			})
+			const captured = collector.getRequests()
+			equal(captured[0].type, CmcdRequestType.SEGMENT)
+			equal(captured[0].reportingMode, 'header')
+			collector.detach()
+		})
+
+		it('classifies POST as event regardless of URL extension', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				transports: [t],
+				eventTargetUrls: ['https://events.example.com'],
+			})
+			t.simulate({
+				url: 'https://events.example.com/cmcd',
+				method: 'POST',
+				headers: {},
+				body: 'sid="abc",ts=1234',
+			})
+			const captured = collector.getRequests()
+			equal(captured[0].type, CmcdRequestType.EVENT)
+			equal(captured[0].reportingMode, 'event')
+			collector.detach()
+		})
+
+		it('does not capture requests that carry no CMCD data', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({
+				url: 'https://e.com/seg1.m4s',
+				method: 'GET',
+				headers: { 'content-type': 'video/mp4' },
+			})
+			equal(collector.getRequests().length, 0)
+			collector.detach()
+		})
+
+		it('captures unknown-type URLs that carry CMCD query', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			collector.attach({ transports: [t] })
+			t.simulate({
+				url: 'https://e.com/something?CMCD=sid%3D%22abc%22',
+				method: 'GET',
+				headers: {},
+			})
+			const captured = collector.getRequests()
+			equal(captured.length, 1)
+			equal(captured[0].type, CmcdRequestType.UNKNOWN)
+			equal(captured[0].reportingMode, 'query')
 			collector.detach()
 		})
 	})
