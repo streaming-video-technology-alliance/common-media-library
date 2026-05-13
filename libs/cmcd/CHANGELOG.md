@@ -8,6 +8,17 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.3.2] - 2026-05-13
+
+### Fixed
+
+- Fix `nor` formatter crash (`TypeError: Invalid URL`) when the value is already a relative path and `baseUrl` is configured ([#364](https://github.com/streaming-video-technology-alliance/common-media-library/issues/364))
+
+### Changed
+
+- `CmcdReporter` now uses the current request URL's directory (via `getBaseUrl`) as the base for `nor` relative-path conversion, producing sibling-relative paths per the CMCD specification (previously the origin was used, yielding root-relative paths)
+- Clarify TSDoc for `nor` and `CmcdEncodeOptions.baseUrl` / `CmcdFormatterOptions.baseUrl` to document the absolute-URL convenience conversion
+
 ## [2.3.1] - 2026-04-30
 
 ### Fixed
@@ -128,7 +139,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...HEAD
+[2.3.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.3.2
 [2.3.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.0...cmcd-v2.3.1
 [2.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.2.0...cmcd-v2.3.0
 [2.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.2...cmcd-v2.2.0

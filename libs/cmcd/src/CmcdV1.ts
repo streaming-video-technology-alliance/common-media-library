@@ -41,6 +41,11 @@ export type CmcdV1 = {
 	 * pre-fetch to take place.
 	 *
 	 * String
+	 *
+	 * @remarks
+	 * Values may be provided as absolute URLs for convenience; when `CmcdEncodeOptions.baseUrl` is set,
+	 * same-origin URLs are converted to paths relative to that base. Already-relative values are not
+	 * converted, but are still URL-encoded on emission as required by CMCD v1.
 	 */
 	nor?: string;
 

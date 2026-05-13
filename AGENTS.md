@@ -16,7 +16,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 ## Build Commands
 
 - `npm run build -w <workspace>`: Build a module
-- `npm run typecheck`: Run the typechecker
+- `npm run typecheck`: Run the typechecker (pre-existing tsdown errors in `node_modules` are expected; do not try to fix them)
 - `npm test -w <workspace>`: Run the tests for a module (build first — tests use bundled output)
 - `npm run format`: Run the formatter
 - `npm run ver <package> <version>`: Update version for a package (`<package>` is the folder name without `libs/` prefix)
@@ -38,6 +38,7 @@ APIs are the product. Design them so adopters fall into the pit of success:
 - Update `package.json` version (semver) and `CHANGELOG.md` for every change
 - When a package's version changes, patch-bump any packages that depend on it
 - Avoid breaking changes; when unavoidable, provide migration guidance in changelog and docs
+- Save all plans in the `plans/` directory in a folder with the name of the feature or issue being implemented. Individual parts of the plan like steps, architecture, tech stack, etc. should be saved in separate files within the folder.
 
 ## Documentation
 
@@ -51,3 +52,5 @@ APIs are the product. Design them so adopters fall into the pit of success:
 
 - **Always use `git commit -s`** to add the DCO sign-off. Every commit must have this.
 - Follow conventional commit format (`feat:`, `fix:`, `refactor:`, `chore:`, etc.).
+- **Never commit directly to `main`**, even for docs or specs. All work goes on a feature branch; integration is through PRs. For issue-driven work, use `issue/<number>-<short-kebab-slug>`.
+- For AI-assisted commits, include a `Co-Authored-By: <agent-name> <model> <noreply@anthropic.com>` trailer in the commit body.

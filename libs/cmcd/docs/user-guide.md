@@ -161,6 +161,28 @@ reporter.update({
 // This encodes to: br=(5000;v 3000;a)
 ```
 
+### Absolute URLs for `nor`
+
+The CMCD specification defines `nor` (next object request) as a path relative to the current request URL. For convenience, `CmcdReporter` also accepts absolute URLs and converts them automatically — same-origin URLs are emitted as relative paths, and cross-origin or already-relative values are passed through unchanged.
+
+```typescript
+// When the current request URL is:
+//   https://cdn.example.com/streams/video/segment_001.m4s
+// either form below produces the same encoded output.
+
+// Already relative (per spec):
+reporter.update({
+	nor: ["segment_002.m4s"],
+});
+
+// Absolute URL — converted automatically:
+reporter.update({
+	nor: ["https://cdn.example.com/streams/video/segment_002.m4s"],
+});
+
+// Both encode to: nor=("segment_002.m4s")
+```
+
 ## Recording Events
 
 Use the `recordEvent()` method to record player events for event-mode reporting. The second argument is an optional object of data to include in the event report:

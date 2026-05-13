@@ -20,12 +20,18 @@ describe('urlToRelativePath', () => {
 	})
 
 	it('produces a relative path when base and url are different', () => {
+		//#region example
 		equal(urlToRelativePath('http://test.com/base/segments/video/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '../segments/video/1.mp4')
-
+		//#endregion example
 	})
 
 	it('returns url when origins are different', () => {
 		equal(urlToRelativePath('http://foo.com/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), 'http://foo.com/1.mp4')
+	})
+
+	it('returns url unchanged when it is already a relative path', () => {
+		equal(urlToRelativePath('1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '1.mp4')
+		equal(urlToRelativePath('../segments/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '../segments/1.mp4')
 	})
 
 	it('maintains query parameters and hash in the relative path', () => {

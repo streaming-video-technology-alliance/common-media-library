@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-05-13
+
+### Added
+
+- Add `getBaseUrl(fullUrl)` to extract the origin and directory path from a full URL
+
+### Fixed
+
+- `urlToRelativePath` now returns the input unchanged when it is already a relative path, instead of throwing `TypeError: Invalid URL` ([#364](https://github.com/streaming-video-technology-alliance/common-media-library/issues/364))
+
 ## [1.4.0] - 2026-02-11
 
 ### Added
@@ -60,7 +70,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...HEAD
+[1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...utils-v1.5.0
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.3.0...utils-v1.4.0
 [1.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.2.0...utils-v1.3.0
 [1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.1.0...utils-v1.2.0

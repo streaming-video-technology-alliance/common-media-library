@@ -44,7 +44,10 @@ export type CmcdEncodeOptions = {
 	filter?: (key: CmcdKey) => boolean;
 
 	/**
-	 * The base URL to use for relative URLs.
+	 * Base URL (typically the manifest or current request URL) used to convert absolute `nor` values
+	 * into paths relative to this base, per the CMCD specification. Values that are already relative
+	 * paths are not modified by this option, though CMCD v1 still URL-encodes them on emission. When
+	 * omitted, `nor` values are emitted as-is (subject to the v1 URL-encoding rule).
 	 */
 	baseUrl?: string;
 
