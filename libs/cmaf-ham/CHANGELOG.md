@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.24.4] - 2026-05-13
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.5.0
+
 ## [0.24.3] - 2026-02-11
 
 ### Changed
@@ -52,7 +58,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.3...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.4...HEAD
+[0.24.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.3...cmaf-ham-v0.24.4
 [0.24.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.2...cmaf-ham-v0.24.3
 [0.24.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.1...cmaf-ham-v0.24.2
 [0.24.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.0...cmaf-ham-v0.24.1
