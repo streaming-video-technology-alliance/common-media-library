@@ -55,11 +55,17 @@ type StateField = 'sta' | 'pr' | 'cid' | 'bg' | 'br'
 
 /**
  * One row in the STATE_FIELDS dispatch table.
+ *
+ * `snapshot` captures the value stored in `lastEmitted` for dedup
+ * comparisons. Reference types must clone so the baseline doesn't
+ * share a reference with the caller's input, which would let in-place
+ * mutation silently poison the dedup state.
  */
 type StateFieldEntry = {
 	field: StateField
 	event: CmcdEventType
 	equal: (a: unknown, b: unknown) => boolean
+	snapshot: (v: unknown) => unknown
 }
 
 /**
@@ -96,20 +102,22 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 }
 
 const equal = Object.is
+const identity = <T>(v: T): T => v
 
 /**
  * Maps each tracked state field to its event type and equality function.
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
 const STATE_FIELDS: readonly StateFieldEntry[] = [
-	{ field: 'sta', event: CMCD_EVENT_PLAY_STATE, equal },
-	{ field: 'pr', event: CMCD_EVENT_PLAYBACK_RATE, equal },
-	{ field: 'cid', event: CMCD_EVENT_CONTENT_ID, equal },
-	{ field: 'bg', event: CMCD_EVENT_BACKGROUNDED_MODE, equal },
+	{ field: 'sta', event: CMCD_EVENT_PLAY_STATE, equal, snapshot: identity },
+	{ field: 'pr', event: CMCD_EVENT_PLAYBACK_RATE, equal, snapshot: identity },
+	{ field: 'cid', event: CMCD_EVENT_CONTENT_ID, equal, snapshot: identity },
+	{ field: 'bg', event: CMCD_EVENT_BACKGROUNDED_MODE, equal, snapshot: identity },
 	{
 		field: 'br',
 		event: CMCD_EVENT_BITRATE_CHANGE,
 		equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
+		snapshot: (v) => (v as CmcdObjectTypeList).slice(),
 	},
 ]
 
@@ -352,7 +360,7 @@ export class CmcdReporter {
 				return
 			}
 
-			Object.assign(this.lastEmitted, { [field]: current })
+			Object.assign(this.lastEmitted, { [field]: entry.snapshot(current) })
 		}
 
 		this.eventTargets.forEach((target, config) => {

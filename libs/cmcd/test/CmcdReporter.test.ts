@@ -1215,6 +1215,25 @@ describe('CmcdReporter', () => {
 
 				equal(requests.length, 2)
 			})
+
+			it('emits when caller mutates the br array in place between updates', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				const arr = [5000]
+				reporter.update({ br: arr })
+				arr[0] = 4000
+				reporter.update({ br: arr })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// The dedup baseline must not share a reference with the caller's
+				// array, otherwise in-place mutation would poison it and the
+				// second update would be incorrectly deduplicated.
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('br=(5000)'))
+				ok((requests[1].body as string)?.includes('br=(4000)'))
+			})
 		})
 
 		describe('cross-cutting', () => {
