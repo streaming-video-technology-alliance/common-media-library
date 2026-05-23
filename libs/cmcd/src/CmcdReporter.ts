@@ -9,6 +9,7 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
 import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
@@ -62,6 +63,38 @@ type StateFieldEntry = {
 }
 
 /**
+ * Deep equality for CmcdObjectTypeList (used for `br` dedup).
+ *
+ * Order-sensitive: arrays with the same elements in different positions
+ * are treated as different. Players that construct `br` consistently
+ * get correct dedup; shuffling produces spurious emits, which is the
+ * safer failure mode.
+ */
+function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): boolean {
+	if (a === b) return true
+	if (a.length !== b.length) return false
+
+	for (let i = 0; i < a.length; i++) {
+		const ai = a[i]
+		const bi = b[i]
+		if (ai === bi) continue
+		if (typeof ai === 'number' || typeof bi === 'number') return false
+
+		// Both are SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>
+		if (ai.value !== bi.value) return false
+
+		// ExclusiveRecord: params (when defined) has exactly one key
+		const ap = ai.params
+		const bp = bi.params
+		const ak = ap && Object.keys(ap)[0]
+		if (ak !== (bp && Object.keys(bp)[0])) return false
+		if (ak !== undefined && ap![ak as keyof typeof ap] !== bp![ak as keyof typeof bp]) return false
+	}
+
+	return true
+}
+
+/**
  * Maps each tracked state field to its event type and equality function.
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
@@ -70,6 +103,13 @@ const STATE_FIELDS: ReadonlyArray<StateFieldEntry> = [
 	{ field: 'pr',  event: CmcdEventType.PLAYBACK_RATE,     equal: (a, b) => a === b },
 	{ field: 'cid', event: CmcdEventType.CONTENT_ID,        equal: (a, b) => a === b },
 	{ field: 'bg',  event: CmcdEventType.BACKGROUNDED_MODE, equal: (a, b) => a === b },
+	{
+		field: 'br',
+		event: CmcdEventType.BITRATE_CHANGE,
+		equal: (a, b) => (a === undefined || b === undefined)
+			? a === b
+			: cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
+	},
 ]
 
 const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = new Map(

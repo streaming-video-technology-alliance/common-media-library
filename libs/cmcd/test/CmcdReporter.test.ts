@@ -1,5 +1,6 @@
 import type { CmcdReporterConfig } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
+import { SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { equal, ok } from 'node:assert'
 import { describe, it, mock } from 'node:test'
@@ -1126,6 +1127,93 @@ describe('CmcdReporter', () => {
 				await new Promise(resolve => setTimeout(resolve, 10))
 
 				equal(requests.length, 1)
+			})
+		})
+
+		describe('BITRATE_CHANGE', () => {
+			function createBrConfig(): Partial<CmcdReporterConfig> {
+				return {
+					sid: 'test-session',
+					enabledKeys: ['br', 'sid', 'v', 'e', 'ts', 'sn'],
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.BITRATE_CHANGE],
+						enabledKeys: ['br', 'sid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+					}],
+				}
+			}
+
+			it('update({ br }) auto-fires BITRATE_CHANGE on change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [5000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('e=bc'))
+			})
+
+			it('deduplicates same content, different array reference', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [5000] })
+				reporter.update({ br: [5000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+
+			it('deduplicates SfItems with same value and params', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [new SfItem(5000, { v: true })] })
+				reporter.update({ br: [new SfItem(5000, { v: true })] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+
+			it('emits when SfItem params differ', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [new SfItem(5000, { v: true })] })
+				reporter.update({ br: [new SfItem(5000, { a: true })] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+			})
+
+			it('emits when order changes', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [1000, 5000] })
+				reporter.update({ br: [5000, 1000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+			})
+
+			it('emits when length changes', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [5000] })
+				reporter.update({ br: [5000, 1000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
 			})
 		})
 	})
