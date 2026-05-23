@@ -68,6 +68,54 @@ describe('encodeCmcd', () => {
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
 			ok(output.includes('cen="my-custom-event"'), 'cen key must not be filtered out in event mode when e=ce')
 		})
+
+		it('doesn\'t filter sta key in event mode when event type is ps', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAY_STATE, sta: 'p', cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('sta='), 'sta key must not be filtered out in event mode when e=ps')
+		})
+
+		it('doesn\'t filter pr key in event mode when event type is pr', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1.5, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('pr='), 'pr key must not be filtered out in event mode when e=pr')
+		})
+
+		it('doesn\'t filter cid key in event mode when event type is c', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.CONTENT_ID, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'sid' })
+			ok(output.includes('cid='), 'cid key must not be filtered out in event mode when e=c')
+		})
+
+		it('doesn\'t filter bg key in event mode when event type is b', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.BACKGROUNDED_MODE, bg: true, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('bg'), 'bg key must not be filtered out in event mode when e=b')
+		})
+
+		it('doesn\'t filter br key in event mode when event type is bc', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.BITRATE_CHANGE, br: [3000], cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('br='), 'br key must not be filtered out in event mode when e=bc')
+		})
+
+		it('doesn\'t force-include sta when value is undefined', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAY_STATE, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			equal(output.includes('sta='), false)
+		})
+
+		it('doesn\'t force-include required field in request mode', () => {
+			const input = { e: CmcdEventType.PLAY_STATE, sta: 'p', cid: 'content-id', br: 3000 }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST, filter: key => key === 'br' })
+			equal(output.includes('sta='), false, 'sta should be filtered out in request mode')
+		})
 	})
 
 	it('returns encoded string when SfToken is used', () => {
