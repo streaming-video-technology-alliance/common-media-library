@@ -97,6 +97,33 @@ describe('encodeCmcd', () => {
 			ok(output.includes('bg'), 'bg key must not be filtered out in event mode when e=b')
 		})
 
+		it('encodes bg=?0 in event mode when bg is false', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.BACKGROUNDED_MODE, bg: false, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('bg=?0'), 'bg must be emitted as ?0 when false on e=b state-change event')
+		})
+
+		it('still strips bg=false in request mode', () => {
+			const input = { bg: false, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST })
+			equal(output.includes('bg'), false, 'bg=false should still be stripped in request mode (v1 default-omission)')
+		})
+
+		it('still strips bg=false in non-b event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.RESPONSE_RECEIVED, bg: false, url: 'https://example.com/v.mp4' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
+			equal(output.includes('bg'), false, 'bg=false should still be stripped when event type is not b')
+		})
+
+		it('still strips sta="" in event mode when event type is ps', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAY_STATE, sta: '' as any, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			equal(output.includes('sta='), false, 'sta="" is a caller bug and should not be carved out')
+		})
+
 		it('doesn\'t filter br key in event mode when event type is bc', (context) => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.BITRATE_CHANGE, br: [3000], cid: 'content-id' }

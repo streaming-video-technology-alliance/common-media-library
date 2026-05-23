@@ -194,8 +194,12 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			value = Date.now()
 		}
 
-		// ignore invalid values
-		if (!isValid(value)) {
+		// Ignore invalid values, except an explicit `false` on a state-change event's
+		// required field — the wire must carry `?0` per CTA-5004-B (e.g. `bg: false`).
+		const isStateRequiredFalse = isEventMode
+			&& value === false
+			&& CMCD_STATE_EVENT_FIELDS.get(data['e']) === key
+		if (!isValid(value) && !isStateRequiredFalse) {
 			continue
 		}
 

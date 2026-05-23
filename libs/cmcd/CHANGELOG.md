@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `prepareCmcdData` now emits an explicit `?0` token for a state-change event's required field when its value is `false` (realistic case: `e=b` with `bg: false` on backgrounded-mode exit). Previously the field was stripped by the `isValid` filter, producing a CTA-5004-B-non-compliant payload. The carve-out is narrow: only `value === false` exactly on the required field for the current state-change event in event mode; `''`/nullish/`NaN` are still stripped, and request-mode default-omission is unchanged ([#372](https://github.com/streaming-video-technology-alliance/common-media-library/issues/372)).
+
 ## [2.4.0] - 2026-05-22
 
 ### Added
