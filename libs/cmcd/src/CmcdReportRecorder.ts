@@ -74,6 +74,7 @@ export class CmcdReportRecorder {
 	#eventTargetUrls: readonly string[] = []
 	#waiters = new Map<ReturnType<typeof setTimeout>, CmcdReportWaiter>()
 	#onReport: ((report: CmcdRecordedReport) => void) | undefined
+	#waitTimeout = 15000
 
 	readonly #deliver = (request: HttpRequest): Response | undefined => {
 		const url = request.url
@@ -157,6 +158,7 @@ export class CmcdReportRecorder {
 		this.#attached = true
 		this.#eventTargetUrls = options.eventTargetUrls ?? []
 		this.#onReport = options.onReport
+		this.#waitTimeout = options.waitTimeout ?? 15000
 
 		const transports = options.transports ?? [createXhrTransport(), createFetchTransport()]
 		for (const transport of transports) {
@@ -210,44 +212,48 @@ export class CmcdReportRecorder {
 	/**
 	 * Wait until at least `count` reports of any type are recorded.
 	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout (default 15000 ms).
+	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public
 	 */
-	waitFor(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(undefined, count, timeout)
+	waitForReports(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(undefined, count, timeout ?? this.#waitTimeout)
 	}
 
 	/**
 	 * Wait until at least `count` manifest reports are recorded.
 	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout (default 15000 ms).
+	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public
 	 */
-	waitForManifest(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.MANIFEST, count, timeout)
+	waitForManifest(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.MANIFEST, count, timeout ?? this.#waitTimeout)
 	}
 
 	/**
-	 * Wait until at least `count` segment reports are recorded. Resolves
-	 * with all matching reports; rejects with a diagnostic error on
-	 * timeout (default 15000 ms).
+	 * Wait until at least `count` segment reports are recorded.
+	 * Resolves with all matching reports; rejects with a diagnostic error
+	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public
 	 */
-	waitForSegments(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.SEGMENT, count, timeout)
+	waitForSegments(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.SEGMENT, count, timeout ?? this.#waitTimeout)
 	}
 
 	/**
 	 * Wait until at least `count` event-mode reports are recorded.
 	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout (default 15000 ms).
+	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public
 	 */
-	waitForEvents(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.EVENT, count, timeout)
+	waitForEvents(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.EVENT, count, timeout ?? this.#waitTimeout)
 	}
 }

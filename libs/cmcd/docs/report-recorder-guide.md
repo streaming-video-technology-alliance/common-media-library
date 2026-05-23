@@ -94,16 +94,18 @@ console.log(`Total: ${all.length}, manifests: ${manifests.length}, segments: ${s
 recorder.detach();
 ```
 
-### `waitFor*(count, timeout?)`: positive assertion
+### `waitFor*(count?, timeout?)`: positive assertion
 
-Resolves once at least `count` matching reports have been recorded. Rejects with a diagnostic error on timeout (default 15 seconds). Use for "expect N to happen" assertions where the test is racing the player. There is one method per request type, plus a generic `waitFor` that matches any type:
+Resolves once at least `count` matching reports have been recorded. Rejects with a diagnostic error on timeout. Use for "expect N to happen" assertions where the test is racing the player. There is one method per request type, plus a generic `waitForReports` that matches any type:
 
-| Method                              | Matches                              |
-| ----------------------------------- | ------------------------------------ |
-| `waitFor(count, timeout?)`          | any recorded report                  |
-| `waitForManifest(count, timeout?)`  | reports with `type === MANIFEST`     |
-| `waitForSegments(count, timeout?)`  | reports with `type === SEGMENT`      |
-| `waitForEvents(count, timeout?)`    | reports with `type === EVENT` (POST) |
+| Method                                | Matches                              |
+| ------------------------------------- | ------------------------------------ |
+| `waitForReports(count?, timeout?)`    | any recorded report                  |
+| `waitForManifest(count?, timeout?)`   | reports with `type === MANIFEST`     |
+| `waitForSegments(count?, timeout?)`   | reports with `type === SEGMENT`      |
+| `waitForEvents(count?, timeout?)`     | reports with `type === EVENT` (POST) |
+
+`count` defaults to `1`. `timeout` defaults to the recorder's `waitTimeout` option (15 seconds if unset). Pass an explicit `timeout` to override per call.
 
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
@@ -123,11 +125,16 @@ for (const report of segments) {
 recorder.detach();
 ```
 
-Set a shorter timeout if the test should fail fast:
+Shorten the timeout per call or globally on the recorder:
 
 ```typescript
-// Fail in 2 seconds rather than the default 15
+// Per call: fail in 2 seconds rather than the recorder default
 await recorder.waitForManifest(1, 2000);
+
+// All wait* calls on this recorder default to 2 seconds
+const fastRecorder = new CmcdReportRecorder();
+fastRecorder.attach({ waitTimeout: 2000 });
+await fastRecorder.waitForManifest();
 ```
 
 ## Live inspection with `onReport`
@@ -309,5 +316,5 @@ Always pair `attach()` with `detach()` in your test teardown (`afterEach` or equ
 - **Seed a live UI from existing reports.** When opening an inspection panel mid-session, call `getReports()` once after `attach()` to populate the table, then rely on `onReport` for incremental updates.
 - **Filter inside `onReport`.** The listener does not accept a type filter directly. Branch on `report.type` or `report.reportingMode` inside the callback if you only care about a subset.
 - **Use `clear()` between test phases.** When a single test exercises multiple playback scenarios, call `recorder.clear()` between phases to reset the buffer without re-attaching.
-- **Default timeout is 15 seconds.** For fast unit-style tests, pass an explicit shorter timeout to any `waitFor*` call so failures surface quickly.
+- **Default timeout is 15 seconds.** For fast unit-style tests, set a shorter recorder-wide default via the `waitTimeout` attach option, or pass an explicit `timeout` to a single `waitFor*` call to override.
 - **Body normalization.** POST bodies are eagerly read into strings by the transports, so `report.request.body` is always a string (or `undefined`), never a `ReadableStream`. Pass it directly to `validateCmcdEventReport`.

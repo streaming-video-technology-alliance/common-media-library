@@ -29,6 +29,15 @@ export type CmcdReportRecorderOptions = {
 	transports?: readonly CmcdTransportAdapter[];
 
 	/**
+	 * Default timeout (in milliseconds) applied to every `waitFor*`
+	 * call on this recorder. Individual call sites can still pass
+	 * an explicit timeout to override per call.
+	 *
+	 * @defaultValue `15000`
+	 */
+	waitTimeout?: number;
+
+	/**
 	 * Called once for each captured CMCD report, immediately after it
 	 * is appended to the buffer and before any pending `waitFor*`
 	 * promises resolve. Use for live UI inspection in test harness

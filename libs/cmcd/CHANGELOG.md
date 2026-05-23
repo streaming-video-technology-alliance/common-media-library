@@ -23,9 +23,10 @@ and this project adheres to
 
 - `CmcdReportRecorder` — test helper that records CMCD-bearing
   reports across XHR and fetch transports for assertion in e2e tests.
-  Includes `waitFor`, `waitForManifest`, `waitForSegments`, and
-  `waitForEvents` wait primitives (reject on timeout) plus
-  event-target POST stubbing.
+  Includes `waitForReports`, `waitForManifest`, `waitForSegments`,
+  and `waitForEvents` wait primitives (`count` defaults to `1`,
+  reject on timeout) plus a `waitTimeout` attach option that sets
+  the per-recorder default timeout, and event-target POST stubbing.
 - `CmcdRequestType` const-enum and supporting types
   (`CmcdRecordedReport`, `CmcdRecordedReportMode`, `CmcdTransportAdapter`,
   `CmcdReportRecorderOptions`).
