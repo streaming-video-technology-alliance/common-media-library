@@ -992,6 +992,19 @@ describe('CmcdReporter', () => {
 
 				equal(requests.length, 0)
 			})
+
+			it('re-fires when same value is set after sid reset', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.update({ sid: 'new-session' })
+				reporter.update({ sta: 'p' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+			})
 		})
 	})
 })

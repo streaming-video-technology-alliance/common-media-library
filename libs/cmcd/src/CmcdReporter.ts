@@ -233,14 +233,16 @@ export class CmcdReporter {
 			this.msd = data.msd
 		}
 
-		const prev = this.data
 		// msd is tracked separately via this.msd and sent once per target,
 		// so it is stripped from the persistent data store after each update.
-		this.data = { ...prev, ...data, msd: undefined }
+		this.data = { ...this.data, ...data, msd: undefined }
 
-		// Auto-trigger state-change events for any tracked field whose value changed.
+		// Auto-trigger state-change events for any tracked field whose value
+		// differs from the last wire-emitted value. Comparing against lastEmitted
+		// (not the pre-merge value) ensures correctness after a session reset,
+		// and unifies the comparison basis with recordEvent's internal dedup.
 		for (const entry of STATE_FIELDS) {
-			if (entry.field in data && !entry.equal(data[entry.field], prev[entry.field])) {
+			if (entry.field in data && !entry.equal(this.data[entry.field], this.lastEmitted[entry.field])) {
 				this.recordEvent(entry.event)
 			}
 		}
