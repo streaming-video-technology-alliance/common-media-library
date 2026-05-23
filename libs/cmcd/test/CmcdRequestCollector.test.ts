@@ -683,6 +683,37 @@ describe('default transports', () => {
 			globalThis.fetch = origFetch
 		}
 	})
+
+	it('provides a valid onReport example', async () => {
+		const origXhr = globalThis.XMLHttpRequest
+		const origFetch = globalThis.fetch
+		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = MockXhr
+		globalThis.fetch = async () => new Response('', { status: 200 })
+
+		try {
+			//#region example-on-report
+			const reports: CmcdCollectedRequest[] = []
+			const collector = new CmcdRequestCollector()
+			collector.attach({
+				onReport: (report) => reports.push(report),
+			})
+
+			// ... player runs, emits CMCD requests ...
+			await fetch('https://cdn.example.com/seg1.m4s?CMCD=sid%3D%22abc%22')
+			await fetch('https://cdn.example.com/seg2.m4s?CMCD=sid%3D%22abc%22')
+
+			// `reports` updates in real time as captures arrive; a test
+			// harness page would push to a UI table here instead of an
+			// array.
+			equal(reports.length, 2)
+
+			collector.detach()
+			//#endregion example-on-report
+		} finally {
+			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
+			globalThis.fetch = origFetch
+		}
+	})
 })
 
 describe('createFetchTransport', () => {
