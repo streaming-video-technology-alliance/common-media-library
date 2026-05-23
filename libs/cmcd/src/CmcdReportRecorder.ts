@@ -100,7 +100,13 @@ export class CmcdReportRecorder {
 			timestamp: Date.now(),
 		}
 		this.#reports.push(captured)
-		this.#onReport?.(captured)
+		if (this.#onReport) {
+			try {
+				this.#onReport(captured)
+			} catch (err) {
+				console.error('CmcdReportRecorder onReport listener threw:', err)
+			}
+		}
 		this.#notifyWaiters()
 
 		return isEventTarget ? new Response(null, { status: 204 }) : undefined

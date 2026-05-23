@@ -58,6 +58,9 @@ export function createXhrTransport(): CmcdTransportAdapter {
 	return {
 		attach(deliver: CmcdRequestDeliver): () => void {
 			const Xhr = globalThis.XMLHttpRequest
+			if (!Xhr) {
+				return () => {}
+			}
 			const origOpen = Xhr.prototype.open
 			const origSetRequestHeader = Xhr.prototype.setRequestHeader
 			const origSend = Xhr.prototype.send

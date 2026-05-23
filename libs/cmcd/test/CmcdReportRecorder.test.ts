@@ -513,6 +513,27 @@ describe('CmcdReportRecorder', () => {
 			equal(b.length, 1)
 			recorder.detach()
 		})
+
+		it('still resolves waiters and returns synthetic 204 when listener throws', async () => {
+			const t = new FakeTransport()
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
+				transports: [t],
+				eventTargetUrls: ['https://events.example.com'],
+				onReport: () => { throw new Error('listener boom') },
+			})
+			const waiter = recorder.waitForReports(CmcdRequestType.EVENT, 1, 1000)
+			const synthetic = t.simulate({
+				url: 'https://events.example.com/cmcd',
+				method: 'POST',
+				headers: {},
+				body: 'sid="abc"',
+			})
+			equal(synthetic?.status, 204, 'synthetic 204 still returned')
+			const reports = await waiter
+			equal(reports.length, 1, 'waiter resolved despite listener error')
+			recorder.detach()
+		})
 	})
 })
 
@@ -629,6 +650,18 @@ describe('createXhrTransport', () => {
 			recorder.detach()
 		} finally {
 			restoreXhrShim()
+		}
+	})
+
+	it('attach is a no-op when globalThis.XMLHttpRequest is undefined', () => {
+		const origXhr = globalThis.XMLHttpRequest
+		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = undefined
+		try {
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createXhrTransport()] })
+			recorder.detach()
+		} finally {
+			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
 		}
 	})
 })
@@ -823,6 +856,36 @@ describe('createFetchTransport', () => {
 			equal(response.status, 204)
 			equal(underlyingCalls, 0, 'underlying fetch should not have been invoked')
 			equal(recorder.getReports(CmcdRequestType.EVENT).length, 1)
+			recorder.detach()
+		} finally {
+			globalThis.fetch = origFetch
+		}
+	})
+
+	it('forwards a Request input with its body intact to the underlying fetch', async () => {
+		const seen: { url: string; body: string }[] = []
+		const origFetch = globalThis.fetch
+		globalThis.fetch = async (input: RequestInfo | URL): Promise<Response> => {
+			const req = input instanceof Request ? input : new Request(input)
+			seen.push({ url: req.url, body: await req.text() })
+			return new Response('', { status: 200 })
+		}
+
+		try {
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createFetchTransport()] })
+
+			const req = new Request('https://e.com/seg.m4s?CMCD=sid%3D%22abc%22', {
+				method: 'POST',
+				body: 'payload',
+			})
+			await fetch(req)
+
+			equal(seen.length, 1, 'underlying fetch received the call')
+			equal(seen[0].body, 'payload', 'body reached underlying fetch unconsumed')
+			const captured = recorder.getReports(CmcdRequestType.EVENT)
+			equal(captured.length, 1, 'recorder captured the request')
+			equal(captured[0].request.body, 'payload', 'recorder also saw the body')
 			recorder.detach()
 		} finally {
 			globalThis.fetch = origFetch
