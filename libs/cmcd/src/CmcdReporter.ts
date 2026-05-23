@@ -52,6 +52,9 @@ function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdRep
  */
 type StateField = 'sta' | 'pr' | 'cid' | 'bg' | 'br'
 
+/**
+ * One row in the STATE_FIELDS dispatch table.
+ */
 type StateFieldEntry = {
 	field: StateField
 	event: CmcdEventType
@@ -65,6 +68,10 @@ type StateFieldEntry = {
 const STATE_FIELDS: ReadonlyArray<StateFieldEntry> = [
 	{ field: 'sta', event: CmcdEventType.PLAY_STATE, equal: (a, b) => a === b },
 ]
+
+const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = new Map(
+	STATE_FIELDS.map(e => [e.event, e]),
+)
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
@@ -240,7 +247,7 @@ export class CmcdReporter {
 	 *               be updated using `update()`.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
-		const entry = STATE_FIELDS.find(e => e.event === type)
+		const entry = STATE_FIELDS_BY_EVENT.get(type)
 		if (entry) {
 			const field = entry.field
 			const incoming = data[field]
