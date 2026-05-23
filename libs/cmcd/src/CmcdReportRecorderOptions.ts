@@ -1,12 +1,12 @@
-import type { CmcdCollectedRequest } from './CmcdCollectedRequest.ts'
+import type { CmcdRecordedReport } from './CmcdRecordedReport.ts'
 import type { CmcdTransportAdapter } from './CmcdTransportAdapter.ts'
 
 /**
- * Options for `CmcdRequestCollector.attach()`.
+ * Options for `CmcdReportRecorder.attach()`.
  *
  * @public
  */
-export type CmcdRequestCollectorOptions = {
+export type CmcdReportRecorderOptions = {
 
 	/**
 	 * URLs whose POST requests are intercepted and stubbed with a
@@ -31,18 +31,18 @@ export type CmcdRequestCollectorOptions = {
 	/**
 	 * Called once for each captured CMCD report, immediately after it
 	 * is appended to the buffer and before any pending
-	 * `waitForRequests` promises resolve. Use for live UI inspection
+	 * `waitForReports` promises resolve. Use for live UI inspection
 	 * in test harness pages. Cleared automatically on `detach()`;
 	 * pass a fresh callback to a subsequent `attach()` to resume
 	 * notification.
 	 *
-	 * The callback receives the same {@link CmcdCollectedRequest}
-	 * shape that `getRequests()` returns. Filter by `report.type` or
+	 * The callback receives the same {@link CmcdRecordedReport}
+	 * shape that `getReports()` returns. Filter by `report.type` or
 	 * `report.reportingMode` inside the callback if you only care
 	 * about a subset.
 	 *
 	 * @example
-	 * {@includeCode ../test/CmcdRequestCollector.test.ts#example-on-report}
+	 * {@includeCode ../test/CmcdReportRecorder.test.ts#example-on-report}
 	 */
-	onReport?: (report: CmcdCollectedRequest) => void;
+	onReport?: (report: CmcdRecordedReport) => void;
 }

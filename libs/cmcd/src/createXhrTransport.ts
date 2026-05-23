@@ -50,7 +50,7 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 /**
  * Create a transport adapter that patches `XMLHttpRequest.prototype` to
  * capture CMCD-bearing requests. Returns the adapter object expected by
- * `CmcdRequestCollector`.
+ * `CmcdReportRecorder`.
  *
  * @public
  */

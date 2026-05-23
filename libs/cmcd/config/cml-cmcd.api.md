@@ -23,15 +23,6 @@ export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOpt
 export type Cmcd = CmcdRequest & CmcdResponse & CmcdEvent;
 
 // @public
-export const CMCD_COLLECTED_REQUEST_MODE_EVENT: "event";
-
-// @public
-export const CMCD_COLLECTED_REQUEST_MODE_HEADER: "header";
-
-// @public
-export const CMCD_COLLECTED_REQUEST_MODE_QUERY: "query";
-
-// @public
 export const CMCD_DEFAULT_TIME_INTERVAL = 30;
 
 // @public
@@ -122,6 +113,15 @@ export const CMCD_PARAM = "CMCD";
 export const CMCD_QUERY: "query";
 
 // @public
+export const CMCD_RECORDED_REPORT_MODE_EVENT: "event";
+
+// @public
+export const CMCD_RECORDED_REPORT_MODE_HEADER: "header";
+
+// @public
+export const CMCD_RECORDED_REPORT_MODE_QUERY: "query";
+
+// @public
 export const CMCD_REQUEST: "CMCD-Request";
 
 // @public
@@ -165,24 +165,6 @@ export const CMCD_VALIDATION_SEVERITY_ERROR: "error";
 
 // @public
 export const CMCD_VALIDATION_SEVERITY_WARNING: "warning";
-
-// @public
-export type CmcdCollectedRequest = {
-    readonly request: HttpRequest;
-    readonly type: CmcdRequestType;
-    readonly reportingMode: CmcdCollectedRequestMode;
-    readonly timestamp: number;
-};
-
-// @public
-export const CmcdCollectedRequestMode: {
-    readonly QUERY: typeof CMCD_COLLECTED_REQUEST_MODE_QUERY;
-    readonly HEADER: typeof CMCD_COLLECTED_REQUEST_MODE_HEADER;
-    readonly EVENT: typeof CMCD_COLLECTED_REQUEST_MODE_EVENT;
-};
-
-// @public (undocumented)
-export type CmcdCollectedRequestMode = ValueOf<typeof CmcdCollectedRequestMode>;
 
 // @public
 export type CmcdCustomKey = `${string}-${string}`;
@@ -333,6 +315,24 @@ export const CmcdPlayerState: {
 export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
 
 // @public
+export type CmcdRecordedReport = {
+    readonly request: HttpRequest;
+    readonly type: CmcdRequestType;
+    readonly reportingMode: CmcdRecordedReportMode;
+    readonly timestamp: number;
+};
+
+// @public
+export const CmcdRecordedReportMode: {
+    readonly QUERY: typeof CMCD_RECORDED_REPORT_MODE_QUERY;
+    readonly HEADER: typeof CMCD_RECORDED_REPORT_MODE_HEADER;
+    readonly EVENT: typeof CMCD_RECORDED_REPORT_MODE_EVENT;
+};
+
+// @public (undocumented)
+export type CmcdRecordedReportMode = ValueOf<typeof CmcdRecordedReportMode>;
+
+// @public
 export type CmcdReportConfig = {
     version?: CmcdVersion;
     enabledKeys?: CmcdKey[];
@@ -372,6 +372,23 @@ export const CmcdReportingMode: {
 
 // @public (undocumented)
 export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
+
+// @public
+export class CmcdReportRecorder {
+    attach(options?: CmcdReportRecorderOptions): void;
+    clear(): void;
+    detach(): void;
+    getReports(type?: CmcdRequestType): CmcdRecordedReport[];
+    recordFor(timeout: number, type?: CmcdRequestType): Promise<CmcdRecordedReport[]>;
+    waitForReports(type: CmcdRequestType | undefined, count: number, timeout?: number): Promise<CmcdRecordedReport[]>;
+}
+
+// @public
+export type CmcdReportRecorderOptions = {
+    eventTargetUrls?: readonly string[];
+    transports?: readonly CmcdTransportAdapter[];
+    onReport?: (report: CmcdRecordedReport) => void;
+};
 
 // @public
 export type CmcdRequest = {
@@ -416,23 +433,6 @@ export type CmcdRequest = {
     tbl?: CmcdObjectTypeList;
     tpb?: CmcdObjectTypeList;
     v?: number;
-};
-
-// @public
-export class CmcdRequestCollector {
-    attach(options?: CmcdRequestCollectorOptions): void;
-    clear(): void;
-    collectFor(timeout: number, type?: CmcdRequestType): Promise<CmcdCollectedRequest[]>;
-    detach(): void;
-    getRequests(type?: CmcdRequestType): CmcdCollectedRequest[];
-    waitForRequests(type: CmcdRequestType | undefined, count: number, timeout?: number): Promise<CmcdCollectedRequest[]>;
-}
-
-// @public
-export type CmcdRequestCollectorOptions = {
-    eventTargetUrls?: readonly string[];
-    transports?: readonly CmcdTransportAdapter[];
-    onReport?: (report: CmcdCollectedRequest) => void;
 };
 
 // @public

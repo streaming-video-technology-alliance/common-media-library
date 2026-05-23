@@ -28,7 +28,7 @@ async function toHttpRequest(request: Request): Promise<HttpRequest> {
  * Create a transport adapter that patches `globalThis.fetch` to capture
  * CMCD-bearing requests, normalizing each to `HttpRequest` (lowercase
  * headers, body read as UTF-8 string). Returns the adapter object
- * expected by `CmcdRequestCollector`.
+ * expected by `CmcdReportRecorder`.
  *
  * @public
  */

@@ -1,5 +1,5 @@
-import type { CmcdTransportAdapter, CmcdRequestDeliver, CmcdCollectedRequest } from '@svta/cml-cmcd'
-import { createFetchTransport, createXhrTransport, CmcdRequestCollector, CmcdRequestType } from '@svta/cml-cmcd'
+import type { CmcdTransportAdapter, CmcdRequestDeliver, CmcdRecordedReport } from '@svta/cml-cmcd'
+import { createFetchTransport, createXhrTransport, CmcdReportRecorder, CmcdRequestType } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -41,7 +41,7 @@ class MockXhr {
 }
 
 /**
- * Fake CmcdTransportAdapter for testing collector logic without patching
+ * Fake CmcdTransportAdapter for testing recorder logic without patching
  * any globals. Exposes `.deliver()` so tests can simulate intercepted
  * requests directly.
  */
@@ -58,88 +58,88 @@ class FakeTransport implements CmcdTransportAdapter {
 		}
 	}
 
-	/** Simulate an intercepted request and return whatever the collector decides. */
+	/** Simulate an intercepted request and return whatever the recorder decides. */
 	simulate(request: HttpRequest): Response | undefined {
 		return this.deliver(request)
 	}
 }
 
-describe('CmcdRequestCollector', () => {
+describe('CmcdReportRecorder', () => {
 	describe('lifecycle', () => {
 		it('starts empty', () => {
-			const collector = new CmcdRequestCollector()
-			deepEqual(collector.getRequests(), [])
+			const recorder = new CmcdReportRecorder()
+			deepEqual(recorder.getReports(), [])
 		})
 
 		it('attach() calls each supplied transport adapter', () => {
 			const t1 = new FakeTransport()
 			const t2 = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t1, t2] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t1, t2] })
 			ok(t1.attached)
 			ok(t2.attached)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('detach() invokes the detach functions returned by each transport', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
-			collector.detach()
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
+			recorder.detach()
 			ok(t.detached)
 		})
 
-		it('clear() empties the captured requests', () => {
+		it('clear() empties the recorded reports', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({
 				url: 'https://example.com/seg.m4s?CMCD=sid%3D%22abc%22',
 				method: 'GET',
 				headers: {},
 			})
-			equal(collector.getRequests().length, 1)
-			collector.clear()
-			equal(collector.getRequests().length, 0)
-			collector.detach()
+			equal(recorder.getReports().length, 1)
+			recorder.clear()
+			equal(recorder.getReports().length, 0)
+			recorder.detach()
 		})
 
-		it('getRequests() returns a defensive copy', () => {
-			const collector = new CmcdRequestCollector()
-			const a = collector.getRequests()
-			const b = collector.getRequests()
+		it('getReports() returns a defensive copy', () => {
+			const recorder = new CmcdReportRecorder()
+			const a = recorder.getReports()
+			const b = recorder.getReports()
 			ok(a !== b)
 		})
 
-		it('getRequests(type) filters by classification', () => {
+		it('getReports(type) filters by classification', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
-			equal(collector.getRequests(CmcdRequestType.MANIFEST).length, 1)
-			equal(collector.getRequests(CmcdRequestType.SEGMENT).length, 1)
-			equal(collector.getRequests().length, 2)
-			collector.detach()
+			equal(recorder.getReports(CmcdRequestType.MANIFEST).length, 1)
+			equal(recorder.getReports(CmcdRequestType.SEGMENT).length, 1)
+			equal(recorder.getReports().length, 2)
+			recorder.detach()
 		})
 
 		it('attach() is a no-op when already attached', () => {
 			const t1 = new FakeTransport()
 			const t2 = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t1] })
-			collector.attach({ transports: [t2] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t1] })
+			recorder.attach({ transports: [t2] })
 			ok(t1.attached)
 			ok(!t2.attached, 't2 should not have been attached')
-			collector.detach()
+			recorder.detach()
 		})
 
-		it('detach() rejects pending waitForRequests promises', async () => {
+		it('detach() rejects pending waitForReports promises', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
-			const promise = collector.waitForRequests(CmcdRequestType.SEGMENT, 5, 60000)
-			setTimeout(() => collector.detach(), 10)
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
+			const promise = recorder.waitForReports(CmcdRequestType.SEGMENT, 5, 60000)
+			setTimeout(() => recorder.detach(), 10)
 			try {
 				await promise
 				ok(false, 'should have rejected')
@@ -148,13 +148,13 @@ describe('CmcdRequestCollector', () => {
 			}
 		})
 
-		it('detach() resolves pending collectFor promises with whatever was collected', async () => {
+		it('detach() resolves pending recordFor promises with whatever was recorded', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
-			const promise = collector.collectFor(60000)
-			setTimeout(() => collector.detach(), 10)
+			const promise = recorder.recordFor(60000)
+			setTimeout(() => recorder.detach(), 10)
 			const result = await promise
 			equal(result.length, 1)
 		})
@@ -163,52 +163,52 @@ describe('CmcdRequestCollector', () => {
 	describe('classification', () => {
 		it('classifies a .m3u8 GET as manifest with reportingMode=query', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({
 				url: 'https://e.com/index.m3u8?CMCD=sid%3D%22abc%22',
 				method: 'GET',
 				headers: {},
 			})
-			const captured = collector.getRequests()
+			const captured = recorder.getReports()
 			equal(captured.length, 1)
 			equal(captured[0].type, CmcdRequestType.MANIFEST)
 			equal(captured[0].reportingMode, 'query')
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('classifies a .mpd GET as manifest', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({
 				url: 'https://e.com/index.mpd?CMCD=sid%3D%22abc%22',
 				method: 'GET',
 				headers: {},
 			})
-			equal(collector.getRequests()[0].type, CmcdRequestType.MANIFEST)
-			collector.detach()
+			equal(recorder.getReports()[0].type, CmcdRequestType.MANIFEST)
+			recorder.detach()
 		})
 
 		it('classifies a .m4s GET as segment with reportingMode=header when CMCD headers present', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({
 				url: 'https://e.com/seg1.m4s',
 				method: 'GET',
 				headers: { 'cmcd-request': 'sid="abc"' },
 			})
-			const captured = collector.getRequests()
+			const captured = recorder.getReports()
 			equal(captured[0].type, CmcdRequestType.SEGMENT)
 			equal(captured[0].reportingMode, 'header')
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('classifies POST as event regardless of URL extension', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				transports: [t],
 				eventTargetUrls: ['https://events.example.com'],
 			})
@@ -218,81 +218,81 @@ describe('CmcdRequestCollector', () => {
 				headers: {},
 				body: 'sid="abc",ts=1234',
 			})
-			const captured = collector.getRequests()
+			const captured = recorder.getReports()
 			equal(captured[0].type, CmcdRequestType.EVENT)
 			equal(captured[0].reportingMode, 'event')
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('does not capture requests that carry no CMCD data', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({
 				url: 'https://e.com/seg1.m4s',
 				method: 'GET',
 				headers: { 'content-type': 'video/mp4' },
 			})
-			equal(collector.getRequests().length, 0)
-			collector.detach()
+			equal(recorder.getReports().length, 0)
+			recorder.detach()
 		})
 
 		it('captures unknown-type URLs that carry CMCD query', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({
 				url: 'https://e.com/something?CMCD=sid%3D%22abc%22',
 				method: 'GET',
 				headers: {},
 			})
-			const captured = collector.getRequests()
+			const captured = recorder.getReports()
 			equal(captured.length, 1)
 			equal(captured[0].type, CmcdRequestType.UNKNOWN)
 			equal(captured[0].reportingMode, 'query')
-			collector.detach()
+			recorder.detach()
 		})
 	})
 
-	describe('collectFor', () => {
-		it('resolves after the timeout with whatever was collected', async () => {
+	describe('recordFor', () => {
+		it('resolves after the timeout with whatever was recorded', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			setTimeout(() => {
 				t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			}, 10)
-			const result = await collector.collectFor(50)
+			const result = await recorder.recordFor(50)
 			equal(result.length, 1)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('resolves with zero when nothing matches', async () => {
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [new FakeTransport()] })
-			const result = await collector.collectFor(50, CmcdRequestType.EVENT)
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [new FakeTransport()] })
+			const result = await recorder.recordFor(50, CmcdRequestType.EVENT)
 			equal(result.length, 0)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('filters by type', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
-			const result = await collector.collectFor(50, CmcdRequestType.SEGMENT)
+			const result = await recorder.recordFor(50, CmcdRequestType.SEGMENT)
 			equal(result.length, 1)
 			equal(result[0].type, CmcdRequestType.SEGMENT)
-			collector.detach()
+			recorder.detach()
 		})
 	})
 
 	describe('event-target stubbing', () => {
 		it('returns a 204 Response from deliver when URL matches', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				transports: [t],
 				eventTargetUrls: ['https://events.example.com'],
 			})
@@ -304,14 +304,14 @@ describe('CmcdRequestCollector', () => {
 			})
 			ok(response instanceof Response)
 			equal(response?.status, 204)
-			equal(collector.getRequests(CmcdRequestType.EVENT).length, 1)
-			collector.detach()
+			equal(recorder.getReports(CmcdRequestType.EVENT).length, 1)
+			recorder.detach()
 		})
 
 		it('returns undefined for non-event-target requests', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				transports: [t],
 				eventTargetUrls: ['https://events.example.com'],
 			})
@@ -321,13 +321,13 @@ describe('CmcdRequestCollector', () => {
 				headers: {},
 			})
 			equal(response, undefined)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('does not stub POSTs that do not match eventTargetUrls', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				transports: [t],
 				eventTargetUrls: ['https://events.example.com'],
 			})
@@ -337,47 +337,47 @@ describe('CmcdRequestCollector', () => {
 				headers: { 'cmcd-request': 'sid="abc"' },
 				body: 'data',
 			})
-			// Request carries CMCD data so it IS captured, but URL doesn't
+			// Request carries CMCD data so it IS recorded, but URL doesn't
 			// match the stub list — must NOT return a synthetic Response.
 			equal(response, undefined)
-			equal(collector.getRequests().length, 1)
-			collector.detach()
+			equal(recorder.getReports().length, 1)
+			recorder.detach()
 		})
 	})
 
-	describe('waitForRequests', () => {
+	describe('waitForReports', () => {
 		it('resolves immediately when count already met', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
-			const result = await collector.waitForRequests(CmcdRequestType.SEGMENT, 2, 1000)
+			const result = await recorder.waitForReports(CmcdRequestType.SEGMENT, 2, 1000)
 			equal(result.length, 2)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('resolves when threshold is reached after the call', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
-			const promise = collector.waitForRequests(CmcdRequestType.SEGMENT, 2, 1000)
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
+			const promise = recorder.waitForReports(CmcdRequestType.SEGMENT, 2, 1000)
 			setTimeout(() => {
 				t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 				t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
 			}, 10)
 			const result = await promise
 			equal(result.length, 2)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('rejects with a diagnostic error on timeout', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			try {
-				await collector.waitForRequests(CmcdRequestType.SEGMENT, 3, 50)
+				await recorder.waitForReports(CmcdRequestType.SEGMENT, 3, 50)
 				ok(false, 'should have rejected')
 			} catch (err) {
 				const e = err as Error
@@ -386,28 +386,28 @@ describe('CmcdRequestCollector', () => {
 				ok(e.message.includes('segment'))
 				ok(e.message.includes('Got 1'))
 			}
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('waits across any type when type is undefined', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [t] })
-			const promise = collector.waitForRequests(undefined, 2, 1000)
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [t] })
+			const promise = recorder.waitForReports(undefined, 2, 1000)
 			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
 			const result = await promise
 			equal(result.length, 2)
-			collector.detach()
+			recorder.detach()
 		})
 	})
 
 	describe('onReport', () => {
 		it('fires once per captured request, in capture order', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			const calls: CmcdCollectedRequest[] = []
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			const calls: CmcdRecordedReport[] = []
+			recorder.attach({
 				transports: [t],
 				onReport: (report) => calls.push(report),
 			})
@@ -418,35 +418,35 @@ describe('CmcdRequestCollector', () => {
 			equal(calls[1].request.url, 'https://e.com/b.m4s?CMCD=sid%3D%22abc%22')
 			equal(calls[0].type, CmcdRequestType.SEGMENT)
 			equal(calls[0].reportingMode, 'query')
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('does not fire a stale listener after detach() then attach() with no listener', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			const calls: CmcdCollectedRequest[] = []
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			const calls: CmcdRecordedReport[] = []
+			recorder.attach({
 				transports: [t],
 				onReport: (report) => calls.push(report),
 			})
-			collector.detach()
-			collector.attach({ transports: [t] })
+			recorder.detach()
+			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			equal(calls.length, 0)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('does not fire the listener after detach() with no further attach', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			const calls: CmcdCollectedRequest[] = []
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			const calls: CmcdRecordedReport[] = []
+			recorder.attach({
 				transports: [t],
 				onReport: (report) => calls.push(report),
 			})
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			equal(calls.length, 1)
-			collector.detach()
+			recorder.detach()
 			// FakeTransport still holds a reference to the patched deliver,
 			// so simulating after detach reaches #deliver. Listener must
 			// have been cleared.
@@ -454,25 +454,25 @@ describe('CmcdRequestCollector', () => {
 			equal(calls.length, 1)
 		})
 
-		it('receives the same object reference that getRequests() returns', () => {
+		it('receives the same object reference that getReports() returns', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			let received: CmcdCollectedRequest | undefined
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			let received: CmcdRecordedReport | undefined
+			recorder.attach({
 				transports: [t],
 				onReport: (report) => { received = report },
 			})
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
-			const fromGet = collector.getRequests()[0]
+			const fromGet = recorder.getReports()[0]
 			equal(received, fromGet)
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('does not fire for requests that carry no CMCD data', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			const calls: CmcdCollectedRequest[] = []
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			const calls: CmcdRecordedReport[] = []
+			recorder.attach({
 				transports: [t],
 				onReport: (report) => calls.push(report),
 			})
@@ -482,36 +482,36 @@ describe('CmcdRequestCollector', () => {
 				headers: { 'content-type': 'video/mp4' },
 			})
 			equal(calls.length, 0)
-			collector.detach()
+			recorder.detach()
 		})
 
-		it('fires the listener before pending waitForRequests resolves', async () => {
+		it('fires the listener before pending waitForReports resolves', async () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
+			const recorder = new CmcdReportRecorder()
 			const order: string[] = []
-			collector.attach({
+			recorder.attach({
 				transports: [t],
 				onReport: () => order.push('listener'),
 			})
-			const promise = collector.waitForRequests(undefined, 1, 1000).then(() => order.push('waiter'))
+			const promise = recorder.waitForReports(undefined, 1, 1000).then(() => order.push('waiter'))
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			await promise
 			deepEqual(order, ['listener', 'waiter'])
-			collector.detach()
+			recorder.detach()
 		})
 
 		it('uses the new listener after detach() and re-attach with a different callback', () => {
 			const t = new FakeTransport()
-			const collector = new CmcdRequestCollector()
-			const a: CmcdCollectedRequest[] = []
-			const b: CmcdCollectedRequest[] = []
-			collector.attach({ transports: [t], onReport: (r) => a.push(r) })
-			collector.detach()
-			collector.attach({ transports: [t], onReport: (r) => b.push(r) })
+			const recorder = new CmcdReportRecorder()
+			const a: CmcdRecordedReport[] = []
+			const b: CmcdRecordedReport[] = []
+			recorder.attach({ transports: [t], onReport: (r) => a.push(r) })
+			recorder.detach()
+			recorder.attach({ transports: [t], onReport: (r) => b.push(r) })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			equal(a.length, 0)
 			equal(b.length, 1)
-			collector.detach()
+			recorder.detach()
 		})
 	})
 })
@@ -531,21 +531,21 @@ describe('createXhrTransport', () => {
 	it('captures an XHR request that carries CMCD-* headers', () => {
 		installXhrShim()
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [createXhrTransport()] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createXhrTransport()] })
 
 			const xhr = new MockXhr()
 			xhr.open('GET', 'https://e.com/seg.m4s')
 			xhr.setRequestHeader('CMCD-Request', 'sid="abc"')
 			xhr.send()
 
-			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			const captured = recorder.getReports(CmcdRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'header')
 			equal(captured[0].request.url, 'https://e.com/seg.m4s')
 			equal(captured[0].request.method, 'GET')
 			equal(captured[0].request.headers?.['cmcd-request'], 'sid="abc"')
-			collector.detach()
+			recorder.detach()
 		} finally {
 			restoreXhrShim()
 		}
@@ -554,17 +554,17 @@ describe('createXhrTransport', () => {
 	it('captures an XHR request with CMCD query parameter', () => {
 		installXhrShim()
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [createXhrTransport()] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createXhrTransport()] })
 
 			const xhr = new MockXhr()
 			xhr.open('GET', 'https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
 			xhr.send()
 
-			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			const captured = recorder.getReports(CmcdRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'query')
-			collector.detach()
+			recorder.detach()
 		} finally {
 			restoreXhrShim()
 		}
@@ -574,10 +574,10 @@ describe('createXhrTransport', () => {
 		installXhrShim()
 		try {
 			const origOpen = MockXhr.prototype.open
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [createXhrTransport()] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createXhrTransport()] })
 			ok(MockXhr.prototype.open !== origOpen, 'open should have been patched')
-			collector.detach()
+			recorder.detach()
 			equal(MockXhr.prototype.open, origOpen, 'open should be restored')
 		} finally {
 			restoreXhrShim()
@@ -587,15 +587,15 @@ describe('createXhrTransport', () => {
 	it('does not capture non-CMCD XHR requests', () => {
 		installXhrShim()
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [createXhrTransport()] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createXhrTransport()] })
 
 			const xhr = new MockXhr()
 			xhr.open('GET', 'https://e.com/seg.m4s')
 			xhr.send()
 
-			equal(collector.getRequests().length, 0)
-			collector.detach()
+			equal(recorder.getReports().length, 0)
+			recorder.detach()
 		} finally {
 			restoreXhrShim()
 		}
@@ -604,8 +604,8 @@ describe('createXhrTransport', () => {
 	it('completes the XHR with synthetic 204 when URL matches eventTargetUrls', async () => {
 		installXhrShim()
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				transports: [createXhrTransport()],
 				eventTargetUrls: ['https://events.example.com'],
 			})
@@ -625,8 +625,8 @@ describe('createXhrTransport', () => {
 			ok(loadEnded, 'onloadend should have fired')
 			equal(xhr.status, 204)
 			equal(xhr.readyState, 4)
-			equal(collector.getRequests(CmcdRequestType.EVENT).length, 1)
-			collector.detach()
+			equal(recorder.getReports(CmcdRequestType.EVENT).length, 1)
+			recorder.detach()
 		} finally {
 			restoreXhrShim()
 		}
@@ -641,8 +641,8 @@ describe('default transports', () => {
 		globalThis.fetch = async () => new Response('', { status: 200 })
 
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach()
+			const recorder = new CmcdReportRecorder()
+			recorder.attach()
 
 			const xhr = new MockXhr()
 			xhr.open('GET', 'https://e.com/a.m4s?CMCD=sid%3D%22x%22')
@@ -650,8 +650,8 @@ describe('default transports', () => {
 
 			await fetch('https://e.com/b.m4s?CMCD=sid%3D%22y%22')
 
-			equal(collector.getRequests(CmcdRequestType.SEGMENT).length, 2)
-			collector.detach()
+			equal(recorder.getReports(CmcdRequestType.SEGMENT).length, 2)
+			recorder.detach()
 		} finally {
 			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
 			globalThis.fetch = origFetch
@@ -666,17 +666,17 @@ describe('default transports', () => {
 
 		try {
 			//#region example
-			const collector = new CmcdRequestCollector()
-			collector.attach({ eventTargetUrls: ['https://events.example.com'] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ eventTargetUrls: ['https://events.example.com'] })
 
 			// ... player runs, emits CMCD requests ...
 			await fetch('https://cdn.example.com/seg1.m4s?CMCD=sid%3D%22abc%22')
 			await fetch('https://cdn.example.com/seg2.m4s?CMCD=sid%3D%22abc%22')
 
-			const segments = collector.getRequests(CmcdRequestType.SEGMENT)
+			const segments = recorder.getReports(CmcdRequestType.SEGMENT)
 			equal(segments.length, 2)
 
-			collector.detach()
+			recorder.detach()
 			//#endregion example
 		} finally {
 			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
@@ -692,9 +692,9 @@ describe('default transports', () => {
 
 		try {
 			//#region example-on-report
-			const reports: CmcdCollectedRequest[] = []
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const reports: CmcdRecordedReport[] = []
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				onReport: (report) => reports.push(report),
 			})
 
@@ -707,7 +707,7 @@ describe('default transports', () => {
 			// array.
 			equal(reports.length, 2)
 
-			collector.detach()
+			recorder.detach()
 			//#endregion example-on-report
 		} finally {
 			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
@@ -731,16 +731,16 @@ describe('createFetchTransport', () => {
 	it('captures a fetch request with CMCD query parameter', async () => {
 		installFetchStub()
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [createFetchTransport()] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createFetchTransport()] })
 
 			await fetch('https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
 
-			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			const captured = recorder.getReports(CmcdRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'query')
 			equal(captured[0].request.url, 'https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
-			collector.detach()
+			recorder.detach()
 		} finally {
 			restoreFetchStub()
 		}
@@ -749,18 +749,18 @@ describe('createFetchTransport', () => {
 	it('captures a fetch request with CMCD-* headers and lowercases header names', async () => {
 		installFetchStub()
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [createFetchTransport()] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createFetchTransport()] })
 
 			await fetch('https://e.com/seg.m4s', {
 				headers: { 'CMCD-Request': 'sid="abc"' },
 			})
 
-			const captured = collector.getRequests(CmcdRequestType.SEGMENT)
+			const captured = recorder.getReports(CmcdRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'header')
 			equal(captured[0].request.headers?.['cmcd-request'], 'sid="abc"')
-			collector.detach()
+			recorder.detach()
 		} finally {
 			restoreFetchStub()
 		}
@@ -769,8 +769,8 @@ describe('createFetchTransport', () => {
 	it('normalizes a POST body to a string', async () => {
 		installFetchStub()
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				transports: [createFetchTransport()],
 				eventTargetUrls: ['https://events.example.com'],
 			})
@@ -780,10 +780,10 @@ describe('createFetchTransport', () => {
 				body: 'sid="abc",ts=1234',
 			})
 
-			const captured = collector.getRequests(CmcdRequestType.EVENT)
+			const captured = recorder.getReports(CmcdRequestType.EVENT)
 			equal(captured.length, 1)
 			equal(captured[0].request.body, 'sid="abc",ts=1234')
-			collector.detach()
+			recorder.detach()
 		} finally {
 			restoreFetchStub()
 		}
@@ -793,10 +793,10 @@ describe('createFetchTransport', () => {
 		installFetchStub()
 		try {
 			const beforeAttach = globalThis.fetch
-			const collector = new CmcdRequestCollector()
-			collector.attach({ transports: [createFetchTransport()] })
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({ transports: [createFetchTransport()] })
 			ok(globalThis.fetch !== beforeAttach, 'fetch should have been wrapped')
-			collector.detach()
+			recorder.detach()
 			equal(globalThis.fetch, beforeAttach, 'fetch should be restored')
 		} finally {
 			restoreFetchStub()
@@ -809,8 +809,8 @@ describe('createFetchTransport', () => {
 		globalThis.fetch = async () => { underlyingCalls += 1; return new Response('', { status: 200 }) }
 
 		try {
-			const collector = new CmcdRequestCollector()
-			collector.attach({
+			const recorder = new CmcdReportRecorder()
+			recorder.attach({
 				transports: [createFetchTransport()],
 				eventTargetUrls: ['https://events.example.com'],
 			})
@@ -822,8 +822,8 @@ describe('createFetchTransport', () => {
 
 			equal(response.status, 204)
 			equal(underlyingCalls, 0, 'underlying fetch should not have been invoked')
-			equal(collector.getRequests(CmcdRequestType.EVENT).length, 1)
-			collector.detach()
+			equal(recorder.getReports(CmcdRequestType.EVENT).length, 1)
+			recorder.detach()
 		} finally {
 			globalThis.fetch = origFetch
 		}

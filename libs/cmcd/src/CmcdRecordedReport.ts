@@ -1,23 +1,24 @@
 import type { HttpRequest } from '@svta/cml-utils'
-import type { CmcdCollectedRequestMode } from './CmcdCollectedRequestMode.ts'
+import type { CmcdRecordedReportMode } from './CmcdRecordedReportMode.ts'
 import type { CmcdRequestType } from './CmcdRequestType.ts'
 
 /**
- * A request captured by `CmcdRequestCollector`, normalized to
+ * A CMCD report captured by `CmcdReportRecorder`, normalized to
  * `HttpRequest` regardless of the transport that produced it.
  *
  * @public
  */
-export type CmcdCollectedRequest = {
+export type CmcdRecordedReport = {
 
 	/**
-	 * The captured request, normalized to {@link @svta/cml-utils!HttpRequest | HttpRequest}.
-	 * Headers are lowercase-keyed; bodies are eagerly read as strings.
+	 * The captured request that carried the CMCD report, normalized to
+	 * {@link @svta/cml-utils!HttpRequest | HttpRequest}. Headers are
+	 * lowercase-keyed; bodies are eagerly read as strings.
 	 */
 	readonly request: HttpRequest;
 
 	/**
-	 * Classification of the request (manifest / segment / event / unknown).
+	 * Classification of the underlying request (manifest / segment / event / unknown).
 	 */
 	readonly type: CmcdRequestType;
 
@@ -26,7 +27,7 @@ export type CmcdCollectedRequest = {
 	 * `'query'` for `CMCD=` URL parameter, `'header'` for `Cmcd-*`
 	 * HTTP headers, `'event'` for an event-target POST body.
 	 */
-	readonly reportingMode: CmcdCollectedRequestMode;
+	readonly reportingMode: CmcdRecordedReportMode;
 
 	/**
 	 * Wall-clock millisecond timestamp from `Date.now()` at capture time.

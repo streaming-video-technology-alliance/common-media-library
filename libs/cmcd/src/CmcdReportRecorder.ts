@@ -1,10 +1,10 @@
 import type { HttpRequest } from '@svta/cml-utils'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
-import type { CmcdCollectedRequest } from './CmcdCollectedRequest.ts'
-import type { CmcdCollectedRequestMode } from './CmcdCollectedRequestMode.ts'
+import type { CmcdRecordedReport } from './CmcdRecordedReport.ts'
+import type { CmcdRecordedReportMode } from './CmcdRecordedReportMode.ts'
 import { createFetchTransport } from './createFetchTransport.ts'
 import { createXhrTransport } from './createXhrTransport.ts'
-import type { CmcdRequestCollectorOptions } from './CmcdRequestCollectorOptions.ts'
+import type { CmcdReportRecorderOptions } from './CmcdReportRecorderOptions.ts'
 import { CmcdRequestType } from './CmcdRequestType.ts'
 
 const MANIFEST_EXTENSIONS = /\.(m3u8|mpd)(\?|$|\/)/i
@@ -39,7 +39,7 @@ function detectReportingMode(
 	url: string,
 	headers: Record<string, string> | undefined,
 	isEventTarget: boolean,
-): CmcdCollectedRequestMode | null {
+): CmcdRecordedReportMode | null {
 	if (isEventTarget) {
 		return 'event'
 	}
@@ -49,39 +49,39 @@ function detectReportingMode(
 	return url.includes(`${CMCD_PARAM}=`) ? 'query' : null
 }
 
-type CmcdRequestWaiter = {
+type CmcdReportWaiter = {
 	type: CmcdRequestType | undefined
 	count: number
-	resolve: (r: CmcdCollectedRequest[]) => void
+	resolve: (r: CmcdRecordedReport[]) => void
 	reject: (e: Error) => void
 	timer: ReturnType<typeof setTimeout>
 }
 
-type CmcdRequestCollectorEntry = {
+type CmcdReportRecorderEntry = {
 	type: CmcdRequestType | undefined
-	resolve: (r: CmcdCollectedRequest[]) => void
+	resolve: (r: CmcdRecordedReport[]) => void
 	timer: ReturnType<typeof setTimeout>
 }
 
 /**
- * Test helper that captures CMCD-bearing requests across XHR and fetch
+ * Test helper that records CMCD-bearing reports across XHR and fetch
  * transports for assertion in e2e tests. Each captured request is
  * normalized to {@link @svta/cml-utils!HttpRequest | HttpRequest} so
  * tests are identical regardless of which transport the player uses.
  *
  * @example
- * {@includeCode ../test/CmcdRequestCollector.test.ts#example}
+ * {@includeCode ../test/CmcdReportRecorder.test.ts#example}
  *
  * @public
  */
-export class CmcdRequestCollector {
-	#requests: CmcdCollectedRequest[] = []
+export class CmcdReportRecorder {
+	#reports: CmcdRecordedReport[] = []
 	#detachers: (() => void)[] = []
 	#attached = false
 	#eventTargetUrls: readonly string[] = []
-	#waiters: CmcdRequestWaiter[] = []
-	#collectors: CmcdRequestCollectorEntry[] = []
-	#onReport: ((report: CmcdCollectedRequest) => void) | undefined
+	#waiters: CmcdReportWaiter[] = []
+	#recorders: CmcdReportRecorderEntry[] = []
+	#onReport: ((report: CmcdRecordedReport) => void) | undefined
 
 	readonly #deliver = (request: HttpRequest): Response | undefined => {
 		const url = request.url
@@ -93,13 +93,13 @@ export class CmcdRequestCollector {
 			return undefined
 		}
 
-		const captured: CmcdCollectedRequest = {
+		const captured: CmcdRecordedReport = {
 			request,
 			type: classifyUrl(url, method),
 			reportingMode,
 			timestamp: Date.now(),
 		}
-		this.#requests.push(captured)
+		this.#reports.push(captured)
 		this.#onReport?.(captured)
 		this.#notifyWaiters()
 
@@ -107,9 +107,9 @@ export class CmcdRequestCollector {
 	}
 
 	#notifyWaiters(): void {
-		const remaining: CmcdRequestWaiter[] = []
+		const remaining: CmcdReportWaiter[] = []
 		for (const waiter of this.#waiters) {
-			const matching = this.getRequests(waiter.type)
+			const matching = this.getReports(waiter.type)
 			if (matching.length >= waiter.count) {
 				clearTimeout(waiter.timer)
 				waiter.resolve(matching)
@@ -121,12 +121,12 @@ export class CmcdRequestCollector {
 	}
 
 	/**
-	 * Install transport patches and begin collecting CMCD requests.
+	 * Install transport patches and begin recording CMCD reports.
 	 * No-op if already attached.
 	 *
 	 * @public
 	 */
-	attach(options: CmcdRequestCollectorOptions = {}): void {
+	attach(options: CmcdReportRecorderOptions = {}): void {
 		if (this.#attached) {
 			return
 		}
@@ -141,10 +141,10 @@ export class CmcdRequestCollector {
 	}
 
 	/**
-	 * Remove transport patches and stop collecting. Rejects any pending
-	 * `waitForRequests` promises with `Error('Collector detached while waiting')`
-	 * and resolves any pending `collectFor` promises with whatever was
-	 * collected up to that point.
+	 * Remove transport patches and stop recording. Rejects any pending
+	 * `waitForReports` promises with `Error('Recorder detached while waiting')`
+	 * and resolves any pending `recordFor` promises with whatever was
+	 * recorded up to that point.
 	 *
 	 * @public
 	 */
@@ -162,69 +162,69 @@ export class CmcdRequestCollector {
 
 		for (const waiter of this.#waiters) {
 			clearTimeout(waiter.timer)
-			waiter.reject(new Error('Collector detached while waiting'))
+			waiter.reject(new Error('Recorder detached while waiting'))
 		}
 		this.#waiters = []
 
-		for (const entry of this.#collectors) {
+		for (const entry of this.#recorders) {
 			clearTimeout(entry.timer)
-			entry.resolve(this.getRequests(entry.type))
+			entry.resolve(this.getReports(entry.type))
 		}
-		this.#collectors = []
+		this.#recorders = []
 	}
 
 	/**
-	 * Discard all captured requests. Does not affect the attached state.
+	 * Discard all recorded reports. Does not affect the attached state.
 	 *
 	 * @public
 	 */
 	clear(): void {
-		this.#requests = []
+		this.#reports = []
 	}
 
 	/**
-	 * Return a defensive copy of the captured requests, optionally
+	 * Return a defensive copy of the recorded reports, optionally
 	 * filtered by classification.
 	 *
-	 * @param type - When provided, only requests with a matching
-	 *   {@link CmcdRequestType:type} are included in the result.
+	 * @param type - When provided, only reports whose underlying request
+	 *   matches {@link CmcdRequestType:type} are included in the result.
 	 *
 	 * @public
 	 */
-	getRequests(type?: CmcdRequestType): CmcdCollectedRequest[] {
+	getReports(type?: CmcdRequestType): CmcdRecordedReport[] {
 		if (type === undefined) {
-			return [...this.#requests]
+			return [...this.#reports]
 		}
-		return this.#requests.filter((r) => r.type === type)
+		return this.#reports.filter((r) => r.type === type)
 	}
 
 	/**
-	 * Wait until at least `count` requests of the given type are captured.
-	 * Resolves with all matching captures; rejects with a diagnostic error
+	 * Wait until at least `count` reports of the given type are recorded.
+	 * Resolves with all matching reports; rejects with a diagnostic error
 	 * on timeout (default 15000 ms). Use for positive assertions
 	 * ("expect N to happen").
 	 *
 	 * @public
 	 */
-	waitForRequests(
+	waitForReports(
 		type: CmcdRequestType | undefined,
 		count: number,
 		timeout = 15000,
-	): Promise<CmcdCollectedRequest[]> {
-		const matching = this.getRequests(type)
+	): Promise<CmcdRecordedReport[]> {
+		const matching = this.getReports(type)
 		if (matching.length >= count) {
 			return Promise.resolve(matching)
 		}
 
-		return new Promise<CmcdCollectedRequest[]>((resolve, reject) => {
+		return new Promise<CmcdRecordedReport[]>((resolve, reject) => {
 			const timer = setTimeout(() => {
 				const idx = this.#waiters.findIndex((w) => w.timer === timer)
 				if (idx >= 0) {
 					this.#waiters.splice(idx, 1)
 				}
-				const current = this.getRequests(type)
+				const current = this.getReports(type)
 				reject(new Error(
-					`Timeout waiting for ${count} ${type ?? 'any'} CMCD request(s). Got ${current.length}. Total collected: ${this.#requests.length}.`,
+					`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.#reports.length}.`,
 				))
 			}, timeout)
 
@@ -233,26 +233,26 @@ export class CmcdRequestCollector {
 	}
 
 	/**
-	 * Wait for the given duration, then resolve with all captures of the
-	 * given type collected so far. Never rejects on timeout (use this for
+	 * Wait for the given duration, then resolve with all reports of the
+	 * given type recorded so far. Never rejects on timeout (use this for
 	 * negative or upper-bound assertions: "no events should fire",
 	 * "exactly N segments and no more").
 	 *
 	 * @public
 	 */
-	collectFor(
+	recordFor(
 		timeout: number,
 		type?: CmcdRequestType,
-	): Promise<CmcdCollectedRequest[]> {
-		return new Promise<CmcdCollectedRequest[]>((resolve) => {
+	): Promise<CmcdRecordedReport[]> {
+		return new Promise<CmcdRecordedReport[]>((resolve) => {
 			const timer = setTimeout(() => {
-				const idx = this.#collectors.findIndex((c) => c.timer === timer)
+				const idx = this.#recorders.findIndex((c) => c.timer === timer)
 				if (idx >= 0) {
-					this.#collectors.splice(idx, 1)
+					this.#recorders.splice(idx, 1)
 				}
-				resolve(this.getRequests(type))
+				resolve(this.getReports(type))
 			}, timeout)
-			this.#collectors.push({ type, resolve, timer })
+			this.#recorders.push({ type, resolve, timer })
 		})
 	}
 }

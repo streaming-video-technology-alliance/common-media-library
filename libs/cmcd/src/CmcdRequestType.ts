@@ -30,7 +30,7 @@ export const CMCD_REQUEST_TYPE_EVENT = 'event' as const
 export const CMCD_REQUEST_TYPE_UNKNOWN = 'unknown' as const
 
 /**
- * Classification of a captured request, used by `CmcdRequestCollector`
+ * Classification of a captured request, used by `CmcdReportRecorder`
  * for filtering.
  *
  * @enum
