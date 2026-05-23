@@ -3,7 +3,8 @@ import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
@@ -140,6 +141,11 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		if (!keys.includes('cen') && data['cen'] != null && eventType === CMCD_EVENT_CUSTOM_EVENT) {
 			keys.push('cen')
 		}
+
+		const requiredField = eventType ? CMCD_STATE_EVENT_FIELDS.get(eventType) : undefined
+		if (requiredField && data[requiredField] != null && !keys.includes(requiredField)) {
+			keys.push(requiredField)
+		}
 	}
 
 	if (keys.length === 0) {
@@ -176,8 +182,10 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			}
 		}
 
-		// Playback rate should only be sent if not equal to 1.
-		if (key === 'pr' && value === 1) {
+		// Playback rate should only be sent if not equal to 1, except as
+		// the value of a PLAYBACK_RATE state-change event (where pr=1 is
+		// the data being reported, not a default to skip).
+		if (key === 'pr' && value === 1 && !(isEventMode && data['e'] === CMCD_EVENT_PLAYBACK_RATE)) {
 			continue
 		}
 

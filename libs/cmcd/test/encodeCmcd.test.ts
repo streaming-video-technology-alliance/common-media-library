@@ -1,5 +1,5 @@
 import type { CmcdEncodeOptions } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
 import { SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -67,6 +67,80 @@ describe('encodeCmcd', () => {
 			const input = { e: CmcdEventType.CUSTOM_EVENT, cen: 'my-custom-event', cid: 'content-id' }
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
 			ok(output.includes('cen="my-custom-event"'), 'cen key must not be filtered out in event mode when e=ce')
+		})
+
+		it('doesn\'t filter sta key in event mode when event type is ps', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('sta='), 'sta key must not be filtered out in event mode when e=ps')
+		})
+
+		it('doesn\'t filter pr key in event mode when event type is pr', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1.5, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('pr='), 'pr key must not be filtered out in event mode when e=pr')
+		})
+
+		it('doesn\'t filter cid key in event mode when event type is c', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.CONTENT_ID, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'sid' })
+			ok(output.includes('cid='), 'cid key must not be filtered out in event mode when e=c')
+		})
+
+		it('doesn\'t filter bg key in event mode when event type is b', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.BACKGROUNDED_MODE, bg: true, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('bg'), 'bg key must not be filtered out in event mode when e=b')
+		})
+
+		it('doesn\'t filter br key in event mode when event type is bc', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.BITRATE_CHANGE, br: [3000], cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			ok(output.includes('br='), 'br key must not be filtered out in event mode when e=bc')
+		})
+
+		it('doesn\'t force-include sta when value is undefined', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAY_STATE, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			equal(output.includes('sta='), false)
+		})
+
+		it('doesn\'t force-include required field in request mode', () => {
+			const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id', br: [3000] }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST, filter: key => key === 'br' })
+			equal(output.includes('sta='), false, 'sta should be filtered out in request mode')
+		})
+
+		it('preserves pr=1 in event mode when event type is pr', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
+			ok(output.includes('pr=1'), 'pr=1 must be preserved when event type is pr')
+		})
+
+		it('still skips pr=1 in request mode', () => {
+			const input = { pr: 1, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST })
+			equal(output.includes('pr=1'), false, 'pr=1 should still be skipped in request mode')
+		})
+
+		it('still skips pr=1 in non-pr event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.RESPONSE_RECEIVED, pr: 1, url: 'https://example.com/v.mp4' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
+			equal(output.includes('pr=1'), false, 'pr=1 should still be skipped when e is not pr')
+		})
+
+		it('still skips pr=1 in request mode even when e=pr is in input data', () => {
+			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST })
+			equal(output.includes('pr=1'), false, 'pr=1 should be suppressed in request mode regardless of e')
 		})
 	})
 

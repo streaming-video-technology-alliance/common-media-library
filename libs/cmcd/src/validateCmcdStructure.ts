@@ -1,7 +1,8 @@
 import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
-import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAY_STATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
@@ -110,13 +111,15 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 			}
 		}
 
-		// Play state change requires sta
-		if (data['e'] === CMCD_EVENT_PLAY_STATE && !('sta' in data)) {
-			issues.push({
-				key: 'sta',
-				message: 'Play state event (e="ps") requires the "sta" key to be present.',
-				severity: CMCD_VALIDATION_SEVERITY_ERROR
-			})
+		// State-change events require their associated field
+		for (const [eventType, requiredField] of CMCD_STATE_EVENT_FIELDS) {
+			if (data['e'] === eventType && !(requiredField in data)) {
+				issues.push({
+					key: requiredField,
+					message: `State-change event (e="${eventType}") requires the "${requiredField}" key to be present.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR
+				})
+			}
 		}
 
 		// Error event requires ec
