@@ -31,7 +31,7 @@ and this project adheres to
   event-target POST stubbing.
 - `CmcdRecorderRequestType` const-enum and supporting types
   (`CmcdRecordedReport`, `CmcdRecordedReportMode`, `CmcdTransportAdapter`,
-  `CmcdReportRecorderOptions`).
+  `CmcdReportRecorderOptions`, `CmcdReportRecorderWaitOptions`).
 - `createXhrTransport` and `createFetchTransport` default adapter
   factories.
 
