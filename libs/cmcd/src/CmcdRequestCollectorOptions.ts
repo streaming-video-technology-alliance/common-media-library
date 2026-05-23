@@ -1,3 +1,4 @@
+import type { CmcdCollectedRequest } from './CmcdCollectedRequest.ts'
 import type { CmcdTransportAdapter } from './CmcdTransportAdapter.ts'
 
 /**
@@ -26,4 +27,22 @@ export type CmcdRequestCollectorOptions = {
 	 * transport (e.g. a custom HTTP client).
 	 */
 	transports?: readonly CmcdTransportAdapter[];
+
+	/**
+	 * Called once for each captured CMCD report, immediately after it
+	 * is appended to the buffer and before any pending
+	 * `waitForRequests` promises resolve. Use for live UI inspection
+	 * in test harness pages. Cleared automatically on `detach()`;
+	 * pass a fresh callback to a subsequent `attach()` to resume
+	 * notification.
+	 *
+	 * The callback receives the same {@link CmcdCollectedRequest}
+	 * shape that `getRequests()` returns. Filter by `report.type` or
+	 * `report.reportingMode` inside the callback if you only care
+	 * about a subset.
+	 *
+	 * @example
+	 * {@includeCode ../test/CmcdRequestCollector.test.ts#example-on-report}
+	 */
+	onReport?: (report: CmcdCollectedRequest) => void;
 }

@@ -81,6 +81,7 @@ export class CmcdRequestCollector {
 	#eventTargetUrls: readonly string[] = []
 	#waiters: CmcdRequestWaiter[] = []
 	#collectors: CmcdRequestCollectorEntry[] = []
+	#onReport: ((report: CmcdCollectedRequest) => void) | undefined
 
 	readonly #deliver = (request: HttpRequest): Response | undefined => {
 		const url = request.url
@@ -92,13 +93,14 @@ export class CmcdRequestCollector {
 			return undefined
 		}
 
-		this.#requests.push({
+		const captured: CmcdCollectedRequest = {
 			request,
 			type: classifyUrl(url, method),
 			reportingMode,
 			timestamp: Date.now(),
-		})
-
+		}
+		this.#requests.push(captured)
+		this.#onReport?.(captured)
 		this.#notifyWaiters()
 
 		return isEventTarget ? new Response(null, { status: 204 }) : undefined
@@ -130,6 +132,7 @@ export class CmcdRequestCollector {
 		}
 		this.#attached = true
 		this.#eventTargetUrls = options.eventTargetUrls ?? []
+		this.#onReport = options.onReport
 
 		const transports = options.transports ?? [createXhrTransport(), createFetchTransport()]
 		for (const transport of transports) {
@@ -155,6 +158,7 @@ export class CmcdRequestCollector {
 		this.#detachers = []
 		this.#attached = false
 		this.#eventTargetUrls = []
+		this.#onReport = undefined
 
 		for (const waiter of this.#waiters) {
 			clearTimeout(waiter.timer)

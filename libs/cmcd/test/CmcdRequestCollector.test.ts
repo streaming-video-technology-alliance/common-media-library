@@ -1,4 +1,4 @@
-import type { CmcdTransportAdapter, CmcdRequestDeliver } from '@svta/cml-cmcd'
+import type { CmcdTransportAdapter, CmcdRequestDeliver, CmcdCollectedRequest } from '@svta/cml-cmcd'
 import { createFetchTransport, createXhrTransport, CmcdRequestCollector, CmcdRequestType } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
@@ -398,6 +398,26 @@ describe('CmcdRequestCollector', () => {
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
 			const result = await promise
 			equal(result.length, 2)
+			collector.detach()
+		})
+	})
+
+	describe('onReport', () => {
+		it('fires once per captured request, in capture order', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			const calls: CmcdCollectedRequest[] = []
+			collector.attach({
+				transports: [t],
+				onReport: (report) => calls.push(report),
+			})
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
+			t.simulate({ url: 'https://e.com/b.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
+			equal(calls.length, 2)
+			equal(calls[0].request.url, 'https://e.com/a.m4s?CMCD=sid%3D%22abc%22')
+			equal(calls[1].request.url, 'https://e.com/b.m4s?CMCD=sid%3D%22abc%22')
+			equal(calls[0].type, CmcdRequestType.SEGMENT)
+			equal(calls[0].reportingMode, 'query')
 			collector.detach()
 		})
 	})
