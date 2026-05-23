@@ -7,7 +7,8 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_BITRATE_CHANGE, CMCD_EVENT_CONTENT_ID, CMCD_EVENT_PLAY_STATE, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
@@ -108,18 +109,20 @@ const identity = <T>(v: T): T => v
  * Maps each tracked state field to its event type and equality function.
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
-const STATE_FIELDS: readonly StateFieldEntry[] = [
-	{ field: 'sta', event: CMCD_EVENT_PLAY_STATE, equal, snapshot: identity },
-	{ field: 'pr', event: CMCD_EVENT_PLAYBACK_RATE, equal, snapshot: identity },
-	{ field: 'cid', event: CMCD_EVENT_CONTENT_ID, equal, snapshot: identity },
-	{ field: 'bg', event: CMCD_EVENT_BACKGROUNDED_MODE, equal, snapshot: identity },
-	{
-		field: 'br',
-		event: CMCD_EVENT_BITRATE_CHANGE,
-		equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
-		snapshot: (v) => (v as CmcdObjectTypeList).slice(),
+const STATE_FIELDS: readonly StateFieldEntry[] = Array.from(
+	CMCD_STATE_EVENT_FIELDS,
+	([event, field]): StateFieldEntry => {
+		if (field === 'br') {
+			return {
+				event,
+				field,
+				equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
+				snapshot: (v) => (v as CmcdObjectTypeList).slice(),
+			}
+		}
+		return { event, field: field as StateField, equal, snapshot: identity }
 	},
-]
+)
 
 const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = new Map(
 	STATE_FIELDS.map(e => [e.event, e]),
