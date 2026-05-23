@@ -3,6 +3,7 @@ import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import type { CmcdRecordedReport } from './CmcdRecordedReport.ts'
 import type { CmcdRecordedReportMode } from './CmcdRecordedReportMode.ts'
 import type { CmcdReportRecorderOptions } from './CmcdReportRecorderOptions.ts'
+import type { CmcdReportRecorderWaitOptions } from './CmcdReportRecorderWaitOptions.ts'
 import { CmcdRequestType } from './CmcdRequestType.ts'
 import { createFetchTransport } from './createFetchTransport.ts'
 import { createXhrTransport } from './createXhrTransport.ts'
@@ -217,8 +218,8 @@ export class CmcdReportRecorder {
 	 *
 	 * @public
 	 */
-	waitForReports(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(undefined, count, timeout ?? this.#waitTimeout)
+	waitForReports(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(undefined, options.count ?? 1, options.timeout ?? this.#waitTimeout)
 	}
 
 	/**
@@ -229,8 +230,8 @@ export class CmcdReportRecorder {
 	 *
 	 * @public
 	 */
-	waitForManifest(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.MANIFEST, count, timeout ?? this.#waitTimeout)
+	waitForManifest(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.MANIFEST, options.count ?? 1, options.timeout ?? this.#waitTimeout)
 	}
 
 	/**
@@ -241,8 +242,8 @@ export class CmcdReportRecorder {
 	 *
 	 * @public
 	 */
-	waitForSegments(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.SEGMENT, count, timeout ?? this.#waitTimeout)
+	waitForSegments(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.SEGMENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
 	}
 
 	/**
@@ -253,7 +254,7 @@ export class CmcdReportRecorder {
 	 *
 	 * @public
 	 */
-	waitForEvents(count = 1, timeout?: number): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.EVENT, count, timeout ?? this.#waitTimeout)
+	waitForEvents(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.EVENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
 	}
 }

@@ -139,7 +139,7 @@ describe('CmcdReportRecorder', () => {
 			const t = new FakeTransport()
 			const recorder = new CmcdReportRecorder()
 			recorder.attach({ transports: [t] })
-			const promise = recorder.waitForSegments(5, 60000)
+			const promise = recorder.waitForSegments({ count: 5, timeout: 60000 })
 			setTimeout(() => recorder.detach(), 10)
 			try {
 				await promise
@@ -309,7 +309,7 @@ describe('CmcdReportRecorder', () => {
 			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=sid%3D%22abc%22', method: 'GET', headers: {} })
-			const result = await recorder.waitForSegments(2, 1000)
+			const result = await recorder.waitForSegments({ count: 2, timeout: 1000 })
 			equal(result.length, 2)
 			recorder.detach()
 		})
@@ -318,7 +318,7 @@ describe('CmcdReportRecorder', () => {
 			const t = new FakeTransport()
 			const recorder = new CmcdReportRecorder()
 			recorder.attach({ transports: [t] })
-			const promise = recorder.waitForSegments(2, 1000)
+			const promise = recorder.waitForSegments({ count: 2, timeout: 1000 })
 			setTimeout(() => {
 				t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 				t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
@@ -334,7 +334,7 @@ describe('CmcdReportRecorder', () => {
 			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			try {
-				await recorder.waitForSegments(3, 50)
+				await recorder.waitForSegments({ count: 3, timeout: 50 })
 				ok(false, 'should have rejected')
 			} catch (err) {
 				const e = err as Error
@@ -350,7 +350,7 @@ describe('CmcdReportRecorder', () => {
 			const t = new FakeTransport()
 			const recorder = new CmcdReportRecorder()
 			recorder.attach({ transports: [t] })
-			const promise = recorder.waitForReports(2, 1000)
+			const promise = recorder.waitForReports({ count: 2, timeout: 1000 })
 			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
 			const result = await promise
@@ -382,7 +382,7 @@ describe('CmcdReportRecorder', () => {
 			recorder.attach({ transports: [t], waitTimeout: 30 })
 			const start = Date.now()
 			try {
-				await recorder.waitForSegments(1)
+				await recorder.waitForSegments()
 				ok(false, 'should have rejected')
 			} catch (err) {
 				const elapsed = Date.now() - start
@@ -398,7 +398,7 @@ describe('CmcdReportRecorder', () => {
 			recorder.attach({ transports: [t], waitTimeout: 5000 })
 			const start = Date.now()
 			try {
-				await recorder.waitForSegments(1, 30)
+				await recorder.waitForSegments({ timeout: 30 })
 				ok(false, 'should have rejected')
 			} catch {
 				const elapsed = Date.now() - start
@@ -413,7 +413,7 @@ describe('CmcdReportRecorder', () => {
 			recorder.attach({ transports: [t] })
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.mpd?CMCD=x', method: 'GET', headers: {} })
-			const result = await recorder.waitForManifest(1, 1000)
+			const result = await recorder.waitForManifest({ timeout: 1000 })
 			equal(result.length, 1)
 			equal(result[0].type, CmcdRequestType.MANIFEST)
 			recorder.detach()
@@ -428,7 +428,7 @@ describe('CmcdReportRecorder', () => {
 			})
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://events.example.com/cmcd', method: 'POST', headers: {}, body: 'sid="x"' })
-			const result = await recorder.waitForEvents(1, 1000)
+			const result = await recorder.waitForEvents({ timeout: 1000 })
 			equal(result.length, 1)
 			equal(result[0].type, CmcdRequestType.EVENT)
 			recorder.detach()
@@ -526,7 +526,7 @@ describe('CmcdReportRecorder', () => {
 				transports: [t],
 				onReport: () => order.push('listener'),
 			})
-			const promise = recorder.waitForReports(1, 1000).then(() => order.push('waiter'))
+			const promise = recorder.waitForReports({ timeout: 1000 }).then(() => order.push('waiter'))
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			await promise
 			deepEqual(order, ['listener', 'waiter'])
@@ -555,7 +555,7 @@ describe('CmcdReportRecorder', () => {
 				eventTargetUrls: ['https://events.example.com'],
 				onReport: () => { throw new Error('listener boom') },
 			})
-			const waiter = recorder.waitForEvents(1, 1000)
+			const waiter = recorder.waitForEvents({ timeout: 1000 })
 			const synthetic = t.simulate({
 				url: 'https://events.example.com/cmcd',
 				method: 'POST',
@@ -739,7 +739,7 @@ describe('default transports', () => {
 			await fetch('https://cdn.example.com/seg1.m4s?CMCD=sid%3D%22abc%22')
 			await fetch('https://cdn.example.com/seg2.m4s?CMCD=sid%3D%22abc%22')
 
-			const segments = await recorder.waitForSegments(2)
+			const segments = await recorder.waitForSegments({ count: 2 })
 			equal(segments.length, 2)
 
 			recorder.detach()

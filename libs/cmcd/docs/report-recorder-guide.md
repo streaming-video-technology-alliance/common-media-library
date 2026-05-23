@@ -27,7 +27,7 @@ recorder.attach();
 
 // ... configure and start the player under test ...
 
-const segments = await recorder.waitForSegments(3);
+const segments = await recorder.waitForSegments({ count: 3 });
 console.log(`Recorded ${segments.length} segment reports with CMCD data`);
 
 recorder.detach();
@@ -94,18 +94,18 @@ console.log(`Total: ${all.length}, manifests: ${manifests.length}, segments: ${s
 recorder.detach();
 ```
 
-### `waitFor*(count?, timeout?)`: positive assertion
+### `waitFor*({ count?, timeout? })`: positive assertion
 
 Resolves once at least `count` matching reports have been recorded. Rejects with a diagnostic error on timeout. Use for "expect N to happen" assertions where the test is racing the player. There is one method per request type, plus a generic `waitForReports` that matches any type:
 
-| Method                                | Matches                              |
-| ------------------------------------- | ------------------------------------ |
-| `waitForReports(count?, timeout?)`    | any recorded report                  |
-| `waitForManifest(count?, timeout?)`   | reports with `type === MANIFEST`     |
-| `waitForSegments(count?, timeout?)`   | reports with `type === SEGMENT`      |
-| `waitForEvents(count?, timeout?)`     | reports with `type === EVENT` (POST) |
+| Method                                  | Matches                              |
+| --------------------------------------- | ------------------------------------ |
+| `waitForReports(options?)`              | any recorded report                  |
+| `waitForManifest(options?)`             | reports with `type === MANIFEST`     |
+| `waitForSegments(options?)`             | reports with `type === SEGMENT`      |
+| `waitForEvents(options?)`               | reports with `type === EVENT` (POST) |
 
-`count` defaults to `1`. `timeout` defaults to the recorder's `waitTimeout` option (15 seconds if unset). Pass an explicit `timeout` to override per call.
+Each method takes a single `CmcdReportRecorderWaitOptions` object with two optional fields. `count` defaults to `1`. `timeout` defaults to the recorder's `waitTimeout` option (15 seconds if unset).
 
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
@@ -117,7 +117,7 @@ recorder.attach();
 startPlayer();
 
 // Wait for the first three segment reports
-const segments = await recorder.waitForSegments(3);
+const segments = await recorder.waitForSegments({ count: 3 });
 for (const report of segments) {
     console.log(report.request.url, report.reportingMode);
 }
@@ -129,7 +129,7 @@ Shorten the timeout per call or globally on the recorder:
 
 ```typescript
 // Per call: fail in 2 seconds rather than the recorder default
-await recorder.waitForManifest(1, 2000);
+await recorder.waitForManifest({ timeout: 2000 });
 
 // All wait* calls on this recorder default to 2 seconds
 const fastRecorder = new CmcdReportRecorder();
@@ -202,7 +202,7 @@ recorder.attach({
 
 startPlayer();
 
-const events = await recorder.waitForEvents(1);
+const events = await recorder.waitForEvents();
 console.log("Event report body:", events[0].request.body);
 
 recorder.detach();
@@ -225,7 +225,7 @@ recorder.attach();
 
 startPlayer();
 
-const segments = await recorder.waitForSegments(3);
+const segments = await recorder.waitForSegments({ count: 3 });
 for (const report of segments) {
     const result = validateCmcdRequest(report.request);
     if (!result.valid) {
@@ -249,7 +249,7 @@ recorder.attach({ eventTargetUrls: ["https://events.example.com"] });
 
 startPlayer();
 
-const events = await recorder.waitForEvents(1);
+const events = await recorder.waitForEvents();
 const result = validateCmcdEventReport(events[0].request);
 if (!result.valid) {
     console.error("Bad event report:", result.issues);

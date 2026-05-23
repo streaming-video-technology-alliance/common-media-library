@@ -40,7 +40,7 @@ recorder.attach({ eventTargetUrls: ['https://events.example.com'] })
 
 // ... configure and start the player under test ...
 
-const segments = await recorder.waitForSegments(3)
+const segments = await recorder.waitForSegments({ count: 3 })
 for (const r of segments) {
   const result = validateCmcdRequest(r.request)
   if (!result.valid) {

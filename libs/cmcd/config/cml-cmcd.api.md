@@ -379,10 +379,10 @@ export class CmcdReportRecorder {
     clear(): void;
     detach(): void;
     getReports(): CmcdRecordedReport[];
-    waitForEvents(count?: number, timeout?: number): Promise<CmcdRecordedReport[]>;
-    waitForManifest(count?: number, timeout?: number): Promise<CmcdRecordedReport[]>;
-    waitForReports(count?: number, timeout?: number): Promise<CmcdRecordedReport[]>;
-    waitForSegments(count?: number, timeout?: number): Promise<CmcdRecordedReport[]>;
+    waitForEvents(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
+    waitForManifest(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
+    waitForReports(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
+    waitForSegments(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
 }
 
 // @public
@@ -391,6 +391,12 @@ export type CmcdReportRecorderOptions = {
     transports?: readonly CmcdTransportAdapter[];
     waitTimeout?: number;
     onReport?: (report: CmcdRecordedReport) => void;
+};
+
+// @public
+export type CmcdReportRecorderWaitOptions = {
+    count?: number;
+    timeout?: number;
 };
 
 // @public
