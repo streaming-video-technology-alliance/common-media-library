@@ -54,7 +54,6 @@ type CmcdReportWaiter = {
 	count: number
 	resolve: (r: CmcdRecordedReport[]) => void
 	reject: (e: Error) => void
-	timer: ReturnType<typeof setTimeout>
 }
 
 type CmcdReportRecorderEntry = {
@@ -79,7 +78,7 @@ export class CmcdReportRecorder {
 	#detachers: (() => void)[] = []
 	#attached = false
 	#eventTargetUrls: readonly string[] = []
-	#waiters: CmcdReportWaiter[] = []
+	#waiters: Map<ReturnType<typeof setTimeout>, CmcdReportWaiter> = new Map()
 	#recorders: CmcdReportRecorderEntry[] = []
 	#onReport: ((report: CmcdRecordedReport) => void) | undefined
 
@@ -113,17 +112,14 @@ export class CmcdReportRecorder {
 	}
 
 	#notifyWaiters(): void {
-		const remaining: CmcdReportWaiter[] = []
-		for (const waiter of this.#waiters) {
+		for (const [timer, waiter] of this.#waiters) {
 			const matching = this.getReports(waiter.type)
 			if (matching.length >= waiter.count) {
-				clearTimeout(waiter.timer)
+				clearTimeout(timer)
+				this.#waiters.delete(timer)
 				waiter.resolve(matching)
-			} else {
-				remaining.push(waiter)
 			}
 		}
-		this.#waiters = remaining
 	}
 
 	/**
@@ -166,11 +162,11 @@ export class CmcdReportRecorder {
 		this.#eventTargetUrls = []
 		this.#onReport = undefined
 
-		for (const waiter of this.#waiters) {
-			clearTimeout(waiter.timer)
+		for (const [timer, waiter] of this.#waiters) {
+			clearTimeout(timer)
 			waiter.reject(new Error('Recorder detached while waiting'))
 		}
-		this.#waiters = []
+		this.#waiters.clear()
 
 		for (const entry of this.#recorders) {
 			clearTimeout(entry.timer)
@@ -224,17 +220,14 @@ export class CmcdReportRecorder {
 
 		return new Promise<CmcdRecordedReport[]>((resolve, reject) => {
 			const timer = setTimeout(() => {
-				const idx = this.#waiters.findIndex((w) => w.timer === timer)
-				if (idx >= 0) {
-					this.#waiters.splice(idx, 1)
-				}
+				this.#waiters.delete(timer)
 				const current = this.getReports(type)
 				reject(new Error(
 					`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.#reports.length}.`,
 				))
 			}, timeout)
 
-			this.#waiters.push({ type, count, resolve, reject, timer })
+			this.#waiters.set(timer, { type, count, resolve, reject })
 		})
 	}
 
