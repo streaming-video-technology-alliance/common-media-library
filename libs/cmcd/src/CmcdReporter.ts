@@ -87,8 +87,9 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 		const ap = ai.params
 		const bp = bi.params
 		const ak = ap && Object.keys(ap)[0]
-		if (ak !== (bp && Object.keys(bp)[0])) return false
-		if (ak !== undefined && ap![ak as keyof typeof ap] !== bp![ak as keyof typeof bp]) return false
+		const bk = bp && Object.keys(bp)[0]
+		if (ak !== bk) return false
+		if (ak !== undefined && bk !== undefined && ap && bp && ap[ak as keyof typeof ap] !== bp[bk as keyof typeof bp]) return false
 	}
 
 	return true
@@ -98,7 +99,7 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
  * Maps each tracked state field to its event type and equality function.
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
-const STATE_FIELDS: ReadonlyArray<StateFieldEntry> = [
+const STATE_FIELDS: readonly StateFieldEntry[] = [
 	{ field: 'sta', event: CmcdEventType.PLAY_STATE,        equal: (a, b) => a === b },
 	{ field: 'pr',  event: CmcdEventType.PLAYBACK_RATE,     equal: (a, b) => a === b },
 	{ field: 'cid', event: CmcdEventType.CONTENT_ID,        equal: (a, b) => a === b },
