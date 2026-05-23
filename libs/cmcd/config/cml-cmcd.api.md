@@ -432,6 +432,7 @@ export class CmcdRequestCollector {
 export type CmcdRequestCollectorOptions = {
     eventTargetUrls?: readonly string[];
     transports?: readonly CmcdTransportAdapter[];
+    onReport?: (report: CmcdCollectedRequest) => void;
 };
 
 // @public
