@@ -264,7 +264,19 @@ export class CmcdReporter {
 	}
 
 	/**
-	 * Updates the CMCD data. Called by the player when the data changes.
+	 * Updates the CMCD data.
+	 *
+	 * Called by the player when data changes. For tracked state fields
+	 * (`sta`, `pr`, `cid`, `bg`, `br`), if the new value differs from the
+	 * current value, the corresponding state-change event is automatically
+	 * fired (subject to dedup against the last-emitted value).
+	 *
+	 * Multi-field updates fire multiple events in the order: `sta` → `pr` →
+	 * `cid` → `bg` → `br`. The order of keys in the input object does not
+	 * affect the firing order.
+	 *
+	 * A `sid` change resets the dedup baseline so the next state-change
+	 * event in the new session always emits.
 	 *
 	 * @param data - The data to update.
 	 */
@@ -295,10 +307,24 @@ export class CmcdReporter {
 	/**
 	 * Records an event. Called by the player when an event occurs.
 	 *
+	 * For state-change events (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`,
+	 * `BACKGROUNDED_MODE`, `BITRATE_CHANGE`), this method:
+	 * 1. Persists the dedup field from `data` (if present) into the reporter's
+	 *    persistent data store — equivalent to a write-through `update()`.
+	 * 2. Suppresses the event if the field's current value matches the
+	 *    last-emitted value (no state transition).
+	 *
+	 * For all other event types, the event is always emitted.
+	 *
+	 * Most callers can rely on {@link CmcdReporter.update} to auto-fire state-change events.
+	 * Use `recordEvent` directly when you need to attach extra context to the
+	 * event report (e.g., `bl`, `pt` at the moment of a play-state transition).
+	 *
 	 * @param type - The type of event to record.
 	 * @param data - Additional data to record with the event. This data
-	 *               only applies to this event report. Persistent data should
-	 *               be updated using `update()`.
+	 *               only applies to this event report, except for the dedup
+	 *               field of a state-change event, which is also persisted
+	 *               into the reporter's data store.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
 		const entry = STATE_FIELDS_BY_EVENT.get(type)
