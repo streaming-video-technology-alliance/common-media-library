@@ -116,6 +116,27 @@ export const CMCD_PARAM = "CMCD";
 export const CMCD_QUERY: "query";
 
 // @public
+export const CMCD_RECORDED_REPORT_MODE_EVENT: "event";
+
+// @public
+export const CMCD_RECORDED_REPORT_MODE_HEADER: "header";
+
+// @public
+export const CMCD_RECORDED_REPORT_MODE_QUERY: "query";
+
+// @public
+export const CMCD_RECORDED_REQUEST_TYPE_EVENT: "event";
+
+// @public
+export const CMCD_RECORDED_REQUEST_TYPE_MANIFEST: "manifest";
+
+// @public
+export const CMCD_RECORDED_REQUEST_TYPE_SEGMENT: "segment";
+
+// @public
+export const CMCD_RECORDED_REQUEST_TYPE_UNKNOWN: "unknown";
+
+// @public
 export const CMCD_REQUEST: "CMCD-Request";
 
 // @public
@@ -298,6 +319,35 @@ export const CmcdPlayerState: {
 export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
 
 // @public
+export type CmcdRecordedReport = {
+    readonly request: HttpRequest;
+    readonly type: CmcdRecordedRequestType;
+    readonly reportingMode: CmcdRecordedReportMode;
+    readonly timestamp: number;
+};
+
+// @public
+export const CmcdRecordedReportMode: {
+    readonly QUERY: typeof CMCD_RECORDED_REPORT_MODE_QUERY;
+    readonly HEADER: typeof CMCD_RECORDED_REPORT_MODE_HEADER;
+    readonly EVENT: typeof CMCD_RECORDED_REPORT_MODE_EVENT;
+};
+
+// @public (undocumented)
+export type CmcdRecordedReportMode = ValueOf<typeof CmcdRecordedReportMode>;
+
+// @public
+export const CmcdRecordedRequestType: {
+    readonly MANIFEST: typeof CMCD_RECORDED_REQUEST_TYPE_MANIFEST;
+    readonly SEGMENT: typeof CMCD_RECORDED_REQUEST_TYPE_SEGMENT;
+    readonly EVENT: typeof CMCD_RECORDED_REQUEST_TYPE_EVENT;
+    readonly UNKNOWN: typeof CMCD_RECORDED_REQUEST_TYPE_UNKNOWN;
+};
+
+// @public (undocumented)
+export type CmcdRecordedRequestType = ValueOf<typeof CmcdRecordedRequestType>;
+
+// @public
 export type CmcdReportConfig = {
     version?: CmcdVersion;
     enabledKeys?: CmcdKey[];
@@ -337,6 +387,32 @@ export const CmcdReportingMode: {
 
 // @public (undocumented)
 export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
+
+// @public
+export class CmcdReportRecorder {
+    attach(options?: CmcdReportRecorderOptions): void;
+    clear(): void;
+    detach(): void;
+    getReports(): CmcdRecordedReport[];
+    waitForEvents(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
+    waitForManifest(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
+    waitForReports(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
+    waitForSegments(options?: CmcdReportRecorderWaitOptions): Promise<CmcdRecordedReport[]>;
+}
+
+// @public
+export type CmcdReportRecorderOptions = {
+    eventTargetUrls?: readonly string[];
+    transports?: readonly CmcdTransportAdapter[];
+    waitTimeout?: number;
+    onReport?: (report: CmcdRecordedReport) => void;
+};
+
+// @public
+export type CmcdReportRecorderWaitOptions = {
+    count?: number;
+    timeout?: number;
+};
 
 // @public
 export type CmcdRequest = {
@@ -382,6 +458,9 @@ export type CmcdRequest = {
     tpb?: CmcdObjectTypeList;
     v?: number;
 };
+
+// @public
+export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined;
 
 // @public
 export type CmcdRequestKey = keyof CmcdRequest | "nrr";
@@ -443,6 +522,11 @@ export const CmcdTransmissionMode: {
 export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
 
 // @public
+export type CmcdTransportAdapter = {
+    attach(deliver: CmcdRequestDeliver): () => void;
+};
+
+// @public
 export type CmcdV1 = {
     bl?: number;
     br?: number;
@@ -495,6 +579,12 @@ export type CmcdValue = ValueOf<Cmcd>;
 
 // @public
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
+
+// @public
+export function createFetchTransport(): CmcdTransportAdapter;
+
+// @public
+export function createXhrTransport(): CmcdTransportAdapter;
 
 // @public
 export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
