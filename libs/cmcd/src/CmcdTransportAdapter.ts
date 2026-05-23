@@ -1,7 +1,7 @@
 import type { HttpRequest } from '@svta/cml-utils'
 
 /**
- * Callback the collector supplies to a transport adapter. The adapter
+ * Callback the recorder supplies to a transport adapter. The adapter
  * calls this once per intercepted request, with the request normalized
  * to {@link @svta/cml-utils!HttpRequest | HttpRequest}.
  *
@@ -17,7 +17,7 @@ import type { HttpRequest } from '@svta/cml-utils'
 export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined
 
 /**
- * Pluggable transport-interception contract for `CmcdRequestCollector`.
+ * Pluggable transport-interception contract for `CmcdReportRecorder`.
  * The default implementations (`createXhrTransport`, `createFetchTransport`)
  * patch global `XMLHttpRequest` and `fetch`. Custom adapters can wrap
  * other transports (e.g. `undici`, a player-internal HTTP client).
@@ -28,7 +28,7 @@ export type CmcdTransportAdapter = {
 
 	/**
 	 * Install the transport's interception hook. Called once per
-	 * collector `attach()`. The adapter must normalize each outgoing
+	 * recorder `attach()`. The adapter must normalize each outgoing
 	 * request to `HttpRequest` (reading the body to a synchronous value
 	 * if necessary) and invoke `deliver`. Returns a detach function that
 	 * restores the original transport.

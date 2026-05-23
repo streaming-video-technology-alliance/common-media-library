@@ -50,7 +50,7 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 /**
  * Create a transport adapter that patches `XMLHttpRequest.prototype` to
  * capture CMCD-bearing requests. Returns the adapter object expected by
- * `CmcdRequestCollector`.
+ * `CmcdReportRecorder`.
  *
  * @public
  */
@@ -58,6 +58,9 @@ export function createXhrTransport(): CmcdTransportAdapter {
 	return {
 		attach(deliver: CmcdRequestDeliver): () => void {
 			const Xhr = globalThis.XMLHttpRequest
+			if (!Xhr) {
+				return () => { /* no XHR to detach */ }
+			}
 			const origOpen = Xhr.prototype.open
 			const origSetRequestHeader = Xhr.prototype.setRequestHeader
 			const origSend = Xhr.prototype.send

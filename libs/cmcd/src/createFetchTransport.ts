@@ -4,7 +4,7 @@ import type { CmcdRequestDeliver, CmcdTransportAdapter } from './CmcdTransportAd
 async function toHttpRequest(request: Request): Promise<HttpRequest> {
 	const headers: Record<string, string> = {}
 	request.headers.forEach((value, name) => {
-		headers[name] = value
+		headers[name.toLowerCase()] = value
 	})
 
 	let body: string | undefined
@@ -28,7 +28,7 @@ async function toHttpRequest(request: Request): Promise<HttpRequest> {
  * Create a transport adapter that patches `globalThis.fetch` to capture
  * CMCD-bearing requests, normalizing each to `HttpRequest` (lowercase
  * headers, body read as UTF-8 string). Returns the adapter object
- * expected by `CmcdRequestCollector`.
+ * expected by `CmcdReportRecorder`.
  *
  * @public
  */
@@ -41,13 +41,15 @@ export function createFetchTransport(): CmcdTransportAdapter {
 				input: RequestInfo | URL,
 				init?: RequestInit,
 			): Promise<Response> => {
-				const inspect = new Request(input, init)
-				const httpRequest = await toHttpRequest(inspect.clone())
+				const inspect = input instanceof Request
+					? input.clone()
+					: new Request(input, init)
+				const httpRequest = await toHttpRequest(inspect)
 				const synthetic = deliver(httpRequest)
 				if (synthetic) {
 					return synthetic
 				}
-				return origFetch.call(globalThis, inspect)
+				return origFetch.call(globalThis, input as RequestInfo, init)
 			}
 
 			return () => {

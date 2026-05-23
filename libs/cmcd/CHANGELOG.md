@@ -21,13 +21,17 @@ and this project adheres to
 
 ### Added
 
-- `CmcdRequestCollector` — test helper that captures CMCD-bearing
-  requests across XHR and fetch transports for assertion in e2e tests.
-  Includes `waitForRequests` (rejects on timeout) and `collectFor`
-  (always resolves) wait primitives, plus event-target POST stubbing.
-- `CmcdRequestType` const-enum and supporting types
-  (`CmcdCollectedRequest`, `CmcdCollectedRequestMode`, `CmcdTransportAdapter`,
-  `CmcdRequestCollectorOptions`).
+- `CmcdReportRecorder` — test helper that records CMCD-bearing
+  reports across XHR and fetch transports for assertion in e2e tests.
+  Includes `waitForReports`, `waitForManifest`, `waitForSegments`,
+  and `waitForEvents` wait primitives that accept a
+  `CmcdReportRecorderWaitOptions` object (`{ count?, timeout? }`,
+  `count` defaults to `1`, reject on timeout) plus a `waitTimeout`
+  attach option that sets the per-recorder default timeout, and
+  event-target POST stubbing.
+- `CmcdRecorderRequestType` const-enum and supporting types
+  (`CmcdRecordedReport`, `CmcdRecordedReportMode`, `CmcdTransportAdapter`,
+  `CmcdReportRecorderOptions`, `CmcdReportRecorderWaitOptions`).
 - `createXhrTransport` and `createFetchTransport` default adapter
   factories.
 
