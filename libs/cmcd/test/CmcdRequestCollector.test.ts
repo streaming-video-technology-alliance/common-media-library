@@ -453,6 +453,66 @@ describe('CmcdRequestCollector', () => {
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
 			equal(calls.length, 1)
 		})
+
+		it('receives the same object reference that getRequests() returns', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			let received: CmcdCollectedRequest | undefined
+			collector.attach({
+				transports: [t],
+				onReport: (report) => { received = report },
+			})
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			const fromGet = collector.getRequests()[0]
+			equal(received, fromGet)
+			collector.detach()
+		})
+
+		it('does not fire for requests that carry no CMCD data', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			const calls: CmcdCollectedRequest[] = []
+			collector.attach({
+				transports: [t],
+				onReport: (report) => calls.push(report),
+			})
+			t.simulate({
+				url: 'https://e.com/seg.m4s',
+				method: 'GET',
+				headers: { 'content-type': 'video/mp4' },
+			})
+			equal(calls.length, 0)
+			collector.detach()
+		})
+
+		it('fires the listener before pending waitForRequests resolves', async () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			const order: string[] = []
+			collector.attach({
+				transports: [t],
+				onReport: () => order.push('listener'),
+			})
+			const promise = collector.waitForRequests(undefined, 1, 1000).then(() => order.push('waiter'))
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			await promise
+			deepEqual(order, ['listener', 'waiter'])
+			collector.detach()
+		})
+
+		it('uses the new listener after detach() and re-attach with a different callback', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			const a: CmcdCollectedRequest[] = []
+			const b: CmcdCollectedRequest[] = []
+			collector.attach({ transports: [t], onReport: (r) => a.push(r) })
+			collector.detach()
+			collector.attach({ transports: [t], onReport: (r) => b.push(r) })
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			equal(a.length, 0)
+			equal(b.length, 1)
+			collector.detach()
+		})
 	})
 })
 
