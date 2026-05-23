@@ -7,7 +7,7 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_BITRATE_CHANGE, CMCD_EVENT_CONTENT_ID, CMCD_EVENT_PLAY_STATE, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
@@ -102,14 +102,14 @@ const equal = Object.is
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
 const STATE_FIELDS: readonly StateFieldEntry[] = [
-	{ field: 'sta', event: CmcdEventType.PLAY_STATE,        equal},
-	{ field: 'pr',  event: CmcdEventType.PLAYBACK_RATE,     equal},
-	{ field: 'cid', event: CmcdEventType.CONTENT_ID,        equal},
-	{ field: 'bg',  event: CmcdEventType.BACKGROUNDED_MODE, equal},
+	{ field: 'sta', event: CMCD_EVENT_PLAY_STATE, equal },
+	{ field: 'pr', event: CMCD_EVENT_PLAYBACK_RATE, equal },
+	{ field: 'cid', event: CMCD_EVENT_CONTENT_ID, equal },
+	{ field: 'bg', event: CMCD_EVENT_BACKGROUNDED_MODE, equal },
 	{
 		field: 'br',
-		event: CmcdEventType.BITRATE_CHANGE,
-		equal: (a, b) => equal(a, b) || cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
+		event: CMCD_EVENT_BITRATE_CHANGE,
+		equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
 	},
 ]
 
@@ -225,7 +225,7 @@ export class CmcdReporter {
 			this.disarmInterval(target)
 
 			// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
-			if (config.interval === 0 || !config.events.includes(CmcdEventType.TIME_INTERVAL)) {
+			if (config.interval === 0 || !config.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
 				return
 			}
 
@@ -334,21 +334,24 @@ export class CmcdReporter {
 		if (entry) {
 			const field = entry.field
 			const incoming = data[field]
+
 			if (incoming !== undefined) {
-				// Write-through: persist before deciding to emit.
-				// Object.assign sidesteps TS heterogeneous-union narrowing on a string-union index.
 				Object.assign(this.data, { [field]: incoming })
 			}
+
 			const current = this.data[field]
+
 			// Never emit a state-change event with a missing required field — per
 			// CTA-5004-B these events must carry their dedup field. Catches both
 			// "no value ever set" and "previous value was cleared to undefined".
 			if (current === undefined) {
 				return
 			}
+
 			if (entry.equal(current, this.lastEmitted[field])) {
 				return
 			}
+
 			Object.assign(this.lastEmitted, { [field]: current })
 		}
 
