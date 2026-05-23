@@ -18,6 +18,10 @@ import type { CmcdKey } from './CmcdKey.ts'
  * against its value (`CmcdReporter`), and check its presence in payloads
  * (`validateCmcdStructure`).
  *
+ * Iteration order is load-bearing: `CmcdReporter.update()` fires state-change
+ * events in map order when multiple tracked fields change in a single call.
+ * Do not reorder entries without auditing reporter behavior.
+ *
  * @internal
  */
 export const CMCD_STATE_EVENT_FIELDS: ReadonlyMap<CmcdEventType, CmcdKey> = new Map([
