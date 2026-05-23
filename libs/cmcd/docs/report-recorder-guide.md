@@ -123,27 +123,6 @@ Pass `undefined` for the type to wait for `count` of any kind. Set a shorter tim
 await recorder.waitForReports(CmcdRequestType.MANIFEST, 1, 2000);
 ```
 
-### `recordFor(timeout, type?)`: negative or upper-bound assertion
-
-Resolves after `timeout` milliseconds with whatever was recorded during the window. Never rejects on timeout. Use for "no events should fire" or "exactly N and no more" assertions.
-
-```typescript
-import { CmcdReportRecorder, CmcdRequestType } from "@svta/cml-cmcd";
-
-const recorder = new CmcdReportRecorder();
-recorder.attach({ eventTargetUrls: ["https://events.example.com"] });
-
-startPlayer();
-
-// Wait 5 seconds, then assert no event reports fired
-const events = await recorder.recordFor(5000, CmcdRequestType.EVENT);
-if (events.length !== 0) {
-    throw new Error(`Expected zero events, got ${events.length}`);
-}
-
-recorder.detach();
-```
-
 ## Live inspection with `onReport`
 
 For test harness pages that show a streaming view of CMCD activity, pass an `onReport` callback to `attach()`. The callback fires synchronously for each recorded report, immediately after it is appended to the buffer and before any pending `waitForReports` promises resolve.
@@ -316,7 +295,6 @@ The `deliver` function returns a `Response` only when the request matched `event
 - Removes the transport patches (restoring the original `XMLHttpRequest`/`fetch` references)
 - Clears the `onReport` listener
 - Rejects any pending `waitForReports` promises with `Error('Recorder detached while waiting')`
-- Resolves any pending `recordFor` promises with whatever was recorded up to that point
 - Does **not** clear the recorded report buffer; call `clear()` for that
 
 Always pair `attach()` with `detach()` in your test teardown (`afterEach` or equivalent). A leaked attached recorder continues to patch `XMLHttpRequest`/`fetch` for the rest of the process, which corrupts subsequent tests.

@@ -50,6 +50,3 @@ for (const r of segments) {
 
 recorder.detach()
 ````
-
-Use `recordFor(timeout, type?)` instead of `waitForReports` when you
-need to verify that reports did *not* arrive within a window.

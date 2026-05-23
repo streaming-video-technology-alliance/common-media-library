@@ -379,7 +379,6 @@ export class CmcdReportRecorder {
     clear(): void;
     detach(): void;
     getReports(type?: CmcdRequestType): CmcdRecordedReport[];
-    recordFor(timeout: number, type?: CmcdRequestType): Promise<CmcdRecordedReport[]>;
     waitForReports(type: CmcdRequestType | undefined, count: number, timeout?: number): Promise<CmcdRecordedReport[]>;
 }
 

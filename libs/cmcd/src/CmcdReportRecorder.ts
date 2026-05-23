@@ -56,11 +56,6 @@ type CmcdReportWaiter = {
 	reject: (e: Error) => void
 }
 
-type CmcdReportRecorderEntry = {
-	type: CmcdRequestType | undefined
-	resolve: (r: CmcdRecordedReport[]) => void
-}
-
 /**
  * Test helper that records CMCD-bearing reports across XHR and fetch
  * transports for assertion in e2e tests. Each captured request is
@@ -78,7 +73,6 @@ export class CmcdReportRecorder {
 	#attached = false
 	#eventTargetUrls: readonly string[] = []
 	#waiters = new Map<ReturnType<typeof setTimeout>, CmcdReportWaiter>()
-	#recorders = new Map<ReturnType<typeof setTimeout>, CmcdReportRecorderEntry>()
 	#onReport: ((report: CmcdRecordedReport) => void) | undefined
 
 	readonly #deliver = (request: HttpRequest): Response | undefined => {
@@ -143,9 +137,7 @@ export class CmcdReportRecorder {
 
 	/**
 	 * Remove transport patches and stop recording. Rejects any pending
-	 * `waitForReports` promises with `Error('Recorder detached while waiting')`
-	 * and resolves any pending `recordFor` promises with whatever was
-	 * recorded up to that point.
+	 * `waitForReports` promises with `Error('Recorder detached while waiting')`.
 	 *
 	 * @public
 	 */
@@ -166,12 +158,6 @@ export class CmcdReportRecorder {
 			waiter.reject(new Error('Recorder detached while waiting'))
 		}
 		this.#waiters.clear()
-
-		for (const [timer, entry] of this.#recorders) {
-			clearTimeout(timer)
-			entry.resolve(this.getReports(entry.type))
-		}
-		this.#recorders.clear()
 	}
 
 	/**
@@ -227,27 +213,6 @@ export class CmcdReportRecorder {
 			}, timeout)
 
 			this.#waiters.set(timer, { type, count, resolve, reject })
-		})
-	}
-
-	/**
-	 * Wait for the given duration, then resolve with all reports of the
-	 * given type recorded so far. Never rejects on timeout (use this for
-	 * negative or upper-bound assertions: "no events should fire",
-	 * "exactly N segments and no more").
-	 *
-	 * @public
-	 */
-	recordFor(
-		timeout: number,
-		type?: CmcdRequestType,
-	): Promise<CmcdRecordedReport[]> {
-		return new Promise<CmcdRecordedReport[]>((resolve) => {
-			const timer = setTimeout(() => {
-				this.#recorders.delete(timer)
-				resolve(this.getReports(type))
-			}, timeout)
-			this.#recorders.set(timer, { type, resolve })
 		})
 	}
 }

@@ -148,16 +148,6 @@ describe('CmcdReportRecorder', () => {
 			}
 		})
 
-		it('detach() resolves pending recordFor promises with whatever was recorded', async () => {
-			const t = new FakeTransport()
-			const recorder = new CmcdReportRecorder()
-			recorder.attach({ transports: [t] })
-			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
-			const promise = recorder.recordFor(60000)
-			setTimeout(() => recorder.detach(), 10)
-			const result = await promise
-			equal(result.length, 1)
-		})
 	})
 
 	describe('classification', () => {
@@ -250,40 +240,6 @@ describe('CmcdReportRecorder', () => {
 			equal(captured.length, 1)
 			equal(captured[0].type, CmcdRequestType.UNKNOWN)
 			equal(captured[0].reportingMode, 'query')
-			recorder.detach()
-		})
-	})
-
-	describe('recordFor', () => {
-		it('resolves after the timeout with whatever was recorded', async () => {
-			const t = new FakeTransport()
-			const recorder = new CmcdReportRecorder()
-			recorder.attach({ transports: [t] })
-			setTimeout(() => {
-				t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
-			}, 10)
-			const result = await recorder.recordFor(50)
-			equal(result.length, 1)
-			recorder.detach()
-		})
-
-		it('resolves with zero when nothing matches', async () => {
-			const recorder = new CmcdReportRecorder()
-			recorder.attach({ transports: [new FakeTransport()] })
-			const result = await recorder.recordFor(50, CmcdRequestType.EVENT)
-			equal(result.length, 0)
-			recorder.detach()
-		})
-
-		it('filters by type', async () => {
-			const t = new FakeTransport()
-			const recorder = new CmcdReportRecorder()
-			recorder.attach({ transports: [t] })
-			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
-			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
-			const result = await recorder.recordFor(50, CmcdRequestType.SEGMENT)
-			equal(result.length, 1)
-			equal(result[0].type, CmcdRequestType.SEGMENT)
 			recorder.detach()
 		})
 	})
