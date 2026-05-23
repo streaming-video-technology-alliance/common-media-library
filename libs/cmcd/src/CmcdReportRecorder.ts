@@ -4,24 +4,24 @@ import type { CmcdRecordedReport } from './CmcdRecordedReport.ts'
 import type { CmcdRecordedReportMode } from './CmcdRecordedReportMode.ts'
 import type { CmcdReportRecorderOptions } from './CmcdReportRecorderOptions.ts'
 import type { CmcdReportRecorderWaitOptions } from './CmcdReportRecorderWaitOptions.ts'
-import { CmcdRequestType } from './CmcdRequestType.ts'
+import { CmcdRecorderRequestType } from './CmcdRecorderRequestType.ts'
 import { createFetchTransport } from './createFetchTransport.ts'
 import { createXhrTransport } from './createXhrTransport.ts'
 
 const MANIFEST_EXTENSIONS = /\.(m3u8|mpd)(\?|$|\/)/i
 const SEGMENT_EXTENSIONS = /\.(m4s|m4v|m4a|mp4|ts|aac)(\?|$|\/)/i
 
-function classifyUrl(url: string, method: string): CmcdRequestType {
+function classifyUrl(url: string, method: string): CmcdRecorderRequestType {
 	if (method === 'POST') {
-		return CmcdRequestType.EVENT
+		return CmcdRecorderRequestType.EVENT
 	}
 	if (MANIFEST_EXTENSIONS.test(url)) {
-		return CmcdRequestType.MANIFEST
+		return CmcdRecorderRequestType.MANIFEST
 	}
 	if (SEGMENT_EXTENSIONS.test(url)) {
-		return CmcdRequestType.SEGMENT
+		return CmcdRecorderRequestType.SEGMENT
 	}
-	return CmcdRequestType.UNKNOWN
+	return CmcdRecorderRequestType.UNKNOWN
 }
 
 function hasCmcdHeader(headers: Record<string, string> | undefined): boolean {
@@ -51,7 +51,7 @@ function detectReportingMode(
 }
 
 type CmcdReportWaiter = {
-	type: CmcdRequestType | undefined
+	type: CmcdRecorderRequestType | undefined
 	count: number
 	resolve: (r: CmcdRecordedReport[]) => void
 	reject: (e: Error) => void
@@ -106,7 +106,7 @@ export class CmcdReportRecorder {
 		return isEventTarget ? new Response(null, { status: 204 }) : undefined
 	}
 
-	#getMatching(type: CmcdRequestType | undefined): CmcdRecordedReport[] {
+	#getMatching(type: CmcdRecorderRequestType | undefined): CmcdRecordedReport[] {
 		return type === undefined
 			? [...this.#reports]
 			: this.#reports.filter((r) => r.type === type)
@@ -124,7 +124,7 @@ export class CmcdReportRecorder {
 	}
 
 	#waitFor(
-		type: CmcdRequestType | undefined,
+		type: CmcdRecorderRequestType | undefined,
 		count: number,
 		timeout: number,
 	): Promise<CmcdRecordedReport[]> {
@@ -231,7 +231,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForManifest(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.MANIFEST, options.count ?? 1, options.timeout ?? this.#waitTimeout)
+		return this.#waitFor(CmcdRecorderRequestType.MANIFEST, options.count ?? 1, options.timeout ?? this.#waitTimeout)
 	}
 
 	/**
@@ -243,7 +243,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForSegments(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.SEGMENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
+		return this.#waitFor(CmcdRecorderRequestType.SEGMENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
 	}
 
 	/**
@@ -255,6 +255,6 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForEvents(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRequestType.EVENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
+		return this.#waitFor(CmcdRecorderRequestType.EVENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
 	}
 }

@@ -29,7 +29,7 @@ and this project adheres to
   `count` defaults to `1`, reject on timeout) plus a `waitTimeout`
   attach option that sets the per-recorder default timeout, and
   event-target POST stubbing.
-- `CmcdRequestType` const-enum and supporting types
+- `CmcdRecorderRequestType` const-enum and supporting types
   (`CmcdRecordedReport`, `CmcdRecordedReportMode`, `CmcdTransportAdapter`,
   `CmcdReportRecorderOptions`).
 - `createXhrTransport` and `createFetchTransport` default adapter

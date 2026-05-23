@@ -122,6 +122,18 @@ export const CMCD_RECORDED_REPORT_MODE_HEADER: "header";
 export const CMCD_RECORDED_REPORT_MODE_QUERY: "query";
 
 // @public
+export const CMCD_RECORDER_REQUEST_TYPE_EVENT: "event";
+
+// @public
+export const CMCD_RECORDER_REQUEST_TYPE_MANIFEST: "manifest";
+
+// @public
+export const CMCD_RECORDER_REQUEST_TYPE_SEGMENT: "segment";
+
+// @public
+export const CMCD_RECORDER_REQUEST_TYPE_UNKNOWN: "unknown";
+
+// @public
 export const CMCD_REQUEST: "CMCD-Request";
 
 // @public
@@ -129,18 +141,6 @@ export const CMCD_REQUEST_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "
 
 // @public
 export const CMCD_REQUEST_MODE: "request";
-
-// @public
-export const CMCD_REQUEST_TYPE_EVENT: "event";
-
-// @public
-export const CMCD_REQUEST_TYPE_MANIFEST: "manifest";
-
-// @public
-export const CMCD_REQUEST_TYPE_SEGMENT: "segment";
-
-// @public
-export const CMCD_REQUEST_TYPE_UNKNOWN: "unknown";
 
 // @public
 export const CMCD_RESPONSE_KEYS: readonly ["cmsdd", "cmsds", "rc", "smrt", "ttfb", "ttfbb", "ttlb", "url"];
@@ -317,7 +317,7 @@ export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
 // @public
 export type CmcdRecordedReport = {
     readonly request: HttpRequest;
-    readonly type: CmcdRequestType;
+    readonly type: CmcdRecorderRequestType;
     readonly reportingMode: CmcdRecordedReportMode;
     readonly timestamp: number;
 };
@@ -331,6 +331,17 @@ export const CmcdRecordedReportMode: {
 
 // @public (undocumented)
 export type CmcdRecordedReportMode = ValueOf<typeof CmcdRecordedReportMode>;
+
+// @public
+export const CmcdRecorderRequestType: {
+    readonly MANIFEST: typeof CMCD_RECORDER_REQUEST_TYPE_MANIFEST;
+    readonly SEGMENT: typeof CMCD_RECORDER_REQUEST_TYPE_SEGMENT;
+    readonly EVENT: typeof CMCD_RECORDER_REQUEST_TYPE_EVENT;
+    readonly UNKNOWN: typeof CMCD_RECORDER_REQUEST_TYPE_UNKNOWN;
+};
+
+// @public (undocumented)
+export type CmcdRecorderRequestType = ValueOf<typeof CmcdRecorderRequestType>;
 
 // @public
 export type CmcdReportConfig = {
@@ -462,17 +473,6 @@ export type CmcdRequestReport<D = unknown> = HttpRequest & {
 export type CmcdRequestReportConfig = CmcdReportConfig & {
     transmissionMode?: CmcdTransmissionMode;
 };
-
-// @public
-export const CmcdRequestType: {
-    readonly MANIFEST: typeof CMCD_REQUEST_TYPE_MANIFEST;
-    readonly SEGMENT: typeof CMCD_REQUEST_TYPE_SEGMENT;
-    readonly EVENT: typeof CMCD_REQUEST_TYPE_EVENT;
-    readonly UNKNOWN: typeof CMCD_REQUEST_TYPE_UNKNOWN;
-};
-
-// @public (undocumented)
-export type CmcdRequestType = ValueOf<typeof CmcdRequestType>;
 
 // @public
 export type CmcdResponse = CmcdRequest & {

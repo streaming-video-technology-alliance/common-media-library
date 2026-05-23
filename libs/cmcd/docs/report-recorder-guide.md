@@ -51,17 +51,17 @@ Each recorded report is classified by URL extension and HTTP method:
 
 | Type                          | Heuristic                                                  |
 | ----------------------------- | ---------------------------------------------------------- |
-| `CmcdRequestType.MANIFEST`    | URL ends in `.m3u8` or `.mpd`                              |
-| `CmcdRequestType.SEGMENT`     | URL ends in `.m4s`, `.m4v`, `.m4a`, `.mp4`, `.ts`, `.aac`  |
-| `CmcdRequestType.EVENT`       | Any `POST`                                                 |
-| `CmcdRequestType.UNKNOWN`     | Anything else carrying CMCD data                           |
+| `CmcdRecorderRequestType.MANIFEST`    | URL ends in `.m3u8` or `.mpd`                              |
+| `CmcdRecorderRequestType.SEGMENT`     | URL ends in `.m4s`, `.m4v`, `.m4a`, `.mp4`, `.ts`, `.aac`  |
+| `CmcdRecorderRequestType.EVENT`       | Any `POST`                                                 |
+| `CmcdRecorderRequestType.UNKNOWN`     | Anything else carrying CMCD data                           |
 
 Recorded entries have a uniform shape:
 
 ```typescript
 type CmcdRecordedReport = {
     readonly request: HttpRequest;            // normalized; headers lowercase, body as string
-    readonly type: CmcdRequestType;
+    readonly type: CmcdRecorderRequestType;
     readonly reportingMode: CmcdRecordedReportMode;
     readonly timestamp: number;               // Date.now() at capture time
 };
@@ -78,7 +78,7 @@ There are three ways to observe recorded reports, suited to different test shape
 Returns a defensive copy of everything recorded so far. Best for tests that fully drive the player to completion before asserting. Filter the result yourself if you need a subset:
 
 ```typescript
-import { CmcdReportRecorder, CmcdRequestType } from "@svta/cml-cmcd";
+import { CmcdReportRecorder, CmcdRecorderRequestType } from "@svta/cml-cmcd";
 
 const recorder = new CmcdReportRecorder();
 recorder.attach();
@@ -86,8 +86,8 @@ recorder.attach();
 // ... player runs to completion ...
 
 const all = recorder.getReports();
-const manifests = all.filter((r) => r.type === CmcdRequestType.MANIFEST);
-const segments = all.filter((r) => r.type === CmcdRequestType.SEGMENT);
+const manifests = all.filter((r) => r.type === CmcdRecorderRequestType.MANIFEST);
+const segments = all.filter((r) => r.type === CmcdRecorderRequestType.SEGMENT);
 
 console.log(`Total: ${all.length}, manifests: ${manifests.length}, segments: ${segments.length}`);
 
@@ -169,13 +169,13 @@ The callback receives the same object reference that `getReports()` returns, so 
 recorder.attach({
     onReport: (report) => {
         switch (report.type) {
-            case CmcdRequestType.MANIFEST:
+            case CmcdRecorderRequestType.MANIFEST:
                 manifestPanel.append(report);
                 break;
-            case CmcdRequestType.SEGMENT:
+            case CmcdRecorderRequestType.SEGMENT:
                 segmentPanel.append(report);
                 break;
-            case CmcdRequestType.EVENT:
+            case CmcdRecorderRequestType.EVENT:
                 eventPanel.append(report);
                 break;
         }
