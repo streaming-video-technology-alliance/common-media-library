@@ -47,6 +47,25 @@ function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdRep
 	}
 }
 
+/**
+ * Tracked state field for dedup + auto-trigger.
+ */
+type StateField = 'sta' | 'pr' | 'cid' | 'bg' | 'br'
+
+type StateFieldEntry = {
+	field: StateField
+	event: CmcdEventType
+	equal: (a: unknown, b: unknown) => boolean
+}
+
+/**
+ * Maps each tracked state field to its event type and equality function.
+ * Order matters: `update()` fires events in this order for multi-field updates.
+ */
+const STATE_FIELDS: ReadonlyArray<StateFieldEntry> = [
+	{ field: 'sta', event: CmcdEventType.PLAY_STATE, equal: (a, b) => a === b },
+]
+
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
 	return fetch(url, init)
@@ -107,6 +126,7 @@ export class CmcdReporter {
 	private config: CmcdReporterConfigNormalized
 	private msd: number = NaN
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
+	private lastEmitted: Partial<Pick<Cmcd, StateField>> = {}
 	private requestTarget: CmcdTarget = {
 		sn: 0,
 		msdSent: false,
@@ -220,6 +240,22 @@ export class CmcdReporter {
 	 *               be updated using `update()`.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+		const entry = STATE_FIELDS.find(e => e.event === type)
+		if (entry) {
+			const field = entry.field
+			const incoming = data[field]
+			if (incoming !== undefined) {
+				// Write-through: persist before deciding to emit.
+				// Object.assign sidesteps TS heterogeneous-union narrowing on a string-union index.
+				Object.assign(this.data, { [field]: incoming })
+			}
+			const current = this.data[field]
+			if (entry.equal(current, this.lastEmitted[field])) {
+				return
+			}
+			Object.assign(this.lastEmitted, { [field]: current })
+		}
+
 		this.eventTargets.forEach((target, config) => {
 			this.recordTargetEvent(target, config, type, data)
 		})
@@ -480,5 +516,6 @@ export class CmcdReporter {
 	private resetSession(): void {
 		this.eventTargets.forEach(target => target.sn = 0)
 		this.requestTarget.sn = 0
+		this.lastEmitted = {}
 	}
 }

@@ -15,7 +15,7 @@ function createMockRequester(status: number = 200) {
 	return { requester, requests }
 }
 
-const EVENT_KEYS = ['br', 'sid', 'cid', 'v', 'e', 'ts', 'sn', 'msd', 'cen'] as const
+const EVENT_KEYS = ['br', 'sid', 'cid', 'v', 'e', 'ts', 'sn', 'msd', 'cen', 'sta'] as const
 const RR_KEYS = ['url', 'rc', 'ttfb', 'ttfbb', 'ttlb', 'cmsdd', 'cmsds', 'smrt', 'sid', 'cid', 'v', 'e', 'ts', 'sn'] as const
 
 function createConfig(overrides: Partial<CmcdReporterConfig> = {}): Partial<CmcdReporterConfig> {
@@ -277,6 +277,7 @@ describe('CmcdReporter', () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
+			reporter.update({ sta: 'p' })
 			reporter.recordEvent(CmcdEventType.ERROR)
 			reporter.recordEvent(CmcdEventType.PLAY_STATE)
 
@@ -322,7 +323,7 @@ describe('CmcdReporter', () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
-			reporter.update({ msd: 500 })
+			reporter.update({ msd: 500, sta: 'p' })
 			reporter.recordEvent(CmcdEventType.ERROR)
 			reporter.recordEvent(CmcdEventType.PLAY_STATE)
 
@@ -499,6 +500,7 @@ describe('CmcdReporter', () => {
 				],
 			}), requester)
 
+			reporter.update({ sta: 'p' })
 			reporter.recordEvent(CmcdEventType.ERROR)
 			reporter.recordEvent(CmcdEventType.PLAY_STATE)
 
@@ -530,6 +532,7 @@ describe('CmcdReporter', () => {
 				],
 			}), requester)
 
+			reporter.update({ sta: 'p' })
 			reporter.recordEvent(CmcdEventType.ERROR)
 			reporter.recordEvent(CmcdEventType.PLAY_STATE)
 
@@ -709,6 +712,7 @@ describe('CmcdReporter', () => {
 				],
 			}), requester)
 
+			reporter.update({ sta: 'p' })
 			reporter.recordEvent(CmcdEventType.ERROR)
 			reporter.recordEvent(CmcdEventType.PLAY_STATE)
 
@@ -856,6 +860,88 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 0)
+		})
+	})
+
+	describe('state-change dedup', () => {
+		describe('PLAY_STATE', () => {
+			it('first PLAY_STATE event passes through', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('e=ps'))
+				ok((requests[0].body as string)?.includes('sta=p'))
+			})
+
+			it('drops consecutive PLAY_STATE events with the same sta', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+
+			it('emits when sta transitions', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+				reporter.update({ sta: 'a' })
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('sta=p'))
+				ok((requests[1].body as string)?.includes('sta=a'))
+			})
+
+			it('recordEvent with sta in data writes through to persistent data', async () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sta'],
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.PLAY_STATE],
+						enabledKeys: ['sta', 'e', 'sid'],
+						batchSize: 1,
+					}],
+				}, requester)
+
+				reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// Verify the write-through: subsequent request reports include sta=p (URL-encoded)
+				const req = reporter.createRequestReport({ url: 'https://cdn.example.com/seg.mp4' })
+				ok(req.url.includes('sta%3Dp'))
+			})
+
+			it('deduplicates across mixed entry points', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+				reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
 		})
 	})
 })
