@@ -190,11 +190,34 @@ Use the `recordEvent()` method to record player events for event-mode reporting.
 ```typescript
 import { CmcdEventType } from "@svta/cml-cmcd";
 
-// Persistent data should be updated using `update()` before recording events
+// State-change events fire automatically from update() when the value differs
+// from the previously reported value. The reporter emits the corresponding
+// event without an explicit recordEvent() call.
 reporter.update({ sta: "p" });
-reporter.recordEvent(CmcdEventType.PLAY_STATE);
+// → fires CmcdEventType.PLAY_STATE
 
-// Event specific data should be passed as the second argument to `recordEvent()`
+reporter.update({ pr: 1.5 });
+// → fires CmcdEventType.PLAYBACK_RATE
+
+reporter.update({ cid: "movie-42" });
+// → fires CmcdEventType.CONTENT_ID
+
+reporter.update({ bg: true });
+// → fires CmcdEventType.BACKGROUNDED_MODE
+
+reporter.update({ br: [5000] });
+// → fires CmcdEventType.BITRATE_CHANGE
+
+// Consecutive same-value updates are deduplicated.
+reporter.update({ sta: "p" }); // dropped (unchanged from the initial update above)
+
+// To attach extra context at the moment of a transition, use recordEvent()
+// directly. The dedup field is persisted into the reporter's data (same as
+// update() would), and additional fields are included in the event payload.
+reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: "a", bl: [3000] });
+// → fires PLAY_STATE with sta="a" (transition from "p") and bl=[3000]
+
+// recordEvent() is also used for non-state events like CUSTOM_EVENT and ERROR.
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "custom-event-name" });
 ```
 

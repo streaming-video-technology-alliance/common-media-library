@@ -15,6 +15,13 @@ export const CMCD_EVENT_BITRATE_CHANGE = 'bc' as const
 export const CMCD_EVENT_PLAY_STATE = 'ps' as const
 
 /**
+ * CMCD event type for the 'pr' key (playback rate change).
+ *
+ * @public
+ */
+export const CMCD_EVENT_PLAYBACK_RATE = 'pr' as const
+
+/**
  * CMCD event type for the 'e' key (error).
  *
  * @public
@@ -138,6 +145,11 @@ export const CmcdEventType = {
 	 * A change in the player state.
 	 */
 	PLAY_STATE: CMCD_EVENT_PLAY_STATE as typeof CMCD_EVENT_PLAY_STATE,
+
+	/**
+	 * A change in the playback rate.
+	 */
+	PLAYBACK_RATE: CMCD_EVENT_PLAYBACK_RATE as typeof CMCD_EVENT_PLAYBACK_RATE,
 
 	/**
 	 * An error event.

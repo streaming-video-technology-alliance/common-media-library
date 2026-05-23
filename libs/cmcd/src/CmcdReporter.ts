@@ -7,8 +7,9 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_BITRATE_CHANGE, CMCD_EVENT_CONTENT_ID, CMCD_EVENT_PLAY_STATE, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
@@ -46,6 +47,83 @@ function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdRep
 		baseUrl,
 	}
 }
+
+/**
+ * Tracked state field for dedup + auto-trigger.
+ */
+type StateField = 'sta' | 'pr' | 'cid' | 'bg' | 'br'
+
+/**
+ * One row in the STATE_FIELDS dispatch table.
+ *
+ * `snapshot` captures the value stored in `lastEmitted` for dedup
+ * comparisons. Reference types must clone so the baseline doesn't
+ * share a reference with the caller's input, which would let in-place
+ * mutation silently poison the dedup state.
+ */
+type StateFieldEntry = {
+	field: StateField
+	event: CmcdEventType
+	equal: (a: unknown, b: unknown) => boolean
+	snapshot: (v: unknown) => unknown
+}
+
+/**
+ * Deep equality for CmcdObjectTypeList (used for `br` dedup).
+ *
+ * Order-sensitive: arrays with the same elements in different positions
+ * are treated as different. Players that construct `br` consistently
+ * get correct dedup; shuffling produces spurious emits, which is the
+ * safer failure mode.
+ */
+function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): boolean {
+	if (a === b) return true
+	if (a.length !== b.length) return false
+
+	for (let i = 0; i < a.length; i++) {
+		const ai = a[i]
+		const bi = b[i]
+		if (ai === bi) continue
+		if (typeof ai === 'number' || typeof bi === 'number') return false
+
+		// Both are SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>
+		if (ai.value !== bi.value) return false
+
+		// ExclusiveRecord: params (when defined) has exactly one key
+		const ap = ai.params
+		const bp = bi.params
+		const ak = ap && Object.keys(ap)[0]
+		const bk = bp && Object.keys(bp)[0]
+		if (ak !== bk) return false
+		if (ak !== undefined && bk !== undefined && ap && bp && ap[ak as keyof typeof ap] !== bp[bk as keyof typeof bp]) return false
+	}
+
+	return true
+}
+
+const equal = Object.is
+const identity = <T>(v: T): T => v
+
+/**
+ * Maps each tracked state field to its event type and equality function.
+ * Order matters: `update()` fires events in this order for multi-field updates.
+ */
+const STATE_FIELDS: readonly StateFieldEntry[] = [
+	{ field: 'sta', event: CMCD_EVENT_PLAY_STATE, equal, snapshot: identity },
+	{ field: 'pr', event: CMCD_EVENT_PLAYBACK_RATE, equal, snapshot: identity },
+	{ field: 'cid', event: CMCD_EVENT_CONTENT_ID, equal, snapshot: identity },
+	{ field: 'bg', event: CMCD_EVENT_BACKGROUNDED_MODE, equal, snapshot: identity },
+	{
+		field: 'br',
+		event: CMCD_EVENT_BITRATE_CHANGE,
+		equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
+		snapshot: (v) => (v as CmcdObjectTypeList).slice(),
+	},
+]
+
+const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = new Map(
+	STATE_FIELDS.map(e => [e.event, e]),
+)
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
@@ -107,6 +185,7 @@ export class CmcdReporter {
 	private config: CmcdReporterConfigNormalized
 	private msd: number = NaN
 	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
+	private lastEmitted: Partial<Pick<Cmcd, StateField>> = {}
 	private requestTarget: CmcdTarget = {
 		sn: 0,
 		msdSent: false,
@@ -154,7 +233,7 @@ export class CmcdReporter {
 			this.disarmInterval(target)
 
 			// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
-			if (config.interval === 0 || !config.events.includes(CmcdEventType.TIME_INTERVAL)) {
+			if (config.interval === 0 || !config.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
 				return
 			}
 
@@ -193,7 +272,22 @@ export class CmcdReporter {
 	}
 
 	/**
-	 * Updates the CMCD data. Called by the player when the data changes.
+	 * Updates the CMCD data.
+	 *
+	 * Called by the player when data changes. For tracked state fields
+	 * (`sta`, `pr`, `cid`, `bg`, `br`), if the new value differs from the
+	 * last-reported value (the value most recently emitted on the wire for
+	 * that field), the corresponding state-change event is automatically
+	 * fired. Comparing against the last-reported value (rather than the
+	 * previous persisted value) ensures the first state-change event in a
+	 * new session always emits, even when the persisted value didn't change
+	 * across the `sid` boundary.
+	 *
+	 * Multi-field updates fire multiple events in the order: `sta` → `pr` →
+	 * `cid` → `bg` → `br`. The order of keys in the input object does not
+	 * affect the firing order.
+	 *
+	 * A `sid` change resets the dedup baseline.
 	 *
 	 * @param data - The data to update.
 	 */
@@ -209,17 +303,69 @@ export class CmcdReporter {
 		// msd is tracked separately via this.msd and sent once per target,
 		// so it is stripped from the persistent data store after each update.
 		this.data = { ...this.data, ...data, msd: undefined }
+
+		// Auto-trigger state-change events for any tracked field whose value
+		// differs from the last wire-emitted value. Comparing against lastEmitted
+		// (not the pre-merge value) ensures correctness after a session reset,
+		// and unifies the comparison basis with recordEvent's internal dedup.
+		for (const entry of STATE_FIELDS) {
+			if (entry.field in data && !entry.equal(this.data[entry.field], this.lastEmitted[entry.field])) {
+				this.recordEvent(entry.event)
+			}
+		}
 	}
 
 	/**
 	 * Records an event. Called by the player when an event occurs.
 	 *
+	 * For state-change events (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`,
+	 * `BACKGROUNDED_MODE`, `BITRATE_CHANGE`), this method:
+	 * 1. Persists the dedup field from `data` (if present) into the reporter's
+	 *    persistent data store — equivalent to a write-through `update()`.
+	 * 2. Drops the event entirely if the dedup field has no value after the
+	 *    write-through (never set, or cleared via `update({ field: undefined })`).
+	 *    State-change events without their required field would violate CTA-5004-B.
+	 * 3. Suppresses the event if the field's current value matches the
+	 *    last-emitted value (no state transition).
+	 *
+	 * For all other event types, the event is always emitted.
+	 *
+	 * Most callers can rely on {@link CmcdReporter.update} to auto-fire state-change events.
+	 * Use `recordEvent` directly when you need to attach extra context to the
+	 * event report (e.g., `bl`, `pt` at the moment of a play-state transition).
+	 *
 	 * @param type - The type of event to record.
 	 * @param data - Additional data to record with the event. This data
-	 *               only applies to this event report. Persistent data should
-	 *               be updated using `update()`.
+	 *               only applies to this event report, except for the dedup
+	 *               field of a state-change event, which is also persisted
+	 *               into the reporter's data store.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+		const entry = STATE_FIELDS_BY_EVENT.get(type)
+		if (entry) {
+			const field = entry.field
+			const incoming = data[field]
+
+			if (incoming !== undefined) {
+				Object.assign(this.data, { [field]: incoming })
+			}
+
+			const current = this.data[field]
+
+			// Never emit a state-change event with a missing required field — per
+			// CTA-5004-B these events must carry their dedup field. Catches both
+			// "no value ever set" and "previous value was cleared to undefined".
+			if (current === undefined) {
+				return
+			}
+
+			if (entry.equal(current, this.lastEmitted[field])) {
+				return
+			}
+
+			Object.assign(this.lastEmitted, { [field]: entry.snapshot(current) })
+		}
+
 		this.eventTargets.forEach((target, config) => {
 			this.recordTargetEvent(target, config, type, data)
 		})
@@ -480,5 +626,6 @@ export class CmcdReporter {
 	private resetSession(): void {
 		this.eventTargets.forEach(target => target.sn = 0)
 		this.requestTarget.sn = 0
+		this.lastEmitted = {}
 	}
 }

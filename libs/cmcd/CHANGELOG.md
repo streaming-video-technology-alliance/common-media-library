@@ -8,19 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
-### Fixed
-
-- Fix `nor` formatter crash (`TypeError: Invalid URL`) when the value is already a relative path and `baseUrl` is configured ([#364](https://github.com/streaming-video-technology-alliance/common-media-library/issues/364))
-
-### Changed
-
-- `CmcdReporter` now uses the current request URL's directory (via `getBaseUrl`) as the base for `nor` relative-path conversion, producing sibling-relative paths per the CMCD specification (previously the origin was used, yielding root-relative paths)
-- Clarify TSDoc for `nor` and `CmcdEncodeOptions.baseUrl` / `CmcdFormatterOptions.baseUrl` to document the absolute-URL convenience conversion
-
-## [2.4.0] - 2026-05-12
+## [2.4.0] - 2026-05-22
 
 ### Added
 
+- `CmcdEventType.PLAYBACK_RATE` (token `'pr'`) for playback-rate-change events, per CTA-5004-B.
 - `CmcdReportRecorder` — test helper that records CMCD-bearing
   reports across XHR and fetch transports for assertion in e2e tests.
   Includes `waitForReports`, `waitForManifest`, `waitForSegments`,
@@ -34,6 +26,23 @@ and this project adheres to
   `CmcdReportRecorderOptions`, `CmcdReportRecorderWaitOptions`).
 - `createXhrTransport` and `createFetchTransport` default adapter
   factories.
+
+### Changed
+
+- `CmcdReporter.update()` now auto-fires the corresponding state-change event (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`, `BACKGROUNDED_MODE`, `BITRATE_CHANGE`) when a tracked field's value changes. The two-step `update()` + `recordEvent()` pattern still works and is harmlessly deduplicated.
+- `CmcdReporter.recordEvent()` with a state-change event now persists the dedup field from its `data` argument into the persistent data store (write-through), keeping `this.data` consistent with the most recently reported value.
+- Consecutive state-change events with the same effective field value are now suppressed, matching CTA-5004-B's definition of these events as state transitions.
+
+## [2.3.2] - 2026-05-13
+
+### Fixed
+
+- Fix `nor` formatter crash (`TypeError: Invalid URL`) when the value is already a relative path and `baseUrl` is configured ([#364](https://github.com/streaming-video-technology-alliance/common-media-library/issues/364))
+
+### Changed
+
+- `CmcdReporter` now uses the current request URL's directory (via `getBaseUrl`) as the base for `nor` relative-path conversion, producing sibling-relative paths per the CMCD specification (previously the origin was used, yielding root-relative paths)
+- Clarify TSDoc for `nor` and `CmcdEncodeOptions.baseUrl` / `CmcdFormatterOptions.baseUrl` to document the absolute-URL convenience conversion
 
 ## [2.3.1] - 2026-04-30
 
@@ -156,7 +165,8 @@ and this project adheres to
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...HEAD
-[2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.4.0
+[2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0
+[2.3.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.3.2
 [2.3.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.0...cmcd-v2.3.1
 [2.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.2.0...cmcd-v2.3.0
 [2.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.1.2...cmcd-v2.2.0
