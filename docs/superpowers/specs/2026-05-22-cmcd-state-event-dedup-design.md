@@ -189,9 +189,12 @@ private resetSession(): void {
 
 ### Edge case: missing dedup field
 
-If neither `data[field]` nor `this.data[field]` is defined when an event would fire, the comparison resolves to `undefined === undefined` → `true` and the event is dropped.
+If `this.data[field]` is `undefined` at emission time, the state-change event is dropped. This applies in two scenarios:
 
-This is deliberate. CMCD validators (`validateCmcdStructure.ts:114`) already flag state-change events without their required field as spec violations. Dropping at the source prevents malformed wire data.
+1. **Never set:** `this.data[field]` was never populated (e.g., `recordEvent(PLAY_STATE)` called before any `sta` was set anywhere).
+2. **Explicitly cleared:** the caller passed `{ field: undefined }` to `update()`, which overwrites the previous value via spread.
+
+CMCD validators (`validateCmcdStructure.ts:114`) already flag state-change events without their required field as spec violations. Dropping at the source prevents malformed wire data, regardless of how the field became undefined.
 
 ## Public API impact
 

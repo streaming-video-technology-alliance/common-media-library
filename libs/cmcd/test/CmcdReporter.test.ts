@@ -1278,6 +1278,22 @@ describe('CmcdReporter', () => {
 
 				equal(requests.length, 0)
 			})
+
+			it('drops PLAY_STATE when sta is explicitly cleared to undefined', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.update({ sta: undefined })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// The initial update fires PLAY_STATE with sta='p'. The second update
+				// clears the persisted sta but must not emit a PLAY_STATE event
+				// without the required sta field (per CTA-5004-B).
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('sta=p'))
+			})
 		})
 	})
 })

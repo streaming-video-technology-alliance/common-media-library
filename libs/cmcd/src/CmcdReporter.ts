@@ -268,15 +268,18 @@ export class CmcdReporter {
 	 *
 	 * Called by the player when data changes. For tracked state fields
 	 * (`sta`, `pr`, `cid`, `bg`, `br`), if the new value differs from the
-	 * current value, the corresponding state-change event is automatically
-	 * fired (subject to dedup against the last-emitted value).
+	 * last-reported value (the value most recently emitted on the wire for
+	 * that field), the corresponding state-change event is automatically
+	 * fired. Comparing against the last-reported value (rather than the
+	 * previous persisted value) ensures the first state-change event in a
+	 * new session always emits, even when the persisted value didn't change
+	 * across the `sid` boundary.
 	 *
 	 * Multi-field updates fire multiple events in the order: `sta` → `pr` →
 	 * `cid` → `bg` → `br`. The order of keys in the input object does not
 	 * affect the firing order.
 	 *
-	 * A `sid` change resets the dedup baseline so the next state-change
-	 * event in the new session always emits.
+	 * A `sid` change resets the dedup baseline.
 	 *
 	 * @param data - The data to update.
 	 */
@@ -337,6 +340,12 @@ export class CmcdReporter {
 				Object.assign(this.data, { [field]: incoming })
 			}
 			const current = this.data[field]
+			// Never emit a state-change event with a missing required field — per
+			// CTA-5004-B these events must carry their dedup field. Catches both
+			// "no value ever set" and "previous value was cleared to undefined".
+			if (current === undefined) {
+				return
+			}
 			if (entry.equal(current, this.lastEmitted[field])) {
 				return
 			}

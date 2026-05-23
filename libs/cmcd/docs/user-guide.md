@@ -205,12 +205,15 @@ reporter.update({ br: [5000] });
 // → fires CmcdEventType.BITRATE_CHANGE
 
 // Consecutive same-value updates are deduplicated.
-reporter.update({ sta: "a" }); // emits (sta changed from "p" to "a")
-reporter.update({ sta: "a" }); // dropped (unchanged)
+reporter.update({ sta: "p" }); // dropped (unchanged from the initial update above)
 
-// recordEvent() still works for attaching extra context at a transition,
-// and for non-state events like CUSTOM_EVENT and ERROR.
+// To attach extra context at the moment of a transition, use recordEvent()
+// directly. The dedup field is persisted into the reporter's data (same as
+// update() would), and additional fields are included in the event payload.
 reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: "a", bl: [3000] });
+// → fires PLAY_STATE with sta="a" (transition from "p") and bl=[3000]
+
+// recordEvent() is also used for non-state events like CUSTOM_EVENT and ERROR.
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "custom-event-name" });
 ```
 
