@@ -195,12 +195,16 @@ import { CmcdEventType } from "@svta/cml-cmcd";
 // event without an explicit recordEvent() call.
 reporter.update({ sta: "p" });
 // → fires CmcdEventType.PLAY_STATE
+
 reporter.update({ pr: 1.5 });
 // → fires CmcdEventType.PLAYBACK_RATE
+
 reporter.update({ cid: "movie-42" });
 // → fires CmcdEventType.CONTENT_ID
+
 reporter.update({ bg: true });
 // → fires CmcdEventType.BACKGROUNDED_MODE
+
 reporter.update({ br: [5000] });
 // → fires CmcdEventType.BITRATE_CHANGE
 
