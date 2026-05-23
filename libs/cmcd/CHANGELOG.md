@@ -8,12 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-### Fixed
-
-- `prepareCmcdData` now force-includes the required field (`sta`, `pr`, `cid`, `bg`, `br`) for state-change events (`ps`, `pr`, `c`, `b`, `bc`) after the per-target `enabledKeys` filter, preventing CTA-5004-B-non-compliant payloads like `e=ps` with no `sta` ([#368](https://github.com/streaming-video-technology-alliance/common-media-library/issues/368)).
-- `prepareCmcdData` preserves `pr=1` when encoding an `e=pr` state-change event in event mode. The v1 default-omission for `pr=1` still applies in request mode and in non-`pr` event-mode payloads.
-- `validateCmcdStructure` now reports missing required fields for all five state-change events; previously only `e=ps` was checked for `sta`.
-
 ## [2.4.0] - 2026-05-22
 
 ### Added
@@ -25,6 +19,12 @@ and this project adheres to
 - `CmcdReporter.update()` now auto-fires the corresponding state-change event (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`, `BACKGROUNDED_MODE`, `BITRATE_CHANGE`) when a tracked field's value changes. The two-step `update()` + `recordEvent()` pattern still works and is harmlessly deduplicated.
 - `CmcdReporter.recordEvent()` with a state-change event now persists the dedup field from its `data` argument into the persistent data store (write-through), keeping `this.data` consistent with the most recently reported value.
 - Consecutive state-change events with the same effective field value are now suppressed, matching CTA-5004-B's definition of these events as state transitions.
+
+### Fixed
+
+- `prepareCmcdData` now force-includes the required field (`sta`, `pr`, `cid`, `bg`, `br`) for state-change events (`ps`, `pr`, `c`, `b`, `bc`) after the per-target `enabledKeys` filter, preventing CTA-5004-B-non-compliant payloads like `e=ps` with no `sta` ([#368](https://github.com/streaming-video-technology-alliance/common-media-library/issues/368)).
+- `prepareCmcdData` preserves `pr=1` when encoding an `e=pr` state-change event in event mode. The v1 default-omission for `pr=1` still applies in request mode and in non-`pr` event-mode payloads.
+- `validateCmcdStructure` now reports missing required fields for all five state-change events; previously only `e=ps` was checked for `sta`.
 
 ## [2.3.2] - 2026-05-13
 
