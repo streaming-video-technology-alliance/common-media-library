@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `prepareCmcdData` now force-includes the required field (`sta`, `pr`, `cid`, `bg`, `br`) for state-change events (`ps`, `pr`, `c`, `b`, `bc`) after the per-target `enabledKeys` filter, preventing CTA-5004-B-non-compliant payloads like `e=ps` with no `sta` ([#368](https://github.com/streaming-video-technology-alliance/common-media-library/issues/368)).
+- `prepareCmcdData` preserves `pr=1` when encoding an `e=pr` state-change event in event mode. The v1 default-omission for `pr=1` still applies in request mode and in non-`pr` event-mode payloads.
+- `validateCmcdStructure` now reports missing required fields for all five state-change events; previously only `e=ps` was checked for `sta`.
+
 ## [2.4.0] - 2026-05-22
 
 ### Added
