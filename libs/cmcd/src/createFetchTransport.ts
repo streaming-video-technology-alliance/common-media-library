@@ -30,6 +30,14 @@ async function toHttpRequest(request: Request): Promise<HttpRequest> {
  * headers, body read as UTF-8 string). Returns the adapter object
  * expected by `CmcdReportRecorder`.
  *
+ * Bodies are read once via `Request.text()` for inspection. This is
+ * safe for the body types CMCD reports use in practice (`string`,
+ * `Blob`, `ArrayBuffer`, `FormData`, `URLSearchParams`), which can be
+ * read by the wrapper and re-read by the underlying `fetch`. Passing
+ * a `ReadableStream` as `init.body` is not supported — the stream is
+ * consumed by the wrapper and the underlying `fetch` will receive an
+ * already-disturbed stream.
+ *
  * @public
  */
 export function createFetchTransport(): CmcdTransportAdapter {

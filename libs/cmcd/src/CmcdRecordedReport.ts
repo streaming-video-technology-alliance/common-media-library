@@ -1,6 +1,6 @@
 import type { HttpRequest } from '@svta/cml-utils'
 import type { CmcdRecordedReportMode } from './CmcdRecordedReportMode.ts'
-import type { CmcdRecorderRequestType } from './CmcdRecorderRequestType.ts'
+import type { CmcdRecordedRequestType } from './CmcdRecordedRequestType.ts'
 
 /**
  * A CMCD report captured by `CmcdReportRecorder`, normalized to
@@ -20,7 +20,7 @@ export type CmcdRecordedReport = {
 	/**
 	 * Classification of the underlying request (manifest / segment / event / unknown).
 	 */
-	readonly type: CmcdRecorderRequestType;
+	readonly type: CmcdRecordedRequestType;
 
 	/**
 	 * Reporting mode under which the CMCD data was carried:

@@ -4,24 +4,24 @@ import type { CmcdRecordedReport } from './CmcdRecordedReport.ts'
 import type { CmcdRecordedReportMode } from './CmcdRecordedReportMode.ts'
 import type { CmcdReportRecorderOptions } from './CmcdReportRecorderOptions.ts'
 import type { CmcdReportRecorderWaitOptions } from './CmcdReportRecorderWaitOptions.ts'
-import { CmcdRecorderRequestType } from './CmcdRecorderRequestType.ts'
+import { CmcdRecordedRequestType } from './CmcdRecordedRequestType.ts'
 import { createFetchTransport } from './createFetchTransport.ts'
 import { createXhrTransport } from './createXhrTransport.ts'
 
 const MANIFEST_EXTENSIONS = /\.(m3u8|mpd)(\?|$|\/)/i
 const SEGMENT_EXTENSIONS = /\.(m4s|m4v|m4a|mp4|ts|aac)(\?|$|\/)/i
 
-function classifyUrl(url: string, method: string): CmcdRecorderRequestType {
-	if (method === 'POST') {
-		return CmcdRecorderRequestType.EVENT
+function classifyUrl(url: string, isEventTarget: boolean): CmcdRecordedRequestType {
+	if (isEventTarget) {
+		return CmcdRecordedRequestType.EVENT
 	}
 	if (MANIFEST_EXTENSIONS.test(url)) {
-		return CmcdRecorderRequestType.MANIFEST
+		return CmcdRecordedRequestType.MANIFEST
 	}
 	if (SEGMENT_EXTENSIONS.test(url)) {
-		return CmcdRecorderRequestType.SEGMENT
+		return CmcdRecordedRequestType.SEGMENT
 	}
-	return CmcdRecorderRequestType.UNKNOWN
+	return CmcdRecordedRequestType.UNKNOWN
 }
 
 function hasCmcdHeader(headers: Record<string, string> | undefined): boolean {
@@ -51,7 +51,7 @@ function detectReportingMode(
 }
 
 type CmcdReportWaiter = {
-	type: CmcdRecorderRequestType | undefined
+	type: CmcdRecordedRequestType | undefined
 	count: number
 	resolve: (r: CmcdRecordedReport[]) => void
 	reject: (e: Error) => void
@@ -89,7 +89,7 @@ export class CmcdReportRecorder {
 
 		const captured: CmcdRecordedReport = {
 			request,
-			type: classifyUrl(url, method),
+			type: classifyUrl(url, isEventTarget),
 			reportingMode,
 			timestamp: Date.now(),
 		}
@@ -106,7 +106,7 @@ export class CmcdReportRecorder {
 		return isEventTarget ? new Response(null, { status: 204 }) : undefined
 	}
 
-	#getMatching(type: CmcdRecorderRequestType | undefined): CmcdRecordedReport[] {
+	#getMatching(type: CmcdRecordedRequestType | undefined): CmcdRecordedReport[] {
 		return type === undefined
 			? [...this.#reports]
 			: this.#reports.filter((r) => r.type === type)
@@ -124,7 +124,7 @@ export class CmcdReportRecorder {
 	}
 
 	#waitFor(
-		type: CmcdRecorderRequestType | undefined,
+		type: CmcdRecordedRequestType | undefined,
 		options: CmcdReportRecorderWaitOptions,
 	): Promise<CmcdRecordedReport[]> {
 		const count = options.count ?? 1
@@ -150,7 +150,10 @@ export class CmcdReportRecorder {
 
 	/**
 	 * Install transport patches and begin recording CMCD reports.
-	 * No-op if already attached.
+	 * No-op if already attached — the previously supplied options are
+	 * retained and the new `options` argument is silently ignored.
+	 * Call `detach()` first if you need to re-attach with different
+	 * options.
 	 *
 	 * @public
 	 */
@@ -233,7 +236,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForManifest(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecorderRequestType.MANIFEST, options)
+		return this.#waitFor(CmcdRecordedRequestType.MANIFEST, options)
 	}
 
 	/**
@@ -245,7 +248,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForSegments(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecorderRequestType.SEGMENT, options)
+		return this.#waitFor(CmcdRecordedRequestType.SEGMENT, options)
 	}
 
 	/**
@@ -257,6 +260,6 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForEvents(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecorderRequestType.EVENT, options)
+		return this.#waitFor(CmcdRecordedRequestType.EVENT, options)
 	}
 }

@@ -125,16 +125,16 @@ export const CMCD_RECORDED_REPORT_MODE_HEADER: "header";
 export const CMCD_RECORDED_REPORT_MODE_QUERY: "query";
 
 // @public
-export const CMCD_RECORDER_REQUEST_TYPE_EVENT: "event";
+export const CMCD_RECORDED_REQUEST_TYPE_EVENT: "event";
 
 // @public
-export const CMCD_RECORDER_REQUEST_TYPE_MANIFEST: "manifest";
+export const CMCD_RECORDED_REQUEST_TYPE_MANIFEST: "manifest";
 
 // @public
-export const CMCD_RECORDER_REQUEST_TYPE_SEGMENT: "segment";
+export const CMCD_RECORDED_REQUEST_TYPE_SEGMENT: "segment";
 
 // @public
-export const CMCD_RECORDER_REQUEST_TYPE_UNKNOWN: "unknown";
+export const CMCD_RECORDED_REQUEST_TYPE_UNKNOWN: "unknown";
 
 // @public
 export const CMCD_REQUEST: "CMCD-Request";
@@ -321,7 +321,7 @@ export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
 // @public
 export type CmcdRecordedReport = {
     readonly request: HttpRequest;
-    readonly type: CmcdRecorderRequestType;
+    readonly type: CmcdRecordedRequestType;
     readonly reportingMode: CmcdRecordedReportMode;
     readonly timestamp: number;
 };
@@ -337,15 +337,15 @@ export const CmcdRecordedReportMode: {
 export type CmcdRecordedReportMode = ValueOf<typeof CmcdRecordedReportMode>;
 
 // @public
-export const CmcdRecorderRequestType: {
-    readonly MANIFEST: typeof CMCD_RECORDER_REQUEST_TYPE_MANIFEST;
-    readonly SEGMENT: typeof CMCD_RECORDER_REQUEST_TYPE_SEGMENT;
-    readonly EVENT: typeof CMCD_RECORDER_REQUEST_TYPE_EVENT;
-    readonly UNKNOWN: typeof CMCD_RECORDER_REQUEST_TYPE_UNKNOWN;
+export const CmcdRecordedRequestType: {
+    readonly MANIFEST: typeof CMCD_RECORDED_REQUEST_TYPE_MANIFEST;
+    readonly SEGMENT: typeof CMCD_RECORDED_REQUEST_TYPE_SEGMENT;
+    readonly EVENT: typeof CMCD_RECORDED_REQUEST_TYPE_EVENT;
+    readonly UNKNOWN: typeof CMCD_RECORDED_REQUEST_TYPE_UNKNOWN;
 };
 
 // @public (undocumented)
-export type CmcdRecorderRequestType = ValueOf<typeof CmcdRecorderRequestType>;
+export type CmcdRecordedRequestType = ValueOf<typeof CmcdRecordedRequestType>;
 
 // @public
 export type CmcdReportConfig = {
