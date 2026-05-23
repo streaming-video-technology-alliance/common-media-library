@@ -125,9 +125,11 @@ export class CmcdReportRecorder {
 
 	#waitFor(
 		type: CmcdRecorderRequestType | undefined,
-		count: number,
-		timeout: number,
+		options: CmcdReportRecorderWaitOptions,
 	): Promise<CmcdRecordedReport[]> {
+		const count = options.count ?? 1
+		const timeout = options.timeout ?? this.#waitTimeout
+
 		const matching = this.#getMatching(type)
 		if (matching.length >= count) {
 			return Promise.resolve(matching)
@@ -219,7 +221,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForReports(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(undefined, options.count ?? 1, options.timeout ?? this.#waitTimeout)
+		return this.#waitFor(undefined, options)
 	}
 
 	/**
@@ -231,7 +233,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForManifest(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecorderRequestType.MANIFEST, options.count ?? 1, options.timeout ?? this.#waitTimeout)
+		return this.#waitFor(CmcdRecorderRequestType.MANIFEST, options)
 	}
 
 	/**
@@ -243,7 +245,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForSegments(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecorderRequestType.SEGMENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
+		return this.#waitFor(CmcdRecorderRequestType.SEGMENT, options)
 	}
 
 	/**
@@ -255,6 +257,6 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForEvents(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecorderRequestType.EVENT, options.count ?? 1, options.timeout ?? this.#waitTimeout)
+		return this.#waitFor(CmcdRecorderRequestType.EVENT, options)
 	}
 }
