@@ -185,7 +185,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		// Playback rate should only be sent if not equal to 1, except as
 		// the value of a PLAYBACK_RATE state-change event (where pr=1 is
 		// the data being reported, not a default to skip).
-		if (key === 'pr' && value === 1 && data['e'] !== CMCD_EVENT_PLAYBACK_RATE) {
+		if (key === 'pr' && value === 1 && !(isEventMode && data['e'] === CMCD_EVENT_PLAYBACK_RATE)) {
 			continue
 		}
 

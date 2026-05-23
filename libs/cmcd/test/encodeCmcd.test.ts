@@ -136,6 +136,12 @@ describe('encodeCmcd', () => {
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
 			equal(output.includes('pr=1'), false, 'pr=1 should still be skipped when e is not pr')
 		})
+
+		it('still skips pr=1 in request mode even when e=pr is in input data', () => {
+			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST })
+			equal(output.includes('pr=1'), false, 'pr=1 should be suppressed in request mode regardless of e')
+		})
 	})
 
 	it('returns encoded string when SfToken is used', () => {
