@@ -205,8 +205,8 @@ reporter.update({ br: [5000] });
 // → fires CmcdEventType.BITRATE_CHANGE
 
 // Consecutive same-value updates are deduplicated.
-reporter.update({ sta: "p" }); // emits
-reporter.update({ sta: "p" }); // dropped
+reporter.update({ sta: "a" }); // emits (sta changed from "p" to "a")
+reporter.update({ sta: "a" }); // dropped (unchanged)
 
 // recordEvent() still works for attaching extra context at a transition,
 // and for non-state events like CUSTOM_EVENT and ERROR.
