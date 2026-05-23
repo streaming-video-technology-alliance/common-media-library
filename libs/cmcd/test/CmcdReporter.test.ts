@@ -943,5 +943,55 @@ describe('CmcdReporter', () => {
 				equal(requests.length, 1)
 			})
 		})
+
+		describe('update() auto-trigger', () => {
+			it('update({ sta }) auto-fires PLAY_STATE when sta changes', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('e=ps'))
+				ok((requests[0].body as string)?.includes('sta=p'))
+			})
+
+			it('update({ sta }) with unchanged value does not fire', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.update({ sta: 'p' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+
+			it('subsequent manual recordEvent after update is deduped', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+
+			it('update with non-tracked-only fields fires no event', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ bl: [3000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 0)
+			})
+		})
 	})
 })
