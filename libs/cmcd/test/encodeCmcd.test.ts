@@ -124,6 +124,13 @@ describe('encodeCmcd', () => {
 			equal(output.includes('sta='), false, 'sta="" is a caller bug and should not be carved out')
 		})
 
+		it('still strips cid=false in event mode when event type is c', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.CONTENT_ID, cid: false as any, sid: 'session-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'sid' })
+			equal(output.includes('cid='), false, 'cid=false is a caller bug (cid is a string field); carve-out is bg-only')
+		})
+
 		it('doesn\'t filter br key in event mode when event type is bc', (context) => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.BITRATE_CHANGE, br: [3000], cid: 'content-id' }
