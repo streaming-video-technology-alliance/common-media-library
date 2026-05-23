@@ -20,14 +20,14 @@ The recorder is shipped as part of `@svta/cml-cmcd` so adopters get a tested, do
 ## Quick start
 
 ```typescript
-import { CmcdReportRecorder, CmcdRequestType } from "@svta/cml-cmcd";
+import { CmcdReportRecorder } from "@svta/cml-cmcd";
 
 const recorder = new CmcdReportRecorder();
 recorder.attach();
 
 // ... configure and start the player under test ...
 
-const segments = await recorder.waitForReports(CmcdRequestType.SEGMENT, 3);
+const segments = await recorder.waitForSegments(3);
 console.log(`Recorded ${segments.length} segment reports with CMCD data`);
 
 recorder.detach();
@@ -73,9 +73,9 @@ This is the same shape that `validateCmcdRequest` from `@svta/cml-cmcd` accepts,
 
 There are three ways to observe recorded reports, suited to different test shapes.
 
-### `getReports(type?)`: snapshot
+### `getReports()`: snapshot
 
-Returns a defensive copy of everything recorded so far, optionally filtered by type. Best for tests that fully drive the player to completion before asserting.
+Returns a defensive copy of everything recorded so far. Best for tests that fully drive the player to completion before asserting. Filter the result yourself if you need a subset:
 
 ```typescript
 import { CmcdReportRecorder, CmcdRequestType } from "@svta/cml-cmcd";
@@ -86,20 +86,27 @@ recorder.attach();
 // ... player runs to completion ...
 
 const all = recorder.getReports();
-const manifests = recorder.getReports(CmcdRequestType.MANIFEST);
-const segments = recorder.getReports(CmcdRequestType.SEGMENT);
+const manifests = all.filter((r) => r.type === CmcdRequestType.MANIFEST);
+const segments = all.filter((r) => r.type === CmcdRequestType.SEGMENT);
 
 console.log(`Total: ${all.length}, manifests: ${manifests.length}, segments: ${segments.length}`);
 
 recorder.detach();
 ```
 
-### `waitForReports(type, count, timeout?)`: positive assertion
+### `waitFor*(count, timeout?)`: positive assertion
 
-Resolves once at least `count` reports of the given type have been recorded. Rejects with a diagnostic error on timeout (default 15 seconds). Use for "expect N to happen" assertions where the test is racing the player.
+Resolves once at least `count` matching reports have been recorded. Rejects with a diagnostic error on timeout (default 15 seconds). Use for "expect N to happen" assertions where the test is racing the player. There is one method per request type, plus a generic `waitFor` that matches any type:
+
+| Method                              | Matches                              |
+| ----------------------------------- | ------------------------------------ |
+| `waitFor(count, timeout?)`          | any recorded report                  |
+| `waitForManifest(count, timeout?)`  | reports with `type === MANIFEST`     |
+| `waitForSegments(count, timeout?)`  | reports with `type === SEGMENT`      |
+| `waitForEvents(count, timeout?)`    | reports with `type === EVENT` (POST) |
 
 ```typescript
-import { CmcdReportRecorder, CmcdRequestType } from "@svta/cml-cmcd";
+import { CmcdReportRecorder } from "@svta/cml-cmcd";
 
 const recorder = new CmcdReportRecorder();
 recorder.attach();
@@ -108,7 +115,7 @@ recorder.attach();
 startPlayer();
 
 // Wait for the first three segment reports
-const segments = await recorder.waitForReports(CmcdRequestType.SEGMENT, 3);
+const segments = await recorder.waitForSegments(3);
 for (const report of segments) {
     console.log(report.request.url, report.reportingMode);
 }
@@ -116,16 +123,16 @@ for (const report of segments) {
 recorder.detach();
 ```
 
-Pass `undefined` for the type to wait for `count` of any kind. Set a shorter timeout if the test should fail fast:
+Set a shorter timeout if the test should fail fast:
 
 ```typescript
 // Fail in 2 seconds rather than the default 15
-await recorder.waitForReports(CmcdRequestType.MANIFEST, 1, 2000);
+await recorder.waitForManifest(1, 2000);
 ```
 
 ## Live inspection with `onReport`
 
-For test harness pages that show a streaming view of CMCD activity, pass an `onReport` callback to `attach()`. The callback fires synchronously for each recorded report, immediately after it is appended to the buffer and before any pending `waitForReports` promises resolve.
+For test harness pages that show a streaming view of CMCD activity, pass an `onReport` callback to `attach()`. The callback fires synchronously for each recorded report, immediately after it is appended to the buffer and before any pending `waitFor*` promises resolve.
 
 ```typescript
 import {
@@ -176,7 +183,7 @@ The listener is bound to the attach lifecycle: it is cleared automatically on `d
 CMCD v2 event reports are POSTed to a configured target URL. In tests, you usually don't want those requests to hit a real endpoint. The `eventTargetUrls` option intercepts matching POSTs and responds with a synthetic `204 No Content`, while still recording the request body for inspection.
 
 ```typescript
-import { CmcdReportRecorder, CmcdRequestType } from "@svta/cml-cmcd";
+import { CmcdReportRecorder } from "@svta/cml-cmcd";
 
 const recorder = new CmcdReportRecorder();
 recorder.attach({
@@ -188,7 +195,7 @@ recorder.attach({
 
 startPlayer();
 
-const events = await recorder.waitForReports(CmcdRequestType.EVENT, 1);
+const events = await recorder.waitForEvents(1);
 console.log("Event report body:", events[0].request.body);
 
 recorder.detach();
@@ -203,7 +210,6 @@ A request matches if its URL starts with any entry in the list. Non-event POSTs 
 ```typescript
 import {
     CmcdReportRecorder,
-    CmcdRequestType,
     validateCmcdRequest,
 } from "@svta/cml-cmcd";
 
@@ -212,7 +218,7 @@ recorder.attach();
 
 startPlayer();
 
-const segments = await recorder.waitForReports(CmcdRequestType.SEGMENT, 3);
+const segments = await recorder.waitForSegments(3);
 for (const report of segments) {
     const result = validateCmcdRequest(report.request);
     if (!result.valid) {
@@ -228,7 +234,6 @@ For event-mode reports, use `validateCmcdEventReport`:
 ```typescript
 import {
     CmcdReportRecorder,
-    CmcdRequestType,
     validateCmcdEventReport,
 } from "@svta/cml-cmcd";
 
@@ -237,7 +242,7 @@ recorder.attach({ eventTargetUrls: ["https://events.example.com"] });
 
 startPlayer();
 
-const events = await recorder.waitForReports(CmcdRequestType.EVENT, 1);
+const events = await recorder.waitForEvents(1);
 const result = validateCmcdEventReport(events[0].request);
 if (!result.valid) {
     console.error("Bad event report:", result.issues);
@@ -294,7 +299,7 @@ The `deliver` function returns a `Response` only when the request matched `event
 
 - Removes the transport patches (restoring the original `XMLHttpRequest`/`fetch` references)
 - Clears the `onReport` listener
-- Rejects any pending `waitForReports` promises with `Error('Recorder detached while waiting')`
+- Rejects any pending `waitFor*` promises with `Error('Recorder detached while waiting')`
 - Does **not** clear the recorded report buffer; call `clear()` for that
 
 Always pair `attach()` with `detach()` in your test teardown (`afterEach` or equivalent). A leaked attached recorder continues to patch `XMLHttpRequest`/`fetch` for the rest of the process, which corrupts subsequent tests.
@@ -304,5 +309,5 @@ Always pair `attach()` with `detach()` in your test teardown (`afterEach` or equ
 - **Seed a live UI from existing reports.** When opening an inspection panel mid-session, call `getReports()` once after `attach()` to populate the table, then rely on `onReport` for incremental updates.
 - **Filter inside `onReport`.** The listener does not accept a type filter directly. Branch on `report.type` or `report.reportingMode` inside the callback if you only care about a subset.
 - **Use `clear()` between test phases.** When a single test exercises multiple playback scenarios, call `recorder.clear()` between phases to reset the buffer without re-attaching.
-- **Default timeout is 15 seconds.** For fast unit-style tests, pass an explicit shorter timeout to `waitForReports` so failures surface quickly.
+- **Default timeout is 15 seconds.** For fast unit-style tests, pass an explicit shorter timeout to any `waitFor*` call so failures surface quickly.
 - **Body normalization.** POST bodies are eagerly read into strings by the transports, so `report.request.body` is always a string (or `undefined`), never a `ReadableStream`. Pass it directly to `validateCmcdEventReport`.

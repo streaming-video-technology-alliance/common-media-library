@@ -30,11 +30,10 @@ export type CmcdReportRecorderOptions = {
 
 	/**
 	 * Called once for each captured CMCD report, immediately after it
-	 * is appended to the buffer and before any pending
-	 * `waitForReports` promises resolve. Use for live UI inspection
-	 * in test harness pages. Cleared automatically on `detach()`;
-	 * pass a fresh callback to a subsequent `attach()` to resume
-	 * notification.
+	 * is appended to the buffer and before any pending `waitFor*`
+	 * promises resolve. Use for live UI inspection in test harness
+	 * pages. Cleared automatically on `detach()`; pass a fresh
+	 * callback to a subsequent `attach()` to resume notification.
 	 *
 	 * The callback receives the same {@link CmcdRecordedReport}
 	 * shape that `getReports()` returns. Filter by `report.type` or

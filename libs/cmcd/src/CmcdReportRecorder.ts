@@ -104,15 +104,44 @@ export class CmcdReportRecorder {
 		return isEventTarget ? new Response(null, { status: 204 }) : undefined
 	}
 
+	#getMatching(type: CmcdRequestType | undefined): CmcdRecordedReport[] {
+		return type === undefined
+			? [...this.#reports]
+			: this.#reports.filter((r) => r.type === type)
+	}
+
 	#notifyWaiters(): void {
 		for (const [timer, waiter] of this.#waiters) {
-			const matching = this.getReports(waiter.type)
+			const matching = this.#getMatching(waiter.type)
 			if (matching.length >= waiter.count) {
 				clearTimeout(timer)
 				this.#waiters.delete(timer)
 				waiter.resolve(matching)
 			}
 		}
+	}
+
+	#waitFor(
+		type: CmcdRequestType | undefined,
+		count: number,
+		timeout: number,
+	): Promise<CmcdRecordedReport[]> {
+		const matching = this.#getMatching(type)
+		if (matching.length >= count) {
+			return Promise.resolve(matching)
+		}
+
+		return new Promise<CmcdRecordedReport[]>((resolve, reject) => {
+			const timer = setTimeout(() => {
+				this.#waiters.delete(timer)
+				const current = this.#getMatching(type)
+				reject(new Error(
+					`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.#reports.length}.`,
+				))
+			}, timeout)
+
+			this.#waiters.set(timer, { type, count, resolve, reject })
+		})
 	}
 
 	/**
@@ -137,7 +166,7 @@ export class CmcdReportRecorder {
 
 	/**
 	 * Remove transport patches and stop recording. Rejects any pending
-	 * `waitForReports` promises with `Error('Recorder detached while waiting')`.
+	 * wait promises with `Error('Recorder detached while waiting')`.
 	 *
 	 * @public
 	 */
@@ -170,49 +199,55 @@ export class CmcdReportRecorder {
 	}
 
 	/**
-	 * Return a defensive copy of the recorded reports, optionally
-	 * filtered by classification.
-	 *
-	 * @param type - When provided, only reports whose underlying request
-	 *   matches {@link CmcdRequestType:type} are included in the result.
+	 * Return a defensive copy of all recorded reports.
 	 *
 	 * @public
 	 */
-	getReports(type?: CmcdRequestType): CmcdRecordedReport[] {
-		if (type === undefined) {
-			return [...this.#reports]
-		}
-		return this.#reports.filter((r) => r.type === type)
+	getReports(): CmcdRecordedReport[] {
+		return [...this.#reports]
 	}
 
 	/**
-	 * Wait until at least `count` reports of the given type are recorded.
+	 * Wait until at least `count` reports of any type are recorded.
 	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout (default 15000 ms). Use for positive assertions
-	 * ("expect N to happen").
+	 * on timeout (default 15000 ms).
 	 *
 	 * @public
 	 */
-	waitForReports(
-		type: CmcdRequestType | undefined,
-		count: number,
-		timeout = 15000,
-	): Promise<CmcdRecordedReport[]> {
-		const matching = this.getReports(type)
-		if (matching.length >= count) {
-			return Promise.resolve(matching)
-		}
+	waitFor(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(undefined, count, timeout)
+	}
 
-		return new Promise<CmcdRecordedReport[]>((resolve, reject) => {
-			const timer = setTimeout(() => {
-				this.#waiters.delete(timer)
-				const current = this.getReports(type)
-				reject(new Error(
-					`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.#reports.length}.`,
-				))
-			}, timeout)
+	/**
+	 * Wait until at least `count` manifest reports are recorded.
+	 * Resolves with all matching reports; rejects with a diagnostic error
+	 * on timeout (default 15000 ms).
+	 *
+	 * @public
+	 */
+	waitForManifest(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.MANIFEST, count, timeout)
+	}
 
-			this.#waiters.set(timer, { type, count, resolve, reject })
-		})
+	/**
+	 * Wait until at least `count` segment reports are recorded. Resolves
+	 * with all matching reports; rejects with a diagnostic error on
+	 * timeout (default 15000 ms).
+	 *
+	 * @public
+	 */
+	waitForSegments(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.SEGMENT, count, timeout)
+	}
+
+	/**
+	 * Wait until at least `count` event-mode reports are recorded.
+	 * Resolves with all matching reports; rejects with a diagnostic error
+	 * on timeout (default 15000 ms).
+	 *
+	 * @public
+	 */
+	waitForEvents(count: number, timeout = 15000): Promise<CmcdRecordedReport[]> {
+		return this.#waitFor(CmcdRequestType.EVENT, count, timeout)
 	}
 }

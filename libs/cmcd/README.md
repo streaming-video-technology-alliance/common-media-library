@@ -33,14 +33,14 @@ player under test, regardless of whether the player uses
 so tests work identically across transports.
 
 ````ts
-import { CmcdReportRecorder, CmcdRequestType, validateCmcdRequest } from '@svta/cml-cmcd'
+import { CmcdReportRecorder, validateCmcdRequest } from '@svta/cml-cmcd'
 
 const recorder = new CmcdReportRecorder()
 recorder.attach({ eventTargetUrls: ['https://events.example.com'] })
 
 // ... configure and start the player under test ...
 
-const segments = await recorder.waitForReports(CmcdRequestType.SEGMENT, 3)
+const segments = await recorder.waitForSegments(3)
 for (const r of segments) {
   const result = validateCmcdRequest(r.request)
   if (!result.valid) {
