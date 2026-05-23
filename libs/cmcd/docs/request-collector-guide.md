@@ -73,7 +73,7 @@ This is the same shape that `validateCmcdRequest` from `@svta/cml-cmcd` accepts,
 
 There are three ways to observe captures, suited to different test shapes.
 
-### `getRequests(type?)` — snapshot
+### `getRequests(type?)`: snapshot
 
 Returns a defensive copy of everything captured so far, optionally filtered by type. Best for tests that fully drive the player to completion before asserting.
 
@@ -94,7 +94,7 @@ console.log(`Total: ${all.length}, manifests: ${manifests.length}, segments: ${s
 collector.detach();
 ```
 
-### `waitForRequests(type, count, timeout?)` — positive assertion
+### `waitForRequests(type, count, timeout?)`: positive assertion
 
 Resolves once at least `count` requests of the given type have been captured. Rejects with a diagnostic error on timeout (default 15 seconds). Use for "expect N to happen" assertions where the test is racing the player.
 
@@ -123,7 +123,7 @@ Pass `undefined` for the type to wait for `count` of any kind. Set a shorter tim
 await collector.waitForRequests(CmcdRequestType.MANIFEST, 1, 2000);
 ```
 
-### `collectFor(timeout, type?)` — negative or upper-bound assertion
+### `collectFor(timeout, type?)`: negative or upper-bound assertion
 
 Resolves after `timeout` milliseconds with whatever was captured during the window. Never rejects on timeout. Use for "no events should fire" or "exactly N and no more" assertions.
 
@@ -215,7 +215,7 @@ console.log("Event report body:", events[0].request.body);
 collector.detach();
 ```
 
-A request matches if its URL starts with any entry in the list. Non-event POSTs (those whose URLs don't match) are not stubbed — they pass through to the underlying transport — but are still captured if they carry CMCD data.
+A request matches if its URL starts with any entry in the list. Non-event POSTs (those whose URLs don't match) are not stubbed and pass through to the underlying transport, but they are still captured if they carry CMCD data.
 
 ## Combining captures with validation
 
@@ -317,7 +317,7 @@ The `deliver` function returns a `Response` only when the request matched `event
 - Clears the `onReport` listener
 - Rejects any pending `waitForRequests` promises with `Error('Collector detached while waiting')`
 - Resolves any pending `collectFor` promises with whatever was captured up to that point
-- Does **not** clear the captured request buffer — call `clear()` for that
+- Does **not** clear the captured request buffer; call `clear()` for that
 
 Always pair `attach()` with `detach()` in your test teardown (`afterEach` or equivalent). A leaked attached collector continues to patch `XMLHttpRequest`/`fetch` for the rest of the process, which corrupts subsequent tests.
 
