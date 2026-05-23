@@ -322,7 +322,10 @@ export class CmcdReporter {
 	 * `BACKGROUNDED_MODE`, `BITRATE_CHANGE`), this method:
 	 * 1. Persists the dedup field from `data` (if present) into the reporter's
 	 *    persistent data store — equivalent to a write-through `update()`.
-	 * 2. Suppresses the event if the field's current value matches the
+	 * 2. Drops the event entirely if the dedup field has no value after the
+	 *    write-through (never set, or cleared via `update({ field: undefined })`).
+	 *    State-change events without their required field would violate CTA-5004-B.
+	 * 3. Suppresses the event if the field's current value matches the
 	 *    last-emitted value (no state transition).
 	 *
 	 * For all other event types, the event is always emitted.
