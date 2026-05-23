@@ -1,5 +1,5 @@
 import type { CmcdEncodeOptions } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
 import { SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -71,7 +71,7 @@ describe('encodeCmcd', () => {
 
 		it('doesn\'t filter sta key in event mode when event type is ps', (context) => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
-			const input = { e: CmcdEventType.PLAY_STATE, sta: 'p', cid: 'content-id' }
+			const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id' }
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
 			ok(output.includes('sta='), 'sta key must not be filtered out in event mode when e=ps')
 		})
@@ -112,7 +112,7 @@ describe('encodeCmcd', () => {
 		})
 
 		it('doesn\'t force-include required field in request mode', () => {
-			const input = { e: CmcdEventType.PLAY_STATE, sta: 'p', cid: 'content-id', br: 3000 }
+			const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id', br: [3000] }
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST, filter: key => key === 'br' })
 			equal(output.includes('sta='), false, 'sta should be filtered out in request mode')
 		})
