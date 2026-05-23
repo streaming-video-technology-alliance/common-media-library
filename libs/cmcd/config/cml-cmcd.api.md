@@ -65,6 +65,9 @@ export const CMCD_EVENT_MUTE: "m";
 export const CMCD_EVENT_PLAY_STATE: "ps";
 
 // @public
+export const CMCD_EVENT_PLAYBACK_RATE: "pr";
+
+// @public
 export const CMCD_EVENT_PLAYER_COLLAPSE: "pc";
 
 // @public
@@ -201,6 +204,7 @@ export type CmcdEventsValidationResult = CmcdValidationResult & {
 export const CmcdEventType: {
     readonly BITRATE_CHANGE: typeof CMCD_EVENT_BITRATE_CHANGE;
     readonly PLAY_STATE: typeof CMCD_EVENT_PLAY_STATE;
+    readonly PLAYBACK_RATE: typeof CMCD_EVENT_PLAYBACK_RATE;
     readonly ERROR: typeof CMCD_EVENT_ERROR;
     readonly TIME_INTERVAL: typeof CMCD_EVENT_TIME_INTERVAL;
     readonly CONTENT_ID: typeof CMCD_EVENT_CONTENT_ID;

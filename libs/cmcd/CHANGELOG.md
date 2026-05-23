@@ -8,6 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-05-22
+
+### Added
+
+- `CmcdEventType.PLAYBACK_RATE` (token `'pr'`) for playback-rate-change events, per CTA-5004-B.
+
+### Changed
+
+- `CmcdReporter.update()` now auto-fires the corresponding state-change event (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`, `BACKGROUNDED_MODE`, `BITRATE_CHANGE`) when a tracked field's value changes. The two-step `update()` + `recordEvent()` pattern still works and is harmlessly deduplicated.
+- `CmcdReporter.recordEvent()` with a state-change event now persists the dedup field from its `data` argument into the persistent data store (write-through), keeping `this.data` consistent with the most recently reported value.
+- Consecutive state-change events with the same effective field value are now suppressed, matching CTA-5004-B's definition of these events as state transitions.
+
 ## [2.3.2] - 2026-05-13
 
 ### Fixed
@@ -139,7 +151,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...HEAD
+[2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0
 [2.3.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.3.2
 [2.3.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.0...cmcd-v2.3.1
 [2.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.2.0...cmcd-v2.3.0
