@@ -66,7 +66,10 @@ type StateFieldEntry = {
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
 const STATE_FIELDS: ReadonlyArray<StateFieldEntry> = [
-	{ field: 'sta', event: CmcdEventType.PLAY_STATE, equal: (a, b) => a === b },
+	{ field: 'sta', event: CmcdEventType.PLAY_STATE,        equal: (a, b) => a === b },
+	{ field: 'pr',  event: CmcdEventType.PLAYBACK_RATE,     equal: (a, b) => a === b },
+	{ field: 'cid', event: CmcdEventType.CONTENT_ID,        equal: (a, b) => a === b },
+	{ field: 'bg',  event: CmcdEventType.BACKGROUNDED_MODE, equal: (a, b) => a === b },
 ]
 
 const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = new Map(

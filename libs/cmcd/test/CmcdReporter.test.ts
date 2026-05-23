@@ -1006,5 +1006,127 @@ describe('CmcdReporter', () => {
 				equal(requests.length, 2)
 			})
 		})
+
+		describe('PLAYBACK_RATE', () => {
+			function createPrConfig(): Partial<CmcdReporterConfig> {
+				return {
+					sid: 'test-session',
+					cid: 'test-content',
+					enabledKeys: ['pr', 'sid', 'cid', 'v', 'e', 'ts', 'sn'],
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.PLAYBACK_RATE],
+						enabledKeys: ['pr', 'sid', 'cid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+					}],
+				}
+			}
+
+			it('update({ pr }) auto-fires PLAYBACK_RATE on change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createPrConfig(), requester)
+
+				reporter.update({ pr: 1.5 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('e=pr'))
+				ok((requests[0].body as string)?.includes('pr=1.5'))
+			})
+
+			it('deduplicates consecutive same pr', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createPrConfig(), requester)
+
+				reporter.update({ pr: 1.5 })
+				reporter.update({ pr: 1.5 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+		})
+
+		describe('CONTENT_ID', () => {
+			function createCidConfig(): Partial<CmcdReporterConfig> {
+				return {
+					sid: 'test-session',
+					enabledKeys: ['cid', 'sid', 'v', 'e', 'ts', 'sn'],
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.CONTENT_ID],
+						enabledKeys: ['cid', 'sid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+					}],
+				}
+			}
+
+			it('update({ cid }) auto-fires CONTENT_ID on change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createCidConfig(), requester)
+
+				reporter.update({ cid: 'content-1' })
+				reporter.update({ cid: 'content-2' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('cid="content-1"'))
+				ok((requests[1].body as string)?.includes('cid="content-2"'))
+			})
+
+			it('deduplicates consecutive same cid', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createCidConfig(), requester)
+
+				reporter.update({ cid: 'content-1' })
+				reporter.update({ cid: 'content-1' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+		})
+
+		describe('BACKGROUNDED_MODE', () => {
+			function createBgConfig(): Partial<CmcdReporterConfig> {
+				return {
+					sid: 'test-session',
+					enabledKeys: ['bg', 'sid', 'v', 'e', 'ts', 'sn'],
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.BACKGROUNDED_MODE],
+						enabledKeys: ['bg', 'sid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+					}],
+				}
+			}
+
+			it('update({ bg }) auto-fires BACKGROUNDED_MODE on change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('e=b'))
+				ok((requests[0].body as string)?.includes('bg'))
+			})
+
+			it('deduplicates consecutive same bg', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+		})
 	})
 })
