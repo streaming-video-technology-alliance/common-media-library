@@ -420,6 +420,39 @@ describe('CmcdRequestCollector', () => {
 			equal(calls[0].reportingMode, 'query')
 			collector.detach()
 		})
+
+		it('does not fire a stale listener after detach() then attach() with no listener', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			const calls: CmcdCollectedRequest[] = []
+			collector.attach({
+				transports: [t],
+				onReport: (report) => calls.push(report),
+			})
+			collector.detach()
+			collector.attach({ transports: [t] })
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			equal(calls.length, 0)
+			collector.detach()
+		})
+
+		it('does not fire the listener after detach() with no further attach', () => {
+			const t = new FakeTransport()
+			const collector = new CmcdRequestCollector()
+			const calls: CmcdCollectedRequest[] = []
+			collector.attach({
+				transports: [t],
+				onReport: (report) => calls.push(report),
+			})
+			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
+			equal(calls.length, 1)
+			collector.detach()
+			// FakeTransport still holds a reference to the patched deliver,
+			// so simulating after detach reaches #deliver. Listener must
+			// have been cleared.
+			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
+			equal(calls.length, 1)
+		})
 	})
 })
 
