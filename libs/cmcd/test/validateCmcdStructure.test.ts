@@ -111,6 +111,21 @@ describe('validateCmcdStructure', () => {
 		equal(result.valid, true)
 	})
 
+	it('doesn\'t raise sta error for non-ps events', () => {
+		const result = validateCmcdStructure({ e: 'pr', pr: 1.5, ts: 123 }, { reportingMode: 'event' })
+		equal(result.issues.some(i => i.key === 'sta'), false)
+	})
+
+	it('doesn\'t require any state field for e=rr', () => {
+		const result = validateCmcdStructure({ e: 'rr', url: 'https://example.com/video.mp4', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
+	it('doesn\'t require any state field for e=ce when cen is present', () => {
+		const result = validateCmcdStructure({ e: 'ce', cen: 'foo', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
 	it('reports error for error event without ec', () => {
 		const result = validateCmcdStructure({ e: 'e', ts: 123 }, { reportingMode: 'event' })
 		equal(result.valid, false)
