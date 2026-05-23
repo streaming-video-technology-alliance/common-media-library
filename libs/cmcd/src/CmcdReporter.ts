@@ -95,21 +95,21 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 	return true
 }
 
+const equal = Object.is
+
 /**
  * Maps each tracked state field to its event type and equality function.
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
 const STATE_FIELDS: readonly StateFieldEntry[] = [
-	{ field: 'sta', event: CmcdEventType.PLAY_STATE,        equal: (a, b) => a === b },
-	{ field: 'pr',  event: CmcdEventType.PLAYBACK_RATE,     equal: (a, b) => a === b },
-	{ field: 'cid', event: CmcdEventType.CONTENT_ID,        equal: (a, b) => a === b },
-	{ field: 'bg',  event: CmcdEventType.BACKGROUNDED_MODE, equal: (a, b) => a === b },
+	{ field: 'sta', event: CmcdEventType.PLAY_STATE,        equal},
+	{ field: 'pr',  event: CmcdEventType.PLAYBACK_RATE,     equal},
+	{ field: 'cid', event: CmcdEventType.CONTENT_ID,        equal},
+	{ field: 'bg',  event: CmcdEventType.BACKGROUNDED_MODE, equal},
 	{
 		field: 'br',
 		event: CmcdEventType.BITRATE_CHANGE,
-		equal: (a, b) => (a === undefined || b === undefined)
-			? a === b
-			: cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
+		equal: (a, b) => equal(a, b) || cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
 	},
 ]
 
