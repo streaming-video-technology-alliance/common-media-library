@@ -1216,5 +1216,68 @@ describe('CmcdReporter', () => {
 				equal(requests.length, 2)
 			})
 		})
+
+		describe('cross-cutting', () => {
+			it('fires multi-field updates in dispatch order (sta then pr)', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sta', 'pr', 'sid', 'v', 'e', 'ts', 'sn'],
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.PLAY_STATE, CmcdEventType.PLAYBACK_RATE],
+						enabledKeys: ['sta', 'pr', 'sid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+					}],
+				}, requester)
+
+				// Order in input differs from dispatch table; output must follow dispatch order.
+				reporter.update({ pr: 1.5, sta: 'a' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('e=ps'))
+				ok((requests[1].body as string)?.includes('e=pr'))
+			})
+
+			it('dropped event does not consume sn', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.update({ sta: 'p' })
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)  // dropped (dedup)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('sn=0'))  // PLAY_STATE (from update auto-trigger)
+				ok((requests[1].body as string)?.includes('sn=1'))  // ERROR (next sn, not 2)
+			})
+
+			it('non-tracked events are unaffected by dedup', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+			})
+
+			it('drops PLAY_STATE with no sta defined anywhere', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig(), requester)
+
+				reporter.recordEvent(CmcdEventType.PLAY_STATE)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 0)
+			})
+		})
 	})
 })
