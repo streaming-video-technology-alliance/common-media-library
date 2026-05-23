@@ -116,6 +116,26 @@ describe('encodeCmcd', () => {
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST, filter: key => key === 'br' })
 			equal(output.includes('sta='), false, 'sta should be filtered out in request mode')
 		})
+
+		it('preserves pr=1 in event mode when event type is pr', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
+			ok(output.includes('pr=1'), 'pr=1 must be preserved when event type is pr')
+		})
+
+		it('still skips pr=1 in request mode', () => {
+			const input = { pr: 1, cid: 'content-id' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST })
+			equal(output.includes('pr=1'), false, 'pr=1 should still be skipped in request mode')
+		})
+
+		it('still skips pr=1 in non-pr event mode', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const input = { e: CmcdEventType.RESPONSE_RECEIVED, pr: 1, url: 'https://example.com/v.mp4' }
+			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
+			equal(output.includes('pr=1'), false, 'pr=1 should still be skipped when e is not pr')
+		})
 	})
 
 	it('returns encoded string when SfToken is used', () => {
