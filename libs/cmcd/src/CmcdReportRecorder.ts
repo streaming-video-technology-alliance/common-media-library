@@ -2,10 +2,10 @@ import type { HttpRequest } from '@svta/cml-utils'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import type { CmcdRecordedReport } from './CmcdRecordedReport.ts'
 import type { CmcdRecordedReportMode } from './CmcdRecordedReportMode.ts'
-import { createFetchTransport } from './createFetchTransport.ts'
-import { createXhrTransport } from './createXhrTransport.ts'
 import type { CmcdReportRecorderOptions } from './CmcdReportRecorderOptions.ts'
 import { CmcdRequestType } from './CmcdRequestType.ts'
+import { createFetchTransport } from './createFetchTransport.ts'
+import { createXhrTransport } from './createXhrTransport.ts'
 
 const MANIFEST_EXTENSIONS = /\.(m3u8|mpd)(\?|$|\/)/i
 const SEGMENT_EXTENSIONS = /\.(m4s|m4v|m4a|mp4|ts|aac)(\?|$|\/)/i
@@ -59,7 +59,6 @@ type CmcdReportWaiter = {
 type CmcdReportRecorderEntry = {
 	type: CmcdRequestType | undefined
 	resolve: (r: CmcdRecordedReport[]) => void
-	timer: ReturnType<typeof setTimeout>
 }
 
 /**
@@ -78,8 +77,8 @@ export class CmcdReportRecorder {
 	#detachers: (() => void)[] = []
 	#attached = false
 	#eventTargetUrls: readonly string[] = []
-	#waiters: Map<ReturnType<typeof setTimeout>, CmcdReportWaiter> = new Map()
-	#recorders: CmcdReportRecorderEntry[] = []
+	#waiters = new Map<ReturnType<typeof setTimeout>, CmcdReportWaiter>()
+	#recorders = new Map<ReturnType<typeof setTimeout>, CmcdReportRecorderEntry>()
 	#onReport: ((report: CmcdRecordedReport) => void) | undefined
 
 	readonly #deliver = (request: HttpRequest): Response | undefined => {
@@ -168,11 +167,11 @@ export class CmcdReportRecorder {
 		}
 		this.#waiters.clear()
 
-		for (const entry of this.#recorders) {
-			clearTimeout(entry.timer)
+		for (const [timer, entry] of this.#recorders) {
+			clearTimeout(timer)
 			entry.resolve(this.getReports(entry.type))
 		}
-		this.#recorders = []
+		this.#recorders.clear()
 	}
 
 	/**
@@ -245,13 +244,10 @@ export class CmcdReportRecorder {
 	): Promise<CmcdRecordedReport[]> {
 		return new Promise<CmcdRecordedReport[]>((resolve) => {
 			const timer = setTimeout(() => {
-				const idx = this.#recorders.findIndex((c) => c.timer === timer)
-				if (idx >= 0) {
-					this.#recorders.splice(idx, 1)
-				}
+				this.#recorders.delete(timer)
 				resolve(this.getReports(type))
 			}, timeout)
-			this.#recorders.push({ type, resolve, timer })
+			this.#recorders.set(timer, { type, resolve })
 		})
 	}
 }
