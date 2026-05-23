@@ -6,7 +6,7 @@ describe('validateCmcdStructure', () => {
 	it('provides a valid example', () => {
 		// #region example
 		const result = validateCmcdStructure(
-			{ e: 'bc', ts: 1234567890 },
+			{ e: 'bc', br: [3000], ts: 1234567890 },
 			{ reportingMode: 'event' },
 		)
 		equal(result.valid, true)
@@ -64,6 +64,50 @@ describe('validateCmcdStructure', () => {
 
 	it('accepts ps event with sta', () => {
 		const result = validateCmcdStructure({ e: 'ps', sta: 'p', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
+	it('reports error for pr event without pr', () => {
+		const result = validateCmcdStructure({ e: 'pr', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.key === 'pr' && i.severity === 'error'), true)
+	})
+
+	it('accepts pr event with pr', () => {
+		const result = validateCmcdStructure({ e: 'pr', pr: 1.5, ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
+	it('reports error for c event without cid', () => {
+		const result = validateCmcdStructure({ e: 'c', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.key === 'cid' && i.severity === 'error'), true)
+	})
+
+	it('accepts c event with cid', () => {
+		const result = validateCmcdStructure({ e: 'c', cid: 'content-123', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
+	it('reports error for b event without bg', () => {
+		const result = validateCmcdStructure({ e: 'b', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.key === 'bg' && i.severity === 'error'), true)
+	})
+
+	it('accepts b event with bg', () => {
+		const result = validateCmcdStructure({ e: 'b', bg: true, ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
+	it('reports error for bc event without br', () => {
+		const result = validateCmcdStructure({ e: 'bc', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.key === 'br' && i.severity === 'error'), true)
+	})
+
+	it('accepts bc event with br', () => {
+		const result = validateCmcdStructure({ e: 'bc', br: [3000], ts: 123 }, { reportingMode: 'event' })
 		equal(result.valid, true)
 	})
 
