@@ -3,7 +3,7 @@ import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
@@ -194,8 +194,16 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			value = Date.now()
 		}
 
-		// ignore invalid values
-		if (!isValid(value)) {
+		// Ignore invalid values, except `bg: false` on a backgrounded-mode (e=b) state-
+		// change event — the wire must carry `?0` per CTA-5004-B so the transition is
+		// reportable. `bg` is the only state-change required field typed as boolean;
+		// `false` on other required fields (e.g. `cid`, `sta`) is a caller bug and stays
+		// stripped so the validator flags it.
+		const isBgFalseTransition = isEventMode
+			&& value === false
+			&& key === 'bg'
+			&& data['e'] === CMCD_EVENT_BACKGROUNDED_MODE
+		if (!isValid(value) && !isBgFalseTransition) {
 			continue
 		}
 

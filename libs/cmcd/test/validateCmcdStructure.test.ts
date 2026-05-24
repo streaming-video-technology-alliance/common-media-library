@@ -100,6 +100,11 @@ describe('validateCmcdStructure', () => {
 		equal(result.valid, true)
 	})
 
+	it('accepts b event with bg=false', () => {
+		const result = validateCmcdStructure({ e: 'b', bg: false, ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
 	it('reports error for bc event without br', () => {
 		const result = validateCmcdStructure({ e: 'bc', ts: 123 }, { reportingMode: 'event' })
 		equal(result.valid, false)
