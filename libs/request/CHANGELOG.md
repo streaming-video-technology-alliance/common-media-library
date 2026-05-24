@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.13] - 2026-05-23
+
+### Changed
+
+- Update `@svta/cml-cmcd` to 2.4.0
+
 ## [1.0.12] - 2026-05-13
 
 ### Changed
@@ -99,7 +105,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.12...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.13...HEAD
+[1.0.13]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.12...request-v1.0.13
 [1.0.12]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.11...request-v1.0.12
 [1.0.11]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.10...request-v1.0.11
 [1.0.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.9...request-v1.0.10
