@@ -185,41 +185,73 @@ reporter.update({
 
 ## Recording Events
 
-Use the `recordEvent()` method to record player events for event-mode reporting. The second argument is an optional object of data to include in the event report:
+State-change events (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`,
+`BACKGROUNDED_MODE`, `BITRATE_CHANGE`) are fired automatically by
+`update()` whenever a tracked field's value differs from the last
+reported value. Use `update()` as the canonical entry point.
 
 ```typescript
 import { CmcdEventType } from "@svta/cml-cmcd";
 
-// State-change events fire automatically from update() when the value differs
-// from the previously reported value. The reporter emits the corresponding
-// event without an explicit recordEvent() call.
-reporter.update({ sta: "p" });
-// → fires CmcdEventType.PLAY_STATE
+reporter.update({ sta: "p" });        // → fires PLAY_STATE
+reporter.update({ pr: 1.5 });         // → fires PLAYBACK_RATE
+reporter.update({ cid: "movie-42" }); // → fires CONTENT_ID
+reporter.update({ bg: true });        // → fires BACKGROUNDED_MODE
+reporter.update({ br: [5000] });      // → fires BITRATE_CHANGE
 
-reporter.update({ pr: 1.5 });
-// → fires CmcdEventType.PLAYBACK_RATE
-
-reporter.update({ cid: "movie-42" });
-// → fires CmcdEventType.CONTENT_ID
-
-reporter.update({ bg: true });
-// → fires CmcdEventType.BACKGROUNDED_MODE
-
-reporter.update({ br: [5000] });
-// → fires CmcdEventType.BITRATE_CHANGE
-
-// Consecutive same-value updates are deduplicated.
-reporter.update({ sta: "p" }); // dropped (unchanged from the initial update above)
-
-// To attach extra context at the moment of a transition, use recordEvent()
-// directly. The dedup field is persisted into the reporter's data (same as
-// update() would), and additional fields are included in the event payload.
-reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: "a", bl: [3000] });
-// → fires PLAY_STATE with sta="a" (transition from "p") and bl=[3000]
-
-// recordEvent() is also used for non-state events like CUSTOM_EVENT and ERROR.
-reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "custom-event-name" });
+// Consecutive updates with the same value are deduplicated.
+reporter.update({ sta: "p" }); // dropped (unchanged)
 ```
+
+### Snapshot context on state changes
+
+Pass continuous metrics alongside the state field in the same `update()`
+call. They're persisted into the reporter's data and emitted with the
+auto-fired event:
+
+```typescript
+reporter.update({ sta: "p", bl: [3000], mtp: [8500], pt: 12500 });
+// → fires PLAY_STATE with sta="p", bl=[3000], mtp=[8500], pt=12500
+```
+
+Persisting these fields also makes `TIME_INTERVAL` reports useful:
+they're emitted by the reporter on a timer and carry whatever is in
+the reporter's data store at that moment. Keep continuous metrics
+fresh by calling `update()` as they change in the player.
+
+### Don't pair `update()` with `recordEvent()` for the same state-change field
+
+The second call's payload is dropped by dedup:
+
+```typescript
+reporter.update({ sta: "p" });                              // auto-fires PLAY_STATE
+reporter.recordEvent(CmcdEventType.PLAY_STATE, {            // suppressed:
+  sta: "p",                                                 //   sta unchanged
+  bl: [3000],                                               //   bl never emitted
+});
+```
+
+Use the single-call form shown above instead.
+
+### Using `recordEvent()`
+
+`recordEvent()` is for events whose payload is intrinsic to the event
+call — they don't represent a persisted state transition:
+
+```typescript
+// Custom event: the name and any payload only make sense for this call.
+reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "ad-quartile" });
+
+// Error: ec/et describe this specific error.
+reporter.recordEvent(CmcdEventType.ERROR, { ec: "FATAL", et: "network" });
+
+// Ad lifecycle, mute/unmute, player expand/collapse, skip.
+reporter.recordEvent(CmcdEventType.AD_START, { /* ad metadata */ });
+reporter.recordEvent(CmcdEventType.MUTE);
+```
+
+For `RESPONSE_RECEIVED`, prefer `recordResponseReceived()` (see below)
+— it derives the per-response fields for you.
 
 ### Recording Response Received Events
 
