@@ -242,8 +242,9 @@ call — they don't represent a persisted state transition:
 // Custom event: the name and any payload only make sense for this call.
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "ad-quartile" });
 
-// Error: ec/et describe this specific error.
-reporter.recordEvent(CmcdEventType.ERROR, { ec: "FATAL", et: "network" });
+// Error: ec carries the player error code(s). Per CTA-5004-B the list
+// notation is required even for a single code.
+reporter.recordEvent(CmcdEventType.ERROR, { ec: ["FATAL"] });
 
 // Ad lifecycle, mute/unmute, player expand/collapse, skip.
 reporter.recordEvent(CmcdEventType.AD_START, { /* ad metadata */ });

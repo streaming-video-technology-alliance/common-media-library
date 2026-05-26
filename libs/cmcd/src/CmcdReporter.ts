@@ -349,7 +349,7 @@ export class CmcdReporter {
 	 * second emission.
 	 *
 	 * Use `recordEvent()` directly for events whose payload is intrinsic to
-	 * the event call — `CUSTOM_EVENT` with `cen`, `ERROR` with `ec`/`et`,
+	 * the event call — `CUSTOM_EVENT` with `cen`, `ERROR` with `ec`,
 	 * ad-lifecycle events, `MUTE`/`UNMUTE`, `PLAYER_EXPAND`/`PLAYER_COLLAPSE`,
 	 * `SKIP`. For `RESPONSE_RECEIVED`, prefer
 	 * {@link CmcdReporter.recordResponseReceived}, which derives the
