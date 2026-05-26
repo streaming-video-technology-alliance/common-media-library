@@ -290,6 +290,14 @@ export class CmcdReporter {
 	 * `cid` → `bg` → `br`. The order of keys in the input object does not
 	 * affect the firing order.
 	 *
+	 * To attach snapshot context (e.g., `bl`, `mtp`, `pt`, `ltc`) to a
+	 * state-change event, include those fields in the same `update()` call
+	 * as the state field. They are persisted into the reporter's data and
+	 * emitted with the auto-fired event. This is also how to keep
+	 * `TIME_INTERVAL` reports useful — those events draw from the
+	 * persistent data store with no caller hook for per-event data, so
+	 * fields the player wants in periodic reports must be kept fresh here.
+	 *
 	 * A `sid` change resets the dedup baseline.
 	 *
 	 * @param data - The data to update.
@@ -333,9 +341,19 @@ export class CmcdReporter {
 	 *
 	 * For all other event types, the event is always emitted.
 	 *
-	 * Most callers can rely on {@link CmcdReporter.update} to auto-fire state-change events.
-	 * Use `recordEvent` directly when you need to attach extra context to the
-	 * event report (e.g., `bl`, `pt` at the moment of a play-state transition).
+	 * For state-change events, prefer {@link CmcdReporter.update} — including
+	 * for snapshot enrichment via a combined call like
+	 * `update({ sta: 'p', bl: [3000], mtp: [8500] })`. Calling `recordEvent()`
+	 * for a state-change event after `update()` has already auto-fired it
+	 * silently drops the second call's `data`, because dedup suppresses the
+	 * second emission.
+	 *
+	 * Use `recordEvent()` directly for events whose payload is intrinsic to
+	 * the event call — `CUSTOM_EVENT` with `cen`, `ERROR` with `ec`/`et`,
+	 * ad-lifecycle events, `MUTE`/`UNMUTE`, `PLAYER_EXPAND`/`PLAYER_COLLAPSE`,
+	 * `SKIP`. For `RESPONSE_RECEIVED`, prefer
+	 * {@link CmcdReporter.recordResponseReceived}, which derives the
+	 * per-response fields automatically.
 	 *
 	 * @param type - The type of event to record.
 	 * @param data - Additional data to record with the event. This data
