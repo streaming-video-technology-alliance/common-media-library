@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Documentation
+
+- Clarify recommended event-firing patterns in `CmcdReporter`: state-change events are fired via `update()`, with snapshot context attached by combining the state field and continuous metrics in a single call. `recordEvent()`'s `data` argument is documented as intended for non-state-change events (custom, error, ad-lifecycle, mute/unmute, expand/collapse, skip). Calling `recordEvent()` for a state-change event after `update()` has auto-fired it silently drops the second call's data; see the user guide for the recommended pattern.
+
 ## [2.4.0] - 2026-05-22
 
 ### Added
