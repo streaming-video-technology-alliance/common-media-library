@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Documentation
+
+- Clarify recommended event-firing patterns in `CmcdReporter`: state-change events are fired via `update()`, with snapshot context attached by combining the state field and continuous metrics in a single call. `recordEvent()`'s `data` argument is documented as intended for non-state-change events (custom, error, ad-lifecycle, mute/unmute, expand/collapse, skip). Calling `recordEvent()` for a state-change event after `update()` has auto-fired it silently drops the second call's data; see the user guide for the recommended pattern.
+
 ## [2.4.0] - 2026-05-22
 
 ### Added
@@ -29,7 +33,7 @@ and this project adheres to
 
 ### Changed
 
-- `CmcdReporter.update()` now auto-fires the corresponding state-change event (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`, `BACKGROUNDED_MODE`, `BITRATE_CHANGE`) when a tracked field's value changes. The two-step `update()` + `recordEvent()` pattern still works and is harmlessly deduplicated.
+- `CmcdReporter.update()` now auto-fires the corresponding state-change event (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`, `BACKGROUNDED_MODE`, `BITRATE_CHANGE`) when a tracked field's value changes. A subsequent `recordEvent()` call for the same state-change event is deduplicated, which silently drops any enrichment data passed to it.
 - `CmcdReporter.recordEvent()` with a state-change event now persists the dedup field from its `data` argument into the persistent data store (write-through), keeping `this.data` consistent with the most recently reported value.
 - Consecutive state-change events with the same effective field value are now suppressed, matching CTA-5004-B's definition of these events as state transitions.
 
