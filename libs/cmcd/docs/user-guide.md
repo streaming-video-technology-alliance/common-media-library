@@ -205,19 +205,33 @@ reporter.update({ sta: "p" }); // dropped (unchanged)
 
 ### Snapshot context on state changes
 
-Pass continuous metrics alongside the state field in the same `update()`
-call. They're persisted into the reporter's data and emitted with the
-auto-fired event:
+Auto-fired events emit whatever is currently in the reporter's
+persistent data store. Snapshot context can be attached either by
+combining the continuous metrics with the state field in a single
+`update()` call:
 
 ```typescript
 reporter.update({ sta: "p", bl: [3000], mtp: [8500], pt: 12500 });
 // → fires PLAY_STATE with sta="p", bl=[3000], mtp=[8500], pt=12500
 ```
 
-Persisting these fields also makes `TIME_INTERVAL` reports useful:
-they're emitted by the reporter on a timer and carry whatever is in
-the reporter's data store at that moment. Keep continuous metrics
-fresh by calling `update()` as they change in the player.
+…or by persisting them via earlier `update()` calls so they're already
+in the data store when the state field changes:
+
+```typescript
+// Keep metrics fresh as the player computes them
+reporter.update({ bl: [3000], mtp: [8500], pt: 12500 });
+
+// Later, when state changes
+reporter.update({ sta: "p" });
+// → fires PLAY_STATE with sta="p", bl=[3000], mtp=[8500], pt=12500
+```
+
+The same pattern keeps `TIME_INTERVAL` reports useful: those events
+are emitted by the reporter on a timer and carry whatever is in the
+reporter's data store at that moment, with no caller hook for
+per-event data. Keep continuous metrics fresh via `update()` as they
+change in the player.
 
 ### Don't pair `update()` with `recordEvent()` for the same state-change field
 

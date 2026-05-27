@@ -291,12 +291,14 @@ export class CmcdReporter {
 	 * affect the firing order.
 	 *
 	 * To attach snapshot context (e.g., `bl`, `mtp`, `pt`, `ltc`) to a
-	 * state-change event, include those fields in the same `update()` call
-	 * as the state field. They are persisted into the reporter's data and
-	 * emitted with the auto-fired event. This is also how to keep
-	 * `TIME_INTERVAL` reports useful — those events draw from the
-	 * persistent data store with no caller hook for per-event data, so
-	 * fields the player wants in periodic reports must be kept fresh here.
+	 * state-change event, ensure those fields are in the reporter's data
+	 * before the state field changes. Either include them alongside the
+	 * state field in the same `update()` call, or persist them via earlier
+	 * `update()` calls — auto-fired events emit whatever is currently in
+	 * the persistent data store. This is also how to keep `TIME_INTERVAL`
+	 * reports useful — those events draw from the persistent data store
+	 * with no caller hook for per-event data, so fields the player wants
+	 * in periodic reports must be kept fresh here.
 	 *
 	 * A `sid` change resets the dedup baseline.
 	 *
