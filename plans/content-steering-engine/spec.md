@@ -1,12 +1,13 @@
 # Content Steering Engine Design
 
 **Date:** 2026-04-13
+**Updated:** 2026-07-01 (reviewed against draft-05)
 **Package:** `@svta/cml-content-steering`
-**Specs:** [IETF draft-pantos-content-steering-03](https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-03), [ETSI TS 103 998 V1.1.1](https://www.etsi.org/deliver/etsi_ts/103900_103999/103998/01.01.01_60/ts_103998v010101p.pdf)
+**Specs:** [IETF draft-pantos-content-steering-05](https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-05), [ETSI TS 103 998 V1.1.1](https://www.etsi.org/deliver/etsi_ts/103900_103999/103998/01.01.01_60/ts_103998v010101p.pdf)
 
 ## Summary
 
-Add a three-layer content steering engine to `@svta/cml-content-steering`. The engine implements the IETF Content Steering spec's 7-step client algorithm in a CDP-agnostic way, with built-in HLS and DASH support via CDP descriptors. The three layers — pure functions, stateful processor, and I/O engine — are independently usable and testable.
+Add a three-layer content steering engine to `@svta/cml-content-steering`. The engine implements the IETF Pathway-based Content Steering spec's 7-step client algorithm in a CDP-agnostic way, with built-in HLS and DASH support via CDP descriptors. The three layers — pure functions, stateful processor, and I/O engine — are independently usable and testable.
 
 ## Architecture
 
@@ -436,6 +437,7 @@ test/
 - HOST only
 - PARAMS only
 - HOST + PARAMS combined
+- Spec §8.2 worked example fixture: HOST + PARAMS applied to URIs with differing original hostnames, both rewritten to the clone host with the token param appended
 - PER-VARIANT-URIS override takes precedence over HOST
 - PER-RENDITION-URIS override takes precedence over HOST
 - No matching stableId falls back to HOST
@@ -565,6 +567,17 @@ const schedule = (fn, ms) => {
 | HLS: PER-RENDITION-URIS | L1 | `applyUriReplacement` with stableId |
 | DASH: multi-pathway reporting | CDP | `DASH_CDP.formatPathway` comma-separates |
 | Ignore unrecognized keys | L1 | `parseSteeringResponse` passes through |
+
+## Draft-05 Review Notes
+
+Reviewed [draft-05](https://www.ietf.org/archive/id/draft-pantos-content-steering-05.txt) against draft-03 (2026-07-01). No normative changes to the client algorithm, manifest schema (VERSION still 1, TTL still integer seconds), HTTP status handling (410/429/other), pathway cloning, or steering query parameters. Section numbering is unchanged, so all spec references in this document remain valid. The design requires no structural changes.
+
+Editorial changes worth recording:
+
+- The protocol is formally renamed **Pathway-based Content Steering**; "Content Steering" remains an accepted interchangeable name. No API impact.
+- New advisory: deployments should not combine multiple application-level steering methods or let Content Steering conflict with transport-layer steering. This is a player integration concern, out of scope for this library.
+- Clarification: the server-side recommendation that the initial Steering Manifest agree with the Content Description's initial Pathway now explicitly means the first element of PATHWAY-PRIORITY. Server-side guidance only; no client change.
+- New worked example for Pathway Cloning (§8.2): HOST + PARAMS replacement applied across pathway URIs whose original hostnames differ. Captured as an `applyUriReplacement` test fixture above.
 
 ## Full Export List
 
