@@ -64,13 +64,47 @@ const C2PA_MANIFEST_UUID: readonly number[] = [
 ]
 
 // JUMBF UUID per ISO 19566-5 (used by c2pa-rs and other JUMBF-compliant tools)
-const JUMBF_UUID: readonly number[] = [
+/** @internal */
+export const JUMBF_UUID: readonly number[] = [
 	0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0e, 0x48, 0x3c,
 	0x92, 0x97, 0x58, 0x28, 0x87, 0x7e, 0xc4, 0x81,
 ]
 
-function matchesUuid(usertype: readonly number[], expected: readonly number[]): boolean {
+// C2PA auxiliary uuid box extended type per §A.5.4: d8fec3d6-1b0d-11ec-8100-000000000000
+/** @internal */
+export const MERKLE_AUX_UUID: readonly number[] = [
+	0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0d, 0x11, 0xec,
+	0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+]
+
+/**
+ * Compares a uuid box `usertype` against an expected 16-byte extended type.
+ *
+ * @internal
+ */
+export function matchesUuid(usertype: readonly number[], expected: readonly number[]): boolean {
 	return usertype.length === expected.length && expected.every((b, i) => b === usertype[i])
+}
+
+/**
+ * Converts CBOR-decoded byte values (`Uint8Array` or `number[]`) to a
+ * `Uint8Array`, or `null` when the value has another shape.
+ *
+ * @internal
+ */
+export function toUint8Array(value: unknown): Uint8Array | null {
+	if (value instanceof Uint8Array) return value
+	if (Array.isArray(value)) return new Uint8Array(value as number[])
+	return null
+}
+
+/**
+ * Narrows a decoded CBOR value to an integer, or `null` when it is not one.
+ *
+ * @internal
+ */
+export function asInteger(value: unknown): number | null {
+	return typeof value === 'number' && Number.isInteger(value) ? value : null
 }
 
 function isC2paUuid(usertype: readonly number[]): boolean {
@@ -109,6 +143,29 @@ export function findC2paUuidBox(boxes: ParsedIsoBox[]): UuidParsedBox | undefine
 
 const FULLBOX_HEADER_SIZE = 4
 const AUX_UUID_OFFSET_SIZE = 8
+const TEXT_DECODER = new TextDecoder()
+
+/**
+ * Reads a C2PA uuid box payload prefix — fullbox version/flags followed by a
+ * null-terminated purpose string (e.g. `"manifest\0"`, `"merkle\0"`) — and
+ * returns the purpose plus the remaining payload bytes.
+ *
+ * Returns `null` if the payload is too short or the purpose is unterminated.
+ *
+ * @internal
+ */
+export function readUuidBoxPurpose(payload: Uint8Array): { purpose: string; rest: Uint8Array } | null {
+	if (payload.length < FULLBOX_HEADER_SIZE) return null
+
+	let offset = FULLBOX_HEADER_SIZE
+	while (offset < payload.length && payload[offset] !== 0) offset++
+	if (offset >= payload.length) return null
+
+	return {
+		purpose: TEXT_DECODER.decode(payload.subarray(FULLBOX_HEADER_SIZE, offset)),
+		rest: payload.subarray(offset + 1),
+	}
+}
 
 /**
  * Strips the JUMBF UUID box prefix (fullbox header, purpose string, aux offset)
@@ -122,14 +179,7 @@ const AUX_UUID_OFFSET_SIZE = 8
  * @internal
  */
 export function stripJumbfUuidPrefix(payload: Uint8Array): Uint8Array | null {
-	if (payload.length < FULLBOX_HEADER_SIZE) return null
-
-	let offset = FULLBOX_HEADER_SIZE
-	// Skip null-terminated purpose string (e.g. "manifest\0")
-	while (offset < payload.length && payload[offset] !== 0) offset++
-	if (offset >= payload.length) return null
-	offset++ // skip the null terminator
-	offset += AUX_UUID_OFFSET_SIZE
-	if (offset > payload.length) return null
-	return payload.subarray(offset)
+	const prefix = readUuidBoxPurpose(payload)
+	if (!prefix || prefix.rest.length < AUX_UUID_OFFSET_SIZE) return null
+	return prefix.rest.subarray(AUX_UUID_OFFSET_SIZE)
 }
