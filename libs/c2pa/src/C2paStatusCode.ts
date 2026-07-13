@@ -19,6 +19,10 @@ export const C2paStatusCode = {
 	ASSERTION_ACTION_INGREDIENT_MISMATCH: 'assertion.action.ingredientMismatch',
 	/** Claim signature verification failed (§15.7) */
 	CLAIM_SIGNATURE_MISMATCH: 'claim.signature.mismatch',
+	/** BMFF hash assertion or Merkle structure is malformed (§D.3) */
+	ASSERTION_BMFFHASH_MALFORMED: 'assertion.bmffHash.malformed',
+	/** BMFF content hash does not match the committed value (§D.3) */
+	ASSERTION_BMFFHASH_MISMATCH: 'assertion.bmffHash.mismatch',
 } as const
 
 /**
