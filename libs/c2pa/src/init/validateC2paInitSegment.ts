@@ -2,7 +2,7 @@ import { decode } from 'cbor-x/decode'
 import { encode } from 'cbor-x/encode'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import type { C2paAssertion } from '../C2paAssertion.ts'
-import type { C2paStatusCode } from '../C2paStatusCode.ts'
+import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
@@ -12,7 +12,10 @@ import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
-import { bytesToHex, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
+import { computeBmffHash } from '../bmff/computeBmffHash.ts'
+import { parseExclusions } from '../bmff/parseExclusions.ts'
+import type { MerkleMap } from '../merkle/MerkleSegmentValidation.ts'
+import { asInteger, bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
@@ -99,6 +102,118 @@ async function validateBmffHashAssertion(
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
 	return validateBmffHash(bytes, expectedHash, { exclusions, alg })
+}
+
+// --- VOD Merkle: merkle map extraction (§18.6) ---
+
+function toBytesOrNull(value: unknown): Uint8Array | null {
+	try {
+		return normalizeToUint8Array(value)
+	} catch {
+		return null
+	}
+}
+
+function parseMerkleRow(rawHashes: unknown): Uint8Array[] | null {
+	if (!Array.isArray(rawHashes) || rawHashes.length === 0) return null
+	const row: Uint8Array[] = []
+	for (const entry of rawHashes) {
+		const bytes = toBytesOrNull(entry)
+		if (!bytes) return null
+		row.push(bytes)
+	}
+	return row
+}
+
+/**
+ * Parses the `merkle` array of a `c2pa.hash.bmff.v3` assertion into one
+ * MerkleMap per track. The `exclusions` are taken from the parent assertion
+ * data and shared across all tracks; per-entry `alg` overrides the
+ * assertion-level `alg`. Returns `null` when `merkle` is not a non-empty
+ * array or an entry is missing required fields.
+ */
+function extractMerkleMaps(bmffHashAssertionData: Record<string, unknown>): MerkleMap[] | null {
+	const rawMerkle = bmffHashAssertionData['merkle']
+	if (!Array.isArray(rawMerkle) || rawMerkle.length === 0) return null
+
+	const exclusions = parseExclusions(bmffHashAssertionData['exclusions'])
+	const assertionAlg = bmffHashAssertionData['alg']
+	// §18.6.2: the box offset prefix is omitted only when the assertion carries both `hash` and `merkle`.
+	const offsetPrefixSize = bmffHashAssertionData['hash'] == null ? 8 : 0
+
+	const maps: MerkleMap[] = []
+	for (const entry of rawMerkle) {
+		if (!entry || typeof entry !== 'object') return null
+		const record = entry as Record<string, unknown>
+
+		const uniqueId = asInteger(record['uniqueId'])
+		const localId = asInteger(record['localId'])
+		const count = asInteger(record['count'])
+		const hashes = parseMerkleRow(record['hashes'])
+		if (uniqueId === null || localId === null || count === null || !hashes) return null
+
+		const rawInitHash = record['initHash']
+		const initHash = rawInitHash == null ? null : toBytesOrNull(rawInitHash)
+		if (rawInitHash != null && !initHash) return null
+
+		const rawAlg = record['alg'] ?? assertionAlg
+		maps.push({
+			uniqueId,
+			localId,
+			count,
+			hashes,
+			initHash,
+			alg: typeof rawAlg === 'string' ? normalizeAlgorithmName(rawAlg) : null,
+			exclusions,
+			offsetPrefixSize,
+		})
+	}
+	return maps
+}
+
+/**
+ * Extracts the merkle maps from the `c2pa.hash.bmff.v3` assertion and
+ * validates each entry's `initHash` binding against the raw init segment
+ * bytes (§18.6.2); entries without an `initHash` (single-file fMP4) skip the
+ * check. Adds error codes to `codes` in place. Returns `null` when the
+ * assertion has no `merkle` field (the stream is not in VOD Merkle mode)
+ * and `[]` when the field is malformed.
+ */
+async function validateMerkleMaps(
+	bytes: Uint8Array,
+	assertion: C2paAssertion | null,
+	codes: Set<LiveVideoStatusCode | C2paStatusCode>,
+): Promise<MerkleMap[] | null> {
+	const data = assertion?.data
+	if (data === null || typeof data !== 'object' || Array.isArray(data)) return null
+	if ((data as Record<string, unknown>)['merkle'] === undefined) return null
+
+	const merkleMaps = extractMerkleMaps(data as Record<string, unknown>)
+	if (!merkleMaps) {
+		codes.add(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
+		return []
+	}
+
+	// All entries share exclusions and offsetPrefixSize, so the init hash only varies by alg.
+	const initHashByAlg = new Map<string | null, Uint8Array>()
+	for (const merkleMap of merkleMaps) {
+		if (!merkleMap.initHash) continue
+		let computed = initHashByAlg.get(merkleMap.alg)
+		if (!computed) {
+			computed = await computeBmffHash(bytes, {
+				offsetPrefixSize: merkleMap.offsetPrefixSize,
+				exclusions: merkleMap.exclusions,
+				alg: merkleMap.alg ?? undefined,
+			})
+			initHashByAlg.set(merkleMap.alg, computed)
+		}
+		if (!hashesEqual(computed, merkleMap.initHash)) {
+			codes.add(LiveVideoStatusCode.INIT_INVALID)
+			codes.add(C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH)
+		}
+	}
+
+	return merkleMaps
 }
 
 type SessionKeyFields = {
@@ -211,6 +326,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 			certificate: null,
 			manifestId: null,
 			sessionKeys: [],
+			merkleMaps: [],
 			isValid: false,
 			errorCodes: [LiveVideoStatusCode.INIT_INVALID],
 		}
@@ -237,8 +353,13 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const integrityCodes = await validateManifestIntegrity(internalData, certificate)
 
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
+	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
+
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
-	if (sessionKeys.length === 0) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	// VOD Merkle streams carry no session keys — only flag their absence in live mode.
+	if (sessionKeys.length === 0 && merkleMaps === null) {
+		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	}
 	for (const code of integrityCodes) codes.add(code)
 	const errorCodes = [...codes]
 
@@ -247,6 +368,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		certificate,
 		manifestId: manifest.instanceId,
 		sessionKeys,
+		merkleMaps: merkleMaps ?? [],
 		isValid: errorCodes.length === 0,
 		errorCodes,
 	}
