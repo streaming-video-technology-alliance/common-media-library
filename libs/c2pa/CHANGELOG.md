@@ -8,6 +8,19 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-13
+
+### Added
+
+- VOD Merkle validation (C2PA §15.12.2 / §18.6): `validateC2paMerkleSegment` verifies fragmented MP4 media segments against the merkle maps from the init manifest — per-track Merkle proof verification with `location` continuity enforced via caller-held state
+- `MerkleMap`, `MerkleSegmentState`, and `MerkleSegmentValidation` types
+- `validateC2paInitSegment` extracts merkle maps from the `c2pa.hash.bmff.v3` assertion, validates each entry's `initHash` binding, and returns them as `merkleMaps`
+- `C2paStatusCode` entries `assertion.bmffHash.malformed` and `assertion.bmffHash.mismatch`
+
+### Changed
+
+- `InitSegmentValidation` gains a `merkleMaps` field; `SESSIONKEY_INVALID` is no longer raised for VOD Merkle streams
+
 ## [1.0.1] - 2026-05-13
 
 ### Changed
