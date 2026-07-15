@@ -36,6 +36,7 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 | `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure: signature, hash, or key mismatch |
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | Continuity chain broken or method unsupported |
+| `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
 | `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | Session key invalid or expired |
 
 Example of handling specific error codes:

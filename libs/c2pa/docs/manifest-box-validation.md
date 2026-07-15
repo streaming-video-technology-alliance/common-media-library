@@ -131,9 +131,29 @@ Segment 3: manifestId = "ghi-789", previousManifestId = "def-456"  // must match
 > [!NOTE]
 > Every segment must declare a `previousManifestId`, including the first one. The first segment typically references the initial static manifest. When `lastManifestId` is `null` (first call), the chain comparison is skipped — the validator only checks that `previousManifestId` is present.
 
-The `continuityMethod` field indicates how continuity is verified. The currently supported method is `c2pa.manifestId`.
+The `continuityMethod` field indicates how continuity is verified. The only built-in method is the spec-defined `c2pa.manifestId` (C2PA §19.3.2).
 
-When the chain is broken (the `previousManifestId` does not match the previous segment's manifest ID), the result includes `LiveVideoStatusCode.CONTINUITY_METHOD_INVALID`.
+When the chain is broken (the `previousManifestId` does not match the previous segment's manifest ID), the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
+
+### Custom continuity methods
+
+The spec allows implementers to define their own continuity methods (§19.3.2), identified by a custom label (e.g. `com.example.anchor-chain`). Since their semantics are implementation-specific, this library cannot validate them by default: segments declaring an unrecognized method fail with `LiveVideoStatusCode.CONTINUITY_METHOD_INVALID`, as required by §19.7.2, plus `LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED`, which lets consumers distinguish an unverifiable method from a broken chain.
+
+To validate a custom method, register a validator for its label via the `options` parameter (a stream uses a single continuity method, so one validator is registered at a time):
+
+```ts
+const { result } = await validateC2paManifestBoxSegment(bytes, lastManifestId, state, {
+  continuityValidator: {
+    method: 'com.example.anchor-chain',
+    validate: (liveVideoAssertion, manifest) => {
+      // method-specific fields are available on liveVideoAssertion
+      return verifyAnchorChain(liveVideoAssertion['anchorToken'], manifest.instanceId)
+    },
+  },
+})
+```
+
+The validator receives the full decoded `c2pa.livevideo.segment` assertion (including method-specific fields) and the segment's parsed manifest; anything else the method needs (e.g. `lastManifestId`, which the caller already holds) can be captured in the callback's closure. Returning `false` (or throwing) reports `LiveVideoStatusCode.SEGMENT_INVALID`. The built-in `c2pa.manifestId` method cannot be overridden.
 
 ## Result Fields
 
