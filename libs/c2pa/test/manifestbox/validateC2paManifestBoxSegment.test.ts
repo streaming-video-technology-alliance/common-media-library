@@ -5,6 +5,27 @@ import { describe, it } from 'node:test'
 import { encode } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 
+const CUSTOM_METHOD = 'com.test.custom'
+
+function loadFixture(name: string): Uint8Array {
+	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
+}
+
+// Rewrites the fixture's continuityMethod from 'c2pa.manifestId' to a
+// same-length custom label. This invalidates the assertion's hashed URI
+// (integrity codes will appear), but continuity codes are asserted on
+// independently.
+function withCustomContinuityMethod(bytes: Uint8Array): Uint8Array {
+	const patched = new Uint8Array(bytes)
+	const needle = new TextEncoder().encode('c2pa.manifestId')
+	const replacement = new TextEncoder().encode(CUSTOM_METHOD)
+	strictEqual(needle.length, replacement.length)
+	for (let i = 0; i <= patched.length - needle.length; i++) {
+		if (needle.every((b, j) => patched[i + j] === b)) patched.set(replacement, i)
+	}
+	return patched
+}
+
 describe('validateC2paManifestBoxSegment', () => {
 	// #region example
 	it('returns isValid=false with errorCodes for empty bytes', async () => {
@@ -56,6 +77,129 @@ describe('validateC2paManifestBoxSegment', () => {
 		)
 
 		strictEqual(result.errorCodes.includes('livevideo.segment.invalid'), false)
+	})
+
+	it('does not report CONTINUITY_METHOD_UNSUPPORTED for the spec-defined method', async () => {
+		const { result } = await validateC2paManifestBoxSegment(loadFixture('test-segment.m4s'), null)
+
+		strictEqual(result.continuityMethod, 'c2pa.manifestId')
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.unsupported'), false)
+	})
+
+	it('fails with CONTINUITY_METHOD_INVALID plus CONTINUITY_METHOD_UNSUPPORTED for an unknown custom method', async () => {
+		const bytes = withCustomContinuityMethod(loadFixture('test-segment.m4s'))
+
+		const { result } = await validateC2paManifestBoxSegment(bytes, null)
+
+		strictEqual(result.continuityMethod, CUSTOM_METHOD)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.invalid'), true)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.unsupported'), true)
+	})
+
+	it('delegates a custom continuity method to its registered validator', async () => {
+		const bytes = withCustomContinuityMethod(loadFixture('test-segment.m4s'))
+		let receivedAssertion: Record<string, unknown> = {}
+		let receivedManifest: unknown = null
+
+		const { result } = await validateC2paManifestBoxSegment(bytes, 'previous-id', undefined, {
+			continuityValidator: {
+				method: CUSTOM_METHOD,
+				validate: (liveVideoAssertion, manifest) => {
+					receivedAssertion = liveVideoAssertion as Record<string, unknown>
+					receivedManifest = manifest
+					return true
+				},
+			},
+		})
+
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.invalid'), false)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.unsupported'), false)
+		strictEqual(result.errorCodes.includes('livevideo.segment.invalid'), false)
+		strictEqual(receivedAssertion['continuityMethod'], CUSTOM_METHOD)
+		strictEqual(typeof receivedAssertion['sequenceNumber'], 'number')
+		strictEqual(receivedManifest !== null && typeof receivedManifest === 'object', true)
+	})
+
+	it('reports SEGMENT_INVALID when the custom continuity validator returns false', async () => {
+		const bytes = withCustomContinuityMethod(loadFixture('test-segment.m4s'))
+
+		const { result } = await validateC2paManifestBoxSegment(bytes, null, undefined, {
+			continuityValidator: { method: CUSTOM_METHOD, validate: () => false },
+		})
+
+		strictEqual(result.errorCodes.includes('livevideo.segment.invalid'), true)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.invalid'), false)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.unsupported'), false)
+	})
+
+	it('awaits an async custom continuity validator', async () => {
+		const bytes = withCustomContinuityMethod(loadFixture('test-segment.m4s'))
+
+		const { result } = await validateC2paManifestBoxSegment(bytes, null, undefined, {
+			continuityValidator: {
+				method: CUSTOM_METHOD,
+				validate: async liveVideoAssertion => liveVideoAssertion['sequenceNumber'] === 1,
+			},
+		})
+
+		strictEqual(result.errorCodes.includes('livevideo.segment.invalid'), false)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.invalid'), false)
+	})
+
+	it('does not invoke a validator registered for a different method', async () => {
+		const bytes = withCustomContinuityMethod(loadFixture('test-segment.m4s'))
+		let called = false
+
+		const { result } = await validateC2paManifestBoxSegment(bytes, null, undefined, {
+			continuityValidator: {
+				method: 'com.other.method',
+				validate: () => {
+					called = true
+					return true
+				},
+			},
+		})
+
+		strictEqual(called, false)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.invalid'), true)
+		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.unsupported'), true)
+	})
+
+	it('treats a throwing custom continuity validator as SEGMENT_INVALID', async () => {
+		const bytes = withCustomContinuityMethod(loadFixture('test-segment.m4s'))
+
+		const { result } = await validateC2paManifestBoxSegment(bytes, null, undefined, {
+			continuityValidator: {
+				method: CUSTOM_METHOD,
+				validate: () => {
+					throw new Error('boom')
+				},
+			},
+		})
+
+		strictEqual(result.errorCodes.includes('livevideo.segment.invalid'), true)
+	})
+
+	it('does not invoke the custom validator for the c2pa.manifestId method', async () => {
+		let called = false
+
+		const { result } = await validateC2paManifestBoxSegment(
+			loadFixture('test-segment.m4s'),
+			null,
+			undefined,
+			{
+				continuityValidator: {
+					method: 'c2pa.manifestId',
+					validate: () => {
+						called = true
+						return true
+					},
+				},
+			},
+		)
+
+		strictEqual(called, false)
+		strictEqual(result.continuityMethod, 'c2pa.manifestId')
 	})
 })
 
