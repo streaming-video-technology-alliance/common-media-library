@@ -78,11 +78,23 @@ export const LiveVideoStatusCode: {
     readonly SEGMENT_INVALID: "livevideo.segment.invalid";
     readonly ASSERTION_INVALID: "livevideo.assertion.invalid";
     readonly CONTINUITY_METHOD_INVALID: "livevideo.continuityMethod.invalid";
+    readonly CONTINUITY_METHOD_UNSUPPORTED: "livevideo.continuityMethod.unsupported";
     readonly SESSIONKEY_INVALID: "livevideo.sessionkey.invalid";
 };
 
 // @public
 export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
+
+// @public
+export type ManifestBoxContinuityValidator = (liveVideoAssertion: Readonly<Record<string, unknown>>, manifest: C2paManifest) => boolean | Promise<boolean>;
+
+// @public
+export type ManifestBoxValidationOptions = {
+    readonly continuityValidator?: {
+        readonly method: string;
+        readonly validate: ManifestBoxContinuityValidator;
+    };
+};
 
 // @public
 export type ManifestBoxValidationResult = {
@@ -175,7 +187,7 @@ export type SequenceValidationResult = {
 export function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSegmentValidation>;
 
 // @public
-export function validateC2paManifestBoxSegment(bytes: Uint8Array, lastManifestId: string | null, state?: ManifestBoxValidationState): Promise<{
+export function validateC2paManifestBoxSegment(bytes: Uint8Array, lastManifestId: string | null, state?: ManifestBoxValidationState, options?: ManifestBoxValidationOptions): Promise<{
     readonly result: ManifestBoxValidationResult;
     readonly nextManifestId: string | null;
     readonly nextState: ManifestBoxValidationState;

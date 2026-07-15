@@ -10,13 +10,16 @@ import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import type { InternalManifestData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
-import type { ManifestBoxValidationResult, ManifestBoxValidationState } from './ManifestBoxValidation.ts'
+import type {
+	ManifestBoxValidationOptions,
+	ManifestBoxValidationResult,
+	ManifestBoxValidationState,
+} from './ManifestBoxValidation.ts'
 
 const LIVE_VIDEO_ASSERTION_LABEL = 'c2pa.livevideo.segment'
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
-const SUPPORTED_CONTINUITY_METHODS = new Set([CONTINUITY_METHOD_MANIFEST_ID])
 
 function normalizeManifestId(id: string | null): string | null {
 	if (!id) return null
@@ -37,6 +40,7 @@ type LiveVideoFields = {
 	previousManifestId: string | null
 	streamId: string | null
 	continuityMethod: string | null
+	data: Record<string, unknown>
 }
 
 function parseLiveVideoAssertion(assertions: readonly C2paAssertion[]): LiveVideoFields | null {
@@ -54,6 +58,7 @@ function parseLiveVideoAssertion(assertions: readonly C2paAssertion[]): LiveVide
 		previousManifestId: typeof rawPrev === 'string' ? rawPrev : null,
 		streamId: typeof rawStreamId === 'string' ? rawStreamId : null,
 		continuityMethod: typeof rawContinuity === 'string' ? rawContinuity : null,
+		data: data ?? {},
 	}
 }
 
@@ -118,9 +123,6 @@ function collectErrorCodes(
 	streamIdValid: boolean,
 	sequenceNumberValid: boolean,
 	bmffHashMatches: boolean,
-	continuityMethod: string | null,
-	previousManifestId: string | null,
-	lastManifestId: string | null,
 ): readonly LiveVideoStatusCode[] {
 	const codes = new Set<LiveVideoStatusCode>()
 
@@ -130,19 +132,40 @@ function collectErrorCodes(
 	if (!sequenceNumberValid) codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
 	if (!bmffHashMatches) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
 
-	if (!continuityMethod) {
-		codes.add(LiveVideoStatusCode.CONTINUITY_METHOD_INVALID)
-	} else if (!SUPPORTED_CONTINUITY_METHODS.has(continuityMethod)) {
-		codes.add(LiveVideoStatusCode.CONTINUITY_METHOD_INVALID)
-	} else if (continuityMethod === CONTINUITY_METHOD_MANIFEST_ID) {
-		if (!previousManifestId) {
-			codes.add(LiveVideoStatusCode.CONTINUITY_METHOD_INVALID)
-		} else if (lastManifestId && normalizeManifestId(previousManifestId) !== normalizeManifestId(lastManifestId)) {
-			codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
-		}
+	return [...codes]
+}
+
+// §19.7.2: c2pa.manifestId is validated built-in; a custom method with a
+// registered validator maps its outcome to segment.invalid, and an
+// unrecognized method fails with continuityMethod.invalid plus
+// continuityMethod.unsupported, so consumers can tell an unverifiable
+// method apart from a broken chain.
+async function validateContinuity(
+	parsed: ParsedManifest,
+	lastManifestId: string | null,
+	options?: ManifestBoxValidationOptions,
+): Promise<readonly LiveVideoStatusCode[]> {
+	const { manifest, liveVideo } = parsed
+	const method = liveVideo?.continuityMethod ?? null
+
+	if (!method) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
+
+	if (method === CONTINUITY_METHOD_MANIFEST_ID) {
+		const prev = liveVideo?.previousManifestId ?? null
+		if (!prev) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
+		const broken = !!lastManifestId && normalizeManifestId(prev) !== normalizeManifestId(lastManifestId)
+		return broken ? [LiveVideoStatusCode.SEGMENT_INVALID] : []
 	}
 
-	return [...codes]
+	const custom = options?.continuityValidator
+	if (custom?.method !== method || !manifest || !liveVideo) {
+		return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID, LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED]
+	}
+
+	const ok = await Promise.resolve()
+		.then(() => custom.validate(liveVideo.data, manifest))
+		.catch(() => false)
+	return ok ? [] : [LiveVideoStatusCode.SEGMENT_INVALID]
 }
 
 /**
@@ -153,6 +176,12 @@ function collectErrorCodes(
  * it against the expected hash in the manifest assertion. Checks live-video assertions
  * (sequenceNumber, streamId, continuityMethod) and manifest-ID chain continuity.
  *
+ * Only the spec-defined `c2pa.manifestId` continuity method (§19.3.2) is
+ * validated built-in. Segments declaring an implementer-defined method fail
+ * with `livevideo.continuityMethod.invalid` (§19.7.2) plus
+ * `livevideo.continuityMethod.unsupported`, unless a
+ * validator for that method is registered via `options.continuityValidator`.
+ *
  * This function is **pure** — it does not access any external state. The
  * caller is responsible for persisting `nextManifestId` and `nextState`
  * between calls.
@@ -160,6 +189,7 @@ function collectErrorCodes(
  * @param bytes - Raw segment bytes
  * @param lastManifestId - Manifest ID from the previous segment, or null for the first segment
  * @param state - Optional state from the previous segment for streamId/sequenceNumber checks
+ * @param options - Optional custom continuity method validators
  * @returns Validation result, the manifest ID, and state to persist for the next call
  *
  * @example
@@ -171,6 +201,7 @@ export async function validateC2paManifestBoxSegment(
 	bytes: Uint8Array,
 	lastManifestId: string | null,
 	state?: ManifestBoxValidationState,
+	options?: ManifestBoxValidationOptions,
 ): Promise<{
 	readonly result: ManifestBoxValidationResult
 	readonly nextManifestId: string | null
@@ -200,11 +231,15 @@ export async function validateC2paManifestBoxSegment(
 		bmffHashMatches = hashesEqual(computed, bmff.hashBytes)
 	}
 
-	const liveVideoCodes = collectErrorCodes(
-		manifest !== null, liveVideo !== null,
-		streamIdValid, sequenceNumberValid, bmffHashMatches,
-		continuityMethod, previousManifestId, lastManifestId,
-	)
+	const continuityCodes = await validateContinuity({ manifest, issuer, liveVideo, bmff, internalData }, lastManifestId, options)
+
+	const liveVideoCodes = [...new Set([
+		...collectErrorCodes(
+			manifest !== null, liveVideo !== null,
+			streamIdValid, sequenceNumberValid, bmffHashMatches,
+		),
+		...continuityCodes,
+	])]
 
 	const integrityCodes: readonly C2paStatusCode[] = internalData
 		? await validateManifestIntegrity(
