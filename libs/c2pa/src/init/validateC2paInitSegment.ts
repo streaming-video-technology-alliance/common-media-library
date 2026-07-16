@@ -2,7 +2,7 @@ import { decode } from 'cbor-x/decode'
 import { encode } from 'cbor-x/encode'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import type { C2paAssertion } from '../C2paAssertion.ts'
-import { C2paStatusCode } from '../C2paStatusCode.ts'
+import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
@@ -12,10 +12,8 @@ import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
-import { computeBmffHash } from '../bmff/computeBmffHash.ts'
-import { parseExclusions } from '../bmff/parseExclusions.ts'
-import type { MerkleMap } from '../merkle/MerkleSegmentValidation.ts'
-import { asInteger, bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
+import { validateMerkleMaps } from '../merkle/validateMerkleMaps.ts'
+import { bytesToHex, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
@@ -102,103 +100,6 @@ async function validateBmffHashAssertion(
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
 	return validateBmffHash(bytes, expectedHash, { exclusions, alg })
-}
-
-// --- VOD Merkle: merkle map extraction (§18.6) ---
-
-function toBytesOrNull(value: unknown): Uint8Array | null {
-	try {
-		return normalizeToUint8Array(value)
-	} catch {
-		return null
-	}
-}
-
-function parseMerkleRow(rawHashes: unknown): Uint8Array[] | null {
-	if (!Array.isArray(rawHashes) || rawHashes.length === 0) return null
-	const row: Uint8Array[] = []
-	for (const entry of rawHashes) {
-		const bytes = toBytesOrNull(entry)
-		if (!bytes) return null
-		row.push(bytes)
-	}
-	return row
-}
-
-function extractMerkleMaps(bmffHashAssertionData: Record<string, unknown>): MerkleMap[] | null {
-	const rawMerkle = bmffHashAssertionData['merkle']
-	if (!Array.isArray(rawMerkle) || rawMerkle.length === 0) return null
-
-	const exclusions = parseExclusions(bmffHashAssertionData['exclusions'])
-	const assertionAlg = bmffHashAssertionData['alg']
-	// §18.6.2: no box offset prefix when the assertion carries both `hash` and `merkle`.
-	const offsetPrefixSize = bmffHashAssertionData['hash'] == null ? 8 : 0
-
-	const maps: MerkleMap[] = []
-	for (const entry of rawMerkle) {
-		if (!entry || typeof entry !== 'object') return null
-		const record = entry as Record<string, unknown>
-
-		const uniqueId = asInteger(record['uniqueId'])
-		const localId = asInteger(record['localId'])
-		const count = asInteger(record['count'])
-		const hashes = parseMerkleRow(record['hashes'])
-		if (uniqueId === null || localId === null || count === null || !hashes) return null
-
-		const rawInitHash = record['initHash']
-		const initHash = rawInitHash == null ? null : toBytesOrNull(rawInitHash)
-		if (rawInitHash != null && !initHash) return null
-
-		const rawAlg = record['alg'] ?? assertionAlg
-		maps.push({
-			uniqueId,
-			localId,
-			count,
-			hashes,
-			initHash,
-			alg: typeof rawAlg === 'string' ? normalizeAlgorithmName(rawAlg) : null,
-			exclusions,
-			offsetPrefixSize,
-		})
-	}
-	return maps
-}
-
-// Returns null when the assertion has no `merkle` field, [] when it is malformed.
-async function validateMerkleMaps(
-	bytes: Uint8Array,
-	assertion: C2paAssertion | null,
-	codes: Set<LiveVideoStatusCode | C2paStatusCode>,
-): Promise<MerkleMap[] | null> {
-	const data = assertion?.data
-	if (data === null || typeof data !== 'object' || Array.isArray(data)) return null
-	if ((data as Record<string, unknown>)['merkle'] === undefined) return null
-
-	const merkleMaps = extractMerkleMaps(data as Record<string, unknown>)
-	if (!merkleMaps) {
-		codes.add(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
-		return []
-	}
-
-	const initHashByAlg = new Map<string | null, Uint8Array>()
-	for (const merkleMap of merkleMaps) {
-		if (!merkleMap.initHash) continue
-		let computed = initHashByAlg.get(merkleMap.alg)
-		if (!computed) {
-			computed = await computeBmffHash(bytes, {
-				offsetPrefixSize: merkleMap.offsetPrefixSize,
-				exclusions: merkleMap.exclusions,
-				alg: merkleMap.alg ?? undefined,
-			})
-			initHashByAlg.set(merkleMap.alg, computed)
-		}
-		if (!hashesEqual(computed, merkleMap.initHash)) {
-			codes.add(LiveVideoStatusCode.INIT_INVALID)
-			codes.add(C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH)
-		}
-	}
-
-	return merkleMaps
 }
 
 type SessionKeyFields = {
