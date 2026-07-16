@@ -77,32 +77,21 @@ export const MERKLE_AUX_UUID: readonly number[] = [
 	0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ]
 
-/**
- * Compares a uuid box `usertype` against an expected 16-byte extended type.
- *
- * @internal
- */
+// Compares a uuid box usertype against an expected 16-byte extended type.
+/** @internal */
 export function matchesUuid(usertype: readonly number[], expected: readonly number[]): boolean {
 	return usertype.length === expected.length && expected.every((b, i) => b === usertype[i])
 }
 
-/**
- * Converts CBOR-decoded byte values (`Uint8Array` or `number[]`) to a
- * `Uint8Array`, or `null` when the value has another shape.
- *
- * @internal
- */
+// Converts CBOR-decoded bytes (Uint8Array or number[]) to Uint8Array, or null.
+/** @internal */
 export function toUint8Array(value: unknown): Uint8Array | null {
 	if (value instanceof Uint8Array) return value
 	if (Array.isArray(value)) return new Uint8Array(value as number[])
 	return null
 }
 
-/**
- * Narrows a decoded CBOR value to an integer, or `null` when it is not one.
- *
- * @internal
- */
+/** @internal */
 export function asInteger(value: unknown): number | null {
 	return typeof value === 'number' && Number.isInteger(value) ? value : null
 }
@@ -145,15 +134,8 @@ const FULLBOX_HEADER_SIZE = 4
 const AUX_UUID_OFFSET_SIZE = 8
 const TEXT_DECODER = new TextDecoder()
 
-/**
- * Reads a C2PA uuid box payload prefix — fullbox version/flags followed by a
- * null-terminated purpose string (e.g. `"manifest\0"`, `"merkle\0"`) — and
- * returns the purpose plus the remaining payload bytes.
- *
- * Returns `null` if the payload is too short or the purpose is unterminated.
- *
- * @internal
- */
+// Reads a version/flags + null-terminated purpose prefix, or null if malformed.
+/** @internal */
 export function readUuidBoxPurpose(payload: Uint8Array): { purpose: string; rest: Uint8Array } | null {
 	if (payload.length < FULLBOX_HEADER_SIZE) return null
 

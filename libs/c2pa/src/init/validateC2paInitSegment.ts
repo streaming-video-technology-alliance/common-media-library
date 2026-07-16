@@ -125,20 +125,13 @@ function parseMerkleRow(rawHashes: unknown): Uint8Array[] | null {
 	return row
 }
 
-/**
- * Parses the `merkle` array of a `c2pa.hash.bmff.v3` assertion into one
- * MerkleMap per track. The `exclusions` are taken from the parent assertion
- * data and shared across all tracks; per-entry `alg` overrides the
- * assertion-level `alg`. Returns `null` when `merkle` is not a non-empty
- * array or an entry is missing required fields.
- */
 function extractMerkleMaps(bmffHashAssertionData: Record<string, unknown>): MerkleMap[] | null {
 	const rawMerkle = bmffHashAssertionData['merkle']
 	if (!Array.isArray(rawMerkle) || rawMerkle.length === 0) return null
 
 	const exclusions = parseExclusions(bmffHashAssertionData['exclusions'])
 	const assertionAlg = bmffHashAssertionData['alg']
-	// §18.6.2: the box offset prefix is omitted only when the assertion carries both `hash` and `merkle`.
+	// §18.6.2: no box offset prefix when the assertion carries both `hash` and `merkle`.
 	const offsetPrefixSize = bmffHashAssertionData['hash'] == null ? 8 : 0
 
 	const maps: MerkleMap[] = []
@@ -171,14 +164,7 @@ function extractMerkleMaps(bmffHashAssertionData: Record<string, unknown>): Merk
 	return maps
 }
 
-/**
- * Extracts the merkle maps from the `c2pa.hash.bmff.v3` assertion and
- * validates each entry's `initHash` binding against the raw init segment
- * bytes (§18.6.2); entries without an `initHash` (single-file fMP4) skip the
- * check. Adds error codes to `codes` in place. Returns `null` when the
- * assertion has no `merkle` field (the stream is not in VOD Merkle mode)
- * and `[]` when the field is malformed.
- */
+// Returns null when the assertion has no `merkle` field, [] when it is malformed.
 async function validateMerkleMaps(
 	bytes: Uint8Array,
 	assertion: C2paAssertion | null,
@@ -194,7 +180,6 @@ async function validateMerkleMaps(
 		return []
 	}
 
-	// All entries share exclusions and offsetPrefixSize, so the init hash only varies by alg.
 	const initHashByAlg = new Map<string | null, Uint8Array>()
 	for (const merkleMap of merkleMaps) {
 		if (!merkleMap.initHash) continue
@@ -356,7 +341,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
 
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
-	// VOD Merkle streams carry no session keys — only flag their absence in live mode.
+	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
 	if (sessionKeys.length === 0 && merkleMaps === null) {
 		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	}

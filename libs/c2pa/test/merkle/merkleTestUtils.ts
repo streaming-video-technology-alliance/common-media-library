@@ -39,11 +39,7 @@ async function hashPair(left: Uint8Array, right: Uint8Array): Promise<Uint8Array
 	return sha256(concatBytes(left, right))
 }
 
-/**
- * Builds all levels of a balanced binary Merkle tree, leaf level first.
- * `null` entries are rightmost padding; a node with a null sibling is
- * promoted unchanged to the next level.
- */
+// Builds all levels of the tree, leaf level first; null entries are rightmost padding.
 export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(Uint8Array | null)[][]> {
 	const depth = leaves.length > 1 ? Math.ceil(Math.log2(leaves.length)) : 0
 	const level: (Uint8Array | null)[] = [...leaves]
@@ -64,12 +60,12 @@ export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(U
 	return levels
 }
 
-/** Merkle row as stored in the manifest: the level's nodes with null padding excluded. */
+// Row as stored in the manifest: the level's nodes with null padding excluded.
 export function manifestRow(levels: readonly (readonly (Uint8Array | null)[])[], level: number): Uint8Array[] {
 	return (levels[level] ?? []).filter((node): node is Uint8Array => node !== null)
 }
 
-/** Sibling proof path for a leaf, from level 0 up to (excluding) the committed level. */
+// Sibling proof path for a leaf, up to (excluding) the committed level.
 export function buildProofPath(
 	levels: readonly (readonly (Uint8Array | null)[])[],
 	leafIndex: number,
@@ -94,7 +90,7 @@ export type AuxBoxFields = {
 	hashes?: readonly (Uint8Array | null)[]
 }
 
-/** Builds the §A.5.4 auxiliary C2PA uuid box carrying a CBOR bmff-merkle-map. */
+// §A.5.4 aux box: CBOR { box_purpose, data }.
 export function buildMerkleAuxBox(fields: AuxBoxFields, useIntegerKeys = true): Uint8Array {
 	const map = useIntegerKeys
 		? new Map<number, unknown>([[1, fields.uniqueId], [2, fields.localId], [3, fields.location]])
@@ -107,11 +103,7 @@ export function buildMerkleAuxBox(fields: AuxBoxFields, useIntegerKeys = true): 
 	return buildUuidBox(MERKLE_AUX_UUID, payload)
 }
 
-/**
- * Builds the auxiliary box in the JUMBF on-disk format: `uuid` box with the
- * ContentProvenanceBox UUID, version/flags, null-terminated `"merkle"` purpose,
- * then the raw bmff-merkle-map CBOR with named string keys.
- */
+// JUMBF aux box: version/flags + "merkle\0" + CBOR with string keys.
 export function buildJumbfMerkleAuxBox(fields: AuxBoxFields): Uint8Array {
 	const map: Record<string, unknown> = {
 		uniqueId: fields.uniqueId,
@@ -126,7 +118,6 @@ export function buildJumbfMerkleAuxBox(fields: AuxBoxFields): Uint8Array {
 	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encode(map) as Uint8Array))
 }
 
-/** Media content whose bytes feed the leaf hash: moof + mdat with distinct payload. */
 export function buildMediaContent(seed: number): Uint8Array {
 	return concatBytes(buildBox('moof'), buildBox('mdat', new Uint8Array([seed, seed + 1, seed + 2])))
 }
@@ -145,16 +136,12 @@ function buildJumb(label: string, ...content: readonly Uint8Array[]): Uint8Array
 	return buildBox('jumb', concatBytes(buildJumd(label), ...content))
 }
 
-/** ftyp + moov pair used as the init segment's media boxes. */
 export function buildInitMediaBoxes(): Uint8Array {
 	return concatBytes(buildBox('ftyp', TEXT_ENCODER.encode('isom')), buildBox('moov'))
 }
 
-/**
- * Builds a synthetic unsigned init segment whose JUMBF manifest carries a
- * `c2pa.hash.bmff.v3` assertion with the given data. The signature box is
- * omitted, so integrity checks skip signature verification.
- */
+// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
+// so integrity checks skip signature verification.
 export function buildMerkleInitSegment(assertionData: Record<string, unknown>): Uint8Array {
 	const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encode(assertionData) as Uint8Array))
 	const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)

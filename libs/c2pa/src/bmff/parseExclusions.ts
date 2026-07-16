@@ -16,14 +16,7 @@ function parseConstraints(rawConstraints: unknown): BmffHashConstraint[] {
 }
 
 /**
- * Parses the `exclusions` array of a `c2pa.hash.bmff.v3` assertion into
- * {@link BmffHashExclusion} entries. Entries without a string `xpath` are
- * skipped; byte-level `data` constraints are preserved when present.
- *
- * Shared by the manifest-box (PSM) and VOD Merkle validation paths.
- *
- * @param rawExclusions - The raw `exclusions` value from the assertion data
- * @returns Parsed exclusion list (empty when the input is not an array)
+ * Parses the `exclusions` array of a `c2pa.hash.bmff.v3` assertion.
  *
  * @internal
  */

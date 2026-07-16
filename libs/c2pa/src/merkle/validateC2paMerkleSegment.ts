@@ -15,7 +15,7 @@ const MERKLE_BOX_PURPOSE = 'merkle'
 
 type AuxPayload = Uint8Array | 'other' | 'malformed'
 
-// §A.5.4 format: the box payload is a CBOR map { box_purpose: string, data: bstr }.
+// §A.5.4 format: CBOR map { box_purpose, data }.
 function readSpecAuxPayload(rawPayload: Uint8Array): AuxPayload {
 	let decoded: unknown
 	try {
@@ -29,24 +29,13 @@ function readSpecAuxPayload(rawPayload: Uint8Array): AuxPayload {
 	return toUint8Array(record['data']) ?? 'malformed'
 }
 
-// JUMBF format: version/flags(4) + null-terminated purpose + raw bmff-merkle-map CBOR.
+// JUMBF format: version/flags + null-terminated purpose + CBOR.
 function readJumbfAuxPayload(rawPayload: Uint8Array): AuxPayload {
 	const prefix = readUuidBoxPurpose(rawPayload)
 	if (!prefix || prefix.purpose !== MERKLE_BOX_PURPOSE) return 'other'
 	return prefix.rest
 }
 
-/**
- * Scans a media segment's top-level BMFF boxes for auxiliary C2PA `uuid`
- * boxes carrying a `bmff-merkle-map`, returning each box's raw CBOR payload
- * (one per track). Supports both on-disk formats:
- *
- * - §A.5.4: dedicated extended type, CBOR `{ box_purpose, data }` wrapper
- * - JUMBF: ContentProvenanceBox UUID, `version/flags + "merkle\0" + CBOR`
- *
- * A matching box that cannot be decoded sets `malformed`; boxes with other
- * purposes or UUIDs are ignored.
- */
 function extractMerkleAuxBoxes(segmentBytes: Uint8Array): { payloads: Uint8Array[]; malformed: boolean } {
 	const payloads: Uint8Array[] = []
 	let malformed = false
@@ -70,16 +59,15 @@ function extractMerkleAuxBoxes(segmentBytes: Uint8Array): { payloads: Uint8Array
 
 // --- bmff-merkle-map decoding ---
 
-// Decoded bmff-merkle-map payload from a segment's auxiliary uuid box (§18.6).
 type BmffMerkleMapSegment = {
 	readonly uniqueId: number
 	readonly localId: number
 	readonly location: number
-	/** Sibling proof path, bottom-up; null entries are padding nodes. Null = leaf row in manifest. */
+	/** Sibling proof path; null when the manifest stores the leaf row */
 	readonly hashes: readonly (Uint8Array | null)[] | null
 }
 
-// CBOR integer keys per the §18.6 bmff-merkle-map schema; string keys are accepted as a fallback.
+// §18.6 integer keys; string keys accepted as fallback.
 const KEY_UNIQUE_ID = 1
 const KEY_LOCAL_ID = 2
 const KEY_LOCATION = 3
@@ -91,12 +79,6 @@ function readMapField(map: unknown, intKey: number, name: string): unknown {
 	return record[intKey] ?? record[name]
 }
 
-/**
- * Decodes the CBOR `bmff-merkle-map` from an auxiliary box payload. Null
- * entries in `hashes` are preserved — they mark padding nodes whose sibling
- * must not be mixed into the proof traversal. Returns `null` when the payload
- * cannot be decoded or a required field is missing.
- */
 function parseBmffMerkleMap(payload: Uint8Array): BmffMerkleMapSegment | null {
 	let decoded: unknown
 	try {
@@ -137,7 +119,7 @@ async function hashPair(left: Uint8Array, right: Uint8Array, alg: string): Promi
 	return new Uint8Array(await crypto.subtle.digest(alg, input))
 }
 
-// Layer sizes of the balanced binary tree, leaf level first (e.g. 61 → [61, 31, 16, 8, 4, 2, 1]).
+// Layer sizes, leaf level first (61 → [61, 31, 16, 8, 4, 2, 1]).
 function treeLayout(leafCount: number): number[] {
 	const layers = [leafCount]
 	while (layers[layers.length - 1] > 1) {
@@ -146,18 +128,7 @@ function treeLayout(leafCount: number): number[] {
 	return layers
 }
 
-/**
- * Verifies a Merkle proof path against the row stored in the merkle map
- * (§15.12.2.2).
- *
- * Traverses the balanced binary tree from the leaf upward, applying sibling
- * hashes level by level (`H(left || right)`), and stops at the level whose
- * layer size equals the manifest row length. A node whose sibling index falls
- * outside its layer (rightmost orphan) is promoted unchanged without
- * consuming a proof entry — proofs carry only present siblings, though null
- * placeholders (§A.5.4 style) are tolerated and skipped. An empty proof with
- * the leaf row stored in the manifest degenerates to a direct compare.
- */
+// §15.12.2.2: hash from the leaf up to the layer matching the manifest row length.
 async function verifyMerkleProof(
 	leafHash: Uint8Array,
 	location: number,
@@ -220,7 +191,6 @@ type LeafHashCache = {
 	hash: Uint8Array
 }[]
 
-/** Computes the segment's leaf hash, reusing a prior result when the hash parameters match (tracks usually share them). */
 async function computeLeafHash(
 	segmentBytes: Uint8Array,
 	merkleMap: MerkleMap,
@@ -251,26 +221,12 @@ async function computeLeafHash(
  * Validates a fragmented MP4 VOD media segment against the merkle maps from
  * the init manifest (C2PA §15.12.2.2).
  *
- * Extracts each track's auxiliary `uuid` box, decodes its `bmff-merkle-map`,
- * computes the segment's leaf hash (all bytes except the exclusion list,
- * with per-box offset prefixes per §18.6.2 when the assertion is
- * merkle-only), and verifies the Merkle proof path against the tree row
- * stored in the matching merkle map. All tracks must pass; error codes from
- * all tracks are accumulated.
- *
- * `location` continuity is enforced across successive calls via `state`:
- * during sequential playback each track's `location` must increment by 1
- * (§15.12.2) — replays, reorders, and gaps flag a discontinuity. Only
- * segments whose proof verifies advance the continuity baseline. The first
- * segment (no prior state) is exempt — callers reset the state after a seek
- * by passing `undefined`.
- *
  * This function is **pure** — the caller persists `nextState` between calls.
  *
  * @param segmentBytes - Raw media segment bytes
  * @param merkleMaps - Merkle maps from `validateC2paInitSegment`
- * @param state - Continuity state from the previous call, or `undefined` for the first segment
- * @returns Validation result and state for the next call, or `null` when `merkleMaps` is empty (stream is not in VOD Merkle mode)
+ * @param state - Continuity state from the previous call; reset after a seek
+ * @returns Validation result and next state, or `null` when `merkleMaps` is empty
  *
  * @example
  * {@includeCode ../../test/merkle/validateC2paMerkleSegment.test.ts#example}
@@ -314,8 +270,7 @@ export async function validateC2paMerkleSegment(
 
 		if (location === null) location = segmentMap.location
 
-		// §15.12.2: during sequential playback each track's location must
-		// increment by 1. Replays, reorders, and gaps all break the sequence.
+		// §15.12.2: each track's location must increment by 1 during sequential playback.
 		const trackKey = `${segmentMap.uniqueId}:${segmentMap.localId}`
 		const lastLocation = previousLocations.get(trackKey)
 		if (lastLocation !== undefined && segmentMap.location !== lastLocation + 1) {
