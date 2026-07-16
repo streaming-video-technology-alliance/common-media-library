@@ -218,15 +218,9 @@ async function computeLeafHash(
 }
 
 /**
- * Validates a fragmented MP4 VOD media segment against the merkle maps from
- * the init manifest (C2PA §15.12.2.2).
- *
- * This function is **pure** — the caller persists `nextState` between calls.
- *
- * @param segmentBytes - Raw media segment bytes
- * @param merkleMaps - Merkle maps from `validateC2paInitSegment`
- * @param state - Continuity state from the previous call; reset after a seek
- * @returns Validation result and next state, or `null` when `merkleMaps` is empty
+ * Validates a fragmented MP4 VOD media segment against the init manifest's
+ * merkle maps (§15.12.2.2). Pure: the caller persists `nextState` and resets
+ * `state` after a seek. Returns `null` when `merkleMaps` is empty.
  *
  * @example
  * {@includeCode ../../test/merkle/validateC2paMerkleSegment.test.ts#example}
