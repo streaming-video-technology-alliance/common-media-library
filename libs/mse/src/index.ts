@@ -3,3 +3,4 @@
  *
  * @packageDocumentation
  */
+export * from './AsyncSourceBuffer.ts'
