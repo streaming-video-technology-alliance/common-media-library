@@ -11,10 +11,6 @@ function loadFixture(name: string): Uint8Array {
 	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
 }
 
-// Rewrites the fixture's continuityMethod from 'c2pa.manifestId' to a
-// same-length custom label. This invalidates the assertion's hashed URI
-// (integrity codes will appear), but continuity codes are asserted on
-// independently.
 function withCustomContinuityMethod(bytes: Uint8Array): Uint8Array {
 	const patched = new Uint8Array(bytes)
 	const needle = new TextEncoder().encode('c2pa.manifestId')

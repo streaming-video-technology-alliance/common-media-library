@@ -135,11 +135,6 @@ function collectErrorCodes(
 	return [...codes]
 }
 
-// §19.7.2: c2pa.manifestId is validated built-in; a custom method with a
-// registered validator maps its outcome to segment.invalid, and an
-// unrecognized method fails with continuityMethod.invalid plus
-// continuityMethod.unsupported, so consumers can tell an unverifiable
-// method apart from a broken chain.
 async function validateContinuity(
 	parsed: ParsedManifest,
 	lastManifestId: string | null,
@@ -175,12 +170,8 @@ async function validateContinuity(
  * Recomputes the `c2pa.hash.bmff.v3` content hash from the raw segment bytes and compares
  * it against the expected hash in the manifest assertion. Checks live-video assertions
  * (sequenceNumber, streamId, continuityMethod) and manifest-ID chain continuity.
- *
- * Only the spec-defined `c2pa.manifestId` continuity method (§19.3.2) is
- * validated built-in. Segments declaring an implementer-defined method fail
- * with `livevideo.continuityMethod.invalid` (§19.7.2) plus
- * `livevideo.continuityMethod.unsupported`, unless a
- * validator for that method is registered via `options.continuityValidator`.
+ * A validator for an implementer-defined continuity method can be registered
+ * via {@link ManifestBoxValidationOptions}.
  *
  * This function is **pure** — it does not access any external state. The
  * caller is responsible for persisting `nextManifestId` and `nextState`
@@ -189,7 +180,7 @@ async function validateContinuity(
  * @param bytes - Raw segment bytes
  * @param lastManifestId - Manifest ID from the previous segment, or null for the first segment
  * @param state - Optional state from the previous segment for streamId/sequenceNumber checks
- * @param options - Optional custom continuity method validators
+ * @param options - Optional custom continuity method validator
  * @returns Validation result, the manifest ID, and state to persist for the next call
  *
  * @example

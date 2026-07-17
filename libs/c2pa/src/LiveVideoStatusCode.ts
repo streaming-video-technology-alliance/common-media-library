@@ -25,7 +25,7 @@ export const LiveVideoStatusCode = {
 	ASSERTION_INVALID: 'livevideo.assertion.invalid',
 	/** continuityMethod absent, unsupported, or companion fields incorrect (§19.7.2) */
 	CONTINUITY_METHOD_INVALID: 'livevideo.continuityMethod.invalid',
-	/** Custom continuityMethod this validator cannot verify; accompanies CONTINUITY_METHOD_INVALID, which alone covers absent/malformed methods */
+	/** Custom continuityMethod with no registered validator (§19.7.2) */
 	CONTINUITY_METHOD_UNSUPPORTED: 'livevideo.continuityMethod.unsupported',
 	/** Session key invalid: signerBinding failed or required fields absent (§19.7.3) */
 	SESSIONKEY_INVALID: 'livevideo.sessionkey.invalid',
