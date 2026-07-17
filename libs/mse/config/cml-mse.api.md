@@ -4,6 +4,23 @@
 
 ```ts
 
+// @public
+export class AsyncSourceBuffer {
+    constructor(sourceBuffer: SourceBuffer);
+    abort(clearQueue?: boolean): void;
+    appendBuffer(data: BufferSource): Promise<boolean>;
+    appendWindowEnd(value: number): Promise<boolean>;
+    appendWindowStart(value: number): Promise<boolean>;
+    get buffered(): TimeRanges;
+    changeType(type: string): Promise<boolean>;
+    clear(clearQueue?: boolean): Promise<boolean>;
+    clearQueue(): void;
+    mode(value: AppendMode): Promise<boolean>;
+    release(): void;
+    remove(start: number, end: number): Promise<boolean>;
+    timestampOffset(value: number): Promise<boolean>;
+}
+
 // (No @packageDocumentation comment for this package)
 
 ```

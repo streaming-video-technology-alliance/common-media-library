@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-mse",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Media Source Extensions (MSE) utilities",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -34,7 +34,8 @@
 		"Common Media Library",
 		"CML",
 		"Media Source Extensions",
-		"MSE"
+		"MSE",
+		"SourceBuffer"
 	],
 	"scripts": {
 		"build": "node ../../scripts/build.ts",
