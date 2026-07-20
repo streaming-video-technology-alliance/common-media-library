@@ -234,6 +234,49 @@ describe('validateC2paMerkleSegment', () => {
 		notStrictEqual(skipped.result.errorCodes.includes('assertion.bmffHash.mismatch'), true)
 	})
 
+	it('resyncs continuity after a gap: the next proof-verified location becomes the new baseline', async () => {
+		const count = 4
+		const contents = Array.from({ length: count }, (_, i) => buildMediaContent(i * 10))
+		const leafHashes = await Promise.all(
+			contents.map(c => computeBmffHash(c, { offsetPrefixSize: 8, exclusions: EXCLUSIONS })),
+		)
+		const gapLevels = await buildTreeLevels(leafHashes)
+		const depth = gapLevels.length - 1
+		const gapMaps: MerkleMap[] = [{
+			uniqueId: UNIQUE_ID,
+			localId: 1,
+			count,
+			hashes: manifestRow(gapLevels, depth),
+			initHash: null,
+			alg: 'SHA-256',
+			exclusions: EXCLUSIONS,
+			offsetPrefixSize: 8,
+		}]
+		function gapSegment(location: number): Uint8Array {
+			return concatBytes(
+				buildMediaContent(location * 10),
+				buildMerkleAuxBox({
+					uniqueId: UNIQUE_ID,
+					localId: 1,
+					location,
+					hashes: buildProofPath(gapLevels, location, depth),
+				}),
+			)
+		}
+
+		const first = await validateC2paMerkleSegment(gapSegment(0), gapMaps)
+		strictEqual(first.result.isValid, true)
+
+		// Skips location 1: flagged as a discontinuity, but its proof still verifies,
+		// so it becomes the new baseline instead of leaving state frozen at 0.
+		const skipped = await validateC2paMerkleSegment(gapSegment(2), gapMaps, first.nextState)
+		strictEqual(skipped.result.isValid, false)
+		ok(skipped.result.errorCodes.includes('livevideo.assertion.invalid'))
+
+		const resynced = await validateC2paMerkleSegment(gapSegment(3), gapMaps, skipped.nextState)
+		strictEqual(resynced.result.isValid, true)
+	})
+
 	it('flags a repeated or lower location as a discontinuity (replay/reorder)', async () => {
 		const first = await validateC2paMerkleSegment(segments[1], merkleMaps)
 

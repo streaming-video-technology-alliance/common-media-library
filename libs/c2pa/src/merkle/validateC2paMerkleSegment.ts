@@ -270,7 +270,10 @@ export async function validateC2paMerkleSegment(
 		if (bmffHashHex === null) bmffHashHex = bytesToHex(leafHash)
 		const proofResult = await verifyMerkleProof(leafHash, segmentMap.location, segmentMap.hashes, merkleMap)
 		if (proofResult === 'ok') {
-			if (locationValid) nextLocations.set(trackKey, segmentMap.location)
+			// Advance on any proof-verified location, even a discontinuous one: it's
+			// genuinely signed content, so it resyncs continuity checking after a gap
+			// instead of leaving every later segment flagged relative to a stale baseline.
+			nextLocations.set(trackKey, segmentMap.location)
 		} else {
 			codes.add(proofResult)
 		}
