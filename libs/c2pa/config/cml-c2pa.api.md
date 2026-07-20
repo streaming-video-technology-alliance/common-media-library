@@ -7,6 +7,18 @@
 import { ValueOf } from '@svta/cml-utils';
 
 // @public
+export type BmffHashConstraint = {
+    readonly offset: number;
+    readonly value: Uint8Array | readonly number[];
+};
+
+// @public
+export type BmffHashExclusion = {
+    readonly xpath: string;
+    readonly data?: readonly BmffHashConstraint[];
+};
+
+// @public
 export type C2paAssertion = {
     readonly label: string;
     readonly data: unknown;
@@ -99,13 +111,7 @@ export type MerkleMap = {
     readonly hashes: readonly Uint8Array[];
     readonly initHash: Uint8Array | null;
     readonly alg: string | null;
-    readonly exclusions: readonly {
-        readonly xpath: string;
-        readonly data?: readonly {
-            readonly offset: number;
-            readonly value: Uint8Array | readonly number[];
-        }[];
-    }[];
+    readonly exclusions: readonly BmffHashExclusion[];
     readonly offsetPrefixSize: number;
 };
 

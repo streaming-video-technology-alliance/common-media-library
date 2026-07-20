@@ -1,3 +1,4 @@
+import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 
@@ -13,13 +14,7 @@ export type MerkleMap = {
 	readonly hashes: readonly Uint8Array[]
 	readonly initHash: Uint8Array | null
 	readonly alg: string | null
-	readonly exclusions: readonly {
-		readonly xpath: string
-		readonly data?: readonly {
-			readonly offset: number
-			readonly value: Uint8Array | readonly number[]
-		}[]
-	}[]
+	readonly exclusions: readonly BmffHashExclusion[]
 	readonly offsetPrefixSize: number
 }
 
