@@ -270,7 +270,8 @@ export async function validateC2paMerkleSegment(
 		// §15.12.2: each track's location must increment by 1 during sequential playback.
 		const trackKey = `${segmentMap.uniqueId}:${segmentMap.localId}`
 		const lastLocation = previousLocations.get(trackKey)
-		if (lastLocation !== undefined && segmentMap.location !== lastLocation + 1) {
+		const locationValid = lastLocation === undefined || segmentMap.location === lastLocation + 1
+		if (!locationValid) {
 			codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
 		}
 
@@ -278,7 +279,7 @@ export async function validateC2paMerkleSegment(
 		if (bmffHashHex === null) bmffHashHex = bytesToHex(leafHash)
 		const proofResult = await verifyMerkleProof(leafHash, segmentMap.location, segmentMap.hashes, merkleMap)
 		if (proofResult === 'ok') {
-			nextLocations.set(trackKey, segmentMap.location)
+			if (locationValid) nextLocations.set(trackKey, segmentMap.location)
 		} else {
 			codes.add(proofResult)
 		}
