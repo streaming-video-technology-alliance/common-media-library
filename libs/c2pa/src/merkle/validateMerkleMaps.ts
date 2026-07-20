@@ -41,8 +41,10 @@ function extractMerkleMaps(bmffHashAssertionData: Record<string, unknown>): Merk
 		const initHash = toUint8Array(record['initHash'])
 		if (!initHash) return null
 
-		// §A.5.4.2/merkle-map CDDL: no default when alg is absent from both this
-		// entry and the enclosing assertion; the structure is invalid.
+		// §A.5.4.2/merkle-map CDDL: falls back from this entry to the enclosing
+		// assertion, then to the Claim's alg (not plumbed through here; c2pa-rs
+		// always writes an assertion-level alg, so this is theoretical), or else
+		// the structure is invalid.
 		const rawAlg = record['alg'] ?? assertionAlg
 		if (typeof rawAlg !== 'string') return null
 

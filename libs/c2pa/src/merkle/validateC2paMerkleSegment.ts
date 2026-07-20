@@ -13,7 +13,7 @@ const MERKLE_BOX_PURPOSE = 'merkle'
 
 // --- Auxiliary uuid box extraction ---
 
-type AuxPayload = Uint8Array | 'other' | 'malformed'
+type AuxPayload = Uint8Array | 'other'
 
 // §A.5.1.2/A.5.4.1.4: version/flags + null-terminated box_purpose + raw data.
 function readAuxPayload(rawPayload: Uint8Array): AuxPayload {
@@ -22,9 +22,8 @@ function readAuxPayload(rawPayload: Uint8Array): AuxPayload {
 	return prefix.rest
 }
 
-function extractMerkleAuxBoxes(segmentBytes: Uint8Array): { payloads: Uint8Array[]; malformed: boolean } {
+function extractMerkleAuxBoxes(segmentBytes: Uint8Array): Uint8Array[] {
 	const payloads: Uint8Array[] = []
-	let malformed = false
 
 	for (const box of readIsoBoxes(segmentBytes)) {
 		const uuidBox = box as unknown as UuidParsedBox
@@ -34,11 +33,10 @@ function extractMerkleAuxBoxes(segmentBytes: Uint8Array): { payloads: Uint8Array
 
 		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
 		const payload = readAuxPayload(rawPayload)
-		if (payload === 'malformed') malformed = true
-		else if (payload !== 'other') payloads.push(payload)
+		if (payload !== 'other') payloads.push(payload)
 	}
 
-	return { payloads, malformed }
+	return payloads
 }
 
 // --- bmff-merkle-map decoding ---
@@ -238,8 +236,8 @@ export async function validateC2paMerkleSegment(
 	let location: number | null = null
 	let bmffHashHex: string | null = null
 
-	const { payloads, malformed } = extractMerkleAuxBoxes(segmentBytes)
-	if (malformed || payloads.length === 0) {
+	const payloads = extractMerkleAuxBoxes(segmentBytes)
+	if (payloads.length === 0) {
 		codes.add(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
 	}
 
