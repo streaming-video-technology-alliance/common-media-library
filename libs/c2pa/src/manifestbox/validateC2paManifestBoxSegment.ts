@@ -3,8 +3,8 @@ import type { C2paManifest } from '../C2paManifest.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { bytesToHex, normalizeAlgorithmName } from '../utils.ts'
-import { validateBmffHash } from '../bmff/validateBmffHash.ts'
+import { bytesToHex, hashesEqual, normalizeAlgorithmName } from '../utils.ts'
+import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import type { BmffHashConstraint, BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import type { InternalManifestData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
@@ -224,10 +224,14 @@ export async function validateC2paManifestBoxSegment(
 
 	let bmffHashMatches = true
 	if (bmff.hashBytes !== null) {
-		bmffHashMatches = await validateBmffHash(bytes, bmff.hashBytes, {
+		// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
+		// box; only Merkle tree hashes may omit the 8-byte offset prefix.
+		const computed = await computeBmffHash(bytes, {
 			exclusions: bmff.exclusions,
 			alg: bmff.alg ?? undefined,
+			offsetPrefixSize: 8,
 		})
+		bmffHashMatches = hashesEqual(computed, bmff.hashBytes)
 	}
 
 	const liveVideoCodes = collectErrorCodes(
