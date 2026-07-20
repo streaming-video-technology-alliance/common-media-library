@@ -22,10 +22,15 @@ export type MerkleMap = {
  * Continuity state carried between calls to `validateC2paMerkleSegment`.
  * Reset (pass `undefined`) after a seek.
  *
+ * `lastLocations` is keyed by `${uniqueId}:${localId}`, matching the
+ * `MerkleMap` fields of the track it tracks. The first location seen for a
+ * key is always accepted (no prior state to compare against), so a caller
+ * that needs strict start-at-zero enforcement must seed this map itself.
+ *
  * @public
  */
 export type MerkleSegmentState = {
-	readonly lastLocation: ReadonlyMap<string, number>
+	readonly lastLocations: ReadonlyMap<string, number>
 }
 
 /**

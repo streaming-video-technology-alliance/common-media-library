@@ -229,7 +229,7 @@ export async function validateC2paMerkleSegment(
 } | null> {
 	if (merkleMaps.length === 0) return null
 
-	const previousLocations = state?.lastLocation ?? new Map<string, number>()
+	const previousLocations = state?.lastLocations ?? new Map<string, number>()
 	const nextLocations = new Map(previousLocations)
 	const codes = new Set<MerkleValidationCode>()
 	const leafHashCache: LeafHashCache = []
@@ -281,6 +281,6 @@ export async function validateC2paMerkleSegment(
 			isValid: codes.size === 0,
 			errorCodes: [...codes],
 		},
-		nextState: { lastLocation: nextLocations },
+		nextState: { lastLocations: nextLocations },
 	}
 }

@@ -117,7 +117,7 @@ export type MerkleMap = {
 
 // @public
 export type MerkleSegmentState = {
-    readonly lastLocation: ReadonlyMap<string, number>;
+    readonly lastLocations: ReadonlyMap<string, number>;
 };
 
 // @public
