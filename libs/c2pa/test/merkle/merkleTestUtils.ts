@@ -91,7 +91,9 @@ export type AuxBoxFields = {
 }
 
 // §A.5.1.2/A.5.4.1.4 aux box: version/flags + purpose\0 + CBOR with string keys.
-export function buildMerkleAuxBox(fields: AuxBoxFields, purpose = MERKLE_BOX_PURPOSE): Uint8Array {
+// `paddingBytes` simulates the fixed-size padding §A.5.4.1.4 requires when
+// multiple boxes for one Merkle tree share a file.
+export function buildMerkleAuxBox(fields: AuxBoxFields, purpose: string = MERKLE_BOX_PURPOSE, paddingBytes: number = 0): Uint8Array {
 	const map: Record<string, unknown> = {
 		uniqueId: fields.uniqueId,
 		localId: fields.localId,
@@ -102,11 +104,11 @@ export function buildMerkleAuxBox(fields: AuxBoxFields, purpose = MERKLE_BOX_PUR
 	const purposeBytes = TEXT_ENCODER.encode(purpose)
 	const prefix = new Uint8Array(4 + purposeBytes.length + 1) // version/flags + purpose\0
 	prefix.set(purposeBytes, 4)
-	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encode(map) as Uint8Array))
+	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encode(map) as Uint8Array, new Uint8Array(paddingBytes)))
 }
 
 // Aux box with the right prefix but undecodable CBOR data, for malformed-payload tests.
-export function buildMalformedMerkleAuxBox(purpose = MERKLE_BOX_PURPOSE): Uint8Array {
+export function buildMalformedMerkleAuxBox(purpose: string = MERKLE_BOX_PURPOSE): Uint8Array {
 	const purposeBytes = TEXT_ENCODER.encode(purpose)
 	const prefix = new Uint8Array(4 + purposeBytes.length + 1)
 	prefix.set(purposeBytes, 4)

@@ -112,6 +112,22 @@ describe('validateC2paMerkleSegment', () => {
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
 	})
 
+	it('tolerates the fixed-size padding required when a tree has multiple aux boxes (§A.5.4.1.4)', async () => {
+		const segment = concatBytes(
+			buildMediaContent(0),
+			buildMerkleAuxBox(
+				{ uniqueId: UNIQUE_ID, localId: 1, location: 0, hashes: buildProofPath(levels, 0, TREE_DEPTH) },
+				'merkle',
+				16,
+			),
+		)
+
+		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
+
+		ok(validated)
+		strictEqual(validated.result.isValid, true)
+	})
+
 	it('rejects an auxiliary box with undecodable CBOR as malformed', async () => {
 		const segment = concatBytes(buildMediaContent(0), buildMalformedMerkleAuxBox())
 

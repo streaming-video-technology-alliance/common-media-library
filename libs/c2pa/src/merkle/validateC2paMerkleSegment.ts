@@ -1,5 +1,5 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
-import { decode } from 'cbor-x/decode'
+import { decodeMultiple } from 'cbor-x/decode'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
@@ -56,14 +56,26 @@ function readMapField(map: unknown, name: string): unknown {
 	return (map as Record<string, unknown>)[name]
 }
 
-function parseBmffMerkleMap(payload: Uint8Array): BmffMerkleMapSegment | null {
-	let decoded: unknown
+// §A.5.4.1.4: multiple merkle boxes for one tree are padded to a fixed size,
+// so trailing bytes after the CBOR item are expected and not part of the data.
+function decodeFirstCbor(payload: Uint8Array): unknown {
+	let first: unknown
+	let found = false
 	try {
-		decoded = decode(payload)
+		decodeMultiple(payload, value => {
+			first = value
+			found = true
+			return false
+		})
 	} catch {
-		return null
+		return undefined
 	}
-	if (decoded === null || typeof decoded !== 'object') return null
+	return found ? first : undefined
+}
+
+function parseBmffMerkleMap(payload: Uint8Array): BmffMerkleMapSegment | null {
+	const decoded = decodeFirstCbor(payload)
+	if (decoded === null || decoded === undefined || typeof decoded !== 'object') return null
 
 	const uniqueId = asInteger(readMapField(decoded, 'uniqueId'))
 	const localId = asInteger(readMapField(decoded, 'localId'))
