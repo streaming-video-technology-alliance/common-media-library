@@ -6,13 +6,13 @@ import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
-import { validateBmffHash } from '../bmff/validateBmffHash.ts'
+import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
-import { bytesToHex, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
+import { bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
@@ -98,7 +98,10 @@ async function validateBmffHashAssertion(
 		rawHash instanceof Uint8Array ? rawHash : new Uint8Array(rawHash as number[])
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
-	return validateBmffHash(bytes, expectedHash, { exclusions, alg })
+	// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
+	// box; only Merkle tree hashes may omit the 8-byte offset prefix.
+	const computed = await computeBmffHash(bytes, { exclusions, alg, offsetPrefixSize: 8 })
+	return hashesEqual(computed, expectedHash)
 }
 
 type SessionKeyFields = {
