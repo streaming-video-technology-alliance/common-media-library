@@ -141,13 +141,14 @@ async function verifyMerkleProof(
 	}
 
 	const layers = treeLayout(count)
-	if (!layers.includes(manifestRow.length)) {
+	const committedLevel = layers.indexOf(manifestRow.length)
+	if (committedLevel === -1) {
 		return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	}
 
-	const treeDepth = layers.length - 1
-	const path = (proofPath ?? []).filter((node): node is Uint8Array => node !== null)
-	if (path.length > treeDepth) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
+	const rawPath = proofPath ?? []
+	if (rawPath.length > committedLevel) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
+	const path = rawPath.filter((node): node is Uint8Array => node !== null)
 
 	const alg = normalizeAlgorithmName(merkleMap.alg ?? undefined)
 
@@ -168,6 +169,8 @@ async function verifyMerkleProof(
 		}
 		currentIndex = Math.floor(currentIndex / 2)
 	}
+
+	if (proofIndex !== path.length) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 
 	const expected = manifestRow[currentIndex]
 	if (!expected) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
