@@ -81,9 +81,13 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_MISSING` | `assertion.missing` | Referenced assertion not found in the assertion store |
 | `ASSERTION_ACTION_INGREDIENT_MISMATCH` | `assertion.action.ingredientMismatch` | Action requires an ingredient reference but none is present |
 | `CLAIM_SIGNATURE_MISMATCH` | `claim.signature.mismatch` | Claim signature verification failed |
+| `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
+| `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 
 > [!NOTE]
 > `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes` (which perform manifest integrity checks). They do not appear in `SegmentValidationResult.errorCodes` — the VSI/EMSG segment validation uses only `LiveVideoStatusCode`.
+>
+> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates each entry's `initHash` binding; `LiveVideoStatusCode.SESSIONKEY_INVALID` is not reported when `merkleMaps` is non-empty, since VOD Merkle segments don't use session keys.
 
 ## Working with Manifest Data
 
