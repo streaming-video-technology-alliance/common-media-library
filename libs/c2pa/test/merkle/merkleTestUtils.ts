@@ -1,5 +1,5 @@
 import { encode } from 'cbor-x/encode'
-import { JUMBF_UUID, MERKLE_AUX_UUID } from '../../src/utils.ts'
+import { JUMBF_UUID } from '../../src/utils.ts'
 
 const TEXT_ENCODER = new TextEncoder()
 
@@ -90,21 +90,8 @@ export type AuxBoxFields = {
 	hashes?: readonly (Uint8Array | null)[]
 }
 
-// §A.5.4 aux box: CBOR { box_purpose, data }.
-export function buildMerkleAuxBox(fields: AuxBoxFields, useIntegerKeys = true): Uint8Array {
-	const map = useIntegerKeys
-		? new Map<number, unknown>([[1, fields.uniqueId], [2, fields.localId], [3, fields.location]])
-		: { uniqueId: fields.uniqueId, localId: fields.localId, location: fields.location } as Record<string, unknown>
-	if (fields.hashes) {
-		if (map instanceof Map) map.set(4, fields.hashes)
-		else map['hashes'] = fields.hashes
-	}
-	const payload = encode({ box_purpose: 'merkle', data: encode(map) as Uint8Array }) as Uint8Array
-	return buildUuidBox(MERKLE_AUX_UUID, payload)
-}
-
-// JUMBF aux box: version/flags + "merkle\0" + CBOR with string keys.
-export function buildJumbfMerkleAuxBox(fields: AuxBoxFields): Uint8Array {
+// §A.5.1.2/A.5.4.1.4 aux box: version/flags + purpose\0 + CBOR with string keys.
+export function buildMerkleAuxBox(fields: AuxBoxFields, purpose = MERKLE_BOX_PURPOSE): Uint8Array {
 	const map: Record<string, unknown> = {
 		uniqueId: fields.uniqueId,
 		localId: fields.localId,
@@ -112,10 +99,18 @@ export function buildJumbfMerkleAuxBox(fields: AuxBoxFields): Uint8Array {
 	}
 	if (fields.hashes) map['hashes'] = fields.hashes
 
-	const purpose = TEXT_ENCODER.encode(MERKLE_BOX_PURPOSE)
-	const prefix = new Uint8Array(4 + purpose.length + 1) // version/flags + purpose\0
-	prefix.set(purpose, 4)
+	const purposeBytes = TEXT_ENCODER.encode(purpose)
+	const prefix = new Uint8Array(4 + purposeBytes.length + 1) // version/flags + purpose\0
+	prefix.set(purposeBytes, 4)
 	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encode(map) as Uint8Array))
+}
+
+// Aux box with the right prefix but undecodable CBOR data, for malformed-payload tests.
+export function buildMalformedMerkleAuxBox(purpose = MERKLE_BOX_PURPOSE): Uint8Array {
+	const purposeBytes = TEXT_ENCODER.encode(purpose)
+	const prefix = new Uint8Array(4 + purposeBytes.length + 1)
+	prefix.set(purposeBytes, 4)
+	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, new Uint8Array([0xff, 0xff])))
 }
 
 export function buildMediaContent(seed: number): Uint8Array {

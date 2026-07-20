@@ -70,13 +70,6 @@ export const JUMBF_UUID: readonly number[] = [
 	0x92, 0x97, 0x58, 0x28, 0x87, 0x7e, 0xc4, 0x81,
 ]
 
-// C2PA auxiliary uuid box extended type per §A.5.4: d8fec3d6-1b0d-11ec-8100-000000000000
-/** @internal */
-export const MERKLE_AUX_UUID: readonly number[] = [
-	0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0d, 0x11, 0xec,
-	0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-]
-
 // Compares a uuid box usertype against an expected 16-byte extended type.
 /** @internal */
 export function matchesUuid(usertype: readonly number[], expected: readonly number[]): boolean {

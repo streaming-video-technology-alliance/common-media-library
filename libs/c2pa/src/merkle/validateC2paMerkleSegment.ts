@@ -3,7 +3,7 @@ import { decode } from 'cbor-x/decode'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
-import { JUMBF_UUID, MERKLE_AUX_UUID, asInteger, bytesToHex, hashesEqual, matchesUuid, normalizeAlgorithmName, readUuidBoxPurpose, toUint8Array } from '../utils.ts'
+import { JUMBF_UUID, asInteger, bytesToHex, hashesEqual, matchesUuid, normalizeAlgorithmName, readUuidBoxPurpose, toUint8Array } from '../utils.ts'
 import type { UuidParsedBox } from '../utils.ts'
 import type { MerkleMap, MerkleSegmentState, MerkleSegmentValidation } from './MerkleSegmentValidation.ts'
 
@@ -15,22 +15,8 @@ const MERKLE_BOX_PURPOSE = 'merkle'
 
 type AuxPayload = Uint8Array | 'other' | 'malformed'
 
-// §A.5.4 format: CBOR map { box_purpose, data }.
-function readSpecAuxPayload(rawPayload: Uint8Array): AuxPayload {
-	let decoded: unknown
-	try {
-		decoded = decode(rawPayload)
-	} catch {
-		return 'malformed'
-	}
-	const record = decoded as Record<string, unknown> | null
-	if (record === null || typeof record !== 'object') return 'malformed'
-	if (record['box_purpose'] !== MERKLE_BOX_PURPOSE) return 'other'
-	return toUint8Array(record['data']) ?? 'malformed'
-}
-
-// JUMBF format: version/flags + null-terminated purpose + CBOR.
-function readJumbfAuxPayload(rawPayload: Uint8Array): AuxPayload {
+// §A.5.1.2/A.5.4.1.4: version/flags + null-terminated box_purpose + raw data.
+function readAuxPayload(rawPayload: Uint8Array): AuxPayload {
 	const prefix = readUuidBoxPurpose(rawPayload)
 	if (!prefix || prefix.purpose !== MERKLE_BOX_PURPOSE) return 'other'
 	return prefix.rest
@@ -44,12 +30,10 @@ function extractMerkleAuxBoxes(segmentBytes: Uint8Array): { payloads: Uint8Array
 		const uuidBox = box as unknown as UuidParsedBox
 		if (uuidBox.type !== 'uuid') continue
 		const usertype = uuidBox.usertype ?? []
-
-		const isSpecUuid = matchesUuid(usertype, MERKLE_AUX_UUID)
-		if (!isSpecUuid && !matchesUuid(usertype, JUMBF_UUID)) continue
+		if (!matchesUuid(usertype, JUMBF_UUID)) continue
 
 		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
-		const payload = isSpecUuid ? readSpecAuxPayload(rawPayload) : readJumbfAuxPayload(rawPayload)
+		const payload = readAuxPayload(rawPayload)
 		if (payload === 'malformed') malformed = true
 		else if (payload !== 'other') payloads.push(payload)
 	}
@@ -67,16 +51,9 @@ type BmffMerkleMapSegment = {
 	readonly hashes: readonly (Uint8Array | null)[] | null
 }
 
-// §18.6 integer keys; string keys accepted as fallback.
-const KEY_UNIQUE_ID = 1
-const KEY_LOCAL_ID = 2
-const KEY_LOCATION = 3
-const KEY_HASHES = 4
-
-function readMapField(map: unknown, intKey: number, name: string): unknown {
-	if (map instanceof Map) return map.get(intKey) ?? map.get(name)
-	const record = map as Record<string | number, unknown>
-	return record[intKey] ?? record[name]
+function readMapField(map: unknown, name: string): unknown {
+	if (map instanceof Map) return map.get(name)
+	return (map as Record<string, unknown>)[name]
 }
 
 function parseBmffMerkleMap(payload: Uint8Array): BmffMerkleMapSegment | null {
@@ -88,12 +65,12 @@ function parseBmffMerkleMap(payload: Uint8Array): BmffMerkleMapSegment | null {
 	}
 	if (decoded === null || typeof decoded !== 'object') return null
 
-	const uniqueId = asInteger(readMapField(decoded, KEY_UNIQUE_ID, 'uniqueId'))
-	const localId = asInteger(readMapField(decoded, KEY_LOCAL_ID, 'localId'))
-	const location = asInteger(readMapField(decoded, KEY_LOCATION, 'location'))
+	const uniqueId = asInteger(readMapField(decoded, 'uniqueId'))
+	const localId = asInteger(readMapField(decoded, 'localId'))
+	const location = asInteger(readMapField(decoded, 'location'))
 	if (uniqueId === null || localId === null || location === null) return null
 
-	const rawHashes = readMapField(decoded, KEY_HASHES, 'hashes')
+	const rawHashes = readMapField(decoded, 'hashes')
 	if (rawHashes == null) return { uniqueId, localId, location, hashes: null }
 	if (!Array.isArray(rawHashes)) return null
 

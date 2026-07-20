@@ -1,16 +1,13 @@
 import { validateC2paMerkleSegment, type MerkleMap } from '@svta/cml-c2pa'
-import { encode } from 'cbor-x/encode'
 import { notStrictEqual, ok, strictEqual } from 'node:assert'
 import { before, describe, it } from 'node:test'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
-import { MERKLE_AUX_UUID } from '../../src/utils.ts'
 import {
-	buildJumbfMerkleAuxBox,
+	buildMalformedMerkleAuxBox,
 	buildMediaContent,
 	buildMerkleAuxBox,
 	buildProofPath,
 	buildTreeLevels,
-	buildUuidBox,
 	concatBytes,
 	manifestRow,
 	sha256,
@@ -116,10 +113,7 @@ describe('validateC2paMerkleSegment', () => {
 	})
 
 	it('rejects an auxiliary box with undecodable CBOR as malformed', async () => {
-		const segment = concatBytes(
-			buildMediaContent(0),
-			buildUuidBox(MERKLE_AUX_UUID, new Uint8Array([0xff, 0xff])),
-		)
+		const segment = concatBytes(buildMediaContent(0), buildMalformedMerkleAuxBox())
 
 		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
 
@@ -129,10 +123,9 @@ describe('validateC2paMerkleSegment', () => {
 	})
 
 	it('ignores merkle-uuid boxes with a different purpose', async () => {
-		const foreignPurpose = encode({ box_purpose: 'manifest', data: new Uint8Array([1]) }) as Uint8Array
 		const segment = concatBytes(
 			buildMediaContent(0),
-			buildUuidBox(MERKLE_AUX_UUID, foreignPurpose),
+			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 1, location: 0 }, 'manifest'),
 		)
 
 		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
@@ -140,23 +133,6 @@ describe('validateC2paMerkleSegment', () => {
 		// The only aux-like box has another purpose → treated as missing aux box
 		ok(validated)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
-	})
-
-	it('accepts the JUMBF auxiliary box format (purpose string + named keys)', async () => {
-		const segment = concatBytes(
-			buildMediaContent(0),
-			buildJumbfMerkleAuxBox({
-				uniqueId: UNIQUE_ID,
-				localId: 1,
-				location: 0,
-				hashes: buildProofPath(levels, 0, TREE_DEPTH),
-			}),
-		)
-
-		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
-
-		ok(validated)
-		strictEqual(validated.result.isValid, true)
 	})
 
 	it('compares directly against a leaf row stored in the manifest (empty proof path)', async () => {
