@@ -63,22 +63,16 @@ describe('validateC2paMerkleSegment', () => {
 	it('validates a segment with a correct Merkle proof', async () => {
 		const validated = await validateC2paMerkleSegment(segments[0], merkleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, true)
 		strictEqual(validated.result.location, 0)
 		strictEqual(validated.result.errorCodes.length, 0)
 	})
 	// #endregion example
 
-	it('returns null when merkleMaps is empty (not in VOD Merkle mode)', async () => {
-		strictEqual(await validateC2paMerkleSegment(segments[0], []), null)
-	})
-
 	it('validates sequential segments carrying state forward', async () => {
 		let state
 		for (let i = 0; i < SEGMENT_COUNT; i++) {
 			const validated = await validateC2paMerkleSegment(segments[i], merkleMaps, state)
-			ok(validated)
 			strictEqual(validated.result.isValid, true, `segment ${i} should be valid`)
 			state = validated.nextState
 		}
@@ -90,7 +84,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(tampered, merkleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, false)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.mismatch'))
 	})
@@ -98,7 +91,6 @@ describe('validateC2paMerkleSegment', () => {
 	it('rejects a segment without an auxiliary box as malformed', async () => {
 		const validated = await validateC2paMerkleSegment(buildMediaContent(0), merkleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, false)
 		strictEqual(validated.result.location, null)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
@@ -107,7 +99,6 @@ describe('validateC2paMerkleSegment', () => {
 	it('rejects a track missing from the merkle maps as malformed', async () => {
 		const validated = await validateC2paMerkleSegment(buildSegment(0, 99), merkleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, false)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
 	})
@@ -124,7 +115,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, true)
 	})
 
@@ -133,7 +123,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, false)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
 	})
@@ -147,7 +136,6 @@ describe('validateC2paMerkleSegment', () => {
 		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
 
 		// The only aux-like box has another purpose → treated as missing aux box
-		ok(validated)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
 	})
 
@@ -160,7 +148,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segment, leafRowMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, true)
 	})
 
@@ -178,7 +165,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segment, intermediateMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, true)
 	})
 
@@ -193,7 +179,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segment, singleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, true)
 	})
 
@@ -204,7 +189,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segments[2], merkleMaps)
 
-		ok(validated)
 		strictEqual(validated.result.isValid, true)
 	})
 
@@ -221,7 +205,6 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
 
-		ok(validated)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
 	})
 
@@ -239,16 +222,13 @@ describe('validateC2paMerkleSegment', () => {
 
 		const validated = await validateC2paMerkleSegment(segment, merkleMaps)
 
-		ok(validated)
 		ok(validated.result.errorCodes.includes('assertion.bmffHash.malformed'))
 	})
 
 	it('flags a location gap without seek as a discontinuity (§15.12.2: +1)', async () => {
 		const first = await validateC2paMerkleSegment(segments[0], merkleMaps)
-		ok(first)
 		const skipped = await validateC2paMerkleSegment(segments[2], merkleMaps, first.nextState)
 
-		ok(skipped)
 		strictEqual(skipped.result.isValid, false)
 		ok(skipped.result.errorCodes.includes('livevideo.assertion.invalid'))
 		notStrictEqual(skipped.result.errorCodes.includes('assertion.bmffHash.mismatch'), true)
@@ -256,41 +236,33 @@ describe('validateC2paMerkleSegment', () => {
 
 	it('flags a repeated or lower location as a discontinuity (replay/reorder)', async () => {
 		const first = await validateC2paMerkleSegment(segments[1], merkleMaps)
-		ok(first)
 
 		const replayed = await validateC2paMerkleSegment(segments[1], merkleMaps, first.nextState)
-		ok(replayed)
 		strictEqual(replayed.result.isValid, false)
 		ok(replayed.result.errorCodes.includes('livevideo.assertion.invalid'))
 
 		const reordered = await validateC2paMerkleSegment(segments[0], merkleMaps, first.nextState)
-		ok(reordered)
 		strictEqual(reordered.result.isValid, false)
 		ok(reordered.result.errorCodes.includes('livevideo.assertion.invalid'))
 	})
 
 	it('does not advance the continuity baseline on a failed segment', async () => {
 		const first = await validateC2paMerkleSegment(segments[0], merkleMaps)
-		ok(first)
 
 		const tampered = new Uint8Array(segments[1])
 		tampered[12] ^= 0xff
 		const bad = await validateC2paMerkleSegment(tampered, merkleMaps, first.nextState)
-		ok(bad)
 		strictEqual(bad.result.isValid, false)
 
 		const retry = await validateC2paMerkleSegment(segments[1], merkleMaps, bad.nextState)
-		ok(retry)
 		strictEqual(retry.result.isValid, true)
 	})
 
 	it('passes after a seek when the caller resets the state', async () => {
-		const first = await validateC2paMerkleSegment(segments[2], merkleMaps)
-		ok(first)
+		await validateC2paMerkleSegment(segments[2], merkleMaps)
 		// Backward seek: caller discards the previous state instead of carrying it forward
 		const afterSeek = await validateC2paMerkleSegment(segments[0], merkleMaps, undefined)
 
-		ok(afterSeek)
 		strictEqual(afterSeek.result.isValid, true)
 	})
 
@@ -303,7 +275,6 @@ describe('validateC2paMerkleSegment', () => {
 		)
 
 		const bothPass = await validateC2paMerkleSegment(validSegment, twoTrackMaps)
-		ok(bothPass)
 		// Both tracks hash the same bytes minus /uuid exclusions, so both proofs verify
 		strictEqual(bothPass.result.isValid, true)
 
@@ -313,7 +284,6 @@ describe('validateC2paMerkleSegment', () => {
 			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 99, location: 0, hashes: buildProofPath(levels, 0, TREE_DEPTH) }),
 		)
 		const oneFails = await validateC2paMerkleSegment(mixedSegment, twoTrackMaps)
-		ok(oneFails)
 		strictEqual(oneFails.result.isValid, false)
 		ok(oneFails.result.errorCodes.includes('assertion.bmffHash.malformed'))
 	})

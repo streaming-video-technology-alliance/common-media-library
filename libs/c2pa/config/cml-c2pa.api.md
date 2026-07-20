@@ -185,7 +185,7 @@ export function validateC2paManifestBoxSegment(bytes: Uint8Array, lastManifestId
 export function validateC2paMerkleSegment(segmentBytes: Uint8Array, merkleMaps: readonly MerkleMap[], state?: MerkleSegmentState): Promise<{
     readonly result: MerkleSegmentValidation;
     readonly nextState: MerkleSegmentState;
-} | null>;
+}>;
 
 // @public
 export function validateC2paSegment(segmentBytes: Uint8Array, sessionKeys: readonly ValidatedSessionKey[], sequenceState?: SequenceState): Promise<{

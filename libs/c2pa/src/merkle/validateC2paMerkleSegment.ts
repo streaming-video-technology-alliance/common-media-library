@@ -212,7 +212,11 @@ async function computeLeafHash(
 /**
  * Validates a fragmented MP4 VOD media segment against the init manifest's
  * merkle maps (§15.12.2.2). Pure: the caller persists `nextState` and resets
- * `state` after a seek. Returns `null` when `merkleMaps` is empty.
+ * `state` after a seek.
+ *
+ * `merkleMaps` must be non-empty; the caller is responsible for only calling
+ * this in VOD Merkle mode (i.e. after `InitSegmentValidation.merkleMaps` came
+ * back non-empty).
  *
  * @example
  * {@includeCode ../../test/merkle/validateC2paMerkleSegment.test.ts#example}
@@ -226,9 +230,7 @@ export async function validateC2paMerkleSegment(
 ): Promise<{
 	readonly result: MerkleSegmentValidation
 	readonly nextState: MerkleSegmentState
-} | null> {
-	if (merkleMaps.length === 0) return null
-
+}> {
 	const previousLocations = state?.lastLocations ?? new Map<string, number>()
 	const nextLocations = new Map(previousLocations)
 	const codes = new Set<MerkleValidationCode>()
