@@ -32,7 +32,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	const HASH = new Uint8Array(32).fill(3)
 
 	function merkleEntry(overrides: Record<string, unknown> = {}): Record<string, unknown> {
-		return { uniqueId: 1, localId: 1, count: 4, hashes: [HASH], ...overrides }
+		return { uniqueId: 1, localId: 1, count: 4, hashes: [HASH], alg: 'SHA-256', initHash: HASH, ...overrides }
 	}
 
 	it('populates merkleMaps and skips SESSIONKEY_INVALID in VOD Merkle mode', async () => {
@@ -85,6 +85,32 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		strictEqual(result.isValid, false)
 		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
 		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH))
+	})
+
+	it('rejects a merkle entry missing initHash as malformed (required for fragmented assets)', async () => {
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ initHash: undefined })],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
+	it('rejects a merkle entry with no alg anywhere as malformed (no default per spec)', async () => {
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ alg: undefined })],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
 	})
 
 	it('rejects an empty merkle array as malformed without flagging session keys', async () => {

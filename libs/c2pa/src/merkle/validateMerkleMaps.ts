@@ -36,18 +36,23 @@ function extractMerkleMaps(bmffHashAssertionData: Record<string, unknown>): Merk
 		const hashes = parseMerkleRow(record['hashes'])
 		if (uniqueId === null || localId === null || count === null || !hashes) return null
 
-		const rawInitHash = record['initHash']
-		const initHash = rawInitHash == null ? null : toUint8Array(rawInitHash)
-		if (rawInitHash != null && !initHash) return null
+		// §A.5.4.2/merkle-map CDDL: initHash is required for fragmented assets, which
+		// is the only case this function handles (it's only called for init segments).
+		const initHash = toUint8Array(record['initHash'])
+		if (!initHash) return null
 
+		// §A.5.4.2/merkle-map CDDL: no default when alg is absent from both this
+		// entry and the enclosing assertion; the structure is invalid.
 		const rawAlg = record['alg'] ?? assertionAlg
+		if (typeof rawAlg !== 'string') return null
+
 		maps.push({
 			uniqueId,
 			localId,
 			count,
 			hashes,
 			initHash,
-			alg: typeof rawAlg === 'string' ? normalizeAlgorithmName(rawAlg) : null,
+			alg: normalizeAlgorithmName(rawAlg),
 			exclusions,
 			offsetPrefixSize,
 		})
