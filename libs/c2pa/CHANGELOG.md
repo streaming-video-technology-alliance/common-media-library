@@ -8,8 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-07-13
-
 ### Added
 
 - VOD Merkle validation (C2PA §15.12.2 / §18.6): `validateC2paMerkleSegment` verifies fragmented MP4 media segments against the merkle maps from the init manifest — per-track Merkle proof verification with `location` continuity enforced via caller-held state
