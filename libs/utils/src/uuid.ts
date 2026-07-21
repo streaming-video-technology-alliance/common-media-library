@@ -17,13 +17,12 @@ export function uuid(): string {
 			return uuid.slice(uuid.lastIndexOf('/') + 1)
 		}
 		catch (error) {
-			let dt = new Date().getTime()
-			const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-				const r = (dt + Math.random() * 16) % 16 | 0
-				dt = Math.floor(dt / 16)
-				return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16)
-			})
-			return uuid
+			const bytes = crypto.getRandomValues(new Uint8Array(16))
+			bytes[6] = (bytes[6] & 0x0f) | 0x40
+			bytes[8] = (bytes[8] & 0x3f) | 0x80
+
+			const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0'))
+			return `${hex[0]}${hex[1]}${hex[2]}${hex[3]}-${hex[4]}${hex[5]}-${hex[6]}${hex[7]}-${hex[8]}${hex[9]}-${hex[10]}${hex[11]}${hex[12]}${hex[13]}${hex[14]}${hex[15]}`
 		}
 	}
 }
