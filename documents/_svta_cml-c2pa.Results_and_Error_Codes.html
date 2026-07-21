@@ -30,7 +30,7 @@
 <tr>
 <td><code>SEGMENT_INVALID</code></td>
 <td><code>livevideo.segment.invalid</code></td>
-<td>Crypto failure: signature, hash, or key mismatch</td>
+<td>Crypto failure (signature, hash, or key mismatch), a broken <code>c2pa.manifestId</code> chain, or a failed custom continuity validator</td>
 </tr>
 <tr>
 <td><code>ASSERTION_INVALID</code></td>
@@ -40,7 +40,12 @@
 <tr>
 <td><code>CONTINUITY_METHOD_INVALID</code></td>
 <td><code>livevideo.continuityMethod.invalid</code></td>
-<td>Continuity chain broken or method unsupported</td>
+<td><code>continuityMethod</code> absent, unsupported, or required companion fields missing</td>
+</tr>
+<tr>
+<td><code>CONTINUITY_METHOD_UNSUPPORTED</code></td>
+<td><code>livevideo.continuityMethod.unsupported</code></td>
+<td>Custom continuity method with no registered validator (always alongside <code>continuityMethod.invalid</code>)</td>
 </tr>
 <tr>
 <td><code>SESSIONKEY_INVALID</code></td>
@@ -86,10 +91,21 @@
 <td><code>claim.signature.mismatch</code></td>
 <td>Claim signature verification failed</td>
 </tr>
+<tr>
+<td><code>ASSERTION_BMFFHASH_MALFORMED</code></td>
+<td><code>assertion.bmffHash.malformed</code></td>
+<td>BMFF hash assertion or Merkle structure is malformed</td>
+</tr>
+<tr>
+<td><code>ASSERTION_BMFFHASH_MISMATCH</code></td>
+<td><code>assertion.bmffHash.mismatch</code></td>
+<td>BMFF content hash does not match the committed value</td>
+</tr>
 </tbody>
 </table>
 <div class="tsd-alert tsd-alert-note"><div class="tsd-alert-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><use href="../assets/icons.svg#icon-alertNote"></use></svg><span>Note</span></div><p>
 <code>C2paStatusCode</code> values appear in <code>InitSegmentValidation.errorCodes</code> and <code>ManifestBoxValidationResult.errorCodes</code> (which perform manifest integrity checks). They do not appear in <code>SegmentValidationResult.errorCodes</code> — the VSI/EMSG segment validation uses only <code>LiveVideoStatusCode</code>.</p>
+<p>For VOD Merkle streams, <code>InitSegmentValidation</code> extracts <code>merkleMaps</code> from the <code>c2pa.hash.bmff.v3</code> assertion and validates each entry's <code>initHash</code> binding; <code>LiveVideoStatusCode.SESSIONKEY_INVALID</code> is not reported when <code>merkleMaps</code> is non-empty, since VOD Merkle segments don't use session keys.</p>
 </div>
 <h2 id="working-with-manifest-data" class="tsd-anchor-link">Working with Manifest Data<a href="#working-with-manifest-data" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The <code>C2paManifest</code> type represents a parsed C2PA manifest. It is available through <code>InitSegmentValidation.manifest</code> (VSI method) and <code>ManifestBoxValidationResult.manifest</code> (Manifest Box method).</p>
 <table>
