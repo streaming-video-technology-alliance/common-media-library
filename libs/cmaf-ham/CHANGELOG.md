@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.24.5] - 2026-07-21
+
+### Fixed
+
+- The ISO 8601 duration regexes in the DASH converter no longer rescan quadratically on long digit runs (CodeQL polynomial ReDoS); matches and captures are unchanged ([#388](https://github.com/streaming-video-technology-alliance/common-media-library/issues/388))
+
 ## [0.24.4] - 2026-05-13
 
 ### Changed
@@ -58,7 +64,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.5...HEAD
+[0.24.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.4...cmaf-ham-v0.24.5
 [0.24.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.3...cmaf-ham-v0.24.4
 [0.24.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.2...cmaf-ham-v0.24.3
 [0.24.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.1...cmaf-ham-v0.24.2

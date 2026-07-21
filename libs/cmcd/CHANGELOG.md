@@ -8,9 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-07-21
+
 ### Fixed
 
 - Module-scope key-table `Set`/`Map` initializers (and the `CmcdReporter` state-field tables) are now marked side-effect free so consumer bundlers can drop them when unused; a bare import of the package previously retained ~4.9 KB of eagerly-built tables (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+- `isCmcdCustomKey` no longer backtracks quadratically on hostile inputs (CodeQL polynomial ReDoS): the ambiguous regex was replaced with an unambiguous character-class check plus an interior-hyphen test; accepted inputs are unchanged ([#388](https://github.com/streaming-video-technology-alliance/common-media-library/issues/388))
 
 ### Documentation
 
@@ -179,7 +182,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...HEAD
+[2.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...cmcd-v2.4.1
 [2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0
 [2.3.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.3.2
 [2.3.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.0...cmcd-v2.3.1

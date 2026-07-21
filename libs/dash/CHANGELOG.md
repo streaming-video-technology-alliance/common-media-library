@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-21
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.5.1
+
 ## [1.0.6] - 2026-05-13
 
 ### Changed
@@ -54,7 +60,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/dash-v1.0.6...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/dash-v1.0.7...HEAD
+[1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/dash-v1.0.6...dash-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/dash-v1.0.5...dash-v1.0.6
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/dash-v1.0.4...dash-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/dash-v1.0.3...dash-v1.0.4
