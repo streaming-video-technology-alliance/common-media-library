@@ -1,9 +1,14 @@
+import { arrayBufferToUuid } from './arrayBufferToUuid.ts'
+
 /**
  * Generate a random v4 UUID
  *
  * @returns A random v4 UUID
  *
  * @public
+ *
+ * @example
+ * {@includeCode ../test/uuid.test.ts#example}
  */
 export function uuid(): string {
 	try {
@@ -11,19 +16,19 @@ export function uuid(): string {
 	}
 	catch (error) {
 		try {
+			const bytes = crypto.getRandomValues(new Uint8Array(16))
+
+			// Set the version (4) and variant (RFC 4122) bits
+			bytes[6] = (bytes[6] & 0x0f) | 0x40
+			bytes[8] = (bytes[8] & 0x3f) | 0x80
+
+			return arrayBufferToUuid(bytes.buffer)
+		}
+		catch (error) {
 			const url = URL.createObjectURL(new Blob())
 			const uuid = url.toString()
 			URL.revokeObjectURL(url)
 			return uuid.slice(uuid.lastIndexOf('/') + 1)
-		}
-		catch (error) {
-			let dt = new Date().getTime()
-			const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-				const r = (dt + Math.random() * 16) % 16 | 0
-				dt = Math.floor(dt / 16)
-				return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16)
-			})
-			return uuid
 		}
 	}
 }
