@@ -1,4 +1,4 @@
-const TEXT_DECODER = new TextDecoder()
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 
 import { readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { decode } from 'cbor-x/decode'
