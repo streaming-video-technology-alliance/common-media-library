@@ -295,4 +295,49 @@ describe('validateC2paManifestBoxSegment — BMFF hash assertion offset prefix (
 
 		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID), false)
 	})
+
+	// Unsigned segment carrying both a live-video assertion and a matching flat
+	// hash, so a custom continuity method can validate isValid=true end to end
+	// (the patched-fixture helper above can't: patching breaks the hashedURI
+	// binding, so its tests only ever assert on individual continuity codes).
+	async function buildLiveSegment(liveVideoData: Record<string, unknown>): Promise<Uint8Array> {
+		const media = buildMediaBoxes()
+		const hash = await computeBmffHash(media, { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const liveVideoAssertion = buildJumb('c2pa.livevideo.segment', buildBox('cbor', encode(liveVideoData) as Uint8Array))
+		const bmffAssertion = buildJumb(
+			'c2pa.hash.bmff.v3',
+			buildBox('cbor', encode({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash }) as Uint8Array),
+		)
+		const assertionStore = buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion)
+		const claimData = { instanceID: 'urn:uuid:live-segment-test-manifest', created_assertions: [] }
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', encode(claimData) as Uint8Array))
+		const manifestJumb = buildJumb('urn:uuid:live-segment-test-manifest', claim, assertionStore)
+		const store = buildJumb('c2pa', manifestJumb)
+
+		const purpose = TEXT_ENCODER.encode('manifest')
+		const prefix = new Uint8Array(4 + purpose.length + 1 + 8)
+		prefix.set(purpose, 4)
+		const uuidBox = buildBox('uuid', concatBytes(new Uint8Array(JUMBF_UUID), prefix, store))
+
+		return concatBytes(media, uuidBox)
+	}
+
+	it('validates a custom continuity method end to end (isValid=true)', async () => {
+		const method = 'com.test.happy-path'
+		const segment = await buildLiveSegment({
+			sequenceNumber: 1,
+			previousManifestId: 'prev-id',
+			streamId: 'stream-1',
+			continuityMethod: method,
+		})
+
+		// lastManifestId is irrelevant here: the manifestId chain check only
+		// applies to the built-in c2pa.manifestId method.
+		const { result } = await validateC2paManifestBoxSegment(segment, null, undefined, {
+			continuityValidator: { method, validate: () => true },
+		})
+
+		strictEqual(result.isValid, true)
+		strictEqual(result.errorCodes.length, 0)
+	})
 })
