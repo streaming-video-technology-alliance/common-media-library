@@ -17,7 +17,11 @@ export const LiveVideoStatusCode = {
 	MANIFEST_INVALID: 'livevideo.manifest.invalid',
 	/** Segment structure invalid: missing Manifest Box/emsg, signature/hash/key failure (§19.7) */
 	SEGMENT_INVALID: 'livevideo.segment.invalid',
-	/** Live video assertion field invalid: sequenceNumber or streamId mismatch (§19.7.2) */
+	/**
+	 * Live video assertion field invalid: sequenceNumber or streamId mismatch
+	 * (§19.7.2). Also reused for VOD Merkle per-track location discontinuity
+	 * (§15.12.2), which has no dedicated code.
+	 */
 	ASSERTION_INVALID: 'livevideo.assertion.invalid',
 	/** continuityMethod absent, unsupported, or companion fields incorrect (§19.7.2) */
 	CONTINUITY_METHOD_INVALID: 'livevideo.continuityMethod.invalid',

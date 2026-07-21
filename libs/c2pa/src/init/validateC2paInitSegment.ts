@@ -12,6 +12,7 @@ import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
+import { validateMerkleMaps } from '../merkle/validateMerkleMaps.ts'
 import { bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
@@ -214,6 +215,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 			certificate: null,
 			manifestId: null,
 			sessionKeys: [],
+			merkleMaps: [],
 			isValid: false,
 			errorCodes: [LiveVideoStatusCode.INIT_INVALID],
 		}
@@ -240,8 +242,13 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const integrityCodes = await validateManifestIntegrity(internalData, certificate)
 
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
+	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
+
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
-	if (sessionKeys.length === 0) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
+	if (sessionKeys.length === 0 && merkleMaps === null) {
+		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	}
 	for (const code of integrityCodes) codes.add(code)
 	const errorCodes = [...codes]
 
@@ -250,6 +257,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		certificate,
 		manifestId: manifest.instanceId,
 		sessionKeys,
+		merkleMaps: merkleMaps ?? [],
 		isValid: errorCodes.length === 0,
 		errorCodes,
 	}

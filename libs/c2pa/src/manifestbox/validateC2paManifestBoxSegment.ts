@@ -3,9 +3,10 @@ import type { C2paManifest } from '../C2paManifest.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { bytesToHex, hashesEqual, normalizeAlgorithmName } from '../utils.ts'
+import { bytesToHex, hashesEqual, normalizeAlgorithmName, toUint8Array } from '../utils.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
-import type { BmffHashConstraint, BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { parseExclusions } from '../bmff/parseExclusions.ts'
+import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import type { InternalManifestData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
@@ -26,12 +27,6 @@ function extractAssertionData(data: unknown): Record<string, unknown> | null {
 	if (data !== null && typeof data === 'object' && !Array.isArray(data)) {
 		return data as Record<string, unknown>
 	}
-	return null
-}
-
-function toUint8Array(value: unknown): Uint8Array | null {
-	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
 	return null
 }
 
@@ -72,35 +67,6 @@ type BmffHashFields = {
 }
 
 const EMPTY_BMFF_HASH: BmffHashFields = { hashBytes: null, hashHex: null, exclusions: [], alg: null }
-
-function parseConstraints(rawConstraints: unknown): BmffHashConstraint[] {
-	if (!Array.isArray(rawConstraints)) return []
-
-	const constraints: BmffHashConstraint[] = []
-	for (const c of rawConstraints) {
-		if (!c || typeof c !== 'object') continue
-		const record = c as Record<string, unknown>
-		if (typeof record['offset'] !== 'number') continue
-		const value = toUint8Array(record['value'])
-		if (value) constraints.push({ offset: record['offset'], value })
-	}
-	return constraints
-}
-
-function parseExclusions(rawExclusions: unknown): BmffHashExclusion[] {
-	if (!Array.isArray(rawExclusions)) return []
-
-	const exclusions: BmffHashExclusion[] = []
-	for (const exc of rawExclusions) {
-		if (!exc || typeof exc !== 'object') continue
-		const record = exc as Record<string, unknown>
-		if (typeof record['xpath'] !== 'string') continue
-
-		const constraints = parseConstraints(record['data'])
-		exclusions.push(constraints.length > 0 ? { xpath: record['xpath'], data: constraints } : { xpath: record['xpath'] })
-	}
-	return exclusions
-}
 
 function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashFields {
 	const assertion = assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL)
