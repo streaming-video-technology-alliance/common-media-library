@@ -2,10 +2,11 @@
 
 C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF/MP4 containers.
 
-Supports both segment validation methods defined in the C2PA specification:
+Supports the segment validation methods defined in the C2PA specification:
 
-- **§19.3 — Per-segment C2PA Manifest Box**: each segment embeds a full C2PA manifest with COSE signature
-- **§19.4 — Verifiable Segment Info (VSI/EMSG)**: the init segment carries the manifest and session keys; each media segment carries a lightweight signed EMSG box
+- **§19.3 Per-segment C2PA Manifest Box**: each segment embeds a full C2PA manifest with COSE signature
+- **§19.4 Verifiable Segment Info (VSI/EMSG)**: the init segment carries the manifest and session keys; each media segment carries a lightweight signed EMSG box
+- **§15.12.2 / §18.6 VOD Merkle**: for on-demand fragmented MP4 assets, the init manifest stores one Merkle tree row per track, and each media segment carries its own leaf hash and proof
 
 
 ## Installation
@@ -55,11 +56,24 @@ const segmentBytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuf
 const validated = await validateC2paSegment(segmentBytes, init.sessionKeys)
 ```
 
+### VOD Merkle method (init segment + media segments)
+
+```typescript
+import { validateC2paInitSegment, validateC2paMerkleSegment } from '@svta/cml-c2pa'
+
+const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+const init = await validateC2paInitSegment(initBytes)
+
+const segmentBytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+const { result } = await validateC2paMerkleSegment(segmentBytes, init.merkleMaps)
+```
+
 ## Docs
 
-- [VSI/EMSG Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/vsi-validation.md) — Validate using Verifiable Segment Info (§19.4)
-- [Manifest Box Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/manifest-box-validation.md) — Validate using per-segment manifests (§19.3)
-- [Results and Error Codes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/results-and-error-codes.md) — Interpret results, error codes, and manifest data
+- [VSI/EMSG Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/vsi-validation.md): Validate using Verifiable Segment Info (§19.4)
+- [Manifest Box Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/manifest-box-validation.md): Validate using per-segment manifests (§19.3)
+- [VOD Merkle Validation](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/merkle-validation.md): Validate on-demand fragmented MP4 assets using Merkle tree proofs (§15.12.2 / §18.6)
+- [Results and Error Codes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/results-and-error-codes.md): Interpret results, error codes, and manifest data
 
 ## References
 
