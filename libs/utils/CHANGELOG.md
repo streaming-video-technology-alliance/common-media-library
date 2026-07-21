@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Security
+
+- Replace `Math.random()`-based UUID fallback with `crypto.getRandomValues` to use a cryptographically secure RNG ([#3](https://github.com/streaming-video-technology-alliance/common-media-library/security/code-scanning/3))
+
 ## [1.5.0] - 2026-05-13
 
 ### Added
