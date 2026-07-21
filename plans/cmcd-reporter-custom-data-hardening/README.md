@@ -2,7 +2,7 @@
 
 **Date**: 2026-07-21
 **Package**: `@svta/cml-cmcd`
-**Status**: Proposed
+**Status**: In progress — PR-A (WI-1, WI-2, WI-6) implemented
 **Branch**: `task/cmcd-reporter-custom-data-hardening`
 
 ## Background
@@ -63,7 +63,7 @@ Only lowercase reverse-DNS keys (e.g. `com.example-foo`) are safe through all th
 
 ### WI-1 — Reporter-level end-to-end tests for custom key transmission
 
-**Priority**: P1 · **Effort**: S–M · **Type**: test-only
+**Priority**: P1 · **Effort**: S–M · **Type**: test-only · **Status**: ✅ Implemented
 
 **Problem.** `libs/cmcd/test/CmcdReporter.test.ts` never passes a `com.example-*` key through any
 reporter path. Custom keys are well-covered at the helper layer (`encodeCmcd.test.ts:16`, `:182-187`,
@@ -100,7 +100,7 @@ gate 2; WI-4 does not change that gate.
 
 ### WI-2 — Strengthen custom-event (`cen`) coverage
 
-**Priority**: P1 · **Effort**: S · **Type**: test-only
+**Priority**: P1 · **Effort**: S · **Type**: test-only · **Status**: ✅ Implemented
 
 **Problem.** The only reporter custom-event test (`CmcdReporter.test.ts:302-321`) asserts `e=ce`
 in the body but never `cen="my-custom-event"` — the event *name*, the point of the feature, is
@@ -259,7 +259,7 @@ an optional property; no new code on the hot path).
 
 ### WI-6 — Direct unit coverage for `prepareCmcdData`
 
-**Priority**: P2 · **Effort**: S–M · **Type**: test-only
+**Priority**: P2 · **Effort**: S–M · **Type**: test-only · **Status**: ✅ Implemented
 **Depends on**: pairs naturally with WI-4 (the fix lands at this choke point)
 
 **Problem.** `prepareCmcdData.ts` is the single filtering choke point for every emission path,

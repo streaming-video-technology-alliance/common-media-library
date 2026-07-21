@@ -96,6 +96,9 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
  * @param options - Options for encoding.
  *
  * @public
+ *
+ * @example
+ * {@includeCode ../test/prepareCmcdData.test.ts#example}
  */
 export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): Cmcd {
 	const results: Cmcd = {}
