@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `WebVttTransformStream` no longer reads the bare `TransformStream` global at module scope: importing only non-stream exports is now fully tree-shakeable, and importing the package never throws on runtimes without the Web Streams API. Instantiating `WebVttTransformStream` on such runtimes throws a descriptive error instead ([#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+
 ## [1.0.6] - 2026-05-13
 
 ### Changed

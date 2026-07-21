@@ -449,8 +449,10 @@ export type IsoBoxMap = {
     vtte: WebVttEmptySampleBox;
 };
 
+// Warning: (ae-forgotten-export) The symbol "ReadableStreamBase" needs to be exported by the entry point index.d.ts
+//
 // @public
-export class IsoBoxReadableStream extends ReadableStream<Uint8Array> {
+export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
     constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig);
 }
 
