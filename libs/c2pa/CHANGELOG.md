@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-21
+
 ### Added
 
 - Custom continuity method support in manifest-box validation (C2PA §19.3.2 / §19.7.2): `validateC2paManifestBoxSegment` accepts an optional `continuityValidator` to verify implementer-defined continuity methods; segments declaring an unregistered method keep failing with `livevideo.continuityMethod.invalid` per spec
@@ -54,6 +56,7 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.1...c2pa-v1.1.0
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.0...c2pa-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/c2pa-v1.0.0

@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-07-21
+
+### Fixed
+
+- `uuid` no longer falls back to `Math.random`: when `crypto.randomUUID` is unavailable it derives the UUID from `crypto.getRandomValues` with RFC 4122 version/variant bits, keeping the blob-URL trick only as a last resort ([#388](https://github.com/streaming-video-technology-alliance/common-media-library/issues/388))
+
 ## [1.5.0] - 2026-05-13
 
 ### Added
@@ -70,7 +76,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...HEAD
+[1.5.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...utils-v1.5.1
 [1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...utils-v1.5.0
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.3.0...utils-v1.4.0
 [1.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.2.0...utils-v1.3.0

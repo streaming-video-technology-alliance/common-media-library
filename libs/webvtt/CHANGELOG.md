@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-21
+
 ### Fixed
 
 - `WebVttTransformStream` no longer reads the bare `TransformStream` global at module scope: importing only non-stream exports is now fully tree-shakeable, and importing the package never throws on runtimes without the Web Streams API. Instantiating `WebVttTransformStream` on such runtimes throws a descriptive error instead ([#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
@@ -58,7 +60,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/webvtt-v1.0.6...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/webvtt-v1.0.7...HEAD
+[1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/webvtt-vtt-v1.0.6...webvtt-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/webvtt-v1.0.5...webvtt-v1.0.6
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/webvtt-v1.0.4...webvtt-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/webvtt-v1.0.3...webvtt-v1.0.4

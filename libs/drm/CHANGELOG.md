@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.7] - 2026-07-21
+
 ### Fixed
 
 - `ensureEncryptedInit`'s sample-entry reader/writer tables are now built inside side-effect-free (`/* @__PURE__ */`) initializers so consumer bundlers can drop the tables (and their `@svta/cml-iso-bmff` factory imports) when `ensureEncryptedInit` is unused; runtime import behavior is unchanged (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
@@ -84,7 +86,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.6...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.7...HEAD
+[1.1.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.6...drm-v1.1.7
 [1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.5...drm-v1.1.6
 [1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.4...drm-v1.1.5
 [1.1.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.3...drm-v1.1.4
