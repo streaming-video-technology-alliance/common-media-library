@@ -9,7 +9,7 @@ import type { CmcdKey } from './CmcdKey.ts'
  *
  * @public
  */
-export const CMCD_KEYS: CmcdKey[] = [
+export const CMCD_KEYS: CmcdKey[] = /* @__PURE__ */ [
 	...CMCD_V1_KEYS,
 	...CMCD_REQUEST_KEYS,
 	...CMCD_RESPONSE_KEYS,

@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Module-scope key-table `Set`/`Map` initializers (and the `CmcdReporter` state-field tables) are now marked side-effect free so consumer bundlers can drop them when unused; a bare import of the package previously retained ~4.9 KB of eagerly-built tables (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+
 ### Documentation
 
 - Clarify recommended event-firing patterns in `CmcdReporter`: state-change events are fired via `update()`, with snapshot context attached by combining the state field and continuous metrics in a single call. `recordEvent()`'s `data` argument is documented as intended for non-state-change events (custom, error, ad-lifecycle, mute/unmute, expand/collapse, skip). Calling `recordEvent()` for a state-change event after `update()` has auto-fired it silently drops the second call's data; see the user guide for the recommended pattern.

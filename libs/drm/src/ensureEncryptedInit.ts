@@ -22,22 +22,28 @@ const videoTypes = [
 	'dvi1',
 ]
 
-const readers = {
-	stsd: readStsd,
-}
-audioTypes.forEach(type => (readers as any)[type] = createAudioSampleEntryReader(type))
-videoTypes.forEach(type => (readers as any)[type] = createVisualSampleEntryReader(type))
+const readers = /* @__PURE__ */ (() => {
+	const map = {
+		stsd: readStsd,
+	}
+	audioTypes.forEach(type => (map as any)[type] = createAudioSampleEntryReader(type))
+	videoTypes.forEach(type => (map as any)[type] = createVisualSampleEntryReader(type))
+	return map
+})()
 
-const writers = {
-	stsd: writeStsd,
-	frma: writeFrma,
-	schm: writeSchm,
-	tenc: writeTenc,
-	encv: writeVisualSampleEntryBox,
-	enca: writeAudioSampleEntryBox,
-}
-audioTypes.forEach(type => (writers as any)[type] = writeAudioSampleEntryBox)
-videoTypes.forEach(type => (writers as any)[type] = writeVisualSampleEntryBox)
+const writers = /* @__PURE__ */ (() => {
+	const map = {
+		stsd: writeStsd,
+		frma: writeFrma,
+		schm: writeSchm,
+		tenc: writeTenc,
+		encv: writeVisualSampleEntryBox,
+		enca: writeAudioSampleEntryBox,
+	}
+	audioTypes.forEach(type => (map as any)[type] = writeAudioSampleEntryBox)
+	videoTypes.forEach(type => (map as any)[type] = writeVisualSampleEntryBox)
+	return map
+})()
 
 /**
  * Options for the `ensureEncryptedInit` function.

@@ -11,8 +11,8 @@ import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
 
-const HUNDRED_ROUNDING_KEYS = new Set(['bl', 'dl', 'mtp', 'rtp', 'tbl'])
-const INTEGER_ROUNDING_KEYS = new Set(['br', 'd', 'tb'])
+const HUNDRED_ROUNDING_KEYS = /* @__PURE__ */ new Set(['bl', 'dl', 'mtp', 'rtp', 'tbl'])
+const INTEGER_ROUNDING_KEYS = /* @__PURE__ */ new Set(['br', 'd', 'tb'])
 
 function isFiniteNumber(value: unknown): value is number {
 	return typeof value === 'number' && Number.isFinite(value)

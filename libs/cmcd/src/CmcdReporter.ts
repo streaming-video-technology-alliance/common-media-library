@@ -109,7 +109,7 @@ const identity = <T>(v: T): T => v
  * Maps each tracked state field to its event type and equality function.
  * Order matters: `update()` fires events in this order for multi-field updates.
  */
-const STATE_FIELDS: readonly StateFieldEntry[] = Array.from(
+const STATE_FIELDS: readonly StateFieldEntry[] = /* @__PURE__ */ Array.from(
 	CMCD_STATE_EVENT_FIELDS,
 	([event, field]): StateFieldEntry => {
 		if (field === 'br') {
@@ -124,8 +124,8 @@ const STATE_FIELDS: readonly StateFieldEntry[] = Array.from(
 	},
 )
 
-const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = new Map(
-	STATE_FIELDS.map(e => [e.event, e]),
+const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = /* @__PURE__ */ new Map(
+	/* @__PURE__ */ STATE_FIELDS.map(e => [e.event, e]),
 )
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {

@@ -14,7 +14,7 @@ export function normalizeAlgorithmName(rawAlg?: string): string {
 	return (rawAlg ?? 'SHA-256').replace(SHA_ALGORITHM_PATTERN, 'SHA-$1')
 }
 
-const HEX_TABLE: readonly string[] = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0'))
+const HEX_TABLE: readonly string[] = /* @__PURE__ */ Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0'))
 
 /**
  * Converts a Uint8Array to a lowercase hex string.
