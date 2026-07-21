@@ -24,7 +24,7 @@ import type { CmcdKey } from './CmcdKey.ts'
  *
  * @internal
  */
-export const CMCD_STATE_EVENT_FIELDS: ReadonlyMap<CmcdEventType, CmcdKey> = new Map([
+export const CMCD_STATE_EVENT_FIELDS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map([
 	[CMCD_EVENT_PLAY_STATE, 'sta'],
 	[CMCD_EVENT_PLAYBACK_RATE, 'pr'],
 	[CMCD_EVENT_CONTENT_ID, 'cid'],

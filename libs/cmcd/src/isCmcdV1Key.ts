@@ -2,7 +2,7 @@ import { CMCD_V1_KEYS } from './CMCD_V1_KEYS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
-const CMCD_V1_KEY_SET: ReadonlySet<string> = new Set(CMCD_V1_KEYS)
+const CMCD_V1_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_V1_KEYS)
 
 /**
  * Filter function for CMCD v1 keys.

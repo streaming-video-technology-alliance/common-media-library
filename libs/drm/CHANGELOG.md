@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Fixed
 
+- `ensureEncryptedInit`'s sample-entry reader/writer tables are now built inside side-effect-free (`/* @__PURE__ */`) initializers so consumer bundlers can drop the tables (and their `@svta/cml-iso-bmff` factory imports) when `ensureEncryptedInit` is unused; runtime import behavior is unchanged (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
 - The module-scope `MediaKeys.isTypeSupported` probe is now marked side-effect free so consumer bundlers can drop it when `getSupportedKeySystemConfiguration` is unused ([#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
 
 ## [1.1.6] - 2026-05-13
