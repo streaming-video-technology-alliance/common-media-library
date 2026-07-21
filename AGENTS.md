@@ -38,7 +38,8 @@ APIs are the product. Design them so adopters fall into the pit of success:
 - Update `package.json` version (semver) and `CHANGELOG.md` for every change
 - When a package's version changes, patch-bump any packages that depend on it
 - Avoid breaking changes; when unavoidable, provide migration guidance in changelog and docs
-- Save all plans, RFCs, and design docs in the `plans/` directory in a folder with the name of the feature or issue being implemented (e.g. `plans/cmcd-reporter-middleware/rfc.md`). Individual parts of the plan like steps, architecture, tech stack, etc. should be saved in separate files within the folder. Do not use `docs/` for planning documents.
+- Save plans and design-session artifacts in the `plans/` directory in a folder with the name of the feature or issue being implemented. Individual parts of the plan like steps, architecture, tech stack, etc. should be saved in separate files within the folder (e.g. `plans/<feature-name>/steps.md`). Do not use `docs/` for planning documents.
+- Proposals that need community buy-in (public API changes, new packages, significant architecture) are RFCs, not plans: save them as `rfc/<feature-name>.md` and follow the process in `rfc/README.md`.
 
 ## Documentation
 

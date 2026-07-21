@@ -1,8 +1,11 @@
+---
+status: draft
+---
+
 # RFC: Report Middleware for `CmcdReporter`
 
 | | |
 |---|---|
-| **Status** | Draft, for community review |
 | **Author** | Casey Occhialini |
 | **Date** | 2026-07-21 |
 | **Package** | `@svta/cml-cmcd` |
@@ -318,3 +321,11 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 - A per-batch stage (e.g. `batchMiddleware`) for cross-event aggregation, dedup, or compression decisions.
 - A small library of shared middleware (session samplers, PII redactors, key normalizers) published as reusable functions, enabled by the pure-function contract.
 - Runtime registration (`use()`/unregister) if dynamic policy changes without reporter reconstruction become a real need.
+
+## Final Decision
+
+*(Completed after review)*
+
+**Decision:**
+**Rationale:**
+**Date:**
