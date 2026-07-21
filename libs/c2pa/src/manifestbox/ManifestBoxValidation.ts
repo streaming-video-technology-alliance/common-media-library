@@ -22,6 +22,28 @@ export type ManifestBoxValidationResult = {
 }
 
 /**
+ * Validates continuity for an implementer-defined continuity method (§19.3.2).
+ *
+ * @public
+ */
+export type ManifestBoxContinuityValidator = (
+	liveVideoAssertion: Readonly<Record<string, unknown>>,
+	manifest: C2paManifest,
+) => boolean | Promise<boolean>
+
+/**
+ * Options for `validateC2paManifestBoxSegment`.
+ *
+ * @public
+ */
+export type ManifestBoxValidationOptions = {
+	readonly continuityValidator?: {
+		readonly method: string
+		readonly validate: ManifestBoxContinuityValidator
+	}
+}
+
+/**
  * State to carry between consecutive manifest-box segment validations.
  *
  * Pass the `nextState` returned by {@link validateC2paManifestBoxSegment}

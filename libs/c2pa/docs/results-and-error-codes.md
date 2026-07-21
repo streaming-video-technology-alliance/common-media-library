@@ -33,9 +33,10 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 |----------|-------|---------|
 | `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box or BMFF hash mismatch |
 | `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
-| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure: signature, hash, or key mismatch |
+| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure (signature, hash, or key mismatch), a broken `c2pa.manifestId` chain, or a failed custom continuity validator |
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | sequenceNumber or streamId mismatch |
-| `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | Continuity chain broken or method unsupported |
+| `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
+| `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
 | `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | Session key invalid or expired |
 
 Example of handling specific error codes:
