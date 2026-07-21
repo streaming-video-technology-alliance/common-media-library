@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `ensureEncryptedInit`'s sample-entry reader/writer tables are now built inside side-effect-free initializers, so importing the package no longer eagerly registers ISO BMFF sample-entry readers and consumer bundlers can drop the tables (and their `@svta/cml-iso-bmff` factory imports) when `ensureEncryptedInit` is unused (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+
 ## [1.1.6] - 2026-05-13
 
 ### Changed
