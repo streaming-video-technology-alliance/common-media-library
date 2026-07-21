@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `IsoBoxReadableStream` no longer reads the bare `ReadableStream` global at module scope: importing the package never throws on runtimes without the Web Streams API. Instantiating `IsoBoxReadableStream` on such runtimes throws a descriptive error instead ([#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+
 ## [1.0.2] - 2026-05-13
 
 ### Changed

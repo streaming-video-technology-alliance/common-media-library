@@ -134,8 +134,10 @@ export class WebVttTransformer {
     transform(chunk: string, controller: TransformStreamDefaultController<WebVttResult>): void;
 }
 
+// Warning: (ae-forgotten-export) The symbol "TransformStreamBase" needs to be exported by the entry point index.d.ts
+//
 // @public
-export class WebVttTransformStream extends TransformStream<string, WebVttResult> {
+export class WebVttTransformStream extends TransformStreamBase<string, WebVttResult> {
     constructor(writableStrategy?: QueuingStrategy<string>, readableStrategy?: QueuingStrategy<WebVttResult>);
 }
 

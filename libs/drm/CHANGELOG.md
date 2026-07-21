@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The module-scope `MediaKeys.isTypeSupported` probe is now marked side-effect free so consumer bundlers can drop it when `getSupportedKeySystemConfiguration` is unused ([#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+
 ## [1.1.6] - 2026-05-13
 
 ### Changed
