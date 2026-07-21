@@ -3,7 +3,7 @@ import type { Cmcd } from './Cmcd.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
-const CMCD_REQUEST_KEY_SET: ReadonlySet<string> = new Set(CMCD_REQUEST_KEYS)
+const CMCD_REQUEST_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_REQUEST_KEYS)
 
 /**
  * Check if a key is a valid CMCD request key.

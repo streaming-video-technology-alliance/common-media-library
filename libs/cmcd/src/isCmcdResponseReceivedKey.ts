@@ -1,7 +1,7 @@
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import type { Cmcd } from './Cmcd.ts'
 
-const CMCD_RESPONSE_KEY_SET: ReadonlySet<string> = new Set(CMCD_RESPONSE_KEYS)
+const CMCD_RESPONSE_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_RESPONSE_KEYS)
 
 /**
  * Check if a key is a valid CMCD response key.

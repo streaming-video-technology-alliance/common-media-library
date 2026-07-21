@@ -8,8 +8,8 @@ import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
 
-const CMCD_V1_KEY_SET: ReadonlySet<string> = new Set(CMCD_V1_KEYS)
-const CMCD_KEY_SET: ReadonlySet<string> = new Set(CMCD_KEYS)
+const CMCD_V1_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_V1_KEYS)
+const CMCD_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_KEYS)
 
 /**
  * Validates that all keys in a CMCD payload are recognized spec keys or valid custom keys.
