@@ -189,12 +189,9 @@ CMCD allows player-defined key/value pairs alongside the standard keys. Per CTA-
 
 ### Naming Rules
 
-The `CmcdCustomKey` type accepts any hyphenated string, but two runtime checks apply before a key reaches the wire, and keys that fail either one are silently dropped:
+The `CmcdCustomKey` type requires a lowercase hyphenated string at compile time. At runtime, `isCmcdCustomKey` enforces the full rule, and keys that fail it are silently dropped: a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character. These are the CTA-5004-B custom-key rules restricted to names that survive RFC 8941 key serialization, so a key that passes the check is guaranteed to reach the wire.
 
-1. The CMCD custom-key check (`isCmcdCustomKey`): characters from `a-z A-Z 0-9 . -`, with a hyphen that is neither the first nor the last character.
-2. RFC 8941 key serialization: the first character must be a lowercase letter, and the rest must be from `a-z 0-9 - _ . *`.
-
-In practice: **use lowercase reverse-DNS names** like `com.example-mykey` and both checks are satisfied.
+In practice: **use lowercase reverse-DNS names** like `com.example-mykey`.
 
 ### Enabling Custom Keys
 

@@ -1,4 +1,4 @@
-import type { CmcdReporterConfig } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdKey, CmcdReporterConfig } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
@@ -762,10 +762,10 @@ describe('CmcdReporter', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 'test-session',
-				enabledKeys: ['sid', 'Com.Example-foo', '2com.example-x', '-a-b'],
+				enabledKeys: ['sid', 'Com.Example-foo' as CmcdKey, '2com.example-x', '-a-b'],
 			}, requester)
 
-			reporter.update({ 'Com.Example-foo': 'a', '2com.example-x': 'b', '-a-b': 'c' })
+			reporter.update({ 'Com.Example-foo': 'a', '2com.example-x': 'b', '-a-b': 'c' } as Partial<Cmcd>)
 
 			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(req.url.includes('sid%3D'))
@@ -824,13 +824,13 @@ describe('CmcdReporter', () => {
 					{
 						url: 'https://example.com/cmcd',
 						events: [CmcdEventType.ERROR],
-						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'Com.Example-foo'],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'Com.Example-foo' as CmcdKey],
 						batchSize: 1,
 					},
 				],
 			}), requester)
 
-			reporter.recordEvent(CmcdEventType.ERROR, { 'Com.Example-foo': 'bar' })
+			reporter.recordEvent(CmcdEventType.ERROR, { 'Com.Example-foo': 'bar' } as Partial<Cmcd>)
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 

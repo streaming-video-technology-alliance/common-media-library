@@ -12,9 +12,13 @@ and this project adheres to
 
 - `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`
 
+### Changed
+
+- `isCmcdCustomKey` and the `CmcdCustomKey` type now only accept custom keys that survive RFC 8941 key serialization: a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character. Uppercase and digit-leading names were never serializable as CMCD; they are now rejected by the type, the validators, and key filtering instead of being dropped at encode preparation
+
 ### Fixed
 
-- `prepareCmcdData` now strips CMCD data that cannot be serialized per RFC 8941 instead of letting the encoder throw: custom keys that pass `isCmcdCustomKey` but fail key serialization (e.g. an uppercase or digit-leading character), and string values containing control characters (including inside arrays and `SfItem` wrappers), are dropped like any other invalid value
+- `prepareCmcdData` now strips CMCD data that cannot be serialized per RFC 8941 instead of letting the encoder throw: string values containing control characters (including inside arrays and `SfItem` wrappers) are dropped like any other invalid value
 - `CmcdReporter` event batches no longer lose data permanently when an event cannot be encoded. Previously the encode failure was indistinguishable from a transport failure, so the whole batch — including its clean events — was re-queued at the head of the queue forever: it was retried on every subsequent send, never delivered, and `flush()` could not clear it. Unencodable events are now dropped from the batch, the clean events deliver, and the re-queue path is reserved for retryable transport failures (429/5xx)
 - `CmcdReporter.createRequestReport` no longer throws into the player's request path when a value survives preparation but fails serialization; the request is returned without CMCD applied instead
 

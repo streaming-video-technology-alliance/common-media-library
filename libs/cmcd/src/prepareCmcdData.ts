@@ -25,12 +25,6 @@ const filterMap: Record<string, (key: string) => boolean> = {
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
 }
 
-// RFC 8941 key charset enforced by the serializer (serializeKey). A custom
-// key can pass isCmcdCustomKey but fail this pattern (e.g. an uppercase or
-// digit-leading character), which would throw at encode time, so such keys
-// are dropped here instead. Standard CMCD keys always match.
-const SERIALIZABLE_KEY_REGEX = /^[a-z*][a-z0-9\-_.*]*$/
-
 /**
  * Unwrap an inner list or SfItem value to a plain scalar.
  */
@@ -122,8 +116,10 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
-	// Filter keys based on the version, reporting mode and options
-	let keys = Object.keys(data).filter(key => keyFilter(key) && SERIALIZABLE_KEY_REGEX.test(key)) as CmcdKey[]
+	// Filter keys based on the version, reporting mode and options. Every key
+	// passing a filter is RFC 8941 serializable: standard keys by definition,
+	// custom keys because isCmcdCustomKey enforces the serializable charset.
+	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
 
 	if (data['e'] && data['e'] !== CMCD_EVENT_RESPONSE_RECEIVED) {
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
