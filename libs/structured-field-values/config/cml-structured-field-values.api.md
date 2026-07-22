@@ -197,6 +197,7 @@ export type SfDictionary = Record<string, SfMember> | Map<string, SfMember>;
 // @public
 export type SfEncodeOptions = {
     whitespace?: boolean;
+    skipUnserializable?: boolean;
 };
 
 // @public

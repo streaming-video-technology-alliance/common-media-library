@@ -16,3 +16,9 @@ test('encodeSfList', () => {
 		new SfItem(3, { a: 2 }),
 	]), `1;a=2, 2;a=2, 3;a=2`)
 })
+
+test('encodeSfList skipUnserializable', () => {
+	assert.throws(() => encodeSfList([1, 10 ** 15, 'ok']))
+	assert.deepStrictEqual(encodeSfList([1, 10 ** 15, 'ok'], { skipUnserializable: true }), `1, "ok"`)
+	assert.deepStrictEqual(encodeSfList([new SfItem([1, 10 ** 15]), new SfItem([2, 3])], { skipUnserializable: true }), `(2 3)`)
+})

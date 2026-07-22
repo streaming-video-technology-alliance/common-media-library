@@ -71,4 +71,31 @@ describe('encodeSfDict', () => {
 		)
 	})
 
+	it('fails on unserializable members by default', () => {
+		assert.throws(() => encodeSfDict({ a: 1, big: 10 ** 15 }))
+		assert.throws(() => encodeSfDict({ a: 1, tok: new SfToken('bad token') }))
+	})
+
+	it('omits unserializable members when skipUnserializable is set', () => {
+		assert.deepStrictEqual(
+			encodeSfDict({ a: 1, big: 10 ** 15, tok: new SfToken('bad token'), b: 'ok' }, { skipUnserializable: true }),
+			`a=1, b="ok"`,
+		)
+	})
+
+	it('omits members with unserializable keys or parameters when skipUnserializable is set', () => {
+		assert.deepStrictEqual(
+			encodeSfDict({ 'BAD-KEY': 1, a: 2 }, { skipUnserializable: true }),
+			`a=2`,
+		)
+		assert.deepStrictEqual(
+			encodeSfDict({ a: new SfItem(true, { p: 10 ** 15 }), b: 2 }, { skipUnserializable: true }),
+			`b=2`,
+		)
+	})
+
+	it('returns an empty string when every member is skipped', () => {
+		assert.deepStrictEqual(encodeSfDict({ big: 10 ** 15 }, { skipUnserializable: true }), ``)
+	})
+
 })

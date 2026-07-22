@@ -1,4 +1,5 @@
 import type { SfEncodeOptions } from '../SfEncodeOptions.ts'
+import type { SfInnerList } from '../SfInnerList.ts'
 import { SfItem } from '../SfItem.ts'
 import { DICT } from '../utils/DICT.ts'
 import { serializeError } from './serializeError.ts'
@@ -54,13 +55,15 @@ export function serializeDict(dict: Record<string, any> | Map<string, any>, opti
 	}
 
 	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict)
-	const optionalWhiteSpace = options?.whitespace ? ' ' : ''
+	// Whitespace defaults to true (the RFC serialization emits a single SP
+	// after each comma) unless explicitly disabled.
+	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
+	const members: string[] = []
 
-	return Array.from(entries)
-		.map(([key, item]) => {
-			if (item instanceof SfItem === false) {
-				item = new SfItem(item)
-			}
+	for (const [key, value] of entries) {
+		const item: SfItem = value instanceof SfItem ? value : new SfItem(value)
+
+		try {
 			let output = serializeKey(key)
 			if (item.value === true) {
 				output += serializeParams(item.params)
@@ -68,13 +71,20 @@ export function serializeDict(dict: Record<string, any> | Map<string, any>, opti
 			else {
 				output += '='
 				if (Array.isArray(item.value)) {
-					output += serializeInnerList(item)
+					output += serializeInnerList(item as unknown as SfInnerList)
 				}
 				else {
 					output += serializeItem(item)
 				}
 			}
-			return output
-		})
-		.join(`,${optionalWhiteSpace}`)
+			members.push(output)
+		}
+		catch (error) {
+			if (!options?.skipUnserializable) {
+				throw error
+			}
+		}
+	}
+
+	return members.join(`,${optionalWhiteSpace}`)
 }

@@ -96,6 +96,9 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
  * @param options - Options for encoding.
  *
  * @public
+ *
+ * @example
+ * {@includeCode ../test/prepareCmcdData.test.ts#example}
  */
 export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): Cmcd {
 	const results: Cmcd = {}
@@ -112,7 +115,9 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
-	// Filter keys based on the version, reporting mode and options
+	// Filter keys based on the version, reporting mode and options. Every key
+	// passing a filter is RFC 8941 serializable: standard keys by definition,
+	// custom keys because isCmcdCustomKey enforces the serializable charset.
 	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
 
 	if (data['e'] && data['e'] !== CMCD_EVENT_RESPONSE_RECEIVED) {
