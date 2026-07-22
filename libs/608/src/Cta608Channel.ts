@@ -284,6 +284,10 @@ export class Cta608Channel {
 		}
 		this.logger.log(VerboseLevel.INFO, 'MIDROW: ' + JSON.stringify(styles))
 		this.writeScreen.setPen(styles)
+		// A mid-row code is a spacing attribute: it occupies one cell (shown as a
+		// space carrying the new pen) and advances the cursor, so text following
+		// the code starts one column to the right (CTA-608).
+		this.writeScreen.moveCursor(1)
 	}
 
 	outputDataUpdate(dispatch: boolean = false): void {
