@@ -1,4 +1,4 @@
-import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { isSerializableSfMember, SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
@@ -16,7 +16,6 @@ import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
 import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
-import { isSerializableValue } from './isSerializableValue.ts'
 import { isTokenField } from './isTokenField.ts'
 import { isValid } from './isValid.ts'
 
@@ -213,10 +212,11 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			continue
 		}
 
-		// A value that would throw during structured-field serialization
-		// (e.g. a string containing control characters) is stripped like
-		// any other invalid value rather than throwing out of the encoder.
-		if (!isSerializableValue(value)) {
+		// A value the structured-field serializer would reject (control
+		// characters, out-of-range numbers, invalid token content) is
+		// stripped like any other invalid value rather than throwing out
+		// of the encoder.
+		if (!isSerializableSfMember(value)) {
 			continue
 		}
 

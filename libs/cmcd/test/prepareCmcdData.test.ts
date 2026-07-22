@@ -198,6 +198,17 @@ describe('prepareCmcdData', () => {
 			ok(!('com.example-item' in data))
 			equal(data['cid'], 'content-id')
 		})
+
+		it('drops values the structured-field serializer cannot represent', () => {
+			const data = prepareCmcdData({
+				'com.example-tok': new SfToken('bad token'),
+				'com.example-big': 10 ** 15,
+				cid: 'content-id',
+			})
+			ok(!('com.example-tok' in data))
+			ok(!('com.example-big' in data))
+			equal(data['cid'], 'content-id')
+		})
 	})
 
 	describe('V1 down-conversion', () => {

@@ -18,7 +18,7 @@ and this project adheres to
 
 ### Fixed
 
-- `prepareCmcdData` now strips CMCD data that cannot be serialized per RFC 8941 instead of letting the encoder throw: string values containing control characters (including inside arrays and `SfItem` wrappers) are dropped like any other invalid value
+- `prepareCmcdData` now strips CMCD data that cannot be serialized per RFC 8941 instead of letting the encoder throw. The check is backed by the structured-field serializers (`isSerializableSfMember` from `@svta/cml-structured-field-values`), so it covers every serialization failure mode: control-character strings (including inside arrays and `SfItem` wrappers), out-of-range integers and decimals, and token values with invalid characters
 - `CmcdReporter` event batches no longer lose data permanently when an event cannot be encoded. Previously the encode failure was indistinguishable from a transport failure, so the whole batch — including its clean events — was re-queued at the head of the queue forever: it was retried on every subsequent send, never delivered, and `flush()` could not clear it. Unencodable events are now dropped from the batch, the clean events deliver, and the re-queue path is reserved for retryable transport failures (429/5xx)
 - `CmcdReporter.createRequestReport` no longer throws into the player's request path when a value survives preparation but fails serialization; the request is returned without CMCD applied instead
 

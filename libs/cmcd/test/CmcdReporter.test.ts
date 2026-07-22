@@ -788,7 +788,7 @@ describe('CmcdReporter', () => {
 			ok(!req.url.includes('com.example-foo'))
 		})
 
-		it('does not throw when an unencodable value reaches the query encoder', () => {
+		it('strips an unserializable custom value at preparation and keeps the report', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 'test-session',
@@ -796,6 +796,25 @@ describe('CmcdReporter', () => {
 			}, requester)
 
 			reporter.update({ 'com.example-tok': new SfToken('bad token') })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			// The invalid token is dropped; the rest of the report survives
+			ok(req.url.includes('CMCD='))
+			ok(req.url.includes('sid%3D'))
+			ok(!req.url.includes('com.example-tok'))
+		})
+
+		it('does not throw when an unencodable value reaches the query encoder', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'ot'],
+			}, requester)
+
+			// A garbage token-field value passes preparation as a plain string
+			// and is wrapped into an invalid SfToken afterwards, so it only
+			// fails at encode time
+			reporter.update({ ot: 'bad token' as string } as Partial<Cmcd>)
 
 			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			// The request goes out without CMCD applied instead of throwing
@@ -806,15 +825,16 @@ describe('CmcdReporter', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 'test-session',
-				enabledKeys: ['sid', 'com.example-tok'],
+				enabledKeys: ['sid', 'ot'],
 				transmissionMode: CmcdTransmissionMode.HEADERS,
 			}, requester)
 
-			reporter.update({ 'com.example-tok': new SfToken('bad token') })
+			reporter.update({ ot: 'bad token' as string } as Partial<Cmcd>)
 
 			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(!req.headers?.['CMCD-Request'])
 			ok(!req.headers?.['CMCD-Session'])
+			ok(!req.headers?.['CMCD-Object'])
 		})
 
 		it('drops an unserializable custom key from event reports', async () => {
@@ -868,13 +888,13 @@ describe('CmcdReporter', () => {
 					{
 						url: 'https://example.com/cmcd',
 						events: [CmcdEventType.ERROR],
-						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'br', 'com.example-tok'],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'br', 'ot'],
 						batchSize: 3,
 					},
 				],
 			}), requester)
 
-			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-tok': new SfToken('bad token') })
+			reporter.recordEvent(CmcdEventType.ERROR, { ot: 'bad token' as string } as Partial<Cmcd>)
 			reporter.recordEvent(CmcdEventType.ERROR, { br: [111] })
 			reporter.recordEvent(CmcdEventType.ERROR, { br: [222] })
 
@@ -886,7 +906,7 @@ describe('CmcdReporter', () => {
 			equal(lines.length, 2)
 			ok(lines[0].includes('br=(111)'))
 			ok(lines[1].includes('br=(222)'))
-			ok(!(requests[0].body as string).includes('com.example-tok'))
+			ok(!(requests[0].body as string).includes('ot='))
 
 			// The unencodable event was consumed, not re-queued
 			reporter.flush()
@@ -905,7 +925,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 2)
 		})
 
-		it('skips the send entirely when every event in the batch fails to encode', async () => {
+		it('strips an unserializable custom value from an event and still delivers it', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig({
 				eventTargets: [
@@ -919,6 +939,28 @@ describe('CmcdReporter', () => {
 			}), requester)
 
 			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-tok': new SfToken('bad token') })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('e=e'))
+			ok(!(requests[0].body as string)?.includes('com.example-tok'))
+		})
+
+		it('skips the send entirely when every event in the batch fails to encode', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'ot'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { ot: 'bad token' as string } as Partial<Cmcd>)
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
