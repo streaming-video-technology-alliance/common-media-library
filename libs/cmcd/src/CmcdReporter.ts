@@ -562,9 +562,9 @@ export class CmcdReporter {
 			}
 		}
 		catch {
-			// A value that survives preparation but cannot be serialized must
-			// not throw into the player's request path — the request goes out
-			// without CMCD applied instead.
+			// Defensive only: the encoder omits unserializable members
+			// (skipUnserializable), so this guards unexpected failures — a
+			// throw must never escape into the player's request path.
 		}
 
 		return report
@@ -607,12 +607,13 @@ export class CmcdReporter {
 	/**
 	 * Sends an event report. Called by the reporter when a batch is ready to be sent.
 	 *
-	 * Events that cannot be encoded are dropped from the batch rather than
-	 * failing it: an encode failure is permanent, so retrying it can never
-	 * succeed, and rejecting would re-queue the batch forever — blocking
-	 * delivery of the other events in it. Only transport-level failures
-	 * reject, which keeps the re-queue path in {@link CmcdReporter.processEventTargets}
-	 * reserved for retryable errors.
+	 * The encoder omits unserializable members (skipUnserializable), so
+	 * events normally always encode. The per-event catch is defensive: an
+	 * encode failure is permanent, so retrying it can never succeed, and
+	 * rejecting would re-queue the batch forever — blocking delivery of the
+	 * other events in it. Only transport-level failures reject, which keeps
+	 * the re-queue path in {@link CmcdReporter.processEventTargets} reserved
+	 * for retryable errors.
 	 *
 	 * @param config - The target config to send the event report to.
 	 * @param data - The data to send in the event report.

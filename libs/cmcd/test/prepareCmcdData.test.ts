@@ -182,31 +182,11 @@ describe('prepareCmcdData', () => {
 			equal(data['cid'], 'content-id')
 		})
 
-		it('drops string values containing control characters', () => {
-			const data = prepareCmcdData({ 'com.example-foo': 'bad\u0000value', cid: 'content-id' })
-			ok(!('com.example-foo' in data))
-			equal(data['cid'], 'content-id')
-		})
-
-		it('drops control-character strings inside arrays and SfItem values', () => {
-			const data = prepareCmcdData({
-				'com.example-list': ['ok', 'bad\u0000value'],
-				'com.example-item': toCmcdValue('bad\u0000value'),
-				cid: 'content-id',
-			})
-			ok(!('com.example-list' in data))
-			ok(!('com.example-item' in data))
-			equal(data['cid'], 'content-id')
-		})
-
-		it('drops values the structured-field serializer cannot represent', () => {
-			const data = prepareCmcdData({
-				'com.example-tok': new SfToken('bad token'),
-				'com.example-big': 10 ** 15,
-				cid: 'content-id',
-			})
-			ok(!('com.example-tok' in data))
-			ok(!('com.example-big' in data))
+		it('passes value serializability through to the encoder', () => {
+			// Unserializable values are omitted at encode time via
+			// skipUnserializable, not stripped here.
+			const data = prepareCmcdData({ 'com.example-tok': new SfToken('bad token'), cid: 'content-id' })
+			ok(data['com.example-tok'] instanceof SfToken)
 			equal(data['cid'], 'content-id')
 		})
 	})

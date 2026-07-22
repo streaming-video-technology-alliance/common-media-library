@@ -229,7 +229,7 @@ reporter.recordEvent(CmcdEventType.ERROR, {
 Custom values may be strings, numbers, booleans, or tokens, optionally wrapped with `toCmcdValue()` to attach structured-field parameters (see the `CmcdCustomValue` type). Notes on the wire format:
 
 - `true` is encoded as a bare valueless key (`com.example-flag`), per the RFC 8941 boolean convention; `false` is treated like other empty values and dropped entirely.
-- Values that cannot be serialized as RFC 8941 structured fields are dropped — for example strings containing control characters, integers outside ±999,999,999,999,999, and token values with characters outside the token grammar.
+- Values that cannot be serialized as RFC 8941 structured fields are omitted from the encoded report — for example strings containing control characters, integers outside ±999,999,999,999,999, and token values with characters outside the token grammar. The rest of the report is unaffected.
 - The package's receiving-side validators expect custom values to be strings of at most 64 characters — prefer short string values for maximum interoperability. See the [Validation Guide](./validation-guide.md#custom-keys).
 
 ### Custom Keys in Headers Mode

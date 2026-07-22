@@ -28,6 +28,15 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), 'nor=(""),v=2')
 	})
 
+	it('omits members that fail RFC 8941 serialization instead of throwing', () => {
+		const input = {
+			cid: 'content-id',
+			'com.example-tok': new SfToken('bad token'),
+			'com.example-big': 10 ** 15,
+		}
+		equal(encodeCmcd(input), 'cid="content-id",v=2')
+	})
+
 	describe('version 1', () => {
 		it('returns encoded v1 string when version option is set to 1', () => {
 			const { v, ...input } = CMCD_INPUT
