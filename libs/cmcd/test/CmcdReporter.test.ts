@@ -682,6 +682,207 @@ describe('CmcdReporter', () => {
 		})
 	})
 
+	describe('unserializable data handling', () => {
+		it('drops custom keys that fail RFC 8941 key serialization from request reports', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'Com.Example-foo', '2com.example-x', '-a-b'],
+			}, requester)
+
+			reporter.update({ 'Com.Example-foo': 'a', '2com.example-x': 'b', '-a-b': 'c' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.url.includes('sid%3D'))
+			ok(!req.url.includes('Com.Example-foo'))
+			ok(!req.url.includes('2com.example-x'))
+			ok(!req.url.includes('-a-b'))
+		})
+
+		it('drops a control-character string value from request reports', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo'],
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bad\u0000value' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.url.includes('sid%3D'))
+			ok(!req.url.includes('com.example-foo'))
+		})
+
+		it('does not throw when an unencodable value reaches the query encoder', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-tok'],
+			}, requester)
+
+			reporter.update({ 'com.example-tok': new SfToken('bad token') })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			// The request goes out without CMCD applied instead of throwing
+			ok(!req.url.includes('CMCD='))
+		})
+
+		it('does not throw when an unencodable value reaches the header encoder', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-tok'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+			}, requester)
+
+			reporter.update({ 'com.example-tok': new SfToken('bad token') })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(!req.headers?.['CMCD-Request'])
+			ok(!req.headers?.['CMCD-Session'])
+		})
+
+		it('drops an unserializable custom key from event reports', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'Com.Example-foo'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'Com.Example-foo': 'bar' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('e=e'))
+			ok(!(requests[0].body as string)?.includes('Com.Example-foo'))
+		})
+
+		it('drops a control-character string value from event reports', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-foo'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-foo': 'bad\u0000value' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('e=e'))
+			ok(!(requests[0].body as string)?.includes('com.example-foo'))
+		})
+
+		it('delivers the clean events from a batch containing an unencodable event', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'br', 'com.example-tok'],
+						batchSize: 3,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-tok': new SfToken('bad token') })
+			reporter.recordEvent(CmcdEventType.ERROR, { br: [111] })
+			reporter.recordEvent(CmcdEventType.ERROR, { br: [222] })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+
+			const lines = (requests[0].body as string).trim().split('\n')
+			equal(lines.length, 2)
+			ok(lines[0].includes('br=(111)'))
+			ok(lines[1].includes('br=(222)'))
+			ok(!(requests[0].body as string).includes('com.example-tok'))
+
+			// The unencodable event was consumed, not re-queued
+			reporter.flush()
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+
+			// Subsequent batches are unaffected
+			reporter.recordEvent(CmcdEventType.ERROR, { br: [333] })
+			reporter.recordEvent(CmcdEventType.ERROR, { br: [444] })
+			reporter.recordEvent(CmcdEventType.ERROR, { br: [555] })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+		})
+
+		it('skips the send entirely when every event in the batch fails to encode', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-tok'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-tok': new SfToken('bad token') })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 0)
+
+			// The queue is drained — nothing left to flush
+			reporter.flush()
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 0)
+		})
+
+		it('still re-queues events on transport failure and delivers them on retry', async () => {
+			const requests: HttpRequest[] = []
+			let calls = 0
+			const requester = async (request: HttpRequest): Promise<{ status: number; }> => {
+				requests.push(request)
+				return { status: calls++ === 0 ? 500 : 200 }
+			}
+
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// First attempt failed with 500 and the event was re-queued
+			equal(requests.length, 1)
+
+			reporter.flush()
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[1].body as string)?.includes('e=e'))
+		})
+	})
+
 	describe('recordResponseReceived', () => {
 		function createRrConfig(overrides: Partial<CmcdReporterConfig> = {}): Partial<CmcdReporterConfig> {
 			return {

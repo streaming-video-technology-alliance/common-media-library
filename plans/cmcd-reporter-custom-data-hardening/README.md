@@ -2,7 +2,7 @@
 
 **Date**: 2026-07-21
 **Package**: `@svta/cml-cmcd`
-**Status**: In progress — PR-A (WI-1, WI-2, WI-6) implemented
+**Status**: In progress — PR-A (WI-1, WI-2, WI-6) and PR-B (WI-4) implemented
 **Branch**: `task/cmcd-reporter-custom-data-hardening`
 
 ## Background
@@ -163,7 +163,11 @@ where applicable).
 
 ### WI-4 — Harden encoding failures: eliminate the poison-batch bug and `createRequestReport` throws
 
-**Priority**: P1 (correctness/data-loss) · **Effort**: M · **Type**: bug fix
+**Priority**: P1 (correctness/data-loss) · **Effort**: M · **Type**: bug fix · **Status**: ✅ Implemented
+(Implementation note: containment was also added around `createRequestReport`'s encode step —
+beyond the plan's two layers — because prevention alone cannot cover every serializer throw,
+e.g. invalid `SfToken` values or out-of-range integers, and the acceptance criterion is that
+`createRequestReport` never throws.)
 
 **Problem.** Gate 3 (RFC 8941 serialization) **throws** rather than dropping. Two consequences,
 both runtime-verified:

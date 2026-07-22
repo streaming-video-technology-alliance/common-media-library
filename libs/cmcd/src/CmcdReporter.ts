@@ -544,18 +544,25 @@ export class CmcdReporter {
 
 		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
 
-		switch (this.config.transmissionMode) {
-			case CMCD_QUERY:
-				const param = encodePreparedCmcd(cmcd)
-				if (param) {
-					url.searchParams.set(CMCD_PARAM, param)
-					report.url = url.toString()
-				}
-				break
+		try {
+			switch (this.config.transmissionMode) {
+				case CMCD_QUERY:
+					const param = encodePreparedCmcd(cmcd)
+					if (param) {
+						url.searchParams.set(CMCD_PARAM, param)
+						report.url = url.toString()
+					}
+					break
 
-			case CMCD_HEADERS:
-				Object.assign(report.headers, toPreparedCmcdHeaders(cmcd, options.customHeaderMap))
-				break
+				case CMCD_HEADERS:
+					Object.assign(report.headers, toPreparedCmcdHeaders(cmcd, options.customHeaderMap))
+					break
+			}
+		}
+		catch {
+			// A value that survives preparation but cannot be serialized must
+			// not throw into the player's request path — the request goes out
+			// without CMCD applied instead.
 		}
 
 		return report
@@ -598,18 +605,40 @@ export class CmcdReporter {
 	/**
 	 * Sends an event report. Called by the reporter when a batch is ready to be sent.
 	 *
+	 * Events that cannot be encoded are dropped from the batch rather than
+	 * failing it: an encode failure is permanent, so retrying it can never
+	 * succeed, and rejecting would re-queue the batch forever — blocking
+	 * delivery of the other events in it. Only transport-level failures
+	 * reject, which keeps the re-queue path in {@link CmcdReporter.processEventTargets}
+	 * reserved for retryable errors.
+	 *
 	 * @param config - The target config to send the event report to.
 	 * @param data - The data to send in the event report.
 	 */
 	private async sendEventReport(config: CmcdEventReportConfigNormalized, data: Cmcd[]): Promise<void> {
 		const options = createEncodingOptions(CMCD_EVENT_MODE, config)
+		const lines: string[] = []
+
+		for (const item of data) {
+			try {
+				lines.push(encodeCmcd(item, options))
+			}
+			catch {
+				// Dropped: permanently unencodable, see doc comment above.
+			}
+		}
+
+		if (!lines.length) {
+			return
+		}
+
 		const response = await this.requester({
 			url: config.url,
 			method: 'POST',
 			headers: {
 				'Content-Type': CMCD_MIME_TYPE,
 			},
-			body: data.map(item => encodeCmcd(item, options)).join('\n') + '\n',
+			body: lines.join('\n') + '\n',
 		})
 
 		const { status } = response

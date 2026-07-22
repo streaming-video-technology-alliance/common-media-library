@@ -172,6 +172,34 @@ describe('prepareCmcdData', () => {
 		})
 	})
 
+	describe('serialization safety', () => {
+		it('drops custom keys that fail RFC 8941 key serialization', () => {
+			const data = prepareCmcdData({ 'Com.Example-foo': 'a', '2com.example-x': 'b', '-a-b': 'c', 'a-b-': 'd', cid: 'content-id' })
+			ok(!('Com.Example-foo' in data))
+			ok(!('2com.example-x' in data))
+			ok(!('-a-b' in data))
+			equal(data['a-b-'], 'd')
+			equal(data['cid'], 'content-id')
+		})
+
+		it('drops string values containing control characters', () => {
+			const data = prepareCmcdData({ 'com.example-foo': 'bad\u0000value', cid: 'content-id' })
+			ok(!('com.example-foo' in data))
+			equal(data['cid'], 'content-id')
+		})
+
+		it('drops control-character strings inside arrays and SfItem values', () => {
+			const data = prepareCmcdData({
+				'com.example-list': ['ok', 'bad\u0000value'],
+				'com.example-item': toCmcdValue('bad\u0000value'),
+				cid: 'content-id',
+			})
+			ok(!('com.example-list' in data))
+			ok(!('com.example-item' in data))
+			equal(data['cid'], 'content-id')
+		})
+	})
+
 	describe('V1 down-conversion', () => {
 		it('extracts nrr from a nor SfItem r parameter and keeps custom keys', () => {
 			const data = prepareCmcdData({ nor: [toCmcdValue('../seg/3.m4v', { r: '0-99' })], 'com.example-hello': 'world' }, { version: 1 })

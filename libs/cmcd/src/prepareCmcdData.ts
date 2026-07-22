@@ -16,6 +16,7 @@ import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
 import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
 import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
+import { isSerializableValue } from './isSerializableValue.ts'
 import { isTokenField } from './isTokenField.ts'
 import { isValid } from './isValid.ts'
 
@@ -23,6 +24,12 @@ const filterMap: Record<string, (key: string) => boolean> = {
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
 	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
 }
+
+// RFC 8941 key charset enforced by the serializer (serializeKey). A custom
+// key can pass isCmcdCustomKey but fail this pattern (e.g. an uppercase or
+// digit-leading character), which would throw at encode time, so such keys
+// are dropped here instead. Standard CMCD keys always match.
+const SERIALIZABLE_KEY_REGEX = /^[a-z*][a-z0-9\-_.*]*$/
 
 /**
  * Unwrap an inner list or SfItem value to a plain scalar.
@@ -116,7 +123,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
 	// Filter keys based on the version, reporting mode and options
-	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
+	let keys = Object.keys(data).filter(key => keyFilter(key) && SERIALIZABLE_KEY_REGEX.test(key)) as CmcdKey[]
 
 	if (data['e'] && data['e'] !== CMCD_EVENT_RESPONSE_RECEIVED) {
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
@@ -207,6 +214,13 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			&& key === 'bg'
 			&& data['e'] === CMCD_EVENT_BACKGROUNDED_MODE
 		if (!isValid(value) && !isBgFalseTransition) {
+			continue
+		}
+
+		// A value that would throw during structured-field serialization
+		// (e.g. a string containing control characters) is stripped like
+		// any other invalid value rather than throwing out of the encoder.
+		if (!isSerializableValue(value)) {
 			continue
 		}
 

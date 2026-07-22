@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `prepareCmcdData` now strips CMCD data that cannot be serialized per RFC 8941 instead of letting the encoder throw: custom keys that pass `isCmcdCustomKey` but fail key serialization (e.g. an uppercase or digit-leading character), and string values containing control characters (including inside arrays and `SfItem` wrappers), are dropped like any other invalid value
+- `CmcdReporter` event batches no longer lose data permanently when an event cannot be encoded. Previously the encode failure was indistinguishable from a transport failure, so the whole batch — including its clean events — was re-queued at the head of the queue forever: it was retried on every subsequent send, never delivered, and `flush()` could not clear it. Unencodable events are now dropped from the batch, the clean events deliver, and the re-queue path is reserved for retryable transport failures (429/5xx)
+- `CmcdReporter.createRequestReport` no longer throws into the player's request path when a value survives preparation but fails serialization; the request is returned without CMCD applied instead
+
 ## [2.4.1] - 2026-07-21
 
 ### Fixed
