@@ -10,7 +10,11 @@ and this project adheres to
 
 ### Added
 
-- `isSerializableSfMember` — checks whether a value can be serialized as a structured field dictionary or list member without failing, covering all RFC 8941 serialization failure modes (control characters in strings, out-of-range integers and decimals, invalid token content, unsupported types)
+- `SfEncodeOptions.skipUnserializable` — when set, `encodeSfDict` and `encodeSfList` omit members that fail RFC 8941 serialization (control-character strings, out-of-range integers and decimals, invalid token content, unsupported types) and emit the remaining members as a valid structured field, instead of failing the entire serialization
+
+### Fixed
+
+- `encodeSfDict` and `encodeSfList` no longer disable whitespace when a partial options object is passed: `whitespace` now defaults to `true` (matching the RFC serialization output and the documented default) unless explicitly set to `false`. Callers that passed an options object without `whitespace` and relied on compact output must now pass `whitespace: false`
 
 ## [1.1.4] - 2026-07-21
 

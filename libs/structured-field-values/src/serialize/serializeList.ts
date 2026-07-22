@@ -37,21 +37,28 @@ export function serializeList(list: SfMember[], options: SfEncodeOptions = { whi
 		throw serializeError(list, LIST)
 	}
 
-	const optionalWhiteSpace = options?.whitespace ? ' ' : ''
+	// Whitespace defaults to true (the RFC serialization emits a single SP
+	// after each comma) unless explicitly disabled.
+	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
+	const members: string[] = []
 
-	return list
-		.map(item => {
-			if (item instanceof SfItem === false) {
-				item = new SfItem(item)
+	for (let item of list) {
+		if (item instanceof SfItem === false) {
+			item = new SfItem(item)
+		}
+
+		// TODO: Fix this type assertion
+		const i = item as any
+
+		try {
+			members.push(Array.isArray(i.value) ? serializeInnerList(i) : serializeItem(i))
+		}
+		catch (error) {
+			if (!options?.skipUnserializable) {
+				throw error
 			}
+		}
+	}
 
-			// TODO: Fix this type assertion
-			const i = item as any
-			if (Array.isArray(i.value)) {
-				return serializeInnerList(i)
-			}
-
-			return serializeItem(i)
-		})
-		.join(`,${optionalWhiteSpace}`)
+	return members.join(`,${optionalWhiteSpace}`)
 }
