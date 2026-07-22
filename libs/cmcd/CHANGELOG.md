@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`
+
 ### Fixed
 
 - `prepareCmcdData` now strips CMCD data that cannot be serialized per RFC 8941 instead of letting the encoder throw: custom keys that pass `isCmcdCustomKey` but fail key serialization (e.g. an uppercase or digit-leading character), and string values containing control characters (including inside arrays and `SfItem` wrappers), are dropped like any other invalid value

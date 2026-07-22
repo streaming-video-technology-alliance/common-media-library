@@ -476,6 +476,7 @@ export type CmcdRequestReport<D = unknown> = HttpRequest & {
 // @public
 export type CmcdRequestReportConfig = CmcdReportConfig & {
     transmissionMode?: CmcdTransmissionMode;
+    customHeaderMap?: Partial<CmcdHeaderMap>;
 };
 
 // @public

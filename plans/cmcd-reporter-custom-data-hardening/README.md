@@ -2,7 +2,7 @@
 
 **Date**: 2026-07-21
 **Package**: `@svta/cml-cmcd`
-**Status**: In progress — PR-A (WI-1, WI-2, WI-6), PR-B (WI-4), and PR-C (WI-3) implemented; WI-5 remains (gated on maintainer sign-off)
+**Status**: Complete — all work items (WI-1 through WI-6) implemented on this branch
 **Branch**: `task/cmcd-reporter-custom-data-hardening`
 
 ## Background
@@ -230,7 +230,8 @@ is debuggability — mitigated by the WI-4 validator warning follow-up and WI-3 
 
 ### WI-5 — Expose `customHeaderMap` (and optionally `formatters`) through the reporter config
 
-**Priority**: P3 · **Effort**: M · **Type**: API addition (minor release) — needs maintainer sign-off
+**Priority**: P3 · **Effort**: M · **Type**: API addition (minor release) · **Status**: ✅ Implemented (maintainer approved)
+(Decision: `formatters` deferred per the plan's recommendation — `customHeaderMap` only.)
 
 **Problem.** `CmcdEncodeOptions.customHeaderMap` lets encoders route custom keys into specific
 CMCD header shards, and `formatters` allows per-key value formatting — but

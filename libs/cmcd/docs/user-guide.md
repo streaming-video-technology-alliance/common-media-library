@@ -237,7 +237,33 @@ Custom values may be strings, numbers, booleans, or tokens, optionally wrapped w
 
 ### Custom Keys in Headers Mode
 
-In headers transmission mode, custom keys are always emitted in the `CMCD-Request` header. The lower-level encoding APIs accept a `customHeaderMap` option to route custom keys into other CMCD header shards, but that option is not currently exposed through `CmcdReporter`.
+In headers transmission mode, custom keys are emitted in the `CMCD-Request` header by default. Use the `customHeaderMap` option to route custom keys into other CMCD header shards — for example, a session-scoped custom key belongs in `CMCD-Session` so intermediaries can treat it as invariant for the session:
+
+```typescript
+import { CmcdReporter, CMCD_HEADERS } from "@svta/cml-cmcd";
+
+const reporter = new CmcdReporter({
+	cid: "video-123",
+	transmissionMode: CMCD_HEADERS,
+	enabledKeys: ["sid", "cid", "com.example-experiment"],
+	customHeaderMap: {
+		"CMCD-Session": ["com.example-experiment"],
+	},
+});
+
+reporter.update({ "com.example-experiment": "variant-b" });
+
+const request = reporter.createRequestReport({
+	url: "https://cdn.example.com/video/segment_001.m4s",
+});
+
+// request.headers will contain:
+// {
+//   'CMCD-Session': 'cid="video-123",com.example-experiment="variant-b",sid="…",v=2',
+// }
+```
+
+Custom keys not listed in any shard still default to `CMCD-Request`. Standard keys have fixed shards per the CMCD specification and cannot be re-routed. The option has no effect in query transmission mode or on event reports (which POST a body and have no header shards).
 
 ## Recording Events
 
@@ -670,6 +696,7 @@ const reporter = new CmcdReporter({
 | `cid`              | `string`                  | `undefined`         | Content ID                                                                     |
 | `version`          | `CmcdVersion`             | `CMCD_V2`           | CMCD protocol version                                                          |
 | `transmissionMode` | `CmcdTransmissionMode`    | `'query'`           | How to transmit CMCD data in request mode                                      |
+| `customHeaderMap`  | `Partial<CmcdHeaderMap>`  | `undefined`         | Routes [custom keys](#custom-keys-in-headers-mode) into specific CMCD header shards in headers mode. |
 | `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
 | `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
 

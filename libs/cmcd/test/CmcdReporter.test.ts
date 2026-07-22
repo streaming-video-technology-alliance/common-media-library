@@ -465,6 +465,81 @@ describe('CmcdReporter', () => {
 			ok(req.headers?.['CMCD-Request']?.includes('com.example-foo="bar"'))
 		})
 
+		it('routes custom keys to the configured header shard via customHeaderMap', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo', 'com.example-bar'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+				customHeaderMap: {
+					'CMCD-Session': ['com.example-foo'],
+					'CMCD-Status': ['com.example-bar'],
+				},
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar', 'com.example-bar': 'baz' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.headers?.['CMCD-Session']?.includes('com.example-foo="bar"'))
+			ok(req.headers?.['CMCD-Status']?.includes('com.example-bar="baz"'))
+			ok(!req.headers?.['CMCD-Request'])
+		})
+
+		it('emits unmapped custom keys in CMCD-Request when customHeaderMap is set', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo', 'com.example-bar'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+				customHeaderMap: {
+					'CMCD-Session': ['com.example-foo'],
+				},
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar', 'com.example-bar': 'baz' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.headers?.['CMCD-Session']?.includes('com.example-foo="bar"'))
+			ok(req.headers?.['CMCD-Request']?.includes('com.example-bar="baz"'))
+		})
+
+		it('does not re-route standard keys via customHeaderMap', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'br'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+				customHeaderMap: {
+					'CMCD-Status': ['sid', 'br'],
+				},
+			}, requester)
+
+			reporter.update({ br: [5000] })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			// Standard keys keep their spec-defined shards
+			ok(req.headers?.['CMCD-Session']?.includes('sid='))
+			ok(req.headers?.['CMCD-Object']?.includes('br='))
+			ok(!req.headers?.['CMCD-Status'])
+		})
+
+		it('ignores customHeaderMap in query transmission mode', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo'],
+				customHeaderMap: {
+					'CMCD-Session': ['com.example-foo'],
+				},
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.url.includes('com.example-foo%3D%22bar%22'))
+			equal(Object.keys(req.headers ?? {}).length, 0)
+		})
+
 		it('drops a custom key not listed in enabledKeys from request reports', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({
