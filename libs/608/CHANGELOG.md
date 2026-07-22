@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- A CTA-608 mid-row style code now advances the cursor by one column. A mid-row code is a spacing attribute: it occupies one on-screen cell (a space carrying the new pen) and advances the cursor, so following text starts one column to the right. Previously `ccMIDROW` only set the pen and did not advance the cursor, so colored/italic text was rendered one column too far left.
+
 ## [1.0.2] - 2026-02-13
 
 ### Fixed
