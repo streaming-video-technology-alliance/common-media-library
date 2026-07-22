@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `isSerializableSfMember` — checks whether a value can be serialized as a structured field dictionary or list member without failing, covering all RFC 8941 serialization failure modes (control characters in strings, out-of-range integers and decimals, invalid token content, unsupported types)
+
 ## [1.1.4] - 2026-07-21
 
 ### Changed
