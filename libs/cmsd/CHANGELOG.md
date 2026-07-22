@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `isCmsdCustomKey`: runtime check for valid custom keys (a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character), the subset of hyphenated key names that survives RFC 8941 key serialization
+
+### Changed
+
+- The `CmsdCustomKey` type now requires a lowercase hyphenated string, matching `isCmsdCustomKey`. Uppercase and digit-leading custom keys were never serializable as CMSD structured fields (`encodeCmsdStatic` and `encodeCmsdDynamic` throw on them); they are now rejected at compile time
+
 ## [1.0.7] - 2026-07-21
 
 ### Changed
