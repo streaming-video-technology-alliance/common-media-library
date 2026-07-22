@@ -44,4 +44,16 @@ describe('Cea608Channel Tests', () => {
 		channel.setMode(captionModeRollUp)
 		equal(channel.mode, captionModeRollUp)
 	})
+
+	it('ccMIDROW is a spacing attribute: it advances the cursor one column', () => {
+		const NR_ROWS = 15
+		const row: any = channel.writeScreen.rows[NR_ROWS - 1]
+		row.setCursor(8)
+		channel.ccMIDROW(0x20) // white mid-row style code
+		// The mid-row code occupies the cell at column 8, so the cursor advances
+		// and following text starts at column 9 (CTA-608).
+		equal(row.pos, 9)
+		channel.writeScreen.insertChar(0x41) // 'A'
+		equal(row.chars[9].uchar, 'A')
+	})
 })

@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-07-22
+
+### Fixed
+
+- A CTA-608 mid-row style code now advances the cursor by one column. A mid-row code is a spacing attribute: it occupies one on-screen cell (a space carrying the new pen) and advances the cursor, so following text starts one column to the right. Previously `ccMIDROW` only set the pen and did not advance the cursor, so colored/italic text was rendered one column too far left. ([#391](https://github.com/streaming-video-technology-alliance/common-media-library/issues/391))
+
 ## [1.0.2] - 2026-02-13
 
 ### Fixed
@@ -29,7 +35,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.3...HEAD
+[1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.2...608-v1.0.3
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.1...608-v1.0.2
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.0...608-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/608-v1.0.0
