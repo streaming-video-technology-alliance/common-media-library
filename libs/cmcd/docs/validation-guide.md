@@ -230,7 +230,7 @@ function validateAndLog(body: string): boolean {
 
 ## Custom Keys
 
-Custom keys (keys containing a hyphen, e.g., `com.example-mykey`) are recognized by all validators:
+Custom keys (keys containing a hyphen, e.g., `com.example-mykey`) are recognized by all validators. For sending custom keys through `CmcdReporter` — including the naming rules and `enabledKeys` requirements — see the [User Guide](./user-guide.md#custom-keys).
 
 - `validateCmcdKeys` — accepts custom keys without error
 - `validateCmcdValues` — checks that custom key values are strings with a max length of 64 characters, and that the key name contains a hyphen

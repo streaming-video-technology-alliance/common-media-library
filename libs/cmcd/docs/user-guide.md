@@ -183,6 +183,62 @@ reporter.update({
 // Both encode to: nor=("segment_002.m4s")
 ```
 
+## Custom Keys
+
+CMCD allows player-defined key/value pairs alongside the standard keys. Per CTA-5004-B, custom key names MUST carry a hyphenated prefix to ensure there is no namespace collision with future revisions of the specification, and clients SHOULD use reverse-DNS syntax when defining their own prefix (e.g., `com.example-mykey`).
+
+### Naming Rules
+
+The `CmcdCustomKey` type accepts any hyphenated string, but two runtime checks apply before a key reaches the wire, and keys that fail either one are silently dropped:
+
+1. The CMCD custom-key check (`isCmcdCustomKey`): characters from `a-z A-Z 0-9 . -`, with a hyphen that is neither the first nor the last character.
+2. RFC 8941 key serialization: the first character must be a lowercase letter, and the rest must be from `a-z 0-9 - _ . *`.
+
+In practice: **use lowercase reverse-DNS names** like `com.example-mykey` and both checks are satisfied.
+
+### Enabling Custom Keys
+
+Custom keys pass through the same `enabledKeys` filter as standard keys — the top-level `enabledKeys` for request reports, and each target's `enabledKeys` for event reports. There is no wildcard: a custom key that is not listed is silently dropped.
+
+```typescript
+import { CmcdReporter, CmcdEventType } from "@svta/cml-cmcd";
+
+const reporter = new CmcdReporter({
+	cid: "video-123",
+	// Request mode: the custom key must be listed here
+	enabledKeys: ["br", "bl", "sid", "cid", "com.example-experiment"],
+	eventTargets: [
+		{
+			url: "https://analytics.example.com/cmcd",
+			events: [CmcdEventType.TIME_INTERVAL, CmcdEventType.ERROR],
+			// Event mode: and here, for each target that should receive it
+			enabledKeys: ["br", "bl", "sid", "cid", "com.example-experiment"],
+		},
+	],
+});
+
+// Persist the value; it rides all subsequent request and event reports
+reporter.update({ "com.example-experiment": "variant-b" });
+
+// Or attach it to a single event report only
+reporter.recordEvent(CmcdEventType.ERROR, {
+	ec: ["FATAL"],
+	"com.example-experiment": "variant-b",
+});
+```
+
+### Value Types and Wire Format
+
+Custom values may be strings, numbers, booleans, or tokens, optionally wrapped with `toCmcdValue()` to attach structured-field parameters (see the `CmcdCustomValue` type). Notes on the wire format:
+
+- `true` is encoded as a bare valueless key (`com.example-flag`), per the RFC 8941 boolean convention; `false` is treated like other empty values and dropped entirely.
+- String values containing control characters cannot be serialized and are dropped.
+- The package's receiving-side validators expect custom values to be strings of at most 64 characters — prefer short string values for maximum interoperability. See the [Validation Guide](./validation-guide.md#custom-keys).
+
+### Custom Keys in Headers Mode
+
+In headers transmission mode, custom keys are always emitted in the `CMCD-Request` header. The lower-level encoding APIs accept a `customHeaderMap` option to route custom keys into other CMCD header shards, but that option is not currently exposed through `CmcdReporter`.
+
 ## Recording Events
 
 State-change events (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`,
@@ -254,6 +310,7 @@ call — they don't represent a persisted state transition:
 
 ```typescript
 // Custom event: the name and any payload only make sense for this call.
+// See "Custom Events" below for the required target configuration.
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "ad-quartile" });
 
 // Error: ec carries the player error code(s). Per CTA-5004-B the list
@@ -267,6 +324,43 @@ reporter.recordEvent(CmcdEventType.MUTE);
 
 For `RESPONSE_RECEIVED`, prefer `recordResponseReceived()` (see below)
 — it derives the per-response fields for you.
+
+> [!NOTE]
+> The response-received keys (`url`, `rc`, `ttfb`, `ttlb`, `ttfbb`, `cmsdd`, `cmsds`, `smrt`) are only valid on `RESPONSE_RECEIVED` reports. If passed in the `data` of any other event, they are stripped even when listed in `enabledKeys`. Custom hyphenated keys are not affected.
+
+### Custom Events
+
+Custom events (`e=ce`) report player-defined events by name via the `cen` key (a string of at most 64 characters). Two configuration rules apply:
+
+- An event target only receives custom events if `CmcdEventType.CUSTOM_EVENT` is listed in its `events` array — otherwise the event is silently dropped for that target.
+- `cen` is always included on custom events and does not need to be in `enabledKeys`, but any additional payload — including custom keys — is still subject to the target's `enabledKeys`.
+
+```typescript
+import { CmcdReporter, CmcdEventType } from "@svta/cml-cmcd";
+
+const reporter = new CmcdReporter({
+	cid: "video-123",
+	eventTargets: [
+		{
+			url: "https://analytics.example.com/cmcd",
+			// CUSTOM_EVENT must be listed for the target to receive it
+			events: [CmcdEventType.CUSTOM_EVENT],
+			// cen is force-included; the custom payload key must be enabled
+			enabledKeys: ["sid", "cid", "com.example-quartile"],
+		},
+	],
+});
+
+reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, {
+	cen: "ad-quartile",
+	"com.example-quartile": "q3",
+});
+
+// The event report contains:
+// cen="ad-quartile",cid="video-123",com.example-quartile="q3",e=ce,sid=…,ts=…,v=2
+```
+
+Per CTA-5004-B, when transferring a value with a custom event, the chosen names SHOULD associate the custom key name with the custom event name (as `com.example-quartile` does with `ad-quartile` above). See [Custom Keys](#custom-keys) for the naming rules.
 
 ### Recording Response Received Events
 
@@ -576,7 +670,7 @@ const reporter = new CmcdReporter({
 | `cid`              | `string`                  | `undefined`         | Content ID                                                                     |
 | `version`          | `CmcdVersion`             | `CMCD_V2`           | CMCD protocol version                                                          |
 | `transmissionMode` | `CmcdTransmissionMode`    | `'query'`           | How to transmit CMCD data in request mode                                      |
-| `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. |
+| `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
 | `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
 
 ### CmcdEventReportConfig
@@ -588,4 +682,4 @@ const reporter = new CmcdReporter({
 | `interval`    | `number`          | `30`        | Seconds between TIME_INTERVAL reports                                       |
 | `batchSize`   | `number`          | `1`         | Events to batch before sending                                              |
 | `version`     | `CmcdVersion`     | `CMCD_V2`   | CMCD version for this target (must be v2 or higher)                         |
-| `enabledKeys` | `CmcdKey[]`       | `undefined` | Keys to include for this target. If not provided, no keys will be reported. |
+| `enabledKeys` | `CmcdKey[]`       | `undefined` | Keys to include for this target. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |

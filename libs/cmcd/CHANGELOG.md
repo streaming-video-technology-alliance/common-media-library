@@ -14,6 +14,12 @@ and this project adheres to
 - `CmcdReporter` event batches no longer lose data permanently when an event cannot be encoded. Previously the encode failure was indistinguishable from a transport failure, so the whole batch — including its clean events — was re-queued at the head of the queue forever: it was retried on every subsequent send, never delivered, and `flush()` could not clear it. Unencodable events are now dropped from the batch, the clean events deliver, and the re-queue path is reserved for retryable transport failures (429/5xx)
 - `CmcdReporter.createRequestReport` no longer throws into the player's request path when a value survives preparation but fails serialization; the request is returned without CMCD applied instead
 
+### Documentation
+
+- The user guide now documents custom reverse-DNS keys end to end: naming rules (including the runtime constraints the `CmcdCustomKey` type cannot express), the explicit `enabledKeys` opt-in required in both request mode and per event target (no wildcard exists), value types and wire-format behavior (`true` as a bare key, `false` dropped, control-character strings dropped), and the fixed `CMCD-Request` header placement in headers mode
+- The custom-event (`e=ce`) documentation now shows a complete working configuration: `CmcdEventType.CUSTOM_EVENT` must be listed in the target's `events` for delivery, `cen` is force-included without an `enabledKeys` entry, and any accompanying payload remains subject to the target's `enabledKeys`. Also documents that response-received keys are stripped from non-`rr` events
+- The user guide and validation guide custom-key sections now cross-link each other
+
 ## [2.4.1] - 2026-07-21
 
 ### Fixed

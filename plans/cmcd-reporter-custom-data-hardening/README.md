@@ -2,7 +2,7 @@
 
 **Date**: 2026-07-21
 **Package**: `@svta/cml-cmcd`
-**Status**: In progress — PR-A (WI-1, WI-2, WI-6) and PR-B (WI-4) implemented
+**Status**: In progress — PR-A (WI-1, WI-2, WI-6), PR-B (WI-4), and PR-C (WI-3) implemented; WI-5 remains (gated on maintainer sign-off)
 **Branch**: `task/cmcd-reporter-custom-data-hardening`
 
 ## Background
@@ -123,7 +123,7 @@ test strengthened rather than duplicated.
 
 ### WI-3 — User-guide documentation for custom keys and custom events
 
-**Priority**: P2 · **Effort**: M · **Type**: docs-only
+**Priority**: P2 · **Effort**: M · **Type**: docs-only · **Status**: ✅ Implemented
 **Depends on**: WI-4 (document final hardened behavior, not the current throwing behavior)
 
 **Problem.** `libs/cmcd/docs/user-guide.md` never mentions custom reverse-DNS keys — not in
