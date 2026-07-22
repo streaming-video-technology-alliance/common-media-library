@@ -25,7 +25,8 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm test -w libs/<package>`: Run the tests for a package (build first: tests import the bundled `dist/` output of the package and its workspace dependencies)
 - `npm test`: Full validation at the root (lint, build all, typecheck, then every package's tests); this is what PR CI runs
 - `npm run format`: Run the linter with auto-fix
-- `npm run ver <package> <version>`: Bump a package version (`<package>` is the folder name without the `libs/` prefix); updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`
+- `npm run ver <package> <version>`: Bump a single package version during release prep (`<package>` is the folder name without the `libs/` prefix); updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`
+- `npm run prepare-release`: Prepare a release; detects packages whose `package.json` version differs from the published npm version and cascades patch bumps (with changelog entries) to the packages that depend on them
 
 ## Developer Experience
 
@@ -41,8 +42,8 @@ APIs are the product. Design them so adopters fall into the pit of success:
 - Typecheck the entire project after code changes
 - Prefer builds and tests at the workspace level
 - Create tests for new public API members
-- Update `package.json` version (semver) and `CHANGELOG.md` for every change; `npm run ver` handles both, then write the change notes under the heading it inserts
-- When a package's version changes, patch-bump any packages that depend on it
+- Add change notes under the `## [Unreleased]` heading in the affected package's `CHANGELOG.md` for every change; do not bump `package.json` versions in change PRs
+- Bump versions only in dedicated release-prep PRs: `npm run ver` bumps each package being released, then `npm run prepare-release` cascades patch bumps to the packages that depend on them
 - Avoid breaking changes; when unavoidable, provide migration guidance in changelog and docs
 - Save all plans in the `plans/` directory in a folder with the name of the feature or issue being implemented. Individual parts of the plan like steps, architecture, tech stack, etc. should be saved in separate files within the folder.
 
