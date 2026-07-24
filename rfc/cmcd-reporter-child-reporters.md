@@ -46,7 +46,7 @@ CMCD v2 defines a session as spanning players. The `sid` key description reads: 
 
 `CmcdReporter` cannot express that today. All sequencing state is private to one instance: the per-target `sn` counters, `msdSent` flags, batching queues, and interval timers live in a private map keyed by that instance's own normalized config objects, and the request-mode `sn` counter and its `msdSent` flag live in a plain private field. Two reporters constructed with the same `sid` still get fully independent counters and queues.
 
-The concrete failure is hls.js interstitials with CMCD v2 event reporting (raised by the hls.js lead maintainer). Each `HlsAssetPlayer` wraps a full child `Hls` instance; the parent's config is spread into the child's, so the child's `CMCDController` constructs its own `CmcdReporter`. Even when the app pins `cmcd.sessionId` so `sid` continuity holds, every asset player:
+The concrete failure is hls.js interstitials with CMCD v2 event reporting. Each `HlsAssetPlayer` wraps a full child `Hls` instance; the parent's config is spread into the child's, so the child's `CMCDController` constructs its own `CmcdReporter`. Even when the app pins `cmcd.sessionId` so `sid` continuity holds, every asset player:
 
 - restarts each target's Sequence Number at 0, so the collector sees `sn` 0, 1, 2… repeated per player within one `sid` — violating the spec's requirement that `sn` increase monotonically per combination of mode and target within a session;
 - re-sends `msd`, which "MUST only be sent once per Session ID";
