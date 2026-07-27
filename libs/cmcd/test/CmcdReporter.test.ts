@@ -998,13 +998,16 @@ describe('CmcdReporter', () => {
 		describe('per-target error isolation', () => {
 			const ISO_KEYS = ['sta', 'sid', 'cid', 'v', 'e', 'ts', 'sn'] as const
 
+			const THROWING_URL = 'https://throwing.example.com/cmcd'
+			const HEALTHY_URL = 'https://healthy.example.com/cmcd'
+
 			function createIsolationReporter(requester: (request: HttpRequest) => Promise<{ status: number; }>) {
 				return new CmcdReporter({
 					sid: 'test-session',
 					enabledKeys: [...ISO_KEYS],
 					eventTargets: [
 						{
-							url: 'https://throwing.example.com/cmcd',
+							url: THROWING_URL,
 							events: [CmcdEventType.PLAY_STATE],
 							enabledKeys: [...ISO_KEYS],
 							batchSize: 1,
@@ -1013,7 +1016,7 @@ describe('CmcdReporter', () => {
 							},
 						},
 						{
-							url: 'https://healthy.example.com/cmcd',
+							url: HEALTHY_URL,
 							events: [CmcdEventType.PLAY_STATE],
 							enabledKeys: [...ISO_KEYS],
 							batchSize: 1,
@@ -1031,7 +1034,7 @@ describe('CmcdReporter', () => {
 				await new Promise(resolve => setTimeout(resolve, 10))
 
 				equal(requests.length, 1)
-				ok(requests[0].url.includes('healthy.example.com'))
+				equal(requests[0].url, HEALTHY_URL)
 				ok((requests[0].body as string)?.includes('sta=p'))
 			})
 
@@ -1045,7 +1048,7 @@ describe('CmcdReporter', () => {
 				throws(() => reporter.update({ sta: 'a' }), /target boom/)
 				await new Promise(resolve => setTimeout(resolve, 10))
 
-				const healthy = requests.filter(r => r.url.includes('healthy.example.com'))
+				const healthy = requests.filter(r => r.url === HEALTHY_URL)
 				equal(healthy.length, 2)
 				// The throwing target consumed no sequence number of its own, and
 				// the healthy target's numbering is unbroken.
