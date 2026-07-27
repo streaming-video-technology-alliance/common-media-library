@@ -7,12 +7,13 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
@@ -38,7 +39,7 @@ type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormali
 	eventTargets: CmcdEventReportConfigNormalized[];
 }
 
-function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig, baseUrl?: string): CmcdEncodeOptions {
+function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>, baseUrl?: string): CmcdEncodeOptions {
 	const enabledKeySet = new Set(config.enabledKeys ?? [])
 
 	return {
@@ -46,6 +47,7 @@ function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdRep
 		reportingMode,
 		filter: (key: CmcdKey) => enabledKeySet.has(key),
 		baseUrl,
+		customHeaderMap: config.customHeaderMap,
 	}
 }
 
@@ -128,6 +130,95 @@ const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = /* @_
 	/* @__PURE__ */ STATE_FIELDS.map(e => [e.event, e]),
 )
 
+/**
+ * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
+ * Built from the state-change table plus the three event types whose
+ * required key rides the caller's per-event data.
+ */
+const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map([
+	.../* @__PURE__ */ CMCD_STATE_EVENT_FIELDS,
+	[CMCD_EVENT_CUSTOM_EVENT, 'cen'] as const,
+	[CMCD_EVENT_ERROR, 'ec'] as const,
+	[CMCD_EVENT_RESPONSE_RECEIVED, 'url'] as const,
+])
+
+/**
+ * Whether a required key's value will survive report preparation.
+ *
+ * This is `isValid` minus its `false` exclusion, plus an empty-array check.
+ * `false` must count as usable because `bg: false` is a legitimate value on a
+ * backgrounded-mode event, which the encoder emits as `?0`; treating it as
+ * unusable would let restoration silently revert a transform that cleared it.
+ * Empty strings, empty lists and non-finite numbers are dropped downstream, so
+ * a transform substituting one leaves the report short a required key.
+ */
+function isUsableRequiredValue(value: unknown): boolean {
+	if (value == null || value === '') {
+		return false
+	}
+
+	if (typeof value === 'number') {
+		return Number.isFinite(value)
+	}
+
+	return !Array.isArray(value) || value.length > 0
+}
+
+/**
+ * Copies an `SfItem`-shaped value and its `params` record.
+ *
+ * The prototype is preserved because `prepareCmcdData`, the formatter map,
+ * validation, and the structured-field encoder all branch on
+ * `instanceof SfItem`. A plain spread (and `structuredClone`) would return a
+ * prototype-less object and silently change what goes on the wire.
+ */
+function copyItemValue(value: unknown): unknown {
+	if (value === null || typeof value !== 'object') {
+		return value
+	}
+
+	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; }
+
+	if (copy.params !== null && typeof copy.params === 'object') {
+		copy.params = { ...copy.params }
+	}
+
+	return copy
+}
+
+/**
+ * Copies the nested values of a report in place so a transform cannot mutate
+ * the reporter's persistent data, or another target's report for the same
+ * event, by mutating an array or an `SfItem` it was handed.
+ *
+ * Complete for the CMCD value space rather than best-effort: `CmcdValue` and
+ * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
+ * those, and `SfItem.params` is a flat record. Only called where a transform
+ * is configured.
+ */
+function copyReportValues(data: Cmcd): Cmcd {
+	const record = data as Record<string, unknown>
+
+	for (const key in record) {
+		const value = record[key]
+
+		if (Array.isArray(value)) {
+			const copy = new Array(value.length)
+
+			for (let i = 0; i < value.length; i++) {
+				copy[i] = copyItemValue(value[i])
+			}
+
+			record[key] = copy
+		}
+		else if (value !== null && typeof value === 'object') {
+			record[key] = copyItemValue(value)
+		}
+	}
+
+	return data
+}
+
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
 	return fetch(url, init)
@@ -158,6 +249,7 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 					events: target.events.slice(),
 					interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
 					batchSize: target.batchSize || 1,
+					transform: target.transform,
 				})
 			}
 			return acc
@@ -231,6 +323,13 @@ export class CmcdReporter {
 	 * populated before calling start().
 	 */
 	start(): void {
+		// The initial time-interval event is fired synchronously per target, so a
+		// throwing transform must not abort the loop: later targets would never
+		// have their intervals armed and would report nothing for the session,
+		// and a retried start() would fail on the same target again. Same
+		// continue-then-rethrow contract as `emitEvent()`.
+		let failure: { error: unknown; } | undefined
+
 		this.eventTargets.forEach((target, config) => {
 			// Disarm any existing timer so repeated start() calls do not leak intervals.
 			this.disarmInterval(target)
@@ -245,9 +344,22 @@ export class CmcdReporter {
 				this.processEventTargets()
 			}
 
+			// Armed before the initial event so a throwing transform leaves the
+			// timer in the same state a successful start() would, rather than
+			// silently disabling the target.
 			target.intervalId = setInterval(timeIntervalEvent, config.interval * 1000)
-			timeIntervalEvent()
+
+			try {
+				timeIntervalEvent()
+			}
+			catch (error) {
+				failure ??= { error }
+			}
 		})
+
+		if (failure) {
+			throw failure.error
+		}
 	}
 
 	/**
@@ -364,6 +476,21 @@ export class CmcdReporter {
 	 *               into the reporter's data store.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+		this.emitEvent(type, data)
+	}
+
+	/**
+	 * Records an event across every configured target, applying
+	 * state-change dedup once before per-target fan-out.
+	 *
+	 * @param type - The type of event to record.
+	 * @param data - Additional data to record with the event.
+	 * @param request - The media request that triggered the event, when
+	 *                  one exists. Only `recordResponseReceived()`
+	 *                  populates this; it is threaded through to each
+	 *                  target's `transform`.
+	 */
+	private emitEvent(type: CmcdEventType, data: Partial<Cmcd>, request?: HttpRequest): void {
 		const entry = STATE_FIELDS_BY_EVENT.get(type)
 		if (entry) {
 			const field = entry.field
@@ -389,11 +516,29 @@ export class CmcdReporter {
 			Object.assign(this.lastEmitted, { [field]: entry.snapshot(current) })
 		}
 
+		// A throwing transform must not abort the fan-out. The dedup baseline
+		// above is already committed and is never rolled back, so aborting here
+		// would strand the transition: targets after the throwing one would
+		// never receive it, and the caller's retry would be deduped away.
+		let failure: { error: unknown; } | undefined
+
 		this.eventTargets.forEach((target, config) => {
-			this.recordTargetEvent(target, config, type, data)
+			try {
+				this.recordTargetEvent(target, config, type, data, request)
+			}
+			catch (error) {
+				failure ??= { error }
+			}
 		})
 
 		this.processEventTargets()
+
+		// Surfaced only once every target has had its turn and the queues have
+		// been processed. Transforms must not throw; this makes the violation
+		// visible without letting it starve unrelated targets.
+		if (failure) {
+			throw failure.error
+		}
 	}
 
 	/**
@@ -405,26 +550,84 @@ export class CmcdReporter {
 	 * @param data - Additional data to record with the event. This data
 	 *               only applies to this event report. Persistent data should
 	 *               be updated using `update()`.
+	 * @param request - The media request that triggered the event, when
+	 *                  one exists. Passed to the target's `transform`.
 	 */
-	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
 		if (!config.events.includes(type)) {
 			return
 		}
 
-		const item = {
+		// Each target gets its own copy, so a transform that mutates in
+		// place affects neither sibling targets nor the persistent data.
+		const item: Cmcd = {
 			...this.data,
 			...data,
 			e: type,
 			ts: data.ts ?? Date.now(),
-			sn: target.sn++,
 		}
 
+		const { transform } = config
+
+		if (!transform) {
+			this.queueTargetEvent(target, item, type)
+			return
+		}
+
+		// The spread above is shallow, so nested values are still shared with
+		// the persistent store and with the other targets' copies.
+		copyReportValues(item)
+
+		// Captured so a transform cannot strip a key the event requires.
+		// `CmcdKey` spans custom keys too, so index through a record view.
+		const requiredKey = CMCD_REQUIRED_EVENT_KEYS.get(type)
+		const requiredValue = requiredKey ? (item as Record<string, unknown>)[requiredKey] : undefined
+		const ts = item.ts
+
+		const report = transform(item, request)
+
+		// A cancelled report consumes neither a sequence number nor msd.
+		if (report == null) {
+			return
+		}
+
+		// Restore, never fabricate: a required key that was already absent (or
+		// already unusable) before the transform ran was a caller bug, not a
+		// transform bug. Removal and substitution are both covered, because a
+		// value the encoder drops leaves the report just as invalid as a missing
+		// one.
+		if (!isUsableRequiredValue(report.ts)) {
+			report.ts = ts
+		}
+
+		if (requiredKey && isUsableRequiredValue(requiredValue) && !isUsableRequiredValue((report as Record<string, unknown>)[requiredKey])) {
+			Object.assign(report, { [requiredKey]: requiredValue })
+		}
+
+		this.queueTargetEvent(target, report, type)
+	}
+
+	/**
+	 * Stamps the reporter-owned fields on a finished event report and pushes it
+	 * to the target's queue.
+	 *
+	 * Called after any transform has run, so a transform cannot bypass the
+	 * target's `events` filter via `e` or break `sn` continuity.
+	 *
+	 * @param target - The target to queue the report for.
+	 * @param report - The finished report data.
+	 * @param type - The type of event being reported.
+	 */
+	private queueTargetEvent(target: CmcdEventTarget, report: Cmcd, type: CmcdEventType): void {
+		report.e = type
+		report.sn = target.sn++
+
 		if (!isNaN(this.msd) && !target.msdSent) {
-			item.msd = this.msd
+			report.msd = this.msd
 			target.msdSent = true
 		}
 
-		target.queue.push(item)
+		target.queue.push(report)
 	}
 
 	/**
@@ -442,11 +645,18 @@ export class CmcdReporter {
 	 * Additional keys like `ttfbb`, `cmsdd`, `cmsds`, and `smrt` can be
 	 * supplied via the `data` parameter if the player has access to them.
 	 *
+	 * The request's `customData` is generic, so a player can pass a request
+	 * carrying its own taxonomy (e.g. `{ requestType: 'segment' }`) without a
+	 * cast. The reporter only reads the optional `cmcd` key that
+	 * {@link CmcdReporter.createRequestReport} writes there; every other key is
+	 * left untouched and stays visible to an event target's `transform` via
+	 * its `request` argument.
+	 *
 	 * @param response - The HTTP response received.
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override any auto-derived values.
 	 */
-	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+	recordResponseReceived<C>(response: HttpResponse<HttpRequest<C & { cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
 
 		const url = data.url ?? request?.url
@@ -481,7 +691,7 @@ export class CmcdReporter {
 
 		const cmcd = request.customData?.cmcd ?? {}
 
-		this.recordEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data })
+		this.emitEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data }, request)
 	}
 
 	/**
@@ -533,14 +743,35 @@ export class CmcdReporter {
 			return report
 		}
 
-		const url = new URL(report.url)
-		const cmcdData = { ...this.data, ...data, sn: this.requestTarget.sn++ }
-		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
+		const merged: Cmcd = { ...this.data, ...data }
+		const { transform } = this.config
+		let cmcdData: Cmcd | null = merged
+
+		if (transform) {
+			// The spread above is shallow, so nested values are still shared
+			// with the persistent store.
+			copyReportValues(merged)
+
+			// The caller's request is passed, not the internal clone, so a
+			// transform cannot alter the outgoing report through it.
+			cmcdData = transform(merged, request)
+
+			// A cancelled report consumes neither a sequence number nor msd.
+			if (cmcdData == null) {
+				return report
+			}
+		}
+
+		// Reporter-owned fields are stamped after the transform runs.
+		cmcdData.sn = this.requestTarget.sn++
 
 		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
 			cmcdData.msd = this.msd
 			this.requestTarget.msdSent = true
 		}
+
+		const url = new URL(report.url)
+		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
 		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
 

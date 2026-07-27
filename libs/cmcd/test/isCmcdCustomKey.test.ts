@@ -15,7 +15,7 @@ describe('isCmcdCustomKey', () => {
 		equal(isCmcdCustomKey('com.hello.world-foo'), true)
 		equal(isCmcdCustomKey('a-b'), true)
 		equal(isCmcdCustomKey('a--b'), true)
-		equal(isCmcdCustomKey('--b'), true)
+		equal(isCmcdCustomKey('a1-b2'), true)
 		equal(isCmcdCustomKey('a--'), true)
 	})
 
@@ -26,10 +26,19 @@ describe('isCmcdCustomKey', () => {
 		equal(isCmcdCustomKey('a-'), false)
 	})
 
+	it('Rejects keys that fail RFC 8941 key serialization', () => {
+		equal(isCmcdCustomKey('Com.Example-key' as CmcdKey), false)
+		equal(isCmcdCustomKey('com.example-KEY' as CmcdKey), false)
+		equal(isCmcdCustomKey('2com.example-x'), false)
+		equal(isCmcdCustomKey('.a-b'), false)
+		equal(isCmcdCustomKey('--b'), false)
+	})
+
 	it('Rejects keys with invalid characters', () => {
 		equal(isCmcdCustomKey('com.example-key!'), false)
 		equal(isCmcdCustomKey('a b-c'), false)
 		equal(isCmcdCustomKey('a_b-c'), false)
+		equal(isCmcdCustomKey('*a-b'), false)
 	})
 
 	it('Runs in linear time on adversarial input', () => {

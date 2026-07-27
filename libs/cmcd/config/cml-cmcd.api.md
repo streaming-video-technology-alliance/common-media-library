@@ -170,7 +170,7 @@ export const CMCD_VALIDATION_SEVERITY_ERROR: "error";
 export const CMCD_VALIDATION_SEVERITY_WARNING: "warning";
 
 // @public
-export type CmcdCustomKey = `${string}-${string}`;
+export type CmcdCustomKey = Lowercase<`${string}-${string}`>;
 
 // @public
 export type CmcdCustomValue = string | SfItem<string> | (string | SfItem<string>)[] | number | SfItem<number> | (number | SfItem<number>)[] | boolean | SfItem<boolean> | (boolean | SfItem<boolean>)[] | symbol | SfItem<symbol> | (symbol | SfItem<symbol>)[] | SfToken | SfItem<SfToken> | (SfToken | SfItem<SfToken>)[];
@@ -214,7 +214,11 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
     events?: CmcdEventType[];
     interval?: number;
     batchSize?: number;
+    transform?: CmcdEventReportTransform;
 };
+
+// @public
+export type CmcdEventReportTransform = (data: Cmcd, request: CmcdTransformRequest | undefined) => Cmcd | null;
 
 // @public
 export type CmcdEventsValidationResult = CmcdValidationResult & {
@@ -364,7 +368,7 @@ export class CmcdReporter {
     flush(): void;
     isRequestReportingEnabled(): boolean;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
-    recordResponseReceived(response: HttpResponse<HttpRequest<{
+    recordResponseReceived<C>(response: HttpResponse<HttpRequest<C & {
         cmcd?: Cmcd;
     }>>, data?: Partial<Cmcd>): void;
     start(): void;
@@ -476,7 +480,12 @@ export type CmcdRequestReport<D = unknown> = HttpRequest & {
 // @public
 export type CmcdRequestReportConfig = CmcdReportConfig & {
     transmissionMode?: CmcdTransmissionMode;
+    customHeaderMap?: Partial<CmcdHeaderMap>;
+    transform?: CmcdRequestReportTransform;
 };
+
+// @public
+export type CmcdRequestReportTransform = (data: Cmcd, request: CmcdTransformRequest) => Cmcd | null;
 
 // @public
 export type CmcdResponse = CmcdRequest & {
@@ -510,6 +519,12 @@ export const CmcdStreamType: {
 
 // @public (undocumented)
 export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;
+
+// @public
+export type CmcdTransformRequest = Readonly<Omit<HttpRequest, "customData" | "headers">> & {
+    readonly headers?: Readonly<Record<string, string>>;
+    readonly customData?: Readonly<Record<string, unknown>>;
+};
 
 // @public
 export const CmcdTransmissionMode: {

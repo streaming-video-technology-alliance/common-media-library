@@ -1,4 +1,5 @@
 import type { CMCD_V2 } from './CMCD_V2.ts'
+import type { CmcdEventReportTransform } from './CmcdEventReportTransform.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 
@@ -45,4 +46,20 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
 	 * @defaultValue `1`
 	 */
 	batchSize?: number;
+
+	/**
+	 * Transform applied to each of this target's event reports before
+	 * it is queued. Return the data to continue, or `null` to cancel
+	 * the report for this target.
+	 *
+	 * Scoped to this target only: targets that share a collector URL
+	 * each run their own transform, and a report cancelled here is
+	 * still sent to other targets that accept the event.
+	 *
+	 * @defaultValue `undefined`
+	 *
+	 * @example
+	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
+	 */
+	transform?: CmcdEventReportTransform;
 };

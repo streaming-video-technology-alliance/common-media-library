@@ -1,9 +1,14 @@
 import type { CmcdKey } from './CmcdKey.ts'
 
-const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9.-]+$/
+// The CMCD custom-key charset restricted to RFC 8941 key serialization
+// (serializeKey): a lowercase first letter, then `a-z 0-9 . -`.
+const CUSTOM_KEY_REGEX = /^[a-z][a-z0-9.-]*$/
 
 /**
- * Check if a key is a custom key.
+ * Check if a key is a valid custom key: a lowercase first letter, then
+ * characters from `a-z 0-9 . -`, with a hyphen that is neither the first
+ * nor the last character. These are the CTA-5004-B custom-key rules
+ * restricted to names that survive RFC 8941 key serialization.
  *
  * @param key - The key to check.
  *

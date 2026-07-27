@@ -1,8 +1,8 @@
-import type { CmcdReporterConfig } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
-import { SfItem } from '@svta/cml-structured-field-values'
+import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdTransformRequest } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
-import { equal, ok } from 'node:assert'
+import { deepEqual, equal, ok, throws } from 'node:assert'
 import { describe, it, mock } from 'node:test'
 
 function createMockRequester(status: number = 200) {
@@ -247,6 +247,1106 @@ describe('CmcdReporter', () => {
 		})
 	})
 
+	describe('report transforms', () => {
+		it('provides a valid example', () => {
+			// #region example-transform
+			const { requester } = createMockRequester()
+
+			const reporter = new CmcdReporter({
+				sid: 'session-id',
+				cid: 'content-id',
+				enabledKeys: ['br', 'sid', 'cid', 'v', 'sn'],
+				// Request mode: never decorate license requests with CMCD
+				transform: (data, request) => request.url.includes('/license') ? null : data,
+				eventTargets: [
+					{
+						url: 'https://collector.example.com/cmcd',
+						events: [CmcdEventType.RESPONSE_RECEIVED],
+						enabledKeys: ['url', 'rc', 'sid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+						// Event mode, this target only: segment responses only
+						transform: (data, request) =>
+							request?.customData?.['requestType'] === 'segment' ? data : null,
+					},
+				],
+			}, requester)
+
+			const license = reporter.createRequestReport({ url: 'https://drm.example.com/license' })
+			ok(!license.url.includes('CMCD='))
+
+			const segment = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
+			ok(segment.url.includes('CMCD='))
+			// #endregion example-transform
+		})
+
+		describe('request mode', () => {
+			it('applies the top-level transform to request reports', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					cid: 'test-content',
+					enabledKeys: ['sid', 'cid'],
+					transform: data => ({ ...data, cid: 'redacted' }),
+				}, requester)
+
+				const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				ok(req.url.includes('cid%3D%22redacted%22'))
+				ok(!req.url.includes('test-content'))
+			})
+
+			it('cancels CMCD decoration when the transform returns null', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: (data, request) => request.url.includes('/license') ? null : data,
+				}, requester)
+
+				const license = reporter.createRequestReport({ url: 'https://example.com/license' })
+				ok(!license.url.includes('CMCD='))
+				deepEqual(license.customData.cmcd, {})
+
+				const segment = reporter.createRequestReport({ url: 'https://example.com/segment.mp4' })
+				ok(segment.url.includes('CMCD='))
+			})
+
+			it('does not consume a sequence number for a cancelled request report', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid', 'sn'],
+					transform: (data, request) => request.url.includes('/skip') ? null : data,
+				}, requester)
+
+				const first = reporter.createRequestReport({ url: 'https://example.com/seg1.mp4' })
+				ok(first.url.includes('sn%3D0'))
+
+				reporter.createRequestReport({ url: 'https://example.com/skip' })
+
+				const second = reporter.createRequestReport({ url: 'https://example.com/seg2.mp4' })
+				ok(second.url.includes('sn%3D1'))
+			})
+
+			it('does not consume msd for a cancelled request report', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['msd'],
+					transform: (data, request) => request.url.includes('/skip') ? null : data,
+				}, requester)
+
+				reporter.update({ msd: 1000 })
+
+				reporter.createRequestReport({ url: 'https://example.com/skip' })
+
+				const next = reporter.createRequestReport({ url: 'https://example.com/seg.mp4' })
+				ok(next.url.includes('msd%3D1000'))
+			})
+
+			it('passes the caller request itself as a read-only view', () => {
+				const { requester } = createMockRequester()
+				const seen: (CmcdTransformRequest | undefined)[] = []
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: (data, request) => {
+						seen.push(request)
+
+						// Mutation is a compile error, not a runtime guarantee:
+						// `request.url = '…'` and `request.customData!['k'] = 1` are
+						// both rejected by CmcdTransformRequest. Reading is the
+						// supported use.
+						ok(request.url.length > 0)
+
+						return data
+					},
+				}, requester)
+
+				const input = { url: 'https://example.com/video.mp4', customData: { player: { kind: 'segment' } } }
+				const req = reporter.createRequestReport(input)
+
+				equal(seen.length, 1)
+				// The caller's own request, not the internal clone the report is
+				// built from, so a transform sees exactly what the player passed.
+				equal(seen[0], input)
+				ok(req.url.startsWith('https://example.com/video.mp4'))
+			})
+
+			it('subjects transform-added keys to enabledKeys', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: data => ({ ...data, bl: [3000] }),
+				}, requester)
+
+				const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				ok(req.url.includes('sid%3D%22test-session%22'))
+				ok(!req.url.includes('bl'))
+			})
+
+			it('does not run the transform when request reporting is disabled', () => {
+				const { requester } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [],
+					transform: (data) => {
+						calls++
+						return data
+					},
+				}, requester)
+
+				reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				equal(calls, 0)
+			})
+
+			it('propagates exceptions thrown by the transform', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: () => {
+						throw new Error('transform boom')
+					},
+				}, requester)
+
+				throws(() => reporter.createRequestReport({ url: 'https://example.com/video.mp4' }), /transform boom/)
+			})
+		})
+
+		describe('event mode', () => {
+			it('applies the target transform to event reports', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => ({ ...data, cid: 'redacted' }),
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('cid="redacted"'))
+			})
+
+			it('cancels the report when the target transform returns null', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: () => null,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 0)
+			})
+
+			it('does not consume a sequence number for a cancelled event report', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR, CmcdEventType.CUSTOM_EVENT],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => data.e === CmcdEventType.CUSTOM_EVENT ? null : data,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'dropped' })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('sn=0'))
+				ok((requests[1].body as string)?.includes('sn=1'))
+			})
+
+			it('does not consume msd for a cancelled event report', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR, CmcdEventType.CUSTOM_EVENT],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => data.e === CmcdEventType.CUSTOM_EVENT ? null : data,
+						},
+					],
+				}), requester)
+
+				reporter.update({ msd: 500 })
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'dropped' })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('msd=500'))
+			})
+
+			it('re-stamps the event type when a transform tampers with it', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => ({ ...data, e: CmcdEventType.PLAY_STATE }),
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('e=e'))
+				ok(!(requests[0].body as string)?.includes('e=ps'))
+			})
+
+			it('does not run the transform for events the target filters out', async () => {
+				const { requester } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								calls++
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'not-configured' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(calls, 0)
+			})
+
+			it('isolates transforms across targets that share a collector URL', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => ({ ...data, cid: 'target-a' }),
+						},
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: () => null,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('cid="target-a"'))
+			})
+
+			it('does not leak in-place mutation from one target into another', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://collector-a.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								data.cid = 'mutated-in-place'
+								return data
+							},
+						},
+						{
+							url: 'https://collector-b.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const a = requests.find(r => r.url.includes('collector-a'))
+				const b = requests.find(r => r.url.includes('collector-b'))
+				ok((a?.body as string)?.includes('cid="mutated-in-place"'))
+				ok((b?.body as string)?.includes('cid="test-content"'))
+			})
+
+			it('does not persist transform mutations into reporter data', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							// Appending rather than assigning makes leakage into the
+							// persistent data store observable on the second report.
+							transform: (data) => {
+								data.cid = `${data.cid}!`
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('cid="test-content!"'))
+				ok((requests[1].body as string)?.includes('cid="test-content!"'))
+			})
+
+			it('does not roll back state-change dedup when a report is cancelled', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.PLAY_STATE],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => data.sta === 'p' ? null : data,
+						},
+					],
+				}), requester)
+
+				// Cancelled on the wire, but the transition still happened.
+				reporter.update({ sta: 'p' })
+				// Same value again: dedup suppresses it, cancellation did not reset it.
+				reporter.update({ sta: 'p' })
+				reporter.update({ sta: 'a' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('sta=a'))
+				ok((requests[0].body as string)?.includes('sn=0'))
+			})
+
+			it('passes undefined as the request for events with no triggering request', async () => {
+				const { requester } = createMockRequester()
+				const seen: unknown[] = []
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR, CmcdEventType.PLAY_STATE],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data, request) => {
+								seen.push(request)
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.update({ sta: 'p' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(seen.length, 2)
+				deepEqual(seen, [undefined, undefined])
+			})
+
+			it('passes undefined as the request for time interval events', () => {
+				const { requester } = createMockRequester()
+				const seen: unknown[] = []
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.TIME_INTERVAL],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							interval: 30,
+							transform: (data, request) => {
+								seen.push(request)
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				// start() fires an initial TIME_INTERVAL event synchronously.
+				reporter.start()
+				reporter.stop()
+
+				equal(seen.length, 1)
+				equal(seen[0], undefined)
+			})
+
+			it('propagates exceptions thrown by a target transform', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: () => {
+								throw new Error('event transform boom')
+							},
+						},
+					],
+				}), requester)
+
+				throws(() => reporter.recordEvent(CmcdEventType.ERROR), /event transform boom/)
+			})
+		})
+
+		describe('required event keys', () => {
+			const ALL_KEYS = ['sta', 'pr', 'cid', 'bg', 'br', 'cen', 'ec', 'url', 'rc', 'sid', 'v', 'e', 'ts', 'sn'] as const
+
+			function createTarget(events: CmcdEventType[], transform: CmcdEventReportTransform): Partial<CmcdReporterConfig> {
+				return {
+					sid: 'test-session',
+					enabledKeys: [...ALL_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events,
+							enabledKeys: [...ALL_KEYS],
+							batchSize: 1,
+							transform,
+						},
+					],
+				}
+			}
+
+			// Strips every key the transform is allowed to touch, so each case
+			// proves the reporter put the required one back.
+			const stripAll: CmcdEventReportTransform = data => ({
+				...data,
+				ts: undefined,
+				sta: undefined,
+				pr: undefined,
+				cid: undefined,
+				bg: undefined,
+				br: undefined,
+				cen: undefined,
+				ec: undefined,
+				url: undefined,
+			})
+
+			it('restores ts when a transform removes it', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.ERROR], stripAll), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ts='))
+			})
+
+			const stateFamilies = [
+				{ event: CmcdEventType.PLAY_STATE, key: 'sta', update: { sta: 'p' as const }, wire: 'sta=p' },
+				{ event: CmcdEventType.PLAYBACK_RATE, key: 'pr', update: { pr: 2 }, wire: 'pr=2' },
+				{ event: CmcdEventType.CONTENT_ID, key: 'cid', update: { cid: 'movie-7' }, wire: 'cid="movie-7"' },
+				{ event: CmcdEventType.BACKGROUNDED_MODE, key: 'bg', update: { bg: true }, wire: 'bg' },
+				{ event: CmcdEventType.BITRATE_CHANGE, key: 'br', update: { br: [5000] }, wire: 'br=(5000)' },
+			]
+
+			for (const family of stateFamilies) {
+				it(`restores the signalled field for ${family.event} events`, async () => {
+					const { requester, requests } = createMockRequester()
+					const reporter = new CmcdReporter(createTarget([family.event], stripAll), requester)
+
+					reporter.update(family.update)
+
+					await new Promise(resolve => setTimeout(resolve, 10))
+
+					equal(requests.length, 1)
+					ok((requests[0].body as string)?.includes(family.wire))
+					deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+				})
+			}
+
+			it('restores cen for custom events', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.CUSTOM_EVENT], stripAll), requester)
+
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'my-event' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('cen="my-event"'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores ec for error events', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.ERROR], stripAll), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ec=("E100")'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores url for response received events', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.RESPONSE_RECEIVED], stripAll), requester)
+
+				reporter.recordResponseReceived({ request: { url: 'https://cdn.example.com/seg.mp4' }, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('url="https://cdn.example.com/seg.mp4"'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores a required key replaced with an empty string', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.RESPONSE_RECEIVED],
+					data => ({ ...data, url: '' }),
+				), requester)
+
+				reporter.recordResponseReceived({ request: { url: 'https://cdn.example.com/seg.mp4' }, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// An empty string is type-valid but dropped during preparation, so
+				// it leaves the report as invalid as removing the key outright.
+				ok((requests[0].body as string)?.includes('url="https://cdn.example.com/seg.mp4"'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores a required key replaced with an empty list', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.ERROR],
+					data => ({ ...data, ec: [] }),
+				), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ec=("E100")'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores ts replaced with a non-finite number', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.ERROR],
+					data => ({ ...data, ts: NaN }),
+				), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ts='))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('does not revert a transform that legitimately clears bg', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.BACKGROUNDED_MODE],
+					data => ({ ...data, bg: false }),
+				), requester)
+
+				// `bg: false` is a real value for this event, emitted as `?0`. The
+				// restore predicate must not treat falsiness as unusable, or it
+				// would silently put the previous `true` back.
+				reporter.update({ bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('bg=?0'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('does not fabricate a required key that was already absent', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.CUSTOM_EVENT], data => data), requester)
+
+				// cen was never supplied, so the report was non-conformant before
+				// any transform ran. Restoration must not invent a value.
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok(!(requests[0].body as string)?.includes('cen='))
+			})
+		})
+
+		describe('nested value isolation', () => {
+			const NESTED_KEYS = ['ec', 'br', 'sid', 'cid', 'v', 'e', 'ts', 'sn'] as const
+
+			it('contains nested array mutation within the mutating target', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://collector-a.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								data.ec?.push('LEAKED')
+								return data
+							},
+						},
+						{
+							url: 'https://collector-b.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+						},
+					],
+				}, requester)
+
+				reporter.update({ ec: ['E100'] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const a = requests.find(r => r.url.includes('collector-a'))?.body as string
+				const b = requests.find(r => r.url.includes('collector-b'))?.body as string
+
+				ok(a?.includes('LEAKED'))
+				ok(!b?.includes('LEAKED'))
+			})
+
+			it('does not corrupt the persistent store through a nested array', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								data.ec?.push('LEAKED')
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.update({ ec: ['E100'] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				// Each report carries exactly one appended value, not a growing array.
+				ok((requests[1].body as string)?.includes('ec=("E100" "LEAKED")'))
+			})
+
+			it('copies SfItem params so nested mutation cannot escape', async () => {
+				const { requester } = createMockRequester()
+				const seen: string[] = []
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								const first = data.br?.[0]
+								if (first instanceof SfItem && first.params) {
+									seen.push(JSON.stringify(first.params))
+									Object.assign(first.params, { v: false })
+								}
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.update({ br: [new SfItem(5000, { v: true })] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// The second event must see the original params, not the mutation
+				// the first event's transform made.
+				deepEqual(seen, ['{"v":true}', '{"v":true}'])
+			})
+
+			it('keeps the SfItem prototype through the copy', async () => {
+				const { requester } = createMockRequester()
+				const kinds: boolean[] = []
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								kinds.push(data.br?.[0] instanceof SfItem)
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.update({ br: [new SfItem(5000, { v: true })] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				deepEqual(kinds, [true])
+			})
+		})
+
+		describe('per-target error isolation', () => {
+			const ISO_KEYS = ['sta', 'sid', 'cid', 'v', 'e', 'ts', 'sn'] as const
+
+			const THROWING_URL = 'https://throwing.example.com/cmcd'
+			const HEALTHY_URL = 'https://healthy.example.com/cmcd'
+
+			function createIsolationReporter(requester: (request: HttpRequest) => Promise<{ status: number; }>) {
+				return new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...ISO_KEYS],
+					eventTargets: [
+						{
+							url: THROWING_URL,
+							events: [CmcdEventType.PLAY_STATE],
+							enabledKeys: [...ISO_KEYS],
+							batchSize: 1,
+							transform: () => {
+								throw new Error('target boom')
+							},
+						},
+						{
+							url: HEALTHY_URL,
+							events: [CmcdEventType.PLAY_STATE],
+							enabledKeys: [...ISO_KEYS],
+							batchSize: 1,
+						},
+					],
+				}, requester)
+			}
+
+			it('delivers to healthy targets even when an earlier target throws', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = createIsolationReporter(requester)
+
+				throws(() => reporter.update({ sta: 'p' }), /target boom/)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(requests[0].url, HEALTHY_URL)
+				ok((requests[0].body as string)?.includes('sta=p'))
+			})
+
+			it('arms later interval targets when an earlier start() transform throws', async () => {
+				const { requester, requests } = createMockRequester()
+				const INTERVAL_KEYS = ['sid', 'v', 'e', 'ts', 'sn'] as const
+				let healthyCalls = 0
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...INTERVAL_KEYS],
+					eventTargets: [
+						{
+							url: THROWING_URL,
+							events: [CmcdEventType.TIME_INTERVAL],
+							enabledKeys: [...INTERVAL_KEYS],
+							batchSize: 1,
+							interval: 30,
+							transform: () => {
+								throw new Error('target boom')
+							},
+						},
+						{
+							url: HEALTHY_URL,
+							events: [CmcdEventType.TIME_INTERVAL],
+							enabledKeys: [...INTERVAL_KEYS],
+							batchSize: 1,
+							interval: 30,
+							transform: (data) => {
+								healthyCalls++
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				// start() fires the initial time-interval event synchronously per
+				// target. Aborting the loop would leave the healthy target with no
+				// armed interval, so it would report nothing for the whole session.
+				throws(() => reporter.start(), /target boom/)
+				reporter.stop()
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(healthyCalls, 1)
+				equal(requests.length, 1)
+				equal(requests[0].url, HEALTHY_URL)
+			})
+
+			it('keeps delivering later transitions after a throw', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = createIsolationReporter(requester)
+
+				throws(() => reporter.update({ sta: 'p' }), /target boom/)
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				throws(() => reporter.update({ sta: 'a' }), /target boom/)
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const healthy = requests.filter(r => r.url === HEALTHY_URL)
+				equal(healthy.length, 2)
+				// The throwing target consumed no sequence number of its own, and
+				// the healthy target's numbering is unbroken.
+				ok((healthy[0].body as string)?.includes('sn=0'))
+				ok((healthy[1].body as string)?.includes('sn=1'))
+			})
+		})
+
+		describe('triggering request', () => {
+			// A player's request carries only its own taxonomy on customData.
+			// It does not have to declare the reporter's `cmcd` key.
+			type PlayerRequest = HttpRequest<{ requestType: string; }>
+
+			it('passes the triggering request to the transform for response-received events', async () => {
+				const { requester, requests } = createMockRequester()
+				const seen: (HttpRequest | undefined)[] = []
+				const triggering: PlayerRequest = {
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				}
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					cid: 'test-content',
+					enabledKeys: [...RR_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.RESPONSE_RECEIVED],
+							enabledKeys: [...RR_KEYS],
+							batchSize: 1,
+							transform: (data, request) => {
+								seen.push(request)
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.recordResponseReceived({ request: triggering, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(seen.length, 1)
+				equal(seen[0], triggering)
+			})
+
+			it('filters response-received reports by player request type', async () => {
+				const { requester, requests } = createMockRequester()
+				const segmentsOnly: CmcdEventReportTransform = (data, request) => {
+					if (data.e !== CmcdEventType.RESPONSE_RECEIVED) {
+						return data
+					}
+
+					return request?.customData?.['requestType'] === 'segment' ? data : null
+				}
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...RR_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.RESPONSE_RECEIVED],
+							enabledKeys: [...RR_KEYS],
+							batchSize: 1,
+							transform: segmentsOnly,
+						},
+					],
+				}, requester)
+
+				const manifestRequest: PlayerRequest = {
+					url: 'https://cdn.example.com/manifest.mpd',
+					customData: { requestType: 'mpd' },
+				}
+
+				const segmentRequest: PlayerRequest = {
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				}
+
+				reporter.recordResponseReceived({ request: manifestRequest, status: 200 })
+				reporter.recordResponseReceived({ request: segmentRequest, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('segment.mp4'))
+				ok((requests[0].body as string)?.includes('sn=0'))
+			})
+
+			it('accepts a request whose customData has only player-specific keys', async () => {
+				const { requester, requests } = createMockRequester()
+				const seen: string[] = []
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...RR_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.RESPONSE_RECEIVED],
+							enabledKeys: [...RR_KEYS],
+							batchSize: 1,
+							transform: (data, request) => {
+								const customData = request?.customData as { requestType?: string; } | undefined
+								if (customData?.requestType) {
+									seen.push(customData.requestType)
+								}
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				// A bare object literal with no `cmcd` key and no helper type
+				// alias: this is the shape a player passes, and it must compile
+				// without a cast. `customData` is inferred, not pinned.
+				reporter.recordResponseReceived({
+					request: {
+						url: 'https://cdn.example.com/segment.mp4',
+						customData: { requestType: 'segment' },
+					},
+					status: 200,
+				})
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				deepEqual(seen, ['segment'])
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('segment.mp4'))
+			})
+		})
+
+		describe('placement isolation', () => {
+			it('does not run the top-level transform for event reports', async () => {
+				const { requester, requests } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter(createConfig({
+					transform: (data) => {
+						calls++
+						return data
+					},
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(calls, 0)
+			})
+
+			it('does not run a target transform for request reports', () => {
+				const { requester } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								calls++
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				ok(req.url.includes('CMCD='))
+				equal(calls, 0)
+			})
+		})
+	})
+
 	describe('recordEvent', () => {
 		it('sends event reports to the configured target', async () => {
 			const { requester, requests } = createMockRequester()
@@ -318,6 +1418,7 @@ describe('CmcdReporter', () => {
 
 			equal(requests.length, 1)
 			ok((requests[0].body as string)?.includes('e=ce'))
+			ok((requests[0].body as string)?.includes('cen="my-custom-event"'))
 		})
 
 		it('includes msd only once in event reports', async () => {
@@ -332,6 +1433,494 @@ describe('CmcdReporter', () => {
 
 			ok((requests[0].body as string)?.includes('msd=500'))
 			ok(!(requests[1].body as string)?.includes('msd'))
+		})
+	})
+
+	describe('custom events', () => {
+		it('force-includes cen even when it is not in the target enabledKeys', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.CUSTOM_EVENT],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'my-custom-event' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('cen="my-custom-event"'))
+		})
+
+		it('emits a custom key payload when the key is in the target enabledKeys', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.CUSTOM_EVENT],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'cen', 'com.example-detail'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'ad-quartile', 'com.example-detail': 'q3' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('cen="ad-quartile"'))
+			ok((requests[0].body as string)?.includes('com.example-detail="q3"'))
+		})
+
+		it('drops a custom key payload not in the target enabledKeys while cen survives', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.CUSTOM_EVENT],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'cen'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'ad-quartile', 'com.example-detail': 'q3' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('cen="ad-quartile"'))
+			ok(!(requests[0].body as string)?.includes('com.example-detail'))
+		})
+
+		it('batches custom events according to batchSize', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.CUSTOM_EVENT],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 2,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'first' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// Batch size is 2, so the first event is queued, not sent
+			equal(requests.length, 0)
+
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'second' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+
+			const lines = (requests[0].body as string).trim().split('\n')
+			equal(lines.length, 2)
+			ok(lines[0].includes('e=ce'))
+			ok(lines[0].includes('cen="first"'))
+			ok(lines[1].includes('e=ce'))
+			ok(lines[1].includes('cen="second"'))
+		})
+	})
+
+	describe('custom keys', () => {
+		it('emits an enabled custom key as a query parameter', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo'],
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.url.includes('com.example-foo%3D%22bar%22'))
+		})
+
+		it('emits an enabled custom key in the CMCD-Request header', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.headers?.['CMCD-Request']?.includes('com.example-foo="bar"'))
+		})
+
+		it('routes custom keys to the configured header shard via customHeaderMap', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo', 'com.example-bar'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+				customHeaderMap: {
+					'CMCD-Session': ['com.example-foo'],
+					'CMCD-Status': ['com.example-bar'],
+				},
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar', 'com.example-bar': 'baz' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.headers?.['CMCD-Session']?.includes('com.example-foo="bar"'))
+			ok(req.headers?.['CMCD-Status']?.includes('com.example-bar="baz"'))
+			ok(!req.headers?.['CMCD-Request'])
+		})
+
+		it('emits unmapped custom keys in CMCD-Request when customHeaderMap is set', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo', 'com.example-bar'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+				customHeaderMap: {
+					'CMCD-Session': ['com.example-foo'],
+				},
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar', 'com.example-bar': 'baz' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.headers?.['CMCD-Session']?.includes('com.example-foo="bar"'))
+			ok(req.headers?.['CMCD-Request']?.includes('com.example-bar="baz"'))
+		})
+
+		it('does not re-route standard keys via customHeaderMap', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'br'],
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+				customHeaderMap: {
+					'CMCD-Status': ['sid', 'br'],
+				},
+			}, requester)
+
+			reporter.update({ br: [5000] })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			// Standard keys keep their spec-defined shards
+			ok(req.headers?.['CMCD-Session']?.includes('sid='))
+			ok(req.headers?.['CMCD-Object']?.includes('br='))
+			ok(!req.headers?.['CMCD-Status'])
+		})
+
+		it('ignores customHeaderMap in query transmission mode', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo'],
+				customHeaderMap: {
+					'CMCD-Session': ['com.example-foo'],
+				},
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.url.includes('com.example-foo%3D%22bar%22'))
+			equal(Object.keys(req.headers ?? {}).length, 0)
+		})
+
+		it('drops a custom key not listed in enabledKeys from request reports', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid'],
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(!req.url.includes('com.example-foo'))
+		})
+
+		it('drops a custom key not listed in the target enabledKeys from event reports', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-foo': 'bar' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('e=e'))
+			ok(!(requests[0].body as string)?.includes('com.example-foo'))
+		})
+
+		it('includes a persistent custom key in event reports when in the target enabledKeys', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-foo'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('com.example-foo="bar"'))
+		})
+
+		it('includes a persistent custom key in time interval reports', () => {
+			const timers = mock.timers
+			timers.enable({ apis: ['setInterval'] })
+
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.TIME_INTERVAL],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-foo'],
+						interval: 30,
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+			reporter.start()
+
+			// The first time interval event is sent immediately
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('com.example-foo="bar"'))
+
+			reporter.stop()
+			timers.reset()
+		})
+
+		it('does not persist a custom key passed as per-event data', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-foo'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-foo': 'bar' })
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[0].body as string)?.includes('com.example-foo="bar"'))
+			ok(!(requests[1].body as string)?.includes('com.example-foo'))
+		})
+
+		it('carries a custom key from the request report into the response received event', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'com.example-foo'],
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.RESPONSE_RECEIVED],
+						enabledKeys: ['sid', 'v', 'e', 'ts', 'sn', 'url', 'rc', 'com.example-foo'],
+						batchSize: 1,
+					},
+				],
+			}, requester)
+
+			reporter.update({ 'com.example-foo': 'bar' })
+
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
+
+			reporter.recordResponseReceived({ request, status: 200 })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('e=rr'))
+			ok((requests[0].body as string)?.includes('com.example-foo="bar"'))
+		})
+
+		it('emits a custom key passed directly to recordResponseReceived', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.RESPONSE_RECEIVED],
+						enabledKeys: ['sid', 'v', 'e', 'ts', 'sn', 'url', 'rc', 'com.example-rr'],
+						batchSize: 1,
+					},
+				],
+			}, requester)
+
+			reporter.recordResponseReceived({
+				request: { url: 'https://cdn.example.com/segment.mp4' },
+				status: 200,
+			}, { 'com.example-rr': 'baz' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('com.example-rr="baz"'))
+		})
+
+		it('emits an SfToken custom value as a bare token', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-tok'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-tok': new SfToken('t0k') })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('com.example-tok=t0k'))
+		})
+
+		it('emits a true custom value as a bare valueless key', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-flag'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-flag': true })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('com.example-flag'))
+			ok(!(requests[0].body as string)?.includes('com.example-flag='))
+		})
+
+		it('drops a false custom value', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'com.example-flag'],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'com.example-flag': false })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok(!(requests[0].body as string)?.includes('com.example-flag'))
+		})
+	})
+
+	describe('unserializable key handling', () => {
+		it('drops custom keys that fail RFC 8941 key serialization from request reports', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'Com.Example-foo' as CmcdKey, '2com.example-x', '-a-b'],
+			}, requester)
+
+			reporter.update({ 'Com.Example-foo': 'a', '2com.example-x': 'b', '-a-b': 'c' } as Partial<Cmcd>)
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+			ok(req.url.includes('sid%3D'))
+			ok(!req.url.includes('Com.Example-foo'))
+			ok(!req.url.includes('2com.example-x'))
+			ok(!req.url.includes('-a-b'))
+		})
+
+		it('drops an unserializable custom key from event reports', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'cid', 'v', 'e', 'ts', 'sn', 'Com.Example-foo' as CmcdKey],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { 'Com.Example-foo': 'bar' } as Partial<Cmcd>)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('e=e'))
+			ok(!(requests[0].body as string)?.includes('Com.Example-foo'))
+		})
+	})
+
+	describe('event transport failures', () => {
+		it('re-queues events on transport failure and delivers them on retry', async () => {
+			const requests: HttpRequest[] = []
+			let calls = 0
+			const requester = async (request: HttpRequest): Promise<{ status: number; }> => {
+				requests.push(request)
+				return { status: calls++ === 0 ? 500 : 200 }
+			}
+
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// First attempt failed with 500 and the event was re-queued
+			equal(requests.length, 1)
+
+			reporter.flush()
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[1].body as string)?.includes('e=e'))
 		})
 	})
 

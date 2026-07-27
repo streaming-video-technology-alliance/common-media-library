@@ -45,7 +45,8 @@ APIs are the product. Design them so adopters fall into the pit of success:
 - Add change notes under the `## [Unreleased]` heading in the affected package's `CHANGELOG.md` for every change; do not bump `package.json` versions in change PRs
 - Bump versions only in dedicated release-prep PRs: `npm run ver` bumps each package being released, then `npm run prepare-release` cascades patch bumps to the packages that depend on them
 - Avoid breaking changes; when unavoidable, provide migration guidance in changelog and docs
-- Save all plans in the `plans/` directory in a folder with the name of the feature or issue being implemented. Individual parts of the plan like steps, architecture, tech stack, etc. should be saved in separate files within the folder.
+- Save plans and design-session artifacts in the `plans/` directory in a folder with the name of the feature or issue being implemented. Individual parts of the plan like steps, architecture, tech stack, etc. should be saved in separate files within the folder (e.g. `plans/<feature-name>/steps.md`). Do not use `docs/` for planning documents.
+- Proposals that need community buy-in (public API changes, new packages, significant architecture) are RFCs, not plans: save them as `rfc/<feature-name>.md` and follow the process in `rfc/README.md`.
 
 ## Documentation
 
