@@ -378,6 +378,354 @@ describe('CmcdReporter', () => {
 				throws(() => reporter.createRequestReport({ url: 'https://example.com/video.mp4' }), /transform boom/)
 			})
 		})
+
+		describe('event mode', () => {
+			it('applies the target transform to event reports', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => ({ ...data, cid: 'redacted' }),
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('cid="redacted"'))
+			})
+
+			it('cancels the report when the target transform returns null', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: () => null,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 0)
+			})
+
+			it('does not consume a sequence number for a cancelled event report', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR, CmcdEventType.CUSTOM_EVENT],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => data.e === CmcdEventType.CUSTOM_EVENT ? null : data,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'dropped' })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('sn=0'))
+				ok((requests[1].body as string)?.includes('sn=1'))
+			})
+
+			it('does not consume msd for a cancelled event report', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR, CmcdEventType.CUSTOM_EVENT],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => data.e === CmcdEventType.CUSTOM_EVENT ? null : data,
+						},
+					],
+				}), requester)
+
+				reporter.update({ msd: 500 })
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'dropped' })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('msd=500'))
+			})
+
+			it('re-stamps the event type when a transform tampers with it', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => ({ ...data, e: CmcdEventType.PLAY_STATE }),
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('e=e'))
+				ok(!(requests[0].body as string)?.includes('e=ps'))
+			})
+
+			it('does not run the transform for events the target filters out', async () => {
+				const { requester } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								calls++
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'not-configured' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(calls, 0)
+			})
+
+			it('isolates transforms across targets that share a collector URL', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => ({ ...data, cid: 'target-a' }),
+						},
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: () => null,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('cid="target-a"'))
+			})
+
+			it('does not leak in-place mutation from one target into another', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://collector-a.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								data.cid = 'mutated-in-place'
+								return data
+							},
+						},
+						{
+							url: 'https://collector-b.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const a = requests.find(r => r.url.includes('collector-a'))
+				const b = requests.find(r => r.url.includes('collector-b'))
+				ok((a?.body as string)?.includes('cid="mutated-in-place"'))
+				ok((b?.body as string)?.includes('cid="test-content"'))
+			})
+
+			it('does not persist transform mutations into reporter data', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							// Appending rather than assigning makes leakage into the
+							// persistent data store observable on the second report.
+							transform: (data) => {
+								data.cid = `${data.cid}!`
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				ok((requests[0].body as string)?.includes('cid="test-content!"'))
+				ok((requests[1].body as string)?.includes('cid="test-content!"'))
+			})
+
+			it('does not roll back state-change dedup when a report is cancelled', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.PLAY_STATE],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: data => data.sta === 'p' ? null : data,
+						},
+					],
+				}), requester)
+
+				// Cancelled on the wire, but the transition still happened.
+				reporter.update({ sta: 'p' })
+				// Same value again: dedup suppresses it, cancellation did not reset it.
+				reporter.update({ sta: 'p' })
+				reporter.update({ sta: 'a' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('sta=a'))
+				ok((requests[0].body as string)?.includes('sn=0'))
+			})
+
+			it('passes undefined as the request for events with no triggering request', async () => {
+				const { requester } = createMockRequester()
+				const seen: unknown[] = []
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR, CmcdEventType.PLAY_STATE],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data, request) => {
+								seen.push(request)
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.update({ sta: 'p' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(seen.length, 2)
+				deepEqual(seen, [undefined, undefined])
+			})
+
+			it('propagates exceptions thrown by a target transform', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: () => {
+								throw new Error('event transform boom')
+							},
+						},
+					],
+				}), requester)
+
+				throws(() => reporter.recordEvent(CmcdEventType.ERROR), /event transform boom/)
+			})
+		})
+
+		describe('placement isolation', () => {
+			it('does not run the top-level transform for event reports', async () => {
+				const { requester, requests } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter(createConfig({
+					transform: (data) => {
+						calls++
+						return data
+					},
+				}), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(calls, 0)
+			})
+
+			it('does not run a target transform for request reports', () => {
+				const { requester } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								calls++
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				ok(req.url.includes('CMCD='))
+				equal(calls, 0)
+			})
+		})
 	})
 
 	describe('recordEvent', () => {

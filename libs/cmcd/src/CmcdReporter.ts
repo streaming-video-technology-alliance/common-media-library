@@ -160,6 +160,7 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 					events: target.events.slice(),
 					interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
 					batchSize: target.batchSize || 1,
+					transform: target.transform,
 				})
 			}
 			return acc
@@ -407,26 +408,43 @@ export class CmcdReporter {
 	 * @param data - Additional data to record with the event. This data
 	 *               only applies to this event report. Persistent data should
 	 *               be updated using `update()`.
+	 * @param request - The media request that triggered the event, when
+	 *                  one exists. Passed to the target's `transform`.
 	 */
-	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
 		if (!config.events.includes(type)) {
 			return
 		}
 
-		const item = {
+		// Each target gets its own copy, so a transform that mutates in
+		// place affects neither sibling targets nor the persistent data.
+		const item: Cmcd = {
 			...this.data,
 			...data,
 			e: type,
 			ts: data.ts ?? Date.now(),
-			sn: target.sn++,
 		}
 
+		const { transform } = config
+		const report = transform ? transform(item, request) : item
+
+		// A cancelled report consumes neither a sequence number nor msd.
+		if (report == null) {
+			return
+		}
+
+		// Reporter-owned fields are stamped after the transform runs, so a
+		// transform cannot bypass the target's `events` filter via `e` or
+		// break `sn` continuity.
+		report.e = type
+		report.sn = target.sn++
+
 		if (!isNaN(this.msd) && !target.msdSent) {
-			item.msd = this.msd
+			report.msd = this.msd
 			target.msdSent = true
 		}
 
-		target.queue.push(item)
+		target.queue.push(report)
 	}
 
 	/**
