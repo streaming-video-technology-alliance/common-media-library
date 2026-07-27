@@ -1307,6 +1307,23 @@ git add libs/cmcd && git commit -s -m "docs(cmcd): document report transforms"
 
 ---
 
+### Task 6: RFC v4 amendments
+
+Tasks 1 through 5 implement the RFC as accepted at v3. Review of that implementation found three contract-level defects, each reproduced against the working code, and the RFC was amended to v4 before this branch was finished. This task records what changed so the plan matches what shipped. All three land in `libs/cmcd/src/CmcdReporter.ts` with regression tests in `libs/cmcd/test/CmcdReporter.test.ts`.
+
+**Files:**
+- Modify: `libs/cmcd/src/CmcdReporter.ts`
+- Test: `libs/cmcd/test/CmcdReporter.test.ts`
+- Modify: `libs/cmcd/docs/user-guide.md`, `libs/cmcd/CHANGELOG.md`
+
+- [x] **Required event keys are restored, not just `e`/`sn`/`msd`.** v3 let a transform strip a key CTA-5004-B requires, so `{ ...data, sta: undefined }` on a `ps` event emitted a report `validateCmcdEventReport()` rejects. A module-level `CMCD_REQUIRED_EVENT_KEYS` map (built from `CMCD_STATE_EVENT_FIELDS` plus `cen` for `ce`, `ec` for the error event, `url` for `rr`) plus a captured `ts` are used to restore anything the transform removed. Restoration never fabricates a key that was already absent.
+
+- [x] **Nested report values are copied before the transform runs.** The per-report spread is shallow and 16 CMCD keys are array-typed, so `data.ec.push(...)` reached the persistent store and other targets' reports. `copyReportValues` copies array values and `SfItem` values including their `params`. The copy must preserve prototypes: `prepareCmcdData`, `CMCD_FORMATTER_MAP`, `validateCmcdValues`, and the encoder all branch on `instanceof SfItem`, and both a plain spread and `structuredClone` drop the prototype. It runs only where a transform is configured. Measured at roughly 400ns end to end against a roughly 8.5µs report path.
+
+- [x] **Transform exceptions are isolated per target.** `emitEvent` commits the dedup baseline before fan-out and never rolls it back, so a throw that aborted the fan-out starved every target ordered after the throwing one for the rest of the session, with the caller's retry deduped away. Each target is now tried independently, `processEventTargets()` still runs, and the first error is re-thrown afterwards.
+
+---
+
 ## Verification
 
 Before opening the PR, confirm every item with actual command output, not inspection:
@@ -1318,3 +1335,4 @@ Before opening the PR, confirm every item with actual command output, not inspec
 - [ ] `git diff origin/main -- libs/cmcd/package.json` — empty
 - [ ] Every commit on the branch has a `Signed-off-by:` trailer: `git log origin/main..HEAD --format='%h %(trailers:key=Signed-off-by)'`
 - [ ] Each RFC "Testing" bullet maps to a passing test: mutate and cancel on both paths; placement isolation both directions; two targets sharing a URL; `sn` continuity across cancels on both paths; `msd` surviving a cancelled carrier; `e` re-stamp; per-target mutation isolation; the `request` argument in all three states; transform-added keys still subject to `enabledKeys`; error propagation from both paths; an `{@includeCode}` example region
+- [ ] The v4 bullets too: required-key restoration per key family asserted against `validateCmcdEventReport()`; no fabrication of already-absent keys; nested array and `SfItem` params isolation from both siblings and the persistent store; `SfItem` prototype survives the copy; a healthy target still receives reports after a sibling transform throws, including on later distinct transitions, with contiguous `sn`
