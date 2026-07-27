@@ -8,13 +8,24 @@ import type { HttpRequest } from '@svta/cml-utils'
  * be using it. Every member is `readonly`, and `customData` is an opaque record
  * so nested values cannot be written either.
  *
- * `customData` values are `unknown` rather than `any` because the library
- * cannot know the player's shape. Narrow with a cast or bracket access to read
- * player-specific fields:
+ * By default `customData` values are `unknown` rather than `any`, because the
+ * library cannot know the player's shape. Narrow with a cast or bracket access
+ * to read player-specific fields:
  *
  * ```ts
  * transform: (data, request) =>
  * 	request?.customData?.['requestType'] === 'segment' ? data : null
+ * ```
+ *
+ * Supply `C` to describe the player's own `customData` instead and those reads
+ * become typed dot access. Annotating one transform is enough: the reporter
+ * infers `C` for every other transform in the same configuration.
+ *
+ * ```ts
+ * type PlayerData = { requestType: string; };
+ *
+ * const segmentsOnly: CmcdEventReportTransform<PlayerData> = (data, request) =>
+ * 	request?.customData?.requestType === 'segment' ? data : null
  * ```
  *
  * Two limits are worth knowing. A mutable body such as `FormData` or
@@ -22,9 +33,12 @@ import type { HttpRequest } from '@svta/cml-utils'
  * JavaScript callers get no enforcement at all. Mutating the request through
  * either route is unsupported, and the outgoing report may reflect it.
  *
+ * @typeParam C - The shape of the player's `customData`. Defaults to
+ *                `Record<string, unknown>`.
+ *
  * @public
  */
-export type CmcdTransformRequest = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
+export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
 	/**
 	 * The headers associated with the request.
 	 */
@@ -34,5 +48,5 @@ export type CmcdTransformRequest = Readonly<Omit<HttpRequest, 'customData' | 'he
 	 * Any custom data the caller attached to the request, including the
 	 * player's own fields.
 	 */
-	readonly customData?: Readonly<Record<string, unknown>>;
+	readonly customData?: Readonly<C>;
 };

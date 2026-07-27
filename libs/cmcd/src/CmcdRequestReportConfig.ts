@@ -6,9 +6,13 @@ import type { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
 /**
  * Configuration for a CMCD request report.
  *
+ * @typeParam C - The shape of the player's `customData` on the requests
+ *                passed to {@link CmcdReporter.createRequestReport}.
+ *                Defaults to `Record<string, unknown>`.
+ *
  * @public
  */
-export type CmcdRequestReportConfig = CmcdReportConfig & {
+export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
 	/**
 	 * The transmission mode to use.
 	 *
@@ -43,5 +47,5 @@ export type CmcdRequestReportConfig = CmcdReportConfig & {
 	 * @example
 	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
 	 */
-	transform?: CmcdRequestReportTransform;
+	transform?: CmcdRequestReportTransform<C>;
 }

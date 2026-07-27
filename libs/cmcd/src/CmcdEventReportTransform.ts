@@ -22,6 +22,10 @@ import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
  * Must not throw. Exceptions propagate to the caller that recorded the
  * event, which for time-interval events is the interval timer.
  *
+ * @typeParam C - The shape of the player's `customData` on the request.
+ *                Defaults to `Record<string, unknown>`, whose values are
+ *                `unknown` and read with bracket access.
+ *
  * @public
  */
-export type CmcdEventReportTransform = (data: Cmcd, request: CmcdTransformRequest | undefined) => Cmcd | null;
+export type CmcdEventReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C> | undefined) => Cmcd | null;
