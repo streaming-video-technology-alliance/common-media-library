@@ -444,11 +444,14 @@ export class CmcdReporter {
 	 * Additional keys like `ttfbb`, `cmsdd`, `cmsds`, and `smrt` can be
 	 * supplied via the `data` parameter if the player has access to them.
 	 *
-	 * @param response - The HTTP response received.
+	 * @param response - The HTTP response received. The request's
+	 *                   `customData` may carry the player's own fields
+	 *                   alongside the `cmcd` key the reporter reads back;
+	 *                   it does not have to declare `cmcd` at all.
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override any auto-derived values.
 	 */
-	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd; } & Record<string, unknown>>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
 
 		const url = data.url ?? request?.url

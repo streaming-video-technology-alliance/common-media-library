@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `CmcdReporter.recordResponseReceived` no longer rejects a request whose `customData` carries only the player's own fields. The parameter pinned `customData` to `{ cmcd?: Cmcd }`, a TypeScript weak type, so passing `{ requestType: 'segment' }` failed with `'requestType' does not exist in type '{ cmcd?: Cmcd | undefined; }'` because the source and target share no properties. Callers had to declare a `cmcd` key they do not own, or cast. The type is widened to `{ cmcd?: Cmcd } & Record<string, unknown>`; the reporter still reads `customData.cmcd` as `Cmcd | undefined`, and existing callers, including those annotating the previous narrower type, are unaffected
+
 ### Added
 
 - `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`

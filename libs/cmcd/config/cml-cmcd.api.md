@@ -366,7 +366,7 @@ export class CmcdReporter {
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     recordResponseReceived(response: HttpResponse<HttpRequest<{
         cmcd?: Cmcd;
-    }>>, data?: Partial<Cmcd>): void;
+    } & Record<string, unknown>>>, data?: Partial<Cmcd>): void;
     start(): void;
     stop(flush?: boolean): void;
     update(data: Partial<Cmcd>): void;

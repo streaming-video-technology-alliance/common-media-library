@@ -964,6 +964,48 @@ describe('CmcdReporter', () => {
 			ok(body.includes('cmsdd="abc123"'))
 		})
 
+		it('accepts a request carrying only player-specific customData', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+
+			// Compile-time regression guard as much as a runtime one: a player
+			// whose customData holds only its own fields must not need a cast or
+			// a placeholder `cmcd` key to call this. Narrowing the parameter back
+			// to `{ cmcd?: Cmcd }` makes this file fail to typecheck, because a
+			// source with no properties in common with a weak target is rejected.
+			reporter.recordResponseReceived({
+				request: {
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				},
+				status: 200,
+			})
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('url="https://cdn.example.com/segment.mp4"'))
+			ok(body.includes('rc=200'))
+		})
+
+		it('still reads the cmcd key back from customData', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+
+			reporter.recordResponseReceived({
+				request: {
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { cmcd: { sid: 'request-scoped' }, requestType: 'segment' },
+				},
+				status: 200,
+			})
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string)?.includes('sid="request-scoped"'))
+		})
+
 		it('does not send if no event target is configured for rr', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
