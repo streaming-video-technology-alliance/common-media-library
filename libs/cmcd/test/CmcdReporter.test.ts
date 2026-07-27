@@ -696,6 +696,33 @@ describe('CmcdReporter', () => {
 				deepEqual(seen, [undefined, undefined])
 			})
 
+			it('passes undefined as the request for time interval events', () => {
+				const { requester } = createMockRequester()
+				const seen: unknown[] = []
+				const reporter = new CmcdReporter(createConfig({
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.TIME_INTERVAL],
+							enabledKeys: [...EVENT_KEYS],
+							batchSize: 1,
+							interval: 30,
+							transform: (data, request) => {
+								seen.push(request)
+								return data
+							},
+						},
+					],
+				}), requester)
+
+				// start() fires an initial TIME_INTERVAL event synchronously.
+				reporter.start()
+				reporter.stop()
+
+				equal(seen.length, 1)
+				equal(seen[0], undefined)
+			})
+
 			it('propagates exceptions thrown by a target transform', () => {
 				const { requester } = createMockRequester()
 				const reporter = new CmcdReporter(createConfig({
