@@ -230,7 +230,7 @@ The merged report data handed to a transform is a shallow spread of the persiste
 Before invoking a transform, the reporter therefore copies nested values as well:
 
 - Array values are copied.
-- Object values, and object elements inside arrays, are `SfItem`s; each is copied along with its `params` record.
+- Object values, and object elements inside arrays, are `SfItem`s; each is copied along with its `params` record. The copy preserves the prototype, because `prepareCmcdData`, `CMCD_FORMATTER_MAP`, `validateCmcdValues`, and the structured-field encoder all branch on `instanceof SfItem`.
 
 This is complete rather than best-effort, because the CMCD value space is bounded by its own types. `CmcdValue` and `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of those, and `SfItem` is `{ value, params }` with a flat `params` record. There is no arbitrary nesting for a general-purpose deep clone to discover.
 
@@ -284,7 +284,7 @@ Propagation is nevertheless isolated per target. A throwing transform must not d
 The event-mode contract is therefore:
 
 - Each target's transform is invoked in isolation. A throw is caught, that target's report is dropped, and the remaining targets are still processed.
-- After the fan-out completes, queued batches are processed as usual, and only then is the error re-thrown to the caller. If several targets throw for the same event, the first error is re-thrown and the others are attached to it as `cause`.
+- After the fan-out completes, queued batches are processed as usual, and only then is the error re-thrown to the caller. If several targets throw for the same event, the first is re-thrown; a throwing transform is already a documented contract violation, and reporting one of them is enough to surface the bug without introducing an aggregate error type.
 - The throwing target consumes no sequence number and does not mark `msd` sent, exactly as if its transform had returned `null`.
 
 Request mode needs no equivalent: there is a single transform and a single report, `sn` and `msd` are not consumed until after the transform returns, and the exception simply reaches the `createRequestReport()` caller with no reporter state disturbed.
@@ -339,7 +339,7 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 - **Async transforms**: `createRequestReport()` is called inline in player request pipelines and must stay synchronous, and the driving use cases are all synchronous decisions. Anything async (remote config, consent state) can feed the reporter via `update()` or a config refresh before reports fire.
 - **Do nothing (use `requester`)**: rejected for the reasons in Motivation. It runs post-encoding, post-batching, and never sees request-mode reports.
 - **Shallow copy with nested mutation declared unsupported**: rejected. It keeps the hot path free but makes the documented isolation guarantee conditional on a caveat, and the failure mode when the caveat is missed is severe and undiagnosable (a sibling target with no transform emits another target's mutation, and the reporter's persistent arrays are corrupted for the rest of the session). A deeply readonly parameter type would enforce it at compile time for TypeScript users, but it gives JavaScript users nothing and revokes the in-place mutation ergonomic for everyone.
-- **`structuredClone` for nested values**: rejected on measured cost, roughly 40% of a report versus roughly 2% for a copy targeted at CMCD's value types, with no additional protection. The value space is bounded by `CmcdValue` and `CmcdCustomValue`, so there is nothing for a general-purpose clone to find that the targeted copy misses.
+- **`structuredClone` for nested values**: rejected, and not merely on cost. `structuredClone` discards prototypes, so every `SfItem` value would come back as a plain object and silently fail the `instanceof SfItem` branches in `prepareCmcdData`, `CMCD_FORMATTER_MAP`, and the encoder, changing what goes on the wire. It is also roughly 40% of a report versus roughly 2% for the targeted copy, and the value space is bounded by `CmcdValue` and `CmcdCustomValue`, so there is nothing for a general-purpose clone to find that the targeted copy misses.
 
 ## Prior art
 
