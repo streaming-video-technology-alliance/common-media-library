@@ -367,6 +367,21 @@ export class CmcdReporter {
 	 *               into the reporter's data store.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
+		this.emitEvent(type, data)
+	}
+
+	/**
+	 * Records an event across every configured target, applying
+	 * state-change dedup once before per-target fan-out.
+	 *
+	 * @param type - The type of event to record.
+	 * @param data - Additional data to record with the event.
+	 * @param request - The media request that triggered the event, when
+	 *                  one exists. Only `recordResponseReceived()`
+	 *                  populates this; it is threaded through to each
+	 *                  target's `transform`.
+	 */
+	private emitEvent(type: CmcdEventType, data: Partial<Cmcd>, request?: HttpRequest): void {
 		const entry = STATE_FIELDS_BY_EVENT.get(type)
 		if (entry) {
 			const field = entry.field
@@ -393,7 +408,7 @@ export class CmcdReporter {
 		}
 
 		this.eventTargets.forEach((target, config) => {
-			this.recordTargetEvent(target, config, type, data)
+			this.recordTargetEvent(target, config, type, data, request)
 		})
 
 		this.processEventTargets()
@@ -501,7 +516,7 @@ export class CmcdReporter {
 
 		const cmcd = request.customData?.cmcd ?? {}
 
-		this.recordEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data })
+		this.emitEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data }, request)
 	}
 
 	/**

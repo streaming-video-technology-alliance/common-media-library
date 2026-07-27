@@ -1,4 +1,4 @@
-import type { Cmcd, CmcdKey, CmcdReporterConfig } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
@@ -680,6 +680,91 @@ describe('CmcdReporter', () => {
 				}), requester)
 
 				throws(() => reporter.recordEvent(CmcdEventType.ERROR), /event transform boom/)
+			})
+		})
+
+		describe('triggering request', () => {
+			// A player's request carries its own taxonomy on customData
+			// alongside the cmcd key the reporter reads back.
+			type PlayerRequest = HttpRequest<{ cmcd?: Cmcd; requestType: string; }>
+
+			it('passes the triggering request to the transform for response-received events', async () => {
+				const { requester, requests } = createMockRequester()
+				const seen: (HttpRequest | undefined)[] = []
+				const triggering: PlayerRequest = {
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				}
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					cid: 'test-content',
+					enabledKeys: [...RR_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.RESPONSE_RECEIVED],
+							enabledKeys: [...RR_KEYS],
+							batchSize: 1,
+							transform: (data, request) => {
+								seen.push(request)
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.recordResponseReceived({ request: triggering, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(seen.length, 1)
+				equal(seen[0], triggering)
+			})
+
+			it('filters response-received reports by player request type', async () => {
+				const { requester, requests } = createMockRequester()
+				const segmentsOnly: CmcdEventReportTransform = (data, request) => {
+					if (data.e !== CmcdEventType.RESPONSE_RECEIVED) {
+						return data
+					}
+					const customData = request?.customData as { requestType?: string } | undefined
+					return customData?.requestType === 'segment' ? data : null
+				}
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...RR_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.RESPONSE_RECEIVED],
+							enabledKeys: [...RR_KEYS],
+							batchSize: 1,
+							transform: segmentsOnly,
+						},
+					],
+				}, requester)
+
+				const manifestRequest: PlayerRequest = {
+					url: 'https://cdn.example.com/manifest.mpd',
+					customData: { requestType: 'mpd' },
+				}
+
+				const segmentRequest: PlayerRequest = {
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				}
+
+				reporter.recordResponseReceived({ request: manifestRequest, status: 200 })
+				reporter.recordResponseReceived({ request: segmentRequest, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('segment.mp4'))
+				ok((requests[0].body as string)?.includes('sn=0'))
 			})
 		})
 
