@@ -600,11 +600,18 @@ export class CmcdReporter {
 	 * Additional keys like `ttfbb`, `cmsdd`, `cmsds`, and `smrt` can be
 	 * supplied via the `data` parameter if the player has access to them.
 	 *
+	 * The request's `customData` is generic, so a player can pass a request
+	 * carrying its own taxonomy (e.g. `{ requestType: 'segment' }`) without a
+	 * cast. The reporter only reads the optional `cmcd` key that
+	 * {@link CmcdReporter.createRequestReport} writes there; every other key is
+	 * left untouched and stays visible to an event target's `transform` via
+	 * its `request` argument.
+	 *
 	 * @param response - The HTTP response received.
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override any auto-derived values.
 	 */
-	recordResponseReceived(response: HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+	recordResponseReceived<C>(response: HttpResponse<HttpRequest<C & { cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
 
 		const url = data.url ?? request?.url

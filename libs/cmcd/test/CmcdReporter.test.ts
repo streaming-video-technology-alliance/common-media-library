@@ -1058,9 +1058,9 @@ describe('CmcdReporter', () => {
 		})
 
 		describe('triggering request', () => {
-			// A player's request carries its own taxonomy on customData
-			// alongside the cmcd key the reporter reads back.
-			type PlayerRequest = HttpRequest<{ cmcd?: Cmcd; requestType: string; }>
+			// A player's request carries only its own taxonomy on customData.
+			// It does not have to declare the reporter's `cmcd` key.
+			type PlayerRequest = HttpRequest<{ requestType: string; }>
 
 			it('passes the triggering request to the transform for response-received events', async () => {
 				const { requester, requests } = createMockRequester()
@@ -1139,6 +1139,48 @@ describe('CmcdReporter', () => {
 				equal(requests.length, 1)
 				ok((requests[0].body as string)?.includes('segment.mp4'))
 				ok((requests[0].body as string)?.includes('sn=0'))
+			})
+
+			it('accepts a request whose customData has only player-specific keys', async () => {
+				const { requester, requests } = createMockRequester()
+				const seen: string[] = []
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...RR_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.RESPONSE_RECEIVED],
+							enabledKeys: [...RR_KEYS],
+							batchSize: 1,
+							transform: (data, request) => {
+								const customData = request?.customData as { requestType?: string; } | undefined
+								if (customData?.requestType) {
+									seen.push(customData.requestType)
+								}
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				// A bare object literal with no `cmcd` key and no helper type
+				// alias: this is the shape a player passes, and it must compile
+				// without a cast. `customData` is inferred, not pinned.
+				reporter.recordResponseReceived({
+					request: {
+						url: 'https://cdn.example.com/segment.mp4',
+						customData: { requestType: 'segment' },
+					},
+					status: 200,
+				})
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				deepEqual(seen, ['segment'])
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('segment.mp4'))
 			})
 		})
 
