@@ -22,6 +22,7 @@ and this project adheres to
 
 ### Changed
 
+- `CmcdReporter.recordResponseReceived()` is now generic over the request's `customData`, so a player can pass a request carrying only its own keys (e.g. `{ requestType: 'segment' }`) without declaring a `cmcd` key it does not own and without a cast. The parameter was previously pinned to `HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>`; because `{ cmcd?: Cmcd }` is a weak type (every property optional), a `customData` sharing no properties with it was rejected outright. This pairs with the per-target `transform`, which reads the player's taxonomy off the triggering request. Type-only widening: the reporter still reads just `customData.cmcd`, and existing callers passing `HttpRequest<{ cmcd?: Cmcd }>` continue to compile
 - `isCmcdCustomKey` and the `CmcdCustomKey` type now only accept custom keys that survive RFC 8941 key serialization: a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character. Uppercase and digit-leading names were never serializable as CMCD; they are now rejected by the type, the validators, and key filtering instead of being dropped at encode preparation
 
 ### Documentation
