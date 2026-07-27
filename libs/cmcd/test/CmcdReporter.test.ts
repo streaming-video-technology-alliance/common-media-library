@@ -2,7 +2,7 @@ import type { Cmcd, CmcdKey, CmcdReporterConfig } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
-import { equal, ok } from 'node:assert'
+import { deepEqual, equal, ok, throws } from 'node:assert'
 import { describe, it, mock } from 'node:test'
 
 function createMockRequester(status: number = 200) {
@@ -244,6 +244,139 @@ describe('CmcdReporter', () => {
 
 			const second = reporter.createRequestReport({ url: 'https://example.com/seg2.mp4' })
 			ok(!second.url.includes('msd'))
+		})
+	})
+
+	describe('report transforms', () => {
+		describe('request mode', () => {
+			it('applies the top-level transform to request reports', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					cid: 'test-content',
+					enabledKeys: ['sid', 'cid'],
+					transform: data => ({ ...data, cid: 'redacted' }),
+				}, requester)
+
+				const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				ok(req.url.includes('cid%3D%22redacted%22'))
+				ok(!req.url.includes('test-content'))
+			})
+
+			it('cancels CMCD decoration when the transform returns null', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: (data, request) => request.url.includes('/license') ? null : data,
+				}, requester)
+
+				const license = reporter.createRequestReport({ url: 'https://example.com/license' })
+				ok(!license.url.includes('CMCD='))
+				deepEqual(license.customData.cmcd, {})
+
+				const segment = reporter.createRequestReport({ url: 'https://example.com/segment.mp4' })
+				ok(segment.url.includes('CMCD='))
+			})
+
+			it('does not consume a sequence number for a cancelled request report', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid', 'sn'],
+					transform: (data, request) => request.url.includes('/skip') ? null : data,
+				}, requester)
+
+				const first = reporter.createRequestReport({ url: 'https://example.com/seg1.mp4' })
+				ok(first.url.includes('sn%3D0'))
+
+				reporter.createRequestReport({ url: 'https://example.com/skip' })
+
+				const second = reporter.createRequestReport({ url: 'https://example.com/seg2.mp4' })
+				ok(second.url.includes('sn%3D1'))
+			})
+
+			it('does not consume msd for a cancelled request report', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['msd'],
+					transform: (data, request) => request.url.includes('/skip') ? null : data,
+				}, requester)
+
+				reporter.update({ msd: 1000 })
+
+				reporter.createRequestReport({ url: 'https://example.com/skip' })
+
+				const next = reporter.createRequestReport({ url: 'https://example.com/seg.mp4' })
+				ok(next.url.includes('msd%3D1000'))
+			})
+
+			it('passes the caller request, which cannot alter the outgoing report', () => {
+				const { requester } = createMockRequester()
+				const seen: HttpRequest[] = []
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: (data, request) => {
+						seen.push(request)
+						request.url = 'https://tampered.example.com/'
+						return data
+					},
+				}, requester)
+
+				const input = { url: 'https://example.com/video.mp4' }
+				const req = reporter.createRequestReport(input)
+
+				equal(seen.length, 1)
+				equal(seen[0], input)
+				ok(req.url.startsWith('https://example.com/video.mp4'))
+			})
+
+			it('subjects transform-added keys to enabledKeys', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: data => ({ ...data, bl: [3000] }),
+				}, requester)
+
+				const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				ok(req.url.includes('sid%3D%22test-session%22'))
+				ok(!req.url.includes('bl'))
+			})
+
+			it('does not run the transform when request reporting is disabled', () => {
+				const { requester } = createMockRequester()
+				let calls = 0
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [],
+					transform: (data) => {
+						calls++
+						return data
+					},
+				}, requester)
+
+				reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+				equal(calls, 0)
+			})
+
+			it('propagates exceptions thrown by the transform', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: () => {
+						throw new Error('transform boom')
+					},
+				}, requester)
+
+				throws(() => reporter.createRequestReport({ url: 'https://example.com/video.mp4' }), /transform boom/)
+			})
 		})
 	})
 

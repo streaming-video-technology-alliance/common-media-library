@@ -535,14 +535,28 @@ export class CmcdReporter {
 			return report
 		}
 
-		const url = new URL(report.url)
-		const cmcdData = { ...this.data, ...data, sn: this.requestTarget.sn++ }
-		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
+		const merged: Cmcd = { ...this.data, ...data }
+		const { transform } = this.config
+
+		// The caller's request is passed, not the internal clone, so a
+		// transform cannot alter the outgoing report through it.
+		const cmcdData = transform ? transform(merged, request) : merged
+
+		// A cancelled report consumes neither a sequence number nor msd.
+		if (cmcdData == null) {
+			return report
+		}
+
+		// Reporter-owned fields are stamped after the transform runs.
+		cmcdData.sn = this.requestTarget.sn++
 
 		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
 			cmcdData.msd = this.msd
 			this.requestTarget.msdSent = true
 		}
+
+		const url = new URL(report.url)
+		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
 		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
 
