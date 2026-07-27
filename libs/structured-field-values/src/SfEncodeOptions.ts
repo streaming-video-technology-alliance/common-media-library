@@ -5,7 +5,10 @@
  */
 export type SfEncodeOptions = {
 	/**
-	 * Include whitespace in the output.
+	 * Include the single space that RFC 8941 serialization emits after each
+	 * comma separating dictionary or list members.
+	 *
+	 * @defaultValue `true`
 	 */
 	whitespace?: boolean;
 };

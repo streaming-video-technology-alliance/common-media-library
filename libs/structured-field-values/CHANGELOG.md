@@ -12,6 +12,10 @@ and this project adheres to
 
 - `isSerializableSfMember` — checks whether a value can be serialized as a structured field dictionary or list member without failing, covering all RFC 8941 serialization failure modes (control characters in strings, out-of-range integers and decimals, invalid token content, unsupported types)
 
+### Fixed
+
+- `encodeSfDict` and `encodeSfList` no longer drop the whitespace RFC 8941 emits after each comma when they are given a partial options object. `whitespace` was applied via a default parameter, so any options object without that property (for example `encodeSfDict(data, {})`) silently produced compact output; it is now treated as `true` unless explicitly set to `false`. Callers that passed an options object without `whitespace` and relied on compact output must now pass `whitespace: false`
+
 ## [1.1.4] - 2026-07-21
 
 ### Changed

@@ -71,4 +71,13 @@ describe('encodeSfDict', () => {
 		)
 	})
 
+	it('keeps whitespace on unless it is explicitly disabled', () => {
+		const dict = { a: 1, b: 2 }
+		assert.deepStrictEqual(encodeSfDict(dict), `a=1, b=2`)
+		assert.deepStrictEqual(encodeSfDict(dict, {}), `a=1, b=2`)
+		assert.deepStrictEqual(encodeSfDict(dict, { whitespace: undefined }), `a=1, b=2`)
+		assert.deepStrictEqual(encodeSfDict(dict, { whitespace: true }), `a=1, b=2`)
+		assert.deepStrictEqual(encodeSfDict(dict, { whitespace: false }), `a=1,b=2`)
+	})
+
 })

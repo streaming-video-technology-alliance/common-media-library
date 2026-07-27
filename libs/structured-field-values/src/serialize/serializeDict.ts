@@ -48,13 +48,16 @@ import { serializeParams } from './serializeParams.ts'
 /**
  * @internal
  */
-export function serializeDict(dict: Record<string, any> | Map<string, any>, options: SfEncodeOptions = { whitespace: true }): string {
+export function serializeDict(dict: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string {
 	if (typeof dict !== 'object' || dict == null) {
 		throw serializeError(dict, DICT)
 	}
 
 	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict)
-	const optionalWhiteSpace = options?.whitespace ? ' ' : ''
+	// The RFC emits a single SP after each comma, so whitespace is on unless
+	// explicitly disabled. Checking the property (rather than defaulting the
+	// whole options object) keeps the default intact for partial options.
+	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
 
 	return Array.from(entries)
 		.map(([key, item]) => {
