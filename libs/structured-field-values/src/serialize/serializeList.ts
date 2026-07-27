@@ -37,9 +37,6 @@ export function serializeList(list: SfMember[], options?: SfEncodeOptions): stri
 		throw serializeError(list, LIST)
 	}
 
-	// The RFC emits a single SP after each comma, so whitespace is on unless
-	// explicitly disabled. Checking the property (rather than defaulting the
-	// whole options object) keeps the default intact for partial options.
 	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
 
 	return list
