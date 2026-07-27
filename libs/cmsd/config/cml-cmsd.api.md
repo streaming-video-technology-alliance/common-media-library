@@ -21,7 +21,7 @@ export const CMSD_STATIC = "CMSD-Static";
 export const CMSD_V1 = 1;
 
 // @public
-export type CmsdCustomKey = `${string}-${string}`;
+export type CmsdCustomKey = Lowercase<`${string}-${string}`>;
 
 // @public
 export type CmsdDynamic = {
@@ -105,6 +105,9 @@ export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
 
 // @public
 export function encodeCmsdStatic(cmsd: CmsdStatic, options?: CmsdEncodeOptions): string;
+
+// @public
+export function isCmsdCustomKey(key: string): boolean;
 
 // (No @packageDocumentation comment for this package)
 
