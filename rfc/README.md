@@ -11,7 +11,9 @@ Proposals that need community buy-in before proceeding.
 
 **Use a plan instead** (`plans/<feature-name>/`) for implementation details and design-session artifacts you own.
 
-**Skip both for:** bug fixes, small features, and documentation updates.
+**Skip both for:** bug fixes, internal changes with no public API surface, and documentation updates.
+
+The public-API rule above takes precedence over size. A small addition still needs an RFC if it lands in a package's public API surface, because adopters live with it and we cannot take it back without a breaking change. "Small" is not an exception; "not public" is.
 
 ## File Format
 

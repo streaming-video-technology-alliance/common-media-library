@@ -25,6 +25,8 @@ Add an optional `transform` function to the request-report configuration and to 
 Placement determines scope, mirroring how `enabledKeys` already works: the top-level `transform` applies to request-mode reports produced by `createRequestReport()`, and each event target's `transform` applies to event reports bound for that target.
 
 ```ts
+import { CmcdEventType, CmcdReporter } from '@svta/cml-cmcd'
+
 const reporter = new CmcdReporter({
 	enabledKeys: ['br', 'bl', 'sid', 'cid', 'v', 'sn'],
 	// Request mode: never decorate license requests with CMCD
@@ -36,7 +38,8 @@ const reporter = new CmcdReporter({
 			enabledKeys: ['sta', 'url', 'rc', 'sid', 'cid', 'v', 'e', 'ts', 'sn'],
 			// Event mode, this target only: drop rr reports for non-segment responses
 			transform: (data, request) => {
-				if (data.e === CmcdEventType.RESPONSE_RECEIVED && request?.customData?.requestType !== 'segment') {
+				const customData = request?.customData as { requestType?: string } | undefined
+				if (data.e === CmcdEventType.RESPONSE_RECEIVED && customData?.requestType !== 'segment') {
 					return null
 				}
 				return data
@@ -87,6 +90,9 @@ Transforms follow the same placement convention as `enabledKeys`:
 There is deliberately no single registration point spanning both paths. Event identity lives in the data itself (`data.e`), the target's own config is in scope where the transform is written, and anything else a transform needs can be closed over.
 
 ```ts
+import type { Cmcd } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdReporter } from '@svta/cml-cmcd'
+
 // Cross-cutting policy is a shared function referenced from each placement
 const sampled = Math.random() < 0.1
 const sampleIntervals = (data: Cmcd): Cmcd | null =>
@@ -116,7 +122,14 @@ const reporter = new CmcdReporter({
 Composing multiple concerns at one placement is ordinary function composition, which integrators own:
 
 ```ts
-transform: (data, request) => {
+import type { Cmcd } from '@svta/cml-cmcd'
+import type { HttpRequest } from '@svta/cml-utils'
+
+// An integrator-owned redaction step, defined here so the composition is runnable
+const scrubPii = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null =>
+	request?.url.includes('/private/') ? null : { ...data, cid: undefined }
+
+const transform = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null => {
 	const scrubbed = scrubPii(data, request)
 	return scrubbed === null ? null : sampleIntervals(scrubbed)
 }
@@ -127,6 +140,8 @@ For request-type filtering that is expressible in pure CMCD terms, the `ot` (obj
 ### What transforms cannot do
 
 The reporter re-stamps `e` and assigns `sn` and `msd` after the transform runs. A transform cannot change a report's event type (which would bypass a target's `events` filter), corrupt sequence numbering, or replay the media-start-delay marker. Transforms also cannot mutate the outgoing HTTP request; they shape CMCD data only.
+
+A transform also cannot strip a key that CTA-5004-B requires for the event being reported. Every event requires `e` and `ts`; state-change events additionally require the field whose value they signal (`sta`, `pr`, `cid`, `bg`, `br`), `ce` requires `cen`, `e` (error) requires `ec`, and `rr` requires `url`. If a transform removes one of these, the reporter restores the value it held before the transform ran, so a transform cannot emit a report that the library's own `validateCmcdEvents()` would reject. Redaction is still available for these keys where it is meaningful: a key that must never reach a destination should not be in that placement's `enabledKeys`, and an event whose defining field you do not want to send should not be in that target's `events`.
 
 ## Reference-level explanation
 
@@ -202,15 +217,19 @@ A nullish return (including a forgotten `return`) cancels the report. This is de
 
 1. Existing guard: the target's `events` filter runs first, before any transform work.
 2. Build the per-target item: `{ ...persistentData, ...eventData, e: type, ts }`. No sequence number is assigned yet. Each target gets a fresh copy, so an event fanning out to three targets invokes each target's transform with its own copy, and mutations for one target never leak into another's report.
-3. Invoke the target's `transform`, if configured, with the item and the triggering request. The triggering request is threaded from `recordResponseReceived()` through a private parameter on the internal record path; the public `recordEvent()` signature is unchanged, and all other event sources (state-change events fired by `update()`, `TIME_INTERVAL` timers, direct `recordEvent()` calls) pass `undefined`.
+3. Invoke the target's `transform`, if configured, with the item and the triggering request. The triggering request is threaded from `recordResponseReceived()` through a private parameter on the internal record path; the public `recordEvent()` signature is unchanged, and all other event sources (state-change events fired by `update()`, `TIME_INTERVAL` timers, direct `recordEvent()` calls) pass `undefined`. The invocation is isolated per target; see Error handling.
 4. On `null`: nothing is queued. No `sn` is consumed and `msd` is not marked sent.
-5. Otherwise: re-stamp `e` with the original event type, assign `sn`, attach `msd` (once per target), and push to the target's queue. Batching, retry, and re-queue-on-failure behavior are untouched because the transform ran before the queue.
+5. Otherwise: restore any key the event requires that the transform removed, re-stamp `e` with the original event type, assign `sn`, attach `msd` (once per target), and push to the target's queue. Batching, retry, and re-queue-on-failure behavior are untouched because the transform ran before the queue.
 
 Config normalization copies each target's `transform` into the normalized target config alongside its other fields.
 
 ### Reporter-owned fields
 
-`e`, `sn`, and `msd` are stamped after the transform completes. Values a transform writes to those keys are overwritten. `ts` is ordinary report data and a transform may override it.
+`e`, `sn`, and `msd` are stamped after the transform completes. Values a transform writes to those keys are overwritten.
+
+`ts` and the other keys CTA-5004-B requires for the event type are *conditionally* reporter-owned: a transform may change their values, but it may not remove them. If the transform returns data in which a required key is missing while it was present before the transform ran, the reporter restores the pre-transform value. The required keys are `e` and `ts` for every event, the signalled field for state-change events (`sta`, `pr`, `cid`, `bg`, `br`), `cen` for `ce`, `ec` for the error event, and `url` for `rr`. This mirrors what the library already does elsewhere: `prepareCmcdData` force-includes the required state field even when `enabledKeys` would filter it out, so these keys are already treated as non-negotiable rather than integrator-controlled.
+
+Restoration is deliberately not invention. If a required key was already absent before the transform ran (for example an error event recorded without `ec`), the report was already non-conformant and the reporter does not fabricate a value; that is a caller bug, unchanged by this proposal.
 
 ### Cancellation guarantees
 
@@ -223,6 +242,7 @@ State-change dedup (`lastEmitted`) commits in `recordEvent()` before per-target 
 
 - Cancelling a state-change report, even for every target, does not roll back the dedup baseline. The state transition still happened; the transform only suppressed its transmission.
 - Mutating a tracked field (e.g. `sta`) in one target's report does not poison dedup for other targets or future events.
+- A *throwing* transform does not roll back the baseline either, which is precisely why the throw must not abort the fan-out. Per-target isolation (see Error handling) keeps the committed transition deliverable to every other target, so the un-rollback-able baseline never strands a transition that no target received.
 
 Canonical state belongs to `update()` and `recordEvent()`. Transforms shape what goes on the wire.
 
@@ -231,7 +251,7 @@ Canonical state belongs to `update()` and `recordEvent()`. Transforms shape what
 Transforms run before encoding, so the `enabledKeys` allowlist (and the encoder's force-include rules for required event fields) still applies to transform output:
 
 - Keys added by a transform must be present in the `enabledKeys` at the same placement to reach the wire.
-- Keys removed by a transform stay removed.
+- Keys removed by a transform stay removed, unless the event requires them; see Reporter-owned fields.
 
 This keeps `enabledKeys` as the single wire allowlist and prevents a transform from accidentally leaking keys a target was never configured to receive. Note that data minimization is already a per-placement concern in this API: a key that must never reach any destination should simply not be enabled anywhere, which is also why a both-paths global hook is unnecessary for that job.
 
@@ -243,6 +263,16 @@ Transform exceptions propagate to the caller: `createRequestReport()`, `recordEv
 - Fail-closed (silently drop the report) makes data loss undebuggable.
 
 Documentation states the rule plainly: transforms must not throw. Wrap risky logic in try/catch and choose fail-open (return the data) or fail-closed (return `null`) explicitly.
+
+Propagation is nevertheless isolated per target. A throwing transform must not deprive *other* targets of a report, and in event mode a naive propagation does exactly that: `recordEvent()` commits the dedup baseline before fan-out, so if the throw aborts iteration, targets ordered after the throwing one never see the transition, and the player's retry of the same state is then suppressed by dedup. Because target order is fixed by configuration, one consistently throwing transform would starve every target after it for the lifetime of the session, not just once.
+
+The event-mode contract is therefore:
+
+- Each target's transform is invoked in isolation. A throw is caught, that target's report is dropped, and the remaining targets are still processed.
+- After the fan-out completes, queued batches are processed as usual, and only then is the error re-thrown to the caller. If several targets throw for the same event, the first error is re-thrown and the others are attached to it as `cause`.
+- The throwing target consumes no sequence number and does not mark `msd` sent, exactly as if its transform had returned `null`.
+
+Request mode needs no equivalent: there is a single transform and a single report, `sn` and `msd` are not consumed until after the transform returns, and the exception simply reaches the `createRequestReport()` caller with no reporter state disturbed.
 
 ### Forward compatibility
 
@@ -264,6 +294,9 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 - `sn` continuity across cancels on both paths (no gaps).
 - `msd` survives a cancelled carrier and rides the next report.
 - `e` re-stamp when a transform tampers with it.
+- Required-key restoration, one case per required-key family: `ts` on any event, the signalled field on each state-change event (`sta`, `pr`, `cid`, `bg`, `br`), `cen` on `ce`, `ec` on the error event, and `url` on `rr`. Each case asserts the restored report passes `validateCmcdEventReport()`.
+- Required keys absent before the transform are not fabricated by it.
+- Per-target error isolation: with a throwing transform on the first of two targets, the second target still receives the report, the throw still reaches the caller, and a subsequent distinct state transition is still delivered. A regression test for the starvation case: after a throw, the healthy target's report count is non-zero.
 - Per-target isolation: mutation for target A does not leak into target B's report.
 - `request` argument: the caller's request in request mode, the triggering request for `recordResponseReceived()`, and `undefined` for state-change and `TIME_INTERVAL` events.
 - Transform-added keys remain subject to `enabledKeys`.
@@ -274,8 +307,9 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 
 - **Cross-cutting policy has no single registration point.** A concern that applies everywhere must be referenced from the top level and from each target. Mitigations: shared function references (see Guide-level), and the observation that whole-session data minimization is already served by `enabledKeys` placement and by not feeding sensitive values into `update()`.
 - **One function per placement.** Integrators composing several concerns at one placement write the composition themselves. A `composeTransforms()` helper can ship later as a separate tree-shakeable export if demand appears.
-- **Footgun potential**: a transform can degrade payloads (e.g. stripping keys a collector expects). The reporter-owned-field re-stamping and `enabledKeys` filtering bound the damage to data quality; structural validity and sequence integrity are protected.
+- **Footgun potential**: a transform can degrade payloads (e.g. stripping optional keys a collector expects). Reporter-owned-field re-stamping, required-key restoration, and `enabledKeys` filtering bound the damage to data quality: sequence integrity is protected, and a transform cannot produce a report that `validateCmcdEvents()` rejects. It can still produce a structurally valid report that is analytically useless.
 - **Error propagation reaches timer contexts**: a throwing transform on a `TIME_INTERVAL` event surfaces as an unhandled error. The alternative (swallowing) was judged worse; see Error handling.
+- **Per-target error isolation adds a try/catch per target per event.** This is the cost of not letting one integrator's throwing transform starve unrelated targets. It also means a throw is reported to the caller slightly later than it occurs, after the remaining targets and the queue have been processed.
 - **A second way to shape data**: simple cases are already served by `enabledKeys` and `update()`. The docs must be clear that transforms are for per-report, per-destination decisions that static config cannot express.
 
 ## Rationale and alternatives
@@ -313,10 +347,13 @@ Both questions were resolved in favor of the stance proposed above when the RFC 
 - **2026-07-21 (v1)**: initial draft proposing a reporter-level `middleware` array applied to both reporting paths, with a discriminated-union context object.
 - **2026-07-22 (v2)**: reshaped into per-placement `transform` functions following dash.js review feedback (per-target `rr` filtering, same-URL targets) and the `enabledKeys` placement-symmetry argument. Resolved former open questions on naming (`transform`) and per-target registration (yes, it is the design).
 - **2026-07-27 (v3)**: accepted as proposed in v2. Recorded the resolution of both unresolved questions (propagate exceptions, keep triggering-request plumbing private).
+- **2026-07-27 (v4)**: two correctness fixes found while implementing v3, both verified against a working implementation. Transforms can no longer remove keys CTA-5004-B requires for the event (v3 protected only `e`, `sn`, and `msd`, so stripping `sta` from a `ps` event produced a report the library's own validator rejects). Event-mode exception propagation is now isolated per target (v3's unqualified propagation aborted the fan-out, and because the dedup baseline commits first, one throwing transform permanently starved every target ordered after it). Also corrected the Drawbacks claim that structural validity was already protected, and made the examples self-contained.
 
 ## Final Decision
 
-**Decision:** Accepted as proposed in v2, with no design changes. Both unresolved questions resolve to the stance the RFC proposed: transform exceptions propagate to the caller, and the triggering request is threaded privately so only `recordResponseReceived()` populates it.
+**Decision:** Accepted as proposed in v2, with the two correctness fixes recorded in v4. Both unresolved questions resolve to the stance the RFC proposed: transform exceptions propagate to the caller (isolated per target, per v4), and the triggering request is threaded privately so only `recordResponseReceived()` populates it.
+
+**Post-acceptance amendments:** v4 tightens two parts of the contract that implementation showed to be unsound. Neither changes the shape of the API, and neither invalidates the review that led to acceptance: required-key restoration only removes a way to emit invalid reports, and per-target error isolation only prevents one target's throwing transform from silently starving the others. Both are strictly more conservative than v3.
 
 **Rationale:** The per-placement single-function shape was confirmed by the concrete consumer during review. dash.js ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390)) verified that one function per target is sufficient to express `sendResponseReceivedForRequestTypes`, which was the case that motivated reshaping the proposal away from a global middleware array, and that composing further target-specific rules into a single function is acceptable. That removes the last open concern about dropping the array contract. On the two remaining questions, the proposed stances were kept because the alternatives are strictly worse and both are reversible in a non-breaking way: swallowing transform exceptions would either leak the data a redaction transform exists to remove or make data loss undebuggable, and a public associated-request parameter on `recordEvent()` can be added later if a use case appears, whereas removing one could not.
 
