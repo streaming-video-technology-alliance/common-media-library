@@ -75,7 +75,7 @@ A transform is a pure synchronous function:
 
 - Return the data object (the same one, mutated in place if you like, or a copy) to send it.
 - Return `null` to cancel the report. Nothing is sent.
-- The `data` argument is a per-report copy, so mutating it never affects the reporter's persistent state or other targets' reports.
+- The `data` argument is a per-report copy, so mutating it never affects the reporter's persistent state or other targets' reports. This holds for nested values too: arrays such as `br` and `ec` are copied, so `data.ec.push(...)` is safe. See Report data copying.
 - The `request` argument is the associated media request: for request-mode reports, the request being decorated (always present); for event reports, the request that triggered the event when one exists (`RESPONSE_RECEIVED` events recorded via `recordResponseReceived()`), otherwise `undefined`.
 
 ### Placement determines scope
@@ -208,7 +208,7 @@ A nullish return (including a forgotten `return`) cancels the report. This is de
 
 1. Build the report skeleton (cloned request, empty `customData.cmcd`), exactly as today.
 2. Existing guard: if request reporting is disabled (`enabledKeys` empty) or the request has no URL, return the bare report. The transform does not run when no report is being made.
-3. Merge persistent data with per-call data. No sequence number is assigned yet.
+3. Merge persistent data with per-call data. No sequence number is assigned yet. When a transform is configured, nested values in the merged data are copied; see Report data copying.
 4. Invoke the top-level `transform`, if configured, with the merged data and the caller's original request argument (not the internal clone, so mutating the `request` parameter cannot alter the outgoing report).
 5. On `null`: return the bare report. No query param or headers are applied, `customData.cmcd` stays empty, and neither `sn` nor `msd` is consumed.
 6. Otherwise: stamp `sn`, attach `msd` if it has not yet been sent on the request path, prepare, encode, and attach via query or headers exactly as today.
@@ -216,12 +216,27 @@ A nullish return (including a forgotten `return`) cancels the report. This is de
 ### Event-mode flow (`recordTargetEvent`)
 
 1. Existing guard: the target's `events` filter runs first, before any transform work.
-2. Build the per-target item: `{ ...persistentData, ...eventData, e: type, ts }`. No sequence number is assigned yet. Each target gets a fresh copy, so an event fanning out to three targets invokes each target's transform with its own copy, and mutations for one target never leak into another's report.
+2. Build the per-target item: `{ ...persistentData, ...eventData, e: type, ts }`. No sequence number is assigned yet. Each target gets a fresh copy, so an event fanning out to three targets invokes each target's transform with its own copy, and mutations for one target never leak into another's report. When the target has a transform, nested values in that copy are copied too; see Report data copying.
 3. Invoke the target's `transform`, if configured, with the item and the triggering request. The triggering request is threaded from `recordResponseReceived()` through a private parameter on the internal record path; the public `recordEvent()` signature is unchanged, and all other event sources (state-change events fired by `update()`, `TIME_INTERVAL` timers, direct `recordEvent()` calls) pass `undefined`. The invocation is isolated per target; see Error handling.
 4. On `null`: nothing is queued. No `sn` is consumed and `msd` is not marked sent.
 5. Otherwise: restore any key the event requires that the transform removed, re-stamp `e` with the original event type, assign `sn`, attach `msd` (once per target), and push to the target's queue. Batching, retry, and re-queue-on-failure behavior are untouched because the transform ran before the queue.
 
 Config normalization copies each target's `transform` into the normalized target config alongside its other fields.
+
+### Report data copying
+
+The merged report data handed to a transform is a shallow spread of the persistent store and the per-call data. A shallow spread is not enough on its own: 16 CMCD keys are array-typed (`br`, `bl`, `mtp`, `ec`, `nor`, and so on), so the copy would share those array references with the reporter's persistent store and with every other target's report for the same event. A transform doing `data.ec.push(...)` would then mutate the persistent array, and the mutation would surface in reports for targets that have no transform at all.
+
+Before invoking a transform, the reporter therefore copies nested values as well:
+
+- Array values are copied.
+- Object values, and object elements inside arrays, are `SfItem`s; each is copied along with its `params` record.
+
+This is complete rather than best-effort, because the CMCD value space is bounded by its own types. `CmcdValue` and `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of those, and `SfItem` is `{ value, params }` with a flat `params` record. There is no arbitrary nesting for a general-purpose deep clone to discover.
+
+The copy runs only where a transform is configured. Reports on a path with no transform take exactly the shallow spread they take today, and a target without a transform pays nothing even when a sibling target has one.
+
+Measured on a representative v2 segment report (six array-valued keys present), the copy adds roughly 180ns against a full `createRequestReport` cost of roughly 8.1µs, so about 2% of the report path, which is dominated by structured-field encoding and URL work. `structuredClone` on the same payload costs roughly 3.2µs, about 40% of the report path, for no additional protection given the bounded value space.
 
 ### Reporter-owned fields
 
@@ -297,7 +312,9 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 - Required-key restoration, one case per required-key family: `ts` on any event, the signalled field on each state-change event (`sta`, `pr`, `cid`, `bg`, `br`), `cen` on `ce`, `ec` on the error event, and `url` on `rr`. Each case asserts the restored report passes `validateCmcdEventReport()`.
 - Required keys absent before the transform are not fabricated by it.
 - Per-target error isolation: with a throwing transform on the first of two targets, the second target still receives the report, the throw still reaches the caller, and a subsequent distinct state transition is still delivered. A regression test for the starvation case: after a throw, the healthy target's report count is non-zero.
-- Per-target isolation: mutation for target A does not leak into target B's report.
+- Per-target isolation: mutation for target A does not leak into target B's report, including nested mutation (`data.ec.push(...)` in target A's transform, asserted against a target B that has no transform).
+- Nested mutation does not corrupt the persistent store: after a transform pushes onto an array value, a later report for the same target carries the original array, not a doubly-appended one.
+- Nested `SfItem` values: mutating `params` on an element inside an array value does not affect the reporter's copy.
 - `request` argument: the caller's request in request mode, the triggering request for `recordResponseReceived()`, and `undefined` for state-change and `TIME_INTERVAL` events.
 - Transform-added keys remain subject to `enabledKeys`.
 - Error propagation from both paths.
@@ -310,6 +327,7 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 - **Footgun potential**: a transform can degrade payloads (e.g. stripping optional keys a collector expects). Reporter-owned-field re-stamping, required-key restoration, and `enabledKeys` filtering bound the damage to data quality: sequence integrity is protected, and a transform cannot produce a report that `validateCmcdEvents()` rejects. It can still produce a structurally valid report that is analytically useless.
 - **Error propagation reaches timer contexts**: a throwing transform on a `TIME_INTERVAL` event surfaces as an unhandled error. The alternative (swallowing) was judged worse; see Error handling.
 - **Per-target error isolation adds a try/catch per target per event.** This is the cost of not letting one integrator's throwing transform starve unrelated targets. It also means a throw is reported to the caller slightly later than it occurs, after the remaining targets and the queue have been processed.
+- **Copying nested values costs roughly 2% of a report** wherever a transform is configured, and charges every transform user for a hazard that only transforms mutating nested values would hit. The alternative was to declare nested mutation unsupported, which was rejected: the failure mode is a report for a target with no transform of its own, plus permanent corruption of the persistent store, with no compile-time signal and no plausible way for the person debugging it to trace the cause.
 - **A second way to shape data**: simple cases are already served by `enabledKeys` and `update()`. The docs must be clear that transforms are for per-report, per-destination decisions that static config cannot express.
 
 ## Rationale and alternatives
@@ -320,6 +338,8 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 - **Per-batch interception** (a hook seeing the event array before POST): enables cross-event logic but interacts badly with retry (failed batches re-queue, so the hook would re-run on retransmission) and cancelled events would have already consumed sequence numbers. Deferred; see Future possibilities.
 - **Async transforms**: `createRequestReport()` is called inline in player request pipelines and must stay synchronous, and the driving use cases are all synchronous decisions. Anything async (remote config, consent state) can feed the reporter via `update()` or a config refresh before reports fire.
 - **Do nothing (use `requester`)**: rejected for the reasons in Motivation. It runs post-encoding, post-batching, and never sees request-mode reports.
+- **Shallow copy with nested mutation declared unsupported**: rejected. It keeps the hot path free but makes the documented isolation guarantee conditional on a caveat, and the failure mode when the caveat is missed is severe and undiagnosable (a sibling target with no transform emits another target's mutation, and the reporter's persistent arrays are corrupted for the rest of the session). A deeply readonly parameter type would enforce it at compile time for TypeScript users, but it gives JavaScript users nothing and revokes the in-place mutation ergonomic for everyone.
+- **`structuredClone` for nested values**: rejected on measured cost, roughly 40% of a report versus roughly 2% for a copy targeted at CMCD's value types, with no additional protection. The value space is bounded by `CmcdValue` and `CmcdCustomValue`, so there is nothing for a general-purpose clone to find that the targeted copy misses.
 
 ## Prior art
 
@@ -347,13 +367,13 @@ Both questions were resolved in favor of the stance proposed above when the RFC 
 - **2026-07-21 (v1)**: initial draft proposing a reporter-level `middleware` array applied to both reporting paths, with a discriminated-union context object.
 - **2026-07-22 (v2)**: reshaped into per-placement `transform` functions following dash.js review feedback (per-target `rr` filtering, same-URL targets) and the `enabledKeys` placement-symmetry argument. Resolved former open questions on naming (`transform`) and per-target registration (yes, it is the design).
 - **2026-07-27 (v3)**: accepted as proposed in v2. Recorded the resolution of both unresolved questions (propagate exceptions, keep triggering-request plumbing private).
-- **2026-07-27 (v4)**: two correctness fixes found while implementing v3, both verified against a working implementation. Transforms can no longer remove keys CTA-5004-B requires for the event (v3 protected only `e`, `sn`, and `msd`, so stripping `sta` from a `ps` event produced a report the library's own validator rejects). Event-mode exception propagation is now isolated per target (v3's unqualified propagation aborted the fan-out, and because the dedup baseline commits first, one throwing transform permanently starved every target ordered after it). Also corrected the Drawbacks claim that structural validity was already protected, and made the examples self-contained.
+- **2026-07-27 (v4)**: three correctness fixes found while implementing v3, all verified against a working implementation. Transforms can no longer remove keys CTA-5004-B requires for the event (v3 protected only `e`, `sn`, and `msd`, so stripping `sta` from a `ps` event produced a report the library's own validator rejects). Event-mode exception propagation is now isolated per target (v3's unqualified propagation aborted the fan-out, and because the dedup baseline commits first, one throwing transform permanently starved every target ordered after it). Nested values in the report copy are now copied as well, making v3's isolation guarantee true as written rather than true only for top-level keys; a shallow spread let `data.ec.push(...)` corrupt the persistent store and surface in reports for targets with no transform. Also corrected the Drawbacks claim that structural validity was already protected, and made the examples self-contained.
 
 ## Final Decision
 
 **Decision:** Accepted as proposed in v2, with the two correctness fixes recorded in v4. Both unresolved questions resolve to the stance the RFC proposed: transform exceptions propagate to the caller (isolated per target, per v4), and the triggering request is threaded privately so only `recordResponseReceived()` populates it.
 
-**Post-acceptance amendments:** v4 tightens two parts of the contract that implementation showed to be unsound. Neither changes the shape of the API, and neither invalidates the review that led to acceptance: required-key restoration only removes a way to emit invalid reports, and per-target error isolation only prevents one target's throwing transform from silently starving the others. Both are strictly more conservative than v3.
+**Post-acceptance amendments:** v4 tightens three parts of the contract that implementation showed to be unsound. None changes the shape of the API, and none invalidates the review that led to acceptance: required-key restoration only removes a way to emit invalid reports, per-target error isolation only prevents one target's throwing transform from silently starving the others, and copying nested values only makes the isolation guarantee v3 already advertised actually hold. All three are strictly more conservative than v3.
 
 **Rationale:** The per-placement single-function shape was confirmed by the concrete consumer during review. dash.js ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390)) verified that one function per target is sufficient to express `sendResponseReceivedForRequestTypes`, which was the case that motivated reshaping the proposal away from a global middleware array, and that composing further target-specific rules into a single function is acceptable. That removes the last open concern about dropping the array contract. On the two remaining questions, the proposed stances were kept because the alternatives are strictly worse and both are reversible in a non-breaking way: swallowing transform exceptions would either leak the data a redaction transform exists to remove or make data loss undebuggable, and a public associated-request parameter on `recordEvent()` can be added later if a use case appears, whereas removing one could not.
 
