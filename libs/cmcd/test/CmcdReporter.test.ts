@@ -1,5 +1,5 @@
 import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdReporter, CmcdTransmissionMode } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, ok, throws } from 'node:assert'
@@ -740,6 +740,317 @@ describe('CmcdReporter', () => {
 				}), requester)
 
 				throws(() => reporter.recordEvent(CmcdEventType.ERROR), /event transform boom/)
+			})
+		})
+
+		describe('required event keys', () => {
+			const ALL_KEYS = ['sta', 'pr', 'cid', 'bg', 'br', 'cen', 'ec', 'url', 'rc', 'sid', 'v', 'e', 'ts', 'sn'] as const
+
+			function createTarget(events: CmcdEventType[], transform: CmcdEventReportTransform): Partial<CmcdReporterConfig> {
+				return {
+					sid: 'test-session',
+					enabledKeys: [...ALL_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events,
+							enabledKeys: [...ALL_KEYS],
+							batchSize: 1,
+							transform,
+						},
+					],
+				}
+			}
+
+			// Strips every key the transform is allowed to touch, so each case
+			// proves the reporter put the required one back.
+			const stripAll: CmcdEventReportTransform = data => ({
+				...data,
+				ts: undefined,
+				sta: undefined,
+				pr: undefined,
+				cid: undefined,
+				bg: undefined,
+				br: undefined,
+				cen: undefined,
+				ec: undefined,
+				url: undefined,
+			})
+
+			it('restores ts when a transform removes it', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.ERROR], stripAll), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ts='))
+			})
+
+			const stateFamilies = [
+				{ event: CmcdEventType.PLAY_STATE, key: 'sta', update: { sta: 'p' as const }, wire: 'sta=p' },
+				{ event: CmcdEventType.PLAYBACK_RATE, key: 'pr', update: { pr: 2 }, wire: 'pr=2' },
+				{ event: CmcdEventType.CONTENT_ID, key: 'cid', update: { cid: 'movie-7' }, wire: 'cid="movie-7"' },
+				{ event: CmcdEventType.BACKGROUNDED_MODE, key: 'bg', update: { bg: true }, wire: 'bg' },
+				{ event: CmcdEventType.BITRATE_CHANGE, key: 'br', update: { br: [5000] }, wire: 'br=(5000)' },
+			]
+
+			for (const family of stateFamilies) {
+				it(`restores the signalled field for ${family.event} events`, async () => {
+					const { requester, requests } = createMockRequester()
+					const reporter = new CmcdReporter(createTarget([family.event], stripAll), requester)
+
+					reporter.update(family.update)
+
+					await new Promise(resolve => setTimeout(resolve, 10))
+
+					equal(requests.length, 1)
+					ok((requests[0].body as string)?.includes(family.wire))
+					deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+				})
+			}
+
+			it('restores cen for custom events', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.CUSTOM_EVENT], stripAll), requester)
+
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'my-event' })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('cen="my-event"'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores ec for error events', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.ERROR], stripAll), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ec=("E100")'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores url for response received events', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.RESPONSE_RECEIVED], stripAll), requester)
+
+				reporter.recordResponseReceived({ request: { url: 'https://cdn.example.com/seg.mp4' }, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('url="https://cdn.example.com/seg.mp4"'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('does not fabricate a required key that was already absent', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget([CmcdEventType.CUSTOM_EVENT], data => data), requester)
+
+				// cen was never supplied, so the report was non-conformant before
+				// any transform ran. Restoration must not invent a value.
+				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok(!(requests[0].body as string)?.includes('cen='))
+			})
+		})
+
+		describe('nested value isolation', () => {
+			const NESTED_KEYS = ['ec', 'br', 'sid', 'cid', 'v', 'e', 'ts', 'sn'] as const
+
+			it('contains nested array mutation within the mutating target', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://collector-a.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								data.ec?.push('LEAKED')
+								return data
+							},
+						},
+						{
+							url: 'https://collector-b.example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+						},
+					],
+				}, requester)
+
+				reporter.update({ ec: ['E100'] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const a = requests.find(r => r.url.includes('collector-a'))?.body as string
+				const b = requests.find(r => r.url.includes('collector-b'))?.body as string
+
+				ok(a?.includes('LEAKED'))
+				ok(!b?.includes('LEAKED'))
+			})
+
+			it('does not corrupt the persistent store through a nested array', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								data.ec?.push('LEAKED')
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.update({ ec: ['E100'] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				// Each report carries exactly one appended value, not a growing array.
+				ok((requests[1].body as string)?.includes('ec=("E100" "LEAKED")'))
+			})
+
+			it('copies SfItem params so nested mutation cannot escape', async () => {
+				const { requester } = createMockRequester()
+				const seen: string[] = []
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								const first = data.br?.[0]
+								if (first instanceof SfItem && first.params) {
+									seen.push(JSON.stringify(first.params))
+									Object.assign(first.params, { v: false })
+								}
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.update({ br: [new SfItem(5000, { v: true })] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// The second event must see the original params, not the mutation
+				// the first event's transform made.
+				deepEqual(seen, ['{"v":true}', '{"v":true}'])
+			})
+
+			it('keeps the SfItem prototype through the copy', async () => {
+				const { requester } = createMockRequester()
+				const kinds: boolean[] = []
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...NESTED_KEYS],
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...NESTED_KEYS],
+							batchSize: 1,
+							transform: (data) => {
+								kinds.push(data.br?.[0] instanceof SfItem)
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				reporter.update({ br: [new SfItem(5000, { v: true })] })
+				reporter.recordEvent(CmcdEventType.ERROR)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				deepEqual(kinds, [true])
+			})
+		})
+
+		describe('per-target error isolation', () => {
+			const ISO_KEYS = ['sta', 'sid', 'cid', 'v', 'e', 'ts', 'sn'] as const
+
+			function createIsolationReporter(requester: (request: HttpRequest) => Promise<{ status: number; }>) {
+				return new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...ISO_KEYS],
+					eventTargets: [
+						{
+							url: 'https://throwing.example.com/cmcd',
+							events: [CmcdEventType.PLAY_STATE],
+							enabledKeys: [...ISO_KEYS],
+							batchSize: 1,
+							transform: () => {
+								throw new Error('target boom')
+							},
+						},
+						{
+							url: 'https://healthy.example.com/cmcd',
+							events: [CmcdEventType.PLAY_STATE],
+							enabledKeys: [...ISO_KEYS],
+							batchSize: 1,
+						},
+					],
+				}, requester)
+			}
+
+			it('delivers to healthy targets even when an earlier target throws', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = createIsolationReporter(requester)
+
+				throws(() => reporter.update({ sta: 'p' }), /target boom/)
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok(requests[0].url.includes('healthy.example.com'))
+				ok((requests[0].body as string)?.includes('sta=p'))
+			})
+
+			it('keeps delivering later transitions after a throw', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = createIsolationReporter(requester)
+
+				throws(() => reporter.update({ sta: 'p' }), /target boom/)
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				throws(() => reporter.update({ sta: 'a' }), /target boom/)
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const healthy = requests.filter(r => r.url.includes('healthy.example.com'))
+				equal(healthy.length, 2)
+				// The throwing target consumed no sequence number of its own, and
+				// the healthy target's numbering is unbroken.
+				ok((healthy[0].body as string)?.includes('sn=0'))
+				ok((healthy[1].body as string)?.includes('sn=1'))
 			})
 		})
 

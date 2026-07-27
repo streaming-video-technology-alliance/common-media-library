@@ -719,15 +719,25 @@ Placement determines scope, the same way it does for `enabledKeys`:
 There is deliberately no single hook spanning both paths. An event report carries its own type in `data.e`, the target's configuration is in scope where you write its transform, and anything else the transform needs can be closed over. Policy that applies in more than one place is a shared function you reference from each placement:
 
 ```typescript
+import type { Cmcd } from "@svta/cml-cmcd";
+import { CmcdEventType } from "@svta/cml-cmcd";
+
 const sampled = Math.random() < 0.1;
-const sampleIntervals = (data) =>
+
+const sampleIntervals = (data: Cmcd): Cmcd | null =>
 	data.e === CmcdEventType.TIME_INTERVAL && !sampled ? null : data;
 ```
 
 Composing several concerns at one placement is ordinary function composition, which you own:
 
 ```typescript
-transform: (data, request) => {
+import type { Cmcd } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
+
+const scrubPii = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null =>
+	request?.url.includes("/private/") ? null : { ...data, cid: undefined };
+
+const transform = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null => {
 	const scrubbed = scrubPii(data, request);
 	return scrubbed === null ? null : sampleIntervals(scrubbed);
 };
@@ -739,18 +749,26 @@ The second argument is the media request the report belongs to. In request mode 
 
 This is where player-specific taxonomy belongs. CMCD has no concept of a "segment request" or an "init request", so a player that wants to filter on one puts it on `request.customData` and reads it back in the transform. For the narrower question of manifest versus media, the `ot` key already answers it in pure CMCD terms when the player populates it: `data.ot === "m"` is a manifest.
 
+### The data you receive is yours
+
+The first argument is a copy made for this one report, so you can mutate it in place without affecting the reporter's persistent data or the reports going to other targets. That holds for nested values too: array keys such as `br` and `ec` are copied, so `data.ec.push("E100")` is safe, and so is changing the `params` of an `SfItem` inside one.
+
 ### What a transform cannot change
 
 The reporter re-stamps `e` and assigns `sn` and `msd` after your transform returns, so a transform cannot change a report's event type to slip past a target's `events` filter, cannot create gaps in sequence numbering, and cannot replay the media-start-delay marker. Cancelling a report consumes neither a sequence number nor `msd`: wire `sn` values stay contiguous per destination, and `msd` rides the next report that is actually sent.
 
-`enabledKeys` is still the wire allowlist and still runs after the transform. A key your transform adds must also be enabled at the same placement to reach the collector, and a key it removes stays removed.
+A transform also cannot remove a key the event requires. Every event needs `e` and `ts`; state-change events need the field they signal (`sta`, `pr`, `cid`, `bg`, `br`), custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these, the reporter puts back the value it had beforehand, so a transform cannot emit a report that `validateCmcdEvents()` would reject. It does not invent values: a required key that was already missing before your transform ran stays missing, since that is a bug at the call site rather than something the transform did. To keep one of these keys away from a collector, configure it away instead of stripping it, by leaving the key out of that placement's `enabledKeys` or the event out of that target's `events`.
+
+`enabledKeys` is still the wire allowlist and still runs after the transform. A key your transform adds must also be enabled at the same placement to reach the collector, and a key it removes stays removed unless the event requires it.
 
 Cancelling a state-change report does not roll back dedup. The transition still happened; the transform only suppressed its transmission, so the next `update()` with the same value is still deduplicated.
 
 Transforms shape CMCD data only. They cannot modify the outgoing HTTP request.
 
 > [!IMPORTANT]
-> Transforms must not throw. Exceptions propagate to whatever called into the reporter, which for `TIME_INTERVAL` events is the interval timer and surfaces as an unhandled error. The library does not swallow them: failing open would leak exactly the data a redaction transform exists to remove, and failing closed would make data loss undebuggable. Wrap risky logic in `try`/`catch` and choose explicitly — return the data to fail open, or `null` to fail closed.
+> Transforms must not throw. Exceptions propagate to whatever called into the reporter, which for `TIME_INTERVAL` events is the interval timer and surfaces as an unhandled error. The library does not swallow them: failing open would leak exactly the data a redaction transform exists to remove, and failing closed would make data loss undebuggable. Wrap risky logic in `try`/`catch` and choose explicitly, returning the data to fail open or `null` to fail closed.
+
+A throw is isolated to the target whose transform threw. The remaining targets still receive the report, queued batches are still sent, and the error reaches your code once the reporter has finished with the event. Only the throwing target loses its report, and it consumes no sequence number doing so. Without that isolation a single throwing transform would starve every target configured after it, because the state-change dedup baseline commits before the reporter fans out to targets and is never rolled back.
 
 ## Configuration Reference
 

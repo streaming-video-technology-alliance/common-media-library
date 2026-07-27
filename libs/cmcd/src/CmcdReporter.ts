@@ -7,7 +7,7 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
@@ -129,6 +129,73 @@ const STATE_FIELDS: readonly StateFieldEntry[] = /* @__PURE__ */ Array.from(
 const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = /* @__PURE__ */ new Map(
 	/* @__PURE__ */ STATE_FIELDS.map(e => [e.event, e]),
 )
+
+/**
+ * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
+ * Built from the state-change table plus the three event types whose
+ * required key rides the caller's per-event data.
+ */
+const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map([
+	.../* @__PURE__ */ CMCD_STATE_EVENT_FIELDS,
+	[CMCD_EVENT_CUSTOM_EVENT, 'cen'] as const,
+	[CMCD_EVENT_ERROR, 'ec'] as const,
+	[CMCD_EVENT_RESPONSE_RECEIVED, 'url'] as const,
+])
+
+/**
+ * Copies an `SfItem`-shaped value and its `params` record.
+ *
+ * The prototype is preserved because `prepareCmcdData`, the formatter map,
+ * validation, and the structured-field encoder all branch on
+ * `instanceof SfItem`. A plain spread (and `structuredClone`) would return a
+ * prototype-less object and silently change what goes on the wire.
+ */
+function copyItemValue(value: unknown): unknown {
+	if (value === null || typeof value !== 'object') {
+		return value
+	}
+
+	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; }
+
+	if (copy.params !== null && typeof copy.params === 'object') {
+		copy.params = { ...copy.params }
+	}
+
+	return copy
+}
+
+/**
+ * Copies the nested values of a report in place so a transform cannot mutate
+ * the reporter's persistent data, or another target's report for the same
+ * event, by mutating an array or an `SfItem` it was handed.
+ *
+ * Complete for the CMCD value space rather than best-effort: `CmcdValue` and
+ * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
+ * those, and `SfItem.params` is a flat record. Only called where a transform
+ * is configured.
+ */
+function copyReportValues(data: Cmcd): Cmcd {
+	const record = data as Record<string, unknown>
+
+	for (const key in record) {
+		const value = record[key]
+
+		if (Array.isArray(value)) {
+			const copy = new Array(value.length)
+
+			for (let i = 0; i < value.length; i++) {
+				copy[i] = copyItemValue(value[i])
+			}
+
+			record[key] = copy
+		}
+		else if (value !== null && typeof value === 'object') {
+			record[key] = copyItemValue(value)
+		}
+	}
+
+	return data
+}
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
@@ -407,11 +474,29 @@ export class CmcdReporter {
 			Object.assign(this.lastEmitted, { [field]: entry.snapshot(current) })
 		}
 
+		// A throwing transform must not abort the fan-out. The dedup baseline
+		// above is already committed and is never rolled back, so aborting here
+		// would strand the transition: targets after the throwing one would
+		// never receive it, and the caller's retry would be deduped away.
+		let failure: { error: unknown; } | undefined
+
 		this.eventTargets.forEach((target, config) => {
-			this.recordTargetEvent(target, config, type, data, request)
+			try {
+				this.recordTargetEvent(target, config, type, data, request)
+			}
+			catch (error) {
+				failure ??= { error }
+			}
 		})
 
 		this.processEventTargets()
+
+		// Surfaced only once every target has had its turn and the queues have
+		// been processed. Transforms must not throw; this makes the violation
+		// visible without letting it starve unrelated targets.
+		if (failure) {
+			throw failure.error
+		}
 	}
 
 	/**
@@ -441,16 +526,54 @@ export class CmcdReporter {
 		}
 
 		const { transform } = config
-		const report = transform ? transform(item, request) : item
+
+		if (!transform) {
+			this.queueTargetEvent(target, item, type)
+			return
+		}
+
+		// The spread above is shallow, so nested values are still shared with
+		// the persistent store and with the other targets' copies.
+		copyReportValues(item)
+
+		// Captured so a transform cannot strip a key the event requires.
+		// `CmcdKey` spans custom keys too, so index through a record view.
+		const requiredKey = CMCD_REQUIRED_EVENT_KEYS.get(type)
+		const requiredValue = requiredKey ? (item as Record<string, unknown>)[requiredKey] : undefined
+		const ts = item.ts
+
+		const report = transform(item, request)
 
 		// A cancelled report consumes neither a sequence number nor msd.
 		if (report == null) {
 			return
 		}
 
-		// Reporter-owned fields are stamped after the transform runs, so a
-		// transform cannot bypass the target's `events` filter via `e` or
-		// break `sn` continuity.
+		// Restore, never fabricate: a required key that was already absent
+		// before the transform ran was a caller bug, not a transform bug.
+		if (report.ts === undefined) {
+			report.ts = ts
+		}
+
+		if (requiredKey && requiredValue !== undefined && (report as Record<string, unknown>)[requiredKey] === undefined) {
+			Object.assign(report, { [requiredKey]: requiredValue })
+		}
+
+		this.queueTargetEvent(target, report, type)
+	}
+
+	/**
+	 * Stamps the reporter-owned fields on a finished event report and pushes it
+	 * to the target's queue.
+	 *
+	 * Called after any transform has run, so a transform cannot bypass the
+	 * target's `events` filter via `e` or break `sn` continuity.
+	 *
+	 * @param target - The target to queue the report for.
+	 * @param report - The finished report data.
+	 * @param type - The type of event being reported.
+	 */
+	private queueTargetEvent(target: CmcdEventTarget, report: Cmcd, type: CmcdEventType): void {
 		report.e = type
 		report.sn = target.sn++
 
@@ -570,14 +693,21 @@ export class CmcdReporter {
 
 		const merged: Cmcd = { ...this.data, ...data }
 		const { transform } = this.config
+		let cmcdData: Cmcd | null = merged
 
-		// The caller's request is passed, not the internal clone, so a
-		// transform cannot alter the outgoing report through it.
-		const cmcdData = transform ? transform(merged, request) : merged
+		if (transform) {
+			// The spread above is shallow, so nested values are still shared
+			// with the persistent store.
+			copyReportValues(merged)
 
-		// A cancelled report consumes neither a sequence number nor msd.
-		if (cmcdData == null) {
-			return report
+			// The caller's request is passed, not the internal clone, so a
+			// transform cannot alter the outgoing report through it.
+			cmcdData = transform(merged, request)
+
+			// A cancelled report consumes neither a sequence number nor msd.
+			if (cmcdData == null) {
+				return report
+			}
 		}
 
 		// Reporter-owned fields are stamped after the transform runs.
