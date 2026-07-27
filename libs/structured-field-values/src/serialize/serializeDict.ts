@@ -54,9 +54,6 @@ export function serializeDict(dict: Record<string, any> | Map<string, any>, opti
 	}
 
 	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict)
-	// The RFC emits a single SP after each comma, so whitespace is on unless
-	// explicitly disabled. Checking the property (rather than defaulting the
-	// whole options object) keeps the default intact for partial options.
 	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
 
 	return Array.from(entries)
