@@ -13,6 +13,7 @@ import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
@@ -38,7 +39,7 @@ type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormali
 	eventTargets: CmcdEventReportConfigNormalized[];
 }
 
-function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig, baseUrl?: string): CmcdEncodeOptions {
+function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>, baseUrl?: string): CmcdEncodeOptions {
 	const enabledKeySet = new Set(config.enabledKeys ?? [])
 
 	return {
@@ -46,6 +47,7 @@ function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdRep
 		reportingMode,
 		filter: (key: CmcdKey) => enabledKeySet.has(key),
 		baseUrl,
+		customHeaderMap: config.customHeaderMap,
 	}
 }
 

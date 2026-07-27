@@ -48,13 +48,13 @@ import { serializeParams } from './serializeParams.ts'
 /**
  * @internal
  */
-export function serializeDict(dict: Record<string, any> | Map<string, any>, options: SfEncodeOptions = { whitespace: true }): string {
+export function serializeDict(dict: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string {
 	if (typeof dict !== 'object' || dict == null) {
 		throw serializeError(dict, DICT)
 	}
 
 	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict)
-	const optionalWhiteSpace = options?.whitespace ? ' ' : ''
+	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
 
 	return Array.from(entries)
 		.map(([key, item]) => {

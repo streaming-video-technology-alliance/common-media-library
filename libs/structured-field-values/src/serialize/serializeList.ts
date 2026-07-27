@@ -32,12 +32,12 @@ import { serializeItem } from './serializeItem.ts'
 /**
  * @internal
  */
-export function serializeList(list: SfMember[], options: SfEncodeOptions = { whitespace: true }): string {
+export function serializeList(list: SfMember[], options?: SfEncodeOptions): string {
 	if (Array.isArray(list) === false) {
 		throw serializeError(list, LIST)
 	}
 
-	const optionalWhiteSpace = options?.whitespace ? ' ' : ''
+	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
 
 	return list
 		.map(item => {

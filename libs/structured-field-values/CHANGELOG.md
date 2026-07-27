@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `encodeSfDict` and `encodeSfList` no longer drop the whitespace RFC 8941 emits after each comma when they are given a partial options object. `whitespace` was applied via a default parameter, so any options object without that property (for example `encodeSfDict(data, {})`) silently produced compact output; it is now treated as `true` unless explicitly set to `false`. Callers that passed an options object without `whitespace` and relied on compact output must now pass `whitespace: false`
+
 ## [1.1.4] - 2026-07-21
 
 ### Changed

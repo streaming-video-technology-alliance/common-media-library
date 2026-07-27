@@ -170,7 +170,7 @@ export const CMCD_VALIDATION_SEVERITY_ERROR: "error";
 export const CMCD_VALIDATION_SEVERITY_WARNING: "warning";
 
 // @public
-export type CmcdCustomKey = `${string}-${string}`;
+export type CmcdCustomKey = Lowercase<`${string}-${string}`>;
 
 // @public
 export type CmcdCustomValue = string | SfItem<string> | (string | SfItem<string>)[] | number | SfItem<number> | (number | SfItem<number>)[] | boolean | SfItem<boolean> | (boolean | SfItem<boolean>)[] | symbol | SfItem<symbol> | (symbol | SfItem<symbol>)[] | SfToken | SfItem<SfToken> | (SfToken | SfItem<SfToken>)[];
@@ -476,6 +476,7 @@ export type CmcdRequestReport<D = unknown> = HttpRequest & {
 // @public
 export type CmcdRequestReportConfig = CmcdReportConfig & {
     transmissionMode?: CmcdTransmissionMode;
+    customHeaderMap?: Partial<CmcdHeaderMap>;
 };
 
 // @public

@@ -8,6 +8,20 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`
+
+### Changed
+
+- `isCmcdCustomKey` and the `CmcdCustomKey` type now only accept custom keys that survive RFC 8941 key serialization: a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character. Uppercase and digit-leading names were never serializable as CMCD; they are now rejected by the type, the validators, and key filtering instead of being dropped at encode preparation
+
+### Documentation
+
+- The user guide now documents custom reverse-DNS keys end to end: naming rules (including the runtime constraints the `CmcdCustomKey` type cannot express), the explicit `enabledKeys` opt-in required in both request mode and per event target (no wildcard exists), value types and wire-format behavior (`true` as a bare key, `false` dropped), and the fixed `CMCD-Request` header placement in headers mode
+- The custom-event (`e=ce`) documentation now shows a complete working configuration: `CmcdEventType.CUSTOM_EVENT` must be listed in the target's `events` for delivery, `cen` is force-included without an `enabledKeys` entry, and any accompanying payload remains subject to the target's `enabledKeys`. Also documents that response-received keys are stripped from non-`rr` events
+- The user guide and validation guide custom-key sections now cross-link each other
+
 ## [2.4.1] - 2026-07-21
 
 ### Fixed

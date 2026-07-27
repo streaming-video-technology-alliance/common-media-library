@@ -16,3 +16,12 @@ test('encodeSfList', () => {
 		new SfItem(3, { a: 2 }),
 	]), `1;a=2, 2;a=2, 3;a=2`)
 })
+
+test('encodeSfList keeps whitespace on unless it is explicitly disabled', () => {
+	const list = [1, 2, 3]
+	assert.deepStrictEqual(encodeSfList(list), `1, 2, 3`)
+	assert.deepStrictEqual(encodeSfList(list, {}), `1, 2, 3`)
+	assert.deepStrictEqual(encodeSfList(list, { whitespace: undefined }), `1, 2, 3`)
+	assert.deepStrictEqual(encodeSfList(list, { whitespace: true }), `1, 2, 3`)
+	assert.deepStrictEqual(encodeSfList(list, { whitespace: false }), `1,2,3`)
+})
