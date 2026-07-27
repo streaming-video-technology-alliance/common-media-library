@@ -248,6 +248,39 @@ describe('CmcdReporter', () => {
 	})
 
 	describe('report transforms', () => {
+		it('provides a valid example', () => {
+			// #region example-transform
+			const { requester } = createMockRequester()
+
+			const reporter = new CmcdReporter({
+				sid: 'session-id',
+				cid: 'content-id',
+				enabledKeys: ['br', 'sid', 'cid', 'v', 'sn'],
+				// Request mode: never decorate license requests with CMCD
+				transform: (data, request) => request.url.includes('/license') ? null : data,
+				eventTargets: [
+					{
+						url: 'https://collector.example.com/cmcd',
+						events: [CmcdEventType.RESPONSE_RECEIVED],
+						enabledKeys: ['url', 'rc', 'sid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+						// Event mode, this target only: segment responses only
+						transform: (data, request) => {
+							const customData = request?.customData as { requestType?: string } | undefined
+							return customData?.requestType === 'segment' ? data : null
+						},
+					},
+				],
+			}, requester)
+
+			const license = reporter.createRequestReport({ url: 'https://drm.example.com/license' })
+			ok(!license.url.includes('CMCD='))
+
+			const segment = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
+			ok(segment.url.includes('CMCD='))
+			// #endregion example-transform
+		})
+
 		describe('request mode', () => {
 			it('applies the top-level transform to request reports', () => {
 				const { requester } = createMockRequester()

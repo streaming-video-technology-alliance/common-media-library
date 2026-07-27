@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- `transform` on the request-report config and on each event-target config: a synchronous `(data, request) => Cmcd | null` hook that modifies a single CMCD report before it goes to the wire, or cancels it by returning `null`. Placement scopes the hook the same way `enabledKeys` does — the top-level `transform` applies to `createRequestReport()` reports, and each event target's `transform` applies to that target's event reports, so targets sharing a collector URL can filter independently. For `RESPONSE_RECEIVED` events the transform also receives the request that triggered them, which is how a player filters reports by its own request taxonomy on `customData`. The reporter stamps `e`, `sn`, and `msd` after the transform runs, so a cancelled report leaves no sequence-number gap and `msd` rides the next report that is sent. Transform exceptions propagate rather than being swallowed; see the user guide. Implements the accepted RFC in `rfc/cmcd-reporter-middleware.md` ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390))
 - `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`
 
 ### Changed
