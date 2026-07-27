@@ -1,5 +1,6 @@
 import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
+import type { CmcdRequestReportTransform } from './CmcdRequestReportTransform.ts'
 import type { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
 
 /**
@@ -27,4 +28,20 @@ export type CmcdRequestReportConfig = CmcdReportConfig & {
 	 * @defaultValue `undefined`
 	 */
 	customHeaderMap?: Partial<CmcdHeaderMap>;
+
+	/**
+	 * Transform applied to each request-mode report before encoding.
+	 * Return the data to continue, or `null` to skip CMCD decoration
+	 * for that request.
+	 *
+	 * Applies only to reports created by
+	 * {@link CmcdReporter.createRequestReport}. To transform event
+	 * reports, set `transform` on the event target instead.
+	 *
+	 * @defaultValue `undefined`
+	 *
+	 * @example
+	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
+	 */
+	transform?: CmcdRequestReportTransform;
 }

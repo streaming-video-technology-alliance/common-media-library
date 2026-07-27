@@ -214,7 +214,11 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
     events?: CmcdEventType[];
     interval?: number;
     batchSize?: number;
+    transform?: CmcdEventReportTransform;
 };
+
+// @public
+export type CmcdEventReportTransform = (data: Cmcd, request: HttpRequest | undefined) => Cmcd | null;
 
 // @public
 export type CmcdEventsValidationResult = CmcdValidationResult & {
@@ -477,7 +481,11 @@ export type CmcdRequestReport<D = unknown> = HttpRequest & {
 export type CmcdRequestReportConfig = CmcdReportConfig & {
     transmissionMode?: CmcdTransmissionMode;
     customHeaderMap?: Partial<CmcdHeaderMap>;
+    transform?: CmcdRequestReportTransform;
 };
+
+// @public
+export type CmcdRequestReportTransform = (data: Cmcd, request: HttpRequest) => Cmcd | null;
 
 // @public
 export type CmcdResponse = CmcdRequest & {
