@@ -301,6 +301,13 @@ export class CmcdReporter {
 	 * populated before calling start().
 	 */
 	start(): void {
+		// The initial time-interval event is fired synchronously per target, so a
+		// throwing transform must not abort the loop: later targets would never
+		// have their intervals armed and would report nothing for the session,
+		// and a retried start() would fail on the same target again. Same
+		// continue-then-rethrow contract as `emitEvent()`.
+		let failure: { error: unknown; } | undefined
+
 		this.eventTargets.forEach((target, config) => {
 			// Disarm any existing timer so repeated start() calls do not leak intervals.
 			this.disarmInterval(target)
@@ -315,9 +322,22 @@ export class CmcdReporter {
 				this.processEventTargets()
 			}
 
+			// Armed before the initial event so a throwing transform leaves the
+			// timer in the same state a successful start() would, rather than
+			// silently disabling the target.
 			target.intervalId = setInterval(timeIntervalEvent, config.interval * 1000)
-			timeIntervalEvent()
+
+			try {
+				timeIntervalEvent()
+			}
+			catch (error) {
+				failure ??= { error }
+			}
 		})
+
+		if (failure) {
+			throw failure.error
+		}
 	}
 
 	/**

@@ -20,6 +20,10 @@ and this project adheres to
   - Transform exceptions propagate rather than being swallowed, but are isolated per target: the remaining targets still receive the report and the error surfaces after the reporter finishes the event. See the user guide.
 - `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`
 
+### Fixed
+
+- `prepareCmcdData` now force-includes `ec` on error events and `url` on response-received events after the per-target `enabledKeys` filter, completing the set started in 2.4.0 for state-change fields and `cen`. A target whose `enabledKeys` omitted `ec` previously emitted `e=e,sid="…",sn=0,ts=…,v=2`, which `validateCmcdEvents()` rejects for the missing required key; `rr` targets lost `url` the same way. This affects any such target, with or without a report transform configured
+
 ### Changed
 
 - `CmcdReporter.recordResponseReceived()` is now generic over the request's `customData`, so a player can pass a request carrying only its own keys (e.g. `{ requestType: 'segment' }`) without declaring a `cmcd` key it does not own and without a cast. The parameter was previously pinned to `HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>`; because `{ cmcd?: Cmcd }` is a weak type (every property optional), a `customData` sharing no properties with it was rejected outright. This pairs with the per-target `transform`, which reads the player's taxonomy off the triggering request. Type-only widening: the reporter still reads just `customData.cmcd`, and existing callers passing `HttpRequest<{ cmcd?: Cmcd }>` continue to compile

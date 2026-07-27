@@ -1038,6 +1038,52 @@ describe('CmcdReporter', () => {
 				ok((requests[0].body as string)?.includes('sta=p'))
 			})
 
+			it('arms later interval targets when an earlier start() transform throws', async () => {
+				const { requester, requests } = createMockRequester()
+				const INTERVAL_KEYS = ['sid', 'v', 'e', 'ts', 'sn'] as const
+				let healthyCalls = 0
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...INTERVAL_KEYS],
+					eventTargets: [
+						{
+							url: THROWING_URL,
+							events: [CmcdEventType.TIME_INTERVAL],
+							enabledKeys: [...INTERVAL_KEYS],
+							batchSize: 1,
+							interval: 30,
+							transform: () => {
+								throw new Error('target boom')
+							},
+						},
+						{
+							url: HEALTHY_URL,
+							events: [CmcdEventType.TIME_INTERVAL],
+							enabledKeys: [...INTERVAL_KEYS],
+							batchSize: 1,
+							interval: 30,
+							transform: (data) => {
+								healthyCalls++
+								return data
+							},
+						},
+					],
+				}, requester)
+
+				// start() fires the initial time-interval event synchronously per
+				// target. Aborting the loop would leave the healthy target with no
+				// armed interval, so it would report nothing for the whole session.
+				throws(() => reporter.start(), /target boom/)
+				reporter.stop()
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(healthyCalls, 1)
+				equal(requests.length, 1)
+				equal(requests[0].url, HEALTHY_URL)
+			})
+
 			it('keeps delivering later transitions after a throw', async () => {
 				const { requester, requests } = createMockRequester()
 				const reporter = createIsolationReporter(requester)
