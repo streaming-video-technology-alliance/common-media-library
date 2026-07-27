@@ -143,6 +143,28 @@ const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE
 ])
 
 /**
+ * Whether a required key's value will survive report preparation.
+ *
+ * This is `isValid` minus its `false` exclusion, plus an empty-array check.
+ * `false` must count as usable because `bg: false` is a legitimate value on a
+ * backgrounded-mode event, which the encoder emits as `?0`; treating it as
+ * unusable would let restoration silently revert a transform that cleared it.
+ * Empty strings, empty lists and non-finite numbers are dropped downstream, so
+ * a transform substituting one leaves the report short a required key.
+ */
+function isUsableRequiredValue(value: unknown): boolean {
+	if (value == null || value === '') {
+		return false
+	}
+
+	if (typeof value === 'number') {
+		return Number.isFinite(value)
+	}
+
+	return !Array.isArray(value) || value.length > 0
+}
+
+/**
  * Copies an `SfItem`-shaped value and its `params` record.
  *
  * The prototype is preserved because `prepareCmcdData`, the formatter map,
@@ -569,13 +591,16 @@ export class CmcdReporter {
 			return
 		}
 
-		// Restore, never fabricate: a required key that was already absent
-		// before the transform ran was a caller bug, not a transform bug.
-		if (report.ts === undefined) {
+		// Restore, never fabricate: a required key that was already absent (or
+		// already unusable) before the transform ran was a caller bug, not a
+		// transform bug. Removal and substitution are both covered, because a
+		// value the encoder drops leaves the report just as invalid as a missing
+		// one.
+		if (!isUsableRequiredValue(report.ts)) {
 			report.ts = ts
 		}
 
-		if (requiredKey && requiredValue !== undefined && (report as Record<string, unknown>)[requiredKey] === undefined) {
+		if (requiredKey && isUsableRequiredValue(requiredValue) && !isUsableRequiredValue((report as Record<string, unknown>)[requiredKey])) {
 			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 

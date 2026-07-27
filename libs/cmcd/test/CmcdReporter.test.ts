@@ -847,6 +847,72 @@ describe('CmcdReporter', () => {
 				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
 			})
 
+			it('restores a required key replaced with an empty string', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.RESPONSE_RECEIVED],
+					data => ({ ...data, url: '' }),
+				), requester)
+
+				reporter.recordResponseReceived({ request: { url: 'https://cdn.example.com/seg.mp4' }, status: 200 })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// An empty string is type-valid but dropped during preparation, so
+				// it leaves the report as invalid as removing the key outright.
+				ok((requests[0].body as string)?.includes('url="https://cdn.example.com/seg.mp4"'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores a required key replaced with an empty list', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.ERROR],
+					data => ({ ...data, ec: [] }),
+				), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ec=("E100")'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores ts replaced with a non-finite number', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.ERROR],
+					data => ({ ...data, ts: NaN }),
+				), requester)
+
+				reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				ok((requests[0].body as string)?.includes('ts='))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('does not revert a transform that legitimately clears bg', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.BACKGROUNDED_MODE],
+					data => ({ ...data, bg: false }),
+				), requester)
+
+				// `bg: false` is a real value for this event, emitted as `?0`. The
+				// restore predicate must not treat falsiness as unusable, or it
+				// would silently put the previous `true` back.
+				reporter.update({ bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('bg=?0'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
 			it('does not fabricate a required key that was already absent', async () => {
 				const { requester, requests } = createMockRequester()
 				const reporter = new CmcdReporter(createTarget([CmcdEventType.CUSTOM_EVENT], data => data), requester)
