@@ -2,7 +2,7 @@
 
 **Date**: 2026-07-21
 **Package**: `@svta/cml-cmcd`
-**Status**: Complete — all work items (WI-1 through WI-6) implemented on this branch
+**Status**: In progress — WI-1, WI-2, WI-3, WI-5, WI-6 implemented on this branch. WI-4 (encoding-failure hardening) is deferred: the implemented approach dropped unserializable data silently, giving the containing application no way to know a report was altered or why. It needs an observability design (for example the `onError` callback tracked in #327) agreed with stakeholders before it lands.
 **Branch**: `task/cmcd-reporter-custom-data-hardening`
 
 ## Background
@@ -163,11 +163,7 @@ where applicable).
 
 ### WI-4 — Harden encoding failures: eliminate the poison-batch bug and `createRequestReport` throws
 
-**Priority**: P1 (correctness/data-loss) · **Effort**: M · **Type**: bug fix · **Status**: ✅ Implemented
-(Implementation note: containment was also added around `createRequestReport`'s encode step —
-beyond the plan's two layers — because prevention alone cannot cover every serializer throw,
-e.g. invalid `SfToken` values or out-of-range integers, and the acceptance criterion is that
-`createRequestReport` never throws.)
+**Priority**: P1 (correctness/data-loss) · **Effort**: M · **Type**: bug fix
 
 **Problem.** Gate 3 (RFC 8941 serialization) **throws** rather than dropping. Two consequences,
 both runtime-verified:

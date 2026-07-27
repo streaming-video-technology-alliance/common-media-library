@@ -25,9 +25,6 @@ export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
 // @public
 export function encodeSfList(value: SfMember[], options?: SfEncodeOptions): string;
 
-// @public
-export function isSerializableSfMember(value: unknown): boolean;
-
 // Warning: (ae-internal-missing-underscore) The name "parseBareItem" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
