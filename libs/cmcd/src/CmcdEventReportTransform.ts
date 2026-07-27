@@ -1,5 +1,5 @@
-import type { HttpRequest } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
 
 /**
  * Transforms an event-mode CMCD report before it is queued for its
@@ -13,6 +13,8 @@ import type { Cmcd } from './Cmcd.ts'
  * The `request` argument is the media request that triggered the event
  * when one exists (events recorded via
  * {@link CmcdReporter.recordResponseReceived}), otherwise `undefined`.
+ * It is a read-only view, provided as context only and not to be
+ * mutated; see {@link CmcdTransformRequest}.
  *
  * The reporter re-stamps `e` and assigns `sn` and `msd` after this
  * function returns, so values written to those keys are overwritten.
@@ -22,4 +24,4 @@ import type { Cmcd } from './Cmcd.ts'
  *
  * @public
  */
-export type CmcdEventReportTransform = (data: Cmcd, request: HttpRequest | undefined) => Cmcd | null;
+export type CmcdEventReportTransform = (data: Cmcd, request: CmcdTransformRequest | undefined) => Cmcd | null;

@@ -703,7 +703,7 @@ const reporter = new CmcdReporter({
 			enabledKeys: ["url", "rc", "sid", "cid", "v", "e", "ts", "sn"],
 			// Event mode, this target only: report segment responses only
 			transform: (data, request) =>
-				request?.customData?.requestType === "segment" ? data : null,
+				request?.customData?.["requestType"] === "segment" ? data : null,
 		},
 	],
 });
@@ -748,6 +748,8 @@ const transform = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null =>
 The second argument is the media request the report belongs to. In request mode it is always present, and it is the object you passed to `createRequestReport()` — mutating it does not change the report that comes back. In event mode it is present for events recorded through `recordResponseReceived()` and `undefined` for everything else, including state-change events fired by `update()` and periodic `TIME_INTERVAL` reports.
 
 This is where player-specific taxonomy belongs. CMCD has no concept of a "segment request" or an "init request", so a player that wants to filter on one puts it on `request.customData` and reads it back in the transform. For the narrower question of manifest versus media, the `ot` key already answers it in pure CMCD terms when the player populates it: `data.ot === "m"` is a manifest.
+
+The request is a read-only view (`CmcdTransformRequest`). It is context for the decision, not something to change: every member is `readonly`, and `customData` values are `unknown`, so reading a player field uses bracket access or a cast rather than dot access. Two caveats the types cannot cover. A mutable body such as `FormData` or `URLSearchParams` has mutating methods of its own, and JavaScript callers get no compile-time enforcement. Mutating the request either way is unsupported, and the outgoing report may reflect it, so treat the request as immutable regardless of what the compiler can prove.
 
 ### The data you receive is yours
 

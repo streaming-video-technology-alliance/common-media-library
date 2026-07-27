@@ -1,4 +1,4 @@
-import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdTransformRequest } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
@@ -265,10 +265,8 @@ describe('CmcdReporter', () => {
 						enabledKeys: ['url', 'rc', 'sid', 'v', 'e', 'ts', 'sn'],
 						batchSize: 1,
 						// Event mode, this target only: segment responses only
-						transform: (data, request) => {
-							const customData = request?.customData as { requestType?: string } | undefined
-							return customData?.requestType === 'segment' ? data : null
-						},
+						transform: (data, request) =>
+							request?.customData?.['requestType'] === 'segment' ? data : null,
 					},
 				],
 			}, requester)
@@ -346,23 +344,31 @@ describe('CmcdReporter', () => {
 				ok(next.url.includes('msd%3D1000'))
 			})
 
-			it('passes the caller request, which cannot alter the outgoing report', () => {
+			it('passes the caller request itself as a read-only view', () => {
 				const { requester } = createMockRequester()
-				const seen: HttpRequest[] = []
+				const seen: (CmcdTransformRequest | undefined)[] = []
 				const reporter = new CmcdReporter({
 					sid: 'test-session',
 					enabledKeys: ['sid'],
 					transform: (data, request) => {
 						seen.push(request)
-						request.url = 'https://tampered.example.com/'
+
+						// Mutation is a compile error, not a runtime guarantee:
+						// `request.url = '…'` and `request.customData!['k'] = 1` are
+						// both rejected by CmcdTransformRequest. Reading is the
+						// supported use.
+						ok(request.url.length > 0)
+
 						return data
 					},
 				}, requester)
 
-				const input = { url: 'https://example.com/video.mp4' }
+				const input = { url: 'https://example.com/video.mp4', customData: { player: { kind: 'segment' } } }
 				const req = reporter.createRequestReport(input)
 
 				equal(seen.length, 1)
+				// The caller's own request, not the internal clone the report is
+				// built from, so a transform sees exactly what the player passed.
 				equal(seen[0], input)
 				ok(req.url.startsWith('https://example.com/video.mp4'))
 			})
@@ -1215,8 +1221,8 @@ describe('CmcdReporter', () => {
 					if (data.e !== CmcdEventType.RESPONSE_RECEIVED) {
 						return data
 					}
-					const customData = request?.customData as { requestType?: string } | undefined
-					return customData?.requestType === 'segment' ? data : null
+
+					return request?.customData?.['requestType'] === 'segment' ? data : null
 				}
 
 				const reporter = new CmcdReporter({

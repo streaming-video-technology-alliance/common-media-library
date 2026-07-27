@@ -218,7 +218,7 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
 };
 
 // @public
-export type CmcdEventReportTransform = (data: Cmcd, request: HttpRequest | undefined) => Cmcd | null;
+export type CmcdEventReportTransform = (data: Cmcd, request: CmcdTransformRequest | undefined) => Cmcd | null;
 
 // @public
 export type CmcdEventsValidationResult = CmcdValidationResult & {
@@ -485,7 +485,7 @@ export type CmcdRequestReportConfig = CmcdReportConfig & {
 };
 
 // @public
-export type CmcdRequestReportTransform = (data: Cmcd, request: HttpRequest) => Cmcd | null;
+export type CmcdRequestReportTransform = (data: Cmcd, request: CmcdTransformRequest) => Cmcd | null;
 
 // @public
 export type CmcdResponse = CmcdRequest & {
@@ -519,6 +519,12 @@ export const CmcdStreamType: {
 
 // @public (undocumented)
 export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;
+
+// @public
+export type CmcdTransformRequest = Readonly<Omit<HttpRequest, "customData" | "headers">> & {
+    readonly headers?: Readonly<Record<string, string>>;
+    readonly customData?: Readonly<Record<string, unknown>>;
+};
 
 // @public
 export const CmcdTransmissionMode: {
