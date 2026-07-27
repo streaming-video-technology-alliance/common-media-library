@@ -683,6 +683,97 @@ const reporter = new CmcdReporter({
 > [!NOTE]
 > Certain keys, such as `v` (version), are required by the CMCD specification and will always be included in reports regardless of the `enabledKeys` setting. The `enabledKeys` property cannot be used to disable these keys.
 
+## Transforming and Cancelling Reports
+
+`enabledKeys` decides which keys a destination may ever receive. When a decision depends on the individual report — this request, this response, this collector — use a `transform` instead. A transform is a synchronous function that receives the assembled CMCD data plus the associated media request, and returns the data to send it or `null` to cancel the report:
+
+```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
+const reporter = new CmcdReporter({
+	cid: "video-123",
+	enabledKeys: ["br", "bl", "sid", "cid", "v", "sn"],
+	// Request mode: never decorate license requests with CMCD
+	transform: (data, request) =>
+		request.url.includes("/license") ? null : data,
+	eventTargets: [
+		{
+			url: "https://analytics.example.com/cmcd",
+			events: [CmcdEventType.RESPONSE_RECEIVED],
+			enabledKeys: ["url", "rc", "sid", "cid", "v", "e", "ts", "sn"],
+			// Event mode, this target only: report segment responses only
+			transform: (data, request) =>
+				request?.customData?.["requestType"] === "segment" ? data : null,
+		},
+	],
+});
+```
+
+Placement determines scope, the same way it does for `enabledKeys`:
+
+| Placement                      | Applies to                                   |
+| ------------------------------ | -------------------------------------------- |
+| `transform` at the top level   | Request reports from `createRequestReport()` |
+| `transform` on an event target | Event reports bound for that target          |
+
+There is deliberately no single hook spanning both paths. An event report carries its own type in `data.e`, the target's configuration is in scope where you write its transform, and anything else the transform needs can be closed over. Policy that applies in more than one place is a shared function you reference from each placement:
+
+```typescript
+import type { Cmcd } from "@svta/cml-cmcd";
+import { CmcdEventType } from "@svta/cml-cmcd";
+
+const sampled = Math.random() < 0.1;
+
+const sampleIntervals = (data: Cmcd): Cmcd | null =>
+	data.e === CmcdEventType.TIME_INTERVAL && !sampled ? null : data;
+```
+
+Composing several concerns at one placement is ordinary function composition, which you own:
+
+```typescript
+import type { Cmcd } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
+
+const scrubPii = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null =>
+	request?.url.includes("/private/") ? null : { ...data, cid: undefined };
+
+const transform = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null => {
+	const scrubbed = scrubPii(data, request);
+	return scrubbed === null ? null : sampleIntervals(scrubbed);
+};
+```
+
+### The associated request
+
+The second argument is the media request the report belongs to. In request mode it is always present, and it is the object you passed to `createRequestReport()` — mutating it does not change the report that comes back. In event mode it is present for events recorded through `recordResponseReceived()` and `undefined` for everything else, including state-change events fired by `update()` and periodic `TIME_INTERVAL` reports.
+
+This is where player-specific taxonomy belongs. CMCD has no concept of a "segment request" or an "init request", so a player that wants to filter on one puts it on `request.customData` and reads it back in the transform. For the narrower question of manifest versus media, the `ot` key already answers it in pure CMCD terms when the player populates it: `data.ot === "m"` is a manifest.
+
+The request is a read-only view (`CmcdTransformRequest`). It is context for the decision, not something to change: every member is `readonly`, and `customData` values are `unknown`, so reading a player field uses bracket access or a cast rather than dot access. Two caveats the types cannot cover. A mutable body such as `FormData` or `URLSearchParams` has mutating methods of its own, and JavaScript callers get no compile-time enforcement. Mutating the request either way is unsupported, and the outgoing report may reflect it, so treat the request as immutable regardless of what the compiler can prove.
+
+### The data you receive is yours
+
+The first argument is a copy made for this one report, so you can mutate it in place without affecting the reporter's persistent data or the reports going to other targets. That holds for nested values too: array keys such as `br` and `ec` are copied, so `data.ec.push("E100")` is safe, and so is changing the `params` of an `SfItem` inside one.
+
+### What a transform cannot change
+
+The reporter re-stamps `e` and assigns `sn` and `msd` after your transform returns, so a transform cannot change a report's event type to slip past a target's `events` filter, cannot create gaps in sequence numbering, and cannot replay the media-start-delay marker. Cancelling a report consumes neither a sequence number nor `msd`: wire `sn` values stay contiguous per destination, and `msd` rides the next report that is actually sent.
+
+A transform also cannot remove a key the event requires. Every event needs `e` and `ts`; state-change events need the field they signal (`sta`, `pr`, `cid`, `bg`, `br`), custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these, the reporter puts back the value it had beforehand. It does not invent values: a required key that was already missing before your transform ran stays missing, since that is a bug at the call site rather than something the transform did.
+
+Required keys cannot be configured away either. They are force-included after the `enabledKeys` filter, so omitting one from `enabledKeys` does not suppress it, it just leaves the payload valid. If a destination must not receive the field an event carries, leave that event out of the target's `events` rather than trying to strip the key.
+
+`enabledKeys` is still the wire allowlist and still runs after the transform. A key your transform adds must also be enabled at the same placement to reach the collector, and a key it removes stays removed unless the event requires it.
+
+Cancelling a state-change report does not roll back dedup. The transition still happened; the transform only suppressed its transmission, so the next `update()` with the same value is still deduplicated.
+
+Transforms shape CMCD data only. They cannot modify the outgoing HTTP request.
+
+> [!IMPORTANT]
+> Transforms must not throw. Exceptions propagate to whatever called into the reporter, which for `TIME_INTERVAL` events is the interval timer and surfaces as an unhandled error. The library does not swallow them: failing open would leak exactly the data a redaction transform exists to remove, and failing closed would make data loss undebuggable. Wrap risky logic in `try`/`catch` and choose explicitly, returning the data to fail open or `null` to fail closed.
+
+A throw is isolated to the target whose transform threw. The remaining targets still receive the report, queued batches are still sent, and the error reaches your code once the reporter has finished with the event. Only the throwing target loses its report, and it consumes no sequence number doing so. Without that isolation a single throwing transform would starve every target configured after it, because the state-change dedup baseline commits before the reporter fans out to targets and is never rolled back.
+
 ## Configuration Reference
 
 ### CmcdReporterConfig
@@ -696,6 +787,7 @@ const reporter = new CmcdReporter({
 | `customHeaderMap`  | `Partial<CmcdHeaderMap>`  | `undefined`         | Routes [custom keys](#custom-keys-in-headers-mode) into specific CMCD header shards in headers mode. |
 | `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
 | `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
+| `transform`        | `CmcdRequestReportTransform` | `undefined`      | Transforms or cancels each request report. See [Transforming and Cancelling Reports](#transforming-and-cancelling-reports). |
 
 ### CmcdEventReportConfig
 
@@ -707,3 +799,4 @@ const reporter = new CmcdReporter({
 | `batchSize`   | `number`          | `1`         | Events to batch before sending                                              |
 | `version`     | `CmcdVersion`     | `CMCD_V2`   | CMCD version for this target (must be v2 or higher)                         |
 | `enabledKeys` | `CmcdKey[]`       | `undefined` | Keys to include for this target. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
+| `transform`   | `CmcdEventReportTransform` | `undefined` | Transforms or cancels each of this target's event reports.         |

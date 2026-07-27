@@ -3,7 +3,7 @@ import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
@@ -145,6 +145,14 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		if (!keys.includes('cen') && data['cen'] != null && eventType === CMCD_EVENT_CUSTOM_EVENT) {
 			keys.push('cen')
+		}
+
+		if (!keys.includes('ec') && data['ec'] != null && eventType === CMCD_EVENT_ERROR) {
+			keys.push('ec')
+		}
+
+		if (!keys.includes('url') && data['url'] != null && eventType === CMCD_EVENT_RESPONSE_RECEIVED) {
+			keys.push('url')
 		}
 
 		const requiredField = eventType ? CMCD_STATE_EVENT_FIELDS.get(eventType) : undefined

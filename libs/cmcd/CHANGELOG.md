@@ -10,10 +10,24 @@ and this project adheres to
 
 ### Added
 
+- `transform` on the request-report config and on each event-target config: a synchronous `(data, request) => Cmcd | null` hook that modifies a single CMCD report before it goes to the wire, or cancels it by returning `null`. Placement scopes the hook the same way `enabledKeys` does — the top-level `transform` applies to `createRequestReport()` reports, and each event target's `transform` applies to that target's event reports, so targets sharing a collector URL can filter independently. For `RESPONSE_RECEIVED` events the transform also receives the request that triggered them, which is how a player filters reports by its own request taxonomy on `customData`. Implements the accepted RFC in `rfc/cmcd-reporter-middleware.md` ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390))
+
+  The contract is bounded so a transform cannot produce an invalid or cross-contaminated report:
+
+  - `e`, `sn`, and `msd` are stamped after the transform runs, so a cancelled report leaves no sequence-number gap and `msd` rides the next report that is sent.
+  - Keys the event requires (`ts` always, the signalled field for state-change events, `cen` for custom events, `ec` for errors, `url` for response-received) are restored if a transform removes them, so a transform cannot emit a report `validateCmcdEvents()` would reject. Keys already absent beforehand are not fabricated.
+  - The report data is copied for each target, nested values included, so mutating an array or an `SfItem`'s `params` in place cannot reach the reporter's persistent data or another target's report.
+  - Transform exceptions propagate rather than being swallowed, but are isolated per target: the remaining targets still receive the report and the error surfaces after the reporter finishes the event. This covers `start()`'s initial time-interval event as well as `recordEvent()`, so a throwing transform cannot leave later targets without armed intervals. See the user guide.
+  - The `request` argument is a read-only view (`CmcdTransformRequest`): it is context for the decision and must not be mutated, since it belongs to the caller. Members are `readonly` and `customData` values are `unknown`, so reading a player field uses bracket access or a cast. A mutable `FormData`/`URLSearchParams` body and JavaScript callers are outside what the type can enforce
 - `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`
+
+### Fixed
+
+- `prepareCmcdData` now force-includes `ec` on error events and `url` on response-received events after the per-target `enabledKeys` filter, completing the set started in 2.4.0 for state-change fields and `cen`. A target whose `enabledKeys` omitted `ec` previously emitted `e=e,sid="…",sn=0,ts=…,v=2`, which `validateCmcdEvents()` rejects for the missing required key; `rr` targets lost `url` the same way. This affects any such target, with or without a report transform configured
 
 ### Changed
 
+- `CmcdReporter.recordResponseReceived()` is now generic over the request's `customData`, so a player can pass a request carrying only its own keys (e.g. `{ requestType: 'segment' }`) without declaring a `cmcd` key it does not own and without a cast. The parameter was previously pinned to `HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>`; because `{ cmcd?: Cmcd }` is a weak type (every property optional), a `customData` sharing no properties with it was rejected outright. This pairs with the per-target `transform`, which reads the player's taxonomy off the triggering request. Type-only widening: the reporter still reads just `customData.cmcd`, and existing callers passing `HttpRequest<{ cmcd?: Cmcd }>` continue to compile
 - `isCmcdCustomKey` and the `CmcdCustomKey` type now only accept custom keys that survive RFC 8941 key serialization: a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character. Uppercase and digit-leading names were never serializable as CMCD; they are now rejected by the type, the validators, and key filtering instead of being dropped at encode preparation
 
 ### Documentation

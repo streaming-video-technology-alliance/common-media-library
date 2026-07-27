@@ -82,6 +82,33 @@ describe('prepareCmcdData', () => {
 			ok(!('cen' in data))
 		})
 
+		it('force-includes ec for filtered error events', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const data = prepareCmcdData(
+				{ e: CmcdEventType.ERROR, ec: ['E100'], cid: 'content-id' },
+				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
+			)
+			ok('ec' in data)
+		})
+
+		it('does not force-include ec for non-error events', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const data = prepareCmcdData(
+				{ e: CmcdEventType.CUSTOM_EVENT, cen: 'my-event', ec: ['E100'], cid: 'content-id' },
+				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
+			)
+			ok(!('ec' in data))
+		})
+
+		it('force-includes url for filtered response received events', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const data = prepareCmcdData(
+				{ e: CmcdEventType.RESPONSE_RECEIVED, url: 'https://example.com/seg.mp4', rc: 200, cid: 'content-id' },
+				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
+			)
+			ok('url' in data)
+		})
+
 		it('force-includes the required field of a filtered state-change event', (context) => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const data = prepareCmcdData(
