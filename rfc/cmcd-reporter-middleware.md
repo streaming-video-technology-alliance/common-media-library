@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: Report Transforms for `CmcdReporter`
@@ -296,8 +296,10 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 
 ## Unresolved questions
 
-1. **Error stance**: this RFC proposes propagating transform exceptions. Should the reporter instead fail closed (drop the report) on throw? Propagation is honest and debuggable but surfaces integrator bugs in timer contexts.
-2. **Triggering request on custom events**: should the public `recordEvent()` accept an associated `HttpRequest` so custom and error events can carry request context into transforms? This RFC keeps the plumbing private and only `recordResponseReceived()` populates it.
+Both questions were resolved in favor of the stance proposed above when the RFC was accepted; see Final Decision.
+
+1. **Error stance** (resolved: propagate). Transform exceptions propagate to the caller rather than being swallowed. Both silent alternatives are worse: fail-open leaks the data a redaction transform exists to remove, and fail-closed makes data loss undebuggable. Documentation states that transforms must not throw.
+2. **Triggering request on custom events** (resolved: keep private). Only `recordResponseReceived()` populates the triggering request, threaded through a private internal path. The public `recordEvent()` signature is unchanged. A public associated-request parameter can be added later without a breaking change if a concrete use case appears.
 
 ## Future possibilities
 
@@ -310,11 +312,12 @@ New coverage in `CmcdReporter.test.ts`, following the existing mock-requester pa
 
 - **2026-07-21 (v1)**: initial draft proposing a reporter-level `middleware` array applied to both reporting paths, with a discriminated-union context object.
 - **2026-07-22 (v2)**: reshaped into per-placement `transform` functions following dash.js review feedback (per-target `rr` filtering, same-URL targets) and the `enabledKeys` placement-symmetry argument. Resolved former open questions on naming (`transform`) and per-target registration (yes, it is the design).
+- **2026-07-27 (v3)**: accepted as proposed in v2. Recorded the resolution of both unresolved questions (propagate exceptions, keep triggering-request plumbing private).
 
 ## Final Decision
 
-*(Completed after review)*
+**Decision:** Accepted as proposed in v2, with no design changes. Both unresolved questions resolve to the stance the RFC proposed: transform exceptions propagate to the caller, and the triggering request is threaded privately so only `recordResponseReceived()` populates it.
 
-**Decision:**
-**Rationale:**
-**Date:**
+**Rationale:** The per-placement single-function shape was confirmed by the concrete consumer during review. dash.js ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390)) verified that one function per target is sufficient to express `sendResponseReceivedForRequestTypes`, which was the case that motivated reshaping the proposal away from a global middleware array, and that composing further target-specific rules into a single function is acceptable. That removes the last open concern about dropping the array contract. On the two remaining questions, the proposed stances were kept because the alternatives are strictly worse and both are reversible in a non-breaking way: swallowing transform exceptions would either leak the data a redaction transform exists to remove or make data loss undebuggable, and a public associated-request parameter on `recordEvent()` can be added later if a use case appears, whereas removing one could not.
+
+**Date:** 2026-07-27
