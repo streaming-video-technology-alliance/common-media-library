@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-07-28
+
 ### Added
 
 - `transform` on the request-report config and on each event-target config: a synchronous `(data, request) => Cmcd | null` hook that modifies a single CMCD report before it goes to the wire, or cancels it by returning `null`. Placement scopes the hook the same way `enabledKeys` does — the top-level `transform` applies to `createRequestReport()` reports, and each event target's `transform` applies to that target's event reports, so targets sharing a collector URL can filter independently. For `RESPONSE_RECEIVED` events the transform also receives the request that triggered them, which is how a player filters reports by its own request taxonomy on `customData`. Implements the accepted RFC in `rfc/cmcd-reporter-middleware.md` ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390))
@@ -216,7 +218,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...HEAD
+[2.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...cmcd-v2.5.0
 [2.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...cmcd-v2.4.1
 [2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0
 [2.3.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.3.2
