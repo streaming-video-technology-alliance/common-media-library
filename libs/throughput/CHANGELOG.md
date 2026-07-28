@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-07-28
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.6.0
+
 ## [1.0.7] - 2026-07-21
 
 ### Changed
@@ -58,7 +64,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.7...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.8...HEAD
+[1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.7...throughput-v1.0.8
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.6...throughput-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.5...throughput-v1.0.6
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.4...throughput-v1.0.5

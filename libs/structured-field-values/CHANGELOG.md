@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.5] - 2026-07-28
+
 ### Fixed
 
 - `encodeSfDict` and `encodeSfList` no longer drop the whitespace RFC 8941 emits after each comma when they are given a partial options object. `whitespace` was applied via a default parameter, so any options object without that property (for example `encodeSfDict(data, {})`) silently produced compact output; it is now treated as `true` unless explicitly set to `false`. Callers that passed an options object without `whitespace` and relied on compact output must now pass `whitespace: false`
@@ -62,7 +64,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.5...HEAD
+[1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.4...structured-field-values-v1.1.5
 [1.1.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.3...structured-field-values-v1.1.4
 [1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.2...structured-field-values-v1.1.3
 [1.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.1...structured-field-values-v1.1.2
