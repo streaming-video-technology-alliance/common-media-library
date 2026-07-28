@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `DeepReadonly<T>` — marks every property of `T` as `readonly`, recursively. `Readonly<T>` stops at the top level, so a nested object stays writable and `value.nested.field = …` still compiles; this applies at every depth, including through arrays. Functions are left unchanged so callbacks carried on a value stay callable, and primitives are returned as they are
+
 ## [1.5.1] - 2026-07-21
 
 ### Fixed

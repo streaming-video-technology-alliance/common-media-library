@@ -4,9 +4,14 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 /**
  * Configuration for a CMCD reporting component.
  *
+ * @typeParam C - The shape of the player's `customData` on the requests this
+ *                reporter sees. Annotating a single `transform` is enough for
+ *                the rest of the configuration to infer it. Defaults to
+ *                `Record<string, unknown>`.
+ *
  * @public
  */
-export type CmcdReporterConfig = CmcdRequestReportConfig & {
+export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportConfig<C> & {
 	/**
 	 * The session ID. If not provided, a new random session ID will be generated.
 	 *
@@ -26,5 +31,5 @@ export type CmcdReporterConfig = CmcdRequestReportConfig & {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	eventTargets?: CmcdEventReportConfig[];
+	eventTargets?: CmcdEventReportConfig<C>[];
 }
