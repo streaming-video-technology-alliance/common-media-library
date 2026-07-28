@@ -89,7 +89,33 @@ transform: (data, request) =>
 	request?.customData?.['requestType'] === 'segment' ? data : null
 ```
 
+v6 lets an adopter buy that cost back by describing their own `customData`; see Typing the player's `customData`. The opaque record remains the default, so the constraint above is what applies unless the adopter opts out of it deliberately.
+
 Two limits are stated rather than hidden. A mutable body such as `FormData` or `URLSearchParams` carries mutating methods that no type can block, and JavaScript callers get no compile-time enforcement at all. Mutating the request through either route is unsupported, and because the outgoing report shallow-clones the request, the report may reflect it. The contract is that the request is immutable, not that the library makes it impossible to mutate.
+
+### Typing the player's `customData`
+
+Every type in the transform chain takes a type parameter for the player's `customData`, defaulting to `Record<string, unknown>`:
+
+```ts
+export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
+	readonly headers?: Readonly<Record<string, string>>;
+	readonly customData?: Readonly<C>;
+}
+
+export type CmcdRequestReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C>) => Cmcd | null
+export type CmcdEventReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C> | undefined) => Cmcd | null
+```
+
+`CmcdRequestReportConfig<C>`, `CmcdEventReportConfig<C>`, `CmcdReporterConfig<C>`, and `CmcdReporter<C>` thread the same parameter, all with the same default, so nothing already written changes meaning.
+
+The parameter is inferred from the configuration rather than declared per transform. Annotating one standalone transform as `CmcdEventReportTransform<PlayerData>` fixes `C` for the whole config object, and the inferred `C` reaches the top-level `transform` slot as well, so its `request.customData` is typed without a second annotation. `new CmcdReporter<PlayerData>({ … })` states it explicitly instead. Either way the cost is one annotation per reporter.
+
+`CmcdReporter<C>` is load-bearing, not decorative: TypeScript rejects type parameters on a constructor declaration (`TS1092`), so a class-level parameter is the only place `C` can be introduced such that a config object literal infers it.
+
+This closes an asymmetry rather than adding a capability. `recordResponseReceived()` is already generic over the request's `customData`, so the call site preserves the player's type while the transform reading that same request saw every value as `unknown`.
+
+One limit is deliberate. The reporter's methods accept a request with any `customData`, so a reporter given a concrete `C` and then handed a request that does not satisfy it compiles cleanly, and the transform reads `undefined` where its type promises a value. The usual symptom is a silently cancelled report rather than an error. Constraining the call sites against `C` was measured and rejected for now: the direct forms break existing callers whose `customData` is declared with `interface` rather than `type`, because interfaces get no implicit index signature and so are not assignable to the default `Record<string, unknown>`. That would partially undo what the generic `recordResponseReceived()` shipped to fix. A conditional constraint that is inert on the default (`Record<string, unknown> extends C ? any : C`) was verified to close the gap while breaking nothing, and remains available as a non-breaking follow-up, since it only rejects code that is already wrong. It was held back because every adopter reading the API would pay for it in signature noise.
 
 ### Placement determines scope
 
@@ -161,7 +187,7 @@ Required keys cannot be filtered away either: they are force-included after the 
 
 ### New types
 
-Three new type-only files, each named for the type it exports and re-exported from the package index via `export type *`:
+Three new type-only files, each named for the type it exports and re-exported from the package index via `export type *`. Each takes a type parameter for the player's `customData`, defaulting to `Record<string, unknown>`; see Typing the player's `customData`.
 
 ```ts
 // CmcdTransformRequest.ts
@@ -173,9 +199,9 @@ import type { HttpRequest } from '@svta/cml-utils'
  *
  * @public
  */
-export type CmcdTransformRequest = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
+export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
 	readonly headers?: Readonly<Record<string, string>>;
-	readonly customData?: Readonly<Record<string, unknown>>;
+	readonly customData?: Readonly<C>;
 }
 ```
 
@@ -191,7 +217,7 @@ import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
  *
  * @public
  */
-export type CmcdRequestReportTransform = (data: Cmcd, request: CmcdTransformRequest) => Cmcd | null
+export type CmcdRequestReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C>) => Cmcd | null
 ```
 
 ```ts
@@ -207,13 +233,13 @@ import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
  *
  * @public
  */
-export type CmcdEventReportTransform = (data: Cmcd, request: CmcdTransformRequest | undefined) => Cmcd | null
+export type CmcdEventReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C> | undefined) => Cmcd | null
 ```
 
-The config types each gain one optional key:
+The config types each gain one optional key, and thread the same parameter through to it:
 
 ```ts
-export type CmcdRequestReportConfig = CmcdReportConfig & {
+export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
 	// ...existing keys...
 
 	/**
@@ -221,10 +247,10 @@ export type CmcdRequestReportConfig = CmcdReportConfig & {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	transform?: CmcdRequestReportTransform;
+	transform?: CmcdRequestReportTransform<C>;
 }
 
-export type CmcdEventReportConfig = CmcdReportConfig & {
+export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
 	// ...existing keys...
 
 	/**
@@ -233,11 +259,11 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	transform?: CmcdEventReportTransform;
+	transform?: CmcdEventReportTransform<C>;
 }
 ```
 
-`CmcdReporterConfig` inherits the request-mode `transform` from `CmcdRequestReportConfig`, exactly as it inherits `enabledKeys` and `transmissionMode`.
+`CmcdReporterConfig<C>` inherits the request-mode `transform` from `CmcdRequestReportConfig<C>`, exactly as it inherits `enabledKeys` and `transmissionMode`, and passes `C` on to its `eventTargets`. `CmcdReporter<C>` takes the same parameter so the constructor's config type is nameable.
 
 A nullish return (including a forgotten `return`) cancels the report. This is deliberate: for TypeScript users the declared return type makes a missing return a compile error, and for JavaScript users cancellation is a loud failure mode (reports visibly stop) rather than a silently inert transform.
 
@@ -418,6 +444,10 @@ Both questions were resolved in favor of the stance proposed above when the RFC 
 
   v5 also corrects two statements. Required keys are force-included after the `enabledKeys` filter, so the earlier advice to keep a key from a destination by omitting it from `enabledKeys` does not work for them; leaving the event out of the target's `events` is the way. And `prepareCmcdData` had never force-included `ec` or `url`, so a target whose `enabledKeys` omitted them emitted an invalid report with no transform involved at all; that gap is fixed alongside, which is what makes the restoration guarantee true end to end rather than only up to the queue.
 
+- **2026-07-27 (v6)**: the transform signature gains a type parameter for the player's `customData`, defaulting to `Record<string, unknown>`. v5 narrowed the request to a read-only view whose `customData` values are `unknown`, which made mutation a compile error but also made every read bracket access. Separately, `recordResponseReceived()` had already become generic over the request's `customData`, so the call site kept the player's type while the transform reading that same request lost it. v6 threads one parameter through `CmcdTransformRequest`, both transform types, the three config types, and `CmcdReporter`, inferred from the configuration so that annotating a single transform types the request in all of them. Purely additive: every parameter defaults, so v5's opaque record is still what an un-annotated adopter gets.
+
+  v6 leaves one gap open, recorded here rather than discovered later. The reporter's methods accept a request with any `customData`, so a reporter given a concrete `C` and handed a request that does not satisfy it compiles, and the transform reads `undefined` where its type promises a value. Closing it means constraining the call sites against `C`, and the direct forms of that break existing callers whose `customData` is an `interface` rather than a `type`, since interfaces carry no implicit index signature and so are not assignable to the default `Record<string, unknown>`. A conditional constraint that is inert on the default was verified to close the gap while breaking nothing, and is deferred as a non-breaking follow-up because it only rejects code that is already wrong. See Typing the player's `customData`.
+
 ## Final Decision
 
 **Decision:** Accepted as proposed in v2, with the two correctness fixes recorded in v4. Both unresolved questions resolve to the stance the RFC proposed: transform exceptions propagate to the caller (isolated per target, per v4), and the triggering request is threaded privately so only `recordResponseReceived()` populates it.
@@ -425,6 +455,8 @@ Both questions were resolved in favor of the stance proposed above when the RFC 
 **Post-acceptance amendments:** v4 tightens three parts of the contract that implementation showed to be unsound. None changes the shape of the API, and none invalidates the review that led to acceptance: required-key restoration only removes a way to emit invalid reports, per-target error isolation only prevents one target's throwing transform from silently starving the others, and copying nested values only makes the isolation guarantee v3 already advertised actually hold. All three are strictly more conservative than v3.
 
 v5 continues in the same direction, with one exception worth flagging to reviewers. Two of its three changes are again strictly more conservative (restoration covering substitution, and `start()` getting the isolation `emitEvent()` already had). The third is a genuine narrowing of what the proposal promises: v3 said mutating the `request` parameter could not affect the outgoing report, and that was false for nested `customData`. Rather than deep-copying caller-owned data on every report, v5 states that the request is context only and must not be mutated, and encodes that in a read-only parameter type. Adopters who relied on the old wording as a guarantee should read The request is context only, since the enforcement is compile-time for TypeScript and contractual for everyone else.
+
+v6 is the first amendment that widens rather than narrows, and it does so without changing what any existing declaration means. Adding a defaulted type parameter to the transform chain is invisible to code that does not use it, and the ergonomic cost v5 introduced (bracket access on every `customData` read) is now opt-out rather than mandatory. Reviewers should focus on the gap it leaves rather than the parameter itself: the reporter trusts the adopter to pass requests matching the `C` they declared, and the alternatives that would enforce it are recorded, measured, and deferred rather than dismissed.
 
 **Rationale:** The per-placement single-function shape was confirmed by the concrete consumer during review. dash.js ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390)) verified that one function per target is sufficient to express `sendResponseReceivedForRequestTypes`, which was the case that motivated reshaping the proposal away from a global middleware array, and that composing further target-specific rules into a single function is acceptable. That removes the last open concern about dropping the array contract. On the two remaining questions, the proposed stances were kept because the alternatives are strictly worse and both are reversible in a non-breaking way: swallowing transform exceptions would either leak the data a redaction transform exists to remove or make data loss undebuggable, and a public associated-request parameter on `recordEvent()` can be added later if a use case appears, whereas removing one could not.
 
