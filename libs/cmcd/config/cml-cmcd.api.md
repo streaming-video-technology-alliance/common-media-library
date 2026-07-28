@@ -4,6 +4,7 @@
 
 ```ts
 
+import { DeepReadonly } from '@svta/cml-utils';
 import { ExclusiveRecord } from '@svta/cml-utils';
 import { HttpRequest } from '@svta/cml-utils';
 import { HttpResponse } from '@svta/cml-utils';
@@ -364,11 +365,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
     }>);
     // @deprecated
     applyRequestReport(req: HttpRequest): HttpRequest;
-    createRequestReport<R extends HttpRequest = HttpRequest>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R["customData"]>;
+    createRequestReport<R extends HttpRequest<CmcdReporterCustomData<C>> = HttpRequest<C>>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R["customData"]>;
     flush(): void;
     isRequestReportingEnabled(): boolean;
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
-    recordResponseReceived<C>(response: HttpResponse<HttpRequest<C & {
+    recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & {
         cmcd?: Cmcd;
     }>>, data?: Partial<Cmcd>): void;
     start(): void;
@@ -382,6 +383,9 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
     cid?: string;
     eventTargets?: CmcdEventReportConfig<C>[];
 };
+
+// @public
+export type CmcdReporterCustomData<C> = Record<string, unknown> extends C ? any : C;
 
 // @public
 export const CmcdReportingMode: {
@@ -523,7 +527,7 @@ export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;
 // @public
 export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, "customData" | "headers">> & {
     readonly headers?: Readonly<Record<string, string>>;
-    readonly customData?: Readonly<C>;
+    readonly customData?: DeepReadonly<C>;
 };
 
 // @public

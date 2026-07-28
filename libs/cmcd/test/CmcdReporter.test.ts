@@ -1380,6 +1380,46 @@ describe('CmcdReporter', () => {
 				ok(segment.url.includes('CMCD='))
 			})
 
+			it('rejects a request whose customData does not match the reporter', () => {
+				const { requester } = createMockRequester()
+
+				const reporter = new CmcdReporter<PlayerData>({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: (data, request) =>
+						request.customData?.requestType === 'segment' ? data : null,
+				}, requester)
+
+				// @ts-expect-error - `requestTypo` does not satisfy PlayerData
+				reporter.createRequestReport({ url: 'https://x/a', customData: { requestTypo: 'segment' } })
+
+				reporter.recordResponseReceived({
+					// @ts-expect-error - `requestTypo` does not satisfy PlayerData
+					request: { url: 'https://x/b', customData: { requestTypo: 'segment' } },
+					status: 200,
+				})
+			})
+
+			it('keeps nested customData readonly', () => {
+				type NestedPlayerData = { timing: { start: number; }; };
+
+				const readNested: CmcdEventReportTransform<NestedPlayerData> = (data, request) => {
+					const customData = request?.customData
+
+					if (customData) {
+						// Reading at depth is the supported use.
+						ok(customData.timing.start >= 0)
+
+						// @ts-expect-error - nested writes are rejected, as at the top level
+						customData.timing.start = 1
+					}
+
+					return data
+				}
+
+				ok(typeof readNested === 'function')
+			})
+
 			it('leaves customData opaque when no type is given', () => {
 				const { requester } = createMockRequester()
 
