@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-07-28
+
+### Added
+
+- `DeepReadonly<T>` — marks every property of `T` as `readonly`, recursively. `Readonly<T>` stops at the top level, so a nested object stays writable and `value.nested.field = …` still compiles; this applies at every depth, including through arrays. Functions are left unchanged so callbacks carried on a value stay callable, and primitives are returned as they are
+
 ## [1.5.1] - 2026-07-21
 
 ### Fixed
@@ -76,7 +82,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...HEAD
+[1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...utils-v1.6.0
 [1.5.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...utils-v1.5.1
 [1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...utils-v1.5.0
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.3.0...utils-v1.4.0

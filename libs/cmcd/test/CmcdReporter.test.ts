@@ -1,4 +1,4 @@
-import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdTransformRequest } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdRequestReportTransform, CmcdTransformRequest } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
@@ -1299,6 +1299,152 @@ describe('CmcdReporter', () => {
 				deepEqual(seen, ['segment'])
 				equal(requests.length, 1)
 				ok((requests[0].body as string)?.includes('segment.mp4'))
+			})
+		})
+
+		describe('typed customData', () => {
+			type PlayerData = { requestType: string; };
+
+			it('types customData across the config from a single annotated transform', async () => {
+				const { requester, requests } = createMockRequester()
+
+				// The only annotation in the config. It fixes the reporter's
+				// customData type, which the un-annotated top-level transform
+				// below picks up by inference.
+				const segmentsOnly: CmcdEventReportTransform<PlayerData> = (data, request) =>
+					request?.customData?.requestType === 'segment' ? data : null
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: [...RR_KEYS],
+					transform: (data, request) =>
+						request.customData?.requestType === 'license' ? null : data,
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.RESPONSE_RECEIVED],
+							enabledKeys: [...RR_KEYS],
+							batchSize: 1,
+							transform: segmentsOnly,
+						},
+					],
+				}, requester)
+
+				const license = reporter.createRequestReport({
+					url: 'https://drm.example.com/license',
+					customData: { requestType: 'license' },
+				})
+				ok(!license.url.includes('CMCD='))
+
+				const segment = reporter.createRequestReport({
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				})
+				ok(segment.url.includes('CMCD='))
+
+				reporter.recordResponseReceived({
+					request: { url: 'https://cdn.example.com/manifest.mpd', customData: { requestType: 'mpd' } },
+					status: 200,
+				})
+				reporter.recordResponseReceived({
+					request: { url: 'https://cdn.example.com/segment.mp4', customData: { requestType: 'segment' } },
+					status: 200,
+				})
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('segment.mp4'))
+			})
+
+			it('types customData from an explicit type argument on the reporter', () => {
+				const { requester } = createMockRequester()
+
+				const reporter = new CmcdReporter<PlayerData>({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: (data, request) =>
+						request.customData?.requestType === 'license' ? null : data,
+				}, requester)
+
+				const license = reporter.createRequestReport({
+					url: 'https://drm.example.com/license',
+					customData: { requestType: 'license' },
+				})
+				ok(!license.url.includes('CMCD='))
+
+				const segment = reporter.createRequestReport({
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				})
+				ok(segment.url.includes('CMCD='))
+			})
+
+			it('rejects a request whose customData does not match the reporter', () => {
+				const { requester } = createMockRequester()
+
+				const reporter = new CmcdReporter<PlayerData>({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: (data, request) =>
+						request.customData?.requestType === 'segment' ? data : null,
+				}, requester)
+
+				// @ts-expect-error - `requestTypo` does not satisfy PlayerData
+				reporter.createRequestReport({ url: 'https://x/a', customData: { requestTypo: 'segment' } })
+
+				reporter.recordResponseReceived({
+					// @ts-expect-error - `requestTypo` does not satisfy PlayerData
+					request: { url: 'https://x/b', customData: { requestTypo: 'segment' } },
+					status: 200,
+				})
+			})
+
+			it('keeps nested customData readonly', () => {
+				type NestedPlayerData = { timing: { start: number; }; };
+
+				const readNested: CmcdEventReportTransform<NestedPlayerData> = (data, request) => {
+					const customData = request?.customData
+
+					if (customData) {
+						// Reading at depth is the supported use.
+						ok(customData.timing.start >= 0)
+
+						// @ts-expect-error - nested writes are rejected, as at the top level
+						customData.timing.start = 1
+					}
+
+					return data
+				}
+
+				ok(typeof readNested === 'function')
+			})
+
+			it('leaves customData opaque when no type is given', () => {
+				const { requester } = createMockRequester()
+
+				// The un-parameterized spelling stays valid, so `customData`
+				// values remain `unknown` and reads go through bracket access.
+				const segmentsOnly: CmcdRequestReportTransform = (data, request) =>
+					request.customData?.['requestType'] === 'segment' ? data : null
+
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid'],
+					transform: segmentsOnly,
+				}, requester)
+
+				const manifest = reporter.createRequestReport({
+					url: 'https://cdn.example.com/manifest.mpd',
+					customData: { requestType: 'mpd' },
+				})
+				ok(!manifest.url.includes('CMCD='))
+
+				const segment = reporter.createRequestReport({
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				})
+				ok(segment.url.includes('CMCD='))
 			})
 		})
 

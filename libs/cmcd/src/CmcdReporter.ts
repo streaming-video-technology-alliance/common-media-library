@@ -13,10 +13,12 @@ import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
+import type { CmcdReporterCustomData } from './CmcdReporterCustomData.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
@@ -28,15 +30,15 @@ type CmcdReportConfigNormalized = CmcdReportConfig & {
 	version: CmcdVersion;
 }
 
-type CmcdEventReportConfigNormalized = CmcdEventReportConfig & CmcdReportConfigNormalized & {
+type CmcdEventReportConfigNormalized<C> = CmcdEventReportConfig<C> & CmcdReportConfigNormalized & {
 	events: CmcdEventType[];
 	interval: number;
 	batchSize: number;
 }
 
-type CmcdReporterConfigNormalized = CmcdReporterConfig & CmcdReportConfigNormalized & {
+type CmcdReporterConfigNormalized<C> = CmcdReporterConfig<C> & CmcdReportConfigNormalized & {
 	sid: string;
-	eventTargets: CmcdEventReportConfigNormalized[];
+	eventTargets: CmcdEventReportConfigNormalized<C>[];
 }
 
 function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>, baseUrl?: string): CmcdEncodeOptions {
@@ -224,7 +226,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	return fetch(url, init)
 }
 
-function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdReporterConfigNormalized {
+function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): CmcdReporterConfigNormalized<C> {
 	// Apply top-level config defaults
 	const {
 		version = CMCD_V2,
@@ -253,7 +255,7 @@ function createCmcdReporterConfig(config: Partial<CmcdReporterConfig>): CmcdRepo
 				})
 			}
 			return acc
-		}, [] as CmcdEventReportConfigNormalized[]),
+		}, [] as CmcdEventReportConfigNormalized<C>[]),
 	}
 }
 
@@ -270,16 +272,24 @@ type CmcdEventTarget = CmcdTarget & {
 /**
  * The CMCD reporter.
  *
+ * `C` describes the player's own `customData`, which the reporter passes
+ * through to each configured `transform`. It is inferred from the
+ * configuration, so annotating a single `transform` types the request in every
+ * other one; the default leaves `customData` values `unknown`.
+ *
+ * @typeParam C - The shape of the player's `customData`. Defaults to
+ *                `Record<string, unknown>`.
+ *
  * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#reporting-modes-when-we-send-data | CTA-5004-B Reporting Modes}
  *
  * @public
  */
-export class CmcdReporter {
+export class CmcdReporter<C = Record<string, unknown>> {
 	private timeOrigin = performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
 	private data: Cmcd = {}
-	private config: CmcdReporterConfigNormalized
+	private config: CmcdReporterConfigNormalized<C>
 	private msd: number = NaN
-	private eventTargets = new Map<CmcdEventReportConfigNormalized, CmcdEventTarget>()
+	private eventTargets = new Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>()
 	private lastEmitted: Partial<Pick<Cmcd, StateField>> = {}
 	private requestTarget: CmcdTarget = {
 		sn: 0,
@@ -296,7 +306,7 @@ export class CmcdReporter {
 	 *                    The default is a simple wrapper around the
 	 *                    native `fetch` API.
 	 */
-	constructor(config: Partial<CmcdReporterConfig>, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester) {
+	constructor(config: Partial<CmcdReporterConfig<C>>, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
 		this.data = {
 			cid: this.config.cid,
@@ -553,7 +563,7 @@ export class CmcdReporter {
 	 * @param request - The media request that triggered the event, when
 	 *                  one exists. Passed to the target's `transform`.
 	 */
-	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
+	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
 		if (!config.events.includes(type)) {
 			return
 		}
@@ -652,11 +662,18 @@ export class CmcdReporter {
 	 * left untouched and stays visible to an event target's `transform` via
 	 * its `request` argument.
 	 *
+	 * A reporter given a concrete `C` requires the request to satisfy it, so a
+	 * request the configured transforms could not read is rejected here rather
+	 * than reaching them; see {@link CmcdReporterCustomData}.
+	 *
+	 * @typeParam RD - The `customData` this request carries. Defaults to the
+	 *                reporter's own `C`.
+	 *
 	 * @param response - The HTTP response received.
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override any auto-derived values.
 	 */
-	recordResponseReceived<C>(response: HttpResponse<HttpRequest<C & { cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
 
 		const url = data.url ?? request?.url
@@ -720,13 +737,21 @@ export class CmcdReporter {
 	 * Creates a new request with the CMCD request report data applied. Called by the player
 	 * before sending the request.
 	 *
+	 * A reporter given a concrete `C` requires the request's `customData` to
+	 * satisfy it, so a request the configured transform could not read is
+	 * rejected here rather than reaching it; see
+	 * {@link CmcdReporterCustomData}.
+	 *
+	 * @typeParam R - The request being decorated. Its `customData` must satisfy
+	 *                the reporter's `C`.
+	 *
 	 * @param request - The request to apply the CMCD request report to.
 	 * @param data - The data to apply to the request. This data only
 	 *               applies to this request report. Persistent data
 	 *               should be updated using `update()`.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	createRequestReport<R extends HttpRequest = HttpRequest>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R['customData']> {
+	createRequestReport<R extends HttpRequest<CmcdReporterCustomData<C>> = HttpRequest<C>>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R['customData']> {
 		const { customData = {}, headers = {}, ...rest } = request
 		const report = {
 			...rest,
@@ -754,7 +779,7 @@ export class CmcdReporter {
 
 			// The caller's request is passed, not the internal clone, so a
 			// transform cannot alter the outgoing report through it.
-			cmcdData = transform(merged, request)
+			cmcdData = transform(merged, request as CmcdTransformRequest<C>)
 
 			// A cancelled report consumes neither a sequence number nor msd.
 			if (cmcdData == null) {
@@ -832,7 +857,7 @@ export class CmcdReporter {
 	 * @param config - The target config to send the event report to.
 	 * @param data - The data to send in the event report.
 	 */
-	private async sendEventReport(config: CmcdEventReportConfigNormalized, data: Cmcd[]): Promise<void> {
+	private async sendEventReport(config: CmcdEventReportConfigNormalized<C>, data: Cmcd[]): Promise<void> {
 		const options = createEncodingOptions(CMCD_EVENT_MODE, config)
 		const response = await this.requester({
 			url: config.url,
@@ -865,7 +890,7 @@ export class CmcdReporter {
 	 * Permanently removes an event target: cancels its timer and removes it from the
 	 * eventTargets map. Used when the collector signals the target is gone (HTTP 410).
 	 */
-	private disposeEventTarget(config: CmcdEventReportConfigNormalized): void {
+	private disposeEventTarget(config: CmcdEventReportConfigNormalized<C>): void {
 		const target = this.eventTargets.get(config)
 		if (!target) {
 			return

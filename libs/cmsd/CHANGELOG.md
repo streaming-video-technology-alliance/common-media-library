@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-28
+
 ### Added
 
 - `isCmsdCustomKey`: runtime check for valid custom keys (a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character), the subset of hyphenated key names that survives RFC 8941 key serialization
@@ -76,7 +78,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.0.7...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.0.7...cmsd-v1.1.0
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.0.6...cmsd-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.0.5...cmsd-v1.0.6
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.0.4...cmsd-v1.0.5

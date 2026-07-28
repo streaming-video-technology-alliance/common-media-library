@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.8] - 2026-07-28
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.4
+- Update `@svta/cml-utils` to 1.6.0
+- Update `@svta/cml-xml` to 1.1.6
+
 ## [1.1.7] - 2026-07-21
 
 ### Fixed
@@ -86,7 +94,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.7...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.8...HEAD
+[1.1.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.7...drm-v1.1.8
 [1.1.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.6...drm-v1.1.7
 [1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.5...drm-v1.1.6
 [1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.4...drm-v1.1.5

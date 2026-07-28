@@ -6,9 +6,12 @@ import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 /**
  * Configuration for a CMCD event report.
  *
+ * @typeParam C - The shape of the player's `customData` on the request that
+ *                triggered the event. Defaults to `Record<string, unknown>`.
+ *
  * @public
  */
-export type CmcdEventReportConfig = CmcdReportConfig & {
+export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
 	/**
 	 * The version of the CMCD protocol to use. Must be
 	 * version 2 or higher for event reporting.
@@ -61,5 +64,5 @@ export type CmcdEventReportConfig = CmcdReportConfig & {
 	 * @example
 	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
 	 */
-	transform?: CmcdEventReportTransform;
+	transform?: CmcdEventReportTransform<C>;
 };
