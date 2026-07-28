@@ -23,22 +23,25 @@ const sections = changelog.split(/^## /m)
 sections.splice(2, 0, `[${ver}] - ????-??-??\n\n`)
 
 const version = `${pkg}-v${ver}`
-// Anchored on the package's own tag prefix so a `v` inside the package name
+// Matched on the package's own tag prefix so a `v` inside the package name
 // (structured-field-values, webvtt) cannot be mistaken for the version's `v`.
-const head = new RegExp(`${pkg}-v([0-9a-zA-Z.-]+)\\.\\.\\.HEAD`)
+// Plain string search rather than a regex: `pkg` is a command-line argument.
+const tagPrefix = `${pkg}-v`
+const headSuffix = '...HEAD'
 const linkBreak = '\n'
 const last = sections.length - 1
 const links = sections[last].split(linkBreak)
-const index = links.findIndex((link) => head.test(link))
+const index = links.findIndex((link) => link.endsWith(headSuffix) && link.includes(tagPrefix))
 
 if (index < 0) {
-	throw new Error(`Missing ${pkg}-v<version>...HEAD compare link in ${folder}/CHANGELOG.md`)
+	throw new Error(`Missing ${tagPrefix}<version>${headSuffix} compare link in ${folder}/CHANGELOG.md`)
 }
 
 const unreleased = links[index]
-const previous = unreleased.match(head)?.[1]
-links[index] = unreleased.replace(head, `${version}...HEAD`)
-links.splice(index + 1, 0, `[${ver}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/${pkg}-v${previous}...${version}`)
+const tagStart = unreleased.lastIndexOf(tagPrefix)
+const previous = unreleased.slice(tagStart + tagPrefix.length, unreleased.length - headSuffix.length)
+links[index] = unreleased.slice(0, tagStart) + version + headSuffix
+links.splice(index + 1, 0, `[${ver}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/${tagPrefix}${previous}...${version}`)
 sections[last] = links.join(linkBreak)
 
 await writeFile(`${folder}/CHANGELOG.md`, sections.join('## '))
