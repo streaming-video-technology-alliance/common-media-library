@@ -709,6 +709,8 @@ const reporter = new CmcdReporter({
 });
 ```
 
+The bracket access on the last line is the default, because the library cannot know the player's shape. [Typing `customData`](#typing-customdata) removes it.
+
 Placement determines scope, the same way it does for `enabledKeys`:
 
 | Placement                      | Applies to                                   |
@@ -749,7 +751,45 @@ The second argument is the media request the report belongs to. In request mode 
 
 This is where player-specific taxonomy belongs. CMCD has no concept of a "segment request" or an "init request", so a player that wants to filter on one puts it on `request.customData` and reads it back in the transform. For the narrower question of manifest versus media, the `ot` key already answers it in pure CMCD terms when the player populates it: `data.ot === "m"` is a manifest.
 
-The request is a read-only view (`CmcdTransformRequest`). It is context for the decision, not something to change: every member is `readonly`, and `customData` values are `unknown`, so reading a player field uses bracket access or a cast rather than dot access. Two caveats the types cannot cover. A mutable body such as `FormData` or `URLSearchParams` has mutating methods of its own, and JavaScript callers get no compile-time enforcement. Mutating the request either way is unsupported, and the outgoing report may reflect it, so treat the request as immutable regardless of what the compiler can prove.
+The request is a read-only view (`CmcdTransformRequest`). It is context for the decision, not something to change: every member is `readonly`. Two caveats the types cannot cover. A mutable body such as `FormData` or `URLSearchParams` has mutating methods of its own, and JavaScript callers get no compile-time enforcement. Mutating the request either way is unsupported, and the outgoing report may reflect it, so treat the request as immutable regardless of what the compiler can prove.
+
+### Typing `customData`
+
+By default `customData` values are `unknown`, which is what forces the bracket access above. Describe the player's shape once and those reads become ordinary dot access, checked at compile time. Annotating a single transform is enough: the rest of the configuration infers the same type, including the top-level `transform`.
+
+```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+import type { CmcdEventReportTransform } from "@svta/cml-cmcd";
+
+// The player's own request taxonomy, carried on customData.
+type PlayerData = { requestType: "segment" | "manifest" | "license" };
+
+// The only annotation in the configuration.
+const segmentsOnly: CmcdEventReportTransform<PlayerData> = (data, request) =>
+	request?.customData?.requestType === "segment" ? data : null;
+
+const reporter = new CmcdReporter({
+	cid: "video-123",
+	enabledKeys: ["br", "bl", "sid", "cid", "v", "sn"],
+	// Not annotated, but `customData` is typed here too, so a misspelt
+	// "licence" is a compile error rather than a filter that never matches.
+	transform: (data, request) =>
+		request.customData?.requestType === "license" ? null : data,
+	eventTargets: [
+		{
+			url: "https://analytics.example.com/cmcd",
+			events: [CmcdEventType.RESPONSE_RECEIVED],
+			enabledKeys: ["url", "rc", "sid", "cid", "v", "e", "ts", "sn"],
+			transform: segmentsOnly,
+		},
+	],
+});
+```
+
+`new CmcdReporter<PlayerData>({ ... })` states the same thing explicitly, which is the clearer option when no transform is annotated. Either way the cost is one annotation per reporter, not one per transform. Omit it entirely and nothing changes from the previous section: values stay `unknown` and bracket access still works.
+
+> [!NOTE]
+> The reporter takes your word for it. `createRequestReport()` and `recordResponseReceived()` accept a request with any `customData`, so passing one that does not match the type you gave the reporter still compiles. The transform then reads `undefined` where it expects a value, which usually shows up as a report that is silently cancelled rather than as an error. Keep the type and the requests you pass in agreement.
 
 ### The data you receive is yours
 
@@ -787,7 +827,7 @@ A throw is isolated to the target whose transform threw. The remaining targets s
 | `customHeaderMap`  | `Partial<CmcdHeaderMap>`  | `undefined`         | Routes [custom keys](#custom-keys-in-headers-mode) into specific CMCD header shards in headers mode. |
 | `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
 | `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
-| `transform`        | `CmcdRequestReportTransform` | `undefined`      | Transforms or cancels each request report. See [Transforming and Cancelling Reports](#transforming-and-cancelling-reports). |
+| `transform`        | `CmcdRequestReportTransform` | `undefined`      | Transforms or cancels each request report. See [Transforming and Cancelling Reports](#transforming-and-cancelling-reports) and [Typing `customData`](#typing-customdata). |
 
 ### CmcdEventReportConfig
 
@@ -799,4 +839,4 @@ A throw is isolated to the target whose transform threw. The remaining targets s
 | `batchSize`   | `number`          | `1`         | Events to batch before sending                                              |
 | `version`     | `CmcdVersion`     | `CMCD_V2`   | CMCD version for this target (must be v2 or higher)                         |
 | `enabledKeys` | `CmcdKey[]`       | `undefined` | Keys to include for this target. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
-| `transform`   | `CmcdEventReportTransform` | `undefined` | Transforms or cancels each of this target's event reports.         |
+| `transform`   | `CmcdEventReportTransform` | `undefined` | Transforms or cancels each of this target's event reports. See [Typing `customData`](#typing-customdata). |
