@@ -788,8 +788,32 @@ const reporter = new CmcdReporter({
 
 `new CmcdReporter<PlayerData>({ ... })` states the same thing explicitly, which is the clearer option when no transform is annotated. Either way the cost is one annotation per reporter, not one per transform. Omit it entirely and nothing changes from the previous section: values stay `unknown` and bracket access still works.
 
-> [!NOTE]
-> The reporter takes your word for it. `createRequestReport()` and `recordResponseReceived()` accept a request with any `customData`, so passing one that does not match the type you gave the reporter still compiles. The transform then reads `undefined` where it expects a value, which usually shows up as a report that is silently cancelled rather than as an error. Keep the type and the requests you pass in agreement.
+Once a reporter has a type, `createRequestReport()` and `recordResponseReceived()` require the requests you pass to satisfy it. A typo or a request from a different code path is a compile error at the call site, rather than a transform that reads `undefined` and silently cancels the report:
+
+```typescript
+// Error: 'requestTypo' does not exist in type 'PlayerData'
+reporter.createRequestReport({
+	url: "https://cdn.example.com/segment.mp4",
+	customData: { requestTypo: "segment" },
+});
+```
+
+A reporter left on the default requires nothing and accepts any `customData`, exactly as before.
+
+`customData` is readonly at every depth, not just at the top level, so describing a nested shape does not cost you the [read-only guarantee](#the-associated-request):
+
+```typescript
+type PlayerData = { timing: { start: number } };
+
+const transform: CmcdEventReportTransform<PlayerData> = (data, request) => {
+	const customData = request?.customData;
+
+	// Error: cannot assign to 'start' because it is a read-only property
+	if (customData) customData.timing.start = 0;
+
+	return data;
+};
+```
 
 ### The data you receive is yours
 

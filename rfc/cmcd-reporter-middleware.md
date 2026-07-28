@@ -115,7 +115,17 @@ The parameter is inferred from the configuration rather than declared per transf
 
 This closes an asymmetry rather than adding a capability. `recordResponseReceived()` is already generic over the request's `customData`, so the call site preserves the player's type while the transform reading that same request saw every value as `unknown`.
 
-One limit is deliberate. The reporter's methods accept a request with any `customData`, so a reporter given a concrete `C` and then handed a request that does not satisfy it compiles cleanly, and the transform reads `undefined` where its type promises a value. The usual symptom is a silently cancelled report rather than an error. Constraining the call sites against `C` was measured and rejected for now: the direct forms break existing callers whose `customData` is declared with `interface` rather than `type`, because interfaces get no implicit index signature and so are not assignable to the default `Record<string, unknown>`. That would partially undo what the generic `recordResponseReceived()` shipped to fix. A conditional constraint that is inert on the default (`Record<string, unknown> extends C ? any : C`) was verified to close the gap while breaking nothing, and remains available as a non-breaking follow-up, since it only rejects code that is already wrong. It was held back because every adopter reading the API would pay for it in signature noise.
+Two things follow from `C` being a promise the transforms rely on.
+
+`customData` is applied through `DeepReadonly<C>`, not `Readonly<C>`. `Readonly` stops at the top level, so `request.customData.nested.field = …` would compile, which is the mutation The request is context only exists to prevent, and which the opaque-record default had always rejected because `unknown` cannot be indexed into. Applying the parameter shallowly would have made describing a nested shape a trade of mutation safety for typed reads. `DeepReadonly` lives in `@svta/cml-utils` since nothing about it is CMCD-specific.
+
+The reporter's methods constrain their request against `C`, so a request the configured transforms could not read is rejected at the call site rather than reaching them and reading `undefined`, whose usual symptom is a silently cancelled report rather than an error. The constraint has to be inert when `C` is left at its default, because the direct forms of it break existing callers whose `customData` is declared with `interface` rather than `type`: interfaces get no implicit index signature and so are not assignable to `Record<string, unknown>`, which would partially undo what the generic `recordResponseReceived()` shipped to fix. `CmcdReporterCustomData<C>` resolves to `any` exactly when `C` is the default and to `C` otherwise:
+
+```ts
+export type CmcdReporterCustomData<C> = Record<string, unknown> extends C ? any : C
+```
+
+The cost is that both signatures carry the helper, which every adopter reading the API sees. That is accepted rather than hidden: a `C` the reporter does not enforce is a type that lies, and the alternative was documenting the lie.
 
 ### Placement determines scope
 
@@ -201,7 +211,7 @@ import type { HttpRequest } from '@svta/cml-utils'
  */
 export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
 	readonly headers?: Readonly<Record<string, string>>;
-	readonly customData?: Readonly<C>;
+	readonly customData?: DeepReadonly<C>;
 }
 ```
 
@@ -263,7 +273,7 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 }
 ```
 
-`CmcdReporterConfig<C>` inherits the request-mode `transform` from `CmcdRequestReportConfig<C>`, exactly as it inherits `enabledKeys` and `transmissionMode`, and passes `C` on to its `eventTargets`. `CmcdReporter<C>` takes the same parameter so the constructor's config type is nameable.
+`CmcdReporterConfig<C>` inherits the request-mode `transform` from `CmcdRequestReportConfig<C>`, exactly as it inherits `enabledKeys` and `transmissionMode`, and passes `C` on to its `eventTargets`. `CmcdReporter<C>` takes the same parameter so the constructor's config type is nameable, and constrains `createRequestReport()` and `recordResponseReceived()` against it via `CmcdReporterCustomData<C>`.
 
 A nullish return (including a forgotten `return`) cancels the report. This is deliberate: for TypeScript users the declared return type makes a missing return a compile error, and for JavaScript users cancellation is a loud failure mode (reports visibly stop) rather than a silently inert transform.
 
@@ -446,7 +456,7 @@ Both questions were resolved in favor of the stance proposed above when the RFC 
 
 - **2026-07-27 (v6)**: the transform signature gains a type parameter for the player's `customData`, defaulting to `Record<string, unknown>`. v5 narrowed the request to a read-only view whose `customData` values are `unknown`, which made mutation a compile error but also made every read bracket access. Separately, `recordResponseReceived()` had already become generic over the request's `customData`, so the call site kept the player's type while the transform reading that same request lost it. v6 threads one parameter through `CmcdTransformRequest`, both transform types, the three config types, and `CmcdReporter`, inferred from the configuration so that annotating a single transform types the request in all of them. Purely additive: every parameter defaults, so v5's opaque record is still what an un-annotated adopter gets.
 
-  v6 leaves one gap open, recorded here rather than discovered later. The reporter's methods accept a request with any `customData`, so a reporter given a concrete `C` and handed a request that does not satisfy it compiles, and the transform reads `undefined` where its type promises a value. Closing it means constraining the call sites against `C`, and the direct forms of that break existing callers whose `customData` is an `interface` rather than a `type`, since interfaces carry no implicit index signature and so are not assignable to the default `Record<string, unknown>`. A conditional constraint that is inert on the default was verified to close the gap while breaking nothing, and is deferred as a non-breaking follow-up because it only rejects code that is already wrong. See Typing the player's `customData`.
+  Two consequences of `C` were caught in review of the implementation PR, both fixed there rather than deferred. `Readonly<C>` is shallow, so supplying a nested `C` reopened exactly the nested-write hole v5 closed by using `unknown` values; `customData` is now `DeepReadonly<C>`, a new utility in `@svta/cml-utils`. And the reporter's methods accepted a request with any `customData`, so a reporter given a concrete `C` and handed a request that did not satisfy it compiled, and the transform read `undefined` where its type promised a value. Both methods now constrain their request against `C` through `CmcdReporterCustomData<C>`, which is inert when `C` is left at its default so that callers whose `customData` is an `interface` rather than a `type` are unaffected. See Typing the player's `customData`.
 
 ## Final Decision
 
@@ -456,7 +466,7 @@ Both questions were resolved in favor of the stance proposed above when the RFC 
 
 v5 continues in the same direction, with one exception worth flagging to reviewers. Two of its three changes are again strictly more conservative (restoration covering substitution, and `start()` getting the isolation `emitEvent()` already had). The third is a genuine narrowing of what the proposal promises: v3 said mutating the `request` parameter could not affect the outgoing report, and that was false for nested `customData`. Rather than deep-copying caller-owned data on every report, v5 states that the request is context only and must not be mutated, and encodes that in a read-only parameter type. Adopters who relied on the old wording as a guarantee should read The request is context only, since the enforcement is compile-time for TypeScript and contractual for everyone else.
 
-v6 is the first amendment that widens rather than narrows, and it does so without changing what any existing declaration means. Adding a defaulted type parameter to the transform chain is invisible to code that does not use it, and the ergonomic cost v5 introduced (bracket access on every `customData` read) is now opt-out rather than mandatory. Reviewers should focus on the gap it leaves rather than the parameter itself: the reporter trusts the adopter to pass requests matching the `C` they declared, and the alternatives that would enforce it are recorded, measured, and deferred rather than dismissed.
+v6 is the first amendment that widens rather than narrows, and it does so without changing what any existing declaration means. Adding a defaulted type parameter to the transform chain is invisible to code that does not use it, and the ergonomic cost v5 introduced (bracket access on every `customData` read) is now opt-out rather than mandatory. The parameter is enforced rather than merely declared: it is applied deeply, so it does not weaken v5's no-mutation guarantee, and both reporter methods constrain their request against it, so a `C` the transforms rely on cannot be contradicted at the call site. Both of those started as gaps in the first draft of the implementation and were closed in review.
 
 **Rationale:** The per-placement single-function shape was confirmed by the concrete consumer during review. dash.js ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390)) verified that one function per target is sufficient to express `sendResponseReceivedForRequestTypes`, which was the case that motivated reshaping the proposal away from a global middleware array, and that composing further target-specific rules into a single function is acceptable. That removes the last open concern about dropping the array contract. On the two remaining questions, the proposed stances were kept because the alternatives are strictly worse and both are reversible in a non-breaking way: swallowing transform exceptions would either leak the data a redaction transform exists to remove or make data loss undebuggable, and a public associated-request parameter on `recordEvent()` can be added later if a use case appears, whereas removing one could not.
 
