@@ -84,6 +84,31 @@ describe('writeEmsg', function () {
 		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
 
+	it('should preserve a non-empty value through a version 1 round trip when schemeIdUri is empty', function () {
+		const messageData = new Uint8Array([0xaa, 0xbb])
+		const box = {
+			type: 'emsg' as const,
+			version: 1 as const,
+			flags: 0,
+			timescale: 90000,
+			presentationTime: 900000,
+			eventDuration: 0,
+			id: 1,
+			schemeIdUri: '',
+			value: '1',
+			messageData
+		}
+
+		const writer = writeEmsg(box)
+		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
+
+		assert.strictEqual(boxes.length, 1)
+		assert.strictEqual(boxes[0].type, 'emsg')
+		assert.strictEqual(boxes[0].schemeIdUri, '')
+		assert.strictEqual(boxes[0].value, '1')
+		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
+	})
+
 	it('should preserve the fixed fields through a version 0 round trip when the strings are empty', function () {
 		const messageData = new Uint8Array([0x01, 0x02, 0x03])
 		const box = {
