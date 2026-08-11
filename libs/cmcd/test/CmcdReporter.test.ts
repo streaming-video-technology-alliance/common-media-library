@@ -115,12 +115,36 @@ describe('CmcdReporter', () => {
 			ok(req.url.includes('br%3D%283000%29'))
 		})
 
-		it('resets session when sid changes', () => {
-			const { requester } = createMockRequester()
+		it('resets session when sid changes', async () => {
+			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
-			reporter.update({ br: [3000] })
+			reporter.recordEvent(CmcdEventType.ERROR)
+			reporter.recordEvent(CmcdEventType.ERROR)
+			const before = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[0].body as string).includes('sn=0'))
+			ok((requests[1].body as string).includes('sn=1'))
+			ok((requests[1].body as string).includes('sid="test-session"'))
+			ok(before.url.includes('sn%3D0'))
+			ok(before.url.includes('sid%3D%22test-session%22'))
+
 			reporter.update({ sid: 'new-session' })
+
+			// Both mode counters restart at 0 and reports carry the new sid.
+			reporter.recordEvent(CmcdEventType.ERROR)
+			const after = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 3)
+			ok((requests[2].body as string).includes('sn=0'))
+			ok((requests[2].body as string).includes('sid="new-session"'))
+			ok(after.url.includes('sn%3D0'))
+			ok(after.url.includes('sid%3D%22new-session%22'))
 		})
 	})
 
@@ -2481,6 +2505,41 @@ describe('CmcdReporter', () => {
 			await new Promise(resolve => setTimeout(resolve, 10))
 			// Target was removed, so second event should not be sent
 			equal(requests.length, 1)
+		})
+
+		it('re-sends a re-queued batch after later batches have already been delivered', async () => {
+			const requests: HttpRequest[] = []
+			const pending: Array<(response: { status: number; }) => void> = []
+			const requester = (request: HttpRequest): Promise<{ status: number; }> => {
+				requests.push(request)
+				return new Promise(resolve => pending.push(resolve))
+			}
+
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			reporter.recordEvent(CmcdEventType.ERROR)
+			equal(requests.length, 2)
+
+			// The second batch is delivered while the first is still in flight,
+			// then the first fails with 429 and goes back on the queue.
+			pending[1]({ status: 200 })
+			pending[0]({ status: 429 })
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// Nothing is re-sent until the next queue processing pass.
+			equal(requests.length, 2)
+
+			reporter.flush()
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 3)
+			ok((requests[0].body as string).includes('sn=0'))
+			ok((requests[1].body as string).includes('sn=1'))
+			// The re-queued batch goes out as-is: sn=0 after sn=1 was already
+			// delivered. Delivery order is not guaranteed; sn orders the stream.
+			ok((requests[2].body as string).includes('sn=0'))
+			pending[2]({ status: 200 })
 		})
 
 		it('clears the interval when target is removed via 410', async (t) => {
