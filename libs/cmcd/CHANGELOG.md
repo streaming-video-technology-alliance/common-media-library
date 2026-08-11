@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `CmcdReporter` now stamps the session-owned keys `sid` and `msd` after per-call data and transforms in both reporting modes, so neither `recordEvent()`/`recordResponseReceived()`/`createRequestReport()` data nor a `transform` return value can substitute the session ID or put `msd` on the wire outside the once-per-session gate. Transforms still see the canonical `sid` in their input. This also makes `update({ sid: undefined })` a no-op; previously the explicit `undefined` was merged into the data store and every later report went out with no `sid` at all ([#408](https://github.com/streaming-video-technology-alliance/common-media-library/issues/408))
+- `msd` lifecycle fixes ([#409](https://github.com/streaming-video-technology-alliance/common-media-library/issues/409)):
+  - `update({ msd })` now accepts `0` (a valid instant-start value), rounds fractional values to integer milliseconds per CTA-5004-B, and rejects `Infinity`, negatives, and `NaN`. Previously `0` was rejected while fractions and negatives reached the wire as-is, and an accepted `Infinity` consumed the once-per-session gate without ever being encodable, so `msd` was silently never sent
+  - A `sid` change now clears the stored `msd` and re-arms every send gate: `msd` is once per Session ID, so a value supplied for the new session is sent again, and a stored-but-unsent value from the old session no longer leaks forward
+  - The send gate is consumed only when the prepared report actually retains `msd`. Previously both modes flipped the flag before the `enabledKeys` filter ran, so a target that filtered `msd` out still consumed its gate
+- HTTP 410 disposal of an event target is now scoped to the current session per CTA-5004-B ("for the remainder of the current session"): a `sid` change restores the target, re-arming its interval when the reporter is started, and a 410 response that resolves after a session change is ignored instead of disposing the new session's target ([#410](https://github.com/streaming-video-technology-alliance/common-media-library/issues/410))
+
 ## [2.5.0] - 2026-07-28
 
 ### Added
