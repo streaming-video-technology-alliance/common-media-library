@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-08-11
+
+### Fixed
+
+- `writeTerminatedString` now writes the null terminator for empty strings, so `writeEmsg` output with an empty `value` or `schemeIdUri` no longer misaligns the fields that follow (version 1 `messageData` lost its head to the `value` read; version 0 numeric fields were garbled) ([#411](https://github.com/streaming-video-technology-alliance/common-media-library/issues/411))
+
 ## [1.0.4] - 2026-07-28
 
 ### Changed
@@ -171,7 +177,8 @@ Official stable release. No changes since 1.0.0-beta.2.
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.4...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.5...HEAD
+[1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.4...iso-bmff-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.3...iso-bmff-v1.0.4
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.2...iso-bmff-v1.0.3
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.1...iso-bmff-v1.0.2
