@@ -424,6 +424,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *
 	 * A `sid` change resets the dedup baseline.
 	 *
+	 * `msd` must be a finite, non-negative number of milliseconds; it is
+	 * rounded to the nearest integer, and invalid values are ignored.
+	 *
 	 * @param data - The data to update.
 	 */
 	update(data: Partial<Cmcd>): void {
@@ -431,8 +434,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			this.resetSession()
 		}
 
-		if (data.msd && !isNaN(data.msd)) {
-			this.msd = data.msd
+		const { msd } = data
+
+		// CTA-5004-B defines msd as integer milliseconds, sent once per session.
+		// 0 is a valid instant-start value; anything non-finite or negative is
+		// ignored so it can neither reach the wire nor consume the send gate.
+		if (typeof msd === 'number' && Number.isFinite(msd) && msd >= 0) {
+			this.msd = Math.round(msd)
 		}
 
 		// msd is tracked separately via this.msd and sent once per target,

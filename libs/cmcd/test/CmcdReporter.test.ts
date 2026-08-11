@@ -146,6 +146,53 @@ describe('CmcdReporter', () => {
 			ok(after.url.includes('sn%3D0'))
 			ok(after.url.includes('sid%3D%22new-session%22'))
 		})
+
+		describe('msd validation', () => {
+			const cases = [
+				{ name: 'accepts 0 as a valid instant-start value', input: 0, wire: 'msd%3D0' },
+				{ name: 'rounds fractional milliseconds to the nearest integer', input: 12.5, wire: 'msd%3D13' },
+				{ name: 'rejects Infinity', input: Infinity, wire: null },
+				{ name: 'rejects negative values', input: -1, wire: null },
+				{ name: 'rejects NaN', input: NaN, wire: null },
+			] as const
+
+			for (const { name, input, wire } of cases) {
+				it(name, () => {
+					const { requester } = createMockRequester()
+					const reporter = new CmcdReporter({
+						sid: 'test-session',
+						enabledKeys: ['sid', 'msd', 'v'],
+					}, requester)
+
+					reporter.update({ msd: input })
+
+					const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+					if (wire) {
+						ok(req.url.includes(wire), `expected ${req.url} to include ${wire}`)
+					}
+					else {
+						ok(!req.url.includes('msd'), `expected ${req.url} to omit msd`)
+					}
+				})
+			}
+
+			it('does not let a rejected value consume the once-per-session gate', () => {
+				const { requester } = createMockRequester()
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: ['sid', 'msd', 'v'],
+				}, requester)
+
+				reporter.update({ msd: Infinity })
+				const first = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+				ok(!first.url.includes('msd'))
+
+				reporter.update({ msd: 800 })
+				const second = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+				ok(second.url.includes('msd%3D800'))
+			})
+		})
 	})
 
 	describe('isRequestEnabled', () => {
