@@ -2872,6 +2872,133 @@ describe('CmcdReporter', () => {
 			pending[2]({ status: 200 })
 		})
 
+		it('restores a 410-disposed target when the session changes', async () => {
+			const { requester, requests } = createMockRequester(410)
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 1)
+
+			// Disposed for the remainder of the session: nothing more is sent.
+			reporter.recordEvent(CmcdEventType.ERROR)
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 1)
+
+			// A new session lifts the suppression.
+			reporter.update({ sid: 'new-session' })
+			reporter.recordEvent(CmcdEventType.ERROR)
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 2)
+			ok((requests[1].body as string).includes('sid="new-session"'))
+			ok((requests[1].body as string).includes('sn=0'))
+		})
+
+		it('re-arms a disposed target interval on session change while started', async (t) => {
+			const timers = mock.timers
+			timers.enable({ apis: ['setInterval'] })
+			t.after(() => timers.reset())
+
+			const { requester, requests } = createMockRequester(410)
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+				}],
+			}), requester)
+
+			reporter.start()
+			equal(requests.length, 1)
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// The 410 disposed the target: the interval is dead.
+			timers.tick(30_000)
+			equal(requests.length, 1)
+
+			reporter.update({ sid: 'new-session' })
+			// Restoration does not fire an immediate report; the next tick does.
+			equal(requests.length, 1)
+
+			timers.tick(30_000)
+			equal(requests.length, 2)
+			ok((requests[1].body as string).includes('sid="new-session"'))
+
+			reporter.stop()
+		})
+
+		it('does not re-arm restored targets when the reporter is stopped', async (t) => {
+			const timers = mock.timers
+			timers.enable({ apis: ['setInterval'] })
+			t.after(() => timers.reset())
+
+			const { requester, requests } = createMockRequester(410)
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+				}],
+			}), requester)
+
+			reporter.start()
+			equal(requests.length, 1)
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			reporter.stop()
+			reporter.update({ sid: 'new-session' })
+
+			timers.tick(30_000)
+			equal(requests.length, 1)
+		})
+
+		it('ignores a 410 from a previous session (delayed response)', async () => {
+			const requests: HttpRequest[] = []
+			const pending: Array<(response: { status: number; }) => void> = []
+			const requester = (request: HttpRequest): Promise<{ status: number; }> => {
+				requests.push(request)
+				return new Promise(resolve => pending.push(resolve))
+			}
+
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			equal(requests.length, 1)
+
+			// The session ends while the report is in flight; the 410 then lands.
+			reporter.update({ sid: 'new-session' })
+			pending[0]({ status: 410 })
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// The 410 belonged to the old session: the target must stay alive.
+			reporter.recordEvent(CmcdEventType.ERROR)
+			equal(requests.length, 2)
+			ok((requests[1].body as string).includes('sid="new-session"'))
+			pending[1]({ status: 200 })
+		})
+
+		it('applies a delayed 410 from the current session', async () => {
+			const requests: HttpRequest[] = []
+			const pending: Array<(response: { status: number; }) => void> = []
+			const requester = (request: HttpRequest): Promise<{ status: number; }> => {
+				requests.push(request)
+				return new Promise(resolve => pending.push(resolve))
+			}
+
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			pending[0]({ status: 410 })
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			equal(requests.length, 1)
+		})
+
 		it('clears the interval when target is removed via 410', async (t) => {
 			const setIntervalSpy = t.mock.method(globalThis, 'setInterval')
 			const clearIntervalSpy = t.mock.method(globalThis, 'clearInterval')

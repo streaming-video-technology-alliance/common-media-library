@@ -267,6 +267,7 @@ type CmcdTarget = {
 type CmcdEventTarget = CmcdTarget & {
 	intervalId: ReturnType<typeof setInterval> | undefined;
 	queue: Cmcd[];
+	disposed: boolean;
 }
 
 /**
@@ -297,6 +298,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		msdSent: false,
 	}
 
+	// Incremented on session reset so an in-flight response that resolves
+	// after a sid change can be recognized as belonging to an ended session.
+	private sessionEpoch = 0
+	private started = false
+
 	private requester: (request: HttpRequest) => Promise<{ status: number; }>
 
 	/**
@@ -322,6 +328,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 				sn: 0,
 				msdSent: false,
 				queue: [],
+				disposed: false,
 			})
 		}
 	}
@@ -334,6 +341,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * populated before calling start().
 	 */
 	start(): void {
+		this.started = true
+
 		// The initial time-interval event is fired synchronously per target, so a
 		// throwing transform must not abort the loop: later targets would never
 		// have their intervals armed and would report nothing for the session,
@@ -345,23 +354,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			// Disarm any existing timer so repeated start() calls do not leak intervals.
 			this.disarmInterval(target)
 
-			// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
-			if (config.interval === 0 || !config.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
+			// A target disposed via HTTP 410 stays silent for the rest of the
+			// session. Armed before the initial event so a throwing transform
+			// leaves the timer in the same state a successful start() would,
+			// rather than silently disabling the target.
+			if (target.disposed || !this.armInterval(target, config)) {
 				return
 			}
 
-			const timeIntervalEvent = () => {
+			try {
 				this.recordTargetEvent(target, config, CMCD_EVENT_TIME_INTERVAL)
 				this.processEventTargets()
-			}
-
-			// Armed before the initial event so a throwing transform leaves the
-			// timer in the same state a successful start() would, rather than
-			// silently disabling the target.
-			target.intervalId = setInterval(timeIntervalEvent, config.interval * 1000)
-
-			try {
-				timeIntervalEvent()
 			}
 			catch (error) {
 				failure ??= { error }
@@ -374,11 +377,31 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
+	 * Arms the time-interval timer for an event target when its config calls
+	 * for one. Returns whether a timer was armed.
+	 */
+	private armInterval(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>): boolean {
+		// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
+		if (config.interval === 0 || !config.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
+			return false
+		}
+
+		target.intervalId = setInterval(() => {
+			this.recordTargetEvent(target, config, CMCD_EVENT_TIME_INTERVAL)
+			this.processEventTargets()
+		}, config.interval * 1000)
+
+		return true
+	}
+
+	/**
 	 * Stops the CMCD reporter. Called by the player when the reporter is disabled.
 	 *
 	 * @param flush - Whether to flush the event targets.
 	 */
 	stop(flush: boolean = false): void {
+		this.started = false
+
 		if (flush) {
 			this.flush()
 		}
@@ -581,7 +604,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *                  one exists. Passed to the target's `transform`.
 	 */
 	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
-		if (!config.events.includes(type)) {
+		if (target.disposed || !config.events.includes(type)) {
 			return
 		}
 
@@ -876,7 +899,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		this.eventTargets.forEach((target, config) => {
 			const { queue } = target
 
-			if (!queue.length) {
+			// A disposed target's queue can be non-empty again if a failed
+			// batch was re-queued after disposal; it must stay unsent.
+			if (target.disposed || !queue.length) {
 				return
 			}
 
@@ -906,6 +931,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param data - The data to send in the event report.
 	 */
 	private async sendEventReport(config: CmcdEventReportConfigNormalized<C>, data: Cmcd[]): Promise<void> {
+		// Captured before the await: CTA-5004-B scopes 410 suppression to "the
+		// remainder of the current session", so a 410 that resolves after a
+		// session change belongs to a session that has already ended.
+		const epoch = this.sessionEpoch
 		const options = createEncodingOptions(CMCD_EVENT_MODE, config)
 		const response = await this.requester({
 			url: config.url,
@@ -919,7 +948,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const { status } = response
 
 		if (status === 410) {
-			this.disposeEventTarget(config)
+			if (epoch === this.sessionEpoch) {
+				this.disposeEventTarget(config)
+			}
 		} else if (status === 429 || (status > 499 && status < 600)) {
 			throw new Error(`Event report failed with status ${status}`)
 		}
@@ -935,8 +966,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Permanently removes an event target: cancels its timer and removes it from the
-	 * eventTargets map. Used when the collector signals the target is gone (HTTP 410).
+	 * Silences an event target for the remainder of the current session: cancels
+	 * its timer, drops its queue, and blocks further enqueues. Used when the
+	 * collector signals the target is gone (HTTP 410). A session change via
+	 * `update({ sid })` restores the target.
 	 */
 	private disposeEventTarget(config: CmcdEventReportConfigNormalized<C>): void {
 		const target = this.eventTargets.get(config)
@@ -944,20 +977,34 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 		this.disarmInterval(target)
-		this.eventTargets.delete(config)
+		target.disposed = true
+		target.queue.length = 0
 	}
 
 	/**
 	 * Resets the session related data. Called when the session ID changes.
 	 */
 	private resetSession(): void {
+		this.sessionEpoch++
+
 		// msd is once per Session ID: a new session re-arms the gate, and a
 		// stored-but-unsent value from the old session must not leak forward.
 		this.msd = NaN
 
-		this.eventTargets.forEach((target) => {
+		this.eventTargets.forEach((target, config) => {
 			target.sn = 0
 			target.msdSent = false
+
+			// 410 disposal is scoped to the session that received it. Timers
+			// re-arm only if the reporter is started, without the immediate
+			// initial report start() fires.
+			if (target.disposed) {
+				target.disposed = false
+
+				if (this.started) {
+					this.armInterval(target, config)
+				}
+			}
 		})
 
 		this.requestTarget.sn = 0
