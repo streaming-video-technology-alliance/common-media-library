@@ -600,7 +600,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const { transform } = config
 
 		if (!transform) {
-			this.queueTargetEvent(target, item, type)
+			this.queueTargetEvent(target, config, item, type)
 			return
 		}
 
@@ -634,7 +634,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 
-		this.queueTargetEvent(target, report, type)
+		this.queueTargetEvent(target, config, report, type)
 	}
 
 	/**
@@ -646,18 +646,22 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * the session identity carried by `sid` and `msd`.
 	 *
 	 * @param target - The target to queue the report for.
+	 * @param config - The configuration for the target.
 	 * @param report - The finished report data.
 	 * @param type - The type of event being reported.
 	 */
-	private queueTargetEvent(target: CmcdEventTarget, report: Cmcd, type: CmcdEventType): void {
+	private queueTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
 		report.e = type
 		report.sn = target.sn++
 		report.sid = this.sid
 
-		// msd may only ride a report through the once-per-target gate; a value
-		// smuggled in via per-call data or a transform is stripped, so the gate
-		// stays the single source of once-per-session semantics.
-		if (!isNaN(this.msd) && !target.msdSent) {
+		// msd may only ride a report through the once-per-target gate, and only
+		// when the target's key filter will retain it (msd is never force-added
+		// at encode time): consuming the gate for a report that filters msd out
+		// would silently drop it for the session. A value smuggled in via
+		// per-call data or a transform is stripped, so the gate stays the
+		// single source of once-per-session semantics.
+		if (!isNaN(this.msd) && !target.msdSent && config.enabledKeys?.includes('msd')) {
 			report.msd = this.msd
 			target.msdSent = true
 		}
@@ -823,10 +827,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		// msd may only ride a report through the once-per-session gate; a value
 		// smuggled in via per-call data or the transform is stripped, so the
-		// gate stays the single source of once-per-session semantics.
-		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
+		// gate stays the single source of once-per-session semantics. The gate
+		// is consumed after preparation, and only if the key filter retained
+		// msd, so a filtered-out msd is not silently dropped for the session.
+		const sendMsd = !isNaN(this.msd) && !this.requestTarget.msdSent
+
+		if (sendMsd) {
 			cmcdData.msd = this.msd
-			this.requestTarget.msdSent = true
 		}
 		else {
 			delete cmcdData.msd
@@ -836,6 +843,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
 		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
+
+		if (sendMsd && cmcd.msd !== undefined) {
+			this.requestTarget.msdSent = true
+		}
 
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:

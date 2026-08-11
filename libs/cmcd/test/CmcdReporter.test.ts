@@ -392,6 +392,57 @@ describe('CmcdReporter', () => {
 		})
 	})
 
+	describe('msd gate', () => {
+		it('does not consume the gate when msd is not an enabled key in request mode', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			reporter.update({ msd: 800 })
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+			ok(!req.url.includes('msd'))
+			// The gate must stay open: the report never carried msd. Asserted on
+			// the private flag because a fixed config has no observable follow-up.
+			equal((reporter as unknown as { requestTarget: { msdSent: boolean; }; }).requestTarget.msdSent, false)
+		})
+
+		it('does not consume a target gate when msd is not in the target enabledKeys', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd-no-msd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: ['sid', 'v', 'e', 'ts', 'sn'],
+						batchSize: 1,
+					},
+					{
+						url: 'https://example.com/cmcd-msd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.update({ msd: 800 })
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok(!(requests[0].body as string).includes('msd'))
+			ok((requests[1].body as string).includes('msd=800'))
+
+			const targets = [...(reporter as unknown as { eventTargets: Map<unknown, { msdSent: boolean; }>; }).eventTargets.values()]
+			equal(targets[0].msdSent, false)
+			equal(targets[1].msdSent, true)
+		})
+	})
+
 	describe('isRequestEnabled', () => {
 		it('returns true when enabledKeys are configured', () => {
 			const { requester } = createMockRequester()
