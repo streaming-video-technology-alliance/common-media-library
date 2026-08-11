@@ -36,13 +36,6 @@ jobs:
         run: npm run notes
 
       - name: Draft Release
-        uses: actions/create-release@v1
+        run: gh release create "v${PKG_VERSION}" --draft --target main --title "${PKG_VERSION}" --notes-file ./RELEASE.md
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
-        with:
-          tag_name: v${{ env.PKG_VERSION }}
-          release_name: ${{ env.PKG_VERSION }}
-          commitish: main
-          body_path: ./RELEASE.md
-          draft: true
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GH_ACTIONS }}
