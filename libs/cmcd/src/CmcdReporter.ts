@@ -951,8 +951,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * Resets the session related data. Called when the session ID changes.
 	 */
 	private resetSession(): void {
-		this.eventTargets.forEach(target => target.sn = 0)
+		// msd is once per Session ID: a new session re-arms the gate, and a
+		// stored-but-unsent value from the old session must not leak forward.
+		this.msd = NaN
+
+		this.eventTargets.forEach((target) => {
+			target.sn = 0
+			target.msdSent = false
+		})
+
 		this.requestTarget.sn = 0
+		this.requestTarget.msdSent = false
 		this.lastEmitted = {}
 	}
 }

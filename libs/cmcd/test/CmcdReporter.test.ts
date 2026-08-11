@@ -441,6 +441,41 @@ describe('CmcdReporter', () => {
 			equal(targets[0].msdSent, false)
 			equal(targets[1].msdSent, true)
 		})
+
+		it('re-arms the msd gate when the session changes', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.update({ msd: 800 })
+			reporter.recordEvent(CmcdEventType.ERROR)
+			const first = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+			reporter.update({ sid: 'new-session', msd: 950 })
+			reporter.recordEvent(CmcdEventType.ERROR)
+			const second = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[0].body as string).includes('msd=800'))
+			ok(first.url.includes('msd%3D800'))
+			ok((requests[1].body as string).includes('msd=950'))
+			ok(second.url.includes('msd%3D950'))
+		})
+
+		it('clears an unsent msd when the session changes', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.update({ msd: 800 })
+			reporter.update({ sid: 'new-session' })
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+			// The stored msd belonged to the previous session and was never
+			// sent; it must not leak into the new one.
+			ok(!req.url.includes('msd'))
+		})
 	})
 
 	describe('isRequestEnabled', () => {
