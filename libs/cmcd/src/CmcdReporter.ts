@@ -288,6 +288,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private timeOrigin = performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
 	private data: Cmcd = {}
 	private config: CmcdReporterConfigNormalized<C>
+	private sid: string
 	private msd: number = NaN
 	private eventTargets = new Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>()
 	private lastEmitted: Partial<Pick<Cmcd, StateField>> = {}
@@ -308,9 +309,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 */
 	constructor(config: Partial<CmcdReporterConfig<C>>, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
+		this.sid = this.config.sid
 		this.data = {
 			cid: this.config.cid,
-			sid: this.config.sid,
 			v: this.config.version,
 		}
 		this.requester = requester
@@ -424,14 +425,20 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *
 	 * A `sid` change resets the dedup baseline.
 	 *
-	 * `msd` must be a finite, non-negative number of milliseconds; it is
-	 * rounded to the nearest integer, and invalid values are ignored.
+	 * `sid` and `msd` are session-owned: the reporter tracks them itself and
+	 * stamps them onto every outgoing report, so this method is the only way
+	 * to change them. Supplying either per call on
+	 * {@link CmcdReporter.recordEvent}, {@link CmcdReporter.recordResponseReceived},
+	 * or {@link CmcdReporter.createRequestReport} has no effect. `msd` must be
+	 * a finite, non-negative number of milliseconds; it is rounded to the
+	 * nearest integer, and invalid values are ignored.
 	 *
 	 * @param data - The data to update.
 	 */
 	update(data: Partial<Cmcd>): void {
-		if (data.sid && data.sid !== this.data.sid) {
+		if (data.sid && data.sid !== this.sid) {
 			this.resetSession()
+			this.sid = data.sid
 		}
 
 		const { msd } = data
@@ -443,9 +450,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			this.msd = Math.round(msd)
 		}
 
-		// msd is tracked separately via this.msd and sent once per target,
-		// so it is stripped from the persistent data store after each update.
-		this.data = { ...this.data, ...data, msd: undefined }
+		// sid and msd are session-owned: tracked in their own fields, stripped
+		// from the persistent store, and stamped onto each report at queue time.
+		this.data = { ...this.data, ...data, sid: undefined, msd: undefined }
 
 		// Auto-trigger state-change events for any tracked field whose value
 		// differs from the last wire-emitted value. Comparing against lastEmitted
@@ -491,7 +498,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param data - Additional data to record with the event. This data
 	 *               only applies to this event report, except for the dedup
 	 *               field of a state-change event, which is also persisted
-	 *               into the reporter's data store.
+	 *               into the reporter's data store. Session-owned keys
+	 *               (`sid`, `msd`) supplied here are ignored; the reporter
+	 *               stamps its own values.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
 		this.emitEvent(type, data)
@@ -578,9 +587,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		// Each target gets its own copy, so a transform that mutates in
 		// place affects neither sibling targets nor the persistent data.
+		// The canonical sid is stamped over any per-call value here so a
+		// transform sees the session identity the report will carry.
 		const item: Cmcd = {
 			...this.data,
 			...data,
+			sid: this.sid,
 			e: type,
 			ts: data.ts ?? Date.now(),
 		}
@@ -630,7 +642,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * to the target's queue.
 	 *
 	 * Called after any transform has run, so a transform cannot bypass the
-	 * target's `events` filter via `e` or break `sn` continuity.
+	 * target's `events` filter via `e`, break `sn` continuity, or substitute
+	 * the session identity carried by `sid` and `msd`.
 	 *
 	 * @param target - The target to queue the report for.
 	 * @param report - The finished report data.
@@ -639,10 +652,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private queueTargetEvent(target: CmcdEventTarget, report: Cmcd, type: CmcdEventType): void {
 		report.e = type
 		report.sn = target.sn++
+		report.sid = this.sid
 
+		// msd may only ride a report through the once-per-target gate; a value
+		// smuggled in via per-call data or a transform is stripped, so the gate
+		// stays the single source of once-per-session semantics.
 		if (!isNaN(this.msd) && !target.msdSent) {
 			report.msd = this.msd
 			target.msdSent = true
+		}
+		else {
+			delete report.msd
 		}
 
 		target.queue.push(report)
@@ -776,7 +796,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return report
 		}
 
-		const merged: Cmcd = { ...this.data, ...data }
+		// The canonical sid is stamped over any per-call value here so a
+		// transform sees the session identity the report will carry.
+		const merged: Cmcd = { ...this.data, ...data, sid: this.sid }
 		const { transform } = this.config
 		let cmcdData: Cmcd | null = merged
 
@@ -797,10 +819,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		// Reporter-owned fields are stamped after the transform runs.
 		cmcdData.sn = this.requestTarget.sn++
+		cmcdData.sid = this.sid
 
+		// msd may only ride a report through the once-per-session gate; a value
+		// smuggled in via per-call data or the transform is stripped, so the
+		// gate stays the single source of once-per-session semantics.
 		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
 			cmcdData.msd = this.msd
 			this.requestTarget.msdSent = true
+		}
+		else {
+			delete cmcdData.msd
 		}
 
 		const url = new URL(report.url)

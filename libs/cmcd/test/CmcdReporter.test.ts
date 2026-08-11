@@ -195,6 +195,203 @@ describe('CmcdReporter', () => {
 		})
 	})
 
+	describe('reserved session keys', () => {
+		it('stamps the reporter sid over a per-call sid on recordEvent', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { sid: 'INJECTED' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="test-session"'))
+			ok(!(requests[0].body as string).includes('INJECTED'))
+		})
+
+		it('stamps the reporter sid over a per-call sid on recordResponseReceived', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS],
+					batchSize: 1,
+				}],
+			}), requester)
+
+			reporter.recordResponseReceived({
+				status: 200,
+				request: { url: 'https://cdn.example.com/segment.mp4' },
+			}, { sid: 'INJECTED' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="test-session"'))
+			ok(!(requests[0].body as string).includes('INJECTED'))
+		})
+
+		it('stamps the reporter sid over a per-call sid on createRequestReport', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' }, { sid: 'INJECTED' })
+
+			ok(req.url.includes('sid%3D%22test-session%22'))
+			ok(!req.url.includes('INJECTED'))
+		})
+
+		it('stamps the reporter sid over a transform-written sid in event mode', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.ERROR],
+					enabledKeys: [...EVENT_KEYS],
+					batchSize: 1,
+					transform: report => ({ ...report, sid: 'EVIL' }),
+				}],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="test-session"'))
+			ok(!(requests[0].body as string).includes('EVIL'))
+		})
+
+		it('stamps the reporter sid over a transform-written sid in request mode', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				transform: data => ({ ...data, sid: 'EVIL' }),
+			}), requester)
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+			ok(req.url.includes('sid%3D%22test-session%22'))
+			ok(!req.url.includes('EVIL'))
+		})
+
+		it('shows transforms the canonical sid even when a per-call sid is supplied', async () => {
+			const { requester } = createMockRequester()
+			const seen: Array<string | undefined> = []
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.ERROR],
+					enabledKeys: [...EVENT_KEYS],
+					batchSize: 1,
+					transform: (report) => {
+						seen.push(report.sid)
+						return report
+					},
+				}],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { sid: 'INJECTED' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			deepEqual(seen, ['test-session'])
+		})
+
+		it('strips a per-call msd when the gate is closed on recordEvent', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { msd: 5000 })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok(!(requests[0].body as string).includes('msd'))
+		})
+
+		it('strips a per-call msd when the gate is closed on recordResponseReceived', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'msd'],
+					batchSize: 1,
+				}],
+			}), requester)
+
+			reporter.recordResponseReceived({
+				status: 200,
+				request: { url: 'https://cdn.example.com/segment.mp4' },
+			}, { msd: 5000 })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok(!(requests[0].body as string).includes('msd'))
+		})
+
+		it('strips a per-call msd when the gate is closed on createRequestReport', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' }, { msd: 5000 })
+
+			ok(!req.url.includes('msd'))
+		})
+
+		it('sends the canonical msd when a per-call msd rides an open gate', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.update({ msd: 800 })
+			reporter.recordEvent(CmcdEventType.ERROR, { msd: 5000 })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('msd=800'))
+			ok(!(requests[0].body as string).includes('5000'))
+		})
+
+		it('strips a transform-written msd when the gate is closed', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.ERROR],
+					enabledKeys: [...EVENT_KEYS],
+					batchSize: 1,
+					transform: report => ({ ...report, msd: 4444 }),
+				}],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok(!(requests[0].body as string).includes('msd'))
+		})
+
+		it('ignores update({ sid: undefined }) and keeps reporting under the current sid', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			reporter.update({ sid: undefined })
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[1].body as string).includes('sid="test-session"'))
+			// No session reset happened: the sequence number kept counting.
+			ok((requests[1].body as string).includes('sn=1'))
+		})
+	})
+
 	describe('isRequestEnabled', () => {
 		it('returns true when enabledKeys are configured', () => {
 			const { requester } = createMockRequester()

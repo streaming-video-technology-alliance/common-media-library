@@ -821,7 +821,7 @@ The first argument is a copy made for this one report, so you can mutate it in p
 
 ### What a transform cannot change
 
-The reporter re-stamps `e` and assigns `sn` and `msd` after your transform returns, so a transform cannot change a report's event type to slip past a target's `events` filter, cannot create gaps in sequence numbering, and cannot replay the media-start-delay marker. Cancelling a report consumes neither a sequence number nor `msd`: wire `sn` values stay contiguous per destination, and `msd` rides the next report that is actually sent.
+The reporter re-stamps `e` and `sid`, and assigns `sn` and `msd`, after your transform returns, so a transform cannot change a report's event type to slip past a target's `events` filter, cannot substitute the session ID, cannot create gaps in sequence numbering, and cannot replay the media-start-delay marker. Cancelling a report consumes neither a sequence number nor `msd`: wire `sn` values stay contiguous per destination, and `msd` rides the next report that is actually sent.
 
 A transform also cannot remove a key the event requires. Every event needs `e` and `ts`; state-change events need the field they signal (`sta`, `pr`, `cid`, `bg`, `br`), custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these, the reporter puts back the value it had beforehand. It does not invent values: a required key that was already missing before your transform ran stays missing, since that is a bug at the call site rather than something the transform did.
 
