@@ -145,10 +145,6 @@ export class IsoBoxWriteView {
 	 * @param value - The value to write.
 	 */
 	writeTerminatedString = (value: string): void => {
-		if (value.length === 0) {
-			return
-		}
-
 		for (let c = 0, len = value.length; c < len; c++) {
 			this.writeUint(value.charCodeAt(c), 1)
 		}

@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `writeTerminatedString` now writes the null terminator for empty strings, so `writeEmsg` output with an empty `value` or `schemeIdUri` no longer misaligns the fields that follow (version 1 `messageData` lost its head to the `value` read; version 0 numeric fields were garbled) ([#411](https://github.com/streaming-video-technology-alliance/common-media-library/issues/411))
+
 ## [1.0.4] - 2026-07-28
 
 ### Changed
