@@ -15,7 +15,7 @@ status: draft
 
 Add a `createChildReporter()` method to `CmcdReporter`. It creates a child reporter for another player that joins the same CMCD session. The main use case is the interstitial asset players of hls.js and Shaka.
 
-A child owns the state of its own playback: `cid`, `sta`, `pt`, `bl`, `pr`, `br`, `nr`, its state-change dedup (duplicate suppression) baseline, and its request-mode report config. All session-wide state stays with the root reporter: the `sid`, every sequence number, the batched event queues and their timers, the session-wide `bg`, and the once-per-session `msd`. The result is one session on the wire: one `sid`, one increasing `sn` sequence per event target across all players, one `msd`, one stream of periodic reports.
+A child owns the state of its own playback: `cid`, `sta`, `pt`, `bl`, `pr`, `br`, `nr`, its state-change dedup (duplicate suppression) baseline, and its request-mode report config. All session-wide state stays with the root reporter: the `sid`, every sequence number, the batched event queues and their timers, the session-wide `bg`, and the once-per-session `msd`. The result is one session on the wire: one `sid`, one increasing `sn` sequence per target in each mode across all players, one `msd`, one stream of periodic reports.
 
 The child is a real `CmcdReporter`, so the same player code works with a root or a child. Session-owned config (`sid`, `eventTargets`, `version`) is rejected at compile time, and there is no requester parameter. A child cannot change the session's identity, targets, or transport, and the reserved keys `sid` and `msd` are stamped by the reporter after all caller-supplied data, so no reporting call can override them either. A companion `activate()` method selects which reporter's data goes into periodic `TIME_INTERVAL` reports, so those reports describe the content the user is watching.
 
@@ -40,7 +40,7 @@ const child = reporter.createChildReporter({ cid: 'ad-creative-42' })
 
 child.update({ sta: CmcdPlayerState.PLAYING, pt: 0 }) // child-owned playback state
 child.recordEvent(CMCD_EVENT_AD_START)                // goes into the root's queues with the next shared sn
-child.createRequestReport(segmentRequest)             // shared request-mode sn, child's cid
+child.createRequestReport(segmentRequest)             // session sn for the child's request target, child's cid
 child.activate()                                      // TIME_INTERVAL reports now use the child's data
 ```
 
@@ -81,9 +81,9 @@ const child = reporter.createChildReporter({
 
 The child is a real `CmcdReporter`. Every method a player calls (`update()`, `recordEvent()`, `recordResponseReceived()`, `createRequestReport()`, `start()`, `stop()`, `flush()`, `isRequestReportingEnabled()`) has the same signature and works on a child. The same integration code drives the primary player and every asset player.
 
-The child **owns** (per playback): its data store (`cid`, `sta`, `pt`, `bl`, `pr`, `br`, `mtp`, `ot`, `nr`, …), its state-change dedup baseline, and its whole request-mode report config (`enabledKeys`, `transmissionMode`, `customHeaderMap`, `transform`; useful when an ad CDN needs query params instead of custom headers, or routes custom keys differently).
+The child **owns** (per playback): its data store (`cid`, `sta`, `pt`, `bl`, `pr`, `br`, `mtp`, `ot`, `nr`, …), its state-change dedup baseline, and its whole request-mode report config (`enabledKeys`, `transmissionMode`, `customHeaderMap`, `transform`, `target`; useful when an ad CDN needs query params instead of custom headers, or routes custom keys differently).
 
-The child **shares** (per session, root-owned): the `sid`, each event target's version, `sn` counter and queue, the request-mode version and `sn` counter, the `TIME_INTERVAL` timers, the once-per-session `msd`, the session-wide backgrounded state (`bg`), and the event-report requester.
+The child **shares** (per session, root-owned): the `sid`, each event target's version, `sn` counter and queue, the request-mode version and its per-target-identity `sn` counters, the `TIME_INTERVAL` timers, the once-per-session `msd`, the session-wide backgrounded state (`bg`), and the event-report requester.
 
 `bg` is root-owned and root-written: `child.update({ bg })` is ignored, the same as `child.update({ sid })`. The key means "all players in a session" are hidden, which no single player can establish. See [`bg`](#bg-is-root-owned).
 
@@ -123,16 +123,16 @@ child.activate()    // TIME_INTERVAL reports now use the ad's cid/sta/pt/bl
 reporter.activate() // reports use primary data again
 ```
 
-`activate()` is optional. Without it, periodic reports keep describing the root's playback. A child's `stop()` returns the active role to the root if that child held it, so normal teardown needs no extra code. Two details: the return-to-root happens on every `stop()`, not only at teardown, and `start()` never takes the active role, because that would let a preloading child take it from the presenting player. A controller that stops and restarts a child that is still presenting (for example, a runtime CMCD disable/enable toggle) must call `activate()` again after `start()`.
+`activate()` is optional. Without it, periodic reports keep describing the root's playback. A child's `stop()` returns the active role to the reporter that created it (the root, for children the player creates directly), so normal teardown needs no extra code, including in nested flows: an ad SDK's per-creative grandchild hands the role back to the still-presenting interstitial child, not to the root. Two details: the return-to-creator happens on every `stop()`, not only at teardown, and `start()` never takes the active role, because that would let a preloading child take it from the presenting player. A controller that stops and restarts a child that is still presenting (for example, a runtime CMCD disable/enable toggle) must call `activate()` again after `start()`.
 
 ### Lifecycle
 
 Children are cheap and disposable. Create one per asset playback and drop it.
 
 - `child.start()`: no-op. The session's timers are already running, and player churn must not send extra `t` events.
-- `child.stop()`: returns the active role to the root if held. Session timers are not touched.
+- `child.stop()`: returns the active role to its creating reporter if held. Session timers are not touched.
 - `child.stop(true)` / `child.flush()`: flushes the session's queues. A child's recorded events are never lost on teardown, because they already live in the root's queues.
-- There is no dispose method to forget. The root holds no reference to its children, except the active-reporter pointer, which is cleared by `child.stop()` or by the next `activate()` (see Drawbacks for what happens if neither is called). A dropped child is normal garbage. A child holds a strong reference to its root, so the session stays alive while any child lives. This is intended.
+- There is no dispose method to forget. The root holds no reference to its children, except the active-reporter pointer, which is cleared by `child.stop()` or by the next `activate()` (see Drawbacks for what happens if neither is called). A dropped child is normal garbage. A child holds strong references to its root and to the reporter that created it (the same object, for a direct child), so the session stays alive while any child lives. This is intended.
 
 ### hls.js interstitials integration
 
@@ -143,11 +143,14 @@ The whole change lives inside hls.js: one config field, one `createChildReporter
 // Typed structurally, so an app that resolves a separate copy of
 // @svta/cml-cmcd can still inject. `Pick` drops the class's private
 // members, which are what make a bare `CmcdReporter` annotation
-// nominal and reject cross-copy instances. See Drawbacks.
+// nominal and reject cross-copy instances. `createChildReporter` is
+// redeclared rather than picked: a picked factory still returns the
+// nominal class, which reintroduces the cross-copy failure. See Drawbacks.
 type InjectedCmcdReporter = Pick<CmcdReporter,
 	'update' | 'recordEvent' | 'recordResponseReceived' | 'createRequestReport' |
-	'createChildReporter' | 'activate' | 'start' | 'stop' | 'flush' |
-	'isRequestReportingEnabled'>;
+	'activate' | 'start' | 'stop' | 'flush' | 'isRequestReportingEnabled'> & {
+	createChildReporter(config?: CmcdChildReporterConfig): InjectedCmcdReporter;
+};
 
 type CMCDControllerConfig = {
 	// …existing: sessionId, contentId, useHeaders, includeKeys, eventTargets, loader…
@@ -195,9 +198,9 @@ parentReporter.activate() // reports use primary data again
 
 ### Non-rendered players and `nr`
 
-A session with children is a session where several players fetch media and at most one renders it. That is exactly what `nr` ("non rendered") is for: "True when the content being retrieved by a player is not rendered as audio or video. The key SHOULD only be sent when it is TRUE."
+A session with children is a session where several players fetch media while, in the common sequential case, only one renders it. That is exactly what `nr` ("non rendered") is for: "True when the content being retrieved by a player is not rendered as audio or video. The key SHOULD only be sent when it is TRUE."
 
-`nr` needs no new machinery, because it lives in each reporter's own data store, which is already per player. It does need wiring, and the companion integrations should do it. The invariant is one line: **the active reporter is the one that does not set `nr`.** Every other reporter in the session is fetching content nobody is watching.
+`nr` needs no new machinery, because it lives in each reporter's own data store, which is already per player. It does need wiring, and the companion integrations should do it. The rule is: **`nr` reflects each player's actual rendering state, not its periodic-report role.** A player sets `nr: true` while it fetches content it is not rendering, and clears it when it renders. In a fully sequential session that coincides with activation (the presenting player is the active reporter and the only one not setting `nr`), but activation does not imply `nr`: `activate()` selects whose data feeds the `t` reports and establishes nothing about other playbacks. During dual presentation (a PiP ad, an overlay), the non-active player is still rendering and must not set `nr`.
 
 In hls.js terms:
 
@@ -205,7 +208,7 @@ In hls.js terms:
 - The primary player sets `nr: true` while an interstitial presents on its own media element, and clears it on `INTERSTITIALS_PRIMARY_RESUMED`, next to the existing `activate()` call.
 - `interstitialAppendInPlace` changes nothing: hls.js transfers the media element to the asset player at asset start, so the child is the rendering player and the primary is the non-rendered one for the ad's duration, the same as the own-element case (see Unresolved questions, item 2).
 
-Preloading otherwise needs no changes: an asset player that buffers ahead sends request-mode reports (with its own `cid`, `sta: 'd'`, and `nr: true`) using the shared request-mode `sn` while another player presents.
+Preloading otherwise needs no changes: an asset player that buffers ahead sends request-mode reports (with its own `cid`, `sta: 'd'`, and `nr: true`) drawing from its request target's `sn` sequence while another player presents.
 
 ### Ad-insertion SDKs
 
@@ -230,7 +233,7 @@ ad.stop()
 
 ### New public surface
 
-One new type-only file, `CmcdChildReporterConfig.ts`, exported from the index via `export type *`, plus two methods on `CmcdReporter`. Expected `cml-cmcd.api.md` diff: the `CmcdChildReporterConfig` type, `CmcdReporter.createChildReporter()`, and `CmcdReporter.activate()`.
+One new type-only file, `CmcdChildReporterConfig.ts`, exported from the index via `export type *`, two methods on `CmcdReporter`, and one new optional member on `CmcdRequestReportConfig`. Expected `cml-cmcd.api.md` diff: the `CmcdChildReporterConfig` type, `CmcdReporter.createChildReporter()`, `CmcdReporter.activate()`, and `CmcdRequestReportConfig.target` (see [Request-mode sequence numbers](#request-mode-sequence-numbers)).
 
 ```ts
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
@@ -249,9 +252,13 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  * at compile time, even through a widened, non-literal object, and the
  * tooltip explains why.
  *
+ * @typeParam C - The shape of the player's `customData`, inherited from the
+ *                creating reporter's `C`. Defaults to
+ *                `Record<string, unknown>`.
+ *
  * @public
  */
-export type CmcdChildReporterConfig = Omit<CmcdRequestReportConfig, 'version'> & {
+export type CmcdChildReporterConfig<C = Record<string, unknown>> = Omit<CmcdRequestReportConfig<C>, 'version'> & {
 	/**
 	 * The content ID of the playback this child reports on. It is deliberately
 	 * NOT inherited from the parent: omitting it reports no `cid`, which is
@@ -279,7 +286,7 @@ The single `Omit` is not a retreat from the `never`-typed locks argued for in [R
 One maintenance obligation follows from the inheritance direction: a **new session-owned field** added to `CmcdReporterConfig` needs an explicit `never` lock added here. It is not silently child-overridable (it is not inherited at all, and object literals reject it as an excess property), but without the lock it is also not explained. A type-level test pins the full lock list so the omission is caught in review.
 
 ```ts
-export class CmcdReporter {
+export class CmcdReporter<C = Record<string, unknown>> {
 	/**
 	 * Creates a child reporter that reports its own playback under this
 	 * reporter's session. The child owns its data store, its state-change
@@ -288,19 +295,21 @@ export class CmcdReporter {
 	 * requester. Calling this on a child creates another child of the same
 	 * root (the hierarchy is flat).
 	 */
-	createChildReporter(config: CmcdChildReporterConfig = {}): CmcdReporter
+	createChildReporter(config: CmcdChildReporterConfig<C> = {}): CmcdReporter<C>
 
 	/**
 	 * Makes this reporter the session's active playback. TIME_INTERVAL
 	 * reports then use this reporter's data. The root is active by default.
-	 * A child's `stop()` returns the active role to the root if that child
-	 * held it. An explicit `activate()` is always honored, including on a
-	 * previously stopped child; call it again after restarting a child that
-	 * is still presenting.
+	 * A child's `stop()` returns the active role to the reporter that
+	 * created it, if that child held the role. An explicit `activate()` is
+	 * always honored, including on a previously stopped child; call it again
+	 * after restarting a child that is still presenting.
 	 */
 	activate(): void
 }
 ```
+
+The reporter is generic over the player's `customData` shape (`C`), threaded through every transform and request argument since [#402](https://github.com/streaming-video-technology-alliance/common-media-library/pull/402), and the child surface preserves it: a child created from a `CmcdReporter<{ kind: string }>` is a `CmcdReporter<{ kind: string }>`, so its inherited or overridden `transform` and its `createRequestReport()`/`recordResponseReceived()` arguments are typed against the same requests as the parent's. Verified against the built types: with a bare (unparameterized) signature, a child accepts `customData` the parent rejects at compile time; parameterizing the config and factory over `C` closes that hole.
 
 There is no requester parameter on `createChildReporter`: a child cannot change the session's transport. At runtime the implementation reads only the request-report members and `cid` from the config. A session-owned field passed through `as any` or from plain JavaScript has no effect. This is a tested invariant, not an implementation accident.
 
@@ -313,6 +322,8 @@ Locking the child *config* is only half of "a child cannot change the session." 
 
 So `sid` and `msd` must be stamped by the reporter **after** all caller-supplied data, in both modes. This is not a new mechanism. [#399](https://github.com/streaming-video-technology-alliance/common-media-library/pull/399) already established it for transforms: `queueTargetEvent()` re-stamps `e` and assigns `sn` and `msd` after a transform runs, so "a transform cannot bypass the target's `events` filter via `e` or break `sn` continuity", and the request path stamps its reporter-owned fields the same way. The fix extends that existing stamping step to cover `sid`, and makes the `msd` gate authoritative rather than merely additive. It lands in the [prerequisite PR](#prerequisite-fixes), because it changes root behavior too.
 
+`bg` needs the same stamp on **child** paths, and it belongs to this feature rather than the prerequisite PR, because root-owned `bg` is introduced here: there is no today-bug to fix. For the root, a per-call `bg` is the root writing the key it owns and stays legal. For a child, `recordEvent(type, { bg })`, `createRequestReport(request, { bg })`, or either transform could otherwise override a visible root and publish a false session-wide claim, so on every child path `bg` is stamped from session state after all caller-supplied data and transforms, exactly like `sid`. Ignoring `child.update({ bg })` alone would seal only one of the four doors.
+
 `v` needs no such treatment, which is worth stating because the opposite is easy to assume. `prepareCmcdData()` already re-stamps `v` from the encoding options on every report in both modes, so neither per-call data nor `update({ v })` can change the emitted version.
 
 ### State partition
@@ -322,13 +333,13 @@ So `sid` and `msd` must be stamped by the reporter **after** all caller-supplied
 | `sid` | Session | The spec's session spans primary and interstitial content on one device. Children never store a `sid`. It is injected from the root when each report is created, together with the `sn`, so a root `sid` change needs no notifications. |
 | `v` / config `version` | Session, per mode and per target | Root-owned, but *not* one value per session. Each event target already carries its own `version`, and the request path uses the top-level one. `v` is re-stamped from the encoding options on every report, so children inherit whatever the target or mode they are reporting through is configured for, and cannot set either. See [Versions are per mode and per target](#versions-are-per-mode-and-per-target). |
 | Per-target event `sn` counters | Session | `sn` is per (session, mode, target) and "MUST be reset to zero on the start of a new session-id". It is assigned at enqueue on the root's counters, so all players form one increasing sequence per target with no gaps. This is the bug being fixed. |
-| Request-mode `sn` counter | Session | Same spec clause. Separate counters would emit duplicate `sn` values whenever players share a CDN, which is the normal interstitials case. See Rationale for the shared-counter argument. |
-| `msd` value + per-target/request-mode `msdSent` flags | Session | "MUST only be sent once per Session ID and MUST be sent for each reporting mode which is active within the player." In a multi-player session, this design applies the per-mode clause to the session, not to each player: the root's flags gate emission no matter which player's report carries the value, so a child does not re-send a value the session already sent. |
-| Event queues, batching, failure re-queue, HTTP 410 disposal | Session | One owner by construction: no queue edits from two owners, no duplicate targets, and a 410 silences the target for every player at once. |
+| Request-mode `sn` counters | Session, per configured target identity | Same spec clause: `sn` is per (session, mode, target). Counters live on the session keyed by the request config's `target` identity, so reporters sharing an identity share one increasing sequence, and per-child counters can never emit duplicates. Reporters that set no identity share the default one. See [Request-mode sequence numbers](#request-mode-sequence-numbers). |
+| `msd` value + per-target `msdSent` flags (event and request targets) | Session | "MUST only be sent once per Session ID and MUST be sent for each reporting mode which is active within the player." In a multi-player session, this design applies the per-mode clause to the session, not to each player: the root's flags gate emission no matter which player's report carries the value, so a child does not re-send a value the session already sent. |
+| Event queues, batching, failure re-queue, HTTP 410 disposal | Session | One owner by construction: no queue edits from two owners, no duplicate targets, and a 410 silences the target for every player at once, for the remainder of the current session (see [Target disposal](#target-disposal-and-failure-re-queue)). |
 | `TIME_INTERVAL` timers | Session | Exactly one periodic report stream per target per session. Child `start()`/`stop()` cannot arm or disarm the timers. |
-| Active-reporter pointer (new) | Session | Selects whose data goes into `t` reports. Root by default; changed by `activate()`; returned to the root by `child.stop()`. |
+| Active-reporter pointer (new) | Session | Selects whose data goes into `t` reports. Root by default; changed by `activate()`; returned to the creating reporter by `child.stop()`. |
 | Requester | Session | Only event-report POSTs use it, and only the root sends them. |
-| Data store (`cid`, `sta`, `pr`, `bl`, `mtp`, `pt`, `br`, `ot`, `nr`, …) | Per player | These fields describe one playback. A preloading child's `sta: 'd'` must never overwrite the presenting player's data. `nr` belongs here too: in a multi-player session it is per player by definition, and the active reporter is the one that does not set it. |
+| Data store (`cid`, `sta`, `pr`, `bl`, `mtp`, `pt`, `br`, `ot`, `nr`, …) | Per player | These fields describe one playback. A preloading child's `sta: 'd'` must never overwrite the presenting player's data. `nr` belongs here too: in a multi-player session it is per player by definition, and the rendering player is the one that does not set it. |
 | `lastEmitted` dedup baseline | Per player | Dedup answers "did this player's state change". A shared baseline would suppress real transitions: an ad's `sta: 'p'` would hide the primary player's later identical resume. See State-change dedup. |
 | `bg` value + its dedup baseline | Session, root-written only | The spec scopes `bg` to *all* players in a session, which no single player can establish. Only `root.update({ bg })` writes it; `child.update({ bg })` is ignored, like `child.update({ sid })`. `bg` is injected into every report next to `sid`, so an active child's periodic reports still carry the session's backgrounded state. Its dedup baseline is session-level, so one `b` event fires per real transition. See [`bg` is root-owned](#bg-is-root-owned). |
 | Request-mode report config (`enabledKeys`, `transmissionMode`, `customHeaderMap`, `transform`) | Per player (inherited by default) | Request-mode encoding is per player/CDN. An ad CDN may need query params where the primary CDN accepts headers, or a different custom-key header routing. |
@@ -347,9 +358,9 @@ Every reporter in a session enqueues through the root's target map. `sn` is assi
 
 ### Request-mode sequence numbers
 
-`createRequestReport()` on any reporter takes the next number from the root's request-mode counter. `msd` on the request path is gated by the root's request-mode `msdSent` flag. The child's own request-report config controls the encoding.
+`createRequestReport()` on any reporter takes the next number from a session-owned counter keyed by that reporter's **request target identity**: a new optional `target` string on `CmcdRequestReportConfig`, so it is child-configurable and inherited from the creating reporter like the rest of that type. Reporters that share an identity share one increasing sequence; reporters that set none share the default identity, which preserves today's single-counter output byte for byte for every existing app. `msd` on the request path is gated per target identity, mirroring the per-target gates event mode already has. The child's own request-report config still controls the encoding.
 
-There is one shared counter for all request-mode reports, which is exactly today's behavior: `createRequestReport()` already increments a single counter regardless of which host the request goes to. Verified against the built package, with no children involved, requests to two CDNs draw from one sequence:
+The spec says sequence numbers "increase independently per each combination of mode and target," and today's single counter is not independent per target: `createRequestReport()` increments one counter regardless of which host the request goes to. Verified against the built package, with no children involved, requests to two CDNs draw from one sequence:
 
 ```text
 cdn-a.example → sn=0
@@ -358,11 +369,9 @@ cdn-b.example → sn=2   ← starts at 2, and cdn-a's activity moved it
 cdn-b.example → sn=3
 ```
 
-The spec says sequence numbers "increase independently per each combination of mode and target," and "independently" is fair to read as *cdn-a's traffic should not move cdn-b's numbers*. Under that reading this behavior is already wrong today, for a single reporter with no children.
+The purpose the standards body gives `sn` decides the design. The CTA WAVE issue that introduced the key states it exists so collectors can identify missing or duplicate entries. A shared counter defeats that purpose at every target: each report to CDN A punches a gap in CDN B's sequence, so B cannot distinguish routine gaps from lost reports. (An earlier resolution kept the shared counter for the cross-origin total order it gives an aggregator; that assigned `sn` a purpose the spec never states while defeating the one it does, and review overturned it. Collectors that need cross-target ordering have `ts`.)
 
-What this RFC changes is not the mechanism but how much it matters. A single player usually talks to one CDN, so one counter approximated one target well enough. The headline use case here, a primary player plus an interstitial from an ad CDN, is precisely the case where one counter starts describing two real targets. This proposal does not introduce the conflation, but it does make it load-bearing, so it should be settled rather than inherited: see [Unresolved questions](#unresolved-questions).
-
-Fixing it is not simply "key the counter by origin," which is why it is a question and not a decision. Origin is not target identity: one CDN serves many hostnames and one hostname can front several CDNs, so a per-origin map is a heuristic that can split one target or merge two. It is also unbounded, growing an entry per host, where today the cost is one integer. And changing it alters existing root output, so it belongs with the other behavior changes, not inside a feature addition.
+Identity is configured, not inferred, because origin is not target identity: one CDN serves many hostnames and one hostname can front several CDNs, so a per-origin map is a heuristic that can split one target or merge two, and it grows per hostname where a configured map is bounded by the identities the player names ("primary-cdn", "ad-cdn"). A single player talking to one CDN needs nothing: the default identity is one counter, exactly today. A session that spans CDNs declares an identity per CDN, on the root and on each child, and each target then sees the gapless-per-target sequence the spec's loss-detection purpose requires. Because the default preserves existing output, this lands with the feature rather than the prerequisite PR.
 
 ### Versions are per mode and per target
 
@@ -384,9 +393,9 @@ First-write-wins only works if "accepted" is defined, and today it is not. The c
 - **accepts `Infinity`**, which is stored but then dropped by the encoder, so it never reaches the wire;
 - **accepts negatives**: `update({ msd: -500 })` emits `msd=-500` today.
 
-Under last-write-wins these are ordinary input bugs, self-correcting on the next write. Under first-write-wins they become permanent: an `Infinity` or a negative accepted first would lock the session's `msd` for its whole lifetime, and in the `Infinity` case lock it to a value that can never be emitted at all, with no later valid value able to replace it. So the validation is a precondition of this design, not a tidy-up alongside it. The rule becomes: accept a finite, non-negative number, which admits `0` and rejects the rest. It lands in the [prerequisite PR](#prerequisite-fixes) because it changes root behavior.
+Under last-write-wins these are ordinary input bugs, self-correcting on the next write. Under first-write-wins they become permanent: an `Infinity` or a negative accepted first would lock the session's `msd` for its whole lifetime, and in the `Infinity` case lock it to a value that can never be emitted at all, with no later valid value able to replace it. So the validation is a precondition of this design, not a tidy-up alongside it. The rule becomes: accept a finite, non-negative number, **rounded to the nearest integer**. `msd` is integer milliseconds per spec, and the current encoder emits a fractional value verbatim (`msd=12.5` reaches the wire today), which first-write-wins would freeze for the session. Rounding rather than rejecting fits how players produce the value (float deltas from `performance.now()`) and matches the reporter's own precedent: `recordResponseReceived()` already rounds its derived timings. The rule admits `0`, normalizes `12.5` to `13`, and rejects the rest. It lands in the [prerequisite PR](#prerequisite-fixes) because it changes root behavior.
 
-This tightens today's root behavior on purpose. Today, `update({ msd })` always overwrites the stored value, and each event target and the request path capture whatever value is current at their own first report. A mid-session revision can therefore already send *different* `msd` values across targets and modes under one `sid`, which conflicts with "once per Session ID". Keeping the first accepted write guarantees one value everywhere. Emission is unchanged: at most once per target and once on the request path, per session.
+This tightens today's root behavior on purpose. Today, `update({ msd })` always overwrites the stored value, and each event target and the request path capture whatever value is current at their own first report. A mid-session revision can therefore already send *different* `msd` values across targets and modes under one `sid`, which conflicts with "once per Session ID". Keeping the first accepted write guarantees one value everywhere. Emission is unchanged in shape: at most once per event target and once per request target, per session. One ordering rule tightens (also a [prerequisite fix](#prerequisite-fixes)): a target's `msdSent` gate is consumed only when the prepared output actually retains `msd`. Today the gate closes when the value is stamped, before `enabledKeys` filtering, so a report that never carries `msd` still spends it. That is invisible for a single reporter, whose key set never changes, but false once request config is per child: a preload child that excludes `msd` from its `enabledKeys` would close a shared gate without emitting, and no later reporter could ever send the session's `msd` in that mode.
 
 About the spec's trailing qualifier, "for each reporting mode which is active within the player": this design treats the once-per-Session-ID MUST as the controlling rule in a multi-player session. The per-mode clause selects which modes must carry `msd`; the session rule caps how often it may be sent. A second player re-sending it under the same `sid` would break that cap.
 
@@ -424,18 +433,18 @@ Root `update({ sid })` resets the session as today (all shared `sn` counters to 
 | Method | Root (unchanged) | Child |
 |---|---|---|
 | `start()` | Arms timers; sends the first `t` report immediately | No-op; never takes the active role. Call `activate()` again after restarting a child that is still presenting |
-| `stop()` | Disarms timers | Returns the active role to the root if held; timers untouched |
+| `stop()` | Disarms timers | Returns the active role to its creating reporter if held; timers untouched |
 | `stop(true)` | Flush + disarm | Flushes session queues + returns the active role |
 | `flush()` | Flushes all queues | Delegates to the root (the queues cannot be split) |
-| `update()` / `recordEvent()` / `recordResponseReceived()` | As today | Child-local store and baseline (`msd` writes through to the session; `sid` and `bg` are ignored); enqueues into the root's queues |
-| `createRequestReport()` | As today | Child's request-report config; shared session `sn`/`msd` |
+| `update()` / `recordEvent()` / `recordResponseReceived()` | As today | Child-local store and baseline (`msd` writes through to the session; `sid` and `bg` are ignored, and per-call `sid`/`bg` are overwritten by the session stamp); enqueues into the root's queues |
+| `createRequestReport()` | As today | Child's request-report config; session `sn`/`msd` for the child's target identity |
 | `isRequestReportingEnabled()` | As today | Answers for the child's own `enabledKeys` |
 
 A child stays usable after `root.stop()`, exactly like the root itself: recording still enqueues, and batch-size sends still fire; only the timers are off. There is no session "destroy": releasing all references ends the session through garbage collection, as today.
 
 ### Target disposal and failure re-queue
 
-Both stay in the root's send path, unchanged. An HTTP 410 removes the target from the single session map and silences it for every player at once. A 429/5xx puts the failed batch back at the front of the single per-target queue. Children add no second owner, so the failure modes of naive queue sharing (interleaved queue edits, repeated reprocessing, re-queueing into a removed target) cannot occur.
+Both stay in the root's send path. A 429/5xx puts the failed batch back at the front of the single per-target queue. An HTTP 410 silences the target for every player at once, but only for the scope the spec gives it: "the player SHOULD immediately cease sending any further CMCD reports to that specific target URL **for the remainder of the current session**." Today's disposal outlives the session (verified against the built package): the target is deleted permanently, `resetSession()` restores nothing, so after a `sid` change the new session's events to that target are silently dropped, and a delayed 410 response from the old session deletes the target even after the new session has begun. The fix, in the [prerequisite PR](#prerequisite-fixes) because it is pre-existing single-reporter behavior, is disposal scoped to the session: disposed targets are restored on session reset, and 410 handling checks a session epoch so a stale response from a previous session cannot dispose a live target. Children add no second owner, so the failure modes of naive queue sharing (interleaved queue edits, repeated reprocessing, re-queueing into a removed target) cannot occur.
 
 ### Grandchildren
 
@@ -443,17 +452,19 @@ Both stay in the root's send path, unchanged. An HTTP 410 removes the target fro
 
 ### Concurrency
 
-Guaranteed with any number of live children: one increasing `sn` per event target, and one increasing `sn` across request mode, because all assignment goes through the root's counters on one thread; independent stores and baselines, so a preloading child's `sta: 'd'` never affects the presenting player's reports; `msd`/`msdSent` gate once-only keys no matter which reporter writes first; exactly one periodic report stream exists. Note the asymmetry: event mode is per target, request mode is one counter for every target, which is today's behavior and an open question rather than a guarantee this proposal makes (see [Unresolved questions](#unresolved-questions)). Not guaranteed, and documented: periodic reports describe only the active playback (two players presenting at the same time get no merged report), and cross-player event order inside a batch is call order. That is allowed: `ts` records when the event happened, and `sn` orders the target's reports.
+Guaranteed with any number of live children: one increasing `sn` per target in each mode (event targets by config entry, request targets by configured identity), because all assignment goes through the session's counters on one thread; independent stores and baselines, so a preloading child's `sta: 'd'` never affects the presenting player's reports; `msd`/`msdSent` gate once-only keys no matter which reporter writes first; exactly one periodic report stream exists. Not guaranteed, and documented: periodic reports describe only the active playback (two players presenting at the same time get no merged report), and cross-player event order inside a batch is call order. That is allowed: `ts` records when the event happened, and `sn` orders the target's reports.
 
 ### Prerequisite fixes
 
-Four existing single-reporter bugs sit on this feature's paths. Three of them are not merely adjacent: this design's guarantees are false until they are fixed. They land in **their own PR, before this feature**, as `### Fixed` entries, rather than riding along here. Two reasons: every one of them changes report output for existing single-reporter usage, which deserves its own reviewable diff and changelog entry, and their fixes are what this feature's invariants rest on, so they should be verifiable independently of a much larger feature.
+Six existing single-reporter bugs sit on this feature's paths. Most are not merely adjacent: this design's guarantees are false until they are fixed. They land in **their own PR, before this feature**, as `### Fixed` entries, rather than riding along here. Two reasons: every one of them changes report output or state for existing single-reporter usage, which deserves its own reviewable diff and changelog entry, and their fixes are what this feature's invariants rest on, so they should be verifiable independently of a much larger feature.
 
 | Fix | Why it blocks this feature |
 |---|---|
 | **Reserved keys are merge-overridable.** A per-call `sid` reaches the wire, and a per-call `msd` bypasses the once-per-session gate. Stamp both after caller data, extending the mechanism [#399](https://github.com/streaming-video-technology-alliance/common-media-library/pull/399) already added for transforms. | "A child cannot change the session's identity" is false without it. A child could emit a foreign `sid` into the root's queue, or re-send `msd` under one `sid`. |
-| **`msd` input is not validated.** `if (data.msd && !isNaN(data.msd))` rejects `0`, accepts `Infinity`, and accepts negatives. Accept finite and non-negative instead. | First-write-wins makes a bad first value permanent for the session, and an `Infinity` locks `msd` to a value the encoder can never emit. |
+| **`msd` input is not validated.** `if (data.msd && !isNaN(data.msd))` rejects `0`, accepts `Infinity`, accepts negatives, and passes fractional values to an encoder that emits them verbatim (`msd=12.5`), though the spec types `msd` as integer milliseconds. Accept finite, non-negative values, rounded to the nearest integer, instead. | First-write-wins makes a bad first value permanent for the session: an `Infinity` locks `msd` to a value the encoder can never emit, and a fractional value freezes an encoding the spec does not allow. |
 | **`resetSession()` never clears `msd`/`msdSent`.** After a `sid` change, a new `update({ msd })` is silently never sent: the old session's flags block the new session's `msd` forever. That violates "once per Session ID", which means once per *each* session, not once per reporter. | The session-wide `msd` gate is the mechanism children share. Sharing a broken gate spreads the bug across every player. |
+| **The `msd` gate is consumed before the key filter.** `msdSent` flips when the value is stamped, before `enabledKeys` filtering runs, so a report that never carries `msd` still spends the gate (verified in both modes). Consume the gate only when the prepared output retains `msd`. Invisible today: a single reporter's key set never changes, so a gate spent without emission is a gate that could never emit anyway. | With per-child request config, a preload child whose `enabledKeys` exclude `msd` would close a shared gate without emitting, so no reporter could ever send the session's `msd` in that mode. |
+| **HTTP 410 disposal outlives the session.** A 410 deletes the target permanently: `resetSession()` restores nothing, so after a `sid` change the new session's events to that target are silently dropped, and a delayed 410 from the old session deletes the target after the new session begins (both verified). The spec scopes suppression to "the remainder of the current session". Restore disposed targets on session reset, and epoch-guard async 410 handling. | Children share the root's target map, so an over-scoped disposal silences a target for every player across every later session, and the session-reset path is machinery children rely on. |
 | **`update({ sid: undefined })` removes `sid` from all later reports.** The guard skips the session reset for a missing `sid`, but the merge still writes the explicit `undefined` into the store. | Fixed for free by stamping `sid` at report-creation time, which children need anyway. |
 
 The `msd` first-write-wins change itself also alters root behavior: today `update({ msd })` can be revised at any time and is captured per target at enqueue, so a root-only app that revises `msd` before its first report would lose the revision. That one is a consequence of this proposal rather than a pre-existing bug, so it stays here. See [Unresolved questions](#unresolved-questions).
@@ -470,14 +481,14 @@ Per-placement report transforms shipped in [#399](https://github.com/streaming-v
 
 ### Internal implementation shape
 
-No public `CmcdSession` type is added, but the implementation groups the session-owned state (counters, queues, timers, `msd` state, requester, active pointer) behind one private session reference: `this` for a root, the root for a child. Root hot paths pay one extra property read and no new branches, and a future public session object (N sibling reporters, no special root) stays purely additive. Session resets reach children through a lazily compared epoch counter (an integer check on the child's next call), so the root keeps no child registry and no child references. References point only from child to root, plus the one bounded active-pointer edge. A dropped child is garbage immediately. A forgotten `stop()` on an activated child keeps one small object alive; the real cost is that `TIME_INTERVAL` reports keep using that dead playback's last data until the next `activate()`. The memory is trivial, the report data is not (see Drawbacks).
+No public `CmcdSession` type is added, but the implementation groups the session-owned state (counters, queues, timers, `msd` state, requester, active pointer) behind one private session reference: `this` for a root, the root for a child. Root hot paths pay one extra property read and no new branches, and a future public session object (N sibling reporters, no special root) stays purely additive. Session resets reach children through a lazily compared epoch counter (an integer check on the child's next call), so the root keeps no child registry and no child references. The same epoch guards asynchronous 410 handling. References point only from child to root and from child to its creating reporter (the same edge, for a direct child), plus the one bounded active-pointer edge. A dropped child is garbage immediately. A forgotten `stop()` on an activated child keeps one small object alive; the real cost is that `TIME_INTERVAL` reports keep using that dead playback's last data until the next `activate()`. The memory is trivial, the report data is not (see Drawbacks).
 
 ### Bundle and performance impact
 
 - `CmcdChildReporterConfig` is type-only: zero runtime bytes, `export type *` barrel entry.
 - Runtime additions are `createChildReporter`, `activate`, and role branches in the lifecycle methods: estimated well under 1 KB minified on the `CmcdReporter` class, to be measured against the real `dist/` build in the implementation PR. Class methods are not tree-shakeable one by one, so all `CmcdReporter` importers carry this. Consumers who never import the class are unaffected.
 - Root-only users pay one property read on shared-state access and one integer compare in `update()`/`recordEvent()`. No new allocations on any root path.
-- A child is one small object holding a data store, an empty baseline, a cached epoch, and a root pointer: no map, no queues, no timers. Creating and destroying asset players allocates and releases only these.
+- A child is one small object holding a data store, an empty baseline, a cached epoch, a root pointer, and a creator pointer: no map, no queues, no timers. Creating and destroying asset players allocates and releases only these.
 
 ### Testing
 
@@ -487,20 +498,22 @@ New coverage, following the existing mock-requester and `mock.timers` idioms:
 
 - Interleaved root and child events share one increasing `sn` per target; two children share it too; deduped or dropped child events consume no `sn`.
 - Child events land in root batches and count toward `batchSize`; root and child `flush()` drain them.
-- `msd` sent exactly once per target and once per request path across root and children, with the same value in every mode; `msd` is first-write-wins session-wide, so a later `update({ msd })` from the root or any child after an accepted write is ignored; post-reset `msd` sends and is writable again (prerequisite fix).
-- Child `createRequestReport()`: shared `sn`, child `cid`, child `enabledKeys`/`transmissionMode`/`customHeaderMap`/`transform` overrides (query vs headers), input never mutated.
+- `msd` sent exactly once per event target and once per request target across root and children, with the same value in every mode; `msd` is first-write-wins session-wide, so a later `update({ msd })` from the root or any child after an accepted write is ignored; post-reset `msd` sends and is writable again (prerequisite fix); the gate is consumed only when the prepared output retains `msd`, tested with mixed key sets in both orders (a child without `msd` enabled reports first, then a root with it enabled sends it; and the reverse) in both modes (prerequisite fix).
+- Child `createRequestReport()`: child `cid`, child `enabledKeys`/`transmissionMode`/`customHeaderMap`/`transform` overrides (query vs headers), input never mutated.
+- Request target identity: reporters sharing a `target` share one increasing `sn` sequence with no duplicates; distinct identities advance independently (traffic to one never moves the other); reporters with no identity share the default and produce byte-identical output to today; `msd` gates per identity.
 - Dedup isolation: child transitions never suppress root transitions, and the reverse; same-valued cross-player events both emit.
-- `bg` root ownership: `child.update({ bg })` has no effect on session state and emits no `b` event; `root.update({ bg })` does; periodic reports from an active child carry the root's `bg`; `sid` change resets the session `bg` baseline.
+- `bg` root ownership: `child.update({ bg })` has no effect on session state and emits no `b` event; `root.update({ bg })` does; periodic reports from an active child carry the root's `bg`; `sid` change resets the session `bg` baseline; per-call `bg` on a child's `recordEvent()`, `recordResponseReceived()`, and `createRequestReport()`, and a child transform's injected `bg`, are all overwritten by the session stamp; root per-call `bg` keeps today's behavior.
 - Version scoping: two event targets configured with different `version` values emit their own `v` under one `sid`, from both root and child reports; a child cannot set `version`; `update({ v })` and a per-call `v` do not change the emitted version.
 - `sid` change: shared counters reset, children lazily clear baselines, children's reports carry the new `sid`; events enqueued before the change but still unsent keep the old `sid`/`sn` and drain correctly, so a later batch may mix old- and new-`sid` lines; `child.update({ sid })` has no effect.
-- Lifecycle: child `start()` arms nothing (interval spies); child `stop()` never disarms session timers; active-role transfer including the `stop()` auto-return; a child `stop()`/`start()` cycle leaves the root active until `activate()` is called again; an activated child abandoned without `stop()` keeps feeding periodic reports until the next `activate()` (assert report content); repeated `start()` stays safe with children present.
-- 410 disposal observed through a child; re-queue path exercised with child events in the batch.
+- Lifecycle: child `start()` arms nothing (interval spies); child `stop()` never disarms session timers; active-role transfer including the `stop()` auto-return to the creating reporter, nested case included (an activated grandchild's `stop()` restores the still-presenting child that created it, not the root); a child `stop()`/`start()` cycle leaves the creator active until `activate()` is called again; an activated child abandoned without `stop()` keeps feeding periodic reports until the next `activate()` (assert report content); repeated `start()` stays safe with children present.
+- 410 disposal observed through a child; disposal is session-scoped: a `sid` change restores the disposed target, and a delayed 410 from the old session leaves the new session's target alive (prerequisite fix); re-queue path exercised with child events in the batch.
 - Child-config hardening: session-owned fields passed via `as any` have no effect. A type-level test pins the full `never` lock list, so a session-owned field added to `CmcdReporterConfig` without a matching lock fails the build. `@ts-expect-error` cases cover all three compile-time smuggling idioms: an object literal, a widened object, and a spread-built config.
+- Generic preservation: a child created from a `CmcdReporter<{ kind: string }>` rejects a request whose `customData` does not satisfy the parent's `C` (`@ts-expect-error` case), and the inherited `transform` receives correctly typed requests.
 - Reserved-key sealing, one test per reporting path (`recordEvent()`, `recordResponseReceived()`, `createRequestReport()`), from both a root and a child: a per-call `sid` never reaches the wire, and a per-call `msd` neither bypasses a closed gate nor satisfies an open one.
 - Grandchild flattening and creator-default inheritance across the whole request-report config.
 - A `// #region example` block wired into the TSDoc via `{@includeCode}`.
 
-The prerequisite PR carries its own coverage, independent of children: the four fixes above, plus `msd` input validation as a table of accepted and rejected values (`0` accepted; `Infinity`, `-1`, `NaN` rejected).
+The prerequisite PR carries its own coverage, independent of children: the six fixes above, with `msd` input validation as a table of accepted, normalized, and rejected values (`0` accepted; `12.5` rounded to `13`; `Infinity`, `-1`, `NaN` rejected), the `msd` gate-consumption ordering in both modes, and 410 session scoping including the delayed-response epoch guard.
 
 ## Drawbacks
 
@@ -510,11 +523,13 @@ The prerequisite PR carries its own coverage, independent of children: the four 
 - **Child `flush()`/`stop(true)` flush the whole session's queues.** Per-child flushing would need per-item attribution in shared queues. Every asset teardown sends partly filled batches; the spec allows it, but batching efficiency drops for ad-heavy content.
 - **No inertness after teardown.** A destroyed but still referenced child that keeps recording (a stray async callback) adds events to the live session stream. v1 relies on garbage collection plus `stop()`; a `detach()`-style hard cut is deferred (see Future possibilities).
 - **Session-scoped counters without aggregation.** `bsa`/`bsda`/`dfa` and `bsd` remain per-player inputs in v1, so a multi-player session whose players supply local values emits decreasing "since session initiation" counts under one `sid`. The application has to own these four keys; the library cannot fix it for them.
-- **Cross-bundle typing needs a `Pick` at every injection boundary.** If a player bundles its own copy of `@svta/cml-cmcd` while the app injects a reporter built from another copy, runtime works (only methods are called), but TypeScript rejects a bare `CmcdReporter` annotation: the class's private members make it nominal, so two declarations of the same class are not interchangeable. The fix belongs on the consuming side and costs one type alias, because `Pick` drops private members and leaves a structural type:
+- **Cross-bundle typing needs a structural alias at every injection boundary.** If a player bundles its own copy of `@svta/cml-cmcd` while the app injects a reporter built from another copy, runtime works (only methods are called), but TypeScript rejects a bare `CmcdReporter` annotation: the class's private members make it nominal, so two declarations of the same class are not interchangeable. The fix belongs on the consuming side and costs one type alias. `Pick` drops private members and leaves a structural type, with one addition (verified with a two-copy reproduction): a picked `createChildReporter` still *returns* the nominal class, which reintroduces the failure, so the factory is redeclared to return the alias itself:
 
   ```ts
   // In the player, for a field an application assigns to:
-  type InjectedCmcdReporter = Pick<CmcdReporter, 'update' | 'recordEvent' | 'createRequestReport' | /* … */>
+  type InjectedCmcdReporter = Pick<CmcdReporter, 'update' | 'recordEvent' | 'createRequestReport' | /* … */> & {
+  	createChildReporter(config?: CmcdChildReporterConfig): InjectedCmcdReporter;
+  };
   ```
 
   This RFC deliberately does not export a `CmcdReporterLike` interface for it. A published parallel type would have to track the class forever, it would weaken the genuine-instance guarantee that makes `createChildReporter()`'s return type useful, and adopters can express it in one line where they need it. If several players end up hand-rolling the same alias, exporting one becomes a cheap additive follow-up.
@@ -530,7 +545,7 @@ The prerequisite PR carries its own coverage, independent of children: the four 
 - **Public session-first API** (`CmcdSession` owning targets, reporters as views, explicit `detach()`): the right long-term shape, and this proposal's internals are deliberately arranged so it stays purely additive. Rejected for v1: a larger surface (three or more concepts), a `detach()`-vs-`stop()` distinction that existing destroy paths never call, and, in the session-first variant considered, any child being able to change the session `sid`, the most dangerous wrong-data hazard of any alternative on this list.
 - **Document "share one reporter instance across players"**: rejected; it corrupts per-player state (see Motivation).
 - **Per-player reporters with collector-side stitching** (accept duplicate `sn` sequences and let collectors sort them out): rejected. It violates the `sn` monotonicity requirement, and CMCD v2 has no per-player key that would make stitching reliable.
-- **Shared request-mode `sn` counter** (vs per-child): per-child counters produce outright duplicate `sn` values whenever two players share a CDN, which is the common case, so they are clearly worse. Sharing the root's counter also preserves today's behavior exactly. An earlier draft went further and called a single counter "safe under any reading" of the spec; that overstated it, and the claim is withdrawn. The spec says sequence numbers "increase independently per each combination of mode and target," and one counter shared across CDNs is not independent per target. Keeping the counter shared is now resolved (see [Unresolved questions](#unresolved-questions), item 3): the session-wide order it provides is what lets an aggregator reconstruct a whole playback across origins, and each target still observes a monotonically increasing sequence.
+- **Per-target request-mode `sn` counters, keyed by configured identity** (vs per-child, vs one shared counter): per-child counters produce outright duplicate `sn` values whenever two players share a CDN, which is the common case, so they were never a candidate. An earlier draft kept one session-wide counter, first defended as "safe under any reading" of the spec (withdrawn: it is not independent per target) and then as cross-origin total ordering for aggregators (withdrawn on review: that assigns `sn` a purpose the spec never states while defeating its stated one, the identification of missing or duplicate entries, since traffic to one CDN punches gaps in every other CDN's sequence). Identity is configured rather than inferred from origin, because origin is not target identity, and the default identity preserves today's single-counter output for apps that configure nothing. See [Request-mode sequence numbers](#request-mode-sequence-numbers) and Unresolved questions, item 3.
 
 ## Prior art
 
@@ -546,10 +561,10 @@ The prerequisite PR carries its own coverage, independent of children: the four 
    **Resolution (2026-07-28): per player, as proposed.** CTA-5004-B contains no duplicate-suppression clause; the dedup obligation derives only from the change-triggered event definitions, and every trigger subject is player-scoped ("the current playback state of the player", "the bitrate being requested by the player ... has changed", "The player has entered backgrounded mode"). The one session-scoped value is `bg` ("All players in a session..."), which this design already dedups at the session level. The spec's multi-player guidance prescribes per-player events ("use of the content ID change events along with play state and not rendered SHOULD be used to make clear the experience of the user"), which a session baseline would suppress. A session baseline is also unstable under interleaved writers: a preloading child's `sta: 'd'` and the primary's `sta: 'p'` ping-pong the shared baseline, so redundant updates re-emit spurious events. The baselines stay movable to the session without a public API change as a hedge.
 2. **Periodic-report model validation.** Does the active-reporter model match collector expectations, or do collectors want parallel per-player periodic reports, or merged ones? Related: which reporter should be active during hls.js `interstitialAppendInPlace` playback, and what should dual-presentation sessions (for example, a PiP ad) report? The `nr` wiring settles with this: whichever reporter is not active is the one marking its fetches non-rendered, so an answer here is also the answer for `interstitialAppendInPlace`'s `nr`.
 
-   **Resolution (2026-07-29): the active-reporter model stands, and both sub-questions are settled.** The spec is normatively silent on how many periodic streams a session has, but every discoverable signal matches a single stream describing the presented playback: the spec's only `t` example is "a hypothetical sequence of individual time interval reports for an active player" with one contiguous `sn` run, its event-mode ad example is one interleaved stream whose `cid` flips between movie and ad, and `pt` is defined as the playhead "being rendered to the viewer", which also confirms the rejection of merged reports. Parallel per-player streams are spec-legal (the shared counters keep `sn` monotonic per target) and stay a purely additive extension if collector guidance ever asks for them. The `interstitialAppendInPlace` sub-question rested on a false premise: "in place" means there is no second media element, not that the parent player keeps presenting. At asset start hls.js transfers the element and its `MediaSource`/`SourceBuffer`s to the child `Hls` instance, and the parent's `CMCDController` detaches (its media reference is cleared and buffer queries return `NaN`), so the root reporter has no live data during the ad. `child.activate()` at `INTERSTITIAL_ASSET_STARTED` is therefore correct in both append modes; in-place it is the only choice with live data, and the `nr` answer falls out because the child is the rendering player either way. For dual presentation, the spec has no way to express two simultaneously rendered playbacks (`nr` only marks not-rendered content), so v1 documents the rule instead: exactly one active reporter per session, the integrator designates the playback that best represents the user's experience (the root by default), and the non-active player stays fully visible through its own state-change events and request reports under the same `sid`.
+   **Resolution (2026-07-29): the active-reporter model stands, and both sub-questions are settled.** The spec is normatively silent on how many periodic streams a session has, but every discoverable signal matches a single stream describing the presented playback: the spec's only `t` example is "a hypothetical sequence of individual time interval reports for an active player" with one contiguous `sn` run, its event-mode ad example is one interleaved stream whose `cid` flips between movie and ad, and `pt` is defined as the playhead "being rendered to the viewer", which also confirms the rejection of merged reports. Parallel per-player streams are spec-legal (the shared counters keep `sn` monotonic per target) and stay a purely additive extension if collector guidance ever asks for them. The `interstitialAppendInPlace` sub-question rested on a false premise: "in place" means there is no second media element, not that the parent player keeps presenting. At asset start hls.js transfers the element and its `MediaSource`/`SourceBuffer`s to the child `Hls` instance, and the parent's `CMCDController` detaches (its media reference is cleared and buffer queries return `NaN`), so the root reporter has no live data during the ad. `child.activate()` at `INTERSTITIAL_ASSET_STARTED` is therefore correct in both append modes; in-place it is the only choice with live data, and the `nr` answer falls out because the child is the rendering player either way. For dual presentation, the spec has no way to express two simultaneously rendered playbacks (`nr` only marks not-rendered content), so v1 documents the rule instead: exactly one active reporter per session, the integrator designates the playback that best represents the user's experience (the root by default), and the non-active player stays fully visible through its own state-change events and request reports under the same `sid`. One refinement from later review: activation selects the periodic stream only, and establishes nothing about other playbacks' rendering, so `nr` follows each player's actual rendering state rather than the active role; in dual presentation the non-active but still-rendering player does not set it (see [Non-rendered players and `nr`](#non-rendered-players-and-nr)).
 3. **Should request-mode `sn` be scoped per target?** One shared counter means traffic to CDN A moves CDN B's sequence, which is hard to square with "increase independently per each combination of mode and target." This is today's single-reporter behavior, not something children introduce, but children make it matter: a primary CDN plus an ad CDN is the first common case where one counter describes two real targets. Scoping it is not free. Origin is not target identity (one CDN fronts many hostnames, one hostname can front several CDNs), a per-origin map is unbounded where today's cost is one integer, and the change alters existing root output.
 
-   **Resolution (2026-07-29): leave it shared, and document the reading.** `sn` keeps incrementing regardless of where segments are requested from, so an aggregator that sees all origins can reconstruct the entire playback session in order, even with ads delivered from different origins. Per-target counters cannot provide that cross-origin order. The spec's MUST clauses hold either way: each target observes a monotonically increasing sequence (a gapped subset of the session counter), and the counter resets to zero on a new `sid`; nothing requires gaplessness. "Increase independently per each combination of mode and target" is read as describing what collectors may assume (no coordination across targets), not as forbidding a shared source. The documented costs stand: a single origin sees gaps it must not read as loss, and traffic to one CDN advances another's numbers. Per-target counters remain the compatible refinement in Future possibilities if CTA WAVE settles what "target" means in request mode.
+   **Resolution (2026-08-11): per target, keyed by a configured identity.** This supersedes the 2026-07-29 resolution to keep one shared counter, which review overturned. The shared counter's defense (a cross-origin total order for aggregators) assigned `sn` a purpose the spec never states while defeating the one the standards body does state: the CTA WAVE issue that introduced `sn` exists so collectors can identify missing or duplicate entries, and under a shared counter every report to one CDN punches a gap in every other CDN's sequence, making loss undetectable per target. The design: `CmcdRequestReportConfig` gains an optional `target` identity string; the session keys its request-mode `sn` counters and `msd` gates by it; reporters sharing an identity share one increasing sequence; reporters that set none share the default identity, which preserves today's output byte for byte, so the change ships with this feature rather than the prerequisite PR. Identity is configured, not inferred, because origin is not target identity, and the counter map is bounded by the identities the player names rather than growing per hostname. See [Request-mode sequence numbers](#request-mode-sequence-numbers).
 4. **Are `bsd` and the absolute counters in scope?** `bsd` is a once-per-mode-per-destination key, the same clause shape that justifies session-gating `msd`, but it has no gate for roots today or children here. Should it get the `msd` treatment in the prerequisite PR? And is documenting that the application owns `bsa`/`bsda`/`dfa` sufficient, or should children suppress them outright given a child cannot know a session total?
 5. **`child.update({ sid })` and `child.update({ bg })` are silently ignored.** This conflicts with the repo's preference for actionable failures, but throwing breaks controller code that forwards whole data objects. Is a dev-mode console warning worth it?
 6. **`msd` first-write-wins changes root behavior.** Today `update({ msd })` can be revised at any time and is captured per target at enqueue, so a root-only app that revises `msd` before its first report would lose the revision under this proposal. Acceptable, or should the freeze apply only once a session has more than one reporter? (The four [prerequisite fixes](#prerequisite-fixes) are settled: they land in their own PR first.)
@@ -563,8 +578,7 @@ The prerequisite PR carries its own coverage, independent of children: the four 
 - **A public `CmcdSession`**: session-first construction with N sibling reporters and no special root; the internal partition already has this shape.
 - **`detach()`** (naming precedent: `CmcdReportRecorder.detach`): a hard cut that makes a torn-down child's stray late calls no-ops.
 - **Cross-player aggregation**: refine v1's root-owned `bg` into automatic visibility aggregation (backgrounded only when *all* players are hidden), which needs a child registry the current design deliberately avoids, plus aggregation hooks for the session-scoped counters `bsa`/`bsda`/`dfa` and `bsd`.
-- **Per-target request-mode `sn` counters**, if collector guidance settles what "target" means in request mode.
-- **A `CmcdReporterLike` structural type**, if enough players end up hand-rolling the same `Pick` at their injection boundaries.
+- **A `CmcdReporterLike` structural type**, if enough players end up hand-rolling the same recursive `Pick` at their injection boundaries.
 - **A readonly `sid` accessor**, so apps can correlate child playbacks externally when the root auto-generated its session ID.
 - **Companion player integrations**: the hls.js `cmcd.reporter` field, `activate()` wiring, and `nr` transitions, and the Shaka `InterstitialAdManager` equivalent.
 
@@ -573,6 +587,7 @@ The prerequisite PR carries its own coverage, independent of children: the four 
 - **2026-07-23 (v1)**: initial draft.
 - **2026-07-24 (v2)**: reworded for concision and plain language; no changes to the proposed design.
 - **2026-07-27 (v3)**: revised from review. `bg` is now root-owned and root-written rather than last-write-wins from any reporter. `CmcdChildReporterConfig` inherits its members from `CmcdRequestReportConfig`, so the `transform` and `customHeaderMap` shipped in #399 are child-configurable. Withdrew the one-version-per-session claim (versions are per mode and per target, and the spec recommends mixing v1 request mode with v2 event mode) and the claim that a single request-mode `sn` counter is safe under any reading of the spec. Added reserved-key stamping for `sid`/`msd` on the per-call data paths, `msd` input validation, `nr` guidance for non-rendered players, and a `Pick`-based recipe for cross-copy injection typing. Companion fixes became four prerequisite fixes in their own PR ahead of this feature. Removed the claim that root `update({ v })` can rewrite the version mid-session: it cannot, in either mode.
+- **2026-08-11 (v4)**: revised from second review; every inline claim was verified against the built package or the repo's compiler before acting. Request-mode `sn` is now per target, keyed by a new optional `target` identity on `CmcdRequestReportConfig`, superseding the shared-counter resolution (the default identity preserves today's output). `CmcdChildReporterConfig` and `createChildReporter()` are parameterized over the reporter's `customData` generic from #402. The `nr` rule is restated against actual rendering state rather than activation, since both players render in dual presentation. `bg` is stamped from session state on child per-call and transform paths. A child's `stop()` returns the active role to its creating reporter instead of the root, so nested (SDK grandchild) teardown restores a still-presenting child. The injection-type recipe redeclares `createChildReporter` to return the alias, because a picked factory still returns the nominal class. The `msd` rule rounds to integer milliseconds. Two prerequisite fixes added, six total: session-scoped HTTP 410 disposal (restore on reset, epoch-guard delayed responses) and consuming the `msd` gate only when the prepared output retains the key.
 
 ## Final Decision
 
