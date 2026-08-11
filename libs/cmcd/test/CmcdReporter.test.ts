@@ -277,7 +277,7 @@ describe('CmcdReporter', () => {
 
 		it('shows transforms the canonical sid even when a per-call sid is supplied', async () => {
 			const { requester } = createMockRequester()
-			const seen: Array<string | undefined> = []
+			const seen: (string | undefined)[] = []
 			const reporter = new CmcdReporter(createConfig({
 				eventTargets: [{
 					url: 'https://example.com/cmcd',
@@ -2839,7 +2839,7 @@ describe('CmcdReporter', () => {
 
 		it('re-sends a re-queued batch after later batches have already been delivered', async () => {
 			const requests: HttpRequest[] = []
-			const pending: Array<(response: { status: number; }) => void> = []
+			const pending: ((response: { status: number; }) => void)[] = []
 			const requester = (request: HttpRequest): Promise<{ status: number; }> => {
 				requests.push(request)
 				return new Promise(resolve => pending.push(resolve))
@@ -2958,7 +2958,7 @@ describe('CmcdReporter', () => {
 
 		it('ignores a 410 from a previous session (delayed response)', async () => {
 			const requests: HttpRequest[] = []
-			const pending: Array<(response: { status: number; }) => void> = []
+			const pending: ((response: { status: number; }) => void)[] = []
 			const requester = (request: HttpRequest): Promise<{ status: number; }> => {
 				requests.push(request)
 				return new Promise(resolve => pending.push(resolve))
@@ -2983,7 +2983,7 @@ describe('CmcdReporter', () => {
 
 		it('applies a delayed 410 from the current session', async () => {
 			const requests: HttpRequest[] = []
-			const pending: Array<(response: { status: number; }) => void> = []
+			const pending: ((response: { status: number; }) => void)[] = []
 			const requester = (request: HttpRequest): Promise<{ status: number; }> => {
 				requests.push(request)
 				return new Promise(resolve => pending.push(resolve))
