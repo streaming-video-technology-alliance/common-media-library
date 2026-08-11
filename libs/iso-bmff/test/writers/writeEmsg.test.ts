@@ -4,7 +4,7 @@ describe('writeEmsg', function () {
 	it('should write a version 1 EventMessageBox that can be read back correctly', function () {
 		const box = {
 			type: 'emsg' as const,
-			version: 1,
+			version: 1 as const,
 			flags: 0,
 			timescale: 90000,
 			presentationTime: 900000,
@@ -19,6 +19,8 @@ describe('writeEmsg', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
+		assert.strictEqual(boxes[0].type, 'emsg')
+		assert.strictEqual(boxes[0].version, 1)
 		assert.strictEqual(boxes[0].schemeIdUri, 'urn:test:scheme')
 		assert.strictEqual(boxes[0].value, '1')
 		assert.strictEqual(boxes[0].timescale, 90000)
@@ -29,7 +31,7 @@ describe('writeEmsg', function () {
 	it('should encode an empty value as a lone null terminator', function () {
 		const box = {
 			type: 'emsg' as const,
-			version: 1,
+			version: 1 as const,
 			flags: 0,
 			timescale: 1,
 			presentationTime: 0,
@@ -62,7 +64,7 @@ describe('writeEmsg', function () {
 		const messageData = new Uint8Array([0x49, 0x44, 0x33, 0x04, 0x00, 0x00, 0x00, 0x01])
 		const box = {
 			type: 'emsg' as const,
-			version: 1,
+			version: 1 as const,
 			flags: 0,
 			timescale: 90000,
 			presentationTime: 900000,
@@ -77,6 +79,7 @@ describe('writeEmsg', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
+		assert.strictEqual(boxes[0].type, 'emsg')
 		assert.strictEqual(boxes[0].value, '')
 		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
@@ -85,7 +88,7 @@ describe('writeEmsg', function () {
 		const messageData = new Uint8Array([0x01, 0x02, 0x03])
 		const box = {
 			type: 'emsg' as const,
-			version: 0,
+			version: 0 as const,
 			flags: 0,
 			timescale: 48000,
 			presentationTimeDelta: 96000,
@@ -100,6 +103,8 @@ describe('writeEmsg', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
+		assert.strictEqual(boxes[0].type, 'emsg')
+		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].schemeIdUri, '')
 		assert.strictEqual(boxes[0].value, '')
 		assert.strictEqual(boxes[0].timescale, 48000)
