@@ -7,7 +7,7 @@ status: draft
 | | |
 |---|---|
 | **Author** | Casey Occhialini |
-| **Date** | 2026-08-11 |
+| **Date** | 2026-08-12 |
 | **Package** | `@svta/cml-cmcd` |
 | **Breaking change** | No (one behavioral change, see Drawbacks) |
 
@@ -17,7 +17,7 @@ status: draft
 
 Three pieces of this are public:
 
-- `sessionRetention`, a new option on `CmcdReporterConfig`, bounds how many sessions the reporter keeps, including the current one. Default `3`.
+- `sessionRetention`, a new option on `CmcdReporterConfig`, bounds how many ended sessions the reporter keeps alongside the current one. Default `2`, and `0` disables retention.
 - Requests returned by `createRequestReport()` carry an opaque session token in `customData.cmcdSession`, next to the existing `customData.cmcd`.
 - `recordResponseReceived()` resolves the session a response belongs to and either attributes the event to that session or drops the event. It never relabels a report with the current `sid`.
 
@@ -62,7 +62,7 @@ Review of [PR #416](https://github.com/streaming-video-technology-alliance/commo
 - Session keys are caller-chosen strings. After `s1 → s2 → s1`, a response to a request issued in the first s1 resolved to the second s1, a different session with its own counters and gates.
 - A partial batch queued under the old session could be evicted unsent, and the archived data snapshot shared arrays with the caller, so mutating a previously passed `bl` array rewrote a not-yet-sent s1 report.
 
-Per-session state objects fix all of these with one structure instead of six guards. The structure itself is internal, but it needs one config option (how many sessions to keep), one field on decorated requests (which session issued this), and defined resolution semantics on `recordResponseReceived()`. Those are public API, and repo process requires public API to go through an RFC. This document is that proposal. The `msd` validation and 410-scoping corrections in #416 are spec-compliance bug fixes and are not part of it.
+Per-session state objects fix all of these with one structure instead of six guards. The structure itself is internal, but it needs one config option (how many ended sessions to keep), one field on decorated requests (which session issued this), and defined resolution semantics on `recordResponseReceived()`. Those are public API, and repo process requires public API to go through an RFC. This document is that proposal. The `msd` validation and 410-scoping corrections in #416 are spec-compliance bug fixes and are not part of it.
 
 ## Guide-level explanation
 
@@ -74,21 +74,21 @@ If the issuing session has already been evicted, the event is dropped. A dropped
 
 ### Bounding the window
 
-`sessionRetention` sets how many sessions the reporter keeps, counting the current one:
+`sessionRetention` sets how many ended sessions the reporter keeps, in addition to the current one:
 
 ```ts
 import { CmcdReporter } from '@svta/cml-cmcd'
 
-// Keep only the current session. A response that completes after a sid
+// Retain no ended sessions. A response that completes after a sid
 // change is dropped, never attributed and never relabeled.
-const strict = new CmcdReporter({ sessionRetention: 1 })
+const strict = new CmcdReporter({ sessionRetention: 0 })
 
 // Never evict. Also retains every session's unsent queues for the life
 // of the reporter, so memory grows with each session change.
 const unbounded = new CmcdReporter({ sessionRetention: Infinity })
 ```
 
-The default of `3` covers a run of short sessions in quick succession, for example ad pods that rotate `sid` per break.
+The default of `2` keeps the current session plus two ended ones, which covers a run of short sessions in quick succession, for example ad pods that rotate `sid` per break.
 
 ### A session change sends what the old session still holds
 
@@ -129,25 +129,26 @@ type CmcdSession<C> = {
 
 Per-target state (`sn`, the `msd` gate, queues, 410 disposal) lives inside the session, so a late report consumes its own session's counters and a delayed 410 disposes its own session's target. Timers live on the reporter and tick across transitions.
 
-Retained sessions are keyed by token, insertion-ordered oldest first. A reused `sid` is a new session with a new token, per CTA-5004-B's definition of a session change, so `s1 → s2 → s1` retains two distinct s1 sessions, and retention counts sessions, never distinct `sid` strings.
+Retained sessions are keyed by token, insertion-ordered oldest first. A reused `sid` is a new session with a new token, per CTA-5004-B's definition of a session change, so `s1 → s2 → s1` retains two distinct s1 sessions, and retention counts ended sessions, never distinct `sid` strings.
 
 ### `sessionRetention`
 
 ```ts
 /**
- * The number of sessions the reporter retains state for, including the
- * current one. Retained sessions let a response that completes after a
- * `sid` change report under the session that issued its request, with
- * that session's data snapshot and sequence numbers. `1` keeps only the
- * current session, so stale responses are dropped. `Infinity` never
- * evicts, which also retains every session's unsent report queues.
+ * The number of ended sessions the reporter retains state for, in
+ * addition to the current one. Retained sessions let a response that
+ * completes after a `sid` change report under the session that issued
+ * its request, with that session's data snapshot and sequence numbers.
+ * `0` retains nothing, so stale responses are dropped. `Infinity`
+ * never evicts, which also retains every session's unsent report
+ * queues.
  *
- * @defaultValue 3
+ * @defaultValue 2
  */
 sessionRetention?: number;
 ```
 
-Normalization is validation, never coercion. Only `number` values are considered: a number is floored, and a floored value of `1` or greater is used, `Infinity` included. Every other input falls back to `3`, including numeric strings, booleans, `NaN`, `0`, negative numbers, and values like `Symbol` that would throw under arithmetic coercion.
+The input is type-checked, never type-coerced: only `number` values are considered, so numeric strings and booleans fall back to the default instead of converting, and a `Symbol` falls back instead of throwing under arithmetic coercion. A `number` is then normalized: it is floored, and the result is used if it is `0` or greater, `Infinity` included. Anything else (`NaN`, negative numbers) falls back to the default of `2`.
 
 ### The provenance token
 
@@ -186,10 +187,10 @@ An attributed event is a normal event of its session. It merges that session's f
 1. Detach the ended session's data graph. The copy is the same one the transform path uses, complete for the CMCD value space (arrays, `SfItem`s and their `params`), so no caller-held reference can change the archived snapshot afterward.
 2. Create the new session: fresh counters, gates, queues, and dedup baseline. Its data store starts as a shallow copy of the detached graph, so persistent keys (`cid`, `br`, custom keys) survive the change as they always have.
 3. Drain. A processing pass sends every archived session's queued reports, including partial batches the ended session could never fill again.
-4. Evict, oldest first, until the count is within `sessionRetention`. An evicted session's remaining state dies with it: a batch in flight during eviction that later fails re-queues into the evicted session and is never sent.
+4. Evict, oldest first, until the number of ended sessions is within `sessionRetention`. An evicted session's remaining state dies with it: a batch in flight during eviction that later fails re-queues into the evicted session and is never sent.
 5. Re-arm interval timers for targets that were disposed in the ended session, when the reporter is started. The new session's targets are fresh, and CTA-5004-B scopes 410 suppression to the session that received it.
 
-Draining before evicting is load-bearing. Without step 3, `sessionRetention: 1` destroys the ended session's partial batches synchronously inside `update()`.
+Draining before evicting is load-bearing. Without step 3, `sessionRetention: 0` destroys the ended session's partial batches synchronously inside `update()`.
 
 ### Wire consequences
 
@@ -202,7 +203,7 @@ Request-mode reports are always current-session. Nothing about decoration change
 - Per decorated request: one string stamp on `customData`.
 - Per response: one map lookup, plus at most one string comparison to classify a foreign token.
 - Per session change: one bounded copy of the data store and a drain pass. Session changes are rare next to reports.
-- Memory: bounded by `sessionRetention` times the session state (data store plus unsent queues).
+- Memory: the current session plus up to `sessionRetention` ended ones, each holding its data store and unsent queues.
 - No new module-scope code and no new runtime exports beyond the config key and the `customData` field. Tree-shaking is unaffected.
 
 ### Testing
@@ -213,9 +214,9 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - A transform-cancelled request attributes via the token, and drops once its session is evicted.
 - `s1 → s2 → s1`: a first-s1 response attributes to the first s1 while retained, drops after eviction, and never resolves to the second s1.
 - A token from another reporter instance falls back to `sid` attribution.
-- Drain before eviction: a partial batch queued under s1 is sent when `update({ sid: 's2' })` runs at `sessionRetention: 1`.
+- Drain before eviction: a partial batch queued under s1 is sent when `update({ sid: 's2' })` runs at `sessionRetention: 0`.
 - Frozen snapshot: mutating a previously passed `bl` array after the transition does not change an archived session's late report.
-- Normalization table: `'1'`, `true`, and `Symbol()` fall back to `3` without throwing, `0`, `-1`, `NaN`, and `undefined` fall back to `3`, `2.5` floors to `2`, `Infinity` never evicts.
+- Normalization table: `'1'`, `true`, and `Symbol()` fall back to `2` without throwing, `-1`, `NaN`, and `undefined` fall back to `2`, `0` is accepted and retains nothing, `2.5` floors to `2`, `Infinity` never evicts.
 - Precedence: a per-call `data.sid` is ignored when the token resolves, and attributes when only it is available.
 
 ## Drawbacks
@@ -223,7 +224,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - **Memory scales with retention.** Each retained session keeps its data store and any unsent queues. `Infinity` makes that unbounded, and the TSDoc says so.
 - **A second reporter-written key in the caller's `customData`.** `cmcd` set the precedent, but every reserved key narrows the player's namespace.
 - **Dropped events are silent.** A response outliving the retention window disappears without a signal. That follows the reporter's silent-tolerance convention, and a drop counter or debug hook is deliberately left to Future possibilities.
-- **Behavioral change from released versions.** Stale responses were previously relabeled with the current `sid`. Any collector pipeline that depended on that (deliberately or not) sees attribution move to the issuing session, or lose the event at `sessionRetention: 1`.
+- **Behavioral change from released versions.** Stale responses were previously relabeled with the current `sid`. Any collector pipeline that depended on that (deliberately or not) sees attribution move to the issuing session, or lose the event at `sessionRetention: 0`.
 - **Interleaved batches.** A collector may receive one POST body mixing two sessions' reports. Spec-tolerated, but worth stating.
 - **Cross-instance attribution is coarser.** A response recorded on a reporter that did not decorate the request resolves at `sid` granularity, with the reused-`sid` ambiguity that implies. Only the issuing reporter can resolve a generation exactly.
 
@@ -231,7 +232,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 
 - **Relabel to the current session (status quo)**: violates the spec's session scoping and is the bug class this design removes.
 - **Epoch guards without retention** (the first shape of #416): a counter can detect that a response is stale and protect the current session from it, but it cannot attribute the response to anything, so every late arrival is dropped. Retention subsumes the guard and keeps the data.
-- **Drop everything stale (default `sessionRetention: 1`)**: safest memory profile, but it throws away reports the issuing session already paid for, and the common case (one content transition with a few requests in flight) is exactly what a small window handles. Review discussion settled on `3`.
+- **Drop everything stale (default `sessionRetention: 0`)**: safest memory profile, but it throws away reports the issuing session already paid for, and the common case (one content transition with a few requests in flight) is exactly what a small window handles. Review discussion settled on a two-session window.
 - **`sid` strings as the only session key**: the shipped shape of #416, and the follow-up review broke it twice. A cancelled transform stores no `sid`, and a reused `sid` names two different sessions. Both need provenance that exists independent of wire keys, which is the token.
 - **A `WeakMap` from request object to session**: zero public surface, but identity-keyed. A player that spread-clones the request between decoration and response breaks the link, and serialization across a worker boundary breaks it completely. A `customData` field survives both, and `customData.cmcd` already established that decorated requests carry reporter-written state.
 - **Storing the token inside `customData.cmcd`**: pollutes the wire-data type with a non-CMCD member, and `recordResponseReceived()` merges stored `cmcd` data into the event report, so the token would need stripping at every consumption site.
@@ -247,7 +248,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 ## Unresolved questions
 
 1. **The field name.** `cmcdSession` is proposed for symmetry with `cmcd`. Alternatives: `cmcdProvenance`, or nesting under a single reserved object to stop consuming further top-level `customData` names.
-2. **The default window.** `3` is proposed from the ad-pod reasoning above. Adopters with real traffic should say whether stale responses ever arrive more than two sessions late in practice.
+2. **The default window.** `2` ended sessions is proposed from the ad-pod reasoning above. Adopters with real traffic should say whether stale responses ever arrive more than two sessions late in practice.
 3. **Foreign-token fallback.** Rule 3 preserves `sid`-level attribution for setups where one reporter records responses for requests another reporter decorated. If nobody runs that topology, dropping foreign tokens would be simpler and stricter.
 
 ## Future possibilities
@@ -259,7 +260,8 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 
 ## Revision history
 
-- **2026-08-11 (v1)**: initial draft. Converts the retained-session design from `plans/cmcd-session-fixes/session-state.md` into a public proposal, corrected per the #416 follow-up review: provenance tokens on decorated requests (replacing `sid`-string-only attribution), drain before eviction, detached archived snapshots, and validation instead of coercion for `sessionRetention`.
+- **2026-08-12 (v1)**: initial draft. Converts the retained-session design from `plans/cmcd-session-fixes/session-state.md` into a public proposal, corrected per the #416 follow-up review: provenance tokens on decorated requests (replacing `sid`-string-only attribution), drain before eviction, detached archived snapshots, and type-checked normalization for `sessionRetention`.
+- **2026-08-12 (v2)**: `sessionRetention` counts ended sessions, excluding the active one, so `0` disables retention (v1 counted every session including the current one, minimum `1`). The default is re-expressed as `2`, the same effective window as v1's `3`. The normalization wording now separates type checking (non-numbers fall back, never convert) from numeric normalization (flooring, range check), which v1 conflated as "validation, never coercion". Both from PR #417 review.
 
 ## Final Decision
 
