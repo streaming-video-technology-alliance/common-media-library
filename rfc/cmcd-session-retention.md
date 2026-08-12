@@ -18,7 +18,7 @@ status: draft
 Three pieces of this are public:
 
 - `sessionRetention`, a new option on `CmcdReporterConfig`, bounds how many ended sessions the reporter keeps alongside the current one. Default `2`, and `0` disables retention.
-- Requests returned by `createRequestReport()` carry an opaque session token in `customData.cmcdSession`, next to the existing `customData.cmcd`.
+- Requests returned by `createRequestReport()` carry an opaque session token on `customData`, keyed by a library-owned symbol rather than a string name. It collides with nothing, never appears in string-keyed enumeration or JSON output, and leaves `CmcdRequestReport` unchanged.
 - `recordResponseReceived()` resolves the session a response belongs to and either attributes the event to that session or drops the event. It never relabels a report with the current `sid`.
 
 ```ts
@@ -38,7 +38,7 @@ const reporter = new CmcdReporter({
 })
 
 // Decorated while s1 is current. The returned request carries session
-// provenance in customData.cmcdSession.
+// provenance under a symbol key on customData.
 const request = reporter.createRequestReport({ url: 'https://cdn.example.com/v/seg-42.m4s' })
 
 // The content changes and the player rotates the session.
@@ -62,7 +62,7 @@ Review of [PR #416](https://github.com/streaming-video-technology-alliance/commo
 - Session keys are caller-chosen strings. After `s1 → s2 → s1`, a response to a request issued in the first s1 resolved to the second s1, a different session with its own counters and gates.
 - A partial batch queued under the old session could be evicted unsent, and the archived data snapshot shared arrays with the caller, so mutating a previously passed `bl` array rewrote a not-yet-sent s1 report.
 
-Per-session state objects fix all of these with one structure instead of six guards. The structure itself is internal, but it needs one config option (how many ended sessions to keep), one field on decorated requests (which session issued this), and defined resolution semantics on `recordResponseReceived()`. Those are public API, and repo process requires public API to go through an RFC. This document is that proposal. The `msd` validation and 410-scoping corrections in #416 are spec-compliance bug fixes and are not part of it.
+Per-session state objects fix all of these with one structure instead of six guards. The structure itself is internal, but it needs one config option (how many ended sessions to keep), one token on decorated requests (which session issued this), and defined resolution semantics on `recordResponseReceived()`. Those are public API, and repo process requires public API to go through an RFC. This document is that proposal. The `msd` validation and 410-scoping corrections in #416 are spec-compliance bug fixes and are not part of it.
 
 ## Guide-level explanation
 
@@ -100,14 +100,24 @@ At the transition, the ended session's data is detached from every reference the
 
 ### The provenance token
 
-Provenance rides the decorated request itself, in `customData.cmcdSession`, beside the `customData.cmcd` data the reporter already writes there:
+Provenance rides the decorated request itself, on `customData`, keyed by a symbol the library owns rather than a string name. A symbol key cannot collide with a player's own `customData` keys, never shows up in `Object.keys`, `for...in`, or `JSON.stringify` output, and cannot be read or parsed by accident, so opacity is structural rather than documented.
+
+The token survives the ways players ordinarily copy requests, and dies where symbols always die:
 
 ```ts
 const request = reporter.createRequestReport({ url: 'https://cdn.example.com/v/seg-42.m4s' })
-typeof request.customData.cmcdSession // 'string'
+
+// Spread and Object.assign copy symbol-keyed properties, so ordinary
+// clones keep the token.
+const clone = { ...request, headers: { ...request.headers } }
+
+// JSON and structured clone drop symbol keys. A request round-tripped
+// through a worker or a JSON cache loses exact provenance and falls
+// back to sid attribution (resolution rule 3).
+const lossy = JSON.parse(JSON.stringify(request))
 ```
 
-The token is opaque. Players must not parse it or assign meaning to its shape, only carry it: a player that clones or serializes requests between decoration and response must preserve `customData` for attribution to work, which the stored `cmcd` data already required. The token never reaches the wire in either transmission mode.
+The token never reaches the wire in either transmission mode: every encode path starts from string-keyed enumeration, so a symbol-keyed member is invisible to it.
 
 ## Reference-level explanation
 
@@ -152,28 +162,20 @@ The input is type-checked, never type-coerced: only `number` values are consider
 
 ### The provenance token
 
-`createRequestReport()` stamps `customData.cmcdSession` on every request it returns. That includes requests it did not decorate: when request reporting is disabled, and when the configured `transform` returns `null` to cancel decoration. The request was still issued by a session, and its response still needs attribution. The deprecated `applyRequestReport()` wraps `createRequestReport()` and inherits the stamp.
+`createRequestReport()` stamps the token on every request it returns, under a registry symbol: `Symbol.for('@svta/cml-cmcd/session')`. That includes requests it did not decorate: when request reporting is disabled, and when the configured `transform` returns `null` to cancel decoration. The request was still issued by a session, and its response still needs attribution. The deprecated `applyRequestReport()` wraps `createRequestReport()` and inherits the stamp.
 
-The token is unique per session and per reporter instance, so the issuing reporter can tell three cases apart: its own retained session, its own evicted session, and a token written by some other reporter. The format is an implementation detail and the public contract is opacity.
+The token value is unique per session and per reporter instance, so the issuing reporter can tell three cases apart: its own retained session, its own evicted session, and a token written by some other reporter. The value's format is an implementation detail and the contract is opacity.
 
-`CmcdRequestReport` gains the field:
+The symbol is not exported, and structural typing tolerates the extra symbol-keyed property, so `CmcdRequestReport` is unchanged and the proposal adds no type surface. A registry symbol rather than a bare `Symbol()` keeps duplicated copies of the library in one bundle interoperable, which makes the registry string stable across versions; it is still not an invitation to read the property. The module-scope constant holding it is side-effect-free for bundlers (`Symbol.for` is a known-pure global).
 
-```ts
-export type CmcdRequestReport<D = unknown> = HttpRequest & {
-	customData: {
-		cmcd: Cmcd;
-		cmcdSession: string;
-	} & D;
-	headers: Record<string, string>;
-}
-```
+Spread and `Object.assign` copy symbol-keyed properties. `JSON.stringify` and structured clone drop them, so a request that crosses such a boundary resolves by rule 3 below.
 
 ### Attribution resolution
 
 `recordResponseReceived()` resolves a session in this order:
 
-1. `customData.cmcdSession` names one of this reporter's retained sessions: attribute to that session. A conflicting per-call `data.sid` is ignored, because reporter-written provenance beats caller-supplied keys.
-2. `customData.cmcdSession` names a session this reporter created but no longer retains: drop the event. Falling back to `sid` lookup here would reintroduce relabeling. After `s1 → s2 → s1`, the evicted first s1 would resolve by name to the live second s1.
+1. The token names one of this reporter's retained sessions: attribute to that session. A conflicting per-call `data.sid` is ignored, because reporter-written provenance beats caller-supplied keys.
+2. The token names a session this reporter created but no longer retains: drop the event. Falling back to `sid` lookup here would reintroduce relabeling. After `s1 → s2 → s1`, the evicted first s1 would resolve by name to the live second s1.
 3. The token is absent or belongs to another reporter instance: fall back to the stored `customData.cmcd.sid`, then to a per-call `data.sid`, then to the current session. A `sid` that names no retained session drops the event. When a `sid` string matches more than one retained session, the newest wins.
 
 Dropping means the method returns without emitting. No sequence number is consumed and no gate is touched.
@@ -200,11 +202,11 @@ Request-mode reports are always current-session. Nothing about decoration change
 
 ### Performance and bundle impact
 
-- Per decorated request: one string stamp on `customData`.
+- Per decorated request: one symbol-keyed property write on `customData`.
 - Per response: one map lookup, plus at most one string comparison to classify a foreign token.
 - Per session change: one bounded copy of the data store and a drain pass. Session changes are rare next to reports.
 - Memory: the current session plus up to `sessionRetention` ended ones, each holding its data store and unsent queues.
-- No new module-scope code and no new runtime exports beyond the config key and the `customData` field. Tree-shaking is unaffected.
+- One module-scope constant for the registry symbol, side-effect-free for bundlers. No new runtime exports and no type changes beyond the config key. Tree-shaking is unaffected.
 
 ### Testing
 
@@ -222,7 +224,8 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 ## Drawbacks
 
 - **Memory scales with retention.** Each retained session keeps its data store and any unsent queues. `Infinity` makes that unbounded, and the TSDoc says so.
-- **A second reporter-written key in the caller's `customData`.** `cmcd` set the precedent, but every reserved key narrows the player's namespace.
+- **Provenance does not survive serialization.** Symbol-keyed properties are dropped by `JSON.stringify` and structured clone, so a request round-tripped through a worker or a JSON cache falls back to `sid` attribution, with the reused-`sid` ambiguity that implies. Spread clones and `Object.assign` preserve the token.
+- **Harder to observe.** The token never appears in logs or JSON dumps, and inspecting it takes `Object.getOwnPropertySymbols` in a debugger. The invisibility that prevents accidental coupling also hides it from quick diagnostics.
 - **Dropped events are silent.** A response outliving the retention window disappears without a signal. That follows the reporter's silent-tolerance convention, and a drop counter or debug hook is deliberately left to Future possibilities.
 - **Behavioral change from released versions.** Stale responses were previously relabeled with the current `sid`. Any collector pipeline that depended on that (deliberately or not) sees attribution move to the issuing session, or lose the event at `sessionRetention: 0`.
 - **Interleaved batches.** A collector may receive one POST body mixing two sessions' reports. Spec-tolerated, but worth stating.
@@ -234,8 +237,9 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - **Epoch guards without retention** (the first shape of #416): a counter can detect that a response is stale and protect the current session from it, but it cannot attribute the response to anything, so every late arrival is dropped. Retention subsumes the guard and keeps the data.
 - **Drop everything stale (default `sessionRetention: 0`)**: safest memory profile, but it throws away reports the issuing session already paid for, and the common case (one content transition with a few requests in flight) is exactly what a small window handles. Review discussion settled on a two-session window.
 - **`sid` strings as the only session key**: the shipped shape of #416, and the follow-up review broke it twice. A cancelled transform stores no `sid`, and a reused `sid` names two different sessions. Both need provenance that exists independent of wire keys, which is the token.
-- **A `WeakMap` from request object to session**: zero public surface, but identity-keyed. A player that spread-clones the request between decoration and response breaks the link, and serialization across a worker boundary breaks it completely. A `customData` field survives both, and `customData.cmcd` already established that decorated requests carry reporter-written state.
-- **Storing the token inside `customData.cmcd`**: pollutes the wire-data type with a non-CMCD member, and `recordResponseReceived()` merges stored `cmcd` data into the event report, so the token would need stripping at every consumption site.
+- **A `WeakMap` from request object to session**: zero public surface, but identity-keyed, so any clone breaks the link, including the spread clones players make routinely. The symbol key survives spread clones and `Object.assign`. Neither survives structured clone; only the string-named field below does, and it loses on other grounds.
+- **A string-named field (`customData.cmcdSession`, this proposal's v1 through v3)**: the only variant that survives JSON and structured clone, and it is straightforwardly typed on `CmcdRequestReport`. Rejected because it consumes a name in the player's `customData` namespace, adds a public type member whose whole contract is "do not touch", and the topologies it saves (requests serialized between decoration and response) are ones no known player runs. The symbol makes opacity structural instead of contractual.
+- **Storing the token inside `customData.cmcd`**: the wrong lifecycle even symbol-keyed. The stored `cmcd` is `prepareCmcdData()` output, rebuilt when decoration succeeds, so the token would be stamped twice, and `recordResponseReceived()` spreads the stored `cmcd` into the event report, where spread copies symbol keys, so the token would ride every `rr` report item through transforms as inert baggage. `customData` itself is built once and never merged into report data.
 - **A bare numeric generation counter**: collides across reporter instances. Reporter B's generation 2 is not reporter A's generation 2, and a collision mis-attributes instead of falling back. The instance-scoped token makes foreign tokens recognizable.
 - **A random per-session id with no instance scope**: cannot distinguish "my evicted session" (drop, rule 2) from "another reporter's session" (fall back, rule 3). One of the two cases would get the wrong behavior.
 
@@ -247,8 +251,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 
 ## Unresolved questions
 
-1. **The field name.** `cmcdSession` is proposed for symmetry with `cmcd`. Alternatives: `cmcdProvenance`, or nesting under a single reserved object to stop consuming further top-level `customData` names.
-2. **Foreign-token fallback.** Rule 3 preserves `sid`-level attribution for setups where one reporter records responses for requests another reporter decorated. If nobody runs that topology, dropping foreign tokens would be simpler and stricter.
+1. **Foreign-token fallback.** Rule 3 preserves `sid`-level attribution for setups where one reporter records responses for requests another reporter decorated. If nobody runs that topology, dropping foreign tokens would be simpler and stricter.
 
 ## Future possibilities
 
@@ -256,12 +259,14 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - Automatic starvation counters (`plans/cmcd-session-counters/design.md`) are session-scoped by definition and would live on the session object, with per-target `bsd` cursors following the same filter-aware gate rules as `msd`.
 - Time-based eviction, if count-based retention proves wrong for some traffic shape.
 - A drop signal (counter or debug callback) if silent drops turn out to hide real integration bugs.
+- Exporting the provenance symbol as a `unique symbol`, so a player with a worker topology can build a serialization bridge (read the token before `postMessage`, restore it after). Not exported until a concrete case appears.
 
 ## Revision history
 
 - **2026-08-12 (v1)**: initial draft. Converts the retained-session design from `plans/cmcd-session-fixes/session-state.md` into a public proposal, corrected per the #416 follow-up review: provenance tokens on decorated requests (replacing `sid`-string-only attribution), drain before eviction, detached archived snapshots, and type-checked normalization for `sessionRetention`.
 - **2026-08-12 (v2)**: `sessionRetention` counts ended sessions, excluding the active one, so `0` disables retention (v1 counted every session including the current one, minimum `1`). The default is re-expressed as `2`, the same effective window as v1's `3`. The normalization wording now separates type checking (non-numbers fall back, never convert) from numeric normalization (flooring, range check), which v1 conflated as "validation, never coercion". Both from PR #417 review.
 - **2026-08-12 (v3)**: the default window of `2` ended sessions is part of the proposal rather than an open question, and is removed from Unresolved questions.
+- **2026-08-12 (v4)**: the provenance token moves from a string-named public field (`customData.cmcdSession`) to a library-owned registry symbol on `customData`, so it cannot collide with player keys, never appears in string-keyed enumeration or JSON output, and leaves `CmcdRequestReport` unchanged. The cost is stated in Drawbacks: symbol keys do not survive `JSON.stringify` or structured clone, so serialized-request topologies fall back to `sid` attribution, and the WeakMap rationale is rewritten to stop claiming serialization survival as the deciding argument. The field-name question dissolves; a symbol export for serialization bridges moves to Future possibilities.
 
 ## Final Decision
 
