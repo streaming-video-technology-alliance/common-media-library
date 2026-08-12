@@ -1,5 +1,7 @@
 # CmcdReporter Session-Integrity Fixes Implementation Plan
 
+> **Superseded in part:** the first review round on PR #416 replaced the `sessionEpoch`/restore-in-place mechanics from Tasks 3 and 6 with per-session state; see `session-state.md` in this folder for the approved design that now governs the branch. The behavior pinned by this plan's tests still holds.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Fix the six verified `CmcdReporter` session-integrity bugs (issues #408, #409, #410) and land the two behavior-pinning tests from the child-reporters RFC, ahead of the child-reporters feature.

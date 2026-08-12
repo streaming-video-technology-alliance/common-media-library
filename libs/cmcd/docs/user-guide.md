@@ -593,7 +593,23 @@ Call `flush()` to immediately send all queued events, regardless of batch size:
 reporter.flush();
 ```
 
-### Complete Lifecycle Example
+### Session Changes and Late Responses
+
+Changing the session ID starts a new session: sequence numbers restart, the `msd` gate re-arms, state-change dedup baselines clear, and targets disposed by an HTTP 410 come back to life. The persistent data store carries over, so `cid`, `br`, custom keys and the rest survive the change.
+
+```typescript
+reporter.update({ sid: "next-session" });
+```
+
+The reporter retains state for recently ended sessions (`sessionRetention`, default 3 sessions including the current one), so a media request that completes after a session change reports under the session that issued it, with that session's `sid`, sequence numbers, and data snapshot. Attribution uses the `sid` that `createRequestReport()` stored on the request. If request mode does not enable `sid`, pass it per call instead:
+
+```typescript
+// sid is not in enabledKeys, so the request carries no stored session ID.
+// The player supplies it when reporting the response.
+reporter.recordResponseReceived(response, { sid: "previous-session" });
+```
+
+A response attributed to a session that is no longer retained is dropped rather than mislabeled with the current session ID. Unsent event reports from an ended session still drain (each report keeps its own session's `sid` and sequence number), and are discarded once their session is evicted.
 
 ```typescript
 const reporter = new CmcdReporter({
@@ -851,6 +867,7 @@ A throw is isolated to the target whose transform threw. The remaining targets s
 | `customHeaderMap`  | `Partial<CmcdHeaderMap>`  | `undefined`         | Routes [custom keys](#custom-keys-in-headers-mode) into specific CMCD header shards in headers mode. |
 | `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
 | `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
+| `sessionRetention` | `number`                  | `3`                 | Sessions to retain state for, including the current one. See [Session Changes and Late Responses](#session-changes-and-late-responses). |
 | `transform`        | `CmcdRequestReportTransform` | `undefined`      | Transforms or cancels each request report. See [Transforming and Cancelling Reports](#transforming-and-cancelling-reports) and [Typing `customData`](#typing-customdata). |
 
 ### CmcdEventReportConfig

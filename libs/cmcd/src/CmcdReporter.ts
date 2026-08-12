@@ -494,11 +494,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *
 	 * `sid` and `msd` are session-owned: the reporter tracks them itself and
 	 * stamps them onto every outgoing report, so this method is the only way
-	 * to change them. Supplying either per call on
-	 * {@link CmcdReporter.recordEvent}, {@link CmcdReporter.recordResponseReceived},
-	 * or {@link CmcdReporter.createRequestReport} has no effect. `msd` must be
-	 * a finite, non-negative number of milliseconds; it is rounded to the
-	 * nearest integer, and invalid values are ignored.
+	 * to change them. A per-call value on {@link CmcdReporter.recordEvent} or
+	 * {@link CmcdReporter.createRequestReport} has no effect; on
+	 * {@link CmcdReporter.recordResponseReceived} a per-call `sid` selects the
+	 * retained session the response belongs to, but never relabels a report.
+	 * `msd` must be a finite number of milliseconds between `0` and
+	 * `999_999_999_999_999` (the RFC 8941 integer maximum); it is rounded to
+	 * the nearest integer, and invalid values are ignored.
 	 *
 	 * @param data - The data to update.
 	 */
@@ -813,12 +815,23 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * request the configured transforms could not read is rejected here rather
 	 * than reaching them; see {@link CmcdReporterCustomData}.
 	 *
+	 * The event is attributed to the session that issued the request: the
+	 * `sid` that {@link CmcdReporter.createRequestReport} stored on the
+	 * request selects the session, falling back to a per-call `data.sid` when
+	 * request mode did not store one (`sid` not in `enabledKeys`), then to the
+	 * current session. A response that completes after a `sid` change reports
+	 * under its own retained session, with that session's data snapshot and
+	 * sequence numbers (see `CmcdReporterConfig.sessionRetention`). When the
+	 * attributed session is no longer retained, the event is dropped rather
+	 * than relabeled with the current `sid`.
+	 *
 	 * @typeParam RD - The `customData` this request carries. Defaults to the
 	 *                reporter's own `C`.
 	 *
 	 * @param response - The HTTP response received.
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override any auto-derived values.
+	 *               `data.sid` is an attribution key, not report data.
 	 */
 	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
