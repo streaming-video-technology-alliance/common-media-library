@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-08-12
+
 ### Added
 
 - `CmcdReporterConfig.sessionRetention` — the number of ended sessions the reporter retains state for, in addition to the current one (default `2`; `0` disables retention, `Infinity` never evicts; only `number` values are accepted and floored, anything else falls back to the default). The reporter now keeps per-session state (data snapshot, sequence numbers, `msd` gate, dedup baseline, unsent queues) for recently ended sessions, so a media request that completes after a `sid` change reports under the session that issued it: its own `sid`, its next per-target sequence number, its still-unsent `msd`, and its frozen data snapshot, which is detached at the transition so mutating an array previously passed to `update()` cannot rewrite an ended session's late reports. A `sid` change also drains an ended session's unsent event reports (each keeps its own `sid` and sequence number) before eviction can discard them. Implements the accepted RFC in `rfc/cmcd-session-retention.md` ([#416](https://github.com/streaming-video-technology-alliance/common-media-library/pull/416))
@@ -232,7 +234,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...HEAD
+[2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0
 [2.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...cmcd-v2.5.0
 [2.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...cmcd-v2.4.1
 [2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0
