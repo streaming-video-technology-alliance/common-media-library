@@ -382,6 +382,7 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
     sid?: string;
     cid?: string;
     eventTargets?: CmcdEventReportConfig<C>[];
+    sessionRetention?: number;
 };
 
 // @public
