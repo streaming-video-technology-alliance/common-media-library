@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: Session retention in `CmcdReporter`
@@ -298,4 +298,8 @@ None. Earlier drafts left the default window and the foreign-token fallback open
 
 ## Final Decision
 
-Pending community review.
+**Decision:** Accepted as proposed in v7.
+
+**Rationale:** Review on [PR #417](https://github.com/streaming-video-technology-alliance/common-media-library/pull/417) shaped the proposal rather than contested it. `sessionRetention` counts ended sessions, with `0` disabling retention and a default window of two. Provenance moved from a string-named `customData` field to the exported `CMCD_REQUEST_PROVENANCE` registry symbol, with the serialization bridge as the escape hatch for boundaries that drop symbol keys. The foreign-token `sid` fallback (rule 3) is the shipped behavior. Every question raised during drafting was settled in-document (see Revision history), so the RFC was accepted with no unresolved questions.
+
+**Date:** 2026-08-12
