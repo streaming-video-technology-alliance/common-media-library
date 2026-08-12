@@ -267,6 +267,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - **Storing the token inside `customData.cmcd`**: the wrong lifecycle even symbol-keyed. The stored `cmcd` is `prepareCmcdData()` output, rebuilt when decoration succeeds, so the token would be stamped twice, and `recordResponseReceived()` spreads the stored `cmcd` into the event report, where spread copies symbol keys, so the token would ride every `rr` report item through transforms as inert baggage. `customData` itself is built once and never merged into report data.
 - **A bare numeric generation counter**: collides across reporter instances. Reporter B's generation 2 is not reporter A's generation 2, and a collision mis-attributes instead of falling back. The instance-scoped token makes foreign tokens recognizable.
 - **A random per-session id with no instance scope**: cannot distinguish "my evicted session" (drop, rule 2) from "another reporter's session" (fall back, rule 3). One of the two cases would get the wrong behavior.
+- **Dropping foreign tokens instead of falling back**: simpler and stricter, but it would silently discard responses in split topologies where one reporter records responses for requests another reporter decorated. The fallback's worst case is `sid`-level attribution, which is today's shipped behavior, so rule 3 keeps it.
 
 ## Prior art
 
@@ -276,7 +277,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 
 ## Unresolved questions
 
-1. **Foreign-token fallback.** Rule 3 preserves `sid`-level attribution for setups where one reporter records responses for requests another reporter decorated. If nobody runs that topology, dropping foreign tokens would be simpler and stricter.
+None. Earlier drafts left the default window and the foreign-token fallback open; both are part of the proposal (see Revision history, v3 and v7).
 
 ## Future possibilities
 
@@ -293,6 +294,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - **2026-08-12 (v4)**: the provenance token moves from a string-named public field (`customData.cmcdSession`) to a library-owned registry symbol on `customData`, so it cannot collide with player keys, never appears in string-keyed enumeration or JSON output, and leaves `CmcdRequestReport` unchanged. The cost is stated in Drawbacks: symbol keys do not survive `JSON.stringify` or structured clone, so serialized-request topologies fall back to `sid` attribution, and the WeakMap rationale is rewritten to stop claiming serialization survival as the deciding argument. The field-name question dissolves; a symbol export for serialization bridges moves to Future possibilities.
 - **2026-08-12 (v5)**: the provenance symbol is exported as `CMCD_SESSION` (a `unique symbol` backed by the registry), and `CmcdRequestReport` types the member, so a player whose requests cross a serialization boundary can carry the token and restore it. The value contract is stated (restore verbatim, never fabricate; unknown values classify as foreign and fall back), and a misuse drawback is recorded. Replaces v4's not-exported stance and retires the Future-possibilities bridge item.
 - **2026-08-12 (v6)**: the export is renamed `CMCD_REQUEST_PROVENANCE`, backed by `Symbol.for('@svta/cml-cmcd/request-provenance')`. v5's `CMCD_SESSION` collides with the package's existing `'CMCD-Session'` header-field constant. No semantic change.
+- **2026-08-12 (v7)**: the foreign-token fallback (rule 3) is part of the proposal rather than an open question. Unresolved questions is now empty, and the drop-foreign-tokens alternative is recorded under Rationale and alternatives.
 
 ## Final Decision
 
