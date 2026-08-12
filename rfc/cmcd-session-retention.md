@@ -1,5 +1,6 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-cmcd@2.6.0
 ---
 
 # RFC: Session retention in `CmcdReporter`

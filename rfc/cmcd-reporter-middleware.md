@@ -1,5 +1,7 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-cmcd@2.5.0
+implementation-plan: plans/cmcd-report-transforms/
 ---
 
 # RFC: Report Transforms for `CmcdReporter`
