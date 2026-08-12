@@ -248,8 +248,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 ## Unresolved questions
 
 1. **The field name.** `cmcdSession` is proposed for symmetry with `cmcd`. Alternatives: `cmcdProvenance`, or nesting under a single reserved object to stop consuming further top-level `customData` names.
-2. **The default window.** `2` ended sessions is proposed from the ad-pod reasoning above. Adopters with real traffic should say whether stale responses ever arrive more than two sessions late in practice.
-3. **Foreign-token fallback.** Rule 3 preserves `sid`-level attribution for setups where one reporter records responses for requests another reporter decorated. If nobody runs that topology, dropping foreign tokens would be simpler and stricter.
+2. **Foreign-token fallback.** Rule 3 preserves `sid`-level attribution for setups where one reporter records responses for requests another reporter decorated. If nobody runs that topology, dropping foreign tokens would be simpler and stricter.
 
 ## Future possibilities
 
@@ -262,6 +261,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 
 - **2026-08-12 (v1)**: initial draft. Converts the retained-session design from `plans/cmcd-session-fixes/session-state.md` into a public proposal, corrected per the #416 follow-up review: provenance tokens on decorated requests (replacing `sid`-string-only attribution), drain before eviction, detached archived snapshots, and type-checked normalization for `sessionRetention`.
 - **2026-08-12 (v2)**: `sessionRetention` counts ended sessions, excluding the active one, so `0` disables retention (v1 counted every session including the current one, minimum `1`). The default is re-expressed as `2`, the same effective window as v1's `3`. The normalization wording now separates type checking (non-numbers fall back, never convert) from numeric normalization (flooring, range check), which v1 conflated as "validation, never coercion". Both from PR #417 review.
+- **2026-08-12 (v3)**: the default window of `2` ended sessions is part of the proposal rather than an open question, and is removed from Unresolved questions.
 
 ## Final Decision
 
