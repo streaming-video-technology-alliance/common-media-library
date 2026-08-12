@@ -3,6 +3,7 @@ import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
+import { CMCD_REQUEST_PROVENANCE } from './CMCD_REQUEST_PROVENANCE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
@@ -196,8 +197,9 @@ function copyItemValue(value: unknown): unknown {
  *
  * Complete for the CMCD value space rather than best-effort: `CmcdValue` and
  * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
- * those, and `SfItem.params` is a flat record. Only called where a transform
- * is configured.
+ * those, and `SfItem.params` is a flat record. Called where a transform is
+ * configured, and on the ended session's store at archival, where it detaches
+ * the frozen snapshot from caller-held references.
  */
 function copyReportValues(data: Cmcd): Cmcd {
 	const record = data as Record<string, unknown>
@@ -237,14 +239,18 @@ function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): Cm
 		...rest
 	} = config
 
-	const sessionRetention = Math.floor(config.sessionRetention ?? NaN)
+	// Type-checked, never type-coerced: a numeric string or boolean falls
+	// back to the default instead of converting, and a Symbol must not
+	// throw under Math.floor's ToNumber.
+	const retention = config.sessionRetention
+	const sessionRetention = typeof retention === 'number' ? Math.floor(retention) : NaN
 
 	return {
 		...rest,
 		version,
 		transmissionMode,
 		sid,
-		sessionRetention: sessionRetention >= 1 ? sessionRetention : 3,
+		sessionRetention: sessionRetention >= 0 ? sessionRetention : 2,
 		// Apply target config defaults
 		eventTargets: eventTargets.reduce((acc, target) => {
 			if (target?.url && target.events?.length) {
@@ -281,6 +287,13 @@ type CmcdEventTarget = CmcdTarget & {
  */
 type CmcdSession<C> = {
 	sid: string;
+	/**
+	 * Opaque provenance token, unique per session per reporter instance.
+	 * Stamped on decorated requests under {@link CMCD_REQUEST_PROVENANCE}
+	 * so a late response resolves this exact session, independent of wire
+	 * keys and of `sid` reuse.
+	 */
+	token: string;
 	data: Cmcd;
 	msd: number;
 	lastEmitted: Partial<Pick<Cmcd, StateField>>;
@@ -308,11 +321,23 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private config: CmcdReporterConfigNormalized<C>
 
 	/**
-	 * Retained sessions keyed by `sid`, insertion-ordered oldest first, the
-	 * current session last. Size is capped by `config.sessionRetention`.
+	 * Retained sessions keyed by provenance token, insertion-ordered oldest
+	 * first, the current session last. The ended-session count is capped by
+	 * `config.sessionRetention`; a reused `sid` is retained alongside its
+	 * namesake, so a `sid` string can match more than one entry.
 	 */
 	private sessions = new Map<string, CmcdSession<C>>()
 	private session: CmcdSession<C>
+
+	/**
+	 * Namespace for this reporter's provenance tokens. Instance-scoped so a
+	 * token written by another reporter is recognizably foreign: it falls
+	 * back to `sid` attribution instead of colliding with this reporter's
+	 * sessions, while an own-namespace token that resolves nothing is a
+	 * known eviction and drops.
+	 */
+	private tokenPrefix = `${uuid()}:`
+	private generation = 0
 
 	/**
 	 * Armed time-interval timers by target config. Timers outlive session
@@ -338,7 +363,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			cid: this.config.cid,
 			v: this.config.version,
 		})
-		this.sessions.set(this.session.sid, this.session)
+		this.sessions.set(this.session.token, this.session)
 		this.requester = requester
 	}
 
@@ -360,6 +385,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		return {
 			sid,
+			token: this.tokenPrefix + this.generation++,
 			data,
 			msd: NaN,
 			lastEmitted: {},
@@ -543,23 +569,32 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 	/**
 	 * Starts a new session: the current one is archived in place for stale
-	 * attribution, a fresh one takes over, and the oldest retained sessions
-	 * are evicted beyond the configured retention.
+	 * attribution, a fresh one takes over, ended sessions are drained, and
+	 * the oldest are evicted beyond the configured retention.
 	 *
-	 * The data store is carried over by shallow copy: `cid`, `br`, custom
-	 * keys and the rest survive a `sid` change as they always have, while the
-	 * archived session keeps its own frozen view. A reused `sid` replaces its
-	 * archived namesake: a `sid` change is a new session per CTA-5004-B,
-	 * never a resumption.
+	 * The data store is carried over, and the archived snapshot is frozen:
+	 * the ended session's value graph is detached first, so nested values
+	 * the caller handed to `update()` can no longer mutate it, and the new
+	 * session starts from a shallow copy of the detached graph, so `cid`,
+	 * `br`, custom keys and the rest survive a `sid` change as they always
+	 * have. Sessions are keyed by provenance token, so a reused `sid` is a
+	 * new session retained alongside its namesake: a `sid` change is a new
+	 * session per CTA-5004-B, never a resumption.
 	 */
 	private startSession(sid: string): void {
-		this.sessions.delete(sid)
+		this.session.data = copyReportValues({ ...this.session.data })
 		this.session = this.createSession(sid, { ...this.session.data })
-		this.sessions.set(sid, this.session)
+		this.sessions.set(this.session.token, this.session)
 
-		// An evicted session's unsent queues die with it.
+		// Drain ended sessions before eviction can destroy their queues: a
+		// partial batch the ended session could never fill again leaves now.
+		this.processEventTargets()
+
+		// An evicted session's unsent queues die with it. The current
+		// session was inserted last, so oldest-first eviction never reaches
+		// it, and `Infinity` retention never evicts.
 		for (const key of this.sessions.keys()) {
-			if (this.sessions.size <= this.config.sessionRetention) {
+			if (this.sessions.size <= this.config.sessionRetention + 1) {
 				break
 			}
 			this.sessions.delete(key)
@@ -816,14 +851,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * than reaching them; see {@link CmcdReporterCustomData}.
 	 *
 	 * The event is attributed to the session that issued the request: the
-	 * `sid` that {@link CmcdReporter.createRequestReport} stored on the
-	 * request selects the session, falling back to a per-call `data.sid` when
-	 * request mode did not store one (`sid` not in `enabledKeys`), then to the
-	 * current session. A response that completes after a `sid` change reports
-	 * under its own retained session, with that session's data snapshot and
-	 * sequence numbers (see `CmcdReporterConfig.sessionRetention`). When the
-	 * attributed session is no longer retained, the event is dropped rather
-	 * than relabeled with the current `sid`.
+	 * provenance token that {@link CmcdReporter.createRequestReport} stored
+	 * on the request's `customData` (under {@link CMCD_REQUEST_PROVENANCE})
+	 * selects the session. A request carrying no token, or one written by
+	 * another reporter instance, falls back to the `sid` stored in the
+	 * request's CMCD data, then to a per-call `data.sid`, then to the
+	 * current session. A response that completes after a `sid` change
+	 * reports under its own retained session, with that session's data
+	 * snapshot and sequence numbers (see
+	 * `CmcdReporterConfig.sessionRetention`). When the attributed session is
+	 * no longer retained, the event is dropped rather than relabeled with
+	 * the current `sid`.
 	 *
 	 * @typeParam RD - The `customData` this request carries. Defaults to the
 	 *                reporter's own `C`.
@@ -833,7 +871,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *               Values provided here override any auto-derived values.
 	 *               `data.sid` is an attribution key, not report data.
 	 */
-	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: string }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
 
 		const url = data.url ?? request?.url
@@ -842,13 +880,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		// The event belongs to the session that issued the request. The sid
-		// stored on the request by createRequestReport() is reporter-written
-		// provenance and wins; a per-call sid lets the player attribute the
-		// response when request mode never stored one (sid not enabled).
 		const cmcd = request.customData?.cmcd ?? {}
-		const sid = cmcd.sid || data.sid
-		const session = sid ? this.sessions.get(sid) : this.session
+		const session = this.resolveSession(request.customData?.[CMCD_REQUEST_PROVENANCE], cmcd.sid || data.sid)
 
 		// A key that names no retained session (evicted, or never owned by
 		// this reporter) cannot be attributed, and emitting the event under
@@ -882,6 +915,35 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 
 		this.emitEvent(session, CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data }, request)
+	}
+
+	/**
+	 * Resolves the session a response belongs to. Reporter-written provenance
+	 * is authoritative: a token from this reporter either names a retained
+	 * session or, when that session has been evicted, drops the response.
+	 * Falling through to `sid` lookup there would relabel a reused `sid`'s
+	 * retained namesake. A foreign or absent token falls back to the `sid`
+	 * chain, where the newest retained session wins a reused name, then to
+	 * the current session when no key exists at all.
+	 */
+	private resolveSession(token: unknown, sid: string | undefined): CmcdSession<C> | undefined {
+		if (typeof token === 'string' && token.startsWith(this.tokenPrefix)) {
+			return this.sessions.get(token)
+		}
+
+		if (!sid) {
+			return this.session
+		}
+
+		let found: CmcdSession<C> | undefined
+
+		this.sessions.forEach((session) => {
+			if (session.sid === sid) {
+				found = session
+			}
+		})
+
+		return found
 	}
 
 	/**
@@ -934,6 +996,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			customData: {
 				...customData,
 				cmcd: {},
+				// Session provenance rides every returned request, including
+				// ones this method does not decorate (request reporting
+				// disabled, or a transform cancels below): the request was
+				// still issued by this session, and its response still needs
+				// attribution.
+				[CMCD_REQUEST_PROVENANCE]: this.session.token,
 			},
 		} as R & CmcdRequestReport<R['customData']>
 

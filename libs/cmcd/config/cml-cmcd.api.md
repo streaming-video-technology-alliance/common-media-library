@@ -147,6 +147,9 @@ export const CMCD_REQUEST_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "
 export const CMCD_REQUEST_MODE: "request";
 
 // @public
+export const CMCD_REQUEST_PROVENANCE: unique symbol;
+
+// @public
 export const CMCD_RESPONSE_KEYS: readonly ["cmsdd", "cmsds", "rc", "smrt", "ttfb", "ttfbb", "ttlb", "url"];
 
 // @public
@@ -371,6 +374,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & {
         cmcd?: Cmcd;
+        [CMCD_REQUEST_PROVENANCE]?: string;
     }>>, data?: Partial<Cmcd>): void;
     start(): void;
     stop(flush?: boolean): void;
@@ -478,6 +482,7 @@ export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 export type CmcdRequestReport<D = unknown> = HttpRequest & {
     customData: {
         cmcd: Cmcd;
+        [CMCD_REQUEST_PROVENANCE]: string;
     } & D;
     headers: Record<string, string>;
 };
