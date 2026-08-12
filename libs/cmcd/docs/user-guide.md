@@ -601,15 +601,32 @@ Changing the session ID starts a new session: sequence numbers restart, the `msd
 reporter.update({ sid: "next-session" });
 ```
 
-The reporter retains state for recently ended sessions (`sessionRetention`, default 3 sessions including the current one), so a media request that completes after a session change reports under the session that issued it, with that session's `sid`, sequence numbers, and data snapshot. Attribution uses the `sid` that `createRequestReport()` stored on the request. If request mode does not enable `sid`, pass it per call instead:
+The reporter retains state for recently ended sessions (`sessionRetention`, default `2` ended sessions in addition to the current one; `0` disables retention), so a media request that completes after a session change reports under the session that issued it, with that session's `sid`, sequence numbers, and data snapshot. The snapshot is frozen at the transition: mutating an array previously passed to `update()` does not change what an ended session's late reports say.
+
+Attribution uses an opaque token that `createRequestReport()` stamps on the request's `customData` under the exported `CMCD_REQUEST_PROVENANCE` symbol, on every request it returns, including ones it does not decorate. Spread and `Object.assign` carry the token through ordinary request clones. `JSON.stringify` and structured clone drop symbol-keyed properties, so a request that crosses such a boundary (a worker, a JSON cache) needs the token carried beside it and restored verbatim:
 
 ```typescript
-// sid is not in enabledKeys, so the request carries no stored session ID.
-// The player supplies it when reporting the response.
+import { CMCD_REQUEST_PROVENANCE } from "@svta/cml-cmcd";
+
+// Symbol keys do not survive JSON, so carry the token explicitly.
+const payload = {
+	request: JSON.parse(JSON.stringify(request)),
+	token: request.customData[CMCD_REQUEST_PROVENANCE],
+};
+
+// Restore it before reporting the response and attribution stays exact.
+payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.token;
+reporter.recordResponseReceived({ status: 200, request: payload.request });
+```
+
+The token's value is opaque: read it to carry it, restore it verbatim, and never fabricate or alter one. A request that carries no token (never decorated, or decorated by another reporter instance) attributes by the `sid` stored in its CMCD data, then by a per-call `data.sid`, then to the current session:
+
+```typescript
+// The request was never decorated, so the player supplies the session.
 reporter.recordResponseReceived(response, { sid: "previous-session" });
 ```
 
-A response attributed to a session that is no longer retained is dropped rather than mislabeled with the current session ID. Unsent event reports from an ended session still drain (each report keeps its own session's `sid` and sequence number), and are discarded once their session is evicted.
+A response attributed to a session that is no longer retained is dropped rather than mislabeled with the current session ID. A session change drains an ended session's unsent event reports before eviction can discard them (each report keeps its own session's `sid` and sequence number); a failed batch re-queued into an evicted session dies with it.
 
 ```typescript
 const reporter = new CmcdReporter({
@@ -867,7 +884,7 @@ A throw is isolated to the target whose transform threw. The remaining targets s
 | `customHeaderMap`  | `Partial<CmcdHeaderMap>`  | `undefined`         | Routes [custom keys](#custom-keys-in-headers-mode) into specific CMCD header shards in headers mode. |
 | `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
 | `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
-| `sessionRetention` | `number`                  | `3`                 | Sessions to retain state for, including the current one. See [Session Changes and Late Responses](#session-changes-and-late-responses). |
+| `sessionRetention` | `number`                  | `2`                 | Ended sessions to retain state for, in addition to the current one. `0` disables retention. See [Session Changes and Late Responses](#session-changes-and-late-responses). |
 | `transform`        | `CmcdRequestReportTransform` | `undefined`      | Transforms or cancels each request report. See [Transforming and Cancelling Reports](#transforming-and-cancelling-reports) and [Typing `customData`](#typing-customdata). |
 
 ### CmcdEventReportConfig
