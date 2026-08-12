@@ -151,6 +151,9 @@ describe('CmcdReporter', () => {
 			const cases = [
 				{ name: 'accepts 0 as a valid instant-start value', input: 0, wire: 'msd%3D0' },
 				{ name: 'rounds fractional milliseconds to the nearest integer', input: 12.5, wire: 'msd%3D13' },
+				{ name: 'accepts the RFC 8941 integer maximum', input: 999_999_999_999_999, wire: 'msd%3D999999999999999' },
+				{ name: 'accepts a value that rounds down to the maximum', input: 999_999_999_999_998.6, wire: 'msd%3D999999999999999' },
+				{ name: 'rejects values above the RFC 8941 integer maximum', input: 1_000_000_000_000_000, wire: null },
 				{ name: 'rejects Infinity', input: Infinity, wire: null },
 				{ name: 'rejects negative values', input: -1, wire: null },
 				{ name: 'rejects NaN', input: NaN, wire: null },

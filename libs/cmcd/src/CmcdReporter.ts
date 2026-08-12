@@ -513,8 +513,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// CTA-5004-B defines msd as integer milliseconds, sent once per session.
 		// 0 is a valid instant-start value; anything non-finite or negative is
 		// ignored so it can neither reach the wire nor consume the send gate.
+		// The rounded value must also fit an RFC 8941 structured-field integer
+		// (at most 999_999_999_999_999), or serialization throws after the
+		// gate is already consumed.
 		if (typeof msd === 'number' && Number.isFinite(msd) && msd >= 0) {
-			session.msd = Math.round(msd)
+			const rounded = Math.round(msd)
+
+			if (rounded <= 999_999_999_999_999) {
+				session.msd = rounded
+			}
 		}
 
 		// sid and msd are session-owned: tracked in their own fields, stripped
