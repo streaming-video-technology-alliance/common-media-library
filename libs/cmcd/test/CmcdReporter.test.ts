@@ -3239,6 +3239,55 @@ describe('CmcdReporter', () => {
 			pending[1]({ status: 200 })
 		})
 
+		it('disposes every same-URL config in the session on a 410', async () => {
+			const requests: HttpRequest[] = []
+			const requester = async (request: HttpRequest): Promise<{ status: number; }> => {
+				requests.push(request)
+				return { status: request.url === 'https://example.com/cmcd' ? 410 : 200 }
+			}
+
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 1,
+					},
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.PLAY_STATE],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 1,
+					},
+					{
+						url: 'https://example.com/cmcd-other',
+						events: [CmcdEventType.PLAY_STATE],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 1,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.filter(r => r.url === 'https://example.com/cmcd').length, 1)
+
+			// CTA-5004-B scopes the suppression to the target URL: the sibling
+			// config shares the gone endpoint and must not keep sending.
+			reporter.update({ sta: 'p' })
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.filter(r => r.url === 'https://example.com/cmcd').length, 1)
+			// A target on a different URL is unaffected.
+			equal(requests.filter(r => r.url === 'https://example.com/cmcd-other').length, 1)
+
+			// A new session restores the disposed targets.
+			reporter.update({ sid: 'new-session' })
+			reporter.recordEvent(CmcdEventType.ERROR)
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.filter(r => r.url === 'https://example.com/cmcd').length, 2)
+		})
+
 		it('applies a delayed 410 from the current session', async () => {
 			const requests: HttpRequest[] = []
 			const pending: ((response: { status: number; }) => void)[] = []

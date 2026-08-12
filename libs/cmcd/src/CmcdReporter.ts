@@ -1077,24 +1077,27 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Silences an event target for the remainder of its session: drops its
-	 * queue and blocks further enqueues, and cancels the config's timer when
-	 * the session is the live one. Used when the collector signals the target
-	 * is gone (HTTP 410). A session started after the disposal is unaffected,
-	 * since it gets fresh target state.
+	 * Silences an event target URL for the remainder of its session: drops the
+	 * queues and blocks further enqueues for every config in the session that
+	 * reports to the URL, per CTA-5004-B's per-target-URL suppression scope,
+	 * and cancels their timers when the session is the live one. Used when the
+	 * collector signals the target is gone (HTTP 410). A session started after
+	 * the disposal is unaffected, since it gets fresh target state.
 	 */
 	private disposeEventTarget(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>): void {
-		const target = session.eventTargets.get(config)
-		if (!target) {
-			return
-		}
-		target.disposed = true
-		target.queue.length = 0
+		session.eventTargets.forEach((target, sibling) => {
+			if (sibling.url !== config.url || target.disposed) {
+				return
+			}
 
-		// The timer belongs to the live session only; an archived session's
-		// disposal is bookkeeping and must not silence current reporting.
-		if (session === this.session) {
-			this.disarmInterval(config)
-		}
+			target.disposed = true
+			target.queue.length = 0
+
+			// The timer belongs to the live session only; an archived session's
+			// disposal is bookkeeping and must not silence current reporting.
+			if (session === this.session) {
+				this.disarmInterval(sibling)
+			}
+		})
 	}
 }
