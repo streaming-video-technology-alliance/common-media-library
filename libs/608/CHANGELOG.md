@@ -8,6 +8,19 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `extractCta608DataFromAv1Sample` extracts CTA-608 field data from AV1 (`av01`) samples, where captions are carried in a `metadata_itu_t_t35` OBU rather than in an SEI message. The `cc_data()` payload is identical to the SEI path, so the result feeds `Cta608Parser` unchanged. Select on the sample entry type: NAL unit and AV1 samples are framed differently and neither is self-identifying, so the framing has to come from the sample entry rather than from the bytes.
+
+### Changed
+
+- The `cc_data()` parser is now shared by the SEI and OBU carriage paths, and every caller bounds it by the structure that encloses it — the SEI message, the OBU payload, or the range handed to `extractCta608Data` — rather than trusting `cc_count` alone. No change to extracted data for well-formed input.
+
+### Fixed
+
+- A wrong `cc_count` no longer reads caption pairs out of the bytes following the payload it belongs to, which in a multi-message SEI NAL could turn the header of the next message into a caption pair.
+- A `user_data_registered_itu_t_t35` payload carrying only the 8-byte A/53 identifier no longer throws a `RangeError` when `cc_data()` would start past the end of the buffer.
+
 ## [1.0.3] - 2026-07-22
 
 ### Fixed
