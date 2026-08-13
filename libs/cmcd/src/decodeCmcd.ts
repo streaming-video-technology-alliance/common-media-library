@@ -12,13 +12,17 @@ type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[];
 // Define the output type for reduceValue - matches what CMCD values can be, including arrays
 type ReduceValueOutput = CmcdValue | ReduceValueOutput[];
 
-function reduceValue(value: ReduceValueInput): ReduceValueOutput {
+function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): ReduceValueOutput {
 	if (Array.isArray(value)) {
-		return value.map(reduceValue)
+		return value.map(item => reduceValue(item, useSymbol))
 	}
 
+	// Tokens reduce to plain strings unless the caller opted into
+	// preservation, where the parser's own representation passes through:
+	// a registry symbol, or an SfToken when `useSymbol` is `false`. Both
+	// re-encode as bare tokens, so preserved output round-trips.
 	if (typeof value === 'symbol') {
-		return symbolToStr(value)
+		return useSymbol === undefined ? symbolToStr(value) : (value as unknown as ReduceValueOutput)
 	}
 
 	if (value instanceof SfItem) {
@@ -26,8 +30,8 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
 		// its value reduced the same way a bare member's would be. Only
 		// param-less wrappers unwrap.
 		return value.params
-			? new SfItem(reduceValue(value.value), value.params)
-			: reduceValue(value.value)
+			? new SfItem(reduceValue(value.value, useSymbol), value.params)
+			: reduceValue(value.value, useSymbol)
 	}
 
 	return value as ReduceValueOutput
@@ -55,13 +59,13 @@ export function decodeCmcd(cmcd: string, options?: CmcdDecodeOptions): CmcdData 
 		return {} as CmcdData
 	}
 
-	const sfDict = decodeSfDict(cmcd)
+	const sfDict = decodeSfDict(cmcd, options)
 
 	// Each dictionary member is reduced whole, not via `item.value`, so
 	// member-level and inner-list-level params survive decoding.
 	const result: Record<string, unknown> = {}
 	for (const [key, item] of Object.entries(sfDict as Record<string, SfItem>)) {
-		result[key] = reduceValue(item)
+		result[key] = reduceValue(item, options?.useSymbol)
 	}
 
 	if (options?.convertToLatest) {

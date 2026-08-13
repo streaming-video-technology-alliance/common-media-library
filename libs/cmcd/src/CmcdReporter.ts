@@ -1,4 +1,3 @@
-import { decodeSfDict, SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -24,6 +23,7 @@ import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
+import { decodeCmcd } from './decodeCmcd.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
@@ -228,36 +228,13 @@ function copyReportValues(data: Cmcd): Cmcd {
 }
 
 /**
- * Rebuilds one decoded structured-field member as CMCD report data:
- * param-less items unwrap to their bare value (encoding re-wraps per key)
- * and items with params stay `SfItem`. Tokens are decoded as `SfToken`
- * (`useSymbol: false`), so a custom-key token keeps its wire type through
- * re-encoding.
- */
-function fromDecodedValue(value: unknown): unknown {
-	if (Array.isArray(value)) {
-		return value.map(fromDecodedValue)
-	}
-
-	if (value instanceof SfItem) {
-		const params = value.params
-
-		if (params !== null && typeof params === 'object' && Object.keys(params).length) {
-			return new SfItem(fromDecodedValue(value.value), { ...params })
-		}
-
-		return fromDecodedValue(value.value)
-	}
-
-	return value
-}
-
-/**
  * Decodes the wire snapshot a provenance record carries into fresh,
- * encodable report data. Only called in `recordResponseReceived()`. Returns
- * an empty object when the record is absent, carries no snapshot, or the
- * snapshot does not parse (a value this reporter did not write); the
- * response then reports its derived keys over the session's data alone.
+ * encodable report data: tokens revive as `SfToken` and params-bearing
+ * items as `SfItem` (`useSymbol: false`), so every value keeps its wire
+ * type through re-encoding. Only called in `recordResponseReceived()`.
+ * Returns an empty object when the record is absent, carries no snapshot,
+ * or the snapshot does not parse (a value this reporter did not write);
+ * the response then reports its derived keys over the session's data alone.
  */
 function decodeSnapshot(provenance: unknown): Cmcd {
 	const encoded = (provenance !== null && typeof provenance === 'object')
@@ -269,14 +246,7 @@ function decodeSnapshot(provenance: unknown): Cmcd {
 	}
 
 	try {
-		const dict = decodeSfDict(encoded, { useSymbol: false }) as Record<string, unknown>
-		const result: Record<string, unknown> = {}
-
-		for (const key of Object.keys(dict)) {
-			result[key] = fromDecodedValue(dict[key])
-		}
-
-		return result as Cmcd
+		return decodeCmcd(encoded, { useSymbol: false }) as Cmcd
 	}
 	catch {
 		return {}

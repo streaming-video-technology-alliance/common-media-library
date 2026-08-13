@@ -1,6 +1,7 @@
-import { decodeCmcd } from '@svta/cml-cmcd'
-import { SfItem } from '@svta/cml-structured-field-values'
-import { deepEqual } from 'node:assert'
+import type { Cmcd } from '@svta/cml-cmcd'
+import { decodeCmcd, encodeCmcd } from '@svta/cml-cmcd'
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { deepEqual, equal } from 'node:assert'
 import { describe, it } from 'node:test'
 import { CMCD_OUTPUT_REQUEST } from './data/CMCD_OUTPUT_REQUEST.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
@@ -45,6 +46,30 @@ describe('decodeCmcd', () => {
 		deepEqual(decodeCmcd('com.example-y=(bar;p=1)'), {
 			'com.example-y': [new SfItem('bar', { p: 1 })],
 		})
+	})
+
+	it('decodes tokens as SfToken with useSymbol: false', () => {
+		deepEqual(decodeCmcd('com.example-tok=abc,ot=v', { useSymbol: false }), {
+			'com.example-tok': new SfToken('abc'),
+			ot: new SfToken('v'),
+		})
+	})
+
+	it('decodes tokens as registry symbols with useSymbol: true', () => {
+		deepEqual(decodeCmcd('com.example-tok=abc,ot=v', { useSymbol: true }), {
+			'com.example-tok': Symbol.for('abc'),
+			ot: Symbol.for('v'),
+		})
+	})
+
+	it('round-trips wire bytes through decode and encode', () => {
+		// Token preservation plus params preservation make the codec
+		// symmetric: with tokens reduced to strings (the default), a
+		// custom-key token would re-encode quoted.
+		const s = 'br=(3000;ot=v 6000),com.example-tok=abc,com.example-x=1;p=2,ot=v,su,tab=(3000);p=2,v=2'
+
+		equal(encodeCmcd(decodeCmcd(s, { useSymbol: false }) as Cmcd), s)
+		equal(encodeCmcd(decodeCmcd(s, { useSymbol: true }) as Cmcd), s)
 	})
 
 	it('handles null data object', () => {

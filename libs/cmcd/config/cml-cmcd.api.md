@@ -190,6 +190,7 @@ export type CmcdDataValidationResult = CmcdValidationResult & {
 // @public
 export type CmcdDecodeOptions = {
     convertToLatest?: boolean;
+    useSymbol?: boolean;
 };
 
 // @public
