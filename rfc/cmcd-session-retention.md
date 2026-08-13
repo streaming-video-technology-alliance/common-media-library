@@ -174,9 +174,9 @@ The input is type-checked, never type-coerced: only `number` values are consider
 
 `createRequestReport()` stamps the token on every request it returns, under `CMCD_REQUEST_PROVENANCE`, an exported `unique symbol` backed by the registry: `Symbol.for('@svta/cml-cmcd/request-provenance')`. That includes requests it did not decorate: when request reporting is disabled, and when the configured `transform` returns `null` to cancel decoration. The request was still issued by a session, and its response still needs attribution. The deprecated `applyRequestReport()` wraps `createRequestReport()` and inherits the stamp.
 
-The token value is unique per session and per reporter instance, so the issuing reporter can tell three cases apart: its own retained session, its own evicted session, and a token written by some other reporter. The value's format is an implementation detail and the contract is opacity: a restored token must be the one the reporter wrote, and a fabricated or altered value classifies as foreign, so misuse degrades to rule 3 rather than mis-attributing.
+The reporter classifies by exact issued tokens: retained sessions are keyed by token, and an evicted session leaves a tombstone, so the issuing reporter can tell three cases apart — its own retained session (attribute), its own evicted session (drop), and a value it never issued, foreign or altered, which falls back to the `sid` chain. The value's format is an implementation detail and the contract is opacity: a restored token must be the one the reporter wrote, and misuse degrades to rule 3 rather than mis-attributing.
 
-The symbol is exported so a player can read the token and restore it when a request crosses a boundary that drops symbol keys, and `CmcdRequestReport` types the member, so the value is `string` wherever the request's type is known. A registry symbol rather than a bare `Symbol()` keeps duplicated copies of the library in one bundle interoperable, which makes the registry string stable across versions. The module-scope constant holding it is side-effect-free for bundlers (`Symbol.for` is a known-pure global) and lives in its own module, so it tree-shakes like every other package constant.
+The symbol is exported so a player can read the token and restore it when a request crosses a boundary that drops symbol keys, and `CmcdRequestReport` types the member as optional, so the type stays constructible by consumers that build or mock request reports; every request the reporter returns carries it. A registry symbol rather than a bare `Symbol()` keeps duplicated copies of the library in one bundle interoperable, which makes the registry string stable across versions. The module-scope constant holding it is side-effect-free for bundlers (`Symbol.for` is a known-pure global) and lives in its own module, so it tree-shakes like every other package constant.
 
 ```ts
 export const CMCD_REQUEST_PROVENANCE: unique symbol = Symbol.for('@svta/cml-cmcd/request-provenance')
@@ -184,7 +184,7 @@ export const CMCD_REQUEST_PROVENANCE: unique symbol = Symbol.for('@svta/cml-cmcd
 export type CmcdRequestReport<D = unknown> = HttpRequest & {
 	customData: {
 		cmcd: Cmcd;
-		[CMCD_REQUEST_PROVENANCE]: string;
+		[CMCD_REQUEST_PROVENANCE]?: string;
 	} & D;
 	headers: Record<string, string>;
 }
@@ -225,7 +225,7 @@ Request-mode reports are always current-session. Nothing about decoration change
 ### Performance and bundle impact
 
 - Per decorated request: one symbol-keyed property write on `customData`.
-- Per response: one map lookup, plus at most one string comparison to classify a foreign token.
+- Per response: at most two map lookups to classify the token (retained sessions, then eviction tombstones), or one `sid`-index lookup on the fallback path.
 - Per session change: one bounded copy of the data store and a drain pass. Session changes are rare next to reports.
 - Memory: the current session plus up to `sessionRetention` ended ones, each holding its data store and unsent queues.
 - One module-scope constant for the registry symbol, side-effect-free for bundlers and exported from its own module, so it tree-shakes like every other constant. The public surface is the config key, the `CMCD_REQUEST_PROVENANCE` symbol, and the typed member on `CmcdRequestReport`.
@@ -247,7 +247,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 
 ## Drawbacks
 
-- **Memory scales with retention.** Each retained session keeps its data store and any unsent queues. `Infinity` makes that unbounded, and the TSDoc says so.
+- **Memory scales with retention.** Each retained session keeps its data store and any unsent queues. `Infinity` makes that unbounded, and the TSDoc says so. Eviction tombstones (one small string per ended session) additionally persist for the reporter's lifetime, so exact-token classification never confuses an evicted session with a foreign one.
 - **Provenance does not survive serialization on its own.** Symbol-keyed properties are dropped by `JSON.stringify` and structured clone, so a request round-tripped through a worker or a JSON cache falls back to `sid` attribution unless the player bridges the token with the exported symbol. Spread clones and `Object.assign` preserve it without help.
 - **Harder to observe.** The token never appears in logs or JSON dumps, and inspecting it takes the imported symbol or `Object.getOwnPropertySymbols` in a debugger. The invisibility that prevents accidental coupling also hides it from quick diagnostics.
 - **The export invites deliberate misuse.** A public symbol means a player can write under it, not only read. The contract (restore verbatim, never fabricate) is documentation, though the failure is contained: an unknown value classifies as foreign and falls back, so a forged token cannot relabel another session's report.
@@ -266,8 +266,8 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - **A `WeakMap` from request object to session**: zero public surface, but identity-keyed, so any clone breaks the link, including the spread clones players make routinely. The symbol key survives spread clones and `Object.assign`. Neither survives structured clone; only the string-named field below does, and it loses on other grounds.
 - **A string-named field (`customData.cmcdSession`, this proposal's v1 through v3)**: the only variant that survives JSON and structured clone, and it is straightforwardly typed on `CmcdRequestReport`. Rejected because it consumes a name in the player's `customData` namespace, adds a public type member whose whole contract is "do not touch", and the topologies it saves (requests serialized between decoration and response) are ones no known player runs. The symbol makes opacity structural instead of contractual.
 - **Storing the token inside `customData.cmcd`**: the wrong lifecycle even symbol-keyed. The stored `cmcd` is `prepareCmcdData()` output, rebuilt when decoration succeeds, so the token would be stamped twice, and `recordResponseReceived()` spreads the stored `cmcd` into the event report, where spread copies symbol keys, so the token would ride every `rr` report item through transforms as inert baggage. `customData` itself is built once and never merged into report data.
-- **A bare numeric generation counter**: collides across reporter instances. Reporter B's generation 2 is not reporter A's generation 2, and a collision mis-attributes instead of falling back. The instance-scoped token makes foreign tokens recognizable.
-- **A random per-session id with no instance scope**: cannot distinguish "my evicted session" (drop, rule 2) from "another reporter's session" (fall back, rule 3). One of the two cases would get the wrong behavior.
+- **A bare numeric generation counter**: collides across reporter instances. Reporter B's generation 2 is not reporter A's generation 2, and a collision mis-attributes instead of falling back. Tokens must be unguessable and classified by exact identity.
+- **A random per-session id with no issued-token tracking**: cannot distinguish "my evicted session" (drop, rule 2) from "another reporter's session" (fall back, rule 3). Retained sessions plus eviction tombstones track exactly what was issued and separate the two. An instance-scoped prefix (the v5 through v8 scheme) classifies without tombstones but is forgeable: a predictable generation suffix can mint another session's valid token, and an altered suffix behind a real prefix misclassifies as own and drops instead of falling back.
 - **Dropping foreign tokens instead of falling back**: simpler and stricter, but it would silently discard responses in split topologies where one reporter records responses for requests another reporter decorated. The fallback's worst case is `sid`-level attribution, which is today's shipped behavior, so rule 3 keeps it.
 
 ## Prior art
@@ -297,6 +297,7 @@ None. Earlier drafts left the default window and the foreign-token fallback open
 - **2026-08-12 (v6)**: the export is renamed `CMCD_REQUEST_PROVENANCE`, backed by `Symbol.for('@svta/cml-cmcd/request-provenance')`. v5's `CMCD_SESSION` collides with the package's existing `'CMCD-Session'` header-field constant. No semantic change.
 - **2026-08-12 (v7)**: the foreign-token fallback (rule 3) is part of the proposal rather than an open question. Unresolved questions is now empty, and the drop-foreign-tokens alternative is recorded under Rationale and alternatives.
 - **2026-08-12 (v8)**: post-acceptance documentation amendment from implementation review discussion: records the rejected `sid`-as-provenance-value alternative (a symbol-keyed copy of the `sid` instead of a minted token) under Rationale and alternatives. No semantic change.
+- **2026-08-12 (v9)**: implementation-review corrections from #416 round 3. The provenance member on `CmcdRequestReport` is optional, keeping the public type constructible by consumers; the reporter still stamps every request it returns. Token classification uses exact issued tokens (retained sessions plus eviction tombstones) instead of the v5 through v8 instance-prefix scheme, which was forgeable via its sequential generation suffix and misclassified altered tokens as own; tokens are opaque `uuid()` values. The performance section reflects two-lookup classification and a constant-time `sid` index on the fallback path.
 
 ## Final Decision
 
