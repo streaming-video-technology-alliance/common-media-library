@@ -18,7 +18,7 @@ status: accepted
 Three pieces of this are public:
 
 - `sessionRetention`, a new option on `CmcdReporterConfig`, bounds how many ended sessions the reporter keeps alongside the current one. Default `2`, and `0` disables retention.
-- Requests returned by `createRequestReport()` carry a frozen provenance record (`CmcdRequestProvenance`, holding the opaque session `token`) on `customData`, keyed by an exported symbol, `CMCD_REQUEST_PROVENANCE`, rather than a string name. It collides with nothing and never appears in string-keyed enumeration or JSON output, and a player whose requests cross a serialization boundary can carry the record explicitly and restore it.
+- Requests returned by `createRequestReport()` carry a frozen provenance record (`CmcdRequestProvenance`, holding the opaque session `token` and, when the request is decorated, `cmcd`: the report exactly as encoded on the wire) on `customData`, keyed by an exported symbol, `CMCD_REQUEST_PROVENANCE`, rather than a string name. It collides with nothing and never appears in string-keyed enumeration or JSON output, and a player whose requests cross a serialization boundary can carry the record explicitly and restore it.
 - `recordResponseReceived()` resolves the session a response belongs to and either attributes the event to that session or drops the event. It never relabels a report with the current `sid`.
 
 ```ts
@@ -102,7 +102,7 @@ At the transition, the ended session's data is detached from every reference the
 
 Provenance rides the decorated request itself, on `customData`, keyed by the exported symbol `CMCD_REQUEST_PROVENANCE` rather than a string name. A symbol key cannot collide with a player's own `customData` keys, never shows up in `Object.keys`, `for...in`, or `JSON.stringify` output, and cannot be touched by accident: reaching it takes a deliberate import.
 
-The value is a frozen record, `CmcdRequestProvenance`, whose `token` member is the opaque session token. It stays opaque: read the value to carry it and restore it; never fabricate or alter one. A value the reporter did not write names no session it owns, so misuse falls back to `sid` attribution instead of mis-attributing. The record shape exists for extensibility — a future provenance member is additive, because bridging code copies the whole value.
+The value is a frozen record, `CmcdRequestProvenance`. `token` is the opaque session token. On decorated requests, `cmcd` is the request report exactly as encoded on the wire; a late `RESPONSE_RECEIVED` event rebuilds its request-time data from those bytes, so the data survives any boundary the record is carried across. The record stays opaque: read the value to carry it and restore it; never fabricate or alter one. A value the reporter did not write names no session it owns, so misuse falls back to `sid` attribution instead of mis-attributing. The record shape exists for extensibility — `cmcd` itself arrived as an additive member, because bridging code copies the whole value.
 
 The record survives the ways players ordinarily copy requests. Where symbol keys die (JSON, structured clone), the exported symbol is the bridge, and the record itself is JSON-safe: attribution reads the token value, never object identity, so a revived plain-object copy attributes exactly:
 
@@ -124,8 +124,11 @@ const payload = JSON.parse(JSON.stringify({
 }))
 payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.provenance
 
-// A request restored this way attributes exactly. One that lost its
-// provenance falls back to sid attribution (resolution rule 3).
+// A request restored this way attributes exactly and keeps its
+// request-time report data, which rides the record as the report's
+// encoded wire bytes. One that lost its provenance falls back to sid
+// attribution (resolution rule 3) and reports derived keys over the
+// session's data alone.
 ```
 
 The record never reaches the wire in either transmission mode: every encode path starts from string-keyed enumeration, so a symbol-keyed member is invisible to it.
@@ -184,6 +187,7 @@ export const CMCD_REQUEST_PROVENANCE: unique symbol = Symbol.for('@svta/cml-cmcd
 
 export type CmcdRequestProvenance = {
 	readonly token: string;
+	readonly cmcd?: string;
 }
 
 export type CmcdRequestReport<D = unknown> = HttpRequest & {
@@ -203,11 +207,17 @@ Spread and `Object.assign` copy symbol-keyed properties. `JSON.stringify` and st
 
 1. The token names one of this reporter's retained sessions: attribute to that session. A conflicting per-call `data.sid` is ignored, because reporter-written provenance beats caller-supplied keys.
 2. The token names a session this reporter created but no longer retains: drop the event. Falling back to `sid` lookup here would reintroduce relabeling. After `s1 → s2 → s1`, the evicted first s1 would resolve by name to the live second s1.
-3. The provenance is absent, is not shaped like a provenance record, or carries a token this reporter never issued (foreign or altered): fall back to the stored `customData.cmcd.sid`, then to a per-call `data.sid`, then to the current session. A `sid` that names no retained session drops the event. When a `sid` string matches more than one retained session, the newest wins.
+3. The provenance is absent, is not shaped like a provenance record, or carries a token this reporter never issued (foreign or altered): fall back to the `sid` in the record's snapshot, then to the `sid` of the player-facing `customData.cmcd` object, then to a per-call `data.sid`, then to the current session. A `sid` that names no retained session drops the event. When a `sid` string matches more than one retained session, the newest wins.
 
 Dropping means the method returns without emitting. No sequence number is consumed and no gate is touched.
 
-An attributed event is a normal event of its session. It merges that session's frozen data snapshot with the stored request data, the derived response keys, and per-call data. It is stamped with that session's `sid`, consumes that session's next per-target `sn`, can carry that session's `msd` if the target's gate is still open, and is suppressed by that session's 410 disposal state.
+An attributed event is a normal event of its session. It merges that session's frozen data snapshot with the request data decoded from the record's wire snapshot, the derived response keys, and per-call data. It is stamped with that session's `sid`, consumes that session's next per-target `sn`, can carry that session's `msd` if the target's gate is still open, and is suppressed by that session's 410 disposal state. A request whose record was lost to a serialization boundary (and not restored) contributes no request-time keys: the event reports the derived keys over the session's data alone.
+
+### The wire snapshot
+
+Decoration already produces the report's wire bytes, so the record carries them: in query mode `cmcd` is the `CMCD` query parameter's value byte for byte, and in headers mode the same prepared dictionary is serialized once more for the record. `recordResponseReceived()` rebuilds request-time report data by decoding those bytes, with tokens revived as `SfToken`, which is lossless by construction: the reporter re-reads only what it wrote. It never re-ingests the player-facing `customData.cmcd` object, which players own, may mutate, and which loses `SfItem`/`SfToken` prototypes across the JSON bridge — shape-based revival of that object could not distinguish a revived token (`{ description }`) from anything else, so token values reached the RFC 8941 serializer as plain objects, threw at send time, and poisoned batched targets. The public object remains the request-identification view players read; the reporter reads only its `sid`, as the rule 3 fallback. A snapshot that does not parse (a value the reporter did not write) contributes nothing, and the event degrades the same way a lost record does.
+
+Event queues hold the same currency. A report is encoded when it is queued, so a value that cannot serialize throws inside the recording call that produced it, attributable to its caller; previously the failure surfaced in the asynchronous batch send, where the retry path swallowed it and re-queued the un-encodable report forever. Queued lines are also immune to later mutation of caller-held values, so the per-target deep copy of report data runs only where a `transform` is configured.
 
 ### The transition sequence
 
@@ -229,8 +239,8 @@ Request-mode reports are always current-session. Nothing about decoration change
 
 ### Performance and bundle impact
 
-- Per decorated request: one symbol-keyed property write on `customData`.
-- Per response: at most two map lookups to classify the token (retained sessions, then eviction tombstones), or one `sid`-index lookup on the fallback path.
+- Per decorated request: one symbol-keyed property write and one frozen provenance record on `customData`. Query mode reuses the query parameter's bytes for the snapshot; headers mode serializes the prepared dictionary once more.
+- Per response: at most two map lookups to classify the token (retained sessions, then eviction tombstones), or one `sid`-index lookup on the fallback path, plus one structured-field decode of the snapshot. Snapshot decoding puts the structured-field parser in the reporter's import graph.
 - Per session change: one bounded copy of the data store and a drain pass. Session changes are rare next to reports.
 - Memory: the current session plus up to `sessionRetention` ended ones, each holding its data store and unsent queues.
 - One module-scope constant for the registry symbol, side-effect-free for bundlers and exported from its own module, so it tree-shakes like every other constant. The public surface is the config key, the `CMCD_REQUEST_PROVENANCE` symbol, the `CmcdRequestProvenance` type, and the typed member on `CmcdRequestReport`. One provenance record is minted and frozen per session, so decoration stays a single property write.
@@ -246,6 +256,10 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - The serialization bridge: a JSON-round-tripped request with the record restored via `CMCD_REQUEST_PROVENANCE` attributes exactly — including when the restored value is itself a JSON-revived copy of the record — and without restoration it falls back to `sid` attribution.
 - A fabricated token value classifies as foreign and falls back rather than attributing; so does a value not shaped like a provenance record.
 - The stamped record is frozen, its `token` is a string, and a new session mints a new record.
+- The snapshot is the query parameter's bytes: a decorated request's record matches its `CMCD` query value, undecorated requests carry no snapshot, and per-request snapshots differ by `sn` under one session token.
+- Token fidelity across the bridge: standard (`ot`, `sf`) and custom-key `SfToken` values ride the snapshot through a JSON round trip and reach the wire as bare tokens, never quoted strings, with nothing left stuck in the queue.
+- Degradation: an unbridged serialized request attributes via the revived `cmcd` object's `sid` and reports derived keys plus session data, with request-time-only keys dropped.
+- Encode-at-enqueue: a report whose value cannot serialize throws from the recording call, and the target's queue keeps working afterward.
 - Drain before eviction: a partial batch queued under s1 is sent when `update({ sid: 's2' })` runs at `sessionRetention: 0`.
 - Frozen snapshot: mutating a previously passed `bl` array after the transition does not change an archived session's late report.
 - Normalization table: `'1'`, `true`, and `Symbol()` fall back to `2` without throwing, `-1`, `NaN`, and `undefined` fall back to `2`, `0` is accepted and retains nothing, `2.5` floors to `2`, `Infinity` never evicts.
@@ -254,7 +268,8 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 ## Drawbacks
 
 - **Memory scales with retention.** Each retained session keeps its data store and any unsent queues. `Infinity` makes that unbounded, and the TSDoc says so. Eviction tombstones (one small string per ended session) additionally persist for the reporter's lifetime, so exact-token classification never confuses an evicted session with a foreign one.
-- **Provenance does not survive serialization on its own.** Symbol-keyed properties are dropped by `JSON.stringify` and structured clone, so a request round-tripped through a worker or a JSON cache falls back to `sid` attribution unless the player bridges the record with the exported symbol. Spread clones and `Object.assign` preserve it without help. The record itself is JSON-safe, so the bridge is a plain copy with no special casing.
+- **Provenance does not survive serialization on its own.** Symbol-keyed properties are dropped by `JSON.stringify` and structured clone, so a request round-tripped through a worker or a JSON cache falls back to `sid` attribution unless the player bridges the record with the exported symbol. Spread clones and `Object.assign` preserve it without help. The record itself is JSON-safe, so the bridge is a plain copy with no special casing. Losing the record now also loses the request-time report data: the response still attributes through the `sid` chain, but reports its derived keys over the session's data alone.
+- **Snapshot memory rides in-flight requests.** Each decorated request holds its report twice — the player-facing object and the encoded string — for as long as the player retains the request. Both are small and share the request's lifetime.
 - **Harder to observe.** The token never appears in logs or JSON dumps, and inspecting it takes the imported symbol or `Object.getOwnPropertySymbols` in a debugger. The invisibility that prevents accidental coupling also hides it from quick diagnostics.
 - **The export invites deliberate misuse.** A public symbol means a player can write under it, not only read. The contract (restore verbatim, never fabricate) is documentation, though the failure is contained: an unknown value classifies as foreign and falls back, so a forged token cannot relabel another session's report.
 - **Dropped events are silent.** A response outliving the retention window disappears without a signal. That follows the reporter's silent-tolerance convention, and a drop counter or debug hook is deliberately left to Future possibilities.
@@ -305,6 +320,7 @@ None. Earlier drafts left the default window and the foreign-token fallback open
 - **2026-08-12 (v8)**: post-acceptance documentation amendment from implementation review discussion: records the rejected `sid`-as-provenance-value alternative (a symbol-keyed copy of the `sid` instead of a minted token) under Rationale and alternatives. No semantic change.
 - **2026-08-12 (v9)**: implementation-review corrections from #416 round 3. The provenance member on `CmcdRequestReport` is optional, keeping the public type constructible by consumers; the reporter still stamps every request it returns. Token classification uses exact issued tokens (retained sessions plus eviction tombstones) instead of the v5 through v8 instance-prefix scheme, which was forgeable via its sequential generation suffix and misclassified altered tokens as own; tokens are opaque `uuid()` values. The performance section reflects two-lookup classification and a constant-time `sid` index on the fallback path.
 - **2026-08-12 (v10)**: post-acceptance amendment: the provenance value becomes a frozen record, `CmcdRequestProvenance` (`{ readonly token: string }`), minted once per session, instead of the bare token string. The record shape makes future provenance members (for example, an encoded report snapshot for serialization-boundary fidelity) additive for players that already bridge the value, where flipping a released string to an object would break every bridge; the pre-release window is the last point this change is free. Classification semantics are unchanged: the token inside the record is read structurally, so a JSON-revived copy of the record attributes exactly, and a malformed value (no `token` string to read) classifies as foreign under rule 3.
+- **2026-08-12 (v11)**: post-acceptance amendment, the second half of the v10 direction. Decorated requests extend the record with `cmcd`, the report's wire bytes, and `recordResponseReceived()` rebuilds request-time data by decoding them instead of re-ingesting the player-facing `customData.cmcd` object, whose `sid` remains the rule 3 fallback. Shape-based revival of the public object is removed: it could not distinguish a JSON-revived `SfToken` (a `{ description }` plain object) from anything else, so token values reached the RFC 8941 serializer un-revived, threw at send time, and poisoned batched targets, and a revived custom-key token that did survive would have degraded to a quoted string; decoding reporter-written bytes is lossless by construction. Event queues now hold encoded report lines (encode-at-enqueue), so a value that cannot serialize throws from the recording call instead of silently blocking the queue, and the per-target deep copy of report data runs only where a `transform` is configured. A request whose record is lost to serialization attributes by `sid` but reports derived keys over session data alone, recorded under Drawbacks.
 
 ## Final Decision
 
