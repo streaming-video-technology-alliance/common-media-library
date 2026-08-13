@@ -18,7 +18,7 @@ status: accepted
 Three pieces of this are public:
 
 - `sessionRetention`, a new option on `CmcdReporterConfig`, bounds how many ended sessions the reporter keeps alongside the current one. Default `2`, and `0` disables retention.
-- Requests returned by `createRequestReport()` carry an opaque session token on `customData`, keyed by an exported symbol, `CMCD_REQUEST_PROVENANCE`, rather than a string name. It collides with nothing and never appears in string-keyed enumeration or JSON output, and a player whose requests cross a serialization boundary can carry the token explicitly and restore it.
+- Requests returned by `createRequestReport()` carry a frozen provenance record (`CmcdRequestProvenance`, holding the opaque session `token`) on `customData`, keyed by an exported symbol, `CMCD_REQUEST_PROVENANCE`, rather than a string name. It collides with nothing and never appears in string-keyed enumeration or JSON output, and a player whose requests cross a serialization boundary can carry the record explicitly and restore it.
 - `recordResponseReceived()` resolves the session a response belongs to and either attributes the event to that session or drops the event. It never relabels a report with the current `sid`.
 
 ```ts
@@ -98,13 +98,13 @@ Changing `sid` drains the ended session before anything is evicted. Queued event
 
 At the transition, the ended session's data is detached from every reference the caller holds. Mutating an array passed to an earlier `update()` no longer changes what an archived session's late reports say. Within the live session, values handed to `update()` are stored by reference, unchanged from today.
 
-### The provenance token
+### The provenance record
 
 Provenance rides the decorated request itself, on `customData`, keyed by the exported symbol `CMCD_REQUEST_PROVENANCE` rather than a string name. A symbol key cannot collide with a player's own `customData` keys, never shows up in `Object.keys`, `for...in`, or `JSON.stringify` output, and cannot be touched by accident: reaching it takes a deliberate import.
 
-The token's value stays opaque. Read it to carry it and restore it verbatim; never fabricate or alter one. A value the reporter did not write names no session it owns, so misuse falls back to `sid` attribution instead of mis-attributing.
+The value is a frozen record, `CmcdRequestProvenance`, whose `token` member is the opaque session token. It stays opaque: read the value to carry it and restore it; never fabricate or alter one. A value the reporter did not write names no session it owns, so misuse falls back to `sid` attribution instead of mis-attributing. The record shape exists for extensibility — a future provenance member is additive, because bridging code copies the whole value.
 
-The token survives the ways players ordinarily copy requests. Where symbol keys die (JSON, structured clone), the exported symbol is the bridge:
+The record survives the ways players ordinarily copy requests. Where symbol keys die (JSON, structured clone), the exported symbol is the bridge, and the record itself is JSON-safe: attribution reads the token value, never object identity, so a revived plain-object copy attributes exactly:
 
 ```ts
 import { CMCD_REQUEST_PROVENANCE } from '@svta/cml-cmcd'
@@ -112,22 +112,23 @@ import { CMCD_REQUEST_PROVENANCE } from '@svta/cml-cmcd'
 const request = reporter.createRequestReport({ url: 'https://cdn.example.com/v/seg-42.m4s' })
 
 // Spread and Object.assign copy symbol-keyed properties, so ordinary
-// clones keep the token.
+// clones keep the record.
 const clone = { ...request, headers: { ...request.headers } }
 
-// JSON and structured clone drop symbol keys, so carry the token
-// explicitly across such a boundary and restore it afterward.
-const payload = {
-	request: JSON.parse(JSON.stringify(request)),
-	token: request.customData[CMCD_REQUEST_PROVENANCE],
-}
-payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.token
+// JSON and structured clone drop symbol keys, so carry the record
+// explicitly across such a boundary and restore it afterward. The
+// revived copy attributes identically to the original reference.
+const payload = JSON.parse(JSON.stringify({
+	request,
+	provenance: request.customData[CMCD_REQUEST_PROVENANCE],
+}))
+payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.provenance
 
 // A request restored this way attributes exactly. One that lost its
-// token falls back to sid attribution (resolution rule 3).
+// provenance falls back to sid attribution (resolution rule 3).
 ```
 
-The token never reaches the wire in either transmission mode: every encode path starts from string-keyed enumeration, so a symbol-keyed member is invisible to it.
+The record never reaches the wire in either transmission mode: every encode path starts from string-keyed enumeration, so a symbol-keyed member is invisible to it.
 
 ## Reference-level explanation
 
@@ -138,9 +139,9 @@ Everything the spec scopes to a session moves into one internal object, created 
 ```ts
 type CmcdSession<C> = {
 	sid: string
-	token: string                  // opaque provenance token, unique per session per reporter
-	data: Cmcd                     // persistent data store for this session
-	msd: number                    // NaN until a valid update({ msd })
+	provenance: CmcdRequestProvenance  // frozen { token }, unique per session per reporter
+	data: Cmcd                         // persistent data store for this session
+	msd: number                        // NaN until a valid update({ msd })
 	lastEmitted: Partial<Pick<Cmcd, StateField>>
 	eventTargets: Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>
 	requestTarget: CmcdTarget
@@ -170,27 +171,31 @@ sessionRetention?: number;
 
 The input is type-checked, never type-coerced: only `number` values are considered, so numeric strings and booleans fall back to the default instead of converting, and a `Symbol` falls back instead of throwing under arithmetic coercion. A `number` is then normalized: it is floored, and the result is used if it is `0` or greater, `Infinity` included. Anything else (`NaN`, negative numbers) falls back to the default of `2`.
 
-### The provenance token
+### The provenance record
 
-`createRequestReport()` stamps the token on every request it returns, under `CMCD_REQUEST_PROVENANCE`, an exported `unique symbol` backed by the registry: `Symbol.for('@svta/cml-cmcd/request-provenance')`. That includes requests it did not decorate: when request reporting is disabled, and when the configured `transform` returns `null` to cancel decoration. The request was still issued by a session, and its response still needs attribution. The deprecated `applyRequestReport()` wraps `createRequestReport()` and inherits the stamp.
+`createRequestReport()` stamps the session's frozen provenance record on every request it returns, under `CMCD_REQUEST_PROVENANCE`, an exported `unique symbol` backed by the registry: `Symbol.for('@svta/cml-cmcd/request-provenance')`. That includes requests it did not decorate: when request reporting is disabled, and when the configured `transform` returns `null` to cancel decoration. The request was still issued by a session, and its response still needs attribution. The deprecated `applyRequestReport()` wraps `createRequestReport()` and inherits the stamp.
 
-The reporter classifies by exact issued tokens: retained sessions are keyed by token, and an evicted session leaves a tombstone, so the issuing reporter can tell three cases apart — its own retained session (attribute), its own evicted session (drop), and a value it never issued, foreign or altered, which falls back to the `sid` chain. The value's format is an implementation detail and the contract is opacity: a restored token must be the one the reporter wrote, and misuse degrades to rule 3 rather than mis-attributing.
+The reporter classifies by exact issued tokens, read structurally from the record: retained sessions are keyed by token, and an evicted session leaves a tombstone, so the issuing reporter can tell three cases apart — its own retained session (attribute), its own evicted session (drop), and a value it never issued, which falls back to the `sid` chain. Foreign tokens, altered tokens, and values not shaped like a provenance record all land in the third case. The token's format is an implementation detail and the contract is opacity: a restored token must be one the reporter wrote, and misuse degrades to rule 3 rather than mis-attributing. One record is minted and frozen per session, so decoration adds no per-request allocation, and player code cannot alter an issued record in place.
 
-The symbol is exported so a player can read the token and restore it when a request crosses a boundary that drops symbol keys, and `CmcdRequestReport` types the member as optional, so the type stays constructible by consumers that build or mock request reports; every request the reporter returns carries it. A registry symbol rather than a bare `Symbol()` keeps duplicated copies of the library in one bundle interoperable, which makes the registry string stable across versions. The module-scope constant holding it is side-effect-free for bundlers (`Symbol.for` is a known-pure global) and lives in its own module, so it tree-shakes like every other package constant.
+The symbol is exported so a player can read the record and restore it when a request crosses a boundary that drops symbol keys, and `CmcdRequestReport` types the member as optional, so the type stays constructible by consumers that build or mock request reports; every request the reporter returns carries it. A registry symbol rather than a bare `Symbol()` keeps duplicated copies of the library in one bundle interoperable, which makes the registry string stable across versions. The module-scope constant holding it is side-effect-free for bundlers (`Symbol.for` is a known-pure global) and lives in its own module, so it tree-shakes like every other package constant.
 
 ```ts
 export const CMCD_REQUEST_PROVENANCE: unique symbol = Symbol.for('@svta/cml-cmcd/request-provenance')
 
+export type CmcdRequestProvenance = {
+	readonly token: string;
+}
+
 export type CmcdRequestReport<D = unknown> = HttpRequest & {
 	customData: {
 		cmcd: Cmcd;
-		[CMCD_REQUEST_PROVENANCE]?: string;
+		[CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance;
 	} & D;
 	headers: Record<string, string>;
 }
 ```
 
-Spread and `Object.assign` copy symbol-keyed properties. `JSON.stringify` and structured clone drop them, so a request that crosses such a boundary resolves by rule 3 below unless the player restores the token first.
+Spread and `Object.assign` copy symbol-keyed properties. `JSON.stringify` and structured clone drop them, so a request that crosses such a boundary resolves by rule 3 below unless the player restores the record first.
 
 ### Attribution resolution
 
@@ -198,7 +203,7 @@ Spread and `Object.assign` copy symbol-keyed properties. `JSON.stringify` and st
 
 1. The token names one of this reporter's retained sessions: attribute to that session. A conflicting per-call `data.sid` is ignored, because reporter-written provenance beats caller-supplied keys.
 2. The token names a session this reporter created but no longer retains: drop the event. Falling back to `sid` lookup here would reintroduce relabeling. After `s1 → s2 → s1`, the evicted first s1 would resolve by name to the live second s1.
-3. The token is absent or belongs to another reporter instance: fall back to the stored `customData.cmcd.sid`, then to a per-call `data.sid`, then to the current session. A `sid` that names no retained session drops the event. When a `sid` string matches more than one retained session, the newest wins.
+3. The provenance is absent, is not shaped like a provenance record, or carries a token this reporter never issued (foreign or altered): fall back to the stored `customData.cmcd.sid`, then to a per-call `data.sid`, then to the current session. A `sid` that names no retained session drops the event. When a `sid` string matches more than one retained session, the newest wins.
 
 Dropping means the method returns without emitting. No sequence number is consumed and no gate is touched.
 
@@ -228,7 +233,7 @@ Request-mode reports are always current-session. Nothing about decoration change
 - Per response: at most two map lookups to classify the token (retained sessions, then eviction tombstones), or one `sid`-index lookup on the fallback path.
 - Per session change: one bounded copy of the data store and a drain pass. Session changes are rare next to reports.
 - Memory: the current session plus up to `sessionRetention` ended ones, each holding its data store and unsent queues.
-- One module-scope constant for the registry symbol, side-effect-free for bundlers and exported from its own module, so it tree-shakes like every other constant. The public surface is the config key, the `CMCD_REQUEST_PROVENANCE` symbol, and the typed member on `CmcdRequestReport`.
+- One module-scope constant for the registry symbol, side-effect-free for bundlers and exported from its own module, so it tree-shakes like every other constant. The public surface is the config key, the `CMCD_REQUEST_PROVENANCE` symbol, the `CmcdRequestProvenance` type, and the typed member on `CmcdRequestReport`. One provenance record is minted and frozen per session, so decoration stays a single property write.
 
 ### Testing
 
@@ -238,8 +243,9 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 - A transform-cancelled request attributes via the token, and drops once its session is evicted.
 - `s1 → s2 → s1`: a first-s1 response attributes to the first s1 while retained, drops after eviction, and never resolves to the second s1.
 - A token from another reporter instance falls back to `sid` attribution.
-- The serialization bridge: a JSON-round-tripped request with the token restored via `CMCD_REQUEST_PROVENANCE` attributes exactly, and without restoration it falls back to `sid` attribution.
-- A fabricated token value classifies as foreign and falls back rather than attributing.
+- The serialization bridge: a JSON-round-tripped request with the record restored via `CMCD_REQUEST_PROVENANCE` attributes exactly — including when the restored value is itself a JSON-revived copy of the record — and without restoration it falls back to `sid` attribution.
+- A fabricated token value classifies as foreign and falls back rather than attributing; so does a value not shaped like a provenance record.
+- The stamped record is frozen, its `token` is a string, and a new session mints a new record.
 - Drain before eviction: a partial batch queued under s1 is sent when `update({ sid: 's2' })` runs at `sessionRetention: 0`.
 - Frozen snapshot: mutating a previously passed `bl` array after the transition does not change an archived session's late report.
 - Normalization table: `'1'`, `true`, and `Symbol()` fall back to `2` without throwing, `-1`, `NaN`, and `undefined` fall back to `2`, `0` is accepted and retains nothing, `2.5` floors to `2`, `Infinity` never evicts.
@@ -248,7 +254,7 @@ Regression coverage lands with the implementation, in `CmcdReporter.test.ts`:
 ## Drawbacks
 
 - **Memory scales with retention.** Each retained session keeps its data store and any unsent queues. `Infinity` makes that unbounded, and the TSDoc says so. Eviction tombstones (one small string per ended session) additionally persist for the reporter's lifetime, so exact-token classification never confuses an evicted session with a foreign one.
-- **Provenance does not survive serialization on its own.** Symbol-keyed properties are dropped by `JSON.stringify` and structured clone, so a request round-tripped through a worker or a JSON cache falls back to `sid` attribution unless the player bridges the token with the exported symbol. Spread clones and `Object.assign` preserve it without help.
+- **Provenance does not survive serialization on its own.** Symbol-keyed properties are dropped by `JSON.stringify` and structured clone, so a request round-tripped through a worker or a JSON cache falls back to `sid` attribution unless the player bridges the record with the exported symbol. Spread clones and `Object.assign` preserve it without help. The record itself is JSON-safe, so the bridge is a plain copy with no special casing.
 - **Harder to observe.** The token never appears in logs or JSON dumps, and inspecting it takes the imported symbol or `Object.getOwnPropertySymbols` in a debugger. The invisibility that prevents accidental coupling also hides it from quick diagnostics.
 - **The export invites deliberate misuse.** A public symbol means a player can write under it, not only read. The contract (restore verbatim, never fabricate) is documentation, though the failure is contained: an unknown value classifies as foreign and falls back, so a forged token cannot relabel another session's report.
 - **Dropped events are silent.** A response outliving the retention window disappears without a signal. That follows the reporter's silent-tolerance convention, and a drop counter or debug hook is deliberately left to Future possibilities.
@@ -298,6 +304,7 @@ None. Earlier drafts left the default window and the foreign-token fallback open
 - **2026-08-12 (v7)**: the foreign-token fallback (rule 3) is part of the proposal rather than an open question. Unresolved questions is now empty, and the drop-foreign-tokens alternative is recorded under Rationale and alternatives.
 - **2026-08-12 (v8)**: post-acceptance documentation amendment from implementation review discussion: records the rejected `sid`-as-provenance-value alternative (a symbol-keyed copy of the `sid` instead of a minted token) under Rationale and alternatives. No semantic change.
 - **2026-08-12 (v9)**: implementation-review corrections from #416 round 3. The provenance member on `CmcdRequestReport` is optional, keeping the public type constructible by consumers; the reporter still stamps every request it returns. Token classification uses exact issued tokens (retained sessions plus eviction tombstones) instead of the v5 through v8 instance-prefix scheme, which was forgeable via its sequential generation suffix and misclassified altered tokens as own; tokens are opaque `uuid()` values. The performance section reflects two-lookup classification and a constant-time `sid` index on the fallback path.
+- **2026-08-12 (v10)**: post-acceptance amendment: the provenance value becomes a frozen record, `CmcdRequestProvenance` (`{ readonly token: string }`), minted once per session, instead of the bare token string. The record shape makes future provenance members (for example, an encoded report snapshot for serialization-boundary fidelity) additive for players that already bridge the value, where flipping a released string to an object would break every bridge; the pre-release window is the last point this change is free. Classification semantics are unchanged: the token inside the record is read structurally, so a JSON-revived copy of the record attributes exactly, and a malformed value (no `token` string to read) classifies as foreign under rule 3.
 
 ## Final Decision
 
