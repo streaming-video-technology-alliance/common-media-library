@@ -867,9 +867,8 @@ describe('CmcdReporter', () => {
 
 		it('keeps the start() fan-out on the session that started', async () => {
 			const { requester, requests } = createMockRequester()
-			let reporter: CmcdReporter
 
-			const config: Partial<CmcdReporterConfig> = {
+			const reporter: CmcdReporter = new CmcdReporter({
 				sid: 's1',
 				eventTargets: [
 					{
@@ -894,9 +893,8 @@ describe('CmcdReporter', () => {
 						interval: 30,
 					},
 				],
-			}
+			}, requester)
 
-			reporter = new CmcdReporter(config, requester)
 			reporter.start()
 			reporter.recordEvent(CmcdEventType.ERROR)
 			reporter.stop()
