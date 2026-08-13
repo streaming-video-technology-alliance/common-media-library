@@ -11,9 +11,10 @@ import type { CmcdVersion } from './CmcdVersion.ts'
  */
 export type CmcdEncodeOptions = {
 	/**
-	 * The version of the CMCD specification to use.
+	 * The version of the CMCD specification to use. If not provided, the version
+	 * is inferred from the data's `v` key, defaulting to `CMCD_V2`.
 	 *
-	 * @defaultValue `1`
+	 * @defaultValue `CMCD_V2`
 	 */
 	version?: CmcdVersion;
 
