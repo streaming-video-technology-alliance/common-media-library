@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Corrected the `CmcdEncodeOptions.version` documentation, which still claimed a default of `1`. Encoding has defaulted to `CMCD_V2` since 2.0.0: when `version` is not set, the version is inferred from the data's `v` key, falling back to `CMCD_V2`, which is why `encodeCmcd({ br: 1000 })` emits `br=1000,v=2`. Documentation-only change; runtime behavior is unchanged
+
 ## [2.5.0] - 2026-07-28
 
 ### Added
