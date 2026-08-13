@@ -10,9 +10,8 @@
  * `cmcd` is the request report as encoded on the wire. Decorated requests
  * carry it; the reporter decodes it to rebuild the request-time report data
  * for a `RESPONSE_RECEIVED` event, so the data survives any boundary the
- * record itself is carried across. A response whose request lost the record
- * still attributes through the `sid` fallback chain, but reports derived
- * response keys over the session's data alone.
+ * record itself is carried across. The record is the only attribution key:
+ * a response whose request lost it (and did not restore it) is dropped.
  *
  * The reporter freezes every record it mints. Treat it as opaque: carry it
  * and restore it, never fabricate or alter one.

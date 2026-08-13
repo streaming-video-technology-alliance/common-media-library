@@ -223,9 +223,8 @@ describe('CmcdReporter', () => {
 				}],
 			}), requester)
 
-			// A per-call sid is an attribution key on this method. A key the
-			// reporter never owned cannot be attributed, and emitting under
-			// the current sid would relabel it.
+			// The request carries no provenance record, so the response drops;
+			// a per-call sid is not an attribution key and cannot relabel it.
 			reporter.recordResponseReceived({
 				status: 200,
 				request: { url: 'https://cdn.example.com/segment.mp4' },
@@ -327,7 +326,7 @@ describe('CmcdReporter', () => {
 
 			reporter.recordResponseReceived({
 				status: 200,
-				request: { url: 'https://cdn.example.com/segment.mp4' },
+				request: reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' }),
 			}, { msd: 5000 })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -461,7 +460,7 @@ describe('CmcdReporter', () => {
 			}, requester)
 
 			// A current-session response advances s1's sequence first.
-			reporter.recordResponseReceived({ status: 200, request: { url: 'https://cdn.example.com/seg0.mp4' } })
+			reporter.recordResponseReceived({ status: 200, request: reporter.createRequestReport({ url: 'https://cdn.example.com/seg0.mp4' }) })
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 
@@ -525,7 +524,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('msd=800'))
 		})
 
-		it('attributes by a per-call sid when the request carries no provenance', async () => {
+		it('drops a response whose request carries no provenance', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -533,10 +532,8 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			reporter.update({ sid: 's2' })
-
-			// A hand-built request was never decorated, so the per-call sid is
-			// the only attribution key.
+			// A hand-built request was never decorated: with no record there
+			// is no attribution key, and a per-call sid cannot substitute.
 			reporter.recordResponseReceived({
 				status: 200,
 				request: { url: 'https://cdn.example.com/seg1.mp4' },
@@ -544,8 +541,7 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('sid="s1"'))
+			equal(requests.length, 0)
 		})
 
 		it('attributes a transform-cancelled request to its issuing session', async () => {
@@ -619,7 +615,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('sid="s1"'))
 		})
 
-		it('falls back to the sid chain for a fabricated provenance token', async () => {
+		it('drops a fabricated provenance token', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -627,24 +623,21 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// A token the reporter never issued classifies as foreign: it
-			// cannot name a session, so resolution falls back to the per-call
-			// sid.
+			// A token the reporter never issued names no session it owns, and
+			// a per-call sid cannot substitute.
 			const forged: HttpRequest = {
 				url: 'https://cdn.example.com/seg1.mp4',
 				customData: { cmcd: {}, [PROVENANCE]: { token: 'not-a-real-token' } },
 			}
 
-			reporter.update({ sid: 's2' })
 			reporter.recordResponseReceived({ status: 200, request: forged }, { sid: 's1' })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('sid="s1"'))
+			equal(requests.length, 0)
 		})
 
-		it('falls back to the sid chain for a malformed provenance value', async () => {
+		it('drops a malformed provenance value', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -652,24 +645,21 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// A value that is not shaped like a provenance record (no token
-			// member to read) also classifies as foreign rather than throwing
-			// or attributing.
+			// A value that is not shaped like a provenance record has no token
+			// to read; it drops rather than throwing or attributing.
 			const malformed: HttpRequest = {
 				url: 'https://cdn.example.com/seg1.mp4',
 				customData: { cmcd: {}, [PROVENANCE]: 'not-a-record' },
 			}
 
-			reporter.update({ sid: 's2' })
 			reporter.recordResponseReceived({ status: 200, request: malformed }, { sid: 's1' })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('sid="s1"'))
+			equal(requests.length, 0)
 		})
 
-		it('attributes a foreign-decorated request by its stored sid', async () => {
+		it('drops a request decorated by another reporter instance', async () => {
 			const { requester: requesterA } = createMockRequester()
 			const issuer = new CmcdReporter({
 				sid: 's1',
@@ -683,18 +673,18 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// The issuer's token is foreign to the recorder, so the stored
-			// cmcd sid resolves the recorder's own s1 session.
+			// The issuer's token names no session the recorder owns, even
+			// though the sid strings match. Only the issuing reporter can
+			// attribute its requests.
 			const request = issuer.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 			recorder.recordResponseReceived({ status: 200, request })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('sid="s1"'))
+			equal(requests.length, 0)
 		})
 
-		it('prefers the stored request sid over a per-call sid', async () => {
+		it('ignores a per-call sid when the record resolves', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -979,7 +969,7 @@ describe('CmcdReporter', () => {
 			ok(b[1].includes('sn=0'))
 		})
 
-		it('falls back to the sid chain for an altered provenance token', async () => {
+		it('drops an altered provenance token', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -990,45 +980,16 @@ describe('CmcdReporter', () => {
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 			const customData = stale.customData as unknown as Record<symbol, unknown>
 
-			// An altered token was never issued, so it must classify as
-			// foreign and fall back to the stored sid, never drop.
+			// An altered token was never issued: it names no session, so the
+			// response drops instead of attributing anywhere.
 			const provenance = customData[PROVENANCE] as CmcdRequestProvenance
 			customData[PROVENANCE] = { token: `${provenance.token}-altered` }
 
-			reporter.update({ sid: 's2' })
 			reporter.recordResponseReceived({ status: 200, request: stale })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('sid="s1"'))
-		})
-
-		it('resolves a tokenless sid to the newest retained namesake', async () => {
-			const { requester, requests } = createMockRequester()
-			const reporter = new CmcdReporter({
-				sid: 's1',
-				cid: 'c1',
-				enabledKeys: ['cid', 'v'],
-				eventTargets: [rrTarget()],
-			}, requester)
-
-			reporter.update({ sid: 's2' })
-			reporter.update({ sid: 's1' })
-			reporter.update({ cid: 'c2' })
-			reporter.update({ sid: 's3' })
-
-			// Two s1 generations are retained; the sid chain resolves the
-			// newest, whose snapshot carries c2.
-			reporter.recordResponseReceived({
-				status: 200,
-				request: { url: 'https://cdn.example.com/seg1.mp4' },
-			}, { sid: 's1' })
-
-			await new Promise(resolve => setTimeout(resolve, 10))
-
-			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('cid="c2"'))
+			equal(requests.length, 0)
 		})
 
 		it('retries a failed batch with the bytes it was queued with', async () => {
@@ -1217,39 +1178,25 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 		})
 
-		it('degrades an unbridged serialized response to derived and session data', async () => {
+		it('drops an unbridged serialized response', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
-				cid: 'c1',
-				enabledKeys: ['sid', 'cid', 'd', 'v'],
-				eventTargets: [{
-					url: 'https://example.com/cmcd',
-					events: [CmcdEventType.RESPONSE_RECEIVED],
-					enabledKeys: [...RR_KEYS, 'd'] as CmcdKey[],
-					batchSize: 1,
-				}],
+				enabledKeys: ['sid', 'v'],
+				eventTargets: [rrTarget()],
 			}, requester)
 
-			// d rides only the request report; the session store never has it.
-			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { d: 4000 })
+			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 
-			reporter.update({ sid: 's2' })
-
-			// Nothing restored: the record is gone with the symbol key, and
-			// the revived cmcd object contributes only its sid, for
-			// attribution. The event reports the derived keys over the
-			// retained session's data alone.
+			// JSON drops the symbol-keyed record, and nothing restores it: the
+			// request has no attribution key left, so the response drops. The
+			// revived player-facing cmcd object is never read.
 			const lossy = JSON.parse(JSON.stringify(stale))
 			reporter.recordResponseReceived({ status: 200, request: lossy })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 1)
-			const body = requests[0].body as string
-			ok(body.includes('sid="s1"'), `expected s1 attribution in ${body}`)
-			ok(body.includes('cid="c1"'), `expected session data in ${body}`)
-			ok(!body.includes('d=4000'), `expected request-time d dropped in ${body}`)
+			equal(requests.length, 0)
 		})
 
 		it('keeps CmcdRequestReport constructible without the provenance member', () => {
@@ -2097,7 +2044,7 @@ describe('CmcdReporter', () => {
 				const { requester, requests } = createMockRequester()
 				const reporter = new CmcdReporter(createTarget([CmcdEventType.RESPONSE_RECEIVED], stripAll), requester)
 
-				reporter.recordResponseReceived({ request: { url: 'https://cdn.example.com/seg.mp4' }, status: 200 })
+				reporter.recordResponseReceived({ request: reporter.createRequestReport({ url: 'https://cdn.example.com/seg.mp4' }), status: 200 })
 
 				await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -2112,7 +2059,7 @@ describe('CmcdReporter', () => {
 					data => ({ ...data, url: '' }),
 				), requester)
 
-				reporter.recordResponseReceived({ request: { url: 'https://cdn.example.com/seg.mp4' }, status: 200 })
+				reporter.recordResponseReceived({ request: reporter.createRequestReport({ url: 'https://cdn.example.com/seg.mp4' }), status: 200 })
 
 				await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -2428,17 +2375,9 @@ describe('CmcdReporter', () => {
 		})
 
 		describe('triggering request', () => {
-			// A player's request carries only its own taxonomy on customData.
-			// It does not have to declare the reporter's `cmcd` key.
-			type PlayerRequest = HttpRequest<{ requestType: string; }>
-
 			it('passes the triggering request to the transform for response-received events', async () => {
 				const { requester, requests } = createMockRequester()
 				const seen: (HttpRequest | undefined)[] = []
-				const triggering: PlayerRequest = {
-					url: 'https://cdn.example.com/segment.mp4',
-					customData: { requestType: 'segment' },
-				}
 
 				const reporter = new CmcdReporter({
 					sid: 'test-session',
@@ -2457,6 +2396,11 @@ describe('CmcdReporter', () => {
 						},
 					],
 				}, requester)
+
+				const triggering = reporter.createRequestReport({
+					url: 'https://cdn.example.com/segment.mp4',
+					customData: { requestType: 'segment' },
+				})
 
 				reporter.recordResponseReceived({ request: triggering, status: 200 })
 
@@ -2491,15 +2435,15 @@ describe('CmcdReporter', () => {
 					],
 				}, requester)
 
-				const manifestRequest: PlayerRequest = {
+				const manifestRequest = reporter.createRequestReport({
 					url: 'https://cdn.example.com/manifest.mpd',
 					customData: { requestType: 'mpd' },
-				}
+				})
 
-				const segmentRequest: PlayerRequest = {
+				const segmentRequest = reporter.createRequestReport({
 					url: 'https://cdn.example.com/segment.mp4',
 					customData: { requestType: 'segment' },
-				}
+				})
 
 				reporter.recordResponseReceived({ request: manifestRequest, status: 200 })
 				reporter.recordResponseReceived({ request: segmentRequest, status: 200 })
@@ -2536,13 +2480,14 @@ describe('CmcdReporter', () => {
 				}, requester)
 
 				// A bare object literal with no `cmcd` key and no helper type
-				// alias: this is the shape a player passes, and it must compile
-				// without a cast. `customData` is inferred, not pinned.
+				// alias: this is the shape a player hands to
+				// createRequestReport, and it must compile without a cast.
+				// `customData` is inferred, not pinned.
 				reporter.recordResponseReceived({
-					request: {
+					request: reporter.createRequestReport({
 						url: 'https://cdn.example.com/segment.mp4',
 						customData: { requestType: 'segment' },
-					},
+					}),
 					status: 200,
 				})
 
@@ -2595,13 +2540,10 @@ describe('CmcdReporter', () => {
 				ok(segment.url.includes('CMCD='))
 
 				reporter.recordResponseReceived({
-					request: { url: 'https://cdn.example.com/manifest.mpd', customData: { requestType: 'mpd' } },
+					request: reporter.createRequestReport({ url: 'https://cdn.example.com/manifest.mpd', customData: { requestType: 'mpd' } }),
 					status: 200,
 				})
-				reporter.recordResponseReceived({
-					request: { url: 'https://cdn.example.com/segment.mp4', customData: { requestType: 'segment' } },
-					status: 200,
-				})
+				reporter.recordResponseReceived({ request: segment, status: 200 })
 
 				await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -3180,7 +3122,7 @@ describe('CmcdReporter', () => {
 			}, requester)
 
 			reporter.recordResponseReceived({
-				request: { url: 'https://cdn.example.com/segment.mp4' },
+				request: reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' }),
 				status: 200,
 			}, { 'com.example-rr': 'baz' })
 
@@ -3340,9 +3282,9 @@ describe('CmcdReporter', () => {
 			}
 		}
 
-		function createResponse(overrides: Partial<HttpResponse> = {}): HttpResponse {
+		function createResponse(reporter: CmcdReporter, overrides: Partial<HttpResponse> = {}): HttpResponse {
 			return {
-				request: { url: 'https://cdn.example.com/segment.mp4' },
+				request: reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' }),
 				status: 200,
 				resourceTiming: {
 					startTime: 1000,
@@ -3372,8 +3314,13 @@ describe('CmcdReporter', () => {
 				],
 			}, requester)
 
+			// Only requests decorated by createRequestReport() can be
+			// attributed: the returned request carries the provenance record
+			// the response is resolved by.
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
+
 			reporter.recordResponseReceived({
-				request: { url: 'https://cdn.example.com/segment.mp4' },
+				request,
 				status: 200,
 				resourceTiming: {
 					startTime: 1000,
@@ -3392,7 +3339,7 @@ describe('CmcdReporter', () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createRrConfig(), requester)
 
-			reporter.recordResponseReceived(createResponse())
+			reporter.recordResponseReceived(createResponse(reporter))
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -3410,7 +3357,7 @@ describe('CmcdReporter', () => {
 			const reporter = new CmcdReporter(createRrConfig(), requester)
 			const before = Date.now()
 
-			reporter.recordResponseReceived(createResponse({
+			reporter.recordResponseReceived(createResponse(reporter, {
 				resourceTiming: undefined,
 			}))
 
@@ -3431,7 +3378,7 @@ describe('CmcdReporter', () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createRrConfig(), requester)
 
-			reporter.recordResponseReceived(createResponse({
+			reporter.recordResponseReceived(createResponse(reporter, {
 				resourceTiming: {
 					startTime: 1000,
 					duration: 200,
@@ -3450,7 +3397,7 @@ describe('CmcdReporter', () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createRrConfig(), requester)
 
-			reporter.recordResponseReceived(createResponse(), {
+			reporter.recordResponseReceived(createResponse(reporter), {
 				ttfbb: 60,
 				cmsdd: 'abc123',
 			})
@@ -3466,7 +3413,7 @@ describe('CmcdReporter', () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
-			reporter.recordResponseReceived(createResponse())
+			reporter.recordResponseReceived(createResponse(reporter))
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 

@@ -12,8 +12,9 @@
  * properties: read the value before such a boundary and restore it
  * afterward. The record itself survives JSON, and attribution is by token
  * value rather than object identity, so a revived copy attributes exactly.
- * Never fabricate or alter one; a value the reporter did not write
- * attributes by the `sid` fallback chain instead.
+ * The record is the only attribution key: never fabricate or alter one,
+ * and a value the reporter did not write names no session, so the
+ * response is dropped rather than relabeled.
  *
  * Backed by the symbol registry so duplicated copies of this library in
  * one bundle interoperate. The registry key is stable across versions.
