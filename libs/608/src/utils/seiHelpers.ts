@@ -1,3 +1,6 @@
+import { isCta608UserData } from './isCta608UserData.ts'
+import { parseCcData } from './parseCcData.ts'
+
 export function getSeiData(raw: DataView, startPos: number, endPos: number): DataView {
 	const data: number[] = []
 
@@ -16,39 +19,12 @@ export function getSeiData(raw: DataView, startPos: number, endPos: number): Dat
 }
 
 export function isCea608Sei(payloadType: number, payloadSize: number, sei: DataView, pos: number): boolean {
+	// user_data_registered_itu_t_t35 is payload type 4, and the A/53 identifier is 8 bytes.
 	if (payloadType !== 4 || payloadSize < 8) {
 		return false
 	}
 
-	const countryCode = sei.getUint8(pos)
-	if (countryCode !== 0xB5) {
-		return false
-	}
-
-	const providerCode = sei.getUint16(pos + 1)
-	if (providerCode !== 0x0031) {
-		return false
-	}
-
-	const userIdentifier = sei.getUint32(pos + 3)
-	if (userIdentifier !== 0x47413934) {
-		return false
-	}
-
-	const userDataTypeCode = sei.getUint8(pos + 7)
-	if (userDataTypeCode !== 0x03) {
-		return false
-	}
-
-	return true
-}
-
-export function isCCType(type: number): boolean {
-	return type === 0 || type === 1
-}
-
-export function isNonEmptyCCData(ccData1: number, ccData2: number): boolean {
-	return (ccData1 & 0x7F) > 0 || (ccData2 & 0x7F) > 0
+	return isCta608UserData(sei, pos)
 }
 
 /**
@@ -148,21 +124,9 @@ export function parseCta608DataFromSei(sei: DataView, fieldData: number[][]): vo
 		} while (now === 0xFF)
 
 		if (isCea608Sei(payloadType, payloadSize, sei, cursor)) {
-			const pos = cursor + 10
-			const ccCount = pos + (sei.getUint8(pos - 2) & 0x1F) * 3
-			for (let i = pos; i < ccCount; i += 3) {
-				const byte = sei.getUint8(i)
-				if (byte & 0x04) {
-					const ccType = byte & 0x03
-					if (isCCType(ccType)) {
-						const ccData1 = sei.getUint8(i + 1)
-						const ccData2 = sei.getUint8(i + 2)
-						if (isNonEmptyCCData(ccData1, ccData2)) {
-							fieldData[ccType].push(ccData1, ccData2)
-						}
-					}
-				}
-			}
+			// Skip the 8-byte A/53 identifier to reach cc_data(). The read is bounded by this
+			// SEI message, so a wrong cc_count cannot consume the message that follows it.
+			parseCcData(sei, cursor + 8, cursor + payloadSize, fieldData)
 		}
 		cursor += payloadSize
 	}

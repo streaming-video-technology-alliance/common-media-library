@@ -8,6 +8,21 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-13
+
+### Added
+
+- `extractCta608DataFromAv1Sample` extracts CTA-608 field data from AV1 (`av01`) samples, where captions are carried in a `metadata_itu_t_t35` OBU rather than in an SEI message. The `cc_data()` payload is identical to the SEI path, so the result feeds `Cta608Parser` unchanged. Select on the sample entry type: NAL unit and AV1 samples are framed differently and neither is self-identifying, so the framing has to come from the sample entry rather than from the bytes.
+
+### Changed
+
+- The `cc_data()` parser is now shared by the SEI and OBU carriage paths, and every caller bounds it by the structure that encloses it — the SEI message, the OBU payload, or the range handed to `extractCta608Data` — rather than trusting `cc_count` alone. No change to extracted data for well-formed input.
+
+### Fixed
+
+- A wrong `cc_count` no longer reads caption pairs out of the bytes following the payload it belongs to, which in a multi-message SEI NAL could turn the header of the next message into a caption pair.
+- A `user_data_registered_itu_t_t35` payload carrying only the 8-byte A/53 identifier no longer throws a `RangeError` when `cc_data()` would start past the end of the buffer.
+
 ## [1.0.3] - 2026-07-22
 
 ### Fixed
@@ -35,7 +50,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.3...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.3...608-v1.1.0
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.2...608-v1.0.3
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.1...608-v1.0.2
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.0...608-v1.0.1
