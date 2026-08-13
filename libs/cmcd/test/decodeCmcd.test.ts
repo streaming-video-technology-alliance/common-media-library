@@ -1,4 +1,5 @@
 import { decodeCmcd } from '@svta/cml-cmcd'
+import { SfItem } from '@svta/cml-structured-field-values'
 import { deepEqual } from 'node:assert'
 import { describe, it } from 'node:test'
 import { CMCD_OUTPUT_REQUEST } from './data/CMCD_OUTPUT_REQUEST.ts'
@@ -23,6 +24,26 @@ describe('decodeCmcd', () => {
 			'com.example-hello': 'world',
 			ec: ['ERR001', 'ERR002'],
 			su: true,
+		})
+	})
+
+	it('preserves params on a dictionary member', () => {
+		deepEqual(decodeCmcd('com.example-x=1;p=2'), {
+			'com.example-x': new SfItem(1, { p: 2 }),
+		})
+	})
+
+	it('preserves params on an inner list', () => {
+		deepEqual(decodeCmcd('tab=(3000);p=2'), {
+			tab: new SfItem([3000], { p: 2 }),
+		})
+	})
+
+	it('reduces the value inside a params-bearing item', () => {
+		// The inner token reduces to a string exactly as a bare member's
+		// value would; only the params-bearing wrapper is retained.
+		deepEqual(decodeCmcd('com.example-y=(bar;p=1)'), {
+			'com.example-y': [new SfItem('bar', { p: 1 })],
 		})
 	})
 

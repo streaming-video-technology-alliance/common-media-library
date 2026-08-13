@@ -21,12 +21,13 @@ function reduceValue(value: ReduceValueInput): ReduceValueOutput {
 		return symbolToStr(value)
 	}
 
-	if (value instanceof SfItem && !value.params) {
-		return reduceValue(value.value)
-	}
-
-	if (typeof value === 'string') {
-		return value
+	if (value instanceof SfItem) {
+		// Params are data: an item that carries them stays an SfItem, with
+		// its value reduced the same way a bare member's would be. Only
+		// param-less wrappers unwrap.
+		return value.params
+			? new SfItem(reduceValue(value.value), value.params)
+			: reduceValue(value.value)
 	}
 
 	return value as ReduceValueOutput
@@ -56,9 +57,11 @@ export function decodeCmcd(cmcd: string, options?: CmcdDecodeOptions): CmcdData 
 
 	const sfDict = decodeSfDict(cmcd)
 
+	// Each dictionary member is reduced whole, not via `item.value`, so
+	// member-level and inner-list-level params survive decoding.
 	const result: Record<string, unknown> = {}
 	for (const [key, item] of Object.entries(sfDict as Record<string, SfItem>)) {
-		result[key] = reduceValue(item.value)
+		result[key] = reduceValue(item)
 	}
 
 	if (options?.convertToLatest) {
