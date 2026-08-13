@@ -1,4 +1,4 @@
-import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { decodeSfDict, SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -200,8 +200,9 @@ function copyItemValue(value: unknown): unknown {
  * Complete for the CMCD value space rather than best-effort: `CmcdValue` and
  * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
  * those, and `SfItem.params` is a flat record. Called where a transform is
- * configured, and on the ended session's store at archival, where it detaches
- * the frozen snapshot from caller-held references.
+ * configured, on the ended session's store at archival (detaching the frozen
+ * snapshot from caller-held references), and on the request's stored
+ * player-facing view.
  */
 function copyReportValues(data: Cmcd): Cmcd {
 	const record = data as Record<string, unknown>
@@ -227,54 +228,59 @@ function copyReportValues(data: Cmcd): Cmcd {
 }
 
 /**
- * Rebuilds one value from a request's stored CMCD data as a detached,
- * encodable value.
- *
- * The stored object may have crossed a boundary that drops prototypes (the
- * documented JSON bridge), leaving `SfItem`-shaped plain objects that the
- * encoder's `instanceof` branches reject. Item-shaped values with params are
- * rebuilt as `SfItem`; param-less ones unwrap to their bare value, which
- * encoding re-wraps per key. A custom-key `SfToken` is indistinguishable from
- * its string after JSON and degrades to one.
+ * Rebuilds one decoded structured-field member as CMCD report data:
+ * param-less items unwrap to their bare value (encoding re-wraps per key)
+ * and items with params stay `SfItem`. Tokens are decoded as `SfToken`
+ * (`useSymbol: false`), so a custom-key token keeps its wire type through
+ * re-encoding.
  */
-function canonicalCmcdValue(value: unknown): unknown {
-	if (value === null || typeof value !== 'object') {
-		return value
+function fromDecodedValue(value: unknown): unknown {
+	if (Array.isArray(value)) {
+		return value.map(fromDecodedValue)
 	}
 
-	if (value instanceof SfItem || value instanceof SfToken) {
-		return copyItemValue(value)
-	}
-
-	if ('value' in value) {
-		const { value: inner, params } = value as { value: unknown; params?: unknown; }
+	if (value instanceof SfItem) {
+		const params = value.params
 
 		if (params !== null && typeof params === 'object' && Object.keys(params).length) {
-			return new SfItem(inner, { ...params })
+			return new SfItem(fromDecodedValue(value.value), { ...params })
 		}
 
-		return inner
+		return fromDecodedValue(value.value)
 	}
 
 	return value
 }
 
 /**
- * Rebuilds a request's stored CMCD data as a fresh, detached, encodable
- * object via {@link canonicalCmcdValue}. Only called in
- * `recordResponseReceived()`, where the stored data may have been serialized
- * and revived by the caller between decoration and response.
+ * Decodes the wire snapshot a provenance record carries into fresh,
+ * encodable report data. Only called in `recordResponseReceived()`. Returns
+ * an empty object when the record is absent, carries no snapshot, or the
+ * snapshot does not parse (a value this reporter did not write); the
+ * response then reports its derived keys over the session's data alone.
  */
-function canonicalizeCmcd(data: Cmcd): Cmcd {
-	const result: Record<string, unknown> = {}
-	const record = data as Record<string, unknown>
+function decodeSnapshot(provenance: unknown): Cmcd {
+	const encoded = (provenance !== null && typeof provenance === 'object')
+		? (provenance as { cmcd?: unknown; }).cmcd
+		: undefined
 
-	for (const key in record) {
-		const value = record[key]
-		result[key] = Array.isArray(value) ? value.map(canonicalCmcdValue) : canonicalCmcdValue(value)
+	if (typeof encoded !== 'string' || !encoded) {
+		return {}
 	}
 
-	return result as Cmcd
+	try {
+		const dict = decodeSfDict(encoded, { useSymbol: false }) as Record<string, unknown>
+		const result: Record<string, unknown> = {}
+
+		for (const key of Object.keys(dict)) {
+			result[key] = fromDecodedValue(dict[key])
+		}
+
+		return result as Cmcd
+	}
+	catch {
+		return {}
+	}
 }
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
@@ -347,11 +353,13 @@ type CmcdEventTarget = CmcdTarget & {
 type CmcdSession<C> = {
 	sid: string;
 	/**
-	 * Frozen provenance record minted for this session, carrying the opaque
-	 * token. Stamped on decorated requests under
-	 * {@link CMCD_REQUEST_PROVENANCE} so a late response resolves this exact
-	 * session, independent of wire keys and of `sid` reuse. Only exact
-	 * issued tokens attribute; see `resolveSession()`.
+	 * Frozen base provenance record minted for this session, carrying the
+	 * opaque token. Stamped under {@link CMCD_REQUEST_PROVENANCE} on requests
+	 * the reporter returns undecorated; a decorated request carries a
+	 * per-request record extending it with the encoded report snapshot.
+	 * Either way a late response resolves this exact session, independent of
+	 * wire keys and of `sid` reuse. Only exact issued tokens attribute; see
+	 * `resolveSession()`.
 	 */
 	provenance: CmcdRequestProvenance;
 	data: Cmcd;
@@ -929,10 +937,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *
 	 * The request's `customData` is generic, so a player can pass a request
 	 * carrying its own taxonomy (e.g. `{ requestType: 'segment' }`) without a
-	 * cast. The reporter only reads the optional `cmcd` key that
-	 * {@link CmcdReporter.createRequestReport} writes there; every other key is
-	 * left untouched and stays visible to an event target's `transform` via
-	 * its `request` argument.
+	 * cast. The reporter reads the provenance record that
+	 * {@link CmcdReporter.createRequestReport} writes there, plus the `sid`
+	 * of the player-facing `cmcd` object as an attribution fallback; every
+	 * other key is left untouched and stays visible to an event target's
+	 * `transform` via its `request` argument.
 	 *
 	 * A reporter given a concrete `C` requires the request to satisfy it, so a
 	 * request the configured transforms could not read is rejected here rather
@@ -943,13 +952,19 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * on the request's `customData` (under {@link CMCD_REQUEST_PROVENANCE})
 	 * selects the session by its `token`. A request carrying no provenance,
 	 * or a value written by another reporter instance, falls back to the
-	 * `sid` stored in the request's CMCD data, then to a per-call
-	 * `data.sid`, then to the current session. A response that completes after a `sid` change
+	 * `sid` carried by the record's snapshot, then to the `sid` of the
+	 * request's `cmcd` object, then to a per-call `data.sid`, then to the
+	 * current session. A response that completes after a `sid` change
 	 * reports under its own retained session, with that session's data
 	 * snapshot and sequence numbers (see
 	 * `CmcdReporterConfig.sessionRetention`). When the attributed session is
 	 * no longer retained, the event is dropped rather than relabeled with
 	 * the current `sid`.
+	 *
+	 * Request-time report keys come from the record's encoded `cmcd`
+	 * snapshot, decoded fresh per response. A request whose record was lost
+	 * to a serialization boundary (and not restored) reports its derived
+	 * keys over the session's data alone.
 	 *
 	 * @typeParam RD - The `customData` this request carries. Defaults to the
 	 *                reporter's own `C`.
@@ -968,12 +983,20 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		// The stored request data is canonicalized, not trusted: the caller
-		// may have serialized and revived the request (the documented JSON
-		// bridge), leaving prototype-less values the encoder rejects, and a
-		// live object may still share values the caller can mutate.
-		const cmcd = canonicalizeCmcd(request.customData?.cmcd ?? {})
-		const session = this.resolveSession(request.customData?.[CMCD_REQUEST_PROVENANCE], cmcd.sid || data.sid)
+		// Request-time report data comes from the wire snapshot on the
+		// provenance record, decoded fresh per response, never from the
+		// player-facing `customData.cmcd` object: the snapshot is
+		// reporter-written bytes, immune to caller mutation and lossless
+		// across any boundary the record is carried over. The public object
+		// contributes only its `sid` string, as an attribution fallback for
+		// requests whose record was lost.
+		const provenance = request.customData?.[CMCD_REQUEST_PROVENANCE]
+		const cmcd = decodeSnapshot(provenance)
+		const storedSid = request.customData?.cmcd?.sid
+		const sid = (typeof cmcd.sid === 'string' ? cmcd.sid : undefined)
+			|| (typeof storedSid === 'string' ? storedSid : undefined)
+			|| data.sid
+		const session = this.resolveSession(provenance, sid)
 
 		// A key that names no retained session (evicted, or never owned by
 		// this reporter) cannot be attributed, and emitting the event under
@@ -1152,21 +1175,34 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
-		// The stored snapshot is detached from the caller and the persistent
-		// store: prepareCmcdData builds a fresh object but copies values by
-		// reference, and a late response merges this snapshot into its
-		// report, where a shared array would leak post-decoration mutation.
+		// The player-facing view is detached from the persistent store:
+		// prepareCmcdData builds a fresh object but copies values by
+		// reference, and players read this object to identify requests, so a
+		// shared array would leak mutation into the store. The reporter never
+		// reads it back; the response path works from the encoded snapshot on
+		// the provenance record.
 		const cmcd = report.customData.cmcd = copyReportValues(prepareCmcdData(cmcdData, options))
 
 		if (sendMsd && cmcd.msd !== undefined) {
 			session.requestTarget.msdSent = true
 		}
 
+		const encoded = encodePreparedCmcd(cmcd)
+
+		if (encoded) {
+			// The wire bytes ride the provenance record, so a late response
+			// rebuilds exactly what was sent, across any boundary the record
+			// itself is carried over.
+			report.customData[CMCD_REQUEST_PROVENANCE] = Object.freeze({
+				token: session.provenance.token,
+				cmcd: encoded,
+			})
+		}
+
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
-				const param = encodePreparedCmcd(cmcd)
-				if (param) {
-					url.searchParams.set(CMCD_PARAM, param)
+				if (encoded) {
+					url.searchParams.set(CMCD_PARAM, encoded)
 					report.url = url.toString()
 				}
 				break

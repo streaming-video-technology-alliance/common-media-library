@@ -412,6 +412,9 @@ describe('CmcdReporter', () => {
 				.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
 
 			equal(typeof first.token, 'string')
+			// Request reporting is disabled, so the base record carries no
+			// snapshot.
+			equal(first.cmcd, undefined)
 			ok(Object.isFrozen(first))
 
 			reporter.update({ sid: 's2' })
@@ -420,6 +423,25 @@ describe('CmcdReporter', () => {
 				.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
 
 			notEqual(second.token, first.token)
+		})
+
+		it('carries the encoded report snapshot on a decorated request', () => {
+			const reporter = new CmcdReporter({ sid: 's1', enabledKeys: ['sid', 'sn', 'v'] })
+
+			const r1 = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+			const r2 = reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' })
+			const p1 = (r1.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+			const p2 = (r2.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+
+			// Same session, same token; the snapshot is per request (sn).
+			equal(p1.token, p2.token)
+			ok(Object.isFrozen(p1))
+			ok(p1.cmcd?.includes('sid="s1"'), `expected sid in ${p1.cmcd}`)
+			ok(p1.cmcd?.includes('sn=0'), `expected sn=0 in ${p1.cmcd}`)
+			ok(p2.cmcd?.includes('sn=1'), `expected sn=1 in ${p2.cmcd}`)
+
+			// The snapshot is the query-mode wire param, byte for byte.
+			equal(p1.cmcd, new URL(r1.url).searchParams.get('CMCD'))
 		})
 
 		const rrTarget = () => ({
@@ -1063,17 +1085,17 @@ describe('CmcdReporter', () => {
 			// A plain object is not an RFC 8941 bare item. Reports are encoded
 			// at enqueue, so the failure surfaces synchronously in the
 			// recording call instead of rejecting the send and re-queueing.
-			throws(() => reporter.recordEvent(CmcdEventType.ERROR, { 'ec': 1, 'com.example-bad': { junk: true } } as unknown as Partial<Cmcd>))
+			throws(() => reporter.recordEvent(CmcdEventType.ERROR, { 'ec': ['404'], 'com.example-bad': { junk: true } } as unknown as Partial<Cmcd>))
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 0)
 
 			// The poisoned report was never queued; the target keeps working.
-			reporter.recordEvent(CmcdEventType.ERROR, { ec: 2 })
+			reporter.recordEvent(CmcdEventType.ERROR, { ec: ['500'] })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('ec=2'), `expected ec=2 in ${requests[0].body}`)
+			ok((requests[0].body as string).includes('500'), `expected ec 500 in ${requests[0].body}`)
 
 			reporter.flush()
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1131,8 +1153,9 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ sid: 's2' })
 
-			// JSON strips the SfItem prototype from the stored cmcd; the
-			// report must still encode instead of re-queueing forever.
+			// JSON strips the SfItem prototype from the player-facing cmcd
+			// object; the report is rebuilt from the record's snapshot, so it
+			// encodes cleanly instead of re-queueing forever.
 			const lossy = JSON.parse(JSON.stringify(stale))
 			lossy.customData[PROVENANCE] = provenance
 			reporter.recordResponseReceived({ status: 200, request: lossy })
@@ -1146,6 +1169,87 @@ describe('CmcdReporter', () => {
 			reporter.flush()
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 1)
+		})
+
+		it('revives token values across the JSON bridge via the snapshot', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'ot', 'sf', 'com.example-tok', 'v'],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'ot', 'sf', 'com.example-tok'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			// The token values ride only the request report, so the event can
+			// draw them from nothing but the record's snapshot.
+			const stale = reporter.createRequestReport(
+				{ url: 'https://cdn.example.com/seg1.mp4' },
+				{ ot: 'v', sf: 'd', 'com.example-tok': new SfToken('abc') },
+			)
+			const provenance = (stale.customData as unknown as Record<symbol, unknown>)[PROVENANCE]
+
+			reporter.update({ sid: 's2' })
+
+			// JSON reduces SfToken values in the player-facing cmcd object to
+			// { description } plain objects; the report is rebuilt from the
+			// encoded snapshot instead, so tokens keep their wire type: bare,
+			// never quoted. The record is restored as a revived copy.
+			const lossy = JSON.parse(JSON.stringify(stale))
+			lossy.customData[PROVENANCE] = JSON.parse(JSON.stringify(provenance))
+			reporter.recordResponseReceived({ status: 200, request: lossy })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('ot=v'), `expected bare ot token in ${body}`)
+			ok(body.includes('sf=d'), `expected bare sf token in ${body}`)
+			ok(body.includes('com.example-tok=abc'), `expected bare custom token in ${body}`)
+			ok(!body.includes('"abc"'), `expected unquoted token value in ${body}`)
+
+			// Nothing stuck: the queue drains clean.
+			reporter.flush()
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 1)
+		})
+
+		it('degrades an unbridged serialized response to derived and session data', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				cid: 'c1',
+				enabledKeys: ['sid', 'cid', 'd', 'v'],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'd'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			// d rides only the request report; the session store never has it.
+			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { d: 4000 })
+
+			reporter.update({ sid: 's2' })
+
+			// Nothing restored: the record is gone with the symbol key, and
+			// the revived cmcd object contributes only its sid, for
+			// attribution. The event reports the derived keys over the
+			// retained session's data alone.
+			const lossy = JSON.parse(JSON.stringify(stale))
+			reporter.recordResponseReceived({ status: 200, request: lossy })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('sid="s1"'), `expected s1 attribution in ${body}`)
+			ok(body.includes('cid="c1"'), `expected session data in ${body}`)
+			ok(!body.includes('d=4000'), `expected request-time d dropped in ${body}`)
 		})
 
 		it('keeps CmcdRequestReport constructible without the provenance member', () => {

@@ -481,6 +481,7 @@ export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 // @public
 export type CmcdRequestProvenance = {
     readonly token: string;
+    readonly cmcd?: string;
 };
 
 // @public
