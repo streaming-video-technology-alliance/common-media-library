@@ -1048,6 +1048,38 @@ describe('CmcdReporter', () => {
 			ok((requests[1].body as string).includes('bl=(25000)'), `expected retry to keep bl=(25000) in ${requests[1].body}`)
 		})
 
+		it('throws at record time for a value that cannot serialize, without blocking the queue', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.ERROR],
+					enabledKeys: [...EVENT_KEYS, 'com.example-bad'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			// A plain object is not an RFC 8941 bare item. Reports are encoded
+			// at enqueue, so the failure surfaces synchronously in the
+			// recording call instead of rejecting the send and re-queueing.
+			throws(() => reporter.recordEvent(CmcdEventType.ERROR, { 'ec': 1, 'com.example-bad': { junk: true } } as unknown as Partial<Cmcd>))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 0)
+
+			// The poisoned report was never queued; the target keeps working.
+			reporter.recordEvent(CmcdEventType.ERROR, { ec: 2 })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('ec=2'), `expected ec=2 in ${requests[0].body}`)
+
+			reporter.flush()
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 1)
+		})
+
 		it('freezes the request-stored cmcd against caller array mutation', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({

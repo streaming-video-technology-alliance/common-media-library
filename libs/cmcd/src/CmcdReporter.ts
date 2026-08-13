@@ -328,7 +328,13 @@ type CmcdTarget = {
 }
 
 type CmcdEventTarget = CmcdTarget & {
-	queue: Cmcd[];
+	/**
+	 * Finished, encoded report lines awaiting send. Reports are encoded at
+	 * enqueue, so a value that cannot serialize throws inside the recording
+	 * call, and a queued line is immune to later mutation of the values it
+	 * was built from.
+	 */
+	queue: string[];
 	disposed: boolean;
 }
 
@@ -817,20 +823,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		// Each target gets its own detached copy (the spread is shallow, so
-		// nested values are copied as well): a transform that mutates in
-		// place affects neither sibling targets nor the persistent data, and
-		// a queued report re-sent after a failure keeps the bytes it was
-		// queued with, immune to later caller mutation of nested values.
 		// The session's sid is stamped over any per-call value here so a
 		// transform sees the session identity the report will carry.
-		const item: Cmcd = copyReportValues({
+		const item: Cmcd = {
 			...session.data,
 			...data,
 			sid: session.sid,
 			e: type,
 			ts: data.ts ?? Date.now(),
-		})
+		}
 
 		const { transform } = config
 
@@ -838,6 +839,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			this.queueTargetEvent(session, target, config, item, type)
 			return
 		}
+
+		// The spread above is shallow, so nested values are still shared with
+		// the persistent store and with sibling targets' inputs; a transform
+		// gets its own detached copy so in-place mutation reaches neither.
+		copyReportValues(item)
 
 		// Captured so a transform cannot strip a key the event requires.
 		// `CmcdKey` spans custom keys too, so index through a record view.
@@ -869,12 +875,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Stamps the reporter-owned fields on a finished event report and pushes it
-	 * to the target's queue.
+	 * Stamps the reporter-owned fields on a finished event report, encodes it,
+	 * and pushes the wire line to the target's queue.
 	 *
 	 * Called after any transform has run, so a transform cannot bypass the
 	 * target's `events` filter via `e`, break `sn` continuity, or substitute
-	 * the session identity carried by `sid` and `msd`.
+	 * the session identity carried by `sid` and `msd`. Encoding here means a
+	 * report that cannot serialize throws inside the recording call that
+	 * produced it, instead of rejecting the batch send and re-queueing
+	 * forever.
 	 *
 	 * @param target - The target to queue the report for.
 	 * @param config - The configuration for the target.
@@ -900,7 +909,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			delete report.msd
 		}
 
-		target.queue.push(report)
+		target.queue.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
 	}
 
 	/**
@@ -1222,17 +1231,16 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * Sends an event report. Called by the reporter when a batch is ready to be sent.
 	 *
 	 * @param config - The target config to send the event report to.
-	 * @param data - The data to send in the event report.
+	 * @param data - The encoded report lines to send in the event report.
 	 */
-	private async sendEventReport(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>, data: Cmcd[]): Promise<void> {
-		const options = createEncodingOptions(CMCD_EVENT_MODE, config)
+	private async sendEventReport(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>, data: string[]): Promise<void> {
 		const response = await this.requester({
 			url: config.url,
 			method: 'POST',
 			headers: {
 				'Content-Type': CMCD_MIME_TYPE,
 			},
-			body: data.map(item => encodeCmcd(item, options)).join('\n') + '\n',
+			body: data.join('\n') + '\n',
 		})
 
 		const { status } = response
