@@ -1,3 +1,4 @@
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -224,6 +225,57 @@ function copyReportValues(data: Cmcd): Cmcd {
 	return data
 }
 
+/**
+ * Rebuilds one value from a request's stored CMCD data as a detached,
+ * encodable value.
+ *
+ * The stored object may have crossed a boundary that drops prototypes (the
+ * documented JSON bridge), leaving `SfItem`-shaped plain objects that the
+ * encoder's `instanceof` branches reject. Item-shaped values with params are
+ * rebuilt as `SfItem`; param-less ones unwrap to their bare value, which
+ * encoding re-wraps per key. A custom-key `SfToken` is indistinguishable from
+ * its string after JSON and degrades to one.
+ */
+function canonicalCmcdValue(value: unknown): unknown {
+	if (value === null || typeof value !== 'object') {
+		return value
+	}
+
+	if (value instanceof SfItem || value instanceof SfToken) {
+		return copyItemValue(value)
+	}
+
+	if ('value' in value) {
+		const { value: inner, params } = value as { value: unknown; params?: unknown; }
+
+		if (params !== null && typeof params === 'object' && Object.keys(params).length) {
+			return new SfItem(inner, { ...params })
+		}
+
+		return inner
+	}
+
+	return value
+}
+
+/**
+ * Rebuilds a request's stored CMCD data as a fresh, detached, encodable
+ * object via {@link canonicalCmcdValue}. Only called in
+ * `recordResponseReceived()`, where the stored data may have been serialized
+ * and revived by the caller between decoration and response.
+ */
+function canonicalizeCmcd(data: Cmcd): Cmcd {
+	const result: Record<string, unknown> = {}
+	const record = data as Record<string, unknown>
+
+	for (const key in record) {
+		const value = record[key]
+		result[key] = Array.isArray(value) ? value.map(canonicalCmcdValue) : canonicalCmcdValue(value)
+	}
+
+	return result as Cmcd
+}
+
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
 	return fetch(url, init)
@@ -288,10 +340,10 @@ type CmcdEventTarget = CmcdTarget & {
 type CmcdSession<C> = {
 	sid: string;
 	/**
-	 * Opaque provenance token, unique per session per reporter instance.
-	 * Stamped on decorated requests under {@link CMCD_REQUEST_PROVENANCE}
-	 * so a late response resolves this exact session, independent of wire
-	 * keys and of `sid` reuse.
+	 * Opaque provenance token minted for this session. Stamped on decorated
+	 * requests under {@link CMCD_REQUEST_PROVENANCE} so a late response
+	 * resolves this exact session, independent of wire keys and of `sid`
+	 * reuse. Only exact issued tokens attribute; see `resolveSession()`.
 	 */
 	token: string;
 	data: Cmcd;
@@ -330,14 +382,21 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private session: CmcdSession<C>
 
 	/**
-	 * Namespace for this reporter's provenance tokens. Instance-scoped so a
-	 * token written by another reporter is recognizably foreign: it falls
-	 * back to `sid` attribution instead of colliding with this reporter's
-	 * sessions, while an own-namespace token that resolves nothing is a
-	 * known eviction and drops.
+	 * Tombstones for evicted sessions' tokens. A token found here was issued
+	 * by this reporter but its session is gone, so the response drops instead
+	 * of falling back to `sid` lookup, which could relabel a reused `sid`'s
+	 * retained namesake. Tokens that were never issued (altered or foreign)
+	 * appear in neither `sessions` nor here, and fall back. Grows by one
+	 * small string per ended session for the reporter's lifetime.
 	 */
-	private tokenPrefix = `${uuid()}:`
-	private generation = 0
+	private evictedTokens = new Set<string>()
+
+	/**
+	 * Newest retained session per `sid`, so the fallback chain for tokenless
+	 * and foreign-token responses resolves in constant time regardless of
+	 * the retention size. Maintained on insertion and eviction.
+	 */
+	private sessionsBySid = new Map<string, CmcdSession<C>>()
 
 	/**
 	 * Armed time-interval timers by target config. Timers outlive session
@@ -364,6 +423,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			v: this.config.version,
 		})
 		this.sessions.set(this.session.token, this.session)
+		this.sessionsBySid.set(this.session.sid, this.session)
 		this.requester = requester
 	}
 
@@ -385,7 +445,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		return {
 			sid,
-			token: this.tokenPrefix + this.generation++,
+			token: uuid(),
 			data,
 			msd: NaN,
 			lastEmitted: {},
@@ -414,7 +474,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// continue-then-rethrow contract as `emitEvent()`.
 		let failure: { error: unknown; } | undefined
 
-		this.session.eventTargets.forEach((target, config) => {
+		// The fan-out is pinned to the session that was current when start()
+		// was called: a transform can synchronously rotate the session, and
+		// pairing the new session with the old session's targets would let a
+		// report consume another session's sequence numbers.
+		const session = this.session
+
+		session.eventTargets.forEach((target, config) => {
 			// Disarm any existing timer so repeated start() calls do not leak intervals.
 			this.disarmInterval(config)
 
@@ -427,7 +493,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			}
 
 			try {
-				this.recordTargetEvent(this.session, target, config, CMCD_EVENT_TIME_INTERVAL)
+				this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
 				this.processEventTargets()
 			}
 			catch (error) {
@@ -585,19 +651,29 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		this.session.data = copyReportValues({ ...this.session.data })
 		this.session = this.createSession(sid, { ...this.session.data })
 		this.sessions.set(this.session.token, this.session)
+		this.sessionsBySid.set(sid, this.session)
 
 		// Drain ended sessions before eviction can destroy their queues: a
 		// partial batch the ended session could never fill again leaves now.
 		this.processEventTargets()
 
-		// An evicted session's unsent queues die with it. The current
-		// session was inserted last, so oldest-first eviction never reaches
-		// it, and `Infinity` retention never evicts.
-		for (const key of this.sessions.keys()) {
+		// An evicted session's unsent queues die with it, and its token
+		// leaves a tombstone so its stale responses drop instead of falling
+		// back. The current session was inserted last, so oldest-first
+		// eviction never reaches it, and `Infinity` retention never evicts.
+		for (const [token, session] of this.sessions) {
 			if (this.sessions.size <= this.config.sessionRetention + 1) {
 				break
 			}
-			this.sessions.delete(key)
+
+			this.sessions.delete(token)
+			this.evictedTokens.add(token)
+
+			// The sid index points at the newest holder of the name; an
+			// older evicted namesake must not clear it.
+			if (this.sessionsBySid.get(session.sid) === session) {
+				this.sessionsBySid.delete(session.sid)
+			}
 		}
 
 		// Timers keep ticking across session changes. Configs whose timer was
@@ -737,17 +813,20 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		// Each target gets its own copy, so a transform that mutates in
-		// place affects neither sibling targets nor the persistent data.
+		// Each target gets its own detached copy (the spread is shallow, so
+		// nested values are copied as well): a transform that mutates in
+		// place affects neither sibling targets nor the persistent data, and
+		// a queued report re-sent after a failure keeps the bytes it was
+		// queued with, immune to later caller mutation of nested values.
 		// The session's sid is stamped over any per-call value here so a
 		// transform sees the session identity the report will carry.
-		const item: Cmcd = {
+		const item: Cmcd = copyReportValues({
 			...session.data,
 			...data,
 			sid: session.sid,
 			e: type,
 			ts: data.ts ?? Date.now(),
-		}
+		})
 
 		const { transform } = config
 
@@ -755,10 +834,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			this.queueTargetEvent(session, target, config, item, type)
 			return
 		}
-
-		// The spread above is shallow, so nested values are still shared with
-		// the persistent store and with the other targets' copies.
-		copyReportValues(item)
 
 		// Captured so a transform cannot strip a key the event requires.
 		// `CmcdKey` spans custom keys too, so index through a record view.
@@ -880,7 +955,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		const cmcd = request.customData?.cmcd ?? {}
+		// The stored request data is canonicalized, not trusted: the caller
+		// may have serialized and revived the request (the documented JSON
+		// bridge), leaving prototype-less values the encoder rejects, and a
+		// live object may still share values the caller can mutate.
+		const cmcd = canonicalizeCmcd(request.customData?.cmcd ?? {})
 		const session = this.resolveSession(request.customData?.[CMCD_REQUEST_PROVENANCE], cmcd.sid || data.sid)
 
 		// A key that names no retained session (evicted, or never owned by
@@ -919,31 +998,32 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 	/**
 	 * Resolves the session a response belongs to. Reporter-written provenance
-	 * is authoritative: a token from this reporter either names a retained
-	 * session or, when that session has been evicted, drops the response.
-	 * Falling through to `sid` lookup there would relabel a reused `sid`'s
-	 * retained namesake. A foreign or absent token falls back to the `sid`
-	 * chain, where the newest retained session wins a reused name, then to
-	 * the current session when no key exists at all.
+	 * is authoritative and classified by exact issued tokens: a retained
+	 * token attributes, an evicted token's tombstone drops the response
+	 * (falling through to `sid` lookup would relabel a reused `sid`'s
+	 * retained namesake), and a value this reporter never issued — foreign
+	 * or altered — falls back to the `sid` chain, where the newest retained
+	 * session wins a reused name, then to the current session when no key
+	 * exists at all.
 	 */
 	private resolveSession(token: unknown, sid: string | undefined): CmcdSession<C> | undefined {
-		if (typeof token === 'string' && token.startsWith(this.tokenPrefix)) {
-			return this.sessions.get(token)
+		if (typeof token === 'string') {
+			const session = this.sessions.get(token)
+
+			if (session) {
+				return session
+			}
+
+			if (this.evictedTokens.has(token)) {
+				return undefined
+			}
 		}
 
 		if (!sid) {
 			return this.session
 		}
 
-		let found: CmcdSession<C> | undefined
-
-		this.sessions.forEach((session) => {
-			if (session.sid === sid) {
-				found = session
-			}
-		})
-
-		return found
+		return this.sessionsBySid.get(sid)
 	}
 
 	/**
@@ -1053,7 +1133,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
-		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
+		// The stored snapshot is detached from the caller and the persistent
+		// store: prepareCmcdData builds a fresh object but copies values by
+		// reference, and a late response merges this snapshot into its
+		// report, where a shared array would leak post-decoration mutation.
+		const cmcd = report.customData.cmcd = copyReportValues(prepareCmcdData(cmcdData, options))
 
 		if (sendMsd && cmcd.msd !== undefined) {
 			session.requestTarget.msdSent = true

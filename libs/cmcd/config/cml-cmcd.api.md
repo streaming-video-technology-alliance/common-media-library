@@ -482,7 +482,7 @@ export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 export type CmcdRequestReport<D = unknown> = HttpRequest & {
     customData: {
         cmcd: Cmcd;
-        [CMCD_REQUEST_PROVENANCE]: string;
+        [CMCD_REQUEST_PROVENANCE]?: string;
     } & D;
     headers: Record<string, string>;
 };

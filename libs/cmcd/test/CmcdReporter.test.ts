@@ -1,4 +1,4 @@
-import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdRequestReportTransform, CmcdTransformRequest } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdRequestReport, CmcdRequestReportTransform, CmcdTransformRequest } from '@svta/cml-cmcd'
 import { CMCD_REQUEST_PROVENANCE, CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
@@ -863,6 +863,224 @@ describe('CmcdReporter', () => {
 			ok((requests[2].body as string).includes('sid="s1"'))
 			ok((requests[3].body as string).includes('sn=2'))
 			ok((requests[3].body as string).includes('sid="s1"'))
+		})
+
+		it('keeps the start() fan-out on the session that started', async () => {
+			const { requester, requests } = createMockRequester()
+			let reporter: CmcdReporter
+
+			const config: Partial<CmcdReporterConfig> = {
+				sid: 's1',
+				eventTargets: [
+					{
+						url: 'https://example.com/a',
+						events: [CmcdEventType.TIME_INTERVAL],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 1,
+						interval: 30,
+						// A transform may synchronously rotate the session
+						// mid-fan-out; later targets must stay on the session
+						// that started.
+						transform: (data) => {
+							reporter.update({ sid: 's2' })
+							return data
+						},
+					},
+					{
+						url: 'https://example.com/b',
+						events: [CmcdEventType.TIME_INTERVAL, CmcdEventType.ERROR],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 1,
+						interval: 30,
+					},
+				],
+			}
+
+			reporter = new CmcdReporter(config, requester)
+			reporter.start()
+			reporter.recordEvent(CmcdEventType.ERROR)
+			reporter.stop()
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			const b = requests.filter(r => r.url === 'https://example.com/b').map(r => r.body as string)
+			equal(b.length, 2)
+			// The initial fan-out stays on s1 with s1's counter...
+			ok(b[0].includes('sid="s1"'), `expected sid="s1" in ${b[0]}`)
+			ok(b[0].includes('sn=0'))
+			// ...so the first s2 report is not a duplicate (sid, sn) pair.
+			ok(b[1].includes('sid="s2"'))
+			ok(b[1].includes('sn=0'))
+		})
+
+		it('falls back to the sid chain for an altered provenance token', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'v'],
+				eventTargets: [rrTarget()],
+			}, requester)
+
+			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+			const customData = stale.customData as unknown as Record<symbol, unknown>
+
+			// An altered token was never issued, so it must classify as
+			// foreign and fall back to the stored sid, never drop.
+			customData[PROVENANCE] = `${String(customData[PROVENANCE])}-altered`
+
+			reporter.update({ sid: 's2' })
+			reporter.recordResponseReceived({ status: 200, request: stale })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
+		})
+
+		it('resolves a tokenless sid to the newest retained namesake', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				cid: 'c1',
+				enabledKeys: ['cid', 'v'],
+				eventTargets: [rrTarget()],
+			}, requester)
+
+			reporter.update({ sid: 's2' })
+			reporter.update({ sid: 's1' })
+			reporter.update({ cid: 'c2' })
+			reporter.update({ sid: 's3' })
+
+			// Two s1 generations are retained; the sid chain resolves the
+			// newest, whose snapshot carries c2.
+			reporter.recordResponseReceived({
+				status: 200,
+				request: { url: 'https://cdn.example.com/seg1.mp4' },
+			}, { sid: 's1' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('cid="c2"'))
+		})
+
+		it('retries a failed batch with the bytes it was queued with', async () => {
+			const requests: HttpRequest[] = []
+			let status = 429
+			const requester = async (request: HttpRequest): Promise<{ status: number; }> => {
+				requests.push(request)
+				const current = status
+				status = 200
+				return { status: current }
+			}
+
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'v'],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.ERROR],
+					enabledKeys: [...EVENT_KEYS, 'bl'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			const bl = [25000]
+			reporter.update({ bl })
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			// The 429 re-queued the batch; mutating the caller's array must
+			// not change what the retry sends.
+			bl[0] = 99000
+			reporter.flush()
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[0].body as string).includes('bl=(25000)'))
+			ok((requests[1].body as string).includes('bl=(25000)'), `expected retry to keep bl=(25000) in ${requests[1].body}`)
+		})
+
+		it('freezes the request-stored cmcd against caller array mutation', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'tab', 'v'],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'tab'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			const tab = [3000]
+			reporter.update({ tab })
+			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+
+			reporter.update({ sid: 's2' })
+
+			// The stored request cmcd overrides the frozen snapshot in the
+			// merge, so it must be detached from the caller too.
+			tab[0] = 9000
+			reporter.recordResponseReceived({ status: 200, request: stale })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('tab=(3000)'), `expected frozen tab=(3000) in ${body}`)
+			ok(!body.includes('9000'))
+		})
+
+		it('encodes a JSON-bridged response report without poisoning the queue', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'tab', 'v'],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'tab'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			reporter.update({ tab: [new SfItem(3000)] })
+			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+			const token = (stale.customData as unknown as Record<symbol, unknown>)[PROVENANCE]
+
+			reporter.update({ sid: 's2' })
+
+			// JSON strips the SfItem prototype from the stored cmcd; the
+			// report must still encode instead of re-queueing forever.
+			const lossy = JSON.parse(JSON.stringify(stale))
+			lossy.customData[PROVENANCE] = token
+			reporter.recordResponseReceived({ status: 200, request: lossy })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('tab=(3000)'), `expected tab=(3000) in ${requests[0].body}`)
+
+			// Nothing poisoned stays queued.
+			reporter.flush()
+			await new Promise(resolve => setTimeout(resolve, 10))
+			equal(requests.length, 1)
+		})
+
+		it('keeps CmcdRequestReport constructible without the provenance member', () => {
+			// Compile-level pin: adding a required member would break
+			// consumers that construct or mock the public type.
+			const mock: CmcdRequestReport = {
+				url: 'https://example.com',
+				headers: {},
+				customData: { cmcd: {} },
+			}
+
+			equal(mock.url, 'https://example.com')
 		})
 
 		it('drops a reused-sid stale response once its original session is evicted', async () => {
