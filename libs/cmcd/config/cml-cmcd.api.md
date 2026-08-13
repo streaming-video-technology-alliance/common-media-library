@@ -374,7 +374,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
     recordEvent(type: CmcdEventType, data?: Partial<Cmcd>): void;
     recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & {
         cmcd?: Cmcd;
-        [CMCD_REQUEST_PROVENANCE]?: string;
+        [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance;
     }>>, data?: Partial<Cmcd>): void;
     start(): void;
     stop(flush?: boolean): void;
@@ -479,10 +479,15 @@ export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined;
 export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 
 // @public
+export type CmcdRequestProvenance = {
+    readonly token: string;
+};
+
+// @public
 export type CmcdRequestReport<D = unknown> = HttpRequest & {
     customData: {
         cmcd: Cmcd;
-        [CMCD_REQUEST_PROVENANCE]?: string;
+        [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance;
     } & D;
     headers: Record<string, string>;
 };

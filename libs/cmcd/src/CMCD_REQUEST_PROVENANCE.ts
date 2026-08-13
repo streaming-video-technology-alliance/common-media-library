@@ -2,14 +2,16 @@
  * The `customData` key under which `CmcdReporter.createRequestReport()`
  * stamps session provenance on every request it returns.
  *
- * The value is an opaque token naming the session that issued the request;
+ * The value is a frozen `CmcdRequestProvenance` record whose `token` names
+ * the session that issued the request;
  * `CmcdReporter.recordResponseReceived()` reads it to attribute a late
- * response to that session. Spread and `Object.assign` carry the token
+ * response to that session. Spread and `Object.assign` carry the record
  * through ordinary request clones, but `JSON.stringify` and structured
- * clone drop symbol-keyed properties: read the token before such a
- * boundary and restore it verbatim afterward. Never fabricate or alter a
- * token; a value the reporter did not write attributes by the `sid`
- * fallback chain instead.
+ * clone drop symbol-keyed properties: read the value before such a
+ * boundary and restore it afterward. The record itself survives JSON, and
+ * attribution is by token value rather than object identity, so a revived
+ * copy attributes exactly. Never fabricate or alter one; a value the
+ * reporter did not write attributes by the `sid` fallback chain instead.
  *
  * Backed by the symbol registry so duplicated copies of this library in
  * one bundle interoperate. The registry key is stable across versions.

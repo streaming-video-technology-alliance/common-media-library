@@ -1,8 +1,8 @@
-import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdRequestReport, CmcdRequestReportTransform, CmcdTransformRequest } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdRequestProvenance, CmcdRequestReport, CmcdRequestReportTransform, CmcdTransformRequest } from '@svta/cml-cmcd'
 import { CMCD_REQUEST_PROVENANCE, CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
-import { deepEqual, equal, ok, throws } from 'node:assert'
+import { deepEqual, equal, notEqual, ok, throws } from 'node:assert'
 import { describe, it, mock } from 'node:test'
 
 function createMockRequester(status: number = 200) {
@@ -405,6 +405,23 @@ describe('CmcdReporter', () => {
 			equal(CMCD_REQUEST_PROVENANCE, PROVENANCE)
 		})
 
+		it('stamps a frozen provenance record minted per session', () => {
+			const reporter = new CmcdReporter({ sid: 's1' })
+
+			const first = (reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+				.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+
+			equal(typeof first.token, 'string')
+			ok(Object.isFrozen(first))
+
+			reporter.update({ sid: 's2' })
+
+			const second = (reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' })
+				.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+
+			notEqual(second.token, first.token)
+		})
+
 		const rrTarget = () => ({
 			url: 'https://example.com/cmcd',
 			events: [CmcdEventType.RESPONSE_RECEIVED],
@@ -552,7 +569,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('sid="s1"'))
 		})
 
-		it('restores attribution across a serialization boundary via the provenance token', async () => {
+		it('restores attribution across a serialization boundary via the provenance record', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -561,15 +578,18 @@ describe('CmcdReporter', () => {
 			}, requester)
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
-			const token = (stale.customData as Record<symbol, unknown>)[PROVENANCE]
-			equal(typeof token, 'string')
+			const provenance = (stale.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+			equal(typeof provenance.token, 'string')
 
 			reporter.update({ sid: 's2' })
 
-			// JSON drops symbol keys; the carried token restores exact attribution.
-			const lossy = JSON.parse(JSON.stringify(stale))
-			lossy.customData[PROVENANCE] = token
-			reporter.recordResponseReceived({ status: 200, request: lossy })
+			// JSON drops symbol keys; the carried record restores exact
+			// attribution. The record itself rides the JSON payload, so the
+			// restored value is a revived plain-object copy: classification
+			// is by token value, never object identity.
+			const payload = JSON.parse(JSON.stringify({ request: stale, provenance }))
+			payload.request.customData[PROVENANCE] = payload.provenance
+			reporter.recordResponseReceived({ status: 200, request: payload.request })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -585,15 +605,41 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// A value the reporter never wrote classifies as foreign: it cannot
-			// name a session, so resolution falls back to the per-call sid.
+			// A token the reporter never issued classifies as foreign: it
+			// cannot name a session, so resolution falls back to the per-call
+			// sid.
 			const forged: HttpRequest = {
 				url: 'https://cdn.example.com/seg1.mp4',
-				customData: { cmcd: {}, [PROVENANCE]: 'not-a-real-token' },
+				customData: { cmcd: {}, [PROVENANCE]: { token: 'not-a-real-token' } },
 			}
 
 			reporter.update({ sid: 's2' })
 			reporter.recordResponseReceived({ status: 200, request: forged }, { sid: 's1' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
+		})
+
+		it('falls back to the sid chain for a malformed provenance value', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['cid', 'v'],
+				eventTargets: [rrTarget()],
+			}, requester)
+
+			// A value that is not shaped like a provenance record (no token
+			// member to read) also classifies as foreign rather than throwing
+			// or attributing.
+			const malformed: HttpRequest = {
+				url: 'https://cdn.example.com/seg1.mp4',
+				customData: { cmcd: {}, [PROVENANCE]: 'not-a-record' },
+			}
+
+			reporter.update({ sid: 's2' })
+			reporter.recordResponseReceived({ status: 200, request: malformed }, { sid: 's1' })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -924,7 +970,8 @@ describe('CmcdReporter', () => {
 
 			// An altered token was never issued, so it must classify as
 			// foreign and fall back to the stored sid, never drop.
-			customData[PROVENANCE] = `${String(customData[PROVENANCE])}-altered`
+			const provenance = customData[PROVENANCE] as CmcdRequestProvenance
+			customData[PROVENANCE] = { token: `${provenance.token}-altered` }
 
 			reporter.update({ sid: 's2' })
 			reporter.recordResponseReceived({ status: 200, request: stale })
@@ -1048,14 +1095,14 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ tab: [new SfItem(3000)] })
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
-			const token = (stale.customData as unknown as Record<symbol, unknown>)[PROVENANCE]
+			const provenance = (stale.customData as unknown as Record<symbol, unknown>)[PROVENANCE]
 
 			reporter.update({ sid: 's2' })
 
 			// JSON strips the SfItem prototype from the stored cmcd; the
 			// report must still encode instead of re-queueing forever.
 			const lossy = JSON.parse(JSON.stringify(stale))
-			lossy.customData[PROVENANCE] = token
+			lossy.customData[PROVENANCE] = provenance
 			reporter.recordResponseReceived({ status: 200, request: lossy })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
