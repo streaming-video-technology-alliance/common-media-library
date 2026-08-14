@@ -603,27 +603,38 @@ reporter.update({ sid: "next-session" });
 
 The reporter retains state for recently ended sessions (`sessionRetention`, default `2` ended sessions in addition to the current one; `0` disables retention), so a media request that completes after a session change reports under the session that issued it, with that session's `sid`, sequence numbers, and data snapshot. The snapshot is frozen at the transition: mutating an array previously passed to `update()` does not change what an ended session's late reports say.
 
-Attribution uses an opaque token that `createRequestReport()` stamps on the request's `customData` under the exported `CMCD_REQUEST_PROVENANCE` symbol, on every request it returns, including ones it does not decorate. Spread and `Object.assign` carry the token through ordinary request clones. `JSON.stringify` and structured clone drop symbol-keyed properties, so a request that crosses such a boundary (a worker, a JSON cache) needs the token carried beside it and restored verbatim:
+Attribution rides a frozen provenance record (`CmcdRequestProvenance`) that `createRequestReport()` stamps on the request's `customData` under the exported `CMCD_REQUEST_PROVENANCE` symbol, on every request it returns, including ones it does not decorate. The record carries the issuing session's `sid` (the attribution key), the `cid` that was current when the request was issued, and the request's per-call data as an encoded CMCD string. A `RESPONSE_RECEIVED` event is rebuilt from the record: it reports under the issuing session, with the record's `cid` and the caller's request-time inputs, so a response that completes after a session or content change keeps the meaning it had when its request went out.
+
+Session identity is the `sid` itself, which CTA-5004-B expects to be unique per playback session: mint a fresh GUID for every session.
+
+> [!WARNING]
+> Never reuse a session ID. Everything session-scoped hangs off the `sid` (sequence numbers, the `msd` gate, HTTP 410 disposal, late-response attribution), so reusing one corrupts the integrity of the collected data: the reporter replaces the retained namesake session, and the replaced session's late responses relabel onto the replacement, consuming the replacement's sequence numbers and gates.
+
+Spread and `Object.assign` carry the record through ordinary request clones. `JSON.stringify` and structured clone drop symbol-keyed properties, so a request that crosses such a boundary (a worker, a JSON cache) needs the record carried beside it and restored:
 
 ```typescript
 import { CMCD_REQUEST_PROVENANCE } from "@svta/cml-cmcd";
 
-// Symbol keys do not survive JSON, so carry the token explicitly.
-const payload = {
-	request: JSON.parse(JSON.stringify(request)),
-	token: request.customData[CMCD_REQUEST_PROVENANCE],
-};
+// Symbol keys do not survive JSON, so carry the record explicitly. The
+// record itself is JSON-safe.
+const payload = JSON.parse(
+	JSON.stringify({
+		request,
+		provenance: request.customData[CMCD_REQUEST_PROVENANCE],
+	}),
+);
 
 // Restore it before reporting the response and attribution stays exact.
-payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.token;
+payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.provenance;
 reporter.recordResponseReceived({ status: 200, request: payload.request });
 ```
 
-The token's value is opaque: read it to carry it, restore it verbatim, and never fabricate or alter one. A request that carries no token (never decorated, or decorated by another reporter instance) attributes by the `sid` stored in its CMCD data, then by a per-call `data.sid`, then to the current session:
+The record is the only attribution key: a response whose request carries none is dropped, and a per-call `data.sid` cannot substitute. It is honored wherever its `sid` resolves, so a record is also constructible: a hand-built request, or one decorated by another reporter configured with the same session, attributes by naming the `sid`:
 
 ```typescript
-// The request was never decorated, so the player supplies the session.
-reporter.recordResponseReceived(response, { sid: "previous-session" });
+// The request was never decorated, so the player names the session.
+request.customData[CMCD_REQUEST_PROVENANCE] = { sid: "previous-session" };
+reporter.recordResponseReceived({ status: 200, request });
 ```
 
 A response attributed to a session that is no longer retained is dropped rather than mislabeled with the current session ID. A session change drains an ended session's unsent event reports before eviction can discard them (each report keeps its own session's `sid` and sequence number); a failed batch re-queued into an evicted session dies with it.

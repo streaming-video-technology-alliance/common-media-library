@@ -404,16 +404,17 @@ describe('CmcdReporter', () => {
 			equal(CMCD_REQUEST_PROVENANCE, PROVENANCE)
 		})
 
-		it('stamps a frozen provenance record minted per session', () => {
-			const reporter = new CmcdReporter({ sid: 's1' })
+		it('stamps a frozen provenance record naming the issuing session', () => {
+			const reporter = new CmcdReporter({ sid: 's1', cid: 'c1' })
 
 			const first = (reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 				.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
 
-			equal(typeof first.token, 'string')
-			// Request reporting is disabled, so the base record carries no
+			equal(first.sid, 's1')
+			equal(first.cid, 'c1')
+			// No per-call data was passed, so the base record carries no
 			// snapshot.
-			equal(first.cmcd, undefined)
+			equal(first.data, undefined)
 			ok(Object.isFrozen(first))
 
 			reporter.update({ sid: 's2' })
@@ -421,10 +422,11 @@ describe('CmcdReporter', () => {
 			const second = (reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' })
 				.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
 
-			notEqual(second.token, first.token)
+			notEqual(second, first)
+			equal(second.sid, 's2')
 		})
 
-		it('carries the encoded report snapshot on a decorated request', () => {
+		it('shares one frozen base record across requests without per-call data', () => {
 			const reporter = new CmcdReporter({ sid: 's1', enabledKeys: ['sid', 'sn', 'v'] })
 
 			const r1 = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
@@ -432,15 +434,26 @@ describe('CmcdReporter', () => {
 			const p1 = (r1.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
 			const p2 = (r2.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
 
-			// Same session, same token; the snapshot is per request (sn).
-			equal(p1.token, p2.token)
-			ok(Object.isFrozen(p1))
-			ok(p1.cmcd?.includes('sid="s1"'), `expected sid in ${p1.cmcd}`)
-			ok(p1.cmcd?.includes('sn=0'), `expected sn=0 in ${p1.cmcd}`)
-			ok(p2.cmcd?.includes('sn=1'), `expected sn=1 in ${p2.cmcd}`)
+			// One record per session: decoration stays a single property
+			// write when there is nothing per-request to carry.
+			equal(p1, p2)
+			equal(p1.sid, 's1')
+			equal(p1.data, undefined)
+		})
 
-			// The snapshot is the query-mode wire param, byte for byte.
-			equal(p1.cmcd, new URL(r1.url).searchParams.get('CMCD'))
+		it('carries encoded per-call data on the provenance record', () => {
+			const reporter = new CmcdReporter({ sid: 's1', enabledKeys: ['sid', 'sn', 'v'] })
+
+			const r1 = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			const p1 = (r1.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+
+			ok(Object.isFrozen(p1))
+			ok(p1.data?.includes('ot=v'), `expected ot in ${p1.data}`)
+			ok(p1.data?.includes('d=2000'), `expected d in ${p1.data}`)
+			// The snapshot is the caller's own inputs, never the wire report:
+			// reporter-stamped fields stay out of it.
+			ok(!p1.data?.includes('sn='), `expected no sn in ${p1.data}`)
+			ok(!p1.data?.includes('sid='), `expected no sid in ${p1.data}`)
 		})
 
 		const rrTarget = () => ({
@@ -587,6 +600,145 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('sid="s1"'))
 		})
 
+		it('reports the request-time cid on a response after a cid change', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				cid: 'c1',
+				enabledKeys: [],
+				eventTargets: [rrTarget()],
+			}, requester)
+
+			const inFlight = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+
+			// The content changes mid-session: an rr event for an in-flight
+			// request keeps the cid the request was issued under, so the
+			// response keeps its meaning in later analysis.
+			reporter.update({ cid: 'c2' })
+			reporter.recordResponseReceived({ status: 200, request: inFlight })
+
+			const fresh = reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' })
+			reporter.recordResponseReceived({ status: 200, request: fresh })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[0].body as string).includes('cid="c1"'), `expected request-time cid in ${requests[0].body}`)
+			ok((requests[1].body as string).includes('cid="c2"'), `expected re-minted cid in ${requests[1].body}`)
+		})
+
+		it('carries per-call data through disabled request reporting to the response event', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: [],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'ot', 'd'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			// Request reporting is disabled, yet the response still reports:
+			// the per-call data rides the provenance record.
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			reporter.recordResponseReceived({ status: 200, request })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('ot=v'), `expected ot in ${body}`)
+			ok(body.includes('d=2000'), `expected d in ${body}`)
+		})
+
+		it('carries per-call data through a cancelled transform to the response event', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'v'],
+				transform: () => null,
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'ot', 'd'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			// The transform cancels decoration, but the snapshot is captured
+			// from the caller's inputs before the transform runs.
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			ok(!request.url.includes('CMCD'))
+
+			reporter.recordResponseReceived({ status: 200, request })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('sid="s1"'))
+			ok(body.includes('ot=v'), `expected ot in ${body}`)
+			ok(body.includes('d=2000'), `expected d in ${body}`)
+		})
+
+		it('feeds the response event untransformed per-call data', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'ot', 'd', 'v'],
+				// The request transform rewrites the wire report; the event
+				// pipeline gets the caller's inputs and applies its own
+				// transforms instead.
+				transform: data => ({ ...data, d: 9999 }),
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...RR_KEYS, 'ot', 'd'] as CmcdKey[],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			ok(request.url.includes('d%3D9999'), `expected transformed wire in ${request.url}`)
+
+			reporter.recordResponseReceived({ status: 200, request })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('d=2000'), `expected untransformed d in ${body}`)
+			ok(!body.includes('9999'))
+		})
+
+		it('attributes a response whose per-call data cannot encode', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: [],
+				eventTargets: [rrTarget()],
+			}, requester)
+
+			// 10^15 exceeds the RFC 8941 integer maximum, so the snapshot
+			// cannot serialize; decoration still returns and the response
+			// still attributes, reporting derived keys over session data.
+			const request = reporter.createRequestReport(
+				{ url: 'https://cdn.example.com/seg1.mp4' },
+				{ 'com.example-big': 1_000_000_000_000_000 },
+			)
+			const provenance = (request.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+			equal(provenance.data, undefined)
+
+			reporter.recordResponseReceived({ status: 200, request })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
+		})
+
 		it('restores attribution across a serialization boundary via the provenance record', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
@@ -597,7 +749,7 @@ describe('CmcdReporter', () => {
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 			const provenance = (stale.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
-			equal(typeof provenance.token, 'string')
+			equal(provenance.sid, 's1')
 
 			reporter.update({ sid: 's2' })
 
@@ -615,7 +767,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('sid="s1"'))
 		})
 
-		it('drops a fabricated provenance token', async () => {
+		it('attributes a hand-built provenance record naming a live sid', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -623,14 +775,38 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// A token the reporter never issued names no session it owns, and
-			// a per-call sid cannot substitute.
-			const forged: HttpRequest = {
+			// The record is constructible: a request that never passed
+			// through createRequestReport() still attributes to the session
+			// its sid names.
+			const handBuilt: HttpRequest = {
 				url: 'https://cdn.example.com/seg1.mp4',
-				customData: { cmcd: {}, [PROVENANCE]: { token: 'not-a-real-token' } },
+				customData: { cmcd: {}, [PROVENANCE]: { sid: 's1' } },
 			}
 
-			reporter.recordResponseReceived({ status: 200, request: forged }, { sid: 's1' })
+			reporter.recordResponseReceived({ status: 200, request: handBuilt })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
+		})
+
+		it('drops a provenance record naming no retained session', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['cid', 'v'],
+				eventTargets: [rrTarget()],
+			}, requester)
+
+			// A sid this reporter never saw names no session it owns, and a
+			// per-call sid cannot substitute.
+			const unknown: HttpRequest = {
+				url: 'https://cdn.example.com/seg1.mp4',
+				customData: { cmcd: {}, [PROVENANCE]: { sid: 'never-issued' } },
+			}
+
+			reporter.recordResponseReceived({ status: 200, request: unknown }, { sid: 's1' })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -659,7 +835,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 0)
 		})
 
-		it('drops a request decorated by another reporter instance', async () => {
+		it('attributes a request decorated by another reporter sharing the sid', async () => {
 			const { requester: requesterA } = createMockRequester()
 			const issuer = new CmcdReporter({
 				sid: 's1',
@@ -673,9 +849,32 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// The issuer's token names no session the recorder owns, even
-			// though the sid strings match. Only the issuing reporter can
-			// attribute its requests.
+			// sid is the attribution key, so a split topology (one reporter
+			// decorates, another records) attributes when both were given
+			// the same session.
+			const request = issuer.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+			recorder.recordResponseReceived({ status: 200, request })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
+		})
+
+		it('drops another reporter\'s request naming a sid it never saw', async () => {
+			const { requester: requesterA } = createMockRequester()
+			const issuer = new CmcdReporter({
+				sid: 'issuer-only',
+				enabledKeys: ['sid', 'v'],
+			}, requesterA)
+
+			const { requester, requests } = createMockRequester()
+			const recorder = new CmcdReporter({
+				sid: 's1',
+				enabledKeys: ['sid', 'v'],
+				eventTargets: [rrTarget()],
+			}, requester)
+
 			const request = issuer.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 			recorder.recordResponseReceived({ status: 200, request })
 
@@ -886,7 +1085,7 @@ describe('CmcdReporter', () => {
 			pending[2]({ status: 200 })
 		})
 
-		it('attributes a reused-sid stale response to its original session', async () => {
+		it('relabels a reused-sid stale response onto the replacement session', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -899,8 +1098,8 @@ describe('CmcdReporter', () => {
 				}],
 			}, requester)
 
-			// Two events advance the original s1's sequence past any value the
-			// reused s1 could produce for the stale response.
+			// Two events advance the original s1's sequence so the original
+			// and the replacement counters are distinguishable.
 			reporter.recordEvent(CmcdEventType.ERROR)
 			reporter.recordEvent(CmcdEventType.ERROR)
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
@@ -908,10 +1107,10 @@ describe('CmcdReporter', () => {
 			reporter.update({ sid: 's2' })
 			reporter.update({ sid: 's1' })
 
-			// The reused name is a fresh session, not a resumption.
+			// sid uniqueness is the caller's contract: reusing one replaces
+			// the retained namesake, so the stale response lands in the
+			// replacement session with the replacement's counters.
 			reporter.recordEvent(CmcdEventType.ERROR)
-			// Both s1 sessions are retained; provenance resolves the original,
-			// so the stale response continues the original's sequence.
 			reporter.recordResponseReceived({ status: 200, request: stale })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -919,7 +1118,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 4)
 			ok((requests[2].body as string).includes('sn=0'))
 			ok((requests[2].body as string).includes('sid="s1"'))
-			ok((requests[3].body as string).includes('sn=2'))
+			ok((requests[3].body as string).includes('sn=1'))
 			ok((requests[3].body as string).includes('sid="s1"'))
 		})
 
@@ -969,7 +1168,7 @@ describe('CmcdReporter', () => {
 			ok(b[1].includes('sn=0'))
 		})
 
-		it('drops an altered provenance token', async () => {
+		it('drops an altered provenance record', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -980,10 +1179,10 @@ describe('CmcdReporter', () => {
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 			const customData = stale.customData as unknown as Record<symbol, unknown>
 
-			// An altered token was never issued: it names no session, so the
-			// response drops instead of attributing anywhere.
+			// An altered record names a session this reporter never saw, so
+			// the response drops instead of attributing anywhere.
 			const provenance = customData[PROVENANCE] as CmcdRequestProvenance
-			customData[PROVENANCE] = { token: `${provenance.token}-altered` }
+			customData[PROVENANCE] = { ...provenance, sid: 'not-the-issued-sid' }
 
 			reporter.recordResponseReceived({ status: 200, request: stale })
 
@@ -1211,7 +1410,7 @@ describe('CmcdReporter', () => {
 			equal(mock.url, 'https://example.com')
 		})
 
-		it('drops a reused-sid stale response once its original session is evicted', async () => {
+		it('relabels a reused-sid stale response onto the retained replacement', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -1221,19 +1420,48 @@ describe('CmcdReporter', () => {
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
 
-			// Three changes evict the original s1 at the default retention,
-			// while a fresh s1 stays live.
+			// Reuse replaces the retained namesake, so after these changes
+			// the retained set is s2 and the replacement s1, with s3 current.
 			reporter.update({ sid: 's2' })
 			reporter.update({ sid: 's1' })
 			reporter.update({ sid: 's3' })
 
-			// The evicted original must drop, never resolve to the retained
-			// namesake by sid string.
+			// The stale response resolves the replacement by name: violating
+			// the sid-uniqueness contract relabels the namesake's late
+			// responses onto the replacement.
 			reporter.recordResponseReceived({ status: 200, request: stale })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 0)
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(body.includes('sid="s1"'))
+			ok(body.includes('sn=0'))
+		})
+
+		it('keeps a reused sid at the newest retention position', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 's1',
+				sessionRetention: 1,
+				enabledKeys: ['sid', 'v'],
+				eventTargets: [rrTarget()],
+			}, requester)
+
+			reporter.update({ sid: 's2' })
+			reporter.update({ sid: 's1' })
+			const fromReuse = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+			reporter.update({ sid: 's3' })
+
+			// Replacement re-inserts the reused sid at the newest position:
+			// with one retained slot it is s2 that ages out, never the
+			// replacement s1.
+			reporter.recordResponseReceived({ status: 200, request: fromReuse })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
 		})
 	})
 
