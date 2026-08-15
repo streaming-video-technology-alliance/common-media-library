@@ -3,6 +3,7 @@ import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
+import { CMCD_REQUEST_PROVENANCE } from './CMCD_REQUEST_PROVENANCE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
@@ -14,6 +15,7 @@ import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
 import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
 import type { CmcdReporterCustomData } from './CmcdReporterCustomData.ts'
+import type { CmcdRequestProvenance } from './CmcdRequestProvenance.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
@@ -21,6 +23,7 @@ import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
+import { decodeCmcd } from './decodeCmcd.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
@@ -39,6 +42,7 @@ type CmcdEventReportConfigNormalized<C> = CmcdEventReportConfig<C> & CmcdReportC
 type CmcdReporterConfigNormalized<C> = CmcdReporterConfig<C> & CmcdReportConfigNormalized & {
 	sid: string;
 	eventTargets: CmcdEventReportConfigNormalized<C>[];
+	sessionRetention: number;
 }
 
 function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>, baseUrl?: string): CmcdEncodeOptions {
@@ -195,8 +199,10 @@ function copyItemValue(value: unknown): unknown {
  *
  * Complete for the CMCD value space rather than best-effort: `CmcdValue` and
  * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
- * those, and `SfItem.params` is a flat record. Only called where a transform
- * is configured.
+ * those, and `SfItem.params` is a flat record. Called where a transform is
+ * configured, on the ended session's store at archival (detaching the frozen
+ * snapshot from caller-held references), and on the request's stored
+ * player-facing view.
  */
 function copyReportValues(data: Cmcd): Cmcd {
 	const record = data as Record<string, unknown>
@@ -221,6 +227,43 @@ function copyReportValues(data: Cmcd): Cmcd {
 	return data
 }
 
+/**
+ * Decodes the per-call data snapshot a provenance record carries into
+ * fresh, encodable report data: tokens revive as `SfToken` and
+ * params-bearing items as `SfItem` (`useSymbol: false`), so every value
+ * keeps its wire type through re-encoding. Only called in
+ * `recordResponseReceived()`. Returns an empty object when the record is
+ * absent, carries no snapshot, or the snapshot does not parse (a value
+ * this reporter did not write); the response then reports its derived keys
+ * over the session's data alone.
+ */
+function decodeSnapshot(provenance: unknown): Cmcd {
+	const encoded = (provenance !== null && typeof provenance === 'object')
+		? (provenance as { data?: unknown; }).data
+		: undefined
+
+	if (typeof encoded !== 'string' || !encoded) {
+		return {}
+	}
+
+	try {
+		return decodeCmcd(encoded, { useSymbol: false }) as Cmcd
+	}
+	catch {
+		return {}
+	}
+}
+
+/**
+ * Mints a session's frozen base provenance record: the issuing `sid`, and
+ * the `cid` in effect at mint time. `update()` re-mints on every `cid`
+ * change, so requests issued before a mid-session content change keep the
+ * `cid` they were issued under while later requests carry the new one.
+ */
+function mintProvenance(sid: string, cid: string | undefined): CmcdRequestProvenance {
+	return Object.freeze(typeof cid === 'string' && cid ? { sid, cid } : { sid })
+}
+
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
 	return fetch(url, init)
@@ -236,11 +279,18 @@ function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): Cm
 		...rest
 	} = config
 
+	// Type-checked, never type-coerced: a numeric string or boolean falls
+	// back to the default instead of converting, and a Symbol must not
+	// throw under Math.floor's ToNumber.
+	const retention = config.sessionRetention
+	const sessionRetention = typeof retention === 'number' ? Math.floor(retention) : NaN
+
 	return {
 		...rest,
 		version,
 		transmissionMode,
 		sid,
+		sessionRetention: sessionRetention >= 0 ? sessionRetention : 2,
 		// Apply target config defaults
 		eventTargets: eventTargets.reduce((acc, target) => {
 			if (target?.url && target.events?.length) {
@@ -265,8 +315,40 @@ type CmcdTarget = {
 }
 
 type CmcdEventTarget = CmcdTarget & {
-	intervalId: ReturnType<typeof setInterval> | undefined;
-	queue: Cmcd[];
+	/**
+	 * Finished, encoded report lines awaiting send. Reports are encoded at
+	 * enqueue, so a value that cannot serialize throws inside the recording
+	 * call, and a queued line is immune to later mutation of the values it
+	 * was built from.
+	 */
+	queue: string[];
+	disposed: boolean;
+}
+
+/**
+ * The state owned by one session (one `sid`). Everything CTA-5004-B scopes
+ * to the session lives here, so a report that belongs to an earlier session
+ * (a response completing after a `sid` change, a re-queued batch) is built
+ * from and accounted against its own session rather than the current one.
+ */
+type CmcdSession<C> = {
+	sid: string;
+	/**
+	 * Frozen base provenance record for this session: its `sid` and the
+	 * `cid` in effect when the record was minted. Stamped under
+	 * {@link CMCD_REQUEST_PROVENANCE} on every request the reporter
+	 * returns; a request created with per-call data carries a per-request
+	 * record extending it with that data encoded. Re-minted by `update()`
+	 * whenever the session's `cid` changes, so records are request-time
+	 * truth: already-issued requests keep the record they were stamped
+	 * with. Attribution reads the record's `sid`; see `resolveSession()`.
+	 */
+	provenance: CmcdRequestProvenance;
+	data: Cmcd;
+	msd: number;
+	lastEmitted: Partial<Pick<Cmcd, StateField>>;
+	eventTargets: Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>;
+	requestTarget: CmcdTarget;
 }
 
 /**
@@ -286,15 +368,25 @@ type CmcdEventTarget = CmcdTarget & {
  */
 export class CmcdReporter<C = Record<string, unknown>> {
 	private timeOrigin = performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
-	private data: Cmcd = {}
 	private config: CmcdReporterConfigNormalized<C>
-	private msd: number = NaN
-	private eventTargets = new Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>()
-	private lastEmitted: Partial<Pick<Cmcd, StateField>> = {}
-	private requestTarget: CmcdTarget = {
-		sn: 0,
-		msdSent: false,
-	}
+
+	/**
+	 * Retained sessions keyed by `sid`, insertion-ordered oldest first, the
+	 * current session last. The ended-session count is capped by
+	 * `config.sessionRetention`. CTA-5004-B expects a `sid` to be unique
+	 * per playback session; a reused one replaces its retained namesake at
+	 * the newest position (see `startSession()`).
+	 */
+	private sessions = new Map<string, CmcdSession<C>>()
+	private session: CmcdSession<C>
+
+	/**
+	 * Armed time-interval timers by target config. Timers outlive session
+	 * changes (their callbacks report into whichever session is current at
+	 * fire time), so they live on the reporter rather than the session.
+	 */
+	private intervals = new Map<CmcdEventReportConfigNormalized<C>, ReturnType<typeof setInterval>>()
+	private started = false
 
 	private requester: (request: HttpRequest) => Promise<{ status: number; }>
 
@@ -308,20 +400,43 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 */
 	constructor(config: Partial<CmcdReporterConfig<C>>, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
-		this.data = {
+		this.session = this.createSession(this.config.sid, {
 			cid: this.config.cid,
-			sid: this.config.sid,
 			v: this.config.version,
-		}
+		})
+		this.sessions.set(this.session.sid, this.session)
 		this.requester = requester
+	}
+
+	/**
+	 * Creates the state for a new session: fresh counters, gates, queues and
+	 * dedup baseline for every configured target.
+	 */
+	private createSession(sid: string, data: Cmcd): CmcdSession<C> {
+		const eventTargets = new Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>()
 
 		for (const target of this.config.eventTargets) {
-			this.eventTargets.set(target, {
-				intervalId: undefined,
+			eventTargets.set(target, {
 				sn: 0,
 				msdSent: false,
 				queue: [],
+				disposed: false,
 			})
+		}
+
+		return {
+			sid,
+			// Frozen because it is handed out on every returned request; the
+			// sid value, not the record's identity, is what attributes.
+			provenance: mintProvenance(sid, data.cid),
+			data,
+			msd: NaN,
+			lastEmitted: {},
+			eventTargets,
+			requestTarget: {
+				sn: 0,
+				msdSent: false,
+			},
 		}
 	}
 
@@ -333,6 +448,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * populated before calling start().
 	 */
 	start(): void {
+		this.started = true
+
 		// The initial time-interval event is fired synchronously per target, so a
 		// throwing transform must not abort the loop: later targets would never
 		// have their intervals armed and would report nothing for the session,
@@ -340,27 +457,27 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// continue-then-rethrow contract as `emitEvent()`.
 		let failure: { error: unknown; } | undefined
 
-		this.eventTargets.forEach((target, config) => {
-			// Disarm any existing timer so repeated start() calls do not leak intervals.
-			this.disarmInterval(target)
+		// The fan-out is pinned to the session that was current when start()
+		// was called: a transform can synchronously rotate the session, and
+		// pairing the new session with the old session's targets would let a
+		// report consume another session's sequence numbers.
+		const session = this.session
 
-			// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
-			if (config.interval === 0 || !config.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
+		session.eventTargets.forEach((target, config) => {
+			// Disarm any existing timer so repeated start() calls do not leak intervals.
+			this.disarmInterval(config)
+
+			// A target disposed via HTTP 410 stays silent for the rest of the
+			// session. Armed before the initial event so a throwing transform
+			// leaves the timer in the same state a successful start() would,
+			// rather than silently disabling the target.
+			if (target.disposed || !this.armInterval(config)) {
 				return
 			}
 
-			const timeIntervalEvent = () => {
-				this.recordTargetEvent(target, config, CMCD_EVENT_TIME_INTERVAL)
-				this.processEventTargets()
-			}
-
-			// Armed before the initial event so a throwing transform leaves the
-			// timer in the same state a successful start() would, rather than
-			// silently disabling the target.
-			target.intervalId = setInterval(timeIntervalEvent, config.interval * 1000)
-
 			try {
-				timeIntervalEvent()
+				this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
+				this.processEventTargets()
 			}
 			catch (error) {
 				failure ??= { error }
@@ -373,18 +490,44 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
+	 * Arms the time-interval timer for an event target when its config calls
+	 * for one. Returns whether a timer was armed. The callback reports into
+	 * whichever session is current when it fires.
+	 */
+	private armInterval(config: CmcdEventReportConfigNormalized<C>): boolean {
+		// If the interval is 0 or the TIME_INTERVAL event is not enabled, do not start the interval.
+		if (config.interval === 0 || !config.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
+			return false
+		}
+
+		this.intervals.set(config, setInterval(() => {
+			const session = this.session
+			const target = session.eventTargets.get(config)
+
+			if (target) {
+				this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
+				this.processEventTargets()
+			}
+		}, config.interval * 1000))
+
+		return true
+	}
+
+	/**
 	 * Stops the CMCD reporter. Called by the player when the reporter is disabled.
 	 *
 	 * @param flush - Whether to flush the event targets.
 	 */
 	stop(flush: boolean = false): void {
+		this.started = false
+
 		if (flush) {
 			this.flush()
 		}
 
-		this.eventTargets.forEach((target) => {
-			this.disarmInterval(target)
-		})
+		for (const config of this.config.eventTargets) {
+			this.disarmInterval(config)
+		}
 	}
 
 	/**
@@ -424,28 +567,114 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *
 	 * A `sid` change resets the dedup baseline.
 	 *
+	 * `sid` and `msd` are session-owned: the reporter tracks them itself and
+	 * stamps them onto every outgoing report, so this method is the only way
+	 * to change them. A per-call value on {@link CmcdReporter.recordEvent},
+	 * {@link CmcdReporter.createRequestReport}, or
+	 * {@link CmcdReporter.recordResponseReceived} has no effect; response
+	 * attribution is by the provenance record alone.
+	 * `msd` must be a finite number of milliseconds between `0` and
+	 * `999_999_999_999_999` (the RFC 8941 integer maximum); it is rounded to
+	 * the nearest integer, and invalid values are ignored.
+	 *
 	 * @param data - The data to update.
 	 */
 	update(data: Partial<Cmcd>): void {
-		if (data.sid && data.sid !== this.data.sid) {
-			this.resetSession()
+		if (data.sid && data.sid !== this.session.sid) {
+			this.startSession(data.sid)
 		}
 
-		if (data.msd && !isNaN(data.msd)) {
-			this.msd = data.msd
+		const session = this.session
+		const { msd } = data
+
+		// CTA-5004-B defines msd as integer milliseconds, sent once per session.
+		// 0 is a valid instant-start value; anything non-finite or negative is
+		// ignored so it can neither reach the wire nor consume the send gate.
+		// The rounded value must also fit an RFC 8941 structured-field integer
+		// (at most 999_999_999_999_999), or serialization throws after the
+		// gate is already consumed.
+		if (typeof msd === 'number' && Number.isFinite(msd) && msd >= 0) {
+			const rounded = Math.round(msd)
+
+			if (rounded <= 999_999_999_999_999) {
+				session.msd = rounded
+			}
 		}
 
-		// msd is tracked separately via this.msd and sent once per target,
-		// so it is stripped from the persistent data store after each update.
-		this.data = { ...this.data, ...data, msd: undefined }
+		// sid and msd are session-owned: tracked in their own fields, stripped
+		// from the persistent store, and stamped onto each report at queue time.
+		session.data = { ...session.data, ...data, sid: undefined, msd: undefined }
+
+		// A cid change re-mints the session's base provenance record, so a
+		// request issued from here on carries the new cid while requests
+		// already in flight keep the one they were issued under. Their late
+		// responses then report the content the request was actually about.
+		if (session.data.cid !== session.provenance.cid) {
+			session.provenance = mintProvenance(session.sid, session.data.cid)
+		}
 
 		// Auto-trigger state-change events for any tracked field whose value
 		// differs from the last wire-emitted value. Comparing against lastEmitted
-		// (not the pre-merge value) ensures correctness after a session reset,
+		// (not the pre-merge value) ensures correctness after a session change,
 		// and unifies the comparison basis with recordEvent's internal dedup.
 		for (const entry of STATE_FIELDS) {
-			if (entry.field in data && !entry.equal(this.data[entry.field], this.lastEmitted[entry.field])) {
+			if (entry.field in data && !entry.equal(session.data[entry.field], session.lastEmitted[entry.field])) {
 				this.recordEvent(entry.event)
+			}
+		}
+	}
+
+	/**
+	 * Starts a new session: the current one is archived in place for stale
+	 * attribution, a fresh one takes over, ended sessions are drained, and
+	 * the oldest are evicted beyond the configured retention.
+	 *
+	 * The data store is carried over, and the archived snapshot is frozen:
+	 * the ended session's value graph is detached first, so nested values
+	 * the caller handed to `update()` can no longer mutate it, and the new
+	 * session starts from a shallow copy of the detached graph, so `cid`,
+	 * `br`, custom keys and the rest survive a `sid` change as they always
+	 * have. Sessions are keyed by `sid`, which CTA-5004-B expects to be
+	 * unique per playback session: reusing one replaces the retained
+	 * namesake, whose remaining state dies as if evicted and whose late
+	 * responses relabel onto the replacement.
+	 */
+	private startSession(sid: string): void {
+		this.session.data = copyReportValues({ ...this.session.data })
+		this.session = this.createSession(sid, { ...this.session.data })
+
+		// Map.set keeps an existing key's insertion position, so a reused
+		// sid must be deleted first: re-inserting at the newest position
+		// keeps oldest-first eviction from ever reaching the current
+		// session, and ages out genuinely older sessions ahead of it.
+		this.sessions.delete(sid)
+		this.sessions.set(sid, this.session)
+
+		// Drain ended sessions before eviction can destroy their queues: a
+		// partial batch the ended session could never fill again leaves now.
+		this.processEventTargets()
+
+		// An evicted session's unsent queues die with it, and its stale
+		// responses drop, because its sid no longer names a retained
+		// session. The current session was inserted last, so oldest-first
+		// eviction never reaches it, and `Infinity` retention never evicts.
+		for (const key of this.sessions.keys()) {
+			if (this.sessions.size <= this.config.sessionRetention + 1) {
+				break
+			}
+
+			this.sessions.delete(key)
+		}
+
+		// Timers keep ticking across session changes. Configs whose timer was
+		// disarmed by a 410 in the previous session re-arm here, because the
+		// new session's targets are fresh; the immediate report start() fires
+		// is not repeated.
+		if (this.started) {
+			for (const config of this.config.eventTargets) {
+				if (!this.intervals.has(config)) {
+					this.armInterval(config)
+				}
 			}
 		}
 	}
@@ -483,16 +712,22 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param data - Additional data to record with the event. This data
 	 *               only applies to this event report, except for the dedup
 	 *               field of a state-change event, which is also persisted
-	 *               into the reporter's data store.
+	 *               into the reporter's data store. Session-owned keys
+	 *               (`sid`, `msd`) supplied here are ignored; the reporter
+	 *               stamps its own values.
 	 */
 	recordEvent(type: CmcdEventType, data: Partial<Cmcd> = {}): void {
-		this.emitEvent(type, data)
+		this.emitEvent(this.session, type, data)
 	}
 
 	/**
-	 * Records an event across every configured target, applying
+	 * Records an event across every configured target of a session, applying
 	 * state-change dedup once before per-target fan-out.
 	 *
+	 * @param session - The session the event belongs to. Everything the event
+	 *                  touches (data store, dedup baseline, counters, queues)
+	 *                  is that session's; only `recordResponseReceived()` ever
+	 *                  passes an archived one.
 	 * @param type - The type of event to record.
 	 * @param data - Additional data to record with the event.
 	 * @param request - The media request that triggered the event, when
@@ -500,17 +735,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *                  populates this; it is threaded through to each
 	 *                  target's `transform`.
 	 */
-	private emitEvent(type: CmcdEventType, data: Partial<Cmcd>, request?: HttpRequest): void {
+	private emitEvent(session: CmcdSession<C>, type: CmcdEventType, data: Partial<Cmcd>, request?: HttpRequest): void {
 		const entry = STATE_FIELDS_BY_EVENT.get(type)
 		if (entry) {
 			const field = entry.field
 			const incoming = data[field]
 
 			if (incoming !== undefined) {
-				Object.assign(this.data, { [field]: incoming })
+				Object.assign(session.data, { [field]: incoming })
 			}
 
-			const current = this.data[field]
+			const current = session.data[field]
 
 			// Never emit a state-change event with a missing required field — per
 			// CTA-5004-B these events must carry their dedup field. Catches both
@@ -519,11 +754,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 				return
 			}
 
-			if (entry.equal(current, this.lastEmitted[field])) {
+			if (entry.equal(current, session.lastEmitted[field])) {
 				return
 			}
 
-			Object.assign(this.lastEmitted, { [field]: entry.snapshot(current) })
+			Object.assign(session.lastEmitted, { [field]: entry.snapshot(current) })
 		}
 
 		// A throwing transform must not abort the fan-out. The dedup baseline
@@ -532,9 +767,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// never receive it, and the caller's retry would be deduped away.
 		let failure: { error: unknown; } | undefined
 
-		this.eventTargets.forEach((target, config) => {
+		session.eventTargets.forEach((target, config) => {
 			try {
-				this.recordTargetEvent(target, config, type, data, request)
+				this.recordTargetEvent(session, target, config, type, data, request)
 			}
 			catch (error) {
 				failure ??= { error }
@@ -563,16 +798,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param request - The media request that triggered the event, when
 	 *                  one exists. Passed to the target's `transform`.
 	 */
-	private recordTargetEvent(target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
-		if (!config.events.includes(type)) {
+	private recordTargetEvent(session: CmcdSession<C>, target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
+		if (target.disposed || !config.events.includes(type)) {
 			return
 		}
 
-		// Each target gets its own copy, so a transform that mutates in
-		// place affects neither sibling targets nor the persistent data.
+		// The session's sid is stamped over any per-call value here so a
+		// transform sees the session identity the report will carry.
 		const item: Cmcd = {
-			...this.data,
+			...session.data,
 			...data,
+			sid: session.sid,
 			e: type,
 			ts: data.ts ?? Date.now(),
 		}
@@ -580,12 +816,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const { transform } = config
 
 		if (!transform) {
-			this.queueTargetEvent(target, item, type)
+			this.queueTargetEvent(session, target, config, item, type)
 			return
 		}
 
 		// The spread above is shallow, so nested values are still shared with
-		// the persistent store and with the other targets' copies.
+		// the persistent store and with sibling targets' inputs; a transform
+		// gets its own detached copy so in-place mutation reaches neither.
 		copyReportValues(item)
 
 		// Captured so a transform cannot strip a key the event requires.
@@ -614,30 +851,45 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 
-		this.queueTargetEvent(target, report, type)
+		this.queueTargetEvent(session, target, config, report, type)
 	}
 
 	/**
-	 * Stamps the reporter-owned fields on a finished event report and pushes it
-	 * to the target's queue.
+	 * Stamps the reporter-owned fields on a finished event report, encodes it,
+	 * and pushes the wire line to the target's queue.
 	 *
 	 * Called after any transform has run, so a transform cannot bypass the
-	 * target's `events` filter via `e` or break `sn` continuity.
+	 * target's `events` filter via `e`, break `sn` continuity, or substitute
+	 * the session identity carried by `sid` and `msd`. Encoding here means a
+	 * report that cannot serialize throws inside the recording call that
+	 * produced it, instead of rejecting the batch send and re-queueing
+	 * forever.
 	 *
 	 * @param target - The target to queue the report for.
+	 * @param config - The configuration for the target.
 	 * @param report - The finished report data.
 	 * @param type - The type of event being reported.
 	 */
-	private queueTargetEvent(target: CmcdEventTarget, report: Cmcd, type: CmcdEventType): void {
+	private queueTargetEvent(session: CmcdSession<C>, target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
 		report.e = type
 		report.sn = target.sn++
+		report.sid = session.sid
 
-		if (!isNaN(this.msd) && !target.msdSent) {
-			report.msd = this.msd
+		// msd may only ride a report through the once-per-target gate, and only
+		// when the target's key filter will retain it (msd is never force-added
+		// at encode time): consuming the gate for a report that filters msd out
+		// would silently drop it for the session. A value smuggled in via
+		// per-call data or a transform is stripped, so the gate stays the
+		// single source of once-per-session semantics.
+		if (!isNaN(session.msd) && !target.msdSent && config.enabledKeys?.includes('msd')) {
+			report.msd = session.msd
 			target.msdSent = true
 		}
+		else {
+			delete report.msd
+		}
 
-		target.queue.push(report)
+		target.queue.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
 	}
 
 	/**
@@ -657,14 +909,36 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *
 	 * The request's `customData` is generic, so a player can pass a request
 	 * carrying its own taxonomy (e.g. `{ requestType: 'segment' }`) without a
-	 * cast. The reporter only reads the optional `cmcd` key that
-	 * {@link CmcdReporter.createRequestReport} writes there; every other key is
-	 * left untouched and stays visible to an event target's `transform` via
-	 * its `request` argument.
+	 * cast. The reporter reads only the provenance record that
+	 * {@link CmcdReporter.createRequestReport} writes there; every other key
+	 * is left untouched and stays visible to an event target's `transform`
+	 * via its `request` argument.
 	 *
 	 * A reporter given a concrete `C` requires the request to satisfy it, so a
 	 * request the configured transforms could not read is rejected here rather
 	 * than reaching them; see {@link CmcdReporterCustomData}.
+	 *
+	 * The event is attributed to the session that issued the request, and to
+	 * nothing else: the provenance record that
+	 * {@link CmcdReporter.createRequestReport} stored on the request's
+	 * `customData` (under {@link CMCD_REQUEST_PROVENANCE}) selects the
+	 * session by its `sid`, or the response is dropped rather than
+	 * relabeled. There is no other key: a record lost to a serialization
+	 * boundary (and not restored; see the bridge notes on
+	 * {@link CMCD_REQUEST_PROVENANCE}) and a session no longer retained
+	 * (see `CmcdReporterConfig.sessionRetention`) both drop, and a per-call
+	 * `data.sid` cannot substitute. The record is honored wherever its
+	 * `sid` resolves: a request decorated by another reporter configured
+	 * with the same session attributes here, as does a hand-built record.
+	 * A response that completes after a `sid` change reports under its own
+	 * retained session, with that session's data snapshot and sequence
+	 * numbers.
+	 *
+	 * Request-time report keys come from the record's encoded per-call
+	 * `data` snapshot, decoded fresh per response, and the record's `cid`
+	 * reports in place of the session's current one, so a response that
+	 * completes after a mid-session content change keeps the meaning it
+	 * had when its request was issued.
 	 *
 	 * @typeParam RD - The `customData` this request carries. Defaults to the
 	 *                reporter's own `C`.
@@ -672,8 +946,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param response - The HTTP response received.
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override any auto-derived values.
+	 *               Session-owned keys (`sid`, `msd`) supplied here are
+	 *               ignored; attribution is by the provenance record alone.
 	 */
-	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd }>>, data: Partial<Cmcd> = {}): void {
+	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
 
 		const url = data.url ?? request?.url
@@ -681,6 +957,28 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		if (!url) {
 			return
 		}
+
+		// Attribution is by the provenance record alone: its sid names a
+		// retained session, or the response is dropped rather than relabeled.
+		const provenance = request.customData?.[CMCD_REQUEST_PROVENANCE]
+		const session = this.resolveSession(provenance)
+
+		if (!session) {
+			return
+		}
+
+		// Request-time report data comes from the per-call snapshot on the
+		// same record, decoded fresh per response, never from the
+		// player-facing `customData.cmcd` object: the snapshot is
+		// reporter-written bytes, immune to caller mutation and lossless
+		// across any boundary the record is carried over.
+		const cmcd = decodeSnapshot(provenance)
+
+		// The record's cid is the content the request was issued under. It
+		// overrides the session store's current value so a response landing
+		// after a mid-session content change keeps its meaning, and it
+		// yields to the decoded snapshot and per-call data above it.
+		const { cid } = provenance as { cid?: unknown; }
 
 		const urlObj = new URL(url)
 		urlObj.searchParams.delete(CMCD_PARAM)
@@ -706,9 +1004,31 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			}
 		}
 
-		const cmcd = request.customData?.cmcd ?? {}
+		this.emitEvent(session, CMCD_EVENT_RESPONSE_RECEIVED, {
+			...(typeof cid === 'string' && cid ? { cid } : undefined),
+			...cmcd,
+			...derived,
+			...data,
+		}, request)
+	}
 
-		this.emitEvent(CMCD_EVENT_RESPONSE_RECEIVED, { ...cmcd, ...derived, ...data }, request)
+	/**
+	 * Resolves the session a response belongs to: the provenance record's
+	 * `sid` names one of this reporter's retained sessions, or the response
+	 * is dropped. There is no other key — a record that was lost, or that
+	 * names an evicted or never-seen `sid`, resolves nothing, and
+	 * attributing it anywhere else would relabel it. The `sid` is read
+	 * structurally, so a JSON-revived copy of a record attributes exactly,
+	 * and a hand-built record naming a retained session is honored.
+	 */
+	private resolveSession(provenance: unknown): CmcdSession<C> | undefined {
+		if (provenance === null || typeof provenance !== 'object') {
+			return undefined
+		}
+
+		const { sid } = provenance as { sid?: unknown; }
+
+		return typeof sid === 'string' ? this.sessions.get(sid) : undefined
 	}
 
 	/**
@@ -731,6 +1051,38 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 */
 	isRequestReportingEnabled(): boolean {
 		return !!this.config.enabledKeys?.length
+	}
+
+	/**
+	 * The provenance record to stamp on a returned request: the session's
+	 * frozen base record, extended with the caller's per-call data encoded
+	 * as a CMCD string when there is any. Requests without per-call data
+	 * share the base record, so decoration stays a single property write.
+	 * The snapshot never contains reporter-stamped fields, and a value that
+	 * cannot encode contributes no snapshot rather than failing the
+	 * request; its response still attributes and reports derived keys over
+	 * session data, matching `decodeSnapshot()`'s tolerance on the read
+	 * side.
+	 */
+	private createRequestProvenance(data: Partial<Cmcd> | undefined, baseUrl: string | undefined): CmcdRequestProvenance {
+		const base = this.session.provenance
+
+		if (!data) {
+			return base
+		}
+
+		try {
+			const encoded = encodeCmcd(data as Cmcd, {
+				version: this.config.version,
+				reportingMode: CMCD_REQUEST_MODE,
+				baseUrl,
+			})
+
+			return encoded ? Object.freeze({ ...base, data: encoded }) : base
+		}
+		catch {
+			return base
+		}
 	}
 
 	/**
@@ -761,6 +1113,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			customData: {
 				...customData,
 				cmcd: {},
+				// Session provenance rides every returned request, including
+				// ones this method does not decorate (request reporting
+				// disabled, or a transform cancels below): the request was
+				// still issued by this session, and its response still needs
+				// attribution. The per-call data is captured on the record
+				// here, before any early return, key filter, or transform
+				// can lose it, so a late response reports the caller's own
+				// request-time inputs.
+				[CMCD_REQUEST_PROVENANCE]: this.createRequestProvenance(data, request.url),
 			},
 		} as R & CmcdRequestReport<R['customData']>
 
@@ -768,7 +1129,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return report
 		}
 
-		const merged: Cmcd = { ...this.data, ...data }
+		// Request reports are always current-session. The session's sid is
+		// stamped over any per-call value here so a transform sees the
+		// session identity the report will carry.
+		const session = this.session
+		const merged: Cmcd = { ...session.data, ...data, sid: session.sid }
 		const { transform } = this.config
 		let cmcdData: Cmcd | null = merged
 
@@ -788,23 +1153,44 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 
 		// Reporter-owned fields are stamped after the transform runs.
-		cmcdData.sn = this.requestTarget.sn++
+		cmcdData.sn = session.requestTarget.sn++
+		cmcdData.sid = session.sid
 
-		if (!isNaN(this.msd) && !this.requestTarget.msdSent) {
-			cmcdData.msd = this.msd
-			this.requestTarget.msdSent = true
+		// msd may only ride a report through the once-per-session gate; a value
+		// smuggled in via per-call data or the transform is stripped, so the
+		// gate stays the single source of once-per-session semantics. The gate
+		// is consumed after preparation, and only if the key filter retained
+		// msd, so a filtered-out msd is not silently dropped for the session.
+		const sendMsd = !isNaN(session.msd) && !session.requestTarget.msdSent
+
+		if (sendMsd) {
+			cmcdData.msd = session.msd
+		}
+		else {
+			delete cmcdData.msd
 		}
 
 		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
-		const cmcd = report.customData.cmcd = prepareCmcdData(cmcdData, options)
+		// The player-facing view is detached from the persistent store:
+		// prepareCmcdData builds a fresh object but copies values by
+		// reference, and players read this object to identify requests, so a
+		// shared array would leak mutation into the store. The reporter never
+		// reads it back; the response path works from the encoded snapshot on
+		// the provenance record.
+		const cmcd = report.customData.cmcd = copyReportValues(prepareCmcdData(cmcdData, options))
+
+		if (sendMsd && cmcd.msd !== undefined) {
+			session.requestTarget.msdSent = true
+		}
+
+		const encoded = encodePreparedCmcd(cmcd)
 
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
-				const param = encodePreparedCmcd(cmcd)
-				if (param) {
-					url.searchParams.set(CMCD_PARAM, param)
+				if (encoded) {
+					url.searchParams.set(CMCD_PARAM, encoded)
 					report.url = url.toString()
 				}
 				break
@@ -825,25 +1211,39 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private processEventTargets(flush: boolean = false): void {
 		let reprocess = false
 
-		this.eventTargets.forEach((target, config) => {
-			const { queue } = target
+		// Oldest session first, so an archived session's late reports leave
+		// ahead of current traffic.
+		this.sessions.forEach((session) => {
+			// An archived session receives no further regular events, so its
+			// queues could never fill a batch again; its remainders are always
+			// drain-eligible, preserving the pre-existing behavior of unsent
+			// old-sid events draining after a session change.
+			const drain = flush || session !== this.session
 
-			if (!queue.length) {
-				return
-			}
+			session.eventTargets.forEach((target, config) => {
+				const { queue } = target
 
-			if (queue.length < config.batchSize && !flush) {
-				return
-			}
+				// A disposed target's queue can be non-empty again if a failed
+				// batch was re-queued after disposal; it must stay unsent.
+				if (target.disposed || !queue.length) {
+					return
+				}
 
-			const deleteCount = flush ? queue.length : config.batchSize
-			const events = queue.splice(0, deleteCount)
-			this.sendEventReport(config, events).catch(() => {
-				// Re-queue events that failed to send
-				target.queue.unshift(...events)
+				if (queue.length < config.batchSize && !drain) {
+					return
+				}
+
+				const deleteCount = drain ? queue.length : config.batchSize
+				const events = queue.splice(0, deleteCount)
+				this.sendEventReport(session, config, events).catch(() => {
+					// Re-queue events that failed to send. The target belongs
+					// to the batch's own session, so a failure after a session
+					// change re-queues there, never into the current session.
+					target.queue.unshift(...events)
+				})
+
+				reprocess ||= queue.length > 0
 			})
-
-			reprocess ||= queue.length > 0
 		})
 
 		if (reprocess) {
@@ -855,56 +1255,63 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * Sends an event report. Called by the reporter when a batch is ready to be sent.
 	 *
 	 * @param config - The target config to send the event report to.
-	 * @param data - The data to send in the event report.
+	 * @param data - The encoded report lines to send in the event report.
 	 */
-	private async sendEventReport(config: CmcdEventReportConfigNormalized<C>, data: Cmcd[]): Promise<void> {
-		const options = createEncodingOptions(CMCD_EVENT_MODE, config)
+	private async sendEventReport(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>, data: string[]): Promise<void> {
 		const response = await this.requester({
 			url: config.url,
 			method: 'POST',
 			headers: {
 				'Content-Type': CMCD_MIME_TYPE,
 			},
-			body: data.map(item => encodeCmcd(item, options)).join('\n') + '\n',
+			body: data.join('\n') + '\n',
 		})
 
 		const { status } = response
 
 		if (status === 410) {
-			this.disposeEventTarget(config)
+			// CTA-5004-B scopes 410 suppression to "the remainder of the
+			// current session". The batch's own session is disposed, so a
+			// delayed 410 that lands after a session change silences the
+			// session that sent it, never the one that replaced it.
+			this.disposeEventTarget(session, config)
 		} else if (status === 429 || (status > 499 && status < 600)) {
 			throw new Error(`Event report failed with status ${status}`)
 		}
 	}
 
 	/**
-	 * Cancels the time-interval timer for an event target and clears the stored id.
-	 * Safe to call when no timer is armed (clearInterval(undefined) is a no-op).
+	 * Cancels the time-interval timer for an event target config and clears the
+	 * stored id. Safe to call when no timer is armed (clearInterval(undefined)
+	 * is a no-op).
 	 */
-	private disarmInterval(target: CmcdEventTarget): void {
-		clearInterval(target.intervalId)
-		target.intervalId = undefined
+	private disarmInterval(config: CmcdEventReportConfigNormalized<C>): void {
+		clearInterval(this.intervals.get(config))
+		this.intervals.delete(config)
 	}
 
 	/**
-	 * Permanently removes an event target: cancels its timer and removes it from the
-	 * eventTargets map. Used when the collector signals the target is gone (HTTP 410).
+	 * Silences an event target URL for the remainder of its session: drops the
+	 * queues and blocks further enqueues for every config in the session that
+	 * reports to the URL, per CTA-5004-B's per-target-URL suppression scope,
+	 * and cancels their timers when the session is the live one. Used when the
+	 * collector signals the target is gone (HTTP 410). A session started after
+	 * the disposal is unaffected, since it gets fresh target state.
 	 */
-	private disposeEventTarget(config: CmcdEventReportConfigNormalized<C>): void {
-		const target = this.eventTargets.get(config)
-		if (!target) {
-			return
-		}
-		this.disarmInterval(target)
-		this.eventTargets.delete(config)
-	}
+	private disposeEventTarget(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>): void {
+		session.eventTargets.forEach((target, sibling) => {
+			if (sibling.url !== config.url || target.disposed) {
+				return
+			}
 
-	/**
-	 * Resets the session related data. Called when the session ID changes.
-	 */
-	private resetSession(): void {
-		this.eventTargets.forEach(target => target.sn = 0)
-		this.requestTarget.sn = 0
-		this.lastEmitted = {}
+			target.disposed = true
+			target.queue.length = 0
+
+			// The timer belongs to the live session only; an archived session's
+			// disposal is bookkeeping and must not silence current reporting.
+			if (session === this.session) {
+				this.disarmInterval(sibling)
+			}
+		})
 	}
 }

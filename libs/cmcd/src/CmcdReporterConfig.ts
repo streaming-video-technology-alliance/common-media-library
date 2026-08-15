@@ -32,4 +32,17 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
 	 * @defaultValue `undefined`
 	 */
 	eventTargets?: CmcdEventReportConfig<C>[];
+
+	/**
+	 * The number of ended sessions the reporter retains state for, in
+	 * addition to the current one. Retained sessions let a response that
+	 * completes after a `sid` change report under the session that issued
+	 * its request, with that session's data snapshot and sequence numbers.
+	 * `0` retains nothing, so stale responses are dropped. `Infinity` never
+	 * evicts, which also retains every session's unsent report queues.
+	 * Numbers are floored; every other input falls back to the default.
+	 *
+	 * @defaultValue 2
+	 */
+	sessionRetention?: number;
 }

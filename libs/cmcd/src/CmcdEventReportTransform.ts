@@ -16,8 +16,9 @@ import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
  * It is a read-only view, provided as context only and not to be
  * mutated; see {@link CmcdTransformRequest}.
  *
- * The reporter re-stamps `e` and assigns `sn` and `msd` after this
- * function returns, so values written to those keys are overwritten.
+ * The reporter re-stamps `e` and `sid`, and assigns `sn` and `msd`,
+ * after this function returns, so values written to those keys are
+ * overwritten.
  *
  * Must not throw. Exceptions propagate to the caller that recorded the
  * event, which for time-interval events is the interval timer.

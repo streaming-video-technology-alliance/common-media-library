@@ -12,8 +12,8 @@ import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
  * `createRequestReport()`, as a read-only view. It is context only and
  * must not be mutated; see {@link CmcdTransformRequest}.
  *
- * The reporter assigns `sn` and `msd` after this function returns, so
- * values written to those keys are overwritten.
+ * The reporter re-stamps `sid` and assigns `sn` and `msd` after this
+ * function returns, so values written to those keys are overwritten.
  *
  * Must not throw. Exceptions propagate to the `createRequestReport()`
  * caller.

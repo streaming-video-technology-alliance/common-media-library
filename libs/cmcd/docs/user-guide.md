@@ -593,7 +593,51 @@ Call `flush()` to immediately send all queued events, regardless of batch size:
 reporter.flush();
 ```
 
-### Complete Lifecycle Example
+### Session Changes and Late Responses
+
+Changing the session ID starts a new session: sequence numbers restart, the `msd` gate re-arms, state-change dedup baselines clear, and targets disposed by an HTTP 410 come back to life. The persistent data store carries over, so `cid`, `br`, custom keys and the rest survive the change.
+
+```typescript
+reporter.update({ sid: "next-session" });
+```
+
+The reporter retains state for recently ended sessions (`sessionRetention`, default `2` ended sessions in addition to the current one; `0` disables retention), so a media request that completes after a session change reports under the session that issued it, with that session's `sid`, sequence numbers, and data snapshot. The snapshot is frozen at the transition: mutating an array previously passed to `update()` does not change what an ended session's late reports say.
+
+Attribution rides a frozen provenance record (`CmcdRequestProvenance`) that `createRequestReport()` stamps on the request's `customData` under the exported `CMCD_REQUEST_PROVENANCE` symbol, on every request it returns, including ones it does not decorate. The record carries the issuing session's `sid` (the attribution key), the `cid` that was current when the request was issued, and the request's per-call data as an encoded CMCD string. A `RESPONSE_RECEIVED` event is rebuilt from the record: it reports under the issuing session, with the record's `cid` and the caller's request-time inputs, so a response that completes after a session or content change keeps the meaning it had when its request went out.
+
+Session identity is the `sid` itself, which CTA-5004-B expects to be unique per playback session: mint a fresh GUID for every session.
+
+> [!WARNING]
+> Never reuse a session ID. Everything session-scoped hangs off the `sid` (sequence numbers, the `msd` gate, HTTP 410 disposal, late-response attribution), so reusing one corrupts the integrity of the collected data: the reporter replaces the retained namesake session, and the replaced session's late responses relabel onto the replacement, consuming the replacement's sequence numbers and gates.
+
+Spread and `Object.assign` carry the record through ordinary request clones. `JSON.stringify` and structured clone drop symbol-keyed properties, so a request that crosses such a boundary (a worker, a JSON cache) needs the record carried beside it and restored:
+
+```typescript
+import { CMCD_REQUEST_PROVENANCE } from "@svta/cml-cmcd";
+
+// Symbol keys do not survive JSON, so carry the record explicitly. The
+// record itself is JSON-safe.
+const payload = JSON.parse(
+	JSON.stringify({
+		request,
+		provenance: request.customData[CMCD_REQUEST_PROVENANCE],
+	}),
+);
+
+// Restore it before reporting the response and attribution stays exact.
+payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.provenance;
+reporter.recordResponseReceived({ status: 200, request: payload.request });
+```
+
+The record is the only attribution key: a response whose request carries none is dropped, and a per-call `data.sid` cannot substitute. It is honored wherever its `sid` resolves, so a record is also constructible: a hand-built request, or one decorated by another reporter configured with the same session, attributes by naming the `sid`:
+
+```typescript
+// The request was never decorated, so the player names the session.
+request.customData[CMCD_REQUEST_PROVENANCE] = { sid: "previous-session" };
+reporter.recordResponseReceived({ status: 200, request });
+```
+
+A response attributed to a session that is no longer retained is dropped rather than mislabeled with the current session ID. A session change drains an ended session's unsent event reports before eviction can discard them (each report keeps its own session's `sid` and sequence number); a failed batch re-queued into an evicted session dies with it.
 
 ```typescript
 const reporter = new CmcdReporter({
@@ -821,7 +865,7 @@ The first argument is a copy made for this one report, so you can mutate it in p
 
 ### What a transform cannot change
 
-The reporter re-stamps `e` and assigns `sn` and `msd` after your transform returns, so a transform cannot change a report's event type to slip past a target's `events` filter, cannot create gaps in sequence numbering, and cannot replay the media-start-delay marker. Cancelling a report consumes neither a sequence number nor `msd`: wire `sn` values stay contiguous per destination, and `msd` rides the next report that is actually sent.
+The reporter re-stamps `e` and `sid`, and assigns `sn` and `msd`, after your transform returns, so a transform cannot change a report's event type to slip past a target's `events` filter, cannot substitute the session ID, cannot create gaps in sequence numbering, and cannot replay the media-start-delay marker. Cancelling a report consumes neither a sequence number nor `msd`: wire `sn` values stay contiguous per destination, and `msd` rides the next report that is actually sent.
 
 A transform also cannot remove a key the event requires. Every event needs `e` and `ts`; state-change events need the field they signal (`sta`, `pr`, `cid`, `bg`, `br`), custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these, the reporter puts back the value it had beforehand. It does not invent values: a required key that was already missing before your transform ran stays missing, since that is a bug at the call site rather than something the transform did.
 
@@ -851,6 +895,7 @@ A throw is isolated to the target whose transform threw. The remaining targets s
 | `customHeaderMap`  | `Partial<CmcdHeaderMap>`  | `undefined`         | Routes [custom keys](#custom-keys-in-headers-mode) into specific CMCD header shards in headers mode. |
 | `enabledKeys`      | `CmcdKey[]`               | `undefined`         | Keys to include in request reports. If not provided, no keys will be reported. [Custom keys](#custom-keys) must be listed explicitly. |
 | `eventTargets`     | `CmcdEventReportConfig[]` | `[]`                | Event reporting targets                                                        |
+| `sessionRetention` | `number`                  | `2`                 | Ended sessions to retain state for, in addition to the current one. `0` disables retention. See [Session Changes and Late Responses](#session-changes-and-late-responses). |
 | `transform`        | `CmcdRequestReportTransform` | `undefined`      | Transforms or cancels each request report. See [Transforming and Cancelling Reports](#transforming-and-cancelling-reports) and [Typing `customData`](#typing-customdata). |
 
 ### CmcdEventReportConfig
