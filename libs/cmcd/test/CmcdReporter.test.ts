@@ -4881,6 +4881,28 @@ describe('CmcdReporter', () => {
 		ok(/msd=250/.test(bodies[0]))
 	})
 
+	it('consumes no sequence number or msd gate when encoding throws on createRequestReport', () => {
+		const { requester } = createMockRequester()
+		const reporter = new CmcdReporter({
+			sid: 'sess-encode',
+			enabledKeys: ['com.example-big', 'msd', 'sid', 'sn'],
+		}, requester)
+
+		reporter.update({ msd: 250 })
+
+		throws(() => {
+			reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, {
+				'com.example-big': 1_000_000_000_000_000,
+			})
+		})
+
+		// The failed report consumed nothing: the next report is sn=0 and
+		// still carries the session's msd.
+		const req = reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' })
+		ok(req.url.includes('sn%3D0'))
+		ok(req.url.includes('msd%3D250'))
+	})
+
 	it('never resends a 429 re-queue whose sid was replaced by reuse', async () => {
 		const requests: HttpRequest[] = []
 		const pending: ((response: { status: number; }) => void)[] = []
