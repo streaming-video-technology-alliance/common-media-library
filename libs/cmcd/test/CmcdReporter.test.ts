@@ -4805,8 +4805,8 @@ describe('CmcdReporter', () => {
 			eventTargets: [
 				{
 					url: 'https://a.example.com/cmcd',
-					events: [CmcdEventType.PLAY_STATE],
-					enabledKeys: ['sta', 'sid', 'e', 'ts', 'sn'],
+					events: [CmcdEventType.PLAY_STATE, CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: ['sta', 'url', 'rc', 'sid', 'e', 'ts', 'sn'],
 					batchSize: 1,
 					// Rotating inside the first target's transform leaves the
 					// second target still fanning out on pinned s1.
@@ -4817,8 +4817,8 @@ describe('CmcdReporter', () => {
 				},
 				{
 					url: 'https://b.example.com/cmcd',
-					events: [CmcdEventType.PLAY_STATE],
-					enabledKeys: ['sta', 'sid', 'e', 'ts', 'sn'],
+					events: [CmcdEventType.PLAY_STATE, CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: ['sta', 'url', 'rc', 'sid', 'e', 'ts', 'sn'],
 					batchSize: 1,
 				},
 			],
@@ -4827,12 +4827,23 @@ describe('CmcdReporter', () => {
 			return { status: 200 }
 		})
 
+		// Issued under s1, so its late response is attributed to s1 alone.
+		const req = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
+
 		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 		await Promise.resolve()
 
 		const bReports = bodies.filter((body) => body.startsWith('https://b.example.com/cmcd'))
 		equal(bReports.length, 1)
 		ok(/sid="s1"/.test(bReports[0]))
+		equal(bodies.length, 2)
+
+		// The held eviction ran once the fan-out drained: s1 is gone, so a
+		// response still attributed to it has no session left to report under.
+		reporter.recordResponseReceived({ status: 200, request: req })
+		await Promise.resolve()
+
+		equal(bodies.length, 2)
 	})
 
 	it('consumes no sequence number or msd gate when encoding throws at enqueue', async () => {

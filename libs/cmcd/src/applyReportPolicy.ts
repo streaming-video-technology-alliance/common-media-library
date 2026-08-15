@@ -25,6 +25,26 @@ function isUsableRequiredValue(value: unknown): boolean {
 	return !Array.isArray(value) || value.length > 0
 }
 
+/**
+ * Runs a finished report through its configured `transform` and holds the
+ * transform to its contract: a `null` return cancels the report, and a
+ * required key the transform dropped or replaced with a value the encoder
+ * discards is restored to what it was on the way in.
+ *
+ * @param report - The report data. Its nested values are detached in place
+ *                 before the transform runs.
+ * @param transform - The transform configured for this report, if any.
+ *                    Without one the report is returned untouched.
+ * @param request - The request that triggered the report, passed to the
+ *                  transform as read-only context.
+ * @param requiredKey - The key the event type requires (`cen`, `ec`, a
+ *                      state-change field), restored if the transform drops
+ *                      it. `undefined` where no key is required.
+ * @param restoreTs - Whether `ts` is restored the same way. `true` for
+ *                    event reports, which require it; `false` for request
+ *                    reports, which do not.
+ * @returns The report to send, or `null` if the transform cancelled it.
+ */
 export function applyReportPolicy<C, R extends CmcdTransformRequest<C> | undefined>(
 	report: Cmcd,
 	transform: ((data: Cmcd, request: R) => Cmcd | null) | undefined,
@@ -36,9 +56,10 @@ export function applyReportPolicy<C, R extends CmcdTransformRequest<C> | undefin
 		return report
 	}
 
-	// The spread above is shallow, so nested values are still shared with
-	// the persistent store and with sibling targets' inputs; a transform
-	// gets its own detached copy so in-place mutation reaches neither.
+	// The caller's merge is shallow, so nested values are still shared with
+	// the persistent store, and in event mode with sibling targets' inputs;
+	// a transform gets its own detached copy so in-place mutation reaches
+	// neither.
 	copyReportValues(report)
 
 	const ts = report.ts

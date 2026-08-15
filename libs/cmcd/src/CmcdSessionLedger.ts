@@ -97,8 +97,4 @@ export class CmcdSessionLedger<C> {
 		this.dirty.clear()
 		return sessions
 	}
-
-	forEach(fn: (session: CmcdSessionState<C>) => void): void {
-		this.sessions.forEach(fn)
-	}
 }

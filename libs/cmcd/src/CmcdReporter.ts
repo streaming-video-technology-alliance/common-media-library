@@ -423,6 +423,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 	}
 
+	/**
+	 * Evicts retained sessions beyond the configured retention. An eviction
+	 * requested during a fan-out is held until the outermost fan-out has
+	 * drained, so a session an active fan-out still holds outlives the
+	 * request.
+	 */
 	private requestEvict(): void {
 		if (this.fanOutDepth > 0) {
 			this.evictPending = true
@@ -432,6 +438,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 	}
 
+	/**
+	 * Runs a held eviction once the outermost fan-out has drained. A no-op
+	 * at any deeper level, and when nothing is held.
+	 */
 	private maybeEvict(): void {
 		if (this.fanOutDepth === 0 && this.evictPending) {
 			this.evictPending = false

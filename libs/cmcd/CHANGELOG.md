@@ -26,6 +26,14 @@ and this project adheres to
   - The send gate is consumed only when the prepared report actually retains `msd`. Previously both modes flipped the flag before the `enabledKeys` filter ran, so a target that filtered `msd` out still consumed its gate
 - HTTP 410 disposal of an event target is now scoped per CTA-5004-B: suppression covers every event target configured with the matching URL, lasts for the remainder of the session that received the 410, and no longer outlives it. A `sid` change restores disposed targets (re-arming their intervals when the reporter is started), a 410 response that resolves after a session change silences the session that sent the batch instead of the one that replaced it, and a batch re-queued after a 429/5xx failure retries only within its own session, so a batch invalidated by a disposal in an ended session is never replayed into the new one ([#410](https://github.com/streaming-video-technology-alliance/common-media-library/issues/410))
 - Corrected the `CmcdEncodeOptions.version` documentation, which still claimed a default of `1`. Encoding has defaulted to `CMCD_V2` since 2.0.0: when `version` is not set, the version is inferred from the data's `v` key, falling back to `CMCD_V2`, which is why `encodeCmcd({ br: 1000 })` emits `br=1000,v=2`. Documentation-only change; runtime behavior is unchanged
+- A report value that fails structured-field encoding no longer consumes a sequence number or the session's once-per-target `msd` gate
+- Reports queued while a transform rotates the session mid-event are no longer lost when the outgoing session is evicted (`sessionRetention: 0`)
+- `SfToken`, `Uint8Array`, and `Date` values are now detached when reports are copied, so caller or transform mutation cannot alter the persistent store, sibling targets, or archived session snapshots
+- Calling `stop()` from a transform during `start()` no longer leaves the remaining targets' interval timers armed
+
+### Changed
+
+- Internal restructuring of `CmcdReporter` into session-ledger, playback-state, report-pipeline, and outbox units in preparation for child reporters and automatic session counters. No public API change. Event-report processing now tracks only sessions with queued reports instead of scanning every retained session
 
 ## [2.5.0] - 2026-07-28
 

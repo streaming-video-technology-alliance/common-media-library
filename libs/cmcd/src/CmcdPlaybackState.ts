@@ -33,7 +33,7 @@ export type CmcdPlaybackState = {
 	 * `update()` whenever this playback's `cid` changes, so records are
 	 * request-time truth: already-issued requests keep the record they were
 	 * stamped with. Attribution reads the record's `sid`; see
-	 * `resolveSession()`.
+	 * `CmcdSessionLedger.resolve()`.
 	 */
 	provenance: CmcdRequestProvenance;
 	lastEmitted: Partial<Pick<Cmcd, CmcdStateField>>;
