@@ -4834,4 +4834,39 @@ describe('CmcdReporter', () => {
 		equal(bReports.length, 1)
 		ok(/sid="s1"/.test(bReports[0]))
 	})
+
+	it('consumes no sequence number or msd gate when encoding throws at enqueue', async () => {
+		const bodies: string[] = []
+		const reporter = new CmcdReporter({
+			sid: 'sess-encode',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE, CmcdEventType.CUSTOM_EVENT],
+					enabledKeys: ['sta', 'cen', 'com.example-big', 'msd', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		reporter.update({ msd: 250 })
+
+		throws(() => {
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, {
+				cen: 'boom',
+				'com.example-big': 1_000_000_000_000_000,
+			})
+		})
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		await Promise.resolve()
+
+		// The failed report consumed nothing: the next report is sn=0 and
+		// still carries the session's msd.
+		ok(/sn=0/.test(bodies[0]))
+		ok(/msd=250/.test(bodies[0]))
+	})
 })

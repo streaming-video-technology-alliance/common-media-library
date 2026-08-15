@@ -546,13 +546,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private queueTargetEvent(session: CmcdSessionState<C>, target: CmcdEventTargetState, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
 		const attach = stampReport(report, session, target, config.enabledKeys?.includes('msd') ?? false, type)
 
+		target.queue.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
+
 		target.sn++
 
 		if (attach) {
 			target.msdSent = true
 		}
-
-		target.queue.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
 	}
 
 	/**
@@ -796,7 +796,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 
 		const sendMsd = stampReport(cmcdData, session, stamps, true)
-		stamps.sn++
 
 		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
@@ -808,10 +807,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// reads it back; the response path works from the encoded snapshot on
 		// the provenance record.
 		const cmcd = report.customData.cmcd = copyReportValues(prepareCmcdData(cmcdData, options))
-
-		if (sendMsd && cmcd.msd !== undefined) {
-			stamps.msdSent = true
-		}
 
 		const encoded = encodePreparedCmcd(cmcd)
 
@@ -826,6 +821,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			case CMCD_HEADERS:
 				Object.assign(report.headers, toPreparedCmcdHeaders(cmcd, options.customHeaderMap))
 				break
+		}
+
+		stamps.sn++
+
+		if (sendMsd && cmcd.msd !== undefined) {
+			stamps.msdSent = true
 		}
 
 		return report
