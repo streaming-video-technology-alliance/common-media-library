@@ -1479,7 +1479,7 @@ describe('CmcdReporter', () => {
 			ok(!req.url.includes('msd'))
 			// The gate must stay open: the report never carried msd. Asserted on
 			// the private flag because a fixed config has no observable follow-up.
-			equal((reporter as unknown as { session: { requestTarget: { msdSent: boolean; }; }; }).session.requestTarget.msdSent, false)
+			equal((reporter as unknown as { session: { requestTargets: Map<string, { msdSent: boolean; }>; }; }).session.requestTargets.get('default')?.msdSent, false)
 		})
 
 		it('does not consume a target gate when msd is not in the target enabledKeys', async () => {
@@ -4706,8 +4706,10 @@ describe('CmcdReporter', () => {
 						if (calls++ === 0) {
 							const tok = data['com.example-tok'] as SfToken
 							const bin = data['com.example-bin'] as SfItem<string, Record<string, unknown>>
+							const bytes = (bin.params as Record<string, unknown>)['data'] as Uint8Array
+
 							tok.description = 'mutated'
-							;(bin.params!['data'] as Uint8Array)[0] = 9
+							bytes[0] = 9
 						}
 						return data
 					},

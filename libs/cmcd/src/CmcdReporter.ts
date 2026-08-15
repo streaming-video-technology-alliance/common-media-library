@@ -120,11 +120,6 @@ type CmcdSession<C> = {
 	snapshots: Map<string, Cmcd>;
 	eventTargets: Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>;
 	requestTargets: Map<string, CmcdTargetStamps>;
-	/**
-	 * The same object `requestTargets` holds under
-	 * {@link CMCD_DEFAULT_REQUEST_TARGET}, reachable by name.
-	 */
-	requestTarget: CmcdTargetStamps;
 }
 
 /**
@@ -217,11 +212,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			})
 		}
 
-		const requestTarget: CmcdTargetStamps = {
-			sn: 0,
-			msdSent: false,
-		}
-
 		return {
 			sid,
 			msd: NaN,
@@ -229,8 +219,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			bgEmitted: undefined,
 			snapshots: new Map(),
 			eventTargets,
-			requestTargets: new Map([[CMCD_DEFAULT_REQUEST_TARGET, requestTarget]]),
-			requestTarget,
+			requestTargets: new Map([[CMCD_DEFAULT_REQUEST_TARGET, {
+				sn: 0,
+				msdSent: false,
+			}]]),
 		}
 	}
 
