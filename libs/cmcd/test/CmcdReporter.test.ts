@@ -4777,4 +4777,23 @@ describe('CmcdReporter', () => {
 		ok(bodies[1].includes('com.example-when="k";at=@1704067200'))
 		ok(bodies[1].includes('com.example-bare-when=@1704067200'))
 	})
+
+	it('does not leave a bg key in the store when update() never received one', () => {
+		const { requester } = createMockRequester()
+		const reporter = new CmcdReporter({
+			sid: 'sess-no-bg',
+			enabledKeys: ['bg'],
+		}, requester)
+
+		reporter.update({ sta: 'p' })
+
+		// bg was never set, so the only enabled key has no value and the report
+		// is empty. An empty report is not transmitted at all: a store carrying
+		// a bg key with an undefined value would make the key set non-empty,
+		// which force-adds `v` and puts a spurious `CMCD=v%3D2` on the wire.
+		const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+		equal(req.url, 'https://example.com/video.mp4')
+		deepEqual(req.customData.cmcd, {})
+	})
 })

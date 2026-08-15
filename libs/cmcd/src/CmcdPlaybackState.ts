@@ -24,12 +24,23 @@ export type CmcdPlaybackState = {
 	/** The ledger epoch this playback last observed; lazy baseline reset. */
 	epoch: number;
 	data: Cmcd;
+	/**
+	 * Frozen base provenance record for this playback: the `sid` of the
+	 * session it reports into, and the `cid` in effect when the record was
+	 * minted. Stamped under {@link CMCD_REQUEST_PROVENANCE} on every request
+	 * the reporter returns; a request created with per-call data carries a
+	 * per-request record extending it with that data encoded. Re-minted by
+	 * `update()` whenever this playback's `cid` changes, so records are
+	 * request-time truth: already-issued requests keep the record they were
+	 * stamped with. Attribution reads the record's `sid`; see
+	 * `resolveSession()`.
+	 */
 	provenance: CmcdRequestProvenance;
 	lastEmitted: Partial<Pick<Cmcd, CmcdStateField>>;
 }
 
 /**
- * Mints a session's frozen base provenance record: the issuing `sid`, and
+ * Mints a playback's frozen base provenance record: the issuing `sid`, and
  * the `cid` in effect at mint time. `update()` re-mints on every `cid`
  * change, so requests issued before a mid-session content change keep the
  * `cid` they were issued under while later requests carry the new one.
@@ -38,6 +49,19 @@ export function mintProvenance(sid: string, cid: string | undefined): CmcdReques
 	return Object.freeze(typeof cid === 'string' && cid ? { sid, cid } : { sid })
 }
 
+/**
+ * Creates the state for a playback reporting into `sid`: the given data as
+ * its persistent store, a freshly minted base provenance record, and an
+ * empty dedup baseline.
+ */
 export function createCmcdPlaybackState(pid: string, sid: string, epoch: number, data: Cmcd): CmcdPlaybackState {
-	return { pid, epoch, data, provenance: mintProvenance(sid, data.cid), lastEmitted: {} }
+	return {
+		pid,
+		epoch,
+		data,
+		// Frozen because it is handed out on every returned request; the
+		// sid value, not the record's identity, is what attributes.
+		provenance: mintProvenance(sid, data.cid),
+		lastEmitted: {},
+	}
 }

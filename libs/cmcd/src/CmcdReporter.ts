@@ -400,16 +400,18 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			}
 		}
 
-		// bg is session-owned like sid and msd: tracked in its own field and
-		// stripped from the persistent store below. Each report picks the value
-		// up when it is built; dedup and emission stay in the event path.
-		if ('bg' in data) {
-			session.bg = data.bg
-		}
-
 		// sid and msd are session-owned: tracked in their own fields, stripped
 		// from the persistent store, and stamped onto each report at queue time.
-		this.playback.data = { ...this.playback.data, ...data, sid: undefined, msd: undefined, bg: undefined }
+		this.playback.data = { ...this.playback.data, ...data, sid: undefined, msd: undefined }
+
+		// bg is session-owned too, but its value is a report field rather than a
+		// stamp: it is tracked here and picked up when each report is built, and
+		// the key is deleted from the store rather than left undefined. Dedup and
+		// emission stay in the event path.
+		if ('bg' in data) {
+			session.bg = data.bg
+			delete this.playback.data.bg
+		}
 
 		// A cid change re-mints the playback's base provenance record, so a
 		// request issued from here on carries the new cid while requests
@@ -849,7 +851,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * The provenance record to stamp on a returned request: the session's
+	 * The provenance record to stamp on a returned request: the playback's
 	 * frozen base record, extended with the caller's per-call data encoded
 	 * as a CMCD string when there is any. Requests without per-call data
 	 * share the base record, so decoration stays a single property write.
