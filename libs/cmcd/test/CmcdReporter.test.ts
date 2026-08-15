@@ -4796,4 +4796,42 @@ describe('CmcdReporter', () => {
 		equal(req.url, 'https://example.com/video.mp4')
 		deepEqual(req.customData.cmcd, {})
 	})
+
+	it('sends reports queued into a session evicted mid-fan-out at sessionRetention 0', async () => {
+		const bodies: string[] = []
+		const reporter = new CmcdReporter({
+			sid: 's1',
+			sessionRetention: 0,
+			eventTargets: [
+				{
+					url: 'https://a.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+					// Rotating inside the first target's transform leaves the
+					// second target still fanning out on pinned s1.
+					transform: (data) => {
+						reporter.update({ sid: 's2' })
+						return data
+					},
+				},
+				{
+					url: 'https://b.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+				},
+			],
+		}, async (request) => {
+			bodies.push(`${request.url} ${String(request.body)}`)
+			return { status: 200 }
+		})
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		await Promise.resolve()
+
+		const bReports = bodies.filter((body) => body.startsWith('https://b.example.com/cmcd'))
+		equal(bReports.length, 1)
+		ok(/sid="s1"/.test(bReports[0]))
+	})
 })

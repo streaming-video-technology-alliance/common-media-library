@@ -101,6 +101,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private config: CmcdReporterConfigNormalized<C>
 
 	private ledger: CmcdSessionLedger<C>
+	private fanOutDepth = 0
+	private evictPending = false
 
 	/**
 	 * The reporter's own playback: the persistent data store, base provenance
@@ -172,26 +174,35 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// report consume another session's sequence numbers.
 		const session = this.ledger.current
 
-		session.eventTargets.forEach((target, config) => {
-			// Disarm any existing timer so repeated start() calls do not leak intervals.
-			this.disarmInterval(config)
+		this.fanOutDepth++
 
-			// A target disposed via HTTP 410 stays silent for the rest of the
-			// session. Armed before the initial event so a throwing transform
-			// leaves the timer in the same state a successful start() would,
-			// rather than silently disabling the target.
-			if (target.disposed || !this.armInterval(config)) {
-				return
-			}
+		try {
+			session.eventTargets.forEach((target, config) => {
+				// Disarm any existing timer so repeated start() calls do not leak intervals.
+				this.disarmInterval(config)
 
-			try {
-				this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
-				this.processEventTargets()
-			}
-			catch (error) {
-				failure ??= { error }
-			}
-		})
+				// A target disposed via HTTP 410 stays silent for the rest of the
+				// session. Armed before the initial event so a throwing transform
+				// leaves the timer in the same state a successful start() would,
+				// rather than silently disabling the target.
+				if (target.disposed || !this.armInterval(config)) {
+					return
+				}
+
+				try {
+					this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
+					this.processEventTargets()
+				}
+				catch (error) {
+					failure ??= { error }
+				}
+			})
+		}
+		finally {
+			this.fanOutDepth--
+		}
+
+		this.maybeEvict()
 
 		if (failure) {
 			throw failure.error
@@ -367,7 +378,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// Drain ended sessions before eviction can destroy their queues: a
 		// partial batch the ended session could never fill again leaves now.
 		this.processEventTargets()
-		this.ledger.evict()
+		this.requestEvict()
 
 		// Timers keep ticking across session changes. Configs whose timer was
 		// disarmed by a 410 in the previous session re-arm here, because the
@@ -379,6 +390,22 @@ export class CmcdReporter<C = Record<string, unknown>> {
 					this.armInterval(config)
 				}
 			}
+		}
+	}
+
+	private requestEvict(): void {
+		if (this.fanOutDepth > 0) {
+			this.evictPending = true
+		}
+		else {
+			this.ledger.evict()
+		}
+	}
+
+	private maybeEvict(): void {
+		if (this.fanOutDepth === 0 && this.evictPending) {
+			this.evictPending = false
+			this.ledger.evict()
 		}
 	}
 
@@ -454,16 +481,24 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// never receive it, and the caller's retry would be deduped away.
 		let failure: { error: unknown; } | undefined
 
-		session.eventTargets.forEach((target, config) => {
-			try {
-				this.recordTargetEvent(session, target, config, type, data, request)
-			}
-			catch (error) {
-				failure ??= { error }
-			}
-		})
+		this.fanOutDepth++
+
+		try {
+			session.eventTargets.forEach((target, config) => {
+				try {
+					this.recordTargetEvent(session, target, config, type, data, request)
+				}
+				catch (error) {
+					failure ??= { error }
+				}
+			})
+		}
+		finally {
+			this.fanOutDepth--
+		}
 
 		this.processEventTargets()
+		this.maybeEvict()
 
 		// Surfaced only once every target has had its turn and the queues have
 		// been processed. Transforms must not throw; this makes the violation
