@@ -4914,4 +4914,46 @@ describe('CmcdReporter', () => {
 		equal(requests.length, 2)
 		pending[1]({ status: 200 })
 	})
+
+	it('does not arm remaining targets when a start() transform calls stop()', (t) => {
+		const timers = mock.timers
+		timers.enable({ apis: ['setInterval'] })
+		t.after(() => timers.reset())
+
+		const { requester, requests } = createMockRequester()
+		const reporter = new CmcdReporter(createConfig({
+			eventTargets: [
+				{
+					url: 'https://example.com/cmcd-stop-a',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+					transform: (data) => {
+						reporter.stop()
+						return data
+					},
+				},
+				{
+					url: 'https://example.com/cmcd-stop-b',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+				},
+			],
+		}), requester)
+
+		reporter.start()
+
+		// stop() ran inside the first target's transform, so the fan-out halts:
+		// the second target is never armed and never reports.
+		equal(requests.length, 1)
+		equal(requests[0].url, 'https://example.com/cmcd-stop-a')
+
+		timers.tick(120_000)
+
+		// No timer may fire after a stop() that ran during start().
+		equal(requests.length, 1)
+	})
 })

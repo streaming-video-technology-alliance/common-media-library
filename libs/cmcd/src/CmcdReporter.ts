@@ -182,6 +182,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		try {
 			session.eventTargets.forEach((target, config) => {
+				// A transform can call stop() synchronously. The fan-out halts
+				// there: arming the remaining targets would leave them reporting
+				// for the rest of the session against the caller's instruction.
+				if (!this.started) {
+					return
+				}
+
 				// Disarm any existing timer so repeated start() calls do not leak intervals.
 				this.disarmInterval(config)
 
@@ -194,8 +201,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 				}
 
 				try {
-					this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
-					this.processEventTargets()
+					this.emitIntervalTick(session, config)
 				}
 				catch (error) {
 					failure ??= { error }
@@ -225,16 +231,25 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 
 		this.intervals.set(config, setInterval(() => {
-			const session = this.ledger.current
-			const target = session.eventTargets.get(config)
-
-			if (target) {
-				this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
-				this.processEventTargets()
-			}
+			this.emitIntervalTick(this.ledger.current, config)
 		}, config.interval * 1000))
 
 		return true
+	}
+
+	/**
+	 * Records the time-interval event for one target of one session and
+	 * processes the queues. Shared by `start()`'s initial report and the
+	 * armed timer's callback; the session is the caller's, so `start()`'s
+	 * pinning survives a transform that rotates mid fan-out.
+	 */
+	private emitIntervalTick(session: CmcdSessionState<C>, config: CmcdEventReportConfigNormalized<C>): void {
+		const target = session.eventTargets.get(config)
+
+		if (target) {
+			this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
+			this.processEventTargets()
+		}
 	}
 
 	/**
