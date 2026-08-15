@@ -60,6 +60,13 @@ export class CmcdSessionLedger<C> {
 		this.current.snapshots.set(pid, snapshot)
 		this.epoch++
 		next.seq = this.seq++
+
+		const replaced = this.sessions.get(next.sid)
+
+		if (replaced) {
+			this.dirty.delete(replaced)
+		}
+
 		this.sessions.delete(next.sid)
 		this.sessions.set(next.sid, next)
 		this.current = next

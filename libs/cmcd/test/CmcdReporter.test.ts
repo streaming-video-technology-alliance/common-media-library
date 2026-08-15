@@ -5010,4 +5010,56 @@ describe('CmcdReporter', () => {
 
 		reporter.stop()
 	})
+
+	it('never resends a 429 re-queue marked dirty before its sid was replaced by reuse', async () => {
+		const requests: HttpRequest[] = []
+		const pending: ((response: { status: number; }) => void)[] = []
+		const requester = (request: HttpRequest): Promise<{ status: number; }> => {
+			requests.push(request)
+			return new Promise(resolve => pending.push(resolve))
+		}
+
+		const reporter = new CmcdReporter({
+			sid: 's1',
+			enabledKeys: ['sid', 'v'],
+			eventTargets: [{
+				url: 'https://example.com/cmcd',
+				events: [CmcdEventType.ERROR],
+				enabledKeys: ['sid', 'v', 'e', 'sn'],
+				batchSize: 1,
+			}],
+		}, requester)
+
+		// s1's batch is in flight when the session rotates away; s1 stays
+		// retained (archived) under default retention.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 1)
+
+		reporter.update({ sid: 's2' })
+
+		// s1's send fails while s1 is still retained under its own sid: the
+		// re-queue's dirty mark is legitimate at the moment it is made.
+		pending[0]({ status: 429 })
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		// sid reuse now replaces the archived s1 with a fresh session object
+		// under the same key. The stale dirty mark must not survive the
+		// swap and must not be picked up by startSession()'s own post-
+		// rotate drain.
+		reporter.update({ sid: 's1' })
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		equal(requests.length, 1)
+
+		// The replacement s1 still reports normally, with its own fresh counter.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 2)
+		ok((requests[1].body as string).includes('sn=0'))
+
+		// No further resend surfaces later either.
+		reporter.flush()
+		await new Promise(resolve => setTimeout(resolve, 10))
+		equal(requests.length, 2)
+		pending[1]({ status: 200 })
+	})
 })
