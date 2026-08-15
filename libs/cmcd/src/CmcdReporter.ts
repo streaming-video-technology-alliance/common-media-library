@@ -1,4 +1,5 @@
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
+import { applyReportPolicy } from './applyReportPolicy.ts'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { CMCD_REQUEST_PROVENANCE } from './CMCD_REQUEST_PROVENANCE.ts'
@@ -25,29 +26,8 @@ import { decodeCmcd } from './decodeCmcd.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
+import { stampReport } from './stampReport.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
-
-/**
- * Whether a required key's value will survive report preparation.
- *
- * This is `isValid` minus its `false` exclusion, plus an empty-array check.
- * `false` must count as usable because `bg: false` is a legitimate value on a
- * backgrounded-mode event, which the encoder emits as `?0`; treating it as
- * unusable would let restoration silently revert a transform that cleared it.
- * Empty strings, empty lists and non-finite numbers are dropped downstream, so
- * a transform substituting one leaves the report short a required key.
- */
-function isUsableRequiredValue(value: unknown): boolean {
-	if (value == null || value === '') {
-		return false
-	}
-
-	if (typeof value === 'number') {
-		return Number.isFinite(value)
-	}
-
-	return !Array.isArray(value) || value.length > 0
-}
 
 /**
  * Decodes the per-call data snapshot a provenance record carries into
@@ -538,42 +518,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			ts: data.ts ?? Date.now(),
 		}
 
-		const { transform } = config
+		const report = applyReportPolicy(item, config.transform, request, CMCD_REQUIRED_EVENT_KEYS.get(type), true)
 
-		if (!transform) {
-			this.queueTargetEvent(session, target, config, item, type)
-			return
-		}
-
-		// The spread above is shallow, so nested values are still shared with
-		// the persistent store and with sibling targets' inputs; a transform
-		// gets its own detached copy so in-place mutation reaches neither.
-		copyReportValues(item)
-
-		// Captured so a transform cannot strip a key the event requires.
-		// `CmcdKey` spans custom keys too, so index through a record view.
-		const requiredKey = CMCD_REQUIRED_EVENT_KEYS.get(type)
-		const requiredValue = requiredKey ? (item as Record<string, unknown>)[requiredKey] : undefined
-		const ts = item.ts
-
-		const report = transform(item, request)
-
-		// A cancelled report consumes neither a sequence number nor msd.
 		if (report == null) {
 			return
-		}
-
-		// Restore, never fabricate: a required key that was already absent (or
-		// already unusable) before the transform ran was a caller bug, not a
-		// transform bug. Removal and substitution are both covered, because a
-		// value the encoder drops leaves the report just as invalid as a missing
-		// one.
-		if (!isUsableRequiredValue(report.ts)) {
-			report.ts = ts
-		}
-
-		if (requiredKey && isUsableRequiredValue(requiredValue) && !isUsableRequiredValue((report as Record<string, unknown>)[requiredKey])) {
-			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 
 		this.queueTargetEvent(session, target, config, report, type)
@@ -596,22 +544,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param type - The type of event being reported.
 	 */
 	private queueTargetEvent(session: CmcdSessionState<C>, target: CmcdEventTargetState, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
-		report.e = type
-		report.sn = target.sn++
-		report.sid = session.sid
+		const attach = stampReport(report, session, target, config.enabledKeys?.includes('msd') ?? false, type)
 
-		// msd may only ride a report through the once-per-target gate, and only
-		// when the target's key filter will retain it (msd is never force-added
-		// at encode time): consuming the gate for a report that filters msd out
-		// would silently drop it for the session. A value smuggled in via
-		// per-call data or a transform is stripped, so the gate stays the
-		// single source of once-per-session semantics.
-		if (!isNaN(session.msd) && !target.msdSent && config.enabledKeys?.includes('msd')) {
-			report.msd = session.msd
+		target.sn++
+
+		if (attach) {
 			target.msdSent = true
-		}
-		else {
-			delete report.msd
 		}
 
 		target.queue.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
@@ -841,21 +779,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const session = this.ledger.current
 		const merged: Cmcd = { ...this.playback.data, ...(session.bg !== undefined && { bg: session.bg }), ...data, sid: session.sid }
 		const { transform } = this.config
-		let cmcdData: Cmcd | null = merged
 
-		if (transform) {
-			// The spread above is shallow, so nested values are still shared
-			// with the persistent store.
-			copyReportValues(merged)
+		// The caller's request is passed, not the internal clone, so a
+		// transform cannot alter the outgoing report through it.
+		const cmcdData: Cmcd | null = applyReportPolicy(merged, transform, request as CmcdTransformRequest<C>, undefined, false)
 
-			// The caller's request is passed, not the internal clone, so a
-			// transform cannot alter the outgoing report through it.
-			cmcdData = transform(merged, request as CmcdTransformRequest<C>)
-
-			// A cancelled report consumes neither a sequence number nor msd.
-			if (cmcdData == null) {
-				return report
-			}
+		if (cmcdData == null) {
+			return report
 		}
 
 		let stamps = session.requestTargets.get(CMCD_DEFAULT_REQUEST_TARGET)
@@ -865,23 +795,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			session.requestTargets.set(CMCD_DEFAULT_REQUEST_TARGET, stamps)
 		}
 
-		// Reporter-owned fields are stamped after the transform runs.
-		cmcdData.sn = stamps.sn++
-		cmcdData.sid = session.sid
-
-		// msd may only ride a report through the once-per-session gate; a value
-		// smuggled in via per-call data or the transform is stripped, so the
-		// gate stays the single source of once-per-session semantics. The gate
-		// is consumed after preparation, and only if the key filter retained
-		// msd, so a filtered-out msd is not silently dropped for the session.
-		const sendMsd = !isNaN(session.msd) && !stamps.msdSent
-
-		if (sendMsd) {
-			cmcdData.msd = session.msd
-		}
-		else {
-			delete cmcdData.msd
-		}
+		const sendMsd = stampReport(cmcdData, session, stamps, true)
+		stamps.sn++
 
 		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
