@@ -1,61 +1,27 @@
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
-import { uuid } from '@svta/cml-utils'
-import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { CMCD_REQUEST_PROVENANCE } from './CMCD_REQUEST_PROVENANCE.ts'
-import { CMCD_V2 } from './CMCD_V2.ts'
+import { CMCD_REQUIRED_EVENT_KEYS } from './CMCD_REQUIRED_EVENT_KEYS.ts'
 import type { Cmcd } from './Cmcd.ts'
-import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
-import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
-import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
 import type { CmcdReporterCustomData } from './CmcdReporterCustomData.ts'
 import type { CmcdRequestProvenance } from './CmcdRequestProvenance.ts'
-import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
-import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
-import type { CmcdVersion } from './CmcdVersion.ts'
+import { copyReportValues } from './copyReportValues.ts'
+import type { CmcdEventReportConfigNormalized, CmcdReporterConfigNormalized } from './createCmcdReporterConfig.ts'
+import { createCmcdReporterConfig, createEncodingOptions } from './createCmcdReporterConfig.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
-
-type CmcdReportConfigNormalized = CmcdReportConfig & {
-	version: CmcdVersion;
-}
-
-type CmcdEventReportConfigNormalized<C> = CmcdEventReportConfig<C> & CmcdReportConfigNormalized & {
-	events: CmcdEventType[];
-	interval: number;
-	batchSize: number;
-}
-
-type CmcdReporterConfigNormalized<C> = CmcdReporterConfig<C> & CmcdReportConfigNormalized & {
-	sid: string;
-	eventTargets: CmcdEventReportConfigNormalized<C>[];
-	sessionRetention: number;
-}
-
-function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>, baseUrl?: string): CmcdEncodeOptions {
-	const enabledKeySet = new Set(config.enabledKeys ?? [])
-
-	return {
-		version: config.version || CMCD_V2,
-		reportingMode,
-		filter: (key: CmcdKey) => enabledKeySet.has(key),
-		baseUrl,
-		customHeaderMap: config.customHeaderMap,
-	}
-}
 
 /**
  * Tracked state field for dedup + auto-trigger.
@@ -137,18 +103,6 @@ const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = /* @_
 )
 
 /**
- * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
- * Built from the state-change table plus the three event types whose
- * required key rides the caller's per-event data.
- */
-const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map([
-	.../* @__PURE__ */ CMCD_STATE_EVENT_FIELDS,
-	[CMCD_EVENT_CUSTOM_EVENT, 'cen'] as const,
-	[CMCD_EVENT_ERROR, 'ec'] as const,
-	[CMCD_EVENT_RESPONSE_RECEIVED, 'url'] as const,
-])
-
-/**
  * Whether a required key's value will survive report preparation.
  *
  * This is `isValid` minus its `false` exclusion, plus an empty-array check.
@@ -168,63 +122,6 @@ function isUsableRequiredValue(value: unknown): boolean {
 	}
 
 	return !Array.isArray(value) || value.length > 0
-}
-
-/**
- * Copies an `SfItem`-shaped value and its `params` record.
- *
- * The prototype is preserved because `prepareCmcdData`, the formatter map,
- * validation, and the structured-field encoder all branch on
- * `instanceof SfItem`. A plain spread (and `structuredClone`) would return a
- * prototype-less object and silently change what goes on the wire.
- */
-function copyItemValue(value: unknown): unknown {
-	if (value === null || typeof value !== 'object') {
-		return value
-	}
-
-	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; }
-
-	if (copy.params !== null && typeof copy.params === 'object') {
-		copy.params = { ...copy.params }
-	}
-
-	return copy
-}
-
-/**
- * Copies the nested values of a report in place so a transform cannot mutate
- * the reporter's persistent data, or another target's report for the same
- * event, by mutating an array or an `SfItem` it was handed.
- *
- * Complete for the CMCD value space rather than best-effort: `CmcdValue` and
- * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
- * those, and `SfItem.params` is a flat record. Called where a transform is
- * configured, on the ended session's store at archival (detaching the frozen
- * snapshot from caller-held references), and on the request's stored
- * player-facing view.
- */
-function copyReportValues(data: Cmcd): Cmcd {
-	const record = data as Record<string, unknown>
-
-	for (const key in record) {
-		const value = record[key]
-
-		if (Array.isArray(value)) {
-			const copy = new Array(value.length)
-
-			for (let i = 0; i < value.length; i++) {
-				copy[i] = copyItemValue(value[i])
-			}
-
-			record[key] = copy
-		}
-		else if (value !== null && typeof value === 'object') {
-			record[key] = copyItemValue(value)
-		}
-	}
-
-	return data
 }
 
 /**
@@ -267,46 +164,6 @@ function mintProvenance(sid: string, cid: string | undefined): CmcdRequestProven
 function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 	const { url, ...init } = request
 	return fetch(url, init)
-}
-
-function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): CmcdReporterConfigNormalized<C> {
-	// Apply top-level config defaults
-	const {
-		version = CMCD_V2,
-		eventTargets = [],
-		sid = uuid(),
-		transmissionMode = CMCD_QUERY,
-		...rest
-	} = config
-
-	// Type-checked, never type-coerced: a numeric string or boolean falls
-	// back to the default instead of converting, and a Symbol must not
-	// throw under Math.floor's ToNumber.
-	const retention = config.sessionRetention
-	const sessionRetention = typeof retention === 'number' ? Math.floor(retention) : NaN
-
-	return {
-		...rest,
-		version,
-		transmissionMode,
-		sid,
-		sessionRetention: sessionRetention >= 0 ? sessionRetention : 2,
-		// Apply target config defaults
-		eventTargets: eventTargets.reduce((acc, target) => {
-			if (target?.url && target.events?.length) {
-				acc.push({
-					version: target.version || CMCD_V2,
-					enabledKeys: target.enabledKeys?.slice() || [],
-					url: target.url,
-					events: target.events.slice(),
-					interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
-					batchSize: target.batchSize || 1,
-					transform: target.transform,
-				})
-			}
-			return acc
-		}, [] as CmcdEventReportConfigNormalized<C>[]),
-	}
 }
 
 type CmcdTarget = {
