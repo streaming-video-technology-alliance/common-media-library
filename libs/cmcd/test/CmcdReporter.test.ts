@@ -4869,4 +4869,49 @@ describe('CmcdReporter', () => {
 		ok(/sn=0/.test(bodies[0]))
 		ok(/msd=250/.test(bodies[0]))
 	})
+
+	it('never resends a 429 re-queue whose sid was replaced by reuse', async () => {
+		const requests: HttpRequest[] = []
+		const pending: ((response: { status: number; }) => void)[] = []
+		const requester = (request: HttpRequest): Promise<{ status: number; }> => {
+			requests.push(request)
+			return new Promise(resolve => pending.push(resolve))
+		}
+
+		const reporter = new CmcdReporter({
+			sid: 's1',
+			enabledKeys: ['sid', 'v'],
+			eventTargets: [{
+				url: 'https://example.com/cmcd',
+				events: [CmcdEventType.ERROR],
+				enabledKeys: ['sid', 'v', 'e', 'sn'],
+				batchSize: 1,
+			}],
+		}, requester)
+
+		// The original s1's batch is in flight when sid reuse replaces it.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 1)
+
+		reporter.update({ sid: 's2' })
+		reporter.update({ sid: 's1' })
+
+		// The replacement s1 reports normally, with its own fresh counter.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 2)
+		ok((requests[1].body as string).includes('sn=0'))
+
+		// The original s1's in-flight send now fails: its re-queue must not
+		// resurrect a sid the ledger no longer maps it to.
+		pending[0]({ status: 429 })
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		reporter.flush()
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		// Only the replacement's own report went out; the orphaned batch
+		// never re-sends, so no third request ever lands.
+		equal(requests.length, 2)
+		pending[1]({ status: 200 })
+	})
 })

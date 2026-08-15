@@ -131,6 +131,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 					config.url,
 					config.batchSize,
 					this.requester,
+					// CTA-5004-B scopes 410 suppression to "the remainder of the
+					// current session": a delayed 410 silences the session that
+					// sent the batch, never whichever session has replaced it by
+					// the time the response arrives.
 					() => this.disposeEventTarget(session, config),
 					() => this.ledger.markDirty(session),
 				),

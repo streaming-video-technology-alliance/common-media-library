@@ -1,6 +1,9 @@
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdSessionState } from './CmcdSessionState.ts'
 
+/** Reused so an idle `takeDirty()` pass returns without allocating. */
+const NO_DIRTY_SESSIONS: readonly never[] = []
+
 /**
  * Retained sessions keyed by `sid`, insertion-ordered oldest first, the
  * current session last. The ended-session count is capped by
@@ -80,12 +83,14 @@ export class CmcdSessionLedger<C> {
 	}
 
 	markDirty(session: CmcdSessionState<C>): void {
-		this.dirty.add(session)
+		if (this.sessions.get(session.sid) === session) {
+			this.dirty.add(session)
+		}
 	}
 
-	takeDirty(): CmcdSessionState<C>[] {
+	takeDirty(): readonly CmcdSessionState<C>[] {
 		if (this.dirty.size === 0) {
-			return []
+			return NO_DIRTY_SESSIONS
 		}
 
 		const sessions = [...this.dirty].sort((a, b) => a.seq - b.seq)

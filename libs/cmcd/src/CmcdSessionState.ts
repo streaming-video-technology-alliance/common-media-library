@@ -13,10 +13,10 @@ export type CmcdTargetStamps = {
 }
 
 /**
- * Finished, encoded report lines awaiting send. Reports are encoded at
- * enqueue, so a value that cannot serialize throws inside the recording
- * call, and a queued line is immune to later mutation of the values it
- * was built from.
+ * The target's outbox holds finished, encoded report lines awaiting send.
+ * Reports are encoded at enqueue, so a value that cannot serialize throws
+ * inside the recording call, and a queued line is immune to later
+ * mutation of the values it was built from.
  */
 export type CmcdEventTargetState = CmcdTargetStamps & {
 	outbox: CmcdOutbox;
