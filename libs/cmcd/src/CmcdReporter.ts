@@ -1,11 +1,11 @@
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { applyReportPolicy } from './applyReportPolicy.ts'
-import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { CMCD_REQUEST_PROVENANCE } from './CMCD_REQUEST_PROVENANCE.ts'
 import { CMCD_REQUIRED_EVENT_KEYS } from './CMCD_REQUIRED_EVENT_KEYS.ts'
 import type { Cmcd } from './Cmcd.ts'
 import { CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CmcdOutbox } from './CmcdOutbox.ts'
 import type { CmcdPlaybackState } from './CmcdPlaybackState.ts'
 import { CMCD_ROOT_PID, createCmcdPlaybackState, mintProvenance } from './CmcdPlaybackState.ts'
 import type { CmcdReporterConfig } from './CmcdReporterConfig.ts'
@@ -112,12 +112,32 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 */
 	constructor(config: Partial<CmcdReporterConfig<C>>, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester) {
 		this.config = createCmcdReporterConfig(config)
+		this.requester = requester
 		this.playback = createCmcdPlaybackState(CMCD_ROOT_PID, this.config.sid, 0, {
 			cid: this.config.cid,
 			v: this.config.version,
 		})
-		this.ledger = new CmcdSessionLedger(this.config.sessionRetention, createCmcdSessionState(this.config.sid, undefined, this.config.eventTargets))
-		this.requester = requester
+		this.ledger = new CmcdSessionLedger(this.config.sessionRetention, this.createSession(this.config.sid, undefined))
+	}
+
+	private createSession(sid: string, bg: boolean | undefined): CmcdSessionState<C> {
+		const session = createCmcdSessionState<C>(sid, bg)
+
+		for (const config of this.config.eventTargets) {
+			session.eventTargets.set(config, {
+				sn: 0,
+				msdSent: false,
+				outbox: new CmcdOutbox(
+					config.url,
+					config.batchSize,
+					this.requester,
+					() => this.disposeEventTarget(session, config),
+					() => this.ledger.markDirty(session),
+				),
+			})
+		}
+
+		return session
 	}
 
 	/**
@@ -165,7 +185,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 				// session. Armed before the initial event so a throwing transform
 				// leaves the timer in the same state a successful start() would,
 				// rather than silently disabling the target.
-				if (target.disposed || !this.armInterval(config)) {
+				if (target.outbox.disposed || !this.armInterval(config)) {
 					return
 				}
 
@@ -352,7 +372,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private startSession(sid: string): void {
 		const snapshot = copyReportValues({ ...this.playback.data })
 		const bg = this.ledger.current.bg
-		this.ledger.rotate(createCmcdSessionState(sid, bg, this.config.eventTargets), this.playback.pid, snapshot)
+		this.ledger.rotate(this.createSession(sid, bg), this.playback.pid, snapshot)
 		this.playback = createCmcdPlaybackState(this.playback.pid, sid, this.ledger.epoch, { ...snapshot })
 
 		// Drain ended sessions before eviction can destroy their queues: a
@@ -501,7 +521,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *                  one exists. Passed to the target's `transform`.
 	 */
 	private recordTargetEvent(session: CmcdSessionState<C>, target: CmcdEventTargetState, config: CmcdEventReportConfigNormalized<C>, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
-		if (target.disposed || !config.events.includes(type)) {
+		if (target.outbox.disposed || !config.events.includes(type)) {
 			return
 		}
 
@@ -546,7 +566,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private queueTargetEvent(session: CmcdSessionState<C>, target: CmcdEventTargetState, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
 		const attach = stampReport(report, session, target, config.enabledKeys?.includes('msd') ?? false, type)
 
-		target.queue.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
+		target.outbox.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
+		this.ledger.markDirty(session)
 
 		target.sn++
 
@@ -842,70 +863,23 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		// Oldest session first, so an archived session's late reports leave
 		// ahead of current traffic.
-		this.ledger.forEach((session) => {
+		for (const session of this.ledger.takeDirty()) {
 			// An archived session receives no further regular events, so its
 			// queues could never fill a batch again; its remainders are always
 			// drain-eligible, preserving the pre-existing behavior of unsent
 			// old-sid events draining after a session change.
 			const drain = flush || session !== this.ledger.current
 
-			session.eventTargets.forEach((target, config) => {
-				const { queue } = target
-
-				// A disposed target's queue can be non-empty again if a failed
-				// batch was re-queued after disposal; it must stay unsent.
-				if (target.disposed || !queue.length) {
-					return
+			session.eventTargets.forEach((target) => {
+				if (target.outbox.process(drain)) {
+					this.ledger.markDirty(session)
+					reprocess = true
 				}
-
-				if (queue.length < config.batchSize && !drain) {
-					return
-				}
-
-				const deleteCount = drain ? queue.length : config.batchSize
-				const events = queue.splice(0, deleteCount)
-				this.sendEventReport(session, config, events).catch(() => {
-					// Re-queue events that failed to send. The target belongs
-					// to the batch's own session, so a failure after a session
-					// change re-queues there, never into the current session.
-					target.queue.unshift(...events)
-				})
-
-				reprocess ||= queue.length > 0
 			})
-		})
+		}
 
 		if (reprocess) {
-			this.processEventTargets()
-		}
-	}
-
-	/**
-	 * Sends an event report. Called by the reporter when a batch is ready to be sent.
-	 *
-	 * @param config - The target config to send the event report to.
-	 * @param data - The encoded report lines to send in the event report.
-	 */
-	private async sendEventReport(session: CmcdSessionState<C>, config: CmcdEventReportConfigNormalized<C>, data: string[]): Promise<void> {
-		const response = await this.requester({
-			url: config.url,
-			method: 'POST',
-			headers: {
-				'Content-Type': CMCD_MIME_TYPE,
-			},
-			body: data.join('\n') + '\n',
-		})
-
-		const { status } = response
-
-		if (status === 410) {
-			// CTA-5004-B scopes 410 suppression to "the remainder of the
-			// current session". The batch's own session is disposed, so a
-			// delayed 410 that lands after a session change silences the
-			// session that sent it, never the one that replaced it.
-			this.disposeEventTarget(session, config)
-		} else if (status === 429 || (status > 499 && status < 600)) {
-			throw new Error(`Event report failed with status ${status}`)
+			this.processEventTargets(flush)
 		}
 	}
 
@@ -929,12 +903,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 */
 	private disposeEventTarget(session: CmcdSessionState<C>, config: CmcdEventReportConfigNormalized<C>): void {
 		session.eventTargets.forEach((target, sibling) => {
-			if (sibling.url !== config.url || target.disposed) {
+			if (sibling.url !== config.url || target.outbox.disposed) {
 				return
 			}
 
-			target.disposed = true
-			target.queue.length = 0
+			target.outbox.dispose()
 
 			// The timer belongs to the live session only; an archived session's
 			// disposal is bookkeeping and must not silence current reporting.

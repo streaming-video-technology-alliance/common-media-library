@@ -1,4 +1,5 @@
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdOutbox } from './CmcdOutbox.ts'
 import type { CmcdEventReportConfigNormalized } from './createCmcdReporterConfig.ts'
 
 /**
@@ -11,15 +12,14 @@ export type CmcdTargetStamps = {
 	msdSent: boolean;
 }
 
+/**
+ * Finished, encoded report lines awaiting send. Reports are encoded at
+ * enqueue, so a value that cannot serialize throws inside the recording
+ * call, and a queued line is immune to later mutation of the values it
+ * was built from.
+ */
 export type CmcdEventTargetState = CmcdTargetStamps & {
-	/**
-	 * Finished, encoded report lines awaiting send. Reports are encoded at
-	 * enqueue, so a value that cannot serialize throws inside the recording
-	 * call, and a queued line is immune to later mutation of the values it
-	 * was built from.
-	 */
-	queue: string[];
-	disposed: boolean;
+	outbox: CmcdOutbox;
 }
 
 /**
@@ -48,23 +48,13 @@ export type CmcdSessionState<C> = {
 }
 
 /**
- * Creates the state for a new session: fresh counters, gates, queues and
- * dedup baseline for every configured target. `bg` is session-owned but
- * carries across a session change, so it is passed in; its dedup baseline
- * starts empty like every other one.
+ * Creates the state for a new session: fresh counters, gates and dedup
+ * baseline for the default request target, and an empty event-target map
+ * for the caller to populate. `bg` is session-owned but carries across a
+ * session change, so it is passed in; its dedup baseline starts empty like
+ * every other one.
  */
-export function createCmcdSessionState<C>(sid: string, bg: boolean | undefined, targets: CmcdEventReportConfigNormalized<C>[]): CmcdSessionState<C> {
-	const eventTargets = new Map<CmcdEventReportConfigNormalized<C>, CmcdEventTargetState>()
-
-	for (const target of targets) {
-		eventTargets.set(target, {
-			sn: 0,
-			msdSent: false,
-			queue: [],
-			disposed: false,
-		})
-	}
-
+export function createCmcdSessionState<C>(sid: string, bg: boolean | undefined): CmcdSessionState<C> {
 	return {
 		sid,
 		seq: 0,
@@ -72,7 +62,7 @@ export function createCmcdSessionState<C>(sid: string, bg: boolean | undefined, 
 		bg,
 		bgEmitted: undefined,
 		snapshots: new Map(),
-		eventTargets,
+		eventTargets: new Map<CmcdEventReportConfigNormalized<C>, CmcdEventTargetState>(),
 		requestTargets: new Map([[CMCD_DEFAULT_REQUEST_TARGET, { sn: 0, msdSent: false }]]),
 	}
 }
