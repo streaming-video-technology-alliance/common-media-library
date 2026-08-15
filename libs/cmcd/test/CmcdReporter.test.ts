@@ -4956,4 +4956,47 @@ describe('CmcdReporter', () => {
 		// No timer may fire after a stop() that ran during start().
 		equal(requests.length, 1)
 	})
+
+	it('sends a time-interval report queued into a session the tick rotated away at sessionRetention 0', (t) => {
+		const timers = mock.timers
+		timers.enable({ apis: ['setInterval'] })
+		t.after(() => timers.reset())
+
+		const { requester, requests } = createMockRequester()
+		let reports = 0
+		const reporter = new CmcdReporter(createConfig({
+			sid: 's1',
+			sessionRetention: 0,
+			eventTargets: [
+				{
+					url: 'https://example.com/cmcd-tick-evict',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+					// Rotates on the timer's tick rather than on start()'s initial
+					// report, so the eviction the rotation triggers lands while the
+					// tick still holds s1.
+					transform: (data) => {
+						if (reports++ === 1) {
+							reporter.update({ sid: 's2' })
+						}
+						return data
+					},
+				},
+			],
+		}), requester)
+
+		reporter.start()
+		equal(requests.length, 1)
+
+		timers.tick(30_000)
+
+		// The tick's report was queued into s1 after its own transform rotated
+		// the session away; s1's eviction must wait for the tick to drain.
+		equal(requests.length, 2)
+		ok((requests[1].body as string).includes('sid="s1"'))
+
+		reporter.stop()
+	})
 })

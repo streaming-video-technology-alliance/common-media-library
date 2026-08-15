@@ -246,10 +246,21 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private emitIntervalTick(session: CmcdSessionState<C>, config: CmcdEventReportConfigNormalized<C>): void {
 		const target = session.eventTargets.get(config)
 
-		if (target) {
-			this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
-			this.processEventTargets()
+		if (!target) {
+			return
 		}
+
+		this.fanOutDepth++
+
+		try {
+			this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
+		}
+		finally {
+			this.fanOutDepth--
+		}
+
+		this.processEventTargets()
+		this.maybeEvict()
 	}
 
 	/**
