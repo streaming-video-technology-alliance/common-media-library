@@ -1479,7 +1479,7 @@ describe('CmcdReporter', () => {
 			ok(!req.url.includes('msd'))
 			// The gate must stay open: the report never carried msd. Asserted on
 			// the private flag because a fixed config has no observable follow-up.
-			equal((reporter as unknown as { session: { requestTargets: Map<string, { msdSent: boolean; }>; }; }).session.requestTargets.get('default')?.msdSent, false)
+			equal((reporter as unknown as { ledger: { current: { requestTargets: Map<string, { msdSent: boolean; }>; }; }; }).ledger.current.requestTargets.get('default')?.msdSent, false)
 		})
 
 		it('does not consume a target gate when msd is not in the target enabledKeys', async () => {
@@ -1510,7 +1510,7 @@ describe('CmcdReporter', () => {
 			ok(!(requests[0].body as string).includes('msd'))
 			ok((requests[1].body as string).includes('msd=800'))
 
-			const targets = [...(reporter as unknown as { session: { eventTargets: Map<unknown, { msdSent: boolean; }>; }; }).session.eventTargets.values()]
+			const targets = [...(reporter as unknown as { ledger: { current: { eventTargets: Map<unknown, { msdSent: boolean; }>; }; }; }).ledger.current.eventTargets.values()]
 			equal(targets[0].msdSent, false)
 			equal(targets[1].msdSent, true)
 		})
