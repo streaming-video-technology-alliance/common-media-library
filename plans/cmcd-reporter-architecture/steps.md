@@ -651,19 +651,25 @@ it('sends reports queued into a session evicted mid-fan-out at sessionRetention 
 Run: `npm run build -w libs/cmcd && npm test -w libs/cmcd`
 Expected: FAIL, target B's s1 report was destroyed by eager eviction.
 
-- [ ] **Step 5: Verify green and commit**
+- [ ] **Step 5: Verify green and commit twice**
 
 ```bash
 npm run typecheck
 npm run build -w libs/cmcd
 npm test -w libs/cmcd
 git diff --exit-code libs/cmcd/config/cml-cmcd.api.md
-git add libs/cmcd/src libs/cmcd/test
-git commit -s -m "refactor(cmcd): move session storage into a session ledger"
-git commit --allow-empty -s -m "fix(cmcd): defer session eviction past active fan-outs" --amend --no-edit
 ```
 
-Note: land this task as two commits if the diff separates cleanly (extraction, then deferral + test); otherwise one `refactor(cmcd)` commit whose body names the fix, with the regression test in it. Do not use the `--allow-empty --amend` line above verbatim; it is a placeholder for whichever split you choose. The changelog entry lands in Task 6 either way.
+Commit the ledger extraction first (the two new files plus the facade rewire, with `requestEvict`/`maybeEvict` calling `ledger.evict()` directly), then the deferral and its regression test:
+
+```bash
+git add libs/cmcd/src/CmcdSessionState.ts libs/cmcd/src/CmcdSessionLedger.ts libs/cmcd/src/CmcdReporter.ts
+git commit -s -m "refactor(cmcd): move session storage into a session ledger"
+git add libs/cmcd/src libs/cmcd/test
+git commit -s -m "fix(cmcd): defer session eviction past active fan-outs"
+```
+
+If the two changes will not stage separately in your working order, one `refactor(cmcd)` commit whose body names the fix is acceptable; the regression test must land in the same commit as the deferral either way. The changelog entry lands in Task 6.
 
 - [ ] **Step 6: Verify the retention tests still pin rotation**
 
