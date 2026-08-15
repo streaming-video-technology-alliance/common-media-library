@@ -9,6 +9,10 @@ function copyBareValue(value: unknown): unknown {
 		return value.slice()
 	}
 
+	if (value instanceof Date) {
+		return new Date(value.getTime())
+	}
+
 	if (Array.isArray(value)) {
 		return value.map(copyBareValue)
 	}
@@ -35,6 +39,10 @@ function copyItemValue(value: unknown): unknown {
 
 	if (value instanceof Uint8Array) {
 		return value.slice()
+	}
+
+	if (value instanceof Date) {
+		return new Date(value.getTime())
 	}
 
 	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { value?: unknown; params?: Record<string, unknown>; }

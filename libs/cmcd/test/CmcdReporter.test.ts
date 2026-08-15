@@ -4732,4 +4732,47 @@ describe('CmcdReporter', () => {
 		ok(bodies[1].includes('com.example-tok=preload'))
 		ok(bodies[1].includes(':AQID:')) // base64 of [1, 2, 3]
 	})
+
+	it('clones Date values through session rotation', async () => {
+		const bodies: string[] = []
+		const reporter = new CmcdReporter({
+			sid: 'sess-date-1',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'com.example-when', 'com.example-bare-when', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		const when = new Date('2024-01-01T00:00:00.000Z')
+
+		reporter.update({
+			'com.example-when': new SfItem('k', { at: when }),
+			'com.example-bare-when': when,
+			sta: 'p',
+		} as unknown as Partial<Cmcd>)
+
+		// Rotate sessions: startSession() runs copyReportValues on the archived
+		// session's data unconditionally, before the new session inherits it.
+		reporter.update({ sid: 'sess-date-2' })
+
+		// Mutate the caller's own Date after rotation; a working clone must not
+		// reflect it.
+		when.setTime(0)
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+		await Promise.resolve()
+
+		// The rotated session must carry a working Date clone, both nested in
+		// an SfItem's params and as a bare custom value, at the value the Date
+		// held when the session rotated, not the caller's later mutation.
+		ok(bodies[1].includes('com.example-when="k";at=@1704067200'))
+		ok(bodies[1].includes('com.example-bare-when=@1704067200'))
+	})
 })
