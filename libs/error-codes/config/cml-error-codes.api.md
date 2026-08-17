@@ -7,6 +7,39 @@
 import { ValueOf } from '@svta/cml-utils';
 
 // @public
+export const SVTA_AUDIO_BUFFER_UNDERRUN: 2002;
+
+// @public
+export const SVTA_AUDIO_BUFFERING_TIMEOUT: 2004;
+
+// @public
+export const SVTA_AUDIO_DECODE_ERROR: 2008;
+
+// @public
+export const SVTA_BUFFER_APPEND_ERROR: 2023;
+
+// @public
+export const SVTA_BUFFER_FULL_ERROR: 2025;
+
+// @public
+export const SVTA_BUFFER_INITIALIZATION_ERROR: 2022;
+
+// @public
+export const SVTA_BUFFER_NUDGE_ON_STALL: 2027;
+
+// @public
+export const SVTA_BUFFER_REMOVE_ERROR: 2024;
+
+// @public
+export const SVTA_BUFFER_SEEK_OVER_HOLE: 2026;
+
+// @public
+export const SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR: 2040;
+
+// @public
+export const SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR: 2041;
+
+// @public
 export const SVTA_CUSTOM_UNKNOWN: 99000;
 
 // @public
@@ -37,10 +70,34 @@ export const SVTA_ERROR_CATEGORY_REMOTE_PLAY: 6;
 export const SVTA_ERROR_CATEGORY_UNKNOWN: 0;
 
 // @public
+export const SVTA_FRAGMENT_LOAD_ERROR: 2033;
+
+// @public
+export const SVTA_FRAGMENT_TIMEOUT_ERROR: 2034;
+
+// @public
+export const SVTA_FULLSCREEN_ERROR: 2037;
+
+// @public
+export const SVTA_INITIALIZATION_SEGMENT_ERROR: 2031;
+
+// @public
 export const SVTA_INVALID_COMPOSITION_TRACK_SEGMENT_TIME: 1007;
 
 // @public
 export const SVTA_INVALID_MANIFEST: 1002;
+
+// @public
+export const SVTA_LIVE_TIMESHIFT_OUT_OF_BOUNDS: 2035;
+
+// @public
+export const SVTA_MANIFEST_FEATURE_UNSUPPORTED: 2039;
+
+// @public
+export const SVTA_MANIFEST_PARSE_ERROR: 2005;
+
+// @public
+export const SVTA_MANIFEST_TRACK_PARSE_ERROR: 2016;
 
 // @public
 export const SVTA_MEDIA_CONTENT_UNKNOWN: 1000;
@@ -52,10 +109,67 @@ export const SVTA_MEDIA_UNAVAILABLE: 1001;
 export const SVTA_MISALIGNED_TRACK_DURATION: 1009;
 
 // @public
+export const SVTA_NO_MATCHING_CODEC: 2013;
+
+// @public
+export const SVTA_NO_SUPPORTED_AUDIO_TRACK: 2012;
+
+// @public
+export const SVTA_NO_SUPPORTED_VIDEO_TRACK: 2011;
+
+// @public
+export const SVTA_OUT_OF_MEMORY: 2028;
+
+// @public
+export const SVTA_PICTURE_IN_PICTURE_ERROR: 2038;
+
+// @public
+export const SVTA_PLAYBACK_UNKNOWN: 2000;
+
+// @public
+export const SVTA_PLAYHEAD_EXCEEDS_CONTENT_DURATION: 2010;
+
+// @public
+export const SVTA_PRIMARY_MANIFEST_LOAD_ERROR: 2014;
+
+// @public
+export const SVTA_PRIMARY_MANIFEST_LOAD_TIMEOUT: 2015;
+
+// @public
+export const SVTA_REMUX_ERROR: 2021;
+
+// @public
+export const SVTA_SECONDARY_MANIFEST_LOAD_ERROR: 2017;
+
+// @public
+export const SVTA_SECONDARY_MANIFEST_PARSE_ERROR: 2018;
+
+// @public
 export const SVTA_SEGMENT_EXCEEDS_TRACK_BITRATE: 1008;
 
 // @public
+export const SVTA_SEGMENT_LOAD_ERROR: 2029;
+
+// @public
+export const SVTA_SEGMENT_PARSE_ERROR: 2006;
+
+// @public
+export const SVTA_SEGMENT_TIMEOUT_ERROR: 2030;
+
+// @public
+export const SVTA_SWITCHED_TO_HIGHER_LATENCY: 2036;
+
+// @public
+export const SVTA_TIME_SYNC_ERROR: 2032;
+
+// @public
+export const SVTA_TRACK_LOAD_ERROR: 2020;
+
+// @public
 export const SVTA_TRACK_NOT_AVAILABLE: 1003;
+
+// @public
+export const SVTA_TRACK_SWITCH_ERROR: 2019;
 
 // @public
 export const SVTA_UNKNOWN: 999;
@@ -68,6 +182,18 @@ export const SVTA_UNSUPPORTED_TEXT_FORMAT: 1006;
 
 // @public
 export const SVTA_UNSUPPORTED_VIDEO_FORMAT: 1004;
+
+// @public
+export const SVTA_VIDEO_BUFFER_UNDERRUN: 2001;
+
+// @public
+export const SVTA_VIDEO_BUFFERING_TIMEOUT: 2003;
+
+// @public
+export const SVTA_VIDEO_DECODE_ERROR: 2007;
+
+// @public
+export const SVTA_VIDEO_DROPPED_FRAMES_EXCEEDED: 2009;
 
 // @public
 export const SvtaCustomErrorCode: {
@@ -109,6 +235,55 @@ export const SvtaMediaContentErrorCode: {
 
 // @public
 export type SvtaMediaContentErrorCode = ValueOf<typeof SvtaMediaContentErrorCode>;
+
+// @public
+export const SvtaPlaybackErrorCode: {
+    readonly UNKNOWN: typeof SVTA_PLAYBACK_UNKNOWN;
+    readonly VIDEO_BUFFER_UNDERRUN: typeof SVTA_VIDEO_BUFFER_UNDERRUN;
+    readonly AUDIO_BUFFER_UNDERRUN: typeof SVTA_AUDIO_BUFFER_UNDERRUN;
+    readonly VIDEO_BUFFERING_TIMEOUT: typeof SVTA_VIDEO_BUFFERING_TIMEOUT;
+    readonly AUDIO_BUFFERING_TIMEOUT: typeof SVTA_AUDIO_BUFFERING_TIMEOUT;
+    readonly MANIFEST_PARSE_ERROR: typeof SVTA_MANIFEST_PARSE_ERROR;
+    readonly SEGMENT_PARSE_ERROR: typeof SVTA_SEGMENT_PARSE_ERROR;
+    readonly VIDEO_DECODE_ERROR: typeof SVTA_VIDEO_DECODE_ERROR;
+    readonly AUDIO_DECODE_ERROR: typeof SVTA_AUDIO_DECODE_ERROR;
+    readonly VIDEO_DROPPED_FRAMES_EXCEEDED: typeof SVTA_VIDEO_DROPPED_FRAMES_EXCEEDED;
+    readonly PLAYHEAD_EXCEEDS_CONTENT_DURATION: typeof SVTA_PLAYHEAD_EXCEEDS_CONTENT_DURATION;
+    readonly NO_SUPPORTED_VIDEO_TRACK: typeof SVTA_NO_SUPPORTED_VIDEO_TRACK;
+    readonly NO_SUPPORTED_AUDIO_TRACK: typeof SVTA_NO_SUPPORTED_AUDIO_TRACK;
+    readonly NO_MATCHING_CODEC: typeof SVTA_NO_MATCHING_CODEC;
+    readonly PRIMARY_MANIFEST_LOAD_ERROR: typeof SVTA_PRIMARY_MANIFEST_LOAD_ERROR;
+    readonly PRIMARY_MANIFEST_LOAD_TIMEOUT: typeof SVTA_PRIMARY_MANIFEST_LOAD_TIMEOUT;
+    readonly MANIFEST_TRACK_PARSE_ERROR: typeof SVTA_MANIFEST_TRACK_PARSE_ERROR;
+    readonly SECONDARY_MANIFEST_LOAD_ERROR: typeof SVTA_SECONDARY_MANIFEST_LOAD_ERROR;
+    readonly SECONDARY_MANIFEST_PARSE_ERROR: typeof SVTA_SECONDARY_MANIFEST_PARSE_ERROR;
+    readonly TRACK_SWITCH_ERROR: typeof SVTA_TRACK_SWITCH_ERROR;
+    readonly TRACK_LOAD_ERROR: typeof SVTA_TRACK_LOAD_ERROR;
+    readonly REMUX_ERROR: typeof SVTA_REMUX_ERROR;
+    readonly BUFFER_INITIALIZATION_ERROR: typeof SVTA_BUFFER_INITIALIZATION_ERROR;
+    readonly BUFFER_APPEND_ERROR: typeof SVTA_BUFFER_APPEND_ERROR;
+    readonly BUFFER_REMOVE_ERROR: typeof SVTA_BUFFER_REMOVE_ERROR;
+    readonly BUFFER_FULL_ERROR: typeof SVTA_BUFFER_FULL_ERROR;
+    readonly BUFFER_SEEK_OVER_HOLE: typeof SVTA_BUFFER_SEEK_OVER_HOLE;
+    readonly BUFFER_NUDGE_ON_STALL: typeof SVTA_BUFFER_NUDGE_ON_STALL;
+    readonly OUT_OF_MEMORY: typeof SVTA_OUT_OF_MEMORY;
+    readonly SEGMENT_LOAD_ERROR: typeof SVTA_SEGMENT_LOAD_ERROR;
+    readonly SEGMENT_TIMEOUT_ERROR: typeof SVTA_SEGMENT_TIMEOUT_ERROR;
+    readonly INITIALIZATION_SEGMENT_ERROR: typeof SVTA_INITIALIZATION_SEGMENT_ERROR;
+    readonly TIME_SYNC_ERROR: typeof SVTA_TIME_SYNC_ERROR;
+    readonly FRAGMENT_LOAD_ERROR: typeof SVTA_FRAGMENT_LOAD_ERROR;
+    readonly FRAGMENT_TIMEOUT_ERROR: typeof SVTA_FRAGMENT_TIMEOUT_ERROR;
+    readonly LIVE_TIMESHIFT_OUT_OF_BOUNDS: typeof SVTA_LIVE_TIMESHIFT_OUT_OF_BOUNDS;
+    readonly SWITCHED_TO_HIGHER_LATENCY: typeof SVTA_SWITCHED_TO_HIGHER_LATENCY;
+    readonly FULLSCREEN_ERROR: typeof SVTA_FULLSCREEN_ERROR;
+    readonly PICTURE_IN_PICTURE_ERROR: typeof SVTA_PICTURE_IN_PICTURE_ERROR;
+    readonly MANIFEST_FEATURE_UNSUPPORTED: typeof SVTA_MANIFEST_FEATURE_UNSUPPORTED;
+    readonly CONTENT_STEERING_MANIFEST_LOAD_ERROR: typeof SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR;
+    readonly CONTENT_STEERING_MANIFEST_PARSE_ERROR: typeof SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR;
+};
+
+// @public
+export type SvtaPlaybackErrorCode = ValueOf<typeof SvtaPlaybackErrorCode>;
 
 // @public
 export const SvtaUnknownErrorCode: {
