@@ -101,6 +101,7 @@ To be raised with the Player Working Group; the tables are treated as normative 
 2. Stacking Example 2 labels 2018 "Video track load error", but the table defines 2018 = Unable to parse secondary manifest / asset list (2020 is Track load error). Implemented per the table.
 3. Grammar nits preserved-with-correction in descriptions: 6002 "Sender unable to make a connection **to** the receiver" (spec omits "to"); the category-1 description in the category table runs two sentences together ("…related error" / "Issues with the content itself").
 4. The prose "native … four digits, external … five" only holds for the zero-padded string rendering ("03404"); as integers both are four digits. The package exposes integers and relies on the spec's normative arithmetic (÷1000, mod 1000), under which native indices are 0–99 and external embeds 100–999.
+5. The Network table's explicit `500` row ("Received an HTTP 500 response: system Error - official definition") is treated as the exemplar of the HTTP embed range rather than a named catalog member; `getSvtaErrorDescription` synthesizes `Received an HTTP <n> response` for every embedded status. Each category's index-0 "Unknown" description is normalized to "Unknown <category> error" to disambiguate the nine identical "Unknown" table rows, and "Timed Text"/"Live Timeshifting Content" casing is normalized to sentence case.
 
 ## Open questions flagged for review (implemented with the stated defaults)
 
