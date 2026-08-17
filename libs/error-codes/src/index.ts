@@ -4,4 +4,7 @@
  *
  * @packageDocumentation
  */
+export * from './SvtaCustomErrorCode.ts'
 export * from './SvtaErrorCategory.ts'
+export * from './SvtaMediaContentErrorCode.ts'
+export * from './SvtaUnknownErrorCode.ts'

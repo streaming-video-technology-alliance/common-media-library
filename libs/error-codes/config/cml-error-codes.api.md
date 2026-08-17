@@ -7,6 +7,9 @@
 import { ValueOf } from '@svta/cml-utils';
 
 // @public
+export const SVTA_CUSTOM_UNKNOWN: 99000;
+
+// @public
 export const SVTA_ERROR_CATEGORY_ACCESSIBILITY: 5;
 
 // @public
@@ -34,6 +37,47 @@ export const SVTA_ERROR_CATEGORY_REMOTE_PLAY: 6;
 export const SVTA_ERROR_CATEGORY_UNKNOWN: 0;
 
 // @public
+export const SVTA_INVALID_COMPOSITION_TRACK_SEGMENT_TIME: 1007;
+
+// @public
+export const SVTA_INVALID_MANIFEST: 1002;
+
+// @public
+export const SVTA_MEDIA_CONTENT_UNKNOWN: 1000;
+
+// @public
+export const SVTA_MEDIA_UNAVAILABLE: 1001;
+
+// @public
+export const SVTA_MISALIGNED_TRACK_DURATION: 1009;
+
+// @public
+export const SVTA_SEGMENT_EXCEEDS_TRACK_BITRATE: 1008;
+
+// @public
+export const SVTA_TRACK_NOT_AVAILABLE: 1003;
+
+// @public
+export const SVTA_UNKNOWN: 999;
+
+// @public
+export const SVTA_UNSUPPORTED_AUDIO_FORMAT: 1005;
+
+// @public
+export const SVTA_UNSUPPORTED_TEXT_FORMAT: 1006;
+
+// @public
+export const SVTA_UNSUPPORTED_VIDEO_FORMAT: 1004;
+
+// @public
+export const SvtaCustomErrorCode: {
+    readonly UNKNOWN: typeof SVTA_CUSTOM_UNKNOWN;
+};
+
+// @public
+export type SvtaCustomErrorCode = ValueOf<typeof SvtaCustomErrorCode>;
+
+// @public
 export const SvtaErrorCategory: {
     readonly UNKNOWN: typeof SVTA_ERROR_CATEGORY_UNKNOWN;
     readonly MEDIA_CONTENT: typeof SVTA_ERROR_CATEGORY_MEDIA_CONTENT;
@@ -48,6 +92,31 @@ export const SvtaErrorCategory: {
 
 // @public
 export type SvtaErrorCategory = ValueOf<typeof SvtaErrorCategory>;
+
+// @public
+export const SvtaMediaContentErrorCode: {
+    readonly UNKNOWN: typeof SVTA_MEDIA_CONTENT_UNKNOWN;
+    readonly MEDIA_UNAVAILABLE: typeof SVTA_MEDIA_UNAVAILABLE;
+    readonly INVALID_MANIFEST: typeof SVTA_INVALID_MANIFEST;
+    readonly TRACK_NOT_AVAILABLE: typeof SVTA_TRACK_NOT_AVAILABLE;
+    readonly UNSUPPORTED_VIDEO_FORMAT: typeof SVTA_UNSUPPORTED_VIDEO_FORMAT;
+    readonly UNSUPPORTED_AUDIO_FORMAT: typeof SVTA_UNSUPPORTED_AUDIO_FORMAT;
+    readonly UNSUPPORTED_TEXT_FORMAT: typeof SVTA_UNSUPPORTED_TEXT_FORMAT;
+    readonly INVALID_COMPOSITION_TRACK_SEGMENT_TIME: typeof SVTA_INVALID_COMPOSITION_TRACK_SEGMENT_TIME;
+    readonly SEGMENT_EXCEEDS_TRACK_BITRATE: typeof SVTA_SEGMENT_EXCEEDS_TRACK_BITRATE;
+    readonly MISALIGNED_TRACK_DURATION: typeof SVTA_MISALIGNED_TRACK_DURATION;
+};
+
+// @public
+export type SvtaMediaContentErrorCode = ValueOf<typeof SvtaMediaContentErrorCode>;
+
+// @public
+export const SvtaUnknownErrorCode: {
+    readonly UNKNOWN: typeof SVTA_UNKNOWN;
+};
+
+// @public
+export type SvtaUnknownErrorCode = ValueOf<typeof SvtaUnknownErrorCode>;
 
 // (No @packageDocumentation comment for this package)
 
