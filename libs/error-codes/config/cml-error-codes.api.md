@@ -7,6 +7,12 @@
 import { ValueOf } from '@svta/cml-utils';
 
 // @public
+export function getSvtaErrorCategory(code: number): SvtaErrorCategory | undefined;
+
+// @public
+export function getSvtaErrorIndex(code: number): number | undefined;
+
+// @public
 export const SVTA_ACCESSIBILITY_UNKNOWN: 5000;
 
 // @public
@@ -549,6 +555,9 @@ export const SvtaErrorCategory: {
 
 // @public
 export type SvtaErrorCategory = ValueOf<typeof SvtaErrorCategory>;
+
+// @public
+export type SvtaErrorCode = SvtaAccessibilityErrorCode | SvtaAdvertisingErrorCode | SvtaContentProtectionErrorCode | SvtaCustomErrorCode | SvtaMediaContentErrorCode | SvtaNetworkErrorCode | SvtaPlaybackErrorCode | SvtaRemotePlayErrorCode | SvtaUnknownErrorCode;
 
 // @public
 export const SvtaMediaContentErrorCode: {
