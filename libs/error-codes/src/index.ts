@@ -5,6 +5,7 @@
  * @packageDocumentation
  */
 export * from './SvtaAccessibilityErrorCode.ts'
+export * from './SvtaAdvertisingErrorCode.ts'
 export * from './SvtaContentProtectionErrorCode.ts'
 export * from './SvtaCustomErrorCode.ts'
 export * from './SvtaErrorCategory.ts'

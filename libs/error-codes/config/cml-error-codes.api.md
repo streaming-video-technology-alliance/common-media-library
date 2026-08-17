@@ -10,6 +10,15 @@ import { ValueOf } from '@svta/cml-utils';
 export const SVTA_ACCESSIBILITY_UNKNOWN: 5000;
 
 // @public
+export const SVTA_AD_BLOCKER_DETECTED: 7001;
+
+// @public
+export const SVTA_AD_TYPE_MISMATCH: 7200;
+
+// @public
+export const SVTA_ADVERTISING_UNKNOWN: 7000;
+
+// @public
 export const SVTA_AUDIO_BUFFER_UNDERRUN: 2002;
 
 // @public
@@ -46,6 +55,15 @@ export const SVTA_BUFFER_SEEK_OVER_HOLE: 2026;
 export const SVTA_CDN_UNAUTHORIZED: 4011;
 
 // @public
+export const SVTA_COMPANION_AD_ERROR: 7600;
+
+// @public
+export const SVTA_COMPANION_AD_FETCH_ERROR: 7603;
+
+// @public
+export const SVTA_COMPANION_DIMENSION_MISMATCH: 7601;
+
+// @public
 export const SVTA_CONCURRENT_STREAM_LIMIT_EXCEEDED: 4001;
 
 // @public
@@ -74,6 +92,15 @@ export const SVTA_DRM_INITIALIZATION_ERROR: 4010;
 
 // @public
 export const SVTA_DRM_SESSION_ERROR: 4014;
+
+// @public
+export const SVTA_DURATION_MISMATCH: 7202;
+
+// @public
+export const SVTA_EMPTY_VAST_RESPONSE: 7999;
+
+// @public
+export const SVTA_EMPTY_WRAPPER_RESPONSE: 7303;
 
 // @public
 export const SVTA_ENTITLEMENT_REFUSED: 4002;
@@ -136,6 +163,9 @@ export const SVTA_INSUFFICIENT_DRM_ROBUSTNESS: 4006;
 export const SVTA_INSUFFICIENT_OUTPUT_PROTECTION: 4007;
 
 // @public
+export const SVTA_INTERACTIVE_CREATIVE_ERROR: 7409;
+
+// @public
 export const SVTA_INVALID_ACCESS_TOKEN: 4012;
 
 // @public
@@ -166,6 +196,12 @@ export const SVTA_LICENSE_RESPONSE_REJECTED: 4016;
 export const SVTA_LICENSE_SERVER_TIMEOUT: 4005;
 
 // @public
+export const SVTA_LINEAR_AD_ERROR: 7400;
+
+// @public
+export const SVTA_LINEARITY_MISMATCH: 7201;
+
+// @public
 export const SVTA_LIVE_TIMESHIFT_OUT_OF_BOUNDS: 2035;
 
 // @public
@@ -184,7 +220,22 @@ export const SVTA_MAX_RETRIES_EXCEEDED: 3008;
 export const SVTA_MEDIA_CONTENT_UNKNOWN: 1000;
 
 // @public
+export const SVTA_MEDIA_FILE_DISPLAY_ERROR: 7405;
+
+// @public
+export const SVTA_MEDIA_FILE_NOT_FOUND: 7401;
+
+// @public
+export const SVTA_MEDIA_FILE_UNAVAILABLE: 7402;
+
+// @public
 export const SVTA_MEDIA_UNAVAILABLE: 1001;
+
+// @public
+export const SVTA_MEZZANINE_DOWNLOADING: 7407;
+
+// @public
+export const SVTA_MEZZANINE_MISSING: 7406;
 
 // @public
 export const SVTA_MISALIGNED_TRACK_DURATION: 1009;
@@ -202,7 +253,19 @@ export const SVTA_NO_NETWORK_CONNECTION: 3001;
 export const SVTA_NO_SUPPORTED_AUDIO_TRACK: 2012;
 
 // @public
+export const SVTA_NO_SUPPORTED_MEDIA_TYPE: 7403;
+
+// @public
 export const SVTA_NO_SUPPORTED_VIDEO_TRACK: 2011;
+
+// @public
+export const SVTA_NONLINEAR_AD_ERROR: 7500;
+
+// @public
+export const SVTA_NONLINEAR_AD_FETCH_ERROR: 7502;
+
+// @public
+export const SVTA_NONLINEAR_DIMENSION_MISMATCH: 7501;
 
 // @public
 export const SVTA_OUT_OF_MEMORY: 2028;
@@ -247,10 +310,16 @@ export const SVTA_RECEIVER_UNAVAILABLE: 6003;
 export const SVTA_RECEIVER_UNSUPPORTED_STREAM: 6007;
 
 // @public
+export const SVTA_REJECTED_AD: 7408;
+
+// @public
 export const SVTA_REMOTE_PLAY_UNKNOWN: 6000;
 
 // @public
 export const SVTA_REMUX_ERROR: 2021;
+
+// @public
+export const SVTA_REQUIRED_COMPANION_AD_ERROR: 7602;
 
 // @public
 export const SVTA_RESOURCE_DENIED: 3010;
@@ -289,6 +358,9 @@ export const SVTA_SENDER_CONNECTION_LOST: 6006;
 export const SVTA_SENDER_INITIALIZATION_ERROR: 6001;
 
 // @public
+export const SVTA_SIZE_MISMATCH: 7203;
+
+// @public
 export const SVTA_SWITCHED_TO_HIGHER_LATENCY: 2036;
 
 // @public
@@ -313,6 +385,9 @@ export const SVTA_TRACK_NOT_AVAILABLE: 1003;
 export const SVTA_TRACK_SWITCH_ERROR: 2019;
 
 // @public
+export const SVTA_UNDEFINED_VAST_ERROR: 7900;
+
+// @public
 export const SVTA_UNKNOWN: 999;
 
 // @public
@@ -322,6 +397,9 @@ export const SVTA_UNSUPPORTED_AUDIO_FORMAT: 1005;
 export const SVTA_UNSUPPORTED_DRM_SYSTEM: 4008;
 
 // @public
+export const SVTA_UNSUPPORTED_NONLINEAR_AD: 7503;
+
+// @public
 export const SVTA_UNSUPPORTED_TEXT_FORMAT: 1006;
 
 // @public
@@ -329,6 +407,18 @@ export const SVTA_UNSUPPORTED_URI_SCHEME: 3006;
 
 // @public
 export const SVTA_UNSUPPORTED_VIDEO_FORMAT: 1004;
+
+// @public
+export const SVTA_VAST_PARSE_ERROR: 7100;
+
+// @public
+export const SVTA_VAST_SCHEMA_VALIDATION_ERROR: 7101;
+
+// @public
+export const SVTA_VAST_VERSION_UNSUPPORTED: 7102;
+
+// @public
+export const SVTA_VERIFICATION_ERROR: 7410;
 
 // @public
 export const SVTA_VIDEO_BUFFER_UNDERRUN: 2001;
@@ -343,6 +433,18 @@ export const SVTA_VIDEO_DECODE_ERROR: 2007;
 export const SVTA_VIDEO_DROPPED_FRAMES_EXCEEDED: 2009;
 
 // @public
+export const SVTA_VPAID_ERROR: 7901;
+
+// @public
+export const SVTA_WRAPPER_ERROR: 7300;
+
+// @public
+export const SVTA_WRAPPER_LIMIT_REACHED: 7302;
+
+// @public
+export const SVTA_WRAPPER_TIMEOUT: 7301;
+
+// @public
 export const SvtaAccessibilityErrorCode: {
     readonly UNKNOWN: typeof SVTA_ACCESSIBILITY_UNKNOWN;
     readonly TIMED_TEXT_PARSE_ERROR: typeof SVTA_TIMED_TEXT_PARSE_ERROR;
@@ -353,6 +455,47 @@ export const SvtaAccessibilityErrorCode: {
 
 // @public
 export type SvtaAccessibilityErrorCode = ValueOf<typeof SvtaAccessibilityErrorCode>;
+
+// @public
+export const SvtaAdvertisingErrorCode: {
+    readonly UNKNOWN: typeof SVTA_ADVERTISING_UNKNOWN;
+    readonly AD_BLOCKER_DETECTED: typeof SVTA_AD_BLOCKER_DETECTED;
+    readonly VAST_PARSE_ERROR: typeof SVTA_VAST_PARSE_ERROR;
+    readonly VAST_SCHEMA_VALIDATION_ERROR: typeof SVTA_VAST_SCHEMA_VALIDATION_ERROR;
+    readonly VAST_VERSION_UNSUPPORTED: typeof SVTA_VAST_VERSION_UNSUPPORTED;
+    readonly AD_TYPE_MISMATCH: typeof SVTA_AD_TYPE_MISMATCH;
+    readonly LINEARITY_MISMATCH: typeof SVTA_LINEARITY_MISMATCH;
+    readonly DURATION_MISMATCH: typeof SVTA_DURATION_MISMATCH;
+    readonly SIZE_MISMATCH: typeof SVTA_SIZE_MISMATCH;
+    readonly WRAPPER_ERROR: typeof SVTA_WRAPPER_ERROR;
+    readonly WRAPPER_TIMEOUT: typeof SVTA_WRAPPER_TIMEOUT;
+    readonly WRAPPER_LIMIT_REACHED: typeof SVTA_WRAPPER_LIMIT_REACHED;
+    readonly EMPTY_WRAPPER_RESPONSE: typeof SVTA_EMPTY_WRAPPER_RESPONSE;
+    readonly LINEAR_AD_ERROR: typeof SVTA_LINEAR_AD_ERROR;
+    readonly MEDIA_FILE_NOT_FOUND: typeof SVTA_MEDIA_FILE_NOT_FOUND;
+    readonly MEDIA_FILE_UNAVAILABLE: typeof SVTA_MEDIA_FILE_UNAVAILABLE;
+    readonly NO_SUPPORTED_MEDIA_TYPE: typeof SVTA_NO_SUPPORTED_MEDIA_TYPE;
+    readonly MEDIA_FILE_DISPLAY_ERROR: typeof SVTA_MEDIA_FILE_DISPLAY_ERROR;
+    readonly MEZZANINE_MISSING: typeof SVTA_MEZZANINE_MISSING;
+    readonly MEZZANINE_DOWNLOADING: typeof SVTA_MEZZANINE_DOWNLOADING;
+    readonly REJECTED_AD: typeof SVTA_REJECTED_AD;
+    readonly INTERACTIVE_CREATIVE_ERROR: typeof SVTA_INTERACTIVE_CREATIVE_ERROR;
+    readonly VERIFICATION_ERROR: typeof SVTA_VERIFICATION_ERROR;
+    readonly NONLINEAR_AD_ERROR: typeof SVTA_NONLINEAR_AD_ERROR;
+    readonly NONLINEAR_DIMENSION_MISMATCH: typeof SVTA_NONLINEAR_DIMENSION_MISMATCH;
+    readonly NONLINEAR_AD_FETCH_ERROR: typeof SVTA_NONLINEAR_AD_FETCH_ERROR;
+    readonly UNSUPPORTED_NONLINEAR_AD: typeof SVTA_UNSUPPORTED_NONLINEAR_AD;
+    readonly COMPANION_AD_ERROR: typeof SVTA_COMPANION_AD_ERROR;
+    readonly COMPANION_DIMENSION_MISMATCH: typeof SVTA_COMPANION_DIMENSION_MISMATCH;
+    readonly REQUIRED_COMPANION_AD_ERROR: typeof SVTA_REQUIRED_COMPANION_AD_ERROR;
+    readonly COMPANION_AD_FETCH_ERROR: typeof SVTA_COMPANION_AD_FETCH_ERROR;
+    readonly UNDEFINED_VAST_ERROR: typeof SVTA_UNDEFINED_VAST_ERROR;
+    readonly VPAID_ERROR: typeof SVTA_VPAID_ERROR;
+    readonly EMPTY_VAST_RESPONSE: typeof SVTA_EMPTY_VAST_RESPONSE;
+};
+
+// @public
+export type SvtaAdvertisingErrorCode = ValueOf<typeof SvtaAdvertisingErrorCode>;
 
 // @public
 export const SvtaContentProtectionErrorCode: {
