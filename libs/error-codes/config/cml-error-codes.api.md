@@ -16,6 +16,9 @@ export const SVTA_AUDIO_BUFFERING_TIMEOUT: 2004;
 export const SVTA_AUDIO_DECODE_ERROR: 2008;
 
 // @public
+export const SVTA_BAD_LICENSE_REQUEST: 4004;
+
+// @public
 export const SVTA_BUFFER_APPEND_ERROR: 2023;
 
 // @public
@@ -34,6 +37,15 @@ export const SVTA_BUFFER_REMOVE_ERROR: 2024;
 export const SVTA_BUFFER_SEEK_OVER_HOLE: 2026;
 
 // @public
+export const SVTA_CDN_UNAUTHORIZED: 4011;
+
+// @public
+export const SVTA_CONCURRENT_STREAM_LIMIT_EXCEEDED: 4001;
+
+// @public
+export const SVTA_CONTENT_PROTECTION_UNKNOWN: 4000;
+
+// @public
 export const SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR: 2040;
 
 // @public
@@ -41,6 +53,24 @@ export const SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR: 2041;
 
 // @public
 export const SVTA_CUSTOM_UNKNOWN: 99000;
+
+// @public
+export const SVTA_DOWNLOAD_ERROR: 3007;
+
+// @public
+export const SVTA_DRM_CERTIFICATE_ERROR: 4013;
+
+// @public
+export const SVTA_DRM_CONFIGURATION_MISSING: 4015;
+
+// @public
+export const SVTA_DRM_INITIALIZATION_ERROR: 4010;
+
+// @public
+export const SVTA_DRM_SESSION_ERROR: 4014;
+
+// @public
+export const SVTA_ENTITLEMENT_REFUSED: 4002;
 
 // @public
 export const SVTA_ERROR_CATEGORY_ACCESSIBILITY: 5;
@@ -79,13 +109,55 @@ export const SVTA_FRAGMENT_TIMEOUT_ERROR: 2034;
 export const SVTA_FULLSCREEN_ERROR: 2037;
 
 // @public
+export const SVTA_GEO_RESTRICTED: 4009;
+
+// @public
+export const SVTA_HOST_RESOLUTION_ERROR: 3003;
+
+// @public
+export const SVTA_HTTP_TIMEOUT: 3002;
+
+// @public
 export const SVTA_INITIALIZATION_SEGMENT_ERROR: 2031;
+
+// @public
+export const SVTA_INSUFFICIENT_BANDWIDTH: 3009;
+
+// @public
+export const SVTA_INSUFFICIENT_DRM_ROBUSTNESS: 4006;
+
+// @public
+export const SVTA_INSUFFICIENT_OUTPUT_PROTECTION: 4007;
+
+// @public
+export const SVTA_INVALID_ACCESS_TOKEN: 4012;
 
 // @public
 export const SVTA_INVALID_COMPOSITION_TRACK_SEGMENT_TIME: 1007;
 
 // @public
+export const SVTA_INVALID_HTTP_CONTENT_TYPE: 3011;
+
+// @public
 export const SVTA_INVALID_MANIFEST: 1002;
+
+// @public
+export const SVTA_INVALID_URI: 3005;
+
+// @public
+export const SVTA_KEY_LOAD_ERROR: 4019;
+
+// @public
+export const SVTA_LICENSE_EXPIRED: 4003;
+
+// @public
+export const SVTA_LICENSE_REQUEST_GENERATION_ERROR: 4021;
+
+// @public
+export const SVTA_LICENSE_RESPONSE_REJECTED: 4016;
+
+// @public
+export const SVTA_LICENSE_SERVER_TIMEOUT: 4005;
 
 // @public
 export const SVTA_LIVE_TIMESHIFT_OUT_OF_BOUNDS: 2035;
@@ -100,6 +172,9 @@ export const SVTA_MANIFEST_PARSE_ERROR: 2005;
 export const SVTA_MANIFEST_TRACK_PARSE_ERROR: 2016;
 
 // @public
+export const SVTA_MAX_RETRIES_EXCEEDED: 3008;
+
+// @public
 export const SVTA_MEDIA_CONTENT_UNKNOWN: 1000;
 
 // @public
@@ -109,7 +184,13 @@ export const SVTA_MEDIA_UNAVAILABLE: 1001;
 export const SVTA_MISALIGNED_TRACK_DURATION: 1009;
 
 // @public
+export const SVTA_NETWORK_UNKNOWN: 3000;
+
+// @public
 export const SVTA_NO_MATCHING_CODEC: 2013;
+
+// @public
+export const SVTA_NO_NETWORK_CONNECTION: 3001;
 
 // @public
 export const SVTA_NO_SUPPORTED_AUDIO_TRACK: 2012;
@@ -119,6 +200,12 @@ export const SVTA_NO_SUPPORTED_VIDEO_TRACK: 2011;
 
 // @public
 export const SVTA_OUT_OF_MEMORY: 2028;
+
+// @public
+export const SVTA_PERMISSION_REJECTED: 4018;
+
+// @public
+export const SVTA_PERSISTENT_SESSION_ERROR: 4017;
 
 // @public
 export const SVTA_PICTURE_IN_PICTURE_ERROR: 2038;
@@ -139,10 +226,19 @@ export const SVTA_PRIMARY_MANIFEST_LOAD_TIMEOUT: 2015;
 export const SVTA_REMUX_ERROR: 2021;
 
 // @public
+export const SVTA_RESOURCE_DENIED: 3010;
+
+// @public
+export const SVTA_RESOURCE_NOT_FOUND: 3004;
+
+// @public
 export const SVTA_SECONDARY_MANIFEST_LOAD_ERROR: 2017;
 
 // @public
 export const SVTA_SECONDARY_MANIFEST_PARSE_ERROR: 2018;
+
+// @public
+export const SVTA_SEGMENT_DECRYPTION_ERROR: 4020;
 
 // @public
 export const SVTA_SEGMENT_EXCEEDS_TRACK_BITRATE: 1008;
@@ -178,7 +274,13 @@ export const SVTA_UNKNOWN: 999;
 export const SVTA_UNSUPPORTED_AUDIO_FORMAT: 1005;
 
 // @public
+export const SVTA_UNSUPPORTED_DRM_SYSTEM: 4008;
+
+// @public
 export const SVTA_UNSUPPORTED_TEXT_FORMAT: 1006;
+
+// @public
+export const SVTA_UNSUPPORTED_URI_SCHEME: 3006;
 
 // @public
 export const SVTA_UNSUPPORTED_VIDEO_FORMAT: 1004;
@@ -194,6 +296,35 @@ export const SVTA_VIDEO_DECODE_ERROR: 2007;
 
 // @public
 export const SVTA_VIDEO_DROPPED_FRAMES_EXCEEDED: 2009;
+
+// @public
+export const SvtaContentProtectionErrorCode: {
+    readonly UNKNOWN: typeof SVTA_CONTENT_PROTECTION_UNKNOWN;
+    readonly CONCURRENT_STREAM_LIMIT_EXCEEDED: typeof SVTA_CONCURRENT_STREAM_LIMIT_EXCEEDED;
+    readonly ENTITLEMENT_REFUSED: typeof SVTA_ENTITLEMENT_REFUSED;
+    readonly LICENSE_EXPIRED: typeof SVTA_LICENSE_EXPIRED;
+    readonly BAD_LICENSE_REQUEST: typeof SVTA_BAD_LICENSE_REQUEST;
+    readonly LICENSE_SERVER_TIMEOUT: typeof SVTA_LICENSE_SERVER_TIMEOUT;
+    readonly INSUFFICIENT_DRM_ROBUSTNESS: typeof SVTA_INSUFFICIENT_DRM_ROBUSTNESS;
+    readonly INSUFFICIENT_OUTPUT_PROTECTION: typeof SVTA_INSUFFICIENT_OUTPUT_PROTECTION;
+    readonly UNSUPPORTED_DRM_SYSTEM: typeof SVTA_UNSUPPORTED_DRM_SYSTEM;
+    readonly GEO_RESTRICTED: typeof SVTA_GEO_RESTRICTED;
+    readonly DRM_INITIALIZATION_ERROR: typeof SVTA_DRM_INITIALIZATION_ERROR;
+    readonly CDN_UNAUTHORIZED: typeof SVTA_CDN_UNAUTHORIZED;
+    readonly INVALID_ACCESS_TOKEN: typeof SVTA_INVALID_ACCESS_TOKEN;
+    readonly DRM_CERTIFICATE_ERROR: typeof SVTA_DRM_CERTIFICATE_ERROR;
+    readonly DRM_SESSION_ERROR: typeof SVTA_DRM_SESSION_ERROR;
+    readonly DRM_CONFIGURATION_MISSING: typeof SVTA_DRM_CONFIGURATION_MISSING;
+    readonly LICENSE_RESPONSE_REJECTED: typeof SVTA_LICENSE_RESPONSE_REJECTED;
+    readonly PERSISTENT_SESSION_ERROR: typeof SVTA_PERSISTENT_SESSION_ERROR;
+    readonly PERMISSION_REJECTED: typeof SVTA_PERMISSION_REJECTED;
+    readonly KEY_LOAD_ERROR: typeof SVTA_KEY_LOAD_ERROR;
+    readonly SEGMENT_DECRYPTION_ERROR: typeof SVTA_SEGMENT_DECRYPTION_ERROR;
+    readonly LICENSE_REQUEST_GENERATION_ERROR: typeof SVTA_LICENSE_REQUEST_GENERATION_ERROR;
+};
+
+// @public
+export type SvtaContentProtectionErrorCode = ValueOf<typeof SvtaContentProtectionErrorCode>;
 
 // @public
 export const SvtaCustomErrorCode: {
@@ -235,6 +366,25 @@ export const SvtaMediaContentErrorCode: {
 
 // @public
 export type SvtaMediaContentErrorCode = ValueOf<typeof SvtaMediaContentErrorCode>;
+
+// @public
+export const SvtaNetworkErrorCode: {
+    readonly UNKNOWN: typeof SVTA_NETWORK_UNKNOWN;
+    readonly NO_NETWORK_CONNECTION: typeof SVTA_NO_NETWORK_CONNECTION;
+    readonly HTTP_TIMEOUT: typeof SVTA_HTTP_TIMEOUT;
+    readonly HOST_RESOLUTION_ERROR: typeof SVTA_HOST_RESOLUTION_ERROR;
+    readonly RESOURCE_NOT_FOUND: typeof SVTA_RESOURCE_NOT_FOUND;
+    readonly INVALID_URI: typeof SVTA_INVALID_URI;
+    readonly UNSUPPORTED_URI_SCHEME: typeof SVTA_UNSUPPORTED_URI_SCHEME;
+    readonly DOWNLOAD_ERROR: typeof SVTA_DOWNLOAD_ERROR;
+    readonly MAX_RETRIES_EXCEEDED: typeof SVTA_MAX_RETRIES_EXCEEDED;
+    readonly INSUFFICIENT_BANDWIDTH: typeof SVTA_INSUFFICIENT_BANDWIDTH;
+    readonly RESOURCE_DENIED: typeof SVTA_RESOURCE_DENIED;
+    readonly INVALID_HTTP_CONTENT_TYPE: typeof SVTA_INVALID_HTTP_CONTENT_TYPE;
+};
+
+// @public
+export type SvtaNetworkErrorCode = ValueOf<typeof SvtaNetworkErrorCode>;
 
 // @public
 export const SvtaPlaybackErrorCode: {
