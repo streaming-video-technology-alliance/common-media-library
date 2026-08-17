@@ -6,6 +6,7 @@
  */
 export * from './getSvtaErrorCategory.ts'
 export * from './getSvtaErrorIndex.ts'
+export * from './httpStatusToSvtaErrorCode.ts'
 export * from './SvtaAccessibilityErrorCode.ts'
 export * from './SvtaAdvertisingErrorCode.ts'
 export * from './SvtaContentProtectionErrorCode.ts'
@@ -17,3 +18,4 @@ export * from './SvtaNetworkErrorCode.ts'
 export * from './SvtaPlaybackErrorCode.ts'
 export * from './SvtaRemotePlayErrorCode.ts'
 export * from './SvtaUnknownErrorCode.ts'
+export * from './vastErrorToSvtaErrorCode.ts'

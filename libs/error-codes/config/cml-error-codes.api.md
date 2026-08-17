@@ -13,6 +13,9 @@ export function getSvtaErrorCategory(code: number): SvtaErrorCategory | undefine
 export function getSvtaErrorIndex(code: number): number | undefined;
 
 // @public
+export function httpStatusToSvtaErrorCode(status: number): number;
+
+// @public
 export const SVTA_ACCESSIBILITY_UNKNOWN: 5000;
 
 // @public
@@ -668,6 +671,9 @@ export const SvtaUnknownErrorCode: {
 
 // @public
 export type SvtaUnknownErrorCode = ValueOf<typeof SvtaUnknownErrorCode>;
+
+// @public
+export function vastErrorToSvtaErrorCode(vastError: number): number;
 
 // (No @packageDocumentation comment for this package)
 
