@@ -10,6 +10,9 @@ import { ValueOf } from '@svta/cml-utils';
 export function getSvtaErrorCategory(code: number): SvtaErrorCategory | undefined;
 
 // @public
+export function getSvtaErrorDescription(code: number): string | undefined;
+
+// @public
 export function getSvtaErrorIndex(code: number): number | undefined;
 
 // @public
