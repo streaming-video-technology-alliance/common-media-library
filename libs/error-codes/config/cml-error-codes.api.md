@@ -7,6 +7,9 @@
 import { ValueOf } from '@svta/cml-utils';
 
 // @public
+export const SVTA_ACCESSIBILITY_UNKNOWN: 5000;
+
+// @public
 export const SVTA_AUDIO_BUFFER_UNDERRUN: 2002;
 
 // @public
@@ -14,6 +17,9 @@ export const SVTA_AUDIO_BUFFERING_TIMEOUT: 2004;
 
 // @public
 export const SVTA_AUDIO_DECODE_ERROR: 2008;
+
+// @public
+export const SVTA_AUDIO_DESCRIPTION_EXCEEDS_CONTENT_DURATION: 5004;
 
 // @public
 export const SVTA_BAD_LICENSE_REQUEST: 4004;
@@ -223,6 +229,27 @@ export const SVTA_PRIMARY_MANIFEST_LOAD_ERROR: 2014;
 export const SVTA_PRIMARY_MANIFEST_LOAD_TIMEOUT: 2015;
 
 // @public
+export const SVTA_RECEIVER_ALREADY_IN_REMOTE_PLAY: 6008;
+
+// @public
+export const SVTA_RECEIVER_CONNECTION_LOST: 6005;
+
+// @public
+export const SVTA_RECEIVER_CONNECTION_REFUSED: 6004;
+
+// @public
+export const SVTA_RECEIVER_PLAYBACK_ERROR: 6009;
+
+// @public
+export const SVTA_RECEIVER_UNAVAILABLE: 6003;
+
+// @public
+export const SVTA_RECEIVER_UNSUPPORTED_STREAM: 6007;
+
+// @public
+export const SVTA_REMOTE_PLAY_UNKNOWN: 6000;
+
+// @public
 export const SVTA_REMUX_ERROR: 2021;
 
 // @public
@@ -253,10 +280,28 @@ export const SVTA_SEGMENT_PARSE_ERROR: 2006;
 export const SVTA_SEGMENT_TIMEOUT_ERROR: 2030;
 
 // @public
+export const SVTA_SENDER_CONNECTION_ERROR: 6002;
+
+// @public
+export const SVTA_SENDER_CONNECTION_LOST: 6006;
+
+// @public
+export const SVTA_SENDER_INITIALIZATION_ERROR: 6001;
+
+// @public
 export const SVTA_SWITCHED_TO_HIGHER_LATENCY: 2036;
 
 // @public
 export const SVTA_TIME_SYNC_ERROR: 2032;
+
+// @public
+export const SVTA_TIMED_TEXT_EXCEEDS_CONTENT_DURATION: 5003;
+
+// @public
+export const SVTA_TIMED_TEXT_PARSE_ERROR: 5001;
+
+// @public
+export const SVTA_TIMED_TEXT_RENDER_ERROR: 5002;
 
 // @public
 export const SVTA_TRACK_LOAD_ERROR: 2020;
@@ -296,6 +341,18 @@ export const SVTA_VIDEO_DECODE_ERROR: 2007;
 
 // @public
 export const SVTA_VIDEO_DROPPED_FRAMES_EXCEEDED: 2009;
+
+// @public
+export const SvtaAccessibilityErrorCode: {
+    readonly UNKNOWN: typeof SVTA_ACCESSIBILITY_UNKNOWN;
+    readonly TIMED_TEXT_PARSE_ERROR: typeof SVTA_TIMED_TEXT_PARSE_ERROR;
+    readonly TIMED_TEXT_RENDER_ERROR: typeof SVTA_TIMED_TEXT_RENDER_ERROR;
+    readonly TIMED_TEXT_EXCEEDS_CONTENT_DURATION: typeof SVTA_TIMED_TEXT_EXCEEDS_CONTENT_DURATION;
+    readonly AUDIO_DESCRIPTION_EXCEEDS_CONTENT_DURATION: typeof SVTA_AUDIO_DESCRIPTION_EXCEEDS_CONTENT_DURATION;
+};
+
+// @public
+export type SvtaAccessibilityErrorCode = ValueOf<typeof SvtaAccessibilityErrorCode>;
 
 // @public
 export const SvtaContentProtectionErrorCode: {
@@ -434,6 +491,23 @@ export const SvtaPlaybackErrorCode: {
 
 // @public
 export type SvtaPlaybackErrorCode = ValueOf<typeof SvtaPlaybackErrorCode>;
+
+// @public
+export const SvtaRemotePlayErrorCode: {
+    readonly UNKNOWN: typeof SVTA_REMOTE_PLAY_UNKNOWN;
+    readonly SENDER_INITIALIZATION_ERROR: typeof SVTA_SENDER_INITIALIZATION_ERROR;
+    readonly SENDER_CONNECTION_ERROR: typeof SVTA_SENDER_CONNECTION_ERROR;
+    readonly RECEIVER_UNAVAILABLE: typeof SVTA_RECEIVER_UNAVAILABLE;
+    readonly RECEIVER_CONNECTION_REFUSED: typeof SVTA_RECEIVER_CONNECTION_REFUSED;
+    readonly RECEIVER_CONNECTION_LOST: typeof SVTA_RECEIVER_CONNECTION_LOST;
+    readonly SENDER_CONNECTION_LOST: typeof SVTA_SENDER_CONNECTION_LOST;
+    readonly RECEIVER_UNSUPPORTED_STREAM: typeof SVTA_RECEIVER_UNSUPPORTED_STREAM;
+    readonly RECEIVER_ALREADY_IN_REMOTE_PLAY: typeof SVTA_RECEIVER_ALREADY_IN_REMOTE_PLAY;
+    readonly RECEIVER_PLAYBACK_ERROR: typeof SVTA_RECEIVER_PLAYBACK_ERROR;
+};
+
+// @public
+export type SvtaRemotePlayErrorCode = ValueOf<typeof SvtaRemotePlayErrorCode>;
 
 // @public
 export const SvtaUnknownErrorCode: {

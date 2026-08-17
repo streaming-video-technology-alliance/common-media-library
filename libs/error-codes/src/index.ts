@@ -4,10 +4,12 @@
  *
  * @packageDocumentation
  */
+export * from './SvtaAccessibilityErrorCode.ts'
 export * from './SvtaContentProtectionErrorCode.ts'
 export * from './SvtaCustomErrorCode.ts'
 export * from './SvtaErrorCategory.ts'
 export * from './SvtaMediaContentErrorCode.ts'
 export * from './SvtaNetworkErrorCode.ts'
 export * from './SvtaPlaybackErrorCode.ts'
+export * from './SvtaRemotePlayErrorCode.ts'
 export * from './SvtaUnknownErrorCode.ts'
