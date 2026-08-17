@@ -15,6 +15,7 @@ This project is a mono-repo with the following workspaces: `libs` and `docs`. Th
 - `@svta/cml-c2pa`
 - `@svta/cml-dash`
 - `@svta/cml-drm`
+- `@svta/cml-error-codes`
 - `@svta/cml-id3`
 - `@svta/cml-iso-8601`
 - `@svta/cml-iso-bmff`
