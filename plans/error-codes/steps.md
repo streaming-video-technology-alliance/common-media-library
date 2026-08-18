@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Design source: `plans/error-codes/design.md`. Spec tables in this plan are authoritative for names/values/descriptions.
+- Design source: `rfc/error-codes.md` (the original `plans/error-codes/design.md` was converted to an RFC for community review). Spec tables in this plan are authoritative for names/values/descriptions.
 - Never use the `enum` keyword; use `as const` object + `export type X = ValueOf<typeof X>` merged alias.
 - One public export per file; filename = export name; explicit return types everywhere (`isolatedDeclarations`).
 - Relative imports carry `.ts` extensions; `import type` for type-only imports.
