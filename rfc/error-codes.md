@@ -149,11 +149,12 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 ## Prior art
 
 - In-repo: `C2paStatusCode` and `LiveVideoStatusCode` in `@svta/cml-c2pa` are spec-defined error-code catalogs using the same const enum idiom.
+- [SPF's `errors.ts`](https://github.com/littlespex/v10/blob/rfc/ads-api/packages/spf/src/media/errors.ts) is an early adopter-side implementation of the same spec. It defines only the codes its engine reports, as flat `SVTA_*` constants (`SVTA_UNSUPPORTED_VIDEO_FORMAT = 1004`), with `svtaCategory` / `svtaIndex` arithmetic helpers, a minimal `SvtaError` envelope (`{ code, message?, data? }`), and a publisher-defined `99001` that exercises the Custom category. Each code's TSDoc leads with its spec coordinates ("SVTA 1 [Media Content] 004"), which makes review against the spec tables trivial.
 - The spec's appendix surveys the per-player error schemes this replaces: hls.js string type/detail pairs, dash.js integer codes, Shaka severity/category/code, THEOplayer category+code, JW Player, Bitmovin, AVFoundation, ExoPlayer. The category-times-1000 shape matches how Shaka and THEOplayer already structure codes, which should ease translation-layer adoption.
 
 ## Unresolved questions
 
-1. Are the 137 derived member names right? Naming is the main review surface. The full listing is in the linked api.md. Bikeshedding individual names is in scope for this RFC and cheap before first publish. The `SVTA_*` constant names derive from the member names mechanically, so renames cascade.
+1. Are the 137 derived member names right? Naming is the main review surface. The full listing is in the linked api.md. Bikeshedding individual names is in scope for this RFC and cheap before first publish. The `SVTA_*` constant names derive from the member names mechanically, so renames cascade. SPF's flat `SVTA_<MEMBER>` style (see Prior art) is shorter and collision-free for every code except the nine `UNKNOWN`s. Whether the dictionary keeps the fully qualified `SVTA_<CATEGORY>_ERROR_<MEMBER>` form, drops the `_ERROR_` joint, or goes flat with qualified `UNKNOWN`s is part of this question.
 2. Should `getSvtaErrorDescription` ship in v1, or should the package stay codes-only until the IANA registry exists?
 3. Do the five errata get fixed in the spec before IANA registration, and does the package track the corrected text or the published text verbatim?
 4. Does the Working Group want a `@svta/cml-error-codes` docs page enumerating the full dictionary (typedoc renders the nine catalogs already)?
@@ -161,6 +162,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 ## Future possibilities
 
 - Feeding SVTA codes into CMCD v2's `ec` (error code) key via `@svta/cml-cmcd`.
+- A minimal `SvtaError` envelope type (`{ code, message?, data? }`, as in the SPF prior art) so players and QoE tooling share one reporting shape. The spec scopes error metadata out, so the envelope stays out of v1.
 - Per-player translation-table helpers (the spec's "translation sub-component"), as a separate package or adopter recipes.
 - Swapping `@see` links to the IANA registry once the spec is registered, and generating the dictionary from the registry if a machine-readable form appears.
 
