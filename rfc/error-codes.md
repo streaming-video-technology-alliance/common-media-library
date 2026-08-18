@@ -2,7 +2,7 @@
 status: draft
 ---
 
-# RFC: SVTA Standardized Error Codes — `@svta/cml-error-codes`
+# RFC: SVTA Standardized Error Codes (`@svta/cml-error-codes`)
 
 | | |
 |---|---|
@@ -119,7 +119,7 @@ The tables are treated as normative where the document disagrees with itself; th
 
 ### Packaging
 
-Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: ["dist/**/*", "NOTICE.md"]`, tsdown zero-config build, api-extractor report, typedoc auto-discovery. The package is registered in the root build script but deliberately **not** in `scripts/projects.ts`; publish-list registration happens in the first release-prep PR (c2pa precedent), preventing accidental publication before this RFC settles.
+Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: ["dist/**/*", "NOTICE.md"]`, tsdown zero-config build, api-extractor report, typedoc auto-discovery. The package is registered in the root build script but deliberately left out of `scripts/projects.ts`; publish-list registration happens in the first release-prep PR (c2pa precedent), preventing accidental publication before this RFC settles.
 
 ## Drawbacks
 
@@ -138,7 +138,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 ## Prior art
 
 - In-repo: `C2paStatusCode` and `LiveVideoStatusCode` in `@svta/cml-c2pa` are spec-defined error-code catalogs using the same const enum idiom.
-- The spec's appendix surveys the player landscape this replaces: hls.js string type/detail pairs, dash.js integer codes, Shaka severity/category/code, THEOplayer category+code, JW Player, Bitmovin, AVFoundation, ExoPlayer. The category-times-1000 shape closely matches how Shaka and THEOplayer already structure codes, which should ease translation-layer adoption.
+- The spec's appendix surveys the per-player error schemes this replaces: hls.js string type/detail pairs, dash.js integer codes, Shaka severity/category/code, THEOplayer category+code, JW Player, Bitmovin, AVFoundation, ExoPlayer. The category-times-1000 shape closely matches how Shaka and THEOplayer already structure codes, which should ease translation-layer adoption.
 
 ## Unresolved questions
 
