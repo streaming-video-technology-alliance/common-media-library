@@ -2,7 +2,7 @@
 status: draft
 ---
 
-# RFC: SVTA Standardized Error Codes (`@svta/cml-error-codes`)
+# RFC: SVTA2070 Standardized Error Codes (`@svta/cml-error-codes`)
 
 | | |
 |---|---|
@@ -13,7 +13,7 @@ status: draft
 
 ## Summary
 
-A new package, `@svta/cml-error-codes`, is the reference implementation of the *SVTA Standardized Error Codes* specification (Player Working Group, published July 8, 2026). It ships every named code as a typed constant, the spec's category/index arithmetic, HTTP and VAST embedding, and an opt-in human-readable dictionary. The spec's own objectives include "Error codes referenced in the Common Media Library via SVTA's Player Working Group". This package is that deliverable.
+A new package, `@svta/cml-error-codes`, is the reference implementation of [*SVTA2070: Standardized Error Codes*](https://www.svta.org/product/svta2070/) (Player Working Group, published July 8, 2026). It ships every named code as a typed constant, the spec's category/index arithmetic, HTTP and VAST embedding, and an opt-in human-readable dictionary. The spec's own objectives include "Error codes referenced in the Common Media Library via SVTA's Player Working Group". This package is that deliverable.
 
 ```ts
 import { getSvtaErrorCategory, httpStatusToSvtaErrorCode, SvtaErrorCategory, SvtaPlaybackErrorCode } from '@svta/cml-error-codes'
@@ -50,9 +50,9 @@ Every code is also exported as an individual constant for direct imports:
 
 ```ts
 import assert from 'node:assert'
-import { SVTA_NETWORK_ERROR_RESOURCE_NOT_FOUND } from '@svta/cml-error-codes'
+import { SVTA_NETWORK_RESOURCE_NOT_FOUND } from '@svta/cml-error-codes'
 
-assert(SVTA_NETWORK_ERROR_RESOURCE_NOT_FOUND === 3004)
+assert(SVTA_NETWORK_RESOURCE_NOT_FOUND === 3004)
 ```
 
 HTTP response statuses embed into the Network category and IAB VAST error codes embed into the Advertising category. The helpers compose these at runtime from values that ad SDKs and network stacks already provide:
@@ -86,7 +86,7 @@ assert(getSvtaErrorDescription(3404) === 'Received an HTTP 404 response')
 
 ### Export surface
 
-All runtime exports use the repo's const enum pattern. Each code is an individual `as const` export, and a per-category collector object aggregates them with a merged `ValueOf` type (the `CmcdEventType` shape). Individual constants follow `SVTA_<CATEGORY>_ERROR_<MEMBER>` (`SVTA_PLAYBACK_ERROR_VIDEO_BUFFER_UNDERRUN = 2001`), and categories follow `SVTA_ERROR_CATEGORY_<MEMBER>`. Each category lives in one file behind an alphabetical barrel. The only dependency is a type-only peer on `@svta/cml-utils`.
+All runtime exports use the repo's const enum pattern. Each code is an individual `as const` export, and a per-category collector object aggregates them with a merged `ValueOf` type (the `CmcdEventType` shape). Individual constants follow `SVTA_<CATEGORY>_<MEMBER>` (`SVTA_PLAYBACK_VIDEO_BUFFER_UNDERRUN = 2001`), and categories follow `SVTA_ERROR_CATEGORY_<MEMBER>`. Each category lives in one file behind an alphabetical barrel. The only dependency is a type-only peer on `@svta/cml-utils`.
 
 | Export | Kind | Contents |
 | --- | --- | --- |
@@ -108,7 +108,7 @@ All runtime exports use the repo's const enum pattern. Each code is an individua
 | `vastErrorToSvtaErrorCode(vastError: number): number` | function | `7000 + vastError` for integer VAST codes 100–999, else `7000` |
 | `getSvtaErrorDescription(code: number): string \| undefined` | function | spec description for every named code; synthesizes `Received an HTTP <n> response` for un-enumerated HTTP embeds; `undefined` otherwise |
 
-The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names derive mechanically from the catalog and member names, so members that already end in `_ERROR` double up (`SVTA_ACCESSIBILITY_ERROR_TIMED_TEXT_PARSE_ERROR`). That doubling is the cost of a derivation with no exceptions. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description verbatim.
+The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names derive mechanically from the catalog and member names by dropping the collector's `ErrorCode` suffix (`SvtaAccessibilityErrorCode.TIMED_TEXT_PARSE_ERROR` becomes `SVTA_ACCESSIBILITY_TIMED_TEXT_PARSE_ERROR`). The derivation has no exceptions, at the cost of two awkward single-member names (`SVTA_UNKNOWN_UNKNOWN`, `SVTA_CUSTOM_UNKNOWN`). Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description verbatim.
 
 ### Semantics and edge cases
 
@@ -136,7 +136,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 - The dictionary is transcribed by hand and must track spec revisions the same way. There is no machine-readable upstream source yet (the spec plans IANA registration, but it is not live).
 - Description strings duplicate the member TSDoc (one is runtime data, one is comments). Only review catches drift between them, though tests pin one exact string per category.
 - A player importing a catalog pays for that whole category (~1 KB minified for the largest). That trade-off is deliberate (see Rationale and alternatives).
-- `@see` links point at the SVTA Google Doc until the spec lands at IANA, then need a one-time swap.
+- `@see` links point at the [SVTA2070 product page](https://www.svta.org/product/svta2070/). They need a one-time swap to the IANA registry entry once registration lands.
 - The 146 individual constants roughly double the export count, so the api.md report and the typedoc index grow accordingly.
 
 ## Rationale and alternatives
@@ -154,7 +154,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 
 ## Unresolved questions
 
-1. Are the 137 derived member names right? Naming is the main review surface. The full listing is in the linked api.md. Bikeshedding individual names is in scope for this RFC and cheap before first publish. The `SVTA_*` constant names derive from the member names mechanically, so renames cascade. SPF's flat `SVTA_<MEMBER>` style (see Prior art) is shorter and collision-free for every code except the nine `UNKNOWN`s. Whether the dictionary keeps the fully qualified `SVTA_<CATEGORY>_ERROR_<MEMBER>` form, drops the `_ERROR_` joint, or goes flat with qualified `UNKNOWN`s is part of this question.
+1. Are the 137 derived member names right? Naming is the main review surface. The full listing is in the linked api.md. Bikeshedding individual names is in scope for this RFC and cheap before first publish. The `SVTA_*` constant names derive from the member names mechanically, so renames cascade. SPF's flat `SVTA_<MEMBER>` style (see Prior art) was considered: it is shorter and collision-free for every code except the nine `UNKNOWN`s, but those exceptions break mechanical derivation, so the dictionary uses `SVTA_<CATEGORY>_<MEMBER>`.
 2. Should `getSvtaErrorDescription` ship in v1, or should the package stay codes-only until the IANA registry exists?
 3. Do the five errata get fixed in the spec before IANA registration, and does the package track the corrected text or the published text verbatim?
 4. Does the Working Group want a `@svta/cml-error-codes` docs page enumerating the full dictionary (typedoc renders the nine catalogs already)?
@@ -170,6 +170,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 
 - v1 (2026-08-18): initial draft.
 - v2 (2026-08-18): every code and category is also exported as an individual `SVTA_*` constant (maintainer feedback). Export surface, rationale, and drawbacks updated to match.
+- v3 (2026-08-18): constants renamed to `SVTA_<CATEGORY>_<MEMBER>` (drops the `_ERROR_` joint), spec-coordinate TSDocs added per the SPF prior art, and spec references updated to the official SVTA2070 name and product page.
 
 ## Final Decision
 
