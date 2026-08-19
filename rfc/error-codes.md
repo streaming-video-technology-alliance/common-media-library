@@ -50,9 +50,9 @@ Every code is also exported as an individual constant for direct imports:
 
 ```ts
 import assert from 'node:assert'
-import { SVTA_NETWORK_RESOURCE_NOT_FOUND } from '@svta/cml-error-codes'
+import { SVTA_RESOURCE_NOT_FOUND } from '@svta/cml-error-codes'
 
-assert(SVTA_NETWORK_RESOURCE_NOT_FOUND === 3004)
+assert(SVTA_RESOURCE_NOT_FOUND === 3004)
 ```
 
 HTTP response statuses embed into the Network category and IAB VAST error codes embed into the Advertising category. The helpers compose these at runtime from values that ad SDKs and network stacks already provide:
@@ -86,7 +86,7 @@ assert(getSvtaErrorDescription(3404) === 'Received an HTTP 404 response')
 
 ### Export surface
 
-All runtime exports use the repo's const enum pattern. Each code is an individual `as const` export, and a per-category collector object aggregates them with a merged `ValueOf` type (the `CmcdEventType` shape). Individual constants follow `SVTA_<CATEGORY>_<MEMBER>` (`SVTA_PLAYBACK_VIDEO_BUFFER_UNDERRUN = 2001`), and categories follow `SVTA_ERROR_CATEGORY_<MEMBER>`. Each category lives in one file behind an alphabetical barrel. The only dependency is `@svta/cml-utils`, declared as a peer dependency per repo convention and imported only with `import type`, so nothing from it appears in the runtime output.
+All runtime exports use the repo's const enum pattern. Each code is an individual `as const` export, and a per-category collector object aggregates them with a merged `ValueOf` type (the `CmcdEventType` shape). Individual constants use flat `SVTA_<MEMBER>` names (`SVTA_VIDEO_BUFFER_UNDERRUN = 2001`). The nine `UNKNOWN`s keep their category qualifier (`SVTA_PLAYBACK_UNKNOWN`), with 999 collapsing to plain `SVTA_UNKNOWN`. Categories follow `SVTA_ERROR_CATEGORY_<MEMBER>`. Each category lives in one file behind an alphabetical barrel. The only dependency is `@svta/cml-utils`, declared as a peer dependency per repo convention and imported only with `import type`, so nothing from it appears in the runtime output.
 
 | Export | Kind | Contents |
 | --- | --- | --- |
@@ -108,7 +108,7 @@ All runtime exports use the repo's const enum pattern. Each code is an individua
 | `vastErrorToSvtaErrorCode(vastError: number): number` | function | `7000 + vastError` for integer VAST codes 100–999, else `7000` |
 | `getSvtaErrorDescription(code: number): string \| undefined` | function | spec description for every named code; synthesizes `Received an HTTP <n> response` for un-enumerated HTTP embeds; `undefined` otherwise |
 
-The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names derive mechanically from the catalog and member names by dropping the collector's `ErrorCode` suffix (`SvtaAccessibilityErrorCode.TIMED_TEXT_PARSE_ERROR` becomes `SVTA_ACCESSIBILITY_TIMED_TEXT_PARSE_ERROR`). The derivation has no exceptions, at the cost of two awkward single-member names (`SVTA_UNKNOWN_UNKNOWN`, `SVTA_CUSTOM_UNKNOWN`). Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description, verbatim except where the errata below apply.
+The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names are the member names with an `SVTA_` prefix (`SVTA_TIMED_TEXT_PARSE_ERROR`), which works because `UNKNOWN` is the only member name shared across categories. The nine `UNKNOWN`s keep a category qualifier (`SVTA_NETWORK_UNKNOWN`), and 999 is plain `SVTA_UNKNOWN` since its category and member are both "unknown". If a future spec revision adds a same-named error to a second category, the newcomer gets a qualified name and existing names stay stable. Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description, verbatim except where the errata below apply.
 
 ### Semantics and edge cases
 
@@ -154,7 +154,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 
 ## Unresolved questions
 
-1. Are the 137 derived member names right? Naming is the main review surface. The full listing is in the linked api.md. Bikeshedding individual names is in scope for this RFC and cheap before first publish. The `SVTA_*` constant names derive from the member names mechanically, so renames cascade. SPF's flat `SVTA_<MEMBER>` style (see Prior art) was considered: it is shorter and collision-free for every code except the nine `UNKNOWN`s, but those exceptions break mechanical derivation, so the dictionary uses `SVTA_<CATEGORY>_<MEMBER>`.
+1. Are the 137 derived member names right? Naming is the main review surface. The full listing is in the linked api.md. Bikeshedding individual names is in scope for this RFC and cheap before first publish. The `SVTA_*` constant names derive from the member names, so renames cascade. The dictionary adopted SPF's flat `SVTA_<MEMBER>` style (see Prior art) with category-qualified names for the nine `UNKNOWN`s, trading a fully exception-free derivation for the shorter names adopters actually type.
 2. Should `getSvtaErrorDescription` ship in v1, or should the package stay codes-only until the IANA registry exists?
 3. Do the five errata get fixed in the spec before IANA registration, and does the package track the corrected text or the published text verbatim?
 4. Does the Working Group want a `@svta/cml-error-codes` docs page enumerating the full dictionary (typedoc renders the nine catalogs already)?
@@ -172,6 +172,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 - v2 (2026-08-18): every code and category is also exported as an individual `SVTA_*` constant (maintainer feedback). Export surface, rationale, and drawbacks updated to match.
 - v3 (2026-08-18): constants renamed to `SVTA_<CATEGORY>_<MEMBER>` (drops the `_ERROR_` joint), spec-coordinate TSDocs added per the SPF prior art, and spec references updated to the official SVTA2070 name and product page.
 - v4 (2026-08-18): review feedback. Both arithmetic helpers reject inputs that are not non-negative integers (`getSvtaErrorIndex` now returns `number | undefined`), the code model states codes are non-negative integers, and the peer-dependency and verbatim-description wording is clarified.
+- v5 (2026-08-19): constants flattened to `SVTA_<MEMBER>` with category-qualified `UNKNOWN`s (`SVTA_PLAYBACK_UNKNOWN`, plain `SVTA_UNKNOWN` for 999), matching the SPF naming after maintainer preference for shorter names.
 
 ## Final Decision
 
