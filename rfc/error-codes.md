@@ -79,14 +79,14 @@ assert(getSvtaErrorDescription(3404) === 'Received an HTTP 404 response')
 
 ### Code model
 
-- Codes are integers. Category = `Math.floor(code / 1000)` and index = `code % 1000`, per the spec's normative arithmetic.
+- Codes are non-negative integers. Category = `Math.floor(code / 1000)` and index = `code % 1000`, per the spec's normative arithmetic.
 - Native indices occupy 0–99. Embedded external codes occupy 100–999 (HTTP in Network, VAST in Advertising).
 - `999` is the only code below 1000 and means "entirely unknown". Index 0 of every other category is that category's "known category, no further detail" code, so every catalog's `UNKNOWN` member equals `category * 1000`.
 - Categories: 0 Unknown, 1 Media Content, 2 Playback, 3 Network, 4 Content Protection, 5 Accessibility, 6 Remote Play, 7 Advertising, 99 Custom (Publisher-defined, with 99001–99999 reserved for bespoke use).
 
 ### Export surface
 
-All runtime exports use the repo's const enum pattern. Each code is an individual `as const` export, and a per-category collector object aggregates them with a merged `ValueOf` type (the `CmcdEventType` shape). Individual constants follow `SVTA_<CATEGORY>_<MEMBER>` (`SVTA_PLAYBACK_VIDEO_BUFFER_UNDERRUN = 2001`), and categories follow `SVTA_ERROR_CATEGORY_<MEMBER>`. Each category lives in one file behind an alphabetical barrel. The only dependency is a type-only peer on `@svta/cml-utils`.
+All runtime exports use the repo's const enum pattern. Each code is an individual `as const` export, and a per-category collector object aggregates them with a merged `ValueOf` type (the `CmcdEventType` shape). Individual constants follow `SVTA_<CATEGORY>_<MEMBER>` (`SVTA_PLAYBACK_VIDEO_BUFFER_UNDERRUN = 2001`), and categories follow `SVTA_ERROR_CATEGORY_<MEMBER>`. Each category lives in one file behind an alphabetical barrel. The only dependency is `@svta/cml-utils`, declared as a peer dependency per repo convention and imported only with `import type`, so nothing from it appears in the runtime output.
 
 | Export | Kind | Contents |
 | --- | --- | --- |
@@ -102,13 +102,13 @@ All runtime exports use the repo's const enum pattern. Each code is an individua
 | `SvtaCustomErrorCode` | catalog | `UNKNOWN: 99000` |
 | `SVTA_*` constants | consts | 146 individual constants, one per catalog and category member |
 | `SvtaErrorCode` | type | union of the nine catalog value types |
-| `getSvtaErrorCategory(code: number): SvtaErrorCategory \| undefined` | function | `floor(code / 1000)`; `undefined` for unassigned categories (8–98, >99, negatives, `NaN`), future-proofing the spec's planned width growth |
-| `getSvtaErrorIndex(code: number): number` | function | `code % 1000` |
+| `getSvtaErrorCategory(code: number): SvtaErrorCategory \| undefined` | function | `floor(code / 1000)`; `undefined` unless `code` is a non-negative integer whose category is assigned (8–98 and >99 are reserved for future use) |
+| `getSvtaErrorIndex(code: number): number \| undefined` | function | `code % 1000` for non-negative integers, else `undefined`; the index stays defined for unassigned categories |
 | `httpStatusToSvtaErrorCode(status: number): number` | function | `3000 + status` for integer statuses 100–599, else `3000` |
 | `vastErrorToSvtaErrorCode(vastError: number): number` | function | `7000 + vastError` for integer VAST codes 100–999, else `7000` |
 | `getSvtaErrorDescription(code: number): string \| undefined` | function | spec description for every named code; synthesizes `Received an HTTP <n> response` for un-enumerated HTTP embeds; `undefined` otherwise |
 
-The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names derive mechanically from the catalog and member names by dropping the collector's `ErrorCode` suffix (`SvtaAccessibilityErrorCode.TIMED_TEXT_PARSE_ERROR` becomes `SVTA_ACCESSIBILITY_TIMED_TEXT_PARSE_ERROR`). The derivation has no exceptions, at the cost of two awkward single-member names (`SVTA_UNKNOWN_UNKNOWN`, `SVTA_CUSTOM_UNKNOWN`). Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description verbatim.
+The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names derive mechanically from the catalog and member names by dropping the collector's `ErrorCode` suffix (`SvtaAccessibilityErrorCode.TIMED_TEXT_PARSE_ERROR` becomes `SVTA_ACCESSIBILITY_TIMED_TEXT_PARSE_ERROR`). The derivation has no exceptions, at the cost of two awkward single-member names (`SVTA_UNKNOWN_UNKNOWN`, `SVTA_CUSTOM_UNKNOWN`). Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description, verbatim except where the errata below apply.
 
 ### Semantics and edge cases
 
@@ -171,6 +171,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 - v1 (2026-08-18): initial draft.
 - v2 (2026-08-18): every code and category is also exported as an individual `SVTA_*` constant (maintainer feedback). Export surface, rationale, and drawbacks updated to match.
 - v3 (2026-08-18): constants renamed to `SVTA_<CATEGORY>_<MEMBER>` (drops the `_ERROR_` joint), spec-coordinate TSDocs added per the SPF prior art, and spec references updated to the official SVTA2070 name and product page.
+- v4 (2026-08-18): review feedback. Both arithmetic helpers reject inputs that are not non-negative integers (`getSvtaErrorIndex` now returns `number | undefined`), the code model states codes are non-negative integers, and the peer-dependency and verbatim-description wording is clarified.
 
 ## Final Decision
 
