@@ -385,6 +385,13 @@ describe('parseXml', () => {
 			}])
 		})
 
+		it('reports end of input when a mismatched close tag is cut off', async () => {
+			await rejects(
+				parseXmlGuarded('<a>text</b'),
+				{ message: /^Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input$/ },
+			)
+		})
+
 		it('terminates on every truncation of the fixtures', async () => {
 			for (const fixture of ['./test/fixtures/node_types.xml', './test/fixtures/bbb_30fps.mpd']) {
 				const xml = await fs.readFile(resolve(fixture), 'utf8')

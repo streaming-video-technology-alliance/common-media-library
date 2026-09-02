@@ -84,14 +84,13 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 					const closesTag = input.startsWith(tagName, closeStart) &&
 						(nameEnd >= length || afterName === CLOSE_BRACKET_CC || afterName === SPACE_CC || afterName === TAB_CC || afterName === CR_CC || afterName === LF_CC)
 					pos = input.indexOf('>', pos)
-					if (!closesTag) {
-						throw syntaxError('Unexpected close tag')
-					}
-
 					if (pos === -1) {
 						pos = length
 					}
-					else {
+					if (!closesTag) {
+						throw syntaxError('Unexpected close tag')
+					}
+					if (pos < length) {
 						pos++
 					}
 
@@ -103,7 +102,9 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 					if (pos === -1) {
 						pos = length
 					}
-					pos++
+					else {
+						pos++
+					}
 					continue
 				}
 				else if (next === EXCLAMATION_CC) {
