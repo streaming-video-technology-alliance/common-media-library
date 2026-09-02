@@ -8,6 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>`, `<a b=c/>`, or input truncated mid-attribute. It now throws an error that names the attribute and reports the line and column, matching the XML 1.0 `Attribute ::= Name Eq AttValue` production.
+- `parseXml` no longer hangs on input that ends inside the XML declaration, such as `<?xml version="1.0"`. Parsing stops at the end of the input.
+- `parseXml` no longer hangs (or, inside nested elements, overflows the call stack) on input that ends inside a matching close tag, such as `<MPD><Period></Period`. The element keeps the children parsed so far.
+- `parseXml` throws `Unexpected close tag` when a close tag's name only starts with the open tag's name, such as `<ab>text</abc>` or `</ab>` closing `<a>`, and when a close tag appears at the document level with no open element, including an empty `</>`. Previously both were accepted. A close tag whose exact name is followed by whitespace, such as `</a >`, still closes the element (XML 1.0 `ETag ::= '</' Name S? '>'`).
+- `Unexpected close tag` reports the line, column, and `Char: end of input` when the mismatched close tag is cut off by the end of the input, such as `<a>text</b`. Previously it reported `Line: 0`, `Column: 1`, `Char: undefined`.
+
+### Changed
+
+- `parseXml` throws on a quoted attribute value with no `=` (`<a b "c"/>`), which previously parsed leniently as `b="c"`.
+
 ## [1.1.6] - 2026-07-28
 
 ### Changed

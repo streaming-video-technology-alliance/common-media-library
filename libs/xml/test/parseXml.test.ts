@@ -1,8 +1,102 @@
-import { parseXml } from '@svta/cml-xml'
-import assert, { equal, strictEqual } from 'node:assert'
+import { parseXml, type XmlNode, type XmlParseOptions } from '@svta/cml-xml'
+import assert, { deepStrictEqual, equal, rejects, strictEqual, throws } from 'node:assert'
 import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, it } from 'node:test'
+import { Worker } from 'node:worker_threads'
+
+const PARSE_XML_URL = import.meta.resolve('@svta/cml-xml')
+const PARSE_TIMEOUT_MS = 2000
+
+const WORKER_SOURCE = `
+const { parentPort, workerData } = require('node:worker_threads')
+import(workerData.url).then(({ parseXml }) => {
+	const { inputs, prefixesOf, options } = workerData
+	const count = inputs ? inputs.length : prefixesOf.length + 1
+	for (let index = 0; index < count; index++) {
+		parentPort.postMessage({ index })
+		try {
+			const result = parseXml(inputs ? inputs[index] : prefixesOf.slice(0, index), options)
+			parentPort.postMessage({ index, result: inputs ? result : true })
+		}
+		catch (error) {
+			parentPort.postMessage({ index, error: error instanceof Error ? error.message : String(error) })
+		}
+	}
+})
+`
+
+type ParseJob = { inputs: string[] } | { prefixesOf: string }
+
+type ParseOutcome<T> = { result: T } | { error: string }
+
+type ParseMessage = {
+	index: number;
+	result?: unknown;
+	error?: string;
+}
+
+/**
+ * Parses each input, or each prefix of a document, in a worker thread so that a parser that
+ * never returns fails the test instead of hanging the test runner. A prefix sweep reports only
+ * whether each parse returned; the parsed trees stay in the worker.
+ */
+function runParseWorker(job: { inputs: string[] }, options?: XmlParseOptions): Promise<ParseOutcome<XmlNode>[]>
+function runParseWorker(job: { prefixesOf: string }, options?: XmlParseOptions): Promise<ParseOutcome<true>[]>
+function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promise<ParseOutcome<unknown>[]> {
+	const count = 'inputs' in job ? job.inputs.length : job.prefixesOf.length + 1
+	const inputAt = (index: number): string => 'inputs' in job ? job.inputs[index] : job.prefixesOf.slice(0, index)
+
+	return new Promise((done, fail) => {
+		const worker = new Worker(WORKER_SOURCE, { eval: true, execArgv: [], workerData: { url: PARSE_XML_URL, options, ...job } })
+		const outcomes: ParseOutcome<unknown>[] = []
+		let current = 0
+		let timer: ReturnType<typeof setTimeout>
+
+		const settle = (callback: () => void) => {
+			clearTimeout(timer)
+			void worker.terminate()
+			callback()
+		}
+
+		const watch = () => {
+			clearTimeout(timer)
+			timer = setTimeout(() => {
+				settle(() => fail(new Error(`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputAt(current))}`)))
+			}, PARSE_TIMEOUT_MS)
+		}
+
+		worker.on('message', (message: ParseMessage) => {
+			current = message.index
+			if (message.error !== undefined) {
+				outcomes.push({ error: message.error })
+			}
+			else if (message.result !== undefined) {
+				outcomes.push({ result: message.result })
+			}
+
+			if (outcomes.length === count) {
+				settle(() => done(outcomes))
+			}
+			else {
+				watch()
+			}
+		})
+		worker.on('error', (error) => settle(() => fail(error)))
+		watch()
+	})
+}
+
+/**
+ * Parses a single input in a worker thread, rethrowing any parse error.
+ */
+async function parseXmlGuarded(input: string, options?: XmlParseOptions): Promise<XmlNode> {
+	const [outcome] = await runParseWorker({ inputs: [input] }, options)
+	if ('error' in outcome) {
+		throw new Error(outcome.error)
+	}
+	return outcome.result
+}
 
 describe('parseXml', () => {
 	it('provides a valid example', async () => {
@@ -59,6 +153,52 @@ describe('parseXml', () => {
 		equal(namespace.nodeName, `tt:Text`)
 		equal(namespace.prefix, `tt`)
 		equal(namespace.localName, `Text`)
+	})
+
+	describe('close tags', () => {
+		it('throws on a close tag whose name differs from the open tag', () => {
+			throws(() => parseXml('<a>text</b>'), /Unexpected close tag/)
+		})
+
+		it('throws on a close tag whose name extends the open tag name', () => {
+			throws(() => parseXml('<ab>text</abc>'), /Unexpected close tag/)
+		})
+
+		it('does not let a longer close tag close a shorter open tag', () => {
+			throws(() => parseXml('<a>text</ab>'), /Unexpected close tag/)
+		})
+
+		it('throws on a close tag with no open element', () => {
+			throws(() => parseXml('<a/></b>'), /Unexpected close tag/)
+		})
+
+		it('throws on an empty close tag with no open element', () => {
+			throws(() => parseXml('<a/></>'), /Unexpected close tag/)
+			throws(() => parseXml('<a/></ ><b/>'), /Unexpected close tag/)
+		})
+
+		it('closes an element when a space precedes the closing bracket', () => {
+			const doc = parseXml('<a>text</a >')
+			const a = doc.childNodes[0]
+
+			equal(doc.childNodes.length, 1)
+			equal(a.nodeName, 'a')
+			equal(a.childNodes[0].nodeValue, 'text')
+		})
+
+		it('closes an element when tabs and line breaks precede the closing bracket', () => {
+			const doc = parseXml('<a>text</a\t\r\n>')
+			equal(doc.childNodes[0].childNodes[0].nodeValue, 'text')
+		})
+
+		it('closes nested elements whose names share a prefix', () => {
+			const doc = parseXml('<a><ab>text</ab></a>')
+			const a = doc.childNodes[0]
+
+			equal(a.nodeName, 'a')
+			equal(a.childNodes[0].nodeName, 'ab')
+			equal(a.childNodes[0].childNodes[0].nodeValue, 'text')
+		})
 	})
 
 	describe('includeParentElement option', () => {
@@ -135,6 +275,152 @@ describe('parseXml', () => {
 			strictEqual(b.parentElement, a)
 			strictEqual(c.parentElement, b)
 			strictEqual(d.parentElement, c)
+		})
+	})
+
+	describe('malformed attributes', () => {
+		it('throws on a valueless attribute', async () => {
+			await rejects(parseXmlGuarded('<a b>'), { message: /^Malformed attribute "b": expected "=" after name/ })
+		})
+
+		it('throws on a valueless attribute in a self-closing tag', async () => {
+			await rejects(parseXmlGuarded('<a b/>'), { message: /^Malformed attribute "b": expected "=" after name/ })
+		})
+
+		it('throws on a valueless attribute after a quoted attribute', async () => {
+			await rejects(parseXmlGuarded('<a b="c" d>'), { message: /^Malformed attribute "d": expected "=" after name/ })
+		})
+
+		it('throws on an unquoted attribute value', async () => {
+			await rejects(parseXmlGuarded('<a b=c/>'), { message: /^Malformed attribute "b": expected quoted value after "="/ })
+		})
+
+		it('throws on a quoted value with no equals sign', async () => {
+			await rejects(parseXmlGuarded('<a b "c"/>'), { message: /^Malformed attribute "b": expected "=" after name/ })
+		})
+
+		it('reports the valueless attribute, not the element that follows it', async () => {
+			await rejects(parseXmlGuarded('<a b><c d="1"/></a>'), { message: /^Malformed attribute "b"/ })
+		})
+
+		it('throws when the input ends inside an attribute name', async () => {
+			await rejects(
+				parseXmlGuarded('<MPD><Period><SegmentTimeline><S d="180000" r'),
+				{ message: /^Malformed attribute "r": expected "=" after name\n.*\n.*\nChar: end of input$/ },
+			)
+		})
+
+		it('throws when the input ends after the equals sign', async () => {
+			await rejects(
+				parseXmlGuarded('<a b='),
+				{ message: /^Malformed attribute "b": expected quoted value after "="\nLine: 0\nColumn: 6\nChar: end of input$/ },
+			)
+		})
+
+		it('reports the line and column of the malformed attribute', async () => {
+			await rejects(parseXmlGuarded('<root>\n\t<a b>'), { message: /\nLine: 1\nColumn: 6\nChar: >$/ })
+		})
+
+		it('throws when the input ends inside a quoted attribute value', async () => {
+			await rejects(parseXmlGuarded('<MPD><Period><S d="1'), /Missing closing quote/)
+		})
+	})
+
+	describe('well-formed attributes', () => {
+		it('parses double- and single-quoted values', () => {
+			const doc = parseXml(`<a b="c" d='e'>text</a>`)
+			const a = doc.childNodes[0]
+
+			deepStrictEqual(a.attributes, { b: 'c', d: 'e' })
+			equal(a.childNodes[0].nodeValue, 'text')
+		})
+
+		it('allows whitespace around the equals sign', () => {
+			const doc = parseXml('<a b = "c"\n\td\t=\n"e"/>')
+			deepStrictEqual(doc.childNodes[0].attributes, { b: 'c', d: 'e' })
+		})
+
+		it('preserves markup characters inside quoted values', () => {
+			const doc = parseXml(`<a b="x/>y" c='p>q'>t</a>`)
+			const a = doc.childNodes[0]
+
+			deepStrictEqual(a.attributes, { b: 'x/>y', c: 'p>q' })
+			equal(a.childNodes[0].nodeValue, 't')
+		})
+	})
+
+	describe('truncated input', () => {
+		it('parses a complete XML declaration followed by markup', async () => {
+			const doc = await parseXmlGuarded('<?xml version="1.0" encoding="UTF-8"?><a b="1"><c/>text</a>')
+			deepStrictEqual(doc.childNodes, [{
+				nodeName: 'a',
+				nodeValue: null,
+				attributes: { b: '1' },
+				childNodes: [
+					{ nodeName: 'c', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'c' },
+					{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] },
+				],
+				prefix: null,
+				localName: 'a',
+			}])
+		})
+
+		it('returns an empty document when the input ends inside the XML declaration', async () => {
+			const doc = await parseXmlGuarded('<?xml version="1.0" encoding="UTF-8"')
+			deepStrictEqual(doc.childNodes, [])
+		})
+
+		it('keeps the parsed children when the input ends inside the root close tag', async () => {
+			const doc = await parseXmlGuarded('<a>text</a')
+			deepStrictEqual(doc.childNodes, [{
+				nodeName: 'a',
+				nodeValue: null,
+				attributes: {},
+				childNodes: [{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] }],
+				prefix: null,
+				localName: 'a',
+			}])
+		})
+
+		it('keeps the parsed children when the input ends inside a nested close tag', async () => {
+			const doc = await parseXmlGuarded('<MPD><Period><S d="1"/></Period')
+			deepStrictEqual(doc.childNodes, [{
+				nodeName: 'MPD',
+				nodeValue: null,
+				attributes: {},
+				childNodes: [{
+					nodeName: 'Period',
+					nodeValue: null,
+					attributes: {},
+					childNodes: [{ nodeName: 'S', nodeValue: null, attributes: { d: '1' }, childNodes: [], prefix: null, localName: 'S' }],
+					prefix: null,
+					localName: 'Period',
+				}],
+				prefix: null,
+				localName: 'MPD',
+			}])
+		})
+
+		it('keeps the parsed children when the input ends right after `</` at the document level', async () => {
+			const doc = await parseXmlGuarded('<a/></')
+			deepStrictEqual(doc.childNodes, [{ nodeName: 'a', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'a' }])
+		})
+
+		it('reports end of input when a mismatched close tag is cut off', async () => {
+			await rejects(
+				parseXmlGuarded('<a>text</b'),
+				{ message: /^Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input$/ },
+			)
+		})
+
+		it('terminates on every truncation of the fixtures', async () => {
+			for (const fixture of ['./test/fixtures/node_types.xml', './test/fixtures/bbb_30fps.mpd']) {
+				const xml = await fs.readFile(resolve(fixture), 'utf8')
+				const outcomes = await runParseWorker({ prefixesOf: xml })
+
+				equal(outcomes.length, xml.length + 1)
+				assert('result' in outcomes[xml.length], `${fixture} did not parse in full`)
+			}
 		})
 	})
 })

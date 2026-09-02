@@ -13,16 +13,26 @@ const SINGLE_QUOTE_CC = 39            // "'"
 const DOUBLE_QUOTE_CC = 34            // '"'
 const OPEN_CORNER_BRACKET_CC = 91     // '['
 const CLOSE_CORNER_BRACKET_CC = 93    // ']'
+const EQUALS_CC = 61                  // '='
+const SPACE_CC = 32                   // ' '
+const TAB_CC = 9                      // '\t'
+const CR_CC = 13                      // '\r'
+const LF_CC = 10                      // '\n'
 
 // Set for fast name delimiter lookup: \r \n \t > / = space
 const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
 
 /**
- * Parse XML into a JS object with no validation and some failure tolerance
+ * Parse XML into a JS object
+ *
+ * The parser does not validate against a DTD or schema, and it does not check every
+ * well-formedness constraint; the errors it does report are listed below under Throws.
+ * Input cut off between tags yields the nodes parsed so far.
  *
  * @param input - The input XML string
  * @param options - Optional parsing options
  * @returns The parsed XML
+ * @throws If an attribute is not `name="value"` or `name='value'`, if a quoted value is not closed, if a close tag does not match its open tag, or if a close tag appears with no element open
  *
  * @public
  *
@@ -50,6 +60,18 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
+	 * Creates an error that reports the line and column of the current position
+	 */
+	function syntaxError(message: string): Error {
+		const parsedText = input.substring(0, pos).split('\n')
+		return new Error(
+			message + '\nLine: ' + (parsedText.length - 1) +
+			'\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
+			'\nChar: ' + (pos < length ? input[pos] : 'end of input'),
+		)
+	}
+
+	/**
 	 * Parses a list of entries
 	 */
 	function parseChildren(tagName: string = ''): XmlNode[] {
@@ -60,18 +82,22 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 				const next = input.charCodeAt(pos + 1)
 				if (next === SLASH_CC) {
 					const closeStart = pos + 2
+					const nameEnd = closeStart + tagName.length
+					const afterName = input.charCodeAt(nameEnd)
+					// ETag ::= '</' Name S? '>' (XML 1.0 §3.1); nothing is open at the document level
+					const closesTag = input.startsWith(tagName, closeStart) && (
+						nameEnd >= length ||
+						(tagName !== '' && (afterName === CLOSE_BRACKET_CC || afterName === SPACE_CC || afterName === TAB_CC || afterName === CR_CC || afterName === LF_CC))
+					)
 					pos = input.indexOf('>', pos)
-					if (!input.startsWith(tagName, closeStart)) {
-						const parsedText = input.substring(0, pos).split('\n')
-						throw new Error(
-							'Unexpected close tag\nLine: ' + (parsedText.length - 1) +
-							'\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
-							'\nChar: ' + input[pos],
-						)
+					if (pos === -1) {
+						pos = length
 					}
-
-					if (pos + 1) {
-						pos += 1
+					if (!closesTag) {
+						throw syntaxError('Unexpected close tag')
+					}
+					if (pos < length) {
+						pos++
 					}
 
 					return children
@@ -79,7 +105,12 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 				else if (next === QUESTION_CC) {
 					// xml declaration
 					pos = input.indexOf('>', pos)
-					pos++
+					if (pos === -1) {
+						pos = length
+					}
+					else {
+						pos++
+					}
 					continue
 				}
 				else if (next === EXCLAMATION_CC) {
@@ -188,29 +219,36 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	function parseAttributes(): Record<string, string> {
 		const attributes: Record<string, string> = {}
 
-		// parsing attributes
+		// Attribute ::= Name Eq AttValue, Eq ::= S? '=' S? (XML 1.0 §3.1, §2.3)
 		while (pos < length && input.charCodeAt(pos) !== CLOSE_BRACKET_CC) {
 			const c = input.charCodeAt(pos)
 			if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
 				const name = parseName()
-				let value: string = ''
-				// search beginning of the string
 				let code = input.charCodeAt(pos)
-				while (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
-					pos++
-					code = input.charCodeAt(pos)
-				}
-
-				if (code === SINGLE_QUOTE_CC || code === DOUBLE_QUOTE_CC) {
-					value = parseString()
-					if (pos === -1) {
-						throw new Error('Missing closing quote')
+				if (code !== EQUALS_CC) {
+					while (code === SPACE_CC || code === TAB_CC || code === CR_CC || code === LF_CC) {
+						pos++
+						code = input.charCodeAt(pos)
+					}
+					if (code !== EQUALS_CC) {
+						throw syntaxError('Malformed attribute "' + name + '": expected "=" after name')
 					}
 				}
-				else {
-					pos--
+				pos++
+				code = input.charCodeAt(pos)
+				if (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
+					while (code === SPACE_CC || code === TAB_CC || code === CR_CC || code === LF_CC) {
+						pos++
+						code = input.charCodeAt(pos)
+					}
+					if (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
+						throw syntaxError('Malformed attribute "' + name + '": expected quoted value after "="')
+					}
 				}
-
+				const value = parseString()
+				if (pos === -1) {
+					throw new Error('Missing closing quote')
+				}
 				attributes[name] = unescapeHtml(value)
 			}
 			pos++
