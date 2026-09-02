@@ -13,6 +13,10 @@ const SINGLE_QUOTE_CC = 39            // "'"
 const DOUBLE_QUOTE_CC = 34            // '"'
 const OPEN_CORNER_BRACKET_CC = 91     // '['
 const CLOSE_CORNER_BRACKET_CC = 93    // ']'
+const SPACE_CC = 32                   // ' '
+const TAB_CC = 9                      // '\t'
+const CR_CC = 13                      // '\r'
+const LF_CC = 10                      // '\n'
 
 // Set for fast name delimiter lookup: \r \n \t > / = space
 const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
@@ -60,8 +64,13 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 				const next = input.charCodeAt(pos + 1)
 				if (next === SLASH_CC) {
 					const closeStart = pos + 2
+					const nameEnd = closeStart + tagName.length
+					const afterName = input.charCodeAt(nameEnd)
+					// ETag ::= '</' Name S? '>' (XML 1.0 §3.1)
+					const closesTag = input.startsWith(tagName, closeStart) &&
+						(nameEnd >= length || afterName === CLOSE_BRACKET_CC || afterName === SPACE_CC || afterName === TAB_CC || afterName === CR_CC || afterName === LF_CC)
 					pos = input.indexOf('>', pos)
-					if (!input.startsWith(tagName, closeStart)) {
+					if (!closesTag) {
 						const parsedText = input.substring(0, pos).split('\n')
 						throw new Error(
 							'Unexpected close tag\nLine: ' + (parsedText.length - 1) +
