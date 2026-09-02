@@ -320,6 +320,34 @@ describe('parseXml', () => {
 			)
 		})
 
+		it('keeps a CDATA prefix cut off before its second bracket as a doctype node', async () => {
+			const doc = await parseXmlGuarded('<a><![CDA')
+			deepStrictEqual(doc.childNodes[0].childNodes, [{ nodeName: '#doctype', nodeValue: '![CDA', attributes: {}, childNodes: [] }])
+		})
+
+		it('keeps a lone `<!` at the end of the input as a doctype node', async () => {
+			const doc = await parseXmlGuarded('<a><!')
+			deepStrictEqual(doc.childNodes[0].childNodes, [{ nodeName: '#doctype', nodeValue: '!', attributes: {}, childNodes: [] }])
+		})
+
+		it('keeps the text before a lone `<` at the end of the input', async () => {
+			const doc = await parseXmlGuarded('<a>x<')
+			deepStrictEqual(doc.childNodes[0].childNodes, [
+				{ nodeName: '#text', nodeValue: 'x', attributes: {}, childNodes: [] },
+				{ nodeName: '', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: '' },
+			])
+		})
+
+		it('keeps an element whose start tag is cut off after its name', async () => {
+			const doc = await parseXmlGuarded('<a><bc')
+			deepStrictEqual(doc.childNodes[0].childNodes, [{ nodeName: 'bc', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'bc' }])
+		})
+
+		it('keeps a doctype cut off before its closing bracket', async () => {
+			const doc = await parseXmlGuarded('<!DOCTYPE html')
+			deepStrictEqual(doc.childNodes, [{ nodeName: '#doctype', nodeValue: '!DOCTYPE html', attributes: {}, childNodes: [] }])
+		})
+
 		it('terminates on every truncation of the fixtures', async () => {
 			for (const fixture of ['./test/fixtures/node_types.xml', './test/fixtures/bbb_30fps.mpd']) {
 				const xml = await fs.readFile(resolve(fixture), 'utf8')
