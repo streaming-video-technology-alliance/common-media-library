@@ -19,6 +19,7 @@ and this project adheres to
 ### Changed
 
 - `parseXml` throws on a quoted attribute value with no `=` (`<a b "c"/>`), which previously parsed leniently as `b="c"`.
+- `parseXml` is rewritten as a flat, non-recursive scanner over an explicit element stack. Output is identical for every option set, verified against a 106-input parity corpus captured from the previous parser, and nesting depth is no longer limited by the call stack. Measured with `npm run bench -w libs/xml` (Node 24.16, Apple M1 Pro, natural GC, medians): the pretty-printed 100,000-`<S>` manifest from #424 parses in 22.4 ms instead of 28.6 ms, its minified form in 15.9 ms instead of 22.7 ms, its `<S ...></S>` form in 24.9 ms instead of 30.6 ms, a 170 KB livesim2 manifest in 0.83 ms instead of 1.35 ms, and `bbb_30fps.mpd` in 0.015 ms instead of 0.023 ms. `parseXml` alone is 3,793 B minified and 1,496 B gzipped, from 2,745 B and 1,213 B.
 
 ## [1.1.6] - 2026-07-28
 
