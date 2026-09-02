@@ -305,4 +305,26 @@ describe('parseXml', () => {
 			equal(a.childNodes[0].nodeValue, 't')
 		})
 	})
+
+	describe('truncated input', () => {
+		it('parses a complete XML declaration followed by markup', async () => {
+			const doc = await parseXmlGuarded('<?xml version="1.0" encoding="UTF-8"?><a b="1"><c/>text</a>')
+			deepStrictEqual(doc.childNodes, [{
+				nodeName: 'a',
+				nodeValue: null,
+				attributes: { b: '1' },
+				childNodes: [
+					{ nodeName: 'c', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'c' },
+					{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] },
+				],
+				prefix: null,
+				localName: 'a',
+			}])
+		})
+
+		it('returns an empty document when the input ends inside the XML declaration', async () => {
+			const doc = await parseXmlGuarded('<?xml version="1.0" encoding="UTF-8"')
+			deepStrictEqual(doc.childNodes, [])
+		})
+	})
 })

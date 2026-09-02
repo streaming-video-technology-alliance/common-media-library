@@ -11,6 +11,7 @@ and this project adheres to
 ### Fixed
 
 - `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>` or input truncated mid-attribute. The attribute yields an empty string and parsing resumes at the closing `>`.
+- `parseXml` no longer hangs on input that ends inside the XML declaration, such as `<?xml version="1.0"`. Parsing stops at the end of the input.
 
 ## [1.1.6] - 2026-07-28
 
