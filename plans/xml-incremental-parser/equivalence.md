@@ -9,6 +9,12 @@ against itself across chunk boundaries. The implementation PR should turn these 
 8,157 checks, 1 failure, and the failure is the known `pos` deviation described in `prototype.md`
 (error-message column relative to `pos` because the prototype slices the input).
 
+Captured against `main` at d74cac3ad. PR #430 changes what `parseXml` accepts: malformed attributes,
+mismatched close tags, and document-level close tags throw. Roughly ten corpus inputs (the valueless and
+unquoted attribute cases, the two close-tag quirks, truncation inside an attribute) switch from tree
+expectations to `throws` expectations once it lands, and the prototype's final-mode handling of those
+inputs must follow.
+
 ## What is compared
 
 1. **Parity.** Every corpus input x six option sets (`{}`, `keepWhitespace`, `keepComments`,

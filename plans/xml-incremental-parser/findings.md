@@ -94,5 +94,6 @@ the decisions taken with Casey during the session.
 ## Out of scope, noted
 
 - `libs/xml/README.md` shows a non-existent `decodeXml`; fix in the implementation PR.
-- The pending hang-fix branch `issue/xml-parse-hang` (close tag and declaration without `>`) is not on
-  main yet; the parity corpus must be captured after it lands.
+- PR #430 (truncation fixes; malformed attributes and mismatched or document-level close tags throw) is
+  open and changes the tolerance behaviors this prototype mirrors from `main`; the parity corpus must be
+  recaptured after it lands and the prototype's final-mode semantics re-verified against it.

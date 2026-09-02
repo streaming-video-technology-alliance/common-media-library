@@ -240,7 +240,7 @@ export class XmlParser<T> {
 ### Callback semantics
 
 - `createDocument` is called once, in the constructor. Its result is the parent of every top-level element, text run, doctype, and comment, and is what `end()` returns.
-- `createElement(parent, name, attributes, localName, prefix)` is called when a start tag has been read completely, before any of the element's content. `name` is the tag name as written. `localName` and `prefix` split it at the first colon; without a colon `localName === name` and `prefix === null`. `attributes` is a fresh object per element with values already entity-decoded; the consumer owns it and may keep or mutate it. An attribute without a quoted value yields an empty string, as it does in `parseXml` today.
+- `createElement(parent, name, attributes, localName, prefix)` is called when a start tag has been read completely, before any of the element's content. `name` is the tag name as written. `localName` and `prefix` split it at the first colon; without a colon `localName === name` and `prefix === null`. `attributes` is a fresh object per element with values already entity-decoded; the consumer owns it and may keep or mutate it. Malformed attributes are handled exactly as `parseXml` handles them at the time: an empty string on `main` today, an error once #430 lands.
 - `appendChild(parent, child)` is called when the element completes: at its close tag, immediately after `createElement` for a self-closing tag, or during `end()` for an element the input never closed. Siblings complete in document order, so post-order appends preserve child order.
 - `appendText(parent, text)` is called once per text run when the run completes. With `keepWhitespace` unset (the default), the text is entity-decoded and trimmed, and runs that are empty after trimming are not delivered. With `keepWhitespace: true`, the text is entity-decoded and delivered as is when non-empty. Text at document level goes to the document value.
 - `appendCdata(parent, text)` receives the raw content between `<![CDATA[` and `]]>`, not decoded.
@@ -259,7 +259,7 @@ Because one scanner runs both modes, `new XmlParser(b).write(s).end()` produces 
 
 The carry is bounded by the size of one construct: one tag, one text run, one comment. In a manifest that is a few dozen bytes; on the 3.7 MB stress manifest split in 64 KB chunks the largest carry was 30 characters. A construct that spans many chunks is rescanned from its start on each `write`, so a document with a multi-megabyte text node still parses correctly but costs more than a whole-string parse; that shape does not occur in manifests and is called out rather than optimized.
 
-Two tolerance behaviors of `parseXml` are preserved deliberately because the grammar is not changing in this RFC. A close tag at document level ends the parse and the rest of the input is ignored (`<a/></b><c/>` yields one element). The close-tag check is a prefix comparison against the open element's name (`<a></ab>` closes `<a>`).
+The grammar is not changing in this RFC: whatever `parseXml` accepts or rejects when the implementation lands, `XmlParser` accepts or rejects identically, because there is one scanner. On `main` today that includes two tolerance quirks, a close tag at document level ends the parse and ignores the rest of the input, and the close-tag check is a prefix comparison (`<a></ab>` closes `<a>`). [#430](https://github.com/streaming-video-technology-alliance/common-media-library/pull/430) turns both into errors and makes malformed attributes throw; the prototype mirrors `main`, and the equivalence corpus is recaptured against whichever behavior has landed when the implementation starts.
 
 ### Errors and lifecycle
 
@@ -267,7 +267,7 @@ One instance parses one document. `write` after `end`, `end` twice, or any call 
 
 A mismatched close tag throws from whichever of `write` or `end` encounters it. The message keeps today's `Unexpected close tag` text and its `Line`, `Column`, and `Char` fields when the text being scanned starts at document offset zero, which is always the case for `parseXml` and for an error inside the first chunk, and always appends an `Offset` line with the absolute character offset. Line and column are omitted when the failing text does not start at offset zero, because they would be relative to a chunk boundary; counting newlines across all consumed chunks would put a measurable cost on the hot path for a debugging aid.
 
-A quoted attribute value that never closes can only be detected in final mode, since the closing quote might be in the next chunk, so `Missing closing quote` is thrown from `end()`.
+Errors that depend on seeing the end of the input, a quoted value that never closes today and any attribute cut off by the end of input once #430 lands, can only be raised in final mode, since the missing text might be in the next chunk, so they are thrown from `end()`.
 
 After a throw the instance is unusable. The builder's partially built structures are whatever the callbacks produced up to that point; the parser does not roll them back.
 
@@ -277,7 +277,7 @@ After a throw the instance is unusable. The builder's partially built structures
 
 `getElementsByName`, `serializeXml`, `XmlNode`, and `XmlParseOptions` are unchanged. `XmlParserOptions` carries only `keepWhitespace`; `keepComments` and `includeParentElement` are tree concerns and stay on `XmlParseOptions`.
 
-Two things improve for free. Nesting depth is no longer limited by the call stack, because the element stack is explicit. The termination fixes for truncated input (#425 and the pending close-tag and declaration fixes) apply to both entry points because there is one scanner.
+Two things improve for free. Nesting depth is no longer limited by the call stack, because the element stack is explicit. The termination fixes for truncated input (#425 and #430) apply to both entry points because there is one scanner.
 
 ### Measured results
 

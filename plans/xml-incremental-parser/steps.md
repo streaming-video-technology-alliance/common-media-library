@@ -1,8 +1,11 @@
 # Implementation steps (after the RFC is accepted)
 
 Branch: `issue/424-xml-incremental-parser` (or continue on the RFC branch if the RFC PR is squash-merged
-first). Prerequisites: the pending hang-fix branch `issue/xml-parse-hang` is merged or folded in, so the
-parity corpus is captured against a parser that terminates on every input.
+first). Prerequisites: [#430](https://github.com/streaming-video-technology-alliance/common-media-library/pull/430)
+(truncation fixes, malformed attributes and mismatched close tags throw) is merged, so the parity corpus
+is captured against the parser as it will ship. Inputs that #430 turns into errors (`<a b>`, `<a b=c/>`,
+`<a></ab>`, `<a/></b><c/>`, truncation inside an attribute) change from tree expectations to `throws`
+expectations in the corpus.
 
 1. Capture parity fixtures before touching the parser. Add `libs/xml/test/parseXml.equivalence.test.ts`
    that parses every corpus input (`equivalence.md`) with each option set and compares to expected output
@@ -23,7 +26,7 @@ parity corpus is captured against a parser that terminates on every input.
    - Boundary sweep with a recording builder (every split for small inputs, sampled for large).
    - Streamed input through `TextDecoderStream` and `WritableStream` (Node 24 has both globally).
    - Lifecycle errors, absolute error offset, `Missing closing quote` only from `end()`.
-   - Hang regression inputs under a worker timeout (pattern from `issue/xml-parse-hang`).
+   - Hang regression inputs under a worker timeout (pattern from #430).
 5. Benchmark under `libs/xml/bench/` with an npm script, per `benchmark.md`: one process per variant,
    natural and forced GC, the generator, and the real livesim2 manifest checked in as a fixture (169 KB).
    Keep it out of the `**/*.test.ts` glob; `eslint .` lints everything except `dist`, so the bench must
