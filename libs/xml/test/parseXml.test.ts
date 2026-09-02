@@ -62,6 +62,21 @@ describe('parseXml', () => {
 		equal(namespace.localName, `Text`)
 	})
 
+	it('parses elements nested deeper than the call stack allows', () => {
+		const depth = 100000
+		const doc = parseXml('<a>'.repeat(depth) + 'x' + '</a>'.repeat(depth))
+		let node = doc.childNodes[0]
+		let count = 1
+
+		while (node.childNodes[0].nodeName === 'a') {
+			node = node.childNodes[0]
+			count++
+		}
+
+		equal(count, depth)
+		equal(node.childNodes[0].nodeValue, 'x')
+	})
+
 	describe('close tags', () => {
 		it('throws on a close tag whose name differs from the open tag', () => {
 			throws(() => parseXml('<a>text</b>'), /Unexpected close tag/)
