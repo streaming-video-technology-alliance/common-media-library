@@ -58,16 +58,19 @@ or underscore (skipped by the grammar), and non-ASCII text.
 
 ## Script
 
+Runs from `plans/xml-incremental-parser/` with the same files and fixture as the harness in `benchmark.md`
+(see its Harness section for the layout); the shipped parser comes from the built `libs/xml/dist`.
+
 ```js
 // Equivalence and chunk-boundary checks for the xml-incremental-parser prototype.
 import assert from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { parseXml as shippedParseXml } from '/Users/cocch1216/dev/common-media-library/.claude/worktrees/streaming-api-rfc-xmlnode-7d96c7/libs/xml/dist/index.js'
+import { parseXml as shippedParseXml } from '../../libs/xml/dist/index.js'
 import { XmlParser } from './xmlParser.mjs'
 import { parseXml, parseXmlChunked, createRecordingBuilder, dashCurrent, dashOnePass, dashOnePassTuned, dashOnePassChunked, dashOnePassAttributeCallbacks, canonicalDash } from './builders.mjs'
 import { generateMpd, chunk } from './generate.mjs'
 
-const FIXTURES = '/Users/cocch1216/dev/common-media-library/.claude/worktrees/streaming-api-rfc-xmlnode-7d96c7/libs/xml/test/fixtures/'
+const FIXTURES = '../../libs/xml/test/fixtures/'
 const bbb = readFileSync(FIXTURES + 'bbb_30fps.mpd', 'utf8')
 const nodeTypes = readFileSync(FIXTURES + 'node_types.xml', 'utf8')
 const livesim2 = readFileSync('./livesim2_tsbd21600.mpd', 'utf8')

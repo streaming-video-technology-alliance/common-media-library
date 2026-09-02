@@ -387,6 +387,12 @@ One `scan` function driven by every builder and by both whole and chunked input 
 
 ## Harness
 
+The code blocks below and the core in `prototype.md` are saved as `generate.mjs`, `bench.mjs`, `xmlParser.mjs`
+(the core plus the measurement-only switch described in `prototype.md`), and `builders.mjs` (the builders in
+`prototype.md`) under `plans/xml-incremental-parser/`, and run from that directory after
+`npm run build -w libs/utils -w libs/xml`. The livesim2 manifest is not checked in; download it next to the
+scripts as `livesim2_tsbd21600.mpd` (URL under Inputs). Paths are relative to that directory.
+
 `generate.mjs`:
 
 ```js
@@ -445,7 +451,7 @@ import { readFileSync } from 'node:fs'
 import { performance } from 'node:perf_hooks'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { parseXml as shippedParseXml } from '/Users/cocch1216/dev/common-media-library/.claude/worktrees/streaming-api-rfc-xmlnode-7d96c7/libs/xml/dist/index.js'
+import { parseXml as shippedParseXml } from '../../libs/xml/dist/index.js'
 import { XmlParser } from './xmlParser.mjs'
 import * as B from './builders.mjs'
 import { generateMpd, chunk } from './generate.mjs'
@@ -454,7 +460,7 @@ const args = process.argv.slice(2)
 const forceGc = args.includes('--gc')
 const interleaved = args.includes('--interleaved')
 const runArg = args.find(a => a.startsWith('--run='))
-const FIXTURES = '/Users/cocch1216/dev/common-media-library/.claude/worktrees/streaming-api-rfc-xmlnode-7d96c7/libs/xml/test/fixtures/'
+const FIXTURES = '../../libs/xml/test/fixtures/'
 
 const inputs = [
 	{ name: 'pretty />, 100k S', make: () => generateMpd({ pretty: true }), iters: forceGc ? 20 : 60 },

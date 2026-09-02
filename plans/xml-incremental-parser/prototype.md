@@ -513,3 +513,63 @@ proposed, `attributeCallbacks`: `createElement(parent, name, localName, prefix)`
 incompatible with the carry model as written: a tag split across chunks is rescanned from its start, which
 would call `createElement` twice, so supporting it would need a completeness pre-scan of every tag before
 any callback fires. Measured whole-string only; results in `benchmark.md`.
+
+The switch as a diff against the core above, so the harness in `benchmark.md` and the script in `equivalence.md` can be run:
+
+```diff
+--- xmlParserClean.mjs
++++ xmlParser.mjs
+@@ -19,6 +19,8 @@
+ 			appendCdata: builder.appendCdata,
+ 			appendComment: builder.appendComment,
+ 			appendDoctype: builder.appendDoctype,
++			attribute: builder.attribute,
++			attributeCallbacks: !!options.attributeCallbacks,
+ 		}
+ 		this.keepWhitespace = !!options.keepWhitespace
+ 		this.document = builder.createDocument()
+@@ -110,6 +112,8 @@
+ 	const appendCdata = slots.appendCdata
+ 	const appendComment = slots.appendComment
+ 	const appendDoctype = slots.appendDoctype
++	const attribute = slots.attribute
++	const attributeCallbacks = slots.attributeCallbacks
+ 	let current = stack[stack.length - 1]
+ 	let currentName = names[names.length - 1]
+ 	const length = input.length
+@@ -238,7 +242,14 @@
+ 		const name = input.slice(nameStart, pos)
+ 		const localName = colon === -1 ? name : name.slice(colon - nameStart + 1)
+ 		const prefix = colon === -1 ? null : name.slice(0, colon - nameStart)
+-		const attributes = {}
++		let attributes = null
++		let element = null
++		if (attributeCallbacks) {
++			element = createElement(current, name, localName, prefix)
++		}
++		else {
++			attributes = {}
++		}
+ 		while (pos < length && cc !== GT) {
+ 			if ((cc > 64 && cc < 91) || (cc > 96 && cc < 123)) {
+ 				const aStart = pos
+@@ -274,7 +285,8 @@
+ 					if (hasAmp) value = unescapeHtml(value)
+ 					cc = ++pos < length ? input.charCodeAt(pos) : 0
+ 				}
+-				attributes[aName] = value
++				if (attributeCallbacks) attribute(element, aName, value)
++				else attributes[aName] = value
+ 				continue
+ 			}
+ 			cc = ++pos < length ? input.charCodeAt(pos) : 0
+@@ -284,7 +296,7 @@
+ 		}
+ 		const selfClosing = input.charCodeAt(pos - 1) === SLASH
+ 		pos++
+-		const element = createElement(current, name, attributes, localName, prefix)
++		if (!attributeCallbacks) element = createElement(current, name, attributes, localName, prefix)
+ 		if (selfClosing) {
+ 			if (appendChild !== undefined) appendChild(current, element)
+ 		}
+```

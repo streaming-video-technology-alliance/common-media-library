@@ -28,7 +28,7 @@ const builder: XmlBuilder<Node> = {
 	createDocument: () => ({ tagName: '#document', children: [] }),
 	createElement: (parent, name, attributes, localName) => ({ tagName: localName, children: [], ...attributes }),
 	appendChild: (parent, child) => { parent.children.push(child) },
-	appendText: (parent, text) => { parent.text = text },
+	appendText: (parent, text) => { parent.text = (parent.text ?? '') + text },
 }
 
 const document = new XmlParser(builder).write('<MPD><Period id="1"/></MPD>').end()
@@ -136,7 +136,7 @@ export function parseManifest(manifestText: string): DashNode {
 }
 ```
 
-The `<S>` branch is the DASH-specific fast path that #424 asked for. It belongs here, in the player, where the schema is known, rather than in a generic XML parser. The builder object is a module-level constant on purpose: the parser's call sites then see the same functions on every refresh, which keeps them monomorphic and inlinable (see Implementation notes).
+The `<S>` branch is the DASH-specific fast path that #424 asked for. It belongs here, in the player, where the schema is known, rather than in a generic XML parser. The builder object is a module-level constant on purpose: the parser's call sites then see the same functions on every refresh, which keeps them monomorphic and inlinable (see Implementation notes). `appendText` keeps only the last text run of an element because that is what `processNode` does today (`node.__text = child.nodeValue` for each text child); a builder that has to preserve mixed content accumulates instead, as the Summary example does.
 
 ### Feeding the parser
 
@@ -251,7 +251,7 @@ export class XmlParser<T> {
 
 ### Incremental tokenization
 
-`write(chunk)` prepends the carried tail from the previous call, if any, and scans the result in streaming mode: a construct is consumed only when it is complete. Complete means the closing `>` of a start tag as found by the attribute scanner (a `>` inside a quoted value does not count), the `>` of a close tag, `?>` for a declaration or processing instruction, `-->` for a comment, `]]>` for CDATA, the `>` outside `[...]` for a doctype, and the next `<` for a text run. The first incomplete construct stops the scan; everything from its start is carried into the next `write`.
+`write(chunk)` prepends the carried tail from the previous call, if any, and scans the result in streaming mode: a construct is consumed only when it is complete. Complete means the closing `>` of a start tag as found by the attribute scanner (a `>` inside a quoted value does not count), the `>` of a close tag, the next `>` for a declaration or processing instruction (`parseXml` does not look for `?>`, so a `>` inside processing-instruction data ends the construct today, and that is preserved), `-->` for a comment, `]]>` for CDATA, the `>` outside `[...]` for a doctype, and the next `<` for a text run. The first incomplete construct stops the scan; everything from its start is carried into the next `write`.
 
 `end()` scans the carry in final mode, where the end of input terminates every construct exactly as `parseXml` treats a truncated document today, then completes still-open elements from the innermost outwards through `appendChild`, and returns the document value.
 
