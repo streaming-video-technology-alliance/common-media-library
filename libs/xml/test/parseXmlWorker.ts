@@ -43,6 +43,10 @@ export function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promis
 	const count = 'inputs' in job ? job.inputs.length : job.prefixesOf.length + 1
 	const inputAt = (index: number): string => 'inputs' in job ? job.inputs[index] : job.prefixesOf.slice(0, index)
 
+	if (count === 0) {
+		return Promise.resolve([])
+	}
+
 	return new Promise((done, fail) => {
 		const worker = new Worker(WORKER_SOURCE, { eval: true, execArgv: [], workerData: { url: PARSE_XML_URL, options, ...job } })
 		const outcomes: ParseOutcome<unknown>[] = []
