@@ -11,34 +11,45 @@ const PARSE_TIMEOUT_MS = 2000
 const WORKER_SOURCE = `
 const { parentPort, workerData } = require('node:worker_threads')
 import(workerData.url).then(({ parseXml }) => {
-	workerData.inputs.forEach((input, index) => {
+	const { inputs, prefixesOf, options } = workerData
+	const count = inputs ? inputs.length : prefixesOf.length + 1
+	for (let index = 0; index < count; index++) {
 		parentPort.postMessage({ index })
 		try {
-			parentPort.postMessage({ index, result: parseXml(input, workerData.options) })
+			const result = parseXml(inputs ? inputs[index] : prefixesOf.slice(0, index), options)
+			parentPort.postMessage({ index, result: inputs ? result : true })
 		}
 		catch (error) {
-			parentPort.postMessage({ index, error: error.message })
+			parentPort.postMessage({ index, error: error instanceof Error ? error.message : String(error) })
 		}
-	})
+	}
 })
 `
 
-type ParseOutcome = { result: XmlNode } | { error: string }
+type ParseJob = { inputs: string[] } | { prefixesOf: string }
+
+type ParseOutcome<T> = { result: T } | { error: string }
 
 type ParseMessage = {
 	index: number;
-	result?: XmlNode;
+	result?: unknown;
 	error?: string;
 }
 
 /**
- * Parses each input in a worker thread so that a parser that never returns fails the test
- * instead of hanging the test runner.
+ * Parses each input, or each prefix of a document, in a worker thread so that a parser that
+ * never returns fails the test instead of hanging the test runner. A prefix sweep reports only
+ * whether each parse returned; the parsed trees stay in the worker.
  */
-function parseXmlInWorker(inputs: string[], options?: XmlParseOptions): Promise<ParseOutcome[]> {
+function runParseWorker(job: { inputs: string[] }, options?: XmlParseOptions): Promise<ParseOutcome<XmlNode>[]>
+function runParseWorker(job: { prefixesOf: string }, options?: XmlParseOptions): Promise<ParseOutcome<true>[]>
+function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promise<ParseOutcome<unknown>[]> {
+	const count = 'inputs' in job ? job.inputs.length : job.prefixesOf.length + 1
+	const inputAt = (index: number): string => 'inputs' in job ? job.inputs[index] : job.prefixesOf.slice(0, index)
+
 	return new Promise((done, fail) => {
-		const worker = new Worker(WORKER_SOURCE, { eval: true, execArgv: [], workerData: { url: PARSE_XML_URL, inputs, options } })
-		const outcomes: ParseOutcome[] = []
+		const worker = new Worker(WORKER_SOURCE, { eval: true, execArgv: [], workerData: { url: PARSE_XML_URL, options, ...job } })
+		const outcomes: ParseOutcome<unknown>[] = []
 		let current = 0
 		let timer: ReturnType<typeof setTimeout>
 
@@ -51,7 +62,7 @@ function parseXmlInWorker(inputs: string[], options?: XmlParseOptions): Promise<
 		const watch = () => {
 			clearTimeout(timer)
 			timer = setTimeout(() => {
-				settle(() => fail(new Error(`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputs[current])}`)))
+				settle(() => fail(new Error(`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputAt(current))}`)))
 			}, PARSE_TIMEOUT_MS)
 		}
 
@@ -64,7 +75,7 @@ function parseXmlInWorker(inputs: string[], options?: XmlParseOptions): Promise<
 				outcomes.push({ result: message.result })
 			}
 
-			if (outcomes.length === inputs.length) {
+			if (outcomes.length === count) {
 				settle(() => done(outcomes))
 			}
 			else {
@@ -80,7 +91,7 @@ function parseXmlInWorker(inputs: string[], options?: XmlParseOptions): Promise<
  * Parses a single input in a worker thread, rethrowing any parse error.
  */
 async function parseXmlGuarded(input: string, options?: XmlParseOptions): Promise<XmlNode> {
-	const [outcome] = await parseXmlInWorker([input], options)
+	const [outcome] = await runParseWorker({ inputs: [input] }, options)
 	if ('error' in outcome) {
 		throw new Error(outcome.error)
 	}
@@ -405,11 +416,10 @@ describe('parseXml', () => {
 		it('terminates on every truncation of the fixtures', async () => {
 			for (const fixture of ['./test/fixtures/node_types.xml', './test/fixtures/bbb_30fps.mpd']) {
 				const xml = await fs.readFile(resolve(fixture), 'utf8')
-				const prefixes = Array.from({ length: xml.length + 1 }, (_, end) => xml.slice(0, end))
-				const outcomes = await parseXmlInWorker(prefixes)
+				const outcomes = await runParseWorker({ prefixesOf: xml })
 
-				equal(outcomes.length, prefixes.length)
-				assert('result' in outcomes[prefixes.length - 1], `${fixture} did not parse in full`)
+				equal(outcomes.length, xml.length + 1)
+				assert('result' in outcomes[xml.length], `${fixture} did not parse in full`)
 			}
 		})
 	})
