@@ -79,6 +79,9 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 				else if (next === QUESTION_CC) {
 					// xml declaration
 					pos = input.indexOf('>', pos)
+					if (pos === -1) {
+						pos = length
+					}
 					pos++
 					continue
 				}
