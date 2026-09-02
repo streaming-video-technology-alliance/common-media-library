@@ -3,12 +3,20 @@
 Issue: https://github.com/streaming-video-technology-alliance/common-media-library/issues/424
 Upstream: https://github.com/Dash-Industry-Forum/dash.js/issues/4984
 
+Status (2026-09-02): implemented by #432 as planned in `steps.md`. The tables below were measured with an
+interleaved harness during the investigation and are indicative (see "Superseded and corrected findings");
+the shipped scanner's numbers are in #432 and reproducible with `npm run bench -w libs/xml`. The fused
+prototype and the benchmark methodology this folder once carried were removed when #432 landed: the
+prototype was superseded by `plans/xml-incremental-parser/prototype.md` and `libs/xml/src/scan.ts`, the
+methodology by `libs/xml/bench/bench.ts`.
+
 Environment: Apple M1 Pro, macOS 26.6.2, Node v24.16.0, `@svta/cml-xml` 1.1.6 built from this worktree.
 Methodology: synthetic MPD with 50 Periods x 4 AdaptationSets x 500 `<S>` (100,000 `<S>`), 4 warm-up
 iterations, 20 measured iterations interleaved across variants, `gc()` forced before each iteration unless
 marked "natural GC". (Interleaving variants in one process was later found to contaminate V8 type
 feedback across them; the deltas below are indicative and were re-measured one variant per process for
-the aligned scanner, see "Superseded and corrected findings".) See `benchmark.md` for the generator and harness.
+the aligned scanner, see "Superseded and corrected findings".) The harness now lives in `libs/xml/bench/`
+with the corrected one-process-per-variant method.
 
 ## Baseline reproduction
 
@@ -74,11 +82,13 @@ includeParentElement, all three, `pos`): 0 mismatches.
 | compare chain + colon detected during tag-name scan | -9.7% | -14.6% | real |
 | above + bounded attribute-value scan (hang fix) | -12.0% | -13.5% | "best" micro-variant, ~3 small diffs |
 
-## Flat rewrite (prototype in `prototype.md`)
+## Flat rewrite (fused prototype, removed from this folder when #432 landed)
 
 A non-recursive parser with an explicit element stack and `charCodeAt`-only scanning for text, names and
 attribute values (`indexOf` only for comments, CDATA, doctype, close tags). Same output on all 192
-equivalence checks. Source is 5.6 KB vs 6.1 KB for the current parseXml region of the bundle.
+equivalence checks. Source was 5.6 KB vs 6.1 KB for the parseXml region of the bundle at the time. The
+shipped scanner, `libs/xml/src/scan.ts`, was ported from `plans/xml-incremental-parser/prototype.md` instead
+(see `steps.md`).
 
 | Input | Baseline | best | flat | Method |
 | --- | ---: | ---: | ---: | --- |
@@ -113,7 +123,7 @@ yielding `""` for valueless attributes.
 
 The RFC prototype (`plans/xml-incremental-parser/`) re-measured this work one variant per process and
 found three things this file got wrong or did not know. `plans/xml-incremental-parser/findings.md` has
-the detail; `steps.md` here carries the consequences.
+the detail; `steps.md` here records the outcome.
 
 - **Interleaving contaminates.** Running several parser variants through one process poisons V8 type
   feedback (builder shapes, string kinds). One run inverted the result, every variant 30 to 65 percent
@@ -126,11 +136,11 @@ the detail; `steps.md` here carries the consequences.
   changed") invalidates every function compiled against it. A scanner reading and writing such an object
   never kept optimized code: 6 ms per parse of the 170 KB livesim2 manifest after a forced full GC against
   0.9 ms natural. A scanner that takes only primitives, arrays, and a literal-created slots object takes
-  0.8 ms in both regimes. The flat prototype in this folder is immune because it has no such object; the
-  aligned implementation must stay immune by construction.
+  0.8 ms in both regimes. The fused prototype was immune because it had no such object; the
+  shipped scanner stays immune by construction.
 - **Reading one past the end poisons type feedback.** `charCodeAt(length)` returns `NaN`; once the
   character variable has been `NaN`, V8 compiles every comparison on it as a floating-point compare for
-  the rest of the process. The prototype in this folder does this once per parse, as the shipped parser
+  the rest of the process. The fused prototype did this once per parse, as the shipped parser
   does. Guarding every advance (`cc = ++pos < length ? input.charCodeAt(pos) : 0`) made tokenization
   about 19 percent faster.
 - **Rope strings.** Relevant once chunked input arrives with the RFC: `a + b` yields a V8 `ConsString`
@@ -139,15 +149,17 @@ the detail; `steps.md` here carries the consequences.
 Re-measured with those fixes, one process per variant, natural GC: the aligned scanner building the same
 `XmlNode` tree is 25 to 37 percent faster than the shipped parser across the six inputs (28.3 ms to
 20.1 ms on the pretty stress input, 1.29 ms to 0.84 ms on the real livesim2 manifest), against 18 to 30
-percent for the fused prototype in this folder.
+percent for the fused prototype. The shipped implementation (#432) measured 19 to 38 percent on the same six
+inputs; the RFC prototype itself re-measured at 23.4 ms on the pretty input the same day on the same machine,
+so the 20.1 ms figure was environmental.
 
 ## Recommendation
 
 1. Done: the three hangs were fixed by #425 and #430, and #430 also made malformed attributes and
    mismatched or document-level close tags throw, which is now the parity target.
-2. Replace the parser body with the aligned scanner (`steps.md`, "Alignment with the RFC prototype"):
-   identical output to `main` after #430, 25 to 37 percent faster, no recursion depth limit, immune to
-   the GC trap above. Ship with the equivalence corpus as tests and the per-process benchmark.
+2. Done in #432: the parser body is the aligned scanner (`steps.md`), with identical output to `main` after
+   #430, no recursion depth limit, immunity to the GC trap above, the equivalence corpus as tests, and the
+   per-process benchmark under `libs/xml/bench/`.
 3. The visitor or streaming API is now `rfc/xml-incremental-parser.md` (#431). It adds `XmlParser` on
    top of the same scanner; `parseXml` does not change again. Measured on the prototype, dash.js can
    reach 43 to 49 percent less time than today on the stress manifests by building its objects in one
