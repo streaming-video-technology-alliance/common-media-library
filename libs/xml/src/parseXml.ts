@@ -1,6 +1,7 @@
 import type { XmlNode } from './XmlNode.ts'
 import type { XmlParseOptions } from './XmlParseOptions.ts'
-import { scan, type XmlBuilder } from './scan.ts'
+import { scan } from './scan.ts'
+import type { XmlBuilder } from './XmlBuilder.ts'
 
 const HASH_CC = 35 // '#'
 

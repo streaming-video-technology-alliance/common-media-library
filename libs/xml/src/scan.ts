@@ -1,4 +1,5 @@
 import { unescapeHtml } from '@svta/cml-utils'
+import type { XmlBuilder } from './XmlBuilder.ts'
 
 // Character codes
 const OPEN_BRACKET_CC = 60            // '<'
@@ -18,23 +19,10 @@ const SPACE_CC = 32                   // ' '
 const TAB_CC = 9                      // '\t'
 const CR_CC = 13                      // '\r'
 const LF_CC = 10                      // '\n'
-
-/**
- * Callbacks that build the result of a scan. `createElement` is called when a start tag has been read,
- * `appendChild` when the element's close tag has been read or the input has ended, and the other
- * `append` callbacks as text, CDATA sections, comments, and doctype declarations are read, each with
- * the innermost open element (or the document) as the parent. Comments are skipped without being
- * sliced when `appendComment` is undefined.
- */
-export type XmlBuilder<T> = {
-	createDocument: () => T;
-	createElement: (parent: T, name: string, attributes: Record<string, string>, localName: string, prefix: string | null) => T;
-	appendChild?: (parent: T, child: T) => void;
-	appendText?: (parent: T, text: string) => void;
-	appendCdata?: (parent: T, text: string) => void;
-	appendComment?: (parent: T, text: string) => void;
-	appendDoctype?: (parent: T, text: string) => void;
-};
+const UPPER_A_CC = 65                 // 'A'
+const UPPER_Z_CC = 90                 // 'Z'
+const LOWER_A_CC = 97                 // 'a'
+const LOWER_Z_CC = 122                // 'z'
 
 /**
  * Creates an error that reports the line and column of `pos`
@@ -49,24 +37,24 @@ function syntaxError(input: string, pos: number, message: string): Error {
 }
 
 /**
- * Scans `input` from `start` to its end and reports every construct to `slots`. `stack` holds the open
+ * Scans `input` from `start` to its end and reports every construct to `builder`. `stack` holds the open
  * elements with the document at index 0 and the innermost element on top, and `names` holds their tag
  * names. Elements still open when the input ends are appended to their parents.
  *
  * @param input - The whole XML document
  * @param start - The index to start scanning at
  * @param keepWhitespace - Whether whitespace-only text is reported and text is left untrimmed
- * @param slots - The builder callbacks
+ * @param builder - The builder callbacks
  * @param stack - The open-element stack, containing the document
  * @param names - The tag names of the open elements, containing `''` for the document
  */
-export function scan<T>(input: string, start: number, keepWhitespace: boolean, slots: XmlBuilder<T>, stack: T[], names: string[]): void {
-	const createElement = slots.createElement
-	const appendChild = slots.appendChild
-	const appendText = slots.appendText
-	const appendCdata = slots.appendCdata
-	const appendComment = slots.appendComment
-	const appendDoctype = slots.appendDoctype
+export function scan<T>(input: string, start: number, keepWhitespace: boolean, builder: XmlBuilder<T>, stack: T[], names: string[]): void {
+	const createElement = builder.createElement
+	const appendChild = builder.appendChild
+	const appendText = builder.appendText
+	const appendCdata = builder.appendCdata
+	const appendComment = builder.appendComment
+	const appendDoctype = builder.appendDoctype
 	const length = input.length
 	let current = stack[stack.length - 1]
 	let currentName = names[names.length - 1]
@@ -207,7 +195,8 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, s
 
 		// Attribute ::= Name Eq AttValue, Eq ::= S? '=' S? (XML 1.0 §3.1, §2.3)
 		while (pos < length && cc !== CLOSE_BRACKET_CC) {
-			if ((cc > 64 && cc < 91) || (cc > 96 && cc < 123)) {
+			// An attribute name starts with an ASCII letter; any other character is skipped
+			if ((cc >= UPPER_A_CC && cc <= UPPER_Z_CC) || (cc >= LOWER_A_CC && cc <= LOWER_Z_CC)) {
 				const attributeStart = pos
 				cc = ++pos < length ? input.charCodeAt(pos) : 0
 				while (pos < length && cc !== SPACE_CC && cc !== CLOSE_BRACKET_CC && cc !== SLASH_CC && cc !== EQUALS_CC && cc !== LF_CC && cc !== CR_CC && cc !== TAB_CC) {
