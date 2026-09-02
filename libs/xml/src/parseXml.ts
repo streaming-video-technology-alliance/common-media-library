@@ -1,26 +1,53 @@
-import { unescapeHtml } from '@svta/cml-utils'
 import type { XmlNode } from './XmlNode.ts'
 import type { XmlParseOptions } from './XmlParseOptions.ts'
+import { scan } from './scan.ts'
+import type { XmlBuilder } from './XmlBuilder.ts'
 
-// Character code constants (computed once at module load)
-const OPEN_BRACKET_CC = 60            // '<'
-const CLOSE_BRACKET_CC = 62           // '>'
-const MINUS_CC = 45                   // '-'
-const SLASH_CC = 47                   // '/'
-const QUESTION_CC = 63                // '?'
-const EXCLAMATION_CC = 33             // '!'
-const SINGLE_QUOTE_CC = 39            // "'"
-const DOUBLE_QUOTE_CC = 34            // '"'
-const OPEN_CORNER_BRACKET_CC = 91     // '['
-const CLOSE_CORNER_BRACKET_CC = 93    // ']'
-const EQUALS_CC = 61                  // '='
-const SPACE_CC = 32                   // ' '
-const TAB_CC = 9                      // '\t'
-const CR_CC = 13                      // '\r'
-const LF_CC = 10                      // '\n'
+const HASH_CC = 35 // '#'
 
-// Set for fast name delimiter lookup: \r \n \t > / = space
-const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
+/**
+ * The parent element of a node whose parent is `parent`: null when the parent is the document
+ */
+function parentElementOf(parent: XmlNode): XmlNode | null {
+	return parent.nodeName.charCodeAt(0) === HASH_CC ? null : parent
+}
+
+/**
+ * Creates a builder that produces the `XmlNode` tree
+ */
+function createTreeBuilder(keepComments: boolean, includeParentElement: boolean): XmlBuilder<XmlNode> {
+	const createLeaf = includeParentElement
+		? (parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({ nodeName, nodeValue, attributes: {}, childNodes: [], parentElement: parentElementOf(parent) })
+		: (_parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({ nodeName, nodeValue, attributes: {}, childNodes: [] })
+
+	const appendLeaf = (parent: XmlNode, nodeName: string, nodeValue: string): void => {
+		parent.childNodes.push(createLeaf(parent, nodeName, nodeValue))
+	}
+
+	return {
+		createDocument: includeParentElement
+			? (): XmlNode => ({ nodeName: '#document', nodeValue: null, childNodes: [], attributes: {}, parentElement: null })
+			: (): XmlNode => ({ nodeName: '#document', nodeValue: null, childNodes: [], attributes: {} }),
+		createElement: includeParentElement
+			? (parent, nodeName, attributes, localName, prefix): XmlNode => ({ nodeName, nodeValue: null, attributes, childNodes: [], prefix, localName, parentElement: parentElementOf(parent) })
+			: (_parent, nodeName, attributes, localName, prefix): XmlNode => ({ nodeName, nodeValue: null, attributes, childNodes: [], prefix, localName }),
+		appendChild: (parent, child) => {
+			parent.childNodes.push(child)
+		},
+		appendText: (parent, text) => appendLeaf(parent, '#text', text),
+		appendCdata: (parent, text) => appendLeaf(parent, '#cdata', text),
+		appendComment: keepComments ? (parent, text) => appendLeaf(parent, '#comment', text) : undefined,
+		appendDoctype: (parent, text) => appendLeaf(parent, '#doctype', text),
+	}
+}
+
+// One builder per combination of keepComments (bit 0) and includeParentElement (bit 1)
+const TREE_BUILDERS: XmlBuilder<XmlNode>[] = [
+	/* @__PURE__ */ createTreeBuilder(false, false),
+	/* @__PURE__ */ createTreeBuilder(true, false),
+	/* @__PURE__ */ createTreeBuilder(false, true),
+	/* @__PURE__ */ createTreeBuilder(true, true),
+]
 
 /**
  * Parse XML into a JS object
@@ -40,290 +67,10 @@ const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
  * {@includeCode ../test/parseXml.test.ts#example}
  */
 export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode {
-	let pos = options.pos || 0
+	const builder = TREE_BUILDERS[(options.keepComments ? 1 : 0) | (options.includeParentElement ? 2 : 0)]
+	const document = builder.createDocument()
 
-	const length = input.length
-	const keepComments = !!options.keepComments
-	const keepWhitespace = !!options.keepWhitespace
-	const includeParentElement = !!options.includeParentElement
-
-	/**
-	 * Creates a text node
-	 */
-	function createTextNode(value: string, nodeName = '#text'): XmlNode {
-		return {
-			nodeName,
-			nodeValue: value,
-			attributes: {},
-			childNodes: [],
-		}
-	}
-
-	/**
-	 * Creates an error that reports the line and column of the current position
-	 */
-	function syntaxError(message: string): Error {
-		const parsedText = input.substring(0, pos).split('\n')
-		return new Error(
-			message + '\nLine: ' + (parsedText.length - 1) +
-			'\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
-			'\nChar: ' + (pos < length ? input[pos] : 'end of input'),
-		)
-	}
-
-	/**
-	 * Parses a list of entries
-	 */
-	function parseChildren(tagName: string = ''): XmlNode[] {
-		const children: XmlNode[] = []
-		while (pos < length) {
-			const c = input.charCodeAt(pos)
-			if (c === OPEN_BRACKET_CC) {
-				const next = input.charCodeAt(pos + 1)
-				if (next === SLASH_CC) {
-					const closeStart = pos + 2
-					const nameEnd = closeStart + tagName.length
-					const afterName = input.charCodeAt(nameEnd)
-					// ETag ::= '</' Name S? '>' (XML 1.0 §3.1); nothing is open at the document level
-					const closesTag = input.startsWith(tagName, closeStart) && (
-						nameEnd >= length ||
-						(tagName !== '' && (afterName === CLOSE_BRACKET_CC || afterName === SPACE_CC || afterName === TAB_CC || afterName === CR_CC || afterName === LF_CC))
-					)
-					pos = input.indexOf('>', pos)
-					if (pos === -1) {
-						pos = length
-					}
-					if (!closesTag) {
-						throw syntaxError('Unexpected close tag')
-					}
-					if (pos < length) {
-						pos++
-					}
-
-					return children
-				}
-				else if (next === QUESTION_CC) {
-					// xml declaration
-					pos = input.indexOf('>', pos)
-					if (pos === -1) {
-						pos = length
-					}
-					else {
-						pos++
-					}
-					continue
-				}
-				else if (next === EXCLAMATION_CC) {
-					const third = input.charCodeAt(pos + 2)
-					if (third === MINUS_CC) {
-						// comment support
-						const startCommentPos = pos
-						while (pos !== -1 && !(input.charCodeAt(pos) === CLOSE_BRACKET_CC && input.charCodeAt(pos - 1) === MINUS_CC && input.charCodeAt(pos - 2) === MINUS_CC)) {
-							pos = input.indexOf('>', pos + 1)
-						}
-						if (pos === -1) {
-							pos = length
-						}
-						if (keepComments) {
-							children.push(createTextNode(input.substring(startCommentPos, pos + 1), '#comment'))
-						}
-					}
-					else if (
-						third === OPEN_CORNER_BRACKET_CC &&
-						input.charCodeAt(pos + 8) === OPEN_CORNER_BRACKET_CC &&
-						input.startsWith('CDATA', pos + 3)
-					) {
-						// cdata
-						const cdataEndIndex = input.indexOf(']]>', pos)
-						if (cdataEndIndex === -1) {
-							children.push(createTextNode(input.substr(pos + 9), '#cdata'))
-							pos = length
-						}
-						else {
-							children.push(createTextNode(input.substring(pos + 9, cdataEndIndex), '#cdata'))
-							pos = cdataEndIndex + 3
-						}
-						continue
-					}
-					else {
-						// doctypesupport
-						const startDoctype = pos + 1
-						pos += 2
-						let encapsuled = false
-						while (pos < length && (input.charCodeAt(pos) !== CLOSE_BRACKET_CC || encapsuled)) {
-							const cc = input.charCodeAt(pos)
-							if (cc === OPEN_CORNER_BRACKET_CC) {
-								encapsuled = true
-							}
-							else if (encapsuled && cc === CLOSE_CORNER_BRACKET_CC) {
-								encapsuled = false
-							}
-							pos++
-						}
-						children.push(createTextNode(input.substring(startDoctype, pos), '#doctype'))
-					}
-
-					pos++
-					continue
-				}
-
-				const node = parseNode()
-				children.push(node)
-			}
-			else {
-				const text = parseText()
-				if (keepWhitespace) {
-					if (text.length > 0) {
-						children.push(createTextNode(text))
-					}
-				}
-				else {
-					const trimmed = text.trim()
-					if (trimmed.length > 0) {
-						children.push(createTextNode(trimmed))
-					}
-				}
-				pos++
-			}
-		}
-		return children
-	}
-
-	/**
-	 * Returns the text outside of texts until the first '&lt;'
-	 */
-	function parseText(): string {
-		const start = pos
-		pos = input.indexOf('<', pos) - 1
-		if (pos === -2) {
-			pos = length
-		}
-
-		return unescapeHtml(input.slice(start, pos + 1))
-	}
-
-	/**
-	 * Returns text until the first nonAlphabetic letter
-	 */
-	function parseName(): string {
-		const start = pos
-		while (pos < length && !NAME_SPACER_SET.has(input.charCodeAt(pos))) {
-			pos++
-		}
-		return input.slice(start, pos)
-	}
-
-	/**
-	 * Parses the attributes of a node
-	 */
-	function parseAttributes(): Record<string, string> {
-		const attributes: Record<string, string> = {}
-
-		// Attribute ::= Name Eq AttValue, Eq ::= S? '=' S? (XML 1.0 §3.1, §2.3)
-		while (pos < length && input.charCodeAt(pos) !== CLOSE_BRACKET_CC) {
-			const c = input.charCodeAt(pos)
-			if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
-				const name = parseName()
-				let code = input.charCodeAt(pos)
-				if (code !== EQUALS_CC) {
-					while (code === SPACE_CC || code === TAB_CC || code === CR_CC || code === LF_CC) {
-						pos++
-						code = input.charCodeAt(pos)
-					}
-					if (code !== EQUALS_CC) {
-						throw syntaxError('Malformed attribute "' + name + '": expected "=" after name')
-					}
-				}
-				pos++
-				code = input.charCodeAt(pos)
-				if (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
-					while (code === SPACE_CC || code === TAB_CC || code === CR_CC || code === LF_CC) {
-						pos++
-						code = input.charCodeAt(pos)
-					}
-					if (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
-						throw syntaxError('Malformed attribute "' + name + '": expected quoted value after "="')
-					}
-				}
-				const value = parseString()
-				if (pos === -1) {
-					throw new Error('Missing closing quote')
-				}
-				attributes[name] = unescapeHtml(value)
-			}
-			pos++
-		}
-
-		return attributes
-	}
-
-	/**
-	 * Parses a node
-	 */
-	function parseNode(): XmlNode {
-		pos++
-		const nodeName = parseName()
-		let localName = nodeName
-		let prefix = null
-
-		const nsIndex = nodeName.indexOf(':')
-		if (nsIndex !== -1) {
-			prefix = nodeName.slice(0, nsIndex)
-			localName = nodeName.slice(nsIndex + 1)
-		}
-
-		const attributes = parseAttributes()
-
-		let childNodes: any[] = []
-
-		// optional parsing of children
-		const prev = input.charCodeAt(pos - 1)
-		pos++
-
-		if (prev !== SLASH_CC) {
-			childNodes = parseChildren(nodeName)
-		}
-
-		return {
-			nodeName,
-			nodeValue: null,
-			attributes,
-			childNodes,
-			prefix,
-			localName,
-		}
-	}
-
-	/**
-	 * Parses a string, that starts with a char and with the same usually ' or "
-	 */
-	function parseString(): string {
-		const startChar = input[pos]
-		const startpos = pos + 1
-		pos = input.indexOf(startChar, startpos)
-		return input.slice(startpos, pos)
-	}
-
-	/**
-	 * Recursively sets parentElement on all nodes in the tree
-	 */
-	function setParentElements(node: XmlNode, parent: XmlNode | null): void {
-		node.parentElement = parent?.nodeName.startsWith('#') ? null : parent
-		for (const child of node.childNodes) {
-			setParentElements(child, node)
-		}
-	}
-
-	const document: XmlNode = {
-		nodeName: '#document',
-		nodeValue: null,
-		childNodes: parseChildren(''),
-		attributes: {},
-	}
-
-	if (includeParentElement) {
-		setParentElements(document, null)
-	}
+	scan(input, options.pos || 0, !!options.keepWhitespace, builder, [document], [''])
 
 	return document
 }

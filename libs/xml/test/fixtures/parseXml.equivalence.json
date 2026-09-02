@@ -1,0 +1,1168 @@
+{
+	"synthetic pretty": {
+		"input": {"length":7944,"sha256":"65797f0b427f725b9f2be6b8727ac9b94a4de29f0cab6ddcc4687046b2238d7b"},
+		"results": {
+			"default": {"sha256":"cc47dc73bb8a730a1eacf72e38d25d1168d8a424b2652bb35470b383deb0517a","length":22916},
+			"keepWhitespace": {"sha256":"b4e42304725b2778acf1f4750f871c22d53026d61263986bedc6a7f20c1b8707","length":38342},
+			"keepComments": {"sha256":"cc47dc73bb8a730a1eacf72e38d25d1168d8a424b2652bb35470b383deb0517a","length":22916},
+			"includeParentElement": {"sha256":"c84e2ecdb8a7de8a8c342e6bfa77780c9c3a7da46136b8f85ce597b389996b63","length":27862},
+			"all": {"sha256":"a46a2be06e99152c60d03d4d88a946c016fab61298f629df5f91d940c37c9bd1","length":48610},
+			"pos3": {"sha256":"dbe36dcd8326e5697922884b2a0f6cb00d14be0f7b823966554c1c630f734f84","length":23023}
+		}
+	},
+	"synthetic minified": {
+		"input": {"length":5973,"sha256":"155b5b705722972136c28289d0ae1a8526e4f396c43278dba7f95dc5f89cf409"},
+		"results": {
+			"default": {"sha256":"cc47dc73bb8a730a1eacf72e38d25d1168d8a424b2652bb35470b383deb0517a","length":22916},
+			"keepWhitespace": {"sha256":"cc47dc73bb8a730a1eacf72e38d25d1168d8a424b2652bb35470b383deb0517a","length":22916},
+			"keepComments": {"sha256":"cc47dc73bb8a730a1eacf72e38d25d1168d8a424b2652bb35470b383deb0517a","length":22916},
+			"includeParentElement": {"sha256":"c84e2ecdb8a7de8a8c342e6bfa77780c9c3a7da46136b8f85ce597b389996b63","length":27862},
+			"all": {"sha256":"c84e2ecdb8a7de8a8c342e6bfa77780c9c3a7da46136b8f85ce597b389996b63","length":27862},
+			"pos3": {"sha256":"dbe36dcd8326e5697922884b2a0f6cb00d14be0f7b823966554c1c630f734f84","length":23023}
+		}
+	},
+	"synthetic closed": {
+		"input": {"length":8264,"sha256":"7c9a07dae828154ae65777ca021c7749eec3ae5de34aca1e13879cf1fdd026e9"},
+		"results": {
+			"default": {"sha256":"cc47dc73bb8a730a1eacf72e38d25d1168d8a424b2652bb35470b383deb0517a","length":22916},
+			"keepWhitespace": {"sha256":"b4e42304725b2778acf1f4750f871c22d53026d61263986bedc6a7f20c1b8707","length":38342},
+			"keepComments": {"sha256":"cc47dc73bb8a730a1eacf72e38d25d1168d8a424b2652bb35470b383deb0517a","length":22916},
+			"includeParentElement": {"sha256":"c84e2ecdb8a7de8a8c342e6bfa77780c9c3a7da46136b8f85ce597b389996b63","length":27862},
+			"all": {"sha256":"a46a2be06e99152c60d03d4d88a946c016fab61298f629df5f91d940c37c9bd1","length":48610},
+			"pos3": {"sha256":"dbe36dcd8326e5697922884b2a0f6cb00d14be0f7b823966554c1c630f734f84","length":23023}
+		}
+	},
+	"bbb_30fps.mpd": {
+		"input": {"length":3060,"sha256":"aec9278b5494bc2a91a3659aa680e33f0c42111d179845baa92eadb562cf1e86"},
+		"results": {
+			"default": {"sha256":"c2b8a7c76567a0636b9f48601eb853c7b0cc5167cb48c9de398fc0dff0d3ec8f","length":5429},
+			"keepWhitespace": {"sha256":"618b0cd2dc67fa3901b52b037dd0390e3fbccf2b356d7f70836356fb4d6a2dea","length":7312},
+			"keepComments": {"sha256":"c2b8a7c76567a0636b9f48601eb853c7b0cc5167cb48c9de398fc0dff0d3ec8f","length":5429},
+			"includeParentElement": {"sha256":"424ca12de1ac005ebbe3ea00e50fbf1d7f2e900d2fd26d3aaf48090d87fbbad5","length":5963},
+			"all": {"sha256":"6e9c7611dd35c8ee00961cfa8d9fe1aa93ef9de642ee61d9b8406c8508cdb6b1","length":8453},
+			"pos3": {"throws":"Unexpected close tag\nLine: 25\nColumn: 6\nChar: >"}
+		}
+	},
+	"node_types.xml": {
+		"input": {"length":385,"sha256":"e3b933c6f38b4247ac9b8daa75d55a54b465d61354b993cb1471e8df361ecc6f"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\" \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\"","attributes":{},"childNodes":[]},{"nodeName":"Sample","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Url","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"https://www.sample.com?test=123&hello=world","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Url"},{"nodeName":"Text","nodeValue":null,"attributes":{"test":"&,<,>,\",', ,‎,‏"},"childNodes":[{"nodeName":"#text","nodeValue":"&,<,>,\",', ,‎,‏","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Text"},{"nodeName":"tt:Text","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"Text","attributes":{},"childNodes":[]}],"prefix":"tt","localName":"Text"}],"prefix":null,"localName":"Sample"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[]},{"nodeName":"#doctype","nodeValue":"!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\" \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\"","attributes":{},"childNodes":[]},{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[]},{"nodeName":"Sample","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\n\t","attributes":{},"childNodes":[]},{"nodeName":"Url","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"https://www.sample.com?test=123&hello=world","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Url"},{"nodeName":"#text","nodeValue":"\n\t","attributes":{},"childNodes":[]},{"nodeName":"Text","nodeValue":null,"attributes":{"test":"&,<,>,\",', ,‎,‏"},"childNodes":[{"nodeName":"#text","nodeValue":"\n\t\t&,<,>,\",', ,‎,‏\n\t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Text"},{"nodeName":"#text","nodeValue":"\n\t","attributes":{},"childNodes":[]},{"nodeName":"tt:Text","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"Text","attributes":{},"childNodes":[]}],"prefix":"tt","localName":"Text"},{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Sample"},{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\" \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\"","attributes":{},"childNodes":[]},{"nodeName":"Sample","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Url","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"https://www.sample.com?test=123&hello=world","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Url"},{"nodeName":"Text","nodeValue":null,"attributes":{"test":"&,<,>,\",', ,‎,‏"},"childNodes":[{"nodeName":"#text","nodeValue":"&,<,>,\",', ,‎,‏","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Text"},{"nodeName":"tt:Text","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"Text","attributes":{},"childNodes":[]}],"prefix":"tt","localName":"Text"}],"prefix":null,"localName":"Sample"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\" \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\"","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"Sample","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Url","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"https://www.sample.com?test=123&hello=world","attributes":{},"childNodes":[],"parentElement":[1,0]}],"prefix":null,"localName":"Url","parentElement":[1]},{"nodeName":"Text","nodeValue":null,"attributes":{"test":"&,<,>,\",', ,‎,‏"},"childNodes":[{"nodeName":"#text","nodeValue":"&,<,>,\",', ,‎,‏","attributes":{},"childNodes":[],"parentElement":[1,1]}],"prefix":null,"localName":"Text","parentElement":[1]},{"nodeName":"tt:Text","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"Text","attributes":{},"childNodes":[],"parentElement":[1,2]}],"prefix":"tt","localName":"Text","parentElement":[1]}],"prefix":null,"localName":"Sample","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"#doctype","nodeValue":"!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\" \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\"","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"Sample","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\n\t","attributes":{},"childNodes":[],"parentElement":[3]},{"nodeName":"Url","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"https://www.sample.com?test=123&hello=world","attributes":{},"childNodes":[],"parentElement":[3,1]}],"prefix":null,"localName":"Url","parentElement":[3]},{"nodeName":"#text","nodeValue":"\n\t","attributes":{},"childNodes":[],"parentElement":[3]},{"nodeName":"Text","nodeValue":null,"attributes":{"test":"&,<,>,\",', ,‎,‏"},"childNodes":[{"nodeName":"#text","nodeValue":"\n\t\t&,<,>,\",', ,‎,‏\n\t","attributes":{},"childNodes":[],"parentElement":[3,3]}],"prefix":null,"localName":"Text","parentElement":[3]},{"nodeName":"#text","nodeValue":"\n\t","attributes":{},"childNodes":[],"parentElement":[3]},{"nodeName":"tt:Text","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"Text","attributes":{},"childNodes":[],"parentElement":[3,5]}],"prefix":"tt","localName":"Text","parentElement":[3]},{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[],"parentElement":[3]}],"prefix":null,"localName":"Sample","parentElement":null},{"nodeName":"#text","nodeValue":"\n","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"ml version=\"1.0\" encoding=\"utf-8\"?>","attributes":{},"childNodes":[]},{"nodeName":"#doctype","nodeValue":"!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\" \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\"","attributes":{},"childNodes":[]},{"nodeName":"Sample","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Url","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"https://www.sample.com?test=123&hello=world","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Url"},{"nodeName":"Text","nodeValue":null,"attributes":{"test":"&,<,>,\",', ,‎,‏"},"childNodes":[{"nodeName":"#text","nodeValue":"&,<,>,\",', ,‎,‏","attributes":{},"childNodes":[]}],"prefix":null,"localName":"Text"},{"nodeName":"tt:Text","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"Text","attributes":{},"childNodes":[]}],"prefix":"tt","localName":"Text"}],"prefix":null,"localName":"Sample"}],"attributes":{}}}
+		}
+	},
+	"livesim2 real": {
+		"input": {"length":169727,"sha256":"427d67f714fbf6c0985bcd3a0f4cd8358709b2c10f1d793570b34710987932d9"},
+		"results": {
+			"default": {"sha256":"556866fa0b3bd312aaec8757347e80ff2cd1fcce771c47fd1f08f9a0a292c545","length":603500},
+			"keepWhitespace": {"sha256":"7491cf3097cca553db70355e783e2bcbb610741395b12bb6d2be806d796fe29b","length":1037678},
+			"keepComments": {"sha256":"556866fa0b3bd312aaec8757347e80ff2cd1fcce771c47fd1f08f9a0a292c545","length":603500},
+			"includeParentElement": {"sha256":"b711a42761e6e1103dc0bfac0efc43357bdb72c3587ff71f5dbad6af3b3baa5c","length":755216},
+			"all": {"sha256":"cb5b4261e10328b0d03a51dbb23be3cffb439f5109e102a4aa85b8963ba31984","length":1341287},
+			"pos3": {"sha256":"4aad0df5ea5eca744a8407983a4f5d8b6dacc9917a64f132a663fc7488361ae0","length":603607}
+		}
+	},
+	"nbsp only text": {
+		"input": {"length":13,"sha256":"58a265e9303788a63512c79a0d7f3a793129a7a6c8e2ce161b3d68d5c296c645"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":" ","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":" ","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 13\nChar: >"}
+		}
+	},
+	"raw nbsp": {
+		"input": {"length":18,"sha256":"b77ad1c52f018c49e8c294af3fd828f71f5d6ff6927a41f689c505d887767023"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":" ","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":" x ","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[1]}],"prefix":null,"localName":"b","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":" ","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":" x ","attributes":{},"childNodes":[],"parentElement":[1]}],"prefix":null,"localName":"b","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"}
+		}
+	},
+	"entities in text": {
+		"input": {"length":86,"sha256":"80199ca81fce1cf0d7fbd28da33b08f09f7ef506c4efd597a3aeeb1a6d8ec18d"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a < b && c > d \"q\" 's' AB ‎‏","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a < b && c > d \"q\" 's' AB ‎‏","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a < b && c > d \"q\" 's' AB ‎‏","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a < b && c > d \"q\" 's' AB ‎‏","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a < b && c > d \"q\" 's' AB ‎‏","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 86\nChar: >"}
+		}
+	},
+	"entities in attributes": {
+		"input": {"length":39,"sha256":"6abea18fac73e40e0e7a7cfb7fd5ae52f898f23789a3e2c249342c45d9475de0"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"x":"<&>","y":"\"A"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"x":"<&>","y":"\"A"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"x":"<&>","y":"\"A"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"x":"<&>","y":"\"A"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"x":"<&>","y":"\"A"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"x=\"<&>\" y='\"A'/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"numeric entities": {
+		"input": {"length":30,"sha256":"e631511ceabc4a4ea3576fe16028888b3e7b45fa645eec36402999c17449af51"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"😀😀A","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"😀😀A","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"😀😀A","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"😀😀A","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"😀😀A","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 30\nChar: >"}
+		}
+	},
+	"mixed content": {
+		"input": {"length":33,"sha256":"451ba22ee074b1490dfb213ac2d0a0b9b3498333a5d7c723f8785656a1ccd6a1"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"one","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"two","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"three","attributes":{},"childNodes":[]},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"},{"nodeName":"#text","nodeValue":"four","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"one","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"two","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"three","attributes":{},"childNodes":[]},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"},{"nodeName":"#text","nodeValue":"four","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"one","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"two","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"three","attributes":{},"childNodes":[]},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"},{"nodeName":"#text","nodeValue":"four","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"one","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"two","attributes":{},"childNodes":[],"parentElement":[0,1]}],"prefix":null,"localName":"b","parentElement":[0]},{"nodeName":"#text","nodeValue":"three","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c","parentElement":[0]},{"nodeName":"#text","nodeValue":"four","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"one","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"two","attributes":{},"childNodes":[],"parentElement":[0,1]}],"prefix":null,"localName":"b","parentElement":[0]},{"nodeName":"#text","nodeValue":"three","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c","parentElement":[0]},{"nodeName":"#text","nodeValue":"four","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 33\nChar: >"}
+		}
+	},
+	"top-level text": {
+		"input": {"length":16,"sha256":"b5700c922a05f7bd8ac704e8905bde4c0e2318051bd4faaebc7b101cf8871803"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"hello","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"world","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"hello ","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":" world","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"hello","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"world","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"hello","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":"world","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"hello ","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":" world","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"lo","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"world","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"text with gt": {
+		"input": {"length":12,"sha256":"3877d3806b630687faf25caaadf39c298d417094fd3e9956c96b0c1c665d38a6"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x > y","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x > y","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x > y","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x > y","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x > y","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"}
+		}
+	},
+	"multiple roots with text between": {
+		"input": {"length":10,"sha256":"df8d63e2360d5c58cc52d9376f8fe688dd6c41c53285d6ccbf29b9842f63f0e2"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":null},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":null},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":">x","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"vertical tab and form feed": {
+		"input": {"length":21,"sha256":"5e064acbae8a365a7cd41e361057280980a0053cfc7d6d31e39d68d9a5d46991"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\u000b\f","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\u000b x \f","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[1]}],"prefix":null,"localName":"b","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\u000b\f","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\u000b x \f","attributes":{},"childNodes":[],"parentElement":[1]}],"prefix":null,"localName":"b","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 9\nChar: >"}
+		}
+	},
+	"empty input": {
+		"input": {"length":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}}
+		}
+	},
+	"whitespace only": {
+		"input": {"length":5,"sha256":"01f99895c51c5c8c34e193dc93f742e059fe25bbdb1b240d062c41c47a5f1ba1"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":" \n\t\r ","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":" \n\t\r ","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}}
+		}
+	},
+	"whitespace before root": {
+		"input": {"length":6,"sha256":"71a7731c5fa5f9b2d131376ef8f06350d24a76e88c74de143dafe3868415ce06"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"\n\n","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"\n\n","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"a/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"trailing whitespace": {
+		"input": {"length":8,"sha256":"ba9bf7b918c7f273d8f2c0bd1cf25607cbfa11891e6da8c732702db5d4694dba"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"\n\n  ","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":"\n\n  ","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":">","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"trailing text": {
+		"input": {"length":8,"sha256":"d1d6c0b970e83d100be1b7c73c1addfed75eac6a10b80034b3ca1853ec99e02f"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"tail","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"tail","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"tail","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":"tail","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":"tail","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":">tail","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"CRLF": {
+		"input": {"length":21,"sha256":"d2d4f7769c185269de057e6b8fc37b4d78b5399c74d6159f255aebc534e8ac09"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\r\n","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"\r\n","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"},{"nodeName":"#text","nodeValue":"\r\n","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0,0]}],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"\r\n","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0,1]}],"prefix":null,"localName":"b","parentElement":[0]},{"nodeName":"#text","nodeValue":"\r\n","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#text","nodeValue":"\r\n","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 2\nColumn: 4\nChar: >"}
+		}
+	},
+	"whitespace then text": {
+		"input": {"length":11,"sha256":"7f598aa21657a1d73da5479aca052a6a8a79080afc9da05171dad9cb21b77f31"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"   x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"   x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: >"}
+		}
+	},
+	"long whitespace run": {
+		"input": {"length":10011,"sha256":"9df444ca0c331c964578b58ea183c76709a56e3b8c1588227f94bce19904eb56"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"sha256":"455195f968bee53fc21841a85f33ba53208a8607f7d72f569083484c169f0f26","length":15399},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"sha256":"554cf132a480365dda058c57a216f5db1ee1a8bf6e9f65160d8b15e9102702a2","length":15501},
+			"pos3": {"throws":"Unexpected close tag\nLine: 5000\nColumn: 4\nChar: >"}
+		}
+	},
+	"unicode text": {
+		"input": {"length":25,"sha256":"7d171e85296641ec20b47b5800854701c6d5437ba50f011150bfd41c6708a464"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"héllo wörld 日本語 😀","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"héllo wörld 日本語 😀","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"héllo wörld 日本語 😀","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"héllo wörld 日本語 😀","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"héllo wörld 日本語 😀","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 25\nChar: >"}
+		}
+	},
+	"attribute spacing and quotes": {
+		"input": {"length":58,"sha256":"0ca5418257546d88906a72347eedc737439c71296cef9462b7754694ac3d3d87"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e","f":"g","h":"i"},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"j","nodeValue":null,"attributes":{"k":"x/>y","l":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"j"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e","f":"g","h":"i"},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"j","nodeValue":null,"attributes":{"k":"x/>y","l":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"j"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e","f":"g","h":"i"},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"j","nodeValue":null,"attributes":{"k":"x/>y","l":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"j"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e","f":"g","h":"i"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"j","nodeValue":null,"attributes":{"k":"x/>y","l":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[],"parentElement":[1]}],"prefix":null,"localName":"j","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e","f":"g","h":"i"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"j","nodeValue":null,"attributes":{"k":"x/>y","l":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[],"parentElement":[1]}],"prefix":null,"localName":"j","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b = \"c\"\n\td\t=\n'e' f=\"g\"h=\"i\" />","attributes":{},"childNodes":[]},{"nodeName":"j","nodeValue":null,"attributes":{"k":"x/>y","l":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"j"}],"attributes":{}}}
+		}
+	},
+	"double and single quoted values": {
+		"input": {"length":23,"sha256":"6bbb72af189046a558c703dc852ce58ce5d460aaad9355ae9945cda6be122908"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 23\nChar: >"}
+		}
+	},
+	"whitespace around equals": {
+		"input": {"length":21,"sha256":"87c24a950879408906a10c2ccf7a52eabbfceb9e71f2cdf3f352054662a16912"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b = \"c\"\n\td\t=\n\"e\"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"markup inside quoted values": {
+		"input": {"length":25,"sha256":"5b19cb03a1da71c9606ef892e979b112a1dd5d4ec3502437348f1417d33e762d"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x/>y","c":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x/>y","c":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x/>y","c":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x/>y","c":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x/>y","c":"p>q"},"childNodes":[{"nodeName":"#text","nodeValue":"t","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 25\nChar: >"}
+		}
+	},
+	"adjacent attributes without space": {
+		"input": {"length":15,"sha256":"52b4d1fdd2e5c94468029671526210e744ed83066361807fae6233ee09e579a3"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c","d":"e"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=\"c\"d=\"e\"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"duplicate attribute": {
+		"input": {"length":16,"sha256":"1a2ae9d0bac439ce205c8140a8998c3bbc1d2775496c8585cd943c4ad1aa5284"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"2"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"2"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"2"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"2"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"2"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=\"1\" b=\"2\"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"empty attribute value": {
+		"input": {"length":14,"sha256":"04c51e4bab4da9788d6d22302249b8f6814deb40f9ad152e7bd62bb80860c1fa"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"","c":""},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"","c":""},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"","c":""},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"","c":""},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"","c":""},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=\"\" c=''/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"mixed quotes in values": {
+		"input": {"length":20,"sha256":"58a5fa71e202b37969572e19d9ffe6fbe6e0660a5d62ab4dfe2d9daacdf0f687"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c\"d","e":"f'g"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c\"d","e":"f'g"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c\"d","e":"f'g"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c\"d","e":"f'g"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"c\"d","e":"f'g"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b='c\"d' e=\"f'g\"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"entity and slash in value": {
+		"input": {"length":22,"sha256":"5ab7e63f8b8683ba4965c9b12bf5b8776a1e6ed783fdd4440ce74eab6c3cdf11"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"&/"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"&/"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"&/"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"&/"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"&/"},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 22\nChar: >"}
+		}
+	},
+	"newline-separated attributes": {
+		"input": {"length":17,"sha256":"3e6119671d51fa300b1319231971427ef664387f69c77cc70b9a4c5b941c8a97"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1","c":"2"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1","c":"2"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1","c":"2"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1","c":"2"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1","c":"2"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=\"1\"\nc=\"2\"\n/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"digits and underscore attrs": {
+		"input": {"length":24,"sha256":"c3b144331d119dd9ec68c6fd749a2285bce6c3fb6aa1a01a3d2e8c3e6a31dce4"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x","c":"y","d":"z"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x","c":"y","d":"z"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x","c":"y","d":"z"},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x","c":"y","d":"z"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"x","c":"y","d":"z"},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"1b=\"x\" _c=\"y\" d=\"z\"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"tag name ends at equals": {
+		"input": {"length":5,"sha256":"19f4a549b7f8bca226f826047304f0b86113502a594f318b97ee6f9175cf48cf"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"all": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"non-letter attribute name then letter": {
+		"input": {"length":17,"sha256":"817425fec25a04e42ce1a3ffb66c32f8f3e21f5cdf801d45554a6e72eef53243"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"x\"\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: b"},
+			"keepWhitespace": {"throws":"Malformed attribute \"x\"\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: b"},
+			"keepComments": {"throws":"Malformed attribute \"x\"\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: b"},
+			"includeParentElement": {"throws":"Malformed attribute \"x\"\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: b"},
+			"all": {"throws":"Malformed attribute \"x\"\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: b"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"😀=\"x\" b=\"y\"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"valueless attribute": {
+		"input": {"length":5,"sha256":"e6eee9dad4600f6fdcc2ee08ded7395b6f56f24b51005f2b81205815c96ebc70"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"all": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"valueless in self-closing tag": {
+		"input": {"length":6,"sha256":"f5982c6c0790580b1a10b5e688d3c1e3f04c5f224205871fbce1cf1d15b2c6fb"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: /"},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: /"},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: /"},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: /"},
+			"all": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: /"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"valueless after quoted": {
+		"input": {"length":11,"sha256":"b6be357dd19791111f8f39d4b6afec22f9c4cb53bfcf727ced1b337f15c28e6f"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"d\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: >"},
+			"keepWhitespace": {"throws":"Malformed attribute \"d\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: >"},
+			"keepComments": {"throws":"Malformed attribute \"d\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: >"},
+			"includeParentElement": {"throws":"Malformed attribute \"d\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: >"},
+			"all": {"throws":"Malformed attribute \"d\": expected \"=\" after name\nLine: 0\nColumn: 11\nChar: >"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=\"c\" d>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"valueless in self-closing child": {
+		"input": {"length":19,"sha256":"7ef839bfa2ccae1602be4b9a127d617e7dd4c7491d6834f123922524b2979758"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"e\": expected \"=\" after name\nLine: 0\nColumn: 14\nChar: /"},
+			"keepWhitespace": {"throws":"Malformed attribute \"e\": expected \"=\" after name\nLine: 0\nColumn: 14\nChar: /"},
+			"keepComments": {"throws":"Malformed attribute \"e\": expected \"=\" after name\nLine: 0\nColumn: 14\nChar: /"},
+			"includeParentElement": {"throws":"Malformed attribute \"e\": expected \"=\" after name\nLine: 0\nColumn: 14\nChar: /"},
+			"all": {"throws":"Malformed attribute \"e\": expected \"=\" after name\nLine: 0\nColumn: 14\nChar: /"},
+			"pos3": {"throws":"Malformed attribute \"e\": expected \"=\" after name\nLine: 0\nColumn: 14\nChar: /"}
+		}
+	},
+	"valueless then markup": {
+		"input": {"length":19,"sha256":"169ea343d0459aa4e2c63de079662a4631b8a4e3f5d946316ee2baf0d7f93b8a"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"all": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 5\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 19\nChar: >"}
+		}
+	},
+	"unquoted value": {
+		"input": {"length":8,"sha256":"6b9971e4885c7d90b6da626e961efe22e722d7ac26bdf4c63c754de1422a6f59"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: c"},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: c"},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: c"},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: c"},
+			"all": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: c"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=c/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"quoted value without equals": {
+		"input": {"length":10,"sha256":"aaccbeff5392817d97cbaf18431b2ceadb36319d9180a09806dc0fe25eda7432"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 6\nChar: \""},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 6\nChar: \""},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 6\nChar: \""},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 6\nChar: \""},
+			"all": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 0\nColumn: 6\nChar: \""},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b \"c\"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"malformed attribute on line 1": {
+		"input": {"length":13,"sha256":"130f4c32cacd8386278328873489dd78361fa256dd1b38310f2851f709c3848d"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 1\nColumn: 6\nChar: >"},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 1\nColumn: 6\nChar: >"},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 1\nColumn: 6\nChar: >"},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 1\nColumn: 6\nChar: >"},
+			"all": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 1\nColumn: 6\nChar: >"},
+			"pos3": {"throws":"Malformed attribute \"b\": expected \"=\" after name\nLine: 1\nColumn: 6\nChar: >"}
+		}
+	},
+	"truncated attribute name": {
+		"input": {"length":45,"sha256":"d1baaa046e99212de3d146c61a680c63d4625fecd973f159d083d896426f6ebd"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"r\": expected \"=\" after name\nLine: 0\nColumn: 46\nChar: end of input"},
+			"keepWhitespace": {"throws":"Malformed attribute \"r\": expected \"=\" after name\nLine: 0\nColumn: 46\nChar: end of input"},
+			"keepComments": {"throws":"Malformed attribute \"r\": expected \"=\" after name\nLine: 0\nColumn: 46\nChar: end of input"},
+			"includeParentElement": {"throws":"Malformed attribute \"r\": expected \"=\" after name\nLine: 0\nColumn: 46\nChar: end of input"},
+			"all": {"throws":"Malformed attribute \"r\": expected \"=\" after name\nLine: 0\nColumn: 46\nChar: end of input"},
+			"pos3": {"throws":"Malformed attribute \"r\": expected \"=\" after name\nLine: 0\nColumn: 46\nChar: end of input"}
+		}
+	},
+	"truncated after equals": {
+		"input": {"length":5,"sha256":"c34227612acb2a0bac631c964e3edd9b77744e41d9b1b116727c1e80452f6b89"},
+		"results": {
+			"default": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: end of input"},
+			"keepWhitespace": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: end of input"},
+			"keepComments": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: end of input"},
+			"includeParentElement": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: end of input"},
+			"all": {"throws":"Malformed attribute \"b\": expected quoted value after \"=\"\nLine: 0\nColumn: 6\nChar: end of input"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"truncated in quoted value": {
+		"input": {"length":20,"sha256":"6abfdcf191b05735401205b57b70c1473a7eddfa7067e7de4feb8ceb54d44340"},
+		"results": {
+			"default": {"throws":"Missing closing quote"},
+			"keepWhitespace": {"throws":"Missing closing quote"},
+			"keepComments": {"throws":"Missing closing quote"},
+			"includeParentElement": {"throws":"Missing closing quote"},
+			"all": {"throws":"Missing closing quote"},
+			"pos3": {"throws":"Missing closing quote"}
+		}
+	},
+	"unterminated attribute value at end": {
+		"input": {"length":7,"sha256":"670698f0e49b91e1132534f4c2873af46d80bfb6c4cd23704c0bd22120b89212"},
+		"results": {
+			"default": {"throws":"Missing closing quote"},
+			"keepWhitespace": {"throws":"Missing closing quote"},
+			"keepComments": {"throws":"Missing closing quote"},
+			"includeParentElement": {"throws":"Missing closing quote"},
+			"all": {"throws":"Missing closing quote"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b=\"c","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"empty element": {
+		"input": {"length":16,"sha256":"8e06fbe2ad541e73173ce6b582b331b9cb04ffce0efe3782ed06e244b32c2777"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":null},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":null},{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: >"}
+		}
+	},
+	"slash space quirk": {
+		"input": {"length":10,"sha256":"f676726047c6e7eb26460f1a1dfaa801cd72fe26b787f248ed182a84939c36c2"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 10\nChar: >"}
+		}
+	},
+	"empty tag name": {
+		"input": {"length":6,"sha256":"7ef29e1c7c0eb37731e54c9884ca6cbf20567e47a343a1d9c255c2e28d7a9051"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 6\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 6\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 6\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 6\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 6\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 6\nChar: >"}
+		}
+	},
+	"hash named element": {
+		"input": {"length":13,"sha256":"7f9de59726282bcafe51ec49ce2448551bd6cd16636ea244fd4fd8b13382bffe"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"#a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"#a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"#a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":null}],"prefix":null,"localName":"#a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":null}],"prefix":null,"localName":"#a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 13\nChar: >"}
+		}
+	},
+	"namespaces": {
+		"input": {"length":72,"sha256":"bdd9fc3c0d9ed4d9cc555225a689d8c66dfa2aec56588879eb44cb8df27dcfd9"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"tt:root","nodeValue":null,"attributes":{"xmlns:tt":"urn:x"},"childNodes":[{"nodeName":"tt:a","nodeValue":null,"attributes":{"xml:lang":"en","tt:b":"1"},"childNodes":[],"prefix":"tt","localName":"a"},{"nodeName":"c:d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"c","localName":"d"}],"prefix":"tt","localName":"root"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"tt:root","nodeValue":null,"attributes":{"xmlns:tt":"urn:x"},"childNodes":[{"nodeName":"tt:a","nodeValue":null,"attributes":{"xml:lang":"en","tt:b":"1"},"childNodes":[],"prefix":"tt","localName":"a"},{"nodeName":"c:d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"c","localName":"d"}],"prefix":"tt","localName":"root"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"tt:root","nodeValue":null,"attributes":{"xmlns:tt":"urn:x"},"childNodes":[{"nodeName":"tt:a","nodeValue":null,"attributes":{"xml:lang":"en","tt:b":"1"},"childNodes":[],"prefix":"tt","localName":"a"},{"nodeName":"c:d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"c","localName":"d"}],"prefix":"tt","localName":"root"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"tt:root","nodeValue":null,"attributes":{"xmlns:tt":"urn:x"},"childNodes":[{"nodeName":"tt:a","nodeValue":null,"attributes":{"xml:lang":"en","tt:b":"1"},"childNodes":[],"prefix":"tt","localName":"a","parentElement":[0]},{"nodeName":"c:d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"c","localName":"d","parentElement":[0]}],"prefix":"tt","localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"tt:root","nodeValue":null,"attributes":{"xmlns:tt":"urn:x"},"childNodes":[{"nodeName":"tt:a","nodeValue":null,"attributes":{"xml:lang":"en","tt:b":"1"},"childNodes":[],"prefix":"tt","localName":"a","parentElement":[0]},{"nodeName":"c:d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"c","localName":"d","parentElement":[0]}],"prefix":"tt","localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 72\nChar: >"}
+		}
+	},
+	"leading colon": {
+		"input": {"length":5,"sha256":"494ee24331f47120f43a90e880e77937ba583067a8128ee7459bcf8336674b6b"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":":a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"","localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":":a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"","localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":":a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"","localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":":a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"","localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":":a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"","localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"trailing colon": {
+		"input": {"length":5,"sha256":"0f077d21e70d7edf85651fe8f2b69e4b4e63623608e6420ac923f712e768fdfa"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":""}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":""}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":""}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":"","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":"","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"multiple colons": {
+		"input": {"length":8,"sha256":"8ba3b928396dea3eecf5e71d5233db7c7850b8aeb61accee702088de85597a63"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:b:c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":"b:c"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:b:c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":"b:c"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:b:c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":"b:c"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:b:c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":"b:c","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a:b:c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":"a","localName":"b:c","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"b:c/>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"deep nesting 200": {
+		"input": {"length":1401,"sha256":"521579f4bccb5ea17a31f52f7a615783bb15dea159cd929d717b7fd9debe04e7"},
+		"results": {
+			"default": {"sha256":"b17c16ed1e5de25870e37c9429d1781d686ec2bae73cc41752e4256824cfc505","length":19141},
+			"keepWhitespace": {"sha256":"b17c16ed1e5de25870e37c9429d1781d686ec2bae73cc41752e4256824cfc505","length":19141},
+			"keepComments": {"sha256":"b17c16ed1e5de25870e37c9429d1781d686ec2bae73cc41752e4256824cfc505","length":19141},
+			"includeParentElement": {"sha256":"de113dcd853551caef84a336f6e474602abee92a2e4c4bd14b8d2c4adf82ef7e","length":62983},
+			"all": {"sha256":"de113dcd853551caef84a336f6e474602abee92a2e4c4bd14b8d2c4adf82ef7e","length":62983},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 1401\nChar: >"}
+		}
+	},
+	"parent element chain": {
+		"input": {"length":25,"sha256":"4118cc3a07d2ea959cfb792ff6851e0ff1fa1c3e21b998f7733249d4ecc72e33"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"d"}],"prefix":null,"localName":"c"}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"d"}],"prefix":null,"localName":"c"}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"d"}],"prefix":null,"localName":"c"}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"d","parentElement":[0,0,0]}],"prefix":null,"localName":"c","parentElement":[0,0]}],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"d","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"d","parentElement":[0,0,0]}],"prefix":null,"localName":"c","parentElement":[0,0]}],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 25\nChar: >"}
+		}
+	},
+	"parent of text": {
+		"input": {"length":25,"sha256":"9ca10e212ea19e89373116b28f9f5d00a7713046ae5425e98e7df550dde05378"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text content","attributes":{},"childNodes":[]}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text content","attributes":{},"childNodes":[]}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text content","attributes":{},"childNodes":[]}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text content","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text content","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 25\nChar: >"}
+		}
+	},
+	"parent of cdata": {
+		"input": {"length":34,"sha256":"c6330518b6ecc9707b6fae202c9a28d19d38411df32c742415dc33220204fe79"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"some data","attributes":{},"childNodes":[]}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"some data","attributes":{},"childNodes":[]}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"some data","attributes":{},"childNodes":[]}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"some data","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"some data","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 34\nChar: >"}
+		}
+	},
+	"parent of comment": {
+		"input": {"length":29,"sha256":"883c622c9b5c1efaa75b44658b80ee59e24deb9f986908b577e4c15937faf83e"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- comment -->","attributes":{},"childNodes":[]}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- comment -->","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 29\nChar: >"}
+		}
+	},
+	"parent of nested elements": {
+		"input": {"length":41,"sha256":"b2d273aa771faa5e0c18971d353cd9b9a0053f34f0d16aeb33954296cd9f3cc2"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"child","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"grandchild","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"grandchild"}],"prefix":null,"localName":"child"}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"child","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"grandchild","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"grandchild"}],"prefix":null,"localName":"child"}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"child","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"grandchild","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"grandchild"}],"prefix":null,"localName":"child"}],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"child","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"grandchild","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"grandchild","parentElement":[0,0]}],"prefix":null,"localName":"child","parentElement":[0]}],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"child","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"grandchild","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"grandchild","parentElement":[0,0]}],"prefix":null,"localName":"child","parentElement":[0]}],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 41\nChar: >"}
+		}
+	},
+	"close tag name differs": {
+		"input": {"length":11,"sha256":"5e9a85be52414824e14a42c1ed5e1f8bd6f0af85adb8641d185304663319e0b1"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: >"}
+		}
+	},
+	"close tag extends open tag name": {
+		"input": {"length":14,"sha256":"27ea9f99062f522a3506f634e39802e0a9026266b765fccebf3ceb754a9f9512"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 14\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 14\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 14\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 14\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 14\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 14\nChar: >"}
+		}
+	},
+	"longer close tag": {
+		"input": {"length":12,"sha256":"05a6ba582caf6a752f84cd2f9c40656bc5ede3429854081f78c945ed97334174"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"}
+		}
+	},
+	"mismatched close tag": {
+		"input": {"length":14,"sha256":"41b344cd6a428f2ef876b1e4fa497dcf8595ed359ad2137ba6fad8e02444020a"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 10\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 10\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 10\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 10\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 10\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 10\nChar: >"}
+		}
+	},
+	"close tag with no open element": {
+		"input": {"length":8,"sha256":"f3ed978fcb6c772fd9fb16ee65fd1b86e6abe4a9df7e3e394542ce738e010528"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"}
+		}
+	},
+	"empty close tag with no open element": {
+		"input": {"length":7,"sha256":"8737e9286106945d06d908adcdf1da310c4468f9de8337fa4087a8d2c1c44fed"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: >"}
+		}
+	},
+	"empty close tag with space": {
+		"input": {"length":12,"sha256":"a0d05465fa420e682d200472cc1ff67b6c25c049496a76df1090595aee063215"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"}
+		}
+	},
+	"close tag at document level after text": {
+		"input": {"length":5,"sha256":"87f2e5352a5d155447fafef3926ad8380dc29f19df5990016be33c6704ce9b2d"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 5\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 5\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 5\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 5\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 5\nChar: >"},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"a>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"close tag prefix quirk": {
+		"input": {"length":12,"sha256":"09daaea6590f7f313873809540353dd20387a1253cf755d83da6077e6da708bb"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"}
+		}
+	},
+	"top-level close tag quirk": {
+		"input": {"length":12,"sha256":"37b62d44a1e8993aa859fbf901dbcb126250821ffa57e957b05e97a7da6e3ee5"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: >"}
+		}
+	},
+	"close tag with space before bracket": {
+		"input": {"length":12,"sha256":"a02c6de93d6f13545ff78ea99928e611c310dc43c92a276e3423fdb41cf7c6c1"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 12\nChar: >"}
+		}
+	},
+	"close tag with tabs and line breaks": {
+		"input": {"length":14,"sha256":"d47449ec0eaa313fe9ac39a68ef0c76a62112c2621fb05558b13daac5e623ad3"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 1\nColumn: 1\nChar: >"}
+		}
+	},
+	"nested elements sharing a prefix": {
+		"input": {"length":20,"sha256":"48a2ff059dd52c3cc39df75ac09568b2b9eedcdc839a6ce54b3cf0a688d406d4"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"ab","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"ab"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"ab","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"ab"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"ab","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"ab"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"ab","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0,0]}],"prefix":null,"localName":"ab","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"ab","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0,0]}],"prefix":null,"localName":"ab","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 20\nChar: >"}
+		}
+	},
+	"comments": {
+		"input": {"length":57,"sha256":"15d64a754744d402c62c8ca7cdd563cc936af24bb79bf189bbc38b5a528bfa0b"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- c1 -->","attributes":{},"childNodes":[]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"},{"nodeName":"#comment","nodeValue":"<!-- c2 -- still -->","attributes":{},"childNodes":[]},{"nodeName":"#comment","nodeValue":"<!---->","attributes":{},"childNodes":[]},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"#comment","nodeValue":"<!--->","attributes":{},"childNodes":[]},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":[0]},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- c1 -->","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":[0]},{"nodeName":"#comment","nodeValue":"<!-- c2 -- still -->","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"#comment","nodeValue":"<!---->","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"#comment","nodeValue":"<!--->","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"#text","nodeValue":"y","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 57\nChar: >"}
+		}
+	},
+	"comment at document level": {
+		"input": {"length":24,"sha256":"ed92c00807b847c7d574984eb074d9bd0b0fe5e081230f432d363d3c0488db50"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- c -->","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"},{"nodeName":"#comment","nodeValue":"<!-- d -->","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- c -->","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null},{"nodeName":"#comment","nodeValue":"<!-- d -->","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"- c -->","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}}
+		}
+	},
+	"cdata": {
+		"input": {"length":39,"sha256":"6d801ccd0d277cc42300113e0544a159219dc35e382657b77c00374d89ae2632"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"<x>&amp;","attributes":{},"childNodes":[]},{"nodeName":"#cdata","nodeValue":"","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"<x>&amp;","attributes":{},"childNodes":[]},{"nodeName":"#cdata","nodeValue":"","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"<x>&amp;","attributes":{},"childNodes":[]},{"nodeName":"#cdata","nodeValue":"","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"<x>&amp;","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"#cdata","nodeValue":"","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"<x>&amp;","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"#cdata","nodeValue":"","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 39\nChar: >"}
+		}
+	},
+	"cdata at document level": {
+		"input": {"length":17,"sha256":"8b83476e135dee1efb4abfd1ac953cd421a66ff0244b373046af67f59c302b47"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"CDATA[x]]>","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}}
+		}
+	},
+	"doctype with subset": {
+		"input": {"length":81,"sha256":"8b083b6ea5c5320b6fc09b5f88f627f3860841d9aa2f54f7d61dada2b3245112"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE note [<!ELEMENT note (to,from)><!ENTITY x \"y\">]","attributes":{},"childNodes":[]},{"nodeName":"note","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"to","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a","attributes":{},"childNodes":[]}],"prefix":null,"localName":"to"}],"prefix":null,"localName":"note"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE note [<!ELEMENT note (to,from)><!ENTITY x \"y\">]","attributes":{},"childNodes":[]},{"nodeName":"note","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"to","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a","attributes":{},"childNodes":[]}],"prefix":null,"localName":"to"}],"prefix":null,"localName":"note"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE note [<!ELEMENT note (to,from)><!ENTITY x \"y\">]","attributes":{},"childNodes":[]},{"nodeName":"note","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"to","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a","attributes":{},"childNodes":[]}],"prefix":null,"localName":"to"}],"prefix":null,"localName":"note"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE note [<!ELEMENT note (to,from)><!ENTITY x \"y\">]","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"note","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"to","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a","attributes":{},"childNodes":[],"parentElement":[1,0]}],"prefix":null,"localName":"to","parentElement":[1]}],"prefix":null,"localName":"note","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE note [<!ELEMENT note (to,from)><!ENTITY x \"y\">]","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"note","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"to","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a","attributes":{},"childNodes":[],"parentElement":[1,0]}],"prefix":null,"localName":"to","parentElement":[1]}],"prefix":null,"localName":"note","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"OCTYPE note [","attributes":{},"childNodes":[]},{"nodeName":"#doctype","nodeValue":"!ELEMENT note (to,from)","attributes":{},"childNodes":[]},{"nodeName":"#doctype","nodeValue":"!ENTITY x \"y\"","attributes":{},"childNodes":[]},{"nodeName":"#text","nodeValue":"]>","attributes":{},"childNodes":[]},{"nodeName":"note","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"to","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"a","attributes":{},"childNodes":[]}],"prefix":null,"localName":"to"}],"prefix":null,"localName":"note"}],"attributes":{}}}
+		}
+	},
+	"doctype simple": {
+		"input": {"length":22,"sha256":"567df346fda149f84308cdfe3752be02a07f036510d5a4bb326869490b365bb3"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[]},{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[]},{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[]},{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[],"parentElement":null},{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"OCTYPE html>","attributes":{},"childNodes":[]},{"nodeName":"root","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"root"}],"attributes":{}}}
+		}
+	},
+	"declaration": {
+		"input": {"length":42,"sha256":"5e461d6f822a5a30d9eceec1516612d00f275195b628fcf47361e365d35d9de6"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"ml version=\"1.0\" encoding=\"UTF-8\"?>","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}}
+		}
+	},
+	"declaration only": {
+		"input": {"length":21,"sha256":"6e4d52d03353c231eb0f8506b412a9bce6d3f991fd26b132425e92ebe4221d31"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"ml version=\"1.0\"?>","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"declaration then markup": {
+		"input": {"length":59,"sha256":"dbd8ed56cf00fd0e5160523d2a5ae85ec873b28748dc4bca92a301a852e8937a"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1"},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"},{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1"},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"},{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1"},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"},{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1"},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c","parentElement":[0]},{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{"b":"1"},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c","parentElement":[0]},{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"ml version=\"1.0\" encoding=\"UTF-8\"?>","attributes":{},"childNodes":[]},{"nodeName":"a","nodeValue":null,"attributes":{"b":"1"},"childNodes":[{"nodeName":"c","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"c"},{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}}
+		}
+	},
+	"processing instruction inside": {
+		"input": {"length":19,"sha256":"36b286313f6d01f403cd5f562f7961887802cadebb985c778afb24bc21085f75"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 19\nChar: >"}
+		}
+	},
+	"pi with gt in value": {
+		"input": {"length":17,"sha256":"187498cecae3c2463be0d0064e548b2c4d6dce91a1d314488904ce738ef3e9b8"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"y?>","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"y?>","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"y?>","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"y?>","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"y?>","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 17\nChar: >"}
+		}
+	},
+	"unclosed element": {
+		"input": {"length":6,"sha256":"f1650f61ee5f325adc31702414201140db3526b95106c289307ef32234cedcbb"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"b"}],"attributes":{}}}
+		}
+	},
+	"unclosed element with text": {
+		"input": {"length":10,"sha256":"591158fb7ae9298e3842a7d107a6187350fc6f017295e72c693761eca3163554"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0,0]}],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[],"parentElement":[0,0]}],"prefix":null,"localName":"b","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"b","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"text","attributes":{},"childNodes":[]}],"prefix":null,"localName":"b"}],"attributes":{}}}
+		}
+	},
+	"unterminated close tag": {
+		"input": {"length":6,"sha256":"3ce260db8c3a19f6e3cce83731bc23b50f82f5dccb77452026f5da161d015608"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 7\nChar: end of input"}
+		}
+	},
+	"unterminated close tag with text": {
+		"input": {"length":7,"sha256":"57bc3e298b4b06c1511157b0dc24433755bf7cd18e17ac8d7317e5b23ce01e07"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 8\nChar: end of input"}
+		}
+	},
+	"unterminated close tag nested": {
+		"input": {"length":21,"sha256":"da86b4c42596e13ac7e7a43e9a351370a8242c49e23f1cf8e47429cc6f9f9c35"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"Period"}],"prefix":null,"localName":"MPD"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"Period"}],"prefix":null,"localName":"MPD"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"Period"}],"prefix":null,"localName":"MPD"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"Period","parentElement":[0]}],"prefix":null,"localName":"MPD","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"Period","parentElement":[0]}],"prefix":null,"localName":"MPD","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"D>","attributes":{},"childNodes":[]},{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"Period"}],"attributes":{}}}
+		}
+	},
+	"truncated nested close tag with child": {
+		"input": {"length":31,"sha256":"dde693da603583c6e8daf5705fc7660ab8bcd82774278db17ddcda198087f94c"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"S","nodeValue":null,"attributes":{"d":"1"},"childNodes":[],"prefix":null,"localName":"S"}],"prefix":null,"localName":"Period"}],"prefix":null,"localName":"MPD"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"S","nodeValue":null,"attributes":{"d":"1"},"childNodes":[],"prefix":null,"localName":"S"}],"prefix":null,"localName":"Period"}],"prefix":null,"localName":"MPD"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"S","nodeValue":null,"attributes":{"d":"1"},"childNodes":[],"prefix":null,"localName":"S"}],"prefix":null,"localName":"Period"}],"prefix":null,"localName":"MPD"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"S","nodeValue":null,"attributes":{"d":"1"},"childNodes":[],"prefix":null,"localName":"S","parentElement":[0,0]}],"prefix":null,"localName":"Period","parentElement":[0]}],"prefix":null,"localName":"MPD","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"MPD","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"S","nodeValue":null,"attributes":{"d":"1"},"childNodes":[],"prefix":null,"localName":"S","parentElement":[0,0]}],"prefix":null,"localName":"Period","parentElement":[0]}],"prefix":null,"localName":"MPD","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"D>","attributes":{},"childNodes":[]},{"nodeName":"Period","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"S","nodeValue":null,"attributes":{"d":"1"},"childNodes":[],"prefix":null,"localName":"S"}],"prefix":null,"localName":"Period"}],"attributes":{}}}
+		}
+	},
+	"truncated close slash after element": {
+		"input": {"length":6,"sha256":"5000d78424a8a6e730ef2ce1c7fbe061b7d093e695130778c6cec408e4123793"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":">","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"truncated mismatched close tag": {
+		"input": {"length":10,"sha256":"4de32a2c02b292ad0b0fd6a8e36fa81ddc67294fbe5579ef81c94f6ba374258d"},
+		"results": {
+			"default": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input"},
+			"keepWhitespace": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input"},
+			"keepComments": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input"},
+			"includeParentElement": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input"},
+			"all": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input"},
+			"pos3": {"throws":"Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input"}
+		}
+	},
+	"bare close slash": {
+		"input": {"length":2,"sha256":"2a535776a2230681d52b3b7c573bffef3948cb5dddba2b1fb37749ad3d86356c"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}}
+		}
+	},
+	"unterminated declaration": {
+		"input": {"length":36,"sha256":"7ef107a5f866496476213edf876a1d1b4cde11d6275fdfcdc4340f8f7c049b7c"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"ml version=\"1.0\" encoding=\"UTF-8\"","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"unterminated pi inside": {
+		"input": {"length":7,"sha256":"3b9312132a919e590dcf7eb53b04076eefedaa6151f127b0a2e4b479e3ca939e"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}}
+		}
+	},
+	"lone lt at end": {
+		"input": {"length":5,"sha256":"7d40d34ab19cf2f2efc8a8bede16839fe11c9412a2a894b4541ce15508eaf68a"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":""}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":""}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":""}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]},{"nodeName":"","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"x","attributes":{},"childNodes":[]},{"nodeName":"","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":""}],"attributes":{}}}
+		}
+	},
+	"truncated tag name": {
+		"input": {"length":6,"sha256":"1cf22574e6c67b9cc604d22f64154e74d9f55048b614fe58a701b07dbdfd2aaf"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"bc","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"bc"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"bc","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"bc"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"bc","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"bc"}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"bc","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"bc","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"bc","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"bc","parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"bc","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"bc"}],"attributes":{}}}
+		}
+	},
+	"truncated exclamation": {
+		"input": {"length":5,"sha256":"ee6c8fa3770295471e4726d14f9df0ad5ccb601fc8d8128dda8cbe0e4afacde6"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"!","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"!","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"!","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"!","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"!","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"truncated cdata prefix": {
+		"input": {"length":9,"sha256":"fd99f322bc66c946a969e798b5b35c972ec7db6df35d0aabb4647037360adbbf"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"![CDA","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"![CDA","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"![CDA","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"![CDA","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#doctype","nodeValue":"![CDA","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"![CDA","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"truncated comment": {
+		"input": {"length":9,"sha256":"e602cbdcf7e14d18fb31d4c8fd8a1ff6d2986afc0787c81c01f1e628e22a9d25"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#comment","nodeValue":"<!-- x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[],"attributes":{}}}
+		}
+	},
+	"truncated cdata": {
+		"input": {"length":13,"sha256":"62673e5e4c2056efb70b015a4b9b0799a9ddbeb91596c9ed58f714e0b43798ed"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[]}],"prefix":null,"localName":"a"}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"a","nodeValue":null,"attributes":{},"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[],"parentElement":[0]}],"prefix":null,"localName":"a","parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#cdata","nodeValue":"x","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	},
+	"truncated doctype": {
+		"input": {"length":14,"sha256":"3b9e077f7233df211b96f514f8453f1fe677dce062655d78ad2099503989bb73"},
+		"results": {
+			"default": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepWhitespace": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"keepComments": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[]}],"attributes":{}}},
+			"includeParentElement": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"all": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#doctype","nodeValue":"!DOCTYPE html","attributes":{},"childNodes":[],"parentElement":null}],"attributes":{},"parentElement":null}},
+			"pos3": {"tree":{"nodeName":"#document","nodeValue":null,"childNodes":[{"nodeName":"#text","nodeValue":"OCTYPE html","attributes":{},"childNodes":[]}],"attributes":{}}}
+		}
+	}
+}

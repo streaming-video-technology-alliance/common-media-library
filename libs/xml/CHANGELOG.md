@@ -19,6 +19,7 @@ and this project adheres to
 ### Changed
 
 - `parseXml` throws on a quoted attribute value with no `=` (`<a b "c"/>`), which previously parsed leniently as `b="c"`.
+- `parseXml` is rewritten as a flat, non-recursive scanner. Output is identical, parsing is 20 to 40 percent faster on dense `SegmentTimeline` manifests (#424), and nesting depth is no longer limited by the call stack.
 
 ## [1.1.6] - 2026-07-28
 
