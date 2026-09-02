@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Fixed
 
-- `parseXml` no longer loops forever on an attribute with no quoted value, such as `<a b>`, `<a b=c/>`, or a document truncated inside an attribute name or after `=`. The attribute now yields an empty string, and the attribute scan stops at `>` so following markup is no longer swallowed into the value.
+- `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>` or input truncated mid-attribute. The attribute yields an empty string and parsing resumes at the closing `>`.
 
 ## [1.1.6] - 2026-07-28
 
