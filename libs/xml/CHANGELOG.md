@@ -11,6 +11,7 @@ and this project adheres to
 ### Fixed
 
 - `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>` or input truncated mid-attribute. The attribute yields an empty string and parsing resumes at the closing `>`.
+- Corrected the README usage example, which imported and called `decodeXml`, a function this package does not export. The example now imports and calls `parseXml`, the public parsing function. Documentation-only change; runtime behavior is unchanged.
 
 ## [1.1.6] - 2026-07-28
 

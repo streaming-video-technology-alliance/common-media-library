@@ -11,9 +11,9 @@ npm i @svta/cml-xml
 ## Usage
 
 ```typescript
-import { decodeXml } from "@svta/cml-xml";
+import { parseXml } from "@svta/cml-xml";
 
-const obj = decodeXml(
+const obj = parseXml(
 	`<root>
 		<child>text</child>
 		<ns:tag>content</ns:tag>
