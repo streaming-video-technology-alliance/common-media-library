@@ -161,6 +161,11 @@ describe('parseXml', () => {
 			throws(() => parseXml('<a/></b>'), /Unexpected close tag/)
 		})
 
+		it('throws on an empty close tag with no open element', () => {
+			throws(() => parseXml('<a/></>'), /Unexpected close tag/)
+			throws(() => parseXml('<a/></ ><b/>'), /Unexpected close tag/)
+		})
+
 		it('closes an element when a space precedes the closing bracket', () => {
 			const doc = parseXml('<a>text</a >')
 			const a = doc.childNodes[0]
@@ -383,6 +388,11 @@ describe('parseXml', () => {
 				prefix: null,
 				localName: 'MPD',
 			}])
+		})
+
+		it('keeps the parsed children when the input ends right after `</` at the document level', async () => {
+			const doc = await parseXmlGuarded('<a/></')
+			deepStrictEqual(doc.childNodes, [{ nodeName: 'a', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'a' }])
 		})
 
 		it('reports end of input when a mismatched close tag is cut off', async () => {

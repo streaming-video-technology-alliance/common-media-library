@@ -80,9 +80,11 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 					const closeStart = pos + 2
 					const nameEnd = closeStart + tagName.length
 					const afterName = input.charCodeAt(nameEnd)
-					// ETag ::= '</' Name S? '>' (XML 1.0 §3.1)
-					const closesTag = input.startsWith(tagName, closeStart) &&
-						(nameEnd >= length || afterName === CLOSE_BRACKET_CC || afterName === SPACE_CC || afterName === TAB_CC || afterName === CR_CC || afterName === LF_CC)
+					// ETag ::= '</' Name S? '>' (XML 1.0 §3.1); nothing is open at the document level
+					const closesTag = input.startsWith(tagName, closeStart) && (
+						nameEnd >= length ||
+						(tagName !== '' && (afterName === CLOSE_BRACKET_CC || afterName === SPACE_CC || afterName === TAB_CC || afterName === CR_CC || afterName === LF_CC))
+					)
 					pos = input.indexOf('>', pos)
 					if (pos === -1) {
 						pos = length
