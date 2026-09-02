@@ -70,8 +70,11 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 						)
 					}
 
-					if (pos + 1) {
-						pos += 1
+					if (pos === -1) {
+						pos = length
+					}
+					else {
+						pos++
 					}
 
 					return children
