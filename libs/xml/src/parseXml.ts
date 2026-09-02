@@ -23,12 +23,16 @@ const LF_CC = 10                      // '\n'
 const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
 
 /**
- * Parse XML into a JS object with no validation and some failure tolerance
+ * Parse XML into a JS object
+ *
+ * The parser does not validate against a DTD or schema, and it does not check every
+ * well-formedness constraint; the errors it does report are listed below under Throws.
+ * Input cut off between tags yields the nodes parsed so far.
  *
  * @param input - The input XML string
  * @param options - Optional parsing options
  * @returns The parsed XML
- * @throws If an attribute is not `name="value"` or `name='value'`, if a quoted value is not closed, or if a close tag does not match its open tag
+ * @throws If an attribute is not `name="value"` or `name='value'`, if a quoted value is not closed, if a close tag does not match its open tag, or if a close tag appears with no element open
  *
  * @public
  *
