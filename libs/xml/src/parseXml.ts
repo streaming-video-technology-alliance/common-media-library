@@ -214,17 +214,6 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
-	 * Advances past XML whitespace: space, tab, CR, LF
-	 */
-	function skipWhitespace(): void {
-		let c = input.charCodeAt(pos)
-		while (c === SPACE_CC || c === TAB_CC || c === CR_CC || c === LF_CC) {
-			pos++
-			c = input.charCodeAt(pos)
-		}
-	}
-
-	/**
 	 * Parses the attributes of a node
 	 */
 	function parseAttributes(): Record<string, string> {
@@ -235,15 +224,26 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 			const c = input.charCodeAt(pos)
 			if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
 				const name = parseName()
-				skipWhitespace()
-				if (input.charCodeAt(pos) !== EQUALS_CC) {
-					throw syntaxError('Malformed attribute "' + name + '": expected "=" after name')
+				let code = input.charCodeAt(pos)
+				if (code !== EQUALS_CC) {
+					while (code === SPACE_CC || code === TAB_CC || code === CR_CC || code === LF_CC) {
+						pos++
+						code = input.charCodeAt(pos)
+					}
+					if (code !== EQUALS_CC) {
+						throw syntaxError('Malformed attribute "' + name + '": expected "=" after name')
+					}
 				}
 				pos++
-				skipWhitespace()
-				const code = input.charCodeAt(pos)
+				code = input.charCodeAt(pos)
 				if (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
-					throw syntaxError('Malformed attribute "' + name + '": expected quoted value after "="')
+					while (code === SPACE_CC || code === TAB_CC || code === CR_CC || code === LF_CC) {
+						pos++
+						code = input.charCodeAt(pos)
+					}
+					if (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
+						throw syntaxError('Malformed attribute "' + name + '": expected quoted value after "="')
+					}
 				}
 				const value = parseString()
 				if (pos === -1) {
