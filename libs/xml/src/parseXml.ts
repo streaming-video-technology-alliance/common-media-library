@@ -13,6 +13,11 @@ const SINGLE_QUOTE_CC = 39            // "'"
 const DOUBLE_QUOTE_CC = 34            // '"'
 const OPEN_CORNER_BRACKET_CC = 91     // '['
 const CLOSE_CORNER_BRACKET_CC = 93    // ']'
+const EQUALS_CC = 61                  // '='
+const SPACE_CC = 32                   // ' '
+const TAB_CC = 9                      // '\t'
+const CR_CC = 13                      // '\r'
+const LF_CC = 10                      // '\n'
 
 // Set for fast name delimiter lookup: \r \n \t > / = space
 const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
@@ -23,6 +28,7 @@ const NAME_SPACER_SET = new Set([13, 10, 9, 62, 47, 61, 32])
  * @param input - The input XML string
  * @param options - Optional parsing options
  * @returns The parsed XML
+ * @throws If an attribute is not `name="value"` or `name='value'`, if a quoted value is not closed, or if a close tag does not match its open tag
  *
  * @public
  *
@@ -50,6 +56,18 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
+	 * Creates an error that reports the line and column of the current position
+	 */
+	function syntaxError(message: string): Error {
+		const parsedText = input.substring(0, pos).split('\n')
+		return new Error(
+			message + '\nLine: ' + (parsedText.length - 1) +
+			'\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
+			'\nChar: ' + (pos < length ? input[pos] : 'end of input'),
+		)
+	}
+
+	/**
 	 * Parses a list of entries
 	 */
 	function parseChildren(tagName: string = ''): XmlNode[] {
@@ -62,12 +80,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 					const closeStart = pos + 2
 					pos = input.indexOf('>', pos)
 					if (!input.startsWith(tagName, closeStart)) {
-						const parsedText = input.substring(0, pos).split('\n')
-						throw new Error(
-							'Unexpected close tag\nLine: ' + (parsedText.length - 1) +
-							'\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
-							'\nChar: ' + input[pos],
-						)
+						throw syntaxError('Unexpected close tag')
 					}
 
 					if (pos + 1) {
@@ -183,34 +196,41 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 	}
 
 	/**
+	 * Advances past XML whitespace: space, tab, CR, LF
+	 */
+	function skipWhitespace(): void {
+		let c = input.charCodeAt(pos)
+		while (c === SPACE_CC || c === TAB_CC || c === CR_CC || c === LF_CC) {
+			pos++
+			c = input.charCodeAt(pos)
+		}
+	}
+
+	/**
 	 * Parses the attributes of a node
 	 */
 	function parseAttributes(): Record<string, string> {
 		const attributes: Record<string, string> = {}
 
-		// parsing attributes
+		// Attribute ::= Name Eq AttValue, Eq ::= S? '=' S? (XML 1.0 §3.1, §2.3)
 		while (pos < length && input.charCodeAt(pos) !== CLOSE_BRACKET_CC) {
 			const c = input.charCodeAt(pos)
 			if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
 				const name = parseName()
-				let value: string = ''
-				// search beginning of the string
-				let code = input.charCodeAt(pos)
-				while (pos < length && code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC && code !== CLOSE_BRACKET_CC) {
-					pos++
-					code = input.charCodeAt(pos)
+				skipWhitespace()
+				if (input.charCodeAt(pos) !== EQUALS_CC) {
+					throw syntaxError('Malformed attribute "' + name + '": expected "=" after name')
 				}
-
-				if (code === SINGLE_QUOTE_CC || code === DOUBLE_QUOTE_CC) {
-					value = parseString()
-					if (pos === -1) {
-						throw new Error('Missing closing quote')
-					}
+				pos++
+				skipWhitespace()
+				const code = input.charCodeAt(pos)
+				if (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
+					throw syntaxError('Malformed attribute "' + name + '": expected quoted value after "="')
 				}
-				else {
-					pos--
+				const value = parseString()
+				if (pos === -1) {
+					throw new Error('Missing closing quote')
 				}
-
 				attributes[name] = unescapeHtml(value)
 			}
 			pos++

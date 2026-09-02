@@ -139,60 +139,46 @@ describe('parseXml', () => {
 	})
 
 	describe('malformed attributes', () => {
-		it('parses a valueless attribute as an empty string', () => {
-			const doc = parseXml('<a b>')
-			const a = doc.childNodes[0]
-
-			equal(a.nodeName, 'a')
-			deepStrictEqual(a.attributes, { b: '' })
-			equal(a.childNodes.length, 0)
+		it('throws on a valueless attribute', () => {
+			throws(() => parseXml('<a b>'), { message: /^Malformed attribute "b": expected "=" after name/ })
 		})
 
-		it('parses a valueless attribute after a quoted attribute', () => {
-			const doc = parseXml('<a b="c" d>')
-			deepStrictEqual(doc.childNodes[0].attributes, { b: 'c', d: '' })
+		it('throws on a valueless attribute in a self-closing tag', () => {
+			throws(() => parseXml('<a b/>'), { message: /^Malformed attribute "b": expected "=" after name/ })
 		})
 
-		it('parses a valueless attribute in a self-closing child', () => {
-			const doc = parseXml('<a b="c"><d e/></a>')
-			const a = doc.childNodes[0]
-
-			equal(a.childNodes.length, 1)
-			equal(a.childNodes[0].nodeName, 'd')
-			deepStrictEqual(a.childNodes[0].attributes, { e: '' })
-			equal(a.childNodes[0].childNodes.length, 0)
+		it('throws on a valueless attribute after a quoted attribute', () => {
+			throws(() => parseXml('<a b="c" d>'), { message: /^Malformed attribute "d": expected "=" after name/ })
 		})
 
-		it('does not swallow markup following a valueless attribute', () => {
-			const doc = parseXml('<a b><c d="1"/></a>')
-			const a = doc.childNodes[0]
-
-			deepStrictEqual(a.attributes, { b: '' })
-			equal(a.childNodes.length, 1)
-			equal(a.childNodes[0].nodeName, 'c')
-			deepStrictEqual(a.childNodes[0].attributes, { d: '1' })
+		it('throws on an unquoted attribute value', () => {
+			throws(() => parseXml('<a b=c/>'), { message: /^Malformed attribute "b": expected quoted value after "="/ })
 		})
 
-		it('parses an unquoted attribute value as an empty string', () => {
-			const doc = parseXml('<a b=c/>')
-			const a = doc.childNodes[0]
-
-			equal(a.nodeName, 'a')
-			deepStrictEqual(a.attributes, { b: '' })
-			equal(a.childNodes.length, 0)
+		it('throws on a quoted value with no equals sign', () => {
+			throws(() => parseXml('<a b "c"/>'), { message: /^Malformed attribute "b": expected "=" after name/ })
 		})
 
-		it('terminates when the input ends inside an attribute name', () => {
-			const doc = parseXml('<MPD><Period><SegmentTimeline><S d="180000" r')
-			const s = doc.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-
-			equal(s.nodeName, 'S')
-			deepStrictEqual(s.attributes, { d: '180000', r: '' })
+		it('reports the valueless attribute, not the element that follows it', () => {
+			throws(() => parseXml('<a b><c d="1"/></a>'), { message: /^Malformed attribute "b"/ })
 		})
 
-		it('terminates when the input ends after an attribute equals sign', () => {
-			const doc = parseXml('<a b=')
-			deepStrictEqual(doc.childNodes[0].attributes, { b: '' })
+		it('throws when the input ends inside an attribute name', () => {
+			throws(
+				() => parseXml('<MPD><Period><SegmentTimeline><S d="180000" r'),
+				{ message: /^Malformed attribute "r": expected "=" after name\n.*\n.*\nChar: end of input$/ },
+			)
+		})
+
+		it('throws when the input ends after the equals sign', () => {
+			throws(
+				() => parseXml('<a b='),
+				{ message: /^Malformed attribute "b": expected quoted value after "="\nLine: 0\nColumn: 6\nChar: end of input$/ },
+			)
+		})
+
+		it('reports the line and column of the malformed attribute', () => {
+			throws(() => parseXml('<root>\n\t<a b>'), { message: /\nLine: 1\nColumn: 6\nChar: >$/ })
 		})
 
 		it('throws when the input ends inside a quoted attribute value', () => {

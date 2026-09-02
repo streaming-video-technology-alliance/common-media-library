@@ -10,7 +10,11 @@ and this project adheres to
 
 ### Fixed
 
-- `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>` or input truncated mid-attribute. The attribute yields an empty string and parsing resumes at the closing `>`.
+- `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>`, `<a b=c/>`, or input truncated mid-attribute. It now throws an error that names the attribute and reports the line and column, matching the XML 1.0 `Attribute ::= Name Eq AttValue` production.
+
+### Changed
+
+- `parseXml` throws on a quoted attribute value with no `=` (`<a b "c"/>`), which previously parsed leniently as `b="c"`.
 
 ## [1.1.6] - 2026-07-28
 
