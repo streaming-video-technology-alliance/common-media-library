@@ -6,7 +6,9 @@ Upstream: https://github.com/Dash-Industry-Forum/dash.js/issues/4984
 Environment: Apple M1 Pro, macOS 26.6.2, Node v24.16.0, `@svta/cml-xml` 1.1.6 built from this worktree.
 Methodology: synthetic MPD with 50 Periods x 4 AdaptationSets x 500 `<S>` (100,000 `<S>`), 4 warm-up
 iterations, 20 measured iterations interleaved across variants, `gc()` forced before each iteration unless
-marked "natural GC". See `benchmark.md` for the generator and harness.
+marked "natural GC". (Interleaving variants in one process was later found to contaminate V8 type
+feedback across them; the deltas below are indicative and were re-measured one variant per process for
+the aligned scanner, see "Superseded and corrected findings".) See `benchmark.md` for the generator and harness.
 
 ## Baseline reproduction
 
@@ -89,11 +91,11 @@ equivalence checks. Source is 5.6 KB vs 6.1 KB for the current parseXml region o
 | livesim2-scale 148 KB | 1.17 ms | 1.03 (-12.5%) | 0.80 (-32.0%) | natural GC, 300 iter |
 | bbb_30fps.mpd 3 KB | 0.02 ms | 0.02 (-18.7%) | 0.01 (-34.4%) | natural GC, 3000 iter |
 
-Benchmark artifact worth knowing: with a forced full GC before every call, the current closure-based parser
-takes 4.85 ms on the 148 KB input (4x its natural-GC time) while the flat version stays at 0.83 ms.
-`--no-flush-bytecode` does not remove the effect. The per-call inner closures appear to lose optimized code
-after a full GC; the flat design has one module-level function and is unaffected. A player that refreshes a
-manifest every few seconds with GCs in between may see the same penalty, but this was not measured in a browser.
+Benchmark artifact, superseded: the first version of this paragraph attributed a 4x forced-GC penalty on
+the 148 KB input to the shipped parser's per-call closures. Measured one variant per process, the shipped
+parser goes from 1.30 ms to 1.72 ms under forced GC on the livesim2 manifest, not 4x; the penalty came from
+interleaving variants in one process. The GC trap that is real is per-parse instance state read and
+written by the scanner, see "Superseded and corrected findings".
 
 ## Robustness bugs found on the way
 
@@ -107,13 +109,48 @@ Truncations that already terminate: `<a>text`, `<a x="1"`, `<a><![CDATA[x`, `<!-
 `<MPD><Period><S d="1` (throws "Missing closing quote"). The flat prototype terminates on all of the above,
 yielding `""` for valueless attributes.
 
+## Superseded and corrected findings (2026-09-02, RFC design session)
+
+The RFC prototype (`plans/xml-incremental-parser/`) re-measured this work one variant per process and
+found three things this file got wrong or did not know. `plans/xml-incremental-parser/findings.md` has
+the detail; `steps.md` here carries the consequences.
+
+- **Interleaving contaminates.** Running several parser variants through one process poisons V8 type
+  feedback (builder shapes, string kinds). One run inverted the result, every variant 30 to 65 percent
+  slower than the shipped parser, while the same code one variant per process was faster. The tables above
+  were measured interleaved; their deltas are indicative. The closure-based forced-GC penalty reported
+  above was this artifact.
+- **Per-parse instance state deoptimizes the scanner after every full GC.** V8 tracks field constness
+  per hidden class and hidden-class transitions are weak, so an object created per parse gets a fresh
+  hidden class after each full GC and the first field reassignment ("dependent field type constness
+  changed") invalidates every function compiled against it. A scanner reading and writing such an object
+  never kept optimized code: 6 ms per parse of the 170 KB livesim2 manifest after a forced full GC against
+  0.9 ms natural. A scanner that takes only primitives, arrays, and a literal-created slots object takes
+  0.8 ms in both regimes. The flat prototype in this folder is immune because it has no such object; the
+  aligned implementation must stay immune by construction.
+- **Reading one past the end poisons type feedback.** `charCodeAt(length)` returns `NaN`; once the
+  character variable has been `NaN`, V8 compiles every comparison on it as a floating-point compare for
+  the rest of the process. The prototype in this folder does this once per parse, as the shipped parser
+  does. Guarding every advance (`cc = ++pos < length ? input.charCodeAt(pos) : 0`) made tokenization
+  about 19 percent faster.
+- **Rope strings.** Relevant once chunked input arrives with the RFC: `a + b` yields a V8 `ConsString`
+  the scanner reads about 25 percent slower than a flat string; `[a, b].join('')` yields a flat one.
+
+Re-measured with those fixes, one process per variant, natural GC: the aligned scanner building the same
+`XmlNode` tree is 25 to 37 percent faster than the shipped parser across the six inputs (28.3 ms to
+20.1 ms on the pretty stress input, 1.29 ms to 0.84 ms on the real livesim2 manifest), against 18 to 30
+percent for the fused prototype in this folder.
+
 ## Recommendation
 
-1. Fix the three hangs first (small, independent PR; tasks were spawned from this session).
-2. Replace the parser body with the flat design: identical output, -18% to -30% on the stress case, -32% on
-   a realistic large manifest, no recursion depth limit, no closure re-optimization penalty. Ship with the
-   equivalence corpus as tests and a repeatable benchmark (see `steps.md`).
-3. If dash.js still wants 2x or more, that requires not building the XmlNode tree at all: propose a visitor
-   or streaming API as an RFC (`rfc/`), letting the consumer build its final structures in one pass. The
-   tokenization floor measured here (~13 to 22 ms for 3.4 MB depending on scanning strategy) bounds the gain.
-4. Do not add DASH-specific `<S>` handling to `parseXml`: it measured -5.6% and breaks the string contract.
+1. Done: the three hangs were fixed by #425 and #430, and #430 also made malformed attributes and
+   mismatched or document-level close tags throw, which is now the parity target.
+2. Replace the parser body with the aligned scanner (`steps.md`, "Alignment with the RFC prototype"):
+   identical output to `main` after #430, 25 to 37 percent faster, no recursion depth limit, immune to
+   the GC trap above. Ship with the equivalence corpus as tests and the per-process benchmark.
+3. The visitor or streaming API is now `rfc/xml-incremental-parser.md` (#431). It adds `XmlParser` on
+   top of the same scanner; `parseXml` does not change again. Measured on the prototype, dash.js can
+   reach 43 to 49 percent less time than today on the stress manifests by building its objects in one
+   pass with a specialized `<S>` branch.
+4. Do not add DASH-specific `<S>` handling to `parseXml`: it measured -5.6% and breaks the string
+   contract. The builder API is where that specialization belongs.

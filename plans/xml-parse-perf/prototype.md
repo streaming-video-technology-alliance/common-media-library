@@ -1,5 +1,10 @@
 # Flat parseXml prototype
 
+> **Status (2026-09-02):** kept as the record of the equivalence-verified flat rewrite at the time of the
+> investigation. The implementation reference is now `plans/xml-incremental-parser/prototype.md`, whose
+> scanner has the same shape plus three measured fixes (guarded end-of-input reads, no per-parse instance
+> state, flat joins) and the builder indirection the RFC needs. Do not port this file; see `steps.md`.
+
 Verified identical to `@svta/cml-xml` 1.1.6 output on the equivalence corpus (192 checks, 0 mismatches).
 Plain JavaScript against the built utils bundle; port to TypeScript with repo style (tabs, single quotes,
 no semicolons) and import `unescapeHtml` from `@svta/cml-utils`.
