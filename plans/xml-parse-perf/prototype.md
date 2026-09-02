@@ -10,7 +10,7 @@ Plain JavaScript against the built utils bundle; port to TypeScript with repo st
 no semicolons) and import `unescapeHtml` from `@svta/cml-utils`.
 
 ```js
-import { unescapeHtml } from 'file:///Users/cocch1216/dev/common-media-library/.claude/worktrees/distracted-jepsen-3850ee/libs/utils/dist/index.js'
+import { unescapeHtml } from '@svta/cml-utils'
 
 const LT = 60, GT = 62, SLASH = 47, QUESTION = 63, EXCL = 33, MINUS = 45, SQ = 39, DQ = 34, LSB = 91, RSB = 93, COLON = 58, AMP = 38, EQ = 61, SP = 32, NL = 10, CR = 13, TAB = 9
 
