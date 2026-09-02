@@ -1,5 +1,5 @@
 import { parseXml } from '@svta/cml-xml'
-import assert, { equal, strictEqual } from 'node:assert'
+import assert, { deepStrictEqual, equal, strictEqual, throws } from 'node:assert'
 import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, it } from 'node:test'
@@ -135,6 +135,91 @@ describe('parseXml', () => {
 			strictEqual(b.parentElement, a)
 			strictEqual(c.parentElement, b)
 			strictEqual(d.parentElement, c)
+		})
+	})
+
+	describe('malformed attributes', () => {
+		it('parses a valueless attribute as an empty string', () => {
+			const doc = parseXml('<a b>')
+			const a = doc.childNodes[0]
+
+			equal(a.nodeName, 'a')
+			deepStrictEqual(a.attributes, { b: '' })
+			equal(a.childNodes.length, 0)
+		})
+
+		it('parses a valueless attribute after a quoted attribute', () => {
+			const doc = parseXml('<a b="c" d>')
+			deepStrictEqual(doc.childNodes[0].attributes, { b: 'c', d: '' })
+		})
+
+		it('parses a valueless attribute in a self-closing child', () => {
+			const doc = parseXml('<a b="c"><d e/></a>')
+			const a = doc.childNodes[0]
+
+			equal(a.childNodes.length, 1)
+			equal(a.childNodes[0].nodeName, 'd')
+			deepStrictEqual(a.childNodes[0].attributes, { e: '' })
+			equal(a.childNodes[0].childNodes.length, 0)
+		})
+
+		it('does not swallow markup following a valueless attribute', () => {
+			const doc = parseXml('<a b><c d="1"/></a>')
+			const a = doc.childNodes[0]
+
+			deepStrictEqual(a.attributes, { b: '' })
+			equal(a.childNodes.length, 1)
+			equal(a.childNodes[0].nodeName, 'c')
+			deepStrictEqual(a.childNodes[0].attributes, { d: '1' })
+		})
+
+		it('parses an unquoted attribute value as an empty string', () => {
+			const doc = parseXml('<a b=c/>')
+			const a = doc.childNodes[0]
+
+			equal(a.nodeName, 'a')
+			deepStrictEqual(a.attributes, { b: '' })
+			equal(a.childNodes.length, 0)
+		})
+
+		it('terminates when the input ends inside an attribute name', () => {
+			const doc = parseXml('<MPD><Period><SegmentTimeline><S d="180000" r')
+			const s = doc.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+
+			equal(s.nodeName, 'S')
+			deepStrictEqual(s.attributes, { d: '180000', r: '' })
+		})
+
+		it('terminates when the input ends after an attribute equals sign', () => {
+			const doc = parseXml('<a b=')
+			deepStrictEqual(doc.childNodes[0].attributes, { b: '' })
+		})
+
+		it('throws when the input ends inside a quoted attribute value', () => {
+			throws(() => parseXml('<MPD><Period><S d="1'), /Missing closing quote/)
+		})
+	})
+
+	describe('well-formed attributes', () => {
+		it('parses double- and single-quoted values', () => {
+			const doc = parseXml(`<a b="c" d='e'>text</a>`)
+			const a = doc.childNodes[0]
+
+			deepStrictEqual(a.attributes, { b: 'c', d: 'e' })
+			equal(a.childNodes[0].nodeValue, 'text')
+		})
+
+		it('allows whitespace around the equals sign', () => {
+			const doc = parseXml('<a b = "c"\n\td\t=\n"e"/>')
+			deepStrictEqual(doc.childNodes[0].attributes, { b: 'c', d: 'e' })
+		})
+
+		it('preserves markup characters inside quoted values', () => {
+			const doc = parseXml(`<a b="x/>y" c='p>q'>t</a>`)
+			const a = doc.childNodes[0]
+
+			deepStrictEqual(a.attributes, { b: 'x/>y', c: 'p>q' })
+			equal(a.childNodes[0].nodeValue, 't')
 		})
 	})
 })
