@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>` or input truncated mid-attribute. The attribute yields an empty string and parsing resumes at the closing `>`.
+
 ## [1.1.6] - 2026-07-28
 
 ### Changed

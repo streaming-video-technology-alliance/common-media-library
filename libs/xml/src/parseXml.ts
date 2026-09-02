@@ -196,7 +196,7 @@ export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode 
 				let value: string = ''
 				// search beginning of the string
 				let code = input.charCodeAt(pos)
-				while (code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC) {
+				while (pos < length && code !== SINGLE_QUOTE_CC && code !== DOUBLE_QUOTE_CC && code !== CLOSE_BRACKET_CC) {
 					pos++
 					code = input.charCodeAt(pos)
 				}
