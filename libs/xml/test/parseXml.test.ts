@@ -1,8 +1,91 @@
-import { parseXml } from '@svta/cml-xml'
-import assert, { deepStrictEqual, equal, strictEqual, throws } from 'node:assert'
+import { parseXml, type XmlNode, type XmlParseOptions } from '@svta/cml-xml'
+import assert, { deepStrictEqual, equal, rejects, strictEqual } from 'node:assert'
 import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, it } from 'node:test'
+import { Worker } from 'node:worker_threads'
+
+const PARSE_XML_URL = import.meta.resolve('@svta/cml-xml')
+const PARSE_TIMEOUT_MS = 2000
+
+const WORKER_SOURCE = `
+const { parentPort, workerData } = require('node:worker_threads')
+import(workerData.url).then(({ parseXml }) => {
+	workerData.inputs.forEach((input, index) => {
+		parentPort.postMessage({ index })
+		try {
+			parentPort.postMessage({ index, result: parseXml(input, workerData.options) })
+		}
+		catch (error) {
+			parentPort.postMessage({ index, error: error.message })
+		}
+	})
+})
+`
+
+type ParseOutcome = { result: XmlNode } | { error: string }
+
+type ParseMessage = {
+	index: number;
+	result?: XmlNode;
+	error?: string;
+}
+
+/**
+ * Parses each input in a worker thread so that a parser that never returns fails the test
+ * instead of hanging the test runner.
+ */
+function parseXmlInWorker(inputs: string[], options?: XmlParseOptions): Promise<ParseOutcome[]> {
+	return new Promise((done, fail) => {
+		const worker = new Worker(WORKER_SOURCE, { eval: true, execArgv: [], workerData: { url: PARSE_XML_URL, inputs, options } })
+		const outcomes: ParseOutcome[] = []
+		let current = 0
+		let timer: ReturnType<typeof setTimeout>
+
+		const settle = (callback: () => void) => {
+			clearTimeout(timer)
+			void worker.terminate()
+			callback()
+		}
+
+		const watch = () => {
+			clearTimeout(timer)
+			timer = setTimeout(() => {
+				settle(() => fail(new Error(`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputs[current])}`)))
+			}, PARSE_TIMEOUT_MS)
+		}
+
+		worker.on('message', (message: ParseMessage) => {
+			current = message.index
+			if (message.error !== undefined) {
+				outcomes.push({ error: message.error })
+			}
+			else if (message.result !== undefined) {
+				outcomes.push({ result: message.result })
+			}
+
+			if (outcomes.length === inputs.length) {
+				settle(() => done(outcomes))
+			}
+			else {
+				watch()
+			}
+		})
+		worker.on('error', (error) => settle(() => fail(error)))
+		watch()
+	})
+}
+
+/**
+ * Parses a single input in a worker thread, rethrowing any parse error.
+ */
+async function parseXmlGuarded(input: string, options?: XmlParseOptions): Promise<XmlNode> {
+	const [outcome] = await parseXmlInWorker([input], options)
+	if ('error' in outcome) {
+		throw new Error(outcome.error)
+	}
+	return outcome.result
+}
 
 describe('parseXml', () => {
 	it('provides a valid example', async () => {
@@ -139,8 +222,8 @@ describe('parseXml', () => {
 	})
 
 	describe('malformed attributes', () => {
-		it('parses a valueless attribute as an empty string', () => {
-			const doc = parseXml('<a b>')
+		it('parses a valueless attribute as an empty string', async () => {
+			const doc = await parseXmlGuarded('<a b>')
 			const a = doc.childNodes[0]
 
 			equal(a.nodeName, 'a')
@@ -148,13 +231,13 @@ describe('parseXml', () => {
 			equal(a.childNodes.length, 0)
 		})
 
-		it('parses a valueless attribute after a quoted attribute', () => {
-			const doc = parseXml('<a b="c" d>')
+		it('parses a valueless attribute after a quoted attribute', async () => {
+			const doc = await parseXmlGuarded('<a b="c" d>')
 			deepStrictEqual(doc.childNodes[0].attributes, { b: 'c', d: '' })
 		})
 
-		it('parses a valueless attribute in a self-closing child', () => {
-			const doc = parseXml('<a b="c"><d e/></a>')
+		it('parses a valueless attribute in a self-closing child', async () => {
+			const doc = await parseXmlGuarded('<a b="c"><d e/></a>')
 			const a = doc.childNodes[0]
 
 			equal(a.childNodes.length, 1)
@@ -163,8 +246,8 @@ describe('parseXml', () => {
 			equal(a.childNodes[0].childNodes.length, 0)
 		})
 
-		it('does not swallow markup following a valueless attribute', () => {
-			const doc = parseXml('<a b><c d="1"/></a>')
+		it('does not swallow markup following a valueless attribute', async () => {
+			const doc = await parseXmlGuarded('<a b><c d="1"/></a>')
 			const a = doc.childNodes[0]
 
 			deepStrictEqual(a.attributes, { b: '' })
@@ -173,8 +256,8 @@ describe('parseXml', () => {
 			deepStrictEqual(a.childNodes[0].attributes, { d: '1' })
 		})
 
-		it('parses an unquoted attribute value as an empty string', () => {
-			const doc = parseXml('<a b=c/>')
+		it('parses an unquoted attribute value as an empty string', async () => {
+			const doc = await parseXmlGuarded('<a b=c/>')
 			const a = doc.childNodes[0]
 
 			equal(a.nodeName, 'a')
@@ -182,21 +265,21 @@ describe('parseXml', () => {
 			equal(a.childNodes.length, 0)
 		})
 
-		it('terminates when the input ends inside an attribute name', () => {
-			const doc = parseXml('<MPD><Period><SegmentTimeline><S d="180000" r')
+		it('terminates when the input ends inside an attribute name', async () => {
+			const doc = await parseXmlGuarded('<MPD><Period><SegmentTimeline><S d="180000" r')
 			const s = doc.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
 
 			equal(s.nodeName, 'S')
 			deepStrictEqual(s.attributes, { d: '180000', r: '' })
 		})
 
-		it('terminates when the input ends after an attribute equals sign', () => {
-			const doc = parseXml('<a b=')
+		it('terminates when the input ends after an attribute equals sign', async () => {
+			const doc = await parseXmlGuarded('<a b=')
 			deepStrictEqual(doc.childNodes[0].attributes, { b: '' })
 		})
 
-		it('throws when the input ends inside a quoted attribute value', () => {
-			throws(() => parseXml('<MPD><Period><S d="1'), /Missing closing quote/)
+		it('throws when the input ends inside a quoted attribute value', async () => {
+			await rejects(parseXmlGuarded('<MPD><Period><S d="1'), /Missing closing quote/)
 		})
 	})
 
