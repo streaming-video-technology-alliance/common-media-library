@@ -11,6 +11,7 @@ and this project adheres to
 ### Fixed
 
 - `parseXml` no longer hangs on an attribute with no quoted value, such as `<a b>` or input truncated mid-attribute. The attribute yields an empty string and parsing resumes at the closing `>`.
+- `parseXml` throws `Unexpected close tag` when a close tag's name only starts with the open tag's name, such as `<ab>text</abc>` or `</ab>` closing `<a>`, and when a close tag appears at the document level with no open element. Previously both were accepted. A close tag whose exact name is followed by whitespace, such as `</a >`, still closes the element (XML 1.0 `ETag ::= '</' Name S? '>'`).
 
 ## [1.1.6] - 2026-07-28
 

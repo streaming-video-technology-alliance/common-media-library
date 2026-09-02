@@ -61,6 +61,47 @@ describe('parseXml', () => {
 		equal(namespace.localName, `Text`)
 	})
 
+	describe('close tags', () => {
+		it('throws on a close tag whose name differs from the open tag', () => {
+			throws(() => parseXml('<a>text</b>'), /Unexpected close tag/)
+		})
+
+		it('throws on a close tag whose name extends the open tag name', () => {
+			throws(() => parseXml('<ab>text</abc>'), /Unexpected close tag/)
+		})
+
+		it('does not let a longer close tag close a shorter open tag', () => {
+			throws(() => parseXml('<a>text</ab>'), /Unexpected close tag/)
+		})
+
+		it('throws on a close tag with no open element', () => {
+			throws(() => parseXml('<a/></b>'), /Unexpected close tag/)
+		})
+
+		it('closes an element when a space precedes the closing bracket', () => {
+			const doc = parseXml('<a>text</a >')
+			const a = doc.childNodes[0]
+
+			equal(doc.childNodes.length, 1)
+			equal(a.nodeName, 'a')
+			equal(a.childNodes[0].nodeValue, 'text')
+		})
+
+		it('closes an element when tabs and line breaks precede the closing bracket', () => {
+			const doc = parseXml('<a>text</a\t\r\n>')
+			equal(doc.childNodes[0].childNodes[0].nodeValue, 'text')
+		})
+
+		it('closes nested elements whose names share a prefix', () => {
+			const doc = parseXml('<a><ab>text</ab></a>')
+			const a = doc.childNodes[0]
+
+			equal(a.nodeName, 'a')
+			equal(a.childNodes[0].nodeName, 'ab')
+			equal(a.childNodes[0].childNodes[0].nodeValue, 'text')
+		})
+	})
+
 	describe('includeParentElement option', () => {
 		it('does not include parentElement by default', () => {
 			const doc = parseXml('<root><child/></root>')
