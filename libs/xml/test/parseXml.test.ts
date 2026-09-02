@@ -326,5 +326,47 @@ describe('parseXml', () => {
 			const doc = await parseXmlGuarded('<?xml version="1.0" encoding="UTF-8"')
 			deepStrictEqual(doc.childNodes, [])
 		})
+
+		it('keeps the parsed children when the input ends inside the root close tag', async () => {
+			const doc = await parseXmlGuarded('<a>text</a')
+			deepStrictEqual(doc.childNodes, [{
+				nodeName: 'a',
+				nodeValue: null,
+				attributes: {},
+				childNodes: [{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] }],
+				prefix: null,
+				localName: 'a',
+			}])
+		})
+
+		it('keeps the parsed children when the input ends inside a nested close tag', async () => {
+			const doc = await parseXmlGuarded('<MPD><Period><S d="1"/></Period')
+			deepStrictEqual(doc.childNodes, [{
+				nodeName: 'MPD',
+				nodeValue: null,
+				attributes: {},
+				childNodes: [{
+					nodeName: 'Period',
+					nodeValue: null,
+					attributes: {},
+					childNodes: [{ nodeName: 'S', nodeValue: null, attributes: { d: '1' }, childNodes: [], prefix: null, localName: 'S' }],
+					prefix: null,
+					localName: 'Period',
+				}],
+				prefix: null,
+				localName: 'MPD',
+			}])
+		})
+
+		it('terminates on every truncation of the fixtures', async () => {
+			for (const fixture of ['./test/fixtures/node_types.xml', './test/fixtures/bbb_30fps.mpd']) {
+				const xml = await fs.readFile(resolve(fixture), 'utf8')
+				const prefixes = Array.from({ length: xml.length + 1 }, (_, end) => xml.slice(0, end))
+				const outcomes = await parseXmlInWorker(prefixes)
+
+				equal(outcomes.length, prefixes.length)
+				assert('result' in outcomes[prefixes.length - 1], `${fixture} did not parse in full`)
+			}
+		})
 	})
 })
