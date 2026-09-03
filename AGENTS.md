@@ -58,9 +58,9 @@ APIs are the product. Design them so adopters fall into the pit of success:
 
 ## Writing Style
 
-CML collaborators and adopters are spread across the world, and many do not read English as a first language. These rules apply to all prose you write: READMEs, TSDoc, changelogs, RFCs, plans, PR descriptions, issue and review comments, and commit messages. They do not apply to code or identifiers.
+CML collaborators and adopters live in many countries. Many of them do not read English as a first language. These rules apply to all prose you write: READMEs, TSDoc, changelogs, RFCs, plans, PR descriptions, issue and review comments, and commit messages. They do not apply to code or identifiers.
 
-- One idea per sentence. Keep sentences under 20 words and split any sentence over 25. No semicolons and no em dashes.
+- One idea per sentence. Keep sentences under 20 words and split any sentence over 25. No semicolons (;) and no em dashes (—).
 - Active voice and simple tenses (present, past, future). Write instructions in the imperative with the condition first: "If the build fails, read the log."
 - One name per thing for the whole document, never a synonym for variety. Give a document over about 1,500 words a short Terms list near the top.
 - No idioms, metaphors, or figures of speech. If a phrase cannot be translated word for word, replace it.
