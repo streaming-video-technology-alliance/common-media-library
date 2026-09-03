@@ -56,6 +56,23 @@ APIs are the product. Design them so adopters fall into the pit of success:
 - All code examples must be complete and runnable — no pseudocode, no elided imports.
 - Public API changes are tracked in `libs/<package>/config/cml-<package>.api.md`, regenerated when the package builds; review its diff to confirm every API change is intentional.
 
+## Writing Style
+
+CML collaborators and adopters live in many countries. Many of them do not read English as a first language. These rules apply to all prose you write: READMEs, TSDoc, changelogs, RFCs, plans, PR descriptions, issue and review comments, and commit messages. They do not apply to code or identifiers.
+
+- One idea per sentence. Keep sentences under 20 words and split any sentence over 25. No semicolons (;) and no em dashes (—).
+- Active voice and simple tenses (present, past, future). Write instructions in the imperative with the condition first: "If the build fails, read the log."
+- One name per thing for the whole document, never a synonym for variety. Give a document over about 1,500 words a short Terms list near the top.
+- No idioms, metaphors, or figures of speech. If a phrase cannot be translated word for word, replace it.
+- Prefer one verb to a phrasal verb ("configure", not "set up") and literal verbs for facts ("the table shows", not "the table carries").
+- Define every abbreviation and term of art once, at first use: MPD, HAM, GC, p95, post-order. Do not use "e.g.", "i.e.", or "vs".
+- Give every pronoun a visible noun in the same or previous sentence: "this check", not "this".
+- At most three nouns in a row. Break longer strings with prepositions.
+- Keep the author's hedges. "May have failed" does not become "failed". Never add a fact the source did not state.
+- Write for the reader's decision. An RFC reader needs what the API is, one example, the contract, the costs, the alternatives, and the open questions. Methodology, history, and engine internals go to the design record in `plans/`, with a link.
+- State each finding once, in one place, and reference it from elsewhere. Numbers go in tables or lists, at most one per sentence of prose.
+- After a clarity pass, do a second pass that removes duplication. Splitting sentences adds words, so the document must get shorter, not longer.
+
 ## Git Commit Guidelines
 
 - **Always use `git commit -s`** to add the DCO sign-off. Every commit must have this.
