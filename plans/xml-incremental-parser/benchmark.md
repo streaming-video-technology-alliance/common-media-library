@@ -1,7 +1,8 @@
-# Benchmark methodology and results
+# Benchmark method and results
 
-`prototype/bench.ts` measures the phase-one prototype against `main` after #432. Run from the repository
-root after `npm run build -w libs/xml`:
+`prototype/bench.ts` measures the phase-one prototype against `main` after #432. Phase one is the scope of
+the RFC: the builder contract and `parseXmlWith`. Run the benchmark from the repository root after
+`npm run build -w libs/xml`:
 
 ```bash
 node plans/xml-incremental-parser/prototype/bench.ts
@@ -10,28 +11,31 @@ node plans/xml-incremental-parser/prototype/bench.ts --gc
 
 ## Method
 
-- One process per (variant, input) pair, as in `libs/xml/bench/bench.ts`: type feedback gathered for one
-  variant never shapes the code compiled for another. Each process builds the input, makes 4 warm-up
-  calls, then times each measured call with `performance.now()` (60 calls on the 100k `<S>` inputs, 300 on
-  the 150 KB inputs, 3,000 on the 3 KB fixture) and reports the median and p95. Every result is kept in a
-  variable so nothing is eliminated as dead code.
-- Two-builder pairs: after the isolated runs, two variants alternate in one process and each is reported
-  against its isolated median. An application that uses `parseXml` and one custom builder drives the
-  shared scanner exactly this way, so the pairs bound what the monomorphic per-process numbers hide.
-- Forced-GC runs call `gc()` before every measured call (`--expose-gc`) and use 20 iterations on the large
-  inputs.
-- Baselines: `parseXml` from `main` (5e4a82276, the #432 scanner) for the tree rows; `main`'s `parseXml`
-  plus a faithful port of dash.js `processNode` (matchers, `arrayNodes`, `__children`) for the dash.js rows.
-- The synthetic inputs come from `libs/xml/bench/generate.ts`, which returns a flat string; the livesim2
-  manifest is the checked-in fixture `libs/xml/test/fixtures/livesim2_tsbd21600.mpd` (169,727 bytes,
+- One process per (variant, input) pair, as in `libs/xml/bench/bench.ts`. V8 type feedback gathered for
+  one variant then never shapes the code compiled for another. Each process builds the input, makes 4
+  warm-up calls, and then times each measured call with `performance.now()`: 60 calls on the 100k `<S>`
+  inputs, 300 on the 150 KB inputs, and 3,000 on the 3 KB fixture. It reports the median and the p95
+  (the 95th percentile). Every result is kept in a variable, so nothing is removed as dead code.
+- Two-builder pairs. After the isolated runs, two variants alternate in one process, and each is
+  reported against its isolated median. An application that uses `parseXml` and one custom builder
+  drives the shared scanner in exactly this way. The pairs show the cost that the one-variant-per-process
+  numbers hide.
+- Forced-GC runs call `gc()` before every measured call (`--expose-gc`) and use 20 iterations on the
+  large inputs. GC is garbage collection.
+- Baselines. For the tree rows: `parseXml` from `main` (5e4a82276, the #432 scanner). For the dash.js
+  rows: `parseXml` from `main` plus a faithful port of dash.js `processNode` (matchers, `arrayNodes`,
+  `__children`).
+- Inputs. The synthetic inputs come from `libs/xml/bench/generate.ts`, which returns a flat string. The
+  livesim2 manifest is the fixture `libs/xml/test/fixtures/livesim2_tsbd21600.mpd` (169,727 bytes,
   sha256 427d67f714fbf6c0985bcd3a0f4cd8358709b2c10f1d793570b34710987932d9).
-- Variants. `parseXml (phase-one scanner)` is `prototype/parseXml.ts`: the same tree with the contract
-  changes on the hot path (skip checks, name arguments, untrimmed text, NameStartChar, `?>`, quoted
+- Variants. `parseXml (phase-one scanner)` is `prototype/parseXml.ts`: the same tree, with the contract
+  changes in the main loop (skip checks, name arguments, untrimmed text, NameStartChar, `?>`, quoted
   doctype literals, `XmlParseError`). `faithful builder` produces objects `deepStrictEqual` to today's
-  `processNode` output, XmlNode leftovers included. `lean builder` keeps only what the rest of dash.js
-  reads and handles `<S>` directly; it is what a real port would write and is not compared for equality.
-- Machine: MacBook Pro M1 Pro, macOS 26.6, Node v24.16.0, on battery. Relative numbers within one table are
-  what matters.
+  `processNode` output, including the `XmlNode` fields that `processNode` leaves in place. `lean builder`
+  keeps only what the rest of dash.js reads and handles `<S>` directly. It is what a real port would
+  write, and it is not compared for equality.
+- Machine: MacBook Pro M1 Pro, macOS 26.6, Node v24.16.0, on battery. Only the relative numbers within
+  one table matter.
 
 ## Inputs
 
@@ -47,29 +51,29 @@ node plans/xml-incremental-parser/prototype/bench.ts --gc
 ## What the numbers say
 
 - **The contract changes cost `parseXml` nothing measurable.** Against `main`, the phase-one scanner is
-  within -2 to +3 percent on every input under natural GC (+2 to +6 percent under forced GC on the
-  stress inputs). The skip checks, name arguments, untrimmed text policy, NameStartChar test, and the
-  quoted-literal doctype scan are on the hot path and do not show.
+  within -2 to +3 percent on every input under natural GC, and +2 to +6 percent under forced GC on the
+  stress inputs. The skip checks, name arguments, untrimmed text policy, NameStartChar test, and
+  quoted-literal doctype scan are in the main loop and do not show in the numbers.
 - **A faithful one-pass replacement of `processNode` gains dash.js almost nothing on top of #432.** It
-  removes the tree and the walk but still allocates every object `processNode` allocates, including the
-  XmlNode leftovers and the text leaves, and still runs the matcher chain per attribute: -1 to -9 percent
-  on the stress inputs, +3 to +5 percent on the real-sized ones. With #432 on `main`, the tree is no
-  longer where the time goes; the per-node conversion is.
+  removes the tree and the walk, but it still allocates every object that `processNode` allocates,
+  including the `XmlNode` fields and the text leaves, and it still runs the matcher chain for each
+  attribute. Result: -1 to -9 percent on the stress inputs, +3 to +5 percent on the real-sized inputs.
+  With #432 on `main`, the tree is no longer the main cost. The per-node conversion is.
 - **A lean builder gains 13 to 21 percent on the stress inputs and 0 to 6 percent on real-sized
-  manifests.** That is the headroom this API adds for dash.js on top of #432: removing the second pass and
-  its object shapes, plus handling `<S>` without the matcher chain. The 2x from #424 is not reachable by
-  the API alone; #432 took the larger share of it (51 ms to 41 ms on the stress input for the whole
-  dash.js pipeline) and a player-side specialization takes the rest.
+  manifests.** That is the gain this API adds for dash.js on top of #432. It comes from removing the
+  second pass and its object shapes, and from handling `<S>` without the matcher chain. The API alone
+  does not reach the 2x from #424. #432 took the larger share (51 ms to 41 ms on the stress input for
+  the whole dash.js pipeline). A player-side specialization takes the rest.
 - **Two builders in one process cost each a few percent.** In the pairs, `parseXml` and the lean builder
-  each land within about +6 percent of their isolated medians on the large inputs; the faithful builder
+  each stay within about +6 percent of their isolated medians on the large inputs. The faithful builder
   pays +10 to +20 percent when paired with `parseXml`.
 - **Forced-GC anomaly, unresolved.** With a full GC before every call, the faithful builder runs 4 to 5
-  times slower than the isolated natural-GC run on the two 150 KB inputs (8.4 ms against 1.4 ms on the
-  livesim2 manifest) and the lean builder 16 to 46 percent slower than today's pipeline on the small
+  times slower than its isolated natural-GC run on the two 150 KB inputs (8.4 ms against 1.4 ms on the
+  livesim2 manifest). The lean builder runs 16 to 46 percent slower than today's pipeline on the small
   inputs. The effect disappears when the same builder alternates with `parseXml` in one process (1.9 ms
-  for the faithful builder in pair 1), and today's `processNode`, which creates the same object shapes,
-  does not show it. This looks like V8 hidden-class or stub-cache churn triggered by the builders'
-  dynamically shaped objects in an isolated process, not a property of the scanner, but it is not
+  for the faithful builder in pair 1). Today's `processNode`, which creates the same object shapes, does
+  not show the effect. The likely cause is V8's object-shape tracking (hidden classes or the stub cache)
+  for the builders' dynamically shaped objects in an isolated process, not the scanner. This is not
   diagnosed. The implementation should measure it with `--trace-deopt` and prefer builders that create
   each object with all of its fields present.
 

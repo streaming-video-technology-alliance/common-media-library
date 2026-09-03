@@ -1,7 +1,8 @@
 # Prototype
 
-The executable prototype lives in `prototype/` and runs against `main` after #432 with Node 24 (no build
-step; the repository's lint and typecheck cover it). It is the reference for the implementation steps.
+The executable prototype is in `prototype/`. It runs against `main` after #432 with Node 24. There is no
+build step, and the repository's lint and typecheck cover it. It is the reference for the implementation
+steps. Phase one is the scope of the RFC: the builder contract and `parseXmlWith`.
 
 | File | Contents |
 |---|---|
@@ -27,37 +28,40 @@ step; the repository's lint and typecheck cover it). It is the reference for the
 | `parseXmlWith` alone (scanner, `parseXmlWith`, `XmlParseError`) | 4,000 B | 1,640 B |
 | whole package after phase one | 5,224 B | 2,012 B |
 
-A `parseXml`-only bundle grows by about 450 bytes gzipped. The scanner carries the strict-mode branches,
-the NameStartChar test, the quoted-literal doctype scan, the skip checks, and `XmlParseError` for both
-entry points, and the tree builder grows from four to eight variants. A `parseXmlWith`-only bundle is about
-150 bytes gzipped larger than `parseXml` is on `main` today and carries no tree builder.
+A bundle that imports only `parseXml` grows by about 450 bytes gzipped. The scanner carries the
+strict-mode branches, the NameStartChar test, the quoted-literal doctype scan, the skip checks, and
+`XmlParseError` for both entry points, and the tree builder grows from four to eight variants. A bundle
+that imports only `parseXmlWith` is about 150 bytes gzipped larger than today's `parseXml` bundle, and it
+has no tree builder.
 
 ## Performance notes for the port
 
-- The scanner takes only primitives, the two stack arrays, and the builder object, and writes nothing
-  back to a per-parse object. #432 established this shape and its reason: an object created per parse
-  gets a fresh V8 hidden class after every full GC, and the first reassignment of a field the
-  constructor initialized deoptimizes every function compiled against it. The `parseXmlWith` wrapper keeps to
-  that shape.
-- Every character read is guarded (`cc = ++pos < length ? input.charCodeAt(pos) : 0`); reading one past
-  the end once makes V8 compile every comparison on that variable as a floating-point compare.
-- Builders should be module-level constants so the call targets inside the scanner are stable across
-  parses. `parseXml` prebuilds its eight variants. Applications that use `parseXml` and one custom builder
-  drive the same scanner with two builders; the two-builder pairs in `benchmark.md` measure that case.
-- The `current !== undefined` skip checks, the name arguments, and the untrimmed text policy are on the
-  hot path. Their aggregate cost is the `parseXml` delta between `main` and the phase-one scanner in
+- The scanner takes only primitives, the two stack arrays, and the builder object. It writes nothing to
+  a per-parse object. #432 chose this shape for a reason: V8 gives an object that is created per parse a
+  new hidden class after every full GC, and the first write to a field that the constructor initialized
+  deoptimizes every function compiled against that class. The `parseXmlWith` wrapper keeps the same
+  shape.
+- Every character read is guarded (`cc = ++pos < length ? input.charCodeAt(pos) : 0`). If the scanner
+  reads one character past the end even once, V8 compiles every comparison on that variable as a
+  floating-point compare.
+- Builders should be module-level constants, so that the functions the scanner calls are the same on
+  every parse. `parseXml` prebuilds its eight variants. An application that uses `parseXml` and one
+  custom builder drives the same scanner with two builders. The two-builder pairs in `benchmark.md`
+  measure that case.
+- The `current !== undefined` skip checks, the name arguments, and the untrimmed text policy are in the
+  main loop. Their total cost is the `parseXml` difference between `main` and the phase-one scanner in
   `benchmark.md`.
 
 ## Known deviations
 
-`prototype/parseXml.ts` produces the same tree as `main` for every corpus input except the eight listed in
-`equivalence.md`, which are the intended grammar fixes and shape changes. One of them is a consequence
-rather than a goal: because comments are delivered as inner text, the tree builder cannot reproduce the
-delimiters of a comment that has none (`<!--->`) or that is cut off by the end of the input, and reports
-both with a closing `-->`. This only shows with `keepComments`.
+`prototype/parseXml.ts` produces the same tree as `main` for every corpus input except the eight listed
+in `equivalence.md`. Those eight are the intended grammar fixes and shape changes. One of them is a side
+effect, not a goal: because comments are delivered as inner text, the tree builder cannot reproduce the
+delimiters of a comment that has no inner text (`<!--->`) or that is cut off by the end of the input. It
+reports both with a closing `-->`. This shows only with `keepComments`.
 
 ## The streaming prototype
 
-The first revision of this design record held a JavaScript prototype of the incremental parser
+The first revision of this design record had a JavaScript prototype of the incremental parser
 (`write`/`end`, carry across chunks). Its findings are summarized under "Deferred: incremental input" in
-`findings.md`, and the code is in this file's history (commit 8eb767e) for the phase-two RFC.
+`findings.md`. The code is in this file's history (commit 8eb767e), for the phase-two RFC.
