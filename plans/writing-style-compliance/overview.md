@@ -72,7 +72,7 @@ The script prints one PASS or FAIL line per check per file and exits with status
 | links | The set of link targets and bare URLs is the same as in the base version. |
 | shorter | The prose word count did not grow. |
 
-The readability metrics in `inventory.md` come from a second script that is not in the repository. See `inventory.md` for what it measures.
+The readability metrics in `inventory.md` come from a second script that is not in the repository. See `inventory.md` for what it measures. That script excludes heading text from its prose word count. The check script includes heading text, so its shorter check reports higher counts for the same file.
 
 ## Open questions
 
@@ -100,6 +100,5 @@ The rewrite kept these statements as they were. Each one may need a separate fix
 ## Noticed, not changed (tranche 2)
 
 - `libs/cmaf-ham/src/README.md`: the code examples import from `@svta/common-media-library`, a package name that no longer exists. The first example has no comma after `hamToDash`. The Documentation section names the API documentation without a link.
-- `libs/cmaf-ham/samples/cmaf-ham-conversion/README.md`: step 3 says `cd samples/cmaf-ham-conversion` from the repository root. The sample is at `libs/cmaf-ham/samples/cmaf-ham-conversion`.
 - `libs/cmaf-ham/README.md`, `libs/drm/README.md`, and `libs/request/README.md` have an empty Usage code block. `libs/mse/README.md` has a Usage example that imports nothing.
 - Several README examples are not complete. They use identifiers without importing or defining them: `assert` in most examples, `CMSD_STATIC_OBJ` and `SfToken` in `libs/cmsd/README.md`, `id3Data` in `libs/id3/README.md`, and `view`, `samplePos`, `sampleSize`, and `sampleTimeMs` in `libs/608/README.md`.

@@ -214,7 +214,7 @@ git push -u origin docs/writing-style-readmes
 
 Casey creates the PR with `/create-pr`.
 
-**Outcome (2026-09-03):** twelve files changed. The other 13 files are package READMEs of one or two sentences. They already followed the rules and are unchanged, so their packages have no changelog note. The fixture, sample, and `src/` READMEs are not shipped with a package, so they have no changelog note either. `libs/dash/README.md` grew from 10 to 15 prose words because it now defines DASH. That growth is the one failed check. Every other check passed for every file.
+**Outcome (2026-09-03):** twelve files changed. The other 13 files are package READMEs of one or two sentences. They already followed the rules and are unchanged, so their packages have no changelog note. The fixture, sample, and `src/` READMEs are not shipped with a package, so they have no changelog note either. `libs/dash/README.md` grew from 4 to 9 prose words because it now defines DASH. That growth is the one failed check. Every other check passed for every file.
 
 ---
 
