@@ -150,14 +150,16 @@ git rebase --onto origin/main 26fd67982 docs/writing-style-compliance
 
 **Known violations at the base:** `libs/608/README.md` has 2 sentences over 25 words and the verbs "carries" and "come from". `libs/c2pa/README.md` has "carries" three times and "vs" twice. `libs/iso-bmff/README.md` has one sentence over 25 words. `libs/608/test/fixtures/README.md` has "carry" twice. `libs/cmaf-ham/samples/cmaf-ham-conversion/README.md` has 2 sentences over 25 words. `libs/iso-bmff/docs/writing-boxes.md` has one "e.g." and one sentence over 25 words. `libs/iso-bmff/docs/reading-boxes.md` has one sentence over 25 words. The other READMEs are one to four sentences and mostly pass already.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-readmes origin/main
 ```
 
-- [ ] **Step 2: Rewrite the 19 package READMEs by the method in `overview.md`**
+Done differently on 2026-09-03: #434 (Task 1) was still open, so the branch was created from the #434 head f848ca616 instead. The checks use `origin/main` as the base, because the `libs/` trees of both commits are identical. Rebase onto `main` after #434 merges.
+
+- [x] **Step 2: Rewrite the 19 package READMEs by the method in `overview.md`**
 
 Code examples do not change. If a code block must change, build first and run the block from the repository root:
 
@@ -211,6 +213,8 @@ git push -u origin docs/writing-style-readmes
 ```
 
 Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** twelve files changed. The other 13 files are package READMEs of one or two sentences. They already followed the rules and are unchanged, so their packages have no changelog note. The fixture, sample, and `src/` READMEs are not shipped with a package, so they have no changelog note either. `libs/dash/README.md` grew from 4 to 9 prose words because it now defines DASH. That growth is the one failed check. Every other check passed for every file.
 
 ---
 

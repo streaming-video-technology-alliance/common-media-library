@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the description defines DASH at first use.
+
 ## [1.0.8] - 2026-07-28
 
 ### Changed
