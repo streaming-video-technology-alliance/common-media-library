@@ -67,7 +67,7 @@ for f in "$@"; do
 	out=$(sentences_over_25 "$f")
 	report length "$f" "$out"
 
-	out=$(prose "$f" | perl -ne 'print "$.: $_" if /(?<!")\b(?:e\.g\.|i\.e\.|vs\.?)(?=\s|$)/')
+	out=$(prose "$f" | perl -ne 'print "$.: $_" if /(?<!["\x27])\b(?:e\.g\.|i\.e\.|vs\.?)(?=\W|$)/')
 	report abbrev "$f" "$out"
 
 	if [ "$hasbase" = 1 ]; then

@@ -1,6 +1,6 @@
 # Writing style compliance: steps
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> Execute one task at a time and tick each step when it is done. Agents with the Superpowers plugin can use its subagent-driven-development or executing-plans skill.
 
 **Goal:** Rewrite every in-scope markdown document so it follows the Writing Style rules in `AGENTS.md`, without changing any fact, number, link, or code block.
 

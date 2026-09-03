@@ -2,7 +2,7 @@
 
 A common library for media playback in JavaScript
 
-Open source players such as [hls.js](https://github.com/video-dev/hls.js/), [dash.js](https://github.com/Dash-Industry-Forum/dash.js/), and [shaka-player](https://github.com/shaka-project/shaka-player) implement many of the same features independently. This duplication is especially common for standards-based features, such as ID3 parsing, 608 parsing, and CMCD. The players share the intent of these features but not the code. A bug fixed in one player can remain in the others. The goal of this library is one place where these utilities are maintained and distributed.
+Open source players such as [hls.js](https://github.com/video-dev/hls.js/), [dash.js](https://github.com/Dash-Industry-Forum/dash.js/), and [shaka-player](https://github.com/shaka-project/shaka-player) implement many of the same features independently. This duplication is especially common for standards-based features, such as ID3 parsing, 608 parsing, and CMCD. The players share the intent of these features but not the code. A bug fixed in one player can remain in the others. The goal of this library is to create one place where these utilities can be maintained and distributed.
 
 ## Project structure
 
