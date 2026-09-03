@@ -37,7 +37,8 @@
 	],
 	"scripts": {
 		"build": "node ../../scripts/build.ts",
-		"test": "node ../../scripts/test.ts"
+		"test": "node ../../scripts/test.ts",
+		"bench": "node bench/bench.ts"
 	},
 	"engines": {
 		"node": ">=20"
