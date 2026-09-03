@@ -1,3 +1,5 @@
+0
+0
 # CMAF HAM
 
 ## Overview
@@ -16,35 +18,30 @@ The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19
 The examples show how to use the CMAF HAM module in TypeScript:
 
 ```typescript
-import {
-  hamToHls,
-  hamToDash
-  hlsToHam,
-} from "@svta/common-media-library";
+import { hamToDash, hamToHls, hlsToHam } from "@svta/cml-cmaf-ham";
 
-const hamObject = hlsToHam(mainHlsManifest, playListHlsManifests); // Convert HLS to HAM object
-const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
-const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
+// Convert an HLS multivariant playlist and its media playlists to HAM, then back to HLS and to DASH.
+function convertHls(mainPlaylist: string, mediaPlaylists: string[]) {
+  const ham = hlsToHam(mainPlaylist, mediaPlaylists);
+  return { hls: hamToHls(ham), dash: hamToDash(ham) };
+}
 ```
 
 ```typescript
-import {
-  hamToDash,
-  hamToHls,
-  dashToHam,
-} from "@svta/common-media-library";
+import { dashToHam, hamToDash, hamToHls } from "@svta/cml-cmaf-ham";
 
-const hamObject = dashToHam(mainDashManifest); // Convert DASH to HAM object
-const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
-const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
-
+// Convert a DASH MPD to HAM, then back to DASH and to HLS.
+function convertDash(mpd: string) {
+  const ham = dashToHam(mpd);
+  return { hls: hamToHls(ham), dash: hamToDash(ham) };
+}
 ```
 
 The library also offers presentation queries and track validation.
 
 ## Documentation
 
-For the API reference and more examples, read the API documentation.
+For the API reference and more examples, read the [API documentation](https://streaming-video-technology-alliance.github.io/common-media-library/).
 
 ## Contribution
 

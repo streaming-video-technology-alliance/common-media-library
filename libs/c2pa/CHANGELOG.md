@@ -12,6 +12,9 @@ and this project adheres to
 
 - README: the prose is rewritten for readers who do not read English as a first language. BMFF, COSE, EMSG, VOD, and JUMBF are defined at first use. The code examples are unchanged.
 - Validation guides (Manifest Box, VOD Merkle, VSI/EMSG, and Results and Error Codes): the prose is rewritten for readers who do not read English as a first language. BMFF, COSE, EMSG, VOD, and Merkle tree are defined at first use. The code examples and tables are unchanged.
+- README: the usage examples are complete. The segment URLs are function parameters.
+- Validation guides: the tables define DER and JWK, empty cells no longer use an em dash, and a code comment no longer uses an em dash.
+
 
 ## [1.1.2] - 2026-08-11
 
