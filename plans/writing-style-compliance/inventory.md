@@ -116,4 +116,4 @@ All four guides changed.
 | `libs/c2pa/docs/manifest-box-validation.md` | 540 | 34 | 15.9 | 3 (9%) | 8.7 | vs(2) |
 | `libs/c2pa/docs/merkle-validation.md` | 406 | 29 | 14.0 | 1 (3%) | 5.8 | vs(1) |
 | `libs/c2pa/docs/results-and-error-codes.md` | 258 | 20 | 12.9 | 1 (5%) | 7.9 | vs(4) |
-| `libs/c2pa/docs/vsi-validation.md` | 411 | 31 | 13.3 | 3 (10%) | 7.2 | stands(1), vs(2) |
+| `libs/c2pa/docs/vsi-validation.md` | 410 | 31 | 13.2 | 3 (10%) | 7.2 | vs(2) |
