@@ -16,7 +16,7 @@ typecheck.
    (whitespace x comments x parentElement), trimming in the builder, the comment and doctype wrappers,
    tolerant mode. The public signature does not change; its `@throws` TSDoc gains `XmlParseError`.
 3. Public additions, each in its own file with TSDoc and `@public`: `XmlBuilder.ts` (property syntax,
-   `this: void`, `TElement`/`TDocument`), `XmlBuildOptions.ts`, `buildXml.ts`, `XmlParseError.ts`. Export
+   `this: void`, `TElement`/`TDocument`), `XmlParseWithOptions.ts`, `parseXmlWith.ts`, `XmlParseError.ts`. Export
    them from `index.ts`, types through `export type *`. Add
    `'@typescript-eslint/no-invalid-void-type': ['error', { allowAsThisParameter: true }]` to
    `eslint.config.ts` so `this: void` lints without a disable comment.
@@ -24,7 +24,7 @@ typecheck.
    `colon-start attribute`, `pi with gt then element`), regenerate with `UPDATE_FIXTURES=1 npm test -w
    libs/xml`, and confirm that exactly the eight cases listed in `equivalence.md` changed, for the reasons
    listed there. Every other expectation must be byte-identical.
-5. Tests in `libs/xml/test/buildXml.test.ts`, with a `// #region example` block that doubles as the TSDoc
+5. Tests in `libs/xml/test/parseXmlWith.test.ts`, with a `// #region example` block that doubles as the TSDoc
    example: strict end-of-input on the truncated corpus cases, root injection, the name arguments,
    skipping, the text policy, the CDATA fallback, inner-text shapes, and the `XmlParseError` fields.
    Port `prototype/dash.ts` as a test helper and assert that the faithful one-pass builder equals
@@ -33,14 +33,14 @@ typecheck.
    `libs/xml/bench/bench.ts`. Record `main` before the port and the branch after it.
 7. `npm run build -w libs/utils -w libs/xml`, `npm test -w libs/xml`, `npm test -w libs/drm`,
    `npm run typecheck`, `npm run lint`, `npm run build -w docs`. The `cml-xml.api.md` diff must be exactly
-   `buildXml`, `XmlBuilder`, `XmlBuildOptions`, and `XmlParseError` added and `parseXml`'s doc comment.
+   `parseXmlWith`, `XmlBuilder`, `XmlParseWithOptions`, and `XmlParseError` added and `parseXml`'s doc comment.
    Measure bundle sizes as in `prototype.md` and put them in the PR.
-8. Changelog under `## [Unreleased]` in `libs/xml/CHANGELOG.md`. Added: `buildXml`, `XmlBuilder`,
-   `XmlBuildOptions`, `XmlParseError`. Fixed: processing instructions end at `?>`, a `>` inside a quoted
+8. Changelog under `## [Unreleased]` in `libs/xml/CHANGELOG.md`. Added: `parseXmlWith`, `XmlBuilder`,
+   `XmlParseWithOptions`, `XmlParseError`. Fixed: processing instructions end at `?>`, a `>` inside a quoted
    doctype literal no longer ends the doctype, attribute names may start with any XML NameStartChar
    (`_`, `:`, non-ASCII letters). Changed: `parseXml` throws `XmlParseError` (a subclass of `Error` with
    the same messages); with `keepComments`, a comment cut off by the end of the input and the malformed
-   `<!--->` are reported with a closing `-->`. README: a `buildXml` quick start next to `parseXml`.
+   `<!--->` are reported with a closing `-->`. README: a `parseXmlWith` quick start next to `parseXml`.
 9. Update the RFC to `status: implemented` with `implemented-in` and `implementation-plan`, and comment on
    #424 and dash.js#4984 with the before/after table and the builder example.
 10. Incremental input (`write`/`end`) is a separate RFC; its design notes are under "Deferred: incremental

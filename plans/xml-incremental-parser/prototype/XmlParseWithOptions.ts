@@ -1,7 +1,7 @@
 /**
- * Options for `buildXml`.
+ * Options for `parseXmlWith`.
  */
-export type XmlBuildOptions<TDocument> = {
+export type XmlParseWithOptions<TDocument> = {
 	/** The document value to build into. When absent, `builder.createDocument()` supplies it. */
 	root?: TDocument;
 	/** Deliver whitespace-only text runs too (default false). Text is never trimmed by the scanner. */

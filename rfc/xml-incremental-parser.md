@@ -23,19 +23,19 @@ status: draft
 
 ## Summary
 
-Add `buildXml(input, builder, options)`. It runs the scanner that #432 shipped and hands each element,
+Add `parseXmlWith(input, builder, options)`. It runs the scanner that #432 shipped and hands each element,
 text run, CDATA section, comment, and doctype to a *builder* that the consumer supplies. It assembles no
 `XmlNode` tree. The builder decides what an element becomes: whatever `createElement` returns is the
 parent that the element's children receive, and the child that `appendChild` receives when the element
 completes. Returning `undefined` skips the element. A manifest parser can therefore produce its final
 objects in the single tokenization pass, with no intermediate tree.
 
-`parseXml` keeps its signature and output. It and `buildXml` share one scanner, and three grammar fixes to
-that scanner land for both. New public members: `buildXml`, `XmlBuilder<TElement, TDocument>`,
-`XmlBuildOptions`, and `XmlParseError`.
+`parseXml` keeps its signature and output. It and `parseXmlWith` share one scanner, and three grammar fixes to
+that scanner land for both. New public members: `parseXmlWith`, `XmlBuilder<TElement, TDocument>`,
+`XmlParseWithOptions`, and `XmlParseError`.
 
 ```ts
-import { buildXml, type XmlBuilder } from '@svta/cml-xml'
+import { parseXmlWith, type XmlBuilder } from '@svta/cml-xml'
 
 type Node = { tagName: string; attributes: Record<string, string>; children: Node[]; text: string }
 
@@ -46,7 +46,7 @@ const builder: XmlBuilder<Node> = {
 	appendText: (parent, text) => { parent.text += text },
 }
 
-const document = buildXml('<MPD><Period id="1"/></MPD>', builder)
+const document = parseXmlWith('<MPD><Period id="1"/></MPD>', builder)
 ```
 
 ## Motivation
@@ -76,7 +76,7 @@ off, and never allocate a tree.
 
 ### The builder contract
 
-A builder is a plain object of functions. `buildXml` calls `createDocument` once, unless a root value is
+A builder is a plain object of functions. `parseXmlWith` calls `createDocument` once, unless a root value is
 supplied in the options, then `createElement` for every start tag with the enclosing element's value as
 `parent`. Whatever `createElement` returns becomes the parent for that element's children, and
 `appendChild` receives it when the element completes.
@@ -119,7 +119,7 @@ elements and one conversion rule. The faithful port of `processNode`, with all o
 elements, lives in `plans/xml-incremental-parser/prototype/dash.ts` and is tested for identical output.
 
 ```ts
-import { buildXml, type XmlBuilder } from '@svta/cml-xml'
+import { parseXmlWith, type XmlBuilder } from '@svta/cml-xml'
 
 type DashNode = Record<string, unknown> & {
 	tagName: string;
@@ -170,7 +170,7 @@ const dashBuilder: XmlBuilder<DashNode, DashDocument> = {
 }
 
 export function parseManifest(manifestText: string): DashNode | undefined {
-	return buildXml(manifestText, dashBuilder).root
+	return parseXmlWith(manifestText, dashBuilder).root
 }
 ```
 
@@ -190,7 +190,7 @@ that share it. The builder keeps a compact record per `<S>` and expands the reco
 Representation, or the Period, completes in `appendChild`:
 
 ```ts
-import { buildXml, type XmlBuilder } from '@svta/cml-xml'
+import { parseXmlWith, type XmlBuilder } from '@svta/cml-xml'
 
 type Timeline = { t: number; d: number; r: number }[]
 type Level = { name: string; attributes: Record<string, string>; timeline: Timeline; segments: string[] }
@@ -222,7 +222,7 @@ const flattening: XmlBuilder<Level, Model> = {
 }
 
 export function listSegments(manifestText: string): string[] {
-	return buildXml(manifestText, flattening).segments
+	return parseXmlWith(manifestText, flattening).segments
 }
 ```
 
@@ -236,7 +236,7 @@ Return `undefined` from `createElement` to skip an element. The scanner reports 
 `appendChild` for it, and still checks the close tags in the skipped region:
 
 ```ts
-import { buildXml, type XmlBuilder } from '@svta/cml-xml'
+import { parseXmlWith, type XmlBuilder } from '@svta/cml-xml'
 
 type Named = { name: string; children: Named[] }
 
@@ -246,22 +246,22 @@ const withoutMetrics: XmlBuilder<Named> = {
 	appendChild: (parent, child) => { parent.children.push(child) },
 }
 
-const document = buildXml('<MPD><Metrics><Range/></Metrics><Period/></MPD>', withoutMetrics)
+const document = parseXmlWith('<MPD><Metrics><Range/></Metrics><Period/></MPD>', withoutMetrics)
 // document.children[0].children.map(child => child.name) is ['Period']
 ```
 
 ### Errors
 
-`buildXml` requires a complete document. An element left open or a construct cut off by the end of the
+`parseXmlWith` requires a complete document. An element left open or a construct cut off by the end of the
 input throws, as do the errors `parseXml` already reports: a malformed attribute, an unclosed quote, a
 mismatched or stray close tag. Every error is an `XmlParseError`, an `Error` subclass with the message text
 `parseXml` has always produced plus `offset`, `line`, and `column` fields:
 
 ```ts
-import { buildXml, XmlParseError } from '@svta/cml-xml'
+import { parseXmlWith, XmlParseError } from '@svta/cml-xml'
 
 try {
-	buildXml(manifestText, dashBuilder)
+	parseXmlWith(manifestText, dashBuilder)
 }
 catch (error) {
 	if (error instanceof XmlParseError) {
@@ -282,7 +282,7 @@ errors become `XmlParseError` instances with the same messages.
 ### Public API
 
 ```ts
-export type XmlBuildOptions<TDocument> = {
+export type XmlParseWithOptions<TDocument> = {
 	root?: TDocument;
 	keepWhitespace?: boolean;
 };
@@ -303,10 +303,10 @@ export class XmlParseError extends Error {
 	readonly column: number;
 }
 
-export function buildXml<TElement, TDocument = TElement>(input: string, builder: XmlBuilder<TElement, TDocument>, options?: XmlBuildOptions<TDocument>): TDocument;
+export function parseXmlWith<TElement, TDocument = TElement>(input: string, builder: XmlBuilder<TElement, TDocument>, options?: XmlParseWithOptions<TDocument>): TDocument;
 ```
 
-`TElement` and `TDocument` are inferred from the builder. `buildXml` returns `options.root` when given,
+`TElement` and `TDocument` are inferred from the builder. `parseXmlWith` returns `options.root` when given,
 otherwise the result of `builder.createDocument()`, and throws a `TypeError` when neither exists.
 `getElementsByName`, `serializeXml`, `XmlNode`, `XmlParseOptions`, and the `parseXml` signature are
 unchanged.
@@ -314,7 +314,7 @@ unchanged.
 ### Callback semantics
 
 - `createDocument` is called once, before scanning, unless `options.root` is set. Its result is the parent
-  of every top-level element, text run, doctype, and comment, and `buildXml` returns it.
+  of every top-level element, text run, doctype, and comment, and `parseXmlWith` returns it.
 - `createElement(parent, name, attributes, localName, prefix)` is called when a start tag has been read
   completely, before any of the element's content. `attributes` is a fresh object per element with values
   already entity-decoded. The consumer owns it and may keep or mutate it. A return value of `undefined`
@@ -355,7 +355,7 @@ cut off by the end of the input or the malformed `<!--->` now reads `<!-- x-->` 
 
 ### Strictness
 
-`buildXml` throws when the input ends inside a start tag, a close tag, a comment, a CDATA section, a
+`parseXmlWith` throws when the input ends inside a start tag, a close tag, a comment, a CDATA section, a
 doctype, a processing instruction, or a quoted attribute value, and when an element is still open at the
 end. The message is `Unexpected end of input inside <name>` for an open element and
 `Unexpected end of input inside a start tag` and its siblings for constructs, with `Line`, `Column`, and
@@ -372,7 +372,7 @@ internal to `parseXml`.
 `parseXml` stays directly on the scanner, as #432 shipped it, with eight prebuilt tree builders
 (`keepWhitespace` x `keepComments` x `includeParentElement`) as module-level constants. Trimming moves
 from the scanner into the tree builder, which is where the `keepWhitespace` semantics of `parseXml` live
-now. A `parseXml`-only bundle never includes `buildXml`.
+now. A `parseXml`-only bundle never includes `parseXmlWith`.
 
 `parseXml` throws `XmlParseError` where it threw `Error`. `instanceof Error` still holds and the messages
 are unchanged, so no caller breaks. Callers that want the position read `offset` instead of parsing the
@@ -442,12 +442,12 @@ creating each object with all of its fields present.
 | `parseXml` on `main` (#432) | 3,797 B | 1,494 B |
 | whole `@svta/cml-xml` on `main` | 4,301 B | 1,734 B |
 | `parseXml` on the phase-one scanner | 5,004 B | 1,947 B |
-| `buildXml` alone | 4,000 B | 1,640 B |
+| `parseXmlWith` alone | 4,000 B | 1,640 B |
 | whole package after phase one | 5,224 B | 2,012 B |
 
 A `parseXml`-only bundle grows by about 450 bytes gzipped: the strict-mode branches, the NameStartChar
 test, the quoted-literal doctype scan, the skip checks, and `XmlParseError` live in the shared scanner,
-and the tree builder grows from four to eight variants. A `buildXml`-only bundle is about 150 bytes
+and the tree builder grows from four to eight variants. A `parseXmlWith`-only bundle is about 150 bytes
 gzipped larger than `parseXml` is on `main` today and carries no tree builder.
 
 ### Implementation notes
@@ -455,7 +455,7 @@ gzipped larger than `parseXml` is on `main` today and carries no tree builder.
 - The scanner takes primitives, the two stack arrays, and the builder object, and writes nothing back to
   a per-parse object. #432 established that shape because an object created per parse gets a fresh V8
   hidden class after every full GC, and the first reassignment of a field the constructor initialized
-  deoptimizes every function compiled against it. `buildXml` keeps to it: the root goes into the stack,
+  deoptimizes every function compiled against it. `parseXmlWith` keeps to it: the root goes into the stack,
   nothing else is allocated per parse.
 - Every character read is guarded (`cc = ++pos < length ? input.charCodeAt(pos) : 0`), as on `main`.
 - Builders should be module-level constants so the call targets inside the scanner are stable across
@@ -476,7 +476,7 @@ implementation carries them over:
 
 1. The parity corpus and fixtures from #432, regenerated for exactly the eight cases, with three new cases
    for the grammar fixes.
-2. `buildXml` tests. Every truncated corpus input throws `XmlParseError`, and every other input produces
+2. `parseXmlWith` tests. Every truncated corpus input throws `XmlParseError`, and every other input produces
    what `parseXml` produces. Root injection, the name arguments, skipping, the text policy, the CDATA
    fallback, the inner-text shapes, and the error fields each get a test.
 3. The faithful dash.js builder compared `deepStrictEqual` to `parseXml` plus `processNode` on the
@@ -505,7 +505,7 @@ A one-shot entry point now, incremental input later. The first draft made `write
 found the carry rescanning quadratic for a long construct and a denial-of-service path on remote input,
 found that `end()` had to become strict, and found the chunked benchmarks confounded by string
 representation. All of that is streaming work. Meanwhile #432 had shipped the scanner and dash.js parses
-complete strings, so `buildXml` is a small wrapper that delivers the contract today. The streaming design,
+complete strings, so `parseXmlWith` is a small wrapper that delivers the contract today. The streaming design,
 with the fixes review asked for, is recorded for a follow-up RFC.
 
 SAX-style events cost the same to run as builder callbacks, but they leave the consumer to keep a stack to
@@ -547,7 +547,7 @@ and doctypes with a leading `!` because `XmlNode` stores them that way. The buil
 output, and the tree builder can re-add what `XmlNode` expects. The price is two malformed-comment inputs
 whose delimiters the tree builder can no longer reproduce.
 
-Strict `buildXml`. A parser that a player points at a network response must not turn a truncated body
+Strict `parseXmlWith`. A parser that a player points at a network response must not turn a truncated body
 into a plausible partial manifest. `parseXml` keeps its tolerance because existing callers rely on it, and
 the difference is one flag on the shared scanner.
 
@@ -580,13 +580,12 @@ names are proposed, and open (see Unresolved questions).
 
 1. Names: `XmlBuilder` with `createElement` and `appendChild` (proposed), or `XmlHandlers` with
    `startElement` and `endElement`?
-2. The entry point's name: `buildXml` (proposed), or a name that says "parse", such as `parseXmlWith`?
-3. Skipping through `undefined` (proposed) or through a dedicated sentinel export, which would let
+2. Skipping through `undefined` (proposed) or through a dedicated sentinel export, which would let
    `TElement` include `undefined`?
-4. Whether `keepWhitespace` belongs on `XmlBuildOptions`, or builders should always receive every run and
+3. Whether `keepWhitespace` belongs on `XmlParseWithOptions`, or builders should always receive every run and
    drop blanks themselves. Proposed: keep the option, since dropping blank runs in the scanner saves a
    slice and a call per run on pretty-printed manifests.
-5. Whether the forced-GC anomaly is a property of the benchmark or of builders with dynamic shapes, which
+4. Whether the forced-GC anomaly is a property of the benchmark or of builders with dynamic shapes, which
    the implementation should settle with `--trace-deopt` before the guide gives advice on object shapes.
 
 ## Future possibilities
@@ -603,11 +602,13 @@ names are proposed, and open (see Unresolved questions).
 - 2026-09-02: initial draft, an incremental parser with `write` and `end`.
 - 2026-09-02: review fixes (text accumulation in the Summary example, the completion rule for processing
   instructions, reproducible scripts in the design record) and a plain-language pass.
-- 2026-09-03: reshaped after review. Incremental input is deferred to a follow-up RFC and `buildXml` is
+- 2026-09-03: reshaped after review. Incremental input is deferred to a follow-up RFC and `parseXmlWith` is
   the one-shot entry point. The contract gains root injection, name arguments, skipping, untrimmed text,
   the CDATA fallback, inner-text shapes, `TElement`/`TDocument`, property syntax with `this: void`,
   `XmlParseError`, and strict end-of-input handling. Three grammar fixes land for both entry points, and
   the measurements are redone against `main` after #432 with an executable prototype.
+- 2026-09-03: the entry point is named `parseXmlWith`, not `buildXml`, so the name says what is parsed and
+  what shapes the result. The options type follows as `XmlParseWithOptions`.
 
 ## Final Decision
 

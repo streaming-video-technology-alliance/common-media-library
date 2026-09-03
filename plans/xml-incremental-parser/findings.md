@@ -28,11 +28,11 @@ Casey reviewed the RFC in 22 threads, partly from trying the contract against th
 Every item below was verified against `main` after #432 before being accepted.
 
 1. **Split.** #432 already put the flat scanner and the internal builder on `main`, and dash.js passes
-   complete strings, so a one-shot `buildXml(input, builder)` gives dash.js everything it uses today. Every
+   complete strings, so a one-shot `parseXmlWith(input, builder)` gives dash.js everything it uses today. Every
    P1 finding sat in the streaming half (carry cost, truncation semantics, chunk benchmarks). Phase one
-   is the builder contract plus `buildXml`; incremental input is a follow-up RFC (see "Deferred").
+   is the builder contract plus `parseXmlWith`; incremental input is a follow-up RFC (see "Deferred").
 2. **`parseXml` stays directly on `scan`**, as #432 shipped it, so a `parseXml`-only bundle never carries
-   `buildXml`. The RFC's decision baseline is `main` after #432, not the pre-#432 parser.
+   `parseXmlWith`. The RFC's decision baseline is `main` after #432, not the pre-#432 parser.
 3. **Text policy.** Runs are delivered untrimmed, entity-decoded. Whitespace-only runs are dropped unless
    `keepWhitespace`. `parseXml`'s tree builder trims, as before. `appendCdata` falls back to `appendText`
    when absent so character data is never lost silently.
@@ -42,7 +42,7 @@ Every item below was verified against `main` after #432 before being accepted.
    changes only on inputs it currently gets wrong (eight corpus cases, listed in `equivalence.md`).
 5. **Shapes.** Comments and doctypes are delivered as inner text (between `<!--` and `-->`, after `<!`);
    the tree builder re-adds what `XmlNode` expects. CDATA was already inner text.
-6. **Root injection.** `buildXml(input, builder, { root })`; `createDocument` becomes optional. Module-level
+6. **Root injection.** `parseXmlWith(input, builder, { root })`; `createDocument` becomes optional. Module-level
    builders then need no per-parse closure and no mutable module state.
 7. **Name argument.** `appendChild(parent, child, name)` receives the child's tag name; the text callbacks
    receive the parent's. Both come from the `names` stack the scanner already keeps.
@@ -52,7 +52,7 @@ Every item below was verified against `main` after #432 before being accepted.
    parameters contravariantly; `this: void` because the scanner calls the functions detached. `main`'s
    internal type already uses property syntax.
 10. **Errors.** `XmlParseError extends Error` with `offset`, `line`, `column`; message text unchanged, so
-    `parseXml` callers see a subclass with the same messages. `buildXml` is strict: an element left open
+    `parseXml` callers see a subclass with the same messages. `parseXmlWith` is strict: an element left open
     or a construct cut off by the end of the input throws (`Unexpected end of input inside ...`); the
     tolerant completion stays internal for `parseXml`.
 11. **Evidence.** The guide's dash.js example is illustrative and says so. A faithful port of
@@ -130,7 +130,7 @@ Tables in `benchmark.md`, code in `prototype/`.
 | `parseXml` on `main` (#432) | 3,797 B | 1,494 B |
 | whole `@svta/cml-xml` on `main` | 4,301 B | 1,734 B |
 | `parseXml` on the phase-one scanner | 5,004 B | 1,947 B |
-| `buildXml` alone | 4,000 B | 1,640 B |
+| `parseXmlWith` alone | 4,000 B | 1,640 B |
 | whole package after phase one | 5,224 B | 2,012 B |
 
 ## Platform notes
@@ -157,7 +157,7 @@ from them.
   add a buffered-construct limit that throws. Start tags may still be rescanned from their start under
   that limit. Test with multi-megabyte constructs in small chunks.
 - **`end()` must be strict by default.** A response that ends cleanly mid-document must not come back as
-  a plausible partial manifest. Phase one's `buildXml` already establishes the rule.
+  a plausible partial manifest. Phase one's `parseXmlWith` already establishes the rule.
 - **Chunk benchmarks need comparable strings.** Flatten one whole input, then measure flat whole input,
   decoder-like flat chunks, and the `slice()` chunks a time-slicing consumer would produce, reporting
   slicing cost and the maximum per-write duration. The earlier "chunking is free" result compared a rope

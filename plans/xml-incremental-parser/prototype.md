@@ -7,7 +7,7 @@ step; the repository's lint and typecheck cover it). It is the reference for the
 |---|---|
 | `prototype/scan.ts` | `libs/xml/src/scan.ts` plus the contract changes, each marked `RFC:` |
 | `prototype/XmlBuilder.ts` | the proposed builder type: property syntax, `this: void`, `TElement`/`TDocument` |
-| `prototype/XmlBuildOptions.ts`, `prototype/buildXml.ts` | the one-shot entry point, strict about truncated input |
+| `prototype/XmlParseWithOptions.ts`, `prototype/parseXmlWith.ts` | the one-shot entry point, strict about truncated input |
 | `prototype/XmlParseError.ts` | the error class with `offset`, `line`, `column` |
 | `prototype/parseXml.ts` | `parseXml` on the new scanner, tolerant, trimming in the tree builder |
 | `prototype/dash.ts` | the dash.js `processNode` port, the faithful one-pass builder, the lean builder |
@@ -24,12 +24,12 @@ step; the repository's lint and typecheck cover it). It is the reference for the
 | `parseXml` on `main` (#432) | 3,797 B | 1,494 B |
 | whole `@svta/cml-xml` on `main` | 4,301 B | 1,734 B |
 | `parseXml` on the phase-one scanner | 5,004 B | 1,947 B |
-| `buildXml` alone (scanner, `buildXml`, `XmlParseError`) | 4,000 B | 1,640 B |
+| `parseXmlWith` alone (scanner, `parseXmlWith`, `XmlParseError`) | 4,000 B | 1,640 B |
 | whole package after phase one | 5,224 B | 2,012 B |
 
 A `parseXml`-only bundle grows by about 450 bytes gzipped. The scanner carries the strict-mode branches,
 the NameStartChar test, the quoted-literal doctype scan, the skip checks, and `XmlParseError` for both
-entry points, and the tree builder grows from four to eight variants. A `buildXml`-only bundle is about
+entry points, and the tree builder grows from four to eight variants. A `parseXmlWith`-only bundle is about
 150 bytes gzipped larger than `parseXml` is on `main` today and carries no tree builder.
 
 ## Performance notes for the port
@@ -37,7 +37,7 @@ entry points, and the tree builder grows from four to eight variants. A `buildXm
 - The scanner takes only primitives, the two stack arrays, and the builder object, and writes nothing
   back to a per-parse object. #432 established this shape and its reason: an object created per parse
   gets a fresh V8 hidden class after every full GC, and the first reassignment of a field the
-  constructor initialized deoptimizes every function compiled against it. The `buildXml` wrapper keeps to
+  constructor initialized deoptimizes every function compiled against it. The `parseXmlWith` wrapper keeps to
   that shape.
 - Every character read is guarded (`cc = ++pos < length ? input.charCodeAt(pos) : 0`); reading one past
   the end once makes V8 compile every comparison on that variable as a floating-point compare.

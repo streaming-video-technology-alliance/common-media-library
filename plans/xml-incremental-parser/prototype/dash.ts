@@ -1,5 +1,5 @@
 import type { XmlNode } from '@svta/cml-xml'
-import { buildXml } from './buildXml.ts'
+import { parseXmlWith } from './parseXmlWith.ts'
 import type { XmlBuilder } from './XmlBuilder.ts'
 
 // dash.js DashParser.processXml as of the development branch (2026-09): the tree walk ported for the
@@ -275,7 +275,7 @@ const faithfulBuilder: XmlBuilder<DashNode, DashDocument> = {
  * The dash.js manifest object in one pass, identical to `dashToday`
  */
 export function dashOnePassFaithful(text: string): Record<string, DashNode> {
-	const document = buildXml(text, faithfulBuilder)
+	const document = parseXmlWith(text, faithfulBuilder)
 	const root = document.entries.find(entry => entry.name === 'MPD' || entry.name === 'Patch') ?? document.entries[0]
 	return { [root.node.tagName as string]: root.node }
 }
@@ -352,5 +352,5 @@ const leanBuilder: XmlBuilder<LeanNode, LeanDocument> = {
  * A lean dash.js manifest object in one pass
  */
 export function dashOnePassLean(text: string): LeanNode | undefined {
-	return buildXml(text, leanBuilder).root
+	return parseXmlWith(text, leanBuilder).root
 }

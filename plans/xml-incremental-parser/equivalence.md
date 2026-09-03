@@ -20,9 +20,9 @@ node plans/xml-incremental-parser/prototype/equivalence.ts
    errors by message. Every difference must appear in `EXPECTED_DIFFERENCES` with the option sets where it
    shows and a check of the new output; the other option sets of the same input must still be identical.
    Every error the prototype throws is an `XmlParseError` with the text `main` produces.
-2. **`buildXml`.** On the 22 truncated corpus inputs it throws `XmlParseError`; on every other input it
+2. **`parseXmlWith`.** On the 22 truncated corpus inputs it throws `XmlParseError`; on every other input it
    produces exactly what `parseXml` produces, with and without `keepWhitespace`.
-3. **The builder contract.** Root injection (`createDocument` not called, `buildXml` returns the root),
+3. **The builder contract.** Root injection (`createDocument` not called, `parseXmlWith` returns the root),
    the name argument on `appendChild` and the text callbacks, skipping on `undefined` (no callbacks inside,
    close tags still checked), untrimmed text with blank runs dropped unless `keepWhitespace`, CDATA falling
    back to `appendText`, inner text for comments and doctypes, and `offset`, `line`, `column` on

@@ -6,7 +6,7 @@
  * 1. Parity: the prototype `parseXml` against the published one (`@svta/cml-xml` on main after #432) over
  *    the parity corpus from libs/xml/test/parseXml.equivalence.test.ts plus a few cases for the grammar
  *    fixes, with every option set. Differences must be listed in EXPECTED_DIFFERENCES with a check.
- * 2. `buildXml`: strict end-of-input handling, and the same result as `parseXml` on complete input.
+ * 2. `parseXmlWith`: strict end-of-input handling, and the same result as `parseXml` on complete input.
  * 3. The builder contract: root injection, names on the append callbacks, skipping, the text policy, the
  *    CDATA fallback, the delivered shapes, and the error fields.
  * 4. dash.js: the faithful one-pass builder produces exactly what parseXml plus processNode produces.
@@ -16,7 +16,7 @@ import { deepStrictEqual, ok, strictEqual, throws } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { generateMpd } from '../../../libs/xml/bench/generate.ts'
-import { buildXml } from './buildXml.ts'
+import { parseXmlWith } from './parseXmlWith.ts'
 import { dashOnePassFaithful, dashToday } from './dash.ts'
 import { createTreeBuilder, parseXml } from './parseXml.ts'
 import type { XmlBuilder } from './XmlBuilder.ts'
@@ -155,7 +155,7 @@ const CORPUS: Record<string, string> = {
 	'pi with gt then element': '<?pi a > b?><root/>',
 }
 
-// Inputs that end inside a construct or with an element open: buildXml rejects them
+// Inputs that end inside a construct or with an element open: parseXmlWith rejects them
 const TRUNCATED = new Set([
 	'truncated attribute name', 'truncated after equals', 'truncated in quoted value', 'unterminated attribute value at end',
 	'unclosed element', 'unclosed element with text', 'unterminated close tag', 'unterminated close tag with text',
@@ -293,27 +293,27 @@ check('parity: errors are XmlParseError with the same text', () => {
 	}
 })
 
-// 2. buildXml: strict on truncated input, identical to parseXml otherwise
+// 2. parseXmlWith: strict on truncated input, identical to parseXml otherwise
 const treeBuilder = createTreeBuilder(false, false, false)
 const treeBuilderWs = createTreeBuilder(true, false, false)
 for (const [name, input] of Object.entries(CORPUS)) {
 	if (TRUNCATED.has(name)) {
-		check(`buildXml rejects: ${name}`, () => {
-			throws(() => buildXml(input, treeBuilder), (error: unknown) => error instanceof XmlParseError)
+		check(`parseXmlWith rejects: ${name}`, () => {
+			throws(() => parseXmlWith(input, treeBuilder), (error: unknown) => error instanceof XmlParseError)
 		})
 	}
 	else {
-		check(`buildXml equals parseXml: ${name}`, () => {
-			deepStrictEqual(outcome(() => buildXml(input, treeBuilder)), outcome(() => parseXml(input)))
-			deepStrictEqual(outcome(() => buildXml(input, treeBuilderWs, { keepWhitespace: true })), outcome(() => parseXml(input, { keepWhitespace: true })))
+		check(`parseXmlWith equals parseXml: ${name}`, () => {
+			deepStrictEqual(outcome(() => parseXmlWith(input, treeBuilder)), outcome(() => parseXml(input)))
+			deepStrictEqual(outcome(() => parseXmlWith(input, treeBuilderWs, { keepWhitespace: true })), outcome(() => parseXml(input, { keepWhitespace: true })))
 		})
 	}
 }
-check('buildXml: unclosed element names the element', () => {
-	throws(() => buildXml('<MPD><Period>', treeBuilder), /Unexpected end of input inside <Period>/)
+check('parseXmlWith: unclosed element names the element', () => {
+	throws(() => parseXmlWith('<MPD><Period>', treeBuilder), /Unexpected end of input inside <Period>/)
 })
-check('buildXml: truncated start tag', () => {
-	throws(() => buildXml('<MPD><Peri', treeBuilder), /Unexpected end of input inside a start tag/)
+check('parseXmlWith: truncated start tag', () => {
+	throws(() => parseXmlWith('<MPD><Peri', treeBuilder), /Unexpected end of input inside a start tag/)
 })
 
 // 3. The builder contract
@@ -347,15 +347,15 @@ check('contract: root injection skips createDocument and end returns the root', 
 		createDocument: () => { created++; return { name: 'made' } },
 		createElement: (_parent, name) => ({ name }),
 	}
-	strictEqual(buildXml('<a/>', builder, { root }), root)
+	strictEqual(parseXmlWith('<a/>', builder, { root }), root)
 	strictEqual(created, 0)
-	strictEqual(buildXml('<a/>', builder).name, 'made')
-	throws(() => buildXml('<a/>', { createElement: (_parent, name) => ({ name }) }), /provide options.root or builder.createDocument/)
+	strictEqual(parseXmlWith('<a/>', builder).name, 'made')
+	throws(() => parseXmlWith('<a/>', { createElement: (_parent, name) => ({ name }) }), /provide options.root or builder.createDocument/)
 })
 
 check('contract: names on the append callbacks', () => {
 	const { builder, log } = recording()
-	buildXml('<r><a>t</a><b/></r>', builder)
+	parseXmlWith('<r><a>t</a><b/></r>', builder)
 	deepStrictEqual(log, [
 		['element', '#document', 'r', {}],
 		['element', 'r', 'a', {}],
@@ -369,7 +369,7 @@ check('contract: names on the append callbacks', () => {
 
 check('contract: returning undefined skips the element and everything inside it', () => {
 	const { builder, log } = recording('skip')
-	buildXml('<r><skip a="1"><x>t<!-- c --></x></skip><y/></r>', builder)
+	parseXmlWith('<r><skip a="1"><x>t<!-- c --></x></skip><y/></r>', builder)
 	deepStrictEqual(log, [
 		['element', '#document', 'r', {}],
 		['skip', 'r', 'skip'],
@@ -377,13 +377,13 @@ check('contract: returning undefined skips the element and everything inside it'
 		['child', 'r', 'y', 'y'],
 		['child', '#document', 'r', 'r'],
 	])
-	throws(() => buildXml('<r><skip><x></y></skip></r>', recording('skip').builder), /Unexpected close tag/)
+	throws(() => parseXmlWith('<r><skip><x></y></skip></r>', recording('skip').builder), /Unexpected close tag/)
 })
 
 check('contract: text is delivered untrimmed, blank runs only with keepWhitespace', () => {
 	const texts = (input: string, keepWhitespace = false): string[] => {
 		const { builder, log } = recording()
-		buildXml(input, builder, { keepWhitespace })
+		parseXmlWith(input, builder, { keepWhitespace })
 		return log.filter(entry => entry[0] === 'text').map(entry => entry[2] as string)
 	}
 	deepStrictEqual(texts('<p>Hello <b>x</b> world</p>'), ['Hello ', 'x', ' world'])
@@ -394,13 +394,13 @@ check('contract: text is delivered untrimmed, blank runs only with keepWhitespac
 
 check('contract: CDATA falls back to appendText', () => {
 	const { builder, log } = recording()
-	buildXml('<a><![CDATA[ <x>&amp; ]]></a>', builder)
+	parseXmlWith('<a><![CDATA[ <x>&amp; ]]></a>', builder)
 	deepStrictEqual(log.filter(entry => entry[0] === 'text'), [['text', 'a', ' <x>&amp; ', 'a']])
 })
 
 check('contract: comments and doctypes are delivered as inner text', () => {
 	const { builder, log } = recording()
-	buildXml('<!DOCTYPE html PUBLIC "a>b"><a><!-- c --></a>', builder)
+	parseXmlWith('<!DOCTYPE html PUBLIC "a>b"><a><!-- c --></a>', builder)
 	deepStrictEqual(log.filter(entry => entry[0] === 'doctype' || entry[0] === 'comment'), [
 		['doctype', '#document', 'DOCTYPE html PUBLIC "a>b"', ''],
 		['comment', 'a', ' c ', 'a'],
@@ -410,7 +410,7 @@ check('contract: comments and doctypes are delivered as inner text', () => {
 check('contract: XmlParseError carries offset, line, and column', () => {
 	const input = '<a>\n<b></c></a>'
 	try {
-		buildXml(input, treeBuilder)
+		parseXmlWith(input, treeBuilder)
 		ok(false, 'expected a throw')
 	}
 	catch (error) {
