@@ -2,7 +2,7 @@
 
 Thank you for contributing to the Common Media Library.
 
-Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approachable and respectable.
+Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approachable and respectful.
 
 This guide gives an overview of the contribution workflow: opening an issue, creating a pull request (PR), review, and merge.
 
@@ -12,7 +12,7 @@ This guide gives an overview of the contribution workflow: opening an issue, cre
 
 #### Create a new issue
 
-If you find a problem with the docs, first [search the existing issues](https://github.com/streaming-video-technology-alliance/common-media-library/issues). If no related issue exists, open a new issue with the relevant [issue form](https://github.com/streaming-video-technology-alliance/common-media-library/issues/new/choose).
+If you find a problem, first [search the existing issues](https://github.com/streaming-video-technology-alliance/common-media-library/issues). If no related issue exists, open a new issue with the relevant [issue form](https://github.com/streaming-video-technology-alliance/common-media-library/issues/new/choose).
 
 #### Solve an issue
 

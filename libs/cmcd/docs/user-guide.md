@@ -194,7 +194,7 @@ reporter.update({
 	nor: ["segment_002.m4s"],
 });
 
-// Absolute URL — converted automatically:
+// Absolute URL, converted automatically:
 reporter.update({
 	nor: ["https://cdn.example.com/streams/video/segment_002.m4s"],
 });
@@ -329,7 +329,7 @@ emits those events on a timer with whatever is in the data store at
 that moment. There is no callback for per-event data. Keep the
 continuous metrics current with `update()`.
 
-### Don't pair `update()` with `recordEvent()` for the same state-change field
+### Do not pair `update()` with `recordEvent()` for the same state-change field
 
 Dedup drops the payload of the second call:
 

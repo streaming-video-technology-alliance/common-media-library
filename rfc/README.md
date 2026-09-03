@@ -68,7 +68,7 @@ rfc/
 ├── README.md           # This file
 ├── feature-name.md     # Single-file RFC
 └── feature-name/       # Multi-file RFC
-    └── index.md        # Overview; split supporting docs as needed
+    └── index.md        # Overview. Split supporting docs as needed
 ```
 
 ## Contributing an RFC

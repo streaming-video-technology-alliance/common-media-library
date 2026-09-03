@@ -13,7 +13,7 @@ There are four main validation functions, each for a different aspect of CMCD co
 
 | Function                  | Purpose                                                           |
 | ------------------------- | ----------------------------------------------------------------- |
-| `validateCmcd`            | Orchestrator — runs key, value, and structure checks              |
+| `validateCmcd`            | Orchestrator: runs key, value, and structure checks               |
 | `validateCmcdRequest`     | Validates a `Request` or `HttpRequest` as request-mode data       |
 | `validateCmcdEvents`      | Validates a multi-line `application/cmcd` body as event-mode data |
 | `validateCmcdEventReport` | Validates a full `HttpRequest` as an event-mode payload           |

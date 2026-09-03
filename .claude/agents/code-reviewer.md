@@ -101,7 +101,7 @@ Items that must be fixed before merging.
 Items that should be addressed but are not blocking.
 
 ## Suggestions
-Optional improvements for better DX, performance, or consistency.
+Optional improvements for developer experience, performance, or consistency.
 
 ## What Looks Good
 Positive observations about the changes.

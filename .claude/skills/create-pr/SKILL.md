@@ -207,4 +207,4 @@ EOF
 - The summary bullets should explain **why** the changes were made, not only which files changed.
 - If builds are slow, build only the packages that the changes affect directly, and their dependents.
 - Always push with `-u` to configure tracking.
-- **Every commit must have DCO sign-off.** Always use `git commit -s` and include `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>` in the message body. If you fix issues found during validation (Steps 2-5), commit the fixes with these requirements before you proceed.
+- **Every commit must have DCO sign-off.** Always use `git commit -s` and include a `Co-Authored-By: <agent-name> <model> <noreply@anthropic.com>` trailer in the message body, as `AGENTS.md` requires. If you fix issues found during validation (Steps 2-5), commit the fixes with these requirements before you proceed.

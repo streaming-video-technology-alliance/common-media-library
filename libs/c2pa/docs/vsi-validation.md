@@ -34,7 +34,7 @@ The returned `InitSegmentValidation` object contains:
 | Field | Type | Description |
 |-------|------|-------------|
 | `manifest` | `C2paManifest \| null` | Parsed manifest (label, assertions, signature info) |
-| `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate |
+| `certificate` | `Uint8Array \| null` | End-entity certificate in Distinguished Encoding Rules (DER) format |
 | `manifestId` | `string \| null` | Manifest identifier |
 | `sessionKeys` | `readonly ValidatedSessionKey[]` | Session keys with valid signer binding |
 | `isValid` | `boolean` | All checks passed |
@@ -59,7 +59,7 @@ Each `ValidatedSessionKey` contains:
 | Field | Type | Description |
 |-------|------|-------------|
 | `kid` | `string` | Key ID (hex-encoded) |
-| `jwk` | `CoseKeyJwk` | Public key in JWK format (WebCrypto-compatible) |
+| `jwk` | `CoseKeyJwk` | Public key in JSON Web Key (JWK) format, compatible with WebCrypto |
 | `minSequenceNumber` | `number` | Minimum accepted sequence number |
 | `validityPeriod` | `number` | Key lifetime in seconds |
 | `createdAt` | `string` | ISO 8601 timestamp of key creation |

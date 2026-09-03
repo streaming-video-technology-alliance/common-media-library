@@ -60,4 +60,4 @@ The documentation will be published on GitHub Pages with every version release.
 
 ### Distribution
 
-The library will be distributed as an npm package in the `@svta` organization: `@svta/common-media-library`. Only SVTA members can publish.
+The library will be distributed as npm packages in the `@svta` organization, one per library, named `@svta/cml-<name>`. Only SVTA members can publish.
