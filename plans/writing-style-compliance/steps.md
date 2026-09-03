@@ -58,11 +58,11 @@ git add plans/writing-style-compliance
 git commit -s -m "docs(plans): writing style compliance plan, inventory, and check script"
 ```
 
-- [ ] **Step 3: Rewrite `AGENTS.md` outside the Writing Style section, and `CLAUDE.md`**
+- [x] **Step 3: Rewrite `AGENTS.md` outside the Writing Style section, and `CLAUDE.md`**
 
 In the priority list, replace the em dash after each bold term with a colon. Split every sentence with a semicolon into two sentences. Define GC, PR, RFC, and DCO at first use. Replace "fall into the pit of success" and "pay for what they import" with literal sentences. Replace every "e.g." and "etc." with a list or "such as". Then remove duplication until the file is not longer than the base version.
 
-- [ ] **Step 4: Check**
+- [x] **Step 4: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh 26fd67982 AGENTS.md CLAUDE.md
@@ -70,18 +70,18 @@ bash plans/writing-style-compliance/check.sh 26fd67982 AGENTS.md CLAUDE.md
 
 Expected: every line PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add AGENTS.md CLAUDE.md
 git commit -s -m "docs(agents): apply the writing style rules to AGENTS.md and CLAUDE.md"
 ```
 
-- [ ] **Step 6: Rewrite `README.md`, `CONTRIBUTING.md`, `SCOPING.md`, and `SECURITY.md`**
+- [x] **Step 6: Rewrite `README.md`, `CONTRIBUTING.md`, `SCOPING.md`, and `SECURITY.md`**
 
 Split the long paragraphs in `README.md` and `SCOPING.md`. Replace "shared in spirit" with "share the intent of these features but not the code". Replace "fall out of sync" with "a bug fixed in one player can remain in the others". Define SVTA and SDK at first use. Keep the future tense in `SCOPING.md`. Keep the code block and every link target in `README.md`.
 
-- [ ] **Step 7: Check**
+- [x] **Step 7: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh 26fd67982 README.md CONTRIBUTING.md SCOPING.md SECURITY.md
@@ -89,18 +89,18 @@ bash plans/writing-style-compliance/check.sh 26fd67982 README.md CONTRIBUTING.md
 
 Expected: every line PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add README.md CONTRIBUTING.md SCOPING.md SECURITY.md
 git commit -s -m "docs: apply the writing style rules to the repository documents"
 ```
 
-- [ ] **Step 9: Rewrite the three templates under `.github/`**
+- [x] **Step 9: Rewrite the three templates under `.github/`**
 
 Remove "please". Replace each "e.g." with "for example". Fix the nesting of the two attribution items in the PR template. Keep the frontmatter of the issue templates.
 
-- [ ] **Step 10: Check**
+- [x] **Step 10: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh 26fd67982 .github/PULL_REQUEST_TEMPLATE.md .github/ISSUE_TEMPLATE/bug_report.md .github/ISSUE_TEMPLATE/feature_request.md
@@ -108,14 +108,14 @@ bash plans/writing-style-compliance/check.sh 26fd67982 .github/PULL_REQUEST_TEMP
 
 Expected: every line PASS.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add .github
 git commit -s -m "docs(github): apply the writing style rules to the issue and PR templates"
 ```
 
-- [ ] **Step 12: Record the after metrics**
+- [x] **Step 12: Record the after metrics**
 
 Run the metrics script on the nine files. Add the rows under "After tranche 1" in `inventory.md`.
 
@@ -166,7 +166,7 @@ npm run build
 sed -n '/^```typescript/,/^```/p' libs/<package>/README.md | sed '1d;$d' | node --input-type=module
 ```
 
-- [ ] **Step 3: Check**
+- [x] **Step 3: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main libs/*/README.md
@@ -174,20 +174,20 @@ bash plans/writing-style-compliance/check.sh origin/main libs/*/README.md
 
 Expected: every line PASS.
 
-- [ ] **Step 4: Add the changelog notes**
+- [x] **Step 4: Add the changelog notes**
 
 Under `## [Unreleased]` in each of the 19 `libs/<package>/CHANGELOG.md` files, add: `- docs: rewrote the README for readers who do not read English as a first language`. If a package has no `## [Unreleased]` heading, add one above the newest version heading.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add libs/*/README.md libs/*/CHANGELOG.md
 git commit -s -m "docs: apply the writing style rules to the package READMEs"
 ```
 
-- [ ] **Step 6: Rewrite the three other READMEs and the three iso-bmff guides**
+- [x] **Step 6: Rewrite the three other READMEs and the three iso-bmff guides**
 
-- [ ] **Step 7: Check**
+- [x] **Step 7: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main libs/cmaf-ham/src/README.md libs/cmaf-ham/samples/cmaf-ham-conversion/README.md libs/608/test/fixtures/README.md libs/iso-bmff/docs/reading-boxes.md libs/iso-bmff/docs/utilities.md libs/iso-bmff/docs/writing-boxes.md
@@ -195,14 +195,14 @@ bash plans/writing-style-compliance/check.sh origin/main libs/cmaf-ham/src/READM
 
 Expected: every line PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add libs/cmaf-ham libs/608 libs/iso-bmff
 git commit -s -m "docs: apply the writing style rules to the sample, fixture, and iso-bmff guides"
 ```
 
-- [ ] **Step 9: Record the after metrics in `inventory.md` under a new "After tranche 2" heading, commit, and push**
+- [x] **Step 9: Record the after metrics in `inventory.md` under a new "After tranche 2" heading, commit, and push**
 
 ```bash
 git add plans/writing-style-compliance/inventory.md
@@ -237,7 +237,7 @@ git checkout -b docs/writing-style-cmcd-guides origin/main
 
 Add a Terms list after the introduction. Define each abbreviation the guide uses at first use, including CMCD, CTA, and any key names it explains. Keep every code block and table.
 
-- [ ] **Step 3: Check**
+- [x] **Step 3: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main libs/cmcd/docs/user-guide.md
@@ -245,16 +245,16 @@ bash plans/writing-style-compliance/check.sh origin/main libs/cmcd/docs/user-gui
 
 Expected: every line PASS. If the Terms list makes the blocks check show one new table, that difference is the only allowed one.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add libs/cmcd/docs/user-guide.md
 git commit -s -m "docs(cmcd): apply the writing style rules to the user guide"
 ```
 
-- [ ] **Step 5: Rewrite `report-recorder-guide.md` and `validation-guide.md`**
+- [x] **Step 5: Rewrite `report-recorder-guide.md` and `validation-guide.md`**
 
-- [ ] **Step 6: Check**
+- [x] **Step 6: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main libs/cmcd/docs/report-recorder-guide.md libs/cmcd/docs/validation-guide.md
@@ -262,7 +262,7 @@ bash plans/writing-style-compliance/check.sh origin/main libs/cmcd/docs/report-r
 
 Expected: every line PASS.
 
-- [ ] **Step 7: Add the changelog note and commit**
+- [x] **Step 7: Add the changelog note and commit**
 
 Under `## [Unreleased]` in `libs/cmcd/CHANGELOG.md`: `- docs: rewrote the user, report recorder, and validation guides for readers who do not read English as a first language`.
 
@@ -271,7 +271,7 @@ git add libs/cmcd
 git commit -s -m "docs(cmcd): apply the writing style rules to the report recorder and validation guides"
 ```
 
-- [ ] **Step 8: Record the after metrics under "After tranche 3" in `inventory.md`, commit, and push**
+- [x] **Step 8: Record the after metrics under "After tranche 3" in `inventory.md`, commit, and push**
 
 ```bash
 git push -u origin docs/writing-style-cmcd-guides
@@ -302,7 +302,7 @@ git checkout -b docs/writing-style-c2pa-guides origin/main
 
 Replace each use of "vs" with "compared with" or with a two-column table. Define VSI, EMSG, BMFF, COSE, and Merkle tree at first use in each file.
 
-- [ ] **Step 3: Check**
+- [x] **Step 3: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main libs/c2pa/docs/*.md
@@ -310,7 +310,7 @@ bash plans/writing-style-compliance/check.sh origin/main libs/c2pa/docs/*.md
 
 Expected: every line PASS.
 
-- [ ] **Step 4: Add the changelog note and commit**
+- [x] **Step 4: Add the changelog note and commit**
 
 Under `## [Unreleased]` in `libs/c2pa/CHANGELOG.md`: `- docs: rewrote the validation guides for readers who do not read English as a first language`.
 
@@ -319,7 +319,7 @@ git add libs/c2pa
 git commit -s -m "docs(c2pa): apply the writing style rules to the validation guides"
 ```
 
-- [ ] **Step 5: Record the after metrics under "After tranche 4" in `inventory.md`, commit, and push**
+- [x] **Step 5: Record the after metrics under "After tranche 4" in `inventory.md`, commit, and push**
 
 ```bash
 git push -u origin docs/writing-style-c2pa-guides
@@ -347,7 +347,7 @@ git checkout -b docs/writing-style-agent-instructions origin/main
 
 - [ ] **Step 2: Rewrite the five files by the method in `overview.md`**
 
-- [ ] **Step 3: Check, including the frontmatter**
+- [x] **Step 3: Check, including the frontmatter**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main .claude/agents/code-reviewer.md .claude/rules/code-quality.md .claude/skills/*/SKILL.md
@@ -356,7 +356,7 @@ for f in .claude/agents/code-reviewer.md .claude/rules/code-quality.md .claude/s
 
 Expected: every line PASS.
 
-- [ ] **Step 4: Commit, record the after metrics under "After tranche 5", and push**
+- [x] **Step 4: Commit, record the after metrics under "After tranche 5", and push**
 
 ```bash
 git add .claude plans/writing-style-compliance/inventory.md
@@ -389,7 +389,7 @@ git checkout -b docs/writing-style-rfc origin/main
 
 - [ ] **Step 2: Rewrite `rfc/README.md`**
 
-- [ ] **Step 3: Check**
+- [x] **Step 3: Check**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main rfc/README.md
@@ -397,14 +397,14 @@ bash plans/writing-style-compliance/check.sh origin/main rfc/README.md
 
 Expected: every line PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add rfc/README.md
 git commit -s -m "docs(rfc): apply the writing style rules to the RFC process document"
 ```
 
-- [ ] **Step 5: If approved, rewrite one RFC body per commit with a Terms list, check each, and commit each**
+- [x] **Step 5: If approved, rewrite one RFC body per commit with a Terms list, check each, and commit each**
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main rfc/cmcd-reporter-middleware.md
@@ -413,7 +413,7 @@ bash plans/writing-style-compliance/check.sh origin/main rfc/cmcd-session-retent
 
 Expected: every line PASS for each file.
 
-- [ ] **Step 6: Record the after metrics under "After tranche 6" in `inventory.md`, commit, and push**
+- [x] **Step 6: Record the after metrics under "After tranche 6" in `inventory.md`, commit, and push**
 
 ```bash
 git push -u origin docs/writing-style-rfc

@@ -66,3 +66,14 @@ Targets from the #431 pass: average under 15 words per sentence, and under 10 pe
 
 Recorded after the rewrite. Same script, same settings.
 
+| File | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `AGENTS.md` | 997 | 107 | 9.3 | 1 (1%) | 5.9 | carries(1), bar(1), e.g.(1), i.e.(1), vs(1) |
+| `CLAUDE.md` | 105 | 5 | 21.0 | 1 (20%) | 14.0 | none |
+| `README.md` | 281 | 23 | 12.2 | 0 (0%) | 8.1 | none |
+| `CONTRIBUTING.md` | 219 | 23 | 9.5 | 0 (0%) | 6.4 | none |
+| `SCOPING.md` | 390 | 27 | 14.4 | 2 (7%) | 10.4 | none |
+| `SECURITY.md` | 16 | 2 | 8.0 | 0 (0%) | 12.6 | none |
+| `.github/PULL_REQUEST_TEMPLATE.md` | 101 | 7 | 14.4 | 1 (14%) | 5.7 | none |
+| `.github/ISSUE_TEMPLATE/bug_report.md` | 82 | 6 | 13.7 | 1 (17%) | 8.7 | none |
+| `.github/ISSUE_TEMPLATE/feature_request.md` | 71 | 6 | 11.8 | 0 (0%) | 8.1 | none |
