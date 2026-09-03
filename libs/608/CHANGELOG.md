@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the prose is rewritten for readers who do not read English as a first language. The extractor table and the code examples are unchanged.
+
 ## [1.1.0] - 2026-08-13
 
 ### Added

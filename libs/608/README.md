@@ -16,17 +16,19 @@ import { CaptionScreen, Row } from "@svta/cml-608";
 
 ### Extracting captions from a media sample
 
-CTA-608 captions ride inside the video elementary stream as an ATSC A/53 `cc_data()`
-payload. The payload is the same for every codec; only the envelope around it differs, so
-pick the extractor that matches the sample entry type:
+CTA-608 captions are embedded in the video elementary stream as an ATSC A/53 `cc_data()`
+payload. Only the envelope around the payload differs by codec. The envelope is either a
+supplemental enhancement information (SEI) message in a network abstraction layer (NAL)
+unit, or an open bitstream unit (OBU). Choose the extractor that matches the sample entry
+type:
 
 | Sample entry            | Envelope                          | Extractor                          |
 | ----------------------- | --------------------------------- | ---------------------------------- |
 | `avc1` / `hvc1` / `vvc1` | `itu_t_t35` SEI message in a NAL  | `extractCta608DataFromSample`      |
 | `av01`                  | `metadata_itu_t_t35` OBU          | `extractCta608DataFromAv1Sample`   |
 
-Both return the same `[field1, field2]` byte arrays, which `Cta608Parser` turns into
-rendered caption screens:
+Both extractors return the same `[field1, field2]` byte arrays. `Cta608Parser` renders
+them as caption screens:
 
 ```typescript
 import { Cta608Parser, extractCta608DataFromAv1Sample } from "@svta/cml-608";
@@ -43,10 +45,9 @@ if (field1.length) {
 }
 ```
 
-These are separate functions rather than one auto-detecting call because the two carriages
-are framed differently and neither sample announces which it is. A NAL unit sample puts a
-fixed-width big-endian length in front of each unit, and that width is only known from
-`lengthSizeMinusOne` in the `avcC`/`hvcC` config. An AV1 sample uses the low-overhead
-format, where each OBU carries its own `obu_size` after the header — and may omit it on
-the last OBU. Either way the framing has to come from the sample entry, so pass the bytes
-to the extractor that matches it.
+The two extractors are separate because the two envelopes are framed differently, and a
+sample does not announce its framing. A NAL unit sample puts a fixed-width big-endian
+length before each unit. Only `lengthSizeMinusOne` in the `avcC` or `hvcC` config gives
+that width. An AV1 sample uses the low-overhead format. Each OBU has its own `obu_size`
+after the header, and the last OBU may omit it. In both cases the sample entry gives the
+framing.
