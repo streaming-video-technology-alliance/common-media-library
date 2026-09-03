@@ -18,6 +18,7 @@ and this project adheres to
 ### Changed
 
 - README: the `CmcdReportRecorder` paragraph is rewritten for readers who do not read English as a first language. The code examples are unchanged.
+- User Guide, Report Recorder Guide, and Validation Guide: the prose is rewritten for readers who do not read English as a first language. The User Guide gains a Terms section. The code examples and tables are unchanged.
 
 ### Fixed
 

@@ -5,11 +5,11 @@ description: How to validate CMCD payloads
 
 # CMCD Validation Guide
 
-The `@svta/cml-cmcd` library provides a set of composable validation functions for verifying that CMCD payloads conform to the CTA-5004 (v1) and CTA-5004-B (v2) specifications. These are useful for validating payloads on the receiving end — for example, in an analytics server that collects CMCD event reports, or in a CDN log processor that inspects CMCD request data.
+The `@svta/cml-cmcd` library provides composable validation functions. They verify that CMCD payloads conform to the CTA-5004 (v1) and CTA-5004-B (v2) specifications. Use them on the receiving side. Examples are an analytics server that collects CMCD event reports, and a content delivery network (CDN) log processor that inspects CMCD request data.
 
 ## Overview
 
-There are four main validation functions, each targeting a different aspect of CMCD compliance:
+There are four main validation functions, each for a different aspect of CMCD compliance:
 
 | Function                  | Purpose                                                           |
 | ------------------------- | ----------------------------------------------------------------- |
@@ -35,11 +35,11 @@ type CmcdValidationIssue = {
 
 ## Validating Event Report Payloads
 
-A common use case is validating CMCD v2 event reports received via POST. The payload is typically an `application/cmcd` body containing newline-separated CMCD-encoded strings, or `application/json`.
+A common use case is validating CMCD v2 event reports received by POST. The payload is usually an `application/cmcd` body with newline-separated CMCD-encoded strings, or `application/json`.
 
 ### Using `validateCmcdEvents`
 
-The `validateCmcdEvents` function accepts a raw CMCD string and validates it as an event-mode payload. It supports multi-line `application/cmcd` bodies directly — each non-empty line is validated independently and the results are merged. An empty payload (no non-empty lines) is treated as an error.
+The `validateCmcdEvents` function accepts a raw CMCD string and validates it as an event-mode payload. It supports multi-line `application/cmcd` bodies directly. It validates each non-empty line on its own and merges the results. An empty payload, with no non-empty lines, is an error.
 
 ```typescript
 import { validateCmcdEvents } from "@svta/cml-cmcd";
@@ -67,7 +67,7 @@ const result = validateCmcdEvents(
 
 ### Parsing and Validating `application/cmcd` manually
 
-The `validateCmcdEvents` function is designed to validate multi-line `application/cmcd` bodies directly. However, if you need to validate a single-line string, you can decode the CMCD string and validate the data manually (this is what `validateCmcdRequest` does internally).
+The `validateCmcdEvents` function validates multi-line `application/cmcd` bodies directly. If you need to validate a single-line string, you can decode the CMCD string and validate the data yourself. `validateCmcdRequest` does the same internally.
 
 ```typescript
 import { decodeCmcd, validateCmcd } from "@svta/cml-cmcd";
@@ -91,11 +91,11 @@ for (const line of lines) {
 
 ## Validating Request Mode Data
 
-In request mode, CMCD data is attached to segment requests via query parameters or HTTP headers. The validator ensures that event-only and response-only keys are not present.
+In request mode, CMCD data is attached to segment requests as query parameters or HTTP headers. The validator checks that event-only and response-only keys are absent.
 
 ### Using `validateCmcdRequest`
 
-The `validateCmcdRequest` function accepts a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) object or an `HttpRequest` object from `@svta/cml-utils`. It checks for CMCD headers first — if any CMCD header shards are found, it delegates to `validateCmcdHeaders` for shard-placement verification. Otherwise, it extracts the `CMCD` query parameter from the URL.
+The `validateCmcdRequest` function accepts a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) object or an `HttpRequest` object from `@svta/cml-utils`. It checks for CMCD headers first. If it finds any CMCD header shards, it delegates to `validateCmcdHeaders`, which verifies the shard placement. Otherwise, it extracts the `CMCD` query parameter from the URL.
 
 ```typescript
 import { validateCmcdRequest } from "@svta/cml-cmcd";
@@ -124,7 +124,7 @@ const httpRequestResult = validateCmcdRequest({
 
 ### From Query Parameters manually
 
-The `validateCmcdRequest` function is designed to validate the `CMCD` query parameter from the URL. However, if you need to validate the `CMCD` query parameter manually, you can extract it from the URL and validate the data using the `validateCmcd` function.
+The `validateCmcdRequest` function validates the `CMCD` query parameter from the URL. If you need to validate the parameter yourself, extract it from the URL and validate the data with the `validateCmcd` function.
 
 ```typescript
 import { fromCmcdQuery, validateCmcd } from "@svta/cml-cmcd";
@@ -144,7 +144,7 @@ if (!result.valid) {
 
 ### From HTTP Headers manually
 
-When CMCD is transmitted via HTTP headers, you can validate the headers manually using the `validateCmcdHeaders` function.
+When CMCD is transmitted in HTTP headers, you can validate the headers yourself with the `validateCmcdHeaders` function.
 
 ```typescript
 import { validateCmcdHeaders } from "@svta/cml-cmcd";
@@ -166,7 +166,7 @@ if (!result.valid) {
 
 ## Version-Aware Validation
 
-The validators automatically detect the CMCD version from the `v` key in the payload. If `v` is absent, version 1 is assumed per the spec. You can override this with the `version` option.
+The validators detect the CMCD version from the `v` key in the payload. If `v` is absent, they assume version 1, per the specification. The `version` option overrides the detection.
 
 ```typescript
 import { validateCmcd } from "@svta/cml-cmcd";
@@ -180,15 +180,15 @@ const v1Result = validateCmcd({ br: 5000, sid: "abc" }, { version: 1 });
 
 ### Version-Specific Behavior
 
-- **Key validation**: v2-only keys (e.g., `sta`, `ec`, `ab`) are rejected when validating as v1
+- **Key validation**: v2-only keys, such as `sta`, `ec`, and `ab`, are rejected when validating as v1
 - **Type validation**: Some keys have different types between versions. For example, `bl` is an integer in v1 but an inner list (array) in v2
-- **Version key**: v2 payloads must include the `v` key; v1 payloads should omit it
+- **Version key**: v2 payloads must include the `v` key. v1 payloads should omit it
 
 ## Handling Validation Results
 
-### Errors vs Warnings
+### Errors and Warnings
 
-A payload is considered `valid` if it contains zero errors. Warnings indicate spec recommendations that are not strict violations.
+A payload is `valid` if it has zero errors. Warnings mark specification recommendations that are not strict violations.
 
 ```typescript
 import { validateCmcd, CMCD_VALIDATION_SEVERITY_ERROR } from "@svta/cml-cmcd";
@@ -230,11 +230,11 @@ function validateAndLog(body: string): boolean {
 
 ## Custom Keys
 
-Custom keys (lowercase hyphenated keys accepted by `isCmcdCustomKey`, e.g., `com.example-mykey`) are recognized by all validators; keys that fail the check — including uppercase or digit-leading names — are reported as unknown keys. For sending custom keys through `CmcdReporter` — including the naming rules and `enabledKeys` requirements — see the [User Guide](./user-guide.md#custom-keys).
+All validators recognize custom keys: lowercase hyphenated keys that `isCmcdCustomKey` accepts, such as `com.example-mykey`. Keys that fail the check, including names with uppercase letters or a leading digit, are reported as unknown keys. For sending custom keys through `CmcdReporter`, including the naming rules and the `enabledKeys` requirements, see the [User Guide](./user-guide.md#custom-keys).
 
-- `validateCmcdKeys` — accepts custom keys without error
-- `validateCmcdValues` — checks that custom key values are strings with a max length of 64 characters, and that the key name contains a hyphen
-- `validateCmcdHeaders` — allows custom keys in any header shard
+- `validateCmcdKeys`: accepts custom keys without error
+- `validateCmcdValues`: checks that custom key values are strings of at most 64 characters, and that the key name contains a hyphen
+- `validateCmcdHeaders`: allows custom keys in any header shard
 
 ```typescript
 import { validateCmcdValues } from "@svta/cml-cmcd";
