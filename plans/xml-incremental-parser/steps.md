@@ -1,42 +1,47 @@
 # Implementation steps (after the RFC is accepted)
 
-Branch: `issue/424-xml-incremental-parser` (or continue on the RFC branch if the RFC PR is squash-merged
-first). Prerequisites: [#430](https://github.com/streaming-video-technology-alliance/common-media-library/pull/430)
-(truncation fixes, malformed attributes and mismatched close tags throw) is merged, so the parity corpus
-is captured against the parser as it will ship. Inputs that #430 turns into errors (`<a b>`, `<a b=c/>`,
-`<a></ab>`, `<a/></b><c/>`, truncation inside an attribute) change from tree expectations to `throws`
-expectations in the corpus.
+Base: `main` after #432 (5e4a82276), which already has the flat scanner in `libs/xml/src/scan.ts`, the
+internal builder type, the parity corpus (106 inputs x 6 option sets), the benchmark harness, and the
+livesim2 fixture. Branch `issue/424-xml-builder-api`. Every commit with `git commit -s`; no version bump.
+The reference for every change is `prototype/`, which runs against that base and is covered by lint and
+typecheck.
 
-1. Capture parity fixtures before touching the parser. Add `libs/xml/test/parseXml.equivalence.test.ts`
-   that parses every corpus input (`equivalence.md`) with each option set and compares to expected output
-   generated once from the current implementation. Serialize `parentElement` as a node path since JSON
-   cannot hold the cycle, or assert it separately.
-2. Add `libs/xml/src/XmlBuilder.ts` (type), `libs/xml/src/XmlParserOptions.ts` (type), and
-   `libs/xml/src/XmlParser.ts` (class plus the module-level `scan` function), ported from `prototype.md`
-   with repo style: tabs, single quotes, no semicolons, `type` not `interface`, TSDoc with `@public` on
-   every export, `{@includeCode ../test/XmlParser.test.ts#example}` on the class.
-   - Copy the builder's functions into instance fields in the constructor (fixed hidden class).
-   - Keep module scope side-effect free (numeric constants and functions only).
-   - Give `parseXml` an internal entry that starts the scan at `pos` on the full input so the
-     mismatched-close-tag message keeps whole-document line and column.
-3. Rewrite `libs/xml/src/parseXml.ts` as four prebuilt `XmlBuilder<XmlNode>` variants over `XmlParser`.
-   `XmlParseOptions` and `XmlNode` are unchanged.
-4. Tests in `libs/xml/test/XmlParser.test.ts`:
-   - `// #region example`: the dash.js-shaped builder from the RFC guide, asserting the manifest object.
-   - Boundary sweep with a recording builder (every split for small inputs, sampled for large).
-   - Streamed input through `TextDecoderStream` and `WritableStream` (Node 24 has both globally).
-   - Lifecycle errors, absolute error offset, `Missing closing quote` only from `end()`.
-   - Hang regression inputs under a worker timeout (pattern from #430).
-5. Benchmark under `libs/xml/bench/` with an npm script, per `benchmark.md`: one process per variant,
-   natural and forced GC, the generator, and the real livesim2 manifest checked in as a fixture (169 KB).
-   Keep it out of the `**/*.test.ts` glob; `eslint .` lints everything except `dist`, so the bench must
-   pass lint too.
-6. Build (`npm run build -w libs/utils -w libs/xml`), `npm test -w libs/xml`, `npm run typecheck`,
-   `npm run lint`. Review the `libs/xml/config/cml-xml.api.md` diff: exactly `XmlParser`, `XmlBuilder`,
-   and `XmlParserOptions` added, nothing else changed.
-7. Docs: README quick start for `XmlParser` next to `parseXml` (the README currently shows a non-existent
-   `decodeXml`; fix while there). Changelog under `## [Unreleased]`: Added (`XmlParser`, `XmlBuilder`,
-   `XmlParserOptions`), Changed (`parseXml` rewritten on the incremental core, with measured numbers, and
-   the added `Offset` line in the mismatched-close-tag message). No version bump.
-8. Update the RFC: `status: implemented`, `implemented-in`, `implementation-plan: plans/xml-incremental-parser/`.
-9. Comment on #424 and dash.js#4984 with the before/after table and a link to the builder example.
+1. Port the scanner changes from `prototype/scan.ts` into `libs/xml/src/scan.ts`, keeping the file's
+   constant names and comment style: the `strict` flag and its end-of-input errors, the name argument on
+   `appendChild` and the text callbacks, skipping when `createElement` returns `undefined`, untrimmed text
+   with blank runs dropped unless `keepWhitespace`, the CDATA fallback to `appendText`, inner text for
+   comments and doctypes, processing instructions ending at `?>`, quoted literals in doctypes,
+   NameStartChar attribute names, and `XmlParseError`.
+2. Update `libs/xml/src/parseXml.ts` as in `prototype/parseXml.ts`: eight prebuilt tree builders
+   (whitespace x comments x parentElement), trimming in the builder, the comment and doctype wrappers,
+   tolerant mode. The public signature does not change; its `@throws` TSDoc gains `XmlParseError`.
+3. Public additions, each in its own file with TSDoc and `@public`: `XmlBuilder.ts` (property syntax,
+   `this: void`, `TElement`/`TDocument`), `XmlBuildOptions.ts`, `buildXml.ts`, `XmlParseError.ts`. Export
+   them from `index.ts`, types through `export type *`. Add
+   `'@typescript-eslint/no-invalid-void-type': ['error', { allowAsThisParameter: true }]` to
+   `eslint.config.ts` so `this: void` lints without a disable comment.
+4. Parity fixtures: add the three corpus cases from `prototype/equivalence.ts` (`doctype with quoted gt`,
+   `colon-start attribute`, `pi with gt then element`), regenerate with `UPDATE_FIXTURES=1 npm test -w
+   libs/xml`, and confirm that exactly the eight cases listed in `equivalence.md` changed, for the reasons
+   listed there. Every other expectation must be byte-identical.
+5. Tests in `libs/xml/test/buildXml.test.ts`, with a `// #region example` block that doubles as the TSDoc
+   example: strict end-of-input on the truncated corpus cases, root injection, the name arguments,
+   skipping, the text policy, the CDATA fallback, inner-text shapes, and the `XmlParseError` fields.
+   Port `prototype/dash.ts` as a test helper and assert that the faithful one-pass builder equals
+   `parseXml` plus `processNode` on the fixtures, the synthetic manifests, and the namespaced sample.
+6. Benchmark: add the dash.js pipelines and the two-builder pairs from `prototype/bench.ts` to
+   `libs/xml/bench/bench.ts`. Record `main` before the port and the branch after it.
+7. `npm run build -w libs/utils -w libs/xml`, `npm test -w libs/xml`, `npm test -w libs/drm`,
+   `npm run typecheck`, `npm run lint`, `npm run build -w docs`. The `cml-xml.api.md` diff must be exactly
+   `buildXml`, `XmlBuilder`, `XmlBuildOptions`, and `XmlParseError` added and `parseXml`'s doc comment.
+   Measure bundle sizes as in `prototype.md` and put them in the PR.
+8. Changelog under `## [Unreleased]` in `libs/xml/CHANGELOG.md`. Added: `buildXml`, `XmlBuilder`,
+   `XmlBuildOptions`, `XmlParseError`. Fixed: processing instructions end at `?>`, a `>` inside a quoted
+   doctype literal no longer ends the doctype, attribute names may start with any XML NameStartChar
+   (`_`, `:`, non-ASCII letters). Changed: `parseXml` throws `XmlParseError` (a subclass of `Error` with
+   the same messages); with `keepComments`, a comment cut off by the end of the input and the malformed
+   `<!--->` are reported with a closing `-->`. README: a `buildXml` quick start next to `parseXml`.
+9. Update the RFC to `status: implemented` with `implemented-in` and `implementation-plan`, and comment on
+   #424 and dash.js#4984 with the before/after table and the builder example.
+10. Incremental input (`write`/`end`) is a separate RFC; its design notes are under "Deferred: incremental
+    input" in `findings.md`.
