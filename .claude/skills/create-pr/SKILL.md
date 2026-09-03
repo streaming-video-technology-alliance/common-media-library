@@ -7,7 +7,7 @@ argument-hint: [base branch]
 
 # Create Pull Request
 
-Validate that all tests and documentation pass, then create a well-formatted GitHub PR for the current branch.
+Validate that tests and documentation pass, then create a well-formatted GitHub pull request (PR) for the current branch.
 
 ## Context
 
@@ -19,11 +19,11 @@ Validate that all tests and documentation pass, then create a well-formatted Git
 
 !`git remote get-url origin 2>&1`
 
-**Commits on this branch (vs main):**
+**Commits on this branch (compared with main):**
 
 !`git log --oneline main..HEAD 2>&1 || git log --oneline origin/main..HEAD 2>&1 || echo "Could not determine commits"`
 
-**Changed files (vs main):**
+**Changed files (compared with main):**
 
 !`git diff --stat main..HEAD 2>&1 || git diff --stat origin/main..HEAD 2>&1 || echo "Could not determine changes"`
 
@@ -45,8 +45,8 @@ Follow these steps in strict order. Do NOT skip ahead.
 
 - Verify the current branch is NOT `main`. If it is, stop and tell the user to create a feature branch first.
 - If a PR already exists for this branch, inform the user and ask whether to update the existing PR description or stop.
-- Ensure all changes are committed. If there are uncommitted changes, inform the user and stop.
-- **DCO sign-off check**: Verify that every commit on this branch has a `Signed-off-by:` line:
+- Ensure all changes are committed. If not, inform the user and stop.
+- **Developer Certificate of Origin (DCO) sign-off check**: Verify that every commit on this branch has a `Signed-off-by:` line:
 
 ```bash
 git log main..HEAD --format="%h %s" --no-merges | while read hash rest; do
@@ -64,7 +64,7 @@ Do NOT create the PR until all commits have DCO sign-off.
 
 ### Step 1: Identify affected packages
 
-Examine the commit history and changed files to determine which `libs/*` packages were modified. This determines which workspaces need building, testing, and which scopes to use in the PR title.
+Examine the commit history and changed files to find which `libs/*` packages changed. That set decides which workspaces to build and test, and the scopes for the PR title.
 
 ### Step 2: Build affected packages
 
@@ -92,7 +92,7 @@ If any test fails, report the error and stop. Do NOT create the PR.
 npm run typecheck
 ```
 
-If the typecheck fails on files within `libs/` (ignore pre-existing errors in `node_modules`), report the error and stop. Do NOT create the PR.
+If the typecheck fails on files in `libs/`, report the error and stop. Ignore pre-existing errors in `node_modules`. Do NOT create the PR.
 
 ### Step 5: Build and validate documentation
 
@@ -112,15 +112,15 @@ Search for related open issues in the repository:
 gh issue list --state open --json number,title --limit 50
 ```
 
-Also check the commit messages and branch name for issue references (e.g., `#123`, `issue-123`, `fixes-123`).
+Also check the commit messages and branch name for issue references, such as `#123`, `issue-123`, or `fixes-123`.
 
-Present any potentially related issues to the user and ask which (if any) should be referenced in the PR.
+Present the possibly related issues to the user. Ask which ones, if any, the PR should reference.
 
 ### Step 7: Draft the PR title and description
 
 #### Title Format
 
-Follow conventional commit format. The title must be under 70 characters.
+Follow the Conventional Commits format. The title must be under 70 characters.
 
 **Pattern:** `<type>(<scope>): <short description>`
 
@@ -134,7 +134,7 @@ Follow conventional commit format. The title must be under 70 characters.
 - `build` - Changes that affect the build system
 - `perf` - Performance improvement
 
-**Scope:** The package name without the `libs/` prefix (e.g., `cmcd`, `iso-bmff`, `utils`). If multiple packages are affected, use the primary package or omit the scope.
+**Scope:** The package name without the `libs/` prefix, such as `cmcd`, `iso-bmff`, or `utils`. If several packages are affected, use the primary package or omit the scope.
 
 **Examples:**
 - `feat(cmcd): add CmcdReporter class`
@@ -165,11 +165,11 @@ Refs: <issue references>
 ```
 
 **Refs footer rules:**
-- Use `Fixes #N` if the PR fully resolves an issue (this auto-closes the issue on merge)
+- Use `Fixes #N` if the PR fully resolves an issue. GitHub closes the issue on merge
 - Use `Refs #N` if the PR is related but does not fully resolve the issue
 - Multiple references are comma-separated: `Refs: #12, #34, Fixes #56`
 - Only include issue references confirmed by the user in Step 6
-- Omit the `Refs:` line entirely if there are no related issues
+- Omit the `Refs:` line if there are no related issues
 
 ### Step 8: Present for approval
 
@@ -182,7 +182,7 @@ Show the user the complete PR title and description. Ask for approval or revisio
 
 ### Step 9: Push and create the PR
 
-1. Ensure the branch is pushed to the remote:
+1. Push the branch to the remote:
 
 ```bash
 git push -u origin <branch-name>
@@ -204,7 +204,7 @@ EOF
 - Never create a PR with failing tests or documentation errors.
 - The conventional commit type in the PR title should reflect the **primary** change, not every change.
 - Keep the title under 70 characters. Use the description for details.
-- The summary bullets should explain **why** the changes were made, not just what files changed.
-- If builds are slow, only build packages that are directly affected by the changes and their dependents.
-- Always push with `-u` to set up tracking if not already configured.
-- **Every commit must have DCO sign-off.** Always use `git commit -s` and include `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>` in the message body. If you need to fix issues discovered during validation (Steps 2-5), commit the fixes with these requirements before proceeding.
+- The summary bullets should explain **why** the changes were made, not only which files changed.
+- If builds are slow, build only the packages that the changes affect directly, and their dependents.
+- Always push with `-u` to configure tracking.
+- **Every commit must have DCO sign-off.** Always use `git commit -s` and include `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>` in the message body. If you fix issues found during validation (Steps 2-5), commit the fixes with these requirements before you proceed.
