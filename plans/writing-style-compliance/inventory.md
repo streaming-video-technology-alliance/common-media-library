@@ -1,6 +1,6 @@
 # Writing style compliance: inventory
 
-Baseline metrics for every file in scope, measured on 2026-09-03 at commit 26fd67982, the head of #433.
+Baseline metrics for every file in scope, measured on 2026-09-03 at commit 26fd67982, the head of #433. The same file content merged into `main` as 8ddcad72c.
 
 ## How the numbers were measured
 

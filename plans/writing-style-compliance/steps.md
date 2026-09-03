@@ -27,7 +27,7 @@
 - Modify: `AGENTS.md`, `CLAUDE.md`, `README.md`, `CONTRIBUTING.md`, `SCOPING.md`, `SECURITY.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/ISSUE_TEMPLATE/bug_report.md`, `.github/ISSUE_TEMPLATE/feature_request.md`
 - Create: `plans/writing-style-compliance/overview.md`, `plans/writing-style-compliance/inventory.md`, `plans/writing-style-compliance/steps.md`, `plans/writing-style-compliance/check.sh`
 
-**Base:** commit 26fd67982 (`origin/docs/agents-writing-style`, the head of #433).
+**Base:** commit 8ddcad72c on `main`, the merge of #433.
 
 **Known violations at the base:**
 
@@ -65,7 +65,7 @@ In the priority list, replace the em dash after each bold term with a colon. Spl
 - [x] **Step 4: Check**
 
 ```bash
-bash plans/writing-style-compliance/check.sh 26fd67982 AGENTS.md CLAUDE.md
+bash plans/writing-style-compliance/check.sh 8ddcad72c AGENTS.md CLAUDE.md
 ```
 
 Expected: every line PASS.
@@ -84,7 +84,7 @@ Split the long paragraphs in `README.md` and `SCOPING.md`. Replace "shared in sp
 - [x] **Step 7: Check**
 
 ```bash
-bash plans/writing-style-compliance/check.sh 26fd67982 README.md CONTRIBUTING.md SCOPING.md SECURITY.md
+bash plans/writing-style-compliance/check.sh 8ddcad72c README.md CONTRIBUTING.md SCOPING.md SECURITY.md
 ```
 
 Expected: every line PASS.
@@ -103,7 +103,7 @@ Remove "please". Replace each "e.g." with "for example". Fix the nesting of the 
 - [x] **Step 10: Check**
 
 ```bash
-bash plans/writing-style-compliance/check.sh 26fd67982 .github/PULL_REQUEST_TEMPLATE.md .github/ISSUE_TEMPLATE/bug_report.md .github/ISSUE_TEMPLATE/feature_request.md
+bash plans/writing-style-compliance/check.sh 8ddcad72c .github/PULL_REQUEST_TEMPLATE.md .github/ISSUE_TEMPLATE/bug_report.md .github/ISSUE_TEMPLATE/feature_request.md
 ```
 
 Expected: every line PASS.
@@ -130,10 +130,10 @@ git commit -s -m "docs(plans): record the tranche 1 metrics"
 git push -u origin docs/writing-style-compliance
 ```
 
-Casey creates the PR with `/create-pr`. After #433 merges, rebase the branch onto `main`:
+Casey creates the PR with `/create-pr`. #433 merged on 2026-09-03 while tranche 1 was in progress, so the branch was rebased onto `main` first:
 
 ```bash
-git rebase --onto origin/main origin/docs/agents-writing-style docs/writing-style-compliance
+git rebase --onto origin/main 26fd67982 docs/writing-style-compliance
 ```
 
 ---

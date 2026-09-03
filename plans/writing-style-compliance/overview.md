@@ -43,7 +43,7 @@ Six tranches, 49 files, about 25,000 words of prose. One PR per tranche, in this
 
 For each file:
 
-1. Take the base version from git. For tranche 1 the base is commit 26fd67982, the head of #433. For later tranches the base is `origin/main`.
+1. Take the base version from git. For tranche 1 the base is commit 8ddcad72c, the merge of #433 into `main`. For later tranches the base is `origin/main`.
 2. Rewrite prose only. Keep code blocks, tables, frontmatter, link targets, and heading text. Two guides link to each other's `#custom-keys` heading: `libs/cmcd/docs/user-guide.md` and `libs/cmcd/docs/validation-guide.md`.
 3. Keep every fact, number, hedge, and tense. If the original says "will", the rewrite says "will". If a fact looks wrong or stale, do not change it. Record it under "Noticed, not changed" in the PR description.
 4. Apply the rules in this order. First split sentences and remove semicolons and em dashes. Then replace idioms and phrasal verbs, and define abbreviations at first use. Last, give each pronoun a noun and use one name per thing.
@@ -83,7 +83,7 @@ The readability metrics in `inventory.md` come from a second script that is not 
 
 ## Status
 
-- 2026-09-03: plan written. Tranche 1 rewritten on branch `docs/writing-style-compliance`, based on the head of #433. PR pending.
+- 2026-09-03: plan written. Tranche 1 rewritten on branch `docs/writing-style-compliance` and rebased onto `main` after #433 merged. PR pending.
 
 ## Noticed, not changed (tranche 1)
 
