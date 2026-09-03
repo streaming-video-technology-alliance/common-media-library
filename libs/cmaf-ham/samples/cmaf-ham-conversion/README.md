@@ -7,9 +7,8 @@ When you run `npm run dev`, the CMAF-Ham library creates different versions of t
 ## Steps to run the script
 1. Open a terminal in the **root folder** of the **common-media-library** project.
 2. Run `npm ci` and then `npm run build`.
-3. Go to the sample folder with `cd libs/cmaf-ham/samples/cmaf-ham-conversion`.
-4. Execute `node src/index.ts`.
-5. Check that a new `dist/` folder exists with the output files. Each subfolder contains:
+3. Run `npm run dev -w libs/cmaf-ham`.
+4. Check that `libs/cmaf-ham/samples/cmaf-ham-conversion/dist/` exists with the output files. Each subfolder contains:
    * `ham.json`: A JSON export of the Ham object.
    * `validations.json`: The validation results for each presentation of the content.
    * `main.m3u8`: The multivariant playlist of the HLS version of the content.
