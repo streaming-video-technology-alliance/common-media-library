@@ -87,6 +87,7 @@ The readability metrics in `inventory.md` come from a second script that is not 
 - 2026-09-03: tranche 2 rewritten on branch `docs/writing-style-readmes`, stacked on the tranche 1 branch because #434 was still open. Rebased onto `main` after #434 merged. PR pending.
 - 2026-09-03: tranche 3 rewritten on branch `docs/writing-style-cmcd-guides`, stacked on the tranche 2 branch. PR pending.
 - 2026-09-03: tranche 4 rewritten on branch `docs/writing-style-c2pa-guides`, stacked on the tranche 3 branch. PR pending.
+- 2026-09-03: tranche 5 rewritten on branch `docs/writing-style-agent-instructions`, stacked on the tranche 4 branch. PR pending.
 
 ## Noticed, not changed (tranche 1)
 
@@ -119,3 +120,8 @@ Tables and code blocks are frozen in this pass, so these items stay as they are.
 
 - `libs/c2pa/docs/results-and-error-codes.md`: the Sequence Validation Reasons table uses an em dash for empty cells, and one code comment contains an em dash.
 - `libs/c2pa/docs/vsi-validation.md` and `libs/c2pa/docs/manifest-box-validation.md`: the field tables contain sentence fragments with abbreviations (DER, JWK, ISO 8601) that no prose defines.
+
+## Noticed, not changed (tranche 5)
+
+- `.claude/skills/create-pr/SKILL.md` names one model in the required `Co-Authored-By` trailer. `AGENTS.md` asks for the agent name and model of the agent that wrote the commit. The skill text is a fact about the skill, so this pass left it.
+- `.claude/agents/code-reviewer.md` uses "DX" inside the frozen report template. Code blocks are frozen in this pass.
