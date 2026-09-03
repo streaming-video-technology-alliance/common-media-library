@@ -1,10 +1,10 @@
 # Common Media Library Contributing Guide
 
-Thank you for investing your time in contributing to the Common Media Library. 
+Thank you for contributing to the Common Media Library.
 
 Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approachable and respectable.
 
-In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.
+This guide gives an overview of the contribution workflow: opening an issue, creating a pull request (PR), review, and merge.
 
 ## Getting started
 
@@ -12,24 +12,24 @@ In this guide you will get an overview of the contribution workflow from opening
 
 #### Create a new issue
 
-If you spot a problem with the docs, [search if an issue already exists](https://github.com/streaming-video-technology-alliance/common-media-library/issues). If a related issue doesn't exist, you can open a new issue using a relevant [issue form](https://github.com/streaming-video-technology-alliance/common-media-library/issues/new/choose).
+If you find a problem with the docs, first [search the existing issues](https://github.com/streaming-video-technology-alliance/common-media-library/issues). If no related issue exists, open a new issue with the relevant [issue form](https://github.com/streaming-video-technology-alliance/common-media-library/issues/new/choose).
 
 #### Solve an issue
 
-Scan through our [existing issues](https://github.com/streaming-video-technology-alliance/common-media-library/issues) to find one that interests you. You can narrow down the search using `labels` as filters.  If you find an issue to work on, you are welcome to open a PR with a fix.
+Look through our [existing issues](https://github.com/streaming-video-technology-alliance/common-media-library/issues) for one that interests you. Filter the search with `labels`. If you find an issue to work on, open a PR with a fix.
 
 ### Make Changes
 
 1. Fork the repository.
-[Fork the repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so that you can make your changes without affecting the original project until you're ready to merge them.
+[Fork the repository](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so you can make changes without affecting the original project until you are ready to merge them.
 
-1. Install or update to **Node.js**.
+1. Install or update **Node.js**.
 
-1. Create a working branch and start with your changes!
+1. Create a working branch and make your changes.
 
-1. Update the [CHANGELOG](./CHANGELOG.md). Make sure to update the change log with the change you've made, along with a reference to the issue.
+1. Update the [CHANGELOG](./CHANGELOG.md). Describe your change and reference the issue.
 
-1. Add yourself to the [Contributors List](./CONTRIBUTORS.md) if you haven't already.
+1. If you are not in the [Contributors List](./CONTRIBUTORS.md), add yourself.
 
 1. Add tests for your changes.
 
@@ -38,14 +38,14 @@ Scan through our [existing issues](https://github.com/streaming-video-technology
 ### Commit your update
 
 > **Warning**
-> This library requires all commits to sign the DCO. See https://github.com/apps/dco for more information.
+> This library requires a Developer Certificate of Origin (DCO) sign-off on every commit. See https://github.com/apps/dco for more information.
 
 1. Run `npm run format` to format the code before committing.
 
-1. Make sure all tests pass by running `npm run test`.
+1. Run `npm run test` and make sure all tests pass.
 
-1. Mare sure to include a commit message that describes the change, following the [Conventional Commits](https://www.conventionalcommits.org/) format.
+1. Write a commit message that describes the change, in the [Conventional Commits](https://www.conventionalcommits.org/) format.
 
 ### Pull Request
 
-When you're finished with the changes, create a pull request.
+When your changes are finished, create a PR.
