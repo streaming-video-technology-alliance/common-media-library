@@ -62,10 +62,10 @@ CML collaborators and adopters live in many countries. Many of them do not read 
 
 - One idea per sentence. Keep sentences under 20 words and split any sentence over 25. No semicolons (;) and no em dashes (—).
 - Active voice and simple tenses (present, past, future). Write instructions in the imperative with the condition first: "If the build fails, read the log."
-- One name per thing for the whole document, never a synonym for variety. Give a document over about 1,500 words a short Terms list near the top.
+- One name per thing for the whole document, never a synonym for variety.
 - No idioms, metaphors, or figures of speech. If a phrase cannot be translated word for word, replace it.
 - Prefer one verb to a phrasal verb ("configure", not "set up") and literal verbs for facts ("the table shows", not "the table carries").
-- Define every abbreviation and term of art once, at first use: MPD, HAM, GC, p95, post-order. Do not use "e.g.", "i.e.", or "vs".
+- Do not use "e.g.", "i.e.", or "vs".
 - Give every pronoun a visible noun in the same or previous sentence: "this check", not "this".
 - At most three nouns in a row. Break longer strings with prepositions.
 - Keep the author's hedges. "May have failed" does not become "failed". Never add a fact the source did not state.
