@@ -84,12 +84,12 @@ The readability metrics in `inventory.md` come from a second script that is not 
 ## Status
 
 - 2026-09-03: plan written. Tranche 1 rewritten on branch `docs/writing-style-compliance` and rebased onto `main` after #433 merged. PR #434.
-- 2026-09-03: tranche 2 rewritten on branch `docs/writing-style-readmes`, stacked on the tranche 1 branch because #434 was still open. Rebased onto `main` after #434 merged. PR pending.
-- 2026-09-03: tranche 3 rewritten on branch `docs/writing-style-cmcd-guides`, stacked on the tranche 2 branch. PR pending.
-- 2026-09-03: tranche 4 rewritten on branch `docs/writing-style-c2pa-guides`, stacked on the tranche 3 branch. PR pending.
-- 2026-09-03: tranche 5 rewritten on branch `docs/writing-style-agent-instructions`, stacked on the tranche 4 branch. PR pending.
-- 2026-09-03: tranche 6 rewritten on branch `docs/writing-style-rfc`, stacked on the tranche 5 branch, `rfc/README.md` only. PR pending. All six tranches are done.
-- 2026-09-03: tranche 7 on branch `docs/writing-style-fixes`, stacked on the tranche 6 branch, fixes every item in the "Noticed, not changed" sections below. PR pending.
+- 2026-09-03: tranche 2 rewritten on branch `docs/writing-style-readmes`, stacked on the tranche 1 branch because #434 was still open. Rebased onto `main` after #434 merged. PR #436.
+- 2026-09-03: tranche 3 rewritten on branch `docs/writing-style-cmcd-guides`, stacked on the tranche 2 branch. PR #437.
+- 2026-09-03: tranche 4 rewritten on branch `docs/writing-style-c2pa-guides`, stacked on the tranche 3 branch. PR #438.
+- 2026-09-03: tranche 5 rewritten on branch `docs/writing-style-agent-instructions`, stacked on the tranche 4 branch. PR #439.
+- 2026-09-03: tranche 6 rewritten on branch `docs/writing-style-rfc`, stacked on the tranche 5 branch, `rfc/README.md` only. PR #440. All six tranches are done.
+- 2026-09-03: tranche 7 on branch `docs/writing-style-fixes`, stacked on the tranche 6 branch. It fixes every item in the "Noticed, not changed" sections below and the cmaf-ham sample script. PR #441.
 
 ## Noticed, not changed (tranche 1)
 
