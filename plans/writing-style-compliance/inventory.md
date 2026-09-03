@@ -96,3 +96,13 @@ Twelve files changed. The other 13 files, all package READMEs of one or two sent
 | `libs/iso-bmff/docs/reading-boxes.md` | 93 | 7 | 13.3 | 1 (14%) | 7.0 | none |
 | `libs/iso-bmff/docs/utilities.md` | 95 | 8 | 11.9 | 0 (0%) | 6.6 | none |
 | `libs/iso-bmff/docs/writing-boxes.md` | 192 | 17 | 11.3 | 1 (6%) | 6.1 | none |
+
+## After tranche 3
+
+All three guides changed. The Terms table in the User Guide does not count as prose.
+
+| File | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `libs/cmcd/docs/user-guide.md` | 2827 | 207 | 13.7 | 8 (4%) | 7.1 | frozen(2), sat(1), bar(2), stay(5), stays(3) |
+| `libs/cmcd/docs/report-recorder-guide.md` | 885 | 65 | 13.6 | 2 (3%) | 6.6 | stay(1), stays(1) |
+| `libs/cmcd/docs/validation-guide.md` | 509 | 38 | 13.4 | 2 (5%) | 7.7 | none |

@@ -230,14 +230,16 @@ Casey creates the PR with `/create-pr`.
 
 **Anchors to keep:** the `## Custom keys` headings in `user-guide.md` and `validation-guide.md`. The two guides link to each other with `#custom-keys`.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-cmcd-guides origin/main
 ```
 
-- [ ] **Step 2: Rewrite `user-guide.md`**
+Done differently on 2026-09-03: tranche 2 had no PR yet, so the branch was created from the tranche 2 head cbb326950 instead. The checks use `origin/main` as the base, because the `libs/cmcd/docs` trees are identical. Rebase onto `main` after tranche 2 merges.
+
+- [x] **Step 2: Rewrite `user-guide.md`**
 
 Add a Terms list after the introduction. Define each abbreviation the guide uses at first use, including CMCD, CTA, and any key names it explains. Keep every code block and table.
 
@@ -282,6 +284,8 @@ git push -u origin docs/writing-style-cmcd-guides
 ```
 
 Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** all three guides changed. The User Guide has a new Terms table after the introduction. That table is the one difference the blocks check reports. The Validation Guide heading that compared errors with warnings now reads "Errors and Warnings". The rules ban the abbreviation it used, and no link points at that heading. Every other check passed for every file. See "Noticed, not changed (tranche 3)" in `overview.md` for the frozen text that still breaks a rule.
 
 ---
 
