@@ -83,7 +83,8 @@ The readability metrics in `inventory.md` come from a second script that is not 
 
 ## Status
 
-- 2026-09-03: plan written. Tranche 1 rewritten on branch `docs/writing-style-compliance` and rebased onto `main` after #433 merged. PR pending.
+- 2026-09-03: plan written. Tranche 1 rewritten on branch `docs/writing-style-compliance` and rebased onto `main` after #433 merged. PR #434.
+- 2026-09-03: tranche 2 rewritten on branch `docs/writing-style-readmes`, stacked on the tranche 1 branch because #434 was still open. PR pending.
 
 ## Noticed, not changed (tranche 1)
 
@@ -95,3 +96,10 @@ The rewrite kept these statements as they were. Each one may need a separate fix
 - `CONTRIBUTING.md` limits new issues to "a problem with the docs". The sentence comes from the GitHub template.
 - `CONTRIBUTING.md` asks readers to keep the community "approachable and respectable". The GitHub template wording may have meant "respectful".
 - `GOVERNANCE.md` names the "Streaming Video Alliance", the former name of the organization. The file is out of scope.
+
+## Noticed, not changed (tranche 2)
+
+- `libs/cmaf-ham/src/README.md`: the code examples import from `@svta/common-media-library`, a package name that no longer exists. The first example has no comma after `hamToDash`. The Documentation section names the API documentation without a link.
+- `libs/cmaf-ham/samples/cmaf-ham-conversion/README.md`: step 3 says `cd samples/cmaf-ham-conversion` from the repository root. The sample is at `libs/cmaf-ham/samples/cmaf-ham-conversion`.
+- `libs/cmaf-ham/README.md`, `libs/drm/README.md`, and `libs/request/README.md` have an empty Usage code block. `libs/mse/README.md` has a Usage example that imports nothing.
+- Several README examples are not complete. They use identifiers without importing or defining them: `assert` in most examples, `CMSD_STATIC_OBJ` and `SfToken` in `libs/cmsd/README.md`, `id3Data` in `libs/id3/README.md`, and `view`, `samplePos`, `sampleSize`, and `sampleTimeMs` in `libs/608/README.md`.

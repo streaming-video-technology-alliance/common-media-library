@@ -77,3 +77,22 @@ Recorded after the rewrite. Same script, same settings.
 | `.github/PULL_REQUEST_TEMPLATE.md` | 101 | 7 | 14.4 | 1 (14%) | 5.7 | none |
 | `.github/ISSUE_TEMPLATE/bug_report.md` | 82 | 6 | 13.7 | 1 (17%) | 8.7 | none |
 | `.github/ISSUE_TEMPLATE/feature_request.md` | 71 | 6 | 11.8 | 0 (0%) | 8.1 | none |
+
+## After tranche 2
+
+Twelve files changed. The other 13 files, all package READMEs of one or two sentences, already followed the rules and keep their baseline rows. The metrics script merges list items that have no final period into one sentence. So the "Over 25 words" column overstates the count for files with bullet lists. The check script counts 0 sentences over 25 words in every file.
+
+| File | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `libs/608/README.md` | 149 | 13 | 11.5 | 0 (0%) | 7.6 | none |
+| `libs/608/test/fixtures/README.md` | 149 | 13 | 11.5 | 1 (8%) | 5.1 | none |
+| `libs/c2pa/README.md` | 197 | 10 | 19.7 | 3 (30%) | 10.2 | vs(2) |
+| `libs/cmaf-ham/samples/cmaf-ham-conversion/README.md` | 250 | 27 | 9.3 | 0 (0%) | 4.5 | none |
+| `libs/cmaf-ham/src/README.md` | 205 | 17 | 12.1 | 0 (0%) | 9.0 | none |
+| `libs/cmcd/README.md` | 41 | 3 | 13.7 | 0 (0%) | 5.3 | none |
+| `libs/cta/README.md` | 36 | 5 | 7.2 | 0 (0%) | 6.9 | none |
+| `libs/dash/README.md` | 9 | 1 | 9.0 | 0 (0%) | 16.8 | none |
+| `libs/iso-bmff/README.md` | 35 | 2 | 17.5 | 1 (50%) | 6.1 | none |
+| `libs/iso-bmff/docs/reading-boxes.md` | 93 | 7 | 13.3 | 1 (14%) | 7.0 | none |
+| `libs/iso-bmff/docs/utilities.md` | 95 | 8 | 11.9 | 0 (0%) | 6.6 | none |
+| `libs/iso-bmff/docs/writing-boxes.md` | 192 | 17 | 11.3 | 1 (6%) | 6.1 | none |
