@@ -2,16 +2,16 @@
 
 ## `608_av1.mp4`
 
-A real, decodable AV1 fragmented mp4 carrying CTA-608 captions in
-`metadata_itu_t_t35` OBUs — 256x144, 30 fps, 40 frames, Main profile
-(`av01.0.00M.08`), one fragment.
+A real, decodable AV1 fragmented mp4 with CTA-608 captions in `metadata_itu_t_t35` open
+bitstream units (OBUs): 256x144, 30 fps, 40 frames, Main profile (`av01.0.00M.08`), one
+fragment.
 
-The caption is `HELLO WORLD` as a pop-on on row 15, with each control code doubled: 14
-field 1 byte pairs across frames 0-13, then `EDM` across frames 30-31. One pair per
-frame, which is what an SCC source specifies.
+The caption is `HELLO WORLD` as a pop-on on row 15, with each control code doubled.
+Frames 0-13 contain 14 field 1 byte pairs. Frames 30-31 contain `EDM`. One pair per frame
+is what a Scenarist Closed Caption (SCC) source specifies.
 
-Regenerate in two steps. First the clean AV1 bitstream, with `+bitexact` so the encode is
-byte-reproducible:
+Regenerate in two steps. First, encode the clean AV1 bitstream with `+bitexact` for a
+byte-reproducible encode:
 
 ```sh
 ffmpeg -y -fflags +bitexact -f lavfi -i "testsrc2=size=256x144:rate=30" -frames:v 40 \
@@ -22,8 +22,8 @@ ffmpeg -y -fflags +bitexact -f lavfi -i "testsrc2=size=256x144:rate=30" -frames:
   av01-clean.mp4
 ```
 
-Then inject the captions with [go-608](https://github.com/Eyevinn/go-608), an independent
-implementation — so these fixtures do not simply re-encode this library's own assumptions:
+Then inject the captions with [go-608](https://github.com/Eyevinn/go-608). go-608 is
+independent, so these fixtures do not re-encode this library's own assumptions:
 
 ```sh
 cat > hello.scc <<'EOF'
@@ -37,11 +37,11 @@ EOF
 go608-inject -i av01-clean.mp4 -sub hello.scc -o 608_av1.mp4 -fps 30
 ```
 
-`go608-info -i 608_av1.mp4` dumps the per-frame field pairs and the rendered screen, and
-`go608-extract` reads the captions back out as WebVTT.
+`go608-info -i 608_av1.mp4` prints the per-frame field pairs and the rendered screen.
+`go608-extract` reads the captions back as WebVTT.
 
 ## `608_h264.m4s` and `608_h265.m4s`
 
-Pre-existing fixtures carrying captions in `itu_t_t35` SEI messages, on both fields, with
-all of a caption's byte pairs packed into a single frame's `cc_data()`. Provenance is not
-recorded.
+Pre-existing fixtures with captions in `itu_t_t35` supplemental enhancement information
+(SEI) messages, on both fields. One frame's `cc_data()` packs all byte pairs of a caption.
+Their provenance is not recorded.
