@@ -15,8 +15,8 @@ status: draft
 
 > **Revision note.** The first draft proposed an incremental parser, `XmlParser`, with `write(chunk)`
 > and `end()`. Review ([#431](https://github.com/streaming-video-technology-alliance/common-media-library/pull/431))
-> found that every blocking problem was in the incremental part, that #432 had already merged the flat
-> scanner and an internal builder, and that dash.js parses complete strings. This revision proposes the
+> found three things. Every blocking problem was in the incremental part. #432 had already merged the
+> flat scanner and an internal builder. dash.js parses complete strings. This revision proposes the
 > builder contract with one entry point, `parseXmlWith`, that takes the complete document. Incremental
 > input moves to a separate RFC. Its design notes are in `plans/xml-incremental-parser/findings.md`
 > under "Deferred: incremental input". The file keeps its original name.
@@ -85,9 +85,13 @@ this. Its options change what the tree contains, not what the output is.
 
 The scanner on `main` already reports every construct to an internal builder. This RFC makes that
 builder public, defines its contract, and fixes three errors in how the scanner reads XML. The
-performance gain for dash.js after #432 is small (see Measured results). The main benefits are that a
-consumer can produce its own objects directly, skip what it does not need, get an error instead of a
-partial document when the input is cut off, and never allocate a tree.
+performance gain for dash.js after #432 is small (see Measured results). The main benefits are for the
+consumer:
+
+- It produces its own objects directly.
+- It skips what it does not need.
+- It gets an error instead of a partial document when the input is cut off.
+- It never allocates a tree.
 
 ## Guide-level explanation
 
@@ -197,51 +201,10 @@ can collide with, because attribute names become properties of the node.
 ### Flattening builders
 
 A builder that flattens the manifest, as a HAM converter does, cannot finish an `<S>` element inside
-`createElement`. A segment URL needs the Representation id and bandwidth. In most manifests the
-`SegmentTemplate` is on the AdaptationSet, so its `<S>` children arrive before the Representations that
-use them. The builder keeps a small record per `<S>` and expands the records in `appendChild`, when the
-Representation or the Period ends:
-
-```ts
-import { parseXmlWith, type XmlBuilder } from '@svta/cml-xml'
-
-type Timeline = { t: number; d: number; r: number }[]
-type Level = { name: string; attributes: Record<string, string>; timeline: Timeline; segments: string[] }
-type Model = { segments: string[] }
-
-const flattening: XmlBuilder<Level, Model> = {
-	createDocument: () => ({ segments: [] }),
-	createElement: (parent, name, attributes, localName) => {
-		const timeline = 'timeline' in parent && localName !== 'AdaptationSet' && localName !== 'Period' ? parent.timeline : []
-		return { name: localName, attributes, timeline, segments: [] }
-	},
-	appendChild: (parent, child) => {
-		if (child.name === 'S') {
-			const parentTimeline = 'timeline' in parent ? parent.timeline : []
-			parentTimeline.push({ t: Number(child.attributes['t'] ?? -1), d: Number(child.attributes['d']), r: Number(child.attributes['r'] ?? 0) })
-		}
-		else if (child.name === 'Representation') {
-			for (const entry of child.timeline) {
-				child.segments.push(`${child.attributes['id']}/${entry.t}.m4s`)
-			}
-			if ('timeline' in parent) {
-				parent.segments.push(...child.segments)
-			}
-		}
-		else if ('segments' in parent) {
-			parent.segments.push(...child.segments)
-		}
-	},
-}
-
-export function listSegments(manifestText: string): string[] {
-	return parseXmlWith(manifestText, flattening).segments
-}
-```
-
-This is still one pass, but it depends on document order. The DASH schema puts `SegmentTemplate` before
-`Representation` and `BaseURL` before `Period`, and this builder relies on that order. A tree consumer
-does not have to.
+`createElement`. The Representation id and bandwidth that a segment URL needs arrive later. Such a
+builder keeps a small record per `<S>` and expands the records in `appendChild`, when the Representation
+or the Period ends. This is still one pass, but it depends on document order, which a tree consumer does
+not. A complete example is in `plans/xml-incremental-parser/flattening-builder.md`.
 
 ### Skipping subtrees
 
@@ -267,8 +230,8 @@ const document = parseXmlWith('<MPD><Metrics><Range/></Metrics><Period/></MPD>',
 ### Errors
 
 `parseXmlWith` requires a complete document. It throws when an element is still open at the end of the
-input or when a construct is cut off, and it throws the errors that `parseXml` already reports (a
-malformed attribute, an unclosed quote, a mismatched or stray close tag). Every error is an
+input, or when a construct is cut off. It also throws the errors that `parseXml` already reports: a
+malformed attribute, an unclosed quote, a mismatched or stray close tag. Every error is an
 `XmlParseError`: an `Error` subclass with the message text that `parseXml` produces today, plus `offset`,
 `line`, and `column`:
 
@@ -335,7 +298,7 @@ change.
 - `createElement(parent, name, attributes, localName, prefix)` is called when a start tag has been read
   completely, before any of the element's content. `attributes` is a new object for each element, and
   its values are entity-decoded. The consumer owns this object and may keep or change it. If the return
-  value is `undefined`, the element is skipped: nothing inside it is reported, `appendChild` is not
+  value is `undefined`, the element is skipped. Nothing inside it is reported, `appendChild` is not
   called for it, and close tags inside it are still checked.
 - `appendChild(parent, child, name)` is called when the element ends: at its close tag, or directly
   after `createElement` for a self-closing tag. Siblings end in document order, so children are appended
@@ -367,18 +330,18 @@ The scanner reads three XML constructs incorrectly today. This RFC fixes them fo
 
 Eight of the 109 inputs in the parity corpus change. `plans/xml-incremental-parser/equivalence.md` lists
 each one with its reason. Six are grammar fixes. Two are a side effect of delivering comments as inner
-text: the `parseXml` tree builder adds the delimiters back, so with `keepComments` a comment cut off by
-the end of the input now reads `<!-- x-->`, and the malformed comment `<!--->` now reads `<!---->`.
-Every other output in the corpus is byte-identical.
+text, because the `parseXml` tree builder adds the delimiters back. With `keepComments`, a comment cut
+off by the end of the input now reads `<!-- x-->`, and the malformed comment `<!--->` now reads
+`<!---->`. Every other output in the corpus is byte-identical.
 
 ### Strictness
 
 `parseXmlWith` throws when the input ends inside a start tag, a close tag, a comment, a CDATA section, a
-doctype, a processing instruction, or a quoted attribute value, and when an element is still open at
-the end of the input. The message is `Unexpected end of input inside <name>` for an open element, or
-`Unexpected end of input inside a start tag` (with the name of the construct) otherwise, with `Line`,
-`Column`, and `Char: end of input` in today's format. As a result, a network response that ends in the
-middle of a document is an error, not a partial manifest.
+doctype, a processing instruction, or a quoted attribute value. It also throws when an element is still
+open at the end of the input. The message is `Unexpected end of input inside <name>` for an open
+element, and `Unexpected end of input inside a start tag` or the matching construct name otherwise. The
+messages include `Line`, `Column`, and `Char: end of input` in today's format. As a result, a network
+response that ends in the middle of a document is an error, not a partial manifest.
 
 `parseXml` keeps its documented tolerance. Input cut off between tags returns the nodes parsed so far. An
 element left open keeps the children parsed so far. The errors that #430 added for malformed attributes
@@ -447,12 +410,12 @@ Three conclusions:
    took 51.4 ms on the stress input. `main` takes 41.4 ms, and the lean builder takes 32.9 ms. That is a
    36 percent reduction from where the issue started, and most of it came from #432.
 
-Two builders in one process, which is what an application with `parseXml` and one custom builder does,
-cost each builder a few percent: within about 6 percent of the isolated medians on the large inputs.
+An application that uses `parseXml` and one custom builder runs two builders in one process. That costs
+each builder a few percent: within about 6 percent of the isolated medians on the large inputs.
 
 One result is unexplained. With a full GC before every call and one variant per process, the faithful
-builder runs 4 to 5 times slower on the 150 KB inputs, and the lean builder 16 to 46 percent slower than
-today's pipeline on the small inputs. `parseXml` is not affected. The effect disappears when the builder
+builder runs 4 to 5 times slower on the 150 KB inputs. The lean builder runs 16 to 46 percent slower
+than today's pipeline on the small inputs. `parseXml` is not affected. The effect disappears when the builder
 alternates with `parseXml` in one process, and `processNode`, which creates the same object shapes, does
 not show it. The likely cause is V8's object-shape tracking for objects whose properties are added one
 by one, not the scanner, but this is not diagnosed. The implementation must measure it with
@@ -473,27 +436,17 @@ present.
 
 A bundle that imports only `parseXml` grows by about 450 bytes gzipped. The strict-mode branches, the
 NameStartChar test, the quoted-literal doctype scan, the skip checks, and `XmlParseError` are in the
-shared scanner, and the tree builder grows from four to eight variants. A bundle that imports only
+shared scanner. The tree builder grows from four to eight variants. A bundle that imports only
 `parseXmlWith` is about 150 bytes gzipped larger than today's `parseXml` bundle, and it has no tree
 builder.
 
 ### Implementation notes
 
-- The scanner takes primitives, the two stack arrays, and the builder object, and writes nothing to a
-  per-parse object. #432 chose this shape because V8 deoptimizes every function compiled against a
-  per-parse object after a full GC (details in `plans/xml-incremental-parser/prototype.md`).
-  `parseXmlWith` keeps the same shape: the root goes on the stack, and nothing else is allocated per
-  parse.
-- Every character read is guarded (`cc = ++pos < length ? input.charCodeAt(pos) : 0`), as on `main`.
-- Builders should be module-level constants, so that the functions the scanner calls are the same on
-  every parse. `parseXml` prebuilds its eight variants. Per-parse input goes through `options.root`, not
-  through a closure.
-- The scanner reads the builder's callbacks into local variables once per scan. Skipping is a
-  `current !== undefined` check at each callback site.
-- `this: void` on the callbacks needs `'@typescript-eslint/no-invalid-void-type': ['error',
-  { allowAsThisParameter: true }]` in the repository's ESLint configuration.
-- Module scope has no side effects: numeric constants, functions, and the prebuilt builders behind
-  `/* @__PURE__ */`.
+The implementation must keep the constraints that #432 established and the prototype follows. The
+scanner takes only primitives, the two stack arrays, and the builder object. Every character read is
+guarded. Builders are module-level constants. `plans/xml-incremental-parser/prototype.md` lists
+these constraints with their reasons under Performance notes for the port, and
+`plans/xml-incremental-parser/steps.md` has the ESLint change that `this: void` needs.
 
 ### Testing
 
@@ -513,8 +466,8 @@ from the eight corpus cases above. The implementation keeps the same checks:
 
 - Small performance gain after #432: 13 to 21 percent for a lean dash.js builder on the stress inputs,
   and 0 to 6 percent on the real-sized inputs. This is not the 2x from #424.
-- Larger bundles for tree users: a `parseXml`-only bundle grows by about 450 bytes gzipped, because the
-  grammar fixes, the strict branches, and the error class are in the shared scanner.
+- Larger bundles for tree users. A `parseXml`-only bundle grows by about 450 bytes gzipped. The grammar
+  fixes, the strict branches, and the error class are in the shared scanner.
 - `parseXml` output changes on eight corpus inputs. All are malformed or rare constructs. Two of them
   (`<!--->` and a comment cut off by the end of the input) change because comments are delivered as
   inner text.
@@ -528,24 +481,24 @@ from the eight corpus cases above. The implementation keeps the same checks:
 ## Rationale and alternatives
 
 **One entry point for complete documents now, incremental input later.** The first draft made `write`
-and `end` the core. Review found three problems, all in the incremental part: rescanning the
-carried-over text was quadratic for a long construct (a denial-of-service risk on remote input), `end()`
-had to become strict, and the chunked benchmarks compared strings with different internal
-representations. #432 had already shipped the scanner, and dash.js parses complete strings, so
-`parseXmlWith` delivers the contract today as a small wrapper. The incremental design, with the fixes
-that review asked for, is recorded for a follow-up RFC.
+and `end` the core. Review found three problems, all in the incremental part. Rescanning the carried-over
+text was quadratic for a long construct, which is a denial-of-service risk on remote input. `end()` had
+to become strict. The chunked benchmarks compared strings with different internal representations. #432
+had already shipped the scanner, and dash.js parses complete strings, so `parseXmlWith` delivers the
+contract today as a small wrapper. The incremental design, with the fixes that review asked for, is
+recorded for a follow-up RFC.
 
 **SAX-style events.** Events cost the same as builder callbacks, but the consumer must keep its own stack
 to know where it is in the document. That bookkeeping is why dash.js chose a tree plus a second pass over
 its earlier X2JS pipeline. Passing the parent's value into every callback removes that stack from the
 consumer, and the scanner already keeps it.
 
-**A pull parser.** A cursor that the consumer advances, as in `XmlReader`, quick-xml, or StAX, can be
-paused and resumed by nature. But generators are slow in JavaScript, and a cursor means many small calls
-for a manifest consumer.
+**A pull parser.** A cursor that the consumer advances, as in `XmlReader`, quick-xml, or StAX, is
+resumable by nature. But generators are slow in JavaScript, and a cursor means many small calls for a
+manifest consumer.
 
-**A lazy tree.** A tree that creates attributes when they are first read does not help when the consumer
-reads every `<S>` immediately, which dash.js does. It also puts proxies or getters in the main loop.
+**A lazy tree.** Attributes created on first read do not help a consumer that reads every `<S>`
+immediately, as dash.js does, and they put proxies or getters in the main loop.
 
 **`DOMParser`.** It is not available in workers, dash.js stopped using it for speed, and it produces a
 heavier tree than the one this RFC removes.
@@ -555,37 +508,35 @@ heavier tree than the one this RFC removes.
 option. Fixing a wrong check is a bug fix, so the fixes apply to both, and the eight corpus inputs that
 change are listed, not hidden.
 
-**Attributes as one object, not one callback per attribute.** The first draft prototyped per-attribute
-callbacks. They force the consumer to create the element before it knows the attributes, which prevents
-immutable objects and constructors that take attributes. They gained a few percent on the stress input.
-The `<S>` branch in the guide recovers most of that gain within the object contract.
+**Attributes as one object, not one callback per attribute.** Per-attribute callbacks gained a few
+percent on the stress input in the first draft. But they force the consumer to create the element before
+it knows the attributes, which prevents immutable objects and constructors that take attributes. The
+`<S>` branch in the guide recovers most of that gain.
 
 **Local name and prefix as arguments, and the name on the append callbacks.** The scanner already has all
-three: it finds the colon while reading the name, and it keeps the names stack for close-tag checks.
-Passing them costs nothing and saves every builder an `indexOf` or a type field. They are trailing
-parameters, so short builders stay valid.
+three, so passing them costs nothing and saves every builder an `indexOf` or a type field. They are
+trailing parameters, so short builders stay valid.
 
 **Root injection instead of closures.** A builder that needs per-parse input, such as a base URL, a
 logger, or counters, cannot close over it if the builder is a module-level constant. Mutable module-level
 state breaks as soon as two parses interleave. `options.root` supplies the per-parse value, and
 `createDocument` becomes optional.
 
-**Inner text for comments, doctypes, and CDATA.** The first draft delivered comments with their
-delimiters and doctypes with a leading `!`, because `XmlNode` stores them that way. The builder layer
-exists to shape output, and the tree builder can add back what `XmlNode` expects. The cost is two
-malformed-comment inputs whose delimiters the tree builder can no longer reproduce.
+**Inner text for comments, doctypes, and CDATA.** The builder layer exists to define the output, so it
+delivers inner text, and the tree builder adds back the delimiters that `XmlNode` expects. The cost is
+listed under Drawbacks.
 
 **Strict `parseXmlWith`.** A parser that a player uses on a network response must not turn a truncated
 body into a partial manifest that looks valid. `parseXml` keeps its tolerance because existing consumers
 rely on it. The difference is one flag on the shared scanner.
 
-**No DASH-specific parsing in the parser.** #424 asked for it as an option. The investigation measured
-5.6 percent for `<S>` handling inside `parseXml`, and it would make attribute types depend on element
-names. The builder puts that specialization in the player, which knows the schema.
+**No DASH-specific parsing in the parser.** #424 asked for it as an option. It measured 5.6 percent for
+`<S>` handling inside `parseXml`, and it would make attribute types depend on element names. That
+specialization stays in the player, which knows the schema.
 
-**Names.** `createElement` and `appendChild` are DOM vocabulary that every web developer knows, and they
-describe what the consumer does: build. `startElement` and `endElement` describe what the parser saw.
-The DOM names are proposed. See Unresolved questions.
+**Names.** `createElement` and `appendChild` are DOM vocabulary and describe what the consumer does:
+build. `startElement` and `endElement` describe what the parser saw. The DOM names are proposed (see
+Unresolved questions).
 
 ## Prior art
 
@@ -641,7 +592,8 @@ The DOM names are proposed. See Unresolved questions.
 - 2026-09-03: the entry point is named `parseXmlWith`, not `buildXml`. The options type is
   `XmlParseWithOptions`.
 - 2026-09-03: rewritten in plain English for readers whose first language is not English. Added the
-  Terms list. No technical change.
+  Terms list, shortened Implementation notes and the minor alternatives, and moved the flattening
+  example to `plans/xml-incremental-parser/flattening-builder.md`. No technical change.
 
 ## Final Decision
 

@@ -48,9 +48,12 @@ has no tree builder.
   every parse. `parseXml` prebuilds its eight variants. An application that uses `parseXml` and one
   custom builder drives the same scanner with two builders. The two-builder pairs in `benchmark.md`
   measure that case.
-- The `current !== undefined` skip checks, the name arguments, and the untrimmed text policy are in the
-  main loop. Their total cost is the `parseXml` difference between `main` and the phase-one scanner in
-  `benchmark.md`.
+- The scanner reads the builder's callbacks into local variables once per scan, and skipping is a
+  `current !== undefined` check at each callback site. These checks, the name arguments, and the
+  untrimmed text policy are in the main loop. Their total cost is the `parseXml` difference between
+  `main` and the phase-one scanner in `benchmark.md`.
+- Module scope has no side effects: numeric constants, functions, and the prebuilt builders behind
+  `/* @__PURE__ */`.
 
 ## Known deviations
 
