@@ -106,3 +106,14 @@ All three guides changed. The Terms table in the User Guide does not count as pr
 | `libs/cmcd/docs/user-guide.md` | 2827 | 207 | 13.7 | 8 (4%) | 7.1 | frozen(2), sat(1), bar(2), stay(5), stays(3) |
 | `libs/cmcd/docs/report-recorder-guide.md` | 885 | 65 | 13.6 | 2 (3%) | 6.6 | stay(1), stays(1) |
 | `libs/cmcd/docs/validation-guide.md` | 509 | 38 | 13.4 | 2 (5%) | 7.7 | none |
+
+## After tranche 4
+
+All four guides changed.
+
+| File | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `libs/c2pa/docs/manifest-box-validation.md` | 540 | 34 | 15.9 | 3 (9%) | 8.7 | vs(2) |
+| `libs/c2pa/docs/merkle-validation.md` | 406 | 29 | 14.0 | 1 (3%) | 5.8 | vs(1) |
+| `libs/c2pa/docs/results-and-error-codes.md` | 258 | 20 | 12.9 | 1 (5%) | 7.9 | vs(4) |
+| `libs/c2pa/docs/vsi-validation.md` | 411 | 31 | 13.3 | 3 (10%) | 7.2 | stands(1), vs(2) |

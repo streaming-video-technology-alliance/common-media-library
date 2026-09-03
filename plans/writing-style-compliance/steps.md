@@ -299,14 +299,16 @@ Casey creates the PR with `/create-pr`.
 
 **Known violations at the base:** 18 sentences over 25 words across the four files. "vs" appears 10 times and "carries" or "carry" 8 times. `merkle-validation.md` averages 22.7 words per sentence. The section references in the form "§19.4" are facts and stay.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-c2pa-guides origin/main
 ```
 
-- [ ] **Step 2: Rewrite the four guides by the method in `overview.md`**
+Done differently on 2026-09-03: tranches 2 and 3 had no PR yet, so the branch was created from the tranche 3 head 56ff94ea9 instead. The checks use `origin/main` as the base, because the `libs/c2pa/docs` trees are identical. Rebase onto `main` after tranche 3 merges.
+
+- [x] **Step 2: Rewrite the four guides by the method in `overview.md`**
 
 Replace each use of "vs" with "compared with" or with a two-column table. Define VSI, EMSG, BMFF, COSE, and Merkle tree at first use in each file.
 
@@ -334,6 +336,8 @@ git push -u origin docs/writing-style-c2pa-guides
 ```
 
 Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** all four guides changed, and every check passed for every file. No heading changed. HLS and DASH stay as names in the VOD Merkle guide, where they are examples. Their expansion pushed one sentence over 25 words and the file over its base length. VSI/EMSG stays undefined in the VOD Merkle guide, where it appears only as a link name. See "Noticed, not changed (tranche 4)" in `overview.md` for the frozen text that still breaks a rule.
 
 ---
 

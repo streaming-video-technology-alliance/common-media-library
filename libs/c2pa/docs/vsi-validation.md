@@ -5,16 +5,16 @@ description: Validate live streams using the Verifiable Segment Info method (C2P
 
 # VSI/EMSG Validation
 
-The Verifiable Segment Info (VSI) method is a two-phase approach to C2PA live video validation defined in section 19.4 of the C2PA specification. The init segment carries the full C2PA manifest and session keys, while each media segment carries a lightweight EMSG box with a COSE_Sign1 signature that is verified against those session keys.
+The Verifiable Segment Info (VSI) method is a two-phase approach to C2PA live video validation, defined in section 19.4 of the C2PA specification. The init segment contains the full C2PA manifest and the session keys. Each media segment contains a small event message (EMSG) box with a COSE_Sign1 signature, verified against those session keys. COSE means CBOR Object Signing and Encryption.
 
 ## Overview
 
 The validation flow has two phases:
 
-1. **Init segment** — call `validateC2paInitSegment` once to parse the C2PA manifest, verify its integrity, and extract the validated session keys.
-2. **Media segments** — call `validateC2paSegment` for each media segment. The function locates the C2PA EMSG box, verifies the COSE_Sign1 signature against a session key, checks the BMFF content hash, and validates the sequence number.
+1. **Init segment**: call `validateC2paInitSegment` once. It parses the C2PA manifest, verifies its integrity, and extracts the validated session keys.
+2. **Media segments**: call `validateC2paSegment` for each media segment. The function finds the C2PA EMSG box and verifies the COSE_Sign1 signature against a session key. It then checks the ISO Base Media File Format (BMFF) content hash and validates the sequence number.
 
-A `SequenceState` object is threaded through the media segment calls to track sequence number history across the stream.
+A `SequenceState` object passes from each media segment call to the next and tracks the sequence numbers.
 
 ## Step 1: Validate the Init Segment
 
@@ -42,7 +42,7 @@ The returned `InitSegmentValidation` object contains:
 
 ### Accessing Session Keys
 
-Only keys whose signer binding is valid and whose validity period has not expired are included in `sessionKeys`:
+`sessionKeys` includes only keys with a valid signer binding and an unexpired validity period:
 
 ```typescript
 for (const key of init.sessionKeys) {
@@ -95,8 +95,8 @@ for (const segmentUrl of segmentUrls) {
 
 `validateC2paSegment` returns `null` when the segment does not contain a C2PA EMSG box. Otherwise it returns an object with:
 
-- `result` — a `SegmentValidationResult` with the validation outcome
-- `nextSequenceState` — the updated sequence state to pass into the next call
+- `result`: a `SegmentValidationResult` with the validation outcome
+- `nextSequenceState`: the updated sequence state to pass into the next call
 
 The `SegmentValidationResult` contains:
 
@@ -111,7 +111,7 @@ The `SegmentValidationResult` contains:
 | `errorCodes` | `readonly LiveVideoStatusCode[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Always persist `nextSequenceState` and pass it to the next `validateC2paSegment` call. This enables duplicate detection, gap detection, and out-of-order detection across the stream.
+> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments.
 
 ## Complete Example
 
@@ -172,20 +172,20 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
 
 ## Session Key Lifecycle
 
-Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key goes through signer binding verification before being included in the validation result.
+Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result.
 
-The validation function automatically handles key matching and expiration:
+The validation function handles key matching and expiration:
 
-1. **Key matching** — `validateC2paSegment` matches the `kid` (key ID) from the COSE_Sign1 header against the available session keys.
-2. **Expiration** — A key expires when `createdAt + validityPeriod` is in the past. If the matched key has expired, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`.
-3. **No match** — If no session key matches the `kid`, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
+1. **Key matching**: `validateC2paSegment` matches the `kid` (key ID) from the COSE_Sign1 header against the available session keys.
+2. **Expiration**: A key expires when `createdAt + validityPeriod` is in the past. If the matched key has expired, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`.
+3. **No match**: If no session key matches the `kid`, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
 
 > [!NOTE]
-> When a session key expires mid-stream, the signer is expected to produce a new init segment with fresh session keys. Your application should re-validate the new init segment and use its `sessionKeys` for subsequent media segments.
+> When a session key expires during the stream, the signer is expected to produce a new init segment with new session keys. Validate the new init segment and use its `sessionKeys` for the following media segments.
 
 ## Sequence Number Validation
 
-Each media segment carries a monotonically increasing sequence number in its VSI map. The `sequenceResult` field in the validation result is a discriminated union on `reason`, using `SequenceValidationReason` constants:
+Each media segment has an increasing sequence number in its VSI map. The `sequenceResult` field is a discriminated union on `reason`, with `SequenceValidationReason` constants:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'
@@ -225,4 +225,4 @@ switch (sequenceResult.reason) {
 ```
 
 > [!NOTE]
-> The sequence state maintains a bounded sliding window of the last 32 sequence numbers, so memory usage stays constant regardless of stream length.
+> The sequence state keeps a bounded sliding window of the last 32 sequence numbers, so memory use is constant whatever the stream length.
