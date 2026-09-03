@@ -129,3 +129,11 @@ All five files changed. Frontmatter and the shell injection lines are byte-ident
 | `.claude/skills/code-review/SKILL.md` | 100 | 12 | 8.3 | 0 (0%) | 6.2 | bar(1) |
 | `.claude/skills/create-pr/SKILL.md` | 683 | 65 | 10.5 | 3 (5%) | 5.3 | none |
 | `.claude/skills/pr-feedback/SKILL.md` | 788 | 82 | 9.6 | 2 (2%) | 5.8 | none |
+
+## After tranche 6
+
+Only `rfc/README.md` changed. Casey decided on 2026-09-03 that the two merged RFC bodies stay as records.
+
+| File | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `rfc/README.md` | 316 | 27 | 11.7 | 2 (7%) | 9.4 | none |

@@ -124,7 +124,7 @@ git add plans/writing-style-compliance/inventory.md
 git commit -s -m "docs(plans): record the tranche 1 metrics"
 ```
 
-- [ ] **Step 13: Push and hand over**
+- [x] **Step 13: Push and hand over**
 
 ```bash
 git push -u origin docs/writing-style-compliance
@@ -396,14 +396,16 @@ Casey creates the PR with `/create-pr`.
 
 **Known violations at the base:** `rfc/README.md` has 3 sentences over 25 words and the verbs "settle" and "shape". The two RFC bodies average 20.4 and 23.3 words per sentence, with 30 and 40 percent of sentences over 25 words. Both exceed 1,500 words and need a Terms list.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-rfc origin/main
 ```
 
-- [ ] **Step 2: Rewrite `rfc/README.md`**
+Done differently on 2026-09-03: tranches 2 to 5 had no PR yet, so the branch was created from the tranche 5 head 0742f7a88 instead. The checks use `origin/main` as the base, because `rfc/README.md` is identical at both commits. Rebase onto `main` after tranche 5 merges.
+
+- [x] **Step 2: Rewrite `rfc/README.md`**
 
 - [x] **Step 3: Check**
 
@@ -420,7 +422,7 @@ git add rfc/README.md
 git commit -s -m "docs(rfc): apply the writing style rules to the RFC process document"
 ```
 
-- [x] **Step 5: If approved, rewrite one RFC body per commit with a Terms list, check each, and commit each**
+- [ ] **Step 5: If approved, rewrite one RFC body per commit with a Terms list, check each, and commit each**. Not approved: Casey decided on 2026-09-03 that the two merged RFC bodies stay as records.
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main rfc/cmcd-reporter-middleware.md
@@ -436,3 +438,5 @@ git push -u origin docs/writing-style-rfc
 ```
 
 Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** `rfc/README.md` changed, and every check passed. RFC, PR, and DCO are defined at first use. The idioms about buy-in, living with an addition, and a design that won are replaced with literal wording. The two merged RFC bodies are unchanged by decision. This task completes the plan.
