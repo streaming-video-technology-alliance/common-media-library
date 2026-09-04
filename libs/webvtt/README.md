@@ -1,4 +1,3 @@
-0
 # @svta/cml-webvtt
 
 WebVTT parsing and rendering functionality.

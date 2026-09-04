@@ -1,4 +1,3 @@
-0
 # @svta/cml-throughput
 
 Throughput estimation functionality.

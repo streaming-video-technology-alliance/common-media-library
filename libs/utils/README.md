@@ -1,4 +1,3 @@
-0
 # @svta/cml-utils
 
 Common utility functions for media processing.

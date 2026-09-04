@@ -1,4 +1,3 @@
-0
 # @svta/cml-structured-field-values
 
 RFC8941 Structured Field Values implementation.

@@ -1,9 +1,3 @@
-0
-0
-0
-0
-0
-0
 # @svta/cml-c2pa
 
 C2PA (Coalition for Content Provenance and Authenticity) live video validation for ISO Base Media File Format (BMFF) and MP4 containers.

@@ -1,4 +1,3 @@
-0
 # @svta/cml-request
 
 Common Media Request and Response types.

@@ -1,4 +1,3 @@
-0
 # @svta/cml-cmsd
 
 Common Media Server Data (CMSD) encoding and decoding.

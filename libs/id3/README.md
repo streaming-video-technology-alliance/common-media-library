@@ -1,4 +1,3 @@
-0
 # @svta/cml-id3
 
 ID3 tag parsing functionality.

@@ -1,6 +1,3 @@
-0
-0
-0
 # @svta/cml-608
 
 CTA-608/CEA-608 closed captioning functionality.

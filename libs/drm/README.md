@@ -1,4 +1,3 @@
-0
 # @svta/cml-drm
 
 Digital Rights Management (DRM) functionality.

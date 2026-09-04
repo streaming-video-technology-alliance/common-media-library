@@ -1,5 +1,3 @@
-0
-0
 # @svta/cml-xml
 
 XML parsing utilities.
