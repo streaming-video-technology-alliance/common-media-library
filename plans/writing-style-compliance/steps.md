@@ -350,14 +350,16 @@ Casey creates the PR with `/create-pr`.
 
 **Known violations at the base:** 10 sentences over 25 words across the five files. "e.g." appears 7 times and "vs" 4 times. `code-reviewer.md` uses "hot path". The frontmatter of every file (`name`, `description`, and the other keys) is configuration and must stay byte for byte.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-agent-instructions origin/main
 ```
 
-- [ ] **Step 2: Rewrite the five files by the method in `overview.md`**
+Done differently on 2026-09-03: tranches 2 to 4 had no PR yet, so the branch was created from the tranche 4 head 85c76ceb6 instead. The checks use `origin/main` as the base, because the `.claude` trees are identical. Rebase onto `main` after tranche 4 merges.
+
+- [x] **Step 2: Rewrite the five files by the method in `overview.md`**
 
 - [x] **Step 3: Check, including the frontmatter**
 
@@ -377,6 +379,8 @@ git push -u origin docs/writing-style-agent-instructions
 ```
 
 Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** all five files changed, and every check passed for every file. The frontmatter of each file and every shell injection line are byte-identical to the base. Every directive kept its wording and emphasis. Double hyphens that stood for dashes became periods or commas. DCO, PR, and ESM are defined at first use. See "Noticed, not changed (tranche 5)" in `overview.md`.
 
 ---
 

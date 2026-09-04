@@ -117,3 +117,15 @@ All four guides changed.
 | `libs/c2pa/docs/merkle-validation.md` | 406 | 29 | 14.0 | 1 (3%) | 5.8 | vs(1) |
 | `libs/c2pa/docs/results-and-error-codes.md` | 258 | 20 | 12.9 | 1 (5%) | 7.9 | vs(4) |
 | `libs/c2pa/docs/vsi-validation.md` | 410 | 31 | 13.2 | 3 (10%) | 7.2 | vs(2) |
+
+## After tranche 5
+
+All five files changed. Frontmatter and the shell injection lines are byte-identical to the base.
+
+| File | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `.claude/agents/code-reviewer.md` | 821 | 105 | 7.8 | 1 (1%) | 5.9 | bar(3) |
+| `.claude/rules/code-quality.md` | 220 | 25 | 8.8 | 0 (0%) | 6.3 | bar(1) |
+| `.claude/skills/code-review/SKILL.md` | 100 | 12 | 8.3 | 0 (0%) | 6.2 | bar(1) |
+| `.claude/skills/create-pr/SKILL.md` | 683 | 65 | 10.5 | 3 (5%) | 5.3 | none |
+| `.claude/skills/pr-feedback/SKILL.md` | 788 | 82 | 9.6 | 2 (2%) | 5.8 | none |
