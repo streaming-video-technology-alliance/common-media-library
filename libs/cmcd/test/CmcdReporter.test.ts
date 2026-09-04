@@ -1479,7 +1479,7 @@ describe('CmcdReporter', () => {
 			ok(!req.url.includes('msd'))
 			// The gate must stay open: the report never carried msd. Asserted on
 			// the private flag because a fixed config has no observable follow-up.
-			equal((reporter as unknown as { session: { requestTarget: { msdSent: boolean; }; }; }).session.requestTarget.msdSent, false)
+			equal((reporter as unknown as { ledger: { current: { requestTargets: Map<string, { msdSent: boolean; }>; }; }; }).ledger.current.requestTargets.get('default')?.msdSent, false)
 		})
 
 		it('does not consume a target gate when msd is not in the target enabledKeys', async () => {
@@ -1510,7 +1510,7 @@ describe('CmcdReporter', () => {
 			ok(!(requests[0].body as string).includes('msd'))
 			ok((requests[1].body as string).includes('msd=800'))
 
-			const targets = [...(reporter as unknown as { session: { eventTargets: Map<unknown, { msdSent: boolean; }>; }; }).session.eventTargets.values()]
+			const targets = [...(reporter as unknown as { ledger: { current: { eventTargets: Map<unknown, { msdSent: boolean; }>; }; }; }).ledger.current.eventTargets.values()]
 			equal(targets[0].msdSent, false)
 			equal(targets[1].msdSent, true)
 		})
@@ -4687,5 +4687,505 @@ describe('CmcdReporter', () => {
 				ok((requests[0].body as string)?.includes('sta=p'))
 			})
 		})
+	})
+
+	it('detaches SfToken values and Uint8Array params from transform mutation', async () => {
+		const bodies: string[] = []
+		let calls = 0
+		const reporter = new CmcdReporter({
+			sid: 'sess-copy',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'com.example-tok', 'com.example-bin', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+					transform: (data) => {
+						// Only the first report's transform mutates; the second call is a
+						// pure probe of whatever the persistent store hands it.
+						if (calls++ === 0) {
+							const tok = data['com.example-tok'] as SfToken
+							const bin = data['com.example-bin'] as SfItem<string, Record<string, unknown>>
+							const bytes = (bin.params as Record<string, unknown>)['data'] as Uint8Array
+
+							tok.description = 'mutated'
+							bytes[0] = 9
+						}
+						return data
+					},
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		reporter.update({
+			'com.example-tok': new SfToken('preload'),
+			'com.example-bin': new SfItem('k', { data: new Uint8Array([1, 2, 3]) }),
+		})
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+		await Promise.resolve()
+
+		// The second report re-reads the persistent store: the first transform's
+		// nested mutation must not have reached it.
+		ok(bodies[1].includes('com.example-tok=preload'))
+		ok(bodies[1].includes(':AQID:')) // base64 of [1, 2, 3]
+	})
+
+	it('clones Date values through session rotation', async () => {
+		const bodies: string[] = []
+		const reporter = new CmcdReporter({
+			sid: 'sess-date-1',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'com.example-when', 'com.example-bare-when', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		const when = new Date('2024-01-01T00:00:00.000Z')
+
+		reporter.update({
+			'com.example-when': new SfItem('k', { at: when }),
+			'com.example-bare-when': when,
+			sta: 'p',
+		} as unknown as Partial<Cmcd>)
+
+		// Rotate sessions: startSession() runs copyReportValues on the archived
+		// session's data unconditionally, before the new session inherits it.
+		reporter.update({ sid: 'sess-date-2' })
+
+		// Mutate the caller's own Date after rotation; a working clone must not
+		// reflect it.
+		when.setTime(0)
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+		await Promise.resolve()
+
+		// The rotated session must carry a working Date clone, both nested in
+		// an SfItem's params and as a bare custom value, at the value the Date
+		// held when the session rotated, not the caller's later mutation.
+		ok(bodies[1].includes('com.example-when="k";at=@1704067200'))
+		ok(bodies[1].includes('com.example-bare-when=@1704067200'))
+	})
+
+	it('does not leave a bg key in the store when update() never received one', () => {
+		const { requester } = createMockRequester()
+		const reporter = new CmcdReporter({
+			sid: 'sess-no-bg',
+			enabledKeys: ['bg'],
+		}, requester)
+
+		reporter.update({ sta: 'p' })
+
+		// bg was never set, so the only enabled key has no value and the report
+		// is empty. An empty report is not transmitted at all: a store carrying
+		// a bg key with an undefined value would make the key set non-empty,
+		// which force-adds `v` and puts a spurious `CMCD=v%3D2` on the wire.
+		const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+		equal(req.url, 'https://example.com/video.mp4')
+		deepEqual(req.customData.cmcd, {})
+	})
+
+	it('sends reports queued into a session evicted mid-fan-out at sessionRetention 0', async () => {
+		const bodies: string[] = []
+		const reporter = new CmcdReporter({
+			sid: 's1',
+			sessionRetention: 0,
+			eventTargets: [
+				{
+					url: 'https://a.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE, CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: ['sta', 'url', 'rc', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+					// Rotating inside the first target's transform leaves the
+					// second target still fanning out on pinned s1.
+					transform: (data) => {
+						reporter.update({ sid: 's2' })
+						return data
+					},
+				},
+				{
+					url: 'https://b.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE, CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: ['sta', 'url', 'rc', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+				},
+			],
+		}, async (request) => {
+			bodies.push(`${request.url} ${String(request.body)}`)
+			return { status: 200 }
+		})
+
+		// Issued under s1, so its late response is attributed to s1 alone.
+		const req = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' })
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		await Promise.resolve()
+
+		const bReports = bodies.filter((body) => body.startsWith('https://b.example.com/cmcd'))
+		equal(bReports.length, 1)
+		ok(/sid="s1"/.test(bReports[0]))
+		equal(bodies.length, 2)
+
+		// The held eviction ran once the fan-out drained: s1 is gone, so a
+		// response still attributed to it has no session left to report under.
+		reporter.recordResponseReceived({ status: 200, request: req })
+		await Promise.resolve()
+
+		equal(bodies.length, 2)
+	})
+
+	it('consumes no sequence number or msd gate when encoding throws at enqueue', async () => {
+		const bodies: string[] = []
+		const reporter = new CmcdReporter({
+			sid: 'sess-encode',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE, CmcdEventType.CUSTOM_EVENT],
+					enabledKeys: ['sta', 'cen', 'com.example-big', 'msd', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		reporter.update({ msd: 250 })
+
+		throws(() => {
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, {
+				cen: 'boom',
+				'com.example-big': 1_000_000_000_000_000,
+			})
+		})
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		await Promise.resolve()
+
+		// The failed report consumed nothing: the next report is sn=0 and
+		// still carries the session's msd.
+		ok(/sn=0/.test(bodies[0]))
+		ok(/msd=250/.test(bodies[0]))
+	})
+
+	it('consumes no sequence number or msd gate when encoding throws on createRequestReport', () => {
+		const { requester } = createMockRequester()
+		const reporter = new CmcdReporter({
+			sid: 'sess-encode',
+			enabledKeys: ['com.example-big', 'msd', 'sid', 'sn'],
+		}, requester)
+
+		reporter.update({ msd: 250 })
+
+		throws(() => {
+			reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, {
+				'com.example-big': 1_000_000_000_000_000,
+			})
+		})
+
+		// The failed report consumed nothing: the next report is sn=0 and
+		// still carries the session's msd.
+		const req = reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' })
+		ok(req.url.includes('sn%3D0'))
+		ok(req.url.includes('msd%3D250'))
+	})
+
+	it('never resends a 429 re-queue whose sid was replaced by reuse', async () => {
+		const requests: HttpRequest[] = []
+		const pending: ((response: { status: number; }) => void)[] = []
+		const requester = (request: HttpRequest): Promise<{ status: number; }> => {
+			requests.push(request)
+			return new Promise(resolve => pending.push(resolve))
+		}
+
+		const reporter = new CmcdReporter({
+			sid: 's1',
+			enabledKeys: ['sid', 'v'],
+			eventTargets: [{
+				url: 'https://example.com/cmcd',
+				events: [CmcdEventType.ERROR],
+				enabledKeys: ['sid', 'v', 'e', 'sn'],
+				batchSize: 1,
+			}],
+		}, requester)
+
+		// The original s1's batch is in flight when sid reuse replaces it.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 1)
+
+		reporter.update({ sid: 's2' })
+		reporter.update({ sid: 's1' })
+
+		// The replacement s1 reports normally, with its own fresh counter.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 2)
+		ok((requests[1].body as string).includes('sn=0'))
+
+		// The original s1's in-flight send now fails: its re-queue must not
+		// resurrect a sid the ledger no longer maps it to.
+		pending[0]({ status: 429 })
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		reporter.flush()
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		// Only the replacement's own report went out; the orphaned batch
+		// never re-sends, so no third request ever lands.
+		equal(requests.length, 2)
+		pending[1]({ status: 200 })
+	})
+
+	it('does not arm remaining targets when a start() transform calls stop()', (t) => {
+		const timers = mock.timers
+		timers.enable({ apis: ['setInterval'] })
+		t.after(() => timers.reset())
+
+		const { requester, requests } = createMockRequester()
+		const reporter = new CmcdReporter(createConfig({
+			eventTargets: [
+				{
+					url: 'https://example.com/cmcd-stop-a',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+					transform: (data) => {
+						reporter.stop()
+						return data
+					},
+				},
+				{
+					url: 'https://example.com/cmcd-stop-b',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+				},
+			],
+		}), requester)
+
+		reporter.start()
+
+		// stop() ran inside the first target's transform, so the fan-out halts:
+		// the second target is never armed and never reports.
+		equal(requests.length, 1)
+		equal(requests[0].url, 'https://example.com/cmcd-stop-a')
+
+		timers.tick(120_000)
+
+		// No timer may fire after a stop() that ran during start().
+		equal(requests.length, 1)
+	})
+
+	it('sends a time-interval report queued into a session the tick rotated away at sessionRetention 0', (t) => {
+		const timers = mock.timers
+		timers.enable({ apis: ['setInterval'] })
+		t.after(() => timers.reset())
+
+		const { requester, requests } = createMockRequester()
+		let reports = 0
+		const reporter = new CmcdReporter(createConfig({
+			sid: 's1',
+			sessionRetention: 0,
+			eventTargets: [
+				{
+					url: 'https://example.com/cmcd-tick-evict',
+					events: [CmcdEventType.TIME_INTERVAL],
+					enabledKeys: [...EVENT_KEYS],
+					interval: 30,
+					batchSize: 1,
+					// Rotates on the timer's tick rather than on start()'s initial
+					// report, so the eviction the rotation triggers lands while the
+					// tick still holds s1.
+					transform: (data) => {
+						if (reports++ === 1) {
+							reporter.update({ sid: 's2' })
+						}
+						return data
+					},
+				},
+			],
+		}), requester)
+
+		reporter.start()
+		equal(requests.length, 1)
+
+		timers.tick(30_000)
+
+		// The tick's report was queued into s1 after its own transform rotated
+		// the session away; s1's eviction must wait for the tick to drain.
+		equal(requests.length, 2)
+		ok((requests[1].body as string).includes('sid="s1"'))
+
+		reporter.stop()
+	})
+
+	it('evicts the session a throwing time-interval transform rotated away at sessionRetention 0', (t) => {
+		const timers = mock.timers
+		timers.enable({ apis: ['setInterval'] })
+		t.after(() => timers.reset())
+
+		const { requester, requests } = createMockRequester()
+		let reports = 0
+		const reporter = new CmcdReporter(createConfig({
+			sid: 's1',
+			sessionRetention: 0,
+			eventTargets: [
+				{
+					url: 'https://example.com/cmcd-tick-throw',
+					events: [CmcdEventType.TIME_INTERVAL, CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...EVENT_KEYS, 'url', 'rc'],
+					interval: 30,
+					batchSize: 1,
+					// Rotates on the timer's tick and then throws, so the eviction
+					// the rotation deferred must still run when the tick unwinds.
+					transform: (data) => {
+						if (reports++ === 1) {
+							reporter.update({ sid: 's2' })
+							throw new Error('tick transform failure')
+						}
+						return data
+					},
+				},
+			],
+		}), requester)
+
+		reporter.start()
+		equal(requests.length, 1)
+
+		const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.m4s' })
+
+		throws(() => timers.tick(30_000), /tick transform failure/)
+		equal(requests.length, 1)
+
+		// s1 is beyond the retention window, so its late response drops
+		// instead of reporting under an evicted session.
+		reporter.recordResponseReceived({ status: 200, request })
+		equal(requests.length, 1)
+
+		reporter.stop()
+	})
+
+	it('detaches Buffer-backed byte sequences from transform mutation', async () => {
+		const bodies: string[] = []
+		let calls = 0
+		const reporter = new CmcdReporter({
+			sid: 'sess-copy-buffer',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'com.example-bin', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+					transform: (data) => {
+						if (calls++ === 0) {
+							const bin = data['com.example-bin'] as SfItem<string, Record<string, unknown>>
+							const bytes = (bin.params as Record<string, unknown>)['data'] as Uint8Array
+
+							bytes[0] = 9
+						}
+						return data
+					},
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		// Buffer is a Uint8Array subclass whose slice() returns a view over the
+		// same memory, so a slice-based copy would not detach it.
+		reporter.update({
+			'com.example-bin': new SfItem('k', { data: Buffer.from([1, 2, 3]) }),
+		})
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+		await Promise.resolve()
+
+		ok(bodies[1].includes(':AQID:')) // base64 of [1, 2, 3]
+	})
+
+	it('drops the bg key from the store when update() clears it with undefined', () => {
+		const { requester } = createMockRequester()
+		const reporter = new CmcdReporter({
+			sid: 'sess-bg-clear',
+			enabledKeys: ['bg'],
+		}, requester)
+
+		reporter.update({ bg: true })
+		reporter.update({ bg: undefined })
+
+		// A present-but-undefined bg key would force-add `v` and put a
+		// data-less `CMCD=v%3D2` on the request.
+		const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+		equal(req.url, 'https://example.com/video.mp4')
+		deepEqual(req.customData.cmcd, {})
+	})
+
+	it('never resends a 429 re-queue marked dirty before its sid was replaced by reuse', async () => {
+		const requests: HttpRequest[] = []
+		const pending: ((response: { status: number; }) => void)[] = []
+		const requester = (request: HttpRequest): Promise<{ status: number; }> => {
+			requests.push(request)
+			return new Promise(resolve => pending.push(resolve))
+		}
+
+		const reporter = new CmcdReporter({
+			sid: 's1',
+			enabledKeys: ['sid', 'v'],
+			eventTargets: [{
+				url: 'https://example.com/cmcd',
+				events: [CmcdEventType.ERROR],
+				enabledKeys: ['sid', 'v', 'e', 'sn'],
+				batchSize: 1,
+			}],
+		}, requester)
+
+		// s1's batch is in flight when the session rotates away; s1 stays
+		// retained (archived) under default retention.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 1)
+
+		reporter.update({ sid: 's2' })
+
+		// s1's send fails while s1 is still retained under its own sid: the
+		// re-queue's dirty mark is legitimate at the moment it is made.
+		pending[0]({ status: 429 })
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		// sid reuse now replaces the archived s1 with a fresh session object
+		// under the same key. The stale dirty mark must not survive the
+		// swap and must not be picked up by startSession()'s own post-
+		// rotate drain.
+		reporter.update({ sid: 's1' })
+		await new Promise(resolve => setTimeout(resolve, 10))
+
+		equal(requests.length, 1)
+
+		// The replacement s1 still reports normally, with its own fresh counter.
+		reporter.recordEvent(CmcdEventType.ERROR)
+		equal(requests.length, 2)
+		ok((requests[1].body as string).includes('sn=0'))
+
+		// No further resend surfaces later either.
+		reporter.flush()
+		await new Promise(resolve => setTimeout(resolve, 10))
+		equal(requests.length, 2)
+		pending[1]({ status: 200 })
 	})
 })
