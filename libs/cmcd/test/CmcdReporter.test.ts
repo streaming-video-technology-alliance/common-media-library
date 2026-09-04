@@ -5033,6 +5033,110 @@ describe('CmcdReporter', () => {
 		reporter.stop()
 	})
 
+	it('evicts the session a throwing time-interval transform rotated away at sessionRetention 0', (t) => {
+		const timers = mock.timers
+		timers.enable({ apis: ['setInterval'] })
+		t.after(() => timers.reset())
+
+		const { requester, requests } = createMockRequester()
+		let reports = 0
+		const reporter = new CmcdReporter(createConfig({
+			sid: 's1',
+			sessionRetention: 0,
+			eventTargets: [
+				{
+					url: 'https://example.com/cmcd-tick-throw',
+					events: [CmcdEventType.TIME_INTERVAL, CmcdEventType.RESPONSE_RECEIVED],
+					enabledKeys: [...EVENT_KEYS, 'url', 'rc'],
+					interval: 30,
+					batchSize: 1,
+					// Rotates on the timer's tick and then throws, so the eviction
+					// the rotation deferred must still run when the tick unwinds.
+					transform: (data) => {
+						if (reports++ === 1) {
+							reporter.update({ sid: 's2' })
+							throw new Error('tick transform failure')
+						}
+						return data
+					},
+				},
+			],
+		}), requester)
+
+		reporter.start()
+		equal(requests.length, 1)
+
+		const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.m4s' })
+
+		throws(() => timers.tick(30_000), /tick transform failure/)
+		equal(requests.length, 1)
+
+		// s1 is beyond the retention window, so its late response drops
+		// instead of reporting under an evicted session.
+		reporter.recordResponseReceived({ status: 200, request })
+		equal(requests.length, 1)
+
+		reporter.stop()
+	})
+
+	it('detaches Buffer-backed byte sequences from transform mutation', async () => {
+		const bodies: string[] = []
+		let calls = 0
+		const reporter = new CmcdReporter({
+			sid: 'sess-copy-buffer',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'com.example-bin', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+					transform: (data) => {
+						if (calls++ === 0) {
+							const bin = data['com.example-bin'] as SfItem<string, Record<string, unknown>>
+							const bytes = (bin.params as Record<string, unknown>)['data'] as Uint8Array
+
+							bytes[0] = 9
+						}
+						return data
+					},
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		// Buffer is a Uint8Array subclass whose slice() returns a view over the
+		// same memory, so a slice-based copy would not detach it.
+		reporter.update({
+			'com.example-bin': new SfItem('k', { data: Buffer.from([1, 2, 3]) }),
+		})
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+		await Promise.resolve()
+
+		ok(bodies[1].includes(':AQID:')) // base64 of [1, 2, 3]
+	})
+
+	it('drops the bg key from the store when update() clears it with undefined', () => {
+		const { requester } = createMockRequester()
+		const reporter = new CmcdReporter({
+			sid: 'sess-bg-clear',
+			enabledKeys: ['bg'],
+		}, requester)
+
+		reporter.update({ bg: true })
+		reporter.update({ bg: undefined })
+
+		// A present-but-undefined bg key would force-add `v` and put a
+		// data-less `CMCD=v%3D2` on the request.
+		const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
+
+		equal(req.url, 'https://example.com/video.mp4')
+		deepEqual(req.customData.cmcd, {})
+	})
+
 	it('never resends a 429 re-queue marked dirty before its sid was replaced by reuse', async () => {
 		const requests: HttpRequest[] = []
 		const pending: ((response: { status: number; }) => void)[] = []

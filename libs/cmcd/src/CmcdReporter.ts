@@ -257,10 +257,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 		finally {
 			this.fanOutDepth--
+			this.processEventTargets()
+			this.maybeEvict()
 		}
-
-		this.processEventTargets()
-		this.maybeEvict()
 	}
 
 	/**
@@ -355,16 +354,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		// sid and msd are session-owned: tracked in their own fields, stripped
 		// from the persistent store, and stamped onto each report at queue time.
-		this.playback.data = { ...this.playback.data, ...data, sid: undefined, msd: undefined }
+		// bg is session-owned too and rides reports as a field, so it is kept
+		// off the store and read from the session when a report is built.
+		let fields: Partial<Cmcd> = data
 
-		// bg is session-owned too, but its value is a report field rather than a
-		// stamp: it is tracked here and picked up when each report is built, and
-		// the key is deleted from the store rather than left undefined. Dedup and
-		// emission stay in the event path.
 		if ('bg' in data) {
-			session.bg = data.bg
-			delete this.playback.data.bg
+			const { bg, ...rest } = data
+			session.bg = bg
+			fields = rest
 		}
+
+		this.playback.data = { ...this.playback.data, ...fields, sid: undefined, msd: undefined }
 
 		// A cid change re-mints the playback's base provenance record, so a
 		// request issued from here on carries the new cid while requests
