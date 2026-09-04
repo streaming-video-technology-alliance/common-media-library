@@ -76,7 +76,7 @@ The readability metrics in `inventory.md` come from a second script that is not 
 
 ## Open questions
 
-1. Merged RFCs (tranche 6). Rewrite 12,000 words of accepted proposals, or apply the rules only to `rfc/README.md` and to new RFCs? Recommendation: `rfc/README.md` only.
+1. Merged RFCs (tranche 6). Rewrite 12,000 words of accepted proposals, or apply the rules only to `rfc/README.md` and to new RFCs? Resolved on 2026-09-03: `rfc/README.md` only. The two merged RFC bodies stay as records, and new RFCs follow the rules.
 2. TSDoc. The rules name TSDoc, and the API reference is built from it. A pass would touch most source files and regenerate every `api.md`. Recommendation: a separate plan, one package per PR, after the markdown tranches.
 3. Records. This plan leaves `plans/` and changelog history unchanged. Confirm.
 4. Enforcement. A lint step could fail when prose in a markdown file contains an em dash, a semicolon, or "e.g.". The check script is a starting point. Should it become `scripts/checkProse.ts` and run in `npm run lint`? A `.ts` file under `plans/` is not an option, because `eslint .` and the root `tsc --noEmit` include it.
@@ -88,6 +88,7 @@ The readability metrics in `inventory.md` come from a second script that is not 
 - 2026-09-03: tranche 3 rewritten on branch `docs/writing-style-cmcd-guides`, stacked on the tranche 2 branch. PR pending.
 - 2026-09-03: tranche 4 rewritten on branch `docs/writing-style-c2pa-guides`, stacked on the tranche 3 branch. PR pending.
 - 2026-09-03: tranche 5 rewritten on branch `docs/writing-style-agent-instructions`, stacked on the tranche 4 branch. PR pending.
+- 2026-09-03: tranche 6 rewritten on branch `docs/writing-style-rfc`, stacked on the tranche 5 branch, `rfc/README.md` only. PR pending. All six tranches are done.
 
 ## Noticed, not changed (tranche 1)
 
@@ -125,3 +126,7 @@ Tables and code blocks are frozen in this pass, so these items stay as they are.
 
 - `.claude/skills/create-pr/SKILL.md` names one model in the required `Co-Authored-By` trailer. `AGENTS.md` asks for the agent name and model of the agent that wrote the commit. The skill text is a fact about the skill, so this pass left it.
 - `.claude/agents/code-reviewer.md` uses "DX" inside the frozen report template. Code blocks are frozen in this pass.
+
+## Noticed, not changed (tranche 6)
+
+- `rfc/README.md`: the directory tree in the Directory Structure section contains a semicolon in a comment. Code blocks are frozen in this pass.
