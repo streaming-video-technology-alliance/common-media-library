@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: a usage example replaces the empty code block.
+
+
 ## [1.1.9] - 2026-08-11
 
 ### Changed

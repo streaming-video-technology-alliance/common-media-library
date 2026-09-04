@@ -11,17 +11,22 @@ import {
 	type HlsManifest,
 } from '@svta/cml-cmaf-ham'
 import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { Parser } from 'm3u8-parser'
 import { Builder, parseString } from 'xml2js'
 import { listDirectories, listM3U8Files, listMPDFiles } from './utils.ts'
 
 const FILE_ENCODING = 'utf8'
 
-const INPUT_PATH_HLS = `./input/hls/`
-const OUTPUT_PATH_HLS = `./dist/hls/`
+// Resolve every folder from the location of this script, so the sample runs from any working directory.
+const SAMPLE_ROOT = fileURLToPath(new URL('..', import.meta.url))
 
-const SAMPLES_PATH_DASH = `./input/dash/`
-const OUTPUT_PATH_DASH = `./dist/dash/`
+const INPUT_PATH_HLS = path.join(SAMPLE_ROOT, 'input', 'hls')
+const OUTPUT_PATH_HLS = path.join(SAMPLE_ROOT, 'dist', 'hls')
+
+const INPUT_PATH_DASH = path.join(SAMPLE_ROOT, 'input', 'dash')
+const OUTPUT_PATH_DASH = path.join(SAMPLE_ROOT, 'dist', 'dash')
 
 setHlsParser((text: string) => {
 	const parser = new Parser()
@@ -86,41 +91,42 @@ function manifestToAllFormats(
 	// Run validations and save them to a file
 	const validations = ham.map(validatePresentation)
 	fs.writeFileSync(
-		`${outputPath}/validations.json`,
+		path.join(outputPath, 'validations.json'),
 		JSON.stringify(validations),
 	)
 
 	// Save HAM object
-	fs.writeFileSync(`${outputPath}/ham.json`, JSON.stringify(ham))
+	fs.writeFileSync(path.join(outputPath, 'ham.json'), JSON.stringify(ham))
 
 	// Convert the HAM to DASH and save the MPD file
 	const dash = hamToDash(ham)
-	fs.writeFileSync(`${outputPath}/main.mpd`, dash.manifest)
+	fs.writeFileSync(path.join(outputPath, 'main.mpd'), dash.manifest)
 
-	// Convert the HAM to HLS and save the m3u8 files
+	// Convert the HAM to HLS and save the m3u8 files.
+	// An ancillary manifest may have an empty file name, so fall back to a numbered name.
 	const hls = hamToHls(ham)
-	fs.writeFileSync(`${outputPath}/main.m3u8`, hls.manifest)
-	hls.ancillaryManifests?.forEach((ancillaryManifest, index: any) => {
+	fs.writeFileSync(path.join(outputPath, 'main.m3u8'), hls.manifest)
+	hls.ancillaryManifests?.forEach((ancillaryManifest, index: number) => {
 		fs.writeFileSync(
-			`${outputPath}/${ancillaryManifest.fileName ?? `${index + 1}.m3u8`}`,
+			path.join(outputPath, ancillaryManifest.fileName || `${index + 1}.m3u8`),
 			ancillaryManifest.manifest,
 		)
 	})
 }
 
-listDirectories(SAMPLES_PATH_DASH).forEach((contentDir) => {
-	const mpds = listMPDFiles(`${SAMPLES_PATH_DASH}/${contentDir}`)
+listDirectories(INPUT_PATH_DASH).forEach((contentDir) => {
+	const mpds = listMPDFiles(path.join(INPUT_PATH_DASH, contentDir))
 	mpds.forEach((mpd) => {
-		manifestToAllFormats(mpd, `${OUTPUT_PATH_DASH}/${contentDir}`)
+		manifestToAllFormats(mpd, path.join(OUTPUT_PATH_DASH, contentDir))
 	})
 })
 
 listDirectories(INPUT_PATH_HLS).forEach((contentDir) => {
-	const hlsManifests = listM3U8Files(`${INPUT_PATH_HLS}/${contentDir}`)
+	const hlsManifests = listM3U8Files(path.join(INPUT_PATH_HLS, contentDir))
 	if (!hlsManifests.error) {
 		manifestToAllFormats(
 			hlsManifests.manifest,
-			`${OUTPUT_PATH_HLS}/${contentDir}`,
+			path.join(OUTPUT_PATH_HLS, contentDir),
 			hlsManifests.playlists,
 		)
 	}

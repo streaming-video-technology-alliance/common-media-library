@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the usage example imports from `@svta/cml-throughput` instead of an unexported subpath, and prints its result instead of calling an undefined `assert`.
+
+
 ## [1.0.8] - 2026-07-28
 
 ### Changed

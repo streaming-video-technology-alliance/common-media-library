@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the usage example prints its results instead of calling an undefined `assert`.
+
+
 ## [1.0.8] - 2026-07-28
 
 ### Changed

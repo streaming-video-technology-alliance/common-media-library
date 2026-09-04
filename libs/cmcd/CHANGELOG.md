@@ -15,6 +15,12 @@ and this project adheres to
 
 - `CmcdDecodeOptions.useSymbol` — controls how RFC 8941 token values are represented by `decodeCmcd` (and `fromCmcdQuery`/`fromCmcdHeaders`/`fromCmcdUrl`). When omitted, tokens reduce to plain strings as before, which cannot be told apart from string values on re-encoding. `true` decodes tokens as registry `Symbol`s, `false` as `SfToken` instances; either preserved representation re-encodes as a bare token, making the codec symmetric: `encodeCmcd(decodeCmcd(s, { useSymbol: false }))` returns the input bytes. `CmcdReporter` decodes provenance snapshots this way, so request-time token values keep their wire type on `RESPONSE_RECEIVED` reports
 
+### Changed
+
+- README: the `CmcdReportRecorder` paragraph is rewritten for readers who do not read English as a first language. The code examples are unchanged.
+- User Guide, Report Recorder Guide, and Validation Guide: the prose is rewritten for readers who do not read English as a first language. The code examples and tables are unchanged.
+- User Guide and Validation Guide: one heading, one table cell, and one code comment no longer use a contraction or an em dash.
+
 ### Fixed
 
 - `decodeCmcd` no longer discards RFC 8941 parameters carried on a dictionary member or an inner list (`com.example-x=1;p=2`, `tab=(3000);p=2`): a params-bearing member now decodes as an `SfItem` with its value reduced as usual, matching how inner-list members with params were already preserved. The value inside a params-bearing item is also reduced consistently now (previously an inner token leaked as a raw `Symbol` instead of a string). Affects `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`, and `fromCmcdUrl`

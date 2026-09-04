@@ -6,7 +6,7 @@ Common Media Library (CML) is a collection of TypeScript libraries for web video
 
 The strategic goal is **widespread adoption**. Evaluate every decision against these priorities, in order:
 
-1. **Performance**: Avoid unnecessary runtime overhead, memory leaks, and excessive garbage collection (GC). This code runs on every video playback.
+1. **Performance**: Avoid unnecessary runtime overhead, memory leaks, and excessive GC. This code runs on every video playback.
 2. **Tree-shakeability**: Adopters' final bundle size is what matters. Adopters must not receive code they do not import.
 3. **Developer experience**: Correct usage should be obvious. Incorrect usage should fail at compile time.
 4. **Documentation quality**: Adopters evaluate libraries by their docs before reading source code.
@@ -23,7 +23,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm run build -w libs/<package>`: Build a package. The root `npm run build` builds every package in dependency order.
 - `npm run typecheck`: Run the typechecker
 - `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies.
-- `npm test`: Full validation at the root. It runs lint, build all, typecheck, then every package's tests. The pull request (PR) checks run this command.
+- `npm test`: Full validation at the root. It runs lint, build all, typecheck, then every package's tests. The PR checks run this command.
 - `npm run format`: Run the linter with auto-fix
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
 - `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the packages that depend on them.
@@ -46,7 +46,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Bump versions only in dedicated release-prep PRs, with `npm run ver` and then `npm run prepare-release` (see Build Commands).
 - Avoid breaking changes. If one is unavoidable, provide migration guidance in the changelog and the docs.
 - Save plans and design-session artifacts in `plans/<feature-name>/`, where the folder name is the feature or issue. Save each part of the plan, such as steps or architecture, in its own file: `plans/<feature-name>/steps.md`. Do not use `docs/` for planning documents.
-- Proposals that need community agreement are requests for comments (RFCs), not plans: public API changes, new packages, and significant architecture changes. Save an RFC as `rfc/<feature-name>.md` and follow the process in `rfc/README.md`.
+- Proposals that need community agreement are RFCs, not plans: public API changes, new packages, and significant architecture changes. Save an RFC as `rfc/<feature-name>.md` and follow the process in `rfc/README.md`.
 
 ## Documentation
 
@@ -62,10 +62,10 @@ CML collaborators and adopters live in many countries. Many of them do not read 
 
 - One idea per sentence. Keep sentences under 20 words and split any sentence over 25. No semicolons (;) and no em dashes (—).
 - Active voice and simple tenses (present, past, future). Write instructions in the imperative with the condition first: "If the build fails, read the log."
-- One name per thing for the whole document, never a synonym for variety. Give a document over about 1,500 words a short Terms list near the top.
+- One name per thing for the whole document, never a synonym for variety.
 - No idioms, metaphors, or figures of speech. If a phrase cannot be translated word for word, replace it.
 - Prefer one verb to a phrasal verb ("configure", not "set up") and literal verbs for facts ("the table shows", not "the table carries").
-- Define every abbreviation and term of art once, at first use: MPD, HAM, GC, p95, post-order. Do not use "e.g.", "i.e.", or "vs".
+- Do not use "e.g.", "i.e.", or "vs".
 - Give every pronoun a visible noun in the same or previous sentence: "this check", not "this".
 - At most three nouns in a row. Break longer strings with prepositions.
 - Keep the author's hedges. "May have failed" does not become "failed". Never add a fact the source did not state.
@@ -75,7 +75,7 @@ CML collaborators and adopters live in many countries. Many of them do not read 
 
 ## Git Commit Guidelines
 
-- **Always use `git commit -s`** to add the Developer Certificate of Origin (DCO) sign-off. Every commit must have this sign-off.
+- **Always use `git commit -s`** to add the DCO sign-off. Every commit must have this sign-off.
 - Follow the Conventional Commits format: `feat:`, `fix:`, `refactor:`, `chore:`, and the other types.
 - **Never commit directly to `main`**, even for docs or specs. All work goes on a feature branch and merges through a PR. For issue-driven work, name the branch `issue/<number>-<short-kebab-slug>`.
 - For AI-assisted commits, include a `Co-Authored-By: <agent-name> <model> <noreply@anthropic.com>` trailer in the commit body.

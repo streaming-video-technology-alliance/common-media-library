@@ -6,7 +6,7 @@ Open source players such as [hls.js](https://github.com/video-dev/hls.js/), [das
 
 ## Project structure
 
-This project is a monorepo with two workspaces: `libs` and `docs`. The `libs` workspace contains the individual libraries, which are published to npm. The `docs` workspace contains the documentation for all the libraries. The documentation is published as one site on GitHub Pages. The available libraries are:
+This project is a monorepo with three workspaces: `libs`, `docs`, and `dev`. The `libs` workspace contains the individual libraries, which are published to npm. The `docs` workspace contains the documentation for all the libraries. The documentation is published as one site on GitHub Pages. The `dev` workspace is a private development server. The available libraries are:
 
 - `@svta/cml-cmcd`
 - `@svta/cml-cmsd`
@@ -64,7 +64,7 @@ If you need help with the Common Media Library, or if you want to talk with othe
 
 ## Contributing
 
-The Common Media Library is free and open source. We welcome help of any kind: fixing bugs, improving documentation, or suggesting new features. Read the [contributing guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md) for details. The [Streaming Video Technology Alliance (SVTA)](https://www.svta.org) Players and Playback working group oversees contributions and project decisions.
+The Common Media Library is free and open source. We welcome help of any kind: fixing bugs, improving documentation, or suggesting new features. Read the [contributing guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md) for details. The [SVTA](https://www.svta.org) Players and Playback working group oversees contributions and project decisions.
 
 ## Code of Conduct
 

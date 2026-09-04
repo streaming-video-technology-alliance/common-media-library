@@ -4,9 +4,10 @@
 
 The table shows which versions receive security updates.
 
-| Version  | Supported          |
-| -------- | ------------------ |
-| <= 1.0.x | :white_check_mark: |
+| Version                        | Supported          |
+| ------------------------------ | ------------------ |
+| Latest release of each package | :white_check_mark: |
+| Older releases                 | :x:                |
 
 ## Reporting a Vulnerability
 

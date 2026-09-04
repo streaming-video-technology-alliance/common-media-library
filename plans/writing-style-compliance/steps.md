@@ -124,7 +124,7 @@ git add plans/writing-style-compliance/inventory.md
 git commit -s -m "docs(plans): record the tranche 1 metrics"
 ```
 
-- [ ] **Step 13: Push and hand over**
+- [x] **Step 13: Push and hand over**
 
 ```bash
 git push -u origin docs/writing-style-compliance
@@ -150,14 +150,16 @@ git rebase --onto origin/main 26fd67982 docs/writing-style-compliance
 
 **Known violations at the base:** `libs/608/README.md` has 2 sentences over 25 words and the verbs "carries" and "come from". `libs/c2pa/README.md` has "carries" three times and "vs" twice. `libs/iso-bmff/README.md` has one sentence over 25 words. `libs/608/test/fixtures/README.md` has "carry" twice. `libs/cmaf-ham/samples/cmaf-ham-conversion/README.md` has 2 sentences over 25 words. `libs/iso-bmff/docs/writing-boxes.md` has one "e.g." and one sentence over 25 words. `libs/iso-bmff/docs/reading-boxes.md` has one sentence over 25 words. The other READMEs are one to four sentences and mostly pass already.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-readmes origin/main
 ```
 
-- [ ] **Step 2: Rewrite the 19 package READMEs by the method in `overview.md`**
+Done differently on 2026-09-03: #434 (Task 1) was still open, so the branch was created from the #434 head f848ca616 instead. The checks use `origin/main` as the base, because the `libs/` trees of both commits are identical. Rebase onto `main` after #434 merges.
+
+- [x] **Step 2: Rewrite the 19 package READMEs by the method in `overview.md`**
 
 Code examples do not change. If a code block must change, build first and run the block from the repository root:
 
@@ -212,6 +214,8 @@ git push -u origin docs/writing-style-readmes
 
 Casey creates the PR with `/create-pr`.
 
+**Outcome (2026-09-03):** twelve files changed. The other 13 files are package READMEs of one or two sentences. They already followed the rules and are unchanged, so their packages have no changelog note. The fixture, sample, and `src/` READMEs are not shipped with a package, so they have no changelog note either. `libs/dash/README.md` grew from 4 to 9 prose words because it now defines DASH. That growth is the one failed check. Every other check passed for every file.
+
 ---
 
 ### Task 3: Tranche 3, CMCD guides
@@ -226,14 +230,16 @@ Casey creates the PR with `/create-pr`.
 
 **Anchors to keep:** the `## Custom keys` headings in `user-guide.md` and `validation-guide.md`. The two guides link to each other with `#custom-keys`.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-cmcd-guides origin/main
 ```
 
-- [ ] **Step 2: Rewrite `user-guide.md`**
+Done differently on 2026-09-03: tranche 2 had no PR yet, so the branch was created from the tranche 2 head cbb326950 instead. The checks use `origin/main` as the base, because the `libs/cmcd/docs` trees are identical. Rebase onto `main` after tranche 2 merges.
+
+- [x] **Step 2: Rewrite `user-guide.md`**
 
 Add a Terms list after the introduction. Define each abbreviation the guide uses at first use, including CMCD, CTA, and any key names it explains. Keep every code block and table.
 
@@ -279,6 +285,8 @@ git push -u origin docs/writing-style-cmcd-guides
 
 Casey creates the PR with `/create-pr`.
 
+**Outcome (2026-09-03):** all three guides changed. The User Guide has a new Terms table after the introduction. That table is the one difference the blocks check reports. The Validation Guide heading that compared errors with warnings now reads "Errors and Warnings". The rules ban the abbreviation it used, and no link points at that heading. Every other check passed for every file. See "Noticed, not changed (tranche 3)" in `overview.md` for the frozen text that still breaks a rule.
+
 ---
 
 ### Task 4: Tranche 4, C2PA guides
@@ -291,14 +299,16 @@ Casey creates the PR with `/create-pr`.
 
 **Known violations at the base:** 18 sentences over 25 words across the four files. "vs" appears 10 times and "carries" or "carry" 8 times. `merkle-validation.md` averages 22.7 words per sentence. The section references in the form "§19.4" are facts and stay.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-c2pa-guides origin/main
 ```
 
-- [ ] **Step 2: Rewrite the four guides by the method in `overview.md`**
+Done differently on 2026-09-03: tranches 2 and 3 had no PR yet, so the branch was created from the tranche 3 head 56ff94ea9 instead. The checks use `origin/main` as the base, because the `libs/c2pa/docs` trees are identical. Rebase onto `main` after tranche 3 merges.
+
+- [x] **Step 2: Rewrite the four guides by the method in `overview.md`**
 
 Replace each use of "vs" with "compared with" or with a two-column table. Define VSI, EMSG, BMFF, COSE, and Merkle tree at first use in each file.
 
@@ -327,6 +337,8 @@ git push -u origin docs/writing-style-c2pa-guides
 
 Casey creates the PR with `/create-pr`.
 
+**Outcome (2026-09-03):** all four guides changed, and every check passed for every file. No heading changed. HLS and DASH stay as names in the VOD Merkle guide, where they are examples. Their expansion pushed one sentence over 25 words and the file over its base length. VSI/EMSG stays undefined in the VOD Merkle guide, where it appears only as a link name. See "Noticed, not changed (tranche 4)" in `overview.md` for the frozen text that still breaks a rule.
+
 ---
 
 ### Task 5: Tranche 5, agent instructions
@@ -338,14 +350,16 @@ Casey creates the PR with `/create-pr`.
 
 **Known violations at the base:** 10 sentences over 25 words across the five files. "e.g." appears 7 times and "vs" 4 times. `code-reviewer.md` uses "hot path". The frontmatter of every file (`name`, `description`, and the other keys) is configuration and must stay byte for byte.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-agent-instructions origin/main
 ```
 
-- [ ] **Step 2: Rewrite the five files by the method in `overview.md`**
+Done differently on 2026-09-03: tranches 2 to 4 had no PR yet, so the branch was created from the tranche 4 head 85c76ceb6 instead. The checks use `origin/main` as the base, because the `.claude` trees are identical. Rebase onto `main` after tranche 4 merges.
+
+- [x] **Step 2: Rewrite the five files by the method in `overview.md`**
 
 - [x] **Step 3: Check, including the frontmatter**
 
@@ -366,6 +380,8 @@ git push -u origin docs/writing-style-agent-instructions
 
 Casey creates the PR with `/create-pr`.
 
+**Outcome (2026-09-03):** all five files changed, and every check passed for every file. The frontmatter of each file and every shell injection line are byte-identical to the base. Every directive kept its wording and emphasis. Double hyphens that stood for dashes became periods or commas. DCO, PR, and ESM are defined at first use. See "Noticed, not changed (tranche 5)" in `overview.md`.
+
 ---
 
 ### Task 6: Tranche 6, RFC process and merged RFCs
@@ -380,14 +396,16 @@ Casey creates the PR with `/create-pr`.
 
 **Known violations at the base:** `rfc/README.md` has 3 sentences over 25 words and the verbs "settle" and "shape". The two RFC bodies average 20.4 and 23.3 words per sentence, with 30 and 40 percent of sentences over 25 words. Both exceed 1,500 words and need a Terms list.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 git fetch origin
 git checkout -b docs/writing-style-rfc origin/main
 ```
 
-- [ ] **Step 2: Rewrite `rfc/README.md`**
+Done differently on 2026-09-03: tranches 2 to 5 had no PR yet, so the branch was created from the tranche 5 head 0742f7a88 instead. The checks use `origin/main` as the base, because `rfc/README.md` is identical at both commits. Rebase onto `main` after tranche 5 merges.
+
+- [x] **Step 2: Rewrite `rfc/README.md`**
 
 - [x] **Step 3: Check**
 
@@ -404,7 +422,7 @@ git add rfc/README.md
 git commit -s -m "docs(rfc): apply the writing style rules to the RFC process document"
 ```
 
-- [x] **Step 5: If approved, rewrite one RFC body per commit with a Terms list, check each, and commit each**
+- [ ] **Step 5: If approved, rewrite one RFC body per commit with a Terms list, check each, and commit each**. Not approved: Casey decided on 2026-09-03 that the two merged RFC bodies stay as records.
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main rfc/cmcd-reporter-middleware.md
@@ -420,3 +438,45 @@ git push -u origin docs/writing-style-rfc
 ```
 
 Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** `rfc/README.md` changed, and every check passed. RFC, PR, and DCO are defined at first use. The idioms about buy-in, living with an addition, and a design that won are replaced with literal wording. The two merged RFC bodies are unchanged by decision. This task completes the plan.
+
+---
+
+### Task 7: Tranche 7, the noticed facts
+
+**Files:** every file named in the "Noticed, not changed" sections of `overview.md`, plus the changelog of each affected package.
+
+**Base:** the tranche 6 head 0c18ecd00. Only the chars, length, and abbrev checks apply, because facts, code blocks, and links change by design.
+
+- [x] **Step 1: Create the branch** `docs/writing-style-fixes` from the tranche 6 head.
+- [x] **Step 2: Fix the root documents.** `README.md` names the `dev` workspace. `SCOPING.md` names the `@svta/cml-<name>` packages. `SECURITY.md` supports the latest release of each package. Casey confirmed that policy on 2026-09-03. `CONTRIBUTING.md` accepts any problem and asks for a respectful community. `GOVERNANCE.md` names the Streaming Video Technology Alliance.
+- [x] **Step 3: Make every package README example complete and runnable.** Undefined inputs became function parameters. Calls to an undefined `assert` became printed results, with the expected output in a comment. Empty Usage blocks got an example, and the mse README states that the package has no exports. The xml example calls `parseXml`, because `decodeXml` no longer exists. The throughput example imports from the package root, because the subpath it used is not exported. The cmaf-ham `src/README.md` examples import from `@svta/cml-cmaf-ham`. The sample README gives the correct folder and run command.
+- [x] **Step 4: Fix the guides, agent instructions, and RFC document.** Fixed in the guides: em dashes in table cells and code comments, one heading with a contraction, and the DER and JWK abbreviations. Fixed elsewhere: the hardcoded co-author model name, the "DX" abbreviation, and the semicolon in the directory tree.
+- [x] **Step 5: Verify.** Every changed markdown file passes the chars, length, and abbrev checks. All 18 code blocks in the changed READMEs ran with `node --input-type=module-typescript` against the built packages, and all of them typecheck with `tsc --strict`.
+- [x] **Step 6: Add a changelog note under Unreleased in each of the 15 affected packages.**
+- [x] **Step 7: Commit and push.** Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** all items fixed. Two code defects found on the way stay open. The cmaf-ham sample script fails after its first DASH sample with a malformed output path. `npm run dev -w libs/cmaf-ham` fails because the script reads paths relative to the sample folder. Both are code, not documentation.
+
+---
+
+### Task 8: Tranche 8, revert the abbreviation definitions
+
+**Files:** the 22 in-scope files in which tranches 1 to 7 added a definition of the form "long name (ABBR)". Also the changelogs of c2pa, cmcd, and dash.
+
+**Base:** `main` after #441 merged, commit 75bcaabe0. Casey removed the abbreviation rule and the Terms list rule from `AGENTS.md` in #442.
+
+- [x] **Step 1: Create the branch** `docs/writing-style-sweep` from `main`.
+- [x] **Step 2: Find the definitions.** For every in-scope file, list each "(ABBR)" at the head of the stack that the base of tranche 1 does not contain. That base is commit 8ddcad72c. The scan found 45 definitions in 22 files.
+- [x] **Step 3: Revert each definition to the abbreviation alone.** Keep the rest of the rewrite. Restore the two table cells in `libs/c2pa/docs/vsi-validation.md` to their base text. Remove the Terms section from `libs/cmcd/docs/user-guide.md`, because it exists only because of the removed rule. Change "of the current branch" to "for the current branch" in `.claude/skills/pr-feedback/SKILL.md`.
+- [x] **Step 4: Verify.** Run the check script against `origin/main` for every changed file. Rescan for the 45 definitions.
+- [x] **Step 5: Update the changelogs.** Remove the sentences that describe the definitions from the Unreleased notes of c2pa, cmcd, and dash. The other packages keep their notes, because their prose is still rewritten.
+- [x] **Step 6: Regenerate the Flagged column of `inventory.md`** with the fixed metrics script, from the file versions that each table measured. Add the After tranche 8 table.
+- [x] **Step 7: Commit and push.**
+
+**Outcome (2026-09-03):** 22 files changed. The sweep removed 45 definitions and the Terms table. Every check passed for every file, except the blocks check for the two files whose tables changed by design: `libs/c2pa/docs/vsi-validation.md` and `libs/cmcd/docs/user-guide.md`. The metrics script fix changed 26 Flagged cells in the inventory.
+
+| Twenty-two files | Before | After |
+|---|---|---|
+| Prose words | 10,613 | 10,460 |

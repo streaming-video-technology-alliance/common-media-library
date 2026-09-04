@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: a usage example replaces the empty code block. The examples in `src/README.md` import from `@svta/cml-cmaf-ham` and compile. The sample README gives the correct folder and run command.
+
+
+### Fixed
+
+- The conversion sample resolves its input and output folders from the script location, so `npm run dev -w libs/cmaf-ham` works from any directory. It no longer fails on an HLS ancillary playlist with an empty file name.
+
 ## [0.24.6] - 2026-07-28
 
 ### Changed
