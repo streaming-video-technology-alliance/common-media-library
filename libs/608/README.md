@@ -32,16 +32,20 @@ them as caption screens:
 
 ```typescript
 import { Cta608Parser, extractCta608DataFromAv1Sample } from "@svta/cml-608";
+import type { CaptionScreen } from "@svta/cml-608";
 
 const parser = new Cta608Parser(1, {
-	newCue(startTime, endTime, screen) {
+	newCue(startTime: number, endTime: number, screen: CaptionScreen) {
 		console.log(startTime, endTime, screen.getDisplayText());
 	},
 }, null);
 
-const [field1] = extractCta608DataFromAv1Sample(view, samplePos, sampleSize);
-if (field1.length) {
-	parser.addData(sampleTimeMs, field1);
+// Call once per AV1 sample. The sample starts at samplePos in view.
+function onSample(view: DataView, samplePos: number, sampleSize: number, sampleTimeMs: number): void {
+	const [field1] = extractCta608DataFromAv1Sample(view, samplePos, sampleSize);
+	if (field1.length) {
+		parser.addData(sampleTimeMs, field1);
+	}
 }
 ```
 

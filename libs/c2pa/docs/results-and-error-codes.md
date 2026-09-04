@@ -50,7 +50,7 @@ for (const code of result.errorCodes) {
       // Cryptographic check failed (signature, hash, or key)
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
-      // Session key expired — may need a fresh init segment
+      // Session key expired, may need a fresh init segment
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
       // Sequence number or stream ID problem
@@ -135,11 +135,11 @@ import { SequenceValidationReason } from '@svta/cml-c2pa'
 
 | Constant | Value | Valid | Additional Fields | Description |
 |----------|-------|-------|-------------------|-------------|
-| `VALID` | `valid` | `true` | — | Sequence number is the next expected value |
-| `DUPLICATE` | `duplicate` | `false` | — | Sequence number was already seen |
+| `VALID` | `valid` | `true` | none | Sequence number is the next expected value |
+| `DUPLICATE` | `duplicate` | `false` | none | Sequence number was already seen |
 | `GAP_DETECTED` | `gap_detected` | `false` | `missingFrom`, `missingTo` | One or more sequence numbers were skipped |
-| `OUT_OF_ORDER` | `out_of_order` | `false` | — | Sequence number is less than the last seen |
-| `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | — | Below the session key's `minSequenceNumber` |
+| `OUT_OF_ORDER` | `out_of_order` | `false` | none | Sequence number is less than the last seen |
+| `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | none | Below the session key's `minSequenceNumber` |
 
 Narrow the type to access the `GAP_DETECTED` fields:
 

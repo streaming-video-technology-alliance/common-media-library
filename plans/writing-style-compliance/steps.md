@@ -440,3 +440,21 @@ git push -u origin docs/writing-style-rfc
 Casey creates the PR with `/create-pr`.
 
 **Outcome (2026-09-03):** `rfc/README.md` changed, and every check passed. RFC, PR, and DCO are defined at first use. The idioms about buy-in, living with an addition, and a design that won are replaced with literal wording. The two merged RFC bodies are unchanged by decision. This task completes the plan.
+
+---
+
+### Task 7: Tranche 7, the noticed facts
+
+**Files:** every file named in the "Noticed, not changed" sections of `overview.md`, plus the changelog of each affected package.
+
+**Base:** the tranche 6 head 0c18ecd00. Only the chars, length, and abbrev checks apply, because facts, code blocks, and links change by design.
+
+- [x] **Step 1: Create the branch** `docs/writing-style-fixes` from the tranche 6 head.
+- [x] **Step 2: Fix the root documents.** `README.md` names the `dev` workspace. `SCOPING.md` names the `@svta/cml-<name>` packages. `SECURITY.md` supports the latest release of each package. Casey confirmed that policy on 2026-09-03. `CONTRIBUTING.md` accepts any problem and asks for a respectful community. `GOVERNANCE.md` names the Streaming Video Technology Alliance.
+- [x] **Step 3: Make every package README example complete and runnable.** Undefined inputs became function parameters. Calls to an undefined `assert` became printed results, with the expected output in a comment. Empty Usage blocks got an example, and the mse README states that the package has no exports. The xml example calls `parseXml`, because `decodeXml` no longer exists. The throughput example imports from the package root, because the subpath it used is not exported. The cmaf-ham `src/README.md` examples import from `@svta/cml-cmaf-ham`. The sample README gives the correct folder and run command.
+- [x] **Step 4: Fix the guides, agent instructions, and RFC document.** Fixed in the guides: em dashes in table cells and code comments, one heading with a contraction, and the DER and JWK abbreviations. Fixed elsewhere: the hardcoded co-author model name, the "DX" abbreviation, and the semicolon in the directory tree.
+- [x] **Step 5: Verify.** Every changed markdown file passes the chars, length, and abbrev checks. All 18 code blocks in the changed READMEs ran with `node --input-type=module-typescript` against the built packages, and all of them typecheck with `tsc --strict`.
+- [x] **Step 6: Add a changelog note under Unreleased in each of the 15 affected packages.**
+- [x] **Step 7: Commit and push.** Casey creates the PR with `/create-pr`.
+
+**Outcome (2026-09-03):** all items fixed. Two code defects found on the way stay open. The cmaf-ham sample script fails after its first DASH sample with a malformed output path. `npm run dev -w libs/cmaf-ham` fails because the script reads paths relative to the sample folder. Both are code, not documentation.

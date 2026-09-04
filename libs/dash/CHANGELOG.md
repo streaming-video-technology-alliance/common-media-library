@@ -11,6 +11,8 @@ and this project adheres to
 ### Changed
 
 - README: the description defines DASH at first use.
+- README: the usage example prints its results instead of calling an undefined `assert`.
+
 
 ## [1.0.8] - 2026-07-28
 

@@ -11,19 +11,20 @@ npm i @svta/cml-xml
 ## Usage
 
 ```typescript
-import { decodeXml } from "@svta/cml-xml";
+import { parseXml } from "@svta/cml-xml";
 
-const obj = decodeXml(
+const obj = parseXml(
 	`<root>
 		<child>text</child>
 		<ns:tag>content</ns:tag>
 	</root>`
 );
 
-assert(obj.childNodes[0].nodeName === "root");
-assert(obj.childNodes[0].childNodes[0].nodeName === "child");
-assert(obj.childNodes[0].childNodes[0].childNodes[0].nodeValue === "text");
-assert(obj.childNodes[0].childNodes[1].nodeName === "ns:tag");
-assert(obj.childNodes[0].childNodes[1].prefix === "ns");
-assert(obj.childNodes[0].childNodes[1].localName === "tag");
+const root = obj.childNodes[0];
+console.log(root.nodeName);
+// root
+console.log(root.childNodes[0].nodeName, root.childNodes[0].childNodes[0].nodeValue);
+// child text
+console.log(root.childNodes[1].nodeName, root.childNodes[1].prefix, root.childNodes[1].localName);
+// ns:tag ns tag
 ```

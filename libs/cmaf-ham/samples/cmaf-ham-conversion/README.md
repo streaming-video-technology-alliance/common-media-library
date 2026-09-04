@@ -7,26 +7,23 @@ When you run `npm run dev`, the CMAF-Ham library creates different versions of t
 ## Steps to run the script
 1. Open a terminal in the **root folder** of the **common-media-library** project.
 2. Run `npm ci` and then `npm run build`.
-3. Go to the sample folder with `cd libs/cmaf-ham/samples/cmaf-ham-conversion`.
-4. Execute `node src/index.ts`.
-5. Check that a new `dist/` folder exists with the output files. Each subfolder contains:
+3. Run `npm run dev -w libs/cmaf-ham`.
+4. Check that `libs/cmaf-ham/samples/cmaf-ham-conversion/dist/` exists with the output files. Each subfolder contains:
    * `ham.json`: A JSON export of the Ham object.
    * `validations.json`: The validation results for each presentation of the content.
    * `main.m3u8`: The multivariant playlist of the HLS version of the content.
    * `main.mpd`: The Media Presentation Description (MPD) of the DASH version of the content.
 
 ## Play the output in a Web Player
-After the script finishes, run `npm run serve`. It starts a web server with cross-origin resource sharing (CORS) enabled, which serves the created manifests. By default the server runs at [`http://localhost:3000/`](http://localhost:3000/).
+Serve the `dist/` folder with a static web server that allows cross-origin requests. Then load a manifest URL in a player.
 
 Steps to play the HLS content:
-1. Run `npm run serve`
-2. Open the [hls.js demo page](https://hlsjs.video-dev.org/demo/)
-3. Load the URL `http://localhost:3000/<sample>/<path>/main.m3u8`
+1. Open the [hls.js demo page](https://hlsjs.video-dev.org/demo/)
+2. Load the URL of a `main.m3u8` file in the served `dist/` folder
 
 Steps to play the DASH content:
-1. Run `npm run serve`
-2. Open the [dash.js test page](https://reference.dashif.org/dash.js/nightly/samples/dash-if-reference-player/index.html)
-3. Load the URL `http://localhost:3000/<sample>/<path>/main.mpd`
+1. Open the [dash.js test page](https://reference.dashif.org/dash.js/nightly/samples/dash-if-reference-player/index.html)
+2. Load the URL of a `main.mpd` file in the served `dist/` folder
 
 ## Samples
 The `input/` folder has seven CMAF sample manifests for the CMAF-Ham library. The table lists them.

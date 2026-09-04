@@ -27,20 +27,23 @@ npm i @svta/cml-c2pa
 import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
 import type { ManifestBoxValidationState } from '@svta/cml-c2pa'
 
-let lastManifestId: string | null = null
-let state: ManifestBoxValidationState | undefined
+async function validateManifestBoxStream(segmentUrls: string[]): Promise<void> {
+  let lastManifestId: string | null = null
+  let state: ManifestBoxValidationState | undefined
 
-for (const segmentUrl of segmentUrls) {
-  const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
-  const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
-    bytes,
-    lastManifestId,
-    state,
-  )
-  lastManifestId = nextManifestId
-  state = nextState
+  for (const segmentUrl of segmentUrls) {
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
+    const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
+      bytes,
+      lastManifestId,
+      state,
+    )
+    lastManifestId = nextManifestId
+    state = nextState
 
-  console.log(result.isValid, result.errorCodes)
+    console.log(result.isValid, result.errorCodes)
+  }
 }
 ```
 
@@ -49,11 +52,15 @@ for (const segmentUrl of segmentUrls) {
 ```typescript
 import { validateC2paInitSegment, validateC2paSegment } from '@svta/cml-c2pa'
 
-const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
-const init = await validateC2paInitSegment(initBytes)
+async function validateVsiSegment(initUrl: string, segmentUrl: string): Promise<void> {
+  const initResponse = await fetch(initUrl)
+  const init = await validateC2paInitSegment(new Uint8Array(await initResponse.arrayBuffer()))
 
-const segmentBytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
-const validated = await validateC2paSegment(segmentBytes, init.sessionKeys)
+  const segmentResponse = await fetch(segmentUrl)
+  const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())
+  const validated = await validateC2paSegment(segmentBytes, init.sessionKeys)
+  console.log(validated?.result.isValid)
+}
 ```
 
 ### VOD Merkle method (init segment + media segments)
@@ -61,11 +68,15 @@ const validated = await validateC2paSegment(segmentBytes, init.sessionKeys)
 ```typescript
 import { validateC2paInitSegment, validateC2paMerkleSegment } from '@svta/cml-c2pa'
 
-const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
-const init = await validateC2paInitSegment(initBytes)
+async function validateMerkleSegment(initUrl: string, segmentUrl: string): Promise<void> {
+  const initResponse = await fetch(initUrl)
+  const init = await validateC2paInitSegment(new Uint8Array(await initResponse.arrayBuffer()))
 
-const segmentBytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
-const { result } = await validateC2paMerkleSegment(segmentBytes, init.merkleMaps)
+  const segmentResponse = await fetch(segmentUrl)
+  const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())
+  const { result } = await validateC2paMerkleSegment(segmentBytes, init.merkleMaps)
+  console.log(result.isValid, result.errorCodes)
+}
 ```
 
 ## Docs
