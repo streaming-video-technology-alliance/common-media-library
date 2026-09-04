@@ -7,7 +7,7 @@ argument-hint: [base branch]
 
 # Create Pull Request
 
-Validate that tests and documentation pass, then create a well-formatted GitHub pull request (PR) for the current branch.
+Validate that tests and documentation pass, then create a well-formatted GitHub PR for the current branch.
 
 ## Context
 
@@ -46,7 +46,7 @@ Follow these steps in strict order. Do NOT skip ahead.
 - Verify the current branch is NOT `main`. If it is, stop and tell the user to create a feature branch first.
 - If a PR already exists for this branch, inform the user and ask whether to update the existing PR description or stop.
 - Ensure all changes are committed. If not, inform the user and stop.
-- **Developer Certificate of Origin (DCO) sign-off check**: Verify that every commit on this branch has a `Signed-off-by:` line:
+- **DCO sign-off check**: Verify that every commit on this branch has a `Signed-off-by:` line:
 
 ```bash
 git log main..HEAD --format="%h %s" --no-merges | while read hash rest; do

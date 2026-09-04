@@ -458,3 +458,25 @@ Casey creates the PR with `/create-pr`.
 - [x] **Step 7: Commit and push.** Casey creates the PR with `/create-pr`.
 
 **Outcome (2026-09-03):** all items fixed. Two code defects found on the way stay open. The cmaf-ham sample script fails after its first DASH sample with a malformed output path. `npm run dev -w libs/cmaf-ham` fails because the script reads paths relative to the sample folder. Both are code, not documentation.
+
+---
+
+### Task 8: Tranche 8, revert the abbreviation definitions
+
+**Files:** the 22 in-scope files in which tranches 1 to 7 added a definition of the form "long name (ABBR)". Also the changelogs of c2pa, cmcd, and dash.
+
+**Base:** `main` after #441 merged, commit 75bcaabe0. Casey removed the abbreviation rule and the Terms list rule from `AGENTS.md` in #442.
+
+- [x] **Step 1: Create the branch** `docs/writing-style-sweep` from `main`.
+- [x] **Step 2: Find the definitions.** For every in-scope file, list each "(ABBR)" at the head of the stack that the base of tranche 1 does not contain. That base is commit 8ddcad72c. The scan found 45 definitions in 22 files.
+- [x] **Step 3: Revert each definition to the abbreviation alone.** Keep the rest of the rewrite. Restore the two table cells in `libs/c2pa/docs/vsi-validation.md` to their base text. Remove the Terms section from `libs/cmcd/docs/user-guide.md`, because it exists only because of the removed rule. Change "of the current branch" to "for the current branch" in `.claude/skills/pr-feedback/SKILL.md`.
+- [x] **Step 4: Verify.** Run the check script against `origin/main` for every changed file. Rescan for the 45 definitions.
+- [x] **Step 5: Update the changelogs.** Remove the sentences that describe the definitions from the Unreleased notes of c2pa, cmcd, and dash. The other packages keep their notes, because their prose is still rewritten.
+- [x] **Step 6: Regenerate the Flagged column of `inventory.md`** with the fixed metrics script, from the file versions that each table measured. Add the After tranche 8 table.
+- [x] **Step 7: Commit and push.**
+
+**Outcome (2026-09-03):** 22 files changed. The sweep removed 45 definitions and the Terms table. Every check passed for every file, except the blocks check for the two files whose tables changed by design: `libs/c2pa/docs/vsi-validation.md` and `libs/cmcd/docs/user-guide.md`. The metrics script fix changed 26 Flagged cells in the inventory.
+
+| Twenty-two files | Before | After |
+|---|---|---|
+| Prose words | 10,613 | 10,460 |

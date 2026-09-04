@@ -5,14 +5,14 @@ description: Validate live streams using the Verifiable Segment Info method (C2P
 
 # VSI/EMSG Validation
 
-The Verifiable Segment Info (VSI) method is a two-phase approach to C2PA live video validation, defined in section 19.4 of the C2PA specification. The init segment contains the full C2PA manifest and the session keys. Each media segment contains a small event message (EMSG) box with a COSE_Sign1 signature, verified against those session keys. COSE means CBOR Object Signing and Encryption.
+The Verifiable Segment Info (VSI) method is a two-phase approach to C2PA live video validation, defined in section 19.4 of the C2PA specification. The init segment contains the full C2PA manifest and the session keys. Each media segment contains a small EMSG box with a COSE_Sign1 signature, verified against those session keys.
 
 ## Overview
 
 The validation flow has two phases:
 
 1. **Init segment**: call `validateC2paInitSegment` once. It parses the C2PA manifest, verifies its integrity, and extracts the validated session keys.
-2. **Media segments**: call `validateC2paSegment` for each media segment. The function finds the C2PA EMSG box and verifies the COSE_Sign1 signature against a session key. It then checks the ISO Base Media File Format (BMFF) content hash and validates the sequence number.
+2. **Media segments**: call `validateC2paSegment` for each media segment. The function finds the C2PA EMSG box and verifies the COSE_Sign1 signature against a session key. It then checks the BMFF content hash and validates the sequence number.
 
 A `SequenceState` object passes from each media segment call to the next and tracks the sequence numbers.
 
@@ -34,7 +34,7 @@ The returned `InitSegmentValidation` object contains:
 | Field | Type | Description |
 |-------|------|-------------|
 | `manifest` | `C2paManifest \| null` | Parsed manifest (label, assertions, signature info) |
-| `certificate` | `Uint8Array \| null` | End-entity certificate in Distinguished Encoding Rules (DER) format |
+| `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate |
 | `manifestId` | `string \| null` | Manifest identifier |
 | `sessionKeys` | `readonly ValidatedSessionKey[]` | Session keys with valid signer binding |
 | `isValid` | `boolean` | All checks passed |
@@ -59,7 +59,7 @@ Each `ValidatedSessionKey` contains:
 | Field | Type | Description |
 |-------|------|-------------|
 | `kid` | `string` | Key ID (hex-encoded) |
-| `jwk` | `CoseKeyJwk` | Public key in JSON Web Key (JWK) format, compatible with WebCrypto |
+| `jwk` | `CoseKeyJwk` | Public key in JWK format (WebCrypto-compatible) |
 | `minSequenceNumber` | `number` | Minimum accepted sequence number |
 | `validityPeriod` | `number` | Key lifetime in seconds |
 | `createdAt` | `string` | ISO 8601 timestamp of key creation |

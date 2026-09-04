@@ -46,7 +46,7 @@ For each file:
 1. Take the base version from git. For tranche 1 the base is commit 8ddcad72c, the merge of #433 into `main`. For later tranches the base is `origin/main`.
 2. Rewrite prose only. Keep code blocks, tables, frontmatter, link targets, and heading text. Two guides link to each other's `#custom-keys` heading: `libs/cmcd/docs/user-guide.md` and `libs/cmcd/docs/validation-guide.md`.
 3. Keep every fact, number, hedge, and tense. If the original says "will", the rewrite says "will". If a fact looks wrong or stale, do not change it. Record it under "Noticed, not changed" in the PR description.
-4. Apply the rules in this order. First split sentences and remove semicolons and em dashes. Then replace idioms and phrasal verbs, and define abbreviations at first use. Last, give each pronoun a noun and use one name per thing.
+4. Apply the rules in this order. First split sentences and remove semicolons and em dashes. Then replace idioms and phrasal verbs, and define abbreviations at first use. Last, give each pronoun a noun and use one name per thing. The definition rule was removed on 2026-09-03, and tranche 8 reverted the definitions.
 5. Do a second pass that removes duplication. The file must not grow. If a definition of an abbreviation makes a very short file longer, record the reason in the PR description.
 6. Run the check script. Fix every FAIL.
 7. Record the after metrics in `inventory.md`.
@@ -90,6 +90,8 @@ The readability metrics in `inventory.md` come from a second script that is not 
 - 2026-09-03: tranche 5 rewritten on branch `docs/writing-style-agent-instructions`, stacked on the tranche 4 branch. PR #439.
 - 2026-09-03: tranche 6 rewritten on branch `docs/writing-style-rfc`, stacked on the tranche 5 branch, `rfc/README.md` only. PR #440. All six tranches are done.
 - 2026-09-03: tranche 7 on branch `docs/writing-style-fixes`, stacked on the tranche 6 branch. It fixes every item in the "Noticed, not changed" sections below and the cmaf-ham sample script. PR #441.
+- 2026-09-03: Casey removed the abbreviation rule and the Terms list rule from `AGENTS.md`. PR #442. Video developers know the abbreviations, and a reader who does not can search for them.
+- 2026-09-03: tranche 8 on branch `docs/writing-style-sweep`, from `main` after #441 merged. It reverts the 45 definitions that tranches 1 to 7 added in 22 files. It also removes the Terms table from the CMCD user guide. PR pending.
 
 ## Noticed, not changed (tranche 1)
 

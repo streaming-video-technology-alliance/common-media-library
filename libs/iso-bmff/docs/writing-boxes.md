@@ -144,7 +144,7 @@ const box = {
 };
 ```
 
-You can also get a box type from `IsoBoxMap` with the box's four-character code (FourCC):
+You can also get a box type from `IsoBoxMap` with the box's FourCC:
 
 ```typescript
 import type { IsoBoxMap } from "@svta/cml-iso-bmff";

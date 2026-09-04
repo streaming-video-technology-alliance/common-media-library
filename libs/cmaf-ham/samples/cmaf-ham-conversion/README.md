@@ -12,7 +12,7 @@ When you run `npm run dev`, the CMAF-Ham library creates different versions of t
    * `ham.json`: A JSON export of the Ham object.
    * `validations.json`: The validation results for each presentation of the content.
    * `main.m3u8`: The multivariant playlist of the HLS version of the content.
-   * `main.mpd`: The Media Presentation Description (MPD) of the DASH version of the content.
+   * `main.mpd`: The MPD of the DASH version of the content.
 
 ## Play the output in a Web Player
 Serve the `dist/` folder with a static web server that allows cross-origin requests. Then load a manifest URL in a player.

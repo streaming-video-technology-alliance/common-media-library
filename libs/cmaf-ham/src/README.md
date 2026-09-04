@@ -2,9 +2,9 @@
 
 ## Overview
 
-HTTP Live Streaming (HLS) and Dynamic Adaptive Streaming over HTTP (DASH) are the two main video streaming technologies today. Users often need to convert between HLS and DASH, edit manifests, and read manifest structures in code.
+HLS and DASH are the two main video streaming technologies today. Users often need to convert between HLS and DASH, edit manifests, and read manifest structures in code.
 
-The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) defines one universal format for both. The format is based on the ISO Base Media File Format (ISO BMFF). CMAF also defines the Hypothetical Application Model (HAM), a framework that shows how streaming applications use CMAF segments and fragments. This project is based on the principles of the CMAF standard and the [Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf).
+The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) defines one universal format for both. The format is based on ISO BMFF. CMAF also defines the Hypothetical Application Model, a framework that shows how streaming applications use CMAF segments and fragments. This project is based on the principles of the CMAF standard and the [Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf).
 
 ## Features
 

@@ -75,7 +75,7 @@ Video players consume this library. Every unnecessary byte costs end users.
 - **No semicolons**: The project uses no-semicolon style.
 - **Single quotes**: Use single quotes for strings, with `avoidEscape: true`.
 - **Tabs for indentation**: The project uses tabs.
-- **ECMAScript modules (ESM) only**: `"type": "module"`. No CommonJS patterns.
+- **ESM only**: `"type": "module"`. No CommonJS patterns.
 - **File extensions in imports**: Use `.ts` extensions in source imports, such as `import { foo } from './foo.ts'`.
 - **Peer dependencies**: Cross-package imports should be declared as `peerDependencies` with `"*"` version.
 

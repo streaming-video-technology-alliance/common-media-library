@@ -5,13 +5,13 @@ description: Validate live streams using per-segment C2PA Manifest Boxes (C2PA s
 
 # Manifest Box Validation
 
-The Manifest Box method embeds a full C2PA manifest in each media segment, as section 19.3 of the C2PA specification defines. Each segment is self-contained, with its own CBOR Object Signing and Encryption (COSE) signature, so it needs no init segment and no session keys.
+The Manifest Box method embeds a full C2PA manifest in each media segment, as section 19.3 of the C2PA specification defines. Each segment is self-contained, with its own COSE signature, so it needs no init segment and no session keys.
 
 Manifest ID chaining verifies the continuity between segments. See Manifest ID Chaining below.
 
 ## Overview
 
-Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method needs no separate init segment validation step. One function, `validateC2paManifestBoxSegment`, does everything: manifest parsing, signature verification, ISO Base Media File Format (BMFF) hash validation, and continuity checks.
+Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method needs no separate init segment validation step. One function, `validateC2paManifestBoxSegment`, does everything: manifest parsing, signature verification, BMFF hash validation, and continuity checks.
 
 Two pieces of state pass from one call to the next:
 

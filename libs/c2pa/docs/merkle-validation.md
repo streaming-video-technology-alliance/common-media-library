@@ -5,7 +5,7 @@ description: Validate on-demand fragmented MP4 assets using Merkle tree proofs (
 
 # VOD Merkle Validation
 
-The video on demand (VOD) Merkle method (C2PA section 15.12.2.2 / 18.6) validates fragmented MP4 (fMP4) assets, such as HLS or DASH VOD streams. The manifest does not list every segment hash. Instead, the init manifest stores one row of a Merkle tree per track. A Merkle tree is a hash tree: each row is computed from the row below. Each media segment has a small auxiliary `uuid` box. The box gives the leaf index of the segment (`location`) and the sibling hashes that derive the stored row from the leaf hash.
+The VOD Merkle method (C2PA section 15.12.2.2 / 18.6) validates fragmented MP4 (fMP4) assets, such as HLS or DASH VOD streams. The manifest does not list every segment hash. Instead, the init manifest stores one row of a Merkle tree per track. A Merkle tree is a hash tree: each row is computed from the row below. Each media segment has a small auxiliary `uuid` box. The box gives the leaf index of the segment (`location`) and the sibling hashes that derive the stored row from the leaf hash.
 
 Unlike the [Manifest Box](manifest-box-validation.md) and [VSI/EMSG](vsi-validation.md) methods, VOD Merkle segments have no manifest or signature of their own. The manifest of the init segment is the only source of trust.
 

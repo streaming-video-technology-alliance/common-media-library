@@ -7,7 +7,7 @@ argument-hint: [PR number]
 
 # Resolve PR Review Feedback
 
-Fetch all unresolved review comments from the GitHub pull request (PR) of the current branch. Evaluate their validity, plan fixes, and implement them after user approval.
+Fetch all unresolved review comments from the GitHub PR for the current branch. Evaluate their validity, plan fixes, and implement them after user approval.
 
 ## Context
 
@@ -145,7 +145,7 @@ After approval:
 ### Step 6: Commit and push
 
 1. Stage the changed files. Be specific, and do not use `git add -A`.
-2. Create a commit with a Conventional Commits message and a Developer Certificate of Origin (DCO) sign-off (`git commit -s`).
+2. Create a commit with a Conventional Commits message and a DCO sign-off (`git commit -s`).
 3. Push to the current branch: `git push`
 
 **Ask the user for confirmation before pushing.**

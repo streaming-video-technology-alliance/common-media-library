@@ -64,7 +64,7 @@ If you need help with the Common Media Library, or if you want to talk with othe
 
 ## Contributing
 
-The Common Media Library is free and open source. We welcome help of any kind: fixing bugs, improving documentation, or suggesting new features. Read the [contributing guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md) for details. The [Streaming Video Technology Alliance (SVTA)](https://www.svta.org) Players and Playback working group oversees contributions and project decisions.
+The Common Media Library is free and open source. We welcome help of any kind: fixing bugs, improving documentation, or suggesting new features. Read the [contributing guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md) for details. The [SVTA](https://www.svta.org) Players and Playback working group oversees contributions and project decisions.
 
 ## Code of Conduct
 
