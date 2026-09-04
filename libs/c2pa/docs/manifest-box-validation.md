@@ -5,18 +5,18 @@ description: Validate live streams using per-segment C2PA Manifest Boxes (C2PA s
 
 # Manifest Box Validation
 
-The Manifest Box method embeds a full C2PA manifest directly into each media segment, as defined in section 19.3 of the C2PA specification. Each segment is self-contained with its own COSE signature, so no init segment or session keys are needed.
+The Manifest Box method embeds a full C2PA manifest in each media segment, as section 19.3 of the C2PA specification defines. Each segment is self-contained, with its own CBOR Object Signing and Encryption (COSE) signature, so it needs no init segment and no session keys.
 
-Continuity between segments is verified through manifest ID chaining: each segment declares the manifest ID of the previous segment, forming a verifiable chain.
+Manifest ID chaining verifies the continuity between segments. See Manifest ID Chaining below.
 
 ## Overview
 
-Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method does not require a separate init segment validation step. Instead, a single function — `validateC2paManifestBoxSegment` — handles everything: manifest parsing, signature verification, BMFF hash validation, and continuity checks.
+Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method needs no separate init segment validation step. One function, `validateC2paManifestBoxSegment`, does everything: manifest parsing, signature verification, ISO Base Media File Format (BMFF) hash validation, and continuity checks.
 
-Two pieces of state are threaded between calls:
+Two pieces of state pass from one call to the next:
 
-- `lastManifestId` — the manifest ID from the previous segment, used for continuity verification
-- `state` — a `ManifestBoxValidationState` object that tracks `lastStreamId` and `lastSequenceNumber`
+- `lastManifestId`: the manifest ID from the previous segment, used for the continuity check
+- `state`: a `ManifestBoxValidationState` object that tracks `lastStreamId` and `lastSequenceNumber`
 
 ## Validating Segments
 
@@ -48,12 +48,12 @@ for (const segmentUrl of segmentUrls) {
 
 The function returns an object with:
 
-- `result` — a `ManifestBoxValidationResult` with the validation outcome
-- `nextManifestId` — the manifest ID to pass into the next call
-- `nextState` — the updated state to pass into the next call
+- `result`: a `ManifestBoxValidationResult` with the validation outcome
+- `nextManifestId`: the manifest ID to pass into the next call
+- `nextState`: the updated state to pass into the next call
 
 > [!NOTE]
-> For the first segment, pass `null` as `lastManifestId` and `undefined` (or omit) for `state`. The chain comparison against the previous segment is skipped when `lastManifestId` is `null`, but the validator still checks that the segment itself declares a valid `continuityMethod` and a non-empty `previousManifestId`.
+> For the first segment, pass `null` as `lastManifestId`, and `undefined` or nothing for `state`. When `lastManifestId` is `null`, the validator skips the chain comparison with the previous segment. It still checks that the segment declares a valid `continuityMethod` and a non-empty `previousManifestId`.
 
 ## Complete Example
 
@@ -107,20 +107,20 @@ async function validateStream(segmentUrls: string[]) {
 
 ## State Management
 
-The `ManifestBoxValidationState` object carries inter-segment state for continuity checks:
+The `ManifestBoxValidationState` object contains the state between segments for the continuity checks:
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `lastStreamId` | `string \| null` | Stream ID from the previous segment |
 | `lastSequenceNumber` | `number \| null` | Sequence number from the previous segment |
 
-The function is pure — it does not mutate any external state. The caller is responsible for persisting `nextManifestId` and `nextState` between calls.
+The function is pure. It does not mutate any external state. The caller must keep `nextManifestId` and `nextState` between calls.
 
-When `state` is omitted or `undefined`, the function skips streamId consistency and sequence number monotonicity checks (suitable for the first segment).
+When `state` is omitted or `undefined`, the function skips the checks for a consistent stream ID and for increasing sequence numbers.
 
 ## Manifest ID Chaining
 
-Each segment's `c2pa.livevideo.segment` assertion includes a `previousManifestId` field that must match the manifest ID of the preceding segment. This creates a verifiable chain:
+The `c2pa.livevideo.segment` assertion of each segment includes a `previousManifestId` field. That field must match the manifest ID of the previous segment, which creates a verifiable chain:
 
 ```
 Segment 1: manifestId = "abc-123", previousManifestId = "initial-manifest"
@@ -129,17 +129,17 @@ Segment 3: manifestId = "ghi-789", previousManifestId = "def-456"  // must match
 ```
 
 > [!NOTE]
-> Every segment must declare a `previousManifestId`, including the first one. The first segment typically references the initial static manifest. When `lastManifestId` is `null` (first call), the chain comparison is skipped — the validator only checks that `previousManifestId` is present.
+> Every segment must declare a `previousManifestId`, including the first one. The first segment usually references the initial static manifest.
 
-The `continuityMethod` field indicates how continuity is verified. The only built-in method is the spec-defined `c2pa.manifestId` (C2PA §19.3.2).
+The `continuityMethod` field states how continuity is verified. The only built-in method is `c2pa.manifestId`, which the specification defines (C2PA §19.3.2).
 
-When the chain is broken (the `previousManifestId` does not match the previous segment's manifest ID), the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
+When the chain is broken, because `previousManifestId` does not match the manifest ID of the previous segment, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
 
 ### Custom continuity methods
 
-The spec allows implementers to define their own continuity methods (§19.3.2), identified by a custom label (e.g. `com.example.anchor-chain`). Since their semantics are implementation-specific, this library cannot validate them by default: segments declaring an unrecognized method fail with `LiveVideoStatusCode.CONTINUITY_METHOD_INVALID`, as required by §19.7.2, plus `LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED`, which lets consumers distinguish an unverifiable method from a broken chain.
+The specification allows implementers to define their own continuity methods (§19.3.2), identified by a custom label such as `com.example.anchor-chain`. Their semantics are implementation-specific, so this library cannot validate them by default. Segments that declare an unrecognized method fail with `LiveVideoStatusCode.CONTINUITY_METHOD_INVALID`, as §19.7.2 requires. They also get `LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED`, which lets consumers tell an unverifiable method from a broken chain.
 
-To validate a custom method, register a validator for its label via the `options` parameter (a stream uses a single continuity method, so one validator is registered at a time):
+To validate a custom method, register a validator for its label in the `options` parameter. A stream uses one continuity method, so one validator is registered at a time:
 
 ```ts
 const { result } = await validateC2paManifestBoxSegment(bytes, lastManifestId, state, {
@@ -153,7 +153,7 @@ const { result } = await validateC2paManifestBoxSegment(bytes, lastManifestId, s
 })
 ```
 
-The validator receives the full decoded `c2pa.livevideo.segment` assertion (including method-specific fields) and the segment's parsed manifest; anything else the method needs (e.g. `lastManifestId`, which the caller already holds) can be captured in the callback's closure. Returning `false` (or throwing) reports `LiveVideoStatusCode.SEGMENT_INVALID`. The built-in `c2pa.manifestId` method cannot be overridden.
+The validator receives the full decoded `c2pa.livevideo.segment` assertion, including method-specific fields, and the parsed manifest of the segment. Anything else the method needs, such as `lastManifestId`, which the caller already has, can be captured in the closure of the callback. Returning `false` or throwing reports `LiveVideoStatusCode.SEGMENT_INVALID`. The built-in `c2pa.manifestId` method cannot be overridden.
 
 ## Result Fields
 
@@ -172,4 +172,4 @@ The `ManifestBoxValidationResult` contains:
 | `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes, since each segment carries a full manifest that undergoes integrity checks (assertion hashes, claim signature verification).
+> Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes. Each segment contains a full manifest, and the manifest goes through integrity checks: assertion hashes and claim signature verification.
