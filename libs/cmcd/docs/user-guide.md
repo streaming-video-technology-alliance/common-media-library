@@ -5,26 +5,7 @@ description: How to use the CMCD reporter
 
 # CMCD User Guide
 
-The `CmcdReporter` class manages Common Media Client Data (CMCD) reporting in a video player from one place. It handles request-mode reporting, which adds CMCD data to media requests, and event-mode reporting, which sends periodic reports to analytics endpoints.
-
-## Terms
-
-| Term | Meaning |
-| --- | --- |
-| CMCD | Common Media Client Data. CTA-5004-B is the version 2 specification. |
-| Request mode | The reporter adds CMCD data to a media request, as a query parameter or as headers. |
-| Event mode | The reporter sends CMCD reports to event targets in a POST body. |
-| Event target | An analytics endpoint configured in `eventTargets`, with its own events, keys, and interval. |
-| Destination | The request path or one event target. |
-| Data store | The values set with `update()`. The reporter keeps them and includes them in later reports. |
-| Session | One playback session, identified by the session ID key `sid`. |
-| State-change event | An event that `update()` fires when a tracked key changes value. |
-| Dedup | Deduplication. `update()` drops a state-change event when the value did not change. |
-| Transform | A function that changes or cancels one report before it is sent. |
-| Provenance record | The frozen record that `createRequestReport()` attaches to a request, so that a late response reports under the right session. |
-| Wire format | The encoded form of a report as it is transmitted. RFC 8941, the structured field values standard, defines the encoding. |
-| Shard | One of the CMCD headers in headers mode, such as `CMCD-Object`, `CMCD-Request`, and `CMCD-Session`. |
-| `msd` | The media start delay key. The reporter sends it once per session. |
+The `CmcdReporter` class manages CMCD reporting in a video player from one place. It handles request-mode reporting, which adds CMCD data to media requests, and event-mode reporting, which sends periodic reports to analytics endpoints.
 
 ## Installation
 
@@ -628,7 +609,7 @@ Attribution uses a frozen provenance record (`CmcdRequestProvenance`). `createRe
 
 The reporter rebuilds a `RESPONSE_RECEIVED` event from the record, with the record's `cid` and the caller's request-time inputs. So a response that completes after a session or content change keeps the meaning it had when its request was sent.
 
-The `sid` itself is the session identity. CTA-5004-B expects it to be unique per playback session, so generate a new universally unique identifier (UUID) for every session.
+The `sid` itself is the session identity. CTA-5004-B expects it to be unique per playback session, so generate a new UUID for every session.
 
 > [!WARNING]
 > Never reuse a session ID. Everything session-scoped depends on the `sid`, so reusing one corrupts the collected data. The reporter replaces the retained session that has the same `sid`. The late responses of the replaced session are then relabeled onto the replacement, and they consume the replacement's sequence numbers and gates.

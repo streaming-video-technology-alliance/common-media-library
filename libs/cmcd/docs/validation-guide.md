@@ -5,7 +5,7 @@ description: How to validate CMCD payloads
 
 # CMCD Validation Guide
 
-The `@svta/cml-cmcd` library provides composable validation functions. They verify that CMCD payloads conform to the CTA-5004 (v1) and CTA-5004-B (v2) specifications. Use them on the receiving side. Examples are an analytics server that collects CMCD event reports, and a content delivery network (CDN) log processor that inspects CMCD request data.
+The `@svta/cml-cmcd` library provides composable validation functions. They verify that CMCD payloads conform to the CTA-5004 (v1) and CTA-5004-B (v2) specifications. Use them on the receiving side. Examples are an analytics server that collects CMCD event reports, and a CDN log processor that inspects CMCD request data.
 
 ## Overview
 

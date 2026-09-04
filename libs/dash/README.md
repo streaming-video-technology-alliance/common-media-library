@@ -1,6 +1,6 @@
 # @svta/cml-dash
 
-Dynamic Adaptive Streaming over HTTP (DASH) manifest parsing functionality.
+DASH manifest parsing functionality.
 
 ## Installation
 

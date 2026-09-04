@@ -18,8 +18,7 @@ import { CaptionScreen, Row } from "@svta/cml-608";
 
 CTA-608 captions are embedded in the video elementary stream as an ATSC A/53 `cc_data()`
 payload. Only the envelope around the payload differs by codec. The envelope is either a
-supplemental enhancement information (SEI) message in a network abstraction layer (NAL)
-unit, or an open bitstream unit (OBU). Choose the extractor that matches the sample entry
+SEI message in a NAL unit, or an OBU. Choose the extractor that matches the sample entry
 type:
 
 | Sample entry            | Envelope                          | Extractor                          |

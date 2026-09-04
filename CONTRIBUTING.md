@@ -4,7 +4,7 @@ Thank you for contributing to the Common Media Library.
 
 Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approachable and respectful.
 
-This guide gives an overview of the contribution workflow: opening an issue, creating a pull request (PR), review, and merge.
+This guide gives an overview of the contribution workflow: opening an issue, creating a PR, review, and merge.
 
 ## Getting started
 
@@ -38,7 +38,7 @@ Look through our [existing issues](https://github.com/streaming-video-technology
 ### Commit your update
 
 > **Warning**
-> This library requires a Developer Certificate of Origin (DCO) sign-off on every commit. See https://github.com/apps/dco for more information.
+> This library requires a DCO sign-off on every commit. See https://github.com/apps/dco for more information.
 
 1. Run `npm run format` to format the code before committing.
 

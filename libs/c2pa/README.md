@@ -1,12 +1,12 @@
 # @svta/cml-c2pa
 
-C2PA (Coalition for Content Provenance and Authenticity) live video validation for ISO Base Media File Format (BMFF) and MP4 containers.
+C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF and MP4 containers.
 
 Supported C2PA segment validation methods:
 
-- **§19.3 Per-segment C2PA Manifest Box**: each segment embeds a full C2PA manifest with a CBOR Object Signing and Encryption (COSE) signature
-- **§19.4 Verifiable Segment Info (VSI/EMSG)**: the init segment contains the manifest and the session keys. Each media segment contains a small signed event message (EMSG) box
-- **§15.12.2 / §18.6 VOD Merkle**: for video on demand (VOD) assets in fragmented MP4, the init manifest stores one Merkle tree row per track. Each media segment contains its own leaf hash and proof
+- **§19.3 Per-segment C2PA Manifest Box**: each segment embeds a full C2PA manifest with a COSE signature
+- **§19.4 Verifiable Segment Info (VSI/EMSG)**: the init segment contains the manifest and the session keys. Each media segment contains a small signed EMSG box
+- **§15.12.2 / §18.6 VOD Merkle**: for VOD assets in fragmented MP4, the init manifest stores one Merkle tree row per track. Each media segment contains its own leaf hash and proof
 
 
 ## Installation

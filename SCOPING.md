@@ -25,7 +25,7 @@ Maintain a modern, modular JavaScript utility library for media playback. To ach
 ## Project Scope
 
 The initial scope of the Common Media Library will cover the following functionality:
-- Software development kits (SDKs) for standards-based media player features, such as:
+- SDKs for standards-based media player features, such as:
   - Common Media Client Data (CMCD) encoding / decoding
   - Common Media Server Data (CMSD) encoding / decoding
   - ID3 tag parsing 
@@ -50,7 +50,7 @@ The library will use the Apache 2.0 license. When applicable, a `NOTICE.md` file
 
 ### Source Code
 
-The source code will be maintained in a public GitHub repository under the `streaming-video-technology-alliance` organization. Changes are submitted as pull requests to the repository. Every pull request needs approval from at least two code reviewers approved by the Streaming Video Technology Alliance (SVTA). A reviewer is an SVTA member or a subject matter expert.
+The source code will be maintained in a public GitHub repository under the `streaming-video-technology-alliance` organization. Changes are submitted as pull requests to the repository. Every pull request needs approval from at least two code reviewers approved by the SVTA. A reviewer is an SVTA member or a subject matter expert.
 
 
 ### Documentation

@@ -1,6 +1,6 @@
 # RFCs
 
-Requests for comments (RFCs): proposals that need community agreement first.
+Proposals that need community agreement first.
 
 ## What Belongs Here
 
@@ -74,8 +74,8 @@ rfc/
 ## Contributing an RFC
 
 1. Create a branch: `rfc/<feature-name>`
-2. Open a pull request (PR) titled `[RFC] Feature Name`, where community review happens as PR comments
+2. Open a PR titled `[RFC] Feature Name`, where community review happens as PR comments
 3. Record the outcome in the RFC's Final Decision section and update `status`
 4. Squash-merge with a `docs(rfc): <feature name>` commit
 
-All commits require a Developer Certificate of Origin (DCO) sign-off (`git commit -s`).
+All commits require a DCO sign-off (`git commit -s`).

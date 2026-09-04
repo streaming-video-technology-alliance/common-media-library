@@ -2,13 +2,12 @@
 
 ## `608_av1.mp4`
 
-A real, decodable AV1 fragmented mp4 with CTA-608 captions in `metadata_itu_t_t35` open
-bitstream units (OBUs): 256x144, 30 fps, 40 frames, Main profile (`av01.0.00M.08`), one
-fragment.
+A real, decodable AV1 fragmented mp4 with CTA-608 captions in `metadata_itu_t_t35` OBUs:
+256x144, 30 fps, 40 frames, Main profile (`av01.0.00M.08`), one fragment.
 
 The caption is `HELLO WORLD` as a pop-on on row 15, with each control code doubled.
 Frames 0-13 contain 14 field 1 byte pairs. Frames 30-31 contain `EDM`. One pair per frame
-is what a Scenarist Closed Caption (SCC) source specifies.
+is what an SCC source specifies.
 
 Regenerate in two steps. First, encode the clean AV1 bitstream with `+bitexact` for a
 byte-reproducible encode:
@@ -42,6 +41,6 @@ go608-inject -i av01-clean.mp4 -sub hello.scc -o 608_av1.mp4 -fps 30
 
 ## `608_h264.m4s` and `608_h265.m4s`
 
-Pre-existing fixtures with captions in `itu_t_t35` supplemental enhancement information
-(SEI) messages, on both fields. One frame's `cc_data()` packs all byte pairs of a caption.
+Pre-existing fixtures with captions in `itu_t_t35` SEI messages, on both fields. One frame's
+`cc_data()` packs all byte pairs of a caption.
 Their provenance is not recorded.
