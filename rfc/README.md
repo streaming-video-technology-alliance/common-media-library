@@ -74,7 +74,7 @@ rfc/
 ## Contributing an RFC
 
 1. Create a branch: `rfc/<feature-name>`
-2. Open a pull request (PR) titled `[RFC] Feature Name`. Community review happens as PR comments
+2. Open a pull request (PR) titled `[RFC] Feature Name`, where community review happens as PR comments
 3. Record the outcome in the RFC's Final Decision section and update `status`
 4. Squash-merge with a `docs(rfc): <feature name>` commit
 

@@ -137,3 +137,5 @@ Only `rfc/README.md` changed. Casey decided on 2026-09-03 that the two merged RF
 | File | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
 |---|---|---|---|---|---|---|
 | `rfc/README.md` | 316 | 27 | 11.7 | 2 (7%) | 9.4 | none |
+
+The two sentences over 25 words in this row are not sentences. The metrics script joins list items that have no final period, and `rfc/README.md` has two such lists. The baseline row counts the same two joins plus one real sentence, which the rewrite split. The check script finds no sentence over 25 words in the rewritten file.
