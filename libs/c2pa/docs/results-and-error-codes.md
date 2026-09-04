@@ -5,11 +5,11 @@ description: Interpret validation results, error codes, and manifest data
 
 # Results and Error Codes
 
-All validation functions in `@svta/cml-c2pa` return structured results with an `isValid` boolean and an `errorCodes` array. This guide covers how to interpret these results, understand error codes, and work with manifest data.
+All validation functions in `@svta/cml-c2pa` return structured results with an `isValid` boolean and an `errorCodes` array. This guide explains the results, the error codes, and the manifest data.
 
 ## Checking Validation Results
 
-Every validation result follows the same pattern:
+Every result follows the same pattern:
 
 ```typescript
 if (!result.isValid) {
@@ -19,11 +19,11 @@ if (!result.isValid) {
 }
 ```
 
-The `errorCodes` array may contain multiple codes when several checks fail simultaneously. When `isValid` is `true`, the array is empty.
+The `errorCodes` array may contain several codes when several checks fail. When `isValid` is `true`, the array is empty.
 
 ## Live Video Error Codes
 
-The `LiveVideoStatusCode` constants represent failures specific to live video validation, as defined in C2PA specification section 19.7.
+The `LiveVideoStatusCode` constants are the live video validation failures that C2PA specification section 19.7 defines.
 
 ```typescript
 import { LiveVideoStatusCode } from '@svta/cml-c2pa'
@@ -50,7 +50,7 @@ for (const code of result.errorCodes) {
       // Cryptographic check failed (signature, hash, or key)
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
-      // Session key expired — may need a fresh init segment
+      // Session key expired, may need a fresh init segment
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
       // Sequence number or stream ID problem
@@ -86,9 +86,9 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 
 > [!NOTE]
-> `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes` (which perform manifest integrity checks). They do not appear in `SegmentValidationResult.errorCodes` — the VSI/EMSG segment validation uses only `LiveVideoStatusCode`.
+> `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes`, which check manifest integrity. They do not appear in `SegmentValidationResult.errorCodes`: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only `LiveVideoStatusCode`.
 >
-> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates each entry's `initHash` binding; `LiveVideoStatusCode.SESSIONKEY_INVALID` is not reported when `merkleMaps` is non-empty, since VOD Merkle segments don't use session keys.
+> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. `LiveVideoStatusCode.SESSIONKEY_INVALID` is not reported when `merkleMaps` is not empty, because VOD Merkle segments do not use session keys.
 
 ## Working with Manifest Data
 
@@ -127,7 +127,7 @@ if (manifest) {
 
 ## Sequence Validation Reasons
 
-When using the [VSI/EMSG method](vsi-validation.md), each segment's `SegmentValidationResult` includes a `sequenceResult` field. This is a discriminated union on `reason`, using `SequenceValidationReason` constants:
+With the [VSI/EMSG method](vsi-validation.md), each `SegmentValidationResult` includes a `sequenceResult` field: a discriminated union on `reason` with `SequenceValidationReason` constants:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'
@@ -135,11 +135,11 @@ import { SequenceValidationReason } from '@svta/cml-c2pa'
 
 | Constant | Value | Valid | Additional Fields | Description |
 |----------|-------|-------|-------------------|-------------|
-| `VALID` | `valid` | `true` | — | Sequence number is the next expected value |
-| `DUPLICATE` | `duplicate` | `false` | — | Sequence number was already seen |
+| `VALID` | `valid` | `true` | none | Sequence number is the next expected value |
+| `DUPLICATE` | `duplicate` | `false` | none | Sequence number was already seen |
 | `GAP_DETECTED` | `gap_detected` | `false` | `missingFrom`, `missingTo` | One or more sequence numbers were skipped |
-| `OUT_OF_ORDER` | `out_of_order` | `false` | — | Sequence number is less than the last seen |
-| `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | — | Below the session key's `minSequenceNumber` |
+| `OUT_OF_ORDER` | `out_of_order` | `false` | none | Sequence number is less than the last seen |
+| `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | none | Below the session key's `minSequenceNumber` |
 
 Narrow the type to access the `GAP_DETECTED` fields:
 
@@ -167,10 +167,10 @@ The two validation methods serve different use cases:
 | Continuity mechanism | Sequence numbers | Manifest ID chaining |
 | Functions | `validateC2paInitSegment` + `validateC2paSegment` | `validateC2paManifestBoxSegment` |
 
-The VSI/EMSG method is designed for low-overhead real-time streaming where bandwidth matters. The Manifest Box method provides self-contained segments that can be independently verified without prior context.
+The VSI/EMSG method suits low-overhead real-time streaming where bandwidth matters. The Manifest Box method gives self-contained segments that are verifiable without earlier context.
 
 ## References
 
 - [C2PA Specification v2.3](https://c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html)
 - [C2PA Live Video Validation (section 19.7)](https://c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html#_live_video_validation_process)
-- [COSE — RFC 9052](https://www.rfc-editor.org/rfc/rfc9052)
+- [COSE, RFC 9052](https://www.rfc-editor.org/rfc/rfc9052)

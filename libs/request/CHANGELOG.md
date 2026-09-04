@@ -14,6 +14,7 @@ and this project adheres to
 
 - Update `@svta/cml-cmcd` to 2.6.0
 - Update `@svta/cml-xml` to 1.2.0
+- README: a usage example replaces the empty code block.
 
 ## [1.0.15] - 2026-07-28
 

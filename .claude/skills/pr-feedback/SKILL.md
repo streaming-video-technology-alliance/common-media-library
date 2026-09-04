@@ -7,7 +7,7 @@ argument-hint: [PR number]
 
 # Resolve PR Review Feedback
 
-Fetch all unresolved review comments from the GitHub PR associated with the current branch, evaluate their validity, plan fixes, and implement them after user approval.
+Fetch all unresolved review comments from the GitHub PR for the current branch. Evaluate their validity, plan fixes, and implement them after user approval.
 
 ## Context
 
@@ -42,7 +42,7 @@ Follow these steps in order. Do NOT skip steps or proceed without completing the
 
 Use the GitHub GraphQL API to fetch all unresolved review threads.
 
-**Important:** The `$` character in GraphQL variable declarations is consumed by the shell even inside single quotes when run through the Bash tool. Always write GraphQL queries to a temp file and use `-F query=@file` to avoid this.
+**Important:** When run through the Bash tool, the shell consumes the `$` character in GraphQL variable declarations, even inside single quotes. Always write GraphQL queries to a temp file and use `-F query=@file`.
 
 1. Write the query to a temp file:
 
@@ -83,7 +83,7 @@ gh api graphql -F query=@/tmp/pr-threads.graphql -f owner='OWNER' -f repo='REPO'
 
 Replace `OWNER`, `REPO`, and `NUMBER` with the actual values.
 
-Filter the results to only include threads where `isResolved` is `false`. Exclude threads where `isOutdated` is `true` (the code they reference has already been changed) unless the comment raises a concern that is still relevant.
+Filter the results to the threads where `isResolved` is `false`. Exclude threads where `isOutdated` is `true`, because their code has changed, unless the comment is still relevant.
 
 If there are no unresolved threads, tell the user and stop.
 
@@ -92,12 +92,12 @@ If there are no unresolved threads, tell the user and stop.
 For each unresolved thread:
 
 1. **Read the file and line range** referenced by the comment to understand the current code.
-2. **Read the full comment thread** (there may be replies with additional context or clarification).
+2. **Read the full comment thread**. Replies may add context or clarification.
 3. **Classify the comment** as one of:
    - **Valid concern**: The reviewer raises a legitimate issue that should be fixed.
-   - **Already addressed**: The code has already been changed to address this (common with outdated threads that weren't marked outdated).
-   - **Disagreement**: The reviewer's suggestion would conflict with project conventions, spec compliance, or would degrade the code. These need a reply explaining why, not a code change.
-   - **Question**: The reviewer is asking for clarification, not requesting a change. These need a reply, not a code change.
+   - **Already addressed**: The code already addresses the comment. This is common with outdated threads that were not marked outdated.
+   - **Disagreement**: The suggestion would conflict with project conventions or spec compliance, or it would degrade the code. These comments need a reply that explains why, not a code change.
+   - **Question**: The reviewer asks for clarification, not for a change. These comments need a reply, not a code change.
    - **Nitpick with merit**: Minor style or naming suggestion that is reasonable to adopt.
 
 Present a summary table to the user:
@@ -144,19 +144,19 @@ After approval:
 
 ### Step 6: Commit and push
 
-1. Stage the changed files (be specific, don't use `git add -A`).
-2. Create a commit with an appropriate conventional commit message and DCO sign-off (`git commit -s`).
+1. Stage the changed files. Be specific, and do not use `git add -A`.
+2. Create a commit with a Conventional Commits message and a DCO sign-off (`git commit -s`).
 3. Push to the current branch: `git push`
 
 **Ask the user for confirmation before pushing.**
 
 ### Step 7: Reply to and resolve review threads
 
-For each addressed thread, reply **and then immediately resolve** it. Both actions are required per thread.
+For each addressed thread, reply **and then immediately resolve** it. Both actions are required.
 
-**Important:** Write GraphQL mutations to temp files and use `-F query=@file` to avoid `$` being consumed by the shell.
+**Important:** Write GraphQL mutations to temp files and use `-F query=@file`, so that the shell does not consume `$`.
 
-First, write both mutation files (do this once, before the loop):
+First, write both mutation files once, before the loop:
 
 ```graphql
 # /tmp/reply-thread.graphql
@@ -176,7 +176,7 @@ mutation($threadId: ID!) {
 }
 ```
 
-Then, for **each** thread that should be resolved, run both commands sequentially:
+Then, for **each** thread that should be resolved, run both commands in order:
 
 ```bash
 # Step A: Reply
@@ -185,12 +185,12 @@ gh api graphql -F query=@/tmp/reply-thread.graphql -f threadId='THREAD_ID' -f bo
 gh api graphql -F query=@/tmp/resolve-thread.graphql -f threadId='THREAD_ID'
 ```
 
-**Which threads to resolve vs. leave open:**
+**Which threads to resolve and which to leave open:**
 - **Valid concerns** that were fixed: reply with a brief description of the fix, then **resolve**.
 - **Nitpicks** that were adopted: acknowledge the change, then **resolve**.
-- **Already addressed**: note the code has been updated, then **resolve**.
-- **Disagreements**: reply explaining the reasoning respectfully. Do **NOT** resolve -- leave for the reviewer.
-- **Questions**: answer clearly. Do **NOT** resolve -- leave for the reviewer.
+- **Already addressed**: note that the code has been updated, then **resolve**.
+- **Disagreements**: reply with the reasoning, respectfully. Do **NOT** resolve. Leave the thread for the reviewer.
+- **Questions**: answer clearly. Do **NOT** resolve. Leave the thread for the reviewer.
 
 ### Step 8: Summary
 
@@ -205,7 +205,7 @@ Present a final summary:
 
 - Always read the full file context around a review comment, not just the referenced line.
 - Review comments may reference code that has changed since the comment was made. Always check the current state of the code.
-- Never resolve a thread that involves a disagreement or question -- only the original reviewer should resolve those.
-- If a review comment requires a change that conflicts with another review comment, flag this to the user.
+- Never resolve a thread with a disagreement or a question. Only the original reviewer should resolve those threads.
+- If a review comment requires a change that conflicts with another review comment, tell the user.
 - Follow all project conventions from CLAUDE.md and the code-quality rules when implementing fixes.
 - The `code-reviewer` agent's criteria (tree-shaking, performance, API design, TypeScript, docs) apply to all code changes made here too.

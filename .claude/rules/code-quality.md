@@ -7,16 +7,16 @@ paths:
 
 ## Tree-Shaking
 
-- Group related exports in a single file (e.g., a function and its options type, related constants). Keep unrelated exports in separate files to preserve tree-shaking granularity.
+- Group related exports in one file: a function and its options type, or related constants. Keep unrelated exports in separate files to preserve tree-shaking granularity.
 - Use `export type *` (not `export *`) in `index.ts` barrels for files that only contain types.
 - No side effects at module scope (no code that executes on import).
 - No default exports. Always use named exports.
-- Never use the TypeScript `enum` keyword. Use the const enum pattern: individual `as const` exports + collector object + `ValueOf<typeof X>` type.
+- Never use the TypeScript `enum` keyword. Use the const enum pattern: individual `as const` exports, a collector object, and a `ValueOf<typeof X>` type.
 
 ## Bundle Size
 
-- Keep functions small and focused -- single responsibility.
-- Avoid pulling in large dependencies for small tasks.
+- Keep functions small and focused, with one responsibility.
+- Avoid large dependencies for small tasks.
 - Regex patterns used in repeatedly-called functions should be module-level constants.
 
 ## TypeScript
@@ -24,13 +24,13 @@ paths:
 - Use `type` not `interface` for type definitions.
 - Use bracket notation for index signature access (`obj['key']`).
 - Use `as const` assertions for literal values.
-- Avoid `any` -- prefer `unknown` with narrowing or generics.
+- Avoid `any`. Prefer `unknown` with narrowing, or generics.
 - All code must be compatible with `isolatedDeclarations: true` and `verbatimModuleSyntax: true`.
 
 ## API Design
 
 - Functions are verbs, types are nouns, constants are UPPER_SNAKE_CASE.
-- Use options objects for 3+ optional parameters.
+- Use options objects for 3 or more optional parameters.
 - Prefer `readonly` properties on types where mutation is not intended.
 - New APIs must follow naming patterns of existing APIs in the same package.
 

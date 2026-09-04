@@ -2,11 +2,11 @@
 
 A common library for media playback in JavaScript
 
-Looking at open source players like [hls.js](https://github.com/video-dev/hls.js/), [dash.js](https://github.com/Dash-Industry-Forum/dash.js/), and [shaka-player](https://github.com/shaka-project/shaka-player) there are common pieces of functionality that have been implemented independently across the libraries. This is particularly true when looking at standards based features, like ID3 parsing, 608 parsing and CMCD. Since the functionality is shared in spirit but not implementation, they can fall out of sync where certain bugs are fixed in one player but not the others. The goal of this library is to create a single place where these utilities can be maintained and distributed.
+Open source players such as [hls.js](https://github.com/video-dev/hls.js/), [dash.js](https://github.com/Dash-Industry-Forum/dash.js/), and [shaka-player](https://github.com/shaka-project/shaka-player) implement many of the same features independently. This duplication is especially common for standards-based features, such as ID3 parsing, 608 parsing, and CMCD. The players share the intent of these features but not the code. A bug fixed in one player can remain in the others. The goal of this library is to create one place where these utilities can be maintained and distributed.
 
 ## Project structure
 
-This project is a mono-repo with the following workspaces: `libs` and `docs`. The `libs` package contains the individual libraries which are published to npm. The `docs` package contains the documentation for all of the libraries and is published as a single site to GitHub pages. The available libraries are:
+This project is a monorepo with three workspaces: `libs`, `docs`, and `dev`. The `libs` workspace contains the individual libraries, which are published to npm. The `docs` workspace contains the documentation for all the libraries. The documentation is published as one site on GitHub Pages. The `dev` workspace is a private development server. The available libraries are:
 
 - `@svta/cml-cmcd`
 - `@svta/cml-cmsd`
@@ -27,7 +27,7 @@ This project is a mono-repo with the following workspaces: `libs` and `docs`. Th
 
 ## Install
 
-Install one of the libraries via npm
+Install one of the libraries with npm:
 
 ```bash
 npm i @svta/cml-cmcd
@@ -53,23 +53,23 @@ console.log(cmcdUrl);
 
 ## Documentation
 
-API docs can be found [here](https://streaming-video-technology-alliance.github.io/common-media-library/).
+Read the [API documentation](https://streaming-video-technology-alliance.github.io/common-media-library/).
 
 ## Community
 
-If you need help with anything related to the Common Media Library, or if you'd like to chat with other members directly:
+If you need help with the Common Media Library, or if you want to talk with other members:
 
 - [Join the Discord Server](https://discord.gg/g2c5vwGvUc)
 - [See GitHub Discussions](https://github.com/streaming-video-technology-alliance/common-media-library/discussions)
 
 ## Contributing
 
-The Common Media Library is a free and open source library, and we appreciate any help you're willing to give - whether it's fixing bugs, improving documentation, or suggesting new features. Check out the [contributing guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md) for more details. Contributions and project decisions are overseen by the [SVTA](https://www.svta.org) Players and Playback working group.
+The Common Media Library is free and open source. We welcome help of any kind: fixing bugs, improving documentation, or suggesting new features. Read the [contributing guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md) for details. The [SVTA](https://www.svta.org) Players and Playback working group oversees contributions and project decisions.
 
 ## Code of Conduct
 
-Please note that this project is released with a [Contributor Code of Conduct](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+This project has a [Contributor Code of Conduct](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CODE_OF_CONDUCT.md). By participating in this project, you agree to follow its terms.
 
 ## Thanks
 
-This project builds upon the work of the open source community. Special thanks to the maintainers of [hls.js](https://github.com/video-dev/hls.js/), [dash.js](https://github.com/dash-industry-forum/dash.js/), [shaka-player](https://github.com/shaka-project/shaka-player), and [structured-field-values](https://github.com/Jxck/structured-field-values) as well as organizations like the [Streaming Video Technology Alliance](https://www.svta.org/), [DASH Industry Forum](https://dashif.org/), and the [CTA WAVE Project](https://www.cta.tech/Resources/Standards/WAVE-Project).
+This project builds on the work of the open source community. Special thanks to the maintainers of [hls.js](https://github.com/video-dev/hls.js/), [dash.js](https://github.com/dash-industry-forum/dash.js/), [shaka-player](https://github.com/shaka-project/shaka-player), and [structured-field-values](https://github.com/Jxck/structured-field-values). Thanks also to the [Streaming Video Technology Alliance](https://www.svta.org/), the [DASH Industry Forum](https://dashif.org/), and the [CTA WAVE Project](https://www.cta.tech/Resources/Standards/WAVE-Project).

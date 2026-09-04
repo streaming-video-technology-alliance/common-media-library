@@ -13,6 +13,7 @@ and this project adheres to
 ### Changed
 
 - Update `@svta/cml-xml` to 1.2.0
+- README: a usage example replaces the empty code block.
 
 ## [1.1.9] - 2026-08-11
 

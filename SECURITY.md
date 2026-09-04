@@ -2,13 +2,13 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+The table shows which versions receive security updates.
 
-| Version  | Supported          |
-| -------- | ------------------ |
-| <= 1.0.x | :white_check_mark: |
+| Version                        | Supported          |
+| ------------------------------ | ------------------ |
+| Latest release of each package | :white_check_mark: |
+| Older releases                 | :x:                |
 
 ## Reporting a Vulnerability
 
-Please report all vulnerabilities by opening a [security issue](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/new).
+To report a vulnerability, open a [security issue](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/new).

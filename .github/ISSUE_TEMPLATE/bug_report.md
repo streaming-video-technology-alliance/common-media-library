@@ -8,10 +8,10 @@ assignees: ''
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+A clear and concise description of the bug.
 
 **To Reproduce**
-Steps to reproduce the behavior:
+Steps to reproduce:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -21,13 +21,13 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+If applicable, add screenshots that explain the problem.
 
-**Platform (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Platform (complete the following information):**
+ - Device: [for example, iPhone6]
+ - OS: [for example, iOS8.1]
+ - Browser: [for example, stock browser, Safari]
+ - Version: [for example, 22]
 
 **Additional context**
-Add any other context about the problem here.
+Add any other context about the problem.
