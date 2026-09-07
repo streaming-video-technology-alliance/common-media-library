@@ -3,12 +3,11 @@ import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED, type CmcdEventType } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
-import type { CmcdObjectType } from './CmcdObjectType.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
@@ -18,6 +17,7 @@ import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
 import { isTokenField } from './isTokenField.ts'
 import { isValid } from './isValid.ts'
+import { toTokenString } from './toTokenString.ts'
 
 const filterMap: Record<string, (key: string) => boolean> = {
 	[CMCD_EVENT_MODE]: isCmcdEventKey,
@@ -27,12 +27,13 @@ const filterMap: Record<string, (key: string) => boolean> = {
 /**
  * Unwrap an inner list or SfItem value to a plain scalar.
  */
-function unwrapValue(value: any, ot?: CmcdObjectType): any {
+function unwrapValue(value: any, ot?: unknown): any {
 	if (Array.isArray(value)) {
 		let item: any
 
-		if (ot) {
-			item = value.find(item => item.params?.ot === ot)
+		const otText = toTokenString(ot)
+		if (otText) {
+			item = value.find(item => toTokenString(item.params?.ot) === otText)
 		}
 
 		if (!item) {
@@ -112,6 +113,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	// Down-convert V2 data to V1 format if needed
 	const data = version === 1 ? downConvertToV1(obj) : obj
+	const eventType = toTokenString(data['e'])
 
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
@@ -120,7 +122,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	// custom keys because isCmcdCustomKey enforces the serializable charset.
 	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
 
-	if (data['e'] && data['e'] !== CMCD_EVENT_RESPONSE_RECEIVED) {
+	if (data['e'] && eventType !== CMCD_EVENT_RESPONSE_RECEIVED) {
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
 	}
 
@@ -133,9 +135,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const isEventMode = reportingMode === CMCD_EVENT_MODE
 
 	if (isEventMode) {
-		const eventType = data['e']
-
-		if (!keys.includes('e') && eventType != null) {
+		if (!keys.includes('e') && data['e'] != null) {
 			keys.push('e')
 		}
 
@@ -155,7 +155,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			keys.push('url')
 		}
 
-		const requiredField = eventType ? CMCD_STATE_EVENT_FIELDS.get(eventType) : undefined
+		const requiredField = eventType ? CMCD_STATE_EVENT_FIELDS.get(eventType as CmcdEventType) : undefined
 		if (requiredField && data[requiredField] != null && !keys.includes(requiredField)) {
 			keys.push(requiredField)
 		}
@@ -198,7 +198,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		// Playback rate should only be sent if not equal to 1, except as
 		// the value of a PLAYBACK_RATE state-change event (where pr=1 is
 		// the data being reported, not a default to skip).
-		if (key === 'pr' && value === 1 && !(isEventMode && data['e'] === CMCD_EVENT_PLAYBACK_RATE)) {
+		if (key === 'pr' && value === 1 && !(isEventMode && eventType === CMCD_EVENT_PLAYBACK_RATE)) {
 			continue
 		}
 
@@ -215,13 +215,18 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		const isBgFalseTransition = isEventMode
 			&& value === false
 			&& key === 'bg'
-			&& data['e'] === CMCD_EVENT_BACKGROUNDED_MODE
+			&& eventType === CMCD_EVENT_BACKGROUNDED_MODE
 		if (!isValid(value) && !isBgFalseTransition) {
 			continue
 		}
 
-		if (isTokenField(key) && typeof value === 'string') {
-			value = new SfToken(value)
+		if (isTokenField(key)) {
+			if (typeof value === 'string') {
+				value = new SfToken(value)
+			}
+			else if (value instanceof SfItem && typeof value.value === 'string') {
+				value = new SfItem(new SfToken(value.value), value.params)
+			}
 		}
 
 		(results as any)[key] = value

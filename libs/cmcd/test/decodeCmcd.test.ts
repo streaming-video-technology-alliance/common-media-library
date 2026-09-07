@@ -114,4 +114,24 @@ describe('decodeCmcd', () => {
 			su: true,
 		})
 	})
+
+	it('round-trips a token field that carries params with tokens reduced to strings', () => {
+		const s = 'ot=m;com.example-p=1,v=2'
+
+		equal(encodeCmcd(decodeCmcd(s) as Cmcd), s)
+	})
+
+	it('round-trips event reports whose e is preserved as a token', () => {
+		const options = { reportingMode: 'event' as const }
+		const strings = [
+			'bg=?0,e=b,ts=1000,v=2',
+			'e=pr,pr=1,ts=1000,v=2',
+			'e=rr,rc=200,ts=1000,url="https://example.com/seg.m4s",v=2',
+		]
+
+		for (const s of strings) {
+			equal(encodeCmcd(decodeCmcd(s, { useSymbol: false }) as Cmcd, options), s)
+			equal(encodeCmcd(decodeCmcd(s, { useSymbol: true }) as Cmcd, options), s)
+		}
+	})
 })
