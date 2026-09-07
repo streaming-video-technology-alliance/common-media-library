@@ -1,0 +1,175 @@
+name: Post Discussion
+
+# Creates a GitHub Discussion from a Markdown file or from workflow inputs.
+#
+# The monthly agenda routine runs in a session that cannot call the GitHub
+# API, but it can push a branch. The routine writes the agenda to
+# `agendas/<date>.md` on a branch named `agenda/<date>` and pushes it. The
+# push triggers this workflow, which posts the newest file in `agendas/`
+# as a discussion. A maintainer can also run the workflow by hand with
+# explicit inputs.
+#
+# The job uses the built-in GITHUB_TOKEN with the `discussions: write`
+# permission, so no personal access token is required.
+#
+# File format: the first line is a level-one heading and becomes the title.
+# The rest of the file becomes the body. A file that contains the text
+# `<!-- dry-run -->` is validated but not posted.
+#
+# A discussion is never posted twice: if a discussion with the same title
+# already exists, the job prints its URL and stops.
+
+on:
+  push:
+    branches:
+      - "agenda/**"
+    paths:
+      - "agendas/*.md"
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "Discussion title"
+        required: true
+        type: string
+      body:
+        description: "Discussion body, in Markdown"
+        required: true
+        type: string
+      category:
+        description: "Discussion category name, as shown in the Discussions sidebar"
+        required: false
+        default: "Meetings"
+        type: string
+      dry_run:
+        description: "Resolve the category and print the inputs without creating the discussion"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  post-discussion:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      discussions: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Create discussion
+        uses: actions/github-script@v8
+        env:
+          INPUT_TITLE: ${{ inputs.title }}
+          INPUT_BODY: ${{ inputs.body }}
+          INPUT_CATEGORY: ${{ inputs.category }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const DRY_RUN_MARKER = '<!-- dry-run -->';
+            let title;
+            let body;
+            let categoryName = 'Meetings';
+            let dryRun = false;
+
+            if (context.eventName === 'push') {
+              const dir = 'agendas';
+              const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md')).sort();
+              if (files.length === 0) {
+                core.setFailed(`No Markdown files found in ${dir}/`);
+                return;
+              }
+              const file = path.join(dir, files[files.length - 1]);
+              core.info(`Source file: ${file}`);
+
+              const text = fs.readFileSync(file, 'utf8');
+              dryRun = text.includes(DRY_RUN_MARKER);
+              const lines = text.replace(DRY_RUN_MARKER, '').trim().split('\n');
+              const heading = lines.shift().trim();
+              if (!heading.startsWith('# ')) {
+                core.setFailed(`The first line of ${file} must be a level-one heading. Found: ${heading}`);
+                return;
+              }
+              title = heading.slice(2).trim();
+              body = lines.join('\n').trim();
+            } else {
+              title = process.env.INPUT_TITLE;
+              body = process.env.INPUT_BODY;
+              categoryName = process.env.INPUT_CATEGORY || categoryName;
+              dryRun = process.env.INPUT_DRY_RUN === 'true';
+            }
+
+            if (!title || !body) {
+              core.setFailed('Both a title and a body are required.');
+              return;
+            }
+
+            const { repository } = await github.graphql(
+              `query ($owner: String!, $repo: String!) {
+                repository(owner: $owner, name: $repo) {
+                  id
+                  discussionCategories(first: 25) {
+                    nodes { id name }
+                  }
+                }
+              }`,
+              { owner: context.repo.owner, repo: context.repo.repo },
+            );
+
+            const categories = repository.discussionCategories.nodes;
+            const category = categories.find((c) => c.name === categoryName);
+            if (!category) {
+              const names = categories.map((c) => c.name).join(', ');
+              core.setFailed(`Unknown discussion category "${categoryName}". Expected one of: ${names}`);
+              return;
+            }
+
+            core.info(`Category: ${category.name} (${category.id})`);
+            core.info(`Title: ${title}`);
+            core.info(`Body length: ${body.length} characters`);
+
+            const { search } = await github.graphql(
+              `query ($searchQuery: String!) {
+                search(query: $searchQuery, type: DISCUSSION, first: 10) {
+                  nodes { ... on Discussion { number title url } }
+                }
+              }`,
+              { searchQuery: `repo:${context.repo.owner}/${context.repo.repo} in:title "${title.replace(/"/g, '')}"` },
+            );
+            const existing = search.nodes.find((d) => d.title === title);
+            if (existing) {
+              core.notice(`Discussion #${existing.number} already has this title: ${existing.url}`);
+              core.setOutput('number', existing.number);
+              core.setOutput('url', existing.url);
+              return;
+            }
+
+            if (dryRun) {
+              await core.summary
+                .addHeading('Dry run: discussion not created')
+                .addRaw(`Category: ${category.name}\n\nTitle: ${title}\n\n`)
+                .addRaw(body)
+                .write();
+              return;
+            }
+
+            const result = await github.graphql(
+              `mutation ($repositoryId: ID!, $categoryId: ID!, $title: String!, $body: String!) {
+                createDiscussion(input: { repositoryId: $repositoryId, categoryId: $categoryId, title: $title, body: $body }) {
+                  discussion { number url }
+                }
+              }`,
+              { repositoryId: repository.id, categoryId: category.id, title, body },
+            );
+
+            const { number, url } = result.createDiscussion.discussion;
+            core.setOutput('number', number);
+            core.setOutput('url', url);
+            core.notice(`Created discussion #${number}: ${url}`);
+            await core.summary
+              .addHeading('Discussion created')
+              .addLink(`#${number} ${title}`, url)
+              .write();
