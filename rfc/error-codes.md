@@ -1,5 +1,6 @@
 ---
-status: draft
+status: accepted
+implementation-plan: plans/error-codes/
 ---
 
 # RFC: SVTA2070 Standardized Error Codes (`@svta/cml-error-codes`)
@@ -55,7 +56,7 @@ import { SVTA_RESOURCE_NOT_FOUND } from '@svta/cml-error-codes'
 assert(SVTA_RESOURCE_NOT_FOUND === 3004)
 ```
 
-HTTP response statuses embed into the Network category and IAB VAST error codes embed into the Advertising category. The helpers compose these at runtime from values that ad SDKs and network stacks already provide:
+HTTP response statuses embed into the Network category and IAB VAST error codes embed into the Advertising category. The helpers compose these at runtime from values that ad SDKs and network stacks already provide. The four-digit VAST error 1009 (empty VAST response) maps to 7999:
 
 ```ts
 import assert from 'node:assert'
@@ -63,6 +64,7 @@ import { httpStatusToSvtaErrorCode, vastErrorToSvtaErrorCode } from '@svta/cml-e
 
 assert(httpStatusToSvtaErrorCode(404) === 3404)
 assert(vastErrorToSvtaErrorCode(301) === 7301)
+assert(vastErrorToSvtaErrorCode(1009) === 7999)
 ```
 
 Human-readable descriptions ship in their own module for dashboards and log lines, and add nothing to bundles that do not use them:
@@ -105,7 +107,7 @@ All runtime exports use the repo's const enum pattern. Each code is an individua
 | `getSvtaErrorCategory(code: number): SvtaErrorCategory \| undefined` | function | `floor(code / 1000)`; `undefined` unless `code` is a non-negative integer whose category is assigned (8–98 and >99 are reserved for future use) |
 | `getSvtaErrorIndex(code: number): number \| undefined` | function | `code % 1000` for non-negative integers, else `undefined`; the index stays defined for unassigned categories |
 | `httpStatusToSvtaErrorCode(status: number): number` | function | `3000 + status` for integer statuses 100–599, else `3000` |
-| `vastErrorToSvtaErrorCode(vastError: number): number` | function | `7000 + vastError` for integer VAST codes 100–999, else `7000` |
+| `vastErrorToSvtaErrorCode(vastError: number): number` | function | `7000 + vastError` for integer VAST codes 100–999, `7999` for the four-digit VAST error 1009, else `7000` |
 | `getSvtaErrorDescription(code: number): string \| undefined` | function | spec description for every named code; synthesizes `Received an HTTP <n> response` for un-enumerated HTTP embeds; `undefined` otherwise |
 
 The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names are the member names with an `SVTA_` prefix (`SVTA_TIMED_TEXT_PARSE_ERROR`), which works because `UNKNOWN` is the only member name shared across categories. The nine `UNKNOWN`s keep a category qualifier (`SVTA_NETWORK_UNKNOWN`), and 999 is plain `SVTA_UNKNOWN` since its category and member are both "unknown". If a future spec revision adds a same-named error to a second category, the newcomer gets a qualified name and existing names stay stable. Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description, verbatim except where the errata below apply.
@@ -113,6 +115,7 @@ The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names sta
 ### Semantics and edge cases
 
 - The embedding helpers never throw. Out-of-range input returns the target category's `UNKNOWN` code (3000 / 7000), because error-reporting paths must not themselves fail.
+- The four-digit VAST error 1009 (empty VAST response) does not fit a three-digit index. SVTA2070 maps it to 7999, so `vastErrorToSvtaErrorCode(1009)` returns `SvtaAdvertisingErrorCode.EMPTY_VAST_RESPONSE`. Every other value above 999 returns 7000.
 - `SvtaErrorCode` is a closed union of the *named* codes. Spec-valid codes exist outside it (un-enumerated HTTP embeds 3100–3599, custom 99001–99999), so open-ended APIs should accept `number`. The type's TSDoc states the caveat.
 - Helpers compose codes from `SvtaErrorCategory` arithmetic and do not import the catalogs, so a consumer of `httpStatusToSvtaErrorCode` does not pay for the Network catalog. The one exception is `getSvtaErrorDescription`, whose purpose is the dictionary. Its `ReadonlyMap` carries the repo's `/* @__PURE__ */` module-scope table annotation, and the map keys are the catalog constants themselves, so a name typo fails typecheck.
 - Data integrity: tests assert per-catalog invariants (unique integer values, `floor(v / 1000)` equals the category, `UNKNOWN === category * 1000`, exact member counts), pin every code the spec uses in its own examples, and sweep all 137 members through `getSvtaErrorDescription`.
@@ -173,7 +176,8 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 - v3 (2026-08-18): constants renamed to `SVTA_<CATEGORY>_<MEMBER>` (drops the `_ERROR_` joint), spec-coordinate TSDocs added per the SPF prior art, and spec references updated to the official SVTA2070 name and product page.
 - v4 (2026-08-18): review feedback. Both arithmetic helpers reject inputs that are not non-negative integers (`getSvtaErrorIndex` now returns `number | undefined`), the code model states codes are non-negative integers, and the peer-dependency and verbatim-description wording is clarified.
 - v5 (2026-08-19): constants flattened to `SVTA_<MEMBER>` with category-qualified `UNKNOWN`s (`SVTA_PLAYBACK_UNKNOWN`, plain `SVTA_UNKNOWN` for 999), matching the SPF naming after maintainer preference for shorter names.
+- v6 (2026-09-07): `vastErrorToSvtaErrorCode(1009)` returns 7999, per the review thread on the four-digit VAST error 1009. Status set to `accepted` after the RFC PR merged. The implementation lives in `libs/error-codes`, with the plan of record in `plans/error-codes/`.
 
 ## Final Decision
 
-Pending community review.
+Accepted on 2026-09-07. The RFC PR [#423](https://github.com/streaming-video-technology-alliance/common-media-library/pull/423) merged with the export surface above as the contract, plus one amendment from review: `vastErrorToSvtaErrorCode(1009)` returns 7999. The implementation follows `plans/error-codes/`. The status changes to `implemented` when the first release-prep PR publishes the package.

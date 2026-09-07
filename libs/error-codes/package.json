@@ -1,0 +1,58 @@
+{
+	"name": "@svta/cml-error-codes",
+	"version": "0.0.1",
+	"description": "SVTA standardized streaming error codes",
+	"license": "Apache-2.0",
+	"type": "module",
+	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/error-codes",
+	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
+	},
+	"bugs": {
+		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org",
+		"provenance": true,
+		"scope": "svta"
+	},
+	"files": [
+		"dist/**/*",
+		"NOTICE.md"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"keywords": [
+		"Common Media Library",
+		"CML",
+		"SVTA",
+		"SVTA2070",
+		"Error Codes",
+		"Streaming Video Technology Alliance"
+	],
+	"scripts": {
+		"build": "node ../../scripts/build.ts",
+		"test": "node ../../scripts/test.ts"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24",
+			"onFail": "error"
+		}
+	},
+	"peerDependencies": {
+		"@svta/cml-utils": "*"
+	}
+}
