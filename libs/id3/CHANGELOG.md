@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the usage example is complete. The tag bytes are a function parameter.
+
+
 ## [1.0.8] - 2026-07-28
 
 ### Changed

@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the usage example prints its results instead of calling an undefined `assert`. Several of those calls compared typed arrays with `===`.
+
+
 ## [1.6.0] - 2026-07-28
 
 ### Added

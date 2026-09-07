@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-xml",
-	"version": "1.1.6",
+	"version": "1.2.0",
 	"description": "XML parsing utilities",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -37,7 +37,8 @@
 	],
 	"scripts": {
 		"build": "node ../../scripts/build.ts",
-		"test": "node ../../scripts/test.ts"
+		"test": "node ../../scripts/test.ts",
+		"bench": "node bench/bench.ts"
 	},
 	"engines": {
 		"node": ">=20"

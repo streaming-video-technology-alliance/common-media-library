@@ -26,11 +26,11 @@ const result = encodeCmcd(input, options);
 
 ## Testing CMCD output with `CmcdReportRecorder`
 
-`CmcdReportRecorder` captures CMCD-bearing requests emitted by a
-player under test, regardless of whether the player uses
-`XMLHttpRequest` or `fetch`. Each capture is normalized to
+`CmcdReportRecorder` captures the CMCD requests that a player under test
+sends, whether through `XMLHttpRequest` or `fetch`. Each capture is
+normalized to
 [`HttpRequest`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/utils),
-so tests work identically across transports.
+so tests work the same for both transports.
 
 ````ts
 import { CmcdReportRecorder, validateCmcdRequest } from '@svta/cml-cmcd'

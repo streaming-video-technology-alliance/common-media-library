@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the usage example is complete. It imports every identifier it uses and shows the encoded output.
+
+
 ## [1.1.0] - 2026-07-28
 
 ### Added
