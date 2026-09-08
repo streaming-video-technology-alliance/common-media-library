@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: SVTA2070 Standardized Error Codes (`@svta/cml-error-codes`)
@@ -13,7 +13,7 @@ status: draft
 
 ## Summary
 
-A new package, `@svta/cml-error-codes`, is the reference implementation of [*SVTA2070: Standardized Error Codes*](https://www.svta.org/product/svta2070/) (Player Working Group, published July 8, 2026). It ships every named code as a typed constant, the spec's category/index arithmetic, HTTP and VAST embedding, and an opt-in human-readable dictionary. The spec's own objectives include "Error codes referenced in the Common Media Library via SVTA's Player Working Group". This package is that deliverable.
+A new package, `@svta/cml-error-codes`, is the reference implementation of [*SVTA2070: Standardized Error Codes*](https://www.svta.org/product/svta2070/) (Player Working Group, published July 8, 2026). It ships every named code as a typed constant, the spec's category/index arithmetic, and HTTP and VAST embedding. An opt-in human-readable dictionary is deferred to a later release (see Final Decision). The spec's own objectives include "Error codes referenced in the Common Media Library via SVTA's Player Working Group". This package is that deliverable.
 
 ```ts
 import { getSvtaErrorCategory, httpStatusToSvtaErrorCode, SvtaErrorCategory, SvtaPlaybackErrorCode } from '@svta/cml-error-codes'
@@ -24,7 +24,7 @@ getSvtaErrorCategory(code) // SvtaErrorCategory.PLAYBACK (2)
 httpStatusToSvtaErrorCode(404) // 3404, an HTTP 404 embedded in the Network category
 ```
 
-A complete reference implementation exists on branch [`claude/svta-error-codes-cml-d0ad01`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/claude/svta-error-codes-cml-d0ad01/libs/error-codes), with implementation artifacts in `plans/error-codes/`. The generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md) lists the full API surface.
+A complete reference implementation exists on branch [`claude/svta-error-codes-cml-d0ad01`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/claude/svta-error-codes-cml-d0ad01/libs/error-codes). The generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md) lists the full API surface.
 
 ## Motivation
 
@@ -55,7 +55,7 @@ import { SVTA_RESOURCE_NOT_FOUND } from '@svta/cml-error-codes'
 assert(SVTA_RESOURCE_NOT_FOUND === 3004)
 ```
 
-HTTP response statuses embed into the Network category and IAB VAST error codes embed into the Advertising category. The helpers compose these at runtime from values that ad SDKs and network stacks already provide:
+HTTP response statuses embed into the Network category and IAB VAST error codes embed into the Advertising category. The helpers compose these at runtime from values that ad SDKs and network stacks already provide. The four-digit VAST error 1009 (empty VAST response) maps to 7999:
 
 ```ts
 import assert from 'node:assert'
@@ -63,17 +63,10 @@ import { httpStatusToSvtaErrorCode, vastErrorToSvtaErrorCode } from '@svta/cml-e
 
 assert(httpStatusToSvtaErrorCode(404) === 3404)
 assert(vastErrorToSvtaErrorCode(301) === 7301)
+assert(vastErrorToSvtaErrorCode(1009) === 7999)
 ```
 
-Human-readable descriptions ship in their own module for dashboards and log lines, and add nothing to bundles that do not use them:
-
-```ts
-import assert from 'node:assert'
-import { getSvtaErrorDescription, SvtaPlaybackErrorCode } from '@svta/cml-error-codes'
-
-assert(getSvtaErrorDescription(SvtaPlaybackErrorCode.VIDEO_BUFFER_UNDERRUN) === 'Video buffer underrun')
-assert(getSvtaErrorDescription(3404) === 'Received an HTTP 404 response')
-```
+Human-readable descriptions are deferred to a later release, so the first release is codes-only. The member TSDoc carries the spec description of every code. See Final Decision.
 
 ## Reference-level explanation
 
@@ -105,17 +98,19 @@ All runtime exports use the repo's const enum pattern. Each code is an individua
 | `getSvtaErrorCategory(code: number): SvtaErrorCategory \| undefined` | function | `floor(code / 1000)`; `undefined` unless `code` is a non-negative integer whose category is assigned (8–98 and >99 are reserved for future use) |
 | `getSvtaErrorIndex(code: number): number \| undefined` | function | `code % 1000` for non-negative integers, else `undefined`; the index stays defined for unassigned categories |
 | `httpStatusToSvtaErrorCode(status: number): number` | function | `3000 + status` for integer statuses 100–599, else `3000` |
-| `vastErrorToSvtaErrorCode(vastError: number): number` | function | `7000 + vastError` for integer VAST codes 100–999, else `7000` |
-| `getSvtaErrorDescription(code: number): string \| undefined` | function | spec description for every named code; synthesizes `Received an HTTP <n> response` for un-enumerated HTTP embeds; `undefined` otherwise |
+| `vastErrorToSvtaErrorCode(vastError: number): number` | function | `7000 + vastError` for integer VAST codes 100–999, `7999` for the four-digit VAST error 1009, else `7000` |
+
+`getSvtaErrorDescription`, the human-readable dictionary that returns the spec description of a code, is deferred to a later release. See Final Decision.
 
 The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names are the member names with an `SVTA_` prefix (`SVTA_TIMED_TEXT_PARSE_ERROR`), which works because `UNKNOWN` is the only member name shared across categories. The nine `UNKNOWN`s keep a category qualifier (`SVTA_NETWORK_UNKNOWN`), and 999 is plain `SVTA_UNKNOWN` since its category and member are both "unknown". If a future spec revision adds a same-named error to a second category, the newcomer gets a qualified name and existing names stay stable. Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description, verbatim except where the errata below apply.
 
 ### Semantics and edge cases
 
 - The embedding helpers never throw. Out-of-range input returns the target category's `UNKNOWN` code (3000 / 7000), because error-reporting paths must not themselves fail.
+- The four-digit VAST error 1009 (empty VAST response) does not fit a three-digit index. SVTA2070 maps it to 7999, so `vastErrorToSvtaErrorCode(1009)` returns `SvtaAdvertisingErrorCode.EMPTY_VAST_RESPONSE`. Every other value above 999 returns 7000.
 - `SvtaErrorCode` is a closed union of the *named* codes. Spec-valid codes exist outside it (un-enumerated HTTP embeds 3100–3599, custom 99001–99999), so open-ended APIs should accept `number`. The type's TSDoc states the caveat.
-- Helpers compose codes from `SvtaErrorCategory` arithmetic and do not import the catalogs, so a consumer of `httpStatusToSvtaErrorCode` does not pay for the Network catalog. The one exception is `getSvtaErrorDescription`, whose purpose is the dictionary. Its `ReadonlyMap` carries the repo's `/* @__PURE__ */` module-scope table annotation, and the map keys are the catalog constants themselves, so a name typo fails typecheck.
-- Data integrity: tests assert per-catalog invariants (unique integer values, `floor(v / 1000)` equals the category, `UNKNOWN === category * 1000`, exact member counts), pin every code the spec uses in its own examples, and sweep all 137 members through `getSvtaErrorDescription`.
+- Helpers compose codes from `SvtaErrorCategory` arithmetic and do not import the catalogs, so a consumer of `httpStatusToSvtaErrorCode` does not pay for the Network catalog.
+- Data integrity: tests assert per-catalog invariants (unique integer values, `floor(v / 1000)` equals the category, `UNKNOWN === category * 1000`, exact member counts) and pin every code the spec uses in its own examples.
 
 ### Spec errata handled during transcription
 
@@ -125,7 +120,7 @@ This package treats the tables as normative where the document disagrees with it
 2. Stacking Example 2 labels 2018 "Video track load error". The table defines 2018 Unable to parse secondary manifest / asset list (2020 is Track load error).
 3. 6002 omits "to" ("Sender unable to make a connection the receiver"). This package corrects the description.
 4. The "native codes are four digits, external five" prose only holds for zero-padded string rendering ("03404"). As integers both are four digits. The package exposes integers and relies on the ÷1000 / mod 1000 arithmetic.
-5. The package treats the Network table's `500` row ("Received an HTTP 500 response: system Error - official definition") as the exemplar of the embed range, not a named member. Descriptions for all embedded statuses follow that row's format. Each category's index-0 description reads "Unknown <category> error" to keep the nine identical "Unknown" rows distinct.
+5. The package treats the Network table's `500` row ("Received an HTTP 500 response: system Error - official definition") as the exemplar of the embed range, not a named member. Each category's index-0 description reads "Unknown <category> error" to keep the nine identical "Unknown" rows distinct.
 
 ### Packaging
 
@@ -133,8 +128,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 
 ## Drawbacks
 
-- The dictionary is transcribed by hand and must track spec revisions the same way. There is no machine-readable upstream source yet (the spec plans IANA registration, but it is not live).
-- Description strings duplicate the member TSDoc (one is runtime data, one is comments). Only review catches drift between them, though tests pin one exact string per category.
+- The member TSDoc is transcribed by hand and must track spec revisions the same way. There is no machine-readable upstream source yet (the spec plans IANA registration, but it is not live).
 - A player importing a catalog pays for that whole category (~1 KB minified for the largest). That trade-off is deliberate (see Rationale and alternatives).
 - `@see` links point at the [SVTA2070 product page](https://www.svta.org/product/svta2070/). They need a one-time swap to the IANA registry entry once registration lands.
 - The 146 individual constants roughly double the export count, so the api.md report and the typedoc index grow accordingly.
@@ -143,7 +137,7 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 
 - **Per-category catalogs** (chosen) vs **one flat 137-member object**: flat needs category prefixes on every name anyway (nine `UNKNOWN`s collide), renders one unnavigable typedoc page, and makes every importer pay for the full dictionary. Per-category mirrors the spec's tables 1:1 and tree-shakes per category. The chosen shape also exports every code as an individual constant in the same file (the `CmcdEventType` pattern), which is the repo's full const enum convention and gives bundlers per-code granularity. A one-file-per-constant layout (the `CmsdHeaderField` split) was rejected: it would cost ~137 files for no extra granularity.
 - **`Svta` prefix on every export** vs bare `ErrorCode` names: player codebases universally have their own `ErrorCode`/`getErrorCategory` identifiers. The prefix prevents collisions and matches how engineers will refer to the standard.
-- **Descriptions included** vs codes-only: the spec's objectives explicitly include human-readable descriptions. Isolating them in one module makes them free for non-users. Dropping them would push every QoE vendor to re-transcribe the dictionary.
+- **Descriptions included** vs codes-only: the spec's objectives explicitly include human-readable descriptions. Isolating them in one module makes them free for non-users. Dropping them would push every QoE vendor to re-transcribe the dictionary. Review chose codes-only for the first release, with the dictionary as a follow-up once the IANA registry exists (see Final Decision).
 - **Numbers, not strings**: the spec defines integer codes. String variants would be an invention.
 
 ## Prior art
@@ -155,12 +149,13 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 ## Unresolved questions
 
 1. Are the 137 derived member names right? Naming is the main review surface. The full listing is in the linked api.md. Bikeshedding individual names is in scope for this RFC and cheap before first publish. The `SVTA_*` constant names derive from the member names, so renames cascade. The dictionary adopted SPF's flat `SVTA_<MEMBER>` style (see Prior art) with category-qualified names for the nine `UNKNOWN`s, trading a fully exception-free derivation for the shorter names adopters actually type.
-2. Should `getSvtaErrorDescription` ship in v1, or should the package stay codes-only until the IANA registry exists?
+2. Should `getSvtaErrorDescription` ship in v1, or should the package stay codes-only until the IANA registry exists? Resolved on 2026-09-08: the first release is codes-only (see Final Decision).
 3. Do the five errata get fixed in the spec before IANA registration, and does the package track the corrected text or the published text verbatim?
 4. Does the Working Group want a `@svta/cml-error-codes` docs page enumerating the full dictionary (typedoc renders the nine catalogs already)?
 
 ## Future possibilities
 
+- `getSvtaErrorDescription`, the human-readable dictionary, once the IANA registry exists as a machine-readable source.
 - Feeding SVTA codes into CMCD v2's `ec` (error code) key via `@svta/cml-cmcd`.
 - A minimal `SvtaError` envelope type (`{ code, message?, data? }`, as in the SPF prior art) so players and QoE tooling share one reporting shape. The spec scopes error metadata out, so the envelope stays out of v1.
 - Per-player translation-table helpers (the spec's "translation sub-component"), as a separate package or adopter recipes.
@@ -173,7 +168,9 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 - v3 (2026-08-18): constants renamed to `SVTA_<CATEGORY>_<MEMBER>` (drops the `_ERROR_` joint), spec-coordinate TSDocs added per the SPF prior art, and spec references updated to the official SVTA2070 name and product page.
 - v4 (2026-08-18): review feedback. Both arithmetic helpers reject inputs that are not non-negative integers (`getSvtaErrorIndex` now returns `number | undefined`), the code model states codes are non-negative integers, and the peer-dependency and verbatim-description wording is clarified.
 - v5 (2026-08-19): constants flattened to `SVTA_<MEMBER>` with category-qualified `UNKNOWN`s (`SVTA_PLAYBACK_UNKNOWN`, plain `SVTA_UNKNOWN` for 999), matching the SPF naming after maintainer preference for shorter names.
+- v6 (2026-09-07): `vastErrorToSvtaErrorCode(1009)` returns 7999, per the review thread on the four-digit VAST error 1009. Status set to `accepted` after the RFC PR merged. The implementation lives in `libs/error-codes`.
+- v7 (2026-09-08): `getSvtaErrorDescription` removed from the first release. Unresolved question 2 is resolved as codes-only, and the dictionary moves to Future possibilities.
 
 ## Final Decision
 
-Pending community review.
+Accepted on 2026-09-07. The RFC PR [#423](https://github.com/streaming-video-technology-alliance/common-media-library/pull/423) merged with the export surface above as the contract, plus one amendment from review: `vastErrorToSvtaErrorCode(1009)` returns 7999. On 2026-09-08, the review of the implementation PR [#445](https://github.com/streaming-video-technology-alliance/common-media-library/pull/445) resolved unresolved question 2: the first release is codes-only, and `getSvtaErrorDescription` is deferred until the IANA registry exists. The status changes to `implemented` when the first release-prep PR publishes the package.
