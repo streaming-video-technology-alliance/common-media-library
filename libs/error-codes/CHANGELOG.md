@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-07
+
 ### Added
 
 - Initial implementation of SVTA2070: Standardized Error Codes, per [`rfc/error-codes.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/rfc/error-codes.md)
@@ -16,4 +18,5 @@ and this project adheres to
 - `getSvtaErrorCategory` and `getSvtaErrorIndex` for the category and index arithmetic of the specification
 - `httpStatusToSvtaErrorCode` and `vastErrorToSvtaErrorCode` to embed HTTP response statuses and IAB VAST error codes. `vastErrorToSvtaErrorCode(1009)` returns 7999
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/main...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/error-codes-v0.1.0...HEAD
+[0.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/error-codes-v0.1.0

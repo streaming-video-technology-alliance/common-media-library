@@ -1,5 +1,6 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-error-codes@0.1.0
 ---
 
 # RFC: SVTA2070 Standardized Error Codes (`@svta/cml-error-codes`)
@@ -24,7 +25,7 @@ getSvtaErrorCategory(code) // SvtaErrorCategory.PLAYBACK (2)
 httpStatusToSvtaErrorCode(404) // 3404, an HTTP 404 embedded in the Network category
 ```
 
-A complete reference implementation exists on branch [`claude/svta-error-codes-cml-d0ad01`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/claude/svta-error-codes-cml-d0ad01/libs/error-codes). The generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md) lists the full API surface.
+The implementation is in [`libs/error-codes`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/error-codes) on `main`. The generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/error-codes/config/cml-error-codes.api.md) lists the full API surface.
 
 ## Motivation
 
@@ -102,7 +103,7 @@ All runtime exports use the repo's const enum pattern. Each code is an individua
 
 `getSvtaErrorDescription`, the human-readable dictionary that returns the spec description of a code, is deferred to a later release. See Final Decision.
 
-The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names are the member names with an `SVTA_` prefix (`SVTA_TIMED_TEXT_PARSE_ERROR`), which works because `UNKNOWN` is the only member name shared across categories. The nine `UNKNOWN`s keep a category qualifier (`SVTA_NETWORK_UNKNOWN`), and 999 is plain `SVTA_UNKNOWN` since its category and member are both "unknown". If a future spec revision adds a same-named error to a second category, the newcomer gets a qualified name and existing names stay stable. Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description, verbatim except where the errata below apply.
+The 137 member names derive from the spec descriptions as UPPER_SNAKE. Names stay consistent within each category (`MANIFEST_PARSE_ERROR` mirrors `SEGMENT_PARSE_ERROR`), and VAST members keep IAB-recognizable names (`WRAPPER_TIMEOUT`, `VPAID_ERROR`). Individual constant names are the member names with an `SVTA_` prefix (`SVTA_TIMED_TEXT_PARSE_ERROR`), which works because `UNKNOWN` is the only member name shared across categories. The nine `UNKNOWN`s keep a category qualifier (`SVTA_NETWORK_UNKNOWN`), and 999 is plain `SVTA_UNKNOWN` since its category and member are both "unknown". If a future spec revision adds a same-named error to a second category, the newcomer gets a qualified name and existing names stay stable. Every constant's TSDoc leads with its spec coordinates (`SVTA 2 [Playback] 001: Video buffer underrun`), adopted from the SPF prior art so review against the spec tables is a one-glance check. The full name-to-value listing is the generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/error-codes/config/cml-error-codes.api.md). Member-level TSDoc carries the spec description, verbatim except where the errata below apply.
 
 ### Semantics and edge cases
 
@@ -170,7 +171,8 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 - v5 (2026-08-19): constants flattened to `SVTA_<MEMBER>` with category-qualified `UNKNOWN`s (`SVTA_PLAYBACK_UNKNOWN`, plain `SVTA_UNKNOWN` for 999), matching the SPF naming after maintainer preference for shorter names.
 - v6 (2026-09-07): `vastErrorToSvtaErrorCode(1009)` returns 7999, per the review thread on the four-digit VAST error 1009. Status set to `accepted` after the RFC PR merged. The implementation lives in `libs/error-codes`.
 - v7 (2026-09-08): `getSvtaErrorDescription` removed from the first release. Unresolved question 2 is resolved as codes-only, and the dictionary moves to Future possibilities.
+- v8 (2026-09-08): status set to `implemented`. The first release is `@svta/cml-error-codes@0.1.0`. The implementation links point at `main`.
 
 ## Final Decision
 
-Accepted on 2026-09-07. The RFC PR [#423](https://github.com/streaming-video-technology-alliance/common-media-library/pull/423) merged with the export surface above as the contract, plus one amendment from review: `vastErrorToSvtaErrorCode(1009)` returns 7999. On 2026-09-08, the review of the implementation PR [#445](https://github.com/streaming-video-technology-alliance/common-media-library/pull/445) resolved unresolved question 2: the first release is codes-only, and `getSvtaErrorDescription` is deferred until the IANA registry exists. The status changes to `implemented` when the first release-prep PR publishes the package.
+Accepted on 2026-09-07. The RFC PR [#423](https://github.com/streaming-video-technology-alliance/common-media-library/pull/423) merged with the export surface above as the contract, plus one amendment from review: `vastErrorToSvtaErrorCode(1009)` returns 7999. On 2026-09-08, the review of the implementation PR [#445](https://github.com/streaming-video-technology-alliance/common-media-library/pull/445) resolved unresolved question 2: the first release is codes-only, and `getSvtaErrorDescription` is deferred until the IANA registry exists. The first release-prep PR set the status to `implemented`. The first release is `@svta/cml-error-codes@0.1.0`.

@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-09-07
+
 ### Changed
 
 - README: the usage example imports from `@svta/cml-throughput` instead of an unexported subpath, and prints its result instead of calling an undefined `assert`.
@@ -69,7 +71,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.8...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.9...HEAD
+[1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.8...throughput-v1.0.9
 [1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.7...throughput-v1.0.8
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.6...throughput-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.5...throughput-v1.0.6
