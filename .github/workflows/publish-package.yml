@@ -33,6 +33,8 @@ jobs:
       - name: Test
         run: npm test
 
+      # This workflow cannot publish a package that is not on npm yet.
+      # See "Publishing a New Package" in AGENTS.md.
       - name: Publish Package
         run: npm publish --provenance --access public -w libs/${{ inputs.package }}
         env:
