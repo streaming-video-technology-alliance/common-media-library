@@ -17,10 +17,9 @@ contract are in [`rfc/error-codes.md`](../../rfc/error-codes.md). The code was w
 - One public export per file. The filename equals the export name. The barrel is alphabetical, and type-only
   files use `export type *`.
 - Helpers compose codes from `SvtaErrorCategory` arithmetic and do not import the catalogs.
-  `getSvtaErrorDescription` is the exception, because the dictionary is its purpose.
-- No code runs at module scope. The description table is a `/* @__PURE__ */` `Map`.
-- Spec descriptions stay verbatim in the member TSDoc and in the dictionary, except where the errata apply.
-  Notes go in a separate TSDoc paragraph.
+- No code runs at module scope.
+- Spec descriptions stay verbatim in the member TSDoc, except where the errata apply. Notes go in a separate
+  TSDoc paragraph.
 - Tests import from `@svta/cml-error-codes`, run against `dist`, and mark examples with `//#region example`.
 - The root build script includes the package. `scripts/projects.ts` does not. The first release-prep PR adds
   the package to the publish list.
@@ -39,11 +38,11 @@ contract are in [`rfc/error-codes.md`](../../rfc/error-codes.md). The code was w
    `undefined` unless the input is a non-negative integer.
 5. `httpStatusToSvtaErrorCode` and `vastErrorToSvtaErrorCode`. Out-of-range input returns 3000 or 7000.
    `vastErrorToSvtaErrorCode(1009)` returns 7999. This mapping is the amendment from the review of #423.
-6. `getSvtaErrorDescription`: one `Map` keyed by the catalog constants, plus `Received an HTTP <n> response`
-   for the embedded statuses 3100 to 3599.
+6. `getSvtaErrorDescription`, the human-readable dictionary, is deferred. The first release is codes-only, per
+   the review of #445 and RFC unresolved question 2.
 7. Tests. `test/data/assertCatalogInvariants.ts` checks each catalog: unique integers, `floor(v / 1000)`
    equals the category, `UNKNOWN === category * 1000`, the exact size, and one `SVTA_*` constant per member.
-   The helper tests pin the codes the spec uses in its examples. The dictionary test sweeps all 137 members.
+   The helper tests pin the codes the spec uses in its examples.
 8. Docs: the README with the guide-level examples from the RFC, the CHANGELOG `## [Unreleased]` entry, and
    the generated `config/cml-error-codes.api.md` reviewed against the RFC tables.
 9. Validation: `npm test` at the root (lint, build all, typecheck, every package's tests) and
@@ -52,10 +51,12 @@ contract are in [`rfc/error-codes.md`](../../rfc/error-codes.md). The code was w
 ## Outcome
 
 - 146 `SVTA_*` constants: 137 codes and 9 categories.
+- No runtime dictionary in the first release. The member TSDoc carries the spec descriptions.
 - The RFC status is `accepted`. The release-prep PR that publishes `@svta/cml-error-codes` changes it to
   `implemented`.
 
 ## Follow-ups
 
+- Add `getSvtaErrorDescription` once the IANA registry exists as a machine-readable source.
 - Report the five spec errata in the RFC to the Player Working Group before IANA registration.
 - Swap the `@see` links to the IANA registry entry once registration lands.

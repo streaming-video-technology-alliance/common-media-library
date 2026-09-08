@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 export * from './getSvtaErrorCategory.ts'
-export * from './getSvtaErrorDescription.ts'
 export * from './getSvtaErrorIndex.ts'
 export * from './httpStatusToSvtaErrorCode.ts'
 export * from './SvtaAccessibilityErrorCode.ts'

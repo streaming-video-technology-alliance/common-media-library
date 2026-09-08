@@ -15,6 +15,5 @@ and this project adheres to
 - Every code and category as an individual `SVTA_*` constant, and the `SvtaErrorCode` union type
 - `getSvtaErrorCategory` and `getSvtaErrorIndex` for the category and index arithmetic of the specification
 - `httpStatusToSvtaErrorCode` and `vastErrorToSvtaErrorCode` to embed HTTP response statuses and IAB VAST error codes. `vastErrorToSvtaErrorCode(1009)` returns 7999
-- `getSvtaErrorDescription` for the human-readable description of every named code
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/main...HEAD

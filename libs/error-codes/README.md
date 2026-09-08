@@ -50,18 +50,6 @@ assert(vastErrorToSvtaErrorCode(1009) === 7999);
 
 The helpers never throw. Out-of-range input returns the unknown code of the target category, 3000 or 7000.
 
-### Descriptions
-
-`getSvtaErrorDescription` returns the specification text for a code. The function lives in its own module, so bundles that do not call it do not include the dictionary.
-
-```typescript
-import assert from "node:assert";
-import { getSvtaErrorDescription, SvtaPlaybackErrorCode } from "@svta/cml-error-codes";
-
-assert(getSvtaErrorDescription(SvtaPlaybackErrorCode.VIDEO_BUFFER_UNDERRUN) === "Video buffer underrun");
-assert(getSvtaErrorDescription(3404) === "Received an HTTP 404 response");
-```
-
 ## References
 
 - [SVTA2070: Standardized Error Codes](https://www.svta.org/product/svta2070/)
