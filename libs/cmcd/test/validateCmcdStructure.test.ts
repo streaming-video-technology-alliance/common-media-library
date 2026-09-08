@@ -1,4 +1,5 @@
 import { validateCmcdStructure } from '@svta/cml-cmcd'
+import { SfToken } from '@svta/cml-structured-field-values'
 import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 
@@ -185,5 +186,27 @@ describe('validateCmcdStructure', () => {
 		const result = validateCmcdStructure({ v: 3, br: 3000 })
 		equal(result.valid, false)
 		equal(result.issues.some(i => i.key === 'v' && i.severity === 'error'), true)
+	})
+
+	it('reports a missing state-change field when e is a Symbol', () => {
+		const result = validateCmcdStructure({ e: Symbol.for('ps'), ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.key === 'sta' && i.severity === 'error'), true)
+	})
+
+	it('reports a missing ec when e is an SfToken', () => {
+		const result = validateCmcdStructure({ e: new SfToken('e'), ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.key === 'ec' && i.severity === 'error'), true)
+	})
+
+	it('accepts cen on a custom event when e is an SfToken', () => {
+		const result = validateCmcdStructure({ e: new SfToken('ce'), cen: 'my-event', ts: 123 }, { reportingMode: 'event' })
+		equal(result.valid, true)
+	})
+
+	it('accepts response keys on a response-received event when e is a Symbol', () => {
+		const result = validateCmcdStructure({ e: Symbol.for('rr'), rc: 200, ts: 123, url: 'https://example.com/seg.m4s' }, { reportingMode: 'event' })
+		equal(result.valid, true)
 	})
 })

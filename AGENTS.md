@@ -28,6 +28,19 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
 - `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the packages that depend on them.
 
+## Publishing a New Package
+
+The Publish workflow uses npm trusted publishing. A trusted publisher is configured per package on npmjs.com. The workflow cannot publish a package that is not on npm yet. The first release of a new package needs these manual steps:
+
+1. Merge the release-prep PR. That PR sets the first version, adds the package to `scripts/projects.ts`, and sets the RFC status to `implemented`.
+2. From a clean checkout of `main`, run `npm ci` and `npm run build`.
+3. Publish the package once manually: `npm publish --no-provenance --access public -w libs/<package>`. The package sets `publishConfig.provenance`, and npm can only generate provenance in CI.
+4. On npmjs.com, open the package settings and add a trusted publisher. Select GitHub Actions with organization `streaming-video-technology-alliance`, repository `common-media-library`, and workflow `publish.yml`.
+5. Run the Publish workflow. It publishes the other packages of the release and skips the new package, because npm already has that version.
+6. Create the GitHub release for the new package manually: `gh release create <package>-v<version> --target main --title "@svta/cml-<package> v<version>"`. Use the changelog section of the version as the notes.
+
+If the Publish workflow runs before steps 3 and 4, the run fails. This happened for c2pa 1.0.0 on 2026-04-15 and for error-codes 0.1.0 on 2026-09-08.
+
 ## Developer Experience
 
 APIs are the product. Design them so that the easy way is the correct way:

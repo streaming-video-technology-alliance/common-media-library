@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-09-07
+
+### Fixed
+
+- `encodeCmcd` now writes a token field as a bare token when its value is an `SfItem` that wraps a string. The token fields are `ot`, `sf`, `st`, `e`, and `sta`. `decodeCmcd` returns that shape for a member with parameters, such as `ot=m;com.example-p=1`. The encoder wrote the field as a quoted string, which is not valid CMCD ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `encodeCmcd` compares the `e` value by token text. `decodeCmcd` with `useSymbol` returns `e` as a `Symbol` or an `SfToken`. Such an event report now keeps its response-received keys on `e=rr`, `bg=?0` on `e=b`, and `pr=1` on `e=pr`. The version 1 down-conversion also matches the `ot` parameter of an inner-list item by token text ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `validateCmcdValues` accepts a token field whose value is an `SfItem`, a `Symbol`, or an `SfToken`. Since 2.6.0, `validateCmcdEvents` and the other string validators rejected a valid member such as `ot=m;com.example-p=1`. The message was `invalid token value "[object Object]"`. `validateCmcdStructure` applies the event rules (`cen`, `url`, response keys, state-change fields, `ec`) when `e` is a `Symbol` or an `SfToken` ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+
+## [2.6.0] - 2026-09-03
+
 ### Added
 
 - `CmcdReporterConfig.sessionRetention` — the number of ended sessions the reporter retains state for, in addition to the current one (default `2`; `0` disables retention, `Infinity` never evicts; only `number` values are accepted and floored, anything else falls back to the default). The reporter now keeps per-session state (data snapshot, sequence numbers, `msd` gate, dedup baseline, unsent queues) for recently ended sessions, so a media request that completes after a `sid` change reports under the session that issued it: its own `sid`, its next per-target sequence number, its still-unsent `msd`, and its frozen data snapshot, which is detached at the transition so mutating an array previously passed to `update()` cannot rewrite an ended session's late reports. A `sid` change also drains an ended session's unsent event reports (each keeps its own `sid` and sequence number) before eviction can discard them. Implements the accepted RFC in `rfc/cmcd-session-retention.md` ([#416](https://github.com/streaming-video-technology-alliance/common-media-library/pull/416))
@@ -243,7 +253,9 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...HEAD
+[2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
+[2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0
 [2.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...cmcd-v2.5.0
 [2.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...cmcd-v2.4.1
 [2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0

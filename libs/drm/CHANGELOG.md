@@ -8,10 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.10] - 2026-09-03
+
 ### Changed
 
+- Update `@svta/cml-xml` to 1.2.0
 - README: a usage example replaces the empty code block.
-
 
 ## [1.1.9] - 2026-08-11
 
@@ -105,7 +107,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.9...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.10...HEAD
+[1.1.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.9...drm-v1.1.10
 [1.1.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.8...drm-v1.1.9
 [1.1.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.7...drm-v1.1.8
 [1.1.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.6...drm-v1.1.7
