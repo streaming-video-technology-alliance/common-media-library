@@ -102,10 +102,10 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 	if (!updated && deps) {
 		const parsed = JSON.parse(deps)
 		// npm 12 wraps the `--json` output of a single field in an array. npm 11 prints the object.
-		const peerDependencies: Record<string, string> = (Array.isArray(parsed) ? parsed[0] : parsed) ?? {}
+		const publishedPeers: Record<string, string> = (Array.isArray(parsed) ? parsed[0] : parsed) ?? {}
 
-		for (const dep in peerDependencies) {
-			const publishedPeer = peerDependencies[dep]
+		for (const dep in publishedPeers) {
+			const publishedPeer = publishedPeers[dep]
 
 			if (!packages[dep] || !isVersion(publishedPeer)) {
 				continue
