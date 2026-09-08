@@ -29,6 +29,8 @@ jobs:
       - name: Test
         run: npm test
 
+      # This workflow cannot publish a package that is not on npm yet.
+      # See "Publishing a New Package" in AGENTS.md.
       - name: Publish
         run: npm run pub
         env:
