@@ -33,6 +33,20 @@ async function loadPackages(): Promise<Packages> {
 
 const tagRegex = /^\d+\.\d+\.\d+(.*$)/
 
+// npm view exits with E404 for a package that has never been published
+async function viewPublished(name: PackageName, prop: string): Promise<string | undefined> {
+	try {
+		return await exec(`npm view ${name} ${prop}`)
+	}
+	catch (error) {
+		if (error instanceof Error && error.message.includes('E404')) {
+			return undefined
+		}
+
+		throw error
+	}
+}
+
 async function getChanges(folder: string, version: string): Promise<string> {
 	const changelog = await readFile(path.resolve(folder, 'CHANGELOG.md'), 'utf8')
 	const sections = changelog.split(/^## /m)
@@ -74,7 +88,13 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 
 	const tag = version.replace(tagRegex, '$1')
 	const prop = tag ? 'dist-tags.prerelease' : 'version'
-	const latest = await exec(`npm view ${name} ${prop}`)
+	const latest = await viewPublished(name, prop)
+
+	if (latest === undefined) {
+		console.log(`${name} is not on npm yet. Publishing ${version}...`)
+		return folder
+	}
+
 	const updated = latest.trim() !== version
 	const deps = await exec(`npm view ${name} peerDependencies --json`)
 
