@@ -1,6 +1,5 @@
 ---
 status: accepted
-implementation-plan: plans/error-codes/
 ---
 
 # RFC: SVTA2070 Standardized Error Codes (`@svta/cml-error-codes`)
@@ -25,7 +24,7 @@ getSvtaErrorCategory(code) // SvtaErrorCategory.PLAYBACK (2)
 httpStatusToSvtaErrorCode(404) // 3404, an HTTP 404 embedded in the Network category
 ```
 
-A complete reference implementation exists on branch [`claude/svta-error-codes-cml-d0ad01`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/claude/svta-error-codes-cml-d0ad01/libs/error-codes), with implementation artifacts in `plans/error-codes/`. The generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md) lists the full API surface.
+A complete reference implementation exists on branch [`claude/svta-error-codes-cml-d0ad01`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/claude/svta-error-codes-cml-d0ad01/libs/error-codes). The generated [`cml-error-codes.api.md`](https://github.com/streaming-video-technology-alliance/common-media-library/blob/claude/svta-error-codes-cml-d0ad01/libs/error-codes/config/cml-error-codes.api.md) lists the full API surface.
 
 ## Motivation
 
@@ -169,9 +168,9 @@ Scaffold mirrors `libs/cmsd` / the c2pa scaffold commit: version 0.0.1, `files: 
 - v3 (2026-08-18): constants renamed to `SVTA_<CATEGORY>_<MEMBER>` (drops the `_ERROR_` joint), spec-coordinate TSDocs added per the SPF prior art, and spec references updated to the official SVTA2070 name and product page.
 - v4 (2026-08-18): review feedback. Both arithmetic helpers reject inputs that are not non-negative integers (`getSvtaErrorIndex` now returns `number | undefined`), the code model states codes are non-negative integers, and the peer-dependency and verbatim-description wording is clarified.
 - v5 (2026-08-19): constants flattened to `SVTA_<MEMBER>` with category-qualified `UNKNOWN`s (`SVTA_PLAYBACK_UNKNOWN`, plain `SVTA_UNKNOWN` for 999), matching the SPF naming after maintainer preference for shorter names.
-- v6 (2026-09-07): `vastErrorToSvtaErrorCode(1009)` returns 7999, per the review thread on the four-digit VAST error 1009. Status set to `accepted` after the RFC PR merged. The implementation lives in `libs/error-codes`, with the plan of record in `plans/error-codes/`.
+- v6 (2026-09-07): `vastErrorToSvtaErrorCode(1009)` returns 7999, per the review thread on the four-digit VAST error 1009. Status set to `accepted` after the RFC PR merged. The implementation lives in `libs/error-codes`.
 - v7 (2026-09-08): `getSvtaErrorDescription` removed from the first release. Unresolved question 2 is resolved as codes-only, and the dictionary moves to Future possibilities.
 
 ## Final Decision
 
-Accepted on 2026-09-07. The RFC PR [#423](https://github.com/streaming-video-technology-alliance/common-media-library/pull/423) merged with the export surface above as the contract, plus one amendment from review: `vastErrorToSvtaErrorCode(1009)` returns 7999. On 2026-09-08, the review of the implementation PR [#445](https://github.com/streaming-video-technology-alliance/common-media-library/pull/445) resolved unresolved question 2: the first release is codes-only, and `getSvtaErrorDescription` is deferred until the IANA registry exists. The implementation follows `plans/error-codes/`. The status changes to `implemented` when the first release-prep PR publishes the package.
+Accepted on 2026-09-07. The RFC PR [#423](https://github.com/streaming-video-technology-alliance/common-media-library/pull/423) merged with the export surface above as the contract, plus one amendment from review: `vastErrorToSvtaErrorCode(1009)` returns 7999. On 2026-09-08, the review of the implementation PR [#445](https://github.com/streaming-video-technology-alliance/common-media-library/pull/445) resolved unresolved question 2: the first release is codes-only, and `getSvtaErrorDescription` is deferred until the IANA registry exists. The status changes to `implemented` when the first release-prep PR publishes the package.
