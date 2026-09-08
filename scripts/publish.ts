@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { cmd } from './cmd.ts'
+import { compareVersions, isVersion } from './compareVersions.ts'
 import { exec } from './exec.ts'
 import { projects } from './projects.ts'
 
@@ -79,18 +80,21 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 	const deps = await exec(`npm view ${name} peerDependencies --json`)
 
 	if (!updated && deps) {
-		const peerDependencies = JSON.parse(deps)
+		const parsed = JSON.parse(deps)
+		// npm 12 wraps the `--json` output of a single field in an array. npm 11 prints the object.
+		const peerDependencies: Record<string, string> = (Array.isArray(parsed) ? parsed[0] : parsed) ?? {}
 
 		for (const dep in peerDependencies) {
-			// TODO: Remove the wildcard check after first successful publish.
-			if (!packages[dep] || peerDependencies[dep] === '*') {
+			const publishedPeer = peerDependencies[dep]
+
+			if (!packages[dep] || !isVersion(publishedPeer)) {
 				continue
 			}
 
-			const version = peerDependencies[dep]
+			const currentPeer = packages[dep][2].version
 
-			if (version < packages[dep][1]) {
-				throw new Error(`Package ${name} (${version}) needs to update its version because ${dep}'s version (${packages[dep][1]}) has changed.`)
+			if (compareVersions(publishedPeer, currentPeer) < 0) {
+				throw new Error(`Package ${name} (${version}) needs a version bump. Its published release depends on ${dep}@${publishedPeer}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`)
 			}
 		}
 	}
