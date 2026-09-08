@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `encodeCmcd` now writes a token field as a bare token when its value is an `SfItem` that wraps a string. The token fields are `ot`, `sf`, `st`, `e`, and `sta`. `decodeCmcd` returns that shape for a member with parameters, such as `ot=m;com.example-p=1`. The encoder wrote the field as a quoted string, which is not valid CMCD ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `encodeCmcd` compares the `e` value by token text. `decodeCmcd` with `useSymbol` returns `e` as a `Symbol` or an `SfToken`. Such an event report now keeps its response-received keys on `e=rr`, `bg=?0` on `e=b`, and `pr=1` on `e=pr`. The version 1 down-conversion also matches the `ot` parameter of an inner-list item by token text ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `validateCmcdValues` accepts a token field whose value is an `SfItem`, a `Symbol`, or an `SfToken`. Since 2.6.0, `validateCmcdEvents` and the other string validators rejected a valid member such as `ot=m;com.example-p=1`. The message was `invalid token value "[object Object]"`. `validateCmcdStructure` applies the event rules (`cen`, `url`, response keys, state-change fields, `ec`) when `e` is a `Symbol` or an `SfToken` ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+
 ## [2.6.0] - 2026-09-03
 
 ### Added

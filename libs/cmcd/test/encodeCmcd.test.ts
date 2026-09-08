@@ -1,6 +1,6 @@
-import type { CmcdEncodeOptions } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdEncodeOptions } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
-import { SfToken } from '@svta/cml-structured-field-values'
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { toCmcdValue } from '@svta/cml-cmcd'
@@ -317,6 +317,36 @@ describe('encodeCmcd', () => {
 				br: [5000, 128],
 			}
 			equal(encodeCmcd(input), 'br=(5000 128),v=2')
+		})
+	})
+
+	describe('token values', () => {
+		it('re-tokenizes a token field wrapped in an SfItem', () => {
+			const input = { ot: new SfItem('m', { 'com.example-p': 1 }) } as unknown as Cmcd
+			equal(encodeCmcd(input), 'ot=m;com.example-p=1,v=2')
+		})
+
+		it('keeps response-received keys when e is an SfToken', () => {
+			const input = { e: new SfToken('rr'), rc: 200, ts: 1000, url: 'https://example.com/seg.m4s' } as unknown as Cmcd
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=rr,rc=200,ts=1000,url="https://example.com/seg.m4s",v=2')
+		})
+
+		it('keeps bg=false on a backgrounded-mode event when e is a Symbol', () => {
+			const input = { bg: false, e: Symbol.for('b'), ts: 1000 } as unknown as Cmcd
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'bg=?0,e=b,ts=1000,v=2')
+		})
+
+		it('keeps pr=1 on a playback-rate event when e is an SfToken', () => {
+			const input = { e: new SfToken('pr'), pr: 1, ts: 1000 } as unknown as Cmcd
+			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=pr,pr=1,ts=1000,v=2')
+		})
+
+		it('matches the ot param of an inner-list item by token text in V1 down-conversion', () => {
+			const input = {
+				br: [toCmcdValue(3000, { ot: Symbol.for('a') }), toCmcdValue(6000, { ot: Symbol.for('v') })],
+				ot: new SfToken('v'),
+			} as unknown as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'br=6000,ot=v')
 		})
 	})
 })
