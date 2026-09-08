@@ -1,5 +1,6 @@
 import { validateCmcdValues } from '@svta/cml-cmcd'
-import { equal } from 'node:assert'
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { equal, match } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('validateCmcdValues', () => {
@@ -137,5 +138,27 @@ describe('validateCmcdValues', () => {
 	it('accepts string key with correct type (smrt)', () => {
 		const result = validateCmcdValues({ smrt: 'base64data', v: 2 })
 		equal(result.valid, true)
+	})
+
+	it('accepts a token field wrapped in an SfItem', () => {
+		const result = validateCmcdValues({ ot: new SfItem('m', { 'com.example-p': 1 }) })
+		equal(result.valid, true)
+	})
+
+	it('accepts a token field decoded as a registry Symbol', () => {
+		const result = validateCmcdValues({ ot: Symbol.for('m') })
+		equal(result.valid, true)
+	})
+
+	it('accepts a token field decoded as an SfToken', () => {
+		const result = validateCmcdValues({ sf: new SfToken('d') })
+		equal(result.valid, true)
+	})
+
+	it('reports the token text of an invalid wrapped token value', () => {
+		const result = validateCmcdValues({ ot: new SfItem('zzz', { 'com.example-p': 1 }) })
+		equal(result.valid, false)
+		equal(result.issues[0].key, 'ot')
+		match(result.issues[0].message, /"zzz"/)
 	})
 })
