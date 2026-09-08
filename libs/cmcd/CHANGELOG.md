@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-09-07
+
 ### Fixed
 
 - `encodeCmcd` now writes a token field as a bare token when its value is an `SfItem` that wraps a string. The token fields are `ot`, `sf`, `st`, `e`, and `sta`. `decodeCmcd` returns that shape for a member with parameters, such as `ot=m;com.example-p=1`. The encoder wrote the field as a quoted string, which is not valid CMCD ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
@@ -251,7 +253,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...HEAD
+[2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
 [2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0
 [2.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...cmcd-v2.5.0
 [2.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...cmcd-v2.4.1

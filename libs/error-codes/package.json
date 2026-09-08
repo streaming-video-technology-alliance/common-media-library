@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-error-codes",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "SVTA standardized streaming error codes",
 	"license": "Apache-2.0",
 	"type": "module",
