@@ -8,8 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.6.1] - 2026-09-07
-
 ### Changed
 
 - README: the usage example prints its results instead of calling an undefined `assert`. Several of those calls compared typed arrays with `===`.
@@ -89,8 +87,7 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...HEAD
-[1.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.6.1
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...HEAD
 [1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...utils-v1.6.0
 [1.5.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...utils-v1.5.1
 [1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...utils-v1.5.0

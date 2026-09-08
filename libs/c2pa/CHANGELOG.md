@@ -8,8 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.1.3] - 2026-09-07
-
 ### Changed
 
 - README: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
@@ -79,8 +77,7 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.3...HEAD
-[1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.2...c2pa-v1.1.3
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.2...HEAD
 [1.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.1...c2pa-v1.1.2
 [1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.0...c2pa-v1.1.1
 [1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.1...c2pa-v1.1.0

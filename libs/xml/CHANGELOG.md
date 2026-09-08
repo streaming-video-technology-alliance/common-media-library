@@ -8,12 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.2.1] - 2026-09-07
-
-### Changed
-
-- Update `@svta/cml-utils` to 1.6.1
-
 ## [1.2.0] - 2026-09-03
 
 ### Fixed
@@ -98,8 +92,7 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.1...HEAD
-[1.2.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.0...xml-v1.2.1
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.0...HEAD
 [1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.1.6...xml-v1.2.0
 [1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.1.5...xml-v1.1.6
 [1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.1.4...xml-v1.1.5

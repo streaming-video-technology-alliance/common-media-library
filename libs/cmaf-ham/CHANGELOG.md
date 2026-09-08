@@ -8,8 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [0.24.7] - 2026-09-07
-
 ### Changed
 
 - README: a usage example replaces the empty code block. The examples in `src/README.md` import from `@svta/cml-cmaf-ham` and compile. The sample README gives the correct folder and run command.
@@ -81,8 +79,7 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.7...HEAD
-[0.24.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.6...cmaf-ham-v0.24.7
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.6...HEAD
 [0.24.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.5...cmaf-ham-v0.24.6
 [0.24.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.4...cmaf-ham-v0.24.5
 [0.24.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.3...cmaf-ham-v0.24.4

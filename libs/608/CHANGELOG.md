@@ -8,8 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.1.1] - 2026-09-07
-
 ### Changed
 
 - README: the prose is rewritten for readers who do not read English as a first language. The extractor table and the code examples are unchanged.
@@ -58,8 +56,7 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.1...HEAD
-[1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.0...608-v1.1.1
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.0...HEAD
 [1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.3...608-v1.1.0
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.2...608-v1.0.3
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.1...608-v1.0.2

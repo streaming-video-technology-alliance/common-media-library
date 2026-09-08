@@ -8,8 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-## [1.0.9] - 2026-09-07
-
 ### Changed
 
 - README: the description is rewritten for readers who do not read English as a first language. A typo is fixed.
@@ -76,8 +74,7 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cta-v1.0.9...HEAD
-[1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cta-v1.0.8...cta-v1.0.9
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cta-v1.0.8...HEAD
 [1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cta-v1.0.7...cta-v1.0.8
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cta-v1.0.6...cta-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cta-v1.0.5...cta-v1.0.6
