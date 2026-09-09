@@ -64,7 +64,9 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 		return {
 			valid: false,
 			issues: [{
-				message: 'No CMCD data found in request headers or query parameters.',
+				message: hasCmcdInFragment(request.url)
+					? 'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.'
+					: 'No CMCD data found in request headers or query parameters.',
 				severity: CMCD_VALIDATION_SEVERITY_ERROR,
 			}],
 			data: {} as CmcdData,
@@ -89,16 +91,24 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 	return { ...result, data }
 }
 
+const CMCD_IN_FRAGMENT = /(?:^|[?&])CMCD=/
+
 function getCmcdQueryParam(url: string): string | null {
-	const start = url.indexOf('?')
+	const hash = url.indexOf('#')
+	const path = hash < 0 ? url : url.slice(0, hash)
+	const start = path.indexOf('?')
 
 	if (start < 0) {
 		return null
 	}
 
-	const end = url.indexOf('#', start)
+	return new URLSearchParams(path.slice(start + 1)).get(CMCD_PARAM)
+}
 
-	return new URLSearchParams(url.slice(start + 1, end < 0 ? url.length : end)).get(CMCD_PARAM)
+function hasCmcdInFragment(url: string): boolean {
+	const hash = url.indexOf('#')
+
+	return hash >= 0 && CMCD_IN_FRAGMENT.test(url.slice(hash + 1))
 }
 
 function extractHeaderRecord(headers: Headers | Record<string, string> | undefined): Partial<Record<CmcdHeaderField, string>> | undefined {

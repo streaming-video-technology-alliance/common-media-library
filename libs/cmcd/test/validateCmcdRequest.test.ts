@@ -205,6 +205,45 @@ describe('validateCmcdRequest', () => {
 		})
 	})
 
+	describe('URL fragments', () => {
+		const url = 'https://cdn.example.com/seg.mp4#t=10?CMCD=br%3D5000'
+
+		it('ignores a CMCD parameter inside the fragment when headers are present', () => {
+			const result = validateCmcdRequest({
+				url,
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			equal(result.valid, true)
+			deepStrictEqual(result.issues, [])
+			equal(result.data['br'], 3000)
+		})
+
+		it('ignores a CMCD parameter inside the fragment of a Request', () => {
+			const request = new Request(url, {
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			equal(validateCmcdRequest(request).valid, true)
+		})
+
+		it('reports no CMCD data and names the fragment when the parameter is only in the fragment', () => {
+			const result = validateCmcdRequest({ url })
+			equal(result.valid, false)
+			equal(result.issues.length, 1)
+			equal(result.issues[0].message, 'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.')
+			deepStrictEqual(result.data, {})
+		})
+
+		it('keeps the plain message when the fragment has no CMCD parameter', () => {
+			const result = validateCmcdRequest({ url: 'https://cdn.example.com/seg.mp4#t=10' })
+			equal(result.valid, false)
+			equal(result.issues[0].message, 'No CMCD data found in request headers or query parameters.')
+		})
+	})
+
 	it('returns decoded data from headers path', () => {
 		const result = validateCmcdRequest({
 			url: 'https://cdn.example.com/seg.mp4',
