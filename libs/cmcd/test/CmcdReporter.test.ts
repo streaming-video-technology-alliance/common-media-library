@@ -4816,6 +4816,49 @@ describe('CmcdReporter', () => {
 		ok(bodies[1].includes(':AQID:')) // base64 of [1, 2, 3]
 	})
 
+	it('detaches an SfToken nested inside an SfItem from transform mutation', async () => {
+		const bodies: string[] = []
+		let calls = 0
+		const reporter = new CmcdReporter({
+			sid: 'sess-copy-nested',
+			eventTargets: [
+				{
+					url: 'https://collector.example.com/cmcd',
+					events: [CmcdEventType.PLAY_STATE],
+					enabledKeys: ['sta', 'com.example-item', 'sid', 'e', 'ts', 'sn'],
+					batchSize: 1,
+					transform: (data) => {
+						// Only the first report's transform mutates; the second call is a
+						// pure probe of whatever the persistent store hands it.
+						if (calls++ === 0) {
+							const item = data['com.example-item'] as SfItem<SfToken, Record<string, unknown>>
+							const hint = (item.params as Record<string, unknown>)['hint'] as SfToken
+
+							;(item.value as SfToken).description = 'mutated'
+							hint.description = 'mutated'
+						}
+						return data
+					},
+				},
+			],
+		}, async (request) => {
+			bodies.push(String(request.body))
+			return { status: 200 }
+		})
+
+		reporter.update({
+			'com.example-item': new SfItem(new SfToken('preload'), { hint: new SfToken('fast') }),
+		})
+
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+		reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+		await Promise.resolve()
+
+		// The second report re-reads the persistent store: the tokens wrapped
+		// in the item's value and params must have kept their text.
+		ok(bodies[1].includes('com.example-item=preload;hint=fast'))
+	})
+
 	it('clones Date values through session rotation', async () => {
 		const bodies: string[] = []
 		const reporter = new CmcdReporter({
