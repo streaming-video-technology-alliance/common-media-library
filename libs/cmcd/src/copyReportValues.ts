@@ -1,38 +1,19 @@
 import type { Cmcd } from './Cmcd.ts'
 
 /**
- * Copies a mutable object held inside an item: an SfToken-shaped value,
- * a byte sequence, or an inner list of either.
- */
-function copyBareValue(value: unknown): unknown {
-	if (value instanceof Uint8Array) {
-		return new Uint8Array(value)
-	}
-
-	if (value instanceof Date) {
-		return new Date(value.getTime())
-	}
-
-	if (Array.isArray(value)) {
-		return value.map(copyBareValue)
-	}
-
-	if (value !== null && typeof value === 'object') {
-		return Object.assign(Object.create(Object.getPrototypeOf(value)), value)
-	}
-
-	return value
-}
-
-/**
- * Copies an `SfItem`-shaped value and its `params` record.
+ * Copies one nested report value: byte sequences and dates by content,
+ * arrays element by element, and objects as prototype-preserving shell
+ * copies whose own object-typed members are copied the same way.
  *
  * The prototype is preserved because `prepareCmcdData`, the formatter map,
  * validation, and the structured-field encoder all branch on
- * `instanceof SfItem`. A plain spread (and `structuredClone`) would return a
- * prototype-less object and silently change what goes on the wire.
+ * `instanceof SfItem` and `instanceof SfToken`. A plain spread (and
+ * `structuredClone`) would return a prototype-less object and silently
+ * change what goes on the wire. `Uint8Array` and `Date` are copied by
+ * content because a shell copy of either loses the internal slot their
+ * serialization reads.
  */
-function copyItemValue(value: unknown): unknown {
+function copyValue(value: unknown): unknown {
 	if (value === null || typeof value !== 'object') {
 		return value
 	}
@@ -45,21 +26,17 @@ function copyItemValue(value: unknown): unknown {
 		return new Date(value.getTime())
 	}
 
-	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { value?: unknown; params?: Record<string, unknown>; }
-
-	if (copy.value !== null && typeof copy.value === 'object') {
-		copy.value = copyBareValue(copy.value)
+	if (Array.isArray(value)) {
+		return value.map(copyValue)
 	}
 
-	if (copy.params !== null && typeof copy.params === 'object') {
-		const params = copy.params = { ...copy.params }
+	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as Record<string, unknown>
 
-		for (const key in params) {
-			const member = params[key]
+	for (const key in copy) {
+		const member = copy[key]
 
-			if (member !== null && typeof member === 'object') {
-				params[key] = copyBareValue(member)
-			}
+		if (member !== null && typeof member === 'object') {
+			copy[key] = copyValue(member)
 		}
 	}
 
@@ -86,17 +63,8 @@ export function copyReportValues(data: Cmcd): Cmcd {
 	for (const key in record) {
 		const value = record[key]
 
-		if (Array.isArray(value)) {
-			const copy = new Array(value.length)
-
-			for (let i = 0; i < value.length; i++) {
-				copy[i] = copyItemValue(value[i])
-			}
-
-			record[key] = copy
-		}
-		else if (value !== null && typeof value === 'object') {
-			record[key] = copyItemValue(value)
+		if (value !== null && typeof value === 'object') {
+			record[key] = copyValue(value)
 		}
 	}
 
