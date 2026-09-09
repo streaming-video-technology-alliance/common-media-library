@@ -177,9 +177,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// report consume another session's sequence numbers.
 		const session = this.ledger.current
 
-		this.fanOutDepth++
-
-		try {
+		this.runFanOut(() => {
 			session.eventTargets.forEach((target, config) => {
 				if (!this.started) {
 					return
@@ -203,16 +201,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 					failure ??= { error }
 				}
 			})
-		}
-		finally {
-			this.fanOutDepth--
-		}
 
-		this.maybeEvict()
-
-		if (failure) {
-			throw failure.error
-		}
+			if (failure) {
+				throw failure.error
+			}
+		})
 	}
 
 	/**
@@ -246,16 +239,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		this.fanOutDepth++
-
-		try {
-			this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
-		}
-		finally {
-			this.fanOutDepth--
-			this.processEventTargets()
-			this.maybeEvict()
-		}
+		this.runFanOut(() => this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL))
 	}
 
 	/**
@@ -400,7 +384,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// Drain ended sessions before eviction can destroy their queues: a
 		// partial batch the ended session could never fill again leaves now.
 		this.processEventTargets()
-		this.requestEvict()
+		this.evictPending = true
+		this.maybeEvict()
 
 		// Timers keep ticking across session changes. Configs whose timer was
 		// disarmed by a 410 in the previous session re-arm here, because the
@@ -416,17 +401,38 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Evicts retained sessions beyond the configured retention. An eviction
-	 * requested during a fan-out is held until the outermost fan-out has
-	 * drained, so a session an active fan-out still holds outlives the
-	 * request.
+	 * Runs one fan-out under the shared epilogue: the depth guard that defers
+	 * eviction, the queue drain, and the held eviction, in that order. A
+	 * throw from the fan-out or from the drain surfaces only after the whole
+	 * epilogue ran, and the first error wins.
 	 */
-	private requestEvict(): void {
-		if (this.fanOutDepth > 0) {
-			this.evictPending = true
+	private runFanOut(fn: () => void): void {
+		let failure: { error: unknown; } | undefined
+
+		this.fanOutDepth++
+
+		try {
+			fn()
 		}
-		else {
-			this.ledger.evict()
+		catch (error) {
+			failure = { error }
+		}
+		finally {
+			this.fanOutDepth--
+		}
+
+		try {
+			this.processEventTargets()
+		}
+		catch (error) {
+			failure ??= { error }
+		}
+		finally {
+			this.maybeEvict()
+		}
+
+		if (failure) {
+			throw failure.error
 		}
 	}
 
@@ -510,9 +516,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// never receive it, and the caller's retry would be deduped away.
 		let failure: { error: unknown; } | undefined
 
-		this.fanOutDepth++
-
-		try {
+		this.runFanOut(() => {
 			session.eventTargets.forEach((target, config) => {
 				try {
 					this.recordTargetEvent(session, target, config, type, data, request)
@@ -521,20 +525,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 					failure ??= { error }
 				}
 			})
-		}
-		finally {
-			this.fanOutDepth--
-		}
 
-		this.processEventTargets()
-		this.maybeEvict()
-
-		// Surfaced only once every target has had its turn and the queues have
-		// been processed. Transforms must not throw; this makes the violation
-		// visible without letting it starve unrelated targets.
-		if (failure) {
-			throw failure.error
-		}
+			// Surfaced only once every target has had its turn, and after the
+			// fan-out epilogue has processed the queues. Transforms must not
+			// throw; this makes the violation visible without letting it
+			// starve unrelated targets.
+			if (failure) {
+				throw failure.error
+			}
+		})
 	}
 
 	/**
