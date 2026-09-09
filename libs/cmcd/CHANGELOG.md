@@ -22,6 +22,7 @@ and this project adheres to
 ### Changed
 
 - Internal restructuring of `CmcdReporter` into session-ledger, playback-state, report-pipeline, and outbox units in preparation for child reporters and automatic session counters. No public API change. Event-report processing now tracks only sessions with queued reports instead of scanning every retained session. Consumers that import `CmcdReporter` pay about 2.8 KB more minified (0.8 KB gzipped). Consumers of the codec functions alone are unaffected
+- Internal consolidation from the reporter architecture review. One fan-out epilogue owns the depth guard, the queue drain, and the held eviction. The outbox is the single source of dirty marks. The report copy is one recursive function. Event mode consumes the `msd` send gate from the prepared report, the same rule request mode uses. A version 1 event target that enabled `msd` no longer consumes the gate, which no version 1 report could ever carry
 
 ## [2.6.1] - 2026-09-07
 
