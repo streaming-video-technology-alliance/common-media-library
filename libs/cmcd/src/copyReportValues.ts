@@ -77,6 +77,8 @@ function copyItemValue(value: unknown): unknown {
  * configured, on the ended session's store at archival (detaching the frozen
  * snapshot from caller-held references), and on the request's stored
  * player-facing view.
+ *
+ * @internal
  */
 export function copyReportValues(data: Cmcd): Cmcd {
 	const record = data as Record<string, unknown>

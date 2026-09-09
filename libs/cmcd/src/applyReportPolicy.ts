@@ -45,6 +45,8 @@ function isUsableRequiredValue(value: unknown): boolean {
  *                    event reports, which require it; `false` for request
  *                    reports, which do not.
  * @returns The report to send, or `null` if the transform cancelled it.
+ *
+ * @internal
  */
 export function applyReportPolicy<C, R extends CmcdTransformRequest<C> | undefined>(
 	report: Cmcd,

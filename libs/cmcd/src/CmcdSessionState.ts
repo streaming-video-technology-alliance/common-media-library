@@ -4,9 +4,17 @@ import type { CmcdEventReportConfigNormalized } from './createCmcdReporterConfig
 
 /**
  * The key the current session's request-report counters are stored under.
+ *
+ * @internal
  */
 export const CMCD_DEFAULT_REQUEST_TARGET = 'default'
 
+/**
+ * One target's per-session report state: its `sn` sequence counter and its
+ * once-per-session `msd` send gate.
+ *
+ * @internal
+ */
 export type CmcdTargetStamps = {
 	sn: number;
 	msdSent: boolean;
@@ -14,6 +22,8 @@ export type CmcdTargetStamps = {
 
 /**
  * Creates the counters and gate one target starts a session with.
+ *
+ * @internal
  */
 export function createTargetStamps(): CmcdTargetStamps {
 	return { sn: 0, msdSent: false }
@@ -22,6 +32,8 @@ export function createTargetStamps(): CmcdTargetStamps {
 /**
  * Returns the session's counters for one request target. A target that has
  * no entry yet gets a fresh one, stored for the next call.
+ *
+ * @internal
  */
 export function resolveRequestTarget<C>(session: CmcdSessionState<C>, target: string): CmcdTargetStamps {
 	let stamps = session.requestTargets.get(target)
@@ -39,6 +51,8 @@ export function resolveRequestTarget<C>(session: CmcdSessionState<C>, target: st
  * Reports are encoded at enqueue, so a value that cannot serialize throws
  * inside the recording call, and a queued line is immune to later
  * mutation of the values it was built from.
+ *
+ * @internal
  */
 export type CmcdEventTargetState = CmcdTargetStamps & {
 	outbox: CmcdOutbox;
@@ -49,6 +63,8 @@ export type CmcdEventTargetState = CmcdTargetStamps & {
  * to the session lives here, so a report that belongs to an earlier session
  * (a response completing after a `sid` change, a re-queued batch) is built
  * from and accounted against its own session rather than the current one.
+ *
+ * @internal
  */
 export type CmcdSessionState<C> = {
 	sid: string;
@@ -70,11 +86,12 @@ export type CmcdSessionState<C> = {
 }
 
 /**
- * Creates the state for a new session: fresh counters, gates and dedup
- * baseline for the default request target, and an empty event-target map
- * for the caller to populate. `bg` is session-owned but carries across a
- * session change, so it is passed in; its dedup baseline starts empty like
- * every other one.
+ * Creates the state for a new session: fresh counters and send gate for
+ * the default request target, and an empty event-target map for the caller
+ * to populate. `bg` is session-owned but carries across a session change,
+ * so it is passed in. Its dedup baseline, `bgEmitted`, starts empty.
+ *
+ * @internal
  */
 export function createCmcdSessionState<C>(sid: string, bg: boolean | undefined): CmcdSessionState<C> {
 	return {

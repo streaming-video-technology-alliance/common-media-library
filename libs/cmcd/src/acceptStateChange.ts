@@ -11,6 +11,8 @@ import type { CmcdPlaybackState, CmcdStateField } from './CmcdPlaybackState.ts'
  * comparisons. Reference types must clone so the baseline doesn't
  * share a reference with the caller's input, which would let in-place
  * mutation silently poison the dedup state.
+ *
+ * @internal
  */
 export type CmcdStateFieldEntry = {
 	field: CmcdStateField | 'bg'
@@ -23,6 +25,8 @@ export type CmcdStateFieldEntry = {
  * The `bg` value and dedup baseline a session owns. `bg` is session-scoped
  * rather than playback-scoped, so it is passed alongside the playback state
  * rather than read from it.
+ *
+ * @internal
  */
 export type CmcdBgState = {
 	bg?: boolean;
@@ -68,6 +72,8 @@ const identity = <T>(v: T): T => v
 /**
  * Maps each tracked state field to its event type and equality function.
  * Order matters: `update()` fires events in this order for multi-field updates.
+ *
+ * @internal
  */
 export const CMCD_STATE_FIELDS: readonly CmcdStateFieldEntry[] = /* @__PURE__ */ Array.from(
 	CMCD_STATE_EVENT_FIELDS,
@@ -92,7 +98,7 @@ const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, CmcdStateFieldEntry> = /
  * Applies state-change dedup for one event, returning whether the event may
  * be emitted. For a state-change event this:
  * 1. Persists the dedup field from `data` (if present) into the owning
- *    store — the playback's data for `sta`, `pr`, `cid` and `br`, the
+ *    store: the playback's data for `sta`, `pr`, `cid` and `br`, the
  *    session's `bg` for `bg`.
  * 2. Rejects the event if the dedup field has no value after the
  *    write-through (never set, or cleared via `update({ field: undefined })`).
@@ -108,6 +114,8 @@ const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, CmcdStateFieldEntry> = /
  * @param type - The type of event being recorded.
  * @param data - Additional data recorded with the event.
  * @returns `true` when the event may be emitted, `false` to suppress it.
+ *
+ * @internal
  */
 export function acceptStateChange(playback: CmcdPlaybackState, session: CmcdBgState, type: CmcdEventType, data: Partial<Cmcd>): boolean {
 	const entry = STATE_FIELDS_BY_EVENT.get(type)
@@ -138,7 +146,7 @@ export function acceptStateChange(playback: CmcdPlaybackState, session: CmcdBgSt
 
 	const current = playback.data[field]
 
-	// Never emit a state-change event with a missing required field — per
+	// Never emit a state-change event with a missing required field: per
 	// CTA-5004-B these events must carry their dedup field. Catches both
 	// "no value ever set" and "previous value was cleared to undefined".
 	if (current === undefined) {

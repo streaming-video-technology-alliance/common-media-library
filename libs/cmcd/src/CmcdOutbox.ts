@@ -1,6 +1,11 @@
 import type { HttpRequest } from '@svta/cml-utils'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 
+/**
+ * Sends one report request and resolves with the response status.
+ *
+ * @internal
+ */
 export type CmcdRequester = (request: HttpRequest) => Promise<{ status: number; }>
 
 /**
@@ -8,6 +13,8 @@ export type CmcdRequester = (request: HttpRequest) => Promise<{ status: number; 
  * lines, batched and POSTed to `url`, with a failed send re-queued for a
  * later pass. `onGone` and `onDirty` report status back to whatever
  * constructed this instance.
+ *
+ * @internal
  */
 export class CmcdOutbox {
 	private queue: string[] = []
@@ -27,11 +34,6 @@ export class CmcdOutbox {
 		this.onDirty = onDirty
 	}
 
-	/**
-	 * Does not gate on `disposed`: a re-queue landing after disposal (see
-	 * `process()`) still lands here, and stays unsent because a disposed
-	 * outbox never sends again.
-	 */
 	push(line: string): void {
 		this.queue.push(line)
 	}
@@ -55,9 +57,6 @@ export class CmcdOutbox {
 		const events = this.queue.splice(0, deleteCount)
 
 		this.send(events).catch(() => {
-			// A failed send re-queues onto this same instance: whichever
-			// outbox dispatched the batch is where its retry belongs, even
-			// if the caller has since moved on to a differently-scoped one.
 			this.queue.unshift(...events)
 			this.onDirty()
 		})

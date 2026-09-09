@@ -181,9 +181,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		try {
 			session.eventTargets.forEach((target, config) => {
-				// A transform can call stop() synchronously. The fan-out halts
-				// there: arming the remaining targets would leave them reporting
-				// for the rest of the session against the caller's instruction.
 				if (!this.started) {
 					return
 				}
@@ -351,10 +348,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			}
 		}
 
-		// sid and msd are session-owned: tracked in their own fields, stripped
-		// from the persistent store, and stamped onto each report at queue time.
-		// bg is session-owned too and rides reports as a field, so it is kept
-		// off the store and read from the session when a report is built.
 		let fields: Partial<Cmcd> = data
 
 		if ('bg' in data) {
@@ -507,9 +500,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private emitEvent(session: CmcdSessionState<C>, type: CmcdEventType, data: Partial<Cmcd>, request?: HttpRequest): void {
 		this.syncPlayback()
 
-		// Passing the current playback is safe for an archived session: only
-		// RESPONSE_RECEIVED is ever emitted into one, and a non-state event
-		// touches neither the playback's store nor the session's bg state.
 		if (!acceptStateChange(this.playback, session, type, data)) {
 			return
 		}
@@ -564,10 +554,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		// The session's sid is stamped over any per-call value here so a
-		// transform sees the session identity the report will carry. The store
-		// is resolved per call: a transform that rotates the session mid
-		// fan-out leaves later targets reading the archived snapshot.
 		const item: Cmcd = {
 			...(session.snapshots.get(CMCD_ROOT_PID) ?? this.playback.data),
 			...(session.bg !== undefined && { bg: session.bg }),

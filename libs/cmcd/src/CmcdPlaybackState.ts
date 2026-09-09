@@ -4,12 +4,16 @@ import type { CmcdRequestProvenance } from './CmcdRequestProvenance.ts'
 /**
  * The playback id of the reporter's own (root) playback. Children mint
  * distinct ids; records without a pid resolve to the root snapshot.
+ *
+ * @internal
  */
 export const CMCD_ROOT_PID = 'root'
 
 /**
  * Tracked state field owned by a playback (dedup + auto-trigger).
  * `bg` is deliberately absent: its value and baseline are session-owned.
+ *
+ * @internal
  */
 export type CmcdStateField = 'sta' | 'pr' | 'cid' | 'br'
 
@@ -18,6 +22,8 @@ export type CmcdStateField = 'sta' | 'pr' | 'cid' | 'br'
  * provenance record, and its state-change dedup baseline. Session-scoped
  * state (counters, gates, queues, bg) lives on the session; see the
  * child-reporters RFC state partition.
+ *
+ * @internal
  */
 export type CmcdPlaybackState = {
 	pid: string;
@@ -44,6 +50,8 @@ export type CmcdPlaybackState = {
  * the `cid` in effect at mint time. `update()` re-mints on every `cid`
  * change, so requests issued before a mid-session content change keep the
  * `cid` they were issued under while later requests carry the new one.
+ *
+ * @internal
  */
 export function mintProvenance(sid: string, cid: string | undefined): CmcdRequestProvenance {
 	return Object.freeze(typeof cid === 'string' && cid ? { sid, cid } : { sid })
@@ -53,6 +61,8 @@ export function mintProvenance(sid: string, cid: string | undefined): CmcdReques
  * Creates the state for a playback reporting into `sid`: the given data as
  * its persistent store, a freshly minted base provenance record, and an
  * empty dedup baseline.
+ *
+ * @internal
  */
 export function createCmcdPlaybackState(pid: string, sid: string, epoch: number, data: Cmcd): CmcdPlaybackState {
 	return {

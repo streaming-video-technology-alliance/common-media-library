@@ -12,22 +12,46 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import { CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 
+/**
+ * A report config whose `version` default has been applied.
+ *
+ * @internal
+ */
 export type CmcdReportConfigNormalized = CmcdReportConfig & {
 	version: CmcdVersion;
 }
 
+/**
+ * An event target config with every default applied and the per-target
+ * arrays copied, so later caller mutation cannot reach the reporter.
+ *
+ * @internal
+ */
 export type CmcdEventReportConfigNormalized<C> = CmcdEventReportConfig<C> & CmcdReportConfigNormalized & {
 	events: CmcdEventType[];
 	interval: number;
 	batchSize: number;
 }
 
+/**
+ * A reporter config with every default applied: a `sid`, a normalized
+ * `sessionRetention`, and normalized event targets.
+ *
+ * @internal
+ */
 export type CmcdReporterConfigNormalized<C> = CmcdReporterConfig<C> & CmcdReportConfigNormalized & {
 	sid: string;
 	eventTargets: CmcdEventReportConfigNormalized<C>[];
 	sessionRetention: number;
 }
 
+/**
+ * Builds the encoding options for one target from its report config: the
+ * version default, a filter over the target's `enabledKeys`, and the
+ * pass-through `baseUrl` and custom header map.
+ *
+ * @internal
+ */
 export function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>, baseUrl?: string): CmcdEncodeOptions {
 	const enabledKeySet = new Set(config.enabledKeys ?? [])
 
@@ -40,6 +64,13 @@ export function createEncodingOptions(reportingMode: CmcdReportingMode, config: 
 	}
 }
 
+/**
+ * Normalizes a partial reporter config: applies the defaults, mints a
+ * `sid` when none is given, clamps the numeric options, copies the
+ * per-target arrays, and drops event targets without a `url` or `events`.
+ *
+ * @internal
+ */
 export function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): CmcdReporterConfigNormalized<C> {
 	// Apply top-level config defaults
 	const {

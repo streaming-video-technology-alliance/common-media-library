@@ -6,6 +6,8 @@ import type { CmcdKey } from './CmcdKey.ts'
  * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
  * Built from the state-change table plus the three event types whose
  * required key rides the caller's per-event data.
+ *
+ * @internal
  */
 export const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map([
 	.../* @__PURE__ */ CMCD_STATE_EVENT_FIELDS,

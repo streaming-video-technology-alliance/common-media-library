@@ -1,7 +1,6 @@
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdSessionState } from './CmcdSessionState.ts'
 
-/** Reused so an idle `takeDirty()` pass returns without allocating. */
 const NO_DIRTY_SESSIONS: readonly never[] = []
 
 /**
@@ -9,7 +8,9 @@ const NO_DIRTY_SESSIONS: readonly never[] = []
  * current session last. The ended-session count is capped by
  * `config.sessionRetention`. CTA-5004-B expects a `sid` to be unique
  * per playback session; a reused one replaces its retained namesake at
- * the newest position (see `startSession()`).
+ * the newest position (see `rotate()`).
+ *
+ * @internal
  */
 export class CmcdSessionLedger<C> {
 	private sessions = new Map<string, CmcdSessionState<C>>()
@@ -34,7 +35,7 @@ export class CmcdSessionLedger<C> {
 	/**
 	 * Resolves the session a response belongs to: the provenance record's
 	 * `sid` names one of this reporter's retained sessions, or the response
-	 * is dropped. There is no other key — a record that was lost, or that
+	 * is dropped. There is no other key. A record that was lost, or that
 	 * names an evicted or never-seen `sid`, resolves nothing, and
 	 * attributing it anywhere else would relabel it. The `sid` is read
 	 * structurally, so a JSON-revived copy of a record attributes exactly,
