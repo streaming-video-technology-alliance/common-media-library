@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The `Cmcd` type documentation links to the CTA-5004-B specification. The type linked only to the version 1 PDF
+
 ### Fixed
 
 - `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter` now apply the "MUST NOT" rules of CTA-5004-B to a version 2 payload. `d` is sent only when `ot` is `a`, `v`, `av`, `tt`, `c`, or `o`. `tpb` is sent only when `ot` is `a`, `v`, `av`, or `c`. When `ot` is absent, both keys are sent unchanged. `ab`, `lab`, and `tab` are omitted when the exact key `br`, `lb`, or `tb` is sent in the same payload. `cen` is omitted unless the event type is `ce`. Version 1 payloads are unchanged
