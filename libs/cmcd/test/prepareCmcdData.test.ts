@@ -278,6 +278,32 @@ describe('prepareCmcdData', () => {
 			})
 		}
 
+		it('keeps the aggregate bitrate key when a formatter removes the exact key', () => {
+			const data = prepareCmcdData({ ab: [5000], br: [3000] }, { formatters: { br: () => NaN } })
+			ok('ab' in data)
+			ok(!('br' in data))
+		})
+
+		it('treats an empty object type as unknown', () => {
+			const data = prepareCmcdData({ ot: '', d: 4000, tpb: [5000] })
+			equal(data['d'], 4000)
+			ok('tpb' in data)
+			ok(!('ot' in data))
+		})
+
+		it('reads the object type after formatting', () => {
+			const kept = prepareCmcdData({ ot: 'video', d: 4000 }, { formatters: { ot: () => 'v' } })
+			equal(kept['d'], 4000)
+			const dropped = prepareCmcdData({ ot: 'v', d: 4000 }, { formatters: { ot: () => 'm' } })
+			ok(!('d' in dropped))
+		})
+
+		it('drops d for a manifest when ot is filtered out', () => {
+			const data = prepareCmcdData({ ot: 'm', d: 4000 }, { filter: key => key !== 'ot' })
+			ok(!('d' in data))
+			ok(!('ot' in data))
+		})
+
 		it('drops cen when the event type is not ce', () => {
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.PLAY_STATE, sta: 'p', cen: 'my-event', ts: 1 },

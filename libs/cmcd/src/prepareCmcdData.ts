@@ -92,6 +92,11 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 	return result
 }
 
+function formatValue(key: CmcdKey, value: CmcdValue, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): CmcdValue {
+	const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
+	return typeof formatter === 'function' && isValid(value) ? formatter(value, formatterOptions) : value
+}
+
 /**
  * Convert a generic object to CMCD data.
  *
@@ -179,20 +184,28 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	keys.sort()
 
+	let objectType: string | undefined
+	let objectTypeResolved = false
+
 	for (const key of keys) {
 		let value = data[key] as CmcdValue
 
 		// An aggregate bitrate key is not sent alongside its exact bitrate key
 		const exactKey = CMCD_AGGREGATE_BITRATE_KEYS[key]
-		if (exactKey && keys.includes(exactKey) && isValid(data[exactKey])) {
+		if (exactKey && keys.includes(exactKey) && isValid(formatValue(exactKey, data[exactKey] as CmcdValue, options, formatterOptions))) {
 			continue
 		}
 
-		// Some keys are only sent for certain object types
+		// Some keys are only sent for certain object types. The object type is
+		// the formatted `ot` value, even when `ot` is filtered out of the report.
 		const objectTypes = version > 1 ? CMCD_KEY_OBJECT_TYPES[key] : undefined
 		if (objectTypes) {
-			const ot = toTokenString(data['ot'])
-			if (ot !== undefined && !objectTypes.includes(ot)) {
+			if (!objectTypeResolved) {
+				const ot = formatValue('ot', data['ot'] as CmcdValue, options, formatterOptions)
+				objectType = isValid(ot) ? toTokenString(ot) : undefined
+				objectTypeResolved = true
+			}
+			if (objectType !== undefined && !objectTypes.includes(objectType)) {
 				continue
 			}
 		}
@@ -202,10 +215,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			continue
 		}
 
-		const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
-		if (typeof formatter === 'function' && isValid(value)) {
-			value = formatter(value, formatterOptions)
-		}
+		value = formatValue(key, value, options, formatterOptions)
 
 		// Version should only be reported if not equal to 1.
 		if (key === 'v') {
