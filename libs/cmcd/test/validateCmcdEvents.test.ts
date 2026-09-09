@@ -105,21 +105,21 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 		deepStrictEqual(result.issues, [])
 	})
 
-	it('warns when a single record body ends with a line feed', () => {
+	it('reports error when a single record body ends with a line feed', () => {
 		const result = validateCmcdEvents('e=ps,sid="session-1",ts=1700000000000,sta=p,v=2\n')
-		equal(result.valid, true)
+		equal(result.valid, false)
 		equal(result.issues.length, 1)
-		equal(result.issues[0].severity, 'warning')
+		equal(result.issues[0].severity, 'error')
 		equal(result.issues[0].message, 'Event report body must not end with a line feed.')
 	})
 
-	it('warns when a multi-record body ends with a line feed', () => {
+	it('reports error when a multi-record body ends with a line feed', () => {
 		const result = validateCmcdEvents('e=ps,sid="s",ts=1,sta=p,v=2\ne=t,sid="s",ts=2,v=2\n')
-		equal(result.valid, true)
-		equal(result.issues.some(i => i.severity === 'warning' && i.message.includes('line feed')), true)
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.severity === 'error' && i.message.includes('line feed')), true)
 	})
 
-	it('does not warn when the body ends without a line feed', () => {
+	it('accepts a body that ends without a line feed', () => {
 		deepStrictEqual(validateCmcdEvents('e=ps,sid="s",ts=1,sta=p,v=2\ne=t,sid="s",ts=2,v=2').issues, [])
 	})
 })

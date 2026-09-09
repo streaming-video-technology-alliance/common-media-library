@@ -19,7 +19,7 @@ and this project adheres to
 - `prepareCmcdData` omits a key whose value is an empty array. `br: []` was sent as `br=()`, an inner list with no value. The specification does not define an empty inner list
 - `CmcdReporter` event report bodies no longer end with a line feed. CTA-5004-B separates the records of a body with a single line feed, and a single-record body MUST NOT end with one. Earlier versions appended a line feed to every event report body
 - `validateCmcdStructure` reports an error when `d` or `tpb` is present with an `ot` that the key does not apply to. It also reports an error when `ab`, `lab`, or `tab` is present together with `br`, `lb`, or `tb`. The message names the conflicting keys and the allowed object types. The checks apply to version 2 payloads. `validateCmcd`, `validateCmcdRequest`, `validateCmcdHeaders`, `validateCmcdEvents`, and `validateCmcdEventReport` inherit the checks
-- `validateCmcdEvents` and `validateCmcdEventReport` report a warning when the body ends with a line feed. The result stays valid, because earlier versions of `CmcdReporter` sent that line feed
+- `validateCmcdEvents` and `validateCmcdEventReport` report an error when the body ends with a line feed. Every earlier version of `CmcdReporter` sent that line feed, so a receiver that upgrades marks event reports from players on those versions as invalid until the players upgrade
 
 ## [2.6.1] - 2026-09-07
 

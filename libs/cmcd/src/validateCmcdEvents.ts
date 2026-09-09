@@ -4,7 +4,7 @@ import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
-import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
+import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { mergeValidationResults } from './mergeValidationResults.ts'
 import { validateCmcd } from './validateCmcd.ts'
@@ -48,7 +48,7 @@ export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOp
 	if (cmcd.endsWith('\n')) {
 		bodyIssues.push({
 			message: 'Event report body must not end with a line feed.',
-			severity: CMCD_VALIDATION_SEVERITY_WARNING,
+			severity: CMCD_VALIDATION_SEVERITY_ERROR,
 		})
 	}
 
