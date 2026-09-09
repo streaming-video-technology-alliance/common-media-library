@@ -36,6 +36,7 @@ export class CmcdOutbox {
 
 	push(line: string): void {
 		this.queue.push(line)
+		this.onDirty()
 	}
 
 	dispose(): void {
@@ -48,20 +49,29 @@ export class CmcdOutbox {
 			return false
 		}
 
-		if (this.queue.length < this.batchSize && !drain) {
-			this.onDirty()
-			return false
+		let dispatched = false
+
+		if (this.queue.length >= this.batchSize || drain) {
+			const deleteCount = drain ? this.queue.length : this.batchSize
+			const events = this.queue.splice(0, deleteCount)
+
+			this.send(events).catch(() => {
+				this.queue.unshift(...events)
+				this.onDirty()
+			})
+
+			dispatched = true
 		}
 
-		const deleteCount = drain ? this.queue.length : this.batchSize
-		const events = this.queue.splice(0, deleteCount)
-
-		this.send(events).catch(() => {
-			this.queue.unshift(...events)
+		// One channel for "still holds lines": every synchronous exit that
+		// leaves the queue non-empty re-marks through onDirty, so no caller
+		// tracks queue state itself. The asynchronous failure path above is
+		// the one other marker, because its re-queue lands after this exit.
+		if (this.queue.length > 0) {
 			this.onDirty()
-		})
+		}
 
-		return this.queue.length > 0
+		return dispatched && this.queue.length > 0
 	}
 
 	private async send(data: string[]): Promise<void> {

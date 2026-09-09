@@ -591,7 +591,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		const attach = stampReport(report, session, target, config.enabledKeys?.includes('msd') ?? false, type)
 
 		target.outbox.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
-		this.ledger.markDirty(session)
 
 		target.sn++
 
@@ -891,7 +890,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 			session.eventTargets.forEach((target) => {
 				if (target.outbox.process(drain)) {
-					this.ledger.markDirty(session)
 					reprocess = true
 				}
 			})
