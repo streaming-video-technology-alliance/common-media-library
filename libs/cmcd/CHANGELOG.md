@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `validateCmcdRequest` reports an error when a request carries CMCD data in both the headers and the `CMCD` query parameter. CTA-5004-B allows one transmission mode per request, and CTA-5004 (version 1) says a request MUST NOT carry both. The headers are still validated and their data is returned. The query parameter is now read from the query string without parsing the full URL, so a relative URL no longer throws
+
 ## [2.6.1] - 2026-09-07
 
 ### Fixed
