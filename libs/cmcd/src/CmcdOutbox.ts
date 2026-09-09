@@ -63,10 +63,10 @@ export class CmcdOutbox {
 			dispatched = true
 		}
 
-		// One channel for "still holds lines": every synchronous exit that
-		// leaves the queue non-empty re-marks through onDirty, so no caller
-		// tracks queue state itself. The asynchronous failure path above is
-		// the one other marker, because its re-queue lands after this exit.
+		// Unsent lines remain, so report that through onDirty. Callers never
+		// read the queue state themselves. The failed-send callback above
+		// calls onDirty separately, because its re-queue runs after this
+		// method has returned.
 		if (this.queue.length > 0) {
 			this.onDirty()
 		}

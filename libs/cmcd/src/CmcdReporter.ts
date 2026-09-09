@@ -401,10 +401,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Runs one fan-out under the shared epilogue: the depth guard that defers
-	 * eviction, the queue drain, and the held eviction, in that order. A
-	 * throw from the fan-out or from the drain surfaces only after the whole
-	 * epilogue ran, and the first error wins.
+	 * Runs one fan-out with the steps that every fan-out shares. The method
+	 * tracks the fan-out depth, which defers eviction while any fan-out is
+	 * active. It then processes the event-target queues and runs a held
+	 * eviction. If the fan-out or the queue processing throws, the remaining
+	 * steps still run. The method rethrows the earliest error afterward.
 	 */
 	private runFanOut(fn: () => void): void {
 		let failure: { error: unknown; } | undefined
@@ -526,10 +527,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 				}
 			})
 
-			// Surfaced only once every target has had its turn, and after the
-			// fan-out epilogue has processed the queues. Transforms must not
-			// throw; this makes the violation visible without letting it
-			// starve unrelated targets.
+			// The first error is thrown only after every target received the
+			// event and runFanOut() processed the queues. Transforms must not
+			// throw. This rethrow makes the violation visible without
+			// blocking the other targets' reports.
 			if (failure) {
 				throw failure.error
 			}
