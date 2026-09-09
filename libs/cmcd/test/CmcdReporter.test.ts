@@ -4278,6 +4278,44 @@ describe('CmcdReporter', () => {
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 0)
 		})
+
+		it('clamps a fractional batchSize to a positive integer', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['e', 'ec'],
+				eventTargets: [
+					{ url: 'https://example.com/cmcd', events: [CmcdEventType.ERROR], batchSize: 0.5 },
+				],
+			}, requester)
+
+			// splice(0, 0.5) removes nothing, so a fractional size previously
+			// POSTed empty bodies until the queue recursion overflowed the stack.
+			reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('ec=("E100")'))
+		})
+
+		it('clamps a negative batchSize to a positive integer', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['e', 'ec'],
+				eventTargets: [
+					{ url: 'https://example.com/cmcd', events: [CmcdEventType.ERROR], batchSize: -1 },
+				],
+			}, requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR, { ec: ['E100'] })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok((requests[0].body as string)?.includes('ec=("E100")'))
+		})
 	})
 
 	describe('state-change dedup', () => {

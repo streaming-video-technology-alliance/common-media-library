@@ -17,6 +17,7 @@ and this project adheres to
 - `update({ bg: undefined })` no longer leaves a `bg` key with an undefined value in the persistent store. In request mode that key put a data-less `CMCD=v%3D2` on requests whose other enabled keys had no value
 - Calling `stop()` from a transform during `start()` no longer leaves the remaining targets' interval timers armed
 - A required key that a `transform` mutated in place is restored from its pre-transform value. The restore baseline is now captured before the transform receives its detached copy of the report. Previously the baseline aliased the array the transform could mutate: emptying `br` in place sent `br=()`, and shortening the list before dropping the key restored the shortened list
+- An event target's `batchSize` is now floored and clamped to at least `1`, matching how `sessionRetention` is normalized. A fractional or negative value previously made the queue processor POST empty report bodies and recurse until the call stack overflowed
 
 ### Changed
 

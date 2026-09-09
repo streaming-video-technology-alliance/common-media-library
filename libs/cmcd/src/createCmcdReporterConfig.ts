@@ -65,13 +65,15 @@ export function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C
 		// Apply target config defaults
 		eventTargets: eventTargets.reduce((acc, target) => {
 			if (target?.url && target.events?.length) {
+				const size = typeof target.batchSize === 'number' ? Math.floor(target.batchSize) : NaN
+
 				acc.push({
 					version: target.version || CMCD_V2,
 					enabledKeys: target.enabledKeys?.slice() || [],
 					url: target.url,
 					events: target.events.slice(),
 					interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
-					batchSize: target.batchSize || 1,
+					batchSize: size >= 1 ? size : 1,
 					transform: target.transform,
 				})
 			}
