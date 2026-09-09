@@ -10,8 +10,9 @@ import { copyReportValues } from './copyReportValues.ts'
  * `false` must count as usable because `bg: false` is a legitimate value on a
  * backgrounded-mode event, which the encoder emits as `?0`; treating it as
  * unusable would let restoration silently revert a transform that cleared it.
- * Empty strings, empty lists and non-finite numbers are dropped downstream, so
- * a transform substituting one leaves the report short a required key.
+ * Empty strings and non-finite numbers are dropped during preparation. The
+ * encoder keeps an empty list as `()`. An empty list still cannot satisfy a
+ * required key, so restoration treats all three as unusable.
  */
 function isUsableRequiredValue(value: unknown): boolean {
 	if (value == null || value === '') {
@@ -56,16 +57,18 @@ export function applyReportPolicy<C, R extends CmcdTransformRequest<C> | undefin
 		return report
 	}
 
+	const ts = report.ts
+	// Captured before the copy below, so the baseline is the store's own
+	// value and no in-place mutation by the transform can reach it. The
+	// report is encoded synchronously, so restoring a shared value is safe.
+	// `CmcdKey` spans custom keys too, so index through a record view.
+	const requiredValue = requiredKey ? (report as Record<string, unknown>)[requiredKey] : undefined
+
 	// The caller's merge is shallow, so nested values are still shared with
 	// the persistent store, and in event mode with sibling targets' inputs;
 	// a transform gets its own detached copy so in-place mutation reaches
 	// neither.
 	copyReportValues(report)
-
-	const ts = report.ts
-	// Captured so a transform cannot strip a key the event requires.
-	// `CmcdKey` spans custom keys too, so index through a record view.
-	const requiredValue = requiredKey ? (report as Record<string, unknown>)[requiredKey] : undefined
 
 	const out = transform(report, request)
 

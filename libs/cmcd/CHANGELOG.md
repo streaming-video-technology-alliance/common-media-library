@@ -16,6 +16,7 @@ and this project adheres to
 - A bare `Date` or `Uint8Array` custom value no longer throws from `createRequestReport()`, from a transform, or from the first report after a `sid` change. Report copies previously produced a prototype-only object for these types, which failed to encode (`TypeError: this is not a Date object.`, `failed to serialize ... as Byte Sequence`)
 - `update({ bg: undefined })` no longer leaves a `bg` key with an undefined value in the persistent store. In request mode that key put a data-less `CMCD=v%3D2` on requests whose other enabled keys had no value
 - Calling `stop()` from a transform during `start()` no longer leaves the remaining targets' interval timers armed
+- A required key that a `transform` mutated in place is restored from its pre-transform value. The restore baseline is now captured before the transform receives its detached copy of the report. Previously the baseline aliased the array the transform could mutate: emptying `br` in place sent `br=()`, and shortening the list before dropping the key restored the shortened list
 
 ### Changed
 

@@ -2358,6 +2358,49 @@ describe('CmcdReporter', () => {
 
 				ok(!(requests[0].body as string)?.includes('cen='))
 			})
+
+			it('restores a required key the transform emptied in place', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.BITRATE_CHANGE],
+					data => {
+						(data.br as number[]).length = 0
+						return data
+					},
+				), requester)
+
+				reporter.update({ br: [5000, 2000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// The restore baseline must be captured before the transform's
+				// detached copy exists, so in-place mutation cannot empty it.
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('br=(5000 2000)'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('restores the pre-transform value after an in-place mutation and drop', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.BITRATE_CHANGE],
+					data => {
+						(data.br as number[]).pop()
+						delete data.br
+						return data
+					},
+				), requester)
+
+				reporter.update({ br: [5000, 2000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				// Restoration must re-attach the original list, not the copy the
+				// transform shortened before dropping the key.
+				equal(requests.length, 1)
+				ok((requests[0].body as string)?.includes('br=(5000 2000)'))
+				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
 		})
 
 		describe('nested value isolation', () => {
