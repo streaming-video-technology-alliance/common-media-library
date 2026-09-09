@@ -572,15 +572,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Stamps the reporter-owned fields on a finished event report, encodes it,
-	 * and pushes the wire line to the target's queue.
+	 * Stamps the reporter-owned fields on a finished event report, prepares
+	 * and encodes it, and pushes the wire line to the target's queue.
 	 *
 	 * Called after any transform has run, so a transform cannot bypass the
 	 * target's `events` filter via `e`, break `sn` continuity, or substitute
 	 * the session identity carried by `sid` and `msd`. Encoding here means a
 	 * report that cannot serialize throws inside the recording call that
 	 * produced it, instead of rejecting the batch send and re-queueing
-	 * forever.
+	 * forever. Preparation and encoding are separate steps so the `msd`
+	 * commit reads the prepared output, the same rule request mode applies:
+	 * the gate is consumed only when the report actually retained `msd`.
 	 *
 	 * @param target - The target to queue the report for.
 	 * @param config - The configuration for the target.
@@ -588,13 +590,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param type - The type of event being reported.
 	 */
 	private queueTargetEvent(session: CmcdSessionState<C>, target: CmcdEventTargetState, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
-		const attach = stampReport(report, session, target, config.enabledKeys?.includes('msd') ?? false, type)
+		stampReport(report, session, target, type)
 
-		target.outbox.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
+		const prepared = prepareCmcdData(report, createEncodingOptions(CMCD_EVENT_MODE, config))
+
+		target.outbox.push(encodePreparedCmcd(prepared))
 
 		target.sn++
 
-		if (attach) {
+		if (prepared.msd !== undefined) {
 			target.msdSent = true
 		}
 	}
@@ -834,7 +838,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		const stamps = resolveRequestTarget(session, CMCD_DEFAULT_REQUEST_TARGET)
 
-		const sendMsd = stampReport(cmcdData, session, stamps, true)
+		stampReport(cmcdData, session, stamps)
 
 		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
@@ -864,7 +868,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		stamps.sn++
 
-		if (sendMsd && cmcd.msd !== undefined) {
+		if (cmcd.msd !== undefined) {
 			stamps.msdSent = true
 		}
 
