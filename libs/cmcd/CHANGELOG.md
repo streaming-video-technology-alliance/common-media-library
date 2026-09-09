@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter` now apply the "MUST NOT" rules of CTA-5004-B to a version 2 payload. `d` is sent only when `ot` is `a`, `v`, `av`, `tt`, `c`, or `o`. `tpb` is sent only when `ot` is `a`, `v`, `av`, or `c`. When `ot` is absent, both keys are sent unchanged. `ab`, `lab`, and `tab` are omitted when the exact key `br`, `lb`, or `tb` is sent in the same payload. `cen` is omitted unless the event type is `ce`. Version 1 payloads are unchanged
+- `prepareCmcdData` no longer formats an empty value. A `null` value on `br`, `d`, `bl`, `dl`, `mtp`, `rtp`, or `tb` was rounded to `0` and sent, as in `bl=0`. An empty string on `nor` was sent as `nor=("")`. The key is now omitted in both cases, as CTA-5004-B section 3 requires for an unknown value. A custom formatter in `CmcdEncodeOptions.formatters` is no longer called for an empty value
+- `prepareCmcdData` omits a key whose value is an empty array. `br: []` was sent as `br=()`, an inner list with no value. The specification does not define an empty inner list
+- `CmcdReporter` event report bodies no longer end with a line feed. CTA-5004-B separates the records of a body with a single line feed, and a single-record body MUST NOT end with one. Earlier versions appended a line feed to every event report body
+- `validateCmcdStructure` reports an error when `d` or `tpb` is present with an `ot` that the key does not apply to. It also reports an error when `ab`, `lab`, or `tab` is present together with `br`, `lb`, or `tb`. The message names the conflicting keys and the allowed object types. The checks apply to version 2 payloads. `validateCmcd`, `validateCmcdRequest`, `validateCmcdHeaders`, `validateCmcdEvents`, and `validateCmcdEventReport` inherit the checks
+- `validateCmcdEvents` and `validateCmcdEventReport` report a warning when the body ends with a line feed. The result stays valid, because earlier versions of `CmcdReporter` sent that line feed
+
 ## [2.6.1] - 2026-09-07
 
 ### Fixed

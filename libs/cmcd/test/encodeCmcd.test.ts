@@ -25,7 +25,7 @@ describe('encodeCmcd', () => {
 
 	it('ignore invalid values', () => {
 		// @ts-expect-error - This is a test
-		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), 'nor=(""),v=2')
+		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), 'v=2')
 	})
 
 	describe('version 1', () => {
@@ -347,6 +347,20 @@ describe('encodeCmcd', () => {
 				ot: new SfToken('v'),
 			} as unknown as Cmcd
 			equal(encodeCmcd(input, { version: 1 }), 'br=6000,ot=v')
+		})
+	})
+
+	describe('specification constraints', () => {
+		it('omits d for a manifest request', () => {
+			equal(encodeCmcd({ ot: 'm', d: 4000, v: 2 }), 'ot=m,v=2')
+		})
+
+		it('omits ab when br is sent', () => {
+			equal(encodeCmcd({ ab: [5000], br: [3000], v: 2 }), 'br=(3000),v=2')
+		})
+
+		it('encodes the aggregate bitrate keys when the exact keys are absent', () => {
+			equal(encodeCmcd({ ab: [2500], lab: [200], tab: [3000], v: 2 }), 'ab=(2500),lab=(200),tab=(3000),v=2')
 		})
 	})
 })

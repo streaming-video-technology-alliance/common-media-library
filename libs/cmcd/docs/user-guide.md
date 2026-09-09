@@ -113,6 +113,19 @@ reporter.update({ bl: [25432] }); // encoded as bl=(25400)
 reporter.update({ bl: [25400] });
 ```
 
+### Keys the Reporter Omits
+
+The reporter applies the "MUST NOT" rules of CTA-5004-B when it encodes a report. It omits a key without an error in these cases:
+
+- The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted, except `bg` on a backgrounded-mode event.
+- `d` when `ot` is not `a`, `v`, `av`, `tt`, `c`, or `o`. For example, a manifest request with `ot: "m"` never carries `d`.
+- `tpb` when `ot` is not `a`, `v`, `av`, or `c`.
+- `ab`, `lab`, or `tab` when the same report also carries `br`, `lb`, or `tb`. The report keeps the exact bitrate.
+- `cen` on every event except a custom event.
+- `pr` when the value is `1`, except on a playback rate event.
+
+When `ot` is absent, `d` and `tpb` are sent unchanged. The validators report the same conflicts as errors. See the [Validation Guide](./validation-guide.md#version-specific-behavior).
+
 ### Parameterized Values with toCmcdValue
 
 In CMCD v2, some keys support values with parameters, such as `nor` (next object request) and `br` (encoded bitrate). Use the `toCmcdValue` helper function to attach parameters to a value:

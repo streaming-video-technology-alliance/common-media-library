@@ -39,7 +39,7 @@ A common use case is validating CMCD v2 event reports received by POST. The payl
 
 ### Using `validateCmcdEvents`
 
-The `validateCmcdEvents` function accepts a raw CMCD string and validates it as an event-mode payload. It supports multi-line `application/cmcd` bodies directly. It validates each non-empty line on its own and merges the results. An empty payload, with no non-empty lines, is an error.
+The `validateCmcdEvents` function accepts a raw CMCD string and validates it as an event-mode payload. It supports multi-line `application/cmcd` bodies directly. It validates each non-empty line on its own and merges the results. An empty payload, with no non-empty lines, is an error. A body that ends with a line feed produces a warning. CTA-5004-B separates records with a single line feed and does not allow a trailing one.
 
 ```typescript
 import { validateCmcdEvents } from "@svta/cml-cmcd";
@@ -183,6 +183,7 @@ const v1Result = validateCmcd({ br: 5000, sid: "abc" }, { version: 1 });
 - **Key validation**: v2-only keys, such as `sta`, `ec`, and `ab`, are rejected when validating as v1
 - **Type validation**: Some keys have different types between versions. For example, `bl` is an integer in v1 but an inner list (array) in v2
 - **Version key**: v2 payloads must include the `v` key. v1 payloads should omit it
+- **Key conflicts**: In v2, `d` and `tpb` must match the object type in `ot`. `d` is allowed for `a`, `v`, `av`, `tt`, `c`, and `o`. `tpb` is allowed for `a`, `v`, `av`, and `c`. `ab`, `lab`, and `tab` must not appear together with `br`, `lb`, and `tb`. Each conflict is an error
 
 ## Handling Validation Results
 

@@ -151,7 +151,7 @@ const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE
 /**
  * Whether a required key's value will survive report preparation.
  *
- * This is `isValid` minus its `false` exclusion, plus an empty-array check.
+ * This is `isValid` minus its `false` exclusion.
  * `false` must count as usable because `bg: false` is a legitimate value on a
  * backgrounded-mode event, which the encoder emits as `?0`; treating it as
  * unusable would let restoration silently revert a transform that cleared it.
@@ -1264,7 +1264,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			headers: {
 				'Content-Type': CMCD_MIME_TYPE,
 			},
-			body: data.join('\n') + '\n',
+			body: data.join('\n'),
 		})
 
 		const { status } = response

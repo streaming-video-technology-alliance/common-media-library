@@ -1,4 +1,6 @@
+import { CMCD_AGGREGATE_BITRATE_KEYS } from './CMCD_AGGREGATE_BITRATE_KEYS.ts'
 import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
+import { CMCD_KEY_OBJECT_TYPES } from './CMCD_KEY_OBJECT_TYPES.ts'
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
 import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
@@ -132,6 +134,35 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 				message: 'Error event (e="e") requires the "ec" key to be present.',
 				severity: CMCD_VALIDATION_SEVERITY_ERROR
 			})
+		}
+	}
+
+	// Object type checks
+	const ot = version > 1 ? toTokenString(data['ot']) : undefined
+	if (ot !== undefined) {
+		for (const key in CMCD_KEY_OBJECT_TYPES) {
+			const objectTypes = CMCD_KEY_OBJECT_TYPES[key]
+			if (key in data && !objectTypes.includes(ot)) {
+				issues.push({
+					key,
+					message: `Key "${key}" must not be present when "ot" is "${ot}". Expected "ot" to be one of: ${objectTypes.join(', ')}.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR
+				})
+			}
+		}
+	}
+
+	// Aggregate bitrate checks
+	if (version > 1) {
+		for (const key in CMCD_AGGREGATE_BITRATE_KEYS) {
+			const exactKey = CMCD_AGGREGATE_BITRATE_KEYS[key]
+			if (key in data && exactKey in data) {
+				issues.push({
+					key,
+					message: `Key "${key}" must not be present when "${exactKey}" is present.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR
+				})
+			}
 		}
 	}
 

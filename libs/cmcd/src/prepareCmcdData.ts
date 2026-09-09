@@ -1,5 +1,7 @@
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { CMCD_AGGREGATE_BITRATE_KEYS } from './CMCD_AGGREGATE_BITRATE_KEYS.ts'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
+import { CMCD_KEY_OBJECT_TYPES } from './CMCD_KEY_OBJECT_TYPES.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
@@ -180,8 +182,28 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	for (const key of keys) {
 		let value = data[key] as CmcdValue
 
+		// An aggregate bitrate key is not sent alongside its exact bitrate key
+		const exactKey = CMCD_AGGREGATE_BITRATE_KEYS[key]
+		if (exactKey && keys.includes(exactKey) && isValid(data[exactKey])) {
+			continue
+		}
+
+		// Some keys are only sent for certain object types
+		const objectTypes = version > 1 ? CMCD_KEY_OBJECT_TYPES[key] : undefined
+		if (objectTypes) {
+			const ot = toTokenString(data['ot'])
+			if (ot !== undefined && !objectTypes.includes(ot)) {
+				continue
+			}
+		}
+
+		// The custom event name is only sent on a custom event
+		if (key === 'cen' && eventType !== CMCD_EVENT_CUSTOM_EVENT) {
+			continue
+		}
+
 		const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
-		if (typeof formatter === 'function') {
+		if (typeof formatter === 'function' && isValid(value)) {
 			value = formatter(value, formatterOptions)
 		}
 
