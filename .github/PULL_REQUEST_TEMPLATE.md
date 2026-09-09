@@ -1,13 +1,13 @@
 ## Description
 
-Please describe the changes:
+Describe the changes:
 
-- If it's a feature or enhancement please be as detailed as possible.
-- If it's a bug fix, please link the issue that it fixes or describe the bug in as much detail.
-- If this change includes work derived from another project, please:
-  - Include links to the original project and the specific files that were used.
-    - Provide the appropriate attribution in the `NOTICE` file, including the full license text if available.
-    - Update "Thanks" section of the `README.md`.
+- If the change is a feature or an enhancement, describe it in detail.
+- If the change is a bug fix, link the issue it fixes or describe the bug in detail.
+- If the change includes work derived from another project:
+  - Link to the original project and to the specific files you used.
+  - Add the attribution to the `NOTICE` file, with the full license text if available.
+  - Update the "Thanks" section of `README.md`.
 
 ## Requirements Checklist
 

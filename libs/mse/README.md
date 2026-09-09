@@ -10,9 +10,7 @@ npm install @svta/cml-mse
 
 ## Usage
 
-```typescript
-import { } from '@svta/cml-mse'
-```
+This package has no public exports yet.
 
 ## License
 

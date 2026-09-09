@@ -99,4 +99,10 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 		const result = validateCmcdEvents('')
 		deepStrictEqual(result.data, [])
 	})
+
+	it('accepts a token field that carries params', () => {
+		const result = validateCmcdEvents('e=ps,ot=m;com.example-p=1,sid="session-1",sta=p,ts=1700000000000,v=2')
+		equal(result.valid, true)
+		deepStrictEqual(result.issues, [])
+	})
 })

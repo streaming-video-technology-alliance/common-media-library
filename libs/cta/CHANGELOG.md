@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the description is rewritten for readers who do not read English as a first language. A typo is fixed.
+
 ## [1.0.8] - 2026-07-28
 
 ### Changed

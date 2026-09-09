@@ -1,55 +1,50 @@
-# CMAF HAM 
+# CMAF HAM
 
-## Overview 
+## Overview
 
-HLS and DASH stand as the predominant video streaming technologies currently. Consequently, users often encounter challenges such as converting between HLS and DASH, manipulating manifests, and programmatically understanding manifest structures.
+HLS and DASH are the two main video streaming technologies today. Users often need to convert between HLS and DASH, edit manifests, and read manifest structures in code.
 
-The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) addresses these challenges by defining a universal format based on ISOBMFF. Additionally, it introduces the Hypothetical Application Model, a framework illustrating the practical usage of CMAF segments and fragments in streaming applications. This project is inspired by the principles outlined in the CMAF standard and the [Hypothetical Application Model] ([Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf)).
+The Common Media Application Format (CMAF) for segmented media (ISO/IEC 23000-19) defines one universal format for both. The format is based on ISO BMFF. CMAF also defines the Hypothetical Application Model, a framework that shows how streaming applications use CMAF segments and fragments. This project is based on the principles of the CMAF standard and the [Hypothetical Application Model](https://cdn.cta.tech/cta/media/media/resources/standards/cta-5005-a-final.pdf).
 
-## Features 
+## Features
 
-* Fundamental on-demand conversion between [HLS] and [DASH] manifests, covering transformations such as HLS to HAM, HAM to HLS, DASH to HAM, and HAM to DASH.
-* Elementary Media Presentation querying functionality.
+* On-demand conversion between HLS and DASH manifests through HAM: HLS to HAM, HAM to HLS, DASH to HAM, and HAM to DASH.
+* Elementary Media Presentation queries.
 
-## Usage 
+## Usage
 
-Here's a simple demonstration illustrating how to use the features of the CMAF HAM module in TypeScript:
+The examples show how to use the CMAF HAM module in TypeScript:
 
 ```typescript
-import {
-  hamToHls,
-  hamToDash
-  hlsToHam,
-} from "@svta/common-media-library";
+import { hamToDash, hamToHls, hlsToHam } from "@svta/cml-cmaf-ham";
 
-const hamObject = hlsToHam(mainHlsManifest, playListHlsManifests); // Convert HLS to HAM object
-const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
-const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
+// Convert an HLS multivariant playlist and its media playlists to HAM, then back to HLS and to DASH.
+function convertHls(mainPlaylist: string, mediaPlaylists: string[]) {
+  const ham = hlsToHam(mainPlaylist, mediaPlaylists);
+  return { hls: hamToHls(ham), dash: hamToDash(ham) };
+}
 ```
 
 ```typescript
-import {
-  hamToDash,
-  hamToHls,
-  dashToHam,
-} from "@svta/common-media-library";
+import { dashToHam, hamToDash, hamToHls } from "@svta/cml-cmaf-ham";
 
-const hamObject = dashToHam(mainDashManifest); // Convert DASH to HAM object
-const hlsManifest = hamToHls(hamObject); // Convert HAM object to HLS manifest
-const dashManifest = hamToDash(hamObject); // Convert HAM object to DASH manifest
-
+// Convert a DASH MPD to HAM, then back to DASH and to HLS.
+function convertDash(mpd: string) {
+  const ham = dashToHam(mpd);
+  return { hls: hamToHls(ham), dash: hamToDash(ham) };
+}
 ```
 
-This example showcases how to leverage functionalities such as manifest conversion, presentation querying, and track validation offered by the CMAF HAM library in TypeScript.
+The library also offers presentation queries and track validation.
 
 ## Documentation
 
-For detailed documentation, including API reference and usage examples, please refer to the API documentation.
+For the API reference and more examples, read the [API documentation](https://streaming-video-technology-alliance.github.io/common-media-library/).
 
 ## Contribution
 
-Contributions are welcome! If you encounter any bugs, have feature requests, or want to contribute code improvements, feel free to open an issue or submit a pull request.
+Contributions are welcome. To report a bug, request a feature, or contribute code, open an issue or a pull request.
 
 ## License
 
-This library is licensed under the Apache 2.0 License. You are free to use, modify, and distribute it for both commercial and non-commercial purposes. See the LICENSE file for details.
+This library uses the Apache 2.0 License. You may use, modify, and distribute it for commercial and non-commercial purposes. See the LICENSE file for details.

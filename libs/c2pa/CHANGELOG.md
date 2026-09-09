@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
+- Validation guides (Manifest Box, VOD Merkle, VSI/EMSG, and Results and Error Codes): the prose is rewritten for readers who do not read English as a first language. Merkle tree is defined at first use. The code examples and tables are unchanged.
+- README: the usage examples are complete. The segment URLs are function parameters.
+- Validation guides: empty table cells no longer use an em dash, and a code comment no longer uses an em dash.
+
+
 ## [1.1.2] - 2026-08-11
 
 ### Changed

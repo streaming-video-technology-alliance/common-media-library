@@ -11,7 +11,7 @@ npm i @svta/cml-throughput
 ## Usage
 
 ```typescript
-import { EwmaEstimator } from "@svta/cml-throughput/EwmaEstimator";
+import { EwmaEstimator } from "@svta/cml-throughput";
 
 const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 });
 
@@ -29,5 +29,6 @@ estimator.sample({
 	duration: 4000,
 });
 
-assert(estimator.getEstimate() === 412);
+console.log(estimator.getEstimate());
+// 412
 ```

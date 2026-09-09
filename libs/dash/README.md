@@ -22,10 +22,11 @@ const result = processUriTemplate(
 	3, // Bandwidth
 	4 // Time
 );
-
-assert(result === "http://example.com/rep1/1/2/3/04/$");
+console.log(result);
+// http://example.com/rep1/1/2/3/04/$
 
 // Parse frame rate
 const frameRate = parseFrameRate("24000/1001");
-assert(frameRate === 23.976023976023978);
+console.log(frameRate);
+// 23.976023976023978
 ```

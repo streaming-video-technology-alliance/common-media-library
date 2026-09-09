@@ -5,19 +5,19 @@ description: Write boxes to byte arrays or streams
 
 # Writing Boxes
 
-Boxes can be written to using the `writeIsoBoxes` function. The function takes an array of streamable items and returns an array of `Uint8Array`s. Streamable items include:
+The `writeIsoBoxes` function writes boxes. It takes an array of streamable items and returns an array of `Uint8Array`s. Streamable items include:
 
-- Raw box objects (e.g. `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`)
-- ArrayBufferViews like `Uint8Array` and `DataView` as well as the box structures returned by the `readIsoBoxes` function (they adhere to the `ArrayBufferView` interface).
+- Raw box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
+- ArrayBufferViews such as `Uint8Array` and `DataView`, and the box structures that `readIsoBoxes` returns. Those structures implement the `ArrayBufferView` interface.
 
-When providing raw box objects, a configuration object must be provided to specify the writers for those box types.
+If you provide raw box objects, also provide a configuration object that names the writers for those box types.
 
 > [!NOTE]
-> Container boxes are automatically written and do not need a writer function. All known container types are listed in the `CONTAINERS` constant.
+> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types.
 
 ## Using default config
 
-If tree shaking isn't a concern, use `defaultWriterConfig()` to get a configuration with all available writers pre-configured:
+If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer:
 
 ```typescript
 import { defaultWriterConfig, writeIsoBoxes } from "@svta/cml-iso-bmff";
@@ -88,7 +88,7 @@ for (const byteArray of byteArrays) {
 
 ## Streaming boxes
 
-Boxes can also be written to a readable stream using the `createIsoBoxReadableStream` function. This also supports both the default config and specific writers approaches:
+The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers:
 
 ```typescript
 import {
@@ -120,7 +120,7 @@ readableStream.pipeTo(transport.writable);
 
 ## Type safety
 
-When working with raw box objects in TypeScript, cast the objects to a box type to ensure type safety. This can be done in two ways. Either by using a box type from the library:
+In TypeScript, cast raw box objects to a box type for type safety. There are two ways. The first way uses a box type from the library:
 
 ```typescript
 import type { FileTypeBox } from "@svta/cml-iso-bmff";
@@ -133,7 +133,7 @@ const box: FileTypeBox = {
 };
 ```
 
-Or by using the `as const` operator on the `type` property:
+The second way uses the `as const` operator on the `type` property:
 
 ```typescript
 const box = {
@@ -144,7 +144,7 @@ const box = {
 };
 ```
 
-Box types can also be accessed from `IsoBoxMap` using the box's FourCC:
+You can also get a box type from `IsoBoxMap` with the box's FourCC:
 
 ```typescript
 import type { IsoBoxMap } from "@svta/cml-iso-bmff";

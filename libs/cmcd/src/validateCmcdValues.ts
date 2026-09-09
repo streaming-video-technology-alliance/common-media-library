@@ -10,6 +10,7 @@ import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
+import { toTokenString } from './toTokenString.ts'
 
 const HUNDRED_ROUNDING_KEYS = /* @__PURE__ */ new Set(['bl', 'dl', 'mtp', 'rtp', 'tbl'])
 const INTEGER_ROUNDING_KEYS = /* @__PURE__ */ new Set(['br', 'd', 'tb'])
@@ -209,10 +210,11 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 
 			case CMCD_KEY_TYPE_TOKEN: {
 				const validValues = CMCD_TOKEN_VALUES[key]
-				if (validValues && !validValues.includes(value as string)) {
+				const token = toTokenString(value)
+				if (validValues && (token === undefined || !validValues.includes(token))) {
 					issues.push({
 						key,
-						message: `Key "${key}" has invalid token value "${String(value)}". Expected one of: ${validValues.join(', ')}.`,
+						message: `Key "${key}" has invalid token value "${token ?? String(value)}". Expected one of: ${validValues.join(', ')}.`,
 						severity: CMCD_VALIDATION_SEVERITY_ERROR
 					})
 				}

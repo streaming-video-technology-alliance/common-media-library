@@ -2,7 +2,7 @@
 
 # Claude Code Configuration
 
-Common Media Library is optimized for adoption by web video players — performance, tree-shakeability, developer experience, and documentation quality are the top priorities. General project instructions are in [AGENTS.md](AGENTS.md).
+Common Media Library is optimized for adoption by web video players. The top priorities are performance, tree-shakeability, developer experience, and documentation quality. General project instructions are in [AGENTS.md](AGENTS.md).
 
 ## Skills
 

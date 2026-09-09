@@ -8,12 +8,28 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-09-07
+
+### Fixed
+
+- `encodeCmcd` now writes a token field as a bare token when its value is an `SfItem` that wraps a string. The token fields are `ot`, `sf`, `st`, `e`, and `sta`. `decodeCmcd` returns that shape for a member with parameters, such as `ot=m;com.example-p=1`. The encoder wrote the field as a quoted string, which is not valid CMCD ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `encodeCmcd` compares the `e` value by token text. `decodeCmcd` with `useSymbol` returns `e` as a `Symbol` or an `SfToken`. Such an event report now keeps its response-received keys on `e=rr`, `bg=?0` on `e=b`, and `pr=1` on `e=pr`. The version 1 down-conversion also matches the `ot` parameter of an inner-list item by token text ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `validateCmcdValues` accepts a token field whose value is an `SfItem`, a `Symbol`, or an `SfToken`. Since 2.6.0, `validateCmcdEvents` and the other string validators rejected a valid member such as `ot=m;com.example-p=1`. The message was `invalid token value "[object Object]"`. `validateCmcdStructure` applies the event rules (`cen`, `url`, response keys, state-change fields, `ec`) when `e` is a `Symbol` or an `SfToken` ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+
+## [2.6.0] - 2026-09-03
+
 ### Added
 
 - `CmcdReporterConfig.sessionRetention` — the number of ended sessions the reporter retains state for, in addition to the current one (default `2`; `0` disables retention, `Infinity` never evicts; only `number` values are accepted and floored, anything else falls back to the default). The reporter now keeps per-session state (data snapshot, sequence numbers, `msd` gate, dedup baseline, unsent queues) for recently ended sessions, so a media request that completes after a `sid` change reports under the session that issued it: its own `sid`, its next per-target sequence number, its still-unsent `msd`, and its frozen data snapshot, which is detached at the transition so mutating an array previously passed to `update()` cannot rewrite an ended session's late reports. A `sid` change also drains an ended session's unsent event reports (each keeps its own `sid` and sequence number) before eviction can discard them. Implements the accepted RFC in `rfc/cmcd-session-retention.md` ([#416](https://github.com/streaming-video-technology-alliance/common-media-library/pull/416))
 - `CMCD_REQUEST_PROVENANCE` — the symbol key (backed by `Symbol.for('@svta/cml-cmcd/request-provenance')`) under which `createRequestReport()` stamps a frozen session-provenance record (`CmcdRequestProvenance`) on every request it returns, including requests it does not decorate (request reporting disabled, or a transform cancels decoration). The record carries `sid`, the issuing session's ID and the attribution key; `cid`, the content ID in effect when the request was issued; and `data`, the request's per-call data encoded as a CMCD string, captured before the key filter and transform run so it rides undecorated requests too. `recordResponseReceived()` attributes by the record's `sid`, and only by it: a response whose record does not name a retained session is dropped rather than relabeled, and a per-call `data.sid` is not an attribution key. The record is honored wherever its `sid` resolves, so a hand-built record attributes, as does a split topology where one reporter decorates and another configured with the same session records. Session identity is the `sid` itself, which CTA-5004-B expects to be unique per playback session: reusing one replaces the retained namesake and relabels its late responses onto the replacement. The `RESPONSE_RECEIVED` event is rebuilt from the record: the decoded per-call snapshot supplies the caller's request-time report keys (never re-ingesting the player-facing, player-mutable `customData.cmcd` object, so token-typed values like `ot`, `sf`, `st`, and custom-key `SfToken`s keep their RFC 8941 wire type across serialization boundaries), and the record's `cid` reports in place of the session's current one, so a response that completes after a mid-session content change keeps the meaning it had when its request was issued. Spread and `Object.assign` carry the record through request clones; `JSON.stringify` and structured clone drop symbol keys, so read the value before such a boundary and restore it afterward — the record itself survives JSON and is read by value rather than object identity, so a revived copy behaves exactly like the original. The member is typed optional on `CmcdRequestReport` so the type stays constructible by consumers; every request the reporter returns carries it ([#416](https://github.com/streaming-video-technology-alliance/common-media-library/pull/416))
 
 - `CmcdDecodeOptions.useSymbol` — controls how RFC 8941 token values are represented by `decodeCmcd` (and `fromCmcdQuery`/`fromCmcdHeaders`/`fromCmcdUrl`). When omitted, tokens reduce to plain strings as before, which cannot be told apart from string values on re-encoding. `true` decodes tokens as registry `Symbol`s, `false` as `SfToken` instances; either preserved representation re-encodes as a bare token, making the codec symmetric: `encodeCmcd(decodeCmcd(s, { useSymbol: false }))` returns the input bytes. `CmcdReporter` decodes provenance snapshots this way, so request-time token values keep their wire type on `RESPONSE_RECEIVED` reports
+
+### Changed
+
+- README: the `CmcdReportRecorder` paragraph is rewritten for readers who do not read English as a first language. The code examples are unchanged.
+- User Guide, Report Recorder Guide, and Validation Guide: the prose is rewritten for readers who do not read English as a first language. The code examples and tables are unchanged.
+- User Guide and Validation Guide: one heading, one table cell, and one code comment no longer use a contraction or an em dash.
 
 ### Fixed
 
@@ -247,7 +263,9 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...HEAD
+[2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
+[2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0
 [2.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...cmcd-v2.5.0
 [2.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...cmcd-v2.4.1
 [2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0
