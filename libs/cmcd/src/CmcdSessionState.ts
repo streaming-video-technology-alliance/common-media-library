@@ -13,6 +13,28 @@ export type CmcdTargetStamps = {
 }
 
 /**
+ * Creates the counters and gate one target starts a session with.
+ */
+export function createTargetStamps(): CmcdTargetStamps {
+	return { sn: 0, msdSent: false }
+}
+
+/**
+ * Returns the session's counters for one request target. A target that has
+ * no entry yet gets a fresh one, stored for the next call.
+ */
+export function resolveRequestTarget<C>(session: CmcdSessionState<C>, target: string): CmcdTargetStamps {
+	let stamps = session.requestTargets.get(target)
+
+	if (!stamps) {
+		stamps = createTargetStamps()
+		session.requestTargets.set(target, stamps)
+	}
+
+	return stamps
+}
+
+/**
  * The target's outbox holds finished, encoded report lines awaiting send.
  * Reports are encoded at enqueue, so a value that cannot serialize throws
  * inside the recording call, and a queued line is immune to later
@@ -63,6 +85,6 @@ export function createCmcdSessionState<C>(sid: string, bg: boolean | undefined):
 		bgEmitted: undefined,
 		snapshots: new Map(),
 		eventTargets: new Map<CmcdEventReportConfigNormalized<C>, CmcdEventTargetState>(),
-		requestTargets: new Map([[CMCD_DEFAULT_REQUEST_TARGET, { sn: 0, msdSent: false }]]),
+		requestTargets: new Map([[CMCD_DEFAULT_REQUEST_TARGET, createTargetStamps()]]),
 	}
 }

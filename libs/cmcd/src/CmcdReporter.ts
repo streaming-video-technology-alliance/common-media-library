@@ -15,7 +15,7 @@ import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import { CmcdSessionLedger } from './CmcdSessionLedger.ts'
 import type { CmcdEventTargetState, CmcdSessionState } from './CmcdSessionState.ts'
-import { CMCD_DEFAULT_REQUEST_TARGET, createCmcdSessionState } from './CmcdSessionState.ts'
+import { CMCD_DEFAULT_REQUEST_TARGET, createCmcdSessionState, createTargetStamps, resolveRequestTarget } from './CmcdSessionState.ts'
 import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
 import { CMCD_HEADERS, CMCD_QUERY } from './CmcdTransmissionMode.ts'
 import { acceptStateChange, CMCD_STATE_FIELDS } from './acceptStateChange.ts'
@@ -125,8 +125,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		for (const config of this.config.eventTargets) {
 			session.eventTargets.set(config, {
-				sn: 0,
-				msdSent: false,
+				...createTargetStamps(),
 				outbox: new CmcdOutbox(
 					config.url,
 					config.batchSize,
@@ -849,12 +848,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return report
 		}
 
-		let stamps = session.requestTargets.get(CMCD_DEFAULT_REQUEST_TARGET)
-
-		if (!stamps) {
-			stamps = { sn: 0, msdSent: false }
-			session.requestTargets.set(CMCD_DEFAULT_REQUEST_TARGET, stamps)
-		}
+		const stamps = resolveRequestTarget(session, CMCD_DEFAULT_REQUEST_TARGET)
 
 		const sendMsd = stampReport(cmcdData, session, stamps, true)
 
