@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Architecture Guide (`docs/architecture-guide.md`): how the reporter works inside. The guide diagrams the internal units and their ownership, the event report pipeline, and late-response attribution
+
 ### Fixed
 
 - A report value that fails structured-field encoding no longer consumes a sequence number or the session's once-per-target `msd` gate
