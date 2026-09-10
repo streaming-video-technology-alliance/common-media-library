@@ -103,6 +103,33 @@ const ad = session.createPlayer({ cid: 'ad-7' })
 
 Every player reports under the session's `sid` and takes the next sequence number of each target. Dispose a player when its media player is destroyed.
 
+The ownership in one picture. Targets belong to the session, and every player reports to every target.
+
+```mermaid
+flowchart TB
+    subgraph session["CmcdSession, one sid"]
+        direction TB
+        sdata["sid, version, transport, timers<br>msd, bg, bsa, bsda, completed spans"]
+        subgraph players["Players, one per media player"]
+            direction LR
+            primary["CmcdPlayer, cid movie-42<br>store, reported values, host, su, open span"]
+            ad["CmcdPlayer, cid ad-7<br>store, reported values, host, su, open span"]
+        end
+        subgraph targets["Targets, one per destination"]
+            direction LR
+            req["request target<br>sn, msd gate, bsd cursor<br>bs and ec per player"]
+            ev1["event target A<br>sn, msd gate, bsd cursor<br>bs and ec per player<br>queue, back-off, gone"]
+            ev2["event target B<br>same state as A"]
+        end
+    end
+    primary --> req
+    primary --> ev1
+    primary --> ev2
+    ad --> req
+    ad --> ev1
+    ad --> ev2
+```
+
 ### Push state, get events
 
 `update()` stores playback state and derives the five state-change events from it: `sta` gives `ps`, `pr` gives `pr`, `cid` gives `c`, `bg` gives `b`, and `br` gives `bc`. The event fires when the value differs from the last value the reporter reported for that player. Metrics pushed in the same call ride the event.
@@ -160,6 +187,26 @@ primary.recordResponse(req, {
 
 A response can arrive after the player has disposed the session that issued the request. The record on the request points to that session, so the `rr` report has the old `sid` and the old session's next sequence number. The old session sends the report at once, because no batch will fill again.
 
+The sequence for a response that arrives after its session was disposed:
+
+```mermaid
+sequenceDiagram
+    participant Player as media player
+    participant A as CmcdSession A
+    participant B as CmcdSession B
+    participant C as collector
+    Player->>A: player.decorate(request, data)
+    A-->>Player: request with cmcd record, sid A, sn 41
+    Player->>Player: send the request to the CDN
+    Player->>A: session.dispose()
+    A->>C: POST the queued lines
+    Player->>B: createCmcdSession(), then createPlayer()
+    Note over Player,C: the response for the old request arrives
+    Player->>B: player.recordResponse(request, info)
+    B-->>A: the record resolves to session A
+    A->>C: POST e=rr with sid A and sn 42, at once
+```
+
 ### Interstitials
 
 The spec covers multi-player sessions with `cid`, `ps`, and `nr`. The session API needs no other concept. When an interstitial renders on its own player, the primary player sets `nr` while it fetches content that the user does not see.
@@ -174,6 +221,23 @@ primary.update({ nr: false })
 ```
 
 Each interval tick emits one `t` line per live player, with the same `ts` and consecutive sequence numbers. Overlay and side-by-side interstitials report both players, and a collector tells them apart by `cid` and `nr`.
+
+The wire during a sequential interstitial. Keys other than the ones shown are omitted.
+
+```text
+# The primary pauses and stops rendering while the ad player starts
+cid="movie-42",e=ps,nr,sid="s1",sn=7,sta=a,ts=1764752400000,v=2
+cid="ad-7",e=as,sid="s1",sn=8,ts=1764752400050,v=2
+cid="ad-7",e=ps,sid="s1",sn=9,sta=p,ts=1764752400120,v=2
+
+# One interval tick: one t line per live player, same ts, consecutive sn
+cid="movie-42",e=t,nr,sid="s1",sn=10,sta=a,ts=1764752430000,v=2
+cid="ad-7",e=t,sid="s1",sn=11,sta=p,ts=1764752430000,v=2
+
+# The ad ends and its player is disposed, the primary renders again
+cid="ad-7",e=ae,sid="s1",sn=12,ts=1764752445000,v=2
+cid="movie-42",e=ps,sid="s1",sn=13,sta=p,ts=1764752445200,v=2
+```
 
 ### Lifecycle
 
@@ -319,6 +383,30 @@ The `cid` given to `createPlayer()` counts as reported, so creating a player emi
 
 `bsa` counts the transitions into `r`. `bsda` and `bsd` count completed spans only. A span still open at `dispose()` is dropped. Automatic `bsa`, `bsd`, and `bsda` entries have no cause token. `url` is the request URL without its `CMCD` parameter. `rc` is `0` when `status` is absent. `ts` for a response is the request start.
 
+The `sta` transitions and what each one derives. Transitions with no effect on a derived key are left out.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    d : d preloading
+    s : s starting
+    p : p playing
+    k : k seeking
+    r : r rebuffering
+    a : a paused
+    [*] --> d
+    [*] --> s : records msdStart, su true
+    d --> s : records msdStart, su true
+    s --> p : msd from msdStart, su false
+    p --> k : su true
+    k --> p : su false
+    p --> r : bsa increments, span opens, bs set on every target, su true
+    r --> p : span closes into bsda and bsd, su false
+    r --> a : span closes into bsda and bsd
+    p --> a
+    a --> p
+```
+
 ### Reports and targets
 
 Every report is assembled in a fixed order, and a later source wins:
@@ -330,6 +418,25 @@ Every report is assembled in a fixed order, and a later source wins:
 5. the derived defaults
 
 The target's `transform` runs on a copy when one is configured, and `null` cancels the report for that target. The reporter then filters the keys, applies the spec rules, encodes, and only then commits: `sn` advances, the `msd` gate closes when the output kept `msd`, `bs` and the `ec` buffer clear, and the `bsd` cursor moves. A cancelled or failed report commits nothing.
+
+The report path for one target:
+
+```mermaid
+flowchart LR
+    subgraph assemble["Assemble, a later source wins"]
+        direction TB
+        s1["player store"] --> s2["session data"] --> s3["per-call data"] --> s4["target state for the player"] --> s5["derived defaults"]
+    end
+    assemble --> tq{"transform<br>configured?"}
+    tq -- no --> prep["filter keys<br>apply the spec rules"]
+    tq -- yes --> tr["copy nested values<br>run the transform"]
+    tr -- null --> cancel["cancelled<br>nothing committed"]
+    tr -- data --> restore["restore required keys<br>re-stamp sid, e, ts"] --> prep
+    prep --> enc["encode"]
+    enc -- throws --> fail["thrown to the caller<br>nothing committed"]
+    enc -- line --> commit["commit<br>sn advances<br>msd gate closes if kept<br>bs and ec clear<br>bsd cursor moves"]
+    commit --> out["event target: queue the line<br>request target: URL or headers"]
+```
 
 Filtering follows the target's `keys`. A key the current event requires is included whatever the list says:
 
@@ -408,8 +515,26 @@ Each event target queues encoded lines. It sends a batch when the queue reaches 
 | 2xx | done, back-off resets |
 | 410 | the target sends nothing else for this session |
 | 429, 5xx, or a rejected transport | the batch returns to the front of the queue, and the target retries after a back-off |
+| other 4xx | the batch is dropped, back-off resets |
 
 The back-off starts at one second and doubles to a cap of 60 seconds. New lines keep queueing during the back-off and go out with the retry, which is the aggregation the spec recommends for 429. After `dispose()`, a target stops retrying when a retry at the 60 second step fails. When a queue exceeds `maxQueueSize`, the oldest lines are dropped.
+
+The delivery states of one event target:
+
+```mermaid
+stateDiagram-v2
+    [*] --> queueing
+    queueing --> sending : batchSize reached, flush, dispose, or a late rr after dispose
+    sending --> queueing : 2xx, back-off resets
+    sending --> queueing : other 4xx, batch dropped
+    sending --> gone : 410
+    sending --> backingOff : 429, 5xx, or a rejected transport, batch back to the front
+    backingOff --> sending : timer fires, 1 s doubling to 60 s, or flush
+    backingOff --> gone : after dispose, the 60 s retry fails
+    gone --> [*]
+    note right of queueing : lines past maxQueueSize drop from the front
+    note right of backingOff : new lines keep queueing and join the retry
+```
 
 ### Errors
 
