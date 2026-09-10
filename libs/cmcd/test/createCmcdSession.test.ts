@@ -49,4 +49,11 @@ describe('createCmcdSession', () => {
 		deepEqual(req.headers, { 'CMCD-Object': 'ot=v', 'CMCD-Request': 'sn=1', 'CMCD-Session': 'sid="s",v=2' })
 		throws(() => session.configure({ keys: ['bad key' as never] }), { message: 'CmcdSession: keys must be reserved keys or hyphenated custom keys, received bad key' })
 	})
+
+	it('createReporter() throws on a disposed session', () => {
+		const session = createCmcdSession()
+		session.dispose()
+		throws(() => session.createReporter(), { message: 'CmcdSession: createReporter must be a live session, received a disposed session' })
+		session.dispose()
+	})
 })
