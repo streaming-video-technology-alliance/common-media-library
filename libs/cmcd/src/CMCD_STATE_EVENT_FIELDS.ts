@@ -16,7 +16,9 @@ import type { CmcdKey } from './CmcdKey.ts'
  * state-transition markers and must carry the field whose value they signal.
  * Consumers force-include the field post-filter (`prepareCmcdData`), dedup
  * against its value (`CmcdReporter`), and check its presence in payloads
- * (`validateCmcdStructure`).
+ * (`validateCmcdStructure`). The `b` event is the exception for that check.
+ * CTA-5004-B defines a `b` event without `bg` as the exit from backgrounded
+ * mode. `validateCmcdStructure` therefore does not require `bg` on `b`.
  *
  * Iteration order is load-bearing: `CmcdReporter.update()` fires state-change
  * events in map order when multiple tracked fields change in a single call.

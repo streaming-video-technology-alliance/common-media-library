@@ -90,10 +90,15 @@ describe('validateCmcdStructure', () => {
 		equal(result.valid, true)
 	})
 
-	it('reports error for b event without bg', () => {
+	it('accepts b event without bg', () => {
 		const result = validateCmcdStructure({ e: 'b', ts: 123 }, { reportingMode: 'event' })
-		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'bg' && i.severity === 'error'), true)
+		equal(result.valid, true)
+		equal(result.issues.some(i => i.key === 'bg'), false)
+	})
+
+	it('accepts v2 b event without bg as the exit from backgrounded mode', () => {
+		const result = validateCmcdStructure({ e: 'b', ts: 1234567890, v: 2 }, { reportingMode: 'event' })
+		equal(result.valid, true)
 	})
 
 	it('accepts b event with bg', () => {
