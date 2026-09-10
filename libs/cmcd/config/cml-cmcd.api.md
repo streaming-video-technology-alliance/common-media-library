@@ -782,6 +782,9 @@ export type CmcdValue = ValueOf<Cmcd>;
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
 // @public
+export function createCmcdSession(config?: CmcdSessionConfig): CmcdSession;
+
+// @public
 export function createFetchTransport(): CmcdTransportAdapter;
 
 // @public
