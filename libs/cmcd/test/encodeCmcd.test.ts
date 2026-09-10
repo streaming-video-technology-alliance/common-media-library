@@ -214,6 +214,24 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input, options), 'nor="bbb_30fps_480x270_600k_2.m4v"')
 	})
 
+	it('percent-encodes the relative path once for version 1 when nor is an absolute URL and baseUrl is provided', () => {
+		const input = {
+			nor: ['https://cdn.example.com/next seg.mp4'],
+		}
+		const options: CmcdEncodeOptions = {
+			version: 1,
+			baseUrl: 'https://cdn.example.com/seg-1.m4s',
+		}
+		equal(encodeCmcd(input, options), 'nor="next%20seg.mp4"')
+	})
+
+	it('keeps the escapes of an already percent-encoded nor path for version 1', () => {
+		const input = {
+			nor: ['next%20seg.mp4'],
+		}
+		equal(encodeCmcd(input, { version: 1 }), 'nor="next%20seg.mp4"')
+	})
+
 	describe('reporting modes', () => {
 		it('defaults to request mode', () => {
 			equal(encodeCmcd(CMCD_INPUT), CMCD_STRING_REQUEST)

@@ -18,6 +18,10 @@ const toRounded = (value: CmcdValue) => {
 	return roundValue(value)
 }
 
+const ESCAPE_OR_UNSAFE = /%[0-9A-Fa-f]{2}|[^A-Za-z0-9\-_.!~*'()]/gu
+
+const encodePath = (path: string): string => path.replace(ESCAPE_OR_UNSAFE, part => part.length === 3 ? part : encodeURIComponent(part))
+
 const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string | SfItem<string>> => {
 	if (Array.isArray(value)) {
 		return value.map(item => toUrlSafe(item, options) as string)
@@ -30,7 +34,7 @@ const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArra
 		if (options.baseUrl) {
 			value = urlToRelativePath(value as string, getBaseUrl(options.baseUrl))
 		}
-		return options.version === 1 ? encodeURIComponent(value as string) : (value as string)
+		return options.version === 1 ? encodePath(value as string) : (value as string)
 	}
 }
 

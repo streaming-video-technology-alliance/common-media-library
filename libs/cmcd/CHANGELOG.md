@@ -25,6 +25,7 @@ and this project adheres to
 - `CmcdReporter` event report bodies no longer end with a line feed. CTA-5004-B separates records with a single line feed and forbids a trailing one
 - `validateCmcdStructure` reports an error when `d` or `tpb` is present with an `ot` that the key does not allow. It also reports an error when `ab`, `lab`, or `tab` is present with `br`, `lb`, or `tb`. The message names the keys and the allowed object types. The checks apply to version 2 payloads and run in every validator
 - `validateCmcdEvents` and `validateCmcdEventReport` report an error when the body ends with a line feed. Every earlier `CmcdReporter` sent that line feed. A receiver that upgrades marks reports from those players as invalid
+- The `nor` formatter percent-encodes a version 1 value once. When `baseUrl` was set and `nor` was an absolute URL, `encodeCmcd` encoded the relative path twice. `https://cdn.example.com/next seg.mp4` was sent as `nor="next%2520seg.mp4"` and is now sent as `nor="next%20seg.mp4"`. The formatter keeps every `%XX` escape that the value already carries. A relative path such as `next%20seg.mp4` was also sent as `next%2520seg.mp4` and is now sent unchanged. The change applies to `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, `toCmcdUrl`, and `CmcdReporter`, which share `CMCD_FORMATTER_MAP`
 
 ## [2.6.1] - 2026-09-07
 
