@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Architecture Guide (`docs/architecture-guide.md`): how the reporter works inside. The guide diagrams the internal units and their ownership, the event report pipeline, and late-response attribution
+
 ### Fixed
 
 - A report value that fails structured-field encoding no longer consumes a sequence number or the session's once-per-target `msd` gate
@@ -21,7 +25,8 @@ and this project adheres to
 
 ### Changed
 
-- Internal restructuring of `CmcdReporter` into session-ledger, playback-state, report-pipeline, and outbox units in preparation for child reporters and automatic session counters. No public API change. Event-report processing now tracks only sessions with queued reports instead of scanning every retained session. Consumers that import `CmcdReporter` pay about 2.8 KB more minified (0.8 KB gzipped). Consumers of the codec functions alone are unaffected
+- `CmcdReporter` is restructured into session-ledger, playback-state, report-pipeline, and outbox units, in preparation for child reporters and session counters. The public API is unchanged. Report processing now visits only sessions with queued reports. Importing `CmcdReporter` costs about 2.8 KB more minified (0.8 KB gzipped). The codec functions are unaffected
+- The fan-out ordering, the unsent-report tracking, the report copy, and the `msd` commit inside `CmcdReporter` are each one code path now. Event mode consumes the `msd` send gate only when the prepared report keeps `msd`, the same rule as request mode. A version 1 event target that enabled `msd` therefore no longer consumes the gate. That gate never put `msd` on a version 1 wire, so no report changes
 
 ## [2.6.1] - 2026-09-07
 

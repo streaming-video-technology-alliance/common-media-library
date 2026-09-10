@@ -36,6 +36,7 @@ export class CmcdOutbox {
 
 	push(line: string): void {
 		this.queue.push(line)
+		this.onDirty()
 	}
 
 	dispose(): void {
@@ -48,20 +49,29 @@ export class CmcdOutbox {
 			return false
 		}
 
-		if (this.queue.length < this.batchSize && !drain) {
-			this.onDirty()
-			return false
+		let dispatched = false
+
+		if (this.queue.length >= this.batchSize || drain) {
+			const deleteCount = drain ? this.queue.length : this.batchSize
+			const events = this.queue.splice(0, deleteCount)
+
+			this.send(events).catch(() => {
+				this.queue.unshift(...events)
+				this.onDirty()
+			})
+
+			dispatched = true
 		}
 
-		const deleteCount = drain ? this.queue.length : this.batchSize
-		const events = this.queue.splice(0, deleteCount)
-
-		this.send(events).catch(() => {
-			this.queue.unshift(...events)
+		// Unsent lines remain, so report that through onDirty. Callers never
+		// read the queue state themselves. The failed-send callback above
+		// calls onDirty separately, because its re-queue runs after this
+		// method has returned.
+		if (this.queue.length > 0) {
 			this.onDirty()
-		})
+		}
 
-		return this.queue.length > 0
+		return dispatched && this.queue.length > 0
 	}
 
 	private async send(data: string[]): Promise<void> {

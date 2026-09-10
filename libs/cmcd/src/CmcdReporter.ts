@@ -177,9 +177,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// report consume another session's sequence numbers.
 		const session = this.ledger.current
 
-		this.fanOutDepth++
-
-		try {
+		this.runFanOut(() => {
 			session.eventTargets.forEach((target, config) => {
 				if (!this.started) {
 					return
@@ -203,16 +201,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 					failure ??= { error }
 				}
 			})
-		}
-		finally {
-			this.fanOutDepth--
-		}
 
-		this.maybeEvict()
-
-		if (failure) {
-			throw failure.error
-		}
+			if (failure) {
+				throw failure.error
+			}
+		})
 	}
 
 	/**
@@ -246,16 +239,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		this.fanOutDepth++
-
-		try {
-			this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
-		}
-		finally {
-			this.fanOutDepth--
-			this.processEventTargets()
-			this.maybeEvict()
-		}
+		this.runFanOut(() => this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL))
 	}
 
 	/**
@@ -400,7 +384,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// Drain ended sessions before eviction can destroy their queues: a
 		// partial batch the ended session could never fill again leaves now.
 		this.processEventTargets()
-		this.requestEvict()
+		this.evictPending = true
+		this.maybeEvict()
 
 		// Timers keep ticking across session changes. Configs whose timer was
 		// disarmed by a 410 in the previous session re-arm here, because the
@@ -416,17 +401,39 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Evicts retained sessions beyond the configured retention. An eviction
-	 * requested during a fan-out is held until the outermost fan-out has
-	 * drained, so a session an active fan-out still holds outlives the
-	 * request.
+	 * Runs one fan-out with the steps that every fan-out shares. The method
+	 * tracks the fan-out depth, which defers eviction while any fan-out is
+	 * active. It then processes the event-target queues and runs a held
+	 * eviction. If the fan-out or the queue processing throws, the remaining
+	 * steps still run. The method rethrows the earliest error afterward.
 	 */
-	private requestEvict(): void {
-		if (this.fanOutDepth > 0) {
-			this.evictPending = true
+	private runFanOut(fn: () => void): void {
+		let failure: { error: unknown; } | undefined
+
+		this.fanOutDepth++
+
+		try {
+			fn()
 		}
-		else {
-			this.ledger.evict()
+		catch (error) {
+			failure = { error }
+		}
+		finally {
+			this.fanOutDepth--
+		}
+
+		try {
+			this.processEventTargets()
+		}
+		catch (error) {
+			failure ??= { error }
+		}
+		finally {
+			this.maybeEvict()
+		}
+
+		if (failure) {
+			throw failure.error
 		}
 	}
 
@@ -510,9 +517,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// never receive it, and the caller's retry would be deduped away.
 		let failure: { error: unknown; } | undefined
 
-		this.fanOutDepth++
-
-		try {
+		this.runFanOut(() => {
 			session.eventTargets.forEach((target, config) => {
 				try {
 					this.recordTargetEvent(session, target, config, type, data, request)
@@ -521,20 +526,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 					failure ??= { error }
 				}
 			})
-		}
-		finally {
-			this.fanOutDepth--
-		}
 
-		this.processEventTargets()
-		this.maybeEvict()
-
-		// Surfaced only once every target has had its turn and the queues have
-		// been processed. Transforms must not throw; this makes the violation
-		// visible without letting it starve unrelated targets.
-		if (failure) {
-			throw failure.error
-		}
+			// The first error is thrown only after every target received the
+			// event and runFanOut() processed the queues. Transforms must not
+			// throw. This rethrow makes the violation visible without
+			// blocking the other targets' reports.
+			if (failure) {
+				throw failure.error
+			}
+		})
 	}
 
 	/**
@@ -573,15 +573,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Stamps the reporter-owned fields on a finished event report, encodes it,
-	 * and pushes the wire line to the target's queue.
+	 * Stamps the reporter-owned fields on a finished event report, prepares
+	 * and encodes it, and pushes the wire line to the target's queue.
 	 *
 	 * Called after any transform has run, so a transform cannot bypass the
 	 * target's `events` filter via `e`, break `sn` continuity, or substitute
 	 * the session identity carried by `sid` and `msd`. Encoding here means a
 	 * report that cannot serialize throws inside the recording call that
 	 * produced it, instead of rejecting the batch send and re-queueing
-	 * forever.
+	 * forever. Preparation and encoding are separate steps so the `msd`
+	 * commit reads the prepared output, the same rule request mode applies:
+	 * the gate is consumed only when the report actually retained `msd`.
 	 *
 	 * @param target - The target to queue the report for.
 	 * @param config - The configuration for the target.
@@ -589,14 +591,15 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param type - The type of event being reported.
 	 */
 	private queueTargetEvent(session: CmcdSessionState<C>, target: CmcdEventTargetState, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
-		const attach = stampReport(report, session, target, config.enabledKeys?.includes('msd') ?? false, type)
+		stampReport(report, session, target, type)
 
-		target.outbox.push(encodeCmcd(report, createEncodingOptions(CMCD_EVENT_MODE, config)))
-		this.ledger.markDirty(session)
+		const prepared = prepareCmcdData(report, createEncodingOptions(CMCD_EVENT_MODE, config))
+
+		target.outbox.push(encodePreparedCmcd(prepared))
 
 		target.sn++
 
-		if (attach) {
+		if (prepared.msd !== undefined) {
 			target.msdSent = true
 		}
 	}
@@ -836,7 +839,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		const stamps = resolveRequestTarget(session, CMCD_DEFAULT_REQUEST_TARGET)
 
-		const sendMsd = stampReport(cmcdData, session, stamps, true)
+		stampReport(cmcdData, session, stamps)
 
 		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
@@ -866,7 +869,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		stamps.sn++
 
-		if (sendMsd && cmcd.msd !== undefined) {
+		if (cmcd.msd !== undefined) {
 			stamps.msdSent = true
 		}
 
@@ -892,7 +895,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 			session.eventTargets.forEach((target) => {
 				if (target.outbox.process(drain)) {
-					this.ledger.markDirty(session)
 					reprocess = true
 				}
 			})
