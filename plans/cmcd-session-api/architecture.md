@@ -24,7 +24,7 @@ One export per file, per the package rule. Names are a starting point for the im
 | File | Export | Kind |
 |---|---|---|
 | `createCmcdSession.ts` | `createCmcdSession` | public |
-| `CmcdSession.ts`, `CmcdSessionConfig.ts`, `CmcdEventTargetConfig.ts`, `CmcdTransport.ts` | types | public |
+| `CmcdSession.ts`, `CmcdSessionConfig.ts`, `CmcdEventTargetConfig.ts`, `CmcdRequester.ts` | types | public |
 | `CmcdSessionReporter.ts`, `CmcdSessionReporterConfig.ts`, `CmcdPlaybackData.ts`, `CmcdMetric.ts`, `CmcdNextObject.ts` | types | public |
 | `CmcdRequestLike.ts`, `CmcdDecoratedRequest.ts`, `CmcdRequestRecord.ts`, `CmcdResponseInfo.ts`, `CmcdResourceTiming.ts` | types | public |
 | `CmcdRequestTransform.ts`, `CmcdEventTransform.ts`, `CmcdDiscreteEventType.ts` | types | public |
@@ -148,7 +148,7 @@ For each field in the order `sta`, `pr`, `cid`, `bg`, `br`:
 3. Skip `pr` when the store's `sta` is not p.
 4. Set the reported value, then emit the event to every event target that lists it.
 
-`bg` emits one line per live reporter, like `t`. The others emit one line for the reporter. A `pr` change while paused is picked up on the next diff that runs while `sta` is p, because step 2 still sees a difference.
+`bg` emits one line per live reporter, like `t`. When `bg` changes to false, the session clears the value before the emit, so the `b` line and later reports carry no `bg`. The others emit one line for the reporter. A `pr` change while paused is picked up on the next diff that runs while `sta` is p, because step 2 still sees a difference.
 
 ### Emit(event, reporter, data, request?)
 
@@ -225,7 +225,7 @@ Per event target, `processQueue(drain)`:
 1. Return when the target is gone, the queue is empty, a send is in flight, or a retry timer is armed.
 2. Return when the queue is shorter than `batchSize` and `drain` is false.
 3. Splice the batch: the whole queue when `drain`, else `batchSize` lines.
-4. POST through the transport. Body: lines joined by `\n`. Headers: `Content-Type: application/cmcd` plus the target's headers.
+4. POST through the requester. Body: lines joined by `\n`. Headers: `Content-Type: application/cmcd` plus the target's headers.
 
 | Result | Action |
 |---|---|
@@ -236,7 +236,7 @@ Per event target, `processQueue(drain)`:
 
 `flush()` clears an armed retry timer and processes with `drain`. Once the owning `sid` state has ended, a failure at the 60 second step stops the retries. When the queue is longer than `maxQueueSize` after an unshift or a push, splice the oldest lines off the front.
 
-The default transport: `fetch(url, { method: 'POST', headers, body, keepalive: body.length < 65536 })`, returning `{ status }`. A network error rejects.
+The default requester: `fetch(url, { method: 'POST', headers, body, keepalive: body.length < 65536 })`, returning `{ status }`. A network error rejects.
 
 ## Key table
 
@@ -341,7 +341,7 @@ Tests import from `@svta/cml-cmcd` and run against the built package.
 | Multi-player | two reporters, one `sid`, `sn` continuity per target, one `t` line per reporter, `nr`, reporter dispose |
 | Late responses | after `rotate()`, after session dispose, with a spread copy of the request, after a JSON round trip, and with `{ url }` alone |
 | Rotation | `sn` restarts per target, the `msd` gate re-arms, baselines reset so the next push emits, the old queue drains at once, a 410 target is active again, the same `sid` is a no-op, and nothing is emitted by the call |
-| Delivery | mock transport with fake timers: batch size, flush, dispose, 410, 429 back-off sequence, 5xx, rejection, queue cap, `pagehide` keepalive |
+| Delivery | mock requester with fake timers: batch size, flush, dispose, 410, 429 back-off sequence, 5xx, rejection, queue cap, `pagehide` keepalive |
 | Errors | configuration checks and their messages, encoder failure commits nothing, throwing transform isolation, `onError` on a tick |
 | Validation | every emitted line passes `validateCmcdEvents` or `validateCmcdRequest` |
 | Types | `@ts-expect-error` for a state-change type in `recordEvent`, `ce` without `cen`, `version` on an event target, `ec` in `CmcdPlaybackData` |
