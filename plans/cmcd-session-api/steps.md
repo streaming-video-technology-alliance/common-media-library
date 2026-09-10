@@ -15,7 +15,7 @@
 - Run one test file with `node --no-warnings --test libs/cmcd/test/<file>.test.ts` from the repository root. Run `npm run typecheck` at the root after every task, because the tests typecheck against `dist/index.d.ts`.
 - Code style: tabs, no semicolons, single quotes, `type` not `interface`, no `enum`, and named exports only.
 - Relative imports carry the `.ts` extension. Use `readonly` where mutation is not intended, and bracket access for index signatures.
-- One export per file. `index.ts` uses `export type *` for type-only files and `export *` for the rest.
+- Public files have one export each. An internal file may group a function with its result type or with the helpers that share its rule, as `.claude/rules/code-quality.md` allows. `index.ts` uses `export type *` for type-only files and `export *` for the rest.
 - No code runs at module scope. Annotate a module-scope `new Map()`, `new Set()`, or `new WeakMap()` with `/* @__PURE__ */`.
 - Every public export has TSDoc with `@public`. Public functions have `@example {@includeCode ../test/<file>.test.ts#example}` and the test file has a `// #region example` block.
 - Every commit uses `git commit -s`, a Conventional Commits subject, and the trailer `Co-Authored-By: Claude claude-fable-5-1 <noreply@anthropic.com>`. Never commit to `main`. Work on branch `feat/cmcd-session-api`.
@@ -1590,7 +1590,7 @@ export function addSpan(session: SessionState, sidState: SidState, cause: string
 }
 ```
 
-`pruneSpans.ts` has three exports. That is the one exception to the one-export rule in this plan, because the three functions share the eligibility rule and the cursor arithmetic.
+`pruneSpans.ts` has four exports. The cap and the three functions share the eligibility rule and the cursor arithmetic.
 
 ```ts
 // libs/cmcd/src/emitReport.ts
