@@ -8,10 +8,10 @@ Baseline: `main` at `2653a012`, `@svta/cml-cmcd` 2.6.1 plus the unreleased fixes
 
 | Unit | Owns | Public |
 |---|---|---|
-| Session | the `sid`, the normalized configuration, the players, the targets, the timers, the visibility listener, and the session totals | `CmcdSession` |
-| Player | the pushed store, the reported baselines of `sta`, `pr`, `cid`, and `br`, the host, the `su` derivation, and the open starvation span | `CmcdPlayer` |
-| Target | one destination: `sn`, the `msd` gate, the `bsd` cursor, the per-player `bs` flag and `ec` buffer, and for an event target the queue, the back-off, and the 410 flag | no |
-| Request origin | the link from a decorated request to its player, its request target, its raw per-request data, its start time, and its host | no |
+| Session | the `sid`, the normalized configuration, the reporters, the targets, the timers, the visibility listener, and the session totals | `CmcdSession` |
+| Reporter | the pushed store, the reported baselines of `sta`, `pr`, `cid`, and `br`, the host, the `su` derivation, and the open starvation span | `CmcdSessionReporter` |
+| Target | one destination: `sn`, the `msd` gate, the `bsd` cursor, the per-reporter `bs` flag and `ec` buffer, and for an event target the queue, the back-off, and the 410 flag | no |
+| Request origin | the link from a decorated request to its reporter, its request target, its raw per-request data, its start time, and its host | no |
 | Preparation | the key table, value normalization, filtering, and encoding | no, `encodeCmcd` moves onto it later |
 
 The request target and the event targets share one state type and one report path. They differ in the encoder output, a query parameter or headers against a body line, and in delivery. The request target has no queue, because the player sends the request.
@@ -24,20 +24,20 @@ One export per file, per the package rule. Names are a starting point for the im
 |---|---|---|
 | `createCmcdSession.ts` | `createCmcdSession` | public |
 | `CmcdSession.ts`, `CmcdSessionConfig.ts`, `CmcdEventTargetConfig.ts`, `CmcdTransport.ts` | types | public |
-| `CmcdPlayer.ts`, `CmcdPlayerConfig.ts`, `CmcdPlayerData.ts`, `CmcdMetric.ts`, `CmcdNextObject.ts` | types | public |
+| `CmcdSessionReporter.ts`, `CmcdSessionReporterConfig.ts`, `CmcdPlaybackData.ts`, `CmcdMetric.ts`, `CmcdNextObject.ts` | types | public |
 | `CmcdRequestLike.ts`, `CmcdDecoratedRequest.ts`, `CmcdRequestRecord.ts`, `CmcdResponseInfo.ts`, `CmcdResourceTiming.ts` | types | public |
 | `CmcdRequestTransform.ts`, `CmcdEventTransform.ts`, `CmcdDiscreteEventType.ts` | types | public |
 | `CmcdEventType.ts` | adds `CMCD_EVENT_HOSTNAME` and `HOSTNAME` | public, existing file |
 | `CmcdKeySpec.ts`, `CMCD_KEY_SPECS.ts` | the key table | internal |
 | `normalizeValue.ts`, `formatNor.ts` | value normalization | internal |
 | `prepareReport.ts` | the table-driven preparation loop | internal |
-| `createCmcdSessionState.ts`, `createCmcdPlayerState.ts`, `createCmcdTargetState.ts` | state factories | internal |
+| `createCmcdSessionState.ts`, `createCmcdReporterState.ts`, `createCmcdTargetState.ts` | state factories | internal |
 | `deriveStateEvents.ts` | the state-change diff and the transition tracking | internal |
 | `assembleReport.ts` | the merge order and the derived defaults | internal |
 | `emitReport.ts` | transform, prepare, encode, commit, for one target | internal |
 | `deliverBatch.ts` | POST, response handling, back-off | internal |
 | `toResponseKeys.ts`, `readCmsdHeaders.ts` | the `rr` derivations | internal |
-| `observeVisibility.ts` | the `bg` listener | internal |
+| `observeVisibility.ts` | the `bg` listener, when `derive.bg` is on | internal |
 | `CMCD_REQUEST_ORIGINS.ts` | the `WeakMap` from record to origin | internal |
 
 No module runs code at import time. The key table is an object literal, so it needs no purity annotation. The `WeakMap` is created inside a function that runs on first use, or has the annotation.
@@ -50,7 +50,7 @@ No module runs code at import time. The key table is an object literal, so it ne
 |---|---|---|
 | `sid` | `string` | immutable |
 | `config` | normalized `CmcdSessionConfig` | defaults applied, lists copied |
-| `players` | `Set<PlayerState>` | insertion order is creation order |
+| `reporters` | `Set<ReporterState>` | insertion order is creation order |
 | `requestTarget` | `TargetState` | always present |
 | `eventTargets` | `TargetState[]` | one per configured target |
 | `timers` | `ReturnType<typeof setInterval>[]` | one per event target with `t` and an interval over 0 |
@@ -62,7 +62,7 @@ No module runs code at import time. The key table is an object literal, so it ne
 | `countersSupplied` | `{ bsa?: true; bsda?: true; bsd?: true }` | per-key sticky override |
 | `disposed` | `boolean` | |
 
-### Player
+### Reporter
 
 | Field | Type | Notes |
 |---|---|---|
@@ -84,7 +84,7 @@ No module runs code at import time. The key table is an object literal, so it ne
 | `sn` | `number` | next sequence number |
 | `msdSent` | `boolean` | |
 | `bsdCursor` | `number` | completed spans delivered to this target |
-| `perPlayer` | `Map<PlayerState, { bs: boolean; ec: string[] }>` | entry removed on player dispose |
+| `perReporter` | `Map<ReporterState, { bs: boolean; ec: string[] }>` | entry removed on reporter dispose |
 | `queue` | `string[]` | event targets only, encoded lines |
 | `attempt`, `retryTimer` | `number`, timer handle or `undefined` | back-off state |
 | `gone` | `boolean` | set by a 410 |
@@ -93,17 +93,17 @@ No module runs code at import time. The key table is an object literal, so it ne
 
 | Field | Type |
 |---|---|
-| `player` | `PlayerState` |
-| `data` | the raw per-request `CmcdPlayerData` |
+| `reporter` | `ReporterState` |
+| `data` | the raw per-request `CmcdPlaybackData` |
 | `startedAt` | epoch milliseconds at `decorate()` |
 
-The origin is stored in a `WeakMap` keyed by the `CmcdRequestRecord` object. A spread copy of the request keeps the same record object, so the lookup still resolves. JSON produces a new object, so the lookup fails and the response reports under the calling player.
+The origin is stored in a `WeakMap` keyed by the `CmcdRequestRecord` object. A spread copy of the request keeps the same record object, so the lookup still resolves. JSON produces a new object, so the lookup fails and the response reports under the calling reporter.
 
 ## Algorithms
 
 ### update(data)
 
-1. If the player or its session is disposed, return.
+1. If the reporter or its session is disposed, return.
 2. Take `ts` from `data`, default `Date.now()`. Do not store it.
 3. For `bg`, `msd`, `bsa`, `bsda`, and `bsd` in `data`: write the value on the session and set the supplied flag. Remove the key from the merge. A pushed `bg` also calls `stopVisibility`.
 4. Merge the rest into `store`. Set `suSupplied` or `dlSupplied` when `su` or `dl` is present.
@@ -118,7 +118,7 @@ Runs when `sta` changes from the previous stored value.
 |---|---|
 | into s, with no `msdStart` | `msdStart = ts` |
 | into p, with `msdStart` set and `msd` unset | `msd = ts - msdStart`, when `msdSupplied` is false |
-| into r | `spanOpenedAt = ts`, `bsa += 1`, set `bs` on every target's entry for this player |
+| into r | `spanOpenedAt = ts`, `bsa += 1`, set `bs` on every target's entry for this reporter |
 | out of r, with `spanOpenedAt` set | push `ts - spanOpenedAt` to `spans`, add it to `bsda`, clear `spanOpenedAt` |
 | into s, k, or r | `su = true` |
 | into p | `su = false` |
@@ -134,9 +134,9 @@ For each field in the order `sta`, `pr`, `cid`, `bg`, `br`:
 3. Skip `pr` when the store's `sta` is not p.
 4. Set the reported value, then emit the event to every event target that lists it.
 
-`bg` emits one line per live player, like `t`. The others emit one line for the player. A `pr` change while paused is picked up on the next diff that runs while `sta` is p, because step 2 still sees a difference.
+`bg` emits one line per live reporter, like `t`. The others emit one line for the reporter. A `pr` change while paused is picked up on the next diff that runs while `sta` is p, because step 2 still sees a difference.
 
-### Emit(event, player, data, request?)
+### Emit(event, reporter, data, request?)
 
 For each event target that lists the event and is not gone:
 
@@ -145,16 +145,16 @@ For each event target that lists the event and is not gone:
 3. After every target, process the target queues.
 4. Rethrow the collected error. On a timer tick, pass it to `onError` instead, or throw when `onError` is absent.
 
-### Assemble(player, target, event?, data?)
+### Assemble(reporter, target, event?, data?)
 
 Merge in this order, later wins:
 
-1. the player's `store`
+1. the reporter's `store`
 2. the session data: `sid`, `v`, `bg`, `msd` when the target's gate is open, `bsa`, `bsda`, and the spans after the target's `bsdCursor` as `bsd`
 3. `data`
-4. the target's entry for the player: `bs` when flagged, `ec` when the buffer is not empty
-5. `su` from the player when `suSupplied` is false and the report has no `su`
-6. `dl` from `bl / pr` when `dlSupplied` is false, the report has `bl` and no `dl`, and `pr` is over 0 or absent
+4. the target's entry for the reporter: `bs` when flagged, `ec` when the buffer is not empty
+5. `su` from the reporter when `derive.su` is on, `suSupplied` is false, and the report has no `su`
+6. `dl` from `bl / pr` when `derive.dl` is on, `dlSupplied` is false, the report has `bl` and no `dl`, and `pr` is over 0 or absent
 7. `e` and `ts` for an event
 
 ### emitReport(target, report, event?, request?)
@@ -162,20 +162,20 @@ Merge in this order, later wins:
 1. When the target has a transform: copy nested values, run the transform, return on `null`, restore a removed required key, re-stamp `sid`, `e`, and `ts`.
 2. `report.sn = target.sn`.
 3. Prepare (below) and encode. An encoder error propagates, and step 4 does not run.
-4. Commit: `target.sn += 1`. When the output has `msd`, `msdSent = true`. Clear the player's `bs` and `ec` entry. Move `bsdCursor` to the end of the spans when the output has `bsd`.
+4. Commit: `target.sn += 1`. When the output has `msd`, `msdSent = true`. Clear the reporter's `bs` and `ec` entry. Move `bsdCursor` to the end of the spans when the output has `bsd`.
 5. Event target: push the line to the queue. Request target: return the prepared data for the URL or the headers.
 
 ### decorate(request, data)
 
 1. If disposed, return a copy of the request with a record `{ sid, data: {} }` and no origin.
-2. Read the host of `request.url`. When `hSupplied` is false and the host differs from `player.host`, set it and emit `h` after step 5.
+2. Read the host of `request.url`. When `hSupplied` is false and the host differs from `reporter.host`, set it and emit `h` after step 5.
 3. Assemble with the request target and `data`. Run `emitReport`. A cancelled report leaves the request as is.
 4. Query mode: set the `CMCD` query parameter, replacing an existing one. Header mode: copy `headers` and set the non-empty shards. `nor` values use `request.url` as the base for the relative path.
-5. Create the record `{ sid, data: prepared }`, store the origin `{ player, data, startedAt: Date.now() }`, and return `{ ...request, url, headers, cmcd: record }`.
+5. Create the record `{ sid, data: prepared }`, store the origin `{ reporter, data, startedAt: Date.now() }`, and return `{ ...request, url, headers, cmcd: record }`.
 
 ### recordResponse(request, info, data)
 
-1. Resolve the origin from `request.cmcd`. Without one, the origin is the calling player with empty data and no start time.
+1. Resolve the origin from `request.cmcd`. Without one, the origin is the calling reporter with empty data and no start time.
 2. Derive the response keys:
    - `url`: `request.url` without the `CMCD` parameter
    - `rc`: `info.status`, or 0
@@ -183,17 +183,17 @@ Merge in this order, later wins:
    - `ttfb`: `responseStart - startTime`
    - `ttlb`: `duration`, or `responseEnd - startTime`, else `Date.now() - origin.startedAt`
    - `cmsds` and `cmsdd`: the `CMSD-Static` and `CMSD-Dynamic` headers, base64 encoded
-3. Assemble for each `rr` target of the origin session: the origin player's store, the session data, `origin.data`, the derived keys, then `data`.
+3. Assemble for each `rr` target of the origin session: the origin reporter's store, the session data, `origin.data`, the derived keys, then `data`.
 4. Emit `rr` with the decorated request as the transform argument.
 5. When the origin session is disposed, dispatch its queues at once.
 
 ### Tick(target)
 
-For each live player in creation order, assemble with `t` and emit to this one target. With no players, emit one line from the session data alone. Then process the queue.
+For each live reporter in creation order, assemble with `t` and emit to this one target. With no reporters, emit one line from the session data alone. Then process the queue.
 
 ### dispose()
 
-Session: set `disposed`, clear the timers, call `stopVisibility`, mark every player disposed, and dispatch every queue in full. Player: set `disposed`, remove the player from `players`, and delete its entries in every target. A late response for a disposed player still resolves through its origin, because the origin references the player object.
+Session: set `disposed`, clear the timers, call `stopVisibility`, mark every reporter disposed, and dispatch every queue in full. Reporter: set `disposed`, remove the reporter from `reporters`, and delete its entries in every target. A late response for a disposed reporter still resolves through its origin, because the origin references the reporter object.
 
 ## Delivery
 
@@ -301,7 +301,7 @@ for key of report keys, sorted:
 | `update()` with one state change | one report object per event target, plus one copy per target with a transform |
 | `decorate()` | the report, the prepared object, the request copy, the record, the origin |
 | `recordResponse()` | the report per `rr` target |
-| tick | one report per player per target |
+| tick | one report per reporter per target |
 | idle | none |
 
 There is no per-call session lookup, no eviction pass, and no scan of past sessions. A late response follows one `WeakMap` read. `br` comparison in the diff is a loop over a short array.
@@ -315,12 +315,12 @@ Tests import from `@svta/cml-cmcd` and run against the built package.
 | Spec conformance | one fixture per scenario in CTA-5004-B section 8: 8.1.1 to 8.1.8, 8.2.1 to 8.2.9, and 8.3. Drive the API with an injected clock and compare the wire string to the spec text, after removing the whitespace the document formatting adds |
 | Derivations | one test per row of the derived keys table in the RFC, including the supplied-value override |
 | State-change diff | order, dedup, `pr` while paused, `cid` at creation, `bg` on the session, `br` by value |
-| Multi-player | two players, one `sid`, `sn` continuity per target, one `t` line per player, `nr`, player dispose |
+| Multi-player | two reporters, one `sid`, `sn` continuity per target, one `t` line per reporter, `nr`, reporter dispose |
 | Late responses | after session dispose, with a spread copy of the request, after a JSON round trip, and with `{ url }` alone |
 | Delivery | mock transport with fake timers: batch size, flush, dispose, 410, 429 back-off sequence, 5xx, rejection, queue cap, `pagehide` keepalive |
 | Errors | configuration checks and their messages, encoder failure commits nothing, throwing transform isolation, `onError` on a tick |
 | Validation | every emitted line passes `validateCmcdEvents` or `validateCmcdRequest` |
-| Types | `@ts-expect-error` for a state-change type in `recordEvent`, `ce` without `cen`, `version` on an event target, `ec` in `CmcdPlayerData` |
+| Types | `@ts-expect-error` for a state-change type in `recordEvent`, `ce` without `cen`, `version` on an event target, `ec` in `CmcdPlaybackData` |
 | Bundle | the bare-import side-effect probe, and a size probe against the baseline in `comparison.md` |
 
 ## Sequencing
@@ -328,7 +328,7 @@ Tests import from `@svta/cml-cmcd` and run against the built package.
 A suggested order for `steps.md`.
 
 1. The key table, `normalizeValue`, `formatNor`, and `prepareReport`, with the spec fixtures for the wire strings.
-2. Session and player state, `update()`, the diff, and the transition tracking.
+2. Session and reporter state, `update()`, the diff, and the transition tracking.
 3. Targets, `emitReport`, and `decorate()`.
 4. `recordResponse()` and the origins.
 5. Delivery, timers, and `dispose()`.
@@ -348,7 +348,7 @@ These are independent of the RFC and can ship as fixes.
 
 ## Open implementation questions
 
-1. Whether `CmcdSession` and `CmcdPlayer` are plain objects from a factory or classes. Plain objects match the `create*` pattern of the package and mangle better. Classes give `instanceof`.
-2. Whether the request origin should hold the player strongly. A strong reference keeps a disposed player alive until its requests complete, which is the intended retention.
-3. Whether the `t` tick for a session without players should emit a line at all.
+1. Whether `CmcdSession` and `CmcdSessionReporter` are plain objects from a factory or classes. Plain objects match the `create*` pattern of the package and mangle better. Classes give `instanceof`.
+2. Whether the request origin should hold the reporter strongly. A strong reference keeps a disposed reporter alive until its requests complete, which is the intended retention.
+3. Whether the `t` tick for a session without reporters should emit a line at all.
 4. The exact configuration error type: `TypeError` for a wrong type and `RangeError` for a wrong value, or one `Error` with a code.

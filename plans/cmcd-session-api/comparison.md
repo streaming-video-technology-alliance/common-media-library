@@ -32,8 +32,8 @@ The `CmcdReporter` sizes were measured on the built `dist` of this worktree, bun
 | Provenance record on `customData` | yes, symbol key | yes | no, a plain `cmcd` record |
 | `customData` type parameter `C` | yes | yes | no |
 | Dirty tracking, deferred eviction | no | yes | no |
-| Root and child reporters | proposed, PR #398 | landing zone prepared | no, players are peers |
-| `activate()` for interval reports | proposed, PR #398 | not yet | no, one line per player |
+| Root and child reporters | proposed, PR #398 | landing zone prepared | no, reporters are peers |
+| `activate()` for interval reports | proposed, PR #398 | not yet | no, one line per reporter |
 | Per-target state in request mode | `sn` and `msd` only | keyed map | full target state |
 | Derived keys | `sn`, `ts`, `v`, `e`, `url`, `rc`, `ttfb`, `ttlb` | same | plus `msd`, `bs`, `bsa`, `bsda`, `bsd`, `su`, `dl`, `h`, `bg`, `cmsds`, `cmsdd` |
 | Per-destination `ec` buffer | no | no | yes |
@@ -46,8 +46,8 @@ The `CmcdReporter` sizes were measured on the built `dist` of this worktree, bun
 | CTA-5004-B rule | `CmcdReporter` and PR #422 | Session API |
 |---|---|---|
 | `msd` once per session and mode, from starting to playing | gate only, value from the player | derived and gated |
-| `bs` since the last report per destination | player value | derived per target and player |
-| `ec` buffered per destination | player value, persists when pushed with `update()` | derived per target and player |
+| `bs` since the last report per destination | player value | derived per target and reporter |
+| `ec` buffered per destination | player value, persists when pushed with `update()` | derived per target and reporter |
 | `bsa`, `bsda`, `bsd` since session initiation | player values, planned derivation | derived |
 | `su` until stable playback | player value | derived default |
 | `dl` | player value | derived default |
@@ -55,7 +55,7 @@ The `CmcdReporter` sizes were measured on the built `dist` of this worktree, bun
 | `bg` over all players in a session | player value | session value, from document visibility |
 | `cmsds`, `cmsdd` from response headers | player values | derived |
 | `pr` event only while playing | not enforced | enforced |
-| One `sid`, one `sn` sequence per target across players | one reporter per player breaks it | native |
+| One `sid`, one `sn` sequence per target across players | one `CmcdReporter` per media player breaks it | native |
 | 429 back-off, 5xx retry, lost connectivity | re-queue, retry on the next event | exponential back-off with aggregation |
 | 410 for the rest of the session | yes | yes |
 | Per-target `Authorization` header, item 16 | no | `headers` per target |
@@ -82,7 +82,7 @@ Both players change under either path once they upgrade past 2.5. PR #422 keeps 
 
 | Work | PR #422 | Session API |
 |---|---|---|
-| Child reporters, PR #398 | a second facade over the ledger, `pid` on the provenance record, `activate()` | `createPlayer()` |
+| Child reporters, PR #398 | a second facade over the ledger, `pid` on the provenance record, `activate()` | `createReporter()` |
 | Starvation counters, `plans/cmcd-session-counters/` | transition detection in `acceptStateChange`, cursors in the commit step | in the transition tracking, same precedence rules |
 | Session retention, shipped in 2.6.0 | the ledger | object lifetime |
 | Transforms, shipped in 2.5.0 | `applyReportPolicy` | `emitReport`, same contract |
