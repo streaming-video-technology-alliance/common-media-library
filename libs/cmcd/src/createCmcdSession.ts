@@ -1,9 +1,12 @@
 import { uuid } from '@svta/cml-utils'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
+import { armTimers } from './armTimers.ts'
 import { configureSession } from './configureSession.ts'
 import { createSessionReporter } from './createSessionReporter.ts'
 import { createSidState } from './createSidState.ts'
+import { disposeSession } from './disposeSession.ts'
+import { flushSession } from './flushSession.ts'
 import { normalizeSessionConfig } from './normalizeSessionConfig.ts'
 import type { SessionState } from './SessionState.ts'
 
@@ -51,16 +54,9 @@ export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 			}
 		},
 		configure: settings => configureSession(state, settings),
-		flush() {
-			// Event mode delivery is not implemented yet.
-		},
-		dispose() {
-			state.disposed = true
-			state.current.ended = true
-			for (const reporter of state.reporters) {
-				reporter.disposed = true
-			}
-		},
+		flush: () => flushSession(state),
+		dispose: () => disposeSession(state),
 	}
+	armTimers(state)
 	return session
 }
