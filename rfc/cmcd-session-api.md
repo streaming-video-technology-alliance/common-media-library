@@ -15,7 +15,7 @@ status: draft
 
 Add a second reporting API to `@svta/cml-cmcd`, next to `CmcdReporter`. The new API has three objects that match the three scopes of CTA-5004-B.
 
-- A `CmcdSession` is one `sid`. It owns the report targets, the transport, the interval timers, and the session totals.
+- A `CmcdSession` reports under one `sid` at a time. It owns the report targets, the transport, the interval timers, and the session totals. `rotate()` starts the next `sid` for every reporter in the session.
 - A `CmcdSessionReporter` reports for one media player inside the session. Through it the player pushes its state, records events, decorates its requests, and records their responses.
 - A target is one report destination. Targets are internal. Each target owns the state the spec scopes to a destination. That state is the sequence number, the `msd` gate, the `bs` flag, the `ec` buffer, and the delivery queue.
 
@@ -68,13 +68,13 @@ The current API also has three traps that the two integrations fall into.
 
 Multi-player sessions are the case the current design fits worst. The spec expects one `sid` to span a movie and its interstitials, and the `bg` key is defined over "all players in a session". A second `CmcdReporter` with the same `sid` restarts every sequence number and sends `msd` again. The child-reporters proposal ([PR #398](https://github.com/streaming-video-technology-alliance/common-media-library/pull/398)) adds a root and child split to the current class. That proposal calls a session-first API "the right long-term shape" and set it aside for surface area.
 
-Inside the package, `CmcdReporter` is one class with five jobs: session bookkeeping, report assembly, transform policy, delivery, and the public facade. Each feature since version 2.4 added pairwise interactions between those jobs. A refactor ([PR #422](https://github.com/streaming-video-technology-alliance/common-media-library/pull/422)) splits the class along those jobs while keeping every current semantic. This RFC asks a different question: which of those semantics would a design built for the version 2 spec keep at all? The answer removes session rotation, the retention window, eviction, the provenance record, and the `customData` generics. It adds derived keys and a reporter per media player. The design record in [`plans/cmcd-session-api/`](../plans/cmcd-session-api/) has the comparison.
+Inside the package, `CmcdReporter` is one class with five jobs: session bookkeeping, report assembly, transform policy, delivery, and the public facade. Each feature since version 2.4 added pairwise interactions between those jobs. A refactor ([PR #422](https://github.com/streaming-video-technology-alliance/common-media-library/pull/422)) splits the class along those jobs while keeping every current semantic. This RFC asks a different question: which of those semantics would a design built for the version 2 spec keep at all? The answer keeps `sid` rotation as one call and removes the retention window, eviction, the provenance record, and the `customData` generics. It adds derived keys and a reporter per media player. The design record in [`plans/cmcd-session-api/`](../plans/cmcd-session-api/) has the comparison.
 
 ## Guide-level explanation
 
 ### One session, one reporter per media player
 
-Create one session per playback session. The session generates a `sid` when the configuration has none. A session never changes its `sid`. When the player needs a new `sid`, it disposes the session and creates a new one. Requests that are still in flight keep reporting under the session that issued them (see [Requests and responses](#requests-and-responses)).
+Create one session per playback session. The session generates a `sid` when the configuration has none. When the same playback needs a new `sid`, for example one supplied by the manifest, call `rotate(sid)`. Every reporter moves to the new `sid` and keeps its state (see [Changing the `sid`](#changing-the-sid)). When a new playback starts, create a new session. Requests that are still in flight keep reporting under the `sid` that issued them (see [Requests and responses](#requests-and-responses)).
 
 ```ts
 const session = createCmcdSession({
@@ -107,9 +107,9 @@ The ownership in one picture. Targets belong to the session, and every reporter 
 
 ```mermaid
 flowchart TB
-    subgraph session["CmcdSession, one sid"]
+    subgraph session["CmcdSession, one sid at a time"]
         direction TB
-        sdata["sid, version, transport, timers<br>msd, bg, bsa, bsda, completed spans"]
+        sdata["current sid, version, transport, timers, bg<br>per sid: msd, bsa, bsda, completed spans"]
         subgraph reporters["Reporters, one per media player"]
             direction LR
             primary["CmcdSessionReporter, cid movie-42<br>store, reported values, host, su, open span"]
@@ -185,25 +185,27 @@ primary.recordResponse(req, {
 
 `timing` is optional. Without it, the reporter computes `ts` and `ttlb` from the clock reading it recorded in `decorate()`. A request the player did not keep can still be recorded with `{ url }`. That response reports under the calling reporter's session.
 
-A response can arrive after the player has disposed the session that issued the request. The record on the request points to that session, so the `rr` report has the old `sid` and the old session's next sequence number. The old session sends the report at once, because no batch will fill again.
+A response can arrive after the session rotated to a new `sid`, or after the player disposed the session. The record on the request points to the `sid` state that issued it. The `rr` report has the old `sid` and that state's next sequence number. An ended `sid` state sends the report at once, because no batch will fill again.
 
-The sequence for a response that arrives after its session was disposed:
+The sequence for a response that arrives after the session rotated to a new `sid`:
 
 ```mermaid
 sequenceDiagram
     participant Player as media player
-    participant A as CmcdSession A
-    participant B as CmcdSession B
+    participant S as CmcdSession
+    participant A as sid A state
+    participant B as sid B state
     participant C as collector
-    Player->>A: reporter.decorate(request, data)
-    A-->>Player: request with cmcd record, sid A, sn 41
+    Player->>S: reporter.decorate(request, data)
+    S->>A: sn 41
+    S-->>Player: request with cmcd record, sid A
     Player->>Player: send the request to the CDN
-    Player->>A: session.dispose()
+    Player->>S: session.rotate(sid B)
     A->>C: POST the queued lines
-    Player->>B: createCmcdSession(), then createReporter()
+    S->>B: fresh counters, gates, and queues
     Note over Player,C: the response for the old request arrives
-    Player->>B: reporter.recordResponse(request, info)
-    B-->>A: the record's origin is session A
+    Player->>S: reporter.recordResponse(request, info)
+    S-->>A: the record's origin is the sid A state
     A->>C: POST e=rr with sid A and sn 42, at once
 ```
 
@@ -238,6 +240,16 @@ cid="ad-7",e=t,sid="s1",sn=11,sta=p,ts=1764752430000,v=2
 cid="ad-7",e=ae,sid="s1",sn=12,ts=1764752445000,v=2
 cid="movie-42",e=ps,sid="s1",sn=13,sta=p,ts=1764752445200,v=2
 ```
+
+### Changing the `sid`
+
+`rotate()` starts the next `sid` for the whole session. Every reporter keeps its store and its `cid`. Every target restarts its sequence at zero, the `msd` gate re-arms, and the session totals reset. The dedup baselines reset, so the first state each reporter pushes after the rotation emits under the new `sid`. Rotation itself emits nothing. The queued lines of the old `sid` are sent at once. A response to a request issued before the rotation still reports under the old `sid`.
+
+```ts
+session.rotate(manifestSid)   // omit the argument for a new UUID
+```
+
+Use `rotate()` for a new `sid` on the same playback. Use a new session for a new playback.
 
 ### Lifecycle
 
@@ -319,8 +331,9 @@ The defaults make `{ url }` a complete event target and `createCmcdSession()` a 
 
 ```ts
 type CmcdSession = {
-	readonly sid: string
+	readonly sid: string                        // the current sid
 	createReporter(config?: CmcdSessionReporterConfig): CmcdSessionReporter
+	rotate(sid?: string): void
 	flush(): void
 	dispose(): void
 }
@@ -340,6 +353,17 @@ type CmcdDiscreteEventType = 'as' | 'ae' | 'abs' | 'abe' | 'sk' | 'm' | 'um' | '
 ```
 
 `CmcdDiscreteEventType` is `CmcdEventType` without the derived types `ps`, `pr`, `c`, `b`, `bc`, `t`, `rr`, `e`, and `h`.
+
+### Rotation
+
+`rotate(sid?)` starts a new `sid`, a new UUID when the argument is omitted. A `sid` equal to the current one is a no-op, and a `sid` over 64 characters throws.
+
+- Resets: every target's `sn`, `msd` gate, `bs` flags, `ec` buffers, and `bsd` cursor. The session totals `msd`, `bsa`, `bsda`, and the spans reset too, with their supplied-value overrides.
+- Kept: every reporter with its store, `cid`, host, and `su` state, and the session `bg`.
+- Baselines: the dedup baselines of every reporter and of `bg` reset. The next push of a tracked field emits under the new `sid`, even when the value did not change. Rotation itself emits nothing.
+- Spans: an open starvation span is dropped, as at `dispose()`.
+- Delivery: the queued lines of the old `sid` are sent at once. A target that a 410 silenced is active again, because the spec scopes the 410 to the current session.
+- Late responses: a request issued before the rotation still reports under the old `sid`, with that `sid`'s next sequence number.
 
 ### Data
 
@@ -478,9 +502,9 @@ type CmcdRequestRecord = {
 }
 ```
 
-The record is a plain object. Spread and `Object.assign` keep it. JSON does not keep the link to the origin. A response for a request that crossed a JSON boundary reports under the calling reporter's session. A request that the transform cancelled still receives a record, so its response is attributed.
+The record is a plain object. Spread and `Object.assign` keep it. JSON does not keep the link to the origin. A response for a request that crossed a JSON boundary reports under the calling reporter's session and its current `sid`. A request that the transform cancelled still receives a record, so its response is attributed.
 
-There is no registry of sessions. The record is the key in a reporter-internal `WeakMap`. The value is the origin: the session and the reporter that issued the request, the per-request data, and the start time. `recordResponse()` on any reporter looks the record up and reports through that origin. The entry lives as long as the request object, and the origin keeps its session reachable, so nothing else tracks past sessions.
+There is no registry of sessions or of past `sid` values. The record is the key in a reporter-internal `WeakMap`. The value is the origin. It holds the `sid` state and the reporter that issued the request, the `cid` at that time, the per-request data, and the start time. `recordResponse()` on any reporter looks the record up and reports through that origin. The entry lives as long as the request object, and the origin keeps its `sid` state reachable, so nothing else tracks past `sid` values.
 
 ### Responses
 
@@ -502,12 +526,13 @@ type CmcdResourceTiming = {
 A `PerformanceResourceTiming` entry satisfies `CmcdResourceTiming`. The `rr` report is assembled in this order, and a later source wins:
 
 1. the origin reporter's store
-2. the session data
-3. the per-request data given to `decorate()`
-4. the derived response keys
-5. the `data` argument
+2. the session data of the origin `sid`
+3. the `cid` at the time of `decorate()`
+4. the per-request data given to `decorate()`
+5. the derived response keys
+6. the `data` argument
 
-It goes to every event target of the origin session that lists `rr`.
+It goes to every event target that lists `rr`, with the counters of the origin `sid`.
 
 ### Transforms
 
@@ -575,7 +600,7 @@ The retention ledger, the eviction pass, the dirty set, and the provenance encod
 | `customHeaderMap` | `headerMap` |
 | `sessionRetention`, `CMCD_REQUEST_PROVENANCE`, the `C` type parameter | removed |
 | `update(data)` | `reporter.update(data)` with plain values |
-| `update({ sid })` | dispose the session and create a new one |
+| `update({ sid })` | `session.rotate(sid)` |
 | `recordEvent(PLAY_STATE, data)` and the other state events | `reporter.update(data)` |
 | `recordEvent(ERROR, { ec })` | `reporter.recordError(codes)` |
 | `createRequestReport(request, data)` | `reporter.decorate(request, data)` |
@@ -602,13 +627,14 @@ The dash.js change deletes `calculateMsd()`, the rebuffer tracking, the `ec` per
 - **A DOM side effect.** The session listens to `visibilitychange` when a document exists. `derive: { bg: false }` turns that off.
 - **Derived defaults are assumptions.** `dl` from `bl` and `pr`, and `su` from the play state, match what hls.js and dash.js compute today. The spec words `dl` as a possible equivalence only.
 - **Exact attribution needs the returned request.** A player that keeps only the URL gets current-session attribution for late responses.
-- **In-flight requests keep their session reachable.** There is no retention knob. Memory is bounded by the requests the player keeps.
+- **In-flight requests keep their `sid` state reachable.** There is no retention knob. Memory is bounded by the requests the player keeps.
 - **Event-mode code is always bundled** with the session API, because targets are configuration objects. `CmcdReporter` has the same property today. The factory-function alternative in Rationale would improve on both.
 - **Wire differences from `CmcdReporter`.** The first `t` report comes after one interval. `ec` no longer persists across reports. `bs` is per destination.
 
 ## Rationale and alternatives
 
-- **Refactor in place ([PR #422](https://github.com/streaming-video-technology-alliance/common-media-library/pull/422)).** Keeps the public API and every 2.6 semantic. It organizes session rotation, retention, eviction, dirty tracking, and provenance into units, and it keeps them. This RFC removes them. The design record compares the two.
+- **Refactor in place ([PR #422](https://github.com/streaming-video-technology-alliance/common-media-library/pull/422)).** Keeps the public API and every 2.6 semantic. It organizes the retention ledger, eviction, dirty tracking, and provenance into units, and it keeps them. This RFC removes them and keeps rotation as one call on the session. The design record compares the two.
+- **A new session object for every `sid`.** The first draft's rule. It made a manifest-supplied `sid` expensive. The player had to dispose the session, create a new one with new reporters, swap every reference, and push the whole store again. `rotate()` keeps every object and moves the `sid`-scoped state to a fresh internal object. The change is one call, and late responses still find their `sid`.
 - **One object that is both the session and the primary reporter.** One fewer line in the common case. It recreates the root and child asymmetry of the child-reporters proposal, where a child cannot do what the root does.
 - **An explicit `activate()` for interval reports.** The child-reporters proposal's answer. It needs two calls in the interstitials controller and gives wrong data when a teardown skips the return call. One line per live reporter needs no call and loses no reporter.
 - **A presenting-reporter rule for one interval line.** The first draft of this design used the most recently updated reporter without `nr`. Overlay and side-by-side interstitials render both players, so the rule flips on every metric push.

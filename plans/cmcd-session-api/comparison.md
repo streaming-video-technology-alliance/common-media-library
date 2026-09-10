@@ -27,7 +27,7 @@ The `CmcdReporter` sizes were measured on the built `dist` of this worktree, bun
 
 | Concept | `CmcdReporter` | PR #422 | Session API |
 |---|---|---|---|
-| `sid` rotation through `update({ sid })` | yes | yes | no, a `sid` is a session object |
+| `sid` rotation | `update({ sid })` | `update({ sid })` | `session.rotate(sid)`, one internal state per `sid`, no ledger |
 | Retention window and eviction | yes, `sessionRetention` | yes, in a ledger | no, object lifetime |
 | Provenance record on `customData` | yes, symbol key | yes | no, a plain `cmcd` record |
 | `customData` type parameter `C` | yes | yes | no |
