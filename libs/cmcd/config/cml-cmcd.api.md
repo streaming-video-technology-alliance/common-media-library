@@ -54,6 +54,9 @@ export const CMCD_EVENT_CUSTOM_EVENT: "ce";
 export const CMCD_EVENT_ERROR: "e";
 
 // @public
+export const CMCD_EVENT_HOSTNAME: "h";
+
+// @public
 export const CMCD_EVENT_KEYS: readonly ["cen", "e", "h", "ts"];
 
 // @public
@@ -194,6 +197,16 @@ export type CmcdDecodeOptions = {
 };
 
 // @public
+export type CmcdDecoratedRequest<R$1 extends CmcdRequestLike> = Omit<R$1, "url" | "headers" | "cmcd"> & {
+    readonly url: string;
+    readonly headers?: Readonly<Record<string, string>>;
+    readonly cmcd: CmcdRequestRecord;
+};
+
+// @public
+export type CmcdDiscreteEventType = "as" | "ae" | "abs" | "abe" | "sk" | "m" | "um" | "pe" | "pc" | "ce";
+
+// @public
 export type CmcdEncodeOptions = {
     version?: CmcdVersion;
     reportingMode?: CmcdReportingMode;
@@ -231,6 +244,21 @@ export type CmcdEventsValidationResult = CmcdValidationResult & {
 };
 
 // @public
+export type CmcdEventTargetConfig = {
+    readonly url: string;
+    readonly events?: readonly CmcdEventType[];
+    readonly keys?: readonly CmcdKey[];
+    readonly interval?: number;
+    readonly batchSize?: number;
+    readonly maxQueueSize?: number;
+    readonly headers?: Readonly<Record<string, string>>;
+    readonly transform?: CmcdEventTransform;
+};
+
+// @public
+export type CmcdEventTransform = (data: Cmcd, request: Readonly<CmcdRequestLike> | undefined) => Cmcd | null;
+
+// @public
 export const CmcdEventType: {
     readonly BITRATE_CHANGE: typeof CMCD_EVENT_BITRATE_CHANGE;
     readonly PLAY_STATE: typeof CMCD_EVENT_PLAY_STATE;
@@ -250,6 +278,7 @@ export const CmcdEventType: {
     readonly AD_BREAK_END: typeof CMCD_EVENT_AD_BREAK_END;
     readonly SKIP: typeof CMCD_EVENT_SKIP;
     readonly CUSTOM_EVENT: typeof CMCD_EVENT_CUSTOM_EVENT;
+    readonly HOSTNAME: typeof CMCD_EVENT_HOSTNAME;
 };
 
 // @public (undocumented)
@@ -292,6 +321,15 @@ export type CmcdHeaderValue = CmcdRequest | CmcdV1;
 export type CmcdKey = keyof Cmcd | keyof CmcdV1;
 
 // @public
+export type CmcdMetric = number | Readonly<Partial<Record<CmcdObjectType, number>>>;
+
+// @public
+export type CmcdNextObject = string | {
+    readonly url: string;
+    readonly range?: string;
+};
+
+// @public
 export const CmcdObjectType: {
     readonly MANIFEST: "m";
     readonly AUDIO: "a";
@@ -309,6 +347,46 @@ export type CmcdObjectType = ValueOf<typeof CmcdObjectType>;
 
 // @public
 export type CmcdObjectTypeList = (number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>)[];
+
+// @public
+export type CmcdPlaybackData = {
+    readonly [key: `${string}-${string}`]: CmcdCustomValue | undefined;
+    readonly ab?: CmcdMetric;
+    readonly bg?: boolean;
+    readonly bl?: CmcdMetric;
+    readonly br?: CmcdMetric;
+    readonly bs?: boolean;
+    readonly bsa?: CmcdMetric;
+    readonly bsd?: CmcdMetric;
+    readonly bsda?: CmcdMetric;
+    readonly cid?: string;
+    readonly cs?: string;
+    readonly d?: number;
+    readonly dfa?: number;
+    readonly dl?: number;
+    readonly h?: string;
+    readonly lab?: CmcdMetric;
+    readonly lb?: CmcdMetric;
+    readonly ltc?: number;
+    readonly msd?: number;
+    readonly mtp?: CmcdMetric;
+    readonly nor?: CmcdNextObject | readonly CmcdNextObject[];
+    readonly nr?: boolean;
+    readonly ot?: CmcdObjectType;
+    readonly pb?: CmcdMetric;
+    readonly pr?: number;
+    readonly pt?: number;
+    readonly rtp?: number;
+    readonly sf?: CmcdStreamingFormat;
+    readonly st?: CmcdStreamType;
+    readonly sta?: CmcdPlayerState;
+    readonly su?: boolean;
+    readonly tab?: CmcdMetric;
+    readonly tb?: CmcdMetric;
+    readonly tbl?: CmcdMetric;
+    readonly tpb?: CmcdMetric;
+    readonly ts?: number;
+};
 
 // @public
 export const CmcdPlayerState: {
@@ -477,13 +555,30 @@ export type CmcdRequest = {
 export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined;
 
 // @public
+export type CmcdRequester = (request: HttpRequest) => Promise<{
+    status: number;
+}>;
+
+// @public
 export type CmcdRequestKey = keyof CmcdRequest | "nrr";
+
+// @public
+export type CmcdRequestLike = {
+    readonly url: string;
+    readonly headers?: Readonly<Record<string, string>>;
+};
 
 // @public
 export type CmcdRequestProvenance = {
     readonly sid: string;
     readonly cid?: string;
     readonly data?: string;
+};
+
+// @public
+export type CmcdRequestRecord = {
+    readonly sid: string;
+    readonly data: Readonly<Cmcd>;
 };
 
 // @public
@@ -506,6 +601,17 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
 export type CmcdRequestReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C>) => Cmcd | null;
 
 // @public
+export type CmcdRequestTransform = (data: Cmcd, request: Readonly<CmcdRequestLike>) => Cmcd | null;
+
+// @public
+export type CmcdResourceTiming = {
+    readonly startTime: number;
+    readonly responseStart?: number;
+    readonly responseEnd?: number;
+    readonly duration?: number;
+};
+
+// @public
 export type CmcdResponse = CmcdRequest & {
     cmsdd?: string;
     cmsds?: string;
@@ -515,6 +621,68 @@ export type CmcdResponse = CmcdRequest & {
     ttfbb?: number;
     ttlb?: number;
     url?: string;
+};
+
+// @public
+export type CmcdResponseData = CmcdPlaybackData & {
+    readonly ttfb?: number;
+    readonly ttlb?: number;
+    readonly ttfbb?: number;
+    readonly smrt?: string;
+    readonly cmsds?: string;
+    readonly cmsdd?: string;
+    readonly rc?: number;
+    readonly url?: string;
+};
+
+// @public
+export type CmcdResponseInfo = {
+    readonly status?: number;
+    readonly headers?: Headers | Readonly<Record<string, string>>;
+    readonly timing?: CmcdResourceTiming;
+};
+
+// @public
+export type CmcdSession = {
+    readonly sid: string;
+    createReporter(config?: CmcdSessionReporterConfig): CmcdSessionReporter;
+    rotate(sid?: string): void;
+    configure(settings: Pick<CmcdSessionConfig, "version" | "transmissionMode" | "keys" | "headerMap">): void;
+    flush(): void;
+    dispose(): void;
+};
+
+// @public
+export type CmcdSessionConfig = {
+    readonly sid?: string;
+    readonly version?: CmcdVersion;
+    readonly transmissionMode?: CmcdTransmissionMode;
+    readonly keys?: readonly CmcdKey[];
+    readonly headerMap?: Partial<CmcdHeaderMap>;
+    readonly transform?: CmcdRequestTransform;
+    readonly eventTargets?: readonly CmcdEventTargetConfig[];
+    readonly requester?: CmcdRequester;
+    readonly derive?: Partial<Record<"bg" | "dl" | "su", boolean>>;
+    readonly onError?: (error: unknown) => void;
+};
+
+// @public
+export type CmcdSessionReporter = {
+    readonly session: CmcdSession;
+    update(data: CmcdPlaybackData): void;
+    recordEvent(type: Exclude<CmcdDiscreteEventType, "ce">, data?: CmcdPlaybackData): void;
+    recordEvent(type: "ce", data: CmcdPlaybackData & {
+        readonly cen: string;
+    }): void;
+    recordError(code: string | readonly string[], data?: CmcdPlaybackData): void;
+    decorate<R extends CmcdRequestLike>(request: R, data?: CmcdPlaybackData): CmcdDecoratedRequest<R>;
+    recordResponse(request: CmcdRequestLike, response: CmcdResponseInfo, data?: CmcdResponseData): void;
+    dispose(): void;
+};
+
+// @public
+export type CmcdSessionReporterConfig = {
+    readonly cid?: string;
 };
 
 // @public

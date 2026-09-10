@@ -127,6 +127,13 @@ export const CMCD_EVENT_SKIP = 'sk' as const
 export const CMCD_EVENT_CUSTOM_EVENT = 'ce' as const
 
 /**
+ * CMCD event type for the 'h' key (hostname). The player reports the host of the request URL when it changes.
+ *
+ * @public
+ */
+export const CMCD_EVENT_HOSTNAME = 'h' as const
+
+/**
  * CMCD event types for the 'e' key (event mode).
  *
  * @enum
@@ -225,6 +232,11 @@ export const CmcdEventType = {
 	 * A custom event.
 	 */
 	CUSTOM_EVENT: CMCD_EVENT_CUSTOM_EVENT as typeof CMCD_EVENT_CUSTOM_EVENT,
+
+	/**
+	 * The host of the request URL changed.
+	 */
+	HOSTNAME: CMCD_EVENT_HOSTNAME as typeof CMCD_EVENT_HOSTNAME,
 } as const
 
 /**
