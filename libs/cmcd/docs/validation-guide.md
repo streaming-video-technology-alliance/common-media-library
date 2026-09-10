@@ -95,7 +95,7 @@ In request mode, CMCD data is attached to segment requests as query parameters o
 
 ### Using `validateCmcdRequest`
 
-The `validateCmcdRequest` function accepts a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) object or an `HttpRequest` object from `@svta/cml-utils`. It checks for CMCD headers first. If it finds any CMCD header shards, it delegates to `validateCmcdHeaders`, which verifies the shard placement. Otherwise, it extracts the `CMCD` query parameter from the URL.
+The `validateCmcdRequest` function accepts a [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) object or an `HttpRequest` object from `@svta/cml-utils`. It checks for CMCD headers first. If it finds any CMCD header shards, it delegates to `validateCmcdHeaders`, which verifies the shard placement. Otherwise, it extracts the `CMCD` query parameter from the URL. A request that carries CMCD data in both the headers and the query parameter is an error. CTA-5004-B allows one transmission mode per request. The validator still checks the headers and returns their data. A `CMCD` parameter inside the URL fragment is ignored, because a server never receives the fragment. When it is the only CMCD data on the request, the error message names the fragment.
 
 ```typescript
 import { validateCmcdRequest } from "@svta/cml-cmcd";

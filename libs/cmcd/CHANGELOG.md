@@ -14,6 +14,8 @@ and this project adheres to
 
 ### Fixed
 
+- `validateCmcdRequest` reports an error when a request carries CMCD data in both the headers and the `CMCD` query parameter. CTA-5004-B allows one transmission mode per request. The validator still checks the headers and returns their data
+- `validateCmcdRequest` reads the `CMCD` parameter from the query string and ignores the URL fragment. A relative URL no longer throws. When the fragment is the only place with a `CMCD` parameter, the error message says so
 - The encoder applies the "MUST NOT" rules of CTA-5004-B to version 2 payloads. The change covers `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`, which share `prepareCmcdData`
 - `d` is sent only when `ot` is `a`, `v`, `av`, `tt`, `c`, or `o`. `tpb` is sent only when `ot` is `a`, `v`, `av`, or `c`. The check reads the formatted `ot` from the data, even when `ot` is filtered out of the report. An absent or empty `ot` does not remove either key. CTA-5004 (version 1) has no such rule, so version 1 payloads are unchanged
 - `ab`, `lab`, and `tab` are omitted when `br`, `lb`, or `tb` is sent in the same payload. The check runs after formatting, so a formatter that empties the exact key keeps the aggregate key

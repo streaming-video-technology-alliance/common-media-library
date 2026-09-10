@@ -137,6 +137,113 @@ describe('validateCmcdRequest', () => {
 		})
 	})
 
+	describe('both transmission modes', () => {
+		const message = 'CMCD data found in both request headers and the "CMCD" query parameter. A request must use only one transmission mode.'
+
+		it('reports error for a Request with CMCD headers and a CMCD query parameter', () => {
+			const request = new Request('https://cdn.example.com/seg.mp4?CMCD=br%3D5000', {
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			const result = validateCmcdRequest(request)
+			equal(result.valid, false)
+			equal(result.issues.some(i => i.severity === 'error' && i.message === message), true)
+		})
+
+		it('reports error for an HttpRequest with CMCD headers and a CMCD query parameter', () => {
+			const result = validateCmcdRequest({
+				url: 'https://cdn.example.com/seg.mp4?CMCD=br%3D5000',
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			equal(result.valid, false)
+			equal(result.issues.some(i => i.severity === 'error' && i.message === message), true)
+		})
+
+		it('still validates the headers and returns their data', () => {
+			const result = validateCmcdRequest({
+				url: 'https://cdn.example.com/seg.mp4?CMCD=br%3D5000',
+				headers: {
+					'CMCD-Object': 'bl=21600',
+				},
+			})
+			equal(result.issues.some(i => i.key === 'bl'), true)
+			equal(result.data['bl'], 21600)
+			equal('br' in result.data, false)
+		})
+
+		it('does not report the error when the query parameter is empty', () => {
+			const result = validateCmcdRequest({
+				url: 'https://cdn.example.com/seg.mp4?CMCD=',
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			equal(result.valid, true)
+		})
+	})
+
+	describe('relative URLs', () => {
+		it('validates headers on a relative URL', () => {
+			const result = validateCmcdRequest({
+				url: 'seg.mp4',
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			equal(result.valid, true)
+		})
+
+		it('validates the query parameter on a relative URL', () => {
+			const result = validateCmcdRequest({
+				url: 'seg.mp4?CMCD=br%3D3000%2Cbl%3D21600#t=10',
+			})
+			equal(result.valid, true)
+			equal(result.data['bl'], 21600)
+		})
+	})
+
+	describe('URL fragments', () => {
+		const url = 'https://cdn.example.com/seg.mp4#t=10?CMCD=br%3D5000'
+
+		it('ignores a CMCD parameter inside the fragment when headers are present', () => {
+			const result = validateCmcdRequest({
+				url,
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			equal(result.valid, true)
+			deepStrictEqual(result.issues, [])
+			equal(result.data['br'], 3000)
+		})
+
+		it('ignores a CMCD parameter inside the fragment of a Request', () => {
+			const request = new Request(url, {
+				headers: {
+					'CMCD-Object': 'br=3000,d=4004',
+				},
+			})
+			equal(validateCmcdRequest(request).valid, true)
+		})
+
+		it('reports no CMCD data and names the fragment when the parameter is only in the fragment', () => {
+			const result = validateCmcdRequest({ url })
+			equal(result.valid, false)
+			equal(result.issues.length, 1)
+			equal(result.issues[0].message, 'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.')
+			deepStrictEqual(result.data, {})
+		})
+
+		it('keeps the plain message when the fragment has no CMCD parameter', () => {
+			const result = validateCmcdRequest({ url: 'https://cdn.example.com/seg.mp4#t=10' })
+			equal(result.valid, false)
+			equal(result.issues[0].message, 'No CMCD data found in request headers or query parameters.')
+		})
+	})
+
 	it('returns decoded data from headers path', () => {
 		const result = validateCmcdRequest({
 			url: 'https://cdn.example.com/seg.mp4',

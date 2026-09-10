@@ -5,9 +5,11 @@ import type { CmcdDataValidationResult } from './CmcdDataValidationResult.ts'
 import { type CmcdHeaderField, CMCD_HEADER_FIELDS } from './CmcdHeaderField.ts'
 import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
+import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { ensureHeaders } from './ensureHeaders.ts'
+import { mergeValidationResults } from './mergeValidationResults.ts'
 import { validateCmcd } from './validateCmcd.ts'
 import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
 
@@ -21,7 +23,9 @@ import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
  * The function checks for CMCD data in the HTTP headers first. If CMCD
  * headers are found, validation includes shard-placement checks via
  * {@link validateCmcdHeaders}. Otherwise, the CMCD query parameter is
- * extracted from the URL and validated.
+ * extracted from the URL and validated. A request that carries CMCD data
+ * in both the headers and the `CMCD` query parameter is an error. The
+ * headers are still validated and their data is returned.
  *
  * @param request - A `Request` or `HttpRequest` to validate.
  * @param options - Validation options (excluding `reportingMode`).
@@ -36,18 +40,33 @@ import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
  */
 export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdDataValidationResult {
 	const headers = extractHeaderRecord(request.headers)
+	const param = getCmcdQueryParam(request.url)
 
 	if (headers) {
-		return validateCmcdHeaders(headers, options)
-	}
+		const result = validateCmcdHeaders(headers, options)
 
-	const param = new URL(request.url).searchParams.get(CMCD_PARAM)
+		if (!param) {
+			return result
+		}
+
+		const conflict: CmcdValidationResult = {
+			valid: false,
+			issues: [{
+				message: 'CMCD data found in both request headers and the "CMCD" query parameter. A request must use only one transmission mode.',
+				severity: CMCD_VALIDATION_SEVERITY_ERROR,
+			}],
+		}
+
+		return { ...mergeValidationResults(conflict, result), data: result.data }
+	}
 
 	if (!param) {
 		return {
 			valid: false,
 			issues: [{
-				message: 'No CMCD data found in request headers or query parameters.',
+				message: hasCmcdInFragment(request.url)
+					? 'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.'
+					: 'No CMCD data found in request headers or query parameters.',
 				severity: CMCD_VALIDATION_SEVERITY_ERROR,
 			}],
 			data: {} as CmcdData,
@@ -70,6 +89,26 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 
 	const result = validateCmcd(data, { ...options, reportingMode: CMCD_REQUEST_MODE })
 	return { ...result, data }
+}
+
+const CMCD_IN_FRAGMENT = /(?:^|[?&])CMCD=/
+
+function getCmcdQueryParam(url: string): string | null {
+	const hash = url.indexOf('#')
+	const path = hash < 0 ? url : url.slice(0, hash)
+	const start = path.indexOf('?')
+
+	if (start < 0) {
+		return null
+	}
+
+	return new URLSearchParams(path.slice(start + 1)).get(CMCD_PARAM)
+}
+
+function hasCmcdInFragment(url: string): boolean {
+	const hash = url.indexOf('#')
+
+	return hash >= 0 && CMCD_IN_FRAGMENT.test(url.slice(hash + 1))
 }
 
 function extractHeaderRecord(headers: Headers | Record<string, string> | undefined): Partial<Record<CmcdHeaderField, string>> | undefined {
