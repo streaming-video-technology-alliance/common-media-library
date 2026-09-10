@@ -215,4 +215,136 @@ describe('prepareCmcdData', () => {
 			equal(data['com.example-hello'], 'world')
 		})
 	})
+
+	describe('specification constraints', () => {
+		it('drops d when ot is not a media object type', () => {
+			for (const ot of ['m', 'i', 'k']) {
+				const data = prepareCmcdData({ ot, d: 4000 })
+				ok(!('d' in data), `d must be dropped for ot=${ot}`)
+				ok('ot' in data)
+			}
+		})
+
+		it('keeps d for the object types that carry a duration', () => {
+			for (const ot of ['a', 'v', 'av', 'tt', 'c', 'o']) {
+				equal(prepareCmcdData({ ot, d: 4000 })['d'], 4000, `d must be kept for ot=${ot}`)
+			}
+		})
+
+		it('keeps d when ot is absent', () => {
+			equal(prepareCmcdData({ d: 4000 })['d'], 4000)
+		})
+
+		it('keeps d for version 1 payloads', () => {
+			equal(prepareCmcdData({ ot: 'm', d: 4000 }, { version: 1 })['d'], 4000)
+		})
+
+		it('reads the object type from an SfItem token', () => {
+			const ot = toCmcdValue(new SfToken('m'), { 'com.example-p': 1 })
+			ok(!('d' in prepareCmcdData({ ot, d: 4000 })))
+		})
+
+		it('drops tpb when ot is not an audio, video, muxed, or caption object', () => {
+			for (const ot of ['m', 'i', 'tt', 'k', 'o']) {
+				ok(!('tpb' in prepareCmcdData({ ot, tpb: [5000] })), `tpb must be dropped for ot=${ot}`)
+			}
+		})
+
+		it('keeps tpb for audio, video, muxed, and caption objects', () => {
+			for (const ot of ['a', 'v', 'av', 'c']) {
+				ok('tpb' in prepareCmcdData({ ot, tpb: [5000] }), `tpb must be kept for ot=${ot}`)
+			}
+		})
+
+		for (const [aggregate, exact] of [['ab', 'br'], ['lab', 'lb'], ['tab', 'tb']] as const) {
+			it(`drops ${aggregate} when ${exact} is sent`, () => {
+				const data = prepareCmcdData({ [aggregate]: [5000], [exact]: [3000] })
+				ok(!(aggregate in data))
+				ok(exact in data)
+			})
+
+			it(`keeps ${aggregate} when ${exact} is absent`, () => {
+				ok(aggregate in prepareCmcdData({ [aggregate]: [5000] }))
+			})
+
+			it(`keeps ${aggregate} when ${exact} is filtered out`, () => {
+				const data = prepareCmcdData({ [aggregate]: [5000], [exact]: [3000] }, { filter: key => key !== exact })
+				ok(aggregate in data)
+				ok(!(exact in data))
+			})
+
+			it(`keeps ${aggregate} when ${exact} has no value`, () => {
+				ok(aggregate in prepareCmcdData({ [aggregate]: [5000], [exact]: undefined }))
+			})
+		}
+
+		it('keeps the aggregate bitrate key when a formatter removes the exact key', () => {
+			const data = prepareCmcdData({ ab: [5000], br: [3000] }, { formatters: { br: () => NaN } })
+			ok('ab' in data)
+			ok(!('br' in data))
+		})
+
+		it('treats an empty object type as unknown', () => {
+			const data = prepareCmcdData({ ot: '', d: 4000, tpb: [5000] })
+			equal(data['d'], 4000)
+			ok('tpb' in data)
+			ok(!('ot' in data))
+		})
+
+		it('reads the object type after formatting', () => {
+			const kept = prepareCmcdData({ ot: 'video', d: 4000 }, { formatters: { ot: () => 'v' } })
+			equal(kept['d'], 4000)
+			const dropped = prepareCmcdData({ ot: 'v', d: 4000 }, { formatters: { ot: () => 'm' } })
+			ok(!('d' in dropped))
+		})
+
+		it('drops d for a manifest when ot is filtered out', () => {
+			const data = prepareCmcdData({ ot: 'm', d: 4000 }, { filter: key => key !== 'ot' })
+			ok(!('d' in data))
+			ok(!('ot' in data))
+		})
+
+		it('drops cen when the event type is not ce', () => {
+			const data = prepareCmcdData(
+				{ e: CmcdEventType.PLAY_STATE, sta: 'p', cen: 'my-event', ts: 1 },
+				{ reportingMode: CmcdReportingMode.EVENT },
+			)
+			ok(!('cen' in data))
+			ok('sta' in data)
+		})
+
+		it('keeps cen when the event type is ce', () => {
+			const data = prepareCmcdData(
+				{ e: CmcdEventType.CUSTOM_EVENT, cen: 'my-event', ts: 1 },
+				{ reportingMode: CmcdReportingMode.EVENT },
+			)
+			equal(data['cen'], 'my-event')
+		})
+
+		it('omits a null value instead of formatting it', () => {
+			for (const key of ['br', 'd', 'bl', 'dl', 'mtp', 'rtp', 'tb']) {
+				ok(!(key in prepareCmcdData({ [key]: null })), `${key}: null must be omitted`)
+			}
+		})
+
+		it('omits an empty list', () => {
+			for (const key of ['br', 'bl', 'tpb', 'ec', 'nor']) {
+				ok(!(key in prepareCmcdData({ [key]: [] })), `${key}: [] must be omitted`)
+			}
+		})
+
+		it('does not pass an empty value to a custom formatter', () => {
+			let called = false
+			const data = prepareCmcdData({ d: null }, {
+				formatters: {
+					d: () => {
+						called = true
+						return 1000
+					},
+				},
+			})
+			equal(called, false)
+			ok(!('d' in data))
+		})
+	})
 })

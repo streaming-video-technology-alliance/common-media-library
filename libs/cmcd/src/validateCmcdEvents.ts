@@ -3,6 +3,7 @@ import type { CmcdEventsValidationResult } from './CmcdEventsValidationResult.ts
 import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
+import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { mergeValidationResults } from './mergeValidationResults.ts'
@@ -43,6 +44,14 @@ export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOp
 		}
 	}
 
+	const bodyIssues: CmcdValidationIssue[] = []
+	if (cmcd.endsWith('\n')) {
+		bodyIssues.push({
+			message: 'Event report body must not end with a line feed.',
+			severity: CMCD_VALIDATION_SEVERITY_ERROR,
+		})
+	}
+
 	const decodedLines: CmcdData[] = []
 	const lineResults: CmcdValidationResult[] = []
 
@@ -63,6 +72,6 @@ export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOp
 		}
 	}
 
-	const result = mergeValidationResults(...lineResults)
+	const result = mergeValidationResults({ valid: true, issues: bodyIssues }, ...lineResults)
 	return { ...result, data: decodedLines }
 }

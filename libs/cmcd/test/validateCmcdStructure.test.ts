@@ -209,4 +209,63 @@ describe('validateCmcdStructure', () => {
 		const result = validateCmcdStructure({ e: Symbol.for('rr'), rc: 200, ts: 123, url: 'https://example.com/seg.m4s' }, { reportingMode: 'event' })
 		equal(result.valid, true)
 	})
+
+	it('reports error for d when ot is not a media object type', () => {
+		for (const ot of ['m', 'i', 'k']) {
+			const result = validateCmcdStructure({ v: 2, ot, d: 4000 })
+			equal(result.valid, false, `ot=${ot}`)
+			equal(result.issues.some(i => i.key === 'd' && i.severity === 'error'), true, `ot=${ot}`)
+		}
+	})
+
+	it('names the received and expected object types in the d message', () => {
+		const result = validateCmcdStructure({ v: 2, ot: 'm', d: 4000 })
+		equal(result.issues[0].message, 'Key "d" must not be present when "ot" is "m". Expected "ot" to be one of: a, v, av, tt, c, o.')
+	})
+
+	it('accepts d for the object types that carry a duration', () => {
+		for (const ot of ['a', 'v', 'av', 'tt', 'c', 'o']) {
+			equal(validateCmcdStructure({ v: 2, ot, d: 4000 }).valid, true, `ot=${ot}`)
+		}
+	})
+
+	it('accepts d when ot is absent', () => {
+		equal(validateCmcdStructure({ v: 2, d: 4000 }).valid, true)
+	})
+
+	it('does not apply the d object type rule to version 1 payloads', () => {
+		equal(validateCmcdStructure({ ot: 'm', d: 4000 }).valid, true)
+	})
+
+	it('reads the object type from an SfToken', () => {
+		equal(validateCmcdStructure({ v: 2, ot: new SfToken('m'), d: 4000 }).valid, false)
+	})
+
+	it('reports error for tpb when ot is not an audio, video, muxed, or caption object', () => {
+		for (const ot of ['m', 'i', 'tt', 'k', 'o']) {
+			const result = validateCmcdStructure({ v: 2, ot, tpb: [5000] })
+			equal(result.issues.some(i => i.key === 'tpb' && i.severity === 'error'), true, `ot=${ot}`)
+		}
+	})
+
+	it('accepts tpb for audio, video, muxed, and caption objects', () => {
+		for (const ot of ['a', 'v', 'av', 'c']) {
+			equal(validateCmcdStructure({ v: 2, ot, tpb: [5000] }).valid, true, `ot=${ot}`)
+		}
+	})
+
+	it('reports error for an aggregate bitrate key sent with its exact key', () => {
+		for (const [aggregate, exact] of [['ab', 'br'], ['lab', 'lb'], ['tab', 'tb']]) {
+			const result = validateCmcdStructure({ v: 2, [aggregate]: [5000], [exact]: [3000] })
+			equal(result.valid, false, aggregate)
+			const message = `Key "${aggregate}" must not be present when "${exact}" is present.`
+			equal(result.issues.some(i => i.key === aggregate && i.severity === 'error' && i.message === message), true, aggregate)
+		}
+	})
+
+	it('accepts an aggregate bitrate key without its exact key', () => {
+		for (const aggregate of ['ab', 'lab', 'tab']) {
+			equal(validateCmcdStructure({ v: 2, [aggregate]: [5000] }).valid, true, aggregate)
+		}
+	})
 })

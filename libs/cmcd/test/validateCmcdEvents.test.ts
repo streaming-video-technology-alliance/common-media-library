@@ -63,8 +63,7 @@ br=3000,sid="s1",v=2`
 	it('ignores blank lines', () => {
 		const body = `e=ps,sid="s1",ts=1700000000000,sta=p,v=2
 
-e=t,sid="s1",ts=1700000001000,bl=(5000),v=2
-`
+e=t,sid="s1",ts=1700000001000,bl=(5000),v=2`
 
 		const result = validateCmcdEvents(body)
 		equal(result.valid, true)
@@ -104,5 +103,23 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 		const result = validateCmcdEvents('e=ps,ot=m;com.example-p=1,sid="session-1",sta=p,ts=1700000000000,v=2')
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
+	})
+
+	it('reports error when a single record body ends with a line feed', () => {
+		const result = validateCmcdEvents('e=ps,sid="session-1",ts=1700000000000,sta=p,v=2\n')
+		equal(result.valid, false)
+		equal(result.issues.length, 1)
+		equal(result.issues[0].severity, 'error')
+		equal(result.issues[0].message, 'Event report body must not end with a line feed.')
+	})
+
+	it('reports error when a multi-record body ends with a line feed', () => {
+		const result = validateCmcdEvents('e=ps,sid="s",ts=1,sta=p,v=2\ne=t,sid="s",ts=2,v=2\n')
+		equal(result.valid, false)
+		equal(result.issues.some(i => i.severity === 'error' && i.message.includes('line feed')), true)
+	})
+
+	it('accepts a body that ends without a line feed', () => {
+		deepStrictEqual(validateCmcdEvents('e=ps,sid="s",ts=1,sta=p,v=2\ne=t,sid="s",ts=2,v=2').issues, [])
 	})
 })

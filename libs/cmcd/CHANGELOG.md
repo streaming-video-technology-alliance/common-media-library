@@ -8,10 +8,23 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The `Cmcd` type documentation links to the CTA-5004-B specification. It linked only to the version 1 PDF
+
 ### Fixed
 
 - `validateCmcdRequest` reports an error when a request carries CMCD data in both the headers and the `CMCD` query parameter. CTA-5004-B allows one transmission mode per request. The validator still checks the headers and returns their data
 - `validateCmcdRequest` reads the `CMCD` parameter from the query string and ignores the URL fragment. A relative URL no longer throws. When the fragment is the only place with a `CMCD` parameter, the error message says so
+- The encoder applies the "MUST NOT" rules of CTA-5004-B to version 2 payloads. The change covers `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`, which share `prepareCmcdData`
+- `d` is sent only when `ot` is `a`, `v`, `av`, `tt`, `c`, or `o`. `tpb` is sent only when `ot` is `a`, `v`, `av`, or `c`. The check reads the formatted `ot` from the data, even when `ot` is filtered out of the report. An absent or empty `ot` does not remove either key. CTA-5004 (version 1) has no such rule, so version 1 payloads are unchanged
+- `ab`, `lab`, and `tab` are omitted when `br`, `lb`, or `tb` is sent in the same payload. The check runs after formatting, so a formatter that empties the exact key keeps the aggregate key
+- `cen` is omitted unless the event type is `ce`
+- An empty value is omitted instead of formatted. `null` on `br`, `d`, `bl`, `dl`, `mtp`, `rtp`, or `tb` was sent as `0`. `''` on `nor` was sent as `nor=("")`. A custom formatter is no longer called for an empty value
+- An empty array is omitted. `br: []` was sent as `br=()`
+- `CmcdReporter` event report bodies no longer end with a line feed. CTA-5004-B separates records with a single line feed and forbids a trailing one
+- `validateCmcdStructure` reports an error when `d` or `tpb` is present with an `ot` that the key does not allow. It also reports an error when `ab`, `lab`, or `tab` is present with `br`, `lb`, or `tb`. The message names the keys and the allowed object types. The checks apply to version 2 payloads and run in every validator
+- `validateCmcdEvents` and `validateCmcdEventReport` report an error when the body ends with a line feed. Every earlier `CmcdReporter` sent that line feed. A receiver that upgrades marks reports from those players as invalid
 
 ## [2.6.1] - 2026-09-07
 

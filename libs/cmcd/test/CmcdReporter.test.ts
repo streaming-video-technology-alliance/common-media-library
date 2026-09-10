@@ -1583,6 +1583,18 @@ describe('CmcdReporter', () => {
 	})
 
 	describe('createRequestReport', () => {
+		it('omits d for a manifest request', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['d', 'ot', 'sid', 'v'],
+			}, requester)
+
+			const req = reporter.createRequestReport({ url: 'https://example.com/manifest.mpd' }, { ot: 'm', d: 4000 })
+
+			deepEqual(Object.keys(req.customData.cmcd).sort(), ['ot', 'sid', 'v'])
+		})
+
 		it('returns the request unchanged if no enabled keys', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({
@@ -3005,6 +3017,19 @@ describe('CmcdReporter', () => {
 	})
 
 	describe('custom events', () => {
+		it('does not send cen on a non-custom event when cen is in the data store', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.update({ cen: 'stale' })
+			reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			ok(!(requests[0].body as string).includes('cen='), requests[0].body as string)
+		})
+
 		it('force-includes cen even when it is not in the target enabledKeys', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig({
@@ -3650,6 +3675,43 @@ describe('CmcdReporter', () => {
 	})
 
 	describe('batching', () => {
+		it('sends a single record without a trailing line feed', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			ok(!body.endsWith('\n'), `unexpected trailing line feed in ${JSON.stringify(body)}`)
+		})
+
+		it('separates batched records with a single line feed and no trailing line feed', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig({
+				eventTargets: [
+					{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.ERROR],
+						enabledKeys: [...EVENT_KEYS],
+						batchSize: 2,
+					},
+				],
+			}), requester)
+
+			reporter.recordEvent(CmcdEventType.ERROR)
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+			const body = requests[0].body as string
+			equal(body.split('\n').length, 2)
+			ok(!body.endsWith('\n'), `unexpected trailing line feed in ${JSON.stringify(body)}`)
+		})
+
 		it('batches events according to batchSize', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig({

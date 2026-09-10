@@ -1,14 +1,11 @@
 import type { Cmcd } from '@svta/cml-cmcd'
 
 export const CMCD_OUTPUT: Cmcd = {
-	ab: [2500],
 	br: [200],
 	'com.example-hello': 'world',
 	d: 325,
-	lab: [200],
 	lb: [100],
-	ot: 'm',
-	tab: [3000],
+	ot: 'v',
 	tb: [5000],
 	tpb: [4000],
 	bl: [5000],
