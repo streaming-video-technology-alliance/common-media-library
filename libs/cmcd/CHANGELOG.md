@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `validateCmcdRequest` reports an error when a request carries CMCD data in both the headers and the `CMCD` query parameter. CTA-5004-B allows one transmission mode per request. The validator still checks the headers and returns their data
+- `validateCmcdRequest` reads the `CMCD` parameter from the query string and ignores the URL fragment. A relative URL no longer throws. When the fragment is the only place with a `CMCD` parameter, the error message says so
+
 ## [2.6.1] - 2026-09-07
 
 ### Fixed
