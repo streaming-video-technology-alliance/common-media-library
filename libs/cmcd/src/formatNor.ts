@@ -5,7 +5,7 @@ import type { PrepareContext } from './PrepareContext.ts'
 
 type Entry = { readonly path: string; readonly range: string | undefined }
 
-const ESCAPE_OR_UNSAFE = /%[0-9A-Fa-f]{2}|[^A-Za-z0-9\-_.!~*'()]/g
+const ESCAPE_OR_UNSAFE = /%[0-9A-Fa-f]{2}|[^A-Za-z0-9\-_.!~*'()]/gu
 
 /** Percent-encodes a path and keeps the escapes it already has, so a relativized path is not encoded twice. */
 function encodePath(path: string): string {

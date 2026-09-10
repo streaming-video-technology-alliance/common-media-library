@@ -95,4 +95,12 @@ describe('CmcdSessionReporter request mode', () => {
 		const req = reporter.decorate({ url: SEGMENT }, { br: { v: 3000 }, d: 4000, ot: 'v', nor: { url: 'https://cdn.example.com/next seg.mp4', range: '0-99' } })
 		equal(queryValue(req.url), 'bl=2000,br=3000,cid="c",d=4000,dl=2000,mtp=15000,nor="next%20seg.mp4",nrr="0-99",ot=v,sf=d,sid="s",st=v')
 	})
+
+	it('encodes version 1 nor with astral-plane characters', () => {
+		const session = createCmcdSession({ sid: 's', version: 1 })
+		const reporter = session.createReporter({ cid: 'c' })
+		const req = reporter.decorate({ url: SEGMENT }, { nor: 'seg-😀.mp4' })
+		const value = queryValue(req.url)
+		equal(value.includes('nor="seg-%F0%9F%98%80.mp4"'), true)
+	})
 })
