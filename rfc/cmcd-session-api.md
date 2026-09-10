@@ -36,6 +36,7 @@ reporter.update({ sta: 'p', bl: 3200, mtp: 15000, pt: 12000 }) // emits e=ps wit
 
 const req = reporter.decorate({ url: 'https://cdn.example.com/seg-1.m4s' }, { ot: 'v', d: 4000, br: 3000 })
 const res = await fetch(req.url, { headers: req.headers })
+const bytes = await res.arrayBuffer() // read the body first, so ttlb measures the last byte
 reporter.recordResponse(req, { status: res.status, headers: res.headers }) // emits e=rr
 
 reporter.recordError('MEDIA_ERR_NETWORK')
@@ -183,7 +184,7 @@ primary.recordResponse(req, {
 })
 ```
 
-`timing` is optional. Without it, the reporter computes `ts` and `ttlb` from the clock reading it recorded in `decorate()`. A request the player did not keep can still be recorded with `{ url }`. That response reports under the calling reporter's session.
+`timing` is optional. Without it, the reporter computes `ts` and `ttlb` from the clock reading it recorded in `decorate()`. Call `recordResponse()` after the body is read, so `ttlb` measures the last byte. A request the player did not keep can still be recorded with `{ url }`. That response reports under the calling reporter's session.
 
 A response can arrive after the session rotated to a new `sid`, or after the player disposed the session. The record on the request points to the `sid` state that issued it. The `rr` report has the old `sid` and that state's next sequence number. An ended `sid` state sends the report at once, because no batch will fill again.
 
@@ -271,7 +272,7 @@ session.dispose()
 | `CmcdSession`, `CmcdSessionConfig` | types |
 | `CmcdSessionReporter`, `CmcdSessionReporterConfig`, `CmcdPlaybackData`, `CmcdMetric`, `CmcdNextObject` | types |
 | `CmcdEventTargetConfig`, `CmcdRequester` | types |
-| `CmcdRequestLike`, `CmcdDecoratedRequest`, `CmcdRequestRecord`, `CmcdResponseInfo`, `CmcdResourceTiming` | types |
+| `CmcdRequestLike`, `CmcdDecoratedRequest`, `CmcdRequestRecord`, `CmcdResponseInfo`, `CmcdResourceTiming`, `CmcdResponseData` | types |
 | `CmcdRequestTransform`, `CmcdEventTransform` | types |
 | `CmcdDiscreteEventType` | type |
 | `CMCD_EVENT_HOSTNAME`, `CmcdEventType.HOSTNAME` | constant, the missing `h` event |
@@ -323,9 +324,11 @@ The defaults make `{ url }` a complete event target and `createCmcdSession()` a 
 - an unknown key or a malformed custom key in a `keys` list
 - an unknown event type
 - a target without `url`
-- a negative `interval`
-- a `batchSize` under 1
+- an `interval` that is negative or not finite
+- a `batchSize` or `maxQueueSize` that is not a finite positive integer, or a `batchSize` over `maxQueueSize`
 - an event target with `version`
+
+`configure()` replaces the request-mode settings `version`, `transmissionMode`, `keys`, and `headerMap` for the current and later `sid` states. It runs the same checks as creation, emits nothing, and resets no counter or gate. Event targets are fixed at creation. A manifest that supplies CMCD parameters is handled with `configure()`, then `rotate(sid)`, then `update({ cid })`.
 
 ### Objects
 
@@ -334,6 +337,7 @@ type CmcdSession = {
 	readonly sid: string                        // the current sid
 	createReporter(config?: CmcdSessionReporterConfig): CmcdSessionReporter
 	rotate(sid?: string): void
+	configure(settings: Pick<CmcdSessionConfig, 'version' | 'transmissionMode' | 'keys' | 'headerMap'>): void
 	flush(): void
 	dispose(): void
 }
@@ -345,7 +349,7 @@ type CmcdSessionReporter = {
 	recordEvent(type: 'ce', data: CmcdPlaybackData & { cen: string }): void
 	recordError(code: string | readonly string[], data?: CmcdPlaybackData): void
 	decorate<R extends CmcdRequestLike>(request: R, data?: CmcdPlaybackData): CmcdDecoratedRequest<R>
-	recordResponse(request: CmcdRequestLike, response: CmcdResponseInfo, data?: CmcdPlaybackData): void
+	recordResponse(request: CmcdRequestLike, response: CmcdResponseInfo, data?: CmcdResponseData): void
 	dispose(): void
 }
 
@@ -358,12 +362,12 @@ type CmcdDiscreteEventType = 'as' | 'ae' | 'abs' | 'abe' | 'sk' | 'm' | 'um' | '
 
 `rotate(sid?)` starts a new `sid`, a new UUID when the argument is omitted. A `sid` equal to the current one is a no-op, and a `sid` over 64 characters throws.
 
-- Resets: every target's `sn`, `msd` gate, `bs` flags, `ec` buffers, and `bsd` cursor. The session totals `msd`, `bsa`, `bsda`, and the spans reset too, with their supplied-value overrides.
-- Kept: every reporter with its store, `cid`, host, and `su` state, and the session `bg`.
+- Resets: every target's `sn`, `msd` gate, `bs` flags, `ec` buffers, and `bsd` cursors. The session totals `bsa` and `bsda`, the pending `bsd` samples, and the supplied-value overrides reset too.
+- Kept: every reporter with its store, `cid`, host, and `su` state, and the session `bg`. A startup measurement in progress carries over. When `msd` is not yet derived or supplied, the new `sid` keeps the start time, so the manifest-supplied `sid` flow still reports `msd`.
 - Baselines: the dedup baselines of every reporter and of `bg` reset. The next push of a tracked field emits under the new `sid`, even when the value did not change. Rotation itself emits nothing.
-- Spans: an open starvation span is dropped, as at `dispose()`.
+- Stalls: a stall open at rotation is measured by the new `sid` from the rotation time, and the old `sid` drops its part. The new targets start with `bs` set, because the player is still rebuffering.
 - Delivery: the queued lines of the old `sid` are sent at once. A target that a 410 silenced is active again, because the spec scopes the 410 to the current session.
-- Late responses: a request issued before the rotation still reports under the old `sid`, with that `sid`'s next sequence number.
+- Late responses: a request issued before the rotation still reports under the old `sid`, with that `sid`'s next sequence number. The ended `sid` state keeps a copy of each reporter's store, so a late response reads the values at rotation and not the live store.
 
 ### Data
 
@@ -385,9 +389,9 @@ type CmcdMetric = number | Readonly<Partial<Record<CmcdObjectType, number>>>
 type CmcdNextObject = string | { readonly url: string; readonly range?: string }
 ```
 
-`ec` is not a member. Errors go through `recordError()`. `sid`, `sn`, `v`, `e`, and the response keys are reporter-owned and not members. The reporter rounds values per the spec: integer keys to the nearest integer, and `bl`, `dl`, `mtp`, `rtp`, and `tbl` to the nearest 100. Pass raw values. `CmcdPlayerState` remains the token union for `sta`, not the payload type.
+`ec` is not a member. Errors go through `recordError()`. `sid`, `sn`, `v`, and `e` are reporter-owned and not members. The response keys are members of `CmcdResponseData` alone, the data type of `recordResponse()`. The reporter rounds values per the spec: integer keys to the nearest integer, and `bl`, `dl`, `mtp`, `rtp`, and `tbl` to the nearest 100. Pass raw values. `CmcdPlayerState` remains the token union for `sta`, not the payload type.
 
-`update()` merges `data` into the reporter's store. A member set to `undefined` removes the key. `bg`, `msd`, `bsa`, `bsda`, and `bsd` are session facts. Pushing one of them through any reporter writes it on the session, and automatic tracking of that key stops for the rest of the session.
+`update()` merges `data` into the reporter's store. A member set to `undefined` removes the key. `bg`, `msd`, `bsa`, `bsda`, and `bsd` are session facts. Pushing one of them through any reporter writes it on the session, and automatic tracking of that key stops for the rest of the session. A pushed `bsd` is not stored. It is appended as one pending sample per cause, and each destination receives it once.
 
 ### State-change events
 
@@ -406,9 +410,10 @@ A derived key is a key the reporter computes from state it observes. A derived d
 |---|---|---|---|
 | `sn`, `v`, `e` | the target's counter, the version, and the event type | target and report | ignored |
 | `ts` | the clock at emission | report | wins for that report |
-| `msd` | the first `sta` s to the next `sta` p | session, sent once per target | wins, stops tracking |
-| `bs` | `sta` entering r | target and reporter, cleared by the next report | wins for that report |
-| `bsa`, `bsda`, `bsd` | spans between `sta` transitions | session totals, `bsd` cursor per target | wins, stops tracking |
+| `msd` | the first `sta` s to the next `sta` p, carried across `rotate()` while in progress | session, sent once per target | wins, stops tracking |
+| `bs` | `sta` entering or remaining in r since the target's last report | target and reporter, cleared by the first report after the stall | wins for that report |
+| `bsa`, `bsda` | completed stalls between `sta` transitions | session totals per cause | wins, stops tracking |
+| `bsd` | one completed stall per entry, one entry per cause per report | pending samples per cause, one cursor per cause per target | appended as a sample, stops tracking |
 | `su` | in s, k, or r, or no p since one | reporter | wins |
 | `dl` | `bl` divided by `pr`, nearest 100 ms, only when `pr` is over 0 | reporter | wins |
 | `h`, event `h` | the host of decorated request URLs | reporter | wins, stops tracking |
@@ -416,7 +421,9 @@ A derived key is a key the reporter computes from state it observes. A derived d
 | `url`, `rc`, `ts`, `ttfb`, `ttlb` | request URL, status, timing | response | wins |
 | `cmsds`, `cmsdd` | `CMSD-Static` and `CMSD-Dynamic` response headers | response | wins |
 
-`bsa` counts the transitions into `r`. `bsda` and `bsd` count completed spans only. A span still open at `dispose()` is dropped. Automatic `bsa`, `bsd`, and `bsda` entries have no cause token. `url` is the request URL without its `CMCD` parameter. `rc` is `0` when `status` is absent. `ts` for a response is the request start.
+`bsa` counts the transitions into `r`. `bsda` and `bsd` count completed stalls only. A stall still open at `dispose()` is dropped. Automatic `bsa`, `bsd`, and `bsda` entries have no cause token. Each completed stall is reported to each destination once, on the next report to that destination, in order. A report carries at most one `bsd` value per cause, per spec item 14. A second stall of the same cause waits for the next report to that destination. The pending samples are capped at 100 per cause, and the oldest is dropped past the cap. When no destination can report `bsd`, no samples are kept.
+
+`url` is the request URL without its `CMCD` parameter. `rc` is `0` when `status` is absent. `ts` for a response is the request start. `ttfb` is omitted when `responseStart` is absent, zero, or earlier than `startTime`. Resource Timing reports zero there for a cross-origin resource without `Timing-Allow-Origin`. `ttlb` is omitted when neither `duration` nor a usable `responseEnd` exists and no start time was recorded. `ttfbb` and `smrt` have no derivation and come only from `CmcdResponseData`.
 
 The `sta` transitions and what each one derives. Transitions with no effect on a derived key are left out.
 
@@ -452,7 +459,7 @@ Every report is assembled in a fixed order, and a later source wins:
 4. the target's per-reporter state
 5. the derived defaults
 
-The target's `transform` runs on a copy when one is configured, and `null` cancels the report for that target. The reporter then filters the keys, applies the spec rules, encodes, and only then commits: `sn` advances, the `msd` gate closes when the output kept `msd`, `bs` and the `ec` buffer clear, and the `bsd` cursor moves. A cancelled or failed report commits nothing.
+The target's `transform` runs on a copy when one is configured, and `null` cancels the report for that target. The reporter then filters the keys, applies the spec rules, encodes, and only then commits. At the commit, `sn` advances, and the `msd` gate closes when the output kept `msd`. The `ec` buffer clears, `bs` clears unless the reporter is still rebuffering, and the `bsd` cursors move. A cancelled or failed report commits nothing.
 
 The report path for one target:
 
@@ -469,7 +476,7 @@ flowchart LR
     tr -- data --> restore["restore required keys<br>re-stamp sid, e, ts"] --> prep
     prep --> enc["encode"]
     enc -- throws --> fail["thrown to the caller<br>nothing committed"]
-    enc -- line --> commit["commit<br>sn advances<br>msd gate closes if kept<br>bs and ec clear<br>bsd cursor moves"]
+    enc -- line --> commit["commit<br>sn advances<br>msd gate closes if kept<br>ec clears, bs clears unless still in r<br>bsd cursors move"]
     commit --> out["event target: queue the line<br>request target: URL or headers"]
 ```
 
@@ -485,7 +492,7 @@ Each interval tick emits one `t` line per live reporter, in creation order, or o
 
 ### Requests
 
-`decorate()` returns a new object. `url` has the `CMCD` query parameter in query mode. `headers` has the four `CMCD-` headers in header mode, and an empty shard is omitted. `cmcd` is the request record.
+`decorate()` returns a new object. `url` has the `CMCD` query parameter in query mode. `headers` has the four `CMCD-` headers in header mode, and an empty shard is omitted. `cmcd` is the request record. Before it writes, `decorate()` removes an existing `CMCD` parameter and every `CMCD-` header from its copy, compared case-insensitively. A re-decorated request carries only the current report.
 
 ```ts
 type CmcdRequestLike = {
@@ -493,7 +500,9 @@ type CmcdRequestLike = {
 	readonly headers?: Readonly<Record<string, string>>
 }
 
-type CmcdDecoratedRequest<R extends CmcdRequestLike> = R & {
+type CmcdDecoratedRequest<R extends CmcdRequestLike> = Omit<R, 'url' | 'headers' | 'cmcd'> & {
+	readonly url: string
+	readonly headers?: Readonly<Record<string, string>>
 	readonly cmcd: CmcdRequestRecord
 }
 
@@ -505,7 +514,7 @@ type CmcdRequestRecord = {
 
 The record is a plain object. Spread and `Object.assign` keep it. JSON does not keep the link to the origin. A response for a request that crossed a JSON boundary reports under the calling reporter's session and its current `sid`. A request that the transform cancelled still receives a record, so its response is attributed.
 
-There is no registry of sessions or of past `sid` values. The record is the key in a reporter-internal `WeakMap`. The value is the origin. It holds the `sid` state and the reporter that issued the request, the `cid` at that time, the per-request data, and the start time. `recordResponse()` on any reporter looks the record up and reports through that origin. The entry lives as long as the request object, and the origin keeps its `sid` state reachable, so nothing else tracks past `sid` values.
+There is no registry of sessions or of past `sid` values. The record is the key in a reporter-internal `WeakMap`. The value is the origin. It holds the `sid` state and the reporter that issued the request. It also holds the `cid` at that time, a copy of the per-request data, and the start time. `decorate()` captures the origin before the transform runs, so a transform that calls `rotate()` does not move the request to the new `sid`. `recordResponse()` on any reporter looks the record up and reports through that origin. The entry lives as long as the request object, and the origin keeps its `sid` state reachable, so nothing else tracks past `sid` values.
 
 ### Responses
 
@@ -522,14 +531,25 @@ type CmcdResourceTiming = {
 	responseEnd?: number
 	duration?: number
 }
+
+type CmcdResponseData = CmcdPlaybackData & {
+	ttfb?: number                                // milliseconds from the request start
+	ttlb?: number
+	ttfbb?: number
+	smrt?: string                                // base64, the request tracing header
+	cmsds?: string                               // base64
+	cmsdd?: string
+	rc?: number
+	url?: string
+}
 ```
 
 A `PerformanceResourceTiming` entry satisfies `CmcdResourceTiming`. The `rr` report is assembled in this order, and a later source wins:
 
-1. the origin reporter's store
+1. the origin reporter's store, or the copy the ended `sid` state keeps
 2. the session data of the origin `sid`
 3. the `cid` at the time of `decorate()`
-4. the per-request data given to `decorate()`
+4. the copy of the per-request data taken in `decorate()`
 5. the derived response keys
 6. the `data` argument
 
@@ -544,6 +564,8 @@ type CmcdEventTransform = (data: Cmcd, request: Readonly<CmcdRequestLike> | unde
 
 The contract is the one the transforms RFC defined. The reporter copies nested values before a configured transform runs, re-stamps the reporter-owned keys after it returns, and restores a required key the transform removed. A transform that throws cancels that target's report. The error is thrown to the caller after every other target has been processed. The `request` argument is the request the player passed to `decorate()`. Read player fields through a cast or bracket access.
 
+A transform may call `rotate()`. The report it runs in and the request origin stay with the `sid` state that was current when the call began. The remaining targets of that emission do too. The rotation applies to every later call.
+
 A transform is also the opt-in for a collector that expects `bg=?0` on the exit `b` report. A target that lists `b` always receives `bg` when it is true. An absent `bg` on `e=b` therefore means exit. The encoder writes an explicit `bg: false` on `e=b` as `?0`.
 
 ```ts
@@ -555,7 +577,7 @@ const legacyCollector: CmcdEventTargetConfig = {
 
 ### Delivery
 
-Each event target queues encoded lines. It sends a batch when the queue reaches `batchSize`, on `flush()`, on `dispose()`, or at once for a late `rr` report after dispose. A batch is one POST with content type `application/cmcd`, the lines joined by a line feed, no trailing line feed, and the target's `headers`. The default requester is `fetch` with `keepalive` set when the body is under 64 KB, so a `flush()` on `pagehide` completes.
+Each event target queues encoded lines. It sends a batch when the queue reaches `batchSize`, on `flush()`, on `dispose()`, or at once for a late `rr` report after dispose. A batch is one POST with content type `application/cmcd`, the lines joined by a line feed, no trailing line feed, and the target's `headers`. The default requester is `fetch` with `keepalive` set when the body is under 64 KB, so a `flush()` on `pagehide` completes. A drain requested by `flush()`, `rotate()`, `dispose()`, or a late `rr` while a send is in flight is kept. The target continues draining when the send settles, until the queue is empty.
 
 | Response | Action |
 |---|---|
@@ -611,6 +633,7 @@ The retention ledger, the eviction pass, the dirty set, and the provenance encod
 | `sessionRetention`, `CMCD_REQUEST_PROVENANCE`, the `C` type parameter | removed |
 | `update(data)` | `reporter.update(data)` with plain values |
 | `update({ sid })` | `session.rotate(sid)` |
+| the rebuild on manifest parameters | `session.configure(settings)`, then `session.rotate(sid)` and `reporter.update({ cid })` |
 | `recordEvent(PLAY_STATE, data)` and the other state events | `reporter.update(data)` |
 | `recordEvent(ERROR, { ec })` | `reporter.recordError(codes)` |
 | `createRequestReport(request, data)` | `reporter.decorate(request, data)` |
@@ -627,7 +650,7 @@ A sketch of the hls.js change in `CMCDController`:
 - keep the decorated request on the loader wrapper, so `onSuccess` can pass it to `recordResponse()`
 - create one reporter per interstitial asset, and set `nr` on the primary at asset start and clear it at primary resume
 
-The dash.js change deletes `calculateMsd()`, the rebuffer tracking, the `ec` persistence, and the rebuild logic. It passes the decorated request through its interceptors.
+The dash.js change deletes `calculateMsd()`, the rebuffer tracking, and the `ec` persistence. The rebuild on manifest parameters becomes `configure()`, `rotate()`, and `update({ cid })`. It passes the decorated request through its interceptors.
 
 ## Drawbacks
 
@@ -637,7 +660,7 @@ The dash.js change deletes `calculateMsd()`, the rebuffer tracking, the `ec` per
 - **A DOM side effect.** The session listens to `visibilitychange` when a document exists. `derive: { bg: false }` turns that off.
 - **Derived defaults are assumptions.** `dl` from `bl` and `pr`, and `su` from the play state, match what hls.js and dash.js compute today. The spec words `dl` as a possible equivalence only.
 - **Exact attribution needs the returned request.** A player that keeps only the URL gets current-session attribution for late responses.
-- **In-flight requests keep their `sid` state reachable.** There is no retention knob. Memory is bounded by the requests the player keeps.
+- **In-flight requests keep their `sid` state reachable.** There is no retention knob. Memory is bounded by the requests the player keeps. An ended `sid` state also holds one copy of each reporter's store, taken at rotation.
 - **Event-mode code is always bundled** with the session API, because targets are configuration objects. `CmcdReporter` has the same property today. The factory-function alternative in Rationale would improve on both.
 - **Wire differences from `CmcdReporter`.** The first `t` report comes after one interval. `ec` no longer persists across reports. `bs` is per destination. The exit `b` report has no `bg` key, and `bg=?0` needs a transform.
 
@@ -652,6 +675,7 @@ The dash.js change deletes `calculateMsd()`, the rebuffer tracking, the `ec` per
 - **Attribution from the wire.** Parse the `sid` back out of the `CMCD` query parameter or the `CMCD-Session` header. It works with a URL alone and survives every boundary. It costs a decode per response, it fails in header mode without the headers, and it cannot attribute a cancelled or undecorated request. It remains possible as a later fallback.
 - **A pull model.** A `getState()` callback read at report time gives fresh interval data. A pull cannot see a `sta` transition when it happens, so transitions still need a push, and the player has two data paths.
 - **Targets as factory functions.** `requestTarget()` and `eventTarget()` would let a request-only player tree-shake event mode. It adds a concept and an import for every integration. A hybrid keeps the top-level request settings and wraps only the event targets in `eventTarget()`. It gets the same bundle result for one import. The configuration shape here matches `CmcdReporterConfig`, which both adopters already map.
+- **Request targets per destination.** The PR #398 review accepted a configured destination identity for request mode. Requests to different CDNs would then keep separate `sn`, `bs`, and `bsd` state. This RFC keeps one request target per `sid`. The spec defines targets as the configured event endpoints, in items 4, 5, 8, 12 to 14, and 16 of section 5. It names no request-mode target below the mode itself. The `sn` rule, one sequence per combination of mode and target, then gives request mode one sequence. An optional destination name on `decorate()` can be added later without a breaking change.
 - **`formatters` on the session API.** Custom formatters remain on `encodeCmcd`. The transform is the per-report hook of this API, and the built-in rounding is a spec `MUST` for `dl`, `mtp`, and `rtp`.
 - **`ts` as a second `update()` argument.** It would keep the payload type to stored keys. Kept in the payload for now, because every other reporting call takes `ts` in its payload too.
 - **`start()` and `stop()`.** Both adopters call them only as a constructor and destructor pair. Creation and `dispose()` cover that with two calls.
@@ -684,6 +708,7 @@ The dash.js change deletes `calculateMsd()`, the rebuffer tracking, the `ec` per
 - `Retry-After` from a 429 response, when the requester returns headers.
 - A per-target URL filter for the `url` key, per spec item 19. A transform covers it today.
 - A request-only entry point that leaves out event-mode delivery, if an adopter without a collector asks for it.
+- An optional destination name on `decorate()`, with request-mode state per name, if CTA WAVE defines request-mode targets below the mode.
 - `CmcdReporter` marked deprecated after hls.js and dash.js migrate, and removed in the next major version.
 
 ## Final Decision

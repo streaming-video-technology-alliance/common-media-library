@@ -8,11 +8,11 @@ Baseline: `main` at `2653a012`, `@svta/cml-cmcd` 2.6.1 plus the unreleased fixes
 
 | Unit | Owns | Public |
 |---|---|---|
-| Session | the normalized configuration, the reporters, the current `sid` state, the timers, the visibility listener, and `bg` | `CmcdSession` |
-| `sid` state | everything that resets with a `sid`: the targets with their counters, gates, entries, queues, and 410 flags, and the session totals | no |
+| Session | the normalized configuration, replaced in part by `configure()`, the reporters, the current `sid` state, the timers, the visibility listener, and `bg` | `CmcdSession` |
+| `sid` state | everything that resets with a `sid`: the targets with their counters, gates, entries, queues, and 410 flags, the session totals, the pending `bsd` samples, and after `rotate()` a copy of each reporter's store | no |
 | Reporter | the pushed store, the reported baselines of `sta`, `pr`, `cid`, and `br`, the host, the `su` derivation, and the open starvation span | `CmcdSessionReporter` |
 | Target | one destination: `sn`, the `msd` gate, the `bsd` cursor, the per-reporter `bs` flag and `ec` buffer, and for an event target the queue, the back-off, and the 410 flag | no |
-| Request origin | the link from a decorated request to its reporter, its `sid` state, the `cid` at issue time, its raw per-request data, and its start time | no |
+| Request origin | the link from a decorated request to its reporter, its `sid` state, the `cid` at issue time, a copy of its per-request data, and its start time | no |
 | Preparation | the key table, value normalization, filtering, and encoding | no, `encodeCmcd` moves onto it later |
 
 The request target and the event targets share one state type and one report path. They differ in the encoder output, a query parameter or headers against a body line, and in delivery. The request target has no queue, because the player sends the request.
@@ -26,7 +26,7 @@ One export per file, per the package rule. Names are a starting point for the im
 | `createCmcdSession.ts` | `createCmcdSession` | public |
 | `CmcdSession.ts`, `CmcdSessionConfig.ts`, `CmcdEventTargetConfig.ts`, `CmcdRequester.ts` | types | public |
 | `CmcdSessionReporter.ts`, `CmcdSessionReporterConfig.ts`, `CmcdPlaybackData.ts`, `CmcdMetric.ts`, `CmcdNextObject.ts` | types | public |
-| `CmcdRequestLike.ts`, `CmcdDecoratedRequest.ts`, `CmcdRequestRecord.ts`, `CmcdResponseInfo.ts`, `CmcdResourceTiming.ts` | types | public |
+| `CmcdRequestLike.ts`, `CmcdDecoratedRequest.ts`, `CmcdRequestRecord.ts`, `CmcdResponseInfo.ts`, `CmcdResourceTiming.ts`, `CmcdResponseData.ts` | types | public |
 | `CmcdRequestTransform.ts`, `CmcdEventTransform.ts`, `CmcdDiscreteEventType.ts` | types | public |
 | `CmcdEventType.ts` | adds `CMCD_EVENT_HOSTNAME` and `HOSTNAME` | public, existing file |
 | `CmcdKeySpec.ts`, `CMCD_KEY_SPECS.ts` | the key table | internal |
@@ -68,8 +68,10 @@ Everything that resets with a `sid`. `rotate()` creates a new one and marks the 
 | `requestTarget` | `TargetState` | always present |
 | `eventTargets` | `TargetState[]` | one per configured target |
 | `bgReported` | `boolean \| undefined` | the last reported `bg` |
-| `msd`, `msdSupplied`, `msdStart` | `number \| undefined`, `boolean`, `number \| undefined` | `msdStart` is the `ts` of the first `sta` s |
-| `bsa`, `bsda`, `spans` | `number`, `number`, `number[]` | totals and completed span durations |
+| `msd`, `msdSupplied`, `msdStart` | `number \| undefined`, `boolean`, `number \| undefined` | `msdStart` is the `ts` of the first `sta` s, carried by `rotate()` while `msd` is unset |
+| `bsa`, `bsda` | `number`, `number` | totals since the `sid` started |
+| `pending` | `Map<string, number[]>` | the pending `bsd` samples per cause, automatic spans under the empty key, at most 100 per list |
+| `stores` | `Map<ReporterState, Record<string, unknown>>` | filled by `rotate()`, read by late responses |
 | `countersSupplied` | `{ bsa?: true; bsda?: true; bsd?: true }` | per-key sticky override |
 
 ### Reporter
@@ -93,7 +95,8 @@ Everything that resets with a `sid`. `rotate()` creates a new one and marks the 
 | `config` | normalized target configuration | |
 | `sn` | `number` | next sequence number |
 | `msdSent` | `boolean` | |
-| `bsdCursor` | `number` | completed spans delivered to this target |
+| `bsdCursors` | `Map<string, number>` | pending samples per cause delivered to this target |
+| `drainRequested` | `boolean` | event targets only, set by `flush()`, `rotate()`, `dispose()`, and a late `rr` |
 | `perReporter` | `Map<ReporterState, { bs: boolean; ec: string[] }>` | entry removed on reporter dispose |
 | `queue` | `string[]` | event targets only, encoded lines |
 | `attempt`, `retryTimer` | `number`, timer handle or `undefined` | back-off state |
@@ -108,7 +111,7 @@ A target state belongs to one `sid` state. `rotate()` creates new ones from the 
 | `reporter` | `ReporterState` |
 | `sidState` | the `sid` state current at `decorate()` |
 | `cid` | the reporter's `cid` at `decorate()` |
-| `data` | the raw per-request `CmcdPlaybackData` |
+| `data` | a copy of the raw per-request `CmcdPlaybackData`, nested values included |
 | `startedAt` | epoch milliseconds at `decorate()` |
 
 The origin is stored in a `WeakMap` keyed by the `CmcdRequestRecord` object. A spread copy of the request keeps the same record object, so the lookup still resolves. JSON produces a new object, so the lookup fails and the response reports under the calling reporter.
@@ -119,7 +122,7 @@ The origin is stored in a `WeakMap` keyed by the `CmcdRequestRecord` object. A s
 
 1. If the reporter or its session is disposed, return.
 2. Take `ts` from `data`, default `Date.now()`. Do not store it.
-3. For `bg`, `msd`, `bsa`, `bsda`, and `bsd` in `data`: write the value on the current `sid` state and set the supplied flag. `bg` is written on the session instead. Remove the key from the merge. A pushed `bg` also calls `stopVisibility`.
+3. For `bg`, `msd`, `bsa`, and `bsda` in `data`: write the value on the current `sid` state and set the supplied flag. `bg` is written on the session instead. For `bsd`: append one sample per cause to `pending` and set `countersSupplied.bsd`. Remove these keys from the merge. A pushed `bg` also calls `stopVisibility`.
 4. Merge the rest into `store`. Set `suSupplied` or `dlSupplied` when `su` or `dl` is present.
 5. Run the transition tracking for `sta` when `data` has `sta` (below).
 6. Run the state-change diff (below).
@@ -133,11 +136,11 @@ Runs when `sta` changes from the previous stored value. `msdStart`, `msd`, `bsa`
 | into s, with no `msdStart` | `msdStart = ts` |
 | into p, with `msdStart` set and `msd` unset | `msd = ts - msdStart`, when `msdSupplied` is false |
 | into r | `spanOpenedAt = ts`, `bsa += 1`, set `bs` on every target's entry for this reporter |
-| out of r, with `spanOpenedAt` set | push `ts - spanOpenedAt` to `spans`, add it to `bsda`, clear `spanOpenedAt` |
+| out of r, with `spanOpenedAt` set | add `ts - spanOpenedAt` to `bsda`, append it to the untagged `pending` list when a destination is eligible for `bsd` and `countersSupplied.bsd` is unset, clear `spanOpenedAt` |
 | into s, k, or r | `su = true` |
 | into p | `su = false` |
 
-`bsa` and `bsda` updates are skipped for a key in `countersSupplied`. The span list is still kept, because `bsd` may be automatic while `bsda` is supplied.
+`bsa` and `bsda` updates are skipped for a key in `countersSupplied`. The pending list is still fed, because `bsd` may be automatic while `bsda` is supplied.
 
 ### State-change diff
 
@@ -152,7 +155,7 @@ For each field in the order `sta`, `pr`, `cid`, `bg`, `br`:
 
 ### Emit(event, reporter, data, request?)
 
-For each event target of the current `sid` state that lists the event and is not gone:
+For each event target of the `sid` state that was current when the call began, when it lists the event and is not gone:
 
 1. Assemble the report (below).
 2. Run `emitReport` for the target (below). Collect the first thrown error.
@@ -164,28 +167,30 @@ For each event target of the current `sid` state that lists the event and is not
 Merge in this order, later wins:
 
 1. the reporter's `store`
-2. the session data: `sid`, `v`, `bg`, `msd` when the target's gate is open, `bsa`, `bsda`, and the spans after the target's `bsdCursor` as `bsd`
-3. `data`
-4. the target's entry for the reporter: `bs` when flagged, `ec` when the buffer is not empty
-5. `su` from the reporter when `derive.su` is on, `suSupplied` is false, and the report has no `su`
-6. `dl` from `bl / pr` when `derive.dl` is on, `dlSupplied` is false, the report has `bl` and no `dl`, and `pr` is over 0 or absent
-7. `e` and `ts` for an event
+2. the session data: `sid`, `v`, `bg`, `msd` when the target's gate is open, `bsa`, and `bsda`
+3. `bsd`: for each cause, the oldest `pending` sample past the target's cursor, one entry per cause
+4. `data`
+5. the target's entry for the reporter: `bs` when flagged, `ec` when the buffer is not empty
+6. `su` from the reporter when `derive.su` is on, `suSupplied` is false, and the report has no `su`
+7. `dl` from `bl / pr` when `derive.dl` is on, `dlSupplied` is false, the report has `bl` and no `dl`, and `pr` is over 0 or absent
+8. `e` and `ts` for an event
 
 ### emitReport(target, report, event?, request?)
 
 1. When the target has a transform: copy nested values, run the transform, return on `null`, restore a removed required key, re-stamp `sid`, `e`, and `ts`.
 2. `report.sn = target.sn`.
 3. Prepare (below) and encode. An encoder error propagates, and step 4 does not run.
-4. Commit: `target.sn += 1`. When the output has `msd`, `msdSent = true`. Clear the reporter's `bs` and `ec` entry. Move `bsdCursor` to the end of the spans when the output has `bsd`.
+4. Commit: `target.sn += 1`. When the output has `msd`, `msdSent = true`. Clear the reporter's `ec` entry, and its `bs` entry unless the store's `sta` is r. When the output has `bsd`, advance the target's cursor for each cause it carried. Then drop from each `pending` list the prefix that every eligible destination has passed. A destination is eligible when it is not gone, its `keys` include `bsd`, and, for the request target, the version is 2.
 5. Event target: push the line to the queue. Request target: return the prepared data for the URL or the headers.
 
 ### decorate(request, data)
 
 1. If disposed, return a copy of the request with a record `{ sid, data: {} }` and no origin.
-2. Read the host of `request.url`. When `hSupplied` is false and the host differs from `reporter.host`, set it and emit `h` after step 5.
-3. Assemble with the request target and `data`. Run `emitReport`. A cancelled report leaves the request as is.
-4. Query mode: set the `CMCD` query parameter, replacing an existing one. Header mode: copy `headers` and set the non-empty shards. `nor` values use `request.url` as the base for the relative path.
-5. Create the record `{ sid, data: prepared }`, store the origin `{ reporter, sidState: current, cid: store.cid, data, startedAt: Date.now() }`, and return `{ ...request, url, headers, cmcd: record }`.
+2. Capture the origin `{ reporter, sidState: current, cid: store.cid, data: a copy of data, startedAt: Date.now() }`. Every later step uses this origin, whatever a transform does.
+3. Read the host of `request.url`. When `hSupplied` is false and the host differs from `reporter.host`, set it and emit `h` after step 6.
+4. Assemble with the request target of the origin `sid` state and the data copy. Run `emitReport`. A cancelled report leaves the request as is.
+5. Copy the request. Remove the `CMCD` query parameter and every header whose name matches `CMCD-` case-insensitively. Query mode: set the `CMCD` parameter. Header mode: set the non-empty shards. `nor` values use `request.url` as the base for the relative path.
+6. Create the record `{ sid, data: prepared }`, store the origin, and return `{ ...request, url, headers, cmcd: record }`.
 
 ### recordResponse(request, info, data)
 
@@ -194,10 +199,10 @@ Merge in this order, later wins:
    - `url`: `request.url` without the `CMCD` parameter
    - `rc`: `info.status`, or 0
    - `ts`: `timing.startTime` mapped to epoch milliseconds, else `origin.startedAt`
-   - `ttfb`: `responseStart - startTime`
-   - `ttlb`: `duration`, or `responseEnd - startTime`, else `Date.now() - origin.startedAt`
+   - `ttfb`: `responseStart - startTime`, omitted when `responseStart` is absent, zero, or under `startTime`
+   - `ttlb`: `duration` when over zero, else `responseEnd - startTime` when `responseEnd` is over `startTime`, else `Date.now() - origin.startedAt` when a start time exists, else omitted
    - `cmsds` and `cmsdd`: the `CMSD-Static` and `CMSD-Dynamic` headers, base64 encoded
-3. Assemble for each `rr` target of `origin.sidState`: the origin reporter's store, that state's session data, `origin.cid`, `origin.data`, the derived keys, then `data`.
+3. Assemble for each `rr` target of `origin.sidState`, in this order: the origin reporter's store, or its entry in `origin.sidState.stores` when that state has ended. Then that state's session data, `origin.cid`, `origin.data`, the derived keys, and `data`.
 4. Emit `rr` with the decorated request as the transform argument.
 5. When `origin.sidState` is ended, dispatch its queues at once.
 
@@ -209,10 +214,17 @@ For each live reporter in creation order, assemble with `t` and emit to this one
 
 1. If the session is disposed, return.
 2. Resolve the `sid`: the argument, or a new UUID. Throw when it is over 64 characters. Return when it equals the current `sid`.
-3. Dispatch every queue of the current `sid` state in full and set its `ended` flag.
-4. Create a new `sid` state with new target states from the configuration.
-5. For each reporter, clear `reported` and `spanOpenedAt`.
-6. Point `current` at the new state. Nothing is emitted.
+3. Set `drainRequested` on every event target of the current `sid` state, dispatch its queues, and set its `ended` flag.
+4. Copy each reporter's store into the old state's `stores`.
+5. Create a new `sid` state with new target states from the configuration. Carry `msdStart` when the old state's `msd` is unset and `msdSupplied` is false.
+6. For each reporter, clear `reported`. When the store has `sta` r, set `spanOpenedAt` to the rotation time and set `bs` on the reporter's entries in the new targets. Otherwise clear `spanOpenedAt`.
+7. Point `current` at the new state. Nothing is emitted.
+
+### configure(settings)
+
+1. If the session is disposed, return.
+2. Run the configuration checks on `settings`. Throw on a violation.
+3. Replace `version`, `transmissionMode`, `keys`, and `headerMap` in the normalized configuration. The request target reads them at the next `decorate()`. Nothing is emitted, and no counter, gate, or entry changes.
 
 ### dispose()
 
@@ -222,17 +234,17 @@ Session: set `disposed`, clear the timers, call `stopVisibility`, mark every rep
 
 Per event target, `processQueue(drain)`:
 
-1. Return when the target is gone, the queue is empty, a send is in flight, or a retry timer is armed.
-2. Return when the queue is shorter than `batchSize` and `drain` is false.
+1. Set `drainRequested` when `drain` is true. Return when the target is gone, the queue is empty, a send is in flight, or a retry timer is armed.
+2. Return when the queue is shorter than `batchSize` and `drainRequested` is false.
 3. Splice the batch: the whole queue when `drain`, else `batchSize` lines.
 4. POST through the requester. Body: lines joined by `\n`. Headers: `Content-Type: application/cmcd` plus the target's headers.
 
 | Result | Action |
 |---|---|
-| 2xx or 3xx | `attempt = 0`, process the queue again |
+| 2xx or 3xx | `attempt = 0`, process the queue again, and clear `drainRequested` once the queue is empty |
 | 410 | `gone = true`, `queue.length = 0` |
 | 429, 5xx, or rejection | unshift the batch, `attempt += 1`, arm `retryTimer` for `min(1000 * 2 ** (attempt - 1), 60000)` ms, then process the queue with `drain` |
-| other 4xx | drop the batch, `attempt = 0` |
+| other 4xx | drop the batch, `attempt = 0`, process the queue again |
 
 `flush()` clears an armed retry timer and processes with `drain`. Once the owning `sid` state has ended, a failure at the 60 second step stops the retries. When the queue is longer than `maxQueueSize` after an unshift or a push, splice the oldest lines off the front.
 
@@ -322,7 +334,8 @@ for key of report keys, sorted:
 |---|---|
 | `update()` with no state change | the merge into the store |
 | `update()` with one state change | one report object per event target, plus one copy per target with a transform |
-| `decorate()` | the report, the prepared object, the request copy, the record, the origin |
+| `decorate()` | the report, the prepared object, the request copy, the record, the origin, the copy of `data` |
+| `rotate()` | the new `sid` state and its targets, and one store copy per reporter |
 | `recordResponse()` | the report per `rr` target |
 | tick | one report per reporter per target |
 | idle | none |
@@ -339,9 +352,14 @@ Tests import from `@svta/cml-cmcd` and run against the built package.
 | Derivations | one test per row of the derived keys table in the RFC, including the supplied-value override |
 | State-change diff | order, dedup, `pr` while paused, `cid` at creation, `bg` on the session, `br` by value |
 | Multi-player | two reporters, one `sid`, `sn` continuity per target, one `t` line per reporter, `nr`, reporter dispose |
-| Late responses | after `rotate()`, after session dispose, with a spread copy of the request, after a JSON round trip, and with `{ url }` alone |
-| Rotation | `sn` restarts per target, the `msd` gate re-arms, baselines reset so the next push emits, the old queue drains at once, a 410 target is active again, the same `sid` is a no-op, and nothing is emitted by the call |
-| Delivery | mock requester with fake timers: batch size, flush, dispose, 410, 429 back-off sequence, 5xx, rejection, queue cap, `pagehide` keepalive |
+| Late responses | after `rotate()`, after session dispose, with a spread copy of the request, after a JSON round trip, and with `{ url }` alone. A late `rr` reads the store copied at rotation and the copied per-request data, and a mutated data object does not change it. An ended `sid` state is collectable once its requests are released, checked with a `WeakRef` under `node --expose-gc` |
+| Rotation | `sn` restarts per target, the `msd` gate re-arms, baselines reset so the next push emits, the old queue drains at once, a 410 target is active again, the same `sid` is a no-op, and nothing is emitted by the call. `msdStart` is carried while a startup is in progress, an open stall is measured from the rotation, and the new targets start with `bs` |
+| Configure | `configure()` replaces the request settings, keeps `sn` and the gates, and throws on a bad setting |
+| Stalls | `bs` on every report during a stall and once after recovery, `bsd` one stall per entry per cause in order, a second stall of the same cause waits, the cap at 100, no samples without an eligible destination, prefix reclamation |
+| Transform rotation | a transform that calls `rotate()` inside `decorate()` and inside an emission leaves the request and the remaining targets on the old `sid` |
+| Requests | re-decoration strips the old `CMCD` parameter and headers, the decorated type compiles for `{ url }`, `CmcdResponseData` accepts `ttfbb` and `smrt` and rejects `sn` |
+| Timing | `ttfb` omitted for a zero `responseStart`, `ttlb` from `responseEnd` for a cross-origin entry, the clock fallback measures the call |
+| Delivery | mock requester with fake timers: batch size, flush, dispose, 410, 429 back-off sequence, 5xx, rejection, queue cap, `pagehide` keepalive, a drain kept across an in-flight send, and a `batchSize` over `maxQueueSize` throws |
 | Errors | configuration checks and their messages, encoder failure commits nothing, throwing transform isolation, `onError` on a tick |
 | Validation | every emitted line passes `validateCmcdEvents` or `validateCmcdRequest` |
 | Types | `@ts-expect-error` for a state-change type in `recordEvent`, `ce` without `cen`, `version` on an event target, `ec` in `CmcdPlaybackData` |
