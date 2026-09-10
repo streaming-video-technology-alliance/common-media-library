@@ -1,6 +1,7 @@
 import { uuid } from '@svta/cml-utils'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
+import { configureSession } from './configureSession.ts'
 import { createSessionReporter } from './createSessionReporter.ts'
 import { createSidState } from './createSidState.ts'
 import { normalizeSessionConfig } from './normalizeSessionConfig.ts'
@@ -49,23 +50,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 				reporter.spanOpenedAt = undefined
 			}
 		},
-		configure(settings) {
-			if (state.disposed) {
-				return
-			}
-			if (settings.version !== undefined) {
-				state.config.version = settings.version
-			}
-			if (settings.transmissionMode !== undefined) {
-				state.config.transmissionMode = settings.transmissionMode
-			}
-			if (settings.keys !== undefined) {
-				state.config.keys = new Set(settings.keys)
-			}
-			if (settings.headerMap !== undefined) {
-				state.config.headerMap = settings.headerMap
-			}
-		},
+		configure: settings => configureSession(state, settings),
 		flush() {
 			// Event mode delivery is not implemented yet.
 		},

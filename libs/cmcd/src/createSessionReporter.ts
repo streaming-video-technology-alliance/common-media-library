@@ -8,6 +8,7 @@ import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionReporter } from './CmcdSessionReporter.ts'
 import type { CmcdSessionReporterConfig } from './CmcdSessionReporterConfig.ts'
 import { assembleReport } from './assembleReport.ts'
+import { checkCid, configError } from './checkRequestSettings.ts'
 import { copyPlaybackData } from './copyPlaybackData.ts'
 import { emitReport } from './emitReport.ts'
 import { getTargetEntry } from './getTargetEntry.ts'
@@ -96,6 +97,12 @@ function finish<R extends CmcdRequestLike>(request: R, placed: { url: string; he
 
 /** One reporter of a session, with its own store and its own entry in every target. */
 export function createSessionReporter(state: SessionState, session: CmcdSession, config: CmcdSessionReporterConfig = {}): CmcdSessionReporter {
+	if (state.disposed) {
+		throw configError('createReporter', 'a live session', 'a disposed session')
+	}
+	if (config.cid !== undefined) {
+		checkCid(config.cid)
+	}
 	const reporter: ReporterState = {
 		session: state,
 		store: config.cid === undefined ? {} : { cid: config.cid },
