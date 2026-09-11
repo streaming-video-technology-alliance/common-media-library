@@ -6,10 +6,10 @@ import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestLike } from './CmcdRequestLike.ts'
 import type { AssembledReport } from './assembleReport.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
-import { filterReport, isRequired } from './filterReport.ts'
 import { getKeySpec } from './getKeySpec.ts'
-import { normalizeReport } from './normalizeReport.ts'
+import { normalizeValue, toTokenText } from './normalizeValue.ts'
 import type { PrepareContext } from './PrepareContext.ts'
+import { isRequired, prepareReport } from './prepareReport.ts'
 import { pruneSpans } from './pruneSpans.ts'
 import type { ReporterState } from './ReporterState.ts'
 import type { SessionState } from './SessionState.ts'
@@ -67,9 +67,44 @@ function fail(stage: 'transform' | 'encode', targetName: string, error: unknown)
 }
 
 /**
- * Normalizes, transforms, filters, encodes, and commits one report for one target.
- * Returns `undefined` when the transform cancels. A transform or encoder error propagates
- * as a wrapped `Error` and commits nothing.
+ * Runs the configured transform on the report and returns the report to prepare. The transform sees every key
+ * in structured-field form, before the allowlist and the spec rules apply. A required key the transform removed
+ * or broke is restored, and `sid`, `e`, and `ts` are re-stamped. Returns `undefined` when the transform cancels.
+ */
+function applyTransform(transform: CmcdEventTransform, report: Record<string, unknown>, context: PrepareContext, event: string | undefined, request: Readonly<CmcdRequestLike> | undefined, targetName: string): Record<string, unknown> | undefined {
+	const before = prepareReport(report, context, false)
+	let result: Cmcd | null
+	try {
+		result = transform(toTransformView(before) as Cmcd, request)
+	}
+	catch (error) {
+		throw fail('transform', targetName, error)
+	}
+	// A nullish result cancels the report, as the transforms RFC states. A forgotten `return` therefore cancels too.
+	if (result == null) {
+		return undefined
+	}
+	// A copy, so the reporter-owned keys never reach an object the transform may keep.
+	const merged: Record<string, unknown> = { ...result }
+	const ot = toTokenText(merged['ot'])
+	for (const key of Object.keys(before)) {
+		const spec = getKeySpec(key)
+		if (spec && isRequired(spec, event) && normalizeValue(merged[key], spec, context, ot) === undefined) {
+			merged[key] = before[key]
+		}
+	}
+	merged['sid'] = before['sid']
+	if (event !== undefined) {
+		merged['e'] = before['e']
+		merged['ts'] = before['ts']
+	}
+	return merged
+}
+
+/**
+ * Prepares, transforms, encodes, and commits one report for one target. The report is normalized and filtered in
+ * one pass. Returns `undefined` when the transform cancels. A transform or encoder error propagates as a wrapped
+ * `Error` and commits nothing.
  */
 export function emitReport(session: SessionState, sidState: SidState, target: TargetState, reporter: ReporterState | undefined, assembled: AssembledReport, event: string | undefined, request: Readonly<CmcdRequestLike> | undefined): EmittedReport | undefined {
 	const config = session.config
@@ -82,35 +117,17 @@ export function emitReport(session: SessionState, sidState: SidState, target: Ta
 		keys: targetConfig ? targetConfig.keys : config.keys,
 		baseUrl: request?.url,
 	}
-	let normalized = normalizeReport(assembled.report, context)
 	const transform = targetConfig ? targetConfig.transform : config.transform
+	let report: Record<string, unknown> | undefined = assembled.report
 	if (transform) {
-		const before = normalized
-		let result: Cmcd | null
-		try {
-			result = (transform as CmcdEventTransform)(toTransformView(before) as Cmcd, request)
-		}
-		catch (error) {
-			throw fail('transform', targetName, error)
-		}
-		if (result === null) {
+		report = applyTransform(transform as CmcdEventTransform, report, context, event, request, targetName)
+		if (report === undefined) {
 			return undefined
 		}
-		normalized = normalizeReport(result as Record<string, unknown>, context)
-		for (const key of Object.keys(before)) {
-			const spec = getKeySpec(key)
-			if (spec && isRequired(spec, event) && normalized[key] === undefined) {
-				normalized[key] = before[key]
-			}
-		}
-		normalized['sid'] = before['sid']
-		if (event !== undefined) {
-			normalized['e'] = before['e']
-			normalized['ts'] = before['ts']
-		}
 	}
-	normalized['sn'] = target.sn
-	const prepared = filterReport(normalized, context)
+	// The sequence number is assigned after the transform and before preparation, so the output stays in key order.
+	report['sn'] = target.sn
+	const prepared = prepareReport(report, context, true)
 	let line: string
 	try {
 		line = encodePreparedCmcd(prepared as Cmcd)

@@ -232,7 +232,7 @@ Session: set `disposed`, clear the timers, call `stopVisibility`, mark every rep
 
 ### Implementation notes
 
-- `filterReport` sorts the keys again and reapplies the version 1 absence rule. `emitReport` assigns `sn` after `normalizeReport` runs, so a second pass keeps the output sorted and correct for version 1.
+- `prepareReport` normalizes and filters in one sorted pass, with one spec lookup per key. `emitReport` writes `sn` into the report before that pass. It writes `sn` after the transform when one is configured. The output stays in key order, and version 1 drops `sn`. A transform sees the unfiltered pass, and its result goes through the filtered pass. The first implementation ran two passes, and [`performance.md`](./performance.md) records why they were merged.
 - `formatNor` percent-encodes each path segment but leaves an existing `%XX` escape unchanged, because `urlToRelativePath` already returns an escaped path. It also accepts an already formatted `nor` entry, so normalizing again after a transform loses nothing.
 - `emitEvent` and `emitResponse` share one fan-out helper, `emitToEventTargets`.
 

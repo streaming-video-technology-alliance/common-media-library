@@ -16,6 +16,7 @@ and this project adheres to
 ### Changed
 
 - The `Cmcd` type documentation links to the CTA-5004-B specification. It linked only to the version 1 PDF
+- The session API prepares each report in one pass over its keys, with one key spec lookup per key. The first implementation normalized in one pass and filtered in a second. The wire output is unchanged
 
 ### Fixed
 
