@@ -60,13 +60,21 @@ function toTransformView(normalized: Record<string, unknown>): Record<string, un
 	return view
 }
 
+/** Names the stage and the target in a report error. The original error becomes `cause`. */
+function fail(stage: 'transform' | 'encode', targetName: string, error: unknown): Error {
+	const detail = error instanceof Error ? error.message : String(error)
+	return new Error(`CmcdSession: ${stage} failed for target ${targetName}: ${detail}`, { cause: error })
+}
+
 /**
  * Normalizes, transforms, filters, encodes, and commits one report for one target.
- * Returns `undefined` when the transform cancels. An encoder error propagates and commits nothing.
+ * Returns `undefined` when the transform cancels. A transform or encoder error propagates
+ * as a wrapped `Error` and commits nothing.
  */
 export function emitReport(session: SessionState, sidState: SidState, target: TargetState, reporter: ReporterState | undefined, assembled: AssembledReport, event: string | undefined, request: Readonly<CmcdRequestLike> | undefined): EmittedReport | undefined {
 	const config = session.config
 	const targetConfig = target.kind === CMCD_EVENT_MODE ? config.eventTargets[target.index] : undefined
+	const targetName = targetConfig ? targetConfig.url : 'request'
 	const context: PrepareContext = {
 		version: targetConfig ? CMCD_V2 : config.version,
 		mode: target.kind,
@@ -78,7 +86,13 @@ export function emitReport(session: SessionState, sidState: SidState, target: Ta
 	const transform = targetConfig ? targetConfig.transform : config.transform
 	if (transform) {
 		const before = normalized
-		const result = (transform as CmcdEventTransform)(toTransformView(before) as Cmcd, request)
+		let result: Cmcd | null
+		try {
+			result = (transform as CmcdEventTransform)(toTransformView(before) as Cmcd, request)
+		}
+		catch (error) {
+			throw fail('transform', targetName, error)
+		}
 		if (result === null) {
 			return undefined
 		}
@@ -97,7 +111,13 @@ export function emitReport(session: SessionState, sidState: SidState, target: Ta
 	}
 	normalized['sn'] = target.sn
 	const prepared = filterReport(normalized, context)
-	const line = encodePreparedCmcd(prepared as Cmcd)
+	let line: string
+	try {
+		line = encodePreparedCmcd(prepared as Cmcd)
+	}
+	catch (error) {
+		throw fail('encode', targetName, error)
+	}
 
 	target.sn += 1
 	if (prepared['msd'] !== undefined) {
