@@ -1,13 +1,19 @@
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { CmcdPlaybackData } from './CmcdPlaybackData.ts'
 
-/** A copy of per-call data, with nested records and arrays copied, so a later mutation by the player does not change a late report. */
+/**
+ * A copy of per-call data, with nested records and arrays copied, so a later mutation by the player does not change a late report.
+ * A member set to `undefined` is left out, so it does not shadow a value taken at decoration.
+ */
 export function copyPlaybackData<D extends CmcdPlaybackData>(data: D | undefined): D | undefined {
 	if (!data) {
 		return undefined
 	}
 	const copy: Record<string, unknown> = {}
 	for (const [key, value] of Object.entries(data)) {
+		if (value === undefined) {
+			continue
+		}
 		if (Array.isArray(value)) {
 			copy[key] = [...value]
 		}

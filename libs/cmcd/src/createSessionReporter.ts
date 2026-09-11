@@ -159,9 +159,14 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 				return
 			}
 			const codes = (typeof code === 'string' ? [code] : [...code]).filter(item => item !== '')
+			if (codes.length === 0) {
+				return
+			}
 			const sidState = state.current
 			for (const target of [sidState.requestTarget, ...sidState.eventTargets]) {
-				getTargetEntry(target, reporter).ec.push(...codes)
+				if (!target.gone) {
+					getTargetEntry(target, reporter).ec.push(...codes)
+				}
 			}
 			emitEvent(state, reporter, CMCD_EVENT_ERROR, data, undefined, typeof data?.ts === 'number' ? data.ts : Date.now())
 		},

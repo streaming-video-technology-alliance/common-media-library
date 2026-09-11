@@ -170,6 +170,24 @@ describe('CmcdSession delivery state machine', () => {
 		other.dispose()
 	})
 
+	it('forgets the drain request when another 4xx drops the batch', async () => {
+		const dropping = createMockRequester(404)
+		const session = createCmcdSession({ sid: 'd', requester: dropping.requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0, batchSize: 2 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		session.flush()
+		await flushPromises()
+		equal(dropping.requests.length, 1)
+		dropping.status = 200
+		reporter.update({ sta: 'a', ts: 2 })
+		await flushPromises()
+		equal(dropping.requests.length, 1)
+		reporter.update({ sta: 'p', ts: 3 })
+		await flushPromises()
+		equal(dropping.bodies()[1], 'e=ps,sid="d",sta=a,ts=2,v=2\ne=ps,sid="d",sta=p,ts=3,v=2')
+		session.dispose()
+	})
+
 	it('keeps the newest maxQueueSize lines when a failed batch is unshifted back', async (context) => {
 		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
 		const requester = createMockRequester(503)
@@ -259,8 +277,10 @@ describe('CmcdSession delivery state machine', () => {
 		session.createReporter().update({ sta: 'p', ts: 1 })
 		await flushPromises()
 		session.rotate('b')
-		let sent = 1
-		for (const wait of [1000, 2000, 4000, 8000, 16000, 32000, 60000]) {
+		await flushPromises()
+		let sent = 2
+		equal(requester.requests.length, sent)
+		for (const wait of [2000, 4000, 8000, 16000, 32000, 60000]) {
 			context.mock.timers.tick(wait - 1)
 			await flushPromises()
 			equal(requester.requests.length, sent)

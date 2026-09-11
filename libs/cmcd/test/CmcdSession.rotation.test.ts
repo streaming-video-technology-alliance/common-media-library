@@ -68,6 +68,28 @@ describe('CmcdSession rotation', () => {
 		session.dispose()
 	})
 
+	it('sends the old queue at once while a back-off is armed', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
+		const mock = createMockRequester(503)
+		const session = createCmcdSession({ sid: 'a', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		equal(mock.requests.length, 1)
+		mock.status = 200
+		reporter.update({ sta: 'a', ts: 2 })
+		await flushPromises()
+		equal(mock.requests.length, 1)
+		session.rotate('b')
+		await flushPromises()
+		equal(mock.requests.length, 2)
+		equal(mock.bodies()[1], 'e=ps,sid="a",sta=p,ts=1,v=2\ne=ps,sid="a",sta=a,ts=2,v=2')
+		context.mock.timers.tick(60000)
+		await flushPromises()
+		equal(mock.requests.length, 2)
+		session.dispose()
+	})
+
 	it('reports a late response under the old sid with the store copied at rotation', async () => {
 		const mock = createMockRequester()
 		const session = createCmcdSession({ sid: 'a', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['rr'], keys: ['bl', 'rc', 'sid', 'sn'], interval: 0, batchSize: 5 }] })

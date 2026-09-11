@@ -45,6 +45,9 @@ function settle(session: SessionState, sidState: SidState, target: TargetState, 
 		return
 	}
 	target.attempt = 0
+	if (target.queue.length === 0) {
+		target.drainRequested = false
+	}
 	processQueue(session, sidState, target, false)
 }
 
@@ -84,5 +87,9 @@ export function processQueue(session: SessionState, sidState: SidState, target: 
 	response.then(
 		result => settle(session, sidState, target, batch, result.status),
 		() => settle(session, sidState, target, batch, 0),
-	)
+	).catch((error: unknown) => {
+		setTimeout(() => {
+			throw error
+		}, 0)
+	})
 }

@@ -100,6 +100,15 @@ describe('CmcdSessionReporter responses', () => {
 		deepEqual(mock.bodies(), [`cid="per-request-cid",e=rr,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
 	})
 
+	it('ignores a per-request member set to undefined and keeps the cid at decoration', async () => {
+		const { mock, reporter } = harness('s', 'first', ['cid', 'rc', 'sid', 'url'])
+		const req = reporter.decorate({ url: `${CDN}/seg.m4s` }, { cid: undefined })
+		reporter.update({ cid: 'second' })
+		reporter.recordResponse(req, { status: 200 }, { ts: 1 })
+		await flushPromises()
+		deepEqual(mock.bodies(), [`cid="first",e=rr,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
+	})
+
 	it('reports a late response through the ended sid state, even after an earlier drain already cleared', async () => {
 		const { mock, session, reporter } = harness('s', 'c', ['rc', 'sid'], 2, ['ps', 'rr'])
 		const req = reporter.decorate({ url: `${CDN}/seg.m4s` })

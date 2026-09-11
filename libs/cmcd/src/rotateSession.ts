@@ -24,6 +24,10 @@ export function rotateSession(state: SessionState, sid: string | undefined): voi
 	}
 	old.ended = true
 	for (const target of old.eventTargets) {
+		if (target.retryTimer !== undefined) {
+			clearTimeout(target.retryTimer)
+			target.retryTimer = undefined
+		}
 		processQueue(state, old, target, true)
 	}
 	for (const reporter of state.reporters) {

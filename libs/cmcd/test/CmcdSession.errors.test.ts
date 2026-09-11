@@ -26,6 +26,36 @@ describe('CmcdSession errors', () => {
 		session.dispose()
 	})
 
+	it('leaves no unhandled rejection when onError throws at the back-off cap', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
+		const rejections: unknown[] = []
+		const collect = (reason: unknown) => {
+			rejections.push(reason)
+		}
+		process.on('unhandledRejection', collect)
+		try {
+			const requester = createMockRequester(503)
+			const session = createCmcdSession({ sid: 'a', requester: requester.requester, onError: () => {
+				throw new Error('collector bug')
+			}, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid'], interval: 0 }] })
+			session.createReporter().update({ sta: 'p', ts: 1 })
+			await flushPromises()
+			session.rotate('b')
+			await flushPromises()
+			for (const wait of [2000, 4000, 8000, 16000, 32000, 60000]) {
+				context.mock.timers.tick(wait)
+				await flushPromises()
+			}
+			equal(requester.requests.length, 8)
+			await flushPromises()
+			deepEqual(rejections, [])
+			session.dispose()
+		}
+		finally {
+			process.off('unhandledRejection', collect)
+		}
+	})
+
 	it('throws an encoder failure to the caller and commits nothing', () => {
 		const session = createCmcdSession({ sid: 's', keys: ['sid', 'sn', 'com.example-x'] })
 		const reporter = session.createReporter()

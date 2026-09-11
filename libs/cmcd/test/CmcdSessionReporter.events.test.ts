@@ -74,6 +74,18 @@ describe('CmcdSessionReporter events', () => {
 		deepEqual(mock.bodies(), ['cen="seek-ui",cid="content-id-123",e=ce,sid="session-id-123",ts=5,v=2'])
 	})
 
+	it('reports nothing when every error code is empty', async () => {
+		const { mock, reporter } = harness(['e'], ['ec', 'sid'])
+		reporter.recordError('')
+		reporter.recordError([])
+		reporter.recordError(['', ''])
+		await flushPromises()
+		deepEqual(mock.bodies(), [])
+		reporter.recordError(['', 'E1'], { ts: 5 })
+		await flushPromises()
+		deepEqual(mock.bodies(), ['e=e,ec=("E1"),sid="session-id-123",ts=5,v=2'])
+	})
+
 	it('buffers error codes for a target that does not list e until its next report', async (context) => {
 		context.mock.timers.enable({ apis: ['Date', 'setInterval', 'setTimeout'], now: 1000 })
 		const mock = createMockRequester()
