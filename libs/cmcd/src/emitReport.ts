@@ -1,3 +1,4 @@
+import { SfToken } from '@svta/cml-structured-field-values'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventTransform } from './CmcdEventTransform.ts'
@@ -21,6 +22,18 @@ export type EmittedReport = {
 	readonly line: string
 }
 
+/** A token key's plain text, matching its declared `Cmcd` type. Every other key passes through unchanged. */
+function toTransformView(normalized: Record<string, unknown>): Record<string, unknown> {
+	const view: Record<string, unknown> = { ...normalized }
+	for (const key of Object.keys(view)) {
+		const value = view[key]
+		if (value instanceof SfToken && getKeySpec(key)?.type === 'token') {
+			view[key] = value.description
+		}
+	}
+	return view
+}
+
 /**
  * Normalizes, transforms, filters, encodes, and commits one report for one target.
  * Returns `undefined` when the transform cancels. An encoder error propagates and commits nothing.
@@ -39,7 +52,7 @@ export function emitReport(session: SessionState, sidState: SidState, target: Ta
 	const transform = targetConfig ? targetConfig.transform : config.transform
 	if (transform) {
 		const before = normalized
-		const result = (transform as CmcdEventTransform)(before as Cmcd, request)
+		const result = (transform as CmcdEventTransform)(toTransformView(before) as Cmcd, request)
 		if (result === null) {
 			return undefined
 		}
