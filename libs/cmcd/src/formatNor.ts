@@ -24,16 +24,19 @@ function safeBase(baseUrl: string | undefined): string | undefined {
 	}
 }
 
+type NorItem = CmcdNextObject | SfItem<string, { r?: string }>
+
+/** Reads the path and range from a raw entry or an already-normalized one. A second `normalizeReport` pass is then a no-op. */
 function toEntries(value: unknown, baseUrl: string | undefined): Entry[] {
 	const items = Array.isArray(value) ? value : [value]
 	const base = safeBase(baseUrl)
 	const entries: Entry[] = []
-	for (const item of items as CmcdNextObject[]) {
-		const url = typeof item === 'string' ? item : item?.url
+	for (const item of items as NorItem[]) {
+		const url = typeof item === 'string' ? item : item instanceof SfItem ? item.value : item?.url
 		if (typeof url !== 'string' || url === '') {
 			continue
 		}
-		const range = typeof item === 'string' ? undefined : item.range
+		const range = typeof item === 'string' ? undefined : item instanceof SfItem ? item.params?.r : item.range
 		entries.push({ path: base === undefined ? url : urlToRelativePath(url, base), range: range === '' ? undefined : range })
 	}
 	return entries

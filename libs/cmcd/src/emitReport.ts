@@ -22,13 +22,39 @@ export type EmittedReport = {
 	readonly line: string
 }
 
-/** A token key's plain text, matching its declared `Cmcd` type. Every other key passes through unchanged. */
+/**
+ * Shallow-copies an object value, keeping its prototype for a later `instanceof` check.
+ * Also copies a `params` record, so a transform cannot mutate it by reference.
+ */
+function copyNestedValue(value: unknown): unknown {
+	if (value === null || typeof value !== 'object') {
+		return value
+	}
+	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown }
+	if (copy.params !== null && typeof copy.params === 'object') {
+		copy.params = { ...copy.params }
+	}
+	return copy
+}
+
+/**
+ * A token key's plain text, matching its declared `Cmcd` type.
+ * Every other value is a copy, so a transform cannot mutate it by reference.
+ * This stops a transform from corrupting the store or another target's report.
+ * A shared `SfItem`, its `params`, or an inner-list item can no longer leak a mutation.
+ */
 function toTransformView(normalized: Record<string, unknown>): Record<string, unknown> {
-	const view: Record<string, unknown> = { ...normalized }
-	for (const key of Object.keys(view)) {
-		const value = view[key]
+	const view: Record<string, unknown> = {}
+	for (const key of Object.keys(normalized)) {
+		const value = normalized[key]
 		if (value instanceof SfToken && getKeySpec(key)?.type === 'token') {
 			view[key] = value.description
+		}
+		else if (Array.isArray(value)) {
+			view[key] = value.map(copyNestedValue)
+		}
+		else {
+			view[key] = copyNestedValue(value)
 		}
 	}
 	return view
