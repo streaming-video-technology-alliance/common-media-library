@@ -471,7 +471,7 @@ flowchart LR
     end
     assemble --> tq{"transform<br>configured?"}
     tq -- no --> prep["filter keys<br>apply the spec rules"]
-    tq -- yes --> tr["copy nested values<br>run the transform"]
+    tq -- yes --> tr["copy the normalized report<br>run the transform"]
     tr -- null --> cancel["cancelled<br>nothing committed"]
     tr -- data --> restore["restore required keys<br>re-stamp sid, e, ts"] --> prep
     prep --> enc["encode"]
@@ -562,7 +562,7 @@ type CmcdRequestTransform = (data: Cmcd, request: Readonly<CmcdRequestLike>) => 
 type CmcdEventTransform = (data: Cmcd, request: Readonly<CmcdRequestLike> | undefined) => Cmcd | null
 ```
 
-The contract is the one the transforms RFC defined. The reporter normalizes the report to structured-field values before a configured transform runs. The transform then receives a copy of that normalized report. A token value in the copy is plain text. Every nested value, such as an inner list or a custom item, is copied too, parameters included. A transform cannot change the store or another target's report through this copy. In version 2 the copy matches the `Cmcd` type. In version 1 request mode, a metric with one value arrives as a number. `nor` arrives as one string, with `nrr` beside it. The reporter restores the required keys `sid`, `e`, and `ts` after the transform runs, and assigns `sn` after it. A transform that throws cancels that target's report. The error is thrown to the caller after every other target has been processed. The `request` argument is the decorated request. Read player fields through a cast or bracket access.
+The contract is the one the transforms RFC defined. The reporter normalizes the report to structured-field values before a configured transform runs. The transform then receives a copy of that normalized report. A token value in the copy is plain text. Every nested value, such as an inner list or a custom item, is copied too, parameters included. A transform cannot change the store or another target's report through this copy. In version 2 the copy matches the `Cmcd` type. In version 1 request mode, a metric with one value arrives as a number. `nor` arrives as one string, with `nrr` beside it. The reporter restores the required keys `sid`, `e`, and `ts` after the transform runs, and assigns `sn` after it. A transform that throws cancels that target's report. The error is thrown to the caller after every other target has been processed. In the request-mode transform, `request` is the request the player passed to `decorate()`, before decoration. In an event transform for `rr`, `request` is the decorated request passed to `recordResponse()`. Read player fields through a cast or bracket access.
 
 A transform may call `rotate()`. The report it runs in and the request origin stay with the `sid` state that was current when the call began. The remaining targets of that emission do too. The rotation applies to every later call.
 
