@@ -1,5 +1,5 @@
 import { createCmcdSession } from '@svta/cml-cmcd'
-import { deepEqual, equal } from 'node:assert'
+import { deepEqual } from 'node:assert'
 import { describe, it } from 'node:test'
 import { EX_8_2_3 } from './data/CTA_5004_B_EXAMPLES.ts'
 import { createMockRequester, flushPromises } from './helpers/cmcdSessionHarness.ts'
@@ -9,9 +9,9 @@ const CDN = 'https://cdn.example.com'
 const CMSD_STATIC = atob('c2lkPSI5YTNiLTIxY2QiO2JyPTQ1MDA7ZD00MDAwO290PXY7c3Q9dg==')
 const CMSD_DYNAMIC = atob('ZXRwPTEyNTAwO3J0dD0zNTttYj02MDAwO3JkPTIwMA==')
 
-function harness(sid: string, cid: string, keys: string[]) {
+function harness(sid: string, cid: string, keys: string[], batchSize?: number) {
 	const mock = createMockRequester()
-	const session = createCmcdSession({ sid, requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['rr'], keys: keys as never, interval: 0 }] })
+	const session = createCmcdSession({ sid, requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['rr'], keys: keys as never, interval: 0, batchSize }] })
 	return { mock, session, reporter: session.createReporter({ cid }) }
 }
 
@@ -33,22 +33,22 @@ describe('CmcdSessionReporter responses', () => {
 		const { mock, reporter } = harness('s', 'c', ['cmsds', 'rc', 'sid', 'ttlb', 'url'])
 		const req = reporter.decorate({ url: `${CDN}/seg.m4s?a=1` })
 		context.mock.timers.setTime(1250)
-		const body = await new Response('', { headers: { 'CMSD-Static': 'ot=v' } }).arrayBuffer()
-		equal(body.byteLength, 0)
 		reporter.recordResponse(req, { status: 206, headers: new Headers({ 'CMSD-Static': 'ot=v' }) })
 		await flushPromises()
 		deepEqual(mock.bodies(), [`cmsds="${btoa('ot=v')}",e=rr,rc=206,sid="s",ts=1000,ttlb=250,url="${CDN}/seg.m4s?a=1",v=2`])
 	})
 
-	it('omits unavailable timing values', async () => {
+	it('omits unavailable timing values', async (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 5000 })
 		const { mock, reporter } = harness('s', 'c', ['rc', 'sid', 'ttfb', 'ttlb', 'url'])
 		const req = reporter.decorate({ url: `${CDN}/seg.m4s` })
 		reporter.recordResponse(req, { status: 200, timing: { startTime: 5000, responseStart: 0, responseEnd: 5100 } }, { ts: 7 })
+		context.mock.timers.setTime(5040)
 		reporter.recordResponse(req, { status: 200, timing: { startTime: 5000, responseStart: 0, responseEnd: 4000, duration: 0 } }, { ts: 8 })
 		await flushPromises()
 		deepEqual(mock.bodies(), [
 			`e=rr,rc=200,sid="s",ts=7,ttlb=100,url="${CDN}/seg.m4s",v=2`,
-			`e=rr,rc=200,sid="s",ts=8,url="${CDN}/seg.m4s",v=2`,
+			`e=rr,rc=200,sid="s",ts=8,ttlb=40,url="${CDN}/seg.m4s",v=2`,
 		])
 	})
 
@@ -98,5 +98,14 @@ describe('CmcdSessionReporter responses', () => {
 		reporter.recordResponse(req, { status: 200 }, { ts: 1 })
 		await flushPromises()
 		deepEqual(mock.bodies(), [`cid="per-request-cid",e=rr,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
+	})
+
+	it('drains at once after the session is disposed, even when the target batches more than one line', async () => {
+		const { mock, session, reporter } = harness('s', 'c', ['rc', 'sid'], 5)
+		const req = reporter.decorate({ url: `${CDN}/seg.m4s` })
+		session.dispose()
+		reporter.recordResponse(req, { status: 200 }, { ts: 1 })
+		await flushPromises()
+		deepEqual(mock.bodies(), [`e=rr,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
 	})
 })

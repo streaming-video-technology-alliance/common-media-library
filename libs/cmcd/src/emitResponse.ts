@@ -2,17 +2,15 @@ import { CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import type { CmcdRequestLike } from './CmcdRequestLike.ts'
 import type { CmcdResponseData } from './CmcdResponseData.ts'
 import type { CmcdResponseInfo } from './CmcdResponseInfo.ts'
-import { assembleReport } from './assembleReport.ts'
-import { emitReport } from './emitReport.ts'
-import { processQueue } from './processQueue.ts'
+import { emitToEventTargets } from './emitToEventTargets.ts'
 import type { RequestOrigin } from './RequestOrigin.ts'
 import type { SessionState } from './SessionState.ts'
-import type { TargetState } from './TargetState.ts'
 import { toResponseKeys } from './toResponseKeys.ts'
 
 /**
- * Emits `rr` to every event target of the origin `sid` state that lists it. The report merges the origin reporter's store,
- * or the copy the ended `sid` state keeps, the `cid` at decoration, the copied per-request data, the derived keys, then `data`.
+ * Emits `rr` to every event target of the origin `sid` state that lists it.
+ * The report merges the origin reporter's store, or its snapshot when that state has ended.
+ * It then merges the `cid` at decoration, the copied per-request data, the derived keys, then `data`.
  */
 export function emitResponse(session: SessionState, origin: RequestOrigin, request: CmcdRequestLike, info: CmcdResponseInfo, data: CmcdResponseData | undefined): void {
 	const { sidState, reporter } = origin
@@ -21,29 +19,5 @@ export function emitResponse(session: SessionState, origin: RequestOrigin, reque
 	const ts = typeof perCall['ts'] === 'number' ? perCall['ts'] : Date.now()
 	delete perCall['ts']
 	const store = sidState.ended ? (sidState.stores.get(reporter) ?? reporter.store) : reporter.store
-	const targets: TargetState[] = []
-	let failure: unknown
-	let failed = false
-	for (const target of sidState.eventTargets) {
-		if (target.gone || !session.config.eventTargets[target.index].events.has(CMCD_EVENT_RESPONSE_RECEIVED)) {
-			continue
-		}
-		try {
-			const assembled = assembleReport(session, sidState, target, reporter, CMCD_EVENT_RESPONSE_RECEIVED, perCall, ts, store)
-			emitReport(session, sidState, target, reporter, assembled, CMCD_EVENT_RESPONSE_RECEIVED, request)
-			targets.push(target)
-		}
-		catch (error) {
-			if (!failed) {
-				failed = true
-				failure = error
-			}
-		}
-	}
-	for (const target of targets) {
-		processQueue(session, sidState, target, sidState.ended)
-	}
-	if (failed) {
-		throw failure
-	}
+	emitToEventTargets(session, sidState, reporter, CMCD_EVENT_RESPONSE_RECEIVED, perCall, request, ts, store, sidState.ended)
 }
