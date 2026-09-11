@@ -9,9 +9,9 @@ const CDN = 'https://cdn.example.com'
 const CMSD_STATIC = atob('c2lkPSI5YTNiLTIxY2QiO2JyPTQ1MDA7ZD00MDAwO290PXY7c3Q9dg==')
 const CMSD_DYNAMIC = atob('ZXRwPTEyNTAwO3J0dD0zNTttYj02MDAwO3JkPTIwMA==')
 
-function harness(sid: string, cid: string, keys: string[], batchSize?: number) {
+function harness(sid: string, cid: string, keys: string[], batchSize?: number, events: string[] = ['rr']) {
 	const mock = createMockRequester()
-	const session = createCmcdSession({ sid, requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['rr'], keys: keys as never, interval: 0, batchSize }] })
+	const session = createCmcdSession({ sid, requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: events as never, keys: keys as never, interval: 0, batchSize }] })
 	return { mock, session, reporter: session.createReporter({ cid }) }
 }
 
@@ -100,12 +100,20 @@ describe('CmcdSessionReporter responses', () => {
 		deepEqual(mock.bodies(), [`cid="per-request-cid",e=rr,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
 	})
 
-	it('drains at once after the session is disposed, even when the target batches more than one line', async () => {
-		const { mock, session, reporter } = harness('s', 'c', ['rc', 'sid'], 5)
+	it('reports a late response through the ended sid state, even after an earlier drain already cleared', async () => {
+		const { mock, session, reporter } = harness('s', 'c', ['rc', 'sid'], 2, ['ps', 'rr'])
 		const req = reporter.decorate({ url: `${CDN}/seg.m4s` })
-		session.dispose()
-		reporter.recordResponse(req, { status: 200 }, { ts: 1 })
+		reporter.update({ sta: 'p', ts: 100 })
 		await flushPromises()
-		deepEqual(mock.bodies(), [`e=rr,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
+		deepEqual(mock.bodies(), [])
+		session.dispose()
+		await flushPromises()
+		deepEqual(mock.bodies(), ['e=ps,sid="s",sta=p,ts=100,v=2'])
+		reporter.recordResponse(req, { status: 200 }, { ts: 999 })
+		await flushPromises()
+		deepEqual(mock.bodies(), [
+			'e=ps,sid="s",sta=p,ts=100,v=2',
+			`e=rr,rc=200,sid="s",ts=999,url="${CDN}/seg.m4s",v=2`,
+		])
 	})
 })
