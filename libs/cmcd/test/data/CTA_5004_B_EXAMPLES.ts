@@ -42,7 +42,10 @@ export const EX_8_2_2: readonly string[] = [
 ]
 export const EX_8_2_3 = 'cid="bbb",cmsdd="ZXRwPTEyNTAwO3J0dD0zNTttYj02MDAwO3JkPTIwMA==",cmsds="c2lkPSI5YTNiLTIxY2QiO2JyPTQ1MDA7ZD00MDAwO290PXY7c3Q9dg==",e=rr,nor=("video/segment-6.m4v"),ot=v,rc=200,sid="session1",ts=1763657019723,ttfb=180,ttlb=200,url="video/segment-5.m4v",v=2'
 export const EX_8_2_4 = 'cid="content-id-123",e=e,ec=("CODEC_NOT_SUPPORTED"),sid="session-id-123",ts=1764269150213,v=2'
-/** 8.2.5. The first line carries `bs`, which the example omits. See the derived test for the reason. */
+/**
+ * 8.2.5. The first line carries `bs`, which the example omits. See the derived test for the reason.
+ * The second `ts` is the first plus the stall. The spec's second `ts` (1764269150112) precedes its first (1764269150889).
+ */
 export const EX_8_2_5: readonly string[] = [
 	'bs,cid="content-id-123",e=ps,sid="session-id-123",sta=r,ts=1764269150889,v=2',
 	'bs,bsd=(1500),cid="content-id-123",e=ps,sid="session-id-123",sta=p,ts=1764269152389,v=2',

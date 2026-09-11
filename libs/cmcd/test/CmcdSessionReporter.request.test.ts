@@ -88,6 +88,15 @@ describe('CmcdSessionReporter request mode', () => {
 		equal(second.url, 'https://cdn.example.com/a?x=1&CMCD=sid%3D%22s%22%2Csn%3D1%2Cv%3D2#frag')
 	})
 
+	it('replaces every stale CMCD header when it decorates a request again', () => {
+		const session = createCmcdSession({ sid: 's', transmissionMode: CmcdTransmissionMode.HEADERS, keys: ['sid', 'sn'] })
+		const reporter = session.createReporter()
+		const first = reporter.decorate({ url: SEGMENT, headers: { Accept: '*/*', 'cmcd-request': 'sn=41', 'cmcd-object': 'ot=v' } })
+		deepEqual(first.headers, { Accept: '*/*', 'CMCD-Request': 'sn=0', 'CMCD-Session': 'sid="s",v=2' })
+		const second = reporter.decorate(first)
+		deepEqual(second.headers, { Accept: '*/*', 'CMCD-Request': 'sn=1', 'CMCD-Session': 'sid="s",v=2' })
+	})
+
 	it('encodes version 1 request mode', () => {
 		const session = createCmcdSession({ sid: 's', version: 1 })
 		const reporter = session.createReporter({ cid: 'c' })

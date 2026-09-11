@@ -13,7 +13,8 @@ const SWEPT_EVENTS = ['ps', 'pr', 'c', 'b', 'bc', 't', 'rr', 'e', 'h', 'ce', 'sk
  * The exit from backgrounded mode is a bare `e=b` line. CTA-5004-B asks a player to send
  * `bg` only when the value is true, so the exit carries no `bg`. `validateCmcdStructure`
  * on this branch still requires `bg` on every `b` event. The fix is on the branch
- * `fix/cmcd-validator-b-event-without-bg`. Delete this exclusion when that fix lands.
+ * `fix/cmcd-validator-b-event-without-bg`. The excluded count drops to 0 when that fix
+ * lands. Delete this exclusion then.
  */
 const BACKGROUND_EXIT_ISSUE = 'State-change event (e="b") requires the "bg" key to be present.'
 
@@ -104,7 +105,7 @@ function sweep(bodies: readonly string[], requests: readonly SweptRequest[], ver
 
 	const exits = backgroundExitLines(bodies)
 	equal(exits.length, 1, `expected one background exit line, got ${exits.length}`)
-	equal(gaps, 1, `expected one excluded issue, got ${gaps}`)
+	ok(gaps <= 1, `expected at most one excluded issue, got ${gaps}`)
 }
 
 describe('CmcdSession validation sweep', () => {

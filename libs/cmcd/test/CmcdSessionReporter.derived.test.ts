@@ -270,6 +270,7 @@ describe('CmcdSessionReporter host and background', () => {
 		reporter.update({ bg: false, ts: 2 })
 		equal(fake.listeners.size, 0)
 		fake.visibilityState = 'visible'
+		fake.listeners.forEach(listener => listener())
 		await flushPromises()
 		deepEqual(mock.bodies(), ['bg,e=ps,sid="s",sta=p,ts=1,v=2', 'e=b,sid="s",ts=2,v=2'])
 	})
