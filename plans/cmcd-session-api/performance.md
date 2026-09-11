@@ -8,6 +8,8 @@ The session API is the cheapest of the implementations on every per-segment path
 
 The one-pass change speeds up every report path by 13 to 20 percent and allocates 8 to 27 percent less. It costs about 335 bytes minified. The wire output is unchanged, checked report by report across four version and mode combinations. The cmcd test suite passes with 698 tests.
 
+A second change caches the request host, so `decorate()` parses a URL only when the authority changes. It removes one URL allocation per decoration, about 100 to 150 bytes. The time effect is within noise, because the host parse was a small part of the decorate path.
+
 The session API is still slower than `main` on three paths that do not matter for a player. Those paths are construction, a metrics-only `update()`, and a stall transition. No implementation leaks.
 
 ## Method
@@ -89,6 +91,19 @@ Microseconds per operation, median and 90th percentile, then heap bytes allocate
 | segment cycle, one event target | 13% faster | 11% less |
 | segment cycle, request mode only | 7% faster | 7% less |
 
+### The effect of caching the request host
+
+`decorate()` derived the host by constructing a URL on every call. It now compares the `scheme://authority` prefix and constructs a URL only when the prefix changes. The measurement is a separate run of the one-pass build against the host-cache build.
+
+| Scenario | One pass | Host cache | Allocation change |
+|---|---|---|---|
+| decorate, query | 22.74 us, 19,381 B | 22.71 us, 19,265 B | 116 B less |
+| decorate, headers | 30.30 us, 29,443 B | 29.12 us, 29,325 B | 118 B less |
+| segment cycle, one event target | 59.46 us, 46,276 B | 58.77 us, 46,123 B | 153 B less |
+| record response | 33.35 us, 22,061 B | 34.40 us, 22,062 B | none |
+
+The response path does not decorate, and its allocation does not move, which confirms the saving is the URL object that decoration no longer builds. The time change is within the spread between passes. The gain is one fewer allocation per request, which scales with the request rate, at a cost of one regular expression in the source.
+
 ### The merged session API against `main`
 
 `session-merged` against `reporter-main`, the implementation that ships next.
@@ -142,7 +157,7 @@ The paths where the session API is slower do not add up to anything. Constructio
 ## Recommendations
 
 1. **Merge the two preparation passes. Done on this branch.** `prepareReport` replaces `normalizeReport` and `filterReport` with one sorted pass. It closed the response-path gap and sped up every report path.
-2. **Cache the request host.** `decorate()` parses the URL with `new URL()` on every call to derive `h`. Comparing the URL prefix with the last one, and parsing only when it differs, removes the parse from the steady state.
+2. **Cache the request host. Done on this branch.** `decorate()` compares the `scheme://authority` prefix and parses a URL only when it changes. It removes one URL allocation per request in the steady state. The `nor` relativization in `formatNor` still parses a URL per request, which is the next allocation to remove on the decorate path.
 3. **Rebase PR #422 onto `main`** before comparing it on the response path. Its base predates PR #459. On its own paths the refactor keeps its promise of no new per-report allocation.
 4. **Two pre-existing costs in `CmcdReporter`** are worth a fix on `main` whatever happens to the session API. `createEncodingOptions` allocates a `Set` of the enabled keys and a filter closure on every report. The request path parses and re-serializes the URL with `URLSearchParams` for one query parameter.
 5. **Add the harness to the review checklist** of the RFC. The bundle probe and this harness together give the two numbers the priorities ask for. Both ran for the first time after the implementation was complete.
