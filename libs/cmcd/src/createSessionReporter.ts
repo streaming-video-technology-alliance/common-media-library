@@ -1,6 +1,8 @@
 import type { Cmcd } from './Cmcd.ts'
 import { CMCD_REQUEST_ORIGINS } from './CMCD_REQUEST_ORIGINS.ts'
 import type { CmcdDecoratedRequest } from './CmcdDecoratedRequest.ts'
+import type { CmcdDiscreteEventType } from './CmcdDiscreteEventType.ts'
+import { CMCD_EVENT_ERROR } from './CmcdEventType.ts'
 import type { CmcdPlaybackData } from './CmcdPlaybackData.ts'
 import type { CmcdRequestLike } from './CmcdRequestLike.ts'
 import type { CmcdRequestRecord } from './CmcdRequestRecord.ts'
@@ -10,6 +12,8 @@ import type { CmcdSessionReporterConfig } from './CmcdSessionReporterConfig.ts'
 import { assembleReport } from './assembleReport.ts'
 import { checkCid, configError } from './checkRequestSettings.ts'
 import { copyPlaybackData } from './copyPlaybackData.ts'
+import { deriveStateEvents } from './deriveStateEvents.ts'
+import { emitEvent } from './emitEvent.ts'
 import { emitReport } from './emitReport.ts'
 import { getTargetEntry } from './getTargetEntry.ts'
 import { placeRequestReport } from './placeRequestReport.ts'
@@ -123,12 +127,16 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 			if (reporter.disposed || state.disposed) {
 				return
 			}
-			mergeUpdate(state, reporter, data)
+			const ts = mergeUpdate(state, reporter, data)
+			deriveStateEvents(state, reporter, ts)
 		},
-		recordEvent() {
-			// Event mode delivery is not implemented yet.
+		recordEvent(type: CmcdDiscreteEventType, data?: CmcdPlaybackData) {
+			if (reporter.disposed || state.disposed) {
+				return
+			}
+			emitEvent(state, reporter, type, data, undefined, typeof data?.ts === 'number' ? data.ts : Date.now())
 		},
-		recordError(code) {
+		recordError(code, data) {
 			if (reporter.disposed || state.disposed) {
 				return
 			}
@@ -137,6 +145,7 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 			for (const target of [sidState.requestTarget, ...sidState.eventTargets]) {
 				getTargetEntry(target, reporter).ec.push(...codes)
 			}
+			emitEvent(state, reporter, CMCD_EVENT_ERROR, data, undefined, typeof data?.ts === 'number' ? data.ts : Date.now())
 		},
 		decorate<R extends CmcdRequestLike>(request: R, data?: CmcdPlaybackData): CmcdDecoratedRequest<R> {
 			const sidState = state.current
