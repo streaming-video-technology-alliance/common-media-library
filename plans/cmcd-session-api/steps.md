@@ -15,7 +15,7 @@
 - Run one test file with `node --no-warnings --test libs/cmcd/test/<file>.test.ts` from the repository root. Run `npm run typecheck` at the root after every task, because the tests typecheck against `dist/index.d.ts`.
 - Code style: tabs, no semicolons, single quotes, `type` not `interface`, no `enum`, and named exports only.
 - Relative imports carry the `.ts` extension. Use `readonly` where mutation is not intended, and bracket access for index signatures.
-- One export per file. `index.ts` uses `export type *` for type-only files and `export *` for the rest.
+- Public files have one export each. An internal file may group a function with its result type or with the helpers that share its rule, as `.claude/rules/code-quality.md` allows. `index.ts` uses `export type *` for type-only files and `export *` for the rest.
 - No code runs at module scope. Annotate a module-scope `new Map()`, `new Set()`, or `new WeakMap()` with `/* @__PURE__ */`.
 - Every public export has TSDoc with `@public`. Public functions have `@example {@includeCode ../test/<file>.test.ts#example}` and the test file has a `// #region example` block.
 - Every commit uses `git commit -s`, a Conventional Commits subject, and the trailer `Co-Authored-By: Claude claude-fable-5-1 <noreply@anthropic.com>`. Never commit to `main`. Work on branch `feat/cmcd-session-api`.
@@ -1590,7 +1590,7 @@ export function addSpan(session: SessionState, sidState: SidState, cause: string
 }
 ```
 
-`pruneSpans.ts` has three exports. That is the one exception to the one-export rule in this plan, because the three functions share the eligibility rule and the cursor arithmetic.
+`pruneSpans.ts` has four exports. The cap and the three functions share the eligibility rule and the cursor arithmetic.
 
 ```ts
 // libs/cmcd/src/emitReport.ts
@@ -4512,13 +4512,22 @@ mkdir -p libs/cmcd/temp/probe
 printf "import { createCmcdSession } from '../../dist/index.js'\nexport { createCmcdSession }\n" > libs/cmcd/temp/probe/session-entry.ts
 printf "import { CmcdReporter } from '../../dist/index.js'\nexport { CmcdReporter }\n" > libs/cmcd/temp/probe/reporter-entry.ts
 printf "import '../../dist/index.js'\n" > libs/cmcd/temp/probe/bare-entry.ts
-npx tsdown libs/cmcd/temp/probe/session-entry.ts libs/cmcd/temp/probe/reporter-entry.ts libs/cmcd/temp/probe/bare-entry.ts --format esm --minify --out-dir libs/cmcd/temp/probe/out --no-clean
-for f in session-entry reporter-entry bare-entry; do printf "%s min=%s gz=%s\n" "$f" "$(wc -c < libs/cmcd/temp/probe/out/$f.js)" "$(gzip -c libs/cmcd/temp/probe/out/$f.js | wc -c)"; done
-grep -c "CmcdReporter" libs/cmcd/temp/probe/out/session-entry.js
-grep -v "^import" libs/cmcd/temp/probe/out/bare-entry.js | grep -c "[a-zA-Z]"
+for f in session-entry reporter-entry bare-entry; do
+	npx tsdown "libs/cmcd/temp/probe/$f.ts" --format esm --minify --no-config --log-level error --out-dir "libs/cmcd/temp/probe/out/$f"
+done
+for f in session-entry reporter-entry bare-entry; do
+	p="libs/cmcd/temp/probe/out/$f/$f.js"
+	printf "%s min=%s gz=%s\n" "$f" "$(wc -c < "$p")" "$(gzip -c "$p" | wc -c)"
+done
+grep -c "CmcdReporter" libs/cmcd/temp/probe/out/session-entry/session-entry.js
+grep -v "^import" libs/cmcd/temp/probe/out/bare-entry/bare-entry.js | grep -c "[a-zA-Z]"
 ```
 
-Expected: the `CmcdReporter` count in the session entry is `0`. The bare entry has no line with letters besides `import` lines, so the last count is `0`. If tsdown externalizes `@svta/cml-utils` or `@svta/cml-structured-field-values`, both entries externalize them the same way, and the comparison stays fair. If the `CmcdReporter` count is not zero, a session module imports something from the `CmcdReporter` module graph. Move that import to a shared file.
+Run `tsdown` once per entry. One run over the three entries emits a shared chunk, and the per-entry sizes then mean nothing.
+
+Expected: the `CmcdReporter` count in the session entry is `0`. If tsdown externalizes `@svta/cml-utils` or `@svta/cml-structured-field-values`, both entries externalize them the same way, and the comparison stays fair. If the `CmcdReporter` count is not zero, a session module imports something from the `CmcdReporter` module graph. Move that import to a shared file.
+
+The bare entry keeps one statement, so the last count is `1`. The statement spreads `CMCD_STATE_EVENT_FIELDS` into the array literal of `CMCD_REQUIRED_EVENT_KEYS` in `CmcdReporter.ts`. A `/* @__PURE__ */` annotation covers the call it marks, not the evaluation of its arguments. The file is the same on `main`, so the session API adds no module-scope side effect.
 
 - [ ] **Step 4: Record the sizes**
 

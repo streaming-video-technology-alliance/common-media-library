@@ -364,8 +364,8 @@ type CmcdDiscreteEventType = 'as' | 'ae' | 'abs' | 'abe' | 'sk' | 'm' | 'um' | '
 
 - Resets: every target's `sn`, `msd` gate, `bs` flags, `ec` buffers, and `bsd` cursors. The session totals `bsa` and `bsda`, the pending `bsd` samples, and the supplied-value overrides reset too.
 - Kept: every reporter with its store, `cid`, host, and `su` state, and the session `bg`. A startup measurement in progress carries over. When `msd` is not yet derived or supplied, the new `sid` keeps the start time, so the manifest-supplied `sid` flow still reports `msd`.
-- Baselines: the dedup baselines of every reporter and of `bg` reset. The next push of a tracked field emits under the new `sid`, even when the value did not change. Rotation itself emits nothing.
-- Stalls: a stall open at rotation is measured by the new `sid` from the rotation time, and the old `sid` drops its part. The new targets start with `bs` set, because the player is still rebuffering.
+- Baselines: the dedup baselines of every reporter reset. The `bg` baseline carries to the new `sid`, so the next visibility change still emits `b`. After `rotate()`, the next `update()` emits every tracked field that has a value, even when no value changed. Rotation itself emits nothing.
+- Stalls: a stall open at rotation is measured by the new `sid` from the rotation time, and the old `sid` drops its part. The new `sid` counts that stall in `bsa`. The new targets start with `bs` set, because the player is still rebuffering.
 - Delivery: the queued lines of the old `sid` are sent at once. A target that a 410 silenced is active again, because the spec scopes the 410 to the current session.
 - Late responses: a request issued before the rotation still reports under the old `sid`, with that `sid`'s next sequence number. The ended `sid` state keeps a copy of each reporter's store, so a late response reads the values at rotation and not the live store.
 
@@ -412,7 +412,8 @@ A derived key is a key the reporter computes from state it observes. A derived d
 | `ts` | the clock at emission | report | wins for that report |
 | `msd` | the first `sta` s to the next `sta` p, carried across `rotate()` while in progress | session, sent once per target | wins, stops tracking |
 | `bs` | `sta` entering or remaining in r since the target's last report | target and reporter, cleared by the first report after the stall | wins for that report |
-| `bsa`, `bsda` | completed stalls between `sta` transitions | session totals per cause | wins, stops tracking |
+| `bsa` | each `sta` transition into r, and a stall carried across `rotate()` | session total | wins, stops tracking |
+| `bsda` | completed stalls between `sta` transitions | session total | wins, stops tracking |
 | `bsd` | one completed stall per entry, one entry per cause per report | pending samples per cause, one cursor per cause per target | appended as a sample, stops tracking |
 | `su` | in s, k, or r, or no p since one | reporter | wins |
 | `dl` | `bl` divided by `pr`, nearest 100 ms, only when `pr` is over 0 | reporter | wins |
@@ -421,7 +422,7 @@ A derived key is a key the reporter computes from state it observes. A derived d
 | `url`, `rc`, `ts`, `ttfb`, `ttlb` | request URL, status, timing | response | wins |
 | `cmsds`, `cmsdd` | `CMSD-Static` and `CMSD-Dynamic` response headers | response | wins |
 
-`bsa` counts the transitions into `r`. `bsda` and `bsd` count completed stalls only. A stall still open at `dispose()` is dropped. Automatic `bsa`, `bsd`, and `bsda` entries have no cause token. Each completed stall is reported to each destination once, on the next report to that destination, in order. A report carries at most one `bsd` value per cause, per spec item 14. A second stall of the same cause waits for the next report to that destination. The pending samples are capped at 100 per cause, and the oldest is dropped past the cap. When no destination can report `bsd`, no samples are kept.
+A stall still open at `dispose()` is dropped. Automatic `bsa`, `bsd`, and `bsda` entries have no cause token. Each completed stall is reported to each destination once, on the next report to that destination, in order. A report carries at most one `bsd` value per cause, per spec item 14. A second stall of the same cause waits for the next report to that destination. The pending samples are capped at 100 per cause, and the oldest is dropped past the cap. When no destination can report `bsd`, no samples are kept.
 
 `url` is the request URL without its `CMCD` parameter. `rc` is `0` when `status` is absent. `ts` for a response is the request start. `ttfb` is omitted when `responseStart` is absent, zero, or earlier than `startTime`. Resource Timing reports zero there for a cross-origin resource without `Timing-Allow-Origin`. `ttlb` is omitted when neither `duration` nor a usable `responseEnd` exists and no start time was recorded. `ttfbb` and `smrt` have no derivation and come only from `CmcdResponseData`.
 
@@ -471,7 +472,7 @@ flowchart LR
     end
     assemble --> tq{"transform<br>configured?"}
     tq -- no --> prep["filter keys<br>apply the spec rules"]
-    tq -- yes --> tr["copy nested values<br>run the transform"]
+    tq -- yes --> tr["copy the normalized report<br>run the transform"]
     tr -- null --> cancel["cancelled<br>nothing committed"]
     tr -- data --> restore["restore required keys<br>re-stamp sid, e, ts"] --> prep
     prep --> enc["encode"]
@@ -483,7 +484,7 @@ flowchart LR
 Filtering follows the target's `keys`. A key the current event requires is included whatever the list says:
 
 - `e` and `ts` on every event report, and `v` in version 2
-- `sta` on `ps`, `pr` on `pr`, `cid` on `c`, `bg` on `b`, and `br` on `bc`
+- `sta` on `ps`, `pr` on `pr`, `cid` on `c`, `bg` on `b`, `br` on `bc`, and `h` on `h`
 - `ec` on `e`, `cen` on `ce`, and `url` on `rr`
 
 The response keys appear only on `rr`. `cen` appears only on `ce`. `d` and `tpb` follow the object-type rule, and `ab`, `lab`, and `tab` yield to `br`, `lb`, and `tb`, as the encoder does today.
@@ -562,7 +563,7 @@ type CmcdRequestTransform = (data: Cmcd, request: Readonly<CmcdRequestLike>) => 
 type CmcdEventTransform = (data: Cmcd, request: Readonly<CmcdRequestLike> | undefined) => Cmcd | null
 ```
 
-The contract is the one the transforms RFC defined. The reporter copies nested values before a configured transform runs, re-stamps the reporter-owned keys after it returns, and restores a required key the transform removed. A transform that throws cancels that target's report. The error is thrown to the caller after every other target has been processed. The `request` argument is the request the player passed to `decorate()`. Read player fields through a cast or bracket access.
+The contract is the one the transforms RFC defined. The reporter normalizes the report to structured-field values before a configured transform runs. The transform then receives a copy of that normalized report. A token value in the copy is plain text. Every nested value, such as an inner list or a custom item, is copied too, parameters included. A transform cannot change the store or another target's report through this copy. In version 2 the copy matches the `Cmcd` type. In version 1 request mode, a metric with one value arrives as a number. `nor` arrives as one string, with `nrr` beside it. The reporter restores the required keys `sid`, `e`, and `ts` after the transform runs, and assigns `sn` after it. A transform that throws cancels that target's report. The error is thrown to the caller after every other target has been processed. In the request-mode transform, `request` is the request the player passed to `decorate()`, before decoration. In an event transform for `rr`, `request` is the decorated request passed to `recordResponse()`. Read player fields through a cast or bracket access.
 
 A transform may call `rotate()`. The report it runs in and the request origin stay with the `sid` state that was current when the call began. The remaining targets of that emission do too. The rotation applies to every later call.
 
@@ -609,19 +610,19 @@ stateDiagram-v2
 
 Runtime data never throws. An unknown or empty value is omitted, as the spec requires. A value the structured-field encoder cannot serialize throws at the call that produced it, and nothing is committed. `createReporter()` on a disposed session throws. Every other call on a disposed reporter or session is a no-op.
 
-`onError` receives the errors that have no caller. Those are a transform or encoding failure on an interval tick, and a requester that still fails after the back-off cap. Without `onError`, those errors are thrown from the timer callback, as today. In both paths the error is an `Error`. Its message names the target URL and the stage, one of transform, encode, or send. Its `cause` is the requester's error when one exists.
+`onError` receives the errors that have no caller. Those are a transform or encoding failure on an interval tick. The same failure on the visibility listener or on the derived `h` event has no caller either. `decorate()` still returns the decorated request when the `h` event fails. A requester that still fails after the back-off cap also goes to `onError`. Without `onError`, those errors are thrown from the timer callback, as today. In both paths the error is an `Error`. Its message names the target URL and the stage, one of transform, encode, or send. Its `cause` is the requester's error when one exists.
 
 ### Bundle and performance
 
-The estimates below are for the design record to verify with a prototype.
+The numbers below are measured. The design record minified one entry of the built package at a time, on 2026-09-10. The `CmcdReporter` column is its own entry, and the session column is the `createCmcdSession` entry.
 
-| Measure | `CmcdReporter` today | This API, estimate |
+| Measure | `CmcdReporter` today | This API, measured |
 |---|---|---|
-| Minified, request mode only | 18.8 KB | at or below 18.8 KB |
-| Minified with gzip | 7.1 KB | at or below 7.1 KB |
+| Minified | 18.7 KB | 26.4 KB |
+| Minified with gzip | 7.1 KB | 8.9 KB |
 | Objects per report | 1, plus copies when a transform runs | 1, plus copies when a transform runs |
 
-The retention ledger, the eviction pass, the dirty set, and the provenance encoding go away. The derivation code and the key table arrive. A player that imports only `createCmcdSession` does not bundle `CmcdReporter`. Event-mode delivery is bundled whenever the session API is, because the configuration is data.
+The session API is the larger of the two. It adds event-mode delivery, rotation, responses, and transforms, which `CmcdReporter` does not have. The retention ledger, the eviction pass, the dirty set, and the provenance encoding go away. The derivation code and the key table arrive. A player that imports only `createCmcdSession` does not bundle `CmcdReporter`. Event-mode delivery is bundled whenever the session API is, because the configuration is data.
 
 ### Migration from `CmcdReporter`
 

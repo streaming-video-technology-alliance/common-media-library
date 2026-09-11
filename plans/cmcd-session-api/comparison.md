@@ -1,6 +1,6 @@
 # CMCD session API: comparison with `CmcdReporter` and PR #422
 
-Companion to [`rfc/cmcd-session-api.md`](../../rfc/cmcd-session-api.md) and [`architecture.md`](./architecture.md). It compares three paths for the CMCD version 2 reporter. All facts are as of 2026-09-09.
+Companion to [`rfc/cmcd-session-api.md`](../../rfc/cmcd-session-api.md) and [`architecture.md`](./architecture.md). It compares three paths for the CMCD version 2 reporter. All facts are as of 2026-09-09, except the bundle measurements of 2026-09-10.
 
 ## The three paths
 
@@ -17,11 +17,11 @@ Companion to [`rfc/cmcd-session-api.md`](../../rfc/cmcd-session-api.md) and [`ar
 | Reporter source lines | 1318 | 1152 added, 610 removed, over 11 source files | 1500 to 1700, estimate |
 | Preparation source lines | 269 plus about 300 in tables | unchanged | 400 to 550 including the key table, estimate |
 | Reporter test lines | 4753 | 5315 | new suite, estimate 3000 to 4000 |
-| Minified bundle, reporter entry | 18.8 KB | not measured | at or below 18.8 KB, estimate |
-| Minified with gzip | 7.1 KB | not measured | at or below 7.1 KB, estimate |
+| Minified bundle, reporter entry | 18.7 KB | not measured | 26.4 KB |
+| Minified with gzip | 7.1 KB | not measured | 8.9 KB |
 | Minified, `encodeCmcd` alone | 6.3 KB | 6.3 KB | 6.3 KB, unchanged |
 
-The `CmcdReporter` sizes were measured on the built `dist` of this worktree, bundled with `tsdown` and minified. The PR #422 line counts are from its diff against `main`, source files only. The session API numbers are estimates until a prototype exists.
+The PR #422 line counts are from its diff against `main`, source files only. The bundle rows come from the probe of Task 13 in [`steps.md`](./steps.md). That probe minifies one entry at a time from the built `dist` of this worktree. It measured both entries on 2026-09-10.
 
 ## Concepts
 
