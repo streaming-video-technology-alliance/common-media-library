@@ -1,6 +1,8 @@
 import { CMCD_MIME_TYPE, createCmcdSession } from '@svta/cml-cmcd'
+import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import type { TestContext } from 'node:test'
+import { describe, it, mock } from 'node:test'
 import { EX_8_2_1 } from './data/CTA_5004_B_EXAMPLES.ts'
 import { createMockRequester, flushPromises } from './helpers/cmcdSessionHarness.ts'
 
@@ -88,6 +90,178 @@ describe('CmcdSession delivery', () => {
 		context.mock.timers.tick(120000)
 		await flushPromises()
 		equal(mock.requests.length, 0)
+		session.dispose()
+	})
+})
+
+describe('CmcdSession delivery state machine', () => {
+	async function twoLines(status: number, context: TestContext) {
+		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
+		const requester = createMockRequester(status)
+		const session = createCmcdSession({ sid: 's', requester: requester.requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		reporter.update({ sta: 'a', ts: 2 })
+		await flushPromises()
+		return { requester, session, reporter }
+	}
+
+	it('silences a target for the rest of the sid after a 410', async (context) => {
+		const { requester, session } = await twoLines(410, context)
+		equal(requester.requests.length, 1)
+		requester.status = 200
+		session.flush()
+		await flushPromises()
+		equal(requester.requests.length, 1)
+		session.dispose()
+	})
+
+	it('backs off after a 429 and aggregates the lines queued during the wait', async (context) => {
+		const { requester, session } = await twoLines(429, context)
+		deepEqual(requester.bodies(), ['e=ps,sid="s",sta=p,ts=1,v=2'])
+		context.mock.timers.tick(999)
+		await flushPromises()
+		equal(requester.requests.length, 1)
+		context.mock.timers.tick(1)
+		await flushPromises()
+		equal(requester.bodies()[1], 'e=ps,sid="s",sta=p,ts=1,v=2\ne=ps,sid="s",sta=a,ts=2,v=2')
+		requester.status = 200
+		context.mock.timers.tick(1999)
+		await flushPromises()
+		equal(requester.requests.length, 2)
+		context.mock.timers.tick(1)
+		await flushPromises()
+		equal(requester.requests.length, 3)
+		equal(requester.bodies()[2], requester.bodies()[1])
+		session.dispose()
+	})
+
+	it('retries a 5xx and a rejection, and drops the batch on another 4xx', async (context) => {
+		const { requester, session } = await twoLines(503, context)
+		equal(requester.requests.length, 1)
+		context.mock.timers.tick(1000)
+		await flushPromises()
+		equal(requester.requests.length, 2)
+		session.dispose()
+
+		let attempts = 0
+		const rejecting = createCmcdSession({ sid: 'r', requester: () => {
+			attempts += 1
+			return Promise.reject(new Error('offline'))
+		}, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid'], interval: 0 }] })
+		rejecting.createReporter().update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		equal(attempts, 1)
+		context.mock.timers.tick(1000)
+		await flushPromises()
+		equal(attempts, 2)
+		rejecting.dispose()
+
+		const dropping = createMockRequester(400)
+		const other = createCmcdSession({ sid: 'd', requester: dropping.requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0 }] })
+		const reporter = other.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		dropping.status = 200
+		reporter.update({ sta: 'a', ts: 2 })
+		await flushPromises()
+		deepEqual(dropping.bodies(), ['e=ps,sid="d",sta=p,ts=1,v=2', 'e=ps,sid="d",sta=a,ts=2,v=2'])
+		other.dispose()
+	})
+
+	it('keeps the newest maxQueueSize lines', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
+		const requester = createMockRequester(429)
+		const session = createCmcdSession({ sid: 's', requester: requester.requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0, batchSize: 2, maxQueueSize: 2 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		reporter.update({ sta: 'a', ts: 2 })
+		await flushPromises()
+		reporter.update({ sta: 'p', ts: 3 })
+		requester.status = 200
+		context.mock.timers.tick(1000)
+		await flushPromises()
+		equal(requester.bodies()[1], 'e=ps,sid="s",sta=a,ts=2,v=2\ne=ps,sid="s",sta=p,ts=3,v=2')
+		session.dispose()
+	})
+
+	it('honors a drain requested while a send is in flight', async () => {
+		let release: ((value: { status: number }) => void) | undefined
+		const bodies: string[] = []
+		const requester = (request: HttpRequest) => {
+			bodies.push(request.body as string)
+			return new Promise<{ status: number }>((resolve) => {
+				release = resolve
+			})
+		}
+		const session = createCmcdSession({ sid: 's', requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0, batchSize: 10 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		session.flush()
+		reporter.update({ sta: 'a', ts: 2 })
+		reporter.update({ sta: 'p', ts: 3 })
+		session.dispose()
+		equal(bodies.length, 1)
+		release?.({ status: 200 })
+		await flushPromises()
+		deepEqual(bodies, ['e=ps,sid="s",sta=p,ts=1,v=2', 'e=ps,sid="s",sta=a,ts=2,v=2\ne=ps,sid="s",sta=p,ts=3,v=2'])
+	})
+
+	it('flush() fires an armed retry at once', async (context) => {
+		const { requester, session } = await twoLines(429, context)
+		requester.status = 200
+		session.flush()
+		await flushPromises()
+		equal(requester.requests.length, 2)
+		context.mock.timers.tick(60000)
+		await flushPromises()
+		equal(requester.requests.length, 2)
+		session.dispose()
+	})
+
+	it('stops retrying an ended sid state after the 60 second step and reports it', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
+		const onError = mock.fn()
+		const requester = createMockRequester(503)
+		const session = createCmcdSession({ sid: 'a', requester: requester.requester, onError, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid'], interval: 0 }] })
+		session.createReporter().update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		session.rotate('b')
+		let sent = 1
+		for (const wait of [1000, 2000, 4000, 8000, 16000, 32000, 60000]) {
+			context.mock.timers.tick(wait - 1)
+			await flushPromises()
+			equal(requester.requests.length, sent)
+			context.mock.timers.tick(1)
+			await flushPromises()
+			sent += 1
+			equal(requester.requests.length, sent)
+		}
+		equal(requester.requests.length, 8)
+		equal(onError.mock.callCount(), 1)
+		const error = onError.mock.calls[0].arguments[0] as Error
+		equal(error.message, `CmcdSession: send failed for target ${COLLECTOR} after the back-off cap, status 503`)
+		context.mock.timers.tick(120000)
+		await flushPromises()
+		equal(requester.requests.length, 8)
+		session.dispose()
+	})
+
+	it('posts through fetch with keepalive by default', async (context) => {
+		const calls: { url: string; init: RequestInit }[] = []
+		context.mock.method(globalThis, 'fetch', async (url: string, init: RequestInit) => {
+			calls.push({ url, init })
+			return new Response(null, { status: 204 })
+		})
+		const session = createCmcdSession({ sid: 's', eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid'], interval: 0 }] })
+		session.createReporter().update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		equal(calls.length, 1)
+		equal(calls[0].url, COLLECTOR)
+		equal(calls[0].init.method, 'POST')
+		equal(calls[0].init.body, 'e=ps,sid="s",sta=p,ts=1,v=2')
+		equal(calls[0].init.keepalive, true)
 		session.dispose()
 	})
 })
