@@ -10,6 +10,7 @@ import { emitBackgroundChange } from './emitBackgroundChange.ts'
 import { flushSession } from './flushSession.ts'
 import { normalizeSessionConfig } from './normalizeSessionConfig.ts'
 import { observeVisibility } from './observeVisibility.ts'
+import { rotateSession } from './rotateSession.ts'
 import type { SessionState } from './SessionState.ts'
 
 /**
@@ -37,24 +38,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 			return state.current.sid
 		},
 		createReporter: reporterConfig => createSessionReporter(state, session, reporterConfig),
-		rotate(sid) {
-			if (state.disposed) {
-				return
-			}
-			const next = sid ?? uuid()
-			if (next === state.current.sid) {
-				return
-			}
-			state.current.ended = true
-			state.current = createSidState(next, state.config)
-			for (const reporter of state.reporters) {
-				reporter.reported.sta = undefined
-				reporter.reported.pr = undefined
-				reporter.reported.cid = undefined
-				reporter.reported.br = undefined
-				reporter.spanOpenedAt = undefined
-			}
-		},
+		rotate: sid => rotateSession(state, sid),
 		configure: settings => configureSession(state, settings),
 		flush: () => flushSession(state),
 		dispose: () => disposeSession(state),
