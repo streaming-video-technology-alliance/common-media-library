@@ -91,4 +91,12 @@ describe('CmcdSessionReporter responses', () => {
 		await flushPromises()
 		deepEqual(mock.bodies(), [`br=(3000;v),e=rr,ot=v,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
 	})
+
+	it('lets per-request data win over the cid at decoration', async () => {
+		const { mock, reporter } = harness('s', 'store-cid', ['cid', 'rc', 'sid', 'url'])
+		const req = reporter.decorate({ url: `${CDN}/seg.m4s` }, { cid: 'per-request-cid' })
+		reporter.recordResponse(req, { status: 200 }, { ts: 1 })
+		await flushPromises()
+		deepEqual(mock.bodies(), [`cid="per-request-cid",e=rr,rc=200,sid="s",ts=1,url="${CDN}/seg.m4s",v=2`])
+	})
 })

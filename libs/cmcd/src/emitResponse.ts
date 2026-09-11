@@ -17,10 +17,7 @@ import { toResponseKeys } from './toResponseKeys.ts'
 export function emitResponse(session: SessionState, origin: RequestOrigin, request: CmcdRequestLike, info: CmcdResponseInfo, data: CmcdResponseData | undefined): void {
 	const { sidState, reporter } = origin
 	const derived = toResponseKeys(request, info, origin)
-	const perCall: Record<string, unknown> = { ...(origin.data ?? {}), ...derived, ...(data ?? {}) }
-	if (origin.cid !== undefined && data?.cid === undefined) {
-		perCall['cid'] = origin.cid
-	}
+	const perCall: Record<string, unknown> = { ...(origin.cid !== undefined ? { cid: origin.cid } : {}), ...(origin.data ?? {}), ...derived, ...(data ?? {}) }
 	const ts = typeof perCall['ts'] === 'number' ? perCall['ts'] : Date.now()
 	delete perCall['ts']
 	const store = sidState.ended ? (sidState.stores.get(reporter) ?? reporter.store) : reporter.store
