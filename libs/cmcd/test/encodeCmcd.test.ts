@@ -232,6 +232,20 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input, { version: 1 }), 'nor="next%20seg.mp4"')
 	})
 
+	it('keeps an escaped slash once-encoded in a version 1 nor path', () => {
+		const input = {
+			nor: ['dir%2Fsegment.mp4'],
+		}
+		equal(encodeCmcd(input, { version: 1 }), 'nor="dir%2Fsegment.mp4"')
+	})
+
+	it('keeps an escaped ampersand once-encoded in a version 1 nor query string', () => {
+		const input = {
+			nor: ['segment.mp4?token=a%26b'],
+		}
+		equal(encodeCmcd(input, { version: 1 }), 'nor="segment.mp4%3Ftoken%3Da%26b"')
+	})
+
 	describe('reporting modes', () => {
 		it('defaults to request mode', () => {
 			equal(encodeCmcd(CMCD_INPUT), CMCD_STRING_REQUEST)
