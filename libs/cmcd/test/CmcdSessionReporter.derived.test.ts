@@ -183,3 +183,101 @@ describe('CmcdSessionReporter derived keys', () => {
 		equal(queryValue(quiet.decorate({ url: `${CDN}/a` }).url), 'sid="s",v=2')
 	})
 })
+
+type FakeDocument = { visibilityState: string; readonly listeners: Set<() => void>; addEventListener(type: string, listener: () => void): void; removeEventListener(type: string, listener: () => void): void }
+
+function installDocument(context: TestContext, visibilityState: string): FakeDocument {
+	const fake: FakeDocument = {
+		visibilityState,
+		listeners: new Set(),
+		addEventListener: (_type, listener) => fake.listeners.add(listener),
+		removeEventListener: (_type, listener) => fake.listeners.delete(listener),
+	}
+	const globals = globalThis as { document?: unknown }
+	globals.document = fake
+	context.after(() => {
+		delete globals.document
+	})
+	return fake
+}
+
+describe('CmcdSessionReporter host and background', () => {
+	it('emits h when the request host changes, and event reports carry h', async (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1000 })
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['h', 'ps'], keys: ['h', 'sid'], interval: 0 }] })
+		const reporter = session.createReporter()
+		reporter.decorate({ url: 'https://a.example.com/seg-1.m4s' })
+		reporter.decorate({ url: 'https://a.example.com/seg-2.m4s' })
+		reporter.decorate({ url: 'https://b.example.com/seg-3.m4s' })
+		reporter.update({ sta: 'p', ts: 5 })
+		await flushPromises()
+		deepEqual(mock.bodies(), [
+			'e=h,h="a.example.com",sid="s",ts=1000,v=2',
+			'e=h,h="b.example.com",sid="s",ts=1000,v=2',
+			'e=ps,h="b.example.com",sid="s",sta=p,ts=5,v=2',
+		])
+		equal(queryValue(reporter.decorate({ url: 'https://b.example.com/seg-4.m4s' }).url).includes('h='), false)
+	})
+
+	it('a pushed h wins and stops tracking', async () => {
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['h', 'ps'], keys: ['h', 'sid'], interval: 0 }] })
+		const reporter = session.createReporter()
+		reporter.update({ h: 'cdn.example' })
+		reporter.decorate({ url: 'https://a.example.com/seg-1.m4s' })
+		reporter.update({ sta: 'p', ts: 5 })
+		await flushPromises()
+		deepEqual(mock.bodies(), ['e=ps,h="cdn.example",sid="s",sta=p,ts=5,v=2'])
+	})
+
+	it('derives bg from document visibility, one b line per reporter', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setInterval', 'setTimeout'], now: 1000 })
+		const fake = installDocument(context, 'visible')
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['b', 't'], keys: ['bg', 'cid', 'sid'], interval: 1 }] })
+		session.createReporter({ cid: 'a' })
+		session.createReporter({ cid: 'b' })
+		equal(fake.listeners.size, 1)
+		fake.visibilityState = 'hidden'
+		fake.listeners.forEach(listener => listener())
+		context.mock.timers.tick(1000)
+		fake.visibilityState = 'visible'
+		fake.listeners.forEach(listener => listener())
+		context.mock.timers.tick(1000)
+		await flushPromises()
+		deepEqual(mock.bodies(), [
+			'bg,cid="a",e=b,sid="s",ts=1000,v=2',
+			'bg,cid="b",e=b,sid="s",ts=1000,v=2',
+			'bg,cid="a",e=t,sid="s",ts=2000,v=2',
+			'bg,cid="b",e=t,sid="s",ts=2000,v=2',
+			'cid="a",e=b,sid="s",ts=2000,v=2',
+			'cid="b",e=b,sid="s",ts=2000,v=2',
+			'cid="a",e=t,sid="s",ts=3000,v=2',
+			'cid="b",e=t,sid="s",ts=3000,v=2',
+		])
+		session.dispose()
+		equal(fake.listeners.size, 0)
+	})
+
+	it('takes the initial visibility without emitting, and a pushed bg stops the listener', async (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1000 })
+		const fake = installDocument(context, 'hidden')
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['b', 'ps'], keys: ['bg', 'sid'], interval: 0 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		reporter.update({ bg: false, ts: 2 })
+		equal(fake.listeners.size, 0)
+		fake.visibilityState = 'visible'
+		await flushPromises()
+		deepEqual(mock.bodies(), ['bg,e=ps,sid="s",sta=p,ts=1,v=2', 'e=b,sid="s",ts=2,v=2'])
+	})
+
+	it('installs no listener with derive.bg off', (context) => {
+		const fake = installDocument(context, 'visible')
+		const session = createCmcdSession({ sid: 's', derive: { bg: false } })
+		equal(fake.listeners.size, 0)
+		session.dispose()
+	})
+})

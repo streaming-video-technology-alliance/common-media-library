@@ -6,8 +6,10 @@ import { configureSession } from './configureSession.ts'
 import { createSessionReporter } from './createSessionReporter.ts'
 import { createSidState } from './createSidState.ts'
 import { disposeSession } from './disposeSession.ts'
+import { emitBackgroundChange } from './emitBackgroundChange.ts'
 import { flushSession } from './flushSession.ts'
 import { normalizeSessionConfig } from './normalizeSessionConfig.ts'
+import { observeVisibility } from './observeVisibility.ts'
 import type { SessionState } from './SessionState.ts'
 
 /**
@@ -56,6 +58,19 @@ export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 		configure: settings => configureSession(state, settings),
 		flush: () => flushSession(state),
 		dispose: () => disposeSession(state),
+	}
+	if (normalized.derive.bg) {
+		state.stopVisibility = observeVisibility((hidden) => {
+			if (state.disposed || state.bgSupplied) {
+				return
+			}
+			state.bg = hidden ? true : undefined
+			emitBackgroundChange(state, Date.now())
+		})
+		if (state.stopVisibility && document.visibilityState === 'hidden') {
+			state.bg = true
+			state.current.bgReported = true
+		}
 	}
 	armTimers(state)
 	return session

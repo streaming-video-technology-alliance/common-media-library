@@ -10,9 +10,9 @@ import type { TargetState } from './TargetState.ts'
 /**
  * Emits one event for one reporter to every event target of the current `sid` state that lists it.
  * The `sid` state is captured once, so a transform that rotates does not move the remaining targets.
- * The first error is rethrown after every target ran.
+ * `reporter` is `undefined` for a session-only line. The first error is rethrown after every target ran.
  */
-export function emitEvent(session: SessionState, reporter: ReporterState, event: string, data: CmcdPlaybackData | undefined, request: Readonly<CmcdRequestLike> | undefined, ts: number): void {
+export function emitEvent(session: SessionState, reporter: ReporterState | undefined, event: string, data: CmcdPlaybackData | undefined, request: Readonly<CmcdRequestLike> | undefined, ts: number): void {
 	const sidState = session.current
 	const targets: TargetState[] = []
 	let failure: unknown

@@ -2,7 +2,7 @@ import type { Cmcd } from './Cmcd.ts'
 import { CMCD_REQUEST_ORIGINS } from './CMCD_REQUEST_ORIGINS.ts'
 import type { CmcdDecoratedRequest } from './CmcdDecoratedRequest.ts'
 import type { CmcdDiscreteEventType } from './CmcdDiscreteEventType.ts'
-import { CMCD_EVENT_ERROR } from './CmcdEventType.ts'
+import { CMCD_EVENT_ERROR, CMCD_EVENT_HOSTNAME } from './CmcdEventType.ts'
 import type { CmcdPlaybackData } from './CmcdPlaybackData.ts'
 import type { CmcdRequestLike } from './CmcdRequestLike.ts'
 import type { CmcdRequestRecord } from './CmcdRequestRecord.ts'
@@ -100,6 +100,15 @@ function finish<R extends CmcdRequestLike>(request: R, placed: { url: string; he
 	return decorated as CmcdDecoratedRequest<R>
 }
 
+function hostOf(url: string): string | undefined {
+	try {
+		return new URL(url).hostname || undefined
+	}
+	catch {
+		return undefined
+	}
+}
+
 /** One reporter of a session, with its own store and its own entry in every target. */
 export function createSessionReporter(state: SessionState, session: CmcdSession, config: CmcdSessionReporterConfig = {}): CmcdSessionReporter {
 	if (state.disposed) {
@@ -162,11 +171,22 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 			}
 			const dataCopy = copyPlaybackData(data)
 			const origin: RequestOrigin = { reporter, sidState, cid: reporter.store['cid'] as string | undefined, data: dataCopy, startedAt: Date.now() }
+			let hostChanged = false
+			if (!reporter.hSupplied) {
+				const host = hostOf(request.url)
+				if (host !== undefined && host !== reporter.host) {
+					reporter.host = host
+					hostChanged = true
+				}
+			}
 			const assembled = assembleReport(state, sidState, sidState.requestTarget, reporter, undefined, dataCopy, origin.startedAt)
 			const emitted = emitReport(state, sidState, sidState.requestTarget, reporter, assembled, undefined, request)
 			const placed = placeRequestReport(request, emitted, mode, state.config.headerMap)
 			const record: CmcdRequestRecord = { sid: sidState.sid, data: (emitted?.prepared ?? {}) as Readonly<Cmcd> }
 			CMCD_REQUEST_ORIGINS.set(record, origin)
+			if (hostChanged) {
+				emitEvent(state, reporter, CMCD_EVENT_HOSTNAME, undefined, undefined, origin.startedAt)
+			}
 			return finish(request, placed, record)
 		},
 		recordResponse() {
