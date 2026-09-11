@@ -4512,13 +4512,22 @@ mkdir -p libs/cmcd/temp/probe
 printf "import { createCmcdSession } from '../../dist/index.js'\nexport { createCmcdSession }\n" > libs/cmcd/temp/probe/session-entry.ts
 printf "import { CmcdReporter } from '../../dist/index.js'\nexport { CmcdReporter }\n" > libs/cmcd/temp/probe/reporter-entry.ts
 printf "import '../../dist/index.js'\n" > libs/cmcd/temp/probe/bare-entry.ts
-npx tsdown libs/cmcd/temp/probe/session-entry.ts libs/cmcd/temp/probe/reporter-entry.ts libs/cmcd/temp/probe/bare-entry.ts --format esm --minify --out-dir libs/cmcd/temp/probe/out --no-clean
-for f in session-entry reporter-entry bare-entry; do printf "%s min=%s gz=%s\n" "$f" "$(wc -c < libs/cmcd/temp/probe/out/$f.js)" "$(gzip -c libs/cmcd/temp/probe/out/$f.js | wc -c)"; done
-grep -c "CmcdReporter" libs/cmcd/temp/probe/out/session-entry.js
-grep -v "^import" libs/cmcd/temp/probe/out/bare-entry.js | grep -c "[a-zA-Z]"
+for f in session-entry reporter-entry bare-entry; do
+	npx tsdown "libs/cmcd/temp/probe/$f.ts" --format esm --minify --no-config --log-level error --out-dir "libs/cmcd/temp/probe/out/$f"
+done
+for f in session-entry reporter-entry bare-entry; do
+	p="libs/cmcd/temp/probe/out/$f/$f.js"
+	printf "%s min=%s gz=%s\n" "$f" "$(wc -c < "$p")" "$(gzip -c "$p" | wc -c)"
+done
+grep -c "CmcdReporter" libs/cmcd/temp/probe/out/session-entry/session-entry.js
+grep -v "^import" libs/cmcd/temp/probe/out/bare-entry/bare-entry.js | grep -c "[a-zA-Z]"
 ```
 
-Expected: the `CmcdReporter` count in the session entry is `0`. The bare entry has no line with letters besides `import` lines, so the last count is `0`. If tsdown externalizes `@svta/cml-utils` or `@svta/cml-structured-field-values`, both entries externalize them the same way, and the comparison stays fair. If the `CmcdReporter` count is not zero, a session module imports something from the `CmcdReporter` module graph. Move that import to a shared file.
+Run `tsdown` once per entry. One run over the three entries emits a shared chunk, and the per-entry sizes then mean nothing.
+
+Expected: the `CmcdReporter` count in the session entry is `0`. If tsdown externalizes `@svta/cml-utils` or `@svta/cml-structured-field-values`, both entries externalize them the same way, and the comparison stays fair. If the `CmcdReporter` count is not zero, a session module imports something from the `CmcdReporter` module graph. Move that import to a shared file.
+
+The bare entry keeps one statement, so the last count is `1`. The statement spreads `CMCD_STATE_EVENT_FIELDS` into the array literal of `CMCD_REQUIRED_EVENT_KEYS` in `CmcdReporter.ts`. A `/* @__PURE__ */` annotation covers the call it marks, not the evaluation of its arguments. The file is the same on `main`, so the session API adds no module-scope side effect.
 
 - [ ] **Step 4: Record the sizes**
 
