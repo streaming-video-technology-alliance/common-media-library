@@ -58,3 +58,23 @@ test('parseIntegerOrDecimal', () => {
 	assert.throws(() => parseIntegerOrDecimal(`999999999999999.1`), /failed to parse "999999999999999.1" as Integer or Decimal/)
 	assert.throws(() => parseIntegerOrDecimal(`1000000000000000`), /failed to parse "1000000000000000" as Integer or Decimal/)
 })
+
+test('parseIntegerOrDecimal does not create an Error when parsing succeeds', () => {
+	const OriginalError = globalThis.Error
+	let errorCount = 0
+	class CountingError extends OriginalError {
+		constructor(message?: string, options?: ErrorOptions) {
+			super(message, options)
+			errorCount++
+		}
+	}
+	globalThis.Error = CountingError as ErrorConstructor
+	try {
+		parseIntegerOrDecimal(`42`)
+		parseIntegerOrDecimal(`-4.5`)
+	}
+	finally {
+		globalThis.Error = OriginalError
+	}
+	assert.strictEqual(errorCount, 0)
+})

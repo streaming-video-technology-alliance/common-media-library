@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - README: the usage example prints its result instead of calling an undefined `assert`.
+- `parseIntegerOrDecimal` creates its `Error` only when parsing fails. Before this change, every call created an `Error` and captured a stack trace, also when parsing succeeded. Every Integer and Decimal in a parsed field passes through this function. Error messages do not change.
 
 ### Fixed
 
