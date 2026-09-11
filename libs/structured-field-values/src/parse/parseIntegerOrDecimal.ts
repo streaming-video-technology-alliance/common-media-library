@@ -1,4 +1,5 @@
-import { INTEGER_DECIMAL } from '../utils/INTEGER_DECIMAL.ts'
+import { DECIMAL } from '../utils/DECIMAL.ts'
+import { INTEGER } from '../utils/INTEGER.ts'
 import { isInvalidInt } from '../utils/isInvalidInt.ts'
 import type { ParsedValue } from './ParsedValue.ts'
 import { parsedValue } from './ParsedValue.ts'
@@ -78,7 +79,8 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 	let num = ''
 	let value
 	const i = 0
-	const error = parseError(orig, INTEGER_DECIMAL)
+	const type = `${INTEGER} or ${DECIMAL}`
+	const error = parseError(orig, type)
 
 	if (src[i] === '-') {
 		sign = -1
@@ -128,7 +130,7 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 
 		value = parseInt(num) * sign
 		if (isInvalidInt(value)) {
-			throw parseError(num, INTEGER_DECIMAL)
+			throw parseError(num, type)
 		}
 	}
 

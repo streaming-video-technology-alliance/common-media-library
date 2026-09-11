@@ -12,6 +12,10 @@ and this project adheres to
 
 - README: the usage example prints its result instead of calling an undefined `assert`.
 
+### Fixed
+
+- Remove the module-scope template literal that built the `Integer or Decimal` error type name. Rolldown-based bundlers such as tsdown kept that statement and two constants in bundles that never used the parser. `parseIntegerOrDecimal` now builds the name inside the function. Error messages do not change.
+
 
 ## [1.1.5] - 2026-07-28
 
