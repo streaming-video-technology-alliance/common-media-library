@@ -177,7 +177,7 @@ Merge in this order, later wins:
 
 ### emitReport(target, report, event?, request?)
 
-1. When the target has a transform: copy nested values, run the transform, return on `null`, restore a removed required key, re-stamp `sid`, `e`, and `ts`.
+1. Normalize the report to structured-field values. When the target has a transform: build a copy of the normalized report for it. In the copy, a token value is plain text, and every nested value is copied, parameters included. Run the transform on the copy, and return on `null`. Normalize the result. Restore a removed required key. Re-stamp `sid`, and on an event, `e` and `ts`.
 2. `report.sn = target.sn`.
 3. Prepare (below) and encode. An encoder error propagates, and step 4 does not run.
 4. Commit: `target.sn += 1`. When the output has `msd`, `msdSent = true`. Clear the reporter's `ec` entry, and its `bs` entry unless the store's `sta` is r. When the output has `bsd`, advance the target's cursor for each cause it carried. Then drop from each `pending` list the prefix that every eligible destination has passed. A destination is eligible when it is not gone, its `keys` include `bsd`, and, for the request target, the version is 2.
@@ -230,6 +230,12 @@ For each live reporter in creation order, assemble with `t` and emit to this one
 
 Session: set `disposed`, clear the timers, call `stopVisibility`, mark every reporter disposed, set `ended` on the current `sid` state, and dispatch every queue in full. Reporter: set `disposed`, remove the reporter from `reporters`, and delete its entries in every target. A late response for a disposed reporter still resolves through its origin, because the origin references the reporter object.
 
+### Implementation notes
+
+- `filterReport` sorts the keys again and reapplies the version 1 absence rule. `emitReport` assigns `sn` after `normalizeReport` runs, so a second pass keeps the output sorted and correct for version 1.
+- `formatNor` percent-encodes each path segment but leaves an existing `%XX` escape unchanged, because `urlToRelativePath` already returns an escaped path. It also accepts an already formatted `nor` entry, so normalizing again after a transform loses nothing.
+- `emitEvent` and `emitResponse` share one fan-out helper, `emitToEventTargets`.
+
 ## Delivery
 
 Per event target, `processQueue(drain)`:
@@ -274,7 +280,7 @@ One row per reserved key of CTA-5004-B Table 1. Empty cells mean not applicable.
 | dl | integer | Request | both | 100 | | | | | | | |
 | e | token | | event | | | | | always | | | absent |
 | ec | string-list | Status | both | | | | | e | | | absent |
-| h | string | | event | | | | | | | 128 | absent |
+| h | string | | event | | | | | h | | 128 | absent |
 | lab | ot-list | Object | both | 1 | | lb | | | | | absent |
 | lb | ot-list | Object | both | 1 | | | | | | | absent |
 | ltc | integer | Request | both | 1 | | | | | | | absent |
@@ -364,6 +370,7 @@ Tests import from `@svta/cml-cmcd` and run against the built package.
 | Validation | every emitted line passes `validateCmcdEvents` or `validateCmcdRequest` |
 | Types | `@ts-expect-error` for a state-change type in `recordEvent`, `ce` without `cen`, `version` on an event target, `ec` in `CmcdPlaybackData` |
 | Bundle | the bare-import side-effect probe, and a size probe against the baseline in `comparison.md` |
+| Bundle probe | Task 13 of steps.md: no CmcdReporter code in the createCmcdSession entry, no module-scope code in a bare import, sizes recorded in comparison.md |
 
 ## Sequencing
 

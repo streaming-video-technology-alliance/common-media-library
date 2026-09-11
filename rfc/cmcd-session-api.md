@@ -483,7 +483,7 @@ flowchart LR
 Filtering follows the target's `keys`. A key the current event requires is included whatever the list says:
 
 - `e` and `ts` on every event report, and `v` in version 2
-- `sta` on `ps`, `pr` on `pr`, `cid` on `c`, `bg` on `b`, and `br` on `bc`
+- `sta` on `ps`, `pr` on `pr`, `cid` on `c`, `bg` on `b`, `br` on `bc`, and `h` on `h`
 - `ec` on `e`, `cen` on `ce`, and `url` on `rr`
 
 The response keys appear only on `rr`. `cen` appears only on `ce`. `d` and `tpb` follow the object-type rule, and `ab`, `lab`, and `tab` yield to `br`, `lb`, and `tb`, as the encoder does today.
@@ -562,7 +562,7 @@ type CmcdRequestTransform = (data: Cmcd, request: Readonly<CmcdRequestLike>) => 
 type CmcdEventTransform = (data: Cmcd, request: Readonly<CmcdRequestLike> | undefined) => Cmcd | null
 ```
 
-The contract is the one the transforms RFC defined. The reporter copies nested values before a configured transform runs, re-stamps the reporter-owned keys after it returns, and restores a required key the transform removed. A transform that throws cancels that target's report. The error is thrown to the caller after every other target has been processed. The `request` argument is the request the player passed to `decorate()`. Read player fields through a cast or bracket access.
+The contract is the one the transforms RFC defined. The reporter normalizes the report to structured-field values before a configured transform runs. The transform then receives a copy of that normalized report. A token value in the copy is plain text. Every nested value, such as an inner list or a custom item, is copied too, parameters included. A transform cannot change the store or another target's report through this copy. In version 2 the copy matches the `Cmcd` type. In version 1 request mode, a metric with one value arrives as a number. `nor` arrives as one string, with `nrr` beside it. The reporter restores the required keys `sid`, `e`, and `ts` after the transform runs, and assigns `sn` after it. A transform that throws cancels that target's report. The error is thrown to the caller after every other target has been processed. The `request` argument is the decorated request. Read player fields through a cast or bracket access.
 
 A transform may call `rotate()`. The report it runs in and the request origin stay with the `sid` state that was current when the call began. The remaining targets of that emission do too. The rotation applies to every later call.
 

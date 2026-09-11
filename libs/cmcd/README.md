@@ -24,6 +24,25 @@ const result = encodeCmcd(input, options);
 // result === 'br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2'
 ```
 
+## Reporting with a session
+
+```typescript
+import { createCmcdSession } from "@svta/cml-cmcd";
+
+const session = createCmcdSession({
+	eventTargets: [{ url: "https://collector.example.com/cmcd" }],
+});
+const reporter = session.createReporter({ cid: "movie-42" });
+
+reporter.update({ sta: "p", bl: 3200, mtp: 15000 });
+const req = reporter.decorate({ url: "https://cdn.example.com/seg-1.m4s" }, { ot: "v", d: 4000 });
+const res = await fetch(req.url, { headers: req.headers });
+await res.arrayBuffer();
+reporter.recordResponse(req, { status: res.status, headers: res.headers });
+```
+
+The [user guide](docs/user-guide.md#reporting-with-a-session) describes the session API.
+
 ## Testing CMCD output with `CmcdReportRecorder`
 
 `CmcdReportRecorder` captures the CMCD requests that a player under test

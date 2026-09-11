@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `createCmcdSession()`, the CMCD version 2 session API. One `CmcdSession` per playback and one `CmcdSessionReporter` per media player. The reporter derives `msd`, `bs`, `bsa`, `bsda`, `bsd`, `su`, `sn`, `h`, `bg`, and the response timing keys. It keeps one `sid` and one sequence per target across players. It handles the event-mode delivery rules for 410, 429, and 5xx. `session.rotate()` changes the `sid`, and `session.configure()` changes the request-mode settings. `CmcdReporter` is unchanged. The design is in `rfc/cmcd-session-api.md`
+- `CmcdEventType.HOSTNAME` and `CMCD_EVENT_HOSTNAME`, the `h` event of CTA-5004-B. The validators accept `e=h`
+
 ### Changed
 
 - The `Cmcd` type documentation links to the CTA-5004-B specification. It linked only to the version 1 PDF
