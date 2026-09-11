@@ -136,17 +136,21 @@ const STATE_FIELDS_BY_EVENT: ReadonlyMap<CmcdEventType, StateFieldEntry> = /* @_
 	/* @__PURE__ */ STATE_FIELDS.map(e => [e.event, e]),
 )
 
+function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
+	return new Map([
+		...CMCD_STATE_EVENT_FIELDS,
+		[CMCD_EVENT_CUSTOM_EVENT, 'cen'] as const,
+		[CMCD_EVENT_ERROR, 'ec'] as const,
+		[CMCD_EVENT_RESPONSE_RECEIVED, 'url'] as const,
+	])
+}
+
 /**
  * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
  * Built from the state-change table plus the three event types whose
  * required key rides the caller's per-event data.
  */
-const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map([
-	.../* @__PURE__ */ CMCD_STATE_EVENT_FIELDS,
-	[CMCD_EVENT_CUSTOM_EVENT, 'cen'] as const,
-	[CMCD_EVENT_ERROR, 'ec'] as const,
-	[CMCD_EVENT_RESPONSE_RECEIVED, 'url'] as const,
-])
+const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
 
 /**
  * Whether a required key's value will survive report preparation.

@@ -10,7 +10,7 @@ import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
-import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
+import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE, type CmcdReportingMode } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
@@ -21,9 +21,9 @@ import { isTokenField } from './isTokenField.ts'
 import { isValid } from './isValid.ts'
 import { toTokenString } from './toTokenString.ts'
 
-const filterMap: Record<string, (key: string) => boolean> = {
-	[CMCD_EVENT_MODE]: isCmcdEventKey,
-	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
+const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
+	event: isCmcdEventKey,
+	request: isCmcdRequestKey,
 }
 
 /**
