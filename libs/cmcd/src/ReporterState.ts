@@ -6,6 +6,7 @@ export type ReporterState = {
 	readonly store: Record<string, unknown>
 	readonly reported: { sta?: unknown; pr?: unknown; cid?: unknown; br?: unknown }
 	host: string | undefined
+	hostOrigin: string | undefined
 	hSupplied: boolean
 	su: boolean | undefined
 	suSupplied: boolean

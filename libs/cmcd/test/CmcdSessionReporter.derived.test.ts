@@ -220,6 +220,34 @@ describe('CmcdSessionReporter host and background', () => {
 		equal(queryValue(reporter.decorate({ url: 'https://b.example.com/seg-4.m4s' }).url).includes('h='), false)
 	})
 
+	it('emits h again when the host returns, and repeats to one host emit once', async (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1000 })
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['h'], keys: ['h', 'sid'], interval: 0 }] })
+		const reporter = session.createReporter()
+		reporter.decorate({ url: 'https://a.example.com/seg-1.m4s' })
+		reporter.decorate({ url: 'https://a.example.com/seg-2.m4s' })
+		reporter.decorate({ url: 'https://b.example.com/seg-3.m4s' })
+		reporter.decorate({ url: 'https://a.example.com/seg-4.m4s' })
+		await flushPromises()
+		deepEqual(mock.bodies(), [
+			'e=h,h="a.example.com",sid="s",ts=1000,v=2',
+			'e=h,h="b.example.com",sid="s",ts=1000,v=2',
+			'e=h,h="a.example.com",sid="s",ts=1000,v=2',
+		])
+	})
+
+	it('a relative request URL derives no host', async (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1000 })
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['h'], keys: ['h', 'sid'], interval: 0 }] })
+		const reporter = session.createReporter()
+		reporter.decorate({ url: '/seg-1.m4s' })
+		reporter.decorate({ url: 'https://a.example.com/seg-2.m4s' })
+		await flushPromises()
+		deepEqual(mock.bodies(), ['e=h,h="a.example.com",sid="s",ts=1000,v=2'])
+	})
+
 	it('a pushed h wins and stops tracking', async () => {
 		const mock = createMockRequester()
 		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['h', 'ps'], keys: ['h', 'sid'], interval: 0 }] })

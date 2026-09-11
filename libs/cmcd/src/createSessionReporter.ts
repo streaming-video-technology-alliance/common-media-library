@@ -112,6 +112,27 @@ function hostOf(url: string): string | undefined {
 	}
 }
 
+/** The `scheme://authority` of a URL, up to the first `/`, `?`, or `#`. Two URLs that share it have the same host. */
+const AUTHORITY_PREFIX = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\/[^/?#]*/
+
+/**
+ * Derives the request host and reports a change since the last decoration. A parse runs only when the
+ * `scheme://authority` prefix differs from the last one, so a run of requests to one CDN parses one URL.
+ */
+function trackHost(reporter: ReporterState, url: string): boolean {
+	const prefix = AUTHORITY_PREFIX.exec(url)?.[0]
+	if (prefix === undefined || prefix === reporter.hostOrigin) {
+		return false
+	}
+	reporter.hostOrigin = prefix
+	const host = hostOf(url)
+	if (host === undefined || host === reporter.host) {
+		return false
+	}
+	reporter.host = host
+	return true
+}
+
 /** One reporter of a session, with its own store and its own entry in every target. */
 export function createSessionReporter(state: SessionState, session: CmcdSession, config: CmcdSessionReporterConfig = {}): CmcdSessionReporter {
 	if (state.disposed) {
@@ -125,6 +146,7 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 		store: config.cid === undefined ? {} : { cid: config.cid },
 		reported: { cid: config.cid },
 		host: undefined,
+		hostOrigin: undefined,
 		hSupplied: false,
 		su: undefined,
 		suSupplied: false,
@@ -180,14 +202,7 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 			const dataCopy = copyPlaybackData(data)
 			const startedAt = Date.now()
 			const origin: RequestOrigin = { reporter, sidState, cid: reporter.store['cid'] as string | undefined, data: dataCopy, startedAt }
-			let hostChanged = false
-			if (!reporter.hSupplied) {
-				const host = hostOf(request.url)
-				if (host !== undefined && host !== reporter.host) {
-					reporter.host = host
-					hostChanged = true
-				}
-			}
+			const hostChanged = !reporter.hSupplied && trackHost(reporter, request.url)
 			const assembled = assembleReport(state, sidState, sidState.requestTarget, reporter, undefined, dataCopy, startedAt)
 			const emitted = emitReport(state, sidState, sidState.requestTarget, reporter, assembled, undefined, request)
 			const placed = placeRequestReport(request, emitted, mode, state.config.headerMap)
