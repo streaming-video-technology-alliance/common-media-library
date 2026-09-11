@@ -252,7 +252,7 @@ Per event target, `processQueue(drain)`:
 | 429, 5xx, or rejection | unshift the batch, `attempt += 1`, arm `retryTimer` for `min(1000 * 2 ** (attempt - 1), 60000)` ms, then process the queue with `drain` |
 | other 4xx | drop the batch, `attempt = 0`, process the queue again |
 
-`flush()` clears an armed retry timer and processes with `drain`. Once the owning `sid` state has ended, a failure at the 60 second step stops the retries. When the queue is longer than `maxQueueSize` after an unshift or a push, splice the oldest lines off the front.
+`flush()`, `dispose()`, and `rotate()` clear an armed retry timer before they process with `drain`. `flush()` and `dispose()` clear the timers of the current `sid` state. `rotate()` clears those of the state it ends. Once the owning `sid` state has ended, a failure at the 60 second step stops the retries. When the queue is longer than `maxQueueSize` after an unshift or a push, splice the oldest lines off the front.
 
 The default requester: `fetch(url, { method: 'POST', headers, body, keepalive: body.length < 65536 })`, returning `{ status }`. A network error rejects.
 
@@ -312,7 +312,7 @@ One row per reserved key of CTA-5004-B Table 1. Empty cells mean not applicable.
 | url | string | | event | | | | rr | rr | | | absent |
 | v | integer | Session | both | | | | | always | 1 | | |
 
-Token values: `e` takes the 19 event tokens, `ot` takes `m a v av i c tt k o`, `sf` takes `d h e s o`, `st` takes `v l ll`, and `sta` takes `s p k r a w e f q d`. `nor` has a `format` function. It makes the path relative to the base URL and wraps the value in a list in version 2. It adds the `r` parameter from a range and percent-encodes the path in version 1. Version 1 also emits `nrr` from the first range. Custom keys are hyphenated, allowed in both modes, typed string or token, limited to 64 characters, and sharded by `headerMap`, default `CMCD-Request`.
+Token values: `e` takes the 19 event tokens, `ot` takes `m a v av i c tt k o`, `sf` takes `d h e s o`, `st` takes `v l ll`, and `sta` takes `s p k r a w e f q d`. `nor` has a `format` function. It makes the path relative to the base URL and wraps the value in a list in version 2. It adds the `r` parameter from a range and percent-encodes the path in version 1. Version 1 also emits `nrr` from the first range. `nrr` is its own key row, so a version 1 `keys` allowlist must name it. Custom keys are hyphenated, allowed in both modes, typed string or token, limited to 64 characters, and sharded by `headerMap`, default `CMCD-Request`.
 
 ### Preparation loop
 

@@ -364,7 +364,7 @@ type CmcdDiscreteEventType = 'as' | 'ae' | 'abs' | 'abe' | 'sk' | 'm' | 'um' | '
 
 - Resets: every target's `sn`, `msd` gate, `bs` flags, `ec` buffers, and `bsd` cursors. The session totals `bsa` and `bsda`, the pending `bsd` samples, and the supplied-value overrides reset too.
 - Kept: every reporter with its store, `cid`, host, and `su` state, and the session `bg`. A startup measurement in progress carries over. When `msd` is not yet derived or supplied, the new `sid` keeps the start time, so the manifest-supplied `sid` flow still reports `msd`.
-- Baselines: the dedup baselines of every reporter and of `bg` reset. The next push of a tracked field emits under the new `sid`, even when the value did not change. Rotation itself emits nothing.
+- Baselines: the dedup baselines of every reporter and of `bg` reset. After `rotate()`, the next `update()` emits every tracked field that has a value, even when no value changed. Rotation itself emits nothing.
 - Stalls: a stall open at rotation is measured by the new `sid` from the rotation time, and the old `sid` drops its part. The new targets start with `bs` set, because the player is still rebuffering.
 - Delivery: the queued lines of the old `sid` are sent at once. A target that a 410 silenced is active again, because the spec scopes the 410 to the current session.
 - Late responses: a request issued before the rotation still reports under the old `sid`, with that `sid`'s next sequence number. The ended `sid` state keeps a copy of each reporter's store, so a late response reads the values at rotation and not the live store.
@@ -613,15 +613,15 @@ Runtime data never throws. An unknown or empty value is omitted, as the spec req
 
 ### Bundle and performance
 
-The estimates below are for the design record to verify with a prototype.
+The numbers below are measured. The design record minified one entry of the built package at a time, on 2026-09-10. The `CmcdReporter` column is its own entry, and the session column is the `createCmcdSession` entry.
 
-| Measure | `CmcdReporter` today | This API, estimate |
+| Measure | `CmcdReporter` today | This API, measured |
 |---|---|---|
-| Minified, request mode only | 18.8 KB | at or below 18.8 KB |
-| Minified with gzip | 7.1 KB | at or below 7.1 KB |
+| Minified | 18.7 KB | 26.4 KB |
+| Minified with gzip | 7.1 KB | 8.9 KB |
 | Objects per report | 1, plus copies when a transform runs | 1, plus copies when a transform runs |
 
-The retention ledger, the eviction pass, the dirty set, and the provenance encoding go away. The derivation code and the key table arrive. A player that imports only `createCmcdSession` does not bundle `CmcdReporter`. Event-mode delivery is bundled whenever the session API is, because the configuration is data.
+The session API is the larger of the two. It adds event-mode delivery, rotation, responses, and transforms, which `CmcdReporter` does not have. The retention ledger, the eviction pass, the dirty set, and the provenance encoding go away. The derivation code and the key table arrive. A player that imports only `createCmcdSession` does not bundle `CmcdReporter`. Event-mode delivery is bundled whenever the session API is, because the configuration is data.
 
 ### Migration from `CmcdReporter`
 
