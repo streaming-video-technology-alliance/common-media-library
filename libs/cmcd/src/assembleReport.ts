@@ -33,8 +33,9 @@ export function deriveDl(bl: unknown, pr: unknown, ot: unknown): number | undefi
 }
 
 /**
- * Merges, in this order and later wins: the store, the session data, the per-call data, the target's entry for the reporter,
- * the derived defaults, and the event stamp. `reporter` is `undefined` for a session-only interval line.
+ * Merges in this order, and later wins: the store, the session data, the per-call data.
+ * Then the target's entry for the reporter, the derived defaults, and the event stamp.
+ * `reporter` is `undefined` for a session-only interval line.
  * `store` replaces the reporter's store, for a response that reports under an ended `sid` state.
  */
 export function assembleReport(session: SessionState, sidState: SidState, target: TargetState, reporter: ReporterState | undefined, event: string | undefined, data: Record<string, unknown> | undefined, ts: number, store?: Record<string, unknown>): AssembledReport {

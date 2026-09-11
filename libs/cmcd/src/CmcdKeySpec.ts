@@ -1,6 +1,7 @@
 /**
- * One row of the key table. `requiredOn` is `'always'` or an event type. `v1` says what version 1 does with the key:
- * absent drops it, scalar collapses an object-type list to one number, string keeps the first `nor` entry.
+ * One row of the key table. `requiredOn` is `'always'` or an event type.
+ * `v1` says what version 1 does with the key. `absent` drops it.
+ * `scalar` collapses an object-type list to one number. `string` keeps the first `nor` entry.
  */
 export type CmcdKeySpec = {
 	readonly type: 'boolean' | 'integer' | 'decimal' | 'string' | 'token' | 'string-list' | 'ot-list' | 'nor' | 'custom'
