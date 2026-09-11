@@ -21,6 +21,7 @@ import type { ReporterState } from './ReporterState.ts'
 import type { RequestOrigin } from './RequestOrigin.ts'
 import type { SessionState } from './SessionState.ts'
 import type { SidState } from './SidState.ts'
+import { trackTransition } from './trackTransition.ts'
 
 const SESSION_FACTS = ['bg', 'msd', 'bsa', 'bsda', 'bsd'] as const
 
@@ -127,7 +128,12 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 			if (reporter.disposed || state.disposed) {
 				return
 			}
+			const previous = reporter.store['sta']
 			const ts = mergeUpdate(state, reporter, data)
+			const next = reporter.store['sta']
+			if (data.sta !== undefined && next !== previous) {
+				trackTransition(state, reporter, previous, next, ts)
+			}
 			deriveStateEvents(state, reporter, ts)
 		},
 		recordEvent(type: CmcdDiscreteEventType, data?: CmcdPlaybackData) {
