@@ -170,19 +170,50 @@ describe('CmcdSession delivery state machine', () => {
 		other.dispose()
 	})
 
-	it('keeps the newest maxQueueSize lines', async (context) => {
+	it('keeps the newest maxQueueSize lines when a failed batch is unshifted back', async (context) => {
 		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
-		const requester = createMockRequester(429)
+		const requester = createMockRequester(503)
 		const session = createCmcdSession({ sid: 's', requester: requester.requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0, batchSize: 2, maxQueueSize: 2 }] })
 		const reporter = session.createReporter()
 		reporter.update({ sta: 'p', ts: 1 })
 		reporter.update({ sta: 'a', ts: 2 })
-		await flushPromises()
 		reporter.update({ sta: 'p', ts: 3 })
+		await flushPromises()
 		requester.status = 200
 		context.mock.timers.tick(1000)
 		await flushPromises()
-		equal(requester.bodies()[1], 'e=ps,sid="s",sta=a,ts=2,v=2\ne=ps,sid="s",sta=p,ts=3,v=2')
+		deepEqual(requester.bodies(), [
+			'e=ps,sid="s",sta=p,ts=1,v=2\ne=ps,sid="s",sta=a,ts=2,v=2',
+			'e=ps,sid="s",sta=a,ts=2,v=2\ne=ps,sid="s",sta=p,ts=3,v=2',
+		])
+		session.dispose()
+	})
+
+	it('keeps the newest maxQueueSize lines when a push exceeds the cap during a send', async () => {
+		let release: ((value: { status: number }) => void) | undefined
+		const bodies: string[] = []
+		const requester = (request: HttpRequest) => {
+			bodies.push(request.body as string)
+			return new Promise<{ status: number }>((resolve) => {
+				release = resolve
+			})
+		}
+		const session = createCmcdSession({ sid: 's', requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0, batchSize: 2, maxQueueSize: 2 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1 })
+		reporter.update({ sta: 'a', ts: 2 })
+		equal(bodies.length, 1)
+		reporter.update({ sta: 'p', ts: 3 })
+		reporter.update({ sta: 'a', ts: 4 })
+		reporter.update({ sta: 'p', ts: 5 })
+		release?.({ status: 200 })
+		await flushPromises()
+		release?.({ status: 200 })
+		await flushPromises()
+		deepEqual(bodies, [
+			'e=ps,sid="s",sta=p,ts=1,v=2\ne=ps,sid="s",sta=a,ts=2,v=2',
+			'e=ps,sid="s",sta=a,ts=4,v=2\ne=ps,sid="s",sta=p,ts=5,v=2',
+		])
 		session.dispose()
 	})
 
