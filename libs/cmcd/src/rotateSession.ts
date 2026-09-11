@@ -10,7 +10,9 @@ import type { SessionState } from './SessionState.ts'
 /**
  * Starts the next `sid`. The old state is drained and ended. Each reporter's store is copied onto it for late responses.
  * Every counter, gate, buffer, and baseline restarts, and a startup measurement in progress carries over.
- * A reporter that is rebuffering keeps `bs` and measures the stall from the rotation time. Emits nothing.
+ * The new `sid` inherits the current visibility as its `bg` baseline, so the next change still emits `b`.
+ * A reporter that is rebuffering keeps `bs` and measures the stall from the rotation time.
+ * The new `sid` counts that stall in `bsa`. Emits nothing.
  */
 export function rotateSession(state: SessionState, sid: string | undefined): void {
 	if (state.disposed) {
@@ -34,6 +36,7 @@ export function rotateSession(state: SessionState, sid: string | undefined): voi
 		old.stores.set(reporter, copyPlaybackData(reporter.store as CmcdPlaybackData) as Record<string, unknown>)
 	}
 	const fresh = createSidState(next, state.config)
+	fresh.bgReported = state.bg
 	if (old.msd === undefined && !old.msdSupplied && old.msdStart !== undefined) {
 		fresh.msdStart = old.msdStart
 	}
@@ -45,6 +48,7 @@ export function rotateSession(state: SessionState, sid: string | undefined): voi
 		reporter.reported.br = undefined
 		if (reporter.store['sta'] === 'r') {
 			reporter.spanOpenedAt = now
+			fresh.bsa += 1
 			for (const target of [fresh.requestTarget, ...fresh.eventTargets]) {
 				getTargetEntry(target, reporter).bs = true
 			}

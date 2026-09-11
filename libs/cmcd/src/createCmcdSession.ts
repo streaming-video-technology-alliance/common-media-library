@@ -10,6 +10,7 @@ import { emitBackgroundChange } from './emitBackgroundChange.ts'
 import { flushSession } from './flushSession.ts'
 import { normalizeSessionConfig } from './normalizeSessionConfig.ts'
 import { observeVisibility } from './observeVisibility.ts'
+import { reportSessionError } from './reportSessionError.ts'
 import { rotateSession } from './rotateSession.ts'
 import type { SessionState } from './SessionState.ts'
 
@@ -49,7 +50,12 @@ export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 				return
 			}
 			state.bg = hidden ? true : undefined
-			emitBackgroundChange(state, Date.now())
+			try {
+				emitBackgroundChange(state, Date.now())
+			}
+			catch (error) {
+				reportSessionError(state, error)
+			}
 		})
 		if (state.stopVisibility && document.visibilityState === 'hidden') {
 			state.bg = true

@@ -8,7 +8,7 @@ import type { TargetState } from './TargetState.ts'
 const BACK_OFF_CAP = 60000
 const ATTEMPTS_TO_CAP = 7
 
-function settle(session: SessionState, sidState: SidState, target: TargetState, batch: string[], status: number): void {
+function settle(session: SessionState, sidState: SidState, target: TargetState, batch: string[], status: number, reason?: unknown): void {
 	const config = session.config.eventTargets[target.index]
 	target.sending = false
 	if (status >= 200 && status < 400) {
@@ -34,7 +34,8 @@ function settle(session: SessionState, sidState: SidState, target: TargetState, 
 		if (sidState.ended && target.attempt > ATTEMPTS_TO_CAP) {
 			target.queue.length = 0
 			target.drainRequested = false
-			reportSessionError(session, new Error(`CmcdSession: send failed for target ${config.url} after the back-off cap, status ${status}`))
+			const message = `CmcdSession: send failed for target ${config.url} after the back-off cap, status ${status}`
+			reportSessionError(session, reason === undefined ? new Error(message) : new Error(message, { cause: reason }))
 			return
 		}
 		const delay = Math.min(1000 * 2 ** (target.attempt - 1), BACK_OFF_CAP)
@@ -79,14 +80,14 @@ export function processQueue(session: SessionState, sidState: SidState, target: 
 	target.sending = true
 	let response: Promise<{ status: number }>
 	try {
-		response = session.config.requester(request)
+		response = Promise.resolve(session.config.requester(request))
 	}
-	catch {
-		response = Promise.resolve({ status: 0 })
+	catch (error) {
+		response = Promise.reject(error)
 	}
 	response.then(
 		result => settle(session, sidState, target, batch, result.status),
-		() => settle(session, sidState, target, batch, 0),
+		(reason: unknown) => settle(session, sidState, target, batch, 0, reason),
 	).catch((error: unknown) => {
 		setTimeout(() => {
 			throw error

@@ -1,3 +1,4 @@
+import type { CmcdRequester } from '@svta/cml-cmcd'
 import { CMCD_MIME_TYPE, createCmcdSession } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal } from 'node:assert'
@@ -297,6 +298,64 @@ describe('CmcdSession delivery state machine', () => {
 		await flushPromises()
 		equal(requester.requests.length, 8)
 		session.dispose()
+	})
+
+	it('gives the requester error as the cause of the give-up error', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
+		const onError = mock.fn()
+		const offline = new Error('offline')
+		const session = createCmcdSession({ sid: 'a', requester: () => Promise.reject(offline), onError, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid'], interval: 0 }] })
+		session.createReporter().update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		session.rotate('b')
+		await flushPromises()
+		for (const wait of [2000, 4000, 8000, 16000, 32000, 60000]) {
+			context.mock.timers.tick(wait)
+			await flushPromises()
+		}
+		equal(onError.mock.callCount(), 1)
+		const error = onError.mock.calls[0].arguments[0] as Error
+		equal(error.message, `CmcdSession: send failed for target ${COLLECTOR} after the back-off cap, status 0`)
+		equal(error.cause, offline)
+		session.dispose()
+	})
+
+	it('retries a status 0 response', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1000 })
+		const requester = createMockRequester(0)
+		const session = createCmcdSession({ sid: 's', requester: requester.requester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0 }] })
+		session.createReporter().update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		equal(requester.requests.length, 1)
+		requester.status = 200
+		context.mock.timers.tick(1000)
+		await flushPromises()
+		deepEqual(requester.bodies(), ['e=ps,sid="s",sta=p,ts=1,v=2', 'e=ps,sid="s",sta=p,ts=1,v=2'])
+		session.dispose()
+	})
+
+	it('accepts a thenable and a plain object from the requester', async () => {
+		const thenables: string[] = []
+		const thenable = (request: HttpRequest) => {
+			thenables.push(request.body as string)
+			return { then: (onFulfilled: (value: { status: number }) => void) => onFulfilled({ status: 200 }) }
+		}
+		const first = createCmcdSession({ sid: 's', requester: thenable as unknown as CmcdRequester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0 }] })
+		first.createReporter().update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		deepEqual(thenables, ['e=ps,sid="s",sta=p,ts=1,v=2'])
+		first.dispose()
+
+		const plain: string[] = []
+		const direct = (request: HttpRequest) => {
+			plain.push(request.body as string)
+			return { status: 200 }
+		}
+		const second = createCmcdSession({ sid: 'p', requester: direct as unknown as CmcdRequester, eventTargets: [{ url: COLLECTOR, events: ['ps'], keys: ['sid', 'sta'], interval: 0 }] })
+		second.createReporter().update({ sta: 'p', ts: 1 })
+		await flushPromises()
+		deepEqual(plain, ['e=ps,sid="p",sta=p,ts=1,v=2'])
+		second.dispose()
 	})
 
 	it('posts through fetch with keepalive by default', async (context) => {

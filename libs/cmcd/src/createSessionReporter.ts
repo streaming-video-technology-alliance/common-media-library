@@ -20,6 +20,7 @@ import { emitReport } from './emitReport.ts'
 import { emitResponse } from './emitResponse.ts'
 import { getTargetEntry } from './getTargetEntry.ts'
 import { placeRequestReport } from './placeRequestReport.ts'
+import { reportSessionError } from './reportSessionError.ts'
 import type { ReporterState } from './ReporterState.ts'
 import type { RequestOrigin } from './RequestOrigin.ts'
 import type { SessionState } from './SessionState.ts'
@@ -194,7 +195,12 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 			const record: CmcdRequestRecord = { sid: sidState.sid, data: (emitted?.prepared ?? {}) as Readonly<Cmcd> }
 			CMCD_REQUEST_ORIGINS.set(record, origin)
 			if (hostChanged) {
-				emitEvent(state, reporter, CMCD_EVENT_HOSTNAME, undefined, undefined, startedAt)
+				try {
+					emitEvent(state, reporter, CMCD_EVENT_HOSTNAME, undefined, undefined, startedAt)
+				}
+				catch (error) {
+					reportSessionError(state, error)
+				}
 			}
 			return finish(request, placed, record)
 		},

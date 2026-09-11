@@ -120,6 +120,24 @@ describe('CmcdSessionReporter derived keys', () => {
 		session.dispose()
 	})
 
+	it('counts a stall in bsa when it starts, and reports bsd only once it ends', async (context) => {
+		context.mock.timers.enable({ apis: ['Date', 'setInterval', 'setTimeout'], now: 1000 })
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, eventTargets: [{ url: COLLECTOR, events: ['t'], keys: ['bsa', 'bsd', 'bsda', 'sid'], interval: 1 }] })
+		const reporter = session.createReporter()
+		reporter.update({ sta: 'p', ts: 1000 })
+		reporter.update({ sta: 'r', ts: 1500 })
+		context.mock.timers.tick(1000)
+		reporter.update({ sta: 'p', ts: 2400 })
+		context.mock.timers.tick(1000)
+		await flushPromises()
+		deepEqual(mock.bodies(), [
+			'bsa=(1),e=t,sid="s",ts=2000,v=2',
+			'bsa=(1),bsd=(900),bsda=(900),e=t,sid="s",ts=3000,v=2',
+		])
+		session.dispose()
+	})
+
 	it('treats a supplied bsd as pending samples per cause and stops automatic detection', async (context) => {
 		context.mock.timers.enable({ apis: ['Date', 'setInterval', 'setTimeout'], now: 1000 })
 		const mock = createMockRequester()
@@ -268,11 +286,67 @@ describe('CmcdSessionReporter host and background', () => {
 		const reporter = session.createReporter()
 		reporter.update({ sta: 'p', ts: 1 })
 		reporter.update({ bg: false, ts: 2 })
-		equal(fake.listeners.size, 0)
-		fake.visibilityState = 'visible'
-		fake.listeners.forEach(listener => listener())
 		await flushPromises()
 		deepEqual(mock.bodies(), ['bg,e=ps,sid="s",sta=p,ts=1,v=2', 'e=b,sid="s",ts=2,v=2'])
+		equal(fake.listeners.size, 0)
+	})
+
+	it('carries the bg baseline across rotate, so the exit b fires under the new sid', async (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1000 })
+		const fake = installDocument(context, 'hidden')
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 'a', requester: mock.requester, keys: ['bg', 'sid'], eventTargets: [{ url: COLLECTOR, events: ['b', 'ps'], keys: ['bg', 'sid'], interval: 0 }] })
+		const reporter = session.createReporter()
+		session.rotate('b')
+		equal(queryValue(reporter.decorate({ url: `${CDN}/a` }).url), 'bg,sid="b",v=2')
+		fake.visibilityState = 'visible'
+		fake.listeners.forEach(listener => listener())
+		reporter.update({ sta: 'p', ts: 2 })
+		await flushPromises()
+		deepEqual(mock.bodies(), ['e=b,sid="b",ts=1000,v=2', 'e=ps,sid="b",sta=p,ts=2,v=2'])
+		session.dispose()
+	})
+
+	it('gives a failed b emission to onError and keeps the listener installed', async (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1000 })
+		const fake = installDocument(context, 'visible')
+		const errors: unknown[] = []
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, onError: error => errors.push(error), eventTargets: [{ url: COLLECTOR, events: ['b', 'ps'], keys: ['bg', 'sid'], interval: 0, transform: (data) => {
+			if (data.e === 'b') {
+				throw new Error('collector bug')
+			}
+			return data
+		} }] })
+		const reporter = session.createReporter()
+		fake.visibilityState = 'hidden'
+		fake.listeners.forEach(listener => listener())
+		equal(errors.length, 1)
+		equal((errors[0] as Error).message, `CmcdSession: transform failed for target ${COLLECTOR}: collector bug`)
+		equal(fake.listeners.size, 1)
+		reporter.update({ sta: 'p', ts: 2 })
+		await flushPromises()
+		deepEqual(mock.bodies(), ['bg,e=ps,sid="s",sta=p,ts=2,v=2'])
+		session.dispose()
+	})
+
+	it('gives a failed h emission to onError and still returns the decorated request', async () => {
+		const errors: unknown[] = []
+		const mock = createMockRequester()
+		const session = createCmcdSession({ sid: 's', requester: mock.requester, keys: ['sid', 'sn'], onError: error => errors.push(error), eventTargets: [{ url: COLLECTOR, events: ['h', 'ps'], keys: ['h', 'sid'], interval: 0, transform: (data) => {
+			if (data.e === 'h') {
+				throw new Error('collector bug')
+			}
+			return data
+		} }] })
+		const reporter = session.createReporter()
+		equal(queryValue(reporter.decorate({ url: 'https://a.example.com/seg-1.m4s' }).url), 'sid="s",sn=0,v=2')
+		equal(errors.length, 1)
+		equal((errors[0] as Error).message, `CmcdSession: transform failed for target ${COLLECTOR}: collector bug`)
+		reporter.update({ sta: 'p', ts: 5 })
+		await flushPromises()
+		deepEqual(mock.bodies(), ['e=ps,h="a.example.com",sid="s",sta=p,ts=5,v=2'])
+		session.dispose()
 	})
 
 	it('installs no listener with derive.bg off', (context) => {

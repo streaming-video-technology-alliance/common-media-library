@@ -108,17 +108,17 @@ describe('CmcdSession rotation', () => {
 		session.dispose()
 	})
 
-	it('measures a stall open at rotation from the rotation time and keeps bs set', async (context) => {
+	it('measures a stall open at rotation from the rotation time, counts it, and keeps bs set', async (context) => {
 		context.mock.timers.enable({ apis: ['Date'], now: 5000 })
-		const session = createCmcdSession({ sid: 'a', keys: ['bs', 'bsd', 'bsda', 'sid'] })
+		const session = createCmcdSession({ sid: 'a', keys: ['bs', 'bsa', 'bsd', 'bsda', 'sid'] })
 		const reporter = session.createReporter()
 		reporter.update({ sta: 'p', ts: 1000 })
 		reporter.update({ sta: 'r', ts: 4000 })
 		session.rotate('b')
-		equal(queryValue(reporter.decorate({ url: `${CDN}/a` }).url), 'bs,sid="b",v=2')
+		equal(queryValue(reporter.decorate({ url: `${CDN}/a` }).url), 'bs,bsa=(1),sid="b",v=2')
 		reporter.update({ sta: 'p', ts: 5300 })
-		equal(queryValue(reporter.decorate({ url: `${CDN}/a` }).url), 'bs,bsd=(300),bsda=(300),sid="b",v=2')
-		equal(queryValue(reporter.decorate({ url: `${CDN}/a` }).url), 'bsda=(300),sid="b",v=2')
+		equal(queryValue(reporter.decorate({ url: `${CDN}/a` }).url), 'bs,bsa=(1),bsd=(300),bsda=(300),sid="b",v=2')
+		equal(queryValue(reporter.decorate({ url: `${CDN}/a` }).url), 'bsa=(1),bsda=(300),sid="b",v=2')
 	})
 
 	it('lets an ended sid state be collected once its requests are released', async () => {
