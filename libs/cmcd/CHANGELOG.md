@@ -14,6 +14,7 @@ and this project adheres to
 
 ### Fixed
 
+- A bare import of the package no longer runs code at module scope. `CmcdReporter` built its required-event-key table with an array spread of `CMCD_STATE_EVENT_FIELDS`. `prepareCmcdData` built its key filter table with computed keys. Bundlers kept one or both tables in every bundle that imports the package, even when the bundle uses neither function
 - `validateCmcdRequest` reports an error when a request carries CMCD data in both the headers and the `CMCD` query parameter. CTA-5004-B allows one transmission mode per request. The validator still checks the headers and returns their data
 - `validateCmcdRequest` reads the `CMCD` parameter from the query string and ignores the URL fragment. A relative URL no longer throws. When the fragment is the only place with a `CMCD` parameter, the error message says so
 - The encoder applies the "MUST NOT" rules of CTA-5004-B to version 2 payloads. The change covers `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`, which share `prepareCmcdData`
