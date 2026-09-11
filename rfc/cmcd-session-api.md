@@ -364,8 +364,8 @@ type CmcdDiscreteEventType = 'as' | 'ae' | 'abs' | 'abe' | 'sk' | 'm' | 'um' | '
 
 - Resets: every target's `sn`, `msd` gate, `bs` flags, `ec` buffers, and `bsd` cursors. The session totals `bsa` and `bsda`, the pending `bsd` samples, and the supplied-value overrides reset too.
 - Kept: every reporter with its store, `cid`, host, and `su` state, and the session `bg`. A startup measurement in progress carries over. When `msd` is not yet derived or supplied, the new `sid` keeps the start time, so the manifest-supplied `sid` flow still reports `msd`.
-- Baselines: the dedup baselines of every reporter and of `bg` reset. After `rotate()`, the next `update()` emits every tracked field that has a value, even when no value changed. Rotation itself emits nothing.
-- Stalls: a stall open at rotation is measured by the new `sid` from the rotation time, and the old `sid` drops its part. The new targets start with `bs` set, because the player is still rebuffering.
+- Baselines: the dedup baselines of every reporter reset. The `bg` baseline carries to the new `sid`, so the next visibility change still emits `b`. After `rotate()`, the next `update()` emits every tracked field that has a value, even when no value changed. Rotation itself emits nothing.
+- Stalls: a stall open at rotation is measured by the new `sid` from the rotation time, and the old `sid` drops its part. The new `sid` counts that stall in `bsa`. The new targets start with `bs` set, because the player is still rebuffering.
 - Delivery: the queued lines of the old `sid` are sent at once. A target that a 410 silenced is active again, because the spec scopes the 410 to the current session.
 - Late responses: a request issued before the rotation still reports under the old `sid`, with that `sid`'s next sequence number. The ended `sid` state keeps a copy of each reporter's store, so a late response reads the values at rotation and not the live store.
 
@@ -412,7 +412,8 @@ A derived key is a key the reporter computes from state it observes. A derived d
 | `ts` | the clock at emission | report | wins for that report |
 | `msd` | the first `sta` s to the next `sta` p, carried across `rotate()` while in progress | session, sent once per target | wins, stops tracking |
 | `bs` | `sta` entering or remaining in r since the target's last report | target and reporter, cleared by the first report after the stall | wins for that report |
-| `bsa`, `bsda` | completed stalls between `sta` transitions | session totals per cause | wins, stops tracking |
+| `bsa` | each `sta` transition into r, and a stall carried across `rotate()` | session total | wins, stops tracking |
+| `bsda` | completed stalls between `sta` transitions | session total | wins, stops tracking |
 | `bsd` | one completed stall per entry, one entry per cause per report | pending samples per cause, one cursor per cause per target | appended as a sample, stops tracking |
 | `su` | in s, k, or r, or no p since one | reporter | wins |
 | `dl` | `bl` divided by `pr`, nearest 100 ms, only when `pr` is over 0 | reporter | wins |
@@ -421,7 +422,7 @@ A derived key is a key the reporter computes from state it observes. A derived d
 | `url`, `rc`, `ts`, `ttfb`, `ttlb` | request URL, status, timing | response | wins |
 | `cmsds`, `cmsdd` | `CMSD-Static` and `CMSD-Dynamic` response headers | response | wins |
 
-`bsa` counts the transitions into `r`. `bsda` and `bsd` count completed stalls only. A stall still open at `dispose()` is dropped. Automatic `bsa`, `bsd`, and `bsda` entries have no cause token. Each completed stall is reported to each destination once, on the next report to that destination, in order. A report carries at most one `bsd` value per cause, per spec item 14. A second stall of the same cause waits for the next report to that destination. The pending samples are capped at 100 per cause, and the oldest is dropped past the cap. When no destination can report `bsd`, no samples are kept.
+A stall still open at `dispose()` is dropped. Automatic `bsa`, `bsd`, and `bsda` entries have no cause token. Each completed stall is reported to each destination once, on the next report to that destination, in order. A report carries at most one `bsd` value per cause, per spec item 14. A second stall of the same cause waits for the next report to that destination. The pending samples are capped at 100 per cause, and the oldest is dropped past the cap. When no destination can report `bsd`, no samples are kept.
 
 `url` is the request URL without its `CMCD` parameter. `rc` is `0` when `status` is absent. `ts` for a response is the request start. `ttfb` is omitted when `responseStart` is absent, zero, or earlier than `startTime`. Resource Timing reports zero there for a cross-origin resource without `Timing-Allow-Origin`. `ttlb` is omitted when neither `duration` nor a usable `responseEnd` exists and no start time was recorded. `ttfbb` and `smrt` have no derivation and come only from `CmcdResponseData`.
 
@@ -609,7 +610,7 @@ stateDiagram-v2
 
 Runtime data never throws. An unknown or empty value is omitted, as the spec requires. A value the structured-field encoder cannot serialize throws at the call that produced it, and nothing is committed. `createReporter()` on a disposed session throws. Every other call on a disposed reporter or session is a no-op.
 
-`onError` receives the errors that have no caller. Those are a transform or encoding failure on an interval tick, and a requester that still fails after the back-off cap. Without `onError`, those errors are thrown from the timer callback, as today. In both paths the error is an `Error`. Its message names the target URL and the stage, one of transform, encode, or send. Its `cause` is the requester's error when one exists.
+`onError` receives the errors that have no caller. Those are a transform or encoding failure on an interval tick. The same failure on the visibility listener or on the derived `h` event has no caller either. `decorate()` still returns the decorated request when the `h` event fails. A requester that still fails after the back-off cap also goes to `onError`. Without `onError`, those errors are thrown from the timer callback, as today. In both paths the error is an `Error`. Its message names the target URL and the stage, one of transform, encode, or send. Its `cause` is the requester's error when one exists.
 
 ### Bundle and performance
 

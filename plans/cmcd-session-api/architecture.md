@@ -160,7 +160,7 @@ For each event target of the `sid` state that was current when the call began, w
 1. Assemble the report (below).
 2. Run `emitReport` for the target (below). Collect the first thrown error.
 3. After every target, process the target queues.
-4. Rethrow the collected error. On a timer tick, pass it to `onError` instead, or throw when `onError` is absent.
+4. Rethrow the collected error. The interval tick, the visibility listener, and the derived `h` event of `decorate()` have no caller. They pass the error to `onError` instead, or throw it when `onError` is absent. `decorate()` still returns the decorated request.
 
 ### Assemble(reporter, target, event?, data?)
 
@@ -216,8 +216,8 @@ For each live reporter in creation order, assemble with `t` and emit to this one
 2. Resolve the `sid`: the argument, or a new UUID. Throw when it is over 64 characters. Return when it equals the current `sid`.
 3. Set `drainRequested` on every event target of the current `sid` state, dispatch its queues, and set its `ended` flag.
 4. Copy each reporter's store into the old state's `stores`.
-5. Create a new `sid` state with new target states from the configuration. Carry `msdStart` when the old state's `msd` is unset and `msdSupplied` is false.
-6. For each reporter, clear `reported`. When the store has `sta` r, set `spanOpenedAt` to the rotation time and set `bs` on the reporter's entries in the new targets. Otherwise clear `spanOpenedAt`.
+5. Create a new `sid` state with new target states from the configuration. Carry `msdStart` when the old state's `msd` is unset and `msdSupplied` is false. The new state inherits the session `bg` as its `b` baseline.
+6. For each reporter, clear `reported`. When the store has `sta` r, set `spanOpenedAt` to the rotation time. Also set `bs` on the reporter's entries in the new targets, and count that stall in the new state's `bsa`. Otherwise clear `spanOpenedAt`.
 7. Point `current` at the new state. Nothing is emitted.
 
 ### configure(settings)
@@ -250,9 +250,9 @@ Per event target, `processQueue(drain)`:
 | 2xx or 3xx | `attempt = 0`, process the queue again, and clear `drainRequested` once the queue is empty |
 | 410 | `gone = true`, `queue.length = 0` |
 | 429, 5xx, or rejection | unshift the batch, `attempt += 1`, arm `retryTimer` for `min(1000 * 2 ** (attempt - 1), 60000)` ms, then process the queue with `drain` |
-| other 4xx | drop the batch, `attempt = 0`, process the queue again |
+| other 4xx | drop the batch, `attempt = 0`, process the queue again, and clear `drainRequested` once the queue is empty |
 
-`flush()`, `dispose()`, and `rotate()` clear an armed retry timer before they process with `drain`. `flush()` and `dispose()` clear the timers of the current `sid` state. `rotate()` clears those of the state it ends. Once the owning `sid` state has ended, a failure at the 60 second step stops the retries. When the queue is longer than `maxQueueSize` after an unshift or a push, splice the oldest lines off the front.
+`flush()`, `dispose()`, and `rotate()` clear an armed retry timer before they process with `drain`. `flush()` and `dispose()` clear the timers of the current `sid` state. `rotate()` clears those of the state it ends. Once the owning `sid` state has ended, a failure at the 60 second step stops the retries. That give-up error carries the requester's rejection reason as its `cause`. When the queue is longer than `maxQueueSize` after an unshift or a push, splice the oldest lines off the front.
 
 The default requester: `fetch(url, { method: 'POST', headers, body, keepalive: body.length < 65536 })`, returning `{ status }`. A network error rejects.
 

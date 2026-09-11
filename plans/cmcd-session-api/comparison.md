@@ -1,6 +1,6 @@
 # CMCD session API: comparison with `CmcdReporter` and PR #422
 
-Companion to [`rfc/cmcd-session-api.md`](../../rfc/cmcd-session-api.md) and [`architecture.md`](./architecture.md). It compares three paths for the CMCD version 2 reporter. All facts are as of 2026-09-09.
+Companion to [`rfc/cmcd-session-api.md`](../../rfc/cmcd-session-api.md) and [`architecture.md`](./architecture.md). It compares three paths for the CMCD version 2 reporter. All facts are as of 2026-09-09, except the bundle measurements of 2026-09-10.
 
 ## The three paths
 
