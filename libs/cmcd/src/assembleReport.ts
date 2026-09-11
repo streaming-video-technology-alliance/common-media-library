@@ -1,6 +1,5 @@
 import { SfItem } from '@svta/cml-structured-field-values'
 import { CMCD_V2 } from './CMCD_V2.ts'
-import type { CmcdPlaybackData } from './CmcdPlaybackData.ts'
 import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { ReporterState } from './ReporterState.ts'
 import type { SessionState } from './SessionState.ts'
@@ -36,10 +35,11 @@ export function deriveDl(bl: unknown, pr: unknown, ot: unknown): number | undefi
 /**
  * Merges, in this order and later wins: the store, the session data, the per-call data, the target's entry for the reporter,
  * the derived defaults, and the event stamp. `reporter` is `undefined` for a session-only interval line.
+ * `store` replaces the reporter's store, for a response that reports under an ended `sid` state.
  */
-export function assembleReport(session: SessionState, sidState: SidState, target: TargetState, reporter: ReporterState | undefined, event: string | undefined, data: CmcdPlaybackData | undefined, ts: number): AssembledReport {
+export function assembleReport(session: SessionState, sidState: SidState, target: TargetState, reporter: ReporterState | undefined, event: string | undefined, data: Record<string, unknown> | undefined, ts: number, store?: Record<string, unknown>): AssembledReport {
 	const config = session.config
-	const report: Record<string, unknown> = reporter ? { ...reporter.store } : {}
+	const report: Record<string, unknown> = { ...(store ?? reporter?.store ?? {}) }
 	const bsdCauses: string[] = []
 
 	report['sid'] = sidState.sid

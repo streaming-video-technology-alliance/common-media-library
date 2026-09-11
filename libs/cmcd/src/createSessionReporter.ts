@@ -6,6 +6,8 @@ import { CMCD_EVENT_ERROR, CMCD_EVENT_HOSTNAME } from './CmcdEventType.ts'
 import type { CmcdPlaybackData } from './CmcdPlaybackData.ts'
 import type { CmcdRequestLike } from './CmcdRequestLike.ts'
 import type { CmcdRequestRecord } from './CmcdRequestRecord.ts'
+import type { CmcdResponseData } from './CmcdResponseData.ts'
+import type { CmcdResponseInfo } from './CmcdResponseInfo.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionReporter } from './CmcdSessionReporter.ts'
 import type { CmcdSessionReporterConfig } from './CmcdSessionReporterConfig.ts'
@@ -15,6 +17,7 @@ import { copyPlaybackData } from './copyPlaybackData.ts'
 import { deriveStateEvents } from './deriveStateEvents.ts'
 import { emitEvent } from './emitEvent.ts'
 import { emitReport } from './emitReport.ts'
+import { emitResponse } from './emitResponse.ts'
 import { getTargetEntry } from './getTargetEntry.ts'
 import { placeRequestReport } from './placeRequestReport.ts'
 import type { ReporterState } from './ReporterState.ts'
@@ -170,7 +173,8 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 				return finish(request, placed, { sid: sidState.sid, data: {} })
 			}
 			const dataCopy = copyPlaybackData(data)
-			const origin: RequestOrigin = { reporter, sidState, cid: reporter.store['cid'] as string | undefined, data: dataCopy, startedAt: Date.now() }
+			const startedAt = Date.now()
+			const origin: RequestOrigin = { reporter, sidState, cid: reporter.store['cid'] as string | undefined, data: dataCopy, startedAt }
 			let hostChanged = false
 			if (!reporter.hSupplied) {
 				const host = hostOf(request.url)
@@ -179,18 +183,23 @@ export function createSessionReporter(state: SessionState, session: CmcdSession,
 					hostChanged = true
 				}
 			}
-			const assembled = assembleReport(state, sidState, sidState.requestTarget, reporter, undefined, dataCopy, origin.startedAt)
+			const assembled = assembleReport(state, sidState, sidState.requestTarget, reporter, undefined, dataCopy, startedAt)
 			const emitted = emitReport(state, sidState, sidState.requestTarget, reporter, assembled, undefined, request)
 			const placed = placeRequestReport(request, emitted, mode, state.config.headerMap)
 			const record: CmcdRequestRecord = { sid: sidState.sid, data: (emitted?.prepared ?? {}) as Readonly<Cmcd> }
 			CMCD_REQUEST_ORIGINS.set(record, origin)
 			if (hostChanged) {
-				emitEvent(state, reporter, CMCD_EVENT_HOSTNAME, undefined, undefined, origin.startedAt)
+				emitEvent(state, reporter, CMCD_EVENT_HOSTNAME, undefined, undefined, startedAt)
 			}
 			return finish(request, placed, record)
 		},
-		recordResponse() {
-			// Event mode delivery is not implemented yet.
+		recordResponse(request: CmcdRequestLike, info: CmcdResponseInfo, data?: CmcdResponseData) {
+			const record = (request as { cmcd?: unknown }).cmcd
+			const origin = record !== null && typeof record === 'object' ? CMCD_REQUEST_ORIGINS.get(record) : undefined
+			if (!origin && (reporter.disposed || state.disposed)) {
+				return
+			}
+			emitResponse(state, origin ?? { reporter, sidState: state.current, cid: reporter.store['cid'] as string | undefined, data: undefined, startedAt: undefined }, request, info, data)
 		},
 		dispose() {
 			reporter.disposed = true
