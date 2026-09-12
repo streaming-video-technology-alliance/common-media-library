@@ -61,6 +61,17 @@ describe('encodeSfDict', () => {
 		)
 	})
 
+	it('encodes inner lists, parameters, and boolean members', () => {
+		assert.deepStrictEqual(encodeSfDict({ a: [1, 2], b: new SfItem([new SfItem(1, { x: true })], { y: 2 }) }), 'a=(1 2), b=(1;x);y=2')
+		assert.deepStrictEqual(encodeSfDict({ a: new SfItem(true, { p: 1 }), b: true, c: new SfItem(false, { q: 2 }) }), 'a;p=1, b, c=?0;q=2')
+		assert.deepStrictEqual(encodeSfDict({ a: new SfItem('x', { p: 1, q: true }) }), 'a="x";p=1;q')
+	})
+
+	it('rejects invalid keys', () => {
+		assert.throws(() => encodeSfDict(new Map([[1, 2]])), /failed to serialize "1" as Key/)
+		assert.throws(() => encodeSfDict({ A: 1 }), /failed to serialize "A" as Key/)
+	})
+
 	it('handles SfToken and Symbol for tokens', () => {
 		assert.deepStrictEqual(
 			encodeSfDict(new Map([

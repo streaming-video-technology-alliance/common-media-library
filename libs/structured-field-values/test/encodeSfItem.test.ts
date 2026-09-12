@@ -15,6 +15,10 @@ test('encodeSfItem', () => {
 	assert.deepStrictEqual(encodeSfItem(new SfItem(Symbol.for('a'))), `a`)
 	assert.deepStrictEqual(encodeSfItem(new SfItem(new Uint8Array([1, 2, 3]))), `:AQID:`)
 	assert.deepStrictEqual(encodeSfItem(new SfItem(new Date(1659578233000))), `@1659578233`)
+	assert.deepStrictEqual(encodeSfItem('a', { p: 1, q: true }), '"a";p=1;q')
+	assert.deepStrictEqual(encodeSfItem(new SfItem('a', { p: 1 })), '"a";p=1')
+	// @ts-expect-error - This is a test
+	assert.throws(() => encodeSfItem([1, 2]), /as Bare Item/)
 
 	// @ts-expect-error - This is a test
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
