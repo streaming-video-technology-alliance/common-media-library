@@ -14,8 +14,8 @@ and this project adheres to
 
 ### Fixed
 
-- `urlToRelativePath` removes every shared leading path segment before it builds the relative path. The old loop advanced its index while it also shifted both arrays. It compared the wrong segments and removed segments it never compared. A base directory with two segments, such as `/v/1080p/`, returned `../1080p/seg-2.m4s` for a target in the same directory. The correct result is `seg-2.m4s`. When the target and base diverged and matched again at a deeper segment, the old result resolved to a wrong URL
-- `urlToRelativePath` adds a `./` prefix when the result is empty, starts with `/`, or has `:` in its first segment. Without the prefix, the reference resolved to a wrong URL (RFC 3986 section 4.2). This bug existed before the shared-segment fix for a one-segment or root base directory
+- `urlToRelativePath` removes every shared leading path segment. A base directory such as `/v/1080p/` returned `../1080p/seg-2.m4s` for a target in the same directory. The correct result is `seg-2.m4s`. A path that diverged and matched again deeper resolved to a wrong URL
+- `urlToRelativePath` adds a `./` prefix when the result is empty, starts with `/`, or has `:` in its first segment. Without the prefix, the reference resolved to a wrong URL (RFC 3986 section 4.2)
 
 
 ## [1.6.0] - 2026-07-28
