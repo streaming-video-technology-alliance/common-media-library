@@ -38,7 +38,13 @@ export function urlToRelativePath(url: string, base: string): string {
 	}
 
 	// add back paths
-	const relativePath = '../'.repeat(fromPath.length - common) + toPath.slice(common).join('/')
+	const ups = fromPath.length - common
+	let relativePath = '../'.repeat(ups) + toPath.slice(common).join('/')
+
+	// RFC 3986 section 4.2: a relative-path reference cannot be empty, start with "/", or have ":" in its first segment
+	if (ups === 0 && (relativePath === '' || relativePath.startsWith('/') || toPath[common].includes(':'))) {
+		relativePath = './' + relativePath
+	}
 
 	// preserve query parameters and hash of the destination url
 	return relativePath + to.search + to.hash

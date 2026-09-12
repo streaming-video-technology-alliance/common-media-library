@@ -85,4 +85,42 @@ describe('urlToRelativePath', () => {
 		const base = getBaseUrl('https://cdn.example.com/v/1080p/init/seg-1.m4s')
 		equal(urlToRelativePath('https://cdn.example.com/v/720p/init/seg-2.m4s', base), '../../720p/init/seg-2.m4s')
 	})
+
+	it('prefixes ./ when the first segment contains a colon', () => {
+		const request = 'https://cdn.example.com/v/1080p/seg-1.m4s'
+		const target = 'https://cdn.example.com/v/1080p/seg:2.m4s'
+		const result = urlToRelativePath(target, getBaseUrl(request))
+		equal(result, './seg:2.m4s')
+		equal(new URL(result, request).href, target)
+	})
+
+	it('prefixes ./ when the target has an empty segment after the base directory', () => {
+		const request = 'https://cdn.example.com/v/1080p/seg-1.m4s'
+		const target = 'https://cdn.example.com/v/1080p//seg-2.m4s'
+		const result = urlToRelativePath(target, getBaseUrl(request))
+		equal(result, './/seg-2.m4s')
+		equal(new URL(result, request).href, target)
+	})
+
+	it('returns ./ when the target is the base directory', () => {
+		const request = 'https://cdn.example.com/v/1080p/seg-1.m4s'
+		const target = 'https://cdn.example.com/v/1080p/'
+		const result = urlToRelativePath(target, getBaseUrl(request))
+		equal(result, './')
+		equal(new URL(result, request).href, target)
+	})
+
+	it('returns ./ with the query when the target is the root directory with a query', () => {
+		const request = 'http://test.com/manifest.mpd'
+		const target = 'http://test.com/?x=1'
+		const result = urlToRelativePath(target, getBaseUrl(request))
+		equal(result, './?x=1')
+		equal(new URL(result, request).href, target)
+	})
+
+	it('does not prefix ./ when the colon is not in the first segment', () => {
+		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
+		equal(urlToRelativePath('https://cdn.example.com/v/1080p/hi/seg:2.m4s', base), 'hi/seg:2.m4s')
+		equal(urlToRelativePath('https://cdn.example.com/v/seg:2.m4s', base), '../seg:2.m4s')
+	})
 })
