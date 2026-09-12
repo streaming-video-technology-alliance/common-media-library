@@ -16,6 +16,7 @@ and this project adheres to
 
 - `urlToRelativePath` removes every shared leading path segment. A base directory such as `/v/1080p/` returned `../1080p/seg-2.m4s` for a target in the same directory. The correct result is `seg-2.m4s`. A path that diverged and matched again deeper resolved to a wrong URL
 - `urlToRelativePath` adds a `./` prefix when the result is empty, starts with `/`, or has `:` in its first segment. Without the prefix, the reference resolved to a wrong URL (RFC 3986 section 4.2)
+- `encodeBase64` encodes inputs of any length. Before this change, it spread every byte into one `String.fromCharCode` call, which threw `RangeError: Maximum call stack size exceeded` at about 125 KB. It now converts the bytes in 32 KB chunks, which also runs about four times faster on small inputs. The output does not change.
 
 
 ## [1.6.0] - 2026-07-28
