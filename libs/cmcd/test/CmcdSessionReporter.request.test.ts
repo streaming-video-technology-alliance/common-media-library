@@ -112,4 +112,27 @@ describe('CmcdSessionReporter request mode', () => {
 		const value = queryValue(req.url)
 		equal(value.includes('nor="seg-%F0%9F%98%80.mp4"'), true)
 	})
+
+	it('relativizes nor against the request directory, cached across a run and re-derived on a directory change', () => {
+		const session = createCmcdSession({ sid: 's', keys: ['nor', 'sid'] })
+		const reporter = session.createReporter()
+		const norOf = (url: string, nor: string): unknown => reporter.decorate({ url }, { nor }).cmcd.data.nor
+		// Same directory, twice, so the second decoration uses the cached base.
+		deepEqual(norOf('https://cdn.example.com/media/seg-1.m4s', 'https://cdn.example.com/media/seg-2.m4s'), ['seg-2.m4s'])
+		deepEqual(norOf('https://cdn.example.com/media/seg-3.m4s', 'https://cdn.example.com/media/seg-4.m4s'), ['seg-4.m4s'])
+		// A subdirectory and a sibling directory.
+		deepEqual(norOf('https://cdn.example.com/media/seg-5.m4s', 'https://cdn.example.com/media/hi/seg-6.m4s'), ['hi/seg-6.m4s'])
+		deepEqual(norOf('https://cdn.example.com/media/seg-7.m4s', 'https://cdn.example.com/audio/seg-8.m4s'), ['../audio/seg-8.m4s'])
+		// A different origin stays absolute.
+		deepEqual(norOf('https://cdn.example.com/media/seg-9.m4s', 'https://other.example.net/x/seg-10.m4s'), ['https://other.example.net/x/seg-10.m4s'])
+		// A request from a new directory re-derives the base, so relativization follows the new directory.
+		deepEqual(norOf('https://cdn.example.com/backup/seg-11.m4s', 'https://cdn.example.com/backup/seg-12.m4s'), ['seg-12.m4s'])
+	})
+
+	it('keeps an absolute nor when the request URL is relative, so no base can be parsed', () => {
+		const session = createCmcdSession({ sid: 's', keys: ['nor', 'sid'] })
+		const reporter = session.createReporter()
+		const req = reporter.decorate({ url: '/v/1080p/seg-1.m4s' }, { nor: 'https://cdn.example.com/v/1080p/seg-2.m4s' })
+		deepEqual(req.cmcd.data.nor, ['https://cdn.example.com/v/1080p/seg-2.m4s'])
+	})
 })

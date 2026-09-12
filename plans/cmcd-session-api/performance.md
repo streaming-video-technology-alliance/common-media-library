@@ -10,6 +10,8 @@ The one-pass change speeds up every report path by 13 to 20 percent and allocate
 
 A second change caches the request host, so `decorate()` parses a URL only when the authority changes. It removes one URL allocation per decoration, about 100 to 150 bytes. The time effect is within noise, because the host parse was a small part of the decorate path.
 
+A third change relativizes `nor` without re-parsing the base URL on every request. It parses the base once per directory and each `nor` target once, where the first implementation parsed the base twice per request. Every report path that carries `nor` is 5 to 12 percent faster and allocates 350 to 1,300 bytes less. The wire output is unchanged.
+
 The session API is still slower than `main` on three paths that do not matter for a player. Those paths are construction, a metrics-only `update()`, and a stall transition. No implementation leaks.
 
 ## Method
@@ -104,6 +106,22 @@ Microseconds per operation, median and 90th percentile, then heap bytes allocate
 
 The response path does not decorate, and its allocation does not move, which confirms the saving is the URL object that decoration no longer builds. The time change is within the spread between passes. The gain is one fewer allocation per request, which scales with the request rate, at a cost of one regular expression in the source.
 
+### The effect of caching the nor base
+
+`formatNor` derived the base URL with `getBaseUrl`, which parsed the request URL, then called `urlToRelativePath`, which parsed the base again and each `nor` target. That is three URL parses for a single `nor` target. The base is now parsed once, cached per reporter by the request directory, and reused. Each `nor` target still parses once, which the path normalization requires. The measurement is a run of the pre-change build against the change.
+
+| Scenario | Before | After | Change |
+|---|---|---|---|
+| decorate, query | 22.97 us, 19,318 B | 21.07 us, 18,358 B | 8% faster, 960 B less |
+| decorate, headers | 29.21 us, 28,743 B | 27.25 us, 28,394 B | 7% faster, 349 B less |
+| record response | 36.69 us, 22,061 B | 32.26 us, 21,202 B | 12% faster, 859 B less |
+| segment cycle, one event target | 59.47 us, 46,121 B | 56.70 us, 44,843 B | 5% faster, 1,278 B less |
+| segment cycle, request mode only | 28.28 us, 22,961 B | 26.81 us, 21,941 B | 5% faster, 1,020 B less |
+
+The response report carries the request's `nor` in its `rr` line, so it relativizes and benefits too. In the decorate profile the `node:internal/url` self time fell from 4.3 percent to 1.1 percent, and `urlToRelativePath` from `@svta/cml-utils` no longer appears. The remaining URL work is `relativePath`, which parses each `nor` target once.
+
+While inlining the relativization, a pre-existing defect surfaced in the shared `urlToRelativePath`. It mis-relativizes when the base directory has two common path segments, so `https://cdn.example.com/v/1080p/seg-2.m4s` against a same-directory request becomes `../1080p/seg-2.m4s` instead of `seg-2.m4s`. One and three segments are correct. The inlined `relativePath` reproduces the current output exactly, so this change alters no wire bytes. The defect is filed as a separate task, since fixing it changes output and also touches the legacy reporter through the same util.
+
 ### The merged session API against `main`
 
 `session-merged` against `reporter-main`, the implementation that ships next.
@@ -157,10 +175,11 @@ The paths where the session API is slower do not add up to anything. Constructio
 ## Recommendations
 
 1. **Merge the two preparation passes. Done on this branch.** `prepareReport` replaces `normalizeReport` and `filterReport` with one sorted pass. It closed the response-path gap and sped up every report path.
-2. **Cache the request host. Done on this branch.** `decorate()` compares the `scheme://authority` prefix and parses a URL only when it changes. It removes one URL allocation per request in the steady state. The `nor` relativization in `formatNor` still parses a URL per request, which is the next allocation to remove on the decorate path.
-3. **Rebase PR #422 onto `main`** before comparing it on the response path. Its base predates PR #459. On its own paths the refactor keeps its promise of no new per-report allocation.
-4. **Two pre-existing costs in `CmcdReporter`** are worth a fix on `main` whatever happens to the session API. `createEncodingOptions` allocates a `Set` of the enabled keys and a filter closure on every report. The request path parses and re-serializes the URL with `URLSearchParams` for one query parameter.
-5. **Add the harness to the review checklist** of the RFC. The bundle probe and this harness together give the two numbers the priorities ask for. Both ran for the first time after the implementation was complete.
+2. **Cache the request host. Done on this branch.** `decorate()` compares the `scheme://authority` prefix and parses a URL only when it changes. It removes one URL allocation per request in the steady state.
+3. **Cache the nor base. Done on this branch.** `formatNor` parses the base once per directory and reuses it, in place of two base parses per request. Every report path that carries `nor` is 5 to 12 percent faster. A separate task tracks the relativization defect found while doing this.
+4. **Rebase PR #422 onto `main`** before comparing it on the response path. Its base predates PR #459. On its own paths the refactor keeps its promise of no new per-report allocation.
+5. **Two pre-existing costs in `CmcdReporter`** are worth a fix on `main` whatever happens to the session API. `createEncodingOptions` allocates a `Set` of the enabled keys and a filter closure on every report. The request path parses and re-serializes the URL with `URLSearchParams` for one query parameter.
+6. **Add the harness to the review checklist** of the RFC. The bundle probe and this harness together give the two numbers the priorities ask for. Both ran for the first time after the implementation was complete.
 
 ## Reproduce
 

@@ -1,4 +1,5 @@
 import { SfToken } from '@svta/cml-structured-field-values'
+import type { BaseParts } from './BaseParts.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventTransform } from './CmcdEventTransform.ts'
@@ -6,6 +7,7 @@ import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestLike } from './CmcdRequestLike.ts'
 import type { AssembledReport } from './assembleReport.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
+import { parseBaseUrl } from './formatNor.ts'
 import { getKeySpec } from './getKeySpec.ts'
 import { normalizeValue, toTokenText } from './normalizeValue.ts'
 import type { PrepareContext } from './PrepareContext.ts'
@@ -58,6 +60,28 @@ function toTransformView(normalized: Record<string, unknown>): Record<string, un
 		}
 	}
 	return view
+}
+
+const PATH_END = /[?#]/
+
+/**
+ * The parsed base URL for `nor` relativization. A reporter caches the parse by the request URL's directory, so a run of
+ * requests to one directory parses one base. A response fanned out to several targets parses one base for the group.
+ */
+function resolveBase(reporter: ReporterState | undefined, url: string | undefined): BaseParts | null {
+	if (url === undefined) {
+		return null
+	}
+	if (!reporter) {
+		return parseBaseUrl(url)
+	}
+	const stop = PATH_END.exec(url)?.index ?? url.length
+	const key = url.slice(0, url.lastIndexOf('/', stop - 1) + 1)
+	if (key !== reporter.baseKey) {
+		reporter.baseKey = key
+		reporter.baseParts = parseBaseUrl(url)
+	}
+	return reporter.baseParts
 }
 
 /** Names the stage and the target in a report error. The original error becomes `cause`. */
@@ -116,6 +140,7 @@ export function emitReport(session: SessionState, sidState: SidState, target: Ta
 		event,
 		keys: targetConfig ? targetConfig.keys : config.keys,
 		baseUrl: request?.url,
+		base: resolveBase(reporter, request?.url),
 	}
 	const transform = targetConfig ? targetConfig.transform : config.transform
 	let report: Record<string, unknown> | undefined = assembled.report

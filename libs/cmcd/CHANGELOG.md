@@ -18,6 +18,7 @@ and this project adheres to
 - The `Cmcd` type documentation links to the CTA-5004-B specification. It linked only to the version 1 PDF
 - The session API prepares each report in one pass over its keys, with one key spec lookup per key. The first implementation normalized in one pass and filtered in a second. The wire output is unchanged
 - The session API derives the request host from the URL only when the `scheme://authority` prefix changes. A run of requests to one CDN parses one URL instead of one per request. The `h` event and the derived `h` key are unchanged
+- The session API relativizes `nor` against the request URL without re-parsing the base on every request. It parses the base once per directory and reuses it, and it parses each `nor` target once. The wire output is unchanged
 
 ### Fixed
 

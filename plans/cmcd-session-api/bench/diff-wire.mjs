@@ -45,11 +45,25 @@ async function run(distPath) {
 		const tick = () => (ts += 250)
 		primary.update({ sf: 'd', st: 'v', sta: 's', bl: 0, mtp: 15000, pr: 1, ts: tick() })
 		const requests = []
+		// The nor target varies by directory, origin, query, and hash, so relativization is tested on its hard paths.
+		const norVariants = [
+			`${CDN}/seg-N.m4s`,                                  // same directory
+			`${CDN}/sub/seg-N.m4s`,                              // subdirectory
+			`https://cdn.example.com/v/audio/seg-N.m4s`,         // sibling directory, needs ..
+			`https://other.example.net/v/1080p/seg-N.m4s`,       // cross origin, kept absolute
+			`${CDN}/seg-N.m4s?tok=abc#part`,                     // query and hash preserved
+			`/v/1080p/seg-N.m4s`,                                // relative, no origin
+		]
 		for (let i = 0; i < 40; i++) {
+			const next = norVariants[i % norVariants.length].replace('N', String(i + 1))
 			const data = i % 7 === 0
 				? { ot: 'm', d: 0, br: { v: 3000 + i, a: 128 }, ab: { v: 3200 }, nor: { url: `${CDN}/manifest.mpd`, range: '0-99' } }
-				: { ot: i % 5 === 0 ? 'a' : 'v', d: 4004 + i, br: { v: 3000 + i, a: 128 }, tb: { v: 6000, a: 300 }, tpb: { v: 5000 }, nor: [`${CDN}/seg-${i + 1}.m4s`, { url: `${CDN}/seg-${i + 2}.m4s`, range: '100-200' }], 'com.example-tag': `t${i}`, pr: i % 9 === 0 ? 1 : 1.5 }
-			const req = primary.decorate({ url: i % 7 === 0 ? `${CDN}/manifest.mpd?x=1#frag` : `${CDN}/seg-${i}.m4s`, headers: { range: 'bytes=0-9' } }, data)
+				: { ot: i % 5 === 0 ? 'a' : 'v', d: 4004 + i, br: { v: 3000 + i, a: 128 }, tb: { v: 6000, a: 300 }, tpb: { v: 5000 }, nor: [next, { url: `${CDN}/seg-${i + 2}.m4s`, range: '100-200' }], 'com.example-tag': `t${i}`, pr: i % 9 === 0 ? 1 : 1.5 }
+			// Every eighth request comes from a different directory, so the base cache key changes.
+			const requestUrl = i % 7 === 0
+				? `${CDN}/manifest.mpd?x=1#frag`
+				: i % 8 === 0 ? `https://cdn.example.com/w/720p/seg-${i}.m4s` : `${CDN}/seg-${i}.m4s`
+			const req = primary.decorate({ url: requestUrl, headers: { range: 'bytes=0-9' } }, data)
 			requests.push(req)
 			if (i === 2) {
 				primary.update({ sta: 'p', bl: 4000, ts: tick() })
