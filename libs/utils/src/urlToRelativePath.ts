@@ -30,25 +30,15 @@ export function urlToRelativePath(url: string, base: string): string {
 	const toPath = to.pathname.split('/').slice(1)
 	const fromPath = from.pathname.split('/').slice(1, -1)
 
-	// remove common parents
-	const length = Math.min(toPath.length, fromPath.length)
+	// count common parents, stopping before the destination file
+	let common = 0
 
-	for (let i = 0; i < length; i++) {
-		if (toPath[i] !== fromPath[i]) {
-			break
-		}
-
-		toPath.shift()
-		fromPath.shift()
+	while (common < toPath.length - 1 && common < fromPath.length && toPath[common] === fromPath[common]) {
+		common++
 	}
 
 	// add back paths
-	while (fromPath.length) {
-		fromPath.shift()
-		toPath.unshift('..')
-	}
-
-	const relativePath = toPath.join('/')
+	const relativePath = '../'.repeat(fromPath.length - common) + toPath.slice(common).join('/')
 
 	// preserve query parameters and hash of the destination url
 	return relativePath + to.search + to.hash

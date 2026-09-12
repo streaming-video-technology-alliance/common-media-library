@@ -12,6 +12,10 @@ and this project adheres to
 
 - README: the usage example prints its results instead of calling an undefined `assert`. Several of those calls compared typed arrays with `===`.
 
+### Fixed
+
+- `urlToRelativePath` removes every shared leading path segment before it builds the relative path. The old loop advanced its index while it also shifted both arrays. It compared the wrong segments and removed segments it never compared. A base directory with two segments, such as `/v/1080p/`, returned `../1080p/seg-2.m4s` for a target in the same directory. The correct result is `seg-2.m4s`. When the target and base diverged and matched again at a deeper segment, the old result resolved to a wrong URL
+
 
 ## [1.6.0] - 2026-07-28
 
