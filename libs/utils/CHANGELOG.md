@@ -12,6 +12,10 @@ and this project adheres to
 
 - README: the usage example prints its results instead of calling an undefined `assert`. Several of those calls compared typed arrays with `===`.
 
+### Fixed
+
+- `encodeBase64` encodes inputs of any length. Before this change, it spread every byte into one `String.fromCharCode` call, which threw `RangeError: Maximum call stack size exceeded` at about 125 KB. It now converts the bytes in 32 KB chunks, which also runs about four times faster on small inputs. The output does not change.
+
 
 ## [1.6.0] - 2026-07-28
 
