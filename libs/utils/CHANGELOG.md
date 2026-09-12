@@ -12,6 +12,11 @@ and this project adheres to
 
 - README: the usage example prints its results instead of calling an undefined `assert`. Several of those calls compared typed arrays with `===`.
 
+### Fixed
+
+- `urlToRelativePath` removes every shared leading path segment. A base directory such as `/v/1080p/` returned `../1080p/seg-2.m4s` for a target in the same directory. The correct result is `seg-2.m4s`. A path that diverged and matched again deeper resolved to a wrong URL
+- `urlToRelativePath` adds a `./` prefix when the result is empty, starts with `/`, or has `:` in its first segment. Without the prefix, the reference resolved to a wrong URL (RFC 3986 section 4.2)
+
 
 ## [1.6.0] - 2026-07-28
 
