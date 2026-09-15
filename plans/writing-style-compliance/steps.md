@@ -480,3 +480,34 @@ Casey creates the PR with `/create-pr`.
 | Twenty-two files | Before | After |
 |---|---|---|
 | Prose words | 10,613 | 10,460 |
+
+---
+
+### Task 9: TSDoc pass for cmcd, structured-field-values, and utils
+
+**Files:** every `libs/cmcd/src/**/*.ts`, `libs/structured-field-values/src/**/*.ts`, and `libs/utils/src/**/*.ts` file with a `/** */` comment, and the three changelogs. Issue #435 proposed one package per PR. Casey asked for one PR with the three packages of the next release.
+
+**Base:** `main` at commit e19894df.
+
+- [x] **Step 1: Create the branch** `issue/435-tsdoc-cmcd-sfv-utils` from `main`.
+- [x] **Step 2: Write `check-tsdoc.sh`**, the comment-aware variant of `check.sh`. It reads the prose of every TSDoc comment. Three checks differ from `check.sh`. `code` is new: the file without its comments is unchanged. `blocks` compares the fenced code inside comments and the `{@includeCode}` tags. `tags` replaces `links`: block tags, modifier tags, `@param` names, `@defaultValue` values, and `{@link}` targets are unchanged.
+- [x] **Step 3: Record the baseline** in `inventory.md` with `tsdoc-metrics.ts`.
+- [x] **Step 4: Rewrite the prose.** One agent per file group for cmcd, in parallel: `CmcdReporter.ts`, `CmcdRequest.ts` with `CmcdV1.ts`, the ten mid-size types, the other 60 types and constants, and the 40 functions. utils and structured-field-values by hand. Spec text keeps its MUST, SHOULD, and MAY words.
+- [x] **Step 5: Verify.** Run `check-tsdoc.sh` against `main` for every file. Read the whole diff for meaning drift. Build the three packages, run their tests, run the typecheck, and build the docs. Compare the docs build warnings and the `api.md` reports with the base.
+- [x] **Step 6: Update the changelogs** with a note under `## [Unreleased]` in each package. Record the after metrics in `inventory.md`.
+- [x] **Step 7: Commit and push.** One commit per package and one for the plan files.
+
+**Outcome (2026-09-15):** 71 source files and 3 changelogs changed. Every check passed for every file. The cmcd build, the tests of the three packages, the typecheck, and the docs build passed. The API reports did not change. The API Extractor warnings for cmcd and the typedoc warnings are the same as at the base commit. Some comments had wrong facts, and the rewrite fixed them:
+
+- The `encodeSfDict` and `encodeSfList` summaries named a dictionary as the output.
+- The `appendCmcdHeaders` summary said query args.
+- The `isCmcdResponseReceivedKey` return description said request key.
+- The `CmcdEventType` constants called their values keys.
+- The `CmcdV1` `mtp` title had a stray key name.
+
+The other suspected errors are listed in `overview.md` under "Noticed, not changed (Task 9)".
+
+| Three packages | Before | After |
+|---|---|---|
+| Prose words | 12,858 | 12,588 |
+| Sentences over 25 words | 66 | 0 |

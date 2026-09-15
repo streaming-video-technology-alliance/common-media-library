@@ -168,3 +168,29 @@ The sweep removed the abbreviation definitions that tranches 1 to 7 added, and t
 | `libs/dash/README.md` | 4 | 1 | 4.0 | 0 (0%) | 18.4 | none |
 | `libs/iso-bmff/docs/writing-boxes.md` | 190 | 17 | 11.2 | 1 (6%) | 6.0 | none |
 | `rfc/README.md` | 307 | 26 | 11.8 | 2 (8%) | 9.2 | none |
+
+## TSDoc: cmcd, structured-field-values, utils
+
+Issue #435 tracks the TSDoc pass. The first PR covers the three packages of the next release. `tsdoc-metrics.ts`, in the same folder as `prose-metrics.ts`, produced the numbers. The script reads every `/** */` comment the way `check-tsdoc.sh` does. It removes fenced code blocks and tag words. Code spans, URLs, `{@link}` targets, and `{@includeCode}` tags count as one word each. Each block tag and each list item starts a paragraph. At commit e19894df, `check-tsdoc.sh` reported failures for 43 files:
+
+- 14 files with an em dash or a semicolon
+- 19 files with a sentence over 25 words
+- 10 files with "e.g." or "i.e."
+
+### Baseline (commit e19894df, 2026-09-15)
+
+| Package | Files with TSDoc | Comments | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|---|---|
+| `libs/cmcd` | 113 | 387 | 11774 | 1122 | 10.5 | 66 (6%) | 6.4 | therefore(1), fan-out(1), frozen(6), holds(3), carries(7), carry(6), shape(11), shaped(1), come from(1), stays(3), e.g.(11) |
+| `libs/structured-field-values` | 51 | 58 | 287 | 47 | 6.1 | 0 (0%) | 6.0 | none |
+| `libs/utils` | 38 | 64 | 797 | 117 | 6.8 | 0 (0%) | 6.1 | stay(1), stays(1), e.g.(1), i.e.(1) |
+
+### After Task 9 (2026-09-15)
+
+`check-tsdoc.sh` passes every check for every file in the three packages: 1744 PASS lines and no FAIL. The rewrite changed 57 cmcd files, 2 structured-field-values files, and 12 utils files.
+
+| Package | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `libs/cmcd` | 11527 | 1259 | 9.2 | 0 (0%) | 6.0 | therefore(7), frozen(6), comes from(1), come from(2), stays(1) |
+| `libs/structured-field-values` | 287 | 47 | 6.1 | 0 (0%) | 5.7 | none |
+| `libs/utils` | 774 | 117 | 6.6 | 0 (0%) | 5.9 | none |
