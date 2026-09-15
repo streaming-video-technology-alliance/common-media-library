@@ -2,12 +2,12 @@
  * Utility type that marks every property of a given type as `readonly`,
  * recursively.
  *
- * `Readonly<T>` stops at the top level, so a nested object stays writable and
- * `value.nested.field = …` still compiles. This applies at every depth,
+ * `Readonly<T>` stops at the top level, so a nested object remains writable and
+ * `value.nested.field = …` still compiles. `DeepReadonly` applies at every depth,
  * including through arrays.
  *
- * Functions are left unchanged so callbacks carried on a value stay callable,
- * and primitives are returned as they are.
+ * Functions keep their type, so callbacks on a value remain callable.
+ * Primitives keep their type.
  *
  * @typeParam T - The type to make deeply readonly.
  *

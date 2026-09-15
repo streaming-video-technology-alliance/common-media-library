@@ -23,7 +23,7 @@ export type HttpRequest<D = any> = {
 	body?: BodyInit;
 
 	/**
-	 * The response type with which the response from the server shall be compatible.
+	 * The type that the response from the server must be compatible with.
 	 */
 	responseType?: RequestResponseType;
 
@@ -33,18 +33,18 @@ export type HttpRequest<D = any> = {
 	headers?: Record<string, string>;
 
 	/**
-	 * Indicates whether the user agent should send or receive cookies from the other domain in the case of cross-origin requests.
+	 * Whether the user agent should send or receive cookies from the other domain in cross-origin requests.
 	 */
 	credentials?: RequestCredentials;
 
 	/**
-	 * The mode of the request (e.g., cors, no-cors, same-origin, etc).
+	 * The mode of the request, for example cors, no-cors, or same-origin.
 	 */
 	mode?: RequestMode;
 
 	/**
-	 * The number of milliseconds the request can take before automatically being terminated.
-	 * If undefined or value is 0 then there is no timeout.
+	 * The number of milliseconds the request may take before it is terminated.
+	 * If the value is undefined or 0, there is no timeout.
 	 */
 	timeout?: number;
 

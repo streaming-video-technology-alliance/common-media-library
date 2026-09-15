@@ -1,7 +1,7 @@
 
 /**
- * Converts a string to a Uint8Array. Similar to `TextEncoder.encode`
- * but with a fallback for environments that don't support `TextEncoder`.
+ * Converts a string to a Uint8Array. The function works like
+ * `TextEncoder.encode` and also supports environments without `TextEncoder`.
  *
  * @param data - The string to encode.
  * @returns The Uint8Array representation of the string.

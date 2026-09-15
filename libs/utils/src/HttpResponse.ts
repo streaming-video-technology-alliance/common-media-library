@@ -20,7 +20,7 @@ export type HttpResponse<R extends HttpRequest = HttpRequest> = {
 	url?: string;
 
 	/**
-	 * Indicates whether or not the request was redirected.
+	 * Whether the request was redirected.
 	 */
 	redirected?: boolean;
 

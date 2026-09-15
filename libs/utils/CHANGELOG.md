@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- TSDoc: the comment prose is rewritten for readers who do not read English as a first language. Signatures, examples, tags, and links are unchanged.
 - README: the usage example prints its results instead of calling an undefined `assert`. Several of those calls compared typed arrays with `===`.
 
 ### Fixed

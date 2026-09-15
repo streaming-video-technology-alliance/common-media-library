@@ -1,5 +1,5 @@
 /**
- * Resource Timing. This is a subset of the `PerformanceResourceTiming` interface.
+ * A subset of the `PerformanceResourceTiming` interface.
  * https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming
  *
  * @public
