@@ -26,6 +26,7 @@ and this project adheres to
 - `CmcdReporter` event report bodies no longer end with a line feed. CTA-5004-B separates records with a single line feed and forbids a trailing one
 - `validateCmcdStructure` reports an error when `d` or `tpb` is present with an `ot` that the key does not allow. It also reports an error when `ab`, `lab`, or `tab` is present with `br`, `lb`, or `tb`. The message names the keys and the allowed object types. The checks apply to version 2 payloads and run in every validator
 - `validateCmcdEvents` and `validateCmcdEventReport` report an error when the body ends with a line feed. Every earlier `CmcdReporter` sent that line feed. A receiver that upgrades marks reports from those players as invalid
+- `nor` is the shortest relative path when the request URL and `baseUrl` share two or more leading path segments. A `baseUrl` directory such as `/v/1080p/` produced `nor=("../1080p/seg-2.m4s")` for a segment in the same directory. The value is now `nor=("seg-2.m4s")`. A value that is empty, starts with `/`, or has `:` in its first segment gets a `./` prefix. This is a wire output change
 
 ## [2.6.1] - 2026-09-07
 
