@@ -1,5 +1,5 @@
 /**
- * A collection of tools for content steering.
+ * A collection of tools for working with content steering.
  *
  * @packageDocumentation
  *

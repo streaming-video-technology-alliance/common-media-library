@@ -1,5 +1,5 @@
 /**
- * A collection of tools for DRM.
+ * A collection of tools for working with DRM.
  *
  * @packageDocumentation
  *

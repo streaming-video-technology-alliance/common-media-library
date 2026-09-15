@@ -92,7 +92,7 @@ The readability metrics in `inventory.md` come from a second script that is not 
 - 2026-09-03: tranche 7 on branch `docs/writing-style-fixes`, stacked on the tranche 6 branch. It fixes every item in the "Noticed, not changed" sections below and the cmaf-ham sample script. PR #441.
 - 2026-09-03: Casey removed the abbreviation rule and the Terms list rule from `AGENTS.md`. PR #442. Video developers know the abbreviations, and a reader who does not can search for them.
 - 2026-09-03: tranche 8 on branch `docs/writing-style-sweep`, from `main` after #441 merged. It reverts the 45 definitions that tranches 1 to 7 added in 22 files. It also removes the Terms table from the CMCD user guide. PR #443.
-- 2026-09-15: TSDoc pass for cmcd, structured-field-values, and utils on branch `issue/435-tsdoc-cmcd-sfv-utils`, from `main`. Issue #435 proposed one package per PR. Casey asked for one PR with the three packages of the next release. `check-tsdoc.sh` is the comment-aware check script. PR #466. A review round on the same day applied Casey's decisions on the noticed facts and changed the package summary in ten `index.ts` files.
+- 2026-09-15: TSDoc pass for cmcd, structured-field-values, and utils on branch `issue/435-tsdoc-cmcd-sfv-utils`, from `main`. Issue #435 proposed one package per PR. Casey asked for one PR with the three packages of the next release. `check-tsdoc.sh` is the comment-aware check script. PR #466. A review round on the same day applied Casey's decisions on the noticed facts.
 
 ## Noticed, not changed (tranche 1)
 
@@ -158,5 +158,5 @@ Changed in the review round:
 - `libs/cmcd/src/CmcdReportConfig.ts`: the `enabledKeys` comment says other options may require keys "specifically in event mode" and does not name the options.
 - The cmcd comments name the versions in three ways: "v1", "V1", and "version 1". Casey chose "version 1" and "version 2".
 - `libs/cmcd/src/prepareCmcdData.ts` has a `//` comment with "e.g." and an em dash. Line comments were out of scope for the TSDoc pass. Casey asked for the five such comments in the three packages to change.
-- Every `index.ts` says "tools for working with". The sentence is the same in all packages. Casey chose "A collection of tools for X" for the ten files.
+- Every `index.ts` says "tools for working with". The sentence is the same in all packages. Casey chose "A collection of tools for X" for the three packages of this PR. The other packages keep their sentence until their own TSDoc PR.
 - `libs/utils/src/getBandwidthBps.ts`: the `@returns` tag has no text.
