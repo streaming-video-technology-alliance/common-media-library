@@ -4,10 +4,10 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { toCmcdUrl } from './toCmcdUrl.ts'
 
 /**
- * Convert a CMCD data object to a query arg.
+ * Convert a CMCD object to a query arg.
  *
  * @param cmcd - The CMCD object to convert.
- * @param options - Options for encoding the CMCD object.
+ * @param options - Options for encoding.
  *
  * @returns The CMCD query arg.
  *

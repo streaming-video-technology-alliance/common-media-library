@@ -1,5 +1,5 @@
 /**
- * CMCD v2 - Response-only and timing keys.
+ * Response-only and timing keys for CMCD v2.
  *
  * @public
  */

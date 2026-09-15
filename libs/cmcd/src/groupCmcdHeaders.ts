@@ -15,9 +15,9 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdHeaderKe
 }
 
 /**
- * Group a CMCD data object into header shards
+ * Group a CMCD object into header shards
  *
- * @param cmcd - The CMCD data object to convert.
+ * @param cmcd - The CMCD object to convert.
  * @param customHeaderMap - A map of CMCD header fields to custom CMCD keys.
  *
  * @returns The CMCD header shards.

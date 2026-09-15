@@ -53,9 +53,9 @@ function unwrapValue(value: any, ot?: unknown): any {
 }
 
 /**
- * Down-convert V2 CMCD data to V1 format.
+ * Down-convert V2 CMCD data to V1.
  *
- * - Extracts `nrr` from `nor` SfItem `r` parameter.
+ * - Extracts `nrr` from the `nor` SfItem's `r` parameter.
  * - Unwraps inner-list values to plain scalars.
  */
 function downConvertToV1(obj: Record<string, any>): Record<string, any> {

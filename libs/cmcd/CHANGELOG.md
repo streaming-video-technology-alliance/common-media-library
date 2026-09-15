@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- TSDoc: the comment prose is rewritten for readers who do not read English as a first language. Signatures, examples, tags, and links are unchanged. Some comments had wrong facts. The `appendCmcdHeaders` summary said query args. The `isCmcdResponseReceivedKey` return description said request key. The `CmcdEventType` constants called their values keys. The `CmcdV1` `mtp` title had a stray key name.
 - The `Cmcd` type documentation links to the CTA-5004-B specification. It linked only to the version 1 PDF
 
 ### Fixed

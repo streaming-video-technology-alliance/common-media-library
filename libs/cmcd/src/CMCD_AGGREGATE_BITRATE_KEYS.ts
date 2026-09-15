@@ -3,8 +3,9 @@ import type { CmcdKey } from './CmcdKey.ts'
 /**
  * Maps each aggregate bitrate key to the exact bitrate key that supersedes it.
  *
- * Per CTA-5004-B, `ab`, `lab`, and `tab` MUST NOT be sent when the encoded
- * bitrate (`br`), the lowest bitrate (`lb`), or the top bitrate (`tb`) is known.
+ * Per CTA-5004-B, `ab` MUST NOT be sent when the encoded bitrate `br` is
+ * known. `lab` and `tab` follow the same rule for the lowest bitrate `lb`
+ * and the top bitrate `tb`.
  *
  * @internal
  */

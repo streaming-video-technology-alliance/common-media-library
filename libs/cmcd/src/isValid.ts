@@ -1,9 +1,9 @@
 /**
- * Checks if the given value can be sent as a CMCD value.
+ * Checks if the given value is valid to send as a CMCD value.
  *
  * `undefined`, `null`, an empty string, `false`, an empty array, and a
- * number that is not finite are not valid. CTA-5004-B requires the key
- * to be omitted when its value is unknown.
+ * number that is not finite are not valid. CTA-5004-B requires omitting
+ * the key when its value is unknown.
  *
  * @param value - The value to check.
  *

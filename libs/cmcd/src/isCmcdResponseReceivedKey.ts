@@ -8,7 +8,7 @@ const CMCD_RESPONSE_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_
  *
  * @param key - The key to check.
  *
- * @returns `true` if the key is a valid CMCD request key, `false` otherwise.
+ * @returns `true` if the key is a valid CMCD response key, `false` otherwise.
  *
  * @public
  *

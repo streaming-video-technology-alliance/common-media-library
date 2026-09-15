@@ -3,10 +3,10 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 
 /**
- * Convert a CMCD data object to a URL encoded string.
+ * Convert a CMCD object to a URL encoded string.
  *
  * @param cmcd - The CMCD object to convert.
- * @param options - Options for encoding the CMCD object.
+ * @param options - Options for encoding.
  *
  * @returns The URL encoded CMCD data.
  *

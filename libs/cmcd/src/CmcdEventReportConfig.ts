@@ -6,7 +6,7 @@ import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 /**
  * Configuration for a CMCD event report.
  *
- * @typeParam C - The shape of the player's `customData` on the request that
+ * @typeParam C - The type of the player's `customData` on the request that
  *                triggered the event. Defaults to `Record<string, unknown>`.
  *
  * @public
@@ -21,21 +21,21 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	version?: typeof CMCD_V2
 
 	/**
-	 * The URL to which the CMCD event should be sent.
+	 * The URL where the reporter sends CMCD event reports.
 	 */
 	url: string;
 
 	/**
-	 * The events to report. If no events are provided,
-	 * the event target will be effectively disabled.
+	 * The events to report. If the caller provides no events,
+	 * the event target is effectively disabled.
 	 *
 	 * @defaultValue `undefined`
 	 */
 	events?: CmcdEventType[];
 
 	/**
-	 * When the time interval event is sent, the interval at which the
-	 * events should be reported as a number of seconds.
+	 * When the time interval event is sent, the interval in seconds at
+	 * which the reporter sends it.
 	 *
 	 * @defaultValue `CMCD_DEFAULT_TIME_INTERVAL`
 	 *
@@ -55,9 +55,9 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 * it is queued. Return the data to continue, or `null` to cancel
 	 * the report for this target.
 	 *
-	 * Scoped to this target only: targets that share a collector URL
-	 * each run their own transform, and a report cancelled here is
-	 * still sent to other targets that accept the event.
+	 * The transform is scoped to this target only. Targets that share a
+	 * collector URL each run their own transform. Other targets that
+	 * accept the event still receive a report cancelled by this transform.
 	 *
 	 * @defaultValue `undefined`
 	 *

@@ -6,7 +6,7 @@ import type { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
 /**
  * Configuration for a CMCD request report.
  *
- * @typeParam C - The shape of the player's `customData` on the requests
+ * @typeParam C - The type of the player's `customData` on the requests
  *                passed to {@link CmcdReporter.createRequestReport}.
  *                Defaults to `Record<string, unknown>`.
  *
@@ -21,12 +21,12 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
 	transmissionMode?: CmcdTransmissionMode;
 
 	/**
-	 * A map of CMCD header fields to the custom keys that should be
-	 * emitted in them when the transmission mode is
+	 * A map of CMCD header fields to the custom keys to emit in them.
+	 * Applies when the transmission mode is
 	 * `CmcdTransmissionMode.HEADERS`. Custom keys not listed in any
 	 * shard are emitted in the `CMCD-Request` header. Standard keys
 	 * have fixed shards per the CMCD specification and cannot be
-	 * re-routed. Has no effect in query transmission mode or on event
+	 * moved. Has no effect in query transmission mode or on event
 	 * reports.
 	 *
 	 * @defaultValue `undefined`
