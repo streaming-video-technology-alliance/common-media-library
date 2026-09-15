@@ -1,126 +1,126 @@
 import type { ValueOf } from '@svta/cml-utils'
 
 /**
- * CMCD event type for the 'bc' key (bitrate change).
+ * CMCD event type 'bc' (bitrate change).
  *
  * @public
  */
 export const CMCD_EVENT_BITRATE_CHANGE = 'bc' as const
 
 /**
- * CMCD event type for the 'ps' key (play state change).
+ * CMCD event type 'ps' (play state change).
  *
  * @public
  */
 export const CMCD_EVENT_PLAY_STATE = 'ps' as const
 
 /**
- * CMCD event type for the 'pr' key (playback rate change).
+ * CMCD event type 'pr' (playback rate change).
  *
  * @public
  */
 export const CMCD_EVENT_PLAYBACK_RATE = 'pr' as const
 
 /**
- * CMCD event type for the 'e' key (error).
+ * CMCD event type 'e' (error).
  *
  * @public
  */
 export const CMCD_EVENT_ERROR = 'e' as const
 
 /**
- * CMCD event type for the 't' key (time interval).
+ * CMCD event type 't' (time interval).
  *
  * @public
  */
 export const CMCD_EVENT_TIME_INTERVAL = 't' as const
 
 /**
- * CMCD event type for the 'c' key (content ID).
+ * CMCD event type 'c' (content ID).
  *
  * @public
  */
 export const CMCD_EVENT_CONTENT_ID = 'c' as const
 
 /**
- * CMCD event type for the 'b' key (backgrounded mode).
+ * CMCD event type 'b' (backgrounded mode).
  *
  * @public
  */
 export const CMCD_EVENT_BACKGROUNDED_MODE = 'b' as const
 
 /**
- * CMCD event type for the 'm' key (mute).
+ * CMCD event type 'm' (mute).
  *
  * @public
  */
 export const CMCD_EVENT_MUTE = 'm' as const
 
 /**
- * CMCD event type for the 'um' key (unmute).
+ * CMCD event type 'um' (unmute).
  *
  * @public
  */
 export const CMCD_EVENT_UNMUTE = 'um' as const
 
 /**
- * CMCD event type for the 'pe' key (player expand).
+ * CMCD event type 'pe' (player expand).
  *
  * @public
  */
 export const CMCD_EVENT_PLAYER_EXPAND = 'pe' as const
 
 /**
- * CMCD event type for the 'pc' key (player collapse).
+ * CMCD event type 'pc' (player collapse).
  *
  * @public
  */
 export const CMCD_EVENT_PLAYER_COLLAPSE = 'pc' as const
 
 /**
- * CMCD event type for the 'rr' key (response received).
+ * CMCD event type 'rr' (response received).
  *
  * @public
  */
 export const CMCD_EVENT_RESPONSE_RECEIVED = 'rr' as const
 
 /**
- * CMCD event type for the 'as' key (ad start).
+ * CMCD event type 'as' (ad start).
  *
  * @public
  */
 export const CMCD_EVENT_AD_START = 'as' as const
 
 /**
- * CMCD event type for the 'ae' key (ad end).
+ * CMCD event type 'ae' (ad end).
  *
  * @public
  */
 export const CMCD_EVENT_AD_END = 'ae' as const
 
 /**
- * CMCD event type for the 'abs' key (ad break start).
+ * CMCD event type 'abs' (ad break start).
  *
  * @public
  */
 export const CMCD_EVENT_AD_BREAK_START = 'abs' as const
 
 /**
- * CMCD event type for the 'abe' key (ad break end).
+ * CMCD event type 'abe' (ad break end).
  *
  * @public
  */
 export const CMCD_EVENT_AD_BREAK_END = 'abe' as const
 
 /**
- * CMCD event type for the 'sk' key (skip).
+ * CMCD event type 'sk' (skip).
  *
  * @public
  */
 export const CMCD_EVENT_SKIP = 'sk' as const
 
 /**
- * CMCD event type for the 'ce' key (custom event).
+ * CMCD event type 'ce' (custom event).
  *
  * @public
  */
@@ -167,7 +167,7 @@ export const CmcdEventType = {
 	CONTENT_ID: CMCD_EVENT_CONTENT_ID as typeof CMCD_EVENT_CONTENT_ID,
 
 	/**
-	 * A change in the application's backgrounded state.
+	 * A change in the player's backgrounded state.
 	 */
 	BACKGROUNDED_MODE: CMCD_EVENT_BACKGROUNDED_MODE as typeof CMCD_EVENT_BACKGROUNDED_MODE,
 
@@ -177,7 +177,7 @@ export const CmcdEventType = {
 	MUTE: CMCD_EVENT_MUTE as typeof CMCD_EVENT_MUTE,
 
 	/**
-	 * Player unmuted.
+	 * The player was unmuted.
 	 */
 	UNMUTE: CMCD_EVENT_UNMUTE as typeof CMCD_EVENT_UNMUTE,
 

@@ -48,8 +48,8 @@ export const CMCD_KEY_TYPE_STRING = 'string' as const
 export const CMCD_KEY_TYPE_TOKEN = 'token' as const
 
 /**
- * Maps each CMCD spec key to its expected value type for v2.
- * Keys that differ between v1 and v2 are handled by CMCD_V1_KEY_TYPE_OVERRIDES.
+ * Maps each CMCD key to its value type for version 2.
+ * CMCD_V1_KEY_TYPE_OVERRIDES handles the keys that differ between version 1 and version 2.
  *
  * @internal
  */
@@ -121,7 +121,7 @@ export const CMCD_KEY_TYPES: Record<string, string> = {
 }
 
 /**
- * Maps keys to their v1-specific types when they differ from v2.
+ * Version 1 types of the keys that differ from version 2.
  *
  * @internal
  */

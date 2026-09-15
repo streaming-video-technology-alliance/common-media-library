@@ -11,7 +11,7 @@ import type { CmcdVersion } from './CmcdVersion.ts'
  */
 export type CmcdEncodeOptions = {
 	/**
-	 * The version of the CMCD specification to use. If not provided, the version
+	 * The version of the CMCD specification to use. If omitted, the version
 	 * is inferred from the data's `v` key, defaulting to `CMCD_V2`.
 	 *
 	 * @defaultValue `CMCD_V2`
@@ -46,9 +46,9 @@ export type CmcdEncodeOptions = {
 
 	/**
 	 * Base URL (typically the manifest or current request URL) used to convert absolute `nor` values
-	 * into paths relative to this base, per the CMCD specification. Values that are already relative
-	 * paths are not modified by this option, though CMCD v1 still URL-encodes them on emission. When
-	 * omitted, `nor` values are emitted as-is (subject to the v1 URL-encoding rule).
+	 * into paths relative to this base, per the CMCD specification. This option does not modify values
+	 * that are already relative paths, but CMCD version 1 still URL-encodes them on emission. If omitted,
+	 * `nor` values are emitted unchanged (subject to the version 1 URL-encoding rule).
 	 */
 	baseUrl?: string;
 

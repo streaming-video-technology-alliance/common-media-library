@@ -1,7 +1,7 @@
 /**
  * Constructs a relative path from a URL.
  *
- * If `url` is already a relative path, or its origin differs from `base`, it is returned unchanged.
+ * If `url` is already relative, or its origin differs from `base`, the function returns `url` unchanged.
  *
  * @param url - The destination URL
  * @param base - The base URL

@@ -11,8 +11,8 @@ import type { CmcdResponse } from './CmcdResponse.ts'
  * This type is the intersection of {@link CmcdRequest}, {@link CmcdResponse},
  * and {@link CmcdEvent}, combining all keys from all reporting modes.
  *
- * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html | CTA-5004-B CMCD v2 Spec}
- * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD v1 Spec}
+ * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html | CTA-5004-B CMCD version 2}
+ * @see {@link https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf|CMCD version 1}
  *
  * @public
  */

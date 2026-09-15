@@ -2,7 +2,7 @@ import { CMCD_V1 } from './CMCD_V1.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 
 /**
- * Resolves the CMCD version from explicit options, the payload's `v` key, or the default (v1).
+ * Resolves the CMCD version from options, the payload's `v` key, or the default (version 1).
  *
  * @internal
  */

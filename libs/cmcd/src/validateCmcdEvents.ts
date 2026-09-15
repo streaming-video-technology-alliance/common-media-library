@@ -14,8 +14,8 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * This function decodes the string internally and validates it with
  * `reportingMode` set to `'event'`. The input may contain multiple
- * newline-separated events (e.g. an `application/cmcd` POST body), in which
- * case each line is validated independently and the results are merged.
+ * newline-separated events, for example an `application/cmcd` POST body.
+ * The function validates each line independently and merges the results.
  *
  * @param cmcd - The raw CMCD-encoded string to validate. May contain
  *   multiple newline-separated event lines.

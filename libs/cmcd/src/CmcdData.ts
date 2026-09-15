@@ -5,8 +5,8 @@ import type { CmcdV1 } from './CmcdV1.ts'
 /**
  * CMCD version 1 data.
  *
- * Overrides keys whose types differ in version 1 (e.g., `bl` and `br`
- * are plain integers instead of inner lists).
+ * Overrides keys whose types differ in version 1. For example, `bl` and
+ * `br` are integers instead of inner lists.
  *
  * @public
  */
@@ -25,7 +25,7 @@ export type CmcdV2Data = Omit<Cmcd, 'v'> & { v: 2 }
 /**
  * A CMCD data object that is either version 1 or version 2.
  *
- * The `v` property acts as a discriminator:
+ * The `v` property is the discriminator:
  *
  * - When `v` is `2`, the type narrows to {@link CmcdV2Data} with
  *   inner-list values and event/response keys.

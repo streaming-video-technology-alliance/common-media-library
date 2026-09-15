@@ -4,7 +4,7 @@ import { SfItem, SfToken, symbolToStr } from '@svta/cml-structured-field-values'
  * Resolve the text of a token value.
  *
  * A token may be a plain string, a registry `Symbol`, an `SfToken`, or an
- * `SfItem` that wraps one of those.
+ * `SfItem` that wraps such a value.
  *
  * @param value - The value to resolve.
  *

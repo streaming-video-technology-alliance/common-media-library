@@ -27,7 +27,7 @@ const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
 }
 
 /**
- * Unwrap an inner list or SfItem value to a plain scalar.
+ * Unwrap an inner list or SfItem value to a scalar.
  */
 function unwrapValue(value: any, ot?: unknown): any {
 	if (Array.isArray(value)) {
@@ -53,10 +53,10 @@ function unwrapValue(value: any, ot?: unknown): any {
 }
 
 /**
- * Down-convert V2 CMCD data to V1 format.
+ * Down-convert version 2 CMCD data to version 1.
  *
- * - Extracts `nrr` from `nor` SfItem `r` parameter.
- * - Unwraps inner-list values to plain scalars.
+ * - Extracts `nrr` from the `nor` SfItem's `r` parameter.
+ * - Unwraps inner-list values to scalars.
  */
 function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 	const result: Record<string, any> = {}
@@ -240,10 +240,10 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		}
 
 		// Ignore invalid values, except `bg: false` on a backgrounded-mode (e=b) state-
-		// change event — the wire must carry `?0` per CTA-5004-B so the transition is
-		// reportable. `bg` is the only state-change required field typed as boolean;
-		// `false` on other required fields (e.g. `cid`, `sta`) is a caller bug and stays
-		// stripped so the validator flags it.
+		// change event. The wire must carry `?0` per CTA-5004-B so the transition is
+		// reportable. `bg` is the only state-change required field typed as boolean.
+		// `false` on other required fields (for example `cid`, `sta`) is a caller bug and
+		// stays stripped so the validator flags it.
 		const isBgFalseTransition = isEventMode
 			&& value === false
 			&& key === 'bg'

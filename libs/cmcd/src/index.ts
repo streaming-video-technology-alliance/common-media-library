@@ -1,5 +1,5 @@
 /**
- * A collection of tools for working with Common Media Client Data (CMCD).
+ * A collection of tools for Common Media Client Data (CMCD).
  *
  * @public
  */

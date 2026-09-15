@@ -10,15 +10,15 @@ import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
  * mutating it in place never affects the reporter's persistent data.
  * The `request` argument is the request passed to
  * `createRequestReport()`, as a read-only view. It is context only and
- * must not be mutated; see {@link CmcdTransformRequest}.
+ * must not be mutated. See {@link CmcdTransformRequest}.
  *
- * The reporter re-stamps `sid` and assigns `sn` and `msd` after this
+ * The reporter rewrites `sid` and assigns `sn` and `msd` after this
  * function returns, so values written to those keys are overwritten.
  *
  * Must not throw. Exceptions propagate to the `createRequestReport()`
  * caller.
  *
- * @typeParam C - The shape of the player's `customData` on the request.
+ * @typeParam C - The type of the player's `customData` on the request.
  *                Defaults to `Record<string, unknown>`, whose values are
  *                `unknown` and read with bracket access.
  *

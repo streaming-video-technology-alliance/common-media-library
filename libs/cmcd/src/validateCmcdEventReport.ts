@@ -12,8 +12,8 @@ import { validateCmcdEvents } from './validateCmcdEvents.ts'
  * Accepts an {@link @svta/cml-utils!HttpRequest | HttpRequest} object.
  *
  * This function validates that the request uses the POST method and has
- * the correct `Content-Type` header (`application/cmcd`) in addition to
- * validating the body content via {@link validateCmcdEvents}.
+ * the correct `Content-Type` header (`application/cmcd`). It also
+ * validates the body content with {@link validateCmcdEvents}.
  *
  * @param request - An `HttpRequest` to validate.
  * @param options - Validation options (excluding `reportingMode`).

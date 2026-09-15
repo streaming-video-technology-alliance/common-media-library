@@ -1,7 +1,7 @@
 import { arrayBufferToUuid } from './arrayBufferToUuid.ts'
 
 /**
- * Generate a random v4 UUID
+ * Generates a random v4 UUID
  *
  * @returns A random v4 UUID
  *

@@ -3,7 +3,7 @@ import type { SfMember } from './SfMember.ts'
 import { serializeList } from './serialize/serializeList.ts'
 
 /**
- * Encode a list into a structured field dictionary
+ * Encode a structured field list to a string
  *
  * @param value - The structured field list to encode
  * @param options - Encoding options

@@ -7,7 +7,7 @@ import type { Encoding } from './Encoding.ts'
  */
 export type DecodeTextOptions = {
 	/**
-	 *  The encoding to use. If not provided, the function will try to detect the encoding from the BOM.
+	 * The encoding to use. If omitted, the function tries to detect the encoding from the BOM.
 	 */
 	encoding?: Encoding;
 

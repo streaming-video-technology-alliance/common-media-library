@@ -1,7 +1,7 @@
 import type { ValueOf } from '@svta/cml-utils'
 
 /**
- * CMCD query reporting mode — CMCD data carried as a `CMCD=` URL
+ * CMCD query reporting mode: CMCD data transmitted as a `CMCD=` URL
  * query parameter.
  *
  * @public
@@ -9,7 +9,7 @@ import type { ValueOf } from '@svta/cml-utils'
 export const CMCD_RECORDED_REPORT_MODE_QUERY = 'query' as const
 
 /**
- * CMCD header reporting mode — CMCD data carried as `Cmcd-*` HTTP
+ * CMCD header reporting mode: CMCD data transmitted as `CMCD-*` HTTP
  * headers.
  *
  * @public
@@ -17,7 +17,7 @@ export const CMCD_RECORDED_REPORT_MODE_QUERY = 'query' as const
 export const CMCD_RECORDED_REPORT_MODE_HEADER = 'header' as const
 
 /**
- * CMCD event reporting mode — CMCD data carried as a POST body to an
+ * CMCD event reporting mode: CMCD data transmitted as a POST body to an
  * event-target URL.
  *
  * @public
@@ -25,8 +25,8 @@ export const CMCD_RECORDED_REPORT_MODE_HEADER = 'header' as const
 export const CMCD_RECORDED_REPORT_MODE_EVENT = 'event' as const
 
 /**
- * Reporting mode under which a captured report was observed by
- * `CmcdReportRecorder`.
+ * Reporting mode in which `CmcdReportRecorder` observed a captured
+ * report.
  *
  * @enum
  *

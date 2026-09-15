@@ -1,15 +1,15 @@
 import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
 
 /**
- * The media request handed to a report transform, as a read-only view.
+ * The media request passed to a report transform, as a read-only view.
  *
  * The request is context only. A transform reads it to decide what to do with
- * the report and must not mutate it: it belongs to the caller, which may still
- * be using it. Every member is `readonly`, and `customData` is readonly at
- * every depth, so nested values cannot be written either.
+ * the report. A transform must not mutate the request, which belongs to the
+ * caller and may still be in use. Every member is `readonly`, and `customData`
+ * is readonly at every depth, so nested values cannot be written either.
  *
  * By default `customData` values are `unknown` rather than `any`, because the
- * library cannot know the player's shape. Narrow with a cast or bracket access
+ * library cannot know the player's fields. Narrow with a cast or bracket access
  * to read player-specific fields:
  *
  * ```ts
@@ -17,9 +17,9 @@ import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
  * 	request?.customData?.['requestType'] === 'segment' ? data : null
  * ```
  *
- * Supply `C` to describe the player's own `customData` instead and those reads
- * become typed dot access. Annotating one transform is enough: the reporter
- * infers `C` for every other transform in the same configuration.
+ * Supply `C` to describe the player's own `customData` instead, and those
+ * reads become typed dot access. Annotating one transform is enough: the
+ * reporter infers `C` for every other transform in the same configuration.
  *
  * ```ts
  * type PlayerData = { requestType: string; };
@@ -28,15 +28,15 @@ import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
  * 	request?.customData?.requestType === 'segment' ? data : null
  * ```
  *
- * `C` is applied through {@link DeepReadonly}, so describing a nested shape
- * does not trade the no-mutation guarantee for typed reads.
+ * This type wraps `C` in {@link DeepReadonly}, so a nested `C` keeps both the
+ * read-only guarantee and typed reads.
  *
- * Two limits are worth knowing. A mutable body such as `FormData` or
- * `URLSearchParams` has mutating methods of its own that no type can block, and
- * JavaScript callers get no enforcement at all. Mutating the request through
- * either route is unsupported, and the outgoing report may reflect it.
+ * Two limits apply. A mutable body such as `FormData` or `URLSearchParams`
+ * has mutating methods of its own that no type can block. JavaScript callers
+ * get no enforcement at all. Both kinds of mutation are unsupported, and the
+ * outgoing report may reflect them.
  *
- * @typeParam C - The shape of the player's `customData`. Defaults to
+ * @typeParam C - The type of the player's `customData`. Defaults to
  *                `Record<string, unknown>`.
  *
  * @public

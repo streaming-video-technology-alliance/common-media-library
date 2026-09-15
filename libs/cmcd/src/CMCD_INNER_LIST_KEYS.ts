@@ -1,5 +1,5 @@
 /**
- * Keys that are inner lists in V2 but plain scalars in V1.
+ * Inner-list keys in version 2 that are scalars in version 1.
  *
  * Used by both encoding (down-conversion) and decoding (up-conversion).
  *

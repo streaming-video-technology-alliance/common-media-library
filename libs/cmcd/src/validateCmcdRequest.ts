@@ -20,12 +20,12 @@ import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Request | Request}
  * object or an {@link @svta/cml-utils!HttpRequest | HttpRequest} object.
  *
- * The function checks for CMCD data in the HTTP headers first. If CMCD
- * headers are found, validation includes shard-placement checks via
- * {@link validateCmcdHeaders}. Otherwise, the CMCD query parameter is
- * extracted from the URL and validated. A request that carries CMCD data
- * in both the headers and the `CMCD` query parameter is an error. The
- * headers are still validated and their data is returned.
+ * The function checks the HTTP headers for CMCD data first. If the
+ * request has CMCD headers, {@link validateCmcdHeaders} validates them,
+ * including shard placement. Otherwise, the function validates the CMCD
+ * query parameter of the URL. A request with CMCD data in both the
+ * headers and the `CMCD` query parameter is an error. The function still
+ * validates the headers and returns their data.
  *
  * @param request - A `Request` or `HttpRequest` to validate.
  * @param options - Validation options (excluding `reportingMode`).

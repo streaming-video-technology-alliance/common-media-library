@@ -6,9 +6,9 @@ const CUSTOM_KEY_REGEX = /^[a-z][a-z0-9.-]*$/
 
 /**
  * Check if a key is a valid custom key: a lowercase first letter, then
- * characters from `a-z 0-9 . -`, with a hyphen that is neither the first
- * nor the last character. These are the CTA-5004-B custom-key rules
- * restricted to names that survive RFC 8941 key serialization.
+ * characters from `a-z 0-9 . -`. The key needs a hyphen, not at the start
+ * or end. This check applies the CTA-5004-B custom-key rules, restricted
+ * to names that RFC 8941 key serialization accepts.
  *
  * @param key - The key to check.
  *

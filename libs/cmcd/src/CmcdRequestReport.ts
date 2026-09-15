@@ -6,9 +6,9 @@ import type { CmcdRequestProvenance } from './CmcdRequestProvenance.ts'
 /**
  * A report of a CMCD request.
  *
- * The provenance member is optional so the type stays constructible by
- * consumers that build or mock request reports; every request returned by
- * `CmcdReporter.createRequestReport()` carries it.
+ * The provenance member is optional so callers that build or mock request
+ * reports can construct the type. Every request returned by
+ * `CmcdReporter.createRequestReport()` includes the member.
  *
  * @public
  */
