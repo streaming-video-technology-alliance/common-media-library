@@ -13,6 +13,12 @@ and this project adheres to
 - README: the usage example is complete. The tag bytes are a function parameter.
 
 
+## [1.0.9] - 2026-09-15
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.6.1
+
 ## [1.0.8] - 2026-07-28
 
 ### Changed
@@ -74,7 +80,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.8...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.9...HEAD
+[1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.8...id3-v1.0.9
 [1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.7...id3-v1.0.8
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.6...id3-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.5...id3-v1.0.6

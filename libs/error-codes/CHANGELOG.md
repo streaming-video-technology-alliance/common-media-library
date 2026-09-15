@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-15
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.6.1
+
 ## [0.1.0] - 2026-09-07
 
 ### Added
@@ -18,5 +24,6 @@ and this project adheres to
 - `getSvtaErrorCategory` and `getSvtaErrorIndex` for the category and index arithmetic of the specification
 - `httpStatusToSvtaErrorCode` and `vastErrorToSvtaErrorCode` to embed HTTP response statuses and IAB VAST error codes. `vastErrorToSvtaErrorCode(1009)` returns 7999
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/error-codes-v0.1.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/error-codes-v0.1.1...HEAD
+[0.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/error-codes-v0.1.0...error-codes-v0.1.1
 [0.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/error-codes-v0.1.0

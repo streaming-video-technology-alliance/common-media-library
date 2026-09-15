@@ -12,6 +12,12 @@ and this project adheres to
 
 - README and the Reading Boxes, Writing Boxes, and Utilities guides: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
 
+## [1.0.6] - 2026-09-15
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.6.1
+
 ## [1.0.5] - 2026-08-11
 
 ### Fixed
@@ -181,7 +187,8 @@ Official stable release. No changes since 1.0.0-beta.2.
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.5...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.6...HEAD
+[1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.5...iso-bmff-v1.0.6
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.4...iso-bmff-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.3...iso-bmff-v1.0.4
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.2...iso-bmff-v1.0.3

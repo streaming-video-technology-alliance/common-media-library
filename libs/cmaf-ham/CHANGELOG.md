@@ -17,6 +17,12 @@ and this project adheres to
 
 - The conversion sample resolves its input and output folders from the script location, so `npm run dev -w libs/cmaf-ham` works from any directory. It no longer fails on an HLS ancillary playlist with an empty file name.
 
+## [0.24.7] - 2026-09-15
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.6.1
+
 ## [0.24.6] - 2026-07-28
 
 ### Changed
@@ -79,7 +85,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.6...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.7...HEAD
+[0.24.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.6...cmaf-ham-v0.24.7
 [0.24.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.5...cmaf-ham-v0.24.6
 [0.24.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.4...cmaf-ham-v0.24.5
 [0.24.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.3...cmaf-ham-v0.24.4
