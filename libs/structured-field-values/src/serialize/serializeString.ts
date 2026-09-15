@@ -17,7 +17,7 @@ const DQUOTE_REGEX = /"/g
 //     conversion fails, fail serialization.
 //
 // 2.  If input_string contains characters in the range %x00-1f or %x7f
-//     (i.e., not in VCHAR or SP), fail serialization.
+//     (that is, not in VCHAR or SP), fail serialization.
 //
 // 3.  Let output be the string DQUOTE.
 //

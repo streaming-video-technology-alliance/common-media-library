@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- TSDoc: the package summary drops the phrase "working with".
 - README: the usage example is complete. It imports every identifier it uses and shows the encoded output.
 
 

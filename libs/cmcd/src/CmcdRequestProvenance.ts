@@ -25,8 +25,8 @@
  *
  * The reporter freezes every record it creates. The record is constructible:
  * a hand-built request may include `{ sid }` to attribute the request to
- * that session. The reporter drops a record naming a `sid` it does not
- * retain.
+ * that session. The reporter drops the response when the record names a
+ * `sid` it does not retain.
  *
  * @public
  */

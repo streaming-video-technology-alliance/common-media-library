@@ -24,7 +24,7 @@ export type CmcdRecordedReport = {
 
 	/**
 	 * Reporting mode under which the CMCD data was transmitted:
-	 * `'query'` for `CMCD=` URL parameter, `'header'` for `Cmcd-*`
+	 * `'query'` for `CMCD=` URL parameter, `'header'` for `CMCD-*`
 	 * HTTP headers, `'event'` for an event-target POST body.
 	 */
 	readonly reportingMode: CmcdRecordedReportMode;

@@ -147,7 +147,7 @@ function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
 /**
  * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
  * Built from the state-change table plus the three event types whose
- * required key comes from the caller's per-call data.
+ * required key is event data, not player state.
  */
 const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
 
@@ -749,8 +749,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 			const current = session.data[field]
 
-			// Never emit a state-change event with a missing required field — per
-			// CTA-5004-B these events must carry their dedup field. Catches both
+			// Never emit a state-change event with a missing required field. Per
+			// CTA-5004-B these events must include their state field. Catches both
 			// "no value ever set" and "previous value was cleared to undefined".
 			if (current === undefined) {
 				return
@@ -917,8 +917,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * `request` argument.
 	 *
 	 * A reporter with a concrete `C` requires the request to satisfy that type.
-	 * This method therefore rejects a request the configured transforms could
-	 * not read, before they receive it. See {@link CmcdReporterCustomData}.
+	 * TypeScript therefore rejects a call whose request the configured
+	 * transforms could not read. See {@link CmcdReporterCustomData}.
 	 *
 	 * The reporter attributes the event only to the session that issued the
 	 * request. The provenance record that
@@ -1091,8 +1091,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * player calls this method before sending the request.
 	 *
 	 * A reporter with a concrete `C` requires the request's `customData` to
-	 * satisfy that type. This method therefore rejects a request the configured
-	 * transform could not read, before the transform receives it. See
+	 * satisfy that type. TypeScript therefore rejects a call whose request the
+	 * configured transform could not read. See
 	 * {@link CmcdReporterCustomData}.
 	 *
 	 * @typeParam R - The type of the request. Its `customData` must satisfy

@@ -1,5 +1,5 @@
 /**
- * A collection of tools for working with media.
+ * A collection of tools for media.
  *
  * @packageDocumentation
  */

@@ -1,5 +1,5 @@
 /**
- * A collection of tools for working with XML.
+ * A collection of tools for XML.
  *
  * @packageDocumentation
  * @public

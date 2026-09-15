@@ -1,5 +1,5 @@
 /**
- * A collection of tools for working with ISO 8601 time values.
+ * A collection of tools for ISO 8601 time values.
  *
  * @packageDocumentation
  *

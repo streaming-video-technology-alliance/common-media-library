@@ -9,7 +9,7 @@ import type { ValueOf } from '@svta/cml-utils'
 export const CMCD_RECORDED_REPORT_MODE_QUERY = 'query' as const
 
 /**
- * CMCD header reporting mode: CMCD data transmitted as `Cmcd-*` HTTP
+ * CMCD header reporting mode: CMCD data transmitted as `CMCD-*` HTTP
  * headers.
  *
  * @public

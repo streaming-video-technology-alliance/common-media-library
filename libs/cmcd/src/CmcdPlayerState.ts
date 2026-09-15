@@ -1,7 +1,7 @@
 import type { ValueOf } from '@svta/cml-utils'
 
 /**
- * CMCD v2 player states for the 'sta' key.
+ * CMCD version 2 player states for the 'sta' key.
  *
  *
  * @enum

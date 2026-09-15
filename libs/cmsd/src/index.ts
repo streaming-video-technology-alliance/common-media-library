@@ -1,5 +1,5 @@
 /**
- * A collection of tools for working with Common Media Server Data (CMSD).
+ * A collection of tools for Common Media Server Data (CMSD).
  *
  * @packageDocumentation
  */

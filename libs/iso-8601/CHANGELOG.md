@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- TSDoc: the package summary drops the phrase "working with".
+
 ## [1.0.2] - 2026-07-21
 
 ### Changed

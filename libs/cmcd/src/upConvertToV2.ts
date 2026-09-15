@@ -2,12 +2,12 @@ import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 
 /**
- * Up-convert V1 CMCD data to V2.
+ * Up-convert version 1 CMCD data to version 2.
  *
- * - Wraps plain scalar values in arrays for inner-list keys.
+ * - Wraps scalar values in arrays for inner-list keys.
  * - Wraps `nor` string in an array.
  *
- * If the data is already V2 (has `v: 2`), the function returns it unchanged.
+ * The function returns version 2 data (has `v: 2`) unchanged.
  *
  * @internal
  */

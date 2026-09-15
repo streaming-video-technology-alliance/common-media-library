@@ -16,8 +16,10 @@ export type CmcdReportConfig = {
 
 	/**
 	 * The list of CMCD keys to include in the report. If omitted, no keys
-	 * are reported. Other configuration options may still require keys to
-	 * be reported, specifically in event mode.
+	 * are reported. In event mode, `e`, `ts`, and the key that CTA-5004-B
+	 * requires for the event type are reported even when this list omits
+	 * them. Examples of required keys: `sta` for a play state change, `ec`
+	 * for an error, `url` for a response received.
 	 *
 	 * @defaultValue `undefined`
 	 */

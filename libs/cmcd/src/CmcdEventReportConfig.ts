@@ -13,8 +13,8 @@ import type { CmcdReportConfig } from './CmcdReportConfig.ts'
  */
 export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
 	/**
-	 * The version of the CMCD protocol to use. Must be
-	 * version 2 or higher for event reporting.
+	 * The version of the CMCD protocol to use. Event reporting
+	 * requires version 2.
 	 *
 	 * @defaultValue `CMCD_V2`
 	 */

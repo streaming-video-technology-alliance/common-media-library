@@ -15,9 +15,13 @@ export type CmcdV1 = {
 	bl?: number;
 
 	/**
-	 * Bitrate
+	 * Encoded bitrate
 	 *
-	 * Integer
+	 * The encoded bitrate of the audio or video object being requested. The player may not know this value precisely.
+	 * However, the player MAY estimate it based upon playlist/manifest declarations. If the playlist declares both peak
+	 * and average bitrate values, the peak value should be transmitted.
+	 *
+	 * Integer kbps
 	 */
 	br?: number;
 
@@ -46,14 +50,14 @@ export type CmcdV1 = {
 	 * @remarks
 	 * Values may be provided as absolute URLs for convenience. If `CmcdEncodeOptions.baseUrl` is set, same-origin URLs
 	 * are converted to paths relative to that base. Already-relative values are not converted. They are still
-	 * URL-encoded when emitted, as CMCD v1 requires.
+	 * URL-encoded when emitted, as CMCD version 1 requires.
 	 */
 	nor?: string;
 
 	/**
 	 * Next range request
 	 *
-	 * @deprecated Use 'nor' with the 'r' parameter instead.
+	 * @deprecated Removed in CMCD version 2. Version 2 sends the range as the 'r' parameter of 'nor'.
 	 *
 	 * String
 	 */
