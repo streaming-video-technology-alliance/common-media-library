@@ -16,6 +16,13 @@ and this project adheres to
 - Validation guides: empty table cells no longer use an em dash, and a code comment no longer uses an em dash.
 
 
+## [1.1.3] - 2026-09-15
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.6
+- Update `@svta/cml-utils` to 1.6.1
+
 ## [1.1.2] - 2026-08-11
 
 ### Changed
@@ -77,7 +84,8 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.3...HEAD
+[1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.2...c2pa-v1.1.3
 [1.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.1...c2pa-v1.1.2
 [1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.0...c2pa-v1.1.1
 [1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.1...c2pa-v1.1.0

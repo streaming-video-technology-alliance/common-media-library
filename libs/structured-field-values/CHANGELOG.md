@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.6] - 2026-09-15
+
 ### Changed
 
 - TSDoc: the comment prose is rewritten for readers who do not read English as a first language. Signatures, examples, tags, and links are unchanged. The `encodeSfDict` and `encodeSfList` summaries now say that the output is a string. They named a dictionary as the output.
@@ -79,7 +81,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.5...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.6...HEAD
+[1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.5...structured-field-values-v1.1.6
 [1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.4...structured-field-values-v1.1.5
 [1.1.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.3...structured-field-values-v1.1.4
 [1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.2...structured-field-values-v1.1.3

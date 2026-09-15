@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-09-15
+
 ### Changed
 
 - TSDoc: the comment prose is rewritten for readers who do not read English as a first language. Signatures, examples, tags, and links are unchanged. Some comments had wrong facts. The `appendCmcdHeaders` summary said query args. The `isCmcdResponseReceivedKey` return description said request key. The `CmcdEventType` constants called their values keys. The `CmcdV1` `mtp` title had a stray key name.
@@ -274,7 +276,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...HEAD
+[2.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...cmcd-v2.7.0
 [2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
 [2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0
 [2.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...cmcd-v2.5.0
