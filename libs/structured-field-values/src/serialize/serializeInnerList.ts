@@ -1,4 +1,7 @@
+import type { SfBareItem } from '../SfBareItem.ts'
 import type { SfInnerList } from '../SfInnerList.ts'
+import type { SfItem } from '../SfItem.ts'
+import type { SfParameters } from '../SfParameters.ts'
 import { serializeItem } from './serializeItem.ts'
 import { serializeParams } from './serializeParams.ts'
 
@@ -27,6 +30,32 @@ import { serializeParams } from './serializeParams.ts'
 /**
  * @internal
  */
-export function serializeInnerList(value: SfInnerList) {
-	return `(${value.value.map(serializeItem).join(' ')})${serializeParams(value.params)}`
+export function serializeInnerList(value: SfInnerList): string;
+
+/**
+ * @internal
+ */
+export function serializeInnerList(value: SfItem[] | SfBareItem[], params?: SfParameters): string;
+
+export function serializeInnerList(value: SfInnerList | SfItem[] | SfBareItem[], params?: SfParameters): string {
+	let list: SfItem[] | SfBareItem[]
+
+	if (Array.isArray(value)) {
+		list = value
+	}
+	else {
+		list = value.value
+		params = value.params
+	}
+
+	let output = '('
+
+	for (let i = 0; i < list.length; i++) {
+		if (i > 0) {
+			output += ' '
+		}
+		output += serializeItem(list[i])
+	}
+
+	return `${output})${serializeParams(params)}`
 }

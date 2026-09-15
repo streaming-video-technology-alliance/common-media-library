@@ -1,11 +1,7 @@
 import type { SfEncodeOptions } from '../SfEncodeOptions.ts'
-import { SfItem } from '../SfItem.ts'
 import { DICT } from '../utils/DICT.ts'
+import { serializeDictMember } from './serializeDictMember.ts'
 import { serializeError } from './serializeError.ts'
-import { serializeInnerList } from './serializeInnerList.ts'
-import { serializeItem } from './serializeItem.ts'
-import { serializeKey } from './serializeKey.ts'
-import { serializeParams } from './serializeParams.ts'
 
 // 4.1.2.  Serializing a Dictionary
 //
@@ -53,28 +49,16 @@ export function serializeDict(dict: Record<string, any> | Map<string, any>, opti
 		throw serializeError(dict, DICT)
 	}
 
-	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict)
-	const optionalWhiteSpace = options?.whitespace === false ? '' : ' '
+	const parts: string[] = []
 
-	return Array.from(entries)
-		.map(([key, item]) => {
-			if (item instanceof SfItem === false) {
-				item = new SfItem(item)
-			}
-			let output = serializeKey(key)
-			if (item.value === true) {
-				output += serializeParams(item.params)
-			}
-			else {
-				output += '='
-				if (Array.isArray(item.value)) {
-					output += serializeInnerList(item)
-				}
-				else {
-					output += serializeItem(item)
-				}
-			}
-			return output
-		})
-		.join(`,${optionalWhiteSpace}`)
+	if (dict instanceof Map) {
+		dict.forEach((member, key) => parts.push(serializeDictMember(key, member)))
+	}
+	else {
+		for (const key of Object.keys(dict)) {
+			parts.push(serializeDictMember(key, dict[key]))
+		}
+	}
+
+	return parts.join(options?.whitespace === false ? ',' : ', ')
 }

@@ -12,10 +12,14 @@ and this project adheres to
 
 - README: the usage example prints its result instead of calling an undefined `assert`.
 - `parseIntegerOrDecimal` creates its `Error` only when parsing fails. Before this change, every call created an `Error` and captured a stack trace, also when parsing succeeded. Every Integer and Decimal in a parsed field passes through this function. Error messages do not change.
+- The encoder allocates less and runs faster. `encodeSfDict`, `encodeSfList`, and `encodeSfItem` no longer wrap bare values in `SfItem` objects, and the dictionary and parameter serializers no longer copy their entries through `Object.entries`, `Array.from`, and `map`. `serializeString` returns a string that needs no escape after one regex test. `serializeKey` checks the character codes in a loop. For a 17-key CMCD request dictionary, one encode takes about 40% less time and allocates 2.1 KB instead of 6.5 KB. The output does not change. The error for `encodeSfItem([1, 2])` now quotes the array as passed, `[1,2]`, instead of the wrapped items.
+- `serializeInnerList` also accepts the list and its parameters as two arguments: `serializeInnerList([1, 2], { a: 1 })`. The `SfInnerList` object form still works.
+- A benchmark for the encoder: `npm run bench -w libs/structured-field-values`. The header of `bench/bench.ts` describes the options.
 
 ### Fixed
 
 - Remove the module-scope template literal that built the `Integer or Decimal` error type name. Rolldown-based bundlers such as tsdown kept that statement and two constants in bundles that never used the parser. `parseIntegerOrDecimal` now builds the name inside the function. Error messages do not change.
+- `serializeDecimal` fails on values of `1e21` and above. Before this change, the magnitude check used the length of `Number.prototype.toString`, which switches to exponent notation at `1e21`, so `serializeDecimal(1e21)` returned `1e+21.0`. RFC 8941 allows at most 12 digits before the decimal point.
 
 
 ## [1.1.5] - 2026-07-28

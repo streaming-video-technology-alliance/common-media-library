@@ -2,6 +2,12 @@ import { STRING } from '../utils/STRING.ts'
 import { STRING_REGEX } from '../utils/STRING_REGEX.ts'
 import { serializeError } from './serializeError.ts'
 
+// Control characters that fail serialization, and the two characters that need an escape.
+// eslint-disable-next-line no-control-regex
+const ESCAPE_OR_CONTROL_REGEX = /[\x00-\x1f\x7f"\\]/
+const BACKSLASH_REGEX = /\\/g
+const DQUOTE_REGEX = /"/g
+
 // 4.1.6.  Serializing a String
 //
 // Given a String as input_string, return an ASCII string suitable for
@@ -29,10 +35,14 @@ import { serializeError } from './serializeError.ts'
 /**
  * @internal
  */
-export function serializeString(value: string) {
+export function serializeString(value: string): string {
+	if (ESCAPE_OR_CONTROL_REGEX.test(value) === false) {
+		return `"${value}"`
+	}
+
 	if (STRING_REGEX.test(value)) {
 		throw serializeError(value, STRING)
 	}
 
-	return `"${value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)}"`
+	return `"${value.replace(BACKSLASH_REGEX, '\\\\').replace(DQUOTE_REGEX, '\\"')}"`
 }

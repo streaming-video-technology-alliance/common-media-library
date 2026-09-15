@@ -3,6 +3,8 @@ import { symbolToStr } from '../utils/symbolToStr.ts'
 import { TOKEN } from '../utils/TOKEN.ts'
 import { serializeError } from './serializeError.ts'
 
+const TOKEN_REGEX = /^[a-zA-Z*][!#$%&'*+\-.^_`|~\w:/]*$/
+
 // 4.1.7.  Serializing a Token
 //
 // Given a Token as input_token, return an ASCII string suitable for use
@@ -26,7 +28,7 @@ import { serializeError } from './serializeError.ts'
  */
 export function serializeToken(token: symbol | SfToken): string {
 	const value = symbolToStr(token)
-	if (/^([a-zA-Z*])([!#$%&'*+\-.^_`|~\w:/]*)$/.test(value) === false) {
+	if (TOKEN_REGEX.test(value) === false) {
 		throw serializeError(value, TOKEN)
 	}
 	return value

@@ -41,7 +41,7 @@ import { serializeError } from './serializeError.ts'
  */
 export function serializeDecimal(value: number): string {
 	const roundedValue = roundToEven(value, 3) // round to 3 decimal places
-	if (Math.floor(Math.abs(roundedValue)).toString().length > 12) {
+	if (Math.abs(roundedValue) >= 1e12) {
 		throw serializeError(value, DECIMAL)
 	}
 	const stringValue = roundedValue.toString()
