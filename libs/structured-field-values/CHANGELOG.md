@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- TSDoc: the comment prose is rewritten for readers who do not read English as a first language. Signatures, examples, tags, and links are unchanged. The `encodeSfDict` and `encodeSfList` summaries now say that the output is a string. They named a dictionary as the output.
 - README: the usage example prints its result instead of calling an undefined `assert`.
 - `parseIntegerOrDecimal` creates its `Error` only when parsing fails. Before this change, every call created an `Error` and captured a stack trace, also when parsing succeeded. Every Integer and Decimal in a parsed field passes through this function. Error messages do not change.
 - The encoder allocates less and runs faster. `encodeSfDict`, `encodeSfList`, and `encodeSfItem` no longer wrap bare values in `SfItem` objects, and the dictionary and parameter serializers no longer copy their entries through `Object.entries`, `Array.from`, and `map`. `serializeString` returns a string that needs no escape after one regex test. `serializeKey` checks the character codes in a loop. For a 17-key CMCD request dictionary, one encode takes about 40% less time and allocates 2.1 KB instead of 6.5 KB. The output does not change. The error for `encodeSfItem([1, 2])` now quotes the array as passed, `[1,2]`, instead of the wrapped items.

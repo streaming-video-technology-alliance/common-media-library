@@ -2,7 +2,7 @@ import type { SfEncodeOptions } from './SfEncodeOptions.ts'
 import { serializeDict } from './serialize/serializeDict.ts'
 
 /**
- * Encode an object into a structured field dictionary
+ * Encode a structured field dictionary to a string
  *
  * @param value - The structured field dictionary to encode
  * @param options - Encoding options
