@@ -194,3 +194,13 @@ Issue #435 tracks the TSDoc pass. The first PR covers the three packages of the 
 | `libs/cmcd` | 11527 | 1259 | 9.2 | 0 (0%) | 6.0 | therefore(7), frozen(6), comes from(1), come from(2), stays(1) |
 | `libs/structured-field-values` | 287 | 47 | 6.1 | 0 (0%) | 5.7 | none |
 | `libs/utils` | 774 | 117 | 6.6 | 0 (0%) | 5.9 | none |
+
+### After the review round (base 4bf937bd, 2026-09-15)
+
+The branch was rebased onto `main` at 4bf937bd. At that commit, structured-field-values has 53 files with TSDoc and 61 comments, because #465 added comments. Its baseline there is 322 prose words in 49 sentences. The cmcd and utils baselines are unchanged.
+
+| Package | Prose words | Sentences | Avg words per sentence | Over 25 words | FK grade | Flagged |
+|---|---|---|---|---|---|---|
+| `libs/cmcd` | 11605 | 1268 | 9.2 | 0 (0%) | 6.0 | therefore(7), frozen(6), come from(2), stays(1) |
+| `libs/structured-field-values` | 320 | 49 | 6.5 | 0 (0%) | 6.0 | none |
+| `libs/utils` | 777 | 118 | 6.6 | 0 (0%) | 5.9 | none |

@@ -507,7 +507,13 @@ Casey creates the PR with `/create-pr`.
 
 The other suspected errors are listed in `overview.md` under "Noticed, not changed (Task 9)".
 
-| Three packages | Before | After |
+**Review round (2026-09-15):** Casey reviewed the "Noticed, not changed" list and asked for changes to every item except the `ab` spec text and the `reportingMode` name. The branch was rebased onto `main` at 4bf937bd, because #464 and #465 merged in the meantime. The review round also changed the package summary of ten `index.ts` files, so seven more packages have a changelog note. `check-tsdoc.sh` now reports ten expected failures against `main`:
+
+- `numbers` for `CmcdKey.ts`, `CmcdReportConfig.ts`, and `CmcdV1.ts`: the new text removes "V1" or adds "CTA-5004-B" and "version 2".
+- `shorter` for `CmcdReportConfig.ts`, `CmcdV1.ts`, and `getBandwidthBps.ts`: the new text adds content that Casey asked for.
+- `code` for `CmcdReporter.ts`, `prepareCmcdData.ts`, `parseString.ts`, and `serializeString.ts`: four `//` comments lost "e.g.", "i.e.", or an em dash. `git diff` shows no other line outside a comment.
+
+| Three packages | Before (at 4bf937bd) | After |
 |---|---|---|
-| Prose words | 12,858 | 12,588 |
+| Prose words | 12,893 | 12,702 |
 | Sentences over 25 words | 66 | 0 |
