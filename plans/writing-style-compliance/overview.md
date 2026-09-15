@@ -77,7 +77,7 @@ The readability metrics in `inventory.md` come from a second script that is not 
 ## Open questions
 
 1. Merged RFCs (tranche 6). Rewrite 12,000 words of accepted proposals, or apply the rules only to `rfc/README.md` and to new RFCs? Resolved on 2026-09-03: `rfc/README.md` only. The two merged RFC bodies stay as records, and new RFCs follow the rules.
-2. TSDoc. The rules name TSDoc, and the API reference is built from it. A pass would touch most source files and regenerate every `api.md`. Recommendation: a separate plan, one package per PR, after the markdown tranches. Resolved on 2026-09-03: tracked in issue #435. The first TSDoc PR covers cmcd, structured-field-values, and utils (Task 9 in `steps.md`, 2026-09-15).
+2. TSDoc. The rules name TSDoc, and the API reference is built from it. A pass would touch most source files and regenerate every `api.md`. Recommendation: a separate plan, one package per PR, after the markdown tranches. Resolved on 2026-09-03: tracked in issue #435.
 3. Records. This plan leaves `plans/` and changelog history unchanged. Confirmed on 2026-09-03.
 4. Enforcement. A lint step could fail when prose in a markdown file contains an em dash, a semicolon, or "e.g.". The check script is a starting point. Should it become `scripts/checkProse.ts` and run in `npm run lint`? A `.ts` file under `plans/` is not an option, because `eslint .` and the root `tsc --noEmit` include it. Resolved on 2026-09-03: no lint step. The check script stays a manual tool.
 
@@ -91,8 +91,7 @@ The readability metrics in `inventory.md` come from a second script that is not 
 - 2026-09-03: tranche 6 rewritten on branch `docs/writing-style-rfc`, stacked on the tranche 5 branch, `rfc/README.md` only. PR #440. All six tranches are done.
 - 2026-09-03: tranche 7 on branch `docs/writing-style-fixes`, stacked on the tranche 6 branch. It fixes every item in the "Noticed, not changed" sections below and the cmaf-ham sample script. PR #441.
 - 2026-09-03: Casey removed the abbreviation rule and the Terms list rule from `AGENTS.md`. PR #442. Video developers know the abbreviations, and a reader who does not can search for them.
-- 2026-09-03: tranche 8 on branch `docs/writing-style-sweep`, from `main` after #441 merged. It reverts the 45 definitions that tranches 1 to 7 added in 22 files. It also removes the Terms table from the CMCD user guide. PR #443.
-- 2026-09-15: TSDoc pass for cmcd, structured-field-values, and utils on branch `issue/435-tsdoc-cmcd-sfv-utils`, from `main`. Issue #435 proposed one package per PR. Casey asked for one PR with the three packages of the next release. `check-tsdoc.sh` is the comment-aware check script. PR #466. A review round on the same day applied Casey's decisions on the noticed facts.
+- 2026-09-03: tranche 8 on branch `docs/writing-style-sweep`, from `main` after #441 merged. It reverts the 45 definitions that tranches 1 to 7 added in 22 files. It also removes the Terms table from the CMCD user guide. PR pending.
 
 ## Noticed, not changed (tranche 1)
 
@@ -140,23 +139,3 @@ Tranche 7 fixed both items on 2026-09-03.
 Tranche 7 fixed this item on 2026-09-03.
 
 - `rfc/README.md`: the directory tree in the Directory Structure section contains a semicolon in a comment. Code blocks are frozen in this pass.
-
-## Noticed, not changed (Task 9)
-
-The TSDoc rewrite kept these statements as they were. Casey reviewed the list on 2026-09-15 and asked for changes to every item except the first two below. The review round changed the other items in the same PR.
-
-- `libs/cmcd/src/CmcdRequest.ts`: the `ab` description states two near-identical conditions with different strengths, SHOULD NOT and MUST NOT. The text comes from CTA-5004-B. Kept.
-- `libs/cmcd/src/CmcdRecordedReport.ts` and `libs/cmcd/src/CmcdRecordedReportMode.ts` call query, header, and event a "reporting mode". The identifiers `reportingMode` and `CmcdRecordedReportMode` fix that name. A rename is a breaking API change. Kept.
-
-Changed in the review round:
-
-- `libs/cmcd/src/CmcdV1.ts`: the `nrr` deprecation note says to use `nor` with the `r` parameter. The `r` parameter exists only in CMCD version 2. The `br` comment has a title and no description.
-- `libs/cmcd/src/CmcdEventReportConfig.ts`: the `version` comment says "version 2 or higher", but the type allows only version 2.
-- `libs/cmcd/src/CmcdRequestProvenance.ts` says the reporter drops the record for an unknown `sid`. `libs/cmcd/src/CMCD_REQUEST_PROVENANCE.ts` says the reporter drops the response. The behavior is the same.
-- `libs/cmcd/src/CmcdReporter.ts`: the `STATE_FIELDS` comment says the required key of the other event types comes from the caller's per-call data. For `RESPONSE_RECEIVED`, `recordResponseReceived()` derives the `url` key from the response. Two comments say a method "rejects" a request whose `customData` does not satisfy `C`. The rejection is a compile-time type error.
-- `libs/cmcd/src/CmcdRecordedReport.ts` and `libs/cmcd/src/CmcdRecordedReportMode.ts` write the header prefix as `Cmcd-*`. `CmcdHeaderField.ts` defines `CMCD-Object` and the other fields with uppercase letters.
-- `libs/cmcd/src/CmcdReportConfig.ts`: the `enabledKeys` comment says other options may require keys "specifically in event mode" and does not name the options.
-- The cmcd comments name the versions in three ways: "v1", "V1", and "version 1". Casey chose "version 1" and "version 2".
-- `libs/cmcd/src/prepareCmcdData.ts` has a `//` comment with "e.g." and an em dash. Line comments were out of scope for the TSDoc pass. Casey asked for the five such comments in the three packages to change.
-- Every `index.ts` says "tools for working with". The sentence is the same in all packages. Casey chose "A collection of tools for X" for the three packages of this PR. The other packages keep their sentence until their own TSDoc PR.
-- `libs/utils/src/getBandwidthBps.ts`: the `@returns` tag has no text.
