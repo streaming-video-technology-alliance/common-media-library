@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-25
+
 ### Security
 
 - `validateC2paManifestBoxSegment` and `validateC2paInitSegment` no longer return `isValid: true` for a manifest without a verifiable claim signature. Before this fix, a manifest without a `c2pa.signature` box, or with a signature that carried no certificate, passed the signature check. An attacker who controlled the media bytes could forge provenance without a signing key. See [GHSA-h5r3-7p8g-g3q2](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/GHSA-h5r3-7p8g-g3q2). A manifest without a signature box now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`. A manifest without a claim box now fails with `C2paStatusCode.CLAIM_MISSING`.
@@ -24,7 +26,6 @@ and this project adheres to
 - Validation guides (Manifest Box, VOD Merkle, VSI/EMSG, and Results and Error Codes): the prose is rewritten for readers who do not read English as a first language. Merkle tree is defined at first use. The code examples and tables are unchanged.
 - README: the usage examples are complete. The segment URLs are function parameters.
 - Validation guides: empty table cells no longer use an em dash, and a code comment no longer uses an em dash.
-
 
 ## [1.1.3] - 2026-09-15
 
@@ -94,7 +95,8 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.3...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.2.0...HEAD
+[1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.3...c2pa-v1.2.0
 [1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.2...c2pa-v1.1.3
 [1.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.1...c2pa-v1.1.2
 [1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.0...c2pa-v1.1.1
