@@ -71,6 +71,10 @@ import { validateC2paInitSegment, validateC2paMerkleSegment } from '@svta/cml-c2
 async function validateMerkleSegment(initUrl: string, segmentUrl: string): Promise<void> {
   const initResponse = await fetch(initUrl)
   const init = await validateC2paInitSegment(new Uint8Array(await initResponse.arrayBuffer()))
+  if (!init.isValid) {
+    console.error(init.errorCodes)
+    return
+  }
 
   const segmentResponse = await fetch(segmentUrl)
   const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())

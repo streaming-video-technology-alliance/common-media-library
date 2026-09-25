@@ -8,8 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Security
+
+- `validateC2paManifestBoxSegment` and `validateC2paInitSegment` no longer return `isValid: true` for a manifest without a verifiable claim signature. Before this fix, a manifest without a `c2pa.signature` box, or with a signature that carried no certificate, passed the signature check. An attacker who controlled the media bytes could forge provenance without a signing key. See [GHSA-h5r3-7p8g-g3q2](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/GHSA-h5r3-7p8g-g3q2). A manifest without a signature box now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`. A manifest without a claim box now fails with `C2paStatusCode.CLAIM_MISSING`.
+
+### Added
+
+- `C2paStatusCode.CLAIM_SIGNATURE_MISSING` (`claimSignature.missing`) and `C2paStatusCode.CLAIM_MISSING` (`claim.missing`).
+- `ManifestBoxValidationResult.certificate`: the DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate. Adopters on the Manifest Box path can now compare the signer with their trust anchors ([#468](https://github.com/streaming-video-technology-alliance/common-media-library/issues/468)).
+
 ### Changed
 
+- Validation guides and README: the library does not check the signing certificate against a trust list. Callers must check `isValid` before they use `merkleMaps`. See the new Signer Trust section of the Results and Error Codes guide.
 - README: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
 - Validation guides (Manifest Box, VOD Merkle, VSI/EMSG, and Results and Error Codes): the prose is rewritten for readers who do not read English as a first language. Merkle tree is defined at first use. The code examples and tables are unchanged.
 - README: the usage examples are complete. The segment URLs are function parameters.

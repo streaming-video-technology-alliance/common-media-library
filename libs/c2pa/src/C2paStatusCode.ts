@@ -17,8 +17,12 @@ export const C2paStatusCode = {
 	ASSERTION_MISSING: 'assertion.missing',
 	/** An action requiring an ingredient reference does not have one (§18.15.4.7) */
 	ASSERTION_ACTION_INGREDIENT_MISMATCH: 'assertion.action.ingredientMismatch',
-	/** Claim signature verification failed (§15.7) */
+	/** Claim signature verification failed, or the signature carries no certificate (§15.7) */
 	CLAIM_SIGNATURE_MISMATCH: 'claim.signature.mismatch',
+	/** The manifest has no `c2pa.signature` box, so the claim signature cannot be found (§15.7) */
+	CLAIM_SIGNATURE_MISSING: 'claimSignature.missing',
+	/** The manifest has no claim box (§15.6.1) */
+	CLAIM_MISSING: 'claim.missing',
 	/** BMFF hash assertion or Merkle structure is malformed (§15.2.2.3) */
 	ASSERTION_BMFFHASH_MALFORMED: 'assertion.bmffHash.malformed',
 	/** BMFF content hash does not match the committed value (§15.2.2.3) */

@@ -5,7 +5,6 @@ import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
@@ -223,9 +222,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 
 	const internalData = readC2paManifest(bytes, boxes)
 	const { manifest } = internalData
-	const certificate = internalData.signatureBytes
-		? extractCertificateFromSignatureBytes(internalData.signatureBytes)
-		: null
+	const { codes: integrityCodes, certificate } = await validateManifestIntegrity(internalData)
 
 	const bmffHashAssertion =
 		manifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
@@ -238,8 +235,6 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		sessionKeysAssertion && certificate
 			? await validateSessionKeys(sessionKeysAssertion, certificate)
 			: []
-
-	const integrityCodes = await validateManifestIntegrity(internalData, certificate)
 
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
 	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)

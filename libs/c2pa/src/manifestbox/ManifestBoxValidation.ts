@@ -12,6 +12,8 @@ import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 export type ManifestBoxValidationResult = {
 	readonly manifest: C2paManifest | null
 	readonly issuer: string | null
+	/** DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate */
+	readonly certificate: Uint8Array | null
 	readonly sequenceNumber: number | null
 	readonly previousManifestId: string | null
 	readonly streamId: string | null

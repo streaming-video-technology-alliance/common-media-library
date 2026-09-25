@@ -1,10 +1,11 @@
 import { validateC2paInitSegment, C2paStatusCode, LiveVideoStatusCode } from '@svta/cml-c2pa'
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { before, describe, it } from 'node:test'
 import { encode } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
-import { buildInitMediaBoxes, buildMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
+import { buildInitMediaBoxes, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
+import { createTestSigner, type TestSigner } from '../testSigner.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -37,11 +38,17 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		return { uniqueId: 1, localId: 1, count: 4, hashes: [HASH], alg: 'SHA-256', initHash: HASH, ...overrides }
 	}
 
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
 	it('populates merkleMaps and skips SESSIONKEY_INVALID in VOD Merkle mode', async () => {
-		const init = buildMerkleInitSegment({
+		const init = await buildSignedMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
 			merkle: [merkleEntry()],
-		})
+		}, signer)
 
 		const result = await validateC2paInitSegment(init)
 
@@ -63,6 +70,21 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		// /uuid is excluded, so the init hash covers only ftyp + moov — computable up front.
 		// Merkle-only assertions hash with 8-byte box-offset prefixes (§18.6.2).
 		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const init = await buildSignedMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ initHash })],
+		}, signer)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.merkleMaps.length, 1)
+		strictEqual(result.isValid, true)
+		deepStrictEqual(result.errorCodes, [])
+		deepStrictEqual(result.certificate, signer.certificateDER)
+	})
+
+	it('rejects an unsigned init segment with CLAIM_SIGNATURE_MISSING', async () => {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const init = buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
 			merkle: [merkleEntry({ initHash })],
@@ -70,9 +92,9 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 
 		const result = await validateC2paInitSegment(init)
 
-		strictEqual(result.merkleMaps.length, 1)
-		strictEqual(result.isValid, true)
-		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, false)
+		strictEqual(result.certificate, null)
+		ok(result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
 	})
 
 	it('rejects a mismatching initHash', async () => {

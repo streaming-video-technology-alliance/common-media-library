@@ -45,6 +45,8 @@ export const C2paStatusCode: {
     readonly ASSERTION_MISSING: "assertion.missing";
     readonly ASSERTION_ACTION_INGREDIENT_MISMATCH: "assertion.action.ingredientMismatch";
     readonly CLAIM_SIGNATURE_MISMATCH: "claim.signature.mismatch";
+    readonly CLAIM_SIGNATURE_MISSING: "claimSignature.missing";
+    readonly CLAIM_MISSING: "claim.missing";
     readonly ASSERTION_BMFFHASH_MALFORMED: "assertion.bmffHash.malformed";
     readonly ASSERTION_BMFFHASH_MISMATCH: "assertion.bmffHash.mismatch";
 };
@@ -100,6 +102,7 @@ export type ManifestBoxValidationOptions = {
 export type ManifestBoxValidationResult = {
     readonly manifest: C2paManifest | null;
     readonly issuer: string | null;
+    readonly certificate: Uint8Array | null;
     readonly sequenceNumber: number | null;
     readonly previousManifestId: string | null;
     readonly streamId: string | null;

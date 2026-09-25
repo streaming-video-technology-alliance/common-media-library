@@ -1,5 +1,6 @@
 import { encode } from 'cbor-x/encode'
 import { JUMBF_UUID } from '../../src/utils.ts'
+import type { TestSigner } from '../testSigner.ts'
 
 const TEXT_ENCODER = new TextEncoder()
 
@@ -137,14 +138,13 @@ export function buildInitMediaBoxes(): Uint8Array {
 	return concatBytes(buildBox('ftyp', TEXT_ENCODER.encode('isom')), buildBox('moov'))
 }
 
-// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
-// so integrity checks skip signature verification.
-export function buildMerkleInitSegment(assertionData: Record<string, unknown>): Uint8Array {
+function assembleMerkleInitSegment(assertionData: Record<string, unknown>, claimCborBytes: Uint8Array, signature: Uint8Array | null): Uint8Array {
 	const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encode(assertionData) as Uint8Array))
 	const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
-	const claimData = { instanceID: 'urn:uuid:merkle-test-manifest', created_assertions: [] }
-	const claim = buildJumb('c2pa.claim', buildBox('cbor', encode(claimData) as Uint8Array))
-	const manifestJumb = buildJumb('urn:uuid:merkle-test-manifest', claim, assertionStore)
+	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
+	const manifestContent = [claim, assertionStore]
+	if (signature) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', signature)))
+	const manifestJumb = buildJumb('urn:uuid:merkle-test-manifest', ...manifestContent)
 	const store = buildJumb('c2pa', manifestJumb)
 
 	const purpose = TEXT_ENCODER.encode('manifest')
@@ -153,4 +153,20 @@ export function buildMerkleInitSegment(assertionData: Record<string, unknown>): 
 	const uuidBox = buildUuidBox(JUMBF_UUID, concatBytes(prefix, store))
 
 	return concatBytes(buildInitMediaBoxes(), uuidBox)
+}
+
+function merkleClaimCborBytes(): Uint8Array {
+	return Uint8Array.from(encode({ instanceID: 'urn:uuid:merkle-test-manifest', created_assertions: [] }))
+}
+
+// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion. It has no signature box, so
+// validation reports CLAIM_SIGNATURE_MISSING next to the codes a test asserts on.
+export function buildMerkleInitSegment(assertionData: Record<string, unknown>): Uint8Array {
+	return assembleMerkleInitSegment(assertionData, merkleClaimCborBytes(), null)
+}
+
+// Init segment with a `c2pa.hash.bmff.v3` assertion and a claim signed by `signer`.
+export async function buildSignedMerkleInitSegment(assertionData: Record<string, unknown>, signer: Pick<TestSigner, 'sign'>): Promise<Uint8Array> {
+	const claimCborBytes = merkleClaimCborBytes()
+	return assembleMerkleInitSegment(assertionData, claimCborBytes, await signer.sign(claimCborBytes))
 }

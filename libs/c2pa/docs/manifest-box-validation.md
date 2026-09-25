@@ -163,6 +163,7 @@ The `ManifestBoxValidationResult` contains:
 |-------|------|-------------|
 | `manifest` | `C2paManifest \| null` | Parsed manifest, or `null` on parse failure |
 | `issuer` | `string \| null` | Certificate issuer from the signature |
+| `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate |
 | `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion |
 | `previousManifestId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
 | `streamId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
@@ -173,3 +174,5 @@ The `ManifestBoxValidationResult` contains:
 
 > [!NOTE]
 > Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes. Each segment contains a full manifest, and the manifest goes through integrity checks: assertion hashes and claim signature verification.
+>
+> A segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The claim signature is verified with the certificate inside the segment. The library does not check that certificate against a trust list. See [Signer Trust](results-and-error-codes.md#signer-trust).

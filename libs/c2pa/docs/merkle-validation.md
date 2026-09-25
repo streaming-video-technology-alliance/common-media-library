@@ -26,12 +26,14 @@ import { validateC2paInitSegment } from '@svta/cml-c2pa'
 const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
 const init = await validateC2paInitSegment(initBytes)
 
-if (init.merkleMaps.length > 0) {
+if (init.isValid && init.merkleMaps.length > 0) {
   // VOD Merkle stream: proceed to validate media segments against init.merkleMaps
 }
 ```
 
 `merkleMaps` is not empty only when the `c2pa.hash.bmff.v3` assertion of the init segment has a `merkle` field.
+
+Check `isValid` before you use `merkleMaps`. The init manifest must carry a claim signature that verifies. An init segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`, and its `merkleMaps` must not be trusted. The signature is verified with the certificate inside the manifest. The library does not check that certificate against a trust list. See [Signer Trust](results-and-error-codes.md#signer-trust).
 
 ## Validating Media Segments
 
@@ -69,6 +71,11 @@ import type { MerkleSegmentState } from '@svta/cml-c2pa'
 async function validateStream(initUrl: string, segmentUrls: string[]) {
   const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
   const init = await validateC2paInitSegment(initBytes)
+
+  if (!init.isValid) {
+    console.error('Init segment failed', init.errorCodes)
+    return
+  }
 
   if (init.merkleMaps.length === 0) {
     console.error('Not a VOD Merkle stream')

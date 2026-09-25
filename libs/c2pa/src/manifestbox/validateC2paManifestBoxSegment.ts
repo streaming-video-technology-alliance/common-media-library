@@ -9,7 +9,6 @@ import { parseExclusions } from '../bmff/parseExclusions.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import type { InternalManifestData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
-import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
 import type {
 	ManifestBoxValidationOptions,
 	ManifestBoxValidationResult,
@@ -232,12 +231,8 @@ export async function validateC2paManifestBoxSegment(
 		...continuityCodes,
 	])]
 
-	const integrityCodes: readonly C2paStatusCode[] = internalData
-		? await validateManifestIntegrity(
-			internalData,
-			internalData.signatureBytes ? extractCertificateFromSignatureBytes(internalData.signatureBytes) : null,
-		)
-		: []
+	const integrity = internalData ? await validateManifestIntegrity(internalData) : null
+	const integrityCodes: readonly C2paStatusCode[] = integrity?.codes ?? []
 
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
 
@@ -247,6 +242,7 @@ export async function validateC2paManifestBoxSegment(
 		result: {
 			manifest: manifest ?? null,
 			issuer,
+			certificate: integrity?.certificate ?? null,
 			sequenceNumber,
 			previousManifestId,
 			streamId,

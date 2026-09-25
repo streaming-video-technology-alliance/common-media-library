@@ -21,6 +21,14 @@ if (!result.isValid) {
 
 The `errorCodes` array may contain several codes when several checks fail. When `isValid` is `true`, the array is empty.
 
+## Signer Trust
+
+`isValid` is `true` when the manifest is well formed, every assertion matches its hash, and the claim signature verifies. The signature is verified with the end-entity certificate that the manifest carries in its `x5chain` header. The library does not check that certificate against a trust list. Any party with a certificate can produce a manifest that validates.
+
+Before you present content as authentic, compare the signer with your own trust anchors. `InitSegmentValidation.certificate` and `ManifestBoxValidationResult.certificate` hold the DER-encoded end-entity certificate from the claim signature. The value is `null` when the signature is absent or carries no certificate.
+
+A manifest without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate, or that does not verify over the claim, fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`.
+
 ## Live Video Error Codes
 
 The `LiveVideoStatusCode` constants are the live video validation failures that C2PA specification section 19.7 defines.
@@ -81,7 +89,9 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_HASHEDURI_MISMATCH` | `assertion.hashedURI.mismatch` | Assertion hash does not match the claim reference |
 | `ASSERTION_MISSING` | `assertion.missing` | Referenced assertion not found in the assertion store |
 | `ASSERTION_ACTION_INGREDIENT_MISMATCH` | `assertion.action.ingredientMismatch` | Action requires an ingredient reference but none is present |
-| `CLAIM_SIGNATURE_MISMATCH` | `claim.signature.mismatch` | Claim signature verification failed |
+| `CLAIM_SIGNATURE_MISMATCH` | `claim.signature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
+| `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box |
+| `CLAIM_MISSING` | `claim.missing` | The manifest has no claim box |
 | `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 
