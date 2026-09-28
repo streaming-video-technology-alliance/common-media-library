@@ -1,17 +1,17 @@
 # Content steering engine: integration map
 
-This document records how four web players would adopt the engine of the [RFC](../../rfc/content-steering-engine.md). It is part of the [implementation plan](steps.md). Tasks 4 to 7 of the plan build a local spike for each player and check the findings here.
+This document records how four web players would adopt the engine of the [RFC](../../rfc/content-steering-engine.md). The implementation plan builds a local spike for each player and checks the findings here. Revision v2 of the RFC applies the decisions of the "Gaps in the API" section.
 
 Four analyses read each player at the commits of the [design record](architecture.md). The analyses give `file:line` references at those commits. The hls.js analysis also built hls.js with a prototype of the engine and ran the hls.js unit tests. The dash.js analysis ran the proposed controller against the dash.js modules with a stub engine. The Shaka Player and VHS analyses read the code only.
 
 ## Summary
 
-| Player | Fit | Code change (estimate) | Blockers |
-|---|---|---|---|
-| hls.js | The request loop and the clone URIs fit. | 624 lines become 653. | No failover before the first Steering Manifest. No way to support the `hls.pathwayPriority` setter. |
-| dash.js | The request loop, the validation, and the 410 and 429 rules fit. They fix real dash.js bugs. | About 50 lines fewer. | One selected pathway does not fit a BaseURL selection for each node. The `_DASH_pathway` list, `@queryBeforeStart`, a forced request, and MPD updates are not possible. |
-| Shaka Player | The engine fits the location model, where Shaka asks for URIs when it needs them. | The steering manager shrinks. The total code grows, because of a port. | The Closure build cannot use the npm module. Shaka has no read access to the priority list or the penalties. |
-| VHS | The engine fits the exclusion model. | About 720 lines become 230. | None in the API. The build needs Babel for `@svta/*` and must inline CML. |
+| Player | Fit | Code change (estimate) | Blockers with RFC v1 | Status with RFC v2 |
+|---|---|---|---|---|
+| hls.js | The request loop and the clone URIs fit. | 624 lines become 653. | No failover before the first Steering Manifest. No way to support the `hls.pathwayPriority` setter. | Resolved by the fallback priority list and `setPriority()`. |
+| dash.js | The request loop, the validation, and the 410 and 429 rules fit. They fix real dash.js bugs. | About 50 lines fewer. | One selected pathway does not fit a BaseURL selection for each node. The `_DASH_pathway` list, `@queryBeforeStart`, a forced request, and MPD updates are not possible. | Resolved by `priority`, `getReportedPathways`, `queryBeforeStart`, and `update()`. `triggerSteeringRequest()` maps to `start()`, because the RFC has no `refresh()`. |
+| Shaka Player | The engine fits the location model, where Shaka asks for URIs when it needs them. | The steering manager shrinks. The total code grows, because of a port. | The Closure build cannot use the npm module. Shaka has no read access to the priority list or the penalties. | `priority` resolves the API gap. The Closure port remains. |
+| VHS | The engine fits the exclusion model. | About 720 lines become 230. | None in the API. The build needs Babel for `@svta/*` and must inline CML. | `acceptClone` and `update()` remove two workarounds. The build changes remain. |
 
 In all four players, the gain is spec compliance and shared maintenance, not smaller code. The engine is larger than the controllers it replaces:
 
@@ -26,33 +26,33 @@ In all four players, the gain is spec compliance and shared maintenance, not sma
 
 Each row names the players that need the change. Severity is the highest severity among those players.
 
-| # | Gap | Players | Severity | Proposal |
-|---|---|---|---|---|
-| 1 | `uri` and `pathways` are fixed at creation. A new engine loses the penalties, the clones, and the wait for the TTL. | all four | blocker for DASH live streams with many periods | `update({ uri?, pathways? })`, which keeps the timers and the penalties |
-| 2 | The player cannot read the ordered priority list. dash.js needs it for each BaseURL node and for `Location` elements. Shaka needs it for its failover lists. | dash.js, Shaka, hls.js | blocker | `readonly priority: readonly string[]`: the known pathways that are not penalized, in order, including the fallback list |
-| 3 | The engine is stricter than the specs. One invalid clone, or an empty `PATHWAY-CLONES` array, rejects the whole Steering Manifest. ETSI TS 103 998 Table 6.3-1 lets PATHWAY-PRIORITY be absent. | all four | workaround exists | Check VERSION, TTL, and PATHWAY-PRIORITY. Skip each invalid clone. Treat an empty `PATHWAY-CLONES` array as no clones. |
-| 4 | `penalize()` cannot fail over before the first valid Steering Manifest, because the priority list is empty. In hls.js the error then becomes fatal. | hls.js, dash.js | blocker | Use the fallback priority list from creation. |
-| 5 | Exceptions in callbacks go to `console.error`. | all four | cosmetic | Report them through `onError`. |
-| 6 | `onManifest` has no URL context. | hls.js, dash.js, VHS | cosmetic | `onManifest(manifest, clones, { url, reloadUri })` |
-| 7 | `createSteeringEngine` throws for values that come from the Content Description, such as an empty `pathways` list. Each player must catch the `TypeError`. | hls.js, Shaka, VHS | workaround exists | Document which checks depend on the content. |
-| 8 | `pathway` is one value, but `@defaultServiceLocation` is a list. | dash.js, Shaka | workaround exists | `pathway?: string \| readonly string[]` |
-| 9 | The priority list cannot be set. hls.js has a public `pathwayPriority` setter. | hls.js | blocker | `setPriority(priority)` |
-| 10 | For DASH, `_DASH_pathway` must list every service location that the player used (DASH spec, step 7). The engine knows only its own selections. | dash.js | blocker | `getReportedPathways?: () => readonly string[]` |
-| 11 | A first request without parameters (`@queryBeforeStart`) requires an absent `pathway`. After a failed first request, `penalize()` without an argument does nothing. | dash.js | blocker | `queryBeforeStart?: boolean` |
-| 12 | No request can be forced. The dash.js method `triggerSteeringRequest()` is public. | dash.js | blocker | `refresh(): Promise<void>`, with no effect after a 410 |
-| 13 | A player cannot refuse a clone that it cannot build. The engine can then select a pathway that the player never applied. | VHS | workaround exists | `onManifest` returns the IDs of the clones that the player built. |
-| 14 | A requester result without `status` counts as a failure. The Shaka data URI plugin returns no status. | Shaka | workaround exists | Treat a missing status as 200. |
-| 15 | `stop()` can be resumed, so an old listener can restart an engine that the player replaced. | VHS | workaround exists | A final `destroy()` |
-| 16 | The engine needs a steering server. hls.js also fails over between redundant streams without content steering. | hls.js | workaround exists | An optional `uri`, for selection and penalties only |
-| 17 | When the selected clone changes its `URI-REPLACEMENT`, no callback runs. | hls.js | workaround exists | Call `onPathwayChange` again, or report the changed clone IDs. |
-| 18 | The RFC does not say that `penalize()` calls `onPathwayChange` synchronously, or that a `data` URI gets no steering parameters. hls.js depends on the first rule. | hls.js, VHS | cosmetic | Document both rules. |
-| 19 | For DASH, `PARAMS` must go on the final request URI. A segment URI that resolves against a BaseURL loses the query of the BaseURL. | dash.js, Shaka | cosmetic | Say so in the guide of the RFC. |
+| # | Gap | Players | Severity | Proposal | Decision (RFC v2) |
+|---|---|---|---|---|---|
+| 1 | `uri` and `pathways` are fixed at creation. A new engine loses the penalties, the clones, and the wait for the TTL. | all four | blocker for DASH live streams with many periods | `update({ uri?, pathways? })`, which keeps the timers and the penalties | accepted: `update()` |
+| 2 | The player cannot read the ordered priority list. dash.js needs it for each BaseURL node and for `Location` elements. Shaka needs it for its failover lists. | dash.js, Shaka, hls.js | blocker | `readonly priority: readonly string[]`: the known pathways that are not penalized, in order, including the fallback list | accepted: `priority` |
+| 3 | The engine is stricter than the specs. One invalid clone, or an empty `PATHWAY-CLONES` array, rejects the whole Steering Manifest. ETSI TS 103 998 Table 6.3-1 lets PATHWAY-PRIORITY be absent. | all four | workaround exists | Check VERSION, TTL, and PATHWAY-PRIORITY. Skip each invalid clone. Treat an empty `PATHWAY-CLONES` array as no clones. | accepted |
+| 4 | `penalize()` cannot fail over before the first valid Steering Manifest, because the priority list is empty. In hls.js the error then becomes fatal. | hls.js, dash.js | blocker | Use the fallback priority list from creation. | accepted |
+| 5 | Exceptions in callbacks go to `console.error`. | all four | cosmetic | Report them through `onError`. | accepted, with the rule of the CMCD session API RFC and `SteeringErrorType` |
+| 6 | `onManifest` has no URL context. | hls.js, dash.js, VHS | cosmetic | `onManifest(manifest, clones, { url, reloadUri })` | accepted |
+| 7 | `createSteeringEngine` throws for values that come from the Content Description, such as an empty `pathways` list. Each player must catch the `TypeError`. | hls.js, Shaka, VHS | workaround exists | Document which checks depend on the content. | accepted: documented |
+| 8 | `pathway` is one value, but `@defaultServiceLocation` is a list. | dash.js, Shaka | workaround exists | `pathway?: string \| readonly string[]` | rejected: the player passes the first value that is in `pathways` |
+| 9 | The priority list cannot be set. hls.js has a public `pathwayPriority` setter. | hls.js | blocker | `setPriority(priority)` | accepted |
+| 10 | For DASH, `_DASH_pathway` must list every service location that the player used (DASH spec, step 7). The engine knows only its own selections. | dash.js | blocker | `getReportedPathways?: () => readonly string[]` | accepted |
+| 11 | A first request without parameters (`@queryBeforeStart`) requires an absent `pathway`. After a failed first request, `penalize()` without an argument does nothing. | dash.js | blocker | `queryBeforeStart?: boolean` | accepted |
+| 12 | No request can be forced. The dash.js method `triggerSteeringRequest()` is public. | dash.js | blocker | `refresh(): Promise<void>`, with no effect after a 410 | rejected: the base spec requires the wait for the TTL |
+| 13 | A player cannot refuse a clone that it cannot build. The engine can then select a pathway that the player never applied. | VHS | workaround exists | `onManifest` returns the IDs of the clones that the player built. | accepted as the `acceptClone` option |
+| 14 | A requester result without `status` counts as a failure. The Shaka data URI plugin returns no status. | Shaka | workaround exists | Treat a missing status as 200. | accepted |
+| 15 | `stop()` can be resumed, so an old listener can restart an engine that the player replaced. | VHS | workaround exists | A final `destroy()` | rejected: `update()` removes the need |
+| 16 | The engine needs a steering server. hls.js also fails over between redundant streams without content steering. | hls.js | workaround exists | An optional `uri`, for selection and penalties only | rejected: not content steering |
+| 17 | When the selected clone changes its `URI-REPLACEMENT`, no callback runs. | hls.js | workaround exists | Call `onPathwayChange` again, or report the changed clone IDs. | rejected: the player compares the clones of `onManifest` |
+| 18 | The RFC does not say that `penalize()` calls `onPathwayChange` synchronously, or that a `data` URI gets no steering parameters. hls.js depends on the first rule. | hls.js, VHS | cosmetic | Document both rules. | accepted: documented |
+| 19 | For DASH, `PARAMS` must go on the final request URI. A segment URI that resolves against a BaseURL loses the query of the BaseURL. | dash.js, Shaka | cosmetic | Say so in the guide of the RFC. | accepted: documented |
 
-Gaps 1, 2, 3, and 4 affect most players. Together they are the smallest change that removes most blockers.
+Gaps 1, 2, 3, and 4 affect most players. Together they are the smallest change that removes most blockers. Revision v2 of the RFC accepts 14 of the 19 proposals and rejects 5.
 
 ## Findings outside the API
 
-- **Exact peer versions.** The publish script changes each `"*"` peer to an exact version (`scripts/publish.ts`). The hls.js and dash.js packages pin older `@svta/*` versions. A new package with `@svta/cml-utils` 1.6.1 as a peer then fails with `ERESOLVE`. Both players would have to upgrade every `@svta/*` package at once. The engine imports only types from `@svta/cml-utils`. Proposal: declare the request and response types in the package and drop the peer dependency, or make the peer optional.
+- **Exact peer versions.** The publish script changes each `"*"` peer to an exact version (`scripts/publish.ts`). The hls.js and dash.js packages pin older `@svta/*` versions. A new package with `@svta/cml-utils` 1.6.1 as a peer then fails with `ERESOLVE`. Both players would have to upgrade every `@svta/*` package at once. The engine imports only types from `@svta/cml-utils`. Decision: the peer dependency remains.
 - **Syntax level.** The published packages contain ES2020 syntax (`??`, `?.`), although `tsconfig.json` sets ES2019. `@svta/cml-cmcd` 2.7.0 has 25 `??` and 21 `?.`. VHS supports Chrome 53 and does not transpile `node_modules`. Proposal: choose a syntax target for all CML packages, and set it for tsdown.
 - **Babel loose mode.** hls.js transpiles `@svta/*` code to ES5 in loose mode. In that mode, `Math.min(...map.values())` becomes `Math.min.apply(Math, iterator)`, which returns `Infinity`. The penalty timer then never fires. An `async` function also adds the regenerator runtime. The Phase 1 code of the plan avoids both constructs, and a loose ES5 build of the engine was checked. Proposal: add both rules to `.claude/rules/code-quality.md`.
 - **ES modules only.** VHS also ships a CommonJS build. It must inline CML, because a `require()` of an ES module fails before Node 20.19 and 22.12.
@@ -115,7 +115,7 @@ function createLoaderRequester(hls: Hls, onLoad: (load: SteeringLoad | null) => 
 }
 ```
 
-**Callbacks.** `onManifest` stores PATHWAY-PRIORITY for the `pathwayPriority` getter, updates the clones, and triggers STEERING_MANIFEST_LOADED. `onPathwayChange` filters the levels by pathway and triggers LEVELS_UPDATED. The ERROR listener calls `engine.penalize(errorPathway)` and sets `errorAction.resolved` when the selection changed. This logic needs the synchronous `onPathwayChange` of gap 18.
+**Callbacks.** `onManifest` stores PATHWAY-PRIORITY for the `pathwayPriority` getter, updates the clones, and triggers STEERING_MANIFEST_LOADED. `onPathwayChange` filters the levels by pathway and triggers LEVELS_UPDATED. The ERROR listener calls `engine.penalize(errorPathway)` and sets `errorAction.resolved` when the selection changed. This logic needs the synchronous `onPathwayChange` of gap 18. With RFC v2, the `pathwayPriority` setter calls `setPriority()`, and `penalize()` fails over before the first Steering Manifest.
 
 **Clones.** `applyUriReplacement` replaces `performUriReplacement`, with `stableVariantId` for levels and `stableRenditionId` for renditions. hls.js keeps the group renaming, the level duplication, and the rendition copies. Clones now live for one Steering Manifest, so the controller compares each list with the previous one. A rendition without a URI (`''`) must skip `applyUriReplacement`, which throws for it.
 
@@ -128,7 +128,7 @@ function createLoaderRequester(hls: Hls, onLoad: (load: SteeringLoad | null) => 
 - `uri`: `urlUtils.resolve(serverUrl.trim(), manifest.url)`. Today the element text is used unresolved.
 - `pathways`: the unique `@serviceLocation` values of the BaseURL elements at every level, and of `Location` and `PatchLocation`.
 - `pathway`: the first `defaultServiceLocationArray` entry that is in `pathways`. Omit it when `@queryBeforeStart` is true.
-MANIFEST_UPDATED must replace the engine when the resolved URI changes (gap 1).
+With RFC v2, MANIFEST_UPDATED calls `update()` with the resolved URI and the service locations. The controller passes its default service location as `pathway`, with `queryBeforeStart`. It passes its location tracking as `getReportedPathways`.
 
 **Requester.** A new `src/dash/utils/ContentSteeringRequester.js` wraps `URLLoader` with the request type `ContentSteering`. That type keeps CMCD, Annex I parameters, credentials, and the request interceptors. On failure, HTTPLoader passes a `CommonMediaResponse` with `status`, `url`, and lower-case headers, so `retry-after` reaches the engine. The request type has no retry setting in dash.js, so the schedule of the engine is the only retry.
 
@@ -160,7 +160,7 @@ function load(httpRequest) {
 }
 ```
 
-**Callbacks.** `onManifest` builds the public `ContentSteeringResponse` and triggers CONTENT_STEERING_REQUEST_COMPLETED, so StreamController rebuilds the BaseURL tree with the clones. `onPathwayChange` only logs, because BaseURLSelector asks ContentSteeringSelector at each `resolve()`. SERVICE_LOCATION_BASE_URL_BLACKLIST_ADD calls `engine.penalize(entry)`. dash.js keeps BlacklistController for the DVB and basic selectors. `LocationSelector` keeps the PATHWAY-PRIORITY of the last response.
+**Callbacks.** `onManifest` builds the public `ContentSteeringResponse` and triggers CONTENT_STEERING_REQUEST_COMPLETED, so StreamController rebuilds the BaseURL tree with the clones. `onPathwayChange` only logs, because BaseURLSelector asks ContentSteeringSelector at each `resolve()`. SERVICE_LOCATION_BASE_URL_BLACKLIST_ADD calls `engine.penalize(entry)`. dash.js keeps BlacklistController for the DVB and basic selectors. `LocationSelector` keeps the PATHWAY-PRIORITY of the last response. With RFC v2, ContentSteeringSelector reads `engine.priority` for each BaseURL node.
 
 **Clones.** HOST goes on the synthesized BaseURL or `Location` through `applyUriReplacement`. The controller keeps `PARAMS` in `queryParams`, and HTTPLoader adds them to the final request URI (gap 19). HTTPLoader can also call `applyUriReplacement(url, { PARAMS })` to replace same-name parameters without a second encoding.
 
@@ -201,7 +201,7 @@ async request(request) {
 }
 ```
 
-**Location model.** Shaka asks for URIs when it builds a segment request, so `getLocations(streamId)` reads `engine.pathway` at that time. The failover order and the penalties are not visible (gap 2), so the manager keeps its own copy of the penalties. `banLocation(uri)` finds the pathway by URI prefix, not by host, and calls `engine.penalize(id)`. Shaka does not read STABLE-VARIANT-ID or STABLE-RENDITION-ID yet, so the HLS parser must start to record them.
+**Location model.** Shaka asks for URIs when it builds a segment request, so `getLocations(streamId)` reads `engine.pathway` at that time. With RFC v1, the failover order and the penalties are not visible (gap 2), so the manager keeps its own copy of the penalties. With RFC v2, `getLocations()` reads `engine.priority` instead. `banLocation(uri)` finds the pathway by URI prefix, not by host, and calls `engine.penalize(id)`. Shaka does not read STABLE-VARIANT-ID or STABLE-RENDITION-ID yet, so the HLS parser must start to record them.
 
 **Behavior changes.** Every test in `content_steering_manager_unit.js` calls `requestInfo()`, so all of them change. These behaviors change:
 
@@ -255,7 +255,7 @@ export const createSteeringRequester = (pc) => (request) => new Promise((resolve
 
 **Callbacks.** `onPathwayChange` calls `excludeThenChangePathway_(pathway)`. When the pathway has no playable variant, it calls `penalize(pathway)` instead. `onManifest` triggers `contentsteeringparsed`, updates the HLS clones, and applies the current selection again, because the clones copy the exclusion state of their base. `excludePlaylist` calls `penalize()` for the last rendition of a pathway. Today VHS removes the pathway and adds it again after the TTL.
 
-**Clones.** `createCloneURI_` calls `applyUriReplacement` with `stableVariantId`. m3u8-parser does not copy STABLE-RENDITION-ID, so PER-RENDITION-URIS needs a parser change. A clone update becomes a delete and a rebuild. VHS has no DASH cloning (gap 13).
+**Clones.** `createCloneURI_` calls `applyUriReplacement` with `stableVariantId`. m3u8-parser does not copy STABLE-RENDITION-ID, so PER-RENDITION-URIS needs a parser change. A clone update becomes a delete and a rebuild. VHS has no DASH cloning (gap 13). With RFC v2, `acceptClone` returns `false` for every DASH clone, and for an HLS clone without a playable variant.
 
 **Behavior changes.** All 37 tests of `content-steering-controller.test.js` and 18 steering tests of `playlist-controller.test.js` read controller internals, so they need a rewrite. `proxyServerURL` support ends, which VHS documents today. Fixed bugs: an immediate retry loop after a failure before the first manifest, and DASH steering that stops after a reset.
 
