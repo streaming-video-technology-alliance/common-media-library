@@ -3,13 +3,13 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { toCmcdHeaders } from './toCmcdHeaders.ts'
 
 /**
- * Append CMCD query args to a header object.
+ * Append CMCD header shards to a header object.
  *
  * @param headers - The headers to append to.
  * @param cmcd - The CMCD object to append.
- * @param options - Encode options.
+ * @param options - Options for encoding.
  *
- * @returns The headers with the CMCD header shards appended.
+ * @returns The headers with CMCD header shards appended.
  *
  * @public
  *

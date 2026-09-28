@@ -1,4 +1,4 @@
-const TOKEN_FIELDS = new Set(['ot', 'sf', 'st', 'e', 'sta'])
+const TOKEN_FIELDS = /* @__PURE__ */ new Set(['ot', 'sf', 'st', 'e', 'sta'])
 
 /**
  * Checks if the given key is a token field.

@@ -18,9 +18,10 @@ export type BmffHashValidationOptions = {
  * Validates the C2PA BMFF content hash (`c2pa.hash.bmff.v3`) for a DASH segment.
  *
  * Tries both offset-prefix modes — 8-byte file offset prefix and no prefix — to handle
- * inter-signer interoperability until a standard signaling mechanism is defined in the spec.
- *
- * Use {@link computeBmffHash} directly when the offset prefix size is known.
+ * inter-signer interoperability for hashes carried in the VSI CBOR map (§19.7.3), where
+ * the spec does not signal the prefix mode. Flat hashes from a `c2pa.hash.bmff.v3`
+ * assertion always use the 8-byte prefix (§18.6.2); verify those with
+ * {@link computeBmffHash} and `offsetPrefixSize: 8` instead.
  *
  * @param segmentBytes - Raw segment bytes to validate
  * @param expectedHash - Expected hash bytes from the VSI CBOR map

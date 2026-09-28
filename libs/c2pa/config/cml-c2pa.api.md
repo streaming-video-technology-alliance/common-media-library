@@ -7,6 +7,18 @@
 import { ValueOf } from '@svta/cml-utils';
 
 // @public
+export type BmffHashConstraint = {
+    readonly offset: number;
+    readonly value: Uint8Array | readonly number[];
+};
+
+// @public
+export type BmffHashExclusion = {
+    readonly xpath: string;
+    readonly data?: readonly BmffHashConstraint[];
+};
+
+// @public
 export type C2paAssertion = {
     readonly label: string;
     readonly data: unknown;
@@ -33,6 +45,10 @@ export const C2paStatusCode: {
     readonly ASSERTION_MISSING: "assertion.missing";
     readonly ASSERTION_ACTION_INGREDIENT_MISMATCH: "assertion.action.ingredientMismatch";
     readonly CLAIM_SIGNATURE_MISMATCH: "claim.signature.mismatch";
+    readonly CLAIM_SIGNATURE_MISSING: "claimSignature.missing";
+    readonly CLAIM_MISSING: "claim.missing";
+    readonly ASSERTION_BMFFHASH_MALFORMED: "assertion.bmffHash.malformed";
+    readonly ASSERTION_BMFFHASH_MISMATCH: "assertion.bmffHash.mismatch";
 };
 
 // @public
@@ -52,6 +68,7 @@ export type InitSegmentValidation = {
     readonly certificate: Uint8Array | null;
     readonly manifestId: string | null;
     readonly sessionKeys: readonly ValidatedSessionKey[];
+    readonly merkleMaps: readonly MerkleMap[];
     readonly isValid: boolean;
     readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[];
 };
@@ -63,6 +80,7 @@ export const LiveVideoStatusCode: {
     readonly SEGMENT_INVALID: "livevideo.segment.invalid";
     readonly ASSERTION_INVALID: "livevideo.assertion.invalid";
     readonly CONTINUITY_METHOD_INVALID: "livevideo.continuityMethod.invalid";
+    readonly CONTINUITY_METHOD_UNSUPPORTED: "livevideo.continuityMethod.unsupported";
     readonly SESSIONKEY_INVALID: "livevideo.sessionkey.invalid";
 };
 
@@ -70,9 +88,21 @@ export const LiveVideoStatusCode: {
 export type LiveVideoStatusCode = ValueOf<typeof LiveVideoStatusCode>;
 
 // @public
+export type ManifestBoxContinuityValidator = (liveVideoAssertion: Readonly<Record<string, unknown>>, manifest: C2paManifest) => boolean | Promise<boolean>;
+
+// @public
+export type ManifestBoxValidationOptions = {
+    readonly continuityValidator?: {
+        readonly method: string;
+        readonly validate: ManifestBoxContinuityValidator;
+    };
+};
+
+// @public
 export type ManifestBoxValidationResult = {
     readonly manifest: C2paManifest | null;
     readonly issuer: string | null;
+    readonly certificate: Uint8Array | null;
     readonly sequenceNumber: number | null;
     readonly previousManifestId: string | null;
     readonly streamId: string | null;
@@ -86,6 +116,31 @@ export type ManifestBoxValidationResult = {
 export type ManifestBoxValidationState = {
     readonly lastStreamId?: string | null;
     readonly lastSequenceNumber?: number | null;
+};
+
+// @public
+export type MerkleMap = {
+    readonly uniqueId: number;
+    readonly localId: number;
+    readonly count: number;
+    readonly hashes: readonly Uint8Array[];
+    readonly initHash: Uint8Array | null;
+    readonly alg: string | null;
+    readonly exclusions: readonly BmffHashExclusion[];
+    readonly offsetPrefixSize: number;
+};
+
+// @public
+export type MerkleSegmentState = {
+    readonly lastLocations: ReadonlyMap<string, number>;
+};
+
+// @public
+export type MerkleSegmentValidation = {
+    readonly location: number | null;
+    readonly bmffHashHex: string | null;
+    readonly isValid: boolean;
+    readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[];
 };
 
 // @public
@@ -135,10 +190,16 @@ export type SequenceValidationResult = {
 export function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSegmentValidation>;
 
 // @public
-export function validateC2paManifestBoxSegment(bytes: Uint8Array, lastManifestId: string | null, state?: ManifestBoxValidationState): Promise<{
+export function validateC2paManifestBoxSegment(bytes: Uint8Array, lastManifestId: string | null, state?: ManifestBoxValidationState, options?: ManifestBoxValidationOptions): Promise<{
     readonly result: ManifestBoxValidationResult;
     readonly nextManifestId: string | null;
     readonly nextState: ManifestBoxValidationState;
+}>;
+
+// @public
+export function validateC2paMerkleSegment(segmentBytes: Uint8Array, merkleMaps: readonly MerkleMap[], state?: MerkleSegmentState): Promise<{
+    readonly result: MerkleSegmentValidation;
+    readonly nextState: MerkleSegmentState;
 }>;
 
 // @public

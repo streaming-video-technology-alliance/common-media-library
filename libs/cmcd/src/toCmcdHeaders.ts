@@ -5,10 +5,10 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
 /**
- * Convert a CMCD data object to request headers
+ * Convert a CMCD object to request headers
  *
- * @param cmcd - The CMCD data object to convert.
- * @param options - Options for encoding the CMCD object.
+ * @param cmcd - The CMCD object to convert.
+ * @param options - Options for encoding.
  *
  * @returns The CMCD header shards.
  *

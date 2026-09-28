@@ -1,6 +1,6 @@
 /**
- * This implements the rounding procedure described in step 2 of the "Serializing a Decimal" specification.
- * This rounding style is known as "even rounding", "banker's rounding", or "commercial rounding".
+ * Rounds a value with the procedure from step 2 of the "Serializing a Decimal" specification.
+ * The style is known as "even rounding", "banker's rounding", or "commercial rounding".
  *
  * @param value - The value to round
  * @param precision - The number of decimal places to round to

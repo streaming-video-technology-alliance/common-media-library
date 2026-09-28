@@ -11,12 +11,12 @@ import type { ValueOf } from '@svta/cml-utils'
  */
 export const CmcdStreamType = {
 	/**
-	 *  All segments are available – e.g., VOD
+	 * All segments are available, for example VOD
 	 */
 	VOD: 'v',
 
 	/**
-	 * Segments become available over time – e.g., LIVE
+	 * Segments become available over time, for example LIVE
 	 */
 	LIVE: 'l',
 

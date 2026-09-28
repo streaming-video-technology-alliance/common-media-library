@@ -1,15 +1,16 @@
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { CMCD_AGGREGATE_BITRATE_KEYS } from './CMCD_AGGREGATE_BITRATE_KEYS.ts'
 import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
+import { CMCD_KEY_OBJECT_TYPES } from './CMCD_KEY_OBJECT_TYPES.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED, type CmcdEventType } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
-import type { CmcdObjectType } from './CmcdObjectType.ts'
-import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
+import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE, type CmcdReportingMode } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import { isCmcdEventKey } from './isCmcdEventKey.ts'
 import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
@@ -18,21 +19,23 @@ import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { isCmcdV1Key } from './isCmcdV1Key.ts'
 import { isTokenField } from './isTokenField.ts'
 import { isValid } from './isValid.ts'
+import { toTokenString } from './toTokenString.ts'
 
-const filterMap: Record<string, (key: string) => boolean> = {
-	[CMCD_EVENT_MODE]: isCmcdEventKey,
-	[CMCD_REQUEST_MODE]: isCmcdRequestKey,
+const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
+	event: isCmcdEventKey,
+	request: isCmcdRequestKey,
 }
 
 /**
- * Unwrap an inner list or SfItem value to a plain scalar.
+ * Unwrap an inner list or SfItem value to a scalar.
  */
-function unwrapValue(value: any, ot?: CmcdObjectType): any {
+function unwrapValue(value: any, ot?: unknown): any {
 	if (Array.isArray(value)) {
 		let item: any
 
-		if (ot) {
-			item = value.find(item => item.params?.ot === ot)
+		const otText = toTokenString(ot)
+		if (otText) {
+			item = value.find(item => toTokenString(item.params?.ot) === otText)
 		}
 
 		if (!item) {
@@ -50,10 +53,10 @@ function unwrapValue(value: any, ot?: CmcdObjectType): any {
 }
 
 /**
- * Down-convert V2 CMCD data to V1 format.
+ * Down-convert version 2 CMCD data to version 1.
  *
- * - Extracts `nrr` from `nor` SfItem `r` parameter.
- * - Unwraps inner-list values to plain scalars.
+ * - Extracts `nrr` from the `nor` SfItem's `r` parameter.
+ * - Unwraps inner-list values to scalars.
  */
 function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 	const result: Record<string, any> = {}
@@ -89,6 +92,11 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 	return result
 }
 
+function formatValue(key: CmcdKey, value: CmcdValue, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): CmcdValue {
+	const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
+	return typeof formatter === 'function' && isValid(value) ? formatter(value, formatterOptions) : value
+}
+
 /**
  * Convert a generic object to CMCD data.
  *
@@ -96,6 +104,9 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
  * @param options - Options for encoding.
  *
  * @public
+ *
+ * @example
+ * {@includeCode ../test/prepareCmcdData.test.ts#example}
  */
 export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): Cmcd {
 	const results: Cmcd = {}
@@ -109,13 +120,16 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	// Down-convert V2 data to V1 format if needed
 	const data = version === 1 ? downConvertToV1(obj) : obj
+	const eventType = toTokenString(data['e'])
 
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
 
-	// Filter keys based on the version, reporting mode and options
+	// Filter keys based on the version, reporting mode and options. Every key
+	// passing a filter is RFC 8941 serializable: standard keys by definition,
+	// custom keys because isCmcdCustomKey enforces the serializable charset.
 	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
 
-	if (data['e'] && data['e'] !== CMCD_EVENT_RESPONSE_RECEIVED) {
+	if (data['e'] && eventType !== CMCD_EVENT_RESPONSE_RECEIVED) {
 		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
 	}
 
@@ -128,9 +142,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const isEventMode = reportingMode === CMCD_EVENT_MODE
 
 	if (isEventMode) {
-		const eventType = data['e']
-
-		if (!keys.includes('e') && eventType != null) {
+		if (!keys.includes('e') && data['e'] != null) {
 			keys.push('e')
 		}
 
@@ -142,7 +154,15 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			keys.push('cen')
 		}
 
-		const requiredField = eventType ? CMCD_STATE_EVENT_FIELDS.get(eventType) : undefined
+		if (!keys.includes('ec') && data['ec'] != null && eventType === CMCD_EVENT_ERROR) {
+			keys.push('ec')
+		}
+
+		if (!keys.includes('url') && data['url'] != null && eventType === CMCD_EVENT_RESPONSE_RECEIVED) {
+			keys.push('url')
+		}
+
+		const requiredField = eventType ? CMCD_STATE_EVENT_FIELDS.get(eventType as CmcdEventType) : undefined
 		if (requiredField && data[requiredField] != null && !keys.includes(requiredField)) {
 			keys.push(requiredField)
 		}
@@ -164,13 +184,38 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	keys.sort()
 
+	let objectType: string | undefined
+	let objectTypeResolved = false
+
 	for (const key of keys) {
 		let value = data[key] as CmcdValue
 
-		const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
-		if (typeof formatter === 'function') {
-			value = formatter(value, formatterOptions)
+		// An aggregate bitrate key is not sent alongside its exact bitrate key
+		const exactKey = CMCD_AGGREGATE_BITRATE_KEYS[key]
+		if (exactKey && keys.includes(exactKey) && isValid(formatValue(exactKey, data[exactKey] as CmcdValue, options, formatterOptions))) {
+			continue
 		}
+
+		// Some keys are only sent for certain object types. The object type is
+		// the formatted `ot` value, even when `ot` is filtered out of the report.
+		const objectTypes = version > 1 ? CMCD_KEY_OBJECT_TYPES[key] : undefined
+		if (objectTypes) {
+			if (!objectTypeResolved) {
+				const ot = formatValue('ot', data['ot'] as CmcdValue, options, formatterOptions)
+				objectType = isValid(ot) ? toTokenString(ot) : undefined
+				objectTypeResolved = true
+			}
+			if (objectType !== undefined && !objectTypes.includes(objectType)) {
+				continue
+			}
+		}
+
+		// The custom event name is only sent on a custom event
+		if (key === 'cen' && eventType !== CMCD_EVENT_CUSTOM_EVENT) {
+			continue
+		}
+
+		value = formatValue(key, value, options, formatterOptions)
 
 		// Version should only be reported if not equal to 1.
 		if (key === 'v') {
@@ -185,7 +230,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		// Playback rate should only be sent if not equal to 1, except as
 		// the value of a PLAYBACK_RATE state-change event (where pr=1 is
 		// the data being reported, not a default to skip).
-		if (key === 'pr' && value === 1 && !(isEventMode && data['e'] === CMCD_EVENT_PLAYBACK_RATE)) {
+		if (key === 'pr' && value === 1 && !(isEventMode && eventType === CMCD_EVENT_PLAYBACK_RATE)) {
 			continue
 		}
 
@@ -195,20 +240,25 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		}
 
 		// Ignore invalid values, except `bg: false` on a backgrounded-mode (e=b) state-
-		// change event — the wire must carry `?0` per CTA-5004-B so the transition is
-		// reportable. `bg` is the only state-change required field typed as boolean;
-		// `false` on other required fields (e.g. `cid`, `sta`) is a caller bug and stays
-		// stripped so the validator flags it.
+		// change event. The wire must carry `?0` per CTA-5004-B so the transition is
+		// reportable. `bg` is the only state-change required field typed as boolean.
+		// `false` on other required fields (for example `cid`, `sta`) is a caller bug and
+		// stays stripped so the validator flags it.
 		const isBgFalseTransition = isEventMode
 			&& value === false
 			&& key === 'bg'
-			&& data['e'] === CMCD_EVENT_BACKGROUNDED_MODE
+			&& eventType === CMCD_EVENT_BACKGROUNDED_MODE
 		if (!isValid(value) && !isBgFalseTransition) {
 			continue
 		}
 
-		if (isTokenField(key) && typeof value === 'string') {
-			value = new SfToken(value)
+		if (isTokenField(key)) {
+			if (typeof value === 'string') {
+				value = new SfToken(value)
+			}
+			else if (value instanceof SfItem && typeof value.value === 'string') {
+				value = new SfItem(new SfToken(value.value), value.params)
+			}
 		}
 
 		(results as any)[key] = value

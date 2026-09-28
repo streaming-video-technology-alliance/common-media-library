@@ -58,10 +58,10 @@ type CmcdReportWaiter = {
 }
 
 /**
- * Test helper that records CMCD-bearing reports across XHR and fetch
- * transports for assertion in e2e tests. Each captured request is
- * normalized to {@link @svta/cml-utils!HttpRequest | HttpRequest} so
- * tests are identical regardless of which transport the player uses.
+ * Test helper that records CMCD reports from the XHR and fetch
+ * transports for assertions in e2e tests. The recorder normalizes each
+ * captured request to {@link @svta/cml-utils!HttpRequest | HttpRequest},
+ * so tests are identical regardless of which transport the player uses.
  *
  * @example
  * {@includeCode ../test/CmcdReportRecorder.test.ts#example}
@@ -149,11 +149,11 @@ export class CmcdReportRecorder {
 	}
 
 	/**
-	 * Install transport patches and begin recording CMCD reports.
-	 * No-op if already attached — the previously supplied options are
-	 * retained and the new `options` argument is silently ignored.
-	 * Call `detach()` first if you need to re-attach with different
-	 * options.
+	 * Install transport patches and start recording CMCD reports.
+	 * If the recorder is already attached, this call does nothing. The
+	 * recorder keeps the previous options and silently ignores the new
+	 * `options` argument. To re-attach with different options, call
+	 * `detach()` first.
 	 *
 	 * @public
 	 */
@@ -207,7 +207,7 @@ export class CmcdReportRecorder {
 	}
 
 	/**
-	 * Return a defensive copy of all recorded reports.
+	 * Return a copy of all recorded reports.
 	 *
 	 * @public
 	 */
@@ -217,8 +217,8 @@ export class CmcdReportRecorder {
 
 	/**
 	 * Wait until at least `count` reports of any type are recorded.
-	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * Resolves with all matching reports. Rejects with a diagnostic error
+	 * on timeout. `count` defaults to 1. `timeout` defaults to the
 	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public
@@ -229,8 +229,8 @@ export class CmcdReportRecorder {
 
 	/**
 	 * Wait until at least `count` manifest reports are recorded.
-	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * Resolves with all matching reports. Rejects with a diagnostic error
+	 * on timeout. `count` defaults to 1. `timeout` defaults to the
 	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public
@@ -241,8 +241,8 @@ export class CmcdReportRecorder {
 
 	/**
 	 * Wait until at least `count` segment reports are recorded.
-	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * Resolves with all matching reports. Rejects with a diagnostic error
+	 * on timeout. `count` defaults to 1. `timeout` defaults to the
 	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public
@@ -253,8 +253,8 @@ export class CmcdReportRecorder {
 
 	/**
 	 * Wait until at least `count` event-mode reports are recorded.
-	 * Resolves with all matching reports; rejects with a diagnostic error
-	 * on timeout. `count` defaults to 1; `timeout` falls back to the
+	 * Resolves with all matching reports. Rejects with a diagnostic error
+	 * on timeout. `count` defaults to 1. `timeout` defaults to the
 	 * recorder's `waitTimeout` option (default 15000 ms).
 	 *
 	 * @public

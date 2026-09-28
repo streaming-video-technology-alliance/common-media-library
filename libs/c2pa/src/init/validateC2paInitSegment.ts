@@ -5,14 +5,14 @@ import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
-import { validateBmffHash } from '../bmff/validateBmffHash.ts'
+import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
-import { bytesToHex, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
+import { validateMerkleMaps } from '../merkle/validateMerkleMaps.ts'
+import { bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
@@ -98,7 +98,10 @@ async function validateBmffHashAssertion(
 		rawHash instanceof Uint8Array ? rawHash : new Uint8Array(rawHash as number[])
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
-	return validateBmffHash(bytes, expectedHash, { exclusions, alg })
+	// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
+	// box; only Merkle tree hashes may omit the 8-byte offset prefix.
+	const computed = await computeBmffHash(bytes, { exclusions, alg, offsetPrefixSize: 8 })
+	return hashesEqual(computed, expectedHash)
 }
 
 type SessionKeyFields = {
@@ -211,6 +214,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 			certificate: null,
 			manifestId: null,
 			sessionKeys: [],
+			merkleMaps: [],
 			isValid: false,
 			errorCodes: [LiveVideoStatusCode.INIT_INVALID],
 		}
@@ -218,9 +222,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 
 	const internalData = readC2paManifest(bytes, boxes)
 	const { manifest } = internalData
-	const certificate = internalData.signatureBytes
-		? extractCertificateFromSignatureBytes(internalData.signatureBytes)
-		: null
+	const { codes: integrityCodes, certificate } = await validateManifestIntegrity(internalData)
 
 	const bmffHashAssertion =
 		manifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
@@ -234,11 +236,14 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 			? await validateSessionKeys(sessionKeysAssertion, certificate)
 			: []
 
-	const integrityCodes = await validateManifestIntegrity(internalData, certificate)
-
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
+	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
+
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
-	if (sessionKeys.length === 0) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
+	if (sessionKeys.length === 0 && merkleMaps === null) {
+		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	}
 	for (const code of integrityCodes) codes.add(code)
 	const errorCodes = [...codes]
 
@@ -247,6 +252,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		certificate,
 		manifestId: manifest.instanceId,
 		sessionKeys,
+		merkleMaps: merkleMaps ?? [],
 		isValid: errorCodes.length === 0,
 		errorCodes,
 	}

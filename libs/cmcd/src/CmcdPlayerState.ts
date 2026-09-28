@@ -1,7 +1,7 @@
 import type { ValueOf } from '@svta/cml-utils'
 
 /**
- * CMCD v2 player states for the 'sta' key.
+ * CMCD version 2 player states for the 'sta' key.
  *
  *
  * @enum
@@ -57,7 +57,7 @@ export const CmcdPlayerState = {
 	QUIT: 'q',
 
 	/**
-	 * Preloading: The player is loading assets ahead of starting in order to provide a fast startup. The expectation is that playback will commence at a future time.
+	 * Preloading: The player is loading assets ahead of starting to provide a fast startup. The expectation is that playback will commence at a future time.
 	 */
 	PRELOADING: 'd',
 } as const

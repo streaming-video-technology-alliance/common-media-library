@@ -1,5 +1,5 @@
 /**
- * Get the base URL from a full URL or a URL object.
+ * Gets the base URL from a full URL or a URL object.
  *
  * @param fullUrl - The full URL or URL object.
  * @returns The base URL.

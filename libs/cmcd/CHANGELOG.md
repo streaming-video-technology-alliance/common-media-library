@@ -8,6 +8,111 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-09-15
+
+### Changed
+
+- TSDoc: the comment prose is rewritten for readers who do not read English as a first language. Signatures, examples, tags, and links are unchanged. Some comments had wrong facts. The `appendCmcdHeaders` summary said query args. The `isCmcdResponseReceivedKey` return description said request key. The `CmcdEventType` constants called their values keys. The `CmcdV1` `mtp` title had a stray key name.
+- The `Cmcd` type documentation links to the CTA-5004-B specification. It linked only to the version 1 PDF
+
+### Fixed
+
+- A bare import of the package no longer runs code at module scope. `CmcdReporter` built its required-event-key table with an array spread of `CMCD_STATE_EVENT_FIELDS`. `prepareCmcdData` built its key filter table with computed keys. Bundlers kept one or both tables in every bundle that imports the package, even when the bundle uses neither function
+- `validateCmcdRequest` reports an error when a request carries CMCD data in both the headers and the `CMCD` query parameter. CTA-5004-B allows one transmission mode per request. The validator still checks the headers and returns their data
+- `validateCmcdRequest` reads the `CMCD` parameter from the query string and ignores the URL fragment. A relative URL no longer throws. When the fragment is the only place with a `CMCD` parameter, the error message says so
+- The encoder applies the "MUST NOT" rules of CTA-5004-B to version 2 payloads. The change covers `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`, which share `prepareCmcdData`
+- `d` is sent only when `ot` is `a`, `v`, `av`, `tt`, `c`, or `o`. `tpb` is sent only when `ot` is `a`, `v`, `av`, or `c`. The check reads the formatted `ot` from the data, even when `ot` is filtered out of the report. An absent or empty `ot` does not remove either key. CTA-5004 (version 1) has no such rule, so version 1 payloads are unchanged
+- `ab`, `lab`, and `tab` are omitted when `br`, `lb`, or `tb` is sent in the same payload. The check runs after formatting, so a formatter that empties the exact key keeps the aggregate key
+- `cen` is omitted unless the event type is `ce`
+- An empty value is omitted instead of formatted. `null` on `br`, `d`, `bl`, `dl`, `mtp`, `rtp`, or `tb` was sent as `0`. `''` on `nor` was sent as `nor=("")`. A custom formatter is no longer called for an empty value
+- An empty array is omitted. `br: []` was sent as `br=()`
+- `CmcdReporter` event report bodies no longer end with a line feed. CTA-5004-B separates records with a single line feed and forbids a trailing one
+- `validateCmcdStructure` reports an error when `d` or `tpb` is present with an `ot` that the key does not allow. It also reports an error when `ab`, `lab`, or `tab` is present with `br`, `lb`, or `tb`. The message names the keys and the allowed object types. The checks apply to version 2 payloads and run in every validator
+- `validateCmcdEvents` and `validateCmcdEventReport` report an error when the body ends with a line feed. Every earlier `CmcdReporter` sent that line feed. A receiver that upgrades marks reports from those players as invalid
+- `nor` is the shortest relative path when the request URL and `baseUrl` share two or more leading path segments. A `baseUrl` directory such as `/v/1080p/` produced `nor=("../1080p/seg-2.m4s")` for a segment in the same directory. The value is now `nor=("seg-2.m4s")`. A value that is empty, starts with `/`, or has `:` in its first segment gets a `./` prefix. This is a wire output change
+
+## [2.6.1] - 2026-09-07
+
+### Fixed
+
+- `encodeCmcd` now writes a token field as a bare token when its value is an `SfItem` that wraps a string. The token fields are `ot`, `sf`, `st`, `e`, and `sta`. `decodeCmcd` returns that shape for a member with parameters, such as `ot=m;com.example-p=1`. The encoder wrote the field as a quoted string, which is not valid CMCD ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `encodeCmcd` compares the `e` value by token text. `decodeCmcd` with `useSymbol` returns `e` as a `Symbol` or an `SfToken`. Such an event report now keeps its response-received keys on `e=rr`, `bg=?0` on `e=b`, and `pr=1` on `e=pr`. The version 1 down-conversion also matches the `ot` parameter of an inner-list item by token text ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+- `validateCmcdValues` accepts a token field whose value is an `SfItem`, a `Symbol`, or an `SfToken`. Since 2.6.0, `validateCmcdEvents` and the other string validators rejected a valid member such as `ot=m;com.example-p=1`. The message was `invalid token value "[object Object]"`. `validateCmcdStructure` applies the event rules (`cen`, `url`, response keys, state-change fields, `ec`) when `e` is a `Symbol` or an `SfToken` ([#419](https://github.com/streaming-video-technology-alliance/common-media-library/issues/419))
+
+## [2.6.0] - 2026-09-03
+
+### Added
+
+- `CmcdReporterConfig.sessionRetention` — the number of ended sessions the reporter retains state for, in addition to the current one (default `2`; `0` disables retention, `Infinity` never evicts; only `number` values are accepted and floored, anything else falls back to the default). The reporter now keeps per-session state (data snapshot, sequence numbers, `msd` gate, dedup baseline, unsent queues) for recently ended sessions, so a media request that completes after a `sid` change reports under the session that issued it: its own `sid`, its next per-target sequence number, its still-unsent `msd`, and its frozen data snapshot, which is detached at the transition so mutating an array previously passed to `update()` cannot rewrite an ended session's late reports. A `sid` change also drains an ended session's unsent event reports (each keeps its own `sid` and sequence number) before eviction can discard them. Implements the accepted RFC in `rfc/cmcd-session-retention.md` ([#416](https://github.com/streaming-video-technology-alliance/common-media-library/pull/416))
+- `CMCD_REQUEST_PROVENANCE` — the symbol key (backed by `Symbol.for('@svta/cml-cmcd/request-provenance')`) under which `createRequestReport()` stamps a frozen session-provenance record (`CmcdRequestProvenance`) on every request it returns, including requests it does not decorate (request reporting disabled, or a transform cancels decoration). The record carries `sid`, the issuing session's ID and the attribution key; `cid`, the content ID in effect when the request was issued; and `data`, the request's per-call data encoded as a CMCD string, captured before the key filter and transform run so it rides undecorated requests too. `recordResponseReceived()` attributes by the record's `sid`, and only by it: a response whose record does not name a retained session is dropped rather than relabeled, and a per-call `data.sid` is not an attribution key. The record is honored wherever its `sid` resolves, so a hand-built record attributes, as does a split topology where one reporter decorates and another configured with the same session records. Session identity is the `sid` itself, which CTA-5004-B expects to be unique per playback session: reusing one replaces the retained namesake and relabels its late responses onto the replacement. The `RESPONSE_RECEIVED` event is rebuilt from the record: the decoded per-call snapshot supplies the caller's request-time report keys (never re-ingesting the player-facing, player-mutable `customData.cmcd` object, so token-typed values like `ot`, `sf`, `st`, and custom-key `SfToken`s keep their RFC 8941 wire type across serialization boundaries), and the record's `cid` reports in place of the session's current one, so a response that completes after a mid-session content change keeps the meaning it had when its request was issued. Spread and `Object.assign` carry the record through request clones; `JSON.stringify` and structured clone drop symbol keys, so read the value before such a boundary and restore it afterward — the record itself survives JSON and is read by value rather than object identity, so a revived copy behaves exactly like the original. The member is typed optional on `CmcdRequestReport` so the type stays constructible by consumers; every request the reporter returns carries it ([#416](https://github.com/streaming-video-technology-alliance/common-media-library/pull/416))
+
+- `CmcdDecodeOptions.useSymbol` — controls how RFC 8941 token values are represented by `decodeCmcd` (and `fromCmcdQuery`/`fromCmcdHeaders`/`fromCmcdUrl`). When omitted, tokens reduce to plain strings as before, which cannot be told apart from string values on re-encoding. `true` decodes tokens as registry `Symbol`s, `false` as `SfToken` instances; either preserved representation re-encodes as a bare token, making the codec symmetric: `encodeCmcd(decodeCmcd(s, { useSymbol: false }))` returns the input bytes. `CmcdReporter` decodes provenance snapshots this way, so request-time token values keep their wire type on `RESPONSE_RECEIVED` reports
+
+### Changed
+
+- README: the `CmcdReportRecorder` paragraph is rewritten for readers who do not read English as a first language. The code examples are unchanged.
+- User Guide, Report Recorder Guide, and Validation Guide: the prose is rewritten for readers who do not read English as a first language. The code examples and tables are unchanged.
+- User Guide and Validation Guide: one heading, one table cell, and one code comment no longer use a contraction or an em dash.
+
+### Fixed
+
+- `decodeCmcd` no longer discards RFC 8941 parameters carried on a dictionary member or an inner list (`com.example-x=1;p=2`, `tab=(3000);p=2`): a params-bearing member now decodes as an `SfItem` with its value reduced as usual, matching how inner-list members with params were already preserved. The value inside a params-bearing item is also reduced consistently now (previously an inner token leaked as a raw `Symbol` instead of a string). Affects `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`, and `fromCmcdUrl`
+- `CmcdReporter` event reports are encoded when they are queued rather than when a batch is sent. A report whose values cannot be serialized (RFC 8941 rejects them) now throws synchronously from the recording call that produced it, attributable to its caller, instead of rejecting the asynchronous batch send, where the failure was swallowed by the retry path and the un-encodable report re-queued forever, silently blocking every later report on batched targets. Queued reports are also finished wire bytes, immune to later mutation of caller-held values, so the per-target deep copy of report data is now made only where a `transform` is configured
+- `CmcdReporter` now stamps the session-owned keys `sid` and `msd` after per-call data and transforms in both reporting modes, so neither `recordEvent()`/`recordResponseReceived()`/`createRequestReport()` data nor a `transform` return value can substitute the session ID or put `msd` on the wire outside the once-per-session gate. Transforms still see the canonical `sid` in their input. This also makes `update({ sid: undefined })` a no-op; previously the explicit `undefined` was merged into the data store and every later report went out with no `sid` at all. On `recordResponseReceived()` per-call session keys have no effect either: attribution is by the request's provenance record alone (see Added) ([#408](https://github.com/streaming-video-technology-alliance/common-media-library/issues/408))
+- `msd` lifecycle fixes ([#409](https://github.com/streaming-video-technology-alliance/common-media-library/issues/409)):
+  - `update({ msd })` now accepts `0` (a valid instant-start value), rounds fractional values to integer milliseconds per CTA-5004-B, and rejects `Infinity`, negatives, `NaN`, and values whose rounded form exceeds the RFC 8941 structured-field integer maximum of `999_999_999_999_999`. Previously `0` was rejected while fractions and negatives reached the wire as-is; an accepted `Infinity` consumed the once-per-session gate without ever being encodable, so `msd` was silently never sent; and an over-range value consumed the gate and then threw in the serializer, poisoning event batches on every retry
+  - A `sid` change now clears the stored `msd` and re-arms every send gate: `msd` is once per Session ID, so a value supplied for the new session is sent again, and a stored-but-unsent value from the old session no longer leaks forward
+  - The send gate is consumed only when the prepared report actually retains `msd`. Previously both modes flipped the flag before the `enabledKeys` filter ran, so a target that filtered `msd` out still consumed its gate
+- HTTP 410 disposal of an event target is now scoped per CTA-5004-B: suppression covers every event target configured with the matching URL, lasts for the remainder of the session that received the 410, and no longer outlives it. A `sid` change restores disposed targets (re-arming their intervals when the reporter is started), a 410 response that resolves after a session change silences the session that sent the batch instead of the one that replaced it, and a batch re-queued after a 429/5xx failure retries only within its own session, so a batch invalidated by a disposal in an ended session is never replayed into the new one ([#410](https://github.com/streaming-video-technology-alliance/common-media-library/issues/410))
+- Corrected the `CmcdEncodeOptions.version` documentation, which still claimed a default of `1`. Encoding has defaulted to `CMCD_V2` since 2.0.0: when `version` is not set, the version is inferred from the data's `v` key, falling back to `CMCD_V2`, which is why `encodeCmcd({ br: 1000 })` emits `br=1000,v=2`. Documentation-only change; runtime behavior is unchanged
+
+## [2.5.0] - 2026-07-28
+
+### Added
+
+- `transform` on the request-report config and on each event-target config: a synchronous `(data, request) => Cmcd | null` hook that modifies a single CMCD report before it goes to the wire, or cancels it by returning `null`. Placement scopes the hook the same way `enabledKeys` does — the top-level `transform` applies to `createRequestReport()` reports, and each event target's `transform` applies to that target's event reports, so targets sharing a collector URL can filter independently. For `RESPONSE_RECEIVED` events the transform also receives the request that triggered them, which is how a player filters reports by its own request taxonomy on `customData`. Implements the accepted RFC in `rfc/cmcd-reporter-middleware.md` ([#390](https://github.com/streaming-video-technology-alliance/common-media-library/pull/390))
+
+  The contract is bounded so a transform cannot produce an invalid or cross-contaminated report:
+
+  - `e`, `sn`, and `msd` are stamped after the transform runs, so a cancelled report leaves no sequence-number gap and `msd` rides the next report that is sent.
+  - Keys the event requires (`ts` always, the signalled field for state-change events, `cen` for custom events, `ec` for errors, `url` for response-received) are restored if a transform removes them, so a transform cannot emit a report `validateCmcdEvents()` would reject. Keys already absent beforehand are not fabricated.
+  - The report data is copied for each target, nested values included, so mutating an array or an `SfItem`'s `params` in place cannot reach the reporter's persistent data or another target's report.
+  - Transform exceptions propagate rather than being swallowed, but are isolated per target: the remaining targets still receive the report and the error surfaces after the reporter finishes the event. This covers `start()`'s initial time-interval event as well as `recordEvent()`, so a throwing transform cannot leave later targets without armed intervals. See the user guide.
+  - The `request` argument is a read-only view (`CmcdTransformRequest`): it is context for the decision and must not be mutated, since it belongs to the caller. Members are `readonly`, and `customData` values are `unknown` unless the reporter is given the player's `customData` type (see below). A mutable `FormData`/`URLSearchParams` body and JavaScript callers are outside what the type can enforce
+- `CmcdReporterConfig.customHeaderMap` — routes custom keys into specific CMCD header shards (`CMCD-Session`, `CMCD-Object`, `CMCD-Status`) when the transmission mode is `HEADERS`. Custom keys not listed in any shard still default to `CMCD-Request`; standard keys keep their spec-defined shards and cannot be re-routed. The option previously existed on `CmcdEncodeOptions` but was not reachable through `CmcdReporter`
+
+### Fixed
+
+- `prepareCmcdData` now force-includes `ec` on error events and `url` on response-received events after the per-target `enabledKeys` filter, completing the set started in 2.4.0 for state-change fields and `cen`. A target whose `enabledKeys` omitted `ec` previously emitted `e=e,sid="…",sn=0,ts=…,v=2`, which `validateCmcdEvents()` rejects for the missing required key; `rr` targets lost `url` the same way. This affects any such target, with or without a report transform configured
+
+### Changed
+
+- `CmcdTransformRequest`, `CmcdRequestReportTransform`, `CmcdEventReportTransform`, `CmcdRequestReportConfig`, `CmcdEventReportConfig`, `CmcdReporterConfig`, and `CmcdReporter` now take a type parameter describing the player's `customData`, so a transform reads player fields with typed dot access instead of bracket access on `unknown`. The parameter is inferred from the configuration: annotating a single transform as `CmcdEventReportTransform<PlayerData>` types the `request` argument in every other transform on the same reporter, and `new CmcdReporter<PlayerData>({ … })` does the same explicitly. Every declaration defaults to `Record<string, unknown>`, so existing code compiles unchanged and un-parameterized spellings such as `CmcdRequestReportTransform` keep their current `unknown`-valued behavior. This closes the asymmetry left by the generic `recordResponseReceived()` below, where the call site preserved the player's `customData` type but the transform reading that same request did not
+
+  `customData` is readonly at every depth rather than only at the top level, so describing a nested shape does not trade the request's no-mutation guarantee for typed reads. `Readonly<C>` would have left `request.customData.nested.field = …` compiling, which the opaque-record default had always rejected
+
+  `createRequestReport()` and `recordResponseReceived()` require the request's `customData` to satisfy the reporter's type, so a request the configured transforms could not read is rejected at the call site instead of reaching them and reading `undefined`. A reporter left on the default constrains nothing and accepts any `customData`, exactly as before; the rule is expressed by the new `CmcdReporterCustomData` type
+- `CmcdReporterCustomData<C>` — the `customData` a `CmcdReporter` method accepts for a reporter typed `C`. Exported because it appears in the signatures of `createRequestReport()` and `recordResponseReceived()`
+- `CmcdReporter.recordResponseReceived()` is now generic over the request's `customData`, so a player can pass a request carrying only its own keys (e.g. `{ requestType: 'segment' }`) without declaring a `cmcd` key it does not own and without a cast. The parameter was previously pinned to `HttpResponse<HttpRequest<{ cmcd?: Cmcd }>>`; because `{ cmcd?: Cmcd }` is a weak type (every property optional), a `customData` sharing no properties with it was rejected outright. This pairs with the per-target `transform`, which reads the player's taxonomy off the triggering request. Type-only widening: the reporter still reads just `customData.cmcd`, and existing callers passing `HttpRequest<{ cmcd?: Cmcd }>` continue to compile
+- `isCmcdCustomKey` and the `CmcdCustomKey` type now only accept custom keys that survive RFC 8941 key serialization: a lowercase first letter, then characters from `a-z 0-9 . -`, with a hyphen that is neither the first nor the last character. Uppercase and digit-leading names were never serializable as CMCD; they are now rejected by the type, the validators, and key filtering instead of being dropped at encode preparation
+
+### Documentation
+
+- The user guide now documents custom reverse-DNS keys end to end: naming rules (including the runtime constraints the `CmcdCustomKey` type cannot express), the explicit `enabledKeys` opt-in required in both request mode and per event target (no wildcard exists), value types and wire-format behavior (`true` as a bare key, `false` dropped), and the fixed `CMCD-Request` header placement in headers mode
+- The custom-event (`e=ce`) documentation now shows a complete working configuration: `CmcdEventType.CUSTOM_EVENT` must be listed in the target's `events` for delivery, `cen` is force-included without an `enabledKeys` entry, and any accompanying payload remains subject to the target's `enabledKeys`. Also documents that response-received keys are stripped from non-`rr` events
+- The user guide and validation guide custom-key sections now cross-link each other
+
+## [2.4.1] - 2026-07-21
+
+### Fixed
+
+- Module-scope key-table `Set`/`Map` initializers (and the `CmcdReporter` state-field tables) are now marked side-effect free so consumer bundlers can drop them when unused; a bare import of the package previously retained ~4.9 KB of eagerly-built tables (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+- `isCmcdCustomKey` no longer backtracks quadratically on hostile inputs (CodeQL polynomial ReDoS): the ambiguous regex was replaced with an unambiguous character-class check plus an interior-hyphen test; accepted inputs are unchanged ([#388](https://github.com/streaming-video-technology-alliance/common-media-library/issues/388))
+
+### Documentation
+
+- Clarify recommended event-firing patterns in `CmcdReporter`: state-change events are fired via `update()`, with snapshot context attached by combining the state field and continuous metrics in a single call. `recordEvent()`'s `data` argument is documented as intended for non-state-change events (custom, error, ad-lifecycle, mute/unmute, expand/collapse, skip). Calling `recordEvent()` for a state-change event after `update()` has auto-fired it silently drops the second call's data; see the user guide for the recommended pattern.
+
 ## [2.4.0] - 2026-05-22
 
 ### Added
@@ -29,7 +134,7 @@ and this project adheres to
 
 ### Changed
 
-- `CmcdReporter.update()` now auto-fires the corresponding state-change event (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`, `BACKGROUNDED_MODE`, `BITRATE_CHANGE`) when a tracked field's value changes. The two-step `update()` + `recordEvent()` pattern still works and is harmlessly deduplicated.
+- `CmcdReporter.update()` now auto-fires the corresponding state-change event (`PLAY_STATE`, `PLAYBACK_RATE`, `CONTENT_ID`, `BACKGROUNDED_MODE`, `BITRATE_CHANGE`) when a tracked field's value changes. A subsequent `recordEvent()` call for the same state-change event is deduplicated, which silently drops any enrichment data passed to it.
 - `CmcdReporter.recordEvent()` with a state-change event now persists the dedup field from its `data` argument into the persistent data store (write-through), keeping `this.data` consistent with the most recently reported value.
 - Consecutive state-change events with the same effective field value are now suppressed, matching CTA-5004-B's definition of these events as state transitions.
 
@@ -171,7 +276,12 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...HEAD
+[2.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...cmcd-v2.7.0
+[2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
+[2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0
+[2.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.1...cmcd-v2.5.0
+[2.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.4.0...cmcd-v2.4.1
 [2.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.2...cmcd-v2.4.0
 [2.3.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.1...cmcd-v2.3.2
 [2.3.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.3.0...cmcd-v2.3.1

@@ -8,6 +8,42 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.11] - 2026-09-15
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.6
+- Update `@svta/cml-utils` to 1.6.1
+- Update `@svta/cml-xml` to 1.2.1
+
+## [1.1.10] - 2026-09-03
+
+### Changed
+
+- Update `@svta/cml-xml` to 1.2.0
+- README: a usage example replaces the empty code block.
+
+## [1.1.9] - 2026-08-11
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.5
+
+## [1.1.8] - 2026-07-28
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.4
+- Update `@svta/cml-utils` to 1.6.0
+- Update `@svta/cml-xml` to 1.1.6
+
+## [1.1.7] - 2026-07-21
+
+### Fixed
+
+- `ensureEncryptedInit`'s sample-entry reader/writer tables are now built inside side-effect-free (`/* @__PURE__ */`) initializers so consumer bundlers can drop the tables (and their `@svta/cml-iso-bmff` factory imports) when `ensureEncryptedInit` is unused; runtime import behavior is unchanged (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+- The module-scope `MediaKeys.isTypeSupported` probe is now marked side-effect free so consumer bundlers can drop it when `getSupportedKeySystemConfiguration` is unused ([#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+
 ## [1.1.6] - 2026-05-13
 
 ### Changed
@@ -79,7 +115,12 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.6...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.11...HEAD
+[1.1.11]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.10...drm-v1.1.11
+[1.1.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.9...drm-v1.1.10
+[1.1.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.8...drm-v1.1.9
+[1.1.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.7...drm-v1.1.8
+[1.1.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.6...drm-v1.1.7
 [1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.5...drm-v1.1.6
 [1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.4...drm-v1.1.5
 [1.1.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.3...drm-v1.1.4

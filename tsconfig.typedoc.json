@@ -12,6 +12,7 @@
 			"@svta/cml-cta": ["./libs/cta/src/index.ts"],
 			"@svta/cml-dash": ["./libs/dash/src/index.ts"],
 			"@svta/cml-drm": ["./libs/drm/src/index.ts"],
+			"@svta/cml-error-codes": ["./libs/error-codes/src/index.ts"],
 			"@svta/cml-id3": ["./libs/id3/src/index.ts"],
 			"@svta/cml-iso-8601": ["./libs/iso-8601/src/index.ts"],
 			"@svta/cml-iso-bmff": ["./libs/iso-bmff/src/index.ts"],

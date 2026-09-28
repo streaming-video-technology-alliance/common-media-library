@@ -8,6 +8,32 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-09-15
+
+### Changed
+
+- TSDoc: the comment prose is rewritten for readers who do not read English as a first language. Signatures, examples, tags, and links are unchanged.
+- README: the usage example prints its results instead of calling an undefined `assert`. Several of those calls compared typed arrays with `===`.
+
+### Fixed
+
+- `urlToRelativePath` removes every shared leading path segment. A base directory such as `/v/1080p/` returned `../1080p/seg-2.m4s` for a target in the same directory. The correct result is `seg-2.m4s`. A path that diverged and matched again deeper resolved to a wrong URL
+- `urlToRelativePath` adds a `./` prefix when the result is empty, starts with `/`, or has `:` in its first segment. Without the prefix, the reference resolved to a wrong URL (RFC 3986 section 4.2)
+- `encodeBase64` encodes inputs of any length. Before this change, it spread every byte into one `String.fromCharCode` call, which threw `RangeError: Maximum call stack size exceeded` at about 125 KB. It now converts the bytes in 32 KB chunks, which also runs about four times faster on small inputs. The output does not change.
+
+
+## [1.6.0] - 2026-07-28
+
+### Added
+
+- `DeepReadonly<T>` — marks every property of `T` as `readonly`, recursively. `Readonly<T>` stops at the top level, so a nested object stays writable and `value.nested.field = …` still compiles; this applies at every depth, including through arrays. Functions are left unchanged so callbacks carried on a value stay callable, and primitives are returned as they are
+
+## [1.5.1] - 2026-07-21
+
+### Fixed
+
+- `uuid` no longer falls back to `Math.random`: when `crypto.randomUUID` is unavailable it derives the UUID from `crypto.getRandomValues` with RFC 4122 version/variant bits, keeping the blob-URL trick only as a last resort ([#388](https://github.com/streaming-video-technology-alliance/common-media-library/issues/388))
+
 ## [1.5.0] - 2026-05-13
 
 ### Added
@@ -70,7 +96,10 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...HEAD
+[1.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.6.1
+[1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...utils-v1.6.0
+[1.5.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...utils-v1.5.1
 [1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.4.0...utils-v1.5.0
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.3.0...utils-v1.4.0
 [1.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.2.0...utils-v1.3.0

@@ -1,4 +1,4 @@
-const TEXT_DECODER = new TextDecoder()
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 
 import type { CertificateInfo } from './CertificateInfo.ts'
 import {

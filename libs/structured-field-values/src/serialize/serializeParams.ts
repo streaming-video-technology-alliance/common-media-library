@@ -33,13 +33,16 @@ export function serializeParams(params?: Record<string, any>): string {
 		return ''
 	}
 
-	return Object.entries(params)
-		.map(([key, value]) => {
-			if (value === true) {
-				return `;${serializeKey(key)}` // omit true
-			}
+	let output = ''
 
-			return `;${serializeKey(key)}=${serializeBareItem(value)}`
-		})
-		.join('')
+	for (const key of Object.keys(params)) {
+		const value = params[key]
+		output += `;${serializeKey(key)}`
+
+		if (value !== true) { // omit true
+			output += `=${serializeBareItem(value)}`
+		}
+	}
+
+	return output
 }

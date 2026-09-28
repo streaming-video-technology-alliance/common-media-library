@@ -1,7 +1,6 @@
 import type { Cmcd } from '@svta/cml-cmcd'
 
 export const CMCD_OUTPUT_REQUEST: Cmcd = {
-	ab: [2500],
 	bg: true,
 	bl: [5000],
 	br: [200],
@@ -19,13 +18,12 @@ export const CMCD_OUTPUT_REQUEST: Cmcd = {
 	dfa: 5,
 	dl: 10000,
 	ec: ['ERR001', 'ERR002'] as const,
-	lab: [200],
 	lb: [100],
 	ltc: 1500,
 	msd: 2500,
 	mtp: [10000],
 	nor: ['../testing/3.m4v'] as const,
-	ot: 'm',
+	ot: 'v',
 	pb: [1000],
 	pt: 45000,
 	rtp: 8000,
@@ -35,7 +33,6 @@ export const CMCD_OUTPUT_REQUEST: Cmcd = {
 	st: 'v',
 	sta: 'p',
 	su: true,
-	tab: [3000],
 	tb: [5000],
 	tbl: [8000],
 	tpb: [4000],

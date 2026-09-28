@@ -34,7 +34,7 @@ import { parseError } from './parseError.ts'
 //
 //     3.  Else, if char is DQUOTE, return output_string.
 //
-//     4.  Else, if char is in the range %x00-1f or %x7f (i.e., is not
+//     4.  Else, if char is in the range %x00-1f or %x7f (that is, is not
 //         in VCHAR or SP), fail parsing.
 //
 //     5.  Else, append char to output_string.

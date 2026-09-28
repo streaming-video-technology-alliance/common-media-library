@@ -1,16 +1,26 @@
 import type { CmcdKey } from './CmcdKey.ts'
 
-const CUSTOM_KEY_REGEX = /^[a-zA-Z0-9-.]+-[a-zA-Z0-9-.]+$/
+// The CMCD custom-key charset restricted to RFC 8941 key serialization
+// (serializeKey): a lowercase first letter, then `a-z 0-9 . -`.
+const CUSTOM_KEY_REGEX = /^[a-z][a-z0-9.-]*$/
 
 /**
- * Check if a key is a custom key.
+ * Check if a key is a valid custom key: a lowercase first letter, then
+ * characters from `a-z 0-9 . -`. The key needs a hyphen, not at the start
+ * or end. This check applies the CTA-5004-B custom-key rules, restricted
+ * to names that RFC 8941 key serialization accepts.
  *
  * @param key - The key to check.
  *
  * @returns `true` if the key is a custom key, `false` otherwise.
  *
  * @public
+ *
+ * @example
+ * {@includeCode ../test/isCmcdCustomKey.test.ts#example}
  */
 export function isCmcdCustomKey(key: CmcdKey): boolean {
-	return CUSTOM_KEY_REGEX.test(key)
+	// The separator is checked outside the regex to keep matching linear (CodeQL js/polynomial-redos).
+	const separator = key.indexOf('-', 1)
+	return separator > 0 && separator < key.length - 1 && CUSTOM_KEY_REGEX.test(key)
 }

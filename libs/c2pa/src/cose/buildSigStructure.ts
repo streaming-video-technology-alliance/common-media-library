@@ -7,7 +7,7 @@ const CBOR_UINT32_LENGTH_INDICATOR = 0x5a
 const CBOR_INLINE_MAX = 23
 const CBOR_UINT8_MAX = 255
 const CBOR_UINT16_MAX = 65535
-const COSE_SIG1_CONTEXT_BYTES = new TextEncoder().encode('Signature1')
+const COSE_SIG1_CONTEXT_BYTES = /* @__PURE__ */ new TextEncoder().encode('Signature1')
 
 function byteStringHeaderSize(length: number): number {
 	if (length <= CBOR_INLINE_MAX) return 1

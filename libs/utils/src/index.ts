@@ -1,5 +1,5 @@
 /**
- * A collection of tools for working with media.
+ * A collection of tools for media.
  *
  * @packageDocumentation
  */
@@ -11,6 +11,7 @@ export * from './convertUint8ToUint16.ts'
 export * from './decodeBase64.ts'
 export * from './decodeText.ts'
 export * from './DecodeTextOptions.ts'
+export type * from './DeepReadonly.ts'
 export * from './encodeBase64.ts'
 export * from './encodeText.ts'
 export * from './Encoding.ts'

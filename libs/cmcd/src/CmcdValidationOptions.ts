@@ -8,7 +8,7 @@ import type { CmcdVersion } from './CmcdVersion.ts'
  */
 export type CmcdValidationOptions = {
 	/**
-	 * Explicit CMCD version override. If not provided, the version is
+	 * Explicit CMCD version override. If omitted, the version is
 	 * inferred from the payload's `v` key, defaulting to 1.
 	 */
 	version?: CmcdVersion

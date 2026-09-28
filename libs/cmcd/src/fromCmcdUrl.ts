@@ -4,9 +4,9 @@ import type { CmcdDecodeOptions } from './CmcdDecodeOptions.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 
 /**
- * Decode CMCD data from a url encoded string.
+ * Decode CMCD data from a URL encoded string.
  *
- * @param url - The url encoded string to decode.
+ * @param url - The URL encoded string to decode.
  * @param options - Options for decoding.
  *
  * @returns The decoded CMCD data.

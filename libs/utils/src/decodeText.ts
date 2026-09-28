@@ -6,8 +6,8 @@ import { UTF_16_LE } from './UTF_16_LE.ts'
 import { UTF_8 } from './UTF_8.ts'
 
 /**
- * Converts an ArrayBuffer or ArrayBufferView to a string. Similar to `TextDecoder.decode`
- * but with a fallback for environments that don't support `TextDecoder`.
+ * Converts an ArrayBuffer or ArrayBufferView to a string. The function works like
+ * `TextDecoder.decode` and also supports environments without `TextDecoder`.
  *
  * @param data - The data to decode.
  * @param options - The options for the decoding.

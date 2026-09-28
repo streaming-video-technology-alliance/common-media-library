@@ -1,4 +1,4 @@
-const TEXT_DECODER = new TextDecoder()
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 const JUMD_UUID_SIZE = 16
 const JUMD_TOGGLES_OFFSET = 16
 const JUMD_LABEL_START = 17

@@ -18,3 +18,4 @@ Please add entries to the bottom of the list in the following format:
 - @dsilhavy [Daniel Silhavy, Fraunhofer FOKUS]
 - @N1Knight [Nicolás Caballero, Qualabs]
 - @valentinamgiusti [Valentina Giusti, Qualabs]
+- @tobbee [Torbjörn Einarsson, Eyevinn]

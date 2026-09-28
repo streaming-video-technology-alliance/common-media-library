@@ -3,6 +3,7 @@ import type { CmcdEventsValidationResult } from './CmcdEventsValidationResult.ts
 import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
+import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR } from './CmcdValidationSeverity.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { mergeValidationResults } from './mergeValidationResults.ts'
@@ -13,8 +14,8 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * This function decodes the string internally and validates it with
  * `reportingMode` set to `'event'`. The input may contain multiple
- * newline-separated events (e.g. an `application/cmcd` POST body), in which
- * case each line is validated independently and the results are merged.
+ * newline-separated events, for example an `application/cmcd` POST body.
+ * The function validates each line independently and merges the results.
  *
  * @param cmcd - The raw CMCD-encoded string to validate. May contain
  *   multiple newline-separated event lines.
@@ -43,6 +44,14 @@ export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOp
 		}
 	}
 
+	const bodyIssues: CmcdValidationIssue[] = []
+	if (cmcd.endsWith('\n')) {
+		bodyIssues.push({
+			message: 'Event report body must not end with a line feed.',
+			severity: CMCD_VALIDATION_SEVERITY_ERROR,
+		})
+	}
+
 	const decodedLines: CmcdData[] = []
 	const lineResults: CmcdValidationResult[] = []
 
@@ -63,6 +72,6 @@ export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOp
 		}
 	}
 
-	const result = mergeValidationResults(...lineResults)
+	const result = mergeValidationResults({ valid: true, issues: bodyIssues }, ...lineResults)
 	return { ...result, data: decodedLines }
 }

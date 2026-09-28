@@ -15,7 +15,7 @@ export type CmcdResponse = CmcdRequest & {
 	/**
 	 * CMSD Dynamic Header
 	 *
-	 * Holds a Base64 encoded copy of the CMSD data received on the CMSD-Dynamic response header. This key MUST only be reported on
+	 * A Base64 encoded copy of the CMSD data received on the CMSD-Dynamic response header. This key MUST only be reported on
 	 * events of type `rr` (response received).
 	 *
 	 * String
@@ -27,7 +27,7 @@ export type CmcdResponse = CmcdRequest & {
 	/**
 	 * CMSD Static Header
 	 *
-	 * Holds a Base64 encoded copy of the CMSD data received on the CMSD-Static response header. This key MUST only be reported on
+	 * A Base64 encoded copy of the CMSD data received on the CMSD-Static response header. This key MUST only be reported on
 	 * events of type `rr` (response received).
 	 *
 	 * String
@@ -39,7 +39,7 @@ export type CmcdResponse = CmcdRequest & {
 	/**
 	 * Response code
 	 *
-	 * The response code received when requesting a media object. In a redirect scenario, this would be the final response code received.
+	 * The response code received when requesting a media object. In a redirect scenario, the value is the final response code received.
 	 * A value of 0 SHOULD be used to indicate that a response was not received.
 	 *
 	 * This key MUST only be reported on events of type `rr` (response received).
@@ -53,7 +53,7 @@ export type CmcdResponse = CmcdRequest & {
 	/**
 	 * SMRT-Data Header
 	 *
-	 * Holds a Base64 encoded copy of the streaming media response tracing data received on the Request Tracing header. This key MUST
+	 * A Base64 encoded copy of the streaming media response tracing data received on the Request Tracing header. This key MUST
 	 * only be reported on events of type `rr` (response received).
 	 *
 	 * String

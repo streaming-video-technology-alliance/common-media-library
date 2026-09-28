@@ -1,5 +1,5 @@
 /**
- * A collection of tools for working with structured fields.
+ * A collection of tools for structured fields.
  *
  * @packageDocumentation
  */

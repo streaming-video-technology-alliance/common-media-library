@@ -23,7 +23,7 @@ export const CMCD_RECORDED_REQUEST_TYPE_SEGMENT = 'segment' as const
 export const CMCD_RECORDED_REQUEST_TYPE_EVENT = 'event' as const
 
 /**
- * Fallback classification for requests the recorder did not recognize
+ * Default classification for requests the recorder did not recognize
  * as manifest, segment, or event.
  *
  * @public

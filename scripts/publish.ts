@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { cmd } from './cmd.ts'
+import { compareVersions, isVersion } from './compareVersions.ts'
 import { exec } from './exec.ts'
 import { projects } from './projects.ts'
 
@@ -32,6 +33,20 @@ async function loadPackages(): Promise<Packages> {
 }
 
 const tagRegex = /^\d+\.\d+\.\d+(.*$)/
+
+// npm view exits with E404 for a package that has never been published
+async function viewPublished(name: PackageName, prop: string): Promise<string | undefined> {
+	try {
+		return await exec(`npm view ${name} ${prop}`)
+	}
+	catch (error) {
+		if (error instanceof Error && error.message.includes('E404')) {
+			return undefined
+		}
+
+		throw error
+	}
+}
 
 async function getChanges(folder: string, version: string): Promise<string> {
 	const changelog = await readFile(path.resolve(folder, 'CHANGELOG.md'), 'utf8')
@@ -74,23 +89,32 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 
 	const tag = version.replace(tagRegex, '$1')
 	const prop = tag ? 'dist-tags.prerelease' : 'version'
-	const latest = await exec(`npm view ${name} ${prop}`)
+	const latest = await viewPublished(name, prop)
+
+	if (latest === undefined) {
+		console.log(`${name} is not on npm yet. Publishing ${version}...`)
+		return folder
+	}
+
 	const updated = latest.trim() !== version
 	const deps = await exec(`npm view ${name} peerDependencies --json`)
 
 	if (!updated && deps) {
-		const peerDependencies = JSON.parse(deps)
+		const parsed = JSON.parse(deps)
+		// npm 12 wraps the `--json` output of a single field in an array. npm 11 prints the object.
+		const publishedPeers: Record<string, string> = (Array.isArray(parsed) ? parsed[0] : parsed) ?? {}
 
-		for (const dep in peerDependencies) {
-			// TODO: Remove the wildcard check after first successful publish.
-			if (!packages[dep] || peerDependencies[dep] === '*') {
+		for (const dep in publishedPeers) {
+			const publishedPeer = publishedPeers[dep]
+
+			if (!packages[dep] || !isVersion(publishedPeer)) {
 				continue
 			}
 
-			const version = peerDependencies[dep]
+			const currentPeer = packages[dep][2].version
 
-			if (version < packages[dep][1]) {
-				throw new Error(`Package ${name} (${version}) needs to update its version because ${dep}'s version (${packages[dep][1]}) has changed.`)
+			if (compareVersions(publishedPeer, currentPeer) < 0) {
+				throw new Error(`Package ${name} (${version}) needs a version bump. Its published release depends on ${dep}@${publishedPeer}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`)
 			}
 		}
 	}

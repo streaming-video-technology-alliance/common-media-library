@@ -1,4 +1,9 @@
-const isTypeSupported: (keySystem: string, type: string) => boolean | undefined = (typeof MediaKeys !== 'undefined' && typeof (MediaKeys as any).isTypeSupported === 'function') ? (MediaKeys as any).isTypeSupported : undefined
+// The pure IIFE keeps this module-scope MediaKeys read from being retained by
+// consumer bundlers when this function is unused (unknown global reads are
+// treated as side effects).
+const isTypeSupported: (keySystem: string, type: string) => boolean | undefined = /* @__PURE__ */ (() =>
+	(typeof MediaKeys !== 'undefined' && typeof (MediaKeys as any).isTypeSupported === 'function') ? (MediaKeys as any).isTypeSupported : undefined
+)()
 
 /**
  * Filters and returns the supported key system configuration for a given system string.

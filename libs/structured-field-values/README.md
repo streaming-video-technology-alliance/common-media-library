@@ -21,5 +21,6 @@ const dict = encodeSfDict({
 	e: new Uint8Array([1, 2, 3]),
 });
 
-assert(dict === `a=1, b=?0, c="x", d=y, e=:AQID:`);
+console.log(dict);
+// a=1, b=?0, c="x", d=y, e=:AQID:
 ```

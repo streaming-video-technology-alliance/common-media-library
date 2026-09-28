@@ -11,14 +11,17 @@
 export * from './init/validateC2paInitSegment.ts'
 export * from './segment/validateC2paSegment.ts'
 export * from './manifestbox/validateC2paManifestBoxSegment.ts'
+export * from './merkle/validateC2paMerkleSegment.ts'
 
 // Result types
 export type * from './C2paAssertion.ts'
 export type * from './C2paManifest.ts'
 export type * from './C2paSignatureInfo.ts'
+export type * from './bmff/BmffHashExclusion.ts'
 export type * from './init/InitSegmentValidation.ts'
 export type * from './segment/SegmentValidation.ts'
 export type * from './manifestbox/ManifestBoxValidation.ts'
+export type * from './merkle/MerkleSegmentValidation.ts'
 export type * from './cose/CoseKeyJwk.ts'
 
 // Sequence state

@@ -1,10 +1,10 @@
 import type { ResourceTiming } from './ResourceTiming.ts'
 
 /**
- * Converts a ResourceTiming sample to bandwidth in bits per second (bps).
+ * Converts a ResourceTiming sample to bandwidth in bits per second.
  *
  * @param sample - A ResourceTiming sample
- * @returns
+ * @returns The bandwidth in bits per second.
  *
  * @public
  */

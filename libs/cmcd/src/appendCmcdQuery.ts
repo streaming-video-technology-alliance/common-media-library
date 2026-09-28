@@ -9,7 +9,7 @@ const REGEX = /CMCD=[^&#]+/
  *
  * @param url - The URL to append to.
  * @param cmcd - The CMCD object to append.
- * @param options - Options for encoding the CMCD object.
+ * @param options - Options for encoding.
  *
  * @returns The URL with the CMCD query args appended.
  *

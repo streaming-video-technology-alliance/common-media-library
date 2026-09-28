@@ -1,6 +1,11 @@
-import { validateC2paInitSegment, LiveVideoStatusCode } from '@svta/cml-c2pa'
-import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { validateC2paInitSegment, C2paStatusCode, LiveVideoStatusCode } from '@svta/cml-c2pa'
+import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
+import { readFileSync } from 'node:fs'
+import { before, describe, it } from 'node:test'
+import { encode } from 'cbor-x/encode'
+import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
+import { buildInitMediaBoxes, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
+import { createTestSigner, type TestSigner } from '../testSigner.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -23,5 +28,217 @@ describe('validateC2paInitSegment', () => {
 		strictEqual(result.isValid, false)
 		strictEqual(result.manifest, null)
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+	})
+})
+
+describe('validateC2paInitSegment — VOD Merkle', () => {
+	const HASH = new Uint8Array(32).fill(3)
+
+	function merkleEntry(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+		return { uniqueId: 1, localId: 1, count: 4, hashes: [HASH], alg: 'SHA-256', initHash: HASH, ...overrides }
+	}
+
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	it('populates merkleMaps and skips SESSIONKEY_INVALID in VOD Merkle mode', async () => {
+		const init = await buildSignedMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry()],
+		}, signer)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.merkleMaps.length, 1)
+		strictEqual(result.merkleMaps[0].count, 4)
+		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.SESSIONKEY_INVALID), false)
+	})
+
+	it('returns empty merkleMaps when the assertion has no merkle field', async () => {
+		const init = buildMerkleInitSegment({ exclusions: [] })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(LiveVideoStatusCode.SESSIONKEY_INVALID))
+	})
+
+	it('accepts a matching initHash without additional error codes', async () => {
+		// /uuid is excluded, so the init hash covers only ftyp + moov — computable up front.
+		// Merkle-only assertions hash with 8-byte box-offset prefixes (§18.6.2).
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const init = await buildSignedMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ initHash })],
+		}, signer)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.merkleMaps.length, 1)
+		strictEqual(result.isValid, true)
+		deepStrictEqual(result.errorCodes, [])
+		deepStrictEqual(result.certificate, signer.certificateDER)
+	})
+
+	it('rejects an unsigned init segment with CLAIM_SIGNATURE_MISSING', async () => {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ initHash })],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		strictEqual(result.certificate, null)
+		ok(result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
+	})
+
+	it('rejects a mismatching initHash', async () => {
+		const wrongHash = await sha256(new Uint8Array([9, 9, 9]))
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ initHash: wrongHash })],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH))
+	})
+
+	it('rejects a merkle entry missing initHash as malformed (required for fragmented assets)', async () => {
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ initHash: undefined })],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
+	it('rejects a merkle entry with no alg anywhere as malformed (no default per spec)', async () => {
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			merkle: [merkleEntry({ alg: undefined })],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
+	it('rejects an empty merkle array as malformed without flagging session keys', async () => {
+		const init = buildMerkleInitSegment({ exclusions: [], merkle: [] })
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.SESSIONKEY_INVALID), false)
+	})
+})
+
+describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.2)', () => {
+	const TEXT_ENCODER = new TextEncoder()
+
+	// JUMBF UUID per ISO 19566-5 (same value as the internal JUMBF_UUID in src/utils.ts)
+	const JUMBF_UUID = [
+		0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0e, 0x48, 0x3c,
+		0x92, 0x97, 0x58, 0x28, 0x87, 0x7e, 0xc4, 0x81,
+	] as const
+
+	function concatBytes(...parts: readonly Uint8Array[]): Uint8Array {
+		const out = new Uint8Array(parts.reduce((sum, p) => sum + p.length, 0))
+		let offset = 0
+		for (const part of parts) {
+			out.set(part, offset)
+			offset += part.length
+		}
+		return out
+	}
+
+	function buildBox(type: string, payload: Uint8Array = new Uint8Array(0)): Uint8Array {
+		const box = new Uint8Array(8 + payload.length)
+		new DataView(box.buffer).setUint32(0, box.length, false)
+		for (let i = 0; i < 4; i++) box[4 + i] = type.charCodeAt(i)
+		box.set(payload, 8)
+		return box
+	}
+
+	function buildJumd(label: string): Uint8Array {
+		const labelBytes = TEXT_ENCODER.encode(label)
+		const data = new Uint8Array(16 + 1 + labelBytes.length + 1)
+		data[16] = 0x03 // toggles: requestable + label present
+		data.set(labelBytes, 17)
+		return buildBox('jumd', data)
+	}
+
+	function buildJumb(label: string, ...content: readonly Uint8Array[]): Uint8Array {
+		return buildBox('jumb', concatBytes(buildJumd(label), ...content))
+	}
+
+	function buildInitMediaBoxes(): Uint8Array {
+		return concatBytes(buildBox('ftyp', TEXT_ENCODER.encode('isom')), buildBox('moov'))
+	}
+
+	// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
+	// so integrity checks skip signature verification.
+	function buildInitSegment(assertionData: Record<string, unknown>): Uint8Array {
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encode(assertionData) as Uint8Array))
+		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
+		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', created_assertions: [] }
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', encode(claimData) as Uint8Array))
+		const manifestJumb = buildJumb('urn:uuid:bmff-hash-test-manifest', claim, assertionStore)
+		const store = buildJumb('c2pa', manifestJumb)
+
+		const purpose = TEXT_ENCODER.encode('manifest')
+		const prefix = new Uint8Array(4 + purpose.length + 1 + 8) // fullbox header + purpose\0 + aux offset
+		prefix.set(purpose, 4)
+		const uuidBox = buildBox('uuid', concatBytes(new Uint8Array(JUMBF_UUID), prefix, store))
+
+		return concatBytes(buildInitMediaBoxes(), uuidBox)
+	}
+
+	// /uuid is excluded, so the flat hash covers only ftyp + moov — computable up front.
+	async function buildInitWithFlatHash(offsetPrefixSize: number): Promise<Uint8Array> {
+		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize })
+		return buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })
+	}
+
+	it('accepts a flat hash computed with 8-byte box-offset prefixes', async () => {
+		const init = await buildInitWithFlatHash(8)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID), false)
+	})
+
+	it('rejects a flat hash computed without box-offset prefixes', async () => {
+		const init = await buildInitWithFlatHash(0)
+
+		const result = await validateC2paInitSegment(init)
+
+		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+	})
+
+	it('accepts the flat hash of a real signed init segment', async () => {
+		const bytes = new Uint8Array(
+			readFileSync(new URL('../fixtures/init_signed_with_session_keys.m4s', import.meta.url)),
+		)
+
+		const result = await validateC2paInitSegment(bytes)
+
+		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID), false)
 	})
 })

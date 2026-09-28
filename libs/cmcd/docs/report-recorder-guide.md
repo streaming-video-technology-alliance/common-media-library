@@ -5,17 +5,17 @@ description: Capture and assert on CMCD-bearing reports in player e2e tests
 
 # CMCD Report Recorder Guide
 
-`CmcdReportRecorder` is a test helper that captures CMCD-bearing HTTP requests emitted by a video player under test. It patches `XMLHttpRequest` and `fetch` in the current realm, normalizes captured reports to a single shape regardless of which transport produced them, and exposes ergonomic APIs for both post-hoc assertions and live inspection.
+`CmcdReportRecorder` is a test helper that captures the HTTP requests with CMCD data that a video player under test sends. It patches `XMLHttpRequest` and `fetch` in the current realm. It normalizes captured reports to one structure, whichever transport produced them. It offers functions for assertions after the run and for live inspection.
 
 Use it when you need to:
 
 - Verify that a player emits CMCD data correctly during a real playback session
-- Assert on a specific number of CMCD-bearing reports of a given type (manifest, segment, event)
+- Assert on the number of reports with CMCD data of a given type (manifest, segment, event)
 - Validate CMCD payloads with `validateCmcdRequest` from the same package
 - Intercept event-mode POSTs without making real network calls to placeholder endpoints
-- Stream recorded reports to a UI in a test harness page for human inspection
+- Show recorded reports live in a test harness page for human inspection
 
-The recorder is shipped as part of `@svta/cml-cmcd` so adopters get a tested, documented helper alongside the encoder they already depend on.
+The recorder ships in `@svta/cml-cmcd`, so adopters get a tested, documented helper next to the encoder they already use.
 
 ## Quick start
 
@@ -33,11 +33,11 @@ console.log(`Recorded ${segments.length} segment reports with CMCD data`);
 recorder.detach();
 ```
 
-That's the whole loop: `attach()` installs the transport patches, the player runs and emits requests, the test asserts on whatever was recorded, `detach()` restores the original transports.
+`attach()` installs the transport patches, the player runs and sends requests, the test asserts on the recorded reports, and `detach()` restores the original transports.
 
 ## What gets recorded
 
-A request is recorded when it carries CMCD data in any of three forms:
+The recorder records a request when it has CMCD data in any of three forms:
 
 | Reporting mode | Trigger                                              |
 | -------------- | ---------------------------------------------------- |
@@ -47,7 +47,7 @@ A request is recorded when it carries CMCD data in any of three forms:
 
 Requests without CMCD data pass through untouched and are not stored.
 
-Each recorded report is classified by URL extension and HTTP method:
+The recorder classifies each report by URL extension and HTTP method:
 
 | Type                          | Heuristic                                                  |
 | ----------------------------- | ---------------------------------------------------------- |
@@ -56,7 +56,7 @@ Each recorded report is classified by URL extension and HTTP method:
 | `CmcdRecordedRequestType.EVENT`       | `POST` to a URL in `eventTargetUrls`                       |
 | `CmcdRecordedRequestType.UNKNOWN`     | Anything else carrying CMCD data                           |
 
-Recorded entries have a uniform shape:
+Recorded entries have one structure:
 
 ```typescript
 type CmcdRecordedReport = {
@@ -67,15 +67,15 @@ type CmcdRecordedReport = {
 };
 ```
 
-This is the same shape that `validateCmcdRequest` from `@svta/cml-cmcd` accepts, so you can pipe recorded reports straight into validation.
+This structure is what `validateCmcdRequest` from `@svta/cml-cmcd` accepts, so you can pass recorded reports directly to validation.
 
 ## Reading recorded reports
 
-There are three ways to observe recorded reports, suited to different test shapes.
+There are three ways to read recorded reports:
 
 ### `getReports()`: snapshot
 
-Returns a defensive copy of everything recorded so far. Best for tests that fully drive the player to completion before asserting. Filter the result yourself if you need a subset:
+Returns a copy of everything recorded so far, so changes to the result do not affect the recorder. Best for tests that run the player to the end before they assert. Filter the result yourself if you need a subset:
 
 ```typescript
 import { CmcdReportRecorder, CmcdRecordedRequestType } from "@svta/cml-cmcd";
@@ -96,7 +96,7 @@ recorder.detach();
 
 ### `waitFor*({ count?, timeout? })`: positive assertion
 
-Resolves once at least `count` matching reports have been recorded. Rejects with a diagnostic error on timeout. Use for "expect N to happen" assertions where the test is racing the player. There is one method per request type, plus a generic `waitForReports` that matches any type:
+Resolves once at least `count` matching reports are recorded. Rejects with a diagnostic error on timeout. Use these methods for "expect N to happen" assertions while the player is still running. There is one method per request type, plus a generic `waitForReports` that matches any type:
 
 | Method                                  | Matches                              |
 | --------------------------------------- | ------------------------------------ |
@@ -105,7 +105,7 @@ Resolves once at least `count` matching reports have been recorded. Rejects with
 | `waitForSegments(options?)`             | reports with `type === SEGMENT`      |
 | `waitForEvents(options?)`               | reports with `type === EVENT` (POST) |
 
-Each method takes a single `CmcdReportRecorderWaitOptions` object with two optional fields. `count` defaults to `1`. `timeout` defaults to the recorder's `waitTimeout` option (15 seconds if unset).
+Each method takes one `CmcdReportRecorderWaitOptions` object with two optional fields. `count` defaults to `1`. `timeout` defaults to the recorder's `waitTimeout` option, which is 15 seconds if unset.
 
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
@@ -125,7 +125,7 @@ for (const report of segments) {
 recorder.detach();
 ```
 
-Shorten the timeout per call or globally on the recorder:
+Shorten the timeout per call or for the whole recorder:
 
 ```typescript
 // Per call: fail in 2 seconds rather than the recorder default
@@ -139,7 +139,7 @@ await fastRecorder.waitForManifest();
 
 ## Live inspection with `onReport`
 
-For test harness pages that show a streaming view of CMCD activity, pass an `onReport` callback to `attach()`. The callback fires synchronously for each recorded report, immediately after it is appended to the buffer and before any pending `waitFor*` promises resolve.
+For test harness pages that show CMCD activity live, pass an `onReport` callback to `attach()`. The callback fires synchronously for each recorded report, right after the report is appended to the buffer and before any pending `waitFor*` promises resolve.
 
 ```typescript
 import {
@@ -163,7 +163,7 @@ recorder.attach({
 // ... player runs; the table updates in real time as reports arrive ...
 ```
 
-The callback receives the same object reference that `getReports()` returns, so a single panel can subscribe to all reports and branch on `report.type` / `report.reportingMode` to dispatch into separate UI surfaces:
+The callback receives the same object reference that `getReports()` returns. So one panel can subscribe to all reports and branch on `report.type` or `report.reportingMode` to send each report to its own view:
 
 ```typescript
 recorder.attach({
@@ -183,11 +183,11 @@ recorder.attach({
 });
 ```
 
-The listener is bound to the attach lifecycle: it is cleared automatically on `detach()`. To resume notification after a detach/reattach cycle, pass the callback again on the next `attach()` call.
+The listener is bound to the attach lifecycle, so `detach()` clears it. To resume notifications after a detach and reattach, pass the callback again on the next `attach()` call.
 
 ## Stubbing event-mode POSTs
 
-CMCD v2 event reports are POSTed to a configured target URL. In tests, you usually don't want those requests to hit a real endpoint. The `eventTargetUrls` option intercepts matching POSTs and responds with a synthetic `204 No Content`, while still recording the request body for inspection.
+CMCD v2 event reports are POSTed to a configured target URL. In tests, you usually do not want those requests to reach a real endpoint. The `eventTargetUrls` option intercepts matching POSTs and responds with a synthetic `204 No Content`. It still records the request body for inspection.
 
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
@@ -208,11 +208,11 @@ console.log("Event report body:", events[0].request.body);
 recorder.detach();
 ```
 
-A request matches if its URL starts with any entry in the list. Non-event POSTs (those whose URLs don't match) are not stubbed and pass through to the underlying transport, but they are still recorded if they carry CMCD data.
+A request matches if its URL starts with any entry in the list. POSTs whose URLs do not match are not stubbed and pass through to the underlying transport. The recorder still records them if they have CMCD data.
 
 ## Combining recorded reports with validation
 
-`CmcdRecordedReport.request` is an `HttpRequest`, which is exactly what `validateCmcdRequest` and the other validators in this package accept. Pipe one straight into the other:
+`CmcdRecordedReport.request` is an `HttpRequest`. Pass it directly to `validateCmcdRequest` or the other validators in this package:
 
 ```typescript
 import {
@@ -260,9 +260,9 @@ recorder.detach();
 
 ## Custom transports
 
-By default, the recorder patches `globalThis.XMLHttpRequest` and `globalThis.fetch`. If the player under test uses a different HTTP client (a custom wrapper, `node-fetch`, `undici`, etc.), supply a custom `CmcdTransportAdapter` via the `transports` option.
+By default, the recorder patches `globalThis.XMLHttpRequest` and `globalThis.fetch`. If the player under test uses a different HTTP client, supply a custom `CmcdTransportAdapter` in the `transports` option. Examples are a custom wrapper, `node-fetch`, and `undici`.
 
-A transport adapter installs its hook, calls the supplied `deliver` function for every outbound request, and returns a teardown function that uninstalls the hook:
+A transport adapter installs its patch, calls the supplied `deliver` function for every outbound request, and returns a teardown function that removes the patch:
 
 ```typescript
 import {
@@ -298,23 +298,23 @@ recorder.attach({
 });
 ```
 
-The `deliver` function returns a `Response` only when the request matched `eventTargetUrls`; in that case the adapter must short-circuit and use the synthetic response instead of forwarding to the underlying client.
+The `deliver` function returns a `Response` only when the request matched `eventTargetUrls`. In that case the adapter must return the synthetic response instead of forwarding the request to the underlying client.
 
 ## Lifecycle and teardown
 
-`attach()` is a no-op when the recorder is already attached, so it is safe to call once per test setup. `detach()`:
+`attach()` does nothing when the recorder is already attached, so it is safe to call once per test setup. `detach()`:
 
-- Removes the transport patches (restoring the original `XMLHttpRequest`/`fetch` references)
+- Removes the transport patches and restores the original `XMLHttpRequest` and `fetch` references
 - Clears the `onReport` listener
 - Rejects any pending `waitFor*` promises with `Error('Recorder detached while waiting')`
-- Does **not** clear the recorded report buffer; call `clear()` for that
+- Does **not** clear the recorded report buffer. Call `clear()` for that
 
-Always pair `attach()` with `detach()` in your test teardown (`afterEach` or equivalent). A leaked attached recorder continues to patch `XMLHttpRequest`/`fetch` for the rest of the process, which corrupts subsequent tests.
+Always pair `attach()` with `detach()` in your test teardown (`afterEach` or equivalent). A recorder that remains attached keeps patching `XMLHttpRequest` and `fetch` for the rest of the process, which breaks later tests.
 
 ## Tips
 
-- **Seed a live UI from existing reports.** When opening an inspection panel mid-session, call `getReports()` once after `attach()` to populate the table, then rely on `onReport` for incremental updates.
-- **Filter inside `onReport`.** The listener does not accept a type filter directly. Branch on `report.type` or `report.reportingMode` inside the callback if you only care about a subset.
-- **Use `clear()` between test phases.** When a single test exercises multiple playback scenarios, call `recorder.clear()` between phases to reset the buffer without re-attaching.
-- **Default timeout is 15 seconds.** For fast unit-style tests, set a shorter recorder-wide default via the `waitTimeout` attach option, or pass an explicit `timeout` to a single `waitFor*` call to override.
-- **Body normalization.** POST bodies are eagerly read into strings by the transports, so `report.request.body` is always a string (or `undefined`), never a `ReadableStream`. Pass it directly to `validateCmcdEventReport`.
+- **Fill a live view from existing reports.** When you open an inspection panel during a session, call `getReports()` once after `attach()` to fill the table. Then use `onReport` for the updates.
+- **Filter inside `onReport`.** The listener does not accept a type filter. If you need only a subset, branch on `report.type` or `report.reportingMode` inside the callback.
+- **Use `clear()` between test phases.** When one test runs several playback scenarios, call `recorder.clear()` between phases to reset the buffer without a reattach.
+- **Default timeout is 15 seconds.** For fast unit-style tests, set a shorter default for the recorder with the `waitTimeout` attach option. Or pass an explicit `timeout` to one `waitFor*` call.
+- **Body normalization.** The transports read POST bodies into strings at capture time, so `report.request.body` is always a string or `undefined`, never a `ReadableStream`. Pass it directly to `validateCmcdEventReport`.

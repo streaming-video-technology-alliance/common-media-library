@@ -4,7 +4,7 @@ import { type SfBareItem, SfItem } from '@svta/cml-structured-field-values'
  * Convert a value to a CMCD value.
  *
  * @param value - The value to convert to a CMCD value.
- * @param params - The parameters to convert to a CMCD value.
+ * @param params - The parameters of the CMCD value.
  * @returns The CMCD value.
  *
  * @public

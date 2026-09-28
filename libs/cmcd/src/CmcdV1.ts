@@ -8,26 +8,31 @@ export type CmcdV1 = {
 	 * Buffer length
 	 *
 	 * The buffer length associated with the media object being requested. This value MUST be rounded to the nearest 100 ms. This key SHOULD only be
-	 * sent with an object type of ‘a’, ‘v’ or ‘av’.
+	 * sent with an object type of 'a', 'v' or 'av'.
 	 *
 	 * Integer milliseconds
 	 */
 	bl?: number;
 
 	/**
-	 * Bitrate
+	 * Encoded bitrate
 	 *
-	 * Integer
+	 * The encoded bitrate of the audio or video object being requested. The player may not know this value precisely.
+	 * However, the player MAY estimate it based upon playlist/manifest declarations. If the playlist declares both peak
+	 * and average bitrate values, the peak value should be transmitted.
+	 *
+	 * Integer kbps
 	 */
 	br?: number;
 
 	/**
-	 * Measured mtp CMCD throughput
+	 * Measured throughput
 	 *
-	 * The throughput between client and server, as measured by the client and MUST be rounded to the nearest 100 kbps. This value, however derived,
-	 * SHOULD be the value that the client is using to make its next Adaptive Bitrate switching decision. If the client is connected to multiple
-	 * servers concurrently, it must take care to report only the throughput measured against the receiving server. If the client has multiple concurrent
-	 * connections to the server, then the intent is that this value communicates the aggregate throughput the client sees across all those connections.
+	 * The throughput between client and server, as measured by the client. Throughput MUST be rounded to the nearest
+	 * 100 kbps. This value, however derived, SHOULD be the value that the client uses for its next Adaptive Bitrate
+	 * switching decision. If the client is connected to multiple servers concurrently, it must report only the
+	 * throughput measured against the receiving server. If the client has multiple concurrent connections to the
+	 * server, this value is intended to communicate the client's aggregate throughput across all those connections.
 	 *
 	 * Integer kbps
 	 */
@@ -36,23 +41,23 @@ export type CmcdV1 = {
 	/**
 	 * Next object request
 	 *
-	 * Relative path of the next object to be requested. This can be used to trigger pre-fetching by the CDN. This MUST be a path relative to the current
-	 * request. This string MUST be URLEncoded. The client SHOULD NOT depend upon any pre-fetch action being taken - it is merely a request for such a
-	 * pre-fetch to take place.
+	 * Relative path of the next object to be requested. The CDN can use this path to trigger pre-fetching. The path
+	 * MUST be relative to the current request. The string MUST be URL-encoded. The client SHOULD NOT depend upon any
+	 * pre-fetch action being taken. The key is only a request for such a pre-fetch.
 	 *
 	 * String
 	 *
 	 * @remarks
-	 * Values may be provided as absolute URLs for convenience; when `CmcdEncodeOptions.baseUrl` is set,
-	 * same-origin URLs are converted to paths relative to that base. Already-relative values are not
-	 * converted, but are still URL-encoded on emission as required by CMCD v1.
+	 * Values may be provided as absolute URLs for convenience. If `CmcdEncodeOptions.baseUrl` is set, same-origin URLs
+	 * are converted to paths relative to that base. Already-relative values are not converted. They are still
+	 * URL-encoded when emitted, as CMCD version 1 requires.
 	 */
 	nor?: string;
 
 	/**
 	 * Next range request
 	 *
-	 * @deprecated Use 'nor' with the 'r' parameter instead.
+	 * @deprecated Removed in CMCD version 2. Version 2 sends the range as the 'r' parameter of 'nor'.
 	 *
 	 * String
 	 */
@@ -64,7 +69,7 @@ export type CmcdV1 = {
 	 * The highest bitrate rendition in the manifest or playlist that the client is allowed to play, given current codec, licensing and
 	 * sizing constraints.
 	 *
-	 * Integer Kbps
+	 * Integer kbps
 	 */
 	tb?: number;
 

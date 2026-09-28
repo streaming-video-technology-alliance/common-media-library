@@ -1,4 +1,6 @@
+import { CMCD_AGGREGATE_BITRATE_KEYS } from './CMCD_AGGREGATE_BITRATE_KEYS.ts'
 import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
+import { CMCD_KEY_OBJECT_TYPES } from './CMCD_KEY_OBJECT_TYPES.ts'
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
 import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
@@ -9,6 +11,7 @@ import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
 import { resolveVersion } from './resolveVersion.ts'
+import { toTokenString } from './toTokenString.ts'
 
 /**
  * Validates the structural rules of a CMCD payload.
@@ -70,7 +73,9 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 
 	// Custom event checks
 	if ('e' in data) {
-		if (data['e'] === CMCD_EVENT_CUSTOM_EVENT) {
+		const eventType = toTokenString(data['e'])
+
+		if (eventType === CMCD_EVENT_CUSTOM_EVENT) {
 			if (!('cen' in data)) {
 				issues.push({
 					key: 'cen',
@@ -90,7 +95,7 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 		}
 
 		// Response-received key restriction and required url
-		if (data['e'] === CMCD_EVENT_RESPONSE_RECEIVED) {
+		if (eventType === CMCD_EVENT_RESPONSE_RECEIVED) {
 			if (!('url' in data)) {
 				issues.push({
 					key: 'url',
@@ -112,23 +117,52 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 		}
 
 		// State-change events require their associated field
-		for (const [eventType, requiredField] of CMCD_STATE_EVENT_FIELDS) {
-			if (data['e'] === eventType && !(requiredField in data)) {
+		for (const [stateEventType, requiredField] of CMCD_STATE_EVENT_FIELDS) {
+			if (eventType === stateEventType && !(requiredField in data)) {
 				issues.push({
 					key: requiredField,
-					message: `State-change event (e="${eventType}") requires the "${requiredField}" key to be present.`,
+					message: `State-change event (e="${stateEventType}") requires the "${requiredField}" key to be present.`,
 					severity: CMCD_VALIDATION_SEVERITY_ERROR
 				})
 			}
 		}
 
 		// Error event requires ec
-		if (data['e'] === CMCD_EVENT_ERROR && !('ec' in data)) {
+		if (eventType === CMCD_EVENT_ERROR && !('ec' in data)) {
 			issues.push({
 				key: 'ec',
 				message: 'Error event (e="e") requires the "ec" key to be present.',
 				severity: CMCD_VALIDATION_SEVERITY_ERROR
 			})
+		}
+	}
+
+	// Object type checks
+	const ot = version > 1 ? toTokenString(data['ot']) : undefined
+	if (ot !== undefined) {
+		for (const key in CMCD_KEY_OBJECT_TYPES) {
+			const objectTypes = CMCD_KEY_OBJECT_TYPES[key]
+			if (key in data && !objectTypes.includes(ot)) {
+				issues.push({
+					key,
+					message: `Key "${key}" must not be present when "ot" is "${ot}". Expected "ot" to be one of: ${objectTypes.join(', ')}.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR
+				})
+			}
+		}
+	}
+
+	// Aggregate bitrate checks
+	if (version > 1) {
+		for (const key in CMCD_AGGREGATE_BITRATE_KEYS) {
+			const exactKey = CMCD_AGGREGATE_BITRATE_KEYS[key]
+			if (key in data && exactKey in data) {
+				issues.push({
+					key,
+					message: `Key "${key}" must not be present when "${exactKey}" is present.`,
+					severity: CMCD_VALIDATION_SEVERITY_ERROR
+				})
+			}
 		}
 	}
 

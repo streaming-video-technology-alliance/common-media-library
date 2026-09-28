@@ -33,7 +33,7 @@ $ARGUMENTS
 
 ## Instructions
 
-1. If `$ARGUMENTS` specifies particular files, focus the review on those files. Otherwise, review all pending changes (staged + unstaged) shown above.
+1. If `$ARGUMENTS` specifies particular files, focus the review on those files. Otherwise, review all pending changes shown above, staged and unstaged.
 2. If there are no pending changes, review the most recent commit (`git diff HEAD~1`).
 3. Read each changed file in full to understand context beyond the diff.
 4. Check related files (types, tests, index.ts barrel exports) for completeness.

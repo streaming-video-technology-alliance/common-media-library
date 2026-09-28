@@ -20,4 +20,5 @@ export * from './decodeCmsdDynamic.ts'
 export * from './decodeCmsdStatic.ts'
 export * from './encodeCmsdDynamic.ts'
 export * from './encodeCmsdStatic.ts'
+export * from './isCmsdCustomKey.ts'
 

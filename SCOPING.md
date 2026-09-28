@@ -2,9 +2,9 @@
 
 ## Overview
 
-The purpose of the Common Media Library is to consolidate common pieces of functionality and interfaces relating to browser-based media playback that have been implemented independently across multiple open-source libraries leading to mismatched functionality and feature sets.
+The Common Media Library consolidates common functionality and interfaces for browser-based media playback. Multiple open-source libraries implemented these pieces independently. The result was mismatched functionality and feature sets.
 
-In our work across Hls.js, Dash.js and Shaka player, we have noticed common pieces of functionality that have been implemented independently, and sometimes copied and pasted, across the libraries. This is particularly true when looking at standards-based features, like ID3 parsing, 608 parsing and CMCD. Since the functionality is shared in spirit but not implementation, they can fall out of sync where certain bugs are fixed in one player but not the others. Having a common library creates a single place where these utilities can be maintained. It also creates a single place for standards groups to request and oversee feature implementation.
+In our work on Hls.js, Dash.js, and Shaka player, we noticed common functionality implemented independently in each library. Some of this functionality was copied and pasted between the libraries. This duplication is especially common for standards-based features, such as ID3 parsing, 608 parsing, and CMCD. The libraries share the intent of these features but not the code. A bug fixed in one player can remain in the others. A common library creates one place to maintain these utilities. It also creates one place for standards groups to request and oversee feature implementation.
 
 
 ## Contributors
@@ -16,16 +16,16 @@ In our work across Hls.js, Dash.js and Shaka player, we have noticed common piec
 
 ## Objectives
 
-Maintain a modern, modular, Javascript utility library for media playback. To achieve this the library will:
-- Be written in TypeScript and modern build tools
-- Distributed as standalone files that can be imported as needed.
-- Provide documentation pertaining to the library's API and usage.
+Maintain a modern, modular JavaScript utility library for media playback. To achieve this goal, the library will:
+- Be written in TypeScript with modern build tools
+- Be distributed as standalone files that can be imported as needed
+- Provide documentation for the library's API and usage
 
 
 ## Project Scope
 
-The initial scope of the Common Media Library will address the following functionality:
-- Providing SDKs for standards based media player features like:
+The initial scope of the Common Media Library will cover the following functionality:
+- SDKs for standards-based media player features, such as:
   - Common Media Client Data (CMCD) encoding / decoding
   - Common Media Server Data (CMSD) encoding / decoding
   - ID3 tag parsing 
@@ -35,29 +35,29 @@ The initial scope of the Common Media Library will address the following functio
   - IMSC parsing and rendering
   - HLS manifest parser 
   - Dash manifest parser
-- Providing a place to develop SDKs for new/upcoming standards like C2PA, MoQ, etc.
+- A place to develop SDKs for new and upcoming standards, such as C2PA and MoQ
 
 The initial scope of this project does not include:
-- A working media player. The library should be used by developers to implement standards based features in their own players.
+- A working media player. Developers should use the library to implement standards-based features in their own players.
 
 
 ## Constraints
 
-The library will be licensed under the Apache 2.0 license. References to other license notifications will be maintained in a `NOTICE.md` file when applicable.
+The library will use the Apache 2.0 license. When applicable, a `NOTICE.md` file will list the notices of other licenses.
 
 
 ## Deliverables
 
 ### Source Code
 
-The source code for the library will be maintained in a public Github repository under the `streaming-video-technology-alliance` organization. Changes to the library are submitted as pull requests to the repository. All pull requests must be approved by a minimum of two SVTA approved code reviewers (SVTA member or subject matter expert).
+The source code will be maintained in a public GitHub repository under the `streaming-video-technology-alliance` organization. Changes are submitted as pull requests to the repository. Every pull request needs approval from at least two code reviewers approved by the SVTA. A reviewer is an SVTA member or a subject matter expert.
 
 
 ### Documentation
 
-The documentation for the library will be distributed via Github pages, deployed with every version release.
+The documentation will be published on GitHub Pages with every version release.
 
 
 ### Distribution
 
-The library will be distributed as an NPM package in the `@svta` organization, `@svta/common-media-library`. Publishing permissions are restricted to SVTA members.
+The library will be distributed as npm packages in the `@svta` organization, one per library, named `@svta/cml-<name>`. Only SVTA members can publish.

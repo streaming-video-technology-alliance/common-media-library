@@ -8,6 +8,68 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-25
+
+### Security
+
+- `validateC2paManifestBoxSegment` and `validateC2paInitSegment` no longer return `isValid: true` for a manifest without a verifiable claim signature. Before this fix, a manifest without a `c2pa.signature` box, or with a signature that carried no certificate, passed the signature check. An attacker who controlled the media bytes could forge provenance without a signing key. See [GHSA-h5r3-7p8g-g3q2](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/GHSA-h5r3-7p8g-g3q2). A manifest without a signature box now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`. A manifest without a claim box now fails with `C2paStatusCode.CLAIM_MISSING`.
+
+### Added
+
+- `C2paStatusCode.CLAIM_SIGNATURE_MISSING` (`claimSignature.missing`) and `C2paStatusCode.CLAIM_MISSING` (`claim.missing`).
+- `ManifestBoxValidationResult.certificate`: the DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate. Adopters on the Manifest Box path can now compare the signer with their trust anchors ([#468](https://github.com/streaming-video-technology-alliance/common-media-library/issues/468)).
+
+### Changed
+
+- Validation guides and README: the library does not check the signing certificate against a trust list. Callers must check `isValid` before they use `merkleMaps`. See the new Signer Trust section of the Results and Error Codes guide.
+- README: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
+- Validation guides (Manifest Box, VOD Merkle, VSI/EMSG, and Results and Error Codes): the prose is rewritten for readers who do not read English as a first language. Merkle tree is defined at first use. The code examples and tables are unchanged.
+- README: the usage examples are complete. The segment URLs are function parameters.
+- Validation guides: empty table cells no longer use an em dash, and a code comment no longer uses an em dash.
+
+## [1.1.3] - 2026-09-15
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.6
+- Update `@svta/cml-utils` to 1.6.1
+
+## [1.1.2] - 2026-08-11
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.5
+
+## [1.1.1] - 2026-07-28
+
+### Changed
+
+- Update `@svta/cml-iso-bmff` to 1.0.4
+- Update `@svta/cml-utils` to 1.6.0
+
+## [1.1.0] - 2026-07-21
+
+### Added
+
+- Custom continuity method support in manifest-box validation (C2PA §19.3.2 / §19.7.2): `validateC2paManifestBoxSegment` accepts an optional `continuityValidator` to verify implementer-defined continuity methods; segments declaring an unregistered method keep failing with `livevideo.continuityMethod.invalid` per spec
+- `LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED` (`livevideo.continuityMethod.unsupported`), emitted alongside `continuityMethod.invalid` so consumers can distinguish an unverifiable custom method from a broken chain
+- `ManifestBoxValidationOptions` and `ManifestBoxContinuityValidator` types
+- VOD Merkle validation (C2PA §15.12.2 / §18.6): `validateC2paMerkleSegment` verifies fragmented MP4 media segments against the merkle maps from the init manifest — per-track Merkle proof verification with `location` continuity enforced via caller-held state
+- `MerkleMap`, `MerkleSegmentState`, and `MerkleSegmentValidation` types
+- `validateC2paInitSegment` extracts merkle maps from the `c2pa.hash.bmff.v3` assertion, validates each entry's `initHash` binding, and returns them as `merkleMaps`
+- `C2paStatusCode` entries `assertion.bmffHash.malformed` and `assertion.bmffHash.mismatch`
+
+### Changed
+
+- `InitSegmentValidation` gains a `merkleMaps` field; `SESSIONKEY_INVALID` is no longer raised for VOD Merkle streams
+
+### Fixed
+
+- `validateC2paManifestBoxSegment` now enforces the 8-byte box-offset prefix (C2PA §18.6.2) when verifying the flat `c2pa.hash.bmff.v3` assertion hash, matching c2pa-rs; unprefixed flat hashes are no longer accepted. The VSI path (§19.7.3) keeps dual-mode validation since its hash comes from the VSI map, not a §18.6.2 assertion.
+- `validateC2paInitSegment` now enforces the 8-byte box-offset prefix (C2PA §18.6.2) when verifying the flat `c2pa.hash.bmff.v3` assertion hash, matching c2pa-rs; unprefixed flat hashes are no longer accepted
+- The module-scope hex lookup table in `bytesToHex` is now marked side-effect free so consumer bundlers can drop it when unused (follow-up to the module-scope side-effect audit in [#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+- Top-level `TextDecoder` and `TextEncoder` instantiations are now marked side-effect free so consumer bundlers can drop them when unused ([#382](https://github.com/streaming-video-technology-alliance/common-media-library/issues/382))
+
 ## [1.0.1] - 2026-05-13
 
 ### Changed
@@ -33,6 +95,11 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.2.0...HEAD
+[1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.3...c2pa-v1.2.0
+[1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.2...c2pa-v1.1.3
+[1.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.1...c2pa-v1.1.2
+[1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.0...c2pa-v1.1.1
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.1...c2pa-v1.1.0
 [1.0.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.0.0...c2pa-v1.0.1
 [1.0.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/c2pa-v1.0.0

@@ -12,6 +12,8 @@ import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 export type ManifestBoxValidationResult = {
 	readonly manifest: C2paManifest | null
 	readonly issuer: string | null
+	/** DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate */
+	readonly certificate: Uint8Array | null
 	readonly sequenceNumber: number | null
 	readonly previousManifestId: string | null
 	readonly streamId: string | null
@@ -19,6 +21,28 @@ export type ManifestBoxValidationResult = {
 	readonly bmffHashHex: string | null
 	readonly isValid: boolean
 	readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[]
+}
+
+/**
+ * Validates continuity for an implementer-defined continuity method (§19.3.2).
+ *
+ * @public
+ */
+export type ManifestBoxContinuityValidator = (
+	liveVideoAssertion: Readonly<Record<string, unknown>>,
+	manifest: C2paManifest,
+) => boolean | Promise<boolean>
+
+/**
+ * Options for `validateC2paManifestBoxSegment`.
+ *
+ * @public
+ */
+export type ManifestBoxValidationOptions = {
+	readonly continuityValidator?: {
+		readonly method: string
+		readonly validate: ManifestBoxContinuityValidator
+	}
 }
 
 /**

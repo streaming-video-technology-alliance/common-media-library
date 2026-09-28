@@ -2,6 +2,7 @@ import type { C2paManifest } from '../C2paManifest.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import type { CoseKeyJwk } from '../cose/CoseKeyJwk.ts'
 import type { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
+import type { MerkleMap } from '../merkle/MerkleSegmentValidation.ts'
 
 /**
  * A session key extracted and verified from a C2PA `c2pa.session-keys` assertion.
@@ -31,6 +32,7 @@ export type InitSegmentValidation = {
 	readonly certificate: Uint8Array | null
 	readonly manifestId: string | null
 	readonly sessionKeys: readonly ValidatedSessionKey[]
+	readonly merkleMaps: readonly MerkleMap[]
 	readonly isValid: boolean
 	readonly errorCodes: readonly (LiveVideoStatusCode | C2paStatusCode)[]
 }

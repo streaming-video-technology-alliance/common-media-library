@@ -25,17 +25,17 @@ async function toHttpRequest(request: Request): Promise<HttpRequest> {
 }
 
 /**
- * Create a transport adapter that patches `globalThis.fetch` to capture
- * CMCD-bearing requests, normalizing each to `HttpRequest` (lowercase
- * headers, body read as UTF-8 string). Returns the adapter object
- * expected by `CmcdReportRecorder`.
+ * Create a transport adapter for `CmcdReportRecorder` that patches
+ * `globalThis.fetch` to capture requests with CMCD data. The patched
+ * `fetch` normalizes each request to `HttpRequest` (lowercase headers,
+ * body read as a UTF-8 string).
  *
- * Bodies are read once via `Request.text()` for inspection. This is
- * safe for the body types CMCD reports use in practice (`string`,
- * `Blob`, `ArrayBuffer`, `FormData`, `URLSearchParams`), which can be
- * read by the wrapper and re-read by the underlying `fetch`. Passing
- * a `ReadableStream` as `init.body` is not supported — the stream is
- * consumed by the wrapper and the underlying `fetch` will receive an
+ * The patched `fetch` reads each body once with `Request.text()` for
+ * inspection. This read is safe for the body types that CMCD reports use
+ * in practice: `string`, `Blob`, `ArrayBuffer`, `FormData`, and
+ * `URLSearchParams`. The underlying `fetch` can read those bodies again.
+ * Do not pass a `ReadableStream` as `init.body`. The patched `fetch`
+ * consumes the stream, and the underlying `fetch` receives an
  * already-disturbed stream.
  *
  * @public

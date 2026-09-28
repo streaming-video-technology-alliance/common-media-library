@@ -16,15 +16,15 @@ import { validateCmcd } from './validateCmcd.ts'
 /**
  * Validates CMCD HTTP headers by checking shard placement and payload validity.
  *
- * This function accepts raw CMCD header strings, decodes each shard
- * internally, verifies that each key is placed in its correct header shard,
- * then merges all shards and runs full payload validation (keys, values, and
- * structure) on the merged data.
+ * This function accepts raw CMCD header strings and decodes each shard
+ * internally. It verifies that each key is in its correct header shard.
+ * The function then merges all shards and runs payload validation (keys,
+ * values, and structure) on the merged data.
  *
  * @example
  * {@includeCode ../test/validateCmcdHeaders.test.ts#example}
  *
- * @param headers - A `Headers` instance or a record of CMCD header fields to their raw encoded string values.
+ * @param headers - A `Headers` instance or a record of CMCD header fields to raw encoded strings.
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result including decoded data.
  *

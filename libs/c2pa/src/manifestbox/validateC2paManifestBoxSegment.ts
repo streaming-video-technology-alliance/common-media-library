@@ -3,19 +3,22 @@ import type { C2paManifest } from '../C2paManifest.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { bytesToHex, normalizeAlgorithmName } from '../utils.ts'
-import { validateBmffHash } from '../bmff/validateBmffHash.ts'
-import type { BmffHashConstraint, BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { bytesToHex, hashesEqual, normalizeAlgorithmName, toUint8Array } from '../utils.ts'
+import { computeBmffHash } from '../bmff/computeBmffHash.ts'
+import { parseExclusions } from '../bmff/parseExclusions.ts'
+import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import type { InternalManifestData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
-import { extractCertificateFromSignatureBytes } from '../extractManifestCertificate.ts'
-import type { ManifestBoxValidationResult, ManifestBoxValidationState } from './ManifestBoxValidation.ts'
+import type {
+	ManifestBoxValidationOptions,
+	ManifestBoxValidationResult,
+	ManifestBoxValidationState,
+} from './ManifestBoxValidation.ts'
 
 const LIVE_VIDEO_ASSERTION_LABEL = 'c2pa.livevideo.segment'
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
-const SUPPORTED_CONTINUITY_METHODS = new Set([CONTINUITY_METHOD_MANIFEST_ID])
 
 function normalizeManifestId(id: string | null): string | null {
 	if (!id) return null
@@ -29,12 +32,6 @@ function extractAssertionData(data: unknown): Record<string, unknown> | null {
 	return null
 }
 
-function toUint8Array(value: unknown): Uint8Array | null {
-	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	return null
-}
-
 // --- Live video assertion parsing ---
 
 type LiveVideoFields = {
@@ -42,6 +39,7 @@ type LiveVideoFields = {
 	previousManifestId: string | null
 	streamId: string | null
 	continuityMethod: string | null
+	data: Record<string, unknown>
 }
 
 function parseLiveVideoAssertion(assertions: readonly C2paAssertion[]): LiveVideoFields | null {
@@ -59,6 +57,7 @@ function parseLiveVideoAssertion(assertions: readonly C2paAssertion[]): LiveVide
 		previousManifestId: typeof rawPrev === 'string' ? rawPrev : null,
 		streamId: typeof rawStreamId === 'string' ? rawStreamId : null,
 		continuityMethod: typeof rawContinuity === 'string' ? rawContinuity : null,
+		data: data ?? {},
 	}
 }
 
@@ -72,35 +71,6 @@ type BmffHashFields = {
 }
 
 const EMPTY_BMFF_HASH: BmffHashFields = { hashBytes: null, hashHex: null, exclusions: [], alg: null }
-
-function parseConstraints(rawConstraints: unknown): BmffHashConstraint[] {
-	if (!Array.isArray(rawConstraints)) return []
-
-	const constraints: BmffHashConstraint[] = []
-	for (const c of rawConstraints) {
-		if (!c || typeof c !== 'object') continue
-		const record = c as Record<string, unknown>
-		if (typeof record['offset'] !== 'number') continue
-		const value = toUint8Array(record['value'])
-		if (value) constraints.push({ offset: record['offset'], value })
-	}
-	return constraints
-}
-
-function parseExclusions(rawExclusions: unknown): BmffHashExclusion[] {
-	if (!Array.isArray(rawExclusions)) return []
-
-	const exclusions: BmffHashExclusion[] = []
-	for (const exc of rawExclusions) {
-		if (!exc || typeof exc !== 'object') continue
-		const record = exc as Record<string, unknown>
-		if (typeof record['xpath'] !== 'string') continue
-
-		const constraints = parseConstraints(record['data'])
-		exclusions.push(constraints.length > 0 ? { xpath: record['xpath'], data: constraints } : { xpath: record['xpath'] })
-	}
-	return exclusions
-}
 
 function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashFields {
 	const assertion = assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL)
@@ -152,9 +122,6 @@ function collectErrorCodes(
 	streamIdValid: boolean,
 	sequenceNumberValid: boolean,
 	bmffHashMatches: boolean,
-	continuityMethod: string | null,
-	previousManifestId: string | null,
-	lastManifestId: string | null,
 ): readonly LiveVideoStatusCode[] {
 	const codes = new Set<LiveVideoStatusCode>()
 
@@ -164,19 +131,35 @@ function collectErrorCodes(
 	if (!sequenceNumberValid) codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
 	if (!bmffHashMatches) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
 
-	if (!continuityMethod) {
-		codes.add(LiveVideoStatusCode.CONTINUITY_METHOD_INVALID)
-	} else if (!SUPPORTED_CONTINUITY_METHODS.has(continuityMethod)) {
-		codes.add(LiveVideoStatusCode.CONTINUITY_METHOD_INVALID)
-	} else if (continuityMethod === CONTINUITY_METHOD_MANIFEST_ID) {
-		if (!previousManifestId) {
-			codes.add(LiveVideoStatusCode.CONTINUITY_METHOD_INVALID)
-		} else if (lastManifestId && normalizeManifestId(previousManifestId) !== normalizeManifestId(lastManifestId)) {
-			codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
-		}
+	return [...codes]
+}
+
+async function validateContinuity(
+	parsed: ParsedManifest,
+	lastManifestId: string | null,
+	options?: ManifestBoxValidationOptions,
+): Promise<readonly LiveVideoStatusCode[]> {
+	const { manifest, liveVideo } = parsed
+	const method = liveVideo?.continuityMethod ?? null
+
+	if (!method) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
+
+	if (method === CONTINUITY_METHOD_MANIFEST_ID) {
+		const prev = liveVideo?.previousManifestId ?? null
+		if (!prev) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
+		const broken = !!lastManifestId && normalizeManifestId(prev) !== normalizeManifestId(lastManifestId)
+		return broken ? [LiveVideoStatusCode.SEGMENT_INVALID] : []
 	}
 
-	return [...codes]
+	const custom = options?.continuityValidator
+	if (custom?.method !== method || !manifest || !liveVideo) {
+		return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID, LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED]
+	}
+
+	const ok = await Promise.resolve()
+		.then(() => custom.validate(liveVideo.data, manifest))
+		.catch(() => false)
+	return ok ? [] : [LiveVideoStatusCode.SEGMENT_INVALID]
 }
 
 /**
@@ -186,6 +169,8 @@ function collectErrorCodes(
  * Recomputes the `c2pa.hash.bmff.v3` content hash from the raw segment bytes and compares
  * it against the expected hash in the manifest assertion. Checks live-video assertions
  * (sequenceNumber, streamId, continuityMethod) and manifest-ID chain continuity.
+ * A validator for an implementer-defined continuity method can be registered
+ * via {@link ManifestBoxValidationOptions}.
  *
  * This function is **pure** — it does not access any external state. The
  * caller is responsible for persisting `nextManifestId` and `nextState`
@@ -194,6 +179,7 @@ function collectErrorCodes(
  * @param bytes - Raw segment bytes
  * @param lastManifestId - Manifest ID from the previous segment, or null for the first segment
  * @param state - Optional state from the previous segment for streamId/sequenceNumber checks
+ * @param options - Optional custom continuity method validator
  * @returns Validation result, the manifest ID, and state to persist for the next call
  *
  * @example
@@ -205,6 +191,7 @@ export async function validateC2paManifestBoxSegment(
 	bytes: Uint8Array,
 	lastManifestId: string | null,
 	state?: ManifestBoxValidationState,
+	options?: ManifestBoxValidationOptions,
 ): Promise<{
 	readonly result: ManifestBoxValidationResult
 	readonly nextManifestId: string | null
@@ -224,24 +211,28 @@ export async function validateC2paManifestBoxSegment(
 
 	let bmffHashMatches = true
 	if (bmff.hashBytes !== null) {
-		bmffHashMatches = await validateBmffHash(bytes, bmff.hashBytes, {
+		// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
+		// box; only Merkle tree hashes may omit the 8-byte offset prefix.
+		const computed = await computeBmffHash(bytes, {
 			exclusions: bmff.exclusions,
 			alg: bmff.alg ?? undefined,
+			offsetPrefixSize: 8,
 		})
+		bmffHashMatches = hashesEqual(computed, bmff.hashBytes)
 	}
 
-	const liveVideoCodes = collectErrorCodes(
-		manifest !== null, liveVideo !== null,
-		streamIdValid, sequenceNumberValid, bmffHashMatches,
-		continuityMethod, previousManifestId, lastManifestId,
-	)
+	const continuityCodes = await validateContinuity({ manifest, issuer, liveVideo, bmff, internalData }, lastManifestId, options)
 
-	const integrityCodes: readonly C2paStatusCode[] = internalData
-		? await validateManifestIntegrity(
-			internalData,
-			internalData.signatureBytes ? extractCertificateFromSignatureBytes(internalData.signatureBytes) : null,
-		)
-		: []
+	const liveVideoCodes = [...new Set([
+		...collectErrorCodes(
+			manifest !== null, liveVideo !== null,
+			streamIdValid, sequenceNumberValid, bmffHashMatches,
+		),
+		...continuityCodes,
+	])]
+
+	const integrity = internalData ? await validateManifestIntegrity(internalData) : null
+	const integrityCodes: readonly C2paStatusCode[] = integrity?.codes ?? []
 
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
 
@@ -251,6 +242,7 @@ export async function validateC2paManifestBoxSegment(
 		result: {
 			manifest: manifest ?? null,
 			issuer,
+			certificate: integrity?.certificate ?? null,
 			sequenceNumber,
 			previousManifestId,
 			streamId,
