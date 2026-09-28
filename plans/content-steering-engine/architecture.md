@@ -10,7 +10,7 @@ The first design is from 2026-04-13. A review against draft-05 of the base spec 
 |---|---|---|
 | Public API | 17 new exports in three layers | `createSteeringEngine`, `applyUriReplacement`, and their types |
 | Protocol differences | `HLS_CDP` and `DASH_CDP` objects with format callbacks | a `protocol` value |
-| I/O | injected `fetch(url, signal)` and `schedule(fn, ms)` | a `requester` with the `HttpRequest` type, and the timers of the platform |
+| I/O | injected `fetch(url, signal)` and `schedule(fn, ms)` | a `request` function with the `HttpRequest` type, and the timers of the platform |
 | Validation | a `validate` option | always on |
 | Unknown pathway IDs | could be selected | ignored (base spec, section 4) |
 | Clone `BASE-ID` | looked up only among earlier clones | also looked up in `pathways` (base spec, section 5) |
@@ -98,7 +98,7 @@ The code rules of the repository require that tests import from the package name
 ## Test plan
 
 - The tests use `node:test` and `node:assert`. The mock timers of `node:test` control `setTimeout` and `Date`, as in the `CmcdReporter` tests.
-- A stub requester records each request and returns fixed responses.
+- A stub `request` function records each request and returns fixed responses.
 - The fixtures include the examples of the base spec, section 8, and the examples of the DASH spec, clause 8.
 - Each row of the response table of the RFC has a test for each protocol.
 - Tests compare the exact request URI for HLS and for DASH, including the quotes and the lists.

@@ -163,7 +163,7 @@ engine.penalize('beta') // a specific pathway
 | `createSteeringEngine` | function |
 | `applyUriReplacement` | function |
 | `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH` | constants and type |
-| `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError` | types |
+| `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequest`, `SteeringError` | types |
 | `UriReplacementOptions` | type |
 
 `SteeringProtocol` follows the const enum pattern of the repository. The package gets `@svta/cml-utils` as a peer dependency, for the `HttpRequest`, `HttpResponse`, and `ValueOf` types. The package imports only types from it.
@@ -177,7 +177,7 @@ type SteeringEngineConfig = {
 	pathways: readonly string[]                             // pathway IDs of the Content Description
 	pathway?: string                                        // the pathway that the player applies now
 	penalty?: number                                        // milliseconds. See Penalties
-	requester?: SteeringRequester                           // default: fetch
+	request?: SteeringRequest                               // default: fetch
 	getThroughput?: (pathway: string) => number | undefined // bits per second
 	onPathwayChange?: (pathway: string) => void
 	onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[]) => void
@@ -209,16 +209,16 @@ type SteeringEngine = {
 ### Requests
 
 ```ts
-type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>
+type SteeringRequest = (request: HttpRequest) => Promise<HttpResponse>
 ```
 
-The engine calls the requester with `url`, `method: 'GET'`, and `responseType: 'text'`. It reads `status`, `headers`, `data`, and `url` from the response:
+The engine calls `request` with `url`, `method: 'GET'`, and `responseType: 'text'`. It reads `status`, `headers`, `data`, and `url` from the response:
 
 - `data` is the response body, as a string or as a parsed JSON value.
 - Header names match without regard to case.
 - `url` is the final URI after redirects. If `url` is absent, the engine uses the request URI.
 
-The default requester uses `fetch`. A `Requester` function from `@svta/cml-request` has a compatible type. For a steering server on another origin, a browser exposes `Retry-After` only if the server lists the header in `Access-Control-Expose-Headers`.
+The default `request` function uses `fetch`. A `Requester` function from `@svta/cml-request` can be passed as `request`. For a steering server on another origin, a browser exposes `Retry-After` only if the server lists the header in `Access-Control-Expose-Headers`.
 
 The first request uses `uri`. Each later request uses the RELOAD-URI of the last valid Steering Manifest. If that Steering Manifest has no RELOAD-URI, the request uses the previous URI. A relative RELOAD-URI resolves against the URI of the response that contains it.
 
@@ -354,7 +354,7 @@ The package documentation links to the spec versions of this RFC.
 
 - The design record compares the four players of the Motivation table rule by rule, with links to fixed commits.
 - A 2024 prototype by Qualabs, on the `content-steering-refactoring` branch of `qualabs/common-media-library`, added a request function and a URL builder. It was not merged.
-- The `requester` argument of `CmcdReporter` and the CMCD session API RFC define the request pattern that this RFC follows.
+- The `requester` argument of `CmcdReporter` and the CMCD session API RFC use the same function shape, with the `HttpRequest` type.
 
 ## Unresolved questions
 
@@ -378,6 +378,7 @@ The package documentation links to the spec versions of this RFC.
 ## Revision history
 
 - v1 (2026-09-28): initial draft. It replaces an unpublished design from April 2026. The design record lists the changes.
+- v2 (2026-09-28): the `requester` property is now `request`, and its type is now `SteeringRequest` (maintainer feedback).
 
 ## Final Decision
 
