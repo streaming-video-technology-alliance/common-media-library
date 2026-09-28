@@ -16,12 +16,6 @@ The following skills are available as slash commands:
 
 - **code-reviewer** - Specialized agent for code review, used by the `/code-review` skill
 
-### Plans
-
-- Save all plan files to `plans/`
-- Use the naming pattern `plans/<feature-name>/spec.md` for design documents
-- Use the naming pattern `plans/<feature-name>/implementation.md` for implementation documents
-
 ## Rules
 
 - `.claude/rules/code-quality.md` - Automatically applied when editing files in `libs/**/*.ts`
