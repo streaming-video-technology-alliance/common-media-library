@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the engine of RFC v2 in `@svta/cml-content-steering`. Then build a prototype of the engine in four players, to check the integration map before the RFC review ends.
+**Goal:** Build the engine of RFC v3 in `@svta/cml-content-steering`. Then build a prototype of the engine in four players, to check the integration map before the RFC review ends.
 
 **Architecture:** `createSteeringEngine` keeps the state and the timers in one closure. It uses small internal modules for the rules of the specs. `applyUriReplacement` is a separate function without state. Each player spike installs a local build of the package in a clone of the player. The spike replaces the steering controller of the player with the engine and records the problems.
 
@@ -10,11 +10,11 @@
 
 **Sources:** the [RFC](../../rfc/content-steering-engine.md) (PR #471), the [design record](architecture.md), and the [integration map](integration.md).
 
-**Status of the code in this plan:** every code block in Phase 1 is the code of a local prototype. The prototype implements RFC v2. It passed 123 package tests, `eslint`, `npm run typecheck` after a full build, and the tree-shaking probe of Task 3. A Babel loose ES5 build of it also passed a penalty test (`integration.md`, Findings outside the API).
+**Status of the code in this plan:** every code block in Phase 1 is the code of a local prototype. The prototype implements RFC v3. It passed 124 package tests, `eslint`, `npm run typecheck` after a full build, and the tree-shaking probe of Task 3. A Babel loose ES5 build of it also passed a penalty test (`integration.md`, Findings outside the API).
 
 ## Global Constraints
 
-- The public API is the export list of RFC v2 and nothing more: `createSteeringEngine`, `applyUriReplacement`, `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH`, `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, `STEERING_ERROR_TYPE_CALLBACK`, and the types `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError`, and `UriReplacementOptions`.
+- The public API is the export list of RFC v3 and nothing more: `createSteeringEngine`, `applyUriReplacement`, `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH`, `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, `STEERING_ERROR_TYPE_CALLBACK`, and the types `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError`, and `UriReplacementOptions`.
 - The spec versions are draft-pantos-content-steering-05, draft-pantos-hls-rfc8216bis-22 (section 7), and ETSI TS 103 998 V1.1.1 (2024-01).
 - Every new export has TSDoc with the `@beta` tag, like the other exports of the package. Unresolved question 5 of the RFC decides the final tag.
 - `@svta/cml-utils` is a peer dependency with the version `"*"`. The package imports only types from it.
@@ -506,7 +506,7 @@ Expected: `eslint` prints nothing.
 
 **Interfaces:**
 - Consumes: `replaceQueryParams` and `toHostname` from Task 1, and the existing `isValidPathwayClone`, `DEFAULT_TTL`, and `DEFAULT_PATHWAY_PENALTY`.
-- Produces: `createSteeringEngine(config: SteeringEngineConfig): SteeringEngine` with the types of RFC v2. The engine has `pathway`, `priority`, `start()`, `stop()`, `penalize()`, `setPriority()`, and `update()`. Task 3 documents it, and the spikes of Phase 2 use it.
+- Produces: `createSteeringEngine(config: SteeringEngineConfig): SteeringEngine` with the types of RFC v3. The engine has `pathway`, `priority`, `start()`, `stop()`, `penalize()`, and `update()`. Task 3 documents it, and the spikes of Phase 2 use it.
 
 The tests cover the RFC section by section:
 
@@ -516,7 +516,7 @@ The tests cover the RFC section by section:
 | `createSteeringEngine.responses.test.ts` | Responses |
 | `createSteeringEngine.clones.test.ts` | Clones |
 | `createSteeringEngine.penalties.test.ts` | Penalties |
-| `createSteeringEngine.priority.test.ts` | Pathway selection, and `setPriority()` |
+| `createSteeringEngine.priority.test.ts` | Pathway selection, and the `priority` value of `update()` |
 | `createSteeringEngine.update.test.ts` | Engine: `update()` |
 | `createSteeringEngine.lifecycle.test.ts` | Engine, Callback errors, and Stop and resume |
 
@@ -1620,11 +1620,11 @@ describe('createSteeringEngine priority', () => {
 		deepEqual(create({ pathway: undefined }).engine.priority, [])
 	})
 
-	it('replaces the priority list with setPriority() and selects', async () => {
+	it('replaces the priority list with update() and selects', async () => {
 		const { engine, changes } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] }))
 
 		await engine.start()
-		engine.setPriority(['CDN-X', 'CDN-B', 'CDN-A', 'CDN-B'])
+		engine.update({ priority: ['CDN-X', 'CDN-B', 'CDN-A', 'CDN-B'] })
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-B')
@@ -1632,12 +1632,12 @@ describe('createSteeringEngine priority', () => {
 		deepEqual(changes, ['CDN-B'])
 	})
 
-	it('replaces the priority list of setPriority() with the next valid Steering Manifest', async () => {
+	it('replaces the priority list of update() with the next valid Steering Manifest', async () => {
 		const manifest = manifestResponse({ VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] })
 		const { engine } = create({}, manifest, manifest)
 
 		await engine.start()
-		engine.setPriority(['CDN-B'])
+		engine.update({ priority: ['CDN-B'] })
 		equal(engine.pathway, 'CDN-B')
 
 		mock.timers.tick(60000)
@@ -1651,10 +1651,10 @@ describe('createSteeringEngine priority', () => {
 		const { engine } = create({})
 
 		// @ts-expect-error - invalid priority list
-		throws(() => engine.setPriority([1]), { name: 'TypeError', message: /SteeringEngine\.setPriority: priority must be an array of strings/ })
+		throws(() => engine.update({ priority: [1] }), { name: 'TypeError', message: /SteeringEngine\.update: priority must be an array of strings/ })
 	})
 
-	it('throws a callback error to the caller of setPriority() after it selects', () => {
+	it('throws a callback error to the caller of update() after a new priority list', () => {
 		const cause = new Error('player bug')
 		const { engine } = create({
 			onPathwayChange: () => {
@@ -1662,7 +1662,7 @@ describe('createSteeringEngine priority', () => {
 			},
 		})
 
-		throws(() => engine.setPriority(['CDN-C']), (error) => error === cause)
+		throws(() => engine.update({ priority: ['CDN-C'] }), (error) => error === cause)
 
 		equal(engine.pathway, 'CDN-C')
 	})
@@ -1743,6 +1743,17 @@ describe('createSteeringEngine update', () => {
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('applies new pathways and a new priority list in one call', async () => {
+		const { engine } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] }))
+
+		await engine.start()
+		engine.update({ pathways: ['CDN-A', 'CDN-B', 'CDN-C'], priority: ['CDN-C', 'CDN-A'] })
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-C')
+		deepEqual(engine.priority, ['CDN-C', 'CDN-A'])
 	})
 
 	it('keeps penalties across update()', async () => {
@@ -2430,21 +2441,14 @@ export type SteeringEngine = {
 	penalize(pathway?: string): void;
 
 	/**
-	 * Replaces the priority list until the next valid Steering Manifest.
-	 * The engine selects a pathway before the method returns.
+	 * Changes the inputs of the engine. The engine keeps its penalties and
+	 * its request schedule, and it selects a pathway before the method returns.
 	 *
-	 * @param priority - The pathway IDs, in priority order.
+	 * @param changes - The new values. `uri` replaces the steering URI.
+	 * `pathways` replaces the pathways of the Content Description.
+	 * `priority` replaces the priority list until the next valid Steering Manifest.
 	 */
-	setPriority(priority: readonly string[]): void;
-
-	/**
-	 * Replaces the steering URI, the pathways of the Content Description, or
-	 * both. The engine keeps its penalties and its request schedule, and it
-	 * selects a pathway before the method returns.
-	 *
-	 * @param changes - The new values.
-	 */
-	update(changes: { readonly uri?: string; readonly pathways?: readonly string[] }): void;
+	update(changes: { readonly uri?: string; readonly pathways?: readonly string[]; readonly priority?: readonly string[] }): void;
 };
 ```
 
@@ -2743,7 +2747,7 @@ type Failure = {
  * The engine requests the Steering Manifest, schedules the next request,
  * and selects the pathway that the player must apply.
  *
- * A callback that throws inside `penalize()`, `setPriority()`, or `update()`
+ * A callback that throws inside `penalize()` or `update()`
  * throws to the caller, after the engine has finished the call. Other
  * callback exceptions go to `onError`. Without `onError`, the engine throws
  * them from a timer callback.
@@ -2861,20 +2865,8 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		run(true, select)
 	}
 
-	function setPriority(list: readonly string[]): void {
-		if (!Array.isArray(list) || list.some(id => typeof id !== 'string')) {
-			throw new TypeError(`SteeringEngine.setPriority: priority must be an array of strings. Received ${JSON.stringify(list)}.`)
-		}
-
-		run(true, () => {
-			priority = uniqueStrings(list)
-			fallbackPriority = false
-			select()
-		})
-	}
-
-	function update(changes: { readonly uri?: string; readonly pathways?: readonly string[] }): void {
-		const { uri: nextUri, pathways: nextPathways } = changes
+	function update(changes: { readonly uri?: string; readonly pathways?: readonly string[]; readonly priority?: readonly string[] }): void {
+		const { uri: nextUri, pathways: nextPathways, priority: nextPriority } = changes
 
 		if (nextUri !== undefined) {
 			checkUri('SteeringEngine.update', nextUri)
@@ -2882,6 +2874,10 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 		if (nextPathways !== undefined) {
 			checkPathways('SteeringEngine.update', nextPathways)
+		}
+
+		if (nextPriority !== undefined && (!Array.isArray(nextPriority) || nextPriority.some(id => typeof id !== 'string'))) {
+			throw new TypeError(`SteeringEngine.update: priority must be an array of strings. Received ${JSON.stringify(nextPriority)}.`)
 		}
 
 		run(true, () => {
@@ -2893,6 +2889,11 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				}
 
 				setClones(manifestClones)
+			}
+
+			if (nextPriority !== undefined) {
+				priority = uniqueStrings(nextPriority)
+				fallbackPriority = false
 			}
 
 			if (nextUri !== undefined && nextUri !== configuredUri) {
@@ -3213,7 +3214,6 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		start,
 		stop,
 		penalize,
-		setPriority,
 		update,
 	}
 }
@@ -3319,7 +3319,7 @@ export type * from './UriReplacement.ts'
 npm run build -w libs/content-steering && npm test -w libs/content-steering
 ```
 
-Expected: `ℹ tests 123`, `ℹ pass 123`, and `ℹ fail 0`.
+Expected: `ℹ tests 124`, `ℹ pass 124`, and `ℹ fail 0`.
 
 - [ ] **Step 16: Check the API report**
 
@@ -3627,7 +3627,7 @@ In `content-steering-controller.ts`, add `createLoaderRequester` from the hls.js
 - In the ERROR listener, call `engine.penalize(errorPathway)` when an engine exists, and set `errorAction.resolved` when the selection changed.
 - Build clone URIs with `applyUriReplacement`, with `stableVariantId` for levels and `stableRenditionId` for renditions. Skip a rendition with an empty URI.
 - Remove `loadSteeringManifest`, `scheduleRefresh`, `clearTimeout`, `performUriReplacement`, and the three steering types. Import the types from `@svta/cml-content-steering`.
-- The `pathwayPriority` setter calls `engine.setPriority()`, and the getter reads `engine.priority`.
+- The `pathwayPriority` setter calls `engine.update({ priority })`, and the getter reads `engine.priority`.
 
 - [ ] **Step 5: Adapt the tests**
 
@@ -3729,7 +3729,7 @@ npm run lint && npx tsc
 npm test
 ```
 
-Expected, from the analysis: the adapted controller tests pass, and the neighbor tests pass. RFC v2 resolves gaps 2, 10, and 11. The RFC rejects gap 12, so record each place where the spike needs a forced request.
+Expected, from the analysis: the adapted controller tests pass, and the neighbor tests pass. RFC v3 resolves gaps 2, 10, and 11. The RFC rejects gap 12, so record each place where the spike needs a forced request.
 
 - [ ] **Step 7: Check a real stream**
 
@@ -3949,9 +3949,9 @@ EOF
 
 **Interfaces:**
 - Consumes: the spike results of Tasks 4 to 7 in `integration.md`.
-- Produces: a list of new RFC changes for the maintainer, and after approval, revision v3 of the RFC.
+- Produces: a list of new RFC changes for the maintainer, and after approval, revision v4 of the RFC.
 
-RFC v2 already applies the decisions on the 19 gaps of `integration.md`. This task reports only what the spikes find beyond them.
+RFC v3 already applies the decisions on the 19 gaps of `integration.md`. This task reports only what the spikes find beyond them.
 
 - [ ] **Step 1: Check the spike results**
 
@@ -3972,7 +3972,7 @@ git switch rfc/content-steering-engine
 git pull --ff-only
 ```
 
-Edit `rfc/content-steering-engine.md` for each approved row. Add revision v3 to the revision history, with one sentence for each change. Then check the prose and commit:
+Edit `rfc/content-steering-engine.md` for each approved row. Add revision v4 to the revision history, with one sentence for each change. Then check the prose and commit:
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main rfc/content-steering-engine.md
