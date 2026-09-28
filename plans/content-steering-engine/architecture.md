@@ -32,7 +32,7 @@ The table maps each rule to the behavior of the engine. An empty cell means that
 
 | Topic | Base spec | HLS spec | DASH spec | Engine |
 |---|---|---|---|---|
-| Initial pathway | step 1: apply the initial pathway until the first Steering Manifest | 4.4.6.6: `PATHWAY-ID` MUST be applied until then | steps 5 and 7: with `@queryBeforeStart`, the first request has no parameters | `pathway` of the configuration |
+| Initial pathway | step 1: apply the initial pathway until the first Steering Manifest | 4.4.6.6: `PATHWAY-ID` MUST be applied until then | steps 5 and 7: with `@queryBeforeStart`, the first request has no parameters | `pathway`, the fallback priority list, and `queryBeforeStart` |
 | Query parameters | section 6: send the pathway and the throughput | 7.4: `_HLS_pathway="<id>"` and integer bits per second | step 7: a quoted list of the pathways since the previous request, and integer bits per second for each | the RFC table. The quotes for HLS are unresolved question 1 |
 | Request timing | section 4 and step 6: wait TTL seconds after a load | | step 9: set the timer at receipt | a timer at receipt |
 | RELOAD-URI | section 4: relative to the current Steering Manifest URI. A `data` base MUST produce an error | 4.4.6.6: `SERVER-URI` can be a `data` URI | step 10: relative to the current server URI | resolved against the response URI. A failure makes the Steering Manifest invalid |
@@ -86,12 +86,15 @@ The package exports only the API of the RFC. These modules are internal:
 
 | Module | Job |
 |---|---|
-| `parseSteeringManifest` | Parses the body, checks it with `isValidSteeringManifest`, and resolves RELOAD-URI. |
-| `resolveClones` | Returns the valid clones of a Steering Manifest, in array order. |
+| `parseSteeringManifest` | Parses the body, checks it with the rules of the RFC, and resolves RELOAD-URI. |
+| `resolveClones` | Returns the valid clones of a Steering Manifest, in array order. It checks the structure with `isValidPathwayClone`. |
 | `selectPathway` | Returns the first known pathway of the priority list that is not penalized. |
 | `buildSteeringUri` | Sets the steering query parameters and keeps the rest of the URI. |
 | `parseRetryAfter` | Converts seconds or an HTTP date to a delay in milliseconds. |
 | `createSteeringEngine` | Holds the state, the timers, and the callbacks. |
+| `replaceQueryParams` | Sets query parameters in code point order, without a second encoding. |
+| `toHostname` | Checks and normalizes a `HOST` value. |
+| `uniqueStrings` | Returns the strings of a list without duplicates. |
 
 The code rules of the repository require that tests import from the package name. So the tests check the internal modules through `createSteeringEngine` and `applyUriReplacement`.
 
