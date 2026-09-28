@@ -15,7 +15,7 @@ status: draft
 
 Add a second reporting API to `@svta/cml-cmcd`, next to `CmcdReporter`. The new API has three objects that match the three scopes of CTA-5004-B.
 
-- A `CmcdSession` reports under one `sid` at a time. It owns the report targets, the `request` function, the interval timers, and the session totals. `rotate()` starts the next `sid` for every reporter in the session.
+- A `CmcdSession` reports under one `sid` at a time. It owns the report targets, the requester, the interval timers, and the session totals. `rotate()` starts the next `sid` for every reporter in the session.
 - A `CmcdSessionReporter` reports for one media player inside the session. Through it the player pushes its state, records events, decorates its requests, and records their responses.
 - A target is one report destination. Targets are internal. Each target owns the state the spec scopes to a destination. That state is the sequence number, the `msd` gate, the `bs` flag, the `ec` buffer, and the delivery queue.
 
@@ -110,7 +110,7 @@ The ownership in one picture. Targets belong to the session, and every reporter 
 flowchart TB
     subgraph session["CmcdSession, one sid at a time"]
         direction TB
-        sdata["current sid, version, request function, timers, bg<br>per sid: msd, bsa, bsda, completed spans"]
+        sdata["current sid, version, requester, timers, bg<br>per sid: msd, bsa, bsda, completed spans"]
         subgraph reporters["Reporters, one per media player"]
             direction LR
             primary["CmcdSessionReporter, cid movie-42<br>store, reported values, host, su, open span"]
@@ -271,7 +271,7 @@ session.dispose()
 | `createCmcdSession` | function |
 | `CmcdSession`, `CmcdSessionConfig` | types |
 | `CmcdSessionReporter`, `CmcdSessionReporterConfig`, `CmcdPlaybackData`, `CmcdMetric`, `CmcdNextObject` | types |
-| `CmcdEventTargetConfig`, `CmcdSessionRequest` | types |
+| `CmcdEventTargetConfig`, `CmcdRequester` | types |
 | `CmcdRequestLike`, `CmcdDecoratedRequest`, `CmcdRequestRecord`, `CmcdResponseInfo`, `CmcdResourceTiming`, `CmcdResponseData` | types |
 | `CmcdRequestTransform`, `CmcdEventTransform` | types |
 | `CmcdDiscreteEventType` | type |
@@ -288,7 +288,7 @@ type CmcdSessionConfig = {
 	headerMap?: Partial<CmcdHeaderMap>          // header shard per custom key
 	transform?: CmcdRequestTransform
 	eventTargets?: readonly CmcdEventTargetConfig[]
-	request?: CmcdSessionRequest                // default: fetch, POST, keepalive
+	requester?: CmcdRequester                   // default: fetch, POST, keepalive
 	derive?: Partial<Record<'bg' | 'dl' | 'su', boolean>>  // observations the reporter may turn into defaults. default: all true
 	onError?: (error: unknown) => void
 }
@@ -310,10 +310,10 @@ type CmcdSessionReporterConfig = {
 ```
 
 ```ts
-type CmcdSessionRequest = (request: HttpRequest) => Promise<{ status: number }>
+type CmcdRequester = (request: HttpRequest) => Promise<{ status: number }>
 ```
 
-`request` sends the event-mode POST requests. It receives an `HttpRequest` with `url`, `method`, `headers`, and `body`, and it resolves with the response status. The default is `fetch` with `keepalive`. It has the signature of the `requester` argument of `CmcdReporter`. The loader adapters that hls.js and dash.js inject today move over unchanged.
+`requester` sends the event-mode POST requests. It receives an `HttpRequest` with `url`, `method`, `headers`, and `body`, and it resolves with the response status. The default is `fetch` with `keepalive`. It is the `requester` argument of `CmcdReporter`, with the same name and signature. The loader adapters that hls.js and dash.js inject today move over unchanged.
 
 `derive` names the three observations the reporter may turn into a default value when the player has not supplied the key: `bg` from document visibility, `dl` from `bl` and `pr`, and `su` from the play state. Each is on by default, and `false` turns it off. The other derived keys are spec definitions and have no switch. A supplied value wins for all of them.
 
@@ -577,13 +577,13 @@ const legacyCollector: CmcdEventTargetConfig = {
 
 ### Delivery
 
-Each event target queues encoded lines. It sends a batch when the queue reaches `batchSize`, on `flush()`, on `dispose()`, or at once for a late `rr` report after dispose. A batch is one POST with content type `application/cmcd`, the lines joined by a line feed, no trailing line feed, and the target's `headers`. The default `request` function is `fetch` with `keepalive` set when the body is under 64 KB, so a `flush()` on `pagehide` completes. A drain requested by `flush()`, `rotate()`, `dispose()`, or a late `rr` while a send is in flight is kept. The target continues draining when the send settles, until the queue is empty.
+Each event target queues encoded lines. It sends a batch when the queue reaches `batchSize`, on `flush()`, on `dispose()`, or at once for a late `rr` report after dispose. A batch is one POST with content type `application/cmcd`, the lines joined by a line feed, no trailing line feed, and the target's `headers`. The default requester is `fetch` with `keepalive` set when the body is under 64 KB, so a `flush()` on `pagehide` completes. A drain requested by `flush()`, `rotate()`, `dispose()`, or a late `rr` while a send is in flight is kept. The target continues draining when the send settles, until the queue is empty.
 
 | Response | Action |
 |---|---|
 | 2xx | done, back-off resets |
 | 410 | the target sends nothing else for this session |
-| 429, 5xx, or a rejected `request` call | the batch returns to the front of the queue, and the target retries after a back-off |
+| 429, 5xx, or a requester rejection | the batch returns to the front of the queue, and the target retries after a back-off |
 | other 4xx | the batch is dropped, back-off resets |
 
 The back-off starts at one second and doubles to a cap of 60 seconds. New lines keep queueing during the back-off and go out with the retry, which is the aggregation the spec recommends for 429. After `dispose()`, a target stops retrying when a retry at the 60 second step fails. When a queue exceeds `maxQueueSize`, the oldest lines are dropped.
@@ -597,7 +597,7 @@ stateDiagram-v2
     sending --> queueing : 2xx, back-off resets
     sending --> queueing : other 4xx, batch dropped
     sending --> gone : 410
-    sending --> backingOff : 429, 5xx, or a rejected request call, batch back to the front
+    sending --> backingOff : 429, 5xx, or a requester rejection, batch back to the front
     backingOff --> sending : timer fires, 1 s doubling to 60 s, or flush
     backingOff --> gone : after dispose, the 60 s retry fails
     gone --> [*]
@@ -609,7 +609,7 @@ stateDiagram-v2
 
 Runtime data never throws. An unknown or empty value is omitted, as the spec requires. A value the structured-field encoder cannot serialize throws at the call that produced it, and nothing is committed. `createReporter()` on a disposed session throws. Every other call on a disposed reporter or session is a no-op.
 
-`onError` receives the errors that have no caller. Those are a transform or encoding failure on an interval tick, and a `request` call that still fails after the back-off cap. Without `onError`, those errors are thrown from the timer callback, as today. In both paths the error is an `Error`. Its message names the target URL and the stage, one of transform, encode, or send. Its `cause` is the rejection reason of the `request` call when one exists.
+`onError` receives the errors that have no caller. Those are a transform or encoding failure on an interval tick, and a requester that still fails after the back-off cap. Without `onError`, those errors are thrown from the timer callback, as today. In both paths the error is an `Error`. Its message names the target URL and the stage, one of transform, encode, or send. Its `cause` is the requester's error when one exists.
 
 ### Bundle and performance
 
@@ -627,7 +627,7 @@ The retention ledger, the eviction pass, the dirty set, and the provenance encod
 
 | `CmcdReporter` | Session API |
 |---|---|
-| `new CmcdReporter(config, requester)` | `createCmcdSession({ ...config, request: requester })` and `session.createReporter({ cid })` |
+| `new CmcdReporter(config, requester)` | `createCmcdSession({ ...config, requester })` and `session.createReporter({ cid })` |
 | `enabledKeys` | `keys` |
 | `customHeaderMap` | `headerMap` |
 | `sessionRetention`, `CMCD_REQUEST_PROVENANCE`, the `C` type parameter | removed |
@@ -698,14 +698,14 @@ The dash.js change deletes `calculateMsd()`, the rebuffer tracking, and the `ec`
 5. **`b` on exit.** `bg=?0`, as today, or a bare `e=b` as the token description implies. **Resolution (2026-09-10):** a bare `e=b`. The `bg` key row says the key SHOULD only be sent when TRUE. The `b` event definition describes exit as the event without `bg`. A collector that checks for the presence of `bg` would read `bg=?0` as an enter. The Transforms section shows the per-target opt-in for `bg=?0`.
 6. **`ts` in the `update()` payload**, or a second argument. **Resolution (2026-09-10):** kept in the payload. `update()`, `recordEvent()`, `recordError()`, `decorate()`, and `recordResponse()` take one data shape. A second argument would give `recordEvent()` and `recordError()` a third parameter or a second convention.
 7. **A URL-only `recordResponse()`** with attribution parsed from the wire, or the current-session fallback alone. **Resolution (2026-09-10):** the fallback alone. Wire parsing needs a map from `sid` strings to past `sid` states, with an eviction rule, which is the retention ledger this design removes. The fallback is wrong only for a response that crosses a `rotate()` from a player that discarded the returned request. Wire parsing stays listed under Rationale as a possible later addition.
-8. **`onError` signature.** A single callback, or a context argument that names the target and the stage. **Resolution (2026-09-10):** a single callback. The target URL and the stage are in the error message, and `cause` holds the rejection reason of the `request` call. Targets are fixed at `createCmcdSession()`, so a player cannot act on a target at runtime, and a context argument would only feed logging. A `CmcdReportError` class with fields stays a later option if a player needs to branch on the stage.
-9. **Names.** `CmcdSessionReporter` and `CmcdPlaybackData` next to the existing `CmcdPlayerState` token union. **Resolution (2026-09-10):** accepted. `CmcdPlayerState` remains the token union for `sta`, and the Data section says so. The send function is not `CmcdTransport`, because the package already uses "transport" for the interception adapters of `CmcdReportRecorder`. **Update (2026-09-28):** the send function is `request`, with the type `CmcdSessionRequest`. The name `CmcdRequest` already belongs to the type of request mode data.
+8. **`onError` signature.** A single callback, or a context argument that names the target and the stage. **Resolution (2026-09-10):** a single callback. The target URL and the stage are in the error message, and `cause` holds the requester's error. Targets are fixed at `createCmcdSession()`, so a player cannot act on a target at runtime, and a context argument would only feed logging. A `CmcdReportError` class with fields stays a later option if a player needs to branch on the stage.
+9. **Names.** `CmcdSessionReporter` and `CmcdPlaybackData` next to the existing `CmcdPlayerState` token union. **Resolution (2026-09-10):** accepted. `CmcdPlayerState` remains the token union for `sta`, and the Data section says so. The send function is `requester` and `CmcdRequester`, not `CmcdTransport`. The package already uses "transport" for the interception adapters of `CmcdReportRecorder`, and `requester` is the existing `CmcdReporter` argument name.
 
 ## Future possibilities
 
 - `encodeCmcd` accepts the plain values of `CmcdPlaybackData`, once the shared preparation step normalizes them.
 - Automatic response recording through a `PerformanceObserver`, so a browser player never calls `recordResponse()`.
-- `Retry-After` from a 429 response, when the `request` function returns headers.
+- `Retry-After` from a 429 response, when the requester returns headers.
 - A per-target URL filter for the `url` key, per spec item 19. A transform covers it today.
 - A request-only entry point that leaves out event-mode delivery, if an adopter without a collector asks for it.
 - An optional destination name on `decorate()`, with request-mode state per name, if CTA WAVE defines request-mode targets below the mode.
