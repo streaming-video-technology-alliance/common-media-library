@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the engine of the RFC in `@svta/cml-content-steering`. Then build a prototype of the engine in four players, to find the integration gaps before the RFC review ends.
+**Goal:** Build the engine of RFC v2 in `@svta/cml-content-steering`. Then build a prototype of the engine in four players, to check the integration map before the RFC review ends.
 
 **Architecture:** `createSteeringEngine` keeps the state and the timers in one closure. It uses small internal modules for the rules of the specs. `applyUriReplacement` is a separate function without state. Each player spike installs a local build of the package in a clone of the player. The spike replaces the steering controller of the player with the engine and records the problems.
 
@@ -10,14 +10,15 @@
 
 **Sources:** the [RFC](../../rfc/content-steering-engine.md) (PR #471), the [design record](architecture.md), and the [integration map](integration.md).
 
-**Status of the code in this plan:** every code block in Phase 1 is the code of a local prototype. The prototype passed 92 package tests, `eslint`, `npm run typecheck` after a full build, and the tree-shaking probe of Task 3. A Babel loose ES5 build of it also passed a penalty test (`integration.md`, Findings outside the API).
+**Status of the code in this plan:** every code block in Phase 1 is the code of a local prototype. The prototype implements RFC v2. It passed 123 package tests, `eslint`, `npm run typecheck` after a full build, and the tree-shaking probe of Task 3. A Babel loose ES5 build of it also passed a penalty test (`integration.md`, Findings outside the API).
 
 ## Global Constraints
 
-- The public API is the export list of the RFC and nothing more: `createSteeringEngine`, `applyUriReplacement`, `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH`, and the types `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError`, and `UriReplacementOptions`.
+- The public API is the export list of RFC v2 and nothing more: `createSteeringEngine`, `applyUriReplacement`, `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH`, `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, `STEERING_ERROR_TYPE_CALLBACK`, and the types `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError`, and `UriReplacementOptions`.
 - The spec versions are draft-pantos-content-steering-05, draft-pantos-hls-rfc8216bis-22 (section 7), and ETSI TS 103 998 V1.1.1 (2024-01).
 - Every new export has TSDoc with the `@beta` tag, like the other exports of the package. Unresolved question 5 of the RFC decides the final tag.
 - `@svta/cml-utils` is a peer dependency with the version `"*"`. The package imports only types from it.
+- The source never calls `console`. Errors go to the caller or to `onError`, with the rule of the RFC section "Callback errors".
 - No code runs at module scope. A bare import of `dist/index.js` bundles to no statements with Rollup and with rolldown.
 - The source has no `async` function and no spread of an iterator. The hls.js build transpiles CML code to ES5 in Babel loose mode. In that mode both constructs fail or grow the bundle (`integration.md`, Findings outside the API).
 - Tests import from `@svta/cml-content-steering` and `@svta/cml-utils`, never from `src`. Each test file has a `//#region example` block.
@@ -38,12 +39,14 @@ All paths are relative to `libs/content-steering/`.
 | `src/replaceQueryParams.ts` | 1 | internal: sets query parameters in code point order, without encoding |
 | `src/toHostname.ts` | 1 | internal: checks and normalizes a `HOST` value |
 | `src/SteeringProtocol.ts` | 2 | the protocol constants and type |
+| `src/SteeringErrorType.ts` | 2 | the error type constants and type |
 | `src/SteeringRequester.ts`, `src/SteeringError.ts`, `src/SteeringEngineConfig.ts`, `src/SteeringEngine.ts` | 2 | the public types |
 | `src/parseRetryAfter.ts` | 2 | internal: the delay of a `Retry-After` value |
 | `src/parseSteeringManifest.ts` | 2 | internal: parses and checks a response body, and resolves RELOAD-URI |
 | `src/resolveClones.ts` | 2 | internal: the valid clones of a Steering Manifest |
 | `src/selectPathway.ts` | 2 | internal: step 5 of the base spec |
 | `src/buildSteeringUri.ts` | 2 | internal: the steering query parameters |
+| `src/uniqueStrings.ts` | 2 | internal: the strings of a list without duplicates |
 | `src/createSteeringEngine.ts` | 2 | the engine |
 | `src/index.ts` | 1, 2, 3 | the exports and the package links |
 | `test/createStubRequester.ts` | 2 | a test requester with recorded requests |
@@ -498,12 +501,12 @@ Expected: `eslint` prints nothing.
 
 **Files:**
 - Modify: `package.json`, `src/index.ts`, `CHANGELOG.md`
-- Create: `src/SteeringProtocol.ts`, `src/SteeringRequester.ts`, `src/SteeringError.ts`, `src/SteeringEngineConfig.ts`, `src/SteeringEngine.ts`, `src/parseRetryAfter.ts`, `src/parseSteeringManifest.ts`, `src/resolveClones.ts`, `src/selectPathway.ts`, `src/buildSteeringUri.ts`, `src/createSteeringEngine.ts`
-- Test: `test/createStubRequester.ts`, `test/SteeringProtocol.test.ts`, `test/createSteeringEngine.test.ts`, `test/createSteeringEngine.responses.test.ts`, `test/createSteeringEngine.clones.test.ts`, `test/createSteeringEngine.penalties.test.ts`, `test/createSteeringEngine.lifecycle.test.ts`
+- Create: `src/SteeringProtocol.ts`, `src/SteeringErrorType.ts`, `src/SteeringRequester.ts`, `src/SteeringError.ts`, `src/SteeringEngineConfig.ts`, `src/SteeringEngine.ts`, `src/uniqueStrings.ts`, `src/parseRetryAfter.ts`, `src/parseSteeringManifest.ts`, `src/resolveClones.ts`, `src/selectPathway.ts`, `src/buildSteeringUri.ts`, `src/createSteeringEngine.ts`
+- Test: `test/createStubRequester.ts`, `test/SteeringProtocol.test.ts`, `test/SteeringErrorType.test.ts`, `test/createSteeringEngine.test.ts`, `test/createSteeringEngine.responses.test.ts`, `test/createSteeringEngine.clones.test.ts`, `test/createSteeringEngine.penalties.test.ts`, `test/createSteeringEngine.priority.test.ts`, `test/createSteeringEngine.update.test.ts`, `test/createSteeringEngine.lifecycle.test.ts`
 
 **Interfaces:**
-- Consumes: `replaceQueryParams` and `toHostname` from Task 1, and the existing `isValidSteeringManifest`, `DEFAULT_TTL`, and `DEFAULT_PATHWAY_PENALTY`.
-- Produces: `createSteeringEngine(config: SteeringEngineConfig): SteeringEngine` with the types of the RFC. Task 3 documents it, and the spikes of Phase 2 use it.
+- Consumes: `replaceQueryParams` and `toHostname` from Task 1, and the existing `isValidPathwayClone`, `DEFAULT_TTL`, and `DEFAULT_PATHWAY_PENALTY`.
+- Produces: `createSteeringEngine(config: SteeringEngineConfig): SteeringEngine` with the types of RFC v2. The engine has `pathway`, `priority`, `start()`, `stop()`, `penalize()`, `setPriority()`, and `update()`. Task 3 documents it, and the spikes of Phase 2 use it.
 
 The tests cover the RFC section by section:
 
@@ -512,8 +515,10 @@ The tests cover the RFC section by section:
 | `createSteeringEngine.test.ts` | Configuration and Requests |
 | `createSteeringEngine.responses.test.ts` | Responses |
 | `createSteeringEngine.clones.test.ts` | Clones |
-| `createSteeringEngine.penalties.test.ts` | Penalties and Pathway selection |
-| `createSteeringEngine.lifecycle.test.ts` | Engine, and Stop and resume |
+| `createSteeringEngine.penalties.test.ts` | Penalties |
+| `createSteeringEngine.priority.test.ts` | Pathway selection, and `setPriority()` |
+| `createSteeringEngine.update.test.ts` | Engine: `update()` |
+| `createSteeringEngine.lifecycle.test.ts` | Engine, Callback errors, and Stop and resume |
 
 The tests use the mock timers of `node:test` for `setTimeout` and `Date`. After `mock.timers.tick()`, they wait for `flush()`, so the promise callbacks of the engine run.
 
@@ -586,7 +591,7 @@ export function flush(): Promise<void> {
 }
 ```
 
-- [ ] **Step 3: Write the protocol test**
+- [ ] **Step 3: Write the protocol and error type tests**
 
 Create `test/SteeringProtocol.test.ts`:
 
@@ -602,6 +607,27 @@ describe('SteeringProtocol', () => {
 		equal(SteeringProtocol.DASH, 'dash')
 		equal(STEERING_PROTOCOL_HLS, SteeringProtocol.HLS)
 		equal(STEERING_PROTOCOL_DASH, SteeringProtocol.DASH)
+		//#endregion example
+	})
+})
+```
+
+Create `test/SteeringErrorType.test.ts`:
+
+```ts
+import { STEERING_ERROR_TYPE_CALLBACK, STEERING_ERROR_TYPE_LOAD, STEERING_ERROR_TYPE_PARSE, SteeringErrorType } from '@svta/cml-content-steering'
+import { equal } from 'node:assert'
+import { describe, it } from 'node:test'
+
+describe('SteeringErrorType', () => {
+	it('has the load, parse, and callback values', () => {
+		//#region example
+		equal(SteeringErrorType.LOAD, 'load')
+		equal(SteeringErrorType.PARSE, 'parse')
+		equal(SteeringErrorType.CALLBACK, 'callback')
+		equal(STEERING_ERROR_TYPE_LOAD, SteeringErrorType.LOAD)
+		equal(STEERING_ERROR_TYPE_PARSE, SteeringErrorType.PARSE)
+		equal(STEERING_ERROR_TYPE_CALLBACK, SteeringErrorType.CALLBACK)
 		//#endregion example
 	})
 })
@@ -785,6 +811,65 @@ describe('createSteeringEngine', () => {
 			equal(requests[1].url, 'https://steering.example.com/dash?_DASH_pathway=%22alpha,beta%22&_DASH_throughput=5140000,')
 		})
 
+		it('sends no steering parameters on the first request with queryBeforeStart', async () => {
+			const manifest = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+			const { requester, requests } = createStubRequester(manifestResponse(manifest), manifestResponse(manifest))
+			const engine = createSteeringEngine(hlsConfig({ requester, queryBeforeStart: true, getThroughput: () => 1000 }))
+
+			await engine.start()
+			mock.timers.tick(60000)
+			await flush()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/manifest.json')
+			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-B%22&_HLS_throughput=1000')
+		})
+
+		it('lists the pathways of getReportedPathways for DASH', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['alpha', 'beta'],
+				pathway: 'alpha',
+				requester,
+				getReportedPathways: () => ['beta', 'alpha', 'beta'],
+				getThroughput: (pathway) => pathway === 'beta' ? 2000 : 1000,
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=%22beta,alpha%22&_DASH_throughput=2000,1000')
+		})
+
+		it('omits the DASH parameters when getReportedPathways returns an empty list', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['alpha'],
+				pathway: 'alpha',
+				requester,
+				getReportedPathways: () => [],
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash')
+		})
+
+		it('ignores getReportedPathways for HLS', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(hlsConfig({ requester, getReportedPathways: () => ['CDN-B'] }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22')
+		})
+
 		it('uses fetch when no requester is configured', async (t) => {
 			const fetchMock = t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(MANIFEST), { status: 200 }))
 			const engine = createSteeringEngine(hlsConfig())
@@ -805,7 +890,7 @@ describe('createSteeringEngine', () => {
 Create `test/createSteeringEngine.responses.test.ts`:
 
 ```ts
-import { createSteeringEngine, DEFAULT_TTL, type SteeringEngineConfig, type SteeringError } from '@svta/cml-content-steering'
+import { createSteeringEngine, DEFAULT_TTL, SteeringErrorType, type SteeringEngineConfig, type SteeringError } from '@svta/cml-content-steering'
 import { deepEqual, equal, ok } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
 import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
@@ -813,9 +898,11 @@ import { createStubRequester, flush, manifestResponse, type StubResponse } from 
 const NOW = Date.parse('Sun, 06 Nov 1994 08:49:37 GMT')
 const MANIFEST = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
 
+type RequestError = Exclude<SteeringError, { type: typeof SteeringErrorType.CALLBACK }>
+
 function setup(protocol: 'hls' | 'dash', ...responses: StubResponse[]) {
 	const stub = createStubRequester(...responses)
-	const errors: SteeringError[] = []
+	const errors: RequestError[] = []
 	const manifests: unknown[] = []
 	const config: SteeringEngineConfig = {
 		protocol,
@@ -823,7 +910,11 @@ function setup(protocol: 'hls' | 'dash', ...responses: StubResponse[]) {
 		pathways: ['CDN-A', 'CDN-B'],
 		pathway: 'CDN-A',
 		requester: stub.requester,
-		onError: (error) => errors.push(error),
+		onError: (error) => {
+			if (error.type !== SteeringErrorType.CALLBACK) {
+				errors.push(error)
+			}
+		},
 		onManifest: (manifest) => manifests.push(manifest),
 	}
 	const engine = createSteeringEngine(config)
@@ -864,6 +955,52 @@ describe('createSteeringEngine responses', () => {
 			//#endregion example
 		})
 
+		it('accepts an empty PATHWAY-CLONES array', async () => {
+			const { engine, errors } = setup('hls', manifestResponse({ ...MANIFEST, 'PATHWAY-CLONES': [] }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors.length, 0)
+			equal(engine.pathway, 'CDN-B')
+		})
+
+		it('keeps the first of each pathway ID in PATHWAY-PRIORITY', async () => {
+			// @ts-expect-error - a pathway ID that is not a string
+			const { engine } = setup('hls', manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': ['CDN-B', 7, 'CDN-B', 'CDN-A'] }))
+
+			await engine.start()
+			engine.stop()
+
+			deepEqual(engine.priority, ['CDN-B', 'CDN-A'])
+		})
+
+		it('treats a response without status as status 200', async () => {
+			const { engine } = setup('hls', { data: JSON.stringify(MANIFEST) })
+
+			await engine.start()
+			engine.stop()
+
+			equal(engine.pathway, 'CDN-B')
+		})
+
+		it('passes the response URI and the next request URI to onManifest', async () => {
+			const contexts: unknown[] = []
+			const manifest = { ...MANIFEST, 'RELOAD-URI': 'next.json' }
+			const engine = createSteeringEngine({
+				protocol: 'hls',
+				uri: 'https://steering.example.com/a/manifest.json',
+				pathways: ['CDN-A', 'CDN-B'],
+				requester: async (request) => ({ request, status: 200, url: 'https://cdn.example.com/b/manifest.json', data: JSON.stringify(manifest) }),
+				onManifest: (_manifest, _clones, context) => contexts.push(context),
+			})
+
+			await engine.start()
+			engine.stop()
+
+			deepEqual(contexts, [{ url: 'https://cdn.example.com/b/manifest.json', reloadUri: 'https://cdn.example.com/b/next.json' }])
+		})
+
 		it('accepts a body that is already parsed', async () => {
 			const { engine } = setup('hls', { status: 200, data: MANIFEST })
 
@@ -898,13 +1035,17 @@ describe('createSteeringEngine responses', () => {
 		it('reports a relative RELOAD-URI of a data URI as a parse error', async () => {
 			const manifest = { ...MANIFEST, 'RELOAD-URI': 'next.json' }
 			const uri = `data:application/json,${encodeURIComponent(JSON.stringify(manifest))}`
-			const errors: SteeringError[] = []
+			const errors: RequestError[] = []
 			const engine = createSteeringEngine({
 				protocol: 'hls',
 				uri,
 				pathways: ['CDN-A', 'CDN-B'],
 				requester: async (request) => ({ request, status: 200, url: request.url, data: JSON.stringify(manifest) }),
-				onError: (error) => errors.push(error),
+				onError: (error) => {
+			if (error.type !== SteeringErrorType.CALLBACK) {
+				errors.push(error)
+			}
+		},
 			})
 
 			await engine.start()
@@ -934,7 +1075,7 @@ describe('createSteeringEngine responses', () => {
 			equal(requests.length, 2)
 		})
 
-		it('reports a parse error for a Steering Manifest that isValidSteeringManifest rejects', async () => {
+		it('reports a parse error for a Steering Manifest without a positive TTL', async () => {
 			const { engine, errors } = setup('hls', manifestResponse({ ...MANIFEST, TTL: 0 }))
 
 			await engine.start()
@@ -1203,6 +1344,39 @@ describe('createSteeringEngine clones', () => {
 		equal(engine.pathway, 'C7')
 	})
 
+	it('ignores a clone that acceptClone refuses', async () => {
+		const refused = clone('C1', 'CDN-A')
+		const accepted = clone('C2', 'CDN-A')
+		const { requester } = createStubRequester(manifestWithClones([refused, accepted], ['C1', 'C2']))
+		const received: (readonly PathwayClone[])[] = []
+		const engine = createSteeringEngine({
+			protocol: 'hls',
+			uri: 'https://steering.example.com/manifest.json',
+			pathways: ['CDN-A', 'CDN-B'],
+			pathway: 'CDN-A',
+			requester,
+			acceptClone: (candidate) => candidate.ID !== 'C1',
+			onManifest: (_manifest, clones) => received.push(clones),
+		})
+
+		await engine.start()
+		engine.stop()
+
+		deepEqual(received, [[accepted]])
+		equal(engine.pathway, 'C2')
+	})
+
+	it('ignores a clone without a valid structure and applies the Steering Manifest', async () => {
+		const valid = clone('C1', 'CDN-A')
+		// @ts-expect-error - a clone without a string ID
+		const broken: PathwayClone = { 'BASE-ID': 'CDN-A', ID: 5, 'URI-REPLACEMENT': {} }
+		const { engine, received } = await receive(manifestWithClones([broken, valid], ['C1', 'CDN-A']))
+		engine.stop()
+
+		deepEqual(received[0], [valid])
+		equal(engine.pathway, 'C1')
+	})
+
 	it('knows only the clones of the current Steering Manifest', async () => {
 		const temporary = clone('CDN-A-CLONE', 'CDN-A')
 		const { engine, received } = await receive(
@@ -1369,7 +1543,7 @@ describe('createSteeringEngine penalties', () => {
 		equal(engine.pathway, 'CDN-C')
 	})
 
-	it('applies a penalty from before the first Steering Manifest', async () => {
+	it('fails over with the fallback priority list before the first Steering Manifest', async () => {
 		const { requester } = createStubRequester(manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }))
 		const engine = createSteeringEngine({
 			protocol: 'hls',
@@ -1380,7 +1554,7 @@ describe('createSteeringEngine penalties', () => {
 		})
 
 		engine.penalize()
-		equal(engine.pathway, 'CDN-A')
+		equal(engine.pathway, 'CDN-B')
 
 		await engine.start()
 		engine.stop()
@@ -1390,14 +1564,279 @@ describe('createSteeringEngine penalties', () => {
 })
 ```
 
-- [ ] **Step 8: Write the lifecycle tests**
+- [ ] **Step 8: Write the priority and update tests**
+
+Create `test/createSteeringEngine.priority.test.ts`:
+
+```ts
+import { createSteeringEngine, type SteeringEngineConfig } from '@svta/cml-content-steering'
+import { deepEqual, equal, throws } from 'node:assert'
+import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
+
+const PATHWAYS = ['CDN-A', 'CDN-B', 'CDN-C']
+
+function create(overrides: Partial<SteeringEngineConfig>, ...responses: StubResponse[]) {
+	const { requester } = createStubRequester(...responses)
+	const changes: string[] = []
+	const engine = createSteeringEngine({
+		protocol: 'hls',
+		uri: 'https://steering.example.com/manifest.json',
+		pathways: PATHWAYS,
+		pathway: 'CDN-A',
+		requester,
+		onPathwayChange: (pathway) => changes.push(pathway),
+		...overrides,
+	})
+
+	return { engine, changes }
+}
+
+describe('createSteeringEngine priority', () => {
+	beforeEach(() => {
+		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
+	})
+
+	afterEach(() => {
+		mock.timers.reset()
+	})
+
+	it('lists the selected pathway first and leaves out penalized and unknown pathways', async () => {
+		//#region example
+		const { engine } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-X', 'CDN-A', 'CDN-B', 'CDN-C'] }))
+
+		await engine.start()
+		engine.penalize('CDN-B')
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+		deepEqual(engine.priority, ['CDN-A', 'CDN-C'])
+		//#endregion example
+	})
+
+	it('returns the fallback priority list before the first Steering Manifest', () => {
+		deepEqual(create({}).engine.priority, ['CDN-A', 'CDN-B', 'CDN-C'])
+		deepEqual(create({ pathway: 'CDN-B' }).engine.priority, ['CDN-B', 'CDN-A', 'CDN-C'])
+		deepEqual(create({ pathway: undefined }).engine.priority, [])
+	})
+
+	it('replaces the priority list with setPriority() and selects', async () => {
+		const { engine, changes } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] }))
+
+		await engine.start()
+		engine.setPriority(['CDN-X', 'CDN-B', 'CDN-A', 'CDN-B'])
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-B')
+		deepEqual(engine.priority, ['CDN-B', 'CDN-A'])
+		deepEqual(changes, ['CDN-B'])
+	})
+
+	it('replaces the priority list of setPriority() with the next valid Steering Manifest', async () => {
+		const manifest = manifestResponse({ VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] })
+		const { engine } = create({}, manifest, manifest)
+
+		await engine.start()
+		engine.setPriority(['CDN-B'])
+		equal(engine.pathway, 'CDN-B')
+
+		mock.timers.tick(60000)
+		await flush()
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('throws for a priority list that is not an array of strings', () => {
+		const { engine } = create({})
+
+		// @ts-expect-error - invalid priority list
+		throws(() => engine.setPriority([1]), { name: 'TypeError', message: /SteeringEngine\.setPriority: priority must be an array of strings/ })
+	})
+
+	it('throws a callback error to the caller of setPriority() after it selects', () => {
+		const cause = new Error('player bug')
+		const { engine } = create({
+			onPathwayChange: () => {
+				throw cause
+			},
+		})
+
+		throws(() => engine.setPriority(['CDN-C']), (error) => error === cause)
+
+		equal(engine.pathway, 'CDN-C')
+	})
+})
+```
+
+Create `test/createSteeringEngine.update.test.ts`:
+
+```ts
+import { createSteeringEngine, type PathwayClone, type SteeringEngineConfig } from '@svta/cml-content-steering'
+import { deepEqual, equal, throws } from 'node:assert'
+import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
+
+function create(overrides: Partial<SteeringEngineConfig>, ...responses: StubResponse[]) {
+	const stub = createStubRequester(...responses)
+	const changes: string[] = []
+	const engine = createSteeringEngine({
+		protocol: 'dash',
+		uri: 'https://steering.example.com/dash.json',
+		pathways: ['CDN-A', 'CDN-B'],
+		pathway: 'CDN-A',
+		requester: stub.requester,
+		onPathwayChange: (pathway) => changes.push(pathway),
+		...overrides,
+	})
+
+	return { ...stub, engine, changes }
+}
+
+async function advance(ms: number): Promise<void> {
+	mock.timers.tick(ms)
+	await flush()
+}
+
+describe('createSteeringEngine update', () => {
+	beforeEach(() => {
+		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
+	})
+
+	afterEach(() => {
+		mock.timers.reset()
+	})
+
+	it('selects a pathway that update() adds', async () => {
+		//#region example
+		const { engine, changes } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-C', 'CDN-A'] }))
+
+		await engine.start()
+		equal(engine.pathway, 'CDN-A')
+
+		engine.update({ pathways: ['CDN-A', 'CDN-B', 'CDN-C'] })
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-C')
+		deepEqual(changes, ['CDN-C'])
+		//#endregion example
+	})
+
+	it('moves off a pathway that update() removes', async () => {
+		const { engine } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }))
+
+		await engine.start()
+		engine.update({ pathways: ['CDN-A'] })
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('checks the clones again after update()', async () => {
+		const clone: PathwayClone = { 'BASE-ID': 'CDN-B', ID: 'CDN-B-CLONE', 'URI-REPLACEMENT': { HOST: 'backup.example.com' } }
+		const { engine } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B-CLONE', 'CDN-A'], 'PATHWAY-CLONES': [clone] }))
+
+		await engine.start()
+		equal(engine.pathway, 'CDN-B-CLONE')
+
+		engine.update({ pathways: ['CDN-A'] })
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('keeps penalties across update()', async () => {
+		const { engine } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B', 'CDN-C'] }))
+
+		await engine.start()
+		engine.penalize('CDN-A')
+		engine.update({ pathways: ['CDN-A', 'CDN-B', 'CDN-C'] })
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-B')
+	})
+
+	it('rebuilds the fallback priority list after update()', () => {
+		const { engine } = create({})
+
+		engine.update({ pathways: ['CDN-A', 'CDN-C'] })
+
+		deepEqual(engine.priority, ['CDN-A', 'CDN-C'])
+	})
+
+	it('uses a new uri at the next scheduled request and drops the RELOAD-URI', async () => {
+		const manifest = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A'], 'RELOAD-URI': 'reload.json' }
+		const { engine, requests } = create({}, manifestResponse(manifest), manifestResponse(manifest))
+
+		await engine.start()
+		engine.update({ uri: 'https://steering2.example.com/dash.json' })
+		await flush()
+		equal(requests.length, 1)
+
+		await advance(60000)
+		engine.stop()
+
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+	})
+
+	it('keeps the RELOAD-URI when update() repeats the configured uri', async () => {
+		const manifest = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A'], 'RELOAD-URI': 'reload.json' }
+		const { engine, requests } = create({}, manifestResponse(manifest), manifestResponse(manifest))
+
+		await engine.start()
+		engine.update({ uri: 'https://steering.example.com/dash.json' })
+		await advance(60000)
+		engine.stop()
+
+		equal(requests[1].url, 'https://steering.example.com/reload.json?_DASH_pathway=%22CDN-A%22')
+	})
+
+	it('resumes the requests after a 410 when update() sets a new uri', async () => {
+		const { engine, requests } = create({}, { status: 410 }, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B'] }))
+
+		await engine.start()
+		engine.update({ uri: 'https://steering2.example.com/dash.json' })
+		await advance(0)
+		engine.stop()
+
+		equal(requests.length, 2)
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(engine.pathway, 'CDN-B')
+	})
+
+	it('throws for an invalid uri or pathways', () => {
+		const { engine } = create({})
+
+		throws(() => engine.update({ uri: '/relative' }), { name: 'TypeError', message: /SteeringEngine\.update: uri must be an absolute URI/ })
+		throws(() => engine.update({ pathways: [] }), { name: 'TypeError', message: /SteeringEngine\.update: pathways must be a non-empty array of strings/ })
+	})
+
+	it('throws a callback error to the caller of update() after it selects', async () => {
+		const cause = new Error('player bug')
+		const { engine } = create({
+			onPathwayChange: () => {
+				throw cause
+			},
+		}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-C', 'CDN-A'] }))
+
+		await engine.start()
+
+		throws(() => engine.update({ pathways: ['CDN-A', 'CDN-C'] }), (error) => error === cause)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-C')
+	})
+})
+```
+
+- [ ] **Step 9: Write the lifecycle tests**
 
 Create `test/createSteeringEngine.lifecycle.test.ts`:
 
 ```ts
-import { createSteeringEngine, type SteeringEngineConfig, type SteeringRequester } from '@svta/cml-content-steering'
+import { createSteeringEngine, SteeringErrorType, type SteeringEngineConfig, type SteeringError, type SteeringRequester } from '@svta/cml-content-steering'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
-import { deepEqual, equal, ok } from 'node:assert'
+import { deepEqual, equal, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
 import { createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
 
@@ -1556,34 +1995,112 @@ describe('createSteeringEngine lifecycle', () => {
 		equal(requests.length, 1)
 	})
 
-	it('reports a callback that throws and continues', async (t) => {
-		const consoleError = t.mock.method(console, 'error', () => undefined)
+	it('reports a callback error without a caller to onError and continues', async () => {
+		const cause = new Error('player bug')
+		const errors: SteeringError[] = []
 		const { requester } = createStubRequester(manifestResponse(MANIFEST))
 		const engine = createSteeringEngine(config(requester, {
 			onManifest: () => {
-				throw new Error('player bug')
+				throw cause
 			},
+			onError: (error) => errors.push(error),
 		}))
 
 		await engine.start()
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-B')
-		equal(consoleError.mock.callCount(), 1)
-		ok(String(consoleError.mock.calls[0].arguments[0]).includes('onManifest'))
+		deepEqual(errors, [{ type: SteeringErrorType.CALLBACK, callback: 'onManifest', cause, message: 'The onManifest callback threw.' }])
+	})
+
+	it('throws a callback error to the caller of penalize() after it selects', async () => {
+		const cause = new Error('player bug')
+		const { requester } = createStubRequester(manifestResponse(MANIFEST))
+		const engine = createSteeringEngine(config(requester, {
+			onPathwayChange: (pathway) => {
+				if (pathway === 'CDN-A') {
+					throw cause
+				}
+			},
+		}))
+
+		await engine.start()
+
+		throws(() => engine.penalize(), (error) => error === cause)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('throws a callback error from the timer callback without onError', async () => {
+		const cause = new Error('player bug')
+		let fail = false
+		const { requester } = createStubRequester(manifestResponse(MANIFEST))
+		const engine = createSteeringEngine(config(requester, {
+			penalty: 1000,
+			onPathwayChange: () => {
+				if (fail) {
+					throw cause
+				}
+			},
+		}))
+
+		await engine.start()
+		engine.penalize()
+		fail = true
+
+		throws(() => mock.timers.tick(1000), (error) => error === cause)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-B')
+	})
+
+	it('reports a getThroughput error and sends the request without throughput', async () => {
+		const cause = new Error('player bug')
+		const errors: SteeringError[] = []
+		const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+		const engine = createSteeringEngine(config(requester, {
+			getThroughput: () => {
+				throw cause
+			},
+			onError: (error) => errors.push(error),
+		}))
+
+		await engine.start()
+		engine.stop()
+
+		equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22')
+		deepEqual(errors, [{ type: SteeringErrorType.CALLBACK, callback: 'getThroughput', cause, message: 'The getThroughput callback threw.' }])
+	})
+
+	it('throws a callback error of start() from a timer callback without onError', async () => {
+		const cause = new Error('player bug')
+		const { requester } = createStubRequester(manifestResponse(MANIFEST))
+		const engine = createSteeringEngine(config(requester, {
+			getThroughput: () => {
+				throw cause
+			},
+		}))
+
+		await engine.start()
+
+		throws(() => mock.timers.tick(1), (error) => error === cause)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-B')
 	})
 })
 ```
 
-- [ ] **Step 9: Run the tests and check that they fail**
+- [ ] **Step 10: Run the tests and check that they fail**
 
 ```bash
 npm test -w libs/content-steering
 ```
 
-Expected: FAIL. The six new files report `does not provide an export named` for `createSteeringEngine` or `STEERING_PROTOCOL_DASH`. The 33 tests of Task 1 and the existing tests pass.
+Expected: FAIL. The nine new test files report `does not provide an export named` for `createSteeringEngine`, `STEERING_PROTOCOL_DASH`, or `STEERING_ERROR_TYPE_CALLBACK`. The 33 tests of Task 1 and the existing tests pass.
 
-- [ ] **Step 10: Write the public types**
+- [ ] **Step 11: Write the public types**
 
 Create `src/SteeringProtocol.ts`:
 
@@ -1631,6 +2148,65 @@ export const SteeringProtocol = {
 export type SteeringProtocol = ValueOf<typeof SteeringProtocol>;
 ```
 
+Create `src/SteeringErrorType.ts`:
+
+```ts
+import type { ValueOf } from '@svta/cml-utils'
+
+/**
+ * A Steering Manifest request failed. Matches the SVTA2070 code 2040.
+ *
+ *
+ * @beta
+ */
+export const STEERING_ERROR_TYPE_LOAD = 'load' as const
+
+/**
+ * A Steering Manifest is not valid. Matches the SVTA2070 code 2041.
+ *
+ *
+ * @beta
+ */
+export const STEERING_ERROR_TYPE_PARSE = 'parse' as const
+
+/**
+ * A callback of the player threw, and no caller can receive the exception.
+ *
+ *
+ * @beta
+ */
+export const STEERING_ERROR_TYPE_CALLBACK = 'callback' as const
+
+/**
+ * The types of `SteeringError`.
+ *
+ * @enum
+ *
+ * @beta
+ */
+export const SteeringErrorType = {
+	/**
+	 * A Steering Manifest request failed.
+	 */
+	LOAD: STEERING_ERROR_TYPE_LOAD as typeof STEERING_ERROR_TYPE_LOAD,
+
+	/**
+	 * A Steering Manifest is not valid.
+	 */
+	PARSE: STEERING_ERROR_TYPE_PARSE as typeof STEERING_ERROR_TYPE_PARSE,
+
+	/**
+	 * A callback of the player threw.
+	 */
+	CALLBACK: STEERING_ERROR_TYPE_CALLBACK as typeof STEERING_ERROR_TYPE_CALLBACK,
+} as const
+
+/**
+ * @beta
+ */
+export type SteeringErrorType = ValueOf<typeof SteeringErrorType>;
+```
+
 Create `src/SteeringRequester.ts`:
 
 ```ts
@@ -1650,45 +2226,69 @@ export type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>;
 Create `src/SteeringError.ts`:
 
 ```ts
+import type { STEERING_ERROR_TYPE_CALLBACK, STEERING_ERROR_TYPE_LOAD, STEERING_ERROR_TYPE_PARSE } from './SteeringErrorType.ts'
+
 /**
- * An error of a Steering Manifest request.
+ * An error that the engine reports to `onError`.
  *
- * `load` matches the SVTA2070 code 2040, and `parse` matches the SVTA2070 code 2041.
+ * `SteeringErrorType` lists the values of `type`.
  *
  *
  * @beta
  */
-export type SteeringError = {
-	/**
-	 * `load` when the request fails, and `parse` when the Steering Manifest is not valid.
-	 */
-	readonly type: 'load' | 'parse';
+export type SteeringError =
+	| {
+		/**
+		 * `load` when the request fails, and `parse` when the Steering Manifest is not valid.
+		 */
+		readonly type: typeof STEERING_ERROR_TYPE_LOAD | typeof STEERING_ERROR_TYPE_PARSE;
 
-	/**
-	 * The request URI.
-	 */
-	readonly url: string;
+		/**
+		 * The request URI.
+		 */
+		readonly url: string;
 
-	/**
-	 * The HTTP status, if the server responded.
-	 */
-	readonly status?: number;
+		/**
+		 * The HTTP status, if the server responded.
+		 */
+		readonly status?: number;
 
-	/**
-	 * The exception, for network errors and JSON errors.
-	 */
-	readonly cause?: unknown;
+		/**
+		 * The exception, for network errors and JSON errors.
+		 */
+		readonly cause?: unknown;
 
-	/**
-	 * A description of the error.
-	 */
-	readonly message: string;
+		/**
+		 * A description of the error.
+		 */
+		readonly message: string;
 
-	/**
-	 * The milliseconds until the next request. Absent when no request follows.
-	 */
-	readonly retryDelay?: number;
-};
+		/**
+		 * The milliseconds until the next request. Absent when no request follows.
+		 */
+		readonly retryDelay?: number;
+	}
+	| {
+		/**
+		 * An exception from a callback of the player.
+		 */
+		readonly type: typeof STEERING_ERROR_TYPE_CALLBACK;
+
+		/**
+		 * The callback that threw.
+		 */
+		readonly callback: 'acceptClone' | 'getReportedPathways' | 'getThroughput' | 'onManifest' | 'onPathwayChange';
+
+		/**
+		 * The exception.
+		 */
+		readonly cause: unknown;
+
+		/**
+		 * A description of the error.
+		 */
+		readonly message: string;
+	};
 ```
 
 Create `src/SteeringEngineConfig.ts`:
@@ -1723,7 +2323,9 @@ export type SteeringEngineConfig = {
 	pathways: readonly string[];
 
 	/**
-	 * The pathway that the player applies now.
+	 * The pathway that the player applies now. The priority list before the
+	 * first valid Steering Manifest starts with this pathway, followed by the
+	 * other `pathways`.
 	 */
 	pathway?: string;
 
@@ -1733,6 +2335,12 @@ export type SteeringEngineConfig = {
 	 * Steering Manifest for DASH.
 	 */
 	penalty?: number;
+
+	/**
+	 * When `true`, the first request has no steering query parameters.
+	 * For DASH, set it from `@queryBeforeStart`.
+	 */
+	queryBeforeStart?: boolean;
 
 	/**
 	 * The function that sends the Steering Manifest requests. The default uses `fetch`.
@@ -1745,17 +2353,34 @@ export type SteeringEngineConfig = {
 	getThroughput?: (pathway: string) => number | undefined;
 
 	/**
+	 * DASH only. Returns every pathway that the player used since the
+	 * previous request, for `_DASH_pathway`. Without this function, the
+	 * engine lists the pathways that it selected since the previous request.
+	 */
+	getReportedPathways?: () => readonly string[];
+
+	/**
+	 * Returns `false` for a valid pathway clone that the player cannot build.
+	 * The engine then ignores the clone. The engine calls this function for
+	 * each valid clone of each Steering Manifest, before `onManifest`.
+	 */
+	acceptClone?: (clone: PathwayClone) => boolean;
+
+	/**
 	 * Called when the selected pathway changes.
 	 */
 	onPathwayChange?: (pathway: string) => void;
 
 	/**
-	 * Called with each valid Steering Manifest and its valid pathway clones.
+	 * Called with each valid Steering Manifest, its pathway clones, the URI
+	 * of the response, and the URI of the next request, before the engine
+	 * selects a pathway.
 	 */
-	onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[]) => void;
+	onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[], context: { readonly url: string; readonly reloadUri: string }) => void;
 
 	/**
-	 * Called when a request fails or a Steering Manifest is not valid.
+	 * Called when a request fails, when a Steering Manifest is not valid,
+	 * or when a callback throws and no caller can receive the exception.
 	 */
 	onError?: (error: SteeringError) => void;
 };
@@ -1777,6 +2402,12 @@ export type SteeringEngine = {
 	readonly pathway: string | undefined;
 
 	/**
+	 * The selected pathway first, then the other known pathways of the
+	 * priority list that are not penalized, in priority order.
+	 */
+	readonly priority: readonly string[];
+
+	/**
 	 * Sends the first request, or resumes the requests after `stop()`.
 	 *
 	 * @returns A promise that resolves when the engine has processed the
@@ -1792,14 +2423,56 @@ export type SteeringEngine = {
 
 	/**
 	 * Excludes a pathway from the selection for the penalty duration.
+	 * The engine selects a pathway before the method returns.
 	 *
 	 * @param pathway - The pathway. The default is the selected pathway.
 	 */
 	penalize(pathway?: string): void;
+
+	/**
+	 * Replaces the priority list until the next valid Steering Manifest.
+	 * The engine selects a pathway before the method returns.
+	 *
+	 * @param priority - The pathway IDs, in priority order.
+	 */
+	setPriority(priority: readonly string[]): void;
+
+	/**
+	 * Replaces the steering URI, the pathways of the Content Description, or
+	 * both. The engine keeps its penalties and its request schedule, and it
+	 * selects a pathway before the method returns.
+	 *
+	 * @param changes - The new values.
+	 */
+	update(changes: { readonly uri?: string; readonly pathways?: readonly string[] }): void;
 };
 ```
 
-- [ ] **Step 11: Write the internal modules**
+- [ ] **Step 12: Write the internal modules**
+
+Create `src/uniqueStrings.ts`:
+
+```ts
+/**
+ * Returns the strings of a list without duplicates, in their first order.
+ *
+ * @param list - The list.
+ * @returns The strings of the list.
+ *
+ * @internal
+ */
+export function uniqueStrings(list: readonly unknown[]): string[] {
+	const result: string[] = []
+
+	for (const item of list) {
+		if (typeof item === 'string' && !result.includes(item)) {
+			result.push(item)
+		}
+	}
+
+	return result
+}
+```
 
 Create `src/parseRetryAfter.ts`:
 
@@ -1836,8 +2509,8 @@ export function parseRetryAfter(value: string | undefined, now: number): number 
 Create `src/parseSteeringManifest.ts`:
 
 ```ts
-import { isValidSteeringManifest } from './isValidSteeringManifest.ts'
 import type { SteeringManifest } from './SteeringManifest.ts'
+import { uniqueStrings } from './uniqueStrings.ts'
 
 /**
  * The result of `parseSteeringManifest`.
@@ -1845,16 +2518,31 @@ import type { SteeringManifest } from './SteeringManifest.ts'
  * @internal
  */
 export type ParsedSteeringManifest =
-	| { readonly manifest: SteeringManifest; readonly reloadUri: string | undefined }
-	| { readonly error: string; readonly version: boolean; readonly cause?: unknown };
+	| {
+		readonly manifest: SteeringManifest;
+		readonly priority: readonly string[];
+		readonly clones: readonly unknown[];
+		readonly reloadUri: string | undefined;
+	}
+	| {
+		readonly error: string;
+		readonly version: boolean;
+		readonly cause?: unknown;
+	};
 
 /**
  * Parses and checks the body of a Steering Manifest response.
  *
+ * The Steering Manifest is valid when VERSION is 1, TTL is a positive
+ * number, PATHWAY-PRIORITY has at least one string, and a relative
+ * RELOAD-URI resolves. PATHWAY-PRIORITY keeps the first of each string.
+ * An absent or empty PATHWAY-CLONES array means no clones.
+ *
  * @param data - The response body, as a string or as a parsed JSON value.
  * @param uri - The URI of the response. A relative RELOAD-URI resolves against it.
- * @returns The Steering Manifest and its resolved RELOAD-URI, or an error.
- * `version` is `true` when the error is a VERSION other than 1.
+ * @returns The Steering Manifest, its priority list, its clones, and its
+ * resolved RELOAD-URI, or an error. `version` is `true` when the error is a
+ * VERSION other than 1.
  *
  * @internal
  */
@@ -1879,14 +2567,23 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 		return { error: `The Steering Manifest from ${uri} has VERSION ${String(manifest.VERSION)}. Only VERSION 1 is supported.`, version: true }
 	}
 
-	if (!isValidSteeringManifest(manifest)) {
-		return { error: `The Steering Manifest from ${uri} is not valid.`, version: false }
+	if (typeof manifest.TTL !== 'number' || !(manifest.TTL > 0)) {
+		return { error: `The Steering Manifest from ${uri} has no positive TTL.`, version: false }
 	}
 
+	const list: unknown = manifest['PATHWAY-PRIORITY']
+	const priority = Array.isArray(list) ? uniqueStrings(list) : []
+
+	if (priority.length === 0) {
+		return { error: `The Steering Manifest from ${uri} has no pathway in PATHWAY-PRIORITY.`, version: false }
+	}
+
+	const cloneList: unknown = manifest['PATHWAY-CLONES']
+	const clones: readonly unknown[] = Array.isArray(cloneList) ? cloneList : []
 	const reload: unknown = manifest['RELOAD-URI']
 
 	if (reload === undefined) {
-		return { manifest, reloadUri: undefined }
+		return { manifest, priority, clones, reloadUri: undefined }
 	}
 
 	try {
@@ -1894,7 +2591,7 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 			throw new TypeError('RELOAD-URI is not a string')
 		}
 
-		return { manifest, reloadUri: new URL(reload, uri).href }
+		return { manifest, priority, clones, reloadUri: new URL(reload, uri).href }
 	} catch (cause) {
 		return { error: `The RELOAD-URI ${JSON.stringify(reload)} of the Steering Manifest from ${uri} does not resolve.`, version: false, cause }
 	}
@@ -1904,6 +2601,7 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 Create `src/resolveClones.ts`:
 
 ```ts
+import { isValidPathwayClone } from './isValidPathwayClone.ts'
 import type { PathwayClone } from './PathwayClone.ts'
 import { toHostname } from './toHostname.ts'
 import type { UriReplacement } from './UriReplacement.ts'
@@ -1921,11 +2619,17 @@ const PATHWAY_ID = /^[\w.-]+$/
  *
  * @internal
  */
-export function resolveClones(clones: readonly PathwayClone[], pathways: readonly string[]): PathwayClone[] {
+export function resolveClones(clones: readonly unknown[], pathways: readonly string[]): PathwayClone[] {
 	const known = new Set(pathways)
 	const valid: PathwayClone[] = []
 
-	for (const clone of clones) {
+	for (const item of clones) {
+		const clone = item as PathwayClone
+
+		if (!isValidPathwayClone(clone)) {
+			continue
+		}
+
 		const id = clone.ID
 
 		if (!PATHWAY_ID.test(id) || known.has(id) || !known.has(clone['BASE-ID']) || !isValidReplacement(clone['URI-REPLACEMENT'])) {
@@ -2000,7 +2704,7 @@ export function buildSteeringUri(uri: string, params: Readonly<Record<string, st
 }
 ```
 
-- [ ] **Step 12: Write the engine**
+- [ ] **Step 13: Write the engine**
 
 Create `src/createSteeringEngine.ts`:
 
@@ -2011,21 +2715,38 @@ import { DEFAULT_PATHWAY_PENALTY } from './DEFAULT_PATHWAY_PENALTY.ts'
 import { DEFAULT_TTL } from './DEFAULT_TTL.ts'
 import { parseRetryAfter } from './parseRetryAfter.ts'
 import { parseSteeringManifest } from './parseSteeringManifest.ts'
+import type { PathwayClone } from './PathwayClone.ts'
 import { resolveClones } from './resolveClones.ts'
 import { selectPathway } from './selectPathway.ts'
 import type { SteeringEngine } from './SteeringEngine.ts'
 import type { SteeringEngineConfig } from './SteeringEngineConfig.ts'
 import type { SteeringError } from './SteeringError.ts'
+import { STEERING_ERROR_TYPE_CALLBACK, STEERING_ERROR_TYPE_LOAD, STEERING_ERROR_TYPE_PARSE } from './SteeringErrorType.ts'
 import type { SteeringManifest } from './SteeringManifest.ts'
 import { STEERING_PROTOCOL_DASH, STEERING_PROTOCOL_HLS } from './SteeringProtocol.ts'
+import { uniqueStrings } from './uniqueStrings.ts'
 
 const MAX_DELAY = 2147483647
+
+type SteeringRequestError = Exclude<SteeringError, { type: typeof STEERING_ERROR_TYPE_CALLBACK }>
+
+type CallbackName = Extract<SteeringError, { type: typeof STEERING_ERROR_TYPE_CALLBACK }>['callback']
+
+type Failure = {
+	readonly name: CallbackName;
+	readonly cause: unknown;
+}
 
 /**
  * Creates a content steering engine.
  *
  * The engine requests the Steering Manifest, schedules the next request,
  * and selects the pathway that the player must apply.
+ *
+ * A callback that throws inside `penalize()`, `setPriority()`, or `update()`
+ * throws to the caller, after the engine has finished the call. Other
+ * callback exceptions go to `onError`. Without `onError`, the engine throws
+ * them from a timer callback.
  *
  * @param config - The configuration of the engine.
  * @returns The engine.
@@ -2042,19 +2763,35 @@ const MAX_DELAY = 2147483647
 export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngine {
 	checkConfig(config)
 
-	const { protocol, pathways, penalty, requester = fetchRequester, getThroughput, onPathwayChange, onManifest, onError } = config
+	const {
+		protocol,
+		penalty,
+		queryBeforeStart,
+		requester = fetchRequester,
+		getThroughput,
+		getReportedPathways,
+		acceptClone,
+		onPathwayChange,
+		onManifest,
+		onError,
+	} = config
 	const isDash = protocol === STEERING_PROTOCOL_DASH
 	const prefix = isDash ? '_DASH_' : '_HLS_'
 	const penalties = new Map<string, number>()
 
+	let pathways: readonly string[] = uniqueStrings(config.pathways)
 	let selected = config.pathway
-	let uri = config.uri
+	let configuredUri = config.uri
+	let uri = configuredUri
 	let ttl = DEFAULT_TTL
 	let loaded = false
 	let ended = false
 	let running = false
+	let sent = false
 	let session = 0
-	let priority: readonly string[] = []
+	let fallbackPriority = true
+	let priority: readonly string[] = selected === undefined ? [] : fallbackList()
+	let manifestClones: readonly unknown[] = []
 	let known: ReadonlySet<string> = new Set(pathways)
 	let trail: string[] = selected === undefined ? [] : [selected]
 	let nextRequestAt: number | undefined
@@ -2062,12 +2799,17 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	let penaltyTimer: ReturnType<typeof setTimeout> | undefined
 	let pending: Promise<void> | undefined
 	let settle: (() => void) | undefined
+	let failures: Failure[] = []
 
 	function start(): Promise<void> {
 		if (running) {
 			return pending ?? Promise.resolve()
 		}
 
+		return run(false, begin)
+	}
+
+	function begin(): Promise<void> {
 		running = true
 		select()
 
@@ -2085,12 +2827,16 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		const promise = new Promise<void>(resolve => {
 			settle = resolve
 		})
-
-		pending = promise
-		void load().then(() => {
+		const done = () => {
 			if (pending === promise) {
 				release()
 			}
+		}
+
+		pending = promise
+		void load().then(done, (cause: unknown) => {
+			done()
+			throw cause
 		})
 
 		return promise
@@ -2112,7 +2858,55 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		}
 
 		penalties.set(pathway, Date.now() + (penalty ?? (isDash ? ttl * 1000 : DEFAULT_PATHWAY_PENALTY)))
-		select()
+		run(true, select)
+	}
+
+	function setPriority(list: readonly string[]): void {
+		if (!Array.isArray(list) || list.some(id => typeof id !== 'string')) {
+			throw new TypeError(`SteeringEngine.setPriority: priority must be an array of strings. Received ${JSON.stringify(list)}.`)
+		}
+
+		run(true, () => {
+			priority = uniqueStrings(list)
+			fallbackPriority = false
+			select()
+		})
+	}
+
+	function update(changes: { readonly uri?: string; readonly pathways?: readonly string[] }): void {
+		const { uri: nextUri, pathways: nextPathways } = changes
+
+		if (nextUri !== undefined) {
+			checkUri('SteeringEngine.update', nextUri)
+		}
+
+		if (nextPathways !== undefined) {
+			checkPathways('SteeringEngine.update', nextPathways)
+		}
+
+		run(true, () => {
+			if (nextPathways !== undefined) {
+				pathways = uniqueStrings(nextPathways)
+
+				if (fallbackPriority && priority.length > 0) {
+					priority = fallbackList()
+				}
+
+				setClones(manifestClones)
+			}
+
+			if (nextUri !== undefined && nextUri !== configuredUri) {
+				configuredUri = nextUri
+				uri = nextUri
+
+				if (ended) {
+					ended = false
+					scheduleRequest(0)
+				}
+			}
+
+			select()
+		})
 	}
 
 	function release(): void {
@@ -2121,21 +2915,65 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		pending = undefined
 	}
 
+	function run<T>(caller: boolean, body: () => T): T {
+		const outer = failures
+
+		failures = []
+
+		try {
+			const result = body()
+
+			raise(failures, caller)
+
+			return result
+		} finally {
+			failures = outer
+		}
+	}
+
+	function raise(list: readonly Failure[], caller: boolean): void {
+		const thrown = caller ? list[0] : undefined
+
+		for (const failure of list) {
+			if (failure !== thrown) {
+				report({ type: STEERING_ERROR_TYPE_CALLBACK, callback: failure.name, cause: failure.cause, message: `The ${failure.name} callback threw.` })
+			}
+		}
+
+		if (thrown) {
+			throw thrown.cause
+		}
+	}
+
+	function invoke<A extends unknown[], R>(name: CallbackName, callback: ((...args: A) => R) | undefined, ...args: A): R | undefined {
+		if (!callback) {
+			return undefined
+		}
+
+		try {
+			return callback(...args)
+		} catch (cause) {
+			failures.push({ name, cause })
+			return undefined
+		}
+	}
+
 	function load(): Promise<void> {
 		const token = session
 		const url = buildSteeringUri(uri, queryParams())
 
+		sent = true
 		trail = selected === undefined ? [] : [selected]
 
 		return send({ url, method: 'GET', responseType: 'text' }).then(
 			response => {
 				if (token === session) {
-					receive(url, response)
+					run(false, () => receive(url, response))
 				}
 			},
 			(cause: unknown) => {
 				if (token === session) {
-					retry({ type: 'load', url, cause, message: `The Steering Manifest request to ${url} failed.` })
+					retry({ type: STEERING_ERROR_TYPE_LOAD, url, cause, message: `The Steering Manifest request to ${url} failed.` })
 				}
 			},
 		)
@@ -2150,26 +2988,27 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	}
 
 	function receive(url: string, response: HttpResponse): void {
-		const status = response.status ?? 0
+		const status = response.status ?? 200
 
 		if (status >= 200 && status < 300) {
-			const result = parseSteeringManifest(response.data, response.url || url)
+			const responseUrl = response.url || url
+			const result = parseSteeringManifest(response.data, responseUrl)
 
 			if ('manifest' in result) {
-				apply(result.manifest, result.reloadUri)
+				apply(result.manifest, result.priority, result.clones, result.reloadUri, responseUrl)
 			} else if (isDash && result.version) {
 				end()
-				report({ type: 'parse', url, status, message: result.error })
+				report({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error })
 				fallback()
 			} else {
-				retry({ type: 'parse', url, status, cause: result.cause, message: result.error })
+				retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, cause: result.cause, message: result.error })
 			}
 			return
 		}
 
 		if (status === 410) {
 			end()
-			report({ type: 'load', url, status, message: `The steering server returned status 410 for ${url}. No request follows.` })
+			report({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410 for ${url}. No request follows.` })
 
 			if (!loaded) {
 				fallback()
@@ -2184,30 +3023,44 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				ttl = retryAfter / 1000
 			}
 
-			retry({ type: 'load', url, status, message: `The steering server returned status 429 for ${url}.` }, retryAfter)
+			retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 429 for ${url}.` }, retryAfter)
 			return
 		}
 
-		retry({ type: 'load', url, status, message: `The Steering Manifest request to ${url} failed with status ${status}.` })
+		retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The Steering Manifest request to ${url} failed with status ${status}.` })
 	}
 
-	function apply(manifest: SteeringManifest, reloadUri: string | undefined): void {
-		const clones = resolveClones(manifest['PATHWAY-CLONES'] ?? [], pathways)
-
+	function apply(manifest: SteeringManifest, list: readonly string[], clones: readonly unknown[], reloadUri: string | undefined, responseUrl: string): void {
 		loaded = true
 		ttl = manifest.TTL
 		uri = reloadUri ?? uri
-		priority = manifest['PATHWAY-PRIORITY']
-		known = new Set([...pathways, ...clones.map(clone => clone.ID)])
+		priority = list
+		fallbackPriority = false
+
+		const valid = setClones(clones)
 
 		scheduleRequest(ttl * 1000)
-		invoke('onManifest', onManifest, manifest, clones)
+		invoke('onManifest', onManifest, manifest, valid, { url: responseUrl, reloadUri: uri })
 		select()
 	}
 
+	function setClones(clones: readonly unknown[]): PathwayClone[] {
+		const valid = resolveClones(clones, pathways).filter(clone => invoke('acceptClone', acceptClone, clone) !== false)
+
+		manifestClones = clones
+		known = new Set([...pathways, ...valid.map(clone => clone.ID)])
+
+		return valid
+	}
+
+	function fallbackList(): readonly string[] {
+		return selected === undefined ? pathways : [selected, ...pathways.filter(pathway => pathway !== selected)]
+	}
+
 	function fallback(): void {
-		priority = selected === undefined ? pathways : [selected, ...pathways.filter(pathway => pathway !== selected)]
-		known = new Set(pathways)
+		priority = fallbackList()
+		fallbackPriority = true
+		setClones([])
 		select()
 	}
 
@@ -2249,7 +3102,12 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			expiry = Math.min(expiry, end)
 		})
 
-		penaltyTimer = setTimeout(select, Math.min(Math.max(expiry - now, 0), MAX_DELAY))
+		penaltyTimer = setTimeout(onPenaltyTimer, Math.min(Math.max(expiry - now, 0), MAX_DELAY))
+	}
+
+	function onPenaltyTimer(): void {
+		penaltyTimer = undefined
+		run(false, select)
 	}
 
 	function scheduleRequest(delay: number): void {
@@ -2268,7 +3126,9 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return
 		}
 
-		void load()
+		run(false, () => {
+			void load()
+		})
 	}
 
 	function end(): void {
@@ -2278,18 +3138,34 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		requestTimer = undefined
 	}
 
-	function retry(error: Omit<SteeringError, 'retryDelay'>, delay: number = ttl * 1000): void {
+	function retry(error: Omit<SteeringRequestError, 'retryDelay'>, delay: number = ttl * 1000): void {
 		scheduleRequest(delay)
 		report({ ...error, retryDelay: delay })
 	}
 
 	function report(error: SteeringError): void {
-		invoke('onError', onError, error)
+		if (!onError) {
+			if (error.type === STEERING_ERROR_TYPE_CALLBACK) {
+				throwLater(error.cause)
+			}
+			return
+		}
+
+		try {
+			onError(error)
+		} catch (cause) {
+			throwLater(cause)
+		}
 	}
 
 	function queryParams(): Record<string, string> {
-		const list = isDash ? trail : selected === undefined ? [] : [selected]
 		const params: Record<string, string> = {}
+
+		if (queryBeforeStart && !sent) {
+			return params
+		}
+
+		const list = isDash ? reportedPathways() : selected === undefined ? [] : [selected]
 
 		if (list.length === 0) {
 			return params
@@ -2306,6 +3182,12 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		return params
 	}
 
+	function reportedPathways(): readonly string[] {
+		const reported = invoke('getReportedPathways', getReportedPathways)
+
+		return Array.isArray(reported) ? uniqueStrings(reported) : trail
+	}
+
 	function throughputOf(pathway: string): string {
 		const value = invoke('getThroughput', getThroughput, pathway)
 
@@ -2316,9 +3198,23 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		get pathway(): string | undefined {
 			return selected
 		},
+		get priority(): readonly string[] {
+			const now = Date.now()
+			const list = selected === undefined ? [] : [selected]
+
+			for (const id of priority) {
+				if (id !== selected && known.has(id) && !((penalties.get(id) ?? 0) > now)) {
+					list.push(id)
+				}
+			}
+
+			return list
+		},
 		start,
 		stop,
 		penalize,
+		setPriority,
+		update,
 	}
 }
 
@@ -2327,13 +3223,8 @@ function checkConfig({ protocol, uri, pathways, pathway, penalty }: SteeringEngi
 		throw new TypeError(`createSteeringEngine: protocol must be 'hls' or 'dash'. Received ${JSON.stringify(protocol)}.`)
 	}
 
-	if (typeof uri !== 'string' || !isAbsoluteUri(uri)) {
-		throw new TypeError(`createSteeringEngine: uri must be an absolute URI. Received ${JSON.stringify(uri)}.`)
-	}
-
-	if (!Array.isArray(pathways) || pathways.length === 0 || pathways.some(id => typeof id !== 'string')) {
-		throw new TypeError(`createSteeringEngine: pathways must be a non-empty array of strings. Received ${JSON.stringify(pathways)}.`)
-	}
+	checkUri('createSteeringEngine', uri)
+	checkPathways('createSteeringEngine', pathways)
 
 	if (pathway !== undefined && !pathways.includes(pathway)) {
 		throw new TypeError(`createSteeringEngine: pathway must be one of pathways. Received ${JSON.stringify(pathway)}.`)
@@ -2341,6 +3232,18 @@ function checkConfig({ protocol, uri, pathways, pathway, penalty }: SteeringEngi
 
 	if (penalty !== undefined && (typeof penalty !== 'number' || !Number.isFinite(penalty) || penalty < 0)) {
 		throw new TypeError(`createSteeringEngine: penalty must be a finite number of milliseconds, 0 or more. Received ${JSON.stringify(penalty)}.`)
+	}
+}
+
+function checkUri(caller: string, uri: unknown): void {
+	if (typeof uri !== 'string' || !isAbsoluteUri(uri)) {
+		throw new TypeError(`${caller}: uri must be an absolute URI. Received ${JSON.stringify(uri)}.`)
+	}
+}
+
+function checkPathways(caller: string, pathways: unknown): void {
+	if (!Array.isArray(pathways) || pathways.length === 0 || pathways.some(id => typeof id !== 'string')) {
+		throw new TypeError(`${caller}: pathways must be a non-empty array of strings. Received ${JSON.stringify(pathways)}.`)
 	}
 }
 
@@ -2367,17 +3270,10 @@ function getHeader(headers: Record<string, string> | undefined, name: string): s
 	return undefined
 }
 
-function invoke<A extends unknown[], R>(name: string, callback: ((...args: A) => R) | undefined, ...args: A): R | undefined {
-	if (!callback) {
-		return undefined
-	}
-
-	try {
-		return callback(...args)
-	} catch (error) {
-		console.error(`SteeringEngine ${name} threw:`, error)
-		return undefined
-	}
+function throwLater(cause: unknown): void {
+	setTimeout(() => {
+		throw cause
+	}, 0)
 }
 
 function fetchRequester(request: HttpRequest): Promise<HttpResponse> {
@@ -2395,7 +3291,7 @@ function fetchRequester(request: HttpRequest): Promise<HttpResponse> {
 }
 ```
 
-- [ ] **Step 13: Export the engine**
+- [ ] **Step 14: Export the engine**
 
 Replace the export lines of `src/index.ts` with this block. The order is alphabetical without regard to case, like the existing lines:
 
@@ -2410,21 +3306,22 @@ export type * from './PathwayClone.ts'
 export type * from './SteeringEngine.ts'
 export type * from './SteeringEngineConfig.ts'
 export type * from './SteeringError.ts'
+export * from './SteeringErrorType.ts'
 export type * from './SteeringManifest.ts'
 export * from './SteeringProtocol.ts'
 export type * from './SteeringRequester.ts'
 export type * from './UriReplacement.ts'
 ```
 
-- [ ] **Step 14: Build and run the tests**
+- [ ] **Step 15: Build and run the tests**
 
 ```bash
 npm run build -w libs/content-steering && npm test -w libs/content-steering
 ```
 
-Expected: `ℹ tests 92`, `ℹ pass 92`, and `ℹ fail 0`.
+Expected: `ℹ tests 123`, `ℹ pass 123`, and `ℹ fail 0`.
 
-- [ ] **Step 15: Check the API report**
+- [ ] **Step 16: Check the API report**
 
 ```bash
 git diff libs/content-steering/config/cml-content-steering.api.md
@@ -2434,12 +3331,13 @@ Expected: the report adds these declarations, and each one has `// @beta`:
 
 - the function `createSteeringEngine`
 - the constants `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, and `STEERING_PROTOCOL_DASH`
-- the types `SteeringProtocol`, `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, and `SteeringError`
+- the constants `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, and `STEERING_ERROR_TYPE_CALLBACK`
+- the types `SteeringProtocol`, `SteeringErrorType`, `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, and `SteeringError`
 - the imports of `HttpRequest`, `HttpResponse`, and `ValueOf` from `@svta/cml-utils`
 
 No internal module appears in the report.
 
-- [ ] **Step 16: Run the repository checks**
+- [ ] **Step 17: Run the repository checks**
 
 ```bash
 npm run build
@@ -2449,13 +3347,14 @@ npx eslint libs/content-steering
 
 Expected: the build completes, `tsc --noEmit` prints no error, and `eslint` prints nothing. The build prints some API Extractor warnings for `libs/cmcd`. Those warnings existed before this plan.
 
-- [ ] **Step 17: Add the changelog entries**
+- [ ] **Step 18: Add the changelog entries**
 
 In `CHANGELOG.md`, add these lines under `### Added` of `## [Unreleased]`:
 
 ```markdown
 - `createSteeringEngine`, a content steering engine for HLS and DASH players. It implements the RFC in `rfc/content-steering-engine.md` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, and `STEERING_PROTOCOL_DASH` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, and `STEERING_ERROR_TYPE_CALLBACK` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 ```
 
 Add this line under `### Changed`:
@@ -2464,7 +3363,7 @@ Add this line under `### Changed`:
 - The package has a peer dependency on `@svta/cml-utils`. The package imports only types from it ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 ```
 
-- [ ] **Step 18: Commit**
+- [ ] **Step 19: Commit**
 
 ```bash
 git add libs/content-steering
@@ -2620,7 +3519,7 @@ Expected, from the prototype:
 
 | Import | Minified | gzip |
 |---|---|---|
-| `createSteeringEngine` and `applyUriReplacement` | about 7.6 KB | about 3.2 KB |
+| `createSteeringEngine` and `applyUriReplacement` | about 9.1 KB | about 3.8 KB |
 | `applyUriReplacement` only | about 1.3 KB | about 0.8 KB |
 
 Error messages are about a quarter of the engine bytes. Put the measured values in the pull request description.
@@ -2728,7 +3627,7 @@ In `content-steering-controller.ts`, add `createLoaderRequester` from the hls.js
 - In the ERROR listener, call `engine.penalize(errorPathway)` when an engine exists, and set `errorAction.resolved` when the selection changed.
 - Build clone URIs with `applyUriReplacement`, with `stableVariantId` for levels and `stableRenditionId` for renditions. Skip a rendition with an empty URI.
 - Remove `loadSteeringManifest`, `scheduleRefresh`, `clearTimeout`, `performUriReplacement`, and the three steering types. Import the types from `@svta/cml-content-steering`.
-- The `pathwayPriority` setter has no engine method (gap 9). Log a warning and ignore the call.
+- The `pathwayPriority` setter calls `engine.setPriority()`, and the getter reads `engine.priority`.
 
 - [ ] **Step 5: Adapt the tests**
 
@@ -2746,7 +3645,7 @@ CI=1 npm run test:unit
 npm run build && npm run size:check && npx es-check
 ```
 
-Expected, from the analysis: `type-check` and `es-check` pass. The unit suite fails only for the documented behavior changes and for gaps 4 and 9. `size:check` exceeds the budget of the light build by about 2.4 KB brotli. In `api-extractor.json`, add `@svta/cml-content-steering` to `bundledPackages`, and expect `ae-incompatible-release-tags` for the `@beta` tags.
+Expected, from the analysis: `type-check` and `es-check` pass. The unit suite fails only for the documented behavior changes: the quotes in `_HLS_pathway`, the clone checks, and the clone lifetime. The error controller probe for a failover before the first Steering Manifest passes (gap 4), and so does the setter probe (gap 9). `size:check` exceeds the budget of the light build by about 2.4 KB brotli. In `api-extractor.json`, add `@svta/cml-content-steering` to `bundledPackages`, and expect `ae-incompatible-release-tags` for the `@beta` tags.
 
 - [ ] **Step 7: Record the result**
 
@@ -2804,12 +3703,14 @@ Create `src/dash/utils/ContentSteeringRequester.js` as a FactoryMaker class with
 
 - [ ] **Step 4: Move the controller to the engine**
 
-- `loadSteeringData()` creates the engine on its first call, with the values of the dash.js section of `integration.md`, and returns `engine.start()`. `stopSteeringRequestTimer()` calls `engine.stop()`.
+- `loadSteeringData()` creates the engine on its first call, with the values of the dash.js section of `integration.md`, and returns `engine.start()`. Pass the default service location as `pathway`, and `@queryBeforeStart` as `queryBeforeStart`. `stopSteeringRequestTimer()` calls `engine.stop()`.
+- Keep the service location tracking of the controller, and pass it as `getReportedPathways`.
+- `triggerSteeringRequest()` calls `engine.start()`. It now sends a request only when one is due. Record this behavior change.
 - `onManifest` builds the `ContentSteeringResponse`, stores the clones, and triggers CONTENT_STEERING_REQUEST_COMPLETED. `onPathwayChange` logs. `onError` logs, and after a 429 stores `retryDelay / 1000` as the TTL for BlacklistController.
 - SERVICE_LOCATION_BASE_URL_BLACKLIST_ADD calls `engine.penalize(entry)` for a known pathway.
-- Add `getPathwayPriority()`: the selection of the engine first, then the rest of PATHWAY-PRIORITY. ContentSteeringSelector uses it instead of `getCurrentSteeringResponseData().pathwayPriority`.
+- Add `getPathwayPriority()`, which returns `engine.priority`. ContentSteeringSelector uses it instead of `getCurrentSteeringResponseData().pathwayPriority`.
 - Rewrite `getSynthesizedBaseUrlElements` and `getSynthesizedLocationElements` with `applyUriReplacement` for `HOST`. Keep `PARAMS` in `queryParams`. In HTTPLoader, `_addPathwayCloningParameters` calls `applyUriReplacement(request.url, { PARAMS: request.queryParams })`.
-- MANIFEST_UPDATED replaces the engine when the resolved steering URI changes (gap 1).
+- MANIFEST_UPDATED calls `engine.update()` with the resolved steering URI and the service locations.
 - Remove `_getSteeringServerUrl`, `_handleSteeringResponse`, `_isValidPathwayClone`, `_startSteeringRequestTimer`, `_handleSteeringResponseError`, and `QUERY_PARAMETER_KEYS`.
 
 - [ ] **Step 5: Adapt the tests**
@@ -2828,7 +3729,7 @@ npm run lint && npx tsc
 npm test
 ```
 
-Expected, from the analysis: the adapted controller tests pass, and the neighbor tests pass. Gaps 2, 10, 11, and 12 have no fix in this spike. Record each place where the spike needed a workaround for them.
+Expected, from the analysis: the adapted controller tests pass, and the neighbor tests pass. RFC v2 resolves gaps 2, 10, and 11. The RFC rejects gap 12, so record each place where the spike needs a forced request.
 
 - [ ] **Step 7: Check a real stream**
 
@@ -2905,8 +3806,8 @@ Create `lib/util/content_steering_requester.js` with the `request()` method of t
 - [ ] **Step 5: Move the manager to the engine**
 
 - `start(protocol, uri, pathways, defaultPathways)` creates the engine with `penalty: 60000`, which keeps the current Shaka penalty, and returns `engine.start()`.
-- `onManifest` stores PATHWAY-PRIORITY and the clones.
-- `getLocations(streamId)` puts `engine.pathway` first, then the other pathways of PATHWAY-PRIORITY that are not penalized. The manager keeps its own copy of the penalties, because the engine does not expose them (gap 2).
+- `onManifest` stores the clones.
+- `getLocations(streamId)` builds the failover list from `engine.priority`.
 - `banLocation(uri)` finds the pathway by URI prefix and calls `engine.penalize(id)`.
 - Resolve clone URIs with `applyUriReplacement`, and record STABLE-VARIANT-ID and STABLE-RENDITION-ID in the HLS parser.
 - In the DASH parser, collect `@serviceLocation` from `Location` and every BaseURL before `parsePeriods_`, and wait for `start()` when `@queryBeforeStart` is true. In the HLS parser, collect the pathways from the `EXT-X-STREAM-INF` tags, with `.` for a tag without PATHWAY-ID.
@@ -3000,11 +3901,12 @@ Create `src/content-steering-requester.js` with `createSteeringRequester` from t
 
 - Replace `initContentSteeringController_` with `initSteeringEngine_`. Call it in the first `loadedplaylist` event, after `excludeUnsupportedVariants_()`, with the values of the VHS section of `integration.md`. Wrap `createSteeringEngine` in `try`/`catch`.
 - Start the engine on `canplay`, or at once with `queryBeforeStart`. Apply the configured pathway once with `excludeThenChangePathway_`.
-- `onPathwayChange` calls `excludeThenChangePathway_(pathway)`, or `penalize(pathway)` when the pathway has no playable variant.
+- `onPathwayChange` calls `excludeThenChangePathway_(pathway)`.
+- `acceptClone` returns `false` for every DASH clone, and for an HLS clone without a playable variant.
 - `onManifest` triggers `contentsteeringparsed`, updates the HLS clones, and applies the current selection again.
 - In `excludePlaylist`, call `penalize()` for the last rendition of a pathway.
 - In `playlist-loader.js`, `createCloneURI_` calls `applyUriReplacement` with `stableVariantId` for absolute URIs. A clone update becomes a delete, then `addClonePathway`.
-- A DASH `loadedplaylist` replaces the engine only when the steering tag or the set of pathways changes. `stopSteering_()` removes the `canplay` listener before it stops the engine.
+- A DASH `loadedplaylist` calls `engine.update()` when the steering tag or the set of pathways changes.
 - Delete `src/content-steering-controller.js`.
 
 - [ ] **Step 6: Adapt the tests**
@@ -3039,7 +3941,7 @@ EOF
 
 ## Phase 3: Feedback to the RFC
 
-### Task 8: Report the findings
+### Task 8: Report the findings of the spikes
 
 **Files:**
 - Modify: `plans/content-steering-engine/integration.md`
@@ -3047,28 +3949,17 @@ EOF
 
 **Interfaces:**
 - Consumes: the spike results of Tasks 4 to 7 in `integration.md`.
-- Produces: a list of RFC changes for the maintainer, and after approval, revision v2 of the RFC.
+- Produces: a list of new RFC changes for the maintainer, and after approval, revision v3 of the RFC.
+
+RFC v2 already applies the decisions on the 19 gaps of `integration.md`. This task reports only what the spikes find beyond them.
 
 - [ ] **Step 1: Check the spike results**
 
 Tasks 4 to 7 fill the "Spike results" table of `integration.md`. Check that each row is complete. If a spike result contradicts the analysis, add a sentence to the section of that player that names the difference.
 
-- [ ] **Step 2: Write the list of RFC changes**
+- [ ] **Step 2: Write the list of new findings**
 
-Start from the changes that the prototype of Phase 1 found:
-
-| RFC section | Change | Source |
-|---|---|---|
-| Requests | A `data` URI gets no steering query parameters, because the parameters would change its content. | `buildSteeringUri` |
-| Engine | The engine catches an exception from a callback and logs it with `console.error`, like `CmcdReportRecorder`. So the promise of `start()` never rejects. | `invoke` in `createSteeringEngine` |
-| Responses | For DASH, a missing VERSION ends the requests, like a VERSION other than 1. The base spec, section 4, treats both cases the same. | `parseSteeringManifest` |
-| Responses | Retry-After accepts a number of seconds, or an HTTP date that ends in `GMT` (IMF-fixdate and RFC 850 dates). | `parseRetryAfter` |
-| URI replacement | The function normalizes `HOST` like a URL hostname: lowercase ASCII, and punycode for an internationalized name. | `toHostname` |
-| Drawbacks | The sentence "The implementation pull request measures the size" becomes the sizes of Task 3, Step 5. | Task 3 |
-
-Then add the gaps of `integration.md`, with the result of each spike. Put gaps 1 to 4 first, because they affect most players.
-
-The findings outside the API of `integration.md` are decisions for all of CML, not RFC changes. List them separately: the peer dependency, the syntax target, and the two code rules for Babel loose mode.
+For each new finding, give the RFC section, the proposed change, the players that need it, and the evidence from the spike. Put the findings that block a player first. List a finding that concerns all of CML, not only this package, separately.
 
 - [ ] **Step 3: Send the list to the maintainer**
 
@@ -3081,16 +3972,16 @@ git switch rfc/content-steering-engine
 git pull --ff-only
 ```
 
-Edit `rfc/content-steering-engine.md` for each approved row. Add revision v2 to the revision history, with one sentence for each change. Then check the prose and commit:
+Edit `rfc/content-steering-engine.md` for each approved row. Add revision v3 to the revision history, with one sentence for each change. Then check the prose and commit:
 
 ```bash
 bash plans/writing-style-compliance/check.sh origin/main rfc/content-steering-engine.md
 git add rfc/content-steering-engine.md
-git commit -s -F - <<'EOF'
-docs(rfc): apply the findings of the engine prototype
+git commit -s -F - <<'EOT'
+docs(rfc): apply the findings of the player spikes
 
 Co-Authored-By: <agent name> <model> <noreply@anthropic.com>
-EOF
+EOT
 git push origin rfc/content-steering-engine
 ```
 
@@ -3103,4 +3994,4 @@ git switch feat/content-steering-engine-impl
 git merge --no-edit --signoff rfc/content-steering-engine
 ```
 
-Expected: the merge completes without a conflict. This branch changes no file that the RFC change touches.
+Expected: the merge completes. If `integration.md` conflicts, keep the version with the spike results.
