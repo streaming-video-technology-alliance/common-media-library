@@ -24,7 +24,7 @@ One export per file, per the package rule. Names are a starting point for the im
 | File | Export | Kind |
 |---|---|---|
 | `createCmcdSession.ts` | `createCmcdSession` | public |
-| `CmcdSession.ts`, `CmcdSessionConfig.ts`, `CmcdEventTargetConfig.ts`, `CmcdRequester.ts` | types | public |
+| `CmcdSession.ts`, `CmcdSessionConfig.ts`, `CmcdEventTargetConfig.ts`, `CmcdSessionRequest.ts` | types | public |
 | `CmcdSessionReporter.ts`, `CmcdSessionReporterConfig.ts`, `CmcdPlaybackData.ts`, `CmcdMetric.ts`, `CmcdNextObject.ts` | types | public |
 | `CmcdRequestLike.ts`, `CmcdDecoratedRequest.ts`, `CmcdRequestRecord.ts`, `CmcdResponseInfo.ts`, `CmcdResourceTiming.ts`, `CmcdResponseData.ts` | types | public |
 | `CmcdRequestTransform.ts`, `CmcdEventTransform.ts`, `CmcdDiscreteEventType.ts` | types | public |
@@ -237,7 +237,7 @@ Per event target, `processQueue(drain)`:
 1. Set `drainRequested` when `drain` is true. Return when the target is gone, the queue is empty, a send is in flight, or a retry timer is armed.
 2. Return when the queue is shorter than `batchSize` and `drainRequested` is false.
 3. Splice the batch: the whole queue when `drain`, else `batchSize` lines.
-4. POST through the requester. Body: lines joined by `\n`. Headers: `Content-Type: application/cmcd` plus the target's headers.
+4. POST through the `request` function. Body: lines joined by `\n`. Headers: `Content-Type: application/cmcd` plus the target's headers.
 
 | Result | Action |
 |---|---|
@@ -248,7 +248,7 @@ Per event target, `processQueue(drain)`:
 
 `flush()` clears an armed retry timer and processes with `drain`. Once the owning `sid` state has ended, a failure at the 60 second step stops the retries. When the queue is longer than `maxQueueSize` after an unshift or a push, splice the oldest lines off the front.
 
-The default requester: `fetch(url, { method: 'POST', headers, body, keepalive: body.length < 65536 })`, returning `{ status }`. A network error rejects.
+The default `request` function: `fetch(url, { method: 'POST', headers, body, keepalive: body.length < 65536 })`, returning `{ status }`. A network error rejects.
 
 ## Key table
 
@@ -359,7 +359,7 @@ Tests import from `@svta/cml-cmcd` and run against the built package.
 | Transform rotation | a transform that calls `rotate()` inside `decorate()` and inside an emission leaves the request and the remaining targets on the old `sid` |
 | Requests | re-decoration strips the old `CMCD` parameter and headers, the decorated type compiles for `{ url }`, `CmcdResponseData` accepts `ttfbb` and `smrt` and rejects `sn` |
 | Timing | `ttfb` omitted for a zero `responseStart`, `ttlb` from `responseEnd` for a cross-origin entry, the clock fallback measures the call |
-| Delivery | mock requester with fake timers: batch size, flush, dispose, 410, 429 back-off sequence, 5xx, rejection, queue cap, `pagehide` keepalive, a drain kept across an in-flight send, and a `batchSize` over `maxQueueSize` throws |
+| Delivery | mock `request` function with fake timers: batch size, flush, dispose, 410, 429 back-off sequence, 5xx, rejection, queue cap, `pagehide` keepalive, a drain kept across an in-flight send, and a `batchSize` over `maxQueueSize` throws |
 | Errors | configuration checks and their messages, encoder failure commits nothing, throwing transform isolation, `onError` on a tick |
 | Validation | every emitted line passes `validateCmcdEvents` or `validateCmcdRequest` |
 | Types | `@ts-expect-error` for a state-change type in `recordEvent`, `ce` without `cen`, `version` on an event target, `ec` in `CmcdPlaybackData` |

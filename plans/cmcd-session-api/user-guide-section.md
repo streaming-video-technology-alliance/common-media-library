@@ -6,7 +6,7 @@ Task 14 of [`steps.md`](./steps.md) inserts the text below into `libs/cmcd/docs/
 
 ## Reporting with a session
 
-The session API is the CMCD version 2 reporter. One `CmcdSession` per playback owns the report targets, the requester, the interval timers, and `bg`. One `CmcdSessionReporter` per media player pushes state, records events, decorates requests, and records responses. The reporter derives `msd`, `bs`, `bsa`, `bsda`, `bsd`, `su`, `sn`, `h`, and the response timing keys. `CmcdReporter` remains available and unchanged.
+The session API is the CMCD version 2 reporter. One `CmcdSession` per playback owns the report targets, the `request` function, the interval timers, and `bg`. One `CmcdSessionReporter` per media player pushes state, records events, decorates requests, and records responses. The reporter derives `msd`, `bs`, `bsa`, `bsda`, `bsd`, `su`, `sn`, `h`, and the response timing keys. `CmcdReporter` remains available and unchanged.
 
 ```typescript
 import { createCmcdSession, CmcdEventType } from '@svta/cml-cmcd'
