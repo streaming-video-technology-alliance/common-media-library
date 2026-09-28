@@ -98,7 +98,7 @@ The promise of `start()` resolves when the engine has processed the response. Th
 
 The engine selects a pathway after each Steering Manifest, after each penalty, and when a penalty ends. When the selection changes, the engine calls `onPathwayChange`. The player must then use only the URIs of that pathway (base spec, section 7). `engine.pathway` returns the current selection.
 
-`engine.priority` returns the whole order: the selected pathway first, then the other known pathways that are not penalized. A DASH player uses the list to select a `BaseURL` for each node of the MPD (DASH spec, step 12). It also uses the list to select a `Location` for MPD updates (step 16). A player can also replace the list with `setPriority()`, for example from an application setting. The next valid Steering Manifest replaces that list again.
+`engine.priority` returns the whole order: the selected pathway first, then the other known pathways that are not penalized. A DASH player uses the list to select a `BaseURL` for each node of the MPD (DASH spec, step 12). It also uses the list to select a `Location` for MPD updates (step 16). A player can also replace the list with `update({ priority })`, for example from an application setting. The next valid Steering Manifest replaces that list again.
 
 ### Update the pathways
 
@@ -166,7 +166,7 @@ engine.penalize('beta') // a specific pathway
 
 ### Handle errors
 
-`onError` receives the request errors and the Steering Manifest errors. It also receives the exceptions of callbacks when no caller can receive them. A callback that throws inside `penalize()`, `setPriority()`, or `update()` throws to the caller of that method.
+`onError` receives the request errors and the Steering Manifest errors. It also receives the exceptions of callbacks when no caller can receive them. A callback that throws inside `penalize()` or `update()` throws to the caller of that method.
 
 ```ts
 import { SteeringErrorType } from '@svta/cml-content-steering'
@@ -240,23 +240,21 @@ type SteeringEngine = {
 	start(): Promise<void>
 	stop(): void
 	penalize(pathway?: string): void              // default: the selected pathway
-	setPriority(priority: readonly string[]): void
-	update(changes: { readonly uri?: string, readonly pathways?: readonly string[] }): void
+	update(changes: { readonly uri?: string, readonly pathways?: readonly string[], readonly priority?: readonly string[] }): void
 }
 ```
 
 `pathway` starts as the `pathway` of the configuration. `start()` sends a request if one is due, and otherwise schedules the next request. A request is due on the first call, and when the delay after the last response has passed. Its promise resolves when the engine has processed the response to that request, or at once if no request is due. A second call before `stop()` returns the same promise. `stop()` resolves a pending promise of `start()`.
 
-`penalize()`, `setPriority()`, and `update()` select a pathway before they return, so `onPathwayChange` runs synchronously inside them.
+`penalize()` and `update()` select a pathway before they return, so `onPathwayChange` runs synchronously inside them.
 
-`setPriority()` replaces the priority list until the next valid Steering Manifest. It throws a `TypeError` when the argument is not an array of strings.
-
-`update()` has two optional values:
+`update()` is the only method that changes the inputs of the engine. It has three optional values:
 
 - `pathways` replaces the pathway IDs of the Content Description. The engine checks the clones of the current Steering Manifest again. Before the first valid Steering Manifest, it also builds the fallback priority list again.
 - `uri` replaces the steering URI and the stored RELOAD-URI, at the next scheduled request. A `uri` equal to the configured one has no effect. After a 410, a new `uri` sends a request at once, because the base spec forbids more requests only for "that URI" (step 7A).
+- `priority` replaces the priority list until the next valid Steering Manifest. The engine applies it after `pathways`.
 
-`update()` throws a `TypeError` for the same `uri` and `pathways` values as `createSteeringEngine()`.
+`update()` throws a `TypeError` for the same `uri` and `pathways` values as `createSteeringEngine()`, and for a `priority` that is not an array of strings.
 
 ### Requests
 
@@ -346,7 +344,7 @@ type SteeringError =
 
 The engine never calls `console`. It handles an exception from a callback like the CMCD session API RFC ([#455](https://github.com/streaming-video-technology-alliance/common-media-library/pull/455)):
 
-- **With a caller.** A callback that throws inside `penalize()`, `setPriority()`, or `update()` throws to the caller, after the engine has finished the call.
+- **With a caller.** A callback that throws inside `penalize()` or `update()` throws to the caller, after the engine has finished the call.
 - **Without a caller.** A callback that throws after a response, in a timer, or inside `start()` goes to `onError` as a `callback` error. The engine continues. For example, it still selects a pathway after `onManifest` throws.
 - **Without `onError`.** The engine throws the exception from a timer callback, so the host reports it. The engine also throws an exception of `onError` itself from a timer callback.
 
@@ -444,6 +442,7 @@ The package documentation links to the spec versions of this RFC.
 - **A class.** `createSteeringEngine` returns an object type, like `createCmcdSession` in the CMCD session API RFC ([#455](https://github.com/streaming-video-technology-alliance/common-media-library/pull/455)). The implementation can change without a change to the public type.
 - **An injected scheduler.** Tests use the mock timers of `node:test`, like the tests of `CmcdReporter`. A player controls the request timing with `start()` and `stop()`.
 - **Cancellation.** `HttpRequest` has no abort signal. `stop()` ignores late responses instead.
+- **A `setPriority()` method.** The `priority` getter returns the effective order, not the list that a player sets. A method named as a pair of the getter would suggest that the getter returns that list. `update({ priority })` keeps one method for every input of the engine.
 - **A `refresh()` method.** dash.js has a public `triggerSteeringRequest()` that always sends a request. The base spec says that the client MUST wait TTL seconds before it reloads. So this RFC has no method to force a request. The dash.js player can map `triggerSteeringRequest()` to `start()`.
 - **A list for `pathway`.** `@defaultServiceLocation` can be a list. The player can pass the first value that is in `pathways`.
 - **A `destroy()` method.** `update()` removes the need to replace an engine. `stop()` and the release of the reference end an engine.
@@ -491,6 +490,7 @@ The package documentation links to the spec versions of this RFC.
   - A response without `status` counts as status 200.
   - Callback errors follow the rule of the CMCD session API RFC. `SteeringError` becomes a union with a `callback` type, and `SteeringErrorType` names the types.
   - The RFC documents the synchronous selection, the `data` URI rule, the checks that depend on the content, the DASH `PARAMS` rule, and the measured sizes.
+- v3 (2026-09-28): `setPriority()` becomes the `priority` value of `update()`, so one method changes every input of the engine.
 
 ## Final Decision
 

@@ -8,7 +8,7 @@ Four analyses read each player at the commits of the [design record](architectur
 
 | Player | Fit | Code change (estimate) | Blockers with RFC v1 | Status with RFC v2 |
 |---|---|---|---|---|
-| hls.js | The request loop and the clone URIs fit. | 624 lines become 653. | No failover before the first Steering Manifest. No way to support the `hls.pathwayPriority` setter. | Resolved by the fallback priority list and `setPriority()`. |
+| hls.js | The request loop and the clone URIs fit. | 624 lines become 653. | No failover before the first Steering Manifest. No way to support the `hls.pathwayPriority` setter. | Resolved by the fallback priority list and `update({ priority })`. |
 | dash.js | The request loop, the validation, and the 410 and 429 rules fit. They fix real dash.js bugs. | About 50 lines fewer. | One selected pathway does not fit a BaseURL selection for each node. The `_DASH_pathway` list, `@queryBeforeStart`, a forced request, and MPD updates are not possible. | Resolved by `priority`, `getReportedPathways`, `queryBeforeStart`, and `update()`. `triggerSteeringRequest()` maps to `start()`, because the RFC has no `refresh()`. |
 | Shaka Player | The engine fits the location model, where Shaka asks for URIs when it needs them. | The steering manager shrinks. The total code grows, because of a port. | The Closure build cannot use the npm module. Shaka has no read access to the priority list or the penalties. | `priority` resolves the API gap. The Closure port remains. |
 | VHS | The engine fits the exclusion model. | About 720 lines become 230. | None in the API. The build needs Babel for `@svta/*` and must inline CML. | `acceptClone` and `update()` remove two workarounds. The build changes remain. |
@@ -36,7 +36,7 @@ Each row names the players that need the change. Severity is the highest severit
 | 6 | `onManifest` has no URL context. | hls.js, dash.js, VHS | cosmetic | `onManifest(manifest, clones, { url, reloadUri })` | accepted |
 | 7 | `createSteeringEngine` throws for values that come from the Content Description, such as an empty `pathways` list. Each player must catch the `TypeError`. | hls.js, Shaka, VHS | workaround exists | Document which checks depend on the content. | accepted: documented |
 | 8 | `pathway` is one value, but `@defaultServiceLocation` is a list. | dash.js, Shaka | workaround exists | `pathway?: string \| readonly string[]` | rejected: the player passes the first value that is in `pathways` |
-| 9 | The priority list cannot be set. hls.js has a public `pathwayPriority` setter. | hls.js | blocker | `setPriority(priority)` | accepted |
+| 9 | The priority list cannot be set. hls.js has a public `pathwayPriority` setter. | hls.js | blocker | `setPriority(priority)` | accepted as the `priority` value of `update()` (RFC v3) |
 | 10 | For DASH, `_DASH_pathway` must list every service location that the player used (DASH spec, step 7). The engine knows only its own selections. | dash.js | blocker | `getReportedPathways?: () => readonly string[]` | accepted |
 | 11 | A first request without parameters (`@queryBeforeStart`) requires an absent `pathway`. After a failed first request, `penalize()` without an argument does nothing. | dash.js | blocker | `queryBeforeStart?: boolean` | accepted |
 | 12 | No request can be forced. The dash.js method `triggerSteeringRequest()` is public. | dash.js | blocker | `refresh(): Promise<void>`, with no effect after a 410 | rejected: the base spec requires the wait for the TTL |
@@ -115,7 +115,7 @@ function createLoaderRequester(hls: Hls, onLoad: (load: SteeringLoad | null) => 
 }
 ```
 
-**Callbacks.** `onManifest` stores PATHWAY-PRIORITY for the `pathwayPriority` getter, updates the clones, and triggers STEERING_MANIFEST_LOADED. `onPathwayChange` filters the levels by pathway and triggers LEVELS_UPDATED. The ERROR listener calls `engine.penalize(errorPathway)` and sets `errorAction.resolved` when the selection changed. This logic needs the synchronous `onPathwayChange` of gap 18. With RFC v2, the `pathwayPriority` setter calls `setPriority()`, and `penalize()` fails over before the first Steering Manifest.
+**Callbacks.** `onManifest` stores PATHWAY-PRIORITY for the `pathwayPriority` getter, updates the clones, and triggers STEERING_MANIFEST_LOADED. `onPathwayChange` filters the levels by pathway and triggers LEVELS_UPDATED. The ERROR listener calls `engine.penalize(errorPathway)` and sets `errorAction.resolved` when the selection changed. This logic needs the synchronous `onPathwayChange` of gap 18. With RFC v3, the `pathwayPriority` setter calls `update({ priority })`, and `penalize()` fails over before the first Steering Manifest.
 
 **Clones.** `applyUriReplacement` replaces `performUriReplacement`, with `stableVariantId` for levels and `stableRenditionId` for renditions. hls.js keeps the group renaming, the level duplication, and the rendition copies. Clones now live for one Steering Manifest, so the controller compares each list with the previous one. A rendition without a URI (`''`) must skip `applyUriReplacement`, which throws for it.
 
