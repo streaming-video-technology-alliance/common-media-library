@@ -103,6 +103,29 @@ describe('applyUriReplacement', () => {
 
 			equal(uri, 'https://cdn-c.example.com/sd/540.m3u8?token=abc')
 		})
+
+		it('applies HOST and PARAMS when PER-VARIANT-URIS is a string', () => {
+			// @ts-expect-error - a server value that is not an object
+			const bad = { ...replacement, 'PER-VARIANT-URIS': 'abc' }
+			const uri = applyUriReplacement('sd/540.m3u8', bad, { baseUri, stableVariantId: '0' })
+
+			equal(uri, 'https://cdn-c.example.com/sd/540.m3u8?token=abc')
+		})
+
+		it('applies HOST and PARAMS when PER-VARIANT-URIS is an array', () => {
+			// @ts-expect-error - a server value that is not an object
+			const bad = { ...replacement, 'PER-VARIANT-URIS': ['https://cdn-d.example.com/x'] }
+			const uri = applyUriReplacement('sd/540.m3u8', bad, { baseUri, stableVariantId: '0' })
+
+			equal(uri, 'https://cdn-c.example.com/sd/540.m3u8?token=abc')
+		})
+
+		it('applies HOST and PARAMS when the per-variant value is a relative URI', () => {
+			const relative = { ...replacement, 'PER-VARIANT-URIS': { 'hd-1080': 'hd/1080.m3u8' } }
+			const uri = applyUriReplacement('hd/1080.m3u8', relative, { baseUri, stableVariantId: 'hd-1080' })
+
+			equal(uri, 'https://cdn-c.example.com/hd/1080.m3u8?token=abc')
+		})
 	})
 
 	describe('errors', () => {

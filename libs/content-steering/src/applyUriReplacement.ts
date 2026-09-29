@@ -71,10 +71,23 @@ export function applyUriReplacement(uri: string, replacement: UriReplacement, op
 	return url.href
 }
 
-function findUri(uris: Record<string, string> | undefined, id: string | undefined): string | undefined {
-	const uri = uris && id !== undefined ? uris[id] : undefined
+function findUri(uris: unknown, id: string | undefined): string | undefined {
+	if (typeof uris !== 'object' || uris === null || Array.isArray(uris) || id === undefined) {
+		return undefined
+	}
 
-	return typeof uri === 'string' ? uri : undefined
+	const uri: unknown = (uris as Record<string, unknown>)[id]
+
+	return typeof uri === 'string' && isAbsoluteUri(uri) ? uri : undefined
+}
+
+function isAbsoluteUri(uri: string): boolean {
+	try {
+		new URL(uri)
+		return true
+	} catch {
+		return false
+	}
 }
 
 function toUrl(uri: string, baseUri: string | undefined): URL {
