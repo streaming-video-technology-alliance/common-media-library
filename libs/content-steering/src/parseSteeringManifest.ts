@@ -46,7 +46,7 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 		}
 	}
 
-	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+	if (!isPlainObject(value)) {
 		return { error: `The Steering Manifest from ${uri} is not a JSON object.`, version: false }
 	}
 
@@ -84,4 +84,14 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 	} catch (cause) {
 		return { error: `The RELOAD-URI ${JSON.stringify(reload)} of the Steering Manifest from ${uri} does not resolve.`, version: false, cause }
 	}
+}
+
+function isPlainObject(value: unknown): boolean {
+	if (typeof value !== 'object' || value === null) {
+		return false
+	}
+
+	const proto: unknown = Object.getPrototypeOf(value)
+
+	return proto === Object.prototype || proto === null
 }

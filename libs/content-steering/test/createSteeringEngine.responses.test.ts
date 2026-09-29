@@ -215,6 +215,21 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
 		})
 
+		it('reports a parse error and retries when the DASH response body is a Uint8Array', async () => {
+			const { engine, errors, requests } = setup('dash', { status: 200, data: new Uint8Array([1, 2, 3]) }, manifestResponse(MANIFEST))
+
+			await engine.start()
+
+			equal(errors[0].type, 'parse')
+			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
+			equal(engine.pathway, 'CDN-A')
+
+			await advance(DEFAULT_TTL * 1000)
+			engine.stop()
+
+			equal(requests.length, 2)
+		})
+
 		it('ends the requests after a VERSION other than 1 for DASH and uses the fallback priority list', async () => {
 			const { engine, errors, requests } = setup('dash', manifestResponse(MANIFEST), manifestResponse({ ...MANIFEST, VERSION: 2 }))
 
@@ -408,6 +423,30 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].status, undefined)
 			equal(errors[0].cause, cause)
 			equal(errors[0].url, 'https://steering.example.com/a/manifest.json?_HLS_pathway=%22CDN-A%22')
+		})
+
+		it('reports a load error and requests again when the requester resolves a value that is not a response object', async () => {
+			const errors: RequestError[] = []
+			const engine = createSteeringEngine({
+				protocol: 'hls',
+				uri: 'https://steering.example.com/a/manifest.json',
+				pathways: ['CDN-A', 'CDN-B'],
+				pathway: 'CDN-A',
+				// @ts-expect-error - a requester that forgets to return a response
+				requester: async () => undefined,
+				onError: (error) => {
+					if (error.type !== SteeringErrorType.CALLBACK) {
+						errors.push(error)
+					}
+				},
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].type, 'load')
+			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
+			equal(engine.pathway, 'CDN-A')
 		})
 	})
 })

@@ -280,6 +280,11 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	}
 
 	function receive(url: string, response: HttpResponse, requestGeneration: number): void {
+		if (typeof response !== 'object' || response === null) {
+			retry({ type: STEERING_ERROR_TYPE_LOAD, url, message: `The Steering Manifest request to ${url} did not return a response object.` })
+			return
+		}
+
 		const stale = requestGeneration !== generation
 		const status = response.status ?? 200
 
