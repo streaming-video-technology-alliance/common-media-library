@@ -2383,9 +2383,9 @@ export type SteeringEngineConfig = {
 	onPathwayChange?: (pathway: string) => void;
 
 	/**
-	 * Called with each valid Steering Manifest, its pathway clones, the URI
-	 * of the response, and the URI of the next request, before the engine
-	 * selects a pathway.
+	 * Called with each valid Steering Manifest and its pathway clones, before
+	 * the engine selects a pathway. The context has the URI of the response
+	 * in `url`, and the URI of the next request in `reloadUri`.
 	 */
 	onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[], context: { readonly url: string; readonly reloadUri: string }) => void;
 
