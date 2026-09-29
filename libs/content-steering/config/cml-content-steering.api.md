@@ -4,8 +4,15 @@
 
 ```ts
 
+import { HttpRequest } from '@svta/cml-utils';
+import { HttpResponse } from '@svta/cml-utils';
+import { ValueOf } from '@svta/cml-utils';
+
 // @beta
 export function applyUriReplacement(uri: string, replacement: UriReplacement, options?: UriReplacementOptions): string;
+
+// @beta
+export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngine;
 
 // @beta
 export const DEFAULT_PATHWAY_PENALTY = 3e5;
@@ -27,6 +34,80 @@ export type PathwayClone = {
 };
 
 // @beta
+export const STEERING_ERROR_TYPE_CALLBACK: "callback";
+
+// @beta
+export const STEERING_ERROR_TYPE_LOAD: "load";
+
+// @beta
+export const STEERING_ERROR_TYPE_PARSE: "parse";
+
+// @beta
+export const STEERING_PROTOCOL_DASH: "dash";
+
+// @beta
+export const STEERING_PROTOCOL_HLS: "hls";
+
+// @beta
+export type SteeringEngine = {
+    readonly pathway: string | undefined;
+    readonly priority: readonly string[];
+    start(): Promise<void>;
+    stop(): void;
+    penalize(pathway?: string): void;
+    update(changes: {
+        readonly uri?: string;
+        readonly pathways?: readonly string[];
+        readonly priority?: readonly string[];
+    }): void;
+};
+
+// @beta
+export type SteeringEngineConfig = {
+    protocol: SteeringProtocol;
+    uri: string;
+    pathways: readonly string[];
+    pathway?: string;
+    penalty?: number;
+    queryBeforeStart?: boolean;
+    requester?: SteeringRequester;
+    getThroughput?: (pathway: string) => number | undefined;
+    getReportedPathways?: () => readonly string[];
+    acceptClone?: (clone: PathwayClone) => boolean;
+    onPathwayChange?: (pathway: string) => void;
+    onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[], context: {
+        readonly url: string;
+        readonly reloadUri: string;
+    }) => void;
+    onError?: (error: SteeringError) => void;
+};
+
+// @beta
+export type SteeringError = {
+    readonly type: typeof STEERING_ERROR_TYPE_LOAD | typeof STEERING_ERROR_TYPE_PARSE;
+    readonly url: string;
+    readonly status?: number;
+    readonly cause?: unknown;
+    readonly message: string;
+    readonly retryDelay?: number;
+} | {
+    readonly type: typeof STEERING_ERROR_TYPE_CALLBACK;
+    readonly callback: "acceptClone" | "getReportedPathways" | "getThroughput" | "onManifest" | "onPathwayChange";
+    readonly cause: unknown;
+    readonly message: string;
+};
+
+// @beta
+export const SteeringErrorType: {
+    readonly LOAD: typeof STEERING_ERROR_TYPE_LOAD;
+    readonly PARSE: typeof STEERING_ERROR_TYPE_PARSE;
+    readonly CALLBACK: typeof STEERING_ERROR_TYPE_CALLBACK;
+};
+
+// @beta (undocumented)
+export type SteeringErrorType = ValueOf<typeof SteeringErrorType>;
+
+// @beta
 export type SteeringManifest = {
     VERSION: number;
     TTL: number;
@@ -34,6 +115,18 @@ export type SteeringManifest = {
     "PATHWAY-PRIORITY": string[];
     "PATHWAY-CLONES"?: PathwayClone[];
 };
+
+// @beta
+export const SteeringProtocol: {
+    readonly HLS: typeof STEERING_PROTOCOL_HLS;
+    readonly DASH: typeof STEERING_PROTOCOL_DASH;
+};
+
+// @beta (undocumented)
+export type SteeringProtocol = ValueOf<typeof SteeringProtocol>;
+
+// @beta
+export type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>;
 
 // @beta
 export type UriReplacement = {
