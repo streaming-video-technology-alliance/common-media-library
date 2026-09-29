@@ -65,8 +65,10 @@ export type SteeringEngineConfig = {
 
 	/**
 	 * Returns `false` for a valid pathway clone that the player cannot build.
-	 * The engine then ignores the clone. The engine calls this function for
-	 * each valid clone of each Steering Manifest, before `onManifest`.
+	 * The engine then ignores the clone. A thrown exception also refuses the
+	 * clone, and it becomes a callback error. The engine calls this function
+	 * for each valid clone of a Steering Manifest, before `onManifest`.
+	 * `update({ pathways })` does not call this function again.
 	 */
 	acceptClone?: (clone: PathwayClone) => boolean;
 

@@ -43,7 +43,9 @@ export type SteeringEngine = {
 	 * its request schedule, and it selects a pathway before the method returns.
 	 *
 	 * @param changes - The new values. `uri` replaces the steering URI.
-	 * `pathways` replaces the pathways of the Content Description.
+	 * `pathways` replaces the pathways of the Content Description. A pathway
+	 * clone whose base pathway is no longer known is then dropped. A clone
+	 * becomes valid only through a Steering Manifest, so `pathways` never adds one.
 	 * `priority` replaces the priority list until the next valid Steering Manifest.
 	 */
 	update(changes: { readonly uri?: string; readonly pathways?: readonly string[]; readonly priority?: readonly string[] }): void;

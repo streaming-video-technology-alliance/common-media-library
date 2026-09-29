@@ -71,6 +71,23 @@ describe('createSteeringEngine update', () => {
 		equal(engine.pathway, 'CDN-A')
 	})
 
+	it('does not select a clone that update() makes valid', async () => {
+		const clone: PathwayClone = { 'BASE-ID': 'CDN-B', ID: 'CDN-B-CLONE', 'URI-REPLACEMENT': { HOST: 'backup.example.com' } }
+		const { engine, changes } = create(
+			{ pathways: ['CDN-A'] },
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B-CLONE', 'CDN-A'], 'PATHWAY-CLONES': [clone] }),
+		)
+
+		await engine.start()
+		equal(engine.pathway, 'CDN-A')
+
+		engine.update({ pathways: ['CDN-A', 'CDN-B'] })
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+		deepEqual(changes, [])
+	})
+
 	it('applies new pathways and a new priority list in one call', async () => {
 		const { engine } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] }))
 

@@ -82,6 +82,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	let priority: readonly string[] = selected === undefined ? [] : fallbackList()
 	let manifestClones: readonly unknown[] = []
 	let known: ReadonlySet<string> = new Set(pathways)
+	let acceptedIds: ReadonlySet<string> = new Set()
 	let trail: string[] = selected === undefined ? [] : [selected]
 	let nextRequestAt: number | undefined
 	let requestTimer: ReturnType<typeof setTimeout> | undefined
@@ -173,7 +174,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 					priority = fallbackList()
 				}
 
-				setClones(manifestClones)
+				setClones(manifestClones, current => acceptedIds.has(current.ID))
 			}
 
 			if (nextPriority !== undefined) {
@@ -323,20 +324,34 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		priority = list
 		fallbackPriority = false
 
-		const valid = setClones(clones)
+		const valid = setClones(clones, acceptsClone)
 
 		scheduleRequest(ttl * 1000)
 		invoke('onManifest', onManifest, manifest, valid, { url: responseUrl, reloadUri: uri })
 		select()
 	}
 
-	function setClones(clones: readonly unknown[]): PathwayClone[] {
-		const valid = resolveClones(clones, pathways).filter(clone => invoke('acceptClone', acceptClone, clone) !== false)
+	function setClones(clones: readonly unknown[], accept: (clone: PathwayClone) => boolean): PathwayClone[] {
+		const valid = resolveClones(clones, pathways, accept)
 
 		manifestClones = clones
 		known = new Set([...pathways, ...valid.map(clone => clone.ID)])
+		acceptedIds = new Set(valid.map(clone => clone.ID))
 
 		return valid
+	}
+
+	function acceptsClone(clone: PathwayClone): boolean {
+		if (!acceptClone) {
+			return true
+		}
+
+		try {
+			return acceptClone(clone) !== false
+		} catch (cause) {
+			failures.push({ name: 'acceptClone', cause })
+			return false
+		}
 	}
 
 	function fallbackList(): readonly string[] {
@@ -346,7 +361,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	function fallback(): void {
 		priority = fallbackList()
 		fallbackPriority = true
-		setClones([])
+		setClones([], acceptsClone)
 		select()
 	}
 

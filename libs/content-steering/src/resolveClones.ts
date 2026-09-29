@@ -10,13 +10,14 @@ const PATHWAY_ID = /^[\w.-]+$/
  *
  * @param clones - The `PATHWAY-CLONES` array.
  * @param pathways - The pathway IDs of the Content Description.
+ * @param accept - Returns `false` to refuse a clone. A refused clone cannot be the base of a later clone.
  * @returns The valid pathway clones.
  *
  * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-05#section-5 | Pathway Cloning}
  *
  * @internal
  */
-export function resolveClones(clones: readonly unknown[], pathways: readonly string[]): PathwayClone[] {
+export function resolveClones(clones: readonly unknown[], pathways: readonly string[], accept: (clone: PathwayClone) => boolean): PathwayClone[] {
 	const known = new Set(pathways)
 	const valid: PathwayClone[] = []
 
@@ -30,6 +31,10 @@ export function resolveClones(clones: readonly unknown[], pathways: readonly str
 		const id = clone.ID
 
 		if (!PATHWAY_ID.test(id) || known.has(id) || !known.has(clone['BASE-ID']) || !isValidReplacement(clone['URI-REPLACEMENT'])) {
+			continue
+		}
+
+		if (!accept(clone)) {
 			continue
 		}
 
