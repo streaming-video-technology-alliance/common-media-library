@@ -28,6 +28,10 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), 'v=2')
 	})
 
+	it('rounds tbl to the nearest 100 ms', () => {
+		equal(encodeCmcd({ tbl: [21349, toCmcdValue(8051, { a: true })] }), 'tbl=(21300 8100;a),v=2')
+	})
+
 	describe('version 1', () => {
 		it('returns encoded v1 string when version option is set to 1', () => {
 			const { v, ...input } = CMCD_INPUT

@@ -108,4 +108,9 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter> = {
 	 * Top Bitrate (kbps) rounded integer
 	 */
 	tb: toRounded,
+
+	/**
+	 * Target Buffer Length (milliseconds) rounded nearest 100ms
+	 */
+	tbl: toHundred,
 } as const
