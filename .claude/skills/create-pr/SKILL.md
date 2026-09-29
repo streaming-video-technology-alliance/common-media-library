@@ -39,7 +39,7 @@ If `$ARGUMENTS` specifies a base branch, use that instead of the default branch.
 
 ## Workflow
 
-Follow these steps in strict order. Do NOT skip ahead.
+Follow these steps in order.
 
 ### Step 0: Pre-flight checks
 
@@ -60,41 +60,22 @@ If any commits are missing DCO sign-off, report them and stop. Instruct the user
 ```bash
 git rebase main --exec "git commit --amend --signoff --no-edit"
 ```
-Do NOT create the PR until all commits have DCO sign-off.
 
 ### Step 1: Identify affected packages
 
-Examine the commit history and changed files to find which `libs/*` packages changed. That set decides which workspaces to build and test, and the scopes for the PR title.
+Examine the commit history and changed files to find which `libs/*` packages changed. That set decides the scopes for the PR title and which documentation errors block the PR in Step 3.
 
-### Step 2: Build affected packages
+### Step 2: Run the full validation
 
-Build each affected package:
-
-```bash
-npm run build -w libs/<package>
-```
-
-If a build fails, report the error and stop. Do NOT create the PR.
-
-### Step 3: Run tests
-
-Run tests for each affected package:
+Run the same command as the PR checks. It runs lint, builds every package, runs the typecheck, and runs the tests of every package:
 
 ```bash
-npm test -w libs/<package>
+npm test
 ```
 
-If any test fails, report the error and stop. Do NOT create the PR.
+If the command fails, report the error and stop.
 
-### Step 4: Run typecheck
-
-```bash
-npm run typecheck
-```
-
-If the typecheck fails on files in `libs/`, report the error and stop. Ignore pre-existing errors in `node_modules`. Do NOT create the PR.
-
-### Step 5: Build and validate documentation
+### Step 3: Build and validate documentation
 
 Build the documentation to catch TSDoc errors, broken `{@includeCode}` references, and missing documentation:
 
@@ -102,9 +83,9 @@ Build the documentation to catch TSDoc errors, broken `{@includeCode}` reference
 npm run build -w docs
 ```
 
-Review the output for warnings and errors. If there are documentation errors related to the changed packages, report them and stop. Do NOT create the PR.
+Review the output for warnings and errors. If there are documentation errors related to the changed packages, report them and stop.
 
-### Step 6: Find related GitHub issues
+### Step 4: Find related GitHub issues
 
 Search for related open issues in the repository:
 
@@ -116,7 +97,7 @@ Also check the commit messages and branch name for issue references, such as `#1
 
 Present the possibly related issues to the user. Ask which ones, if any, the PR should reference.
 
-### Step 7: Draft the PR title and description
+### Step 5: Draft the PR title and description
 
 #### Title Format
 
@@ -144,34 +125,13 @@ Follow the Conventional Commits format. The title must be under 70 characters.
 
 #### Description Format
 
-Use this template:
+Fill in the repository template, `.github/PULL_REQUEST_TEMPLATE.md`. Keep its headings, and replace its instructions with the content they ask for.
 
-```markdown
-## Summary
+- Under `## Description`, describe the change. Add a `### Test plan` with the commands from Steps 2 and 3 and their results.
+- Reference only the issues that the user confirmed in Step 4. If there are none, omit the references.
+- In `## Requirements Checklist`, check each item that the branch satisfies. If an item does not apply, check it and give the reason in parentheses.
 
-<1-4 bullet points describing what changed and why>
-
-## Packages Changed
-
-| Package | Version | Change Type |
-|---------|---------|-------------|
-| @svta/cml-<name> | x.x.x | feat/fix/etc |
-
-## Test Plan
-
-- [ ] <specific test scenarios that validate the changes>
-
-Refs: <issue references>
-```
-
-**Refs footer rules:**
-- Use `Fixes #N` if the PR fully resolves an issue. GitHub closes the issue on merge
-- Use `Refs #N` if the PR is related but does not fully resolve the issue
-- Multiple references are comma-separated: `Refs: #12, #34, Fixes #56`
-- Only include issue references confirmed by the user in Step 6
-- Omit the `Refs:` line if there are no related issues
-
-### Step 8: Present for approval
+### Step 6: Present for approval
 
 Show the user the complete PR title and description. Ask for approval or revisions. The user may:
 - Approve as-is
@@ -180,7 +140,7 @@ Show the user the complete PR title and description. Ask for approval or revisio
 
 **Do NOT create the PR until the user explicitly approves.**
 
-### Step 9: Push and create the PR
+### Step 7: Push and create the PR
 
 1. Push the branch to the remote:
 
@@ -204,7 +164,6 @@ EOF
 - Never create a PR with failing tests or documentation errors.
 - The conventional commit type in the PR title should reflect the **primary** change, not every change.
 - Keep the title under 70 characters. Use the description for details.
-- The summary bullets should explain **why** the changes were made, not only which files changed.
-- If builds are slow, build only the packages that the changes affect directly, and their dependents.
+- The description should explain **why** the changes were made, not only which files changed.
 - Always push with `-u` to configure tracking.
-- **Every commit must have DCO sign-off.** Always use `git commit -s` and include a `Co-Authored-By: <agent-name> <model> <noreply@anthropic.com>` trailer in the message body, as `AGENTS.md` requires. If you fix issues found during validation (Steps 2-5), commit the fixes with these requirements before you proceed.
+- **Every commit must have DCO sign-off.** Always use `git commit -s` and include a `Co-Authored-By: <agent-name> <model> <noreply@anthropic.com>` trailer in the message body, as `AGENTS.md` requires. If you fix issues found during validation (Steps 2 and 3), commit the fixes with these requirements before you proceed.
