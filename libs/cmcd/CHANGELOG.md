@@ -10,7 +10,8 @@ and this project adheres to
 
 ### Fixed
 
-- `validateCmcdStructure` accepts a `b` event without the `bg` key. CTA-5004-B defines that form as the exit from backgrounded mode. The validator reported an error on `bg`. The fix also applies to `validateCmcd`, `validateCmcdEvents`, and `validateCmcdEventReport`
+- `validateCmcdStructure` accepts a `b` event without `bg`, a `pr` event without `pr`, a `c` event without `cid`, and a `bc` event without `br`. The validator reported an error for each of them. CTA-5004-B defines a `b` event without `bg` as the exit from backgrounded mode. CTA-5004-B has no rule that requires the other three keys. The fix also applies to `validateCmcd`, `validateCmcdEvents`, and `validateCmcdEventReport`. A `ps` event still requires `sta`. The error message for a `ps` event without `sta` now begins with "Play state change event" instead of "State-change event"
+- The TSDoc of `CmcdReporter.recordEvent` and `CmcdReportConfig.enabledKeys` no longer says that CTA-5004-B requires a key on every state-change event. The reporter behavior is unchanged
 
 ## [2.7.0] - 2026-09-15
 
