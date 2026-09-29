@@ -85,7 +85,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	let priority: readonly string[] = selected === undefined ? [] : fallbackList()
 	let manifestClones: readonly unknown[] = []
 	let known: ReadonlySet<string> = new Set(pathways)
-	let acceptedIds: ReadonlySet<string> = new Set()
+	let acceptedClones: ReadonlySet<PathwayClone> = new Set()
 	let trail: string[] = selected === undefined ? [] : [selected]
 	let nextRequestAt: number | undefined
 	let requestTimer: ReturnType<typeof setTimeout> | undefined
@@ -177,7 +177,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 					priority = fallbackList()
 				}
 
-				setClones(manifestClones, current => acceptedIds.has(current.ID))
+				setClones(manifestClones, current => acceptedClones.has(current))
 			}
 
 			if (nextPriority !== undefined) {
@@ -360,7 +360,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 		manifestClones = clones
 		known = new Set([...pathways, ...valid.map(clone => clone.ID)])
-		acceptedIds = new Set(valid.map(clone => clone.ID))
+		acceptedClones = new Set(valid)
 
 		return valid
 	}

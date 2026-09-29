@@ -110,6 +110,24 @@ describe('createSteeringEngine update', () => {
 		deepEqual(changes, [])
 	})
 
+	it('does not select a clone through another definition that shares its ID', async () => {
+		const unknownBase: PathwayClone = { 'BASE-ID': 'CDN-B', ID: 'C1', 'URI-REPLACEMENT': { HOST: 'x.example.com' } }
+		const knownBase: PathwayClone = { 'BASE-ID': 'CDN-A', ID: 'C1', 'URI-REPLACEMENT': { HOST: 'y.example.com' } }
+		const { engine } = create(
+			{ pathways: ['CDN-A', 'CDN-Z'], pathway: 'CDN-Z' },
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['C1', 'CDN-Z'], 'PATHWAY-CLONES': [unknownBase, knownBase] }),
+		)
+
+		await engine.start()
+		equal(engine.pathway, 'C1')
+
+		engine.update({ pathways: ['CDN-A', 'CDN-B', 'CDN-Z'] })
+		engine.update({ pathways: ['CDN-B', 'CDN-Z'] })
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-Z')
+	})
+
 	it('applies new pathways and a new priority list in one call', async () => {
 		const { engine } = create({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] }))
 
