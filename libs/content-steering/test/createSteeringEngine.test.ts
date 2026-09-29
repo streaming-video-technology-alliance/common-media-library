@@ -202,6 +202,34 @@ describe('createSteeringEngine', () => {
 			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=%22A%26B,C%3DD%2CE%22')
 		})
 
+		it('encodes a pathway ID with an unpaired surrogate instead of throwing', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(hlsConfig({ requester, pathways: ['CDN-\uD800'], pathway: 'CDN-\uD800' }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests.length, 1)
+			equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-%EF%BF%BD%22')
+		})
+
+		it('encodes a DASH pathway ID with an unpaired surrogate from getReportedPathways', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['CDN-A'],
+				pathway: 'CDN-A',
+				requester,
+				getReportedPathways: () => ['CDN-\uDC00'],
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=%22CDN-%EF%BF%BD%22')
+		})
+
 		it('lists the pathways of getReportedPathways for DASH', async () => {
 			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
 			const engine = createSteeringEngine({

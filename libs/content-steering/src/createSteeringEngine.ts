@@ -495,7 +495,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return params
 		}
 
-		params[`${prefix}pathway`] = `"${list.map(encodeURIComponent).join(',')}"`
+		params[`${prefix}pathway`] = `"${list.map(encodePathwayId).join(',')}"`
 
 		const throughputs = list.map(throughputOf)
 
@@ -577,6 +577,39 @@ function isAbsoluteUri(uri: string): boolean {
 	} catch {
 		return false
 	}
+}
+
+function encodePathwayId(id: string): string {
+	try {
+		return encodeURIComponent(id)
+	} catch {
+		return encodeURIComponent(withoutUnpairedSurrogates(id))
+	}
+}
+
+function withoutUnpairedSurrogates(value: string): string {
+	let result = ''
+
+	for (let i = 0; i < value.length; i++) {
+		const code = value.charCodeAt(i)
+
+		if (code >= 0xd800 && code <= 0xdbff) {
+			const next = value.charCodeAt(i + 1)
+
+			if (next >= 0xdc00 && next <= 0xdfff) {
+				result += value[i] + value[i + 1]
+				i++
+			} else {
+				result += '�'
+			}
+		} else if (code >= 0xdc00 && code <= 0xdfff) {
+			result += '�'
+		} else {
+			result += value[i]
+		}
+	}
+
+	return result
 }
 
 function getHeader(headers: Record<string, string> | undefined, name: string): string | undefined {
