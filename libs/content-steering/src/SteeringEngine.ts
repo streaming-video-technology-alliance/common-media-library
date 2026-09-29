@@ -20,7 +20,8 @@ export type SteeringEngine = {
 	 * Sends the first request, or resumes the requests after `stop()`.
 	 *
 	 * @returns A promise that resolves when the engine has processed the
-	 * response. The promise never rejects.
+	 * response. The promise resolves at once when no request is due yet.
+	 * The promise never rejects.
 	 */
 	start(): Promise<void>;
 
@@ -39,14 +40,17 @@ export type SteeringEngine = {
 	penalize(pathway?: string): void;
 
 	/**
-	 * Changes the inputs of the engine. The engine keeps its penalties and
-	 * its request schedule, and it selects a pathway before the method returns.
+	 * Changes the inputs of the engine. The engine keeps its penalties, and
+	 * it selects a pathway before the method returns.
 	 *
-	 * @param changes - The new values. `uri` replaces the steering URI.
-	 * `pathways` replaces the pathways of the Content Description. A pathway
-	 * clone whose base pathway is no longer known is then dropped. A clone
-	 * becomes valid only through a Steering Manifest, so `pathways` never adds one.
-	 * `priority` replaces the priority list until the next valid Steering Manifest.
+	 * @param changes - The new values. A new `uri` replaces the steering URI
+	 * and the stored RELOAD-URI. A `uri` equal to the configured URI has no
+	 * effect. After the end of steering, a new `uri` sends a request at once.
+	 * `pathways` replaces the pathways of the Content Description. The engine
+	 * then drops a pathway clone whose base pathway is no longer known. A
+	 * clone becomes valid only through a Steering Manifest, so `pathways`
+	 * never adds one. `priority` replaces the priority list until the next
+	 * valid Steering Manifest.
 	 */
 	update(changes: { readonly uri?: string; readonly pathways?: readonly string[]; readonly priority?: readonly string[] }): void;
 };

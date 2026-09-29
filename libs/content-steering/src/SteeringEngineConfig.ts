@@ -38,9 +38,11 @@ export type SteeringEngineConfig = {
 	 * `DEFAULT_PATHWAY_PENALTY` for HLS.
 	 *
 	 * For DASH, the default is the current TTL. Before the first valid
-	 * Steering Manifest, the current TTL is `DEFAULT_TTL`. After that, it is
-	 * the TTL of the last valid Steering Manifest. A 429 response with a
-	 * valid Retry-After value then sets it to that delay.
+	 * Steering Manifest, the current TTL is `DEFAULT_TTL`. Otherwise, the
+	 * current TTL is the TTL of the last valid Steering Manifest. A DASH 429
+	 * response with a positive Retry-After delay sets the current TTL. This
+	 * 429 response can arrive at any time, even before the first valid
+	 * Steering Manifest. The engine never uses a current TTL below 1 second.
 	 */
 	penalty?: number;
 
@@ -51,7 +53,9 @@ export type SteeringEngineConfig = {
 	queryBeforeStart?: boolean;
 
 	/**
-	 * The function that sends the Steering Manifest requests. The default uses `fetch`.
+	 * The function that sends the Steering Manifest requests. The default
+	 * uses `fetch`. `SteeringRequester` describes the contract of the
+	 * request and the response.
 	 */
 	requester?: SteeringRequester;
 
@@ -70,8 +74,8 @@ export type SteeringEngineConfig = {
 	/**
 	 * Returns `false` for a valid pathway clone that the player cannot build.
 	 * The engine then ignores the clone. A thrown exception also refuses the
-	 * clone, and it becomes a callback error. The engine calls this function
-	 * for each valid clone of a Steering Manifest, before `onManifest`.
+	 * clone. The exception then becomes a callback error. The engine calls
+	 * this function for each valid clone of a Steering Manifest, before `onManifest`.
 	 * `update({ pathways })` does not call this function again.
 	 */
 	acceptClone?: (clone: PathwayClone) => boolean;
@@ -83,14 +87,16 @@ export type SteeringEngineConfig = {
 
 	/**
 	 * Called with each valid Steering Manifest and its pathway clones, before
-	 * the engine selects a pathway. The context has the URI of the response
-	 * in `url`, and the URI of the next request in `reloadUri`.
+	 * the engine selects a pathway. The engine passes the Steering Manifest
+	 * object with no changes. `clones` and `engine.priority` hold the
+	 * checked values instead. The context has the URI of the response in
+	 * `url`, and the URI of the next request in `reloadUri`.
 	 */
 	onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[], context: { readonly url: string; readonly reloadUri: string }) => void;
 
 	/**
-	 * Called when a request fails, when a Steering Manifest is not valid,
-	 * or when a callback throws and no caller can receive the exception.
+	 * Called when a request fails or a Steering Manifest is not valid. Also
+	 * called when a callback throws and no caller can receive the exception.
 	 */
 	onError?: (error: SteeringError) => void;
 };

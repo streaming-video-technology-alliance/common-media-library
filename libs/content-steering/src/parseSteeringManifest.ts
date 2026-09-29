@@ -22,10 +22,11 @@ export type ParsedSteeringManifest =
 /**
  * Parses and checks the body of a Steering Manifest response.
  *
- * The Steering Manifest is valid when VERSION is 1, TTL is a positive
- * number, PATHWAY-PRIORITY has at least one string, and a relative
- * RELOAD-URI resolves. PATHWAY-PRIORITY keeps the first of each string.
- * An absent or empty PATHWAY-CLONES array means no clones.
+ * The Steering Manifest is valid when VERSION is 1 and TTL is a
+ * positive, finite number. The Steering Manifest is also valid only when
+ * PATHWAY-PRIORITY has at least one string and a relative RELOAD-URI
+ * resolves. PATHWAY-PRIORITY keeps the first of each string. An absent
+ * or empty PATHWAY-CLONES array means no clones.
  *
  * @param data - The response body, as a string or as a parsed JSON value.
  * @param uri - The URI of the response. A relative RELOAD-URI resolves against it.
