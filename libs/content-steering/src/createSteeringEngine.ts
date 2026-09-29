@@ -78,6 +78,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	let running = false
 	let sent = false
 	let session = 0
+	let generation = 0
 	let fallbackPriority = true
 	let priority: readonly string[] = selected === undefined ? [] : fallbackList()
 	let manifestClones: readonly unknown[] = []
@@ -185,6 +186,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			if (nextUri !== undefined && nextUri !== configuredUri) {
 				configuredUri = nextUri
 				uri = nextUri
+				generation++
 
 				if (ended) {
 					ended = false
@@ -247,6 +249,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 	function load(): Promise<void> {
 		const token = session
+		const requestGeneration = generation
 		const url = buildSteeringUri(uri, queryParams())
 
 		sent = true
@@ -255,7 +258,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		return send({ url, method: 'GET', responseType: 'text' }).then(
 			response => {
 				if (token === session) {
-					run(false, () => receive(url, response))
+					run(false, () => receive(url, response, requestGeneration))
 				}
 			},
 			(cause: unknown) => {
@@ -274,7 +277,8 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		}
 	}
 
-	function receive(url: string, response: HttpResponse): void {
+	function receive(url: string, response: HttpResponse, requestGeneration: number): void {
+		const stale = requestGeneration !== generation
 		const status = response.status ?? 200
 
 		if (status >= 200 && status < 300) {
@@ -282,11 +286,15 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			const result = parseSteeringManifest(response.data, responseUrl)
 
 			if ('manifest' in result) {
-				apply(result.manifest, result.priority, result.clones, result.reloadUri, responseUrl)
+				apply(result.manifest, result.priority, result.clones, stale ? undefined : result.reloadUri, responseUrl)
 			} else if (isDash && result.version) {
-				end()
-				report({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error })
-				fallback()
+				if (stale) {
+					retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error }, 0)
+				} else {
+					end()
+					report({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error })
+					fallback()
+				}
 			} else {
 				retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, cause: result.cause, message: result.error })
 			}
@@ -294,11 +302,15 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		}
 
 		if (status === 410) {
-			end()
-			report({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410 for ${url}. No request follows.` })
+			if (stale) {
+				retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410 for ${url}.` }, 0)
+			} else {
+				end()
+				report({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410 for ${url}. No request follows.` })
 
-			if (!loaded) {
-				fallback()
+				if (!loaded) {
+					fallback()
+				}
 			}
 			return
 		}

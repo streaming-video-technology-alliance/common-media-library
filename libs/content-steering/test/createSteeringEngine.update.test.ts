@@ -1,7 +1,10 @@
-import { createSteeringEngine, type PathwayClone, type SteeringEngineConfig } from '@svta/cml-content-steering'
-import { deepEqual, equal, throws } from 'node:assert'
+import { createSteeringEngine, SteeringErrorType, type PathwayClone, type SteeringEngineConfig, type SteeringError, type SteeringRequester } from '@svta/cml-content-steering'
+import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
+import { deepEqual, equal, ok, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
 import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
+
+type RequestError = Exclude<SteeringError, { type: typeof SteeringErrorType.CALLBACK }>
 
 function create(overrides: Partial<SteeringEngineConfig>, ...responses: StubResponse[]) {
 	const stub = createStubRequester(...responses)
@@ -17,6 +20,25 @@ function create(overrides: Partial<SteeringEngineConfig>, ...responses: StubResp
 	})
 
 	return { ...stub, engine, changes }
+}
+
+function createDeferred(overrides: Partial<SteeringEngineConfig> = {}) {
+	const requests: HttpRequest[] = []
+	const answers: ((response: Omit<HttpResponse, 'request'>) => void)[] = []
+	const requester: SteeringRequester = (request) => {
+		requests.push(request)
+		return new Promise(resolve => answers.push(response => resolve({ request, ...response })))
+	}
+	const engine = createSteeringEngine({
+		protocol: 'dash',
+		uri: 'https://steering.example.com/dash.json',
+		pathways: ['CDN-A', 'CDN-B'],
+		pathway: 'CDN-A',
+		requester,
+		...overrides,
+	})
+
+	return { engine, requests, answers }
 }
 
 async function advance(ms: number): Promise<void> {
@@ -156,6 +178,76 @@ describe('createSteeringEngine update', () => {
 		equal(requests.length, 2)
 		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
 		equal(engine.pathway, 'CDN-B')
+	})
+
+	it('ignores a stale RELOAD-URI when a response arrives after update() changes the uri', async () => {
+		const { engine, requests, answers } = createDeferred()
+
+		const promise = engine.start()
+		engine.update({ uri: 'https://steering2.example.com/dash.json' })
+
+		answers[0]({ status: 200, data: JSON.stringify({ VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A'], 'RELOAD-URI': 'reload.json' }) })
+		await promise
+
+		await advance(60000)
+		engine.stop()
+
+		equal(requests.length, 2)
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+	})
+
+	it('does not end steering for a stale 410 and requests the current uri at once', async () => {
+		const errors: RequestError[] = []
+		const { engine, requests, answers } = createDeferred({ onError: (error) => {
+			if (error.type !== SteeringErrorType.CALLBACK) {
+				errors.push(error)
+			}
+		} })
+
+		const promise = engine.start()
+		engine.update({ uri: 'https://steering2.example.com/dash.json' })
+
+		answers[0]({ status: 410 })
+		await promise
+
+		equal(errors.length, 1)
+		equal(errors[0].status, 410)
+		equal(errors[0].retryDelay, 0)
+		ok(!errors[0].message.includes('No request follows'))
+		equal(engine.pathway, 'CDN-A')
+
+		await advance(0)
+		engine.stop()
+
+		equal(requests.length, 2)
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+	})
+
+	it('does not end steering for a stale DASH VERSION error and requests the current uri at once', async () => {
+		const errors: RequestError[] = []
+		const { engine, requests, answers } = createDeferred({ onError: (error) => {
+			if (error.type !== SteeringErrorType.CALLBACK) {
+				errors.push(error)
+			}
+		} })
+
+		const promise = engine.start()
+		engine.update({ uri: 'https://steering2.example.com/dash.json' })
+
+		answers[0]({ status: 200, data: JSON.stringify({ VERSION: 2, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A'] }) })
+		await promise
+
+		equal(errors.length, 1)
+		equal(errors[0].type, 'parse')
+		equal(errors[0].retryDelay, 0)
+		ok(!errors[0].message.includes('No request follows'))
+		equal(engine.pathway, 'CDN-A')
+
+		await advance(0)
+		engine.stop()
+
+		equal(requests.length, 2)
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
 	})
 
 	it('throws for an invalid uri or pathways', () => {
