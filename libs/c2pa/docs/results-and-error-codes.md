@@ -89,11 +89,13 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_HASHEDURI_MISMATCH` | `assertion.hashedURI.mismatch` | Assertion hash does not match the claim reference |
 | `ASSERTION_MISSING` | `assertion.missing` | Referenced assertion not found in the assertion store |
 | `ASSERTION_ACTION_INGREDIENT_MISMATCH` | `assertion.action.ingredientMismatch` | Action requires an ingredient reference but none is present |
-| `CLAIM_SIGNATURE_MISMATCH` | `claim.signature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
+| `CLAIM_SIGNATURE_MISMATCH` | `claimSignature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
 | `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box |
 | `CLAIM_MISSING` | `claim.missing` | The manifest has no claim box |
 | `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
+
+Versions 1.2.0 and earlier report `claim.signature.mismatch` for `CLAIM_SIGNATURE_MISMATCH`. That value does not match the C2PA specification. Compare codes with the `C2paStatusCode` constants, not with string literals.
 
 > [!NOTE]
 > `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes`, which check manifest integrity. They do not appear in `SegmentValidationResult.errorCodes`: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only `LiveVideoStatusCode`.

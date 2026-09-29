@@ -44,7 +44,7 @@ export const C2paStatusCode: {
     readonly ASSERTION_HASHEDURI_MISMATCH: "assertion.hashedURI.mismatch";
     readonly ASSERTION_MISSING: "assertion.missing";
     readonly ASSERTION_ACTION_INGREDIENT_MISMATCH: "assertion.action.ingredientMismatch";
-    readonly CLAIM_SIGNATURE_MISMATCH: "claim.signature.mismatch";
+    readonly CLAIM_SIGNATURE_MISMATCH: "claimSignature.mismatch";
     readonly CLAIM_SIGNATURE_MISSING: "claimSignature.missing";
     readonly CLAIM_MISSING: "claim.missing";
     readonly ASSERTION_BMFFHASH_MALFORMED: "assertion.bmffHash.malformed";
