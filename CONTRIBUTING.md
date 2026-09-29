@@ -27,7 +27,7 @@ Look through our [existing issues](https://github.com/streaming-video-technology
 
 1. Create a working branch and make your changes.
 
-1. Update the [CHANGELOG](./CHANGELOG.md). Describe your change and reference the issue.
+1. Add a note under the `## [Unreleased]` heading in the `CHANGELOG.md` of each package that you changed, such as [`libs/cmcd/CHANGELOG.md`](./libs/cmcd/CHANGELOG.md). Describe your change and reference the issue.
 
 1. If you are not in the [Contributors List](./CONTRIBUTORS.md), add yourself.
 
