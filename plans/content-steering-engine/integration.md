@@ -265,7 +265,7 @@ Task 8 fills this table with the results of Tasks 4 to 7.
 
 | Player | Engine commit | Tests run | Result | Blockers confirmed | New findings |
 |---|---|---|---|---|---|
-| hls.js | | | | | |
+| hls.js | `99ff4ef76` (hls.js `c721313f`, spike `32b323a01`) | Type check, ESLint, es-check, steering suite (20 tests before, 63 after), unit suite (1204 before, 1247 after), build, `size:check`, and a smoke test of `hls.light.min.js` in headless Chrome | Works. The unit suite passes. Five old tests have new expectations for documented behavior changes. `size:check` fails: `hls.light.min.js` grows 3.1 KiB brotli (97.9 to 101.0 KiB). That is 1.4 KiB over the limit and about 3.5 KiB over the budget. | Gaps 4 and 9 resolved: their tests fail when the fix is removed. Gaps 2, 3, 5, 6, 7, 17, and 18 confirmed. Gap 16: a placeholder URI works, and the engine never starts. So an optional `uri` is a decision, not a blocker. | The engine needs an absolute `uri` even without a Steering Server (iframe player, setter, redundant streams). The old refresh skipped requests while the media was missing or ended. `stop()` and `start()` can replace that, with new hls.js media wiring. The `pathwayPriority` getter now returns the effective order, because it reads `engine.priority`. Old bugs that the engine fixes: a 429 stopped steering, and a clone of an embedded-audio group threw a `TypeError`. |
 | dash.js | | | | | |
 | Shaka Player | | | | | |
 | VHS | | | | | |
