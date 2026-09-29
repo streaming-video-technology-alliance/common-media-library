@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Fixed
 
-- `validateCmcdStructure` accepts a `b` event without the `bg` key. CTA-5004-B defines that form as the exit from backgrounded mode. The validator reported an error on `bg`. Every validator that runs the structure rules shares the fix. The other state-change events still require their key: `sta` on `ps`, `pr` on `pr`, `cid` on `c`, and `br` on `bc`
+- `validateCmcdStructure` accepts a `b` event without the `bg` key. CTA-5004-B defines that form as the exit from backgrounded mode. The validator reported an error on `bg`. The fix also applies to `validateCmcd`, `validateCmcdEvents`, and `validateCmcdEventReport`
 
 ## [2.7.0] - 2026-09-15
 
