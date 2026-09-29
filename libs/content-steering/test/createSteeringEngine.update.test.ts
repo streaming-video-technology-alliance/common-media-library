@@ -198,14 +198,31 @@ describe('createSteeringEngine update', () => {
 		equal(engine.pathway, 'CDN-B')
 	})
 
+	it('resumes the requests after a DASH VERSION error when update() sets a new uri', async () => {
+		const versionError = { status: 200, data: JSON.stringify({ VERSION: 2, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A'] }) }
+		const { engine, requests } = create({}, versionError, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B'] }))
+
+		await engine.start()
+		engine.update({ uri: 'https://steering2.example.com/dash.json' })
+		await advance(0)
+		engine.stop()
+
+		equal(requests.length, 2)
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(engine.pathway, 'CDN-B')
+	})
+
 	it('ignores a stale RELOAD-URI when a response arrives after update() changes the uri', async () => {
-		const { engine, requests, answers } = createDeferred()
+		const contexts: unknown[] = []
+		const { engine, requests, answers } = createDeferred({ onManifest: (_manifest, _clones, context) => contexts.push(context) })
 
 		const promise = engine.start()
 		engine.update({ uri: 'https://steering2.example.com/dash.json' })
 
 		answers[0]({ status: 200, data: JSON.stringify({ VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-A'], 'RELOAD-URI': 'reload.json' }) })
 		await promise
+
+		deepEqual(contexts, [{ url: 'https://steering.example.com/dash.json?_DASH_pathway=%22CDN-A%22', reloadUri: 'https://steering2.example.com/dash.json' }])
 
 		await advance(60000)
 		engine.stop()

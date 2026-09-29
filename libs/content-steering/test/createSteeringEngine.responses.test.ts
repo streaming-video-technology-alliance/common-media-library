@@ -331,6 +331,22 @@ describe('createSteeringEngine responses', () => {
 
 			deepEqual(engine.priority, ['CDN-A', 'CDN-C', 'CDN-B'])
 		})
+
+		it('selects the first pathway of the fallback priority list after a 410 for an engine without a configured pathway', async () => {
+			const { requester } = createStubRequester({ status: 410 })
+			const engine = createSteeringEngine({
+				protocol: 'hls',
+				uri: 'https://steering.example.com/a/manifest.json',
+				pathways: ['CDN-A', 'CDN-B'],
+				requester,
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(engine.pathway, 'CDN-A')
+			deepEqual(engine.priority, ['CDN-A', 'CDN-B'])
+		})
 	})
 
 	describe('HTTP 429', () => {

@@ -129,6 +129,23 @@ describe('createSteeringEngine lifecycle', () => {
 		equal(requests.length, 2)
 	})
 
+	it('does not send the next request before the full TTL when the TTL exceeds the setTimeout cap', async () => {
+		const MAX_DELAY = 2147483647
+		const longManifest = { VERSION: 1, TTL: 3000000, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+		const { requester, requests } = createStubRequester(manifestResponse(longManifest), manifestResponse(MANIFEST))
+		const engine = createSteeringEngine(config(requester))
+
+		await engine.start()
+
+		await advance(MAX_DELAY)
+		equal(requests.length, 1)
+
+		await advance(3000000000 - MAX_DELAY)
+		engine.stop()
+
+		equal(requests.length, 2)
+	})
+
 	it('selects again on start() when a penalty ended while the engine was stopped', async () => {
 		const { requester } = createStubRequester(manifestResponse(MANIFEST))
 		const engine = createSteeringEngine(config(requester, { penalty: 1000 }))
