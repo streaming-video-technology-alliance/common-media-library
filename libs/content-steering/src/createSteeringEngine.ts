@@ -300,7 +300,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 					retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error }, 0)
 				} else {
 					end()
-					report({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error })
+					report({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: `${result.error} No request follows.` })
 
 					if (!manualPriority) {
 						fallback()

@@ -272,6 +272,15 @@ describe('createSteeringEngine responses', () => {
 
 			equal(requests.length, 2)
 		})
+
+		it('says that no request follows a DASH VERSION error', async () => {
+			const { engine, errors } = setup('dash', manifestResponse({ ...MANIFEST, VERSION: 2 }))
+
+			await engine.start()
+			engine.stop()
+
+			ok(errors[0].message.includes('No request follows.'))
+		})
 	})
 
 	describe('HTTP 410', () => {
