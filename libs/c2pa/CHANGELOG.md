@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH` now has the value `claimSignature.mismatch`, the identifier that the C2PA specification defines. The old value was `claim.signature.mismatch`. The constant name does not change ([#469](https://github.com/streaming-video-technology-alliance/common-media-library/issues/469)). If your code compares `errorCodes` with the string `claim.signature.mismatch`, compare with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH` instead. Also update logs, dashboards, and alert rules that store the old string.
+
 ## [1.2.0] - 2026-09-25
 
 ### Security
