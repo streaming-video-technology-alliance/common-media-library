@@ -42,4 +42,4 @@ paths:
 
 ## Style
 
-- Tests import from the package name, not relative paths.
+- Tests of exported members import from the package name. Tests of internal members import from the source file.
