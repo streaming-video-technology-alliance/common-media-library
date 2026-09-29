@@ -5,6 +5,9 @@
 ```ts
 
 // @beta
+export function applyUriReplacement(uri: string, replacement: UriReplacement, options?: UriReplacementOptions): string;
+
+// @beta
 export const DEFAULT_PATHWAY_PENALTY = 3e5;
 
 // @beta
@@ -36,6 +39,15 @@ export type SteeringManifest = {
 export type UriReplacement = {
     HOST?: string;
     PARAMS?: Record<string, string>;
+    "PER-VARIANT-URIS"?: Record<string, string>;
+    "PER-RENDITION-URIS"?: Record<string, string>;
+};
+
+// @beta
+export type UriReplacementOptions = {
+    baseUri?: string;
+    stableVariantId?: string;
+    stableRenditionId?: string;
 };
 
 // (No @packageDocumentation comment for this package)
