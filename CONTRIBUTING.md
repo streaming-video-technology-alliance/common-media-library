@@ -23,7 +23,9 @@ Look through our [existing issues](https://github.com/streaming-video-technology
 1. Fork the repository.
 [Fork the repository](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so you can make changes without affecting the original project until you are ready to merge them.
 
-1. Install or update **Node.js**.
+1. Clone your fork with its submodule: `git clone --recurse-submodules <your-fork-url>`. If you cloned without the submodule, run `git submodule update --init`. The structured-field-values tests need the `structured-field-tests` submodule.
+
+1. Install **Node.js** 24 or later, then run `npm install`.
 
 1. Create a working branch and make your changes.
 
