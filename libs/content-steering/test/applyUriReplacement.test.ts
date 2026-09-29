@@ -105,16 +105,16 @@ describe('applyUriReplacement', () => {
 		})
 
 		it('applies HOST and PARAMS when PER-VARIANT-URIS is a string', () => {
-			// @ts-expect-error - a server value that is not an object
 			const bad = { ...replacement, 'PER-VARIANT-URIS': 'abc' }
+			// @ts-expect-error - a server value that is not an object
 			const uri = applyUriReplacement('sd/540.m3u8', bad, { baseUri, stableVariantId: '0' })
 
 			equal(uri, 'https://cdn-c.example.com/sd/540.m3u8?token=abc')
 		})
 
 		it('applies HOST and PARAMS when PER-VARIANT-URIS is an array', () => {
-			// @ts-expect-error - a server value that is not an object
 			const bad = { ...replacement, 'PER-VARIANT-URIS': ['https://cdn-d.example.com/x'] }
+			// @ts-expect-error - a server value that is not an object
 			const uri = applyUriReplacement('sd/540.m3u8', bad, { baseUri, stableVariantId: '0' })
 
 			equal(uri, 'https://cdn-c.example.com/sd/540.m3u8?token=abc')
