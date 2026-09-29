@@ -91,7 +91,7 @@
 </tr>
 <tr>
 <td><code>CLAIM_SIGNATURE_MISMATCH</code></td>
-<td><code>claim.signature.mismatch</code></td>
+<td><code>claimSignature.mismatch</code></td>
 <td>Claim signature verification failed, or the signature carries no certificate</td>
 </tr>
 <tr>
@@ -116,6 +116,7 @@
 </tr>
 </tbody>
 </table>
+<p>Versions 1.2.0 and earlier report <code>claim.signature.mismatch</code> for <code>CLAIM_SIGNATURE_MISMATCH</code>. That value does not match the C2PA specification. Compare codes with the <code>C2paStatusCode</code> constants, not with string literals.</p>
 <div class="tsd-alert tsd-alert-note"><div class="tsd-alert-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><use href="../assets/icons.svg#icon-alertNote"></use></svg><span>Note</span></div><p>
 <code>C2paStatusCode</code> values appear in <code>InitSegmentValidation.errorCodes</code> and <code>ManifestBoxValidationResult.errorCodes</code>, which check manifest integrity. They do not appear in <code>SegmentValidationResult.errorCodes</code>: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only <code>LiveVideoStatusCode</code>.</p>
 <p>For VOD Merkle streams, <code>InitSegmentValidation</code> extracts <code>merkleMaps</code> from the <code>c2pa.hash.bmff.v3</code> assertion and validates the <code>initHash</code> binding of each entry. <code>LiveVideoStatusCode.SESSIONKEY_INVALID</code> is not reported when <code>merkleMaps</code> is not empty, because VOD Merkle segments do not use session keys.</p>
