@@ -185,6 +185,23 @@ describe('createSteeringEngine', () => {
 			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-B%22&_HLS_throughput=1000')
 		})
 
+		it('encodes DASH pathway IDs that contain reserved characters', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['A&B', 'C=D,E'],
+				pathway: 'A&B',
+				requester,
+				getReportedPathways: () => ['A&B', 'C=D,E'],
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=%22A%26B,C%3DD%2CE%22')
+		})
+
 		it('lists the pathways of getReportedPathways for DASH', async () => {
 			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
 			const engine = createSteeringEngine({

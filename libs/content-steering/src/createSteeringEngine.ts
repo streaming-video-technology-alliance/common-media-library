@@ -495,7 +495,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return params
 		}
 
-		params[`${prefix}pathway`] = `"${list.join(',')}"`
+		params[`${prefix}pathway`] = `"${list.map(encodeURIComponent).join(',')}"`
 
 		const throughputs = list.map(throughputOf)
 
