@@ -80,6 +80,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	let session = 0
 	let generation = 0
 	let fallbackPriority = true
+	let manualPriority = false
 	let priority: readonly string[] = selected === undefined ? [] : fallbackList()
 	let manifestClones: readonly unknown[] = []
 	let known: ReadonlySet<string> = new Set(pathways)
@@ -181,6 +182,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			if (nextPriority !== undefined) {
 				priority = uniqueStrings(nextPriority)
 				fallbackPriority = false
+				manualPriority = true
 			}
 
 			if (nextUri !== undefined && nextUri !== configuredUri) {
@@ -293,7 +295,10 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				} else {
 					end()
 					report({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error })
-					fallback()
+
+					if (!manualPriority) {
+						fallback()
+					}
 				}
 			} else {
 				retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, cause: result.cause, message: result.error })
@@ -308,7 +313,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				end()
 				report({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410 for ${url}. No request follows.` })
 
-				if (!loaded) {
+				if (!loaded && !manualPriority) {
 					fallback()
 				}
 			}
@@ -335,6 +340,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		uri = reloadUri ?? uri
 		priority = list
 		fallbackPriority = false
+		manualPriority = false
 
 		const valid = setClones(clones, acceptsClone)
 

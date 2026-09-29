@@ -266,6 +266,23 @@ describe('createSteeringEngine responses', () => {
 
 			equal(engine.pathway, 'CDN-B')
 		})
+
+		it('keeps a priority list from update() when a 410 ends steering', async () => {
+			const { requester } = createStubRequester({ status: 410 })
+			const engine = createSteeringEngine({
+				protocol: 'hls',
+				uri: 'https://steering.example.com/a/manifest.json',
+				pathways: ['CDN-A', 'CDN-B', 'CDN-C'],
+				pathway: 'CDN-A',
+				requester,
+			})
+
+			engine.update({ priority: ['CDN-A', 'CDN-C', 'CDN-B'] })
+			await engine.start()
+			engine.stop()
+
+			deepEqual(engine.priority, ['CDN-A', 'CDN-C', 'CDN-B'])
+		})
 	})
 
 	describe('HTTP 429', () => {
