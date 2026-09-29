@@ -10,7 +10,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 2. **Tree-shakeability**: Adopters' final bundle size is what matters. Adopters must not receive code they do not import.
 3. **Developer experience**: Correct usage should be obvious. Incorrect usage should fail at compile time.
 4. **Documentation quality**: Adopters evaluate libraries by their docs before reading source code.
-5. **Minimal barriers to entry**: Zero config, no peer dependencies, copy-pasteable examples.
+5. **Minimal barriers to entry**: Zero config and copy-pasteable examples. Strive for no peer dependencies outside of CML.
 6. **Spec compliance**: Implementations must be accurate to the relevant specification. Do not invent extensions.
 
 ## Repo Setup
@@ -39,7 +39,7 @@ The Publish workflow uses npm trusted publishing. A trusted publisher is configu
 5. Run the Publish workflow. It publishes the other packages of the release and skips the new package, because npm already has that version.
 6. Create the GitHub release for the new package manually: `gh release create <package>-v<version> --target main --title "@svta/cml-<package> v<version>"`. Use the changelog section of the version as the notes.
 
-If the Publish workflow runs before steps 3 and 4, the run fails. This happened for c2pa 1.0.0 on 2026-04-15 and for error-codes 0.1.0 on 2026-09-08.
+If the Publish workflow runs before steps 3 and 4, the run fails.
 
 ## Developer Experience
 
