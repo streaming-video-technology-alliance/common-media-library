@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `validateCmcdStructure` accepts a `b` event without the `bg` key. CTA-5004-B defines that form as the exit from backgrounded mode. The validator reported an error on `bg`. The fix also applies to `validateCmcd`, `validateCmcdEvents`, and `validateCmcdEventReport`
+
 ## [2.7.0] - 2026-09-15
 
 ### Changed
