@@ -35,8 +35,12 @@ export type SteeringEngineConfig = {
 
 	/**
 	 * The penalty duration in milliseconds. The default is
-	 * `DEFAULT_PATHWAY_PENALTY` for HLS, and the TTL of the last valid
-	 * Steering Manifest for DASH.
+	 * `DEFAULT_PATHWAY_PENALTY` for HLS.
+	 *
+	 * For DASH, the default is the current TTL. Before the first valid
+	 * Steering Manifest, the current TTL is `DEFAULT_TTL`. After that, it is
+	 * the TTL of the last valid Steering Manifest. A 429 response with a
+	 * valid Retry-After value then sets it to that delay.
 	 */
 	penalty?: number;
 

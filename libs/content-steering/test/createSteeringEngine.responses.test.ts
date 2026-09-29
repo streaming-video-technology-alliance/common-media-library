@@ -312,6 +312,15 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].retryDelay, 120000)
 		})
 
+		it('uses the previous TTL for a Retry-After HTTP date in the past', async () => {
+			const { engine, errors } = setup('hls', { status: 429, headers: { 'retry-after': 'Sun, 06 Nov 1994 08:00:00 GMT' } })
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
+		})
+
 		it('uses the previous TTL without a valid Retry-After', async () => {
 			const { engine, errors } = setup('hls', { status: 429, headers: { 'retry-after': 'soon' } })
 
@@ -343,6 +352,34 @@ describe('createSteeringEngine responses', () => {
 
 			equal(errors[1].status, 500)
 			equal(errors[1].retryDelay, 5000)
+		})
+
+		it('ignores a Retry-After of 0 for DASH and keeps the previous TTL for retries and penalties', async () => {
+			const { engine, errors, requests } = setup('dash', manifestResponse(MANIFEST), { status: 429, headers: { 'retry-after': '0' } }, { status: 503 })
+
+			await engine.start()
+			equal(engine.pathway, 'CDN-B')
+
+			await advance(60000)
+			equal(errors[0].status, 429)
+			equal(errors[0].retryDelay, 60000)
+			equal(requests.length, 2)
+
+			await advance(60000)
+			equal(errors[1].status, 503)
+			equal(errors[1].retryDelay, 60000)
+			equal(requests.length, 3)
+
+			engine.penalize()
+			equal(engine.pathway, 'CDN-A')
+
+			await advance(59999)
+			equal(engine.pathway, 'CDN-A')
+
+			await advance(1)
+			engine.stop()
+
+			equal(engine.pathway, 'CDN-B')
 		})
 	})
 

@@ -6,7 +6,8 @@ const HTTP_DATE = /GMT$/
  *
  * @param value - The header value: a number of seconds or an HTTP date.
  * @param now - The current time, in milliseconds since the epoch.
- * @returns The delay in milliseconds, or `undefined` when the value is not valid.
+ * @returns The delay in milliseconds, or `undefined` when the value is not
+ * valid or the delay is not positive.
  *
  * @internal
  */
@@ -18,10 +19,16 @@ export function parseRetryAfter(value: string | undefined, now: number): number 
 	}
 
 	if (DELAY_SECONDS.test(text)) {
-		return Number(text) * 1000
+		const delay = Number(text) * 1000
+		return delay > 0 ? delay : undefined
 	}
 
 	const time = HTTP_DATE.test(text) ? Date.parse(text) : NaN
 
-	return Number.isNaN(time) ? undefined : Math.max(0, time - now)
+	if (Number.isNaN(time)) {
+		return undefined
+	}
+
+	const delay = time - now
+	return delay > 0 ? delay : undefined
 }
