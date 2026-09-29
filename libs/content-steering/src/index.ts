@@ -5,8 +5,9 @@
  *
  * @beta
  *
- * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-00 | Content Steering}
- * @see {@link https://www.etsi.org/deliver/etsi_ts/103900_103999/103998/01.01.01_60/ts_103998v010101p.pdf | ETSI TS 103 998 V1.1.1 (2024-04)}
+ * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-05 | Pathway-based Content Steering}
+ * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-22#section-7 | HTTP Live Streaming 2nd Edition, section 7}
+ * @see {@link https://www.etsi.org/deliver/etsi_ts/103900_103999/103998/01.01.01_60/ts_103998v010101p.pdf | ETSI TS 103 998 V1.1.1 (2024-01)}
  */
 export * from './applyUriReplacement.ts'
 export * from './createSteeringEngine.ts'
