@@ -12,26 +12,24 @@ and this project adheres to
 
 ### Fixed
 
-- `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH` now has the value `claimSignature.mismatch`, the identifier that the C2PA specification defines. The old value was `claim.signature.mismatch`. The constant name does not change ([#469](https://github.com/streaming-video-technology-alliance/common-media-library/issues/469)). If your code compares `errorCodes` with the string `claim.signature.mismatch`, compare with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH` instead. Also update logs, dashboards, and alert rules that store the old string.
+- `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH` now has the value `claimSignature.mismatch` from the C2PA specification ([#469](https://github.com/streaming-video-technology-alliance/common-media-library/issues/469)). The old value was `claim.signature.mismatch`. The constant name does not change. If your code compares `errorCodes` with the old value, compare with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH` instead. Also update logs, dashboards, and alert rules that store the old value.
 
 ## [1.2.0] - 2026-09-25
 
 ### Security
 
-- `validateC2paManifestBoxSegment` and `validateC2paInitSegment` no longer return `isValid: true` for a manifest without a verifiable claim signature. Before this fix, a manifest without a `c2pa.signature` box, or with a signature that carried no certificate, passed the signature check. An attacker who controlled the media bytes could forge provenance without a signing key. See [GHSA-h5r3-7p8g-g3q2](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/GHSA-h5r3-7p8g-g3q2). A manifest without a signature box now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`. A manifest without a claim box now fails with `C2paStatusCode.CLAIM_MISSING`.
+- `validateC2paManifestBoxSegment` and `validateC2paInitSegment` no longer return `isValid: true` for a manifest without a verifiable claim signature. An attacker who controlled the media bytes could forge provenance without a signing key. See [GHSA-h5r3-7p8g-g3q2](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/GHSA-h5r3-7p8g-g3q2). A manifest without a `c2pa.signature` box now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A manifest whose claim signature has no certificate now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`. A manifest without a claim box now fails with `C2paStatusCode.CLAIM_MISSING`.
 
 ### Added
 
 - `C2paStatusCode.CLAIM_SIGNATURE_MISSING` (`claimSignature.missing`) and `C2paStatusCode.CLAIM_MISSING` (`claim.missing`).
-- `ManifestBoxValidationResult.certificate`: the DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate. Adopters on the Manifest Box path can now compare the signer with their trust anchors ([#468](https://github.com/streaming-video-technology-alliance/common-media-library/issues/468)).
+- `ManifestBoxValidationResult.certificate`: the DER-encoded end-entity certificate from the claim signature ([#468](https://github.com/streaming-video-technology-alliance/common-media-library/issues/468)). The value is `null` when the claim signature is absent or has no certificate. You can now compare this certificate with your trust list.
 
 ### Changed
 
-- Validation guides and README: the library does not check the signing certificate against a trust list. Callers must check `isValid` before they use `merkleMaps`. See the new Signer Trust section of the Results and Error Codes guide.
-- README: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
-- Validation guides (Manifest Box, VOD Merkle, VSI/EMSG, and Results and Error Codes): the prose is rewritten for readers who do not read English as a first language. Merkle tree is defined at first use. The code examples and tables are unchanged.
-- README: the usage examples are complete. The segment URLs are function parameters.
-- Validation guides: empty table cells no longer use an em dash, and a code comment no longer uses an em dash.
+- Validation guides and README: the library does not compare the certificate from the claim signature with a trust list. Check `isValid` before you use `merkleMaps`. See the new Signer Trust section of the Results and Error Codes guide.
+- Validation guides and README: rewritten prose for readers who do not read English as a first language. The validation guides define the term Merkle tree at its first use. Empty table cells and a code comment in the validation guides no longer use an em dash.
+- README: the code examples are complete. The code examples take the segment URLs as function parameters.
 
 ## [1.1.3] - 2026-09-15
 
