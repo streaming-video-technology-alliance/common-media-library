@@ -86,6 +86,19 @@ describe('createSteeringEngine penalties', () => {
 		equal(engine.pathway, 'CDN-A')
 	})
 
+	it('uses a DASH penalty of at least 1 second for a TTL below 1 second', async () => {
+		const { engine } = await started({ protocol: 'dash' }, manifestResponse({ VERSION: 1, TTL: 0.001, 'PATHWAY-PRIORITY': PRIORITY }))
+
+		engine.penalize()
+		await advance(999)
+		equal(engine.pathway, 'CDN-B')
+
+		await advance(1)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+	})
+
 	it('uses the penalty of the configuration for both protocols', async () => {
 		const { engine } = await started({ penalty: 1000 }, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }))
 

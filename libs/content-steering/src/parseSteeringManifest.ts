@@ -56,7 +56,7 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 		return { error: `The Steering Manifest from ${uri} has VERSION ${String(manifest.VERSION)}. Only VERSION 1 is supported.`, version: true }
 	}
 
-	if (typeof manifest.TTL !== 'number' || !(manifest.TTL > 0)) {
+	if (typeof manifest.TTL !== 'number' || !Number.isFinite(manifest.TTL) || manifest.TTL <= 0) {
 		return { error: `The Steering Manifest from ${uri} has no positive TTL.`, version: false }
 	}
 

@@ -63,6 +63,19 @@ describe('createSteeringEngine responses', () => {
 			//#endregion example
 		})
 
+		it('waits at least 1 second before the next request for a TTL below 1 second', async () => {
+			const { engine, requests } = setup('hls', manifestResponse({ ...MANIFEST, TTL: 0.001 }), manifestResponse(MANIFEST))
+
+			await engine.start()
+
+			await advance(999)
+			equal(requests.length, 1)
+
+			await advance(1)
+			equal(requests.length, 2)
+			engine.stop()
+		})
+
 		it('accepts an empty PATHWAY-CLONES array', async () => {
 			const { engine, errors } = setup('hls', manifestResponse({ ...MANIFEST, 'PATHWAY-CLONES': [] }))
 
@@ -185,6 +198,17 @@ describe('createSteeringEngine responses', () => {
 
 		it('reports a parse error for a Steering Manifest without a positive TTL', async () => {
 			const { engine, errors } = setup('hls', manifestResponse({ ...MANIFEST, TTL: 0 }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].type, 'parse')
+			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
+		})
+
+		it('reports a parse error for a TTL too large to be finite', async () => {
+			const data = '{"VERSION":1,"TTL":1e400,"PATHWAY-PRIORITY":["CDN-B","CDN-A"]}'
+			const { engine, errors } = setup('hls', { status: 200, data })
 
 			await engine.start()
 			engine.stop()
@@ -336,6 +360,15 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
 		})
 
+		it('ignores a Retry-After with too many digits to be finite', async () => {
+			const { engine, errors } = setup('hls', { status: 429, headers: { 'retry-after': '9'.repeat(400) } })
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
+		})
+
 		it('uses the previous TTL without a valid Retry-After', async () => {
 			const { engine, errors } = setup('hls', { status: 429, headers: { 'retry-after': 'soon' } })
 
@@ -367,6 +400,18 @@ describe('createSteeringEngine responses', () => {
 
 			equal(errors[1].status, 500)
 			equal(errors[1].retryDelay, 5000)
+		})
+
+		it('does not change the TTL for DASH when the Retry-After has too many digits to be finite', async () => {
+			const { engine, errors } = setup('dash', manifestResponse(MANIFEST), { status: 429, headers: { 'retry-after': '9'.repeat(400) } }, { status: 500 })
+
+			await engine.start()
+			await advance(60000)
+			await advance(60000)
+			engine.stop()
+
+			equal(errors[1].status, 500)
+			equal(errors[1].retryDelay, 60000)
 		})
 
 		it('ignores a Retry-After of 0 for DASH and keeps the previous TTL for retries and penalties', async () => {

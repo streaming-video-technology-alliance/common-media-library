@@ -16,6 +16,7 @@ import { STEERING_PROTOCOL_DASH, STEERING_PROTOCOL_HLS } from './SteeringProtoco
 import { uniqueStrings } from './uniqueStrings.ts'
 
 const MAX_DELAY = 2147483647
+const MIN_TTL = 1
 
 type SteeringRequestError = Exclude<SteeringError, { type: typeof STEERING_ERROR_TYPE_CALLBACK }>
 
@@ -329,7 +330,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 		if (retryAfter !== undefined) {
 			if (isDash) {
-				ttl = retryAfter / 1000
+				ttl = Math.max(retryAfter / 1000, MIN_TTL)
 			}
 
 			retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 429 for ${url}.` }, retryAfter)
@@ -341,7 +342,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 	function apply(manifest: SteeringManifest, list: readonly string[], clones: readonly unknown[], reloadUri: string | undefined, responseUrl: string): void {
 		loaded = true
-		ttl = manifest.TTL
+		ttl = Math.max(manifest.TTL, MIN_TTL)
 		uri = reloadUri ?? uri
 		priority = list
 		fallbackPriority = false

@@ -20,7 +20,7 @@ export function parseRetryAfter(value: string | undefined, now: number): number 
 
 	if (DELAY_SECONDS.test(text)) {
 		const delay = Number(text) * 1000
-		return delay > 0 ? delay : undefined
+		return Number.isFinite(delay) && delay > 0 ? delay : undefined
 	}
 
 	const time = HTTP_DATE.test(text) ? Date.parse(text) : NaN
