@@ -393,7 +393,7 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 		const { result } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID)
 
 		strictEqual(result.isValid, false)
-		ok(result.errorCodes.includes('claimSignature.mismatch'))
+		ok(result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISMATCH))
 		deepStrictEqual(result.certificate, signer.certificateDER)
 	})
 })
