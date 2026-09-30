@@ -1,5 +1,5 @@
 import type { Cmcd, CmcdSession } from '@svta/cml-cmcd'
-import { createCmcdSession } from '@svta/cml-cmcd'
+import { createCmcdSession, decodeCmcd } from '@svta/cml-cmcd'
 import { SfItem } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, throws } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -154,6 +154,22 @@ describe('CmcdSession transforms', () => {
 		reporter.update({ sta: 'p', ts: 1, nor: ['seg1.m4s', { url: 'seg2.m4s', range: '0-99' }] })
 		await flushPromises()
 		deepEqual(mock.bodies(), ['e=ps,nor=("seg1.m4s" "seg2.m4s";r="0-99"),sid="s",sta=p,ts=1,v=2'])
+	})
+
+	it('keeps a decoded nor inner list with parameters through renormalization in v2 request mode', () => {
+		const { nor } = decodeCmcd('nor=("https://a.test/x/seg2.m4s";r="0-99");x') as Cmcd
+		const session = createCmcdSession({ sid: 's', keys: ['nor', 'sid'], transform: (data) => ({ ...data, nor }) })
+		const reporter = session.createReporter()
+		const req = reporter.decorate({ url: 'https://a.test/x/seg1.m4s' })
+		equal(queryValue(req.url), 'nor=("seg2.m4s";r="0-99"),sid="s",v=2')
+	})
+
+	it('keeps a decoded nor inner list with parameters through renormalization in v1 request mode', () => {
+		const { nor } = decodeCmcd('nor=("https://a.test/x/seg2.m4s";r="0-99");x') as Cmcd
+		const session = createCmcdSession({ sid: 's', version: 1, keys: ['nor', 'nrr', 'sid'], transform: (data) => ({ ...data, nor }) })
+		const reporter = session.createReporter()
+		const req = reporter.decorate({ url: 'https://a.test/x/seg1.m4s' })
+		equal(queryValue(req.url), 'nor="seg2.m4s",nrr="0-99",sid="s"')
 	})
 
 	it('assigns sn after the transform so a transform cannot set or remove it', async () => {
