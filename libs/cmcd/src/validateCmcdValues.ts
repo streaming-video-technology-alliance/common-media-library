@@ -12,14 +12,38 @@ import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
 import { toTokenString } from './toTokenString.ts'
 
-const HUNDRED_ROUNDING_KEYS = /* @__PURE__ */ new Set(['bl', 'dl', 'mtp', 'rtp', 'tbl'])
-const INTEGER_ROUNDING_KEYS = /* @__PURE__ */ new Set(['br', 'd', 'tb'])
+const HUNDRED_ROUNDING_UNITS: Record<string, string> = {
+	bl: 'ms',
+	dl: 'ms',
+	mtp: 'kbps',
+	rtp: 'kbps',
+	tbl: 'ms',
+}
 
 function isFiniteNumber(value: unknown): value is number {
 	return typeof value === 'number' && Number.isFinite(value)
 }
 
-function validateListValue(key: string, value: unknown, issues: CmcdValidationIssue[]): void {
+function isInteger(value: unknown): value is number {
+	return Number.isInteger(value)
+}
+
+// CTA-5004 Table 1 states every rounding rule with MUST. CTA-5004-B Table 1 uses SHOULD for bl and tbl.
+function validateRounding(key: string, value: number, version: number, issues: CmcdValidationIssue[], index?: number): void {
+	const unit = HUNDRED_ROUNDING_UNITS[key]
+	if (!unit || value % 100 === 0) {
+		return
+	}
+	const should = key === 'tbl' || (key === 'bl' && version !== CMCD_V1)
+	const target = index === undefined ? `Key "${key}"` : `Key "${key}" array element [${index}]`
+	issues.push({
+		key,
+		message: `${target} ${should ? 'should' : 'must'} be rounded to the nearest 100 ${unit}. Received ${value}.`,
+		severity: should ? CMCD_VALIDATION_SEVERITY_WARNING : CMCD_VALIDATION_SEVERITY_ERROR
+	})
+}
+
+function validateListValue(key: string, value: unknown, version: number, issues: CmcdValidationIssue[]): void {
 	if (!Array.isArray(value)) {
 		issues.push({
 			key,
@@ -29,22 +53,16 @@ function validateListValue(key: string, value: unknown, issues: CmcdValidationIs
 		return
 	}
 	for (let i = 0; i < value.length; i++) {
-		const element = value[i]
-		if (element instanceof SfItem) {
-			if (!isFiniteNumber(element.value)) {
-				issues.push({
-					key,
-					message: `Key "${key}" array element [${i}] must be a finite number.`,
-					severity: CMCD_VALIDATION_SEVERITY_ERROR
-				})
-			}
-		}
-		else if (!isFiniteNumber(element)) {
+		const element = value[i] instanceof SfItem ? value[i].value : value[i]
+		if (!isInteger(element)) {
 			issues.push({
 				key,
-				message: `Key "${key}" array element [${i}] must be a finite number.`,
+				message: `Key "${key}" array element [${i}] must be a finite integer.`,
 				severity: CMCD_VALIDATION_SEVERITY_ERROR
 			})
+		}
+		else {
+			validateRounding(key, element, version, issues, i)
 		}
 	}
 }
@@ -141,19 +159,15 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 
 		switch (expectedType) {
 			case CMCD_KEY_TYPE_INTEGER:
-				if (!isFiniteNumber(value) || !Number.isInteger(value)) {
+				if (!isInteger(value)) {
 					issues.push({
 						key,
 						message: `Key "${key}" must be a finite integer.`,
 						severity: CMCD_VALIDATION_SEVERITY_ERROR
 					})
 				}
-				else if (HUNDRED_ROUNDING_KEYS.has(key) && (value as number) % 100 !== 0) {
-					issues.push({
-						key,
-						message: `Key "${key}" should be rounded to the nearest 100.`,
-						severity: CMCD_VALIDATION_SEVERITY_WARNING
-					})
+				else {
+					validateRounding(key, value, version, issues)
 				}
 				break
 
@@ -163,20 +177,6 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 						key,
 						message: `Key "${key}" must be a finite number.`,
 						severity: CMCD_VALIDATION_SEVERITY_ERROR
-					})
-				}
-				else if (HUNDRED_ROUNDING_KEYS.has(key) && (value as number) % 100 !== 0) {
-					issues.push({
-						key,
-						message: `Key "${key}" should be rounded to the nearest 100.`,
-						severity: CMCD_VALIDATION_SEVERITY_WARNING
-					})
-				}
-				else if (INTEGER_ROUNDING_KEYS.has(key) && !Number.isInteger(value)) {
-					issues.push({
-						key,
-						message: `Key "${key}" should be rounded to an integer.`,
-						severity: CMCD_VALIDATION_SEVERITY_WARNING
 					})
 				}
 				break
@@ -222,7 +222,7 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 			}
 
 			case CMCD_KEY_TYPE_NUMBER_LIST:
-				validateListValue(key, value, issues)
+				validateListValue(key, value, version, issues)
 				break
 
 			case CMCD_KEY_TYPE_STRING_LIST:
