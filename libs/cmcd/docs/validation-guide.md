@@ -181,7 +181,8 @@ const v1Result = validateCmcd({ br: 5000, sid: "abc" }, { version: 1 });
 ### Version-Specific Behavior
 
 - **Key validation**: v2-only keys, such as `sta`, `ec`, and `ab`, are rejected when validating as v1
-- **Type validation**: Some keys have different types between versions. For example, `bl` is an integer in v1 but an inner list (array) in v2
+- **Type validation**: Some keys have different types between versions. For example, `bl` is an integer in v1 but an inner list (array) in v2. Each element of an inner list must be an integer
+- **Rounding**: `dl`, `mtp`, and `rtp` must be multiples of 100 in both versions. `bl` must be a multiple of 100 in v1. A value that violates one of these rules is an error. In v2, a `bl` or `tbl` value that is not a multiple of 100 produces a warning
 - **Version key**: v2 payloads must include the `v` key. v1 payloads should omit it
 - **Key conflicts**: In v2, `d` and `tpb` must match the object type in `ot`. `d` is allowed for `a`, `v`, `av`, `tt`, `c`, and `o`. `tpb` is allowed for `a`, `v`, `av`, and `c`. `ab`, `lab`, and `tab` must not appear together with `br`, `lb`, and `tb`. Each conflict is an error
 
@@ -207,7 +208,7 @@ const warnings = result.issues.filter(
 console.log(`Valid: ${result.valid}`);
 console.log(`Errors: ${errors.length}, Warnings: ${warnings.length}`);
 
-// bl=150 produces a warning (should be rounded to nearest 100)
+// bl=150 produces a warning (should be rounded to the nearest 100 ms)
 // but the payload is still valid
 ```
 

@@ -1,6 +1,6 @@
 import { validateCmcdValues } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
-import { equal, match } from 'node:assert'
+import { deepEqual, equal, match } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('validateCmcdValues', () => {
@@ -58,16 +58,63 @@ describe('validateCmcdValues', () => {
 		equal(result.valid, true)
 	})
 
-	it('warns when bl is not a multiple of 100 (v1)', () => {
+	it('reports error when bl is not a multiple of 100 (v1)', () => {
 		const result = validateCmcdValues({ bl: 150 })
-		equal(result.valid, true)
+		equal(result.valid, false)
 		equal(result.issues.length, 1)
 		equal(result.issues[0].key, 'bl')
-		equal(result.issues[0].severity, 'warning')
+		equal(result.issues[0].severity, 'error')
 	})
 
 	it('does not warn when bl is a multiple of 100 (v1)', () => {
 		const result = validateCmcdValues({ bl: 200 })
+		equal(result.valid, true)
+		equal(result.issues.length, 0)
+	})
+
+	it('reports error when dl, mtp, or rtp is not a multiple of 100 (v1)', () => {
+		const result = validateCmcdValues({ dl: 150, mtp: 150, rtp: 150 })
+		equal(result.valid, false)
+		deepEqual(result.issues.map(i => [i.key, i.severity]), [['dl', 'error'], ['mtp', 'error'], ['rtp', 'error']])
+	})
+
+	it('reports error with the unit and the received value when dl is not a multiple of 100 (v2)', () => {
+		const result = validateCmcdValues({ dl: 150, v: 2 })
+		equal(result.valid, false)
+		equal(result.issues.length, 1)
+		equal(result.issues[0].key, 'dl')
+		equal(result.issues[0].severity, 'error')
+		match(result.issues[0].message, /must be rounded to the nearest 100 ms/)
+		match(result.issues[0].message, /150/)
+	})
+
+	it('reports error when rtp is not a multiple of 100 (v2)', () => {
+		const result = validateCmcdValues({ rtp: 150, v: 2 })
+		equal(result.valid, false)
+		equal(result.issues.length, 1)
+		equal(result.issues[0].key, 'rtp')
+		equal(result.issues[0].severity, 'error')
+		match(result.issues[0].message, /nearest 100 kbps/)
+	})
+
+	it('reports error for each mtp element that is not a multiple of 100 (v2)', () => {
+		const result = validateCmcdValues({ mtp: [150, new SfItem(1200, { v: true }), new SfItem(250, { a: true })], v: 2 })
+		equal(result.valid, false)
+		deepEqual(result.issues.map(i => [i.key, i.severity]), [['mtp', 'error'], ['mtp', 'error']])
+		match(result.issues[0].message, /element \[0\] must be rounded to the nearest 100 kbps/)
+		match(result.issues[1].message, /element \[2\] must be rounded to the nearest 100 kbps/)
+	})
+
+	it('warns when bl or tbl is not a multiple of 100 (v2)', () => {
+		const result = validateCmcdValues({ bl: [150], tbl: [new SfItem(250, { v: true })], v: 2 })
+		equal(result.valid, true)
+		deepEqual(result.issues.map(i => [i.key, i.severity]), [['bl', 'warning'], ['tbl', 'warning']])
+		match(result.issues[0].message, /should be rounded to the nearest 100 ms/)
+		match(result.issues[1].message, /should be rounded to the nearest 100 ms/)
+	})
+
+	it('accepts list elements that are multiples of 100 (v2)', () => {
+		const result = validateCmcdValues({ bl: [21300, new SfItem(200, { a: true })], mtp: [48100], tbl: [new SfItem(30000, { v: true })], v: 2 })
 		equal(result.valid, true)
 		equal(result.issues.length, 0)
 	})
@@ -101,12 +148,27 @@ describe('validateCmcdValues', () => {
 		equal(result.valid, true)
 	})
 
-	it('warns when br is not an integer (v1)', () => {
+	it('reports error when br is not an integer (v1)', () => {
 		const result = validateCmcdValues({ br: 3000.5 })
-		equal(result.valid, true)
+		equal(result.valid, false)
 		equal(result.issues.length, 1)
 		equal(result.issues[0].key, 'br')
-		equal(result.issues[0].severity, 'warning')
+		equal(result.issues[0].severity, 'error')
+	})
+
+	it('reports error when tb is not an integer (v1)', () => {
+		const result = validateCmcdValues({ tb: 3000.5 })
+		equal(result.valid, false)
+		equal(result.issues.length, 1)
+		equal(result.issues[0].key, 'tb')
+		equal(result.issues[0].severity, 'error')
+	})
+
+	it('reports error for a list element that is not an integer (v2)', () => {
+		const result = validateCmcdValues({ br: [3000.5], lb: [new SfItem(1.5, { v: true })], v: 2 })
+		equal(result.valid, false)
+		deepEqual(result.issues.map(i => [i.key, i.severity]), [['br', 'error'], ['lb', 'error']])
+		match(result.issues[0].message, /element \[0\] must be a finite integer/)
 	})
 
 	it('reports error for custom key with non-string value', () => {
