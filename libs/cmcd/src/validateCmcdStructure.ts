@@ -3,7 +3,7 @@ import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
 import { CMCD_KEY_OBJECT_TYPES } from './CMCD_KEY_OBJECT_TYPES.ts'
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
-import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
@@ -116,8 +116,12 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 			}
 		}
 
-		// State-change events require their associated field
+		// State-change events require their associated field. CTA-5004-B defines
+		// a `b` event without `bg` as the exit from backgrounded mode.
 		for (const [stateEventType, requiredField] of CMCD_STATE_EVENT_FIELDS) {
+			if (stateEventType === CMCD_EVENT_BACKGROUNDED_MODE) {
+				continue
+			}
 			if (eventType === stateEventType && !(requiredField in data)) {
 				issues.push({
 					key: requiredField,

@@ -32,6 +32,23 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd({ tbl: [21349, toCmcdValue(8051, { a: true })] }), 'tbl=(21300 8100;a),v=2')
 	})
 
+	it('keeps the parameters of a formatted inner list and of its elements', () => {
+		for (const s of [
+			'bl=(21300;v 8100;a);p=2,v=2',
+			'br=(3000;v 128;a);p=2,v=2',
+			'mtp=(10000;v);p=2,v=2',
+			'tb=(6000;v 320;a);p=2,v=2',
+			'tbl=(21300;v 8100;a);p=2,v=2',
+		]) {
+			equal(encodeCmcd(decodeCmcd(s, { convertToLatest: true }) as Cmcd), s)
+		}
+	})
+
+	it('rounds the values inside an inner list with parameters', () => {
+		equal(encodeCmcd(decodeCmcd('tbl=(21349;v 8051;a);p=2,v=2', { convertToLatest: true }) as Cmcd), 'tbl=(21300;v 8100;a);p=2,v=2')
+		equal(encodeCmcd(decodeCmcd('br=(3000.4;v 128.6;a);p=2,v=2', { convertToLatest: true }) as Cmcd), 'br=(3000;v 129;a);p=2,v=2')
+	})
+
 	it('rounds the integer inner list keys to integers', () => {
 		const input = { bsa: [2.5], bsd: [toCmcdValue(1549.6, { v: true })], bsda: [3000.5], lb: [1234.5], pb: [2500.7], tpb: [8049.6] }
 		equal(encodeCmcd(input), 'bsa=(3),bsd=(1550;v),bsda=(3001),lb=(1235),pb=(2501),tpb=(8050),v=2')
@@ -48,11 +65,6 @@ describe('encodeCmcd', () => {
 	it('rounds the integer response keys to integers', () => {
 		const input = { e: CmcdEventType.RESPONSE_RECEIVED, rc: 404.4, ts: 1727712000000, ttfb: 12.3, ttfbb: 7.7, ttlb: 45.6, url: 'https://example.com/seg.m4s' }
 		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=rr,rc=404,ts=1727712000000,ttfb=12,ttfbb=8,ttlb=46,url="https://example.com/seg.m4s",v=2')
-	})
-
-	it('rounds each element of an inner list that has parameters', () => {
-		const input = decodeCmcd('bl=(2150 3049);p=2,br=(3000.4 6000.6);p=1', { useSymbol: false }) as Cmcd
-		equal(encodeCmcd(input), 'bl=(2200 3000);p=2,br=(3000 6001);p=1,v=2')
 	})
 
 	it('rounds a fractional ts instead of failing to serialize it', () => {

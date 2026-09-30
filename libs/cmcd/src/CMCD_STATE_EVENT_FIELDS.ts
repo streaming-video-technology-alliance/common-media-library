@@ -18,6 +18,10 @@ import type { CmcdKey } from './CmcdKey.ts'
  * (`prepareCmcdData`), deduplicate against its value (`CmcdReporter`), and
  * check its presence in payloads (`validateCmcdStructure`).
  *
+ * The `b` event is the exception for the presence check. CTA-5004-B defines
+ * a `b` event without `bg` as the exit from backgrounded mode.
+ * `validateCmcdStructure` therefore does not require `bg` on `b`.
+ *
  * Iteration order matters: `CmcdReporter.update()` records state-change
  * events in map order when several tracked fields change in one call.
  * Do not reorder entries without auditing reporter behavior.
