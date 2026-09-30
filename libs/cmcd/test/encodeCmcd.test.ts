@@ -1,5 +1,5 @@
 import type { Cmcd, CmcdEncodeOptions } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, decodeCmcd, encodeCmcd } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -30,6 +30,34 @@ describe('encodeCmcd', () => {
 
 	it('rounds tbl to the nearest 100 ms', () => {
 		equal(encodeCmcd({ tbl: [21349, toCmcdValue(8051, { a: true })] }), 'tbl=(21300 8100;a),v=2')
+	})
+
+	it('rounds the integer inner list keys to integers', () => {
+		const input = { bsa: [2.5], bsd: [toCmcdValue(1549.6, { v: true })], bsda: [3000.5], lb: [1234.5], pb: [2500.7], tpb: [8049.6] }
+		equal(encodeCmcd(input), 'bsa=(3),bsd=(1550;v),bsda=(3001),lb=(1235),pb=(2501),tpb=(8050),v=2')
+	})
+
+	it('rounds the aggregate bitrate keys to integers', () => {
+		equal(encodeCmcd({ ab: [4000.6], lab: [1500.5], tab: [6049.6] }), 'ab=(4001),lab=(1501),tab=(6050),v=2')
+	})
+
+	it('rounds the integer request keys to integers', () => {
+		equal(encodeCmcd({ dfa: 1.5, ltc: 3549.6, msd: 250.4, pt: 12345.6, sn: 3.2 }), 'dfa=2,ltc=3550,msd=250,pt=12346,sn=3,v=2')
+	})
+
+	it('rounds the integer response keys to integers', () => {
+		const input = { e: CmcdEventType.RESPONSE_RECEIVED, rc: 404.4, ts: 1727712000000, ttfb: 12.3, ttfbb: 7.7, ttlb: 45.6, url: 'https://example.com/seg.m4s' }
+		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=rr,rc=404,ts=1727712000000,ttfb=12,ttfbb=8,ttlb=46,url="https://example.com/seg.m4s",v=2')
+	})
+
+	it('rounds each element of an inner list that has parameters', () => {
+		const input = decodeCmcd('bl=(2150 3049);p=2,br=(3000.4 6000.6);p=1', { useSymbol: false }) as Cmcd
+		equal(encodeCmcd(input), 'bl=(2200 3000);p=2,br=(3000 6001);p=1,v=2')
+	})
+
+	it('rounds a fractional ts instead of failing to serialize it', () => {
+		const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, ts: 1727712000000.5 }
+		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=ps,sta=p,ts=1727712000001,v=2')
 	})
 
 	describe('version 1', () => {

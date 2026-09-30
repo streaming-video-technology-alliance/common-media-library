@@ -103,14 +103,18 @@ reporter.update({ bs: true }); // Buffer starvation occurred
 
 ### Value Formatting
 
-The CMCD specification requires certain keys to be formatted before transmission. `CmcdReporter` does this formatting, so always pass raw values in their base units. Do not round or truncate values yourself. For example, pass the exact buffer length in milliseconds:
+CTA-5004 and CTA-5004-B define every numeric key as an integer, except `pr`. `CmcdReporter` and the encoding functions, such as `encodeCmcd`, format each value before transmission. Pass raw values in their base units. Do not round or truncate values yourself. The table shows the formatting rules:
+
+| Keys                            | Formatting                     |
+| ------------------------------- | ------------------------------ |
+| `bl`, `dl`, `mtp`, `rtp`, `tbl` | Rounded to the nearest 100     |
+| `pr`                            | Not rounded                    |
+| Every other numeric key         | Rounded to the nearest integer |
+
+For example, pass the exact buffer length in milliseconds and the exact bitrate in kbps:
 
 ```typescript
-// Correct: pass the raw value, the reporter rounds to nearest 100
-reporter.update({ bl: [25432] }); // encoded as bl=(25400)
-
-// Incorrect: do not pre-round the value
-reporter.update({ bl: [25400] });
+reporter.update({ bl: [25432], br: [2500.7] }); // sent as bl=(25400) and br=(2501)
 ```
 
 ### Keys the Reporter Omits

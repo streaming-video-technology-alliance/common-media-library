@@ -1,8 +1,9 @@
 import type { CmcdV1 } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, prepareCmcdData, toCmcdValue } from '@svta/cml-cmcd'
-import { SfToken } from '@svta/cml-structured-field-values'
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
+import { CMCD_KEY_TYPE_INTEGER, CMCD_KEY_TYPE_NUMBER_LIST, CMCD_KEY_TYPES } from '../src/CMCD_KEY_TYPES.ts'
 
 describe('prepareCmcdData', () => {
 	it('provides a valid example', () => {
@@ -179,6 +180,20 @@ describe('prepareCmcdData', () => {
 			const data = prepareCmcdData({ sf: 'd', cid: 'content-id' })
 			ok((data['sf'] as unknown) instanceof SfToken)
 		})
+
+		for (const [key, type] of Object.entries(CMCD_KEY_TYPES)) {
+			// The encoder sets v from the version option.
+			if (key === 'v' || (type !== CMCD_KEY_TYPE_INTEGER && type !== CMCD_KEY_TYPE_NUMBER_LIST)) {
+				continue
+			}
+
+			it(`rounds ${key} to an integer`, () => {
+				const value = type === CMCD_KEY_TYPE_NUMBER_LIST ? [1234.5] : 1234.5
+				const data: Record<string, unknown> = prepareCmcdData({ e: CmcdEventType.RESPONSE_RECEIVED, [key]: value }, { reportingMode: CmcdReportingMode.EVENT })
+				const items = [data[key]].flat()
+				ok(items.every(item => Number.isInteger(item instanceof SfItem ? item.value : item)), `Key "${key}" is prepared as ${items}.`)
+			})
+		}
 	})
 
 	describe('custom keys', () => {

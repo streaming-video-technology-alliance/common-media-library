@@ -4,19 +4,19 @@ import type { CmcdFormatter } from './CmcdFormatter.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 
-const roundValue = (value: CmcdValue): number | SfItem<number> => {
-	if (value instanceof SfItem) {
-		return new SfItem(Math.round(value.value as number), value.params)
+const formatNumbers = (value: CmcdValue, format: (value: number) => number): ValueOrArray<number | SfItem<number>> => {
+	if (Array.isArray(value)) {
+		return value.map(item => formatNumbers(item, format) as number)
 	}
-	return Math.round(value as number)
+
+	if (value instanceof SfItem) {
+		return new SfItem(formatNumbers(value.value as CmcdValue, format), value.params)
+	}
+
+	return format(value as number)
 }
 
-const toRounded = (value: CmcdValue) => {
-	if (Array.isArray(value)) {
-		return value.map(roundValue)
-	}
-	return roundValue(value)
-}
+const toRounded = (value: CmcdValue) => formatNumbers(value, Math.round)
 
 const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string | SfItem<string>> => {
 	if (Array.isArray(value)) {
@@ -34,19 +34,9 @@ const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArra
 	}
 }
 
-const hundredValue = (value: CmcdValue): number | SfItem<number> => {
-	if (value instanceof SfItem) {
-		return new SfItem(Math.round((value.value as number) / 100) * 100, value.params)
-	}
-	return Math.round((value as number) / 100) * 100
-}
+const roundToHundred = (value: number): number => Math.round(value / 100) * 100
 
-const toHundred = (value: CmcdValue) => {
-	if (Array.isArray(value)) {
-		return value.map(hundredValue)
-	}
-	return hundredValue(value)
-}
+const toHundred = (value: CmcdValue) => formatNumbers(value, roundToHundred)
 
 const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
 	let norValue = value
@@ -113,4 +103,99 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter> = {
 	 * Target Buffer Length (milliseconds) rounded nearest 100ms
 	 */
 	tbl: toHundred,
+
+	/**
+	 * Aggregate Encoded Bitrate (kbps) rounded integer
+	 */
+	ab: toRounded,
+
+	/**
+	 * Buffer Starvation Absolute (count) rounded integer
+	 */
+	bsa: toRounded,
+
+	/**
+	 * Buffer Starvation Duration (milliseconds) rounded integer
+	 */
+	bsd: toRounded,
+
+	/**
+	 * Buffer Starvation Duration Absolute (milliseconds) rounded integer
+	 */
+	bsda: toRounded,
+
+	/**
+	 * Dropped Frames Absolute (count) rounded integer
+	 */
+	dfa: toRounded,
+
+	/**
+	 * Lowest Aggregated Encoded Bitrate (kbps) rounded integer
+	 */
+	lab: toRounded,
+
+	/**
+	 * Lowest Encoded Bitrate (kbps) rounded integer
+	 */
+	lb: toRounded,
+
+	/**
+	 * Live Stream Latency (milliseconds) rounded integer
+	 */
+	ltc: toRounded,
+
+	/**
+	 * Media Start Delay (milliseconds) rounded integer
+	 */
+	msd: toRounded,
+
+	/**
+	 * Playhead Bitrate (kbps) rounded integer
+	 */
+	pb: toRounded,
+
+	/**
+	 * Playhead Time (milliseconds) rounded integer
+	 */
+	pt: toRounded,
+
+	/**
+	 * Response Code rounded integer
+	 */
+	rc: toRounded,
+
+	/**
+	 * Sequence Number rounded integer
+	 */
+	sn: toRounded,
+
+	/**
+	 * Top Aggregated Encoded Bitrate (kbps) rounded integer
+	 */
+	tab: toRounded,
+
+	/**
+	 * Top Playable Bitrate (kbps) rounded integer
+	 */
+	tpb: toRounded,
+
+	/**
+	 * Timestamp (milliseconds) rounded integer
+	 */
+	ts: toRounded,
+
+	/**
+	 * Time To First Byte (milliseconds) rounded integer
+	 */
+	ttfb: toRounded,
+
+	/**
+	 * Time To First Body Byte (milliseconds) rounded integer
+	 */
+	ttfbb: toRounded,
+
+	/**
+	 * Time To Last Byte (milliseconds) rounded integer
+	 */
+	ttlb: toRounded,
 } as const
