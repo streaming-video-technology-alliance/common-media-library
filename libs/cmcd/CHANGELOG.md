@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Fixed
 
+- `validateCmcdStructure` accepts a `b` event without the `bg` key. CTA-5004-B defines that form as the exit from backgrounded mode. The validator reported an error on `bg`. The fix also applies to `validateCmcd`, `validateCmcdEvents`, and `validateCmcdEventReport`
 - `validateCmcdValues` reports an error when `dl`, `mtp`, or `rtp` is not a multiple of 100. In version 1, the same rule applies to `bl`. CTA-5004 and CTA-5004-B state these rounding rules with MUST. The validator reported a warning. A payload that passed with this warning now fails validation. The rounding messages include the unit and the received value
 - `validateCmcdValues` checks the rounding of each element of a version 2 inner list. An `mtp` element that was not a multiple of 100 passed with no issue. A `bl` or `tbl` element that is not a multiple of 100 produces a warning, because CTA-5004-B states these rules with SHOULD
 - `validateCmcdValues` reports an error when `br` or `tb` is not an integer in a version 1 payload. The same applies to each element of a version 2 inner list. Both specifications define these values as integers. The version 1 check reported a warning. The version 2 check did not exist
