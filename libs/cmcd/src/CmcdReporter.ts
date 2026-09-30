@@ -110,15 +110,6 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 	return true
 }
 
-/**
- * Equality for `bg` deduplication. `false` equals a value that the session
- * never reported, so `bg: false` before an entry fires no event. CTA-5004-B
- * defines a `b` event without `bg` as the exit from backgrounded mode.
- */
-function bgStateEqual(a: unknown, b: unknown): boolean {
-	return !a === !b
-}
-
 const equal = Object.is
 const identity = <T>(v: T): T => v
 
@@ -136,9 +127,6 @@ const STATE_FIELDS: readonly StateFieldEntry[] = /* @__PURE__ */ Array.from(
 				equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
 				snapshot: (v) => (v as CmcdObjectTypeList).slice(),
 			}
-		}
-		if (field === 'bg') {
-			return { event, field, equal: bgStateEqual, snapshot: identity }
 		}
 		return { event, field: field as StateField, equal, snapshot: identity }
 	},
@@ -424,7 +412,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			provenance: mintProvenance(sid, data.cid),
 			data,
 			msd: NaN,
-			lastEmitted: {},
+			// A session that does not start backgrounded has no exit to report.
+			// CTA-5004-B defines a `b` event without `bg` as the exit.
+			lastEmitted: data.bg === true ? {} : { bg: false },
 			eventTargets,
 			requestTarget: {
 				sn: 0,
@@ -545,13 +535,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * a new session therefore always fires, even when the persisted value did
 	 * not change across the `sid` boundary.
 	 *
-	 * The `bg` field is an exception. The reporter treats `bg: false` and a
-	 * value that the session never reported as the same state. `bg: false`
-	 * therefore fires `BACKGROUNDED_MODE` only after the session reported
-	 * `bg: true`. CTA-5004-B defines a `b` event without `bg` as the exit from
-	 * backgrounded mode, so the exit report does not carry `bg`. A target
-	 * transform can add `bg: false` to the exit report. The encoder writes that
-	 * value as `?0`.
+	 * The `bg` field is an exception. A session that does not start with
+	 * `bg: true` begins with `false` as its last reported `bg` value.
+	 * `bg: false` therefore fires `BACKGROUNDED_MODE` only if the session
+	 * started with `bg: true` or reported `bg: true`. CTA-5004-B defines a
+	 * `b` event without `bg` as the exit from backgrounded mode, so the exit
+	 * report does not carry `bg`. A target transform can add `bg: false` to
+	 * the exit report. The encoder writes that value as `?0`.
 	 *
 	 * Multi-field updates fire the events in this order: `sta`, `pr`, `cid`,
 	 * `bg`, `br`. The order of keys in the input object does not affect the
@@ -691,8 +681,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * 2. Discards the event if the state field has no value after that write
 	 *    (never set, or cleared with `update({ field: undefined })`).
 	 * 3. Suppresses the event if the field's current value equals the
-	 *    last reported value (no state transition). For `bg`, `false` also
-	 *    equals a value that the session never reported.
+	 *    last reported value (no state transition). {@link CmcdReporter.update}
+	 *    describes the `bg` value that a new session starts with.
 	 *
 	 * The reporter always records all other event types.
 	 *

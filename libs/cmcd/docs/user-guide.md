@@ -304,7 +304,7 @@ reporter.update({ br: [5000] });      // → fires BITRATE_CHANGE
 reporter.update({ sta: "p" }); // dropped (unchanged)
 ```
 
-A `BACKGROUNDED_MODE` report with `bg` is the entry to backgrounded mode. A report without `bg` is the exit, as CTA-5004-B defines it. If the session has not reported `bg: true`, `update({ bg: false })` fires no event.
+A `BACKGROUNDED_MODE` report with `bg` is the entry to backgrounded mode. A report without `bg` is the exit, as CTA-5004-B defines it. If the session has not reported `bg: true`, `update({ bg: false })` fires no event. The exception is a session that starts while `bg` is `true`, after a `sid` change.
 
 If a collector expects `bg=?0` on the exit, add `bg: false` to the exit report in the target's transform. The encoder writes that value as `?0`:
 

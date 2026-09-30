@@ -4631,6 +4631,52 @@ describe('CmcdReporter', () => {
 				equal(requests.length, 1)
 				equal(decodeCmcd((requests[0].body as string).trim())['bg'], true)
 			})
+
+			it('reports the exit in a session that starts with bg: true', async () => {
+				const { requester, requests } = createMockRequester()
+				const keys = ['bg', 'sid', 'v', 'e', 'ts', 'sn'] as CmcdKey[]
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: keys,
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.BACKGROUNDED_MODE, CmcdEventType.TIME_INTERVAL],
+						enabledKeys: keys,
+						batchSize: 1,
+					}],
+				}, requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ sid: 'session-2' })
+				reporter.recordEvent(CmcdEventType.TIME_INTERVAL)
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 3)
+				const interval = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(interval.sid, 'session-2')
+				equal(interval.bg, true)
+				const exit = decodeCmcd((requests[2].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				equal(exit.sid, 'session-2')
+				ok(!('bg' in exit))
+			})
+
+			it('re-fires BACKGROUNDED_MODE for bg: true after a sid change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ sid: 'session-2', bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				const entry = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(entry.sid, 'session-2')
+				equal(entry.bg, true)
+			})
 		})
 
 		describe('BITRATE_CHANGE', () => {
