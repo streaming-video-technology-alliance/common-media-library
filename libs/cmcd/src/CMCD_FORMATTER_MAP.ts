@@ -37,7 +37,7 @@ const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArra
 		return value.map(item => toUrlSafe(item, options) as string)
 	}
 
-	if (value instanceof SfItem && typeof value.value === 'string') {
+	if (value instanceof SfItem && (typeof value.value === 'string' || Array.isArray(value.value))) {
 		return new SfItem(toUrlSafe(value.value, options), value.params)
 	}
 	else {

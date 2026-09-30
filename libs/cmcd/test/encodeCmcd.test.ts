@@ -284,6 +284,24 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input, options), 'nor="bbb_30fps_480x270_600k_2.m4v"')
 	})
 
+	it('converts a nor inner list with parameters to relative paths when baseUrl is provided', () => {
+		const input = decodeCmcd('nor=("http://test.com/base/segments/video/1.mp4";r="0-99" "http://test.com/base/segments/video/2.mp4");x') as Cmcd
+		const options: CmcdEncodeOptions = {
+			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
+		}
+		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4";r="0-99" "../segments/video/2.mp4");x,v=2')
+	})
+
+	it('converts a nor SfItem to a relative path when baseUrl is provided', () => {
+		const input = {
+			nor: toCmcdValue('http://test.com/base/segments/video/1.mp4', { r: '0-99' }),
+		} as unknown as Cmcd
+		const options: CmcdEncodeOptions = {
+			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
+		}
+		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4";r="0-99"),v=2')
+	})
+
 	describe('reporting modes', () => {
 		it('defaults to request mode', () => {
 			equal(encodeCmcd(CMCD_INPUT), CMCD_STRING_REQUEST)
