@@ -242,6 +242,13 @@ describe('prepareCmcdData', () => {
 			equal((data as CmcdV1)['nrr'], '0-99')
 			equal(data['com.example-hello'], 'world')
 		})
+
+		it('selects the inner-list item by the object type after formatting', () => {
+			const kept = prepareCmcdData({ ot: 'video', br: [toCmcdValue(5000, { v: true })] }, { version: 1, formatters: { ot: () => 'v' } })
+			equal(kept['br'], 5000)
+			const dropped = prepareCmcdData({ ot: 'v', br: [toCmcdValue(5000, { v: true })] }, { version: 1, formatters: { ot: () => 'm' } })
+			ok(!('br' in dropped))
+		})
 	})
 
 	describe('specification constraints', () => {
