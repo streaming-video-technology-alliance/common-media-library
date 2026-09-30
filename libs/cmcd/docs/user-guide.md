@@ -179,6 +179,9 @@ reporter.update({
 // This encodes to: br=(5000;v 3000;a)
 ```
 
+> [!NOTE]
+> CMCD version 1 has one number for each of these keys. For version 1, the reporter sends the value that has the object type (`ot`) of the request. It uses a value without an object type for every `ot`. If no value matches, it omits the key. For example, the list above gives `br=3000` for an audio request and no `br` for a manifest request.
+
 ### Absolute URLs for `nor`
 
 The CMCD specification defines `nor` (next object request) as a path relative to the current request URL. `CmcdReporter` also accepts absolute URLs and converts them. It emits same-origin URLs as relative paths. It passes cross-origin values, and values that are already relative, through unchanged.

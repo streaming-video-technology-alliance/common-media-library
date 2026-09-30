@@ -336,14 +336,34 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(input, { version: 1 }), 'br=5000,mtp=10000')
 		})
 
+		it('selects the item whose object type flag matches ot for V1', () => {
+			equal(encodeCmcd(decodeCmcd('bl=(0;v 2000;a),br=(5000;v 320;a),ot=a') as Cmcd, { version: 1 }), 'bl=2000,br=320,ot=a')
+			equal(encodeCmcd(decodeCmcd('bl=(0;v 2000;a),br=(5000;v 320;a),ot=v') as Cmcd, { version: 1 }), 'bl=0,br=5000,ot=v')
+		})
+
+		it('selects an item without an object type flag when no flag matches ot for V1', () => {
+			equal(encodeCmcd(decodeCmcd('mtp=(6000;a 15000),ot=v') as Cmcd, { version: 1 }), 'mtp=15000,ot=v')
+			equal(encodeCmcd({ mtp: [toCmcdValue(6000, { a: true }), toCmcdValue(15000, {})], ot: 'v' } as unknown as Cmcd, { version: 1 }), 'mtp=15000,ot=v')
+		})
+
+		it('prefers a matching object type flag over an item without a flag for V1', () => {
+			equal(encodeCmcd(decodeCmcd('mtp=(15000 6000;a),ot=a') as Cmcd, { version: 1 }), 'mtp=6000,ot=a')
+		})
+
+		it('omits an inner-list key when no item matches ot for V1', () => {
+			equal(encodeCmcd(decodeCmcd('br=(5000;v 320;a),ot=m') as Cmcd, { version: 1 }), 'ot=m')
+			equal(encodeCmcd(decodeCmcd('br=(5000;v 320;a),ot=av') as Cmcd, { version: 1 }), 'ot=av')
+			equal(encodeCmcd(decodeCmcd('br=(5000;v 320;a),sid="s"') as Cmcd, { version: 1 }), 'sid="s"')
+		})
+
 		it('unwraps inner lists with parameters to plain scalars for V1', () => {
 			const input = decodeCmcd('bl=(2100 3200);p=2,br=(3000 6000);p=2,mtp=(25400 1200);p=1,tb=(6000 128);x') as Cmcd
 			equal(encodeCmcd(input, { version: 1 }), 'bl=2100,br=3000,mtp=25400,tb=6000')
 		})
 
-		it('matches the ot param of an item in an inner list with parameters for V1', () => {
+		it('matches the object type flag of an item in an inner list with parameters for V1', () => {
 			const input = {
-				br: new SfItem([toCmcdValue(3000, { ot: Symbol.for('a') }), toCmcdValue(6000, { ot: Symbol.for('v') })], { p: 2 }),
+				br: new SfItem([toCmcdValue(3000, { a: true }), toCmcdValue(6000, { v: true })], { p: 2 }),
 				ot: new SfToken('v'),
 			} as unknown as Cmcd
 			equal(encodeCmcd(input, { version: 1 }), 'br=6000,ot=v')
@@ -429,9 +449,9 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=pr,pr=1,ts=1000,v=2')
 		})
 
-		it('matches the ot param of an inner-list item by token text in V1 down-conversion', () => {
+		it('matches the object type flag of an inner-list item by token text in V1 down-conversion', () => {
 			const input = {
-				br: [toCmcdValue(3000, { ot: Symbol.for('a') }), toCmcdValue(6000, { ot: Symbol.for('v') })],
+				br: [toCmcdValue(3000, { a: true }), toCmcdValue(6000, { v: true })],
 				ot: new SfToken('v'),
 			} as unknown as Cmcd
 			equal(encodeCmcd(input, { version: 1 }), 'br=6000,ot=v')

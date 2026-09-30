@@ -26,30 +26,50 @@ const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
 	request: isCmcdRequestKey,
 }
 
+function hasParams(params: object | undefined): boolean {
+	for (const _ in params) {
+		return true
+	}
+
+	return false
+}
+
 /**
  * Unwrap an inner list or SfItem value to a scalar.
+ *
+ * The scalar is the value of the item with the object type flag of `ot`
+ * (CTA-5004-B section 4.1, item 14). Without that item, it is the value
+ * of the first item without parameters. Otherwise it is `undefined`.
  */
-function unwrapValue(value: any, ot?: unknown): any {
+function unwrapValue(value: unknown, ot: string | undefined): unknown {
 	if (value instanceof SfItem) {
 		value = value.value
 	}
 
-	if (Array.isArray(value)) {
-		let item: any
-
-		const otText = toTokenString(ot)
-		if (otText) {
-			item = value.find(item => toTokenString(item.params?.ot) === otText)
-		}
-
-		if (!item) {
-			item = value[0]
-		}
-
-		return unwrapValue(item)
+	if (!Array.isArray(value)) {
+		return value
 	}
 
-	return value
+	let fallback: unknown
+
+	for (const item of value) {
+		if (!(item instanceof SfItem)) {
+			if (fallback === undefined) {
+				fallback = item
+			}
+			continue
+		}
+
+		if (ot && item.params?.[ot] === true) {
+			return item.value
+		}
+
+		if (fallback === undefined && !hasParams(item.params)) {
+			fallback = item.value
+		}
+	}
+
+	return fallback
 }
 
 /**
@@ -60,6 +80,7 @@ function unwrapValue(value: any, ot?: unknown): any {
  */
 function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 	const result: Record<string, any> = {}
+	const ot = toTokenString(obj['ot'])
 
 	for (const [key, value] of Object.entries(obj)) {
 		if (value == null) {
@@ -82,7 +103,7 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 			}
 		}
 		else if (CMCD_INNER_LIST_KEYS.has(key)) {
-			result[key] = unwrapValue(value, obj['ot'])
+			result[key] = unwrapValue(value, ot)
 		}
 		else {
 			result[key] = value
