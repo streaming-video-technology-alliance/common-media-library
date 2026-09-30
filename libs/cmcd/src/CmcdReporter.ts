@@ -145,9 +145,9 @@ function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
 }
 
 /**
- * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
- * Built from the state-change table plus the three event types whose
- * required key is event data, not player state.
+ * Maps each event type to the key that a report of that type must keep,
+ * beyond `e` and `ts`. Built from the state-change table plus the three
+ * event types whose required key is event data, not player state.
  */
 const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
 
@@ -692,7 +692,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *    data store, as `update()` would.
 	 * 2. Discards the event if the state field has no value after that write
 	 *    (never set, or cleared with `update({ field: undefined })`).
-	 *    A state-change event without its required field would violate CTA-5004-B.
 	 * 3. Suppresses the event if the field's current value equals the
 	 *    last reported value (no state transition).
 	 *
@@ -749,9 +748,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 			const current = session.data[field]
 
-			// Never emit a state-change event with a missing required field. Per
-			// CTA-5004-B these events must include their state field. Catches both
-			// "no value ever set" and "previous value was cleared to undefined".
+			// Never emit a state-change event without its state field. Catches
+			// both "no value ever set" and "previous value was cleared to undefined".
 			if (current === undefined) {
 				return
 			}

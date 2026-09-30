@@ -266,7 +266,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		// change event. The wire must carry `?0` per CTA-5004-B so the transition is
 		// reportable. `bg` is the only state-change required field typed as boolean.
 		// `false` on other required fields (for example `cid`, `sta`) is a caller bug and
-		// stays stripped so the validator flags it.
+		// stays stripped.
 		const isBgFalseTransition = isEventMode
 			&& value === false
 			&& key === 'bg'
