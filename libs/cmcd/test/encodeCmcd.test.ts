@@ -1,5 +1,5 @@
 import type { Cmcd, CmcdEncodeOptions } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, decodeCmcd, encodeCmcd } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -26,6 +26,76 @@ describe('encodeCmcd', () => {
 	it('ignore invalid values', () => {
 		// @ts-expect-error - This is a test
 		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), 'v=2')
+	})
+
+	it('rounds tbl to the nearest 100 ms', () => {
+		equal(encodeCmcd({ tbl: [21349, toCmcdValue(8051, { a: true })] }), 'tbl=(21300 8100;a),v=2')
+	})
+
+	it('keeps the parameters of a formatted inner list and of its elements', () => {
+		for (const s of [
+			'bl=(21300;v 8100;a);p=2,v=2',
+			'br=(3000;v 128;a);p=2,v=2',
+			'mtp=(10000;v);p=2,v=2',
+			'tb=(6000;v 320;a);p=2,v=2',
+			'tbl=(21300;v 8100;a);p=2,v=2',
+		]) {
+			equal(encodeCmcd(decodeCmcd(s, { convertToLatest: true }) as Cmcd), s)
+		}
+	})
+
+	it('rounds the values inside an inner list with parameters', () => {
+		equal(encodeCmcd(decodeCmcd('tbl=(21349;v 8051;a);p=2,v=2', { convertToLatest: true }) as Cmcd), 'tbl=(21300;v 8100;a);p=2,v=2')
+		equal(encodeCmcd(decodeCmcd('br=(3000.4;v 128.6;a);p=2,v=2', { convertToLatest: true }) as Cmcd), 'br=(3000;v 129;a);p=2,v=2')
+	})
+
+	it('rounds the integer inner list keys to integers', () => {
+		const input = { bsa: [2.5], bsd: [toCmcdValue(1549.6, { v: true })], bsda: [3000.5], lb: [1234.5], pb: [2500.7], tpb: [8049.6] }
+		equal(encodeCmcd(input), 'bsa=(3),bsd=(1550;v),bsda=(3001),lb=(1235),pb=(2501),tpb=(8050),v=2')
+	})
+
+	it('rounds the aggregate bitrate keys to integers', () => {
+		equal(encodeCmcd({ ab: [4000.6], lab: [1500.5], tab: [6049.6] }), 'ab=(4001),lab=(1501),tab=(6050),v=2')
+	})
+
+	it('rounds the integer request keys to integers', () => {
+		equal(encodeCmcd({ dfa: 1.5, ltc: 3549.6, msd: 250.4, pt: 12345.6, sn: 3.2 }), 'dfa=2,ltc=3550,msd=250,pt=12346,sn=3,v=2')
+	})
+
+	it('rounds the integer response keys to integers', () => {
+		const input = { e: CmcdEventType.RESPONSE_RECEIVED, rc: 404.4, ts: 1727712000000, ttfb: 12.3, ttfbb: 7.7, ttlb: 45.6, url: 'https://example.com/seg.m4s' }
+		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=rr,rc=404,ts=1727712000000,ttfb=12,ttfbb=8,ttlb=46,url="https://example.com/seg.m4s",v=2')
+	})
+
+	it('rounds a fractional ts instead of failing to serialize it', () => {
+		const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, ts: 1727712000000.5 }
+		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=ps,sta=p,ts=1727712000001,v=2')
+	})
+
+	it('drops an inner list element that is not a finite number', () => {
+		const input = { pb: [2500.4, null, 'abc', Infinity, toCmcdValue('x', { v: true }), toCmcdValue(1000.6, { a: true })] } as unknown as Cmcd
+		equal(encodeCmcd(input), 'pb=(2500 1001;a),v=2')
+	})
+
+	it('omits an inner list key when no element is a finite number', () => {
+		const input = { bl: [NaN], pb: ['abc'], tb: [null] } as unknown as Cmcd
+		equal(encodeCmcd(input), 'v=2')
+	})
+
+	it('drops an element that is not a number from an inner list that has parameters', () => {
+		const input = decodeCmcd('pb=(2500 "abc");p=2,tb=("x");p=1', { useSymbol: false }) as Cmcd
+		equal(encodeCmcd(input), 'pb=(2500);p=2,v=2')
+	})
+
+	it('omits a numeric key when the value is not a number', () => {
+		const input = { d: '4000', dfa: true, pr: 'abc', pt: '123' } as unknown as Cmcd
+		equal(encodeCmcd(input), 'v=2')
+	})
+
+	it('replaces a ts that is not a number with the current time', (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, ts: '1727712000000' } as unknown as Cmcd
+		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=ps,sta=p,ts=1234,v=2')
 	})
 
 	describe('version 1', () => {
@@ -214,6 +284,24 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input, options), 'nor="bbb_30fps_480x270_600k_2.m4v"')
 	})
 
+	it('converts a nor inner list with parameters to relative paths when baseUrl is provided', () => {
+		const input = decodeCmcd('nor=("http://test.com/base/segments/video/1.mp4";r="0-99" "http://test.com/base/segments/video/2.mp4");x') as Cmcd
+		const options: CmcdEncodeOptions = {
+			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
+		}
+		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4";r="0-99" "../segments/video/2.mp4");x,v=2')
+	})
+
+	it('converts a nor SfItem to a relative path when baseUrl is provided', () => {
+		const input = {
+			nor: toCmcdValue('http://test.com/base/segments/video/1.mp4', { r: '0-99' }),
+		} as unknown as Cmcd
+		const options: CmcdEncodeOptions = {
+			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
+		}
+		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4";r="0-99"),v=2')
+	})
+
 	describe('reporting modes', () => {
 		it('defaults to request mode', () => {
 			equal(encodeCmcd(CMCD_INPUT), CMCD_STRING_REQUEST)
@@ -266,9 +354,47 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(input, { version: 1 }), 'br=5000,mtp=10000')
 		})
 
+		it('selects the item whose object type flag matches ot for V1', () => {
+			equal(encodeCmcd(decodeCmcd('bl=(0;v 2000;a),br=(5000;v 320;a),ot=a') as Cmcd, { version: 1 }), 'bl=2000,br=320,ot=a')
+			equal(encodeCmcd(decodeCmcd('bl=(0;v 2000;a),br=(5000;v 320;a),ot=v') as Cmcd, { version: 1 }), 'bl=0,br=5000,ot=v')
+		})
+
+		it('selects an item without an object type flag when no flag matches ot for V1', () => {
+			equal(encodeCmcd(decodeCmcd('mtp=(6000;a 15000),ot=v') as Cmcd, { version: 1 }), 'mtp=15000,ot=v')
+			equal(encodeCmcd({ mtp: [toCmcdValue(6000, { a: true }), toCmcdValue(15000, {})], ot: 'v' } as unknown as Cmcd, { version: 1 }), 'mtp=15000,ot=v')
+		})
+
+		it('prefers a matching object type flag over an item without a flag for V1', () => {
+			equal(encodeCmcd(decodeCmcd('mtp=(15000 6000;a),ot=a') as Cmcd, { version: 1 }), 'mtp=6000,ot=a')
+		})
+
+		it('omits an inner-list key when no item matches ot for V1', () => {
+			equal(encodeCmcd(decodeCmcd('br=(5000;v 320;a),ot=m') as Cmcd, { version: 1 }), 'ot=m')
+			equal(encodeCmcd(decodeCmcd('br=(5000;v 320;a),ot=av') as Cmcd, { version: 1 }), 'ot=av')
+			equal(encodeCmcd(decodeCmcd('br=(5000;v 320;a),sid="s"') as Cmcd, { version: 1 }), 'sid="s"')
+		})
+
+		it('unwraps inner lists with parameters to plain scalars for V1', () => {
+			const input = decodeCmcd('bl=(2100 3200);p=2,br=(3000 6000);p=2,mtp=(25400 1200);p=1,tb=(6000 128);x') as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'bl=2100,br=3000,mtp=25400,tb=6000')
+		})
+
+		it('matches the object type flag of an item in an inner list with parameters for V1', () => {
+			const input = {
+				br: new SfItem([toCmcdValue(3000, { a: true }), toCmcdValue(6000, { v: true })], { p: 2 }),
+				ot: new SfToken('v'),
+			} as unknown as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'br=6000,ot=v')
+		})
+
 		it('preserves plain nor string in V1', () => {
 			const input = { nor: ['../testing/3.m4v'] }
 			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v"')
+		})
+
+		it('extracts nrr from the first item of a nor inner list with parameters for V1', () => {
+			const input = decodeCmcd('nor=("../testing/3.m4v";r="0-99" "../testing/4.m4v");x') as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v",nrr="0-99"')
 		})
 	})
 
@@ -341,9 +467,9 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=pr,pr=1,ts=1000,v=2')
 		})
 
-		it('matches the ot param of an inner-list item by token text in V1 down-conversion', () => {
+		it('matches the object type flag of an inner-list item by token text in V1 down-conversion', () => {
 			const input = {
-				br: [toCmcdValue(3000, { ot: Symbol.for('a') }), toCmcdValue(6000, { ot: Symbol.for('v') })],
+				br: [toCmcdValue(3000, { a: true }), toCmcdValue(6000, { v: true })],
 				ot: new SfToken('v'),
 			} as unknown as Cmcd
 			equal(encodeCmcd(input, { version: 1 }), 'br=6000,ot=v')

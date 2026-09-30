@@ -3,27 +3,41 @@ import { getBaseUrl, urlToRelativePath, type ValueOrArray } from '@svta/cml-util
 import type { CmcdFormatter } from './CmcdFormatter.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdValue } from './CmcdValue.ts'
+import { isValid } from './isValid.ts'
 
-const roundValue = (value: CmcdValue): number | SfItem<number> => {
-	if (value instanceof SfItem) {
-		return new SfItem(Math.round(value.value as number), value.params)
-	}
-	return Math.round(value as number)
-}
-
-const toRounded = (value: CmcdValue) => {
+const formatNumbers = (value: CmcdValue, format: (value: number) => number): ValueOrArray<number | SfItem<number>> => {
 	if (Array.isArray(value)) {
-		return value.map(roundValue)
+		const list: (number | SfItem<number>)[] = []
+
+		for (const item of value) {
+			const formatted = formatNumbers(item, format) as number | SfItem<number>
+
+			if (Number.isFinite(formatted instanceof SfItem ? formatted.value : formatted)) {
+				list.push(formatted)
+			}
+		}
+
+		return list
 	}
-	return roundValue(value)
+
+	if (value instanceof SfItem) {
+		const formatted = formatNumbers(value.value as CmcdValue, format)
+		return isValid(formatted) ? new SfItem(formatted, value.params) : NaN
+	}
+
+	return typeof value === 'number' ? format(value) : NaN
 }
+
+const toRounded = (value: CmcdValue) => formatNumbers(value, Math.round)
+
+const toNumber = (value: CmcdValue) => formatNumbers(value, Number)
 
 const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string | SfItem<string>> => {
 	if (Array.isArray(value)) {
 		return value.map(item => toUrlSafe(item, options) as string)
 	}
 
-	if (value instanceof SfItem && typeof value.value === 'string') {
+	if (value instanceof SfItem && (typeof value.value === 'string' || Array.isArray(value.value))) {
 		return new SfItem(toUrlSafe(value.value, options), value.params)
 	}
 	else {
@@ -34,19 +48,9 @@ const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArra
 	}
 }
 
-const hundredValue = (value: CmcdValue): number | SfItem<number> => {
-	if (value instanceof SfItem) {
-		return new SfItem(Math.round((value.value as number) / 100) * 100, value.params)
-	}
-	return Math.round((value as number) / 100) * 100
-}
+const roundToHundred = (value: number): number => Math.round(value / 100) * 100
 
-const toHundred = (value: CmcdValue) => {
-	if (Array.isArray(value)) {
-		return value.map(hundredValue)
-	}
-	return hundredValue(value)
-}
+const toHundred = (value: CmcdValue) => formatNumbers(value, roundToHundred)
 
 const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
 	let norValue = value
@@ -65,6 +69,8 @@ const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
 
 /**
  * The default formatters for CMCD values.
+ *
+ * The formatter of a numeric key drops a value or a list element that is not a finite number.
  *
  * @public
  */
@@ -108,4 +114,109 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter> = {
 	 * Top Bitrate (kbps) rounded integer
 	 */
 	tb: toRounded,
+
+	/**
+	 * Target Buffer Length (milliseconds) rounded nearest 100ms
+	 */
+	tbl: toHundred,
+
+	/**
+	 * Aggregate Encoded Bitrate (kbps) rounded integer
+	 */
+	ab: toRounded,
+
+	/**
+	 * Buffer Starvation Absolute (count) rounded integer
+	 */
+	bsa: toRounded,
+
+	/**
+	 * Buffer Starvation Duration (milliseconds) rounded integer
+	 */
+	bsd: toRounded,
+
+	/**
+	 * Buffer Starvation Duration Absolute (milliseconds) rounded integer
+	 */
+	bsda: toRounded,
+
+	/**
+	 * Dropped Frames Absolute (count) rounded integer
+	 */
+	dfa: toRounded,
+
+	/**
+	 * Lowest Aggregated Encoded Bitrate (kbps) rounded integer
+	 */
+	lab: toRounded,
+
+	/**
+	 * Lowest Encoded Bitrate (kbps) rounded integer
+	 */
+	lb: toRounded,
+
+	/**
+	 * Live Stream Latency (milliseconds) rounded integer
+	 */
+	ltc: toRounded,
+
+	/**
+	 * Media Start Delay (milliseconds) rounded integer
+	 */
+	msd: toRounded,
+
+	/**
+	 * Playhead Bitrate (kbps) rounded integer
+	 */
+	pb: toRounded,
+
+	/**
+	 * Playback Rate decimal, not rounded
+	 */
+	pr: toNumber,
+
+	/**
+	 * Playhead Time (milliseconds) rounded integer
+	 */
+	pt: toRounded,
+
+	/**
+	 * Response Code rounded integer
+	 */
+	rc: toRounded,
+
+	/**
+	 * Sequence Number rounded integer
+	 */
+	sn: toRounded,
+
+	/**
+	 * Top Aggregated Encoded Bitrate (kbps) rounded integer
+	 */
+	tab: toRounded,
+
+	/**
+	 * Top Playable Bitrate (kbps) rounded integer
+	 */
+	tpb: toRounded,
+
+	/**
+	 * Timestamp (milliseconds) rounded integer
+	 */
+	ts: toRounded,
+
+	/**
+	 * Time To First Byte (milliseconds) rounded integer
+	 */
+	ttfb: toRounded,
+
+	/**
+	 * Time To First Body Byte (milliseconds) rounded integer
+	 */
+	ttfbb: toRounded,
+
+	/**
+	 * Time To Last Byte (milliseconds) rounded integer
+	 */
+	ttlb: toRounded,
 } as const

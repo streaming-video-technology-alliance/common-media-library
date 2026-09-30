@@ -2954,6 +2954,17 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string)?.includes('ts='))
 		})
 
+		it('rounds a fractional ts instead of throwing', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', ts: 1727712000000.5 })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string)?.includes('ts=1727712000001'))
+		})
+
 		it('increments sequence number for each event', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)

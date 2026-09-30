@@ -26,39 +26,59 @@ const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
 	request: isCmcdRequestKey,
 }
 
+function hasParams(params: object | undefined): boolean {
+	for (const _ in params) {
+		return true
+	}
+
+	return false
+}
+
 /**
  * Unwrap an inner list or SfItem value to a scalar.
+ *
+ * The scalar is the value of the item with the object type flag of `ot`
+ * (CTA-5004-B section 4.1, item 14). Without that item, it is the value
+ * of the first item without parameters. Otherwise it is `undefined`.
  */
-function unwrapValue(value: any, ot?: unknown): any {
-	if (Array.isArray(value)) {
-		let item: any
-
-		const otText = toTokenString(ot)
-		if (otText) {
-			item = value.find(item => toTokenString(item.params?.ot) === otText)
-		}
-
-		if (!item) {
-			item = value[0]
-		}
-
-		return unwrapValue(item)
-	}
-
+function unwrapValue(value: unknown, ot: string | undefined): unknown {
 	if (value instanceof SfItem) {
-		return value.value
+		value = value.value
 	}
 
-	return value
+	if (!Array.isArray(value)) {
+		return value
+	}
+
+	let fallback: unknown
+
+	for (const item of value) {
+		if (!(item instanceof SfItem)) {
+			if (fallback === undefined) {
+				fallback = item
+			}
+			continue
+		}
+
+		if (ot && item.params?.[ot] === true) {
+			return item.value
+		}
+
+		if (fallback === undefined && !hasParams(item.params)) {
+			fallback = item.value
+		}
+	}
+
+	return fallback
 }
 
 /**
  * Down-convert version 2 CMCD data to version 1.
  *
  * - Extracts `nrr` from the `nor` SfItem's `r` parameter.
- * - Unwraps inner-list values to scalars.
+ * - Unwraps inner-list values to scalars for the object type `ot`.
  */
-function downConvertToV1(obj: Record<string, any>): Record<string, any> {
+function downConvertToV1(obj: Record<string, any>, ot: string | undefined): Record<string, any> {
 	const result: Record<string, any> = {}
 
 	for (const [key, value] of Object.entries(obj)) {
@@ -68,8 +88,8 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 		}
 
 		if (key === 'nor') {
-			const items = Array.isArray(value) ? value : [value]
-			const first = items[0]
+			const list = value instanceof SfItem && Array.isArray(value.value) ? value.value : value
+			const first = Array.isArray(list) ? list[0] : list
 
 			if (first instanceof SfItem) {
 				result['nor'] = first.value
@@ -82,7 +102,7 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 			}
 		}
 		else if (CMCD_INNER_LIST_KEYS.has(key)) {
-			result[key] = unwrapValue(value, obj['ot'])
+			result[key] = unwrapValue(value, ot)
 		}
 		else {
 			result[key] = value
@@ -95,6 +115,11 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 function formatValue(key: CmcdKey, value: CmcdValue, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): CmcdValue {
 	const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
 	return typeof formatter === 'function' && isValid(value) ? formatter(value, formatterOptions) : value
+}
+
+function formatObjectType(data: Record<string, any>, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): string | undefined {
+	const ot = formatValue('ot', data['ot'] as CmcdValue, options, formatterOptions)
+	return isValid(ot) ? toTokenString(ot) : undefined
 }
 
 /**
@@ -117,9 +142,14 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 	const version = options.version || (obj['v'] as CmcdVersion) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
+	const formatterOptions: CmcdFormatterOptions = {
+		version,
+		reportingMode,
+		baseUrl: options.baseUrl,
+	}
 
 	// Down-convert V2 data to V1 format if needed
-	const data = version === 1 ? downConvertToV1(obj) : obj
+	const data = version === 1 ? downConvertToV1(obj, formatObjectType(obj, options, formatterOptions)) : obj
 	const eventType = toTokenString(data['e'])
 
 	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
@@ -176,12 +206,6 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		keys.push('v')
 	}
 
-	const formatterOptions: CmcdFormatterOptions = {
-		version,
-		reportingMode,
-		baseUrl: options.baseUrl,
-	}
-
 	keys.sort()
 
 	let objectType: string | undefined
@@ -201,8 +225,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		const objectTypes = version > 1 ? CMCD_KEY_OBJECT_TYPES[key] : undefined
 		if (objectTypes) {
 			if (!objectTypeResolved) {
-				const ot = formatValue('ot', data['ot'] as CmcdValue, options, formatterOptions)
-				objectType = isValid(ot) ? toTokenString(ot) : undefined
+				objectType = formatObjectType(data, options, formatterOptions)
 				objectTypeResolved = true
 			}
 			if (objectType !== undefined && !objectTypes.includes(objectType)) {

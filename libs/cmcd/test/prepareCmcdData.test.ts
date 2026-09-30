@@ -1,8 +1,9 @@
 import type { CmcdV1 } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, prepareCmcdData, toCmcdValue } from '@svta/cml-cmcd'
-import { SfToken } from '@svta/cml-structured-field-values'
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
+import { CMCD_KEY_TYPE_INTEGER, CMCD_KEY_TYPE_NUMBER, CMCD_KEY_TYPE_NUMBER_LIST, CMCD_KEY_TYPES } from '../src/CMCD_KEY_TYPES.ts'
 
 describe('prepareCmcdData', () => {
 	it('provides a valid example', () => {
@@ -179,6 +180,33 @@ describe('prepareCmcdData', () => {
 			const data = prepareCmcdData({ sf: 'd', cid: 'content-id' })
 			ok((data['sf'] as unknown) instanceof SfToken)
 		})
+
+		for (const [key, type] of Object.entries(CMCD_KEY_TYPES)) {
+			// The encoder sets v from the version option.
+			if (key === 'v' || (type !== CMCD_KEY_TYPE_INTEGER && type !== CMCD_KEY_TYPE_NUMBER_LIST)) {
+				continue
+			}
+
+			it(`rounds ${key} to an integer`, () => {
+				const value = type === CMCD_KEY_TYPE_NUMBER_LIST ? [1234.5] : 1234.5
+				const data: Record<string, unknown> = prepareCmcdData({ e: CmcdEventType.RESPONSE_RECEIVED, [key]: value }, { reportingMode: CmcdReportingMode.EVENT })
+				const items = [data[key]].flat()
+				ok(items.every(item => Number.isInteger(item instanceof SfItem ? item.value : item)), `Key "${key}" is prepared as ${items}.`)
+			})
+		}
+
+		for (const [key, type] of Object.entries(CMCD_KEY_TYPES)) {
+			// The encoder sets v from the version option and replaces an invalid ts with the current time.
+			if (key === 'v' || key === 'ts' || (type !== CMCD_KEY_TYPE_INTEGER && type !== CMCD_KEY_TYPE_NUMBER && type !== CMCD_KEY_TYPE_NUMBER_LIST)) {
+				continue
+			}
+
+			it(`drops a ${key} value that is not a number`, () => {
+				const value = type === CMCD_KEY_TYPE_NUMBER_LIST ? ['1234'] : '1234'
+				const data: Record<string, unknown> = prepareCmcdData({ e: CmcdEventType.RESPONSE_RECEIVED, [key]: value }, { reportingMode: CmcdReportingMode.EVENT })
+				ok(!(key in data), `Key "${key}" is prepared as ${data[key]}.`)
+			})
+		}
 	})
 
 	describe('custom keys', () => {
@@ -213,6 +241,13 @@ describe('prepareCmcdData', () => {
 			equal(data['nor'], '..%2Fseg%2F3.m4v')
 			equal((data as CmcdV1)['nrr'], '0-99')
 			equal(data['com.example-hello'], 'world')
+		})
+
+		it('selects the inner-list item by the object type after formatting', () => {
+			const kept = prepareCmcdData({ ot: 'video', br: [toCmcdValue(5000, { v: true })] }, { version: 1, formatters: { ot: () => 'v' } })
+			equal(kept['br'], 5000)
+			const dropped = prepareCmcdData({ ot: 'v', br: [toCmcdValue(5000, { v: true })] }, { version: 1, formatters: { ot: () => 'm' } })
+			ok(!('br' in dropped))
 		})
 	})
 

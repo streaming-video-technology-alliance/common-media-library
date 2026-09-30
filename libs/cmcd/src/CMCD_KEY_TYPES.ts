@@ -1,5 +1,5 @@
 /**
- * CMCD key value type: inner list of numbers with token identifiers.
+ * CMCD key value type: inner list of integers with token identifiers.
  *
  * @internal
  */
@@ -54,7 +54,7 @@ export const CMCD_KEY_TYPE_TOKEN = 'token' as const
  * @internal
  */
 export const CMCD_KEY_TYPES: Record<string, string> = {
-	// List keys (inner list of integers/numbers with token identifiers)
+	// List keys (inner list of integers with token identifiers)
 	ab: CMCD_KEY_TYPE_NUMBER_LIST,
 	bl: CMCD_KEY_TYPE_NUMBER_LIST,
 	br: CMCD_KEY_TYPE_NUMBER_LIST,
@@ -127,8 +127,8 @@ export const CMCD_KEY_TYPES: Record<string, string> = {
  */
 export const CMCD_V1_KEY_TYPE_OVERRIDES: Record<string, string> = {
 	bl: CMCD_KEY_TYPE_INTEGER,
-	br: CMCD_KEY_TYPE_NUMBER,
+	br: CMCD_KEY_TYPE_INTEGER,
 	mtp: CMCD_KEY_TYPE_INTEGER,
-	tb: CMCD_KEY_TYPE_NUMBER,
+	tb: CMCD_KEY_TYPE_INTEGER,
 	nor: CMCD_KEY_TYPE_STRING,
 }
