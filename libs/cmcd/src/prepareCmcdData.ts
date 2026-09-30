@@ -30,6 +30,10 @@ const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
  * Unwrap an inner list or SfItem value to a scalar.
  */
 function unwrapValue(value: any, ot?: unknown): any {
+	if (value instanceof SfItem) {
+		value = value.value
+	}
+
 	if (Array.isArray(value)) {
 		let item: any
 
@@ -43,10 +47,6 @@ function unwrapValue(value: any, ot?: unknown): any {
 		}
 
 		return unwrapValue(item)
-	}
-
-	if (value instanceof SfItem) {
-		return value.value
 	}
 
 	return value
@@ -68,8 +68,8 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 		}
 
 		if (key === 'nor') {
-			const items = Array.isArray(value) ? value : [value]
-			const first = items[0]
+			const list = value instanceof SfItem && Array.isArray(value.value) ? value.value : value
+			const first = Array.isArray(list) ? list[0] : list
 
 			if (first instanceof SfItem) {
 				result['nor'] = first.value

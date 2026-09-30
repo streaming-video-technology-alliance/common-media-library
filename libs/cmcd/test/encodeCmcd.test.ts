@@ -336,9 +336,27 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(input, { version: 1 }), 'br=5000,mtp=10000')
 		})
 
+		it('unwraps inner lists with parameters to plain scalars for V1', () => {
+			const input = decodeCmcd('bl=(2100 3200);p=2,br=(3000 6000);p=2,mtp=(25400 1200);p=1,tb=(6000 128);x') as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'bl=2100,br=3000,mtp=25400,tb=6000')
+		})
+
+		it('matches the ot param of an item in an inner list with parameters for V1', () => {
+			const input = {
+				br: new SfItem([toCmcdValue(3000, { ot: Symbol.for('a') }), toCmcdValue(6000, { ot: Symbol.for('v') })], { p: 2 }),
+				ot: new SfToken('v'),
+			} as unknown as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'br=6000,ot=v')
+		})
+
 		it('preserves plain nor string in V1', () => {
 			const input = { nor: ['../testing/3.m4v'] }
 			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v"')
+		})
+
+		it('extracts nrr from the first item of a nor inner list with parameters for V1', () => {
+			const input = decodeCmcd('nor=("../testing/3.m4v";r="0-99" "../testing/4.m4v");x') as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v",nrr="0-99"')
 		})
 	})
 
