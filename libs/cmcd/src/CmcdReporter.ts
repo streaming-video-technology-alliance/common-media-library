@@ -8,7 +8,7 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
@@ -26,6 +26,7 @@ import type { CmcdVersion } from './CmcdVersion.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
+import { isValid } from './isValid.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
@@ -150,29 +151,6 @@ function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
  * event types whose required key is event data, not player state.
  */
 const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
-
-/**
- * Whether a required key's value will survive report preparation.
- *
- * This is `isValid` without its `false` exclusion. `false` must count as
- * usable because `bg: false` is a valid value on a backgrounded-mode event,
- * which the encoder writes as `?0`. If `false` counted as unusable,
- * restoration would silently revert a transform that cleared the key.
- * Later processing drops empty strings, empty lists, and non-finite numbers.
- * A transform that substitutes one of them leaves the report without a
- * required key.
- */
-function isUsableRequiredValue(value: unknown): boolean {
-	if (value == null || value === '') {
-		return false
-	}
-
-	if (typeof value === 'number') {
-		return Number.isFinite(value)
-	}
-
-	return !Array.isArray(value) || value.length > 0
-}
 
 /**
  * Copies a value with the `SfItem` structure, including its `params` record.
@@ -434,7 +412,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			provenance: mintProvenance(sid, data.cid),
 			data,
 			msd: NaN,
-			lastEmitted: {},
+			// A session that does not start backgrounded has no exit to report.
+			// CTA-5004-B defines a `b` event without `bg` as the exit.
+			lastEmitted: data.bg === true ? {} : { bg: false },
 			eventTargets,
 			requestTarget: {
 				sn: 0,
@@ -554,6 +534,14 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * value, not the previous persisted value. The first state-change event in
 	 * a new session therefore always fires, even when the persisted value did
 	 * not change across the `sid` boundary.
+	 *
+	 * The `bg` field is an exception. A session that does not start with
+	 * `bg: true` begins with `false` as its last reported `bg` value.
+	 * `bg: false` therefore fires `BACKGROUNDED_MODE` only if the session
+	 * started with `bg: true` or reported `bg: true`. CTA-5004-B defines a
+	 * `b` event without `bg` as the exit from backgrounded mode, so the exit
+	 * report does not carry `bg`. A target transform can add `bg: false` to
+	 * the exit report. The encoder writes that value as `?0`.
 	 *
 	 * Multi-field updates fire the events in this order: `sta`, `pr`, `cid`,
 	 * `bg`, `br`. The order of keys in the input object does not affect the
@@ -693,7 +681,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * 2. Discards the event if the state field has no value after that write
 	 *    (never set, or cleared with `update({ field: undefined })`).
 	 * 3. Suppresses the event if the field's current value equals the
-	 *    last reported value (no state transition).
+	 *    last reported value (no state transition). {@link CmcdReporter.update}
+	 *    describes the `bg` value that a new session starts with.
 	 *
 	 * The reporter always records all other event types.
 	 *
@@ -748,8 +737,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 			const current = session.data[field]
 
-			// Never emit a state-change event without its state field. Catches
-			// both "no value ever set" and "previous value was cleared to undefined".
+			// Never emit a state-change event whose state field has no value.
+			// Catches both "no value ever set" and "previous value was cleared to
+			// undefined".
 			if (current === undefined) {
 				return
 			}
@@ -814,6 +804,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			ts: data.ts ?? Date.now(),
 		}
 
+		// CTA-5004-B defines a `b` event without `bg` as the exit from
+		// backgrounded mode. A transform can add `bg: false`, which the encoder
+		// writes as `?0`.
+		if (type === CMCD_EVENT_BACKGROUNDED_MODE && item.bg === false) {
+			delete item.bg
+		}
+
 		const { transform } = config
 
 		if (!transform) {
@@ -840,15 +837,14 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 
 		// Restore, never fabricate: a required key that was already absent (or
-		// already unusable) before the transform ran was a caller bug, not a
-		// transform bug. Removal and substitution are both covered, because a
-		// value the encoder drops leaves the report just as invalid as a missing
-		// one.
-		if (!isUsableRequiredValue(report.ts)) {
+		// already unusable) before the transform ran is not restored. The
+		// restore covers removal and substitution with any value that `isValid`
+		// rejects, `false` included.
+		if (!isValid(report.ts)) {
 			report.ts = ts
 		}
 
-		if (requiredKey && isUsableRequiredValue(requiredValue) && !isUsableRequiredValue((report as Record<string, unknown>)[requiredKey])) {
+		if (requiredKey && isValid(requiredValue) && !isValid((report as Record<string, unknown>)[requiredKey])) {
 			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 

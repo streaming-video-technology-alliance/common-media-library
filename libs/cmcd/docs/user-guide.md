@@ -121,7 +121,7 @@ reporter.update({ bl: [25432], br: [2500.7] }); // sent as bl=(25400) and br=(25
 
 The reporter applies the "MUST NOT" rules of CTA-5004-B when it encodes a report. It omits a key without an error in these cases:
 
-- The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted, except `bg` on a backgrounded-mode event.
+- The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted. The exception is a `bg: false` that a transform adds to a backgrounded-mode report (see [Recording Events](#recording-events)).
 - The value of a numeric key is not a number, such as `pt: "123"`. In a list, the reporter drops each element that is not a finite number, such as `null` in `pb: [2500, null]`. It omits the key when no element is left.
 - `d` when `ot` is not `a`, `v`, `av`, `tt`, `c`, or `o`. For example, a manifest request with `ot: "m"` never carries `d`. The rule uses the object type you set, even if `ot` is not in `enabledKeys`.
 - `tpb` when `ot` is not `a`, `v`, `av`, or `c`.
@@ -297,10 +297,31 @@ reporter.update({ sta: "p" });        // → fires PLAY_STATE
 reporter.update({ pr: 1.5 });         // → fires PLAYBACK_RATE
 reporter.update({ cid: "movie-42" }); // → fires CONTENT_ID
 reporter.update({ bg: true });        // → fires BACKGROUNDED_MODE
+reporter.update({ bg: false });       // → fires BACKGROUNDED_MODE without bg
 reporter.update({ br: [5000] });      // → fires BITRATE_CHANGE
 
 // Consecutive updates with the same value are deduplicated.
 reporter.update({ sta: "p" }); // dropped (unchanged)
+```
+
+A `BACKGROUNDED_MODE` report with `bg` is the entry to backgrounded mode. A report without `bg` is the exit, as CTA-5004-B defines it. If the session has not reported `bg: true`, `update({ bg: false })` fires no event. The exception is a session that starts while `bg` is `true`, after a `sid` change.
+
+If a collector expects `bg=?0` on the exit, add `bg: false` to the exit report in the target's transform. The encoder writes that value as `?0`:
+
+```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
+const reporter = new CmcdReporter({
+	eventTargets: [
+		{
+			url: "https://legacy-collector.example.com/cmcd",
+			events: [CmcdEventType.BACKGROUNDED_MODE],
+			enabledKeys: ["bg", "sid", "v", "e", "ts", "sn"],
+			transform: (data) =>
+				data.e === CmcdEventType.BACKGROUNDED_MODE && !("bg" in data) ? { ...data, bg: false } : data,
+		},
+	],
+});
 ```
 
 ### Snapshot context on state changes
@@ -890,7 +911,7 @@ The first argument is a copy made for this one report. You can mutate it in plac
 
 After your transform returns, the reporter sets `e` and `sid` again and assigns the sequence number `sn` and `msd`. So a transform cannot change the event type of a report to pass a target's `events` filter. It cannot substitute the session ID, create gaps in the sequence numbers, or replay the media start delay marker. Cancelling a report consumes neither a sequence number nor `msd`. Wire `sn` values remain contiguous per destination, and `msd` goes on the next report that is sent.
 
-A transform also cannot remove a key that the event requires. Every event needs `e` and `ts`. State-change events need the key they signal (`sta`, `pr`, `cid`, `bg`, `br`). Custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these keys, the reporter restores the value it had before. The reporter does not invent values. A required key that was already missing before your transform ran remains missing. That is a bug at the call site, not something the transform did.
+A transform also cannot remove a key that the event requires. Every event needs `e` and `ts`. State-change events need the key they signal (`sta`, `pr`, `cid`, `bg`, `br`). Custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these keys, or replaces its value with `false` or an empty value, the reporter restores the value it had before. The reporter does not invent values. A required key that was already missing before your transform ran remains missing. The exit from backgrounded mode has no `bg` by design. For the other events, a missing required key is a bug at the call site, not something the transform did.
 
 Configuration cannot remove required keys either. The reporter includes them after the `enabledKeys` filter, so omitting one from `enabledKeys` does not suppress it. The payload remains valid. If a destination must not receive a key that an event requires, leave that event out of the target's `events`. Do not try to remove the key.
 

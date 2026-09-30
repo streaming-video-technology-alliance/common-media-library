@@ -1,5 +1,5 @@
 import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdRequestProvenance, CmcdRequestReport, CmcdRequestReportTransform, CmcdTransformRequest } from '@svta/cml-cmcd'
-import { CMCD_REQUEST_PROVENANCE, CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
+import { CMCD_REQUEST_PROVENANCE, CmcdEventType, CmcdReporter, CmcdTransmissionMode, decodeCmcd, validateCmcdEventReport } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, notEqual, ok, throws } from 'node:assert'
@@ -2339,23 +2339,38 @@ describe('CmcdReporter', () => {
 				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
 			})
 
-			it('does not revert a transform that legitimately clears bg', async () => {
+			it('restores bg when a transform sets it to false on an entry report', async () => {
 				const { requester, requests } = createMockRequester()
 				const reporter = new CmcdReporter(createTarget(
 					[CmcdEventType.BACKGROUNDED_MODE],
 					data => ({ ...data, bg: false }),
 				), requester)
 
-				// `bg: false` is a real value for this event, emitted as `?0`. The
-				// restore predicate must not treat falsiness as unusable, or it
-				// would silently put the previous `true` back.
+				// Without the restore, the entry report would carry `bg=?0`, which a
+				// receiver that reads the value takes as the exit.
 				reporter.update({ bg: true })
 
 				await new Promise(resolve => setTimeout(resolve, 10))
 
 				equal(requests.length, 1)
-				ok((requests[0].body as string)?.includes('bg=?0'))
+				equal(decodeCmcd((requests[0].body as string).trim())['bg'], true)
 				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('sends bg=?0 on the exit when a transform adds bg: false', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.BACKGROUNDED_MODE],
+					data => data.e === CmcdEventType.BACKGROUNDED_MODE && !('bg' in data) ? { ...data, bg: false } : data,
+				), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				equal(decodeCmcd((requests[1].body as string).trim())['bg'], false)
 			})
 
 			it('does not fabricate a required key that was already absent', async () => {
@@ -4573,6 +4588,94 @@ describe('CmcdReporter', () => {
 				await new Promise(resolve => setTimeout(resolve, 10))
 
 				equal(requests.length, 1)
+			})
+
+			it('reports the exit without bg', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				const exit = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				ok(!('bg' in exit))
+				deepEqual(validateCmcdEventReport(requests[1]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('does not fire BACKGROUNDED_MODE for bg: false before an entry', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: false })
+				reporter.update({ bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(decodeCmcd((requests[0].body as string).trim())['bg'], true)
+			})
+
+			it('does not record BACKGROUNDED_MODE for bg: false before an entry', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.recordEvent(CmcdEventType.BACKGROUNDED_MODE, { bg: false })
+				reporter.recordEvent(CmcdEventType.BACKGROUNDED_MODE, { bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(decodeCmcd((requests[0].body as string).trim())['bg'], true)
+			})
+
+			it('reports the exit in a session that starts with bg: true', async () => {
+				const { requester, requests } = createMockRequester()
+				const keys = ['bg', 'sid', 'v', 'e', 'ts', 'sn'] as CmcdKey[]
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: keys,
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.BACKGROUNDED_MODE, CmcdEventType.TIME_INTERVAL],
+						enabledKeys: keys,
+						batchSize: 1,
+					}],
+				}, requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ sid: 'session-2' })
+				reporter.recordEvent(CmcdEventType.TIME_INTERVAL)
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 3)
+				const interval = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(interval.sid, 'session-2')
+				equal(interval.bg, true)
+				const exit = decodeCmcd((requests[2].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				equal(exit.sid, 'session-2')
+				ok(!('bg' in exit))
+			})
+
+			it('re-fires BACKGROUNDED_MODE for bg: true after a sid change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ sid: 'session-2', bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				const entry = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(entry.sid, 'session-2')
+				equal(entry.bg, true)
 			})
 		})
 
