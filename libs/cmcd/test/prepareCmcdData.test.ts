@@ -3,7 +3,7 @@ import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, prepareCmcdData, toC
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
-import { CMCD_KEY_TYPE_INTEGER, CMCD_KEY_TYPE_NUMBER_LIST, CMCD_KEY_TYPES } from '../src/CMCD_KEY_TYPES.ts'
+import { CMCD_KEY_TYPE_INTEGER, CMCD_KEY_TYPE_NUMBER, CMCD_KEY_TYPE_NUMBER_LIST, CMCD_KEY_TYPES } from '../src/CMCD_KEY_TYPES.ts'
 
 describe('prepareCmcdData', () => {
 	it('provides a valid example', () => {
@@ -192,6 +192,19 @@ describe('prepareCmcdData', () => {
 				const data: Record<string, unknown> = prepareCmcdData({ e: CmcdEventType.RESPONSE_RECEIVED, [key]: value }, { reportingMode: CmcdReportingMode.EVENT })
 				const items = [data[key]].flat()
 				ok(items.every(item => Number.isInteger(item instanceof SfItem ? item.value : item)), `Key "${key}" is prepared as ${items}.`)
+			})
+		}
+
+		for (const [key, type] of Object.entries(CMCD_KEY_TYPES)) {
+			// The encoder sets v from the version option and replaces an invalid ts with the current time.
+			if (key === 'v' || key === 'ts' || (type !== CMCD_KEY_TYPE_INTEGER && type !== CMCD_KEY_TYPE_NUMBER && type !== CMCD_KEY_TYPE_NUMBER_LIST)) {
+				continue
+			}
+
+			it(`drops a ${key} value that is not a number`, () => {
+				const value = type === CMCD_KEY_TYPE_NUMBER_LIST ? ['1234'] : '1234'
+				const data: Record<string, unknown> = prepareCmcdData({ e: CmcdEventType.RESPONSE_RECEIVED, [key]: value }, { reportingMode: CmcdReportingMode.EVENT })
+				ok(!(key in data), `Key "${key}" is prepared as ${data[key]}.`)
 			})
 		}
 	})

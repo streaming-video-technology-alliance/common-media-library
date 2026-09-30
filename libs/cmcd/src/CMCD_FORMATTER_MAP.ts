@@ -3,20 +3,34 @@ import { getBaseUrl, urlToRelativePath, type ValueOrArray } from '@svta/cml-util
 import type { CmcdFormatter } from './CmcdFormatter.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdValue } from './CmcdValue.ts'
+import { isValid } from './isValid.ts'
 
 const formatNumbers = (value: CmcdValue, format: (value: number) => number): ValueOrArray<number | SfItem<number>> => {
 	if (Array.isArray(value)) {
-		return value.map(item => formatNumbers(item, format) as number)
+		const list: (number | SfItem<number>)[] = []
+
+		for (const item of value) {
+			const formatted = formatNumbers(item, format) as number | SfItem<number>
+
+			if (Number.isFinite(formatted instanceof SfItem ? formatted.value : formatted)) {
+				list.push(formatted)
+			}
+		}
+
+		return list
 	}
 
 	if (value instanceof SfItem) {
-		return new SfItem(formatNumbers(value.value as CmcdValue, format), value.params)
+		const formatted = formatNumbers(value.value as CmcdValue, format)
+		return isValid(formatted) ? new SfItem(formatted, value.params) : NaN
 	}
 
-	return format(value as number)
+	return typeof value === 'number' ? format(value) : NaN
 }
 
 const toRounded = (value: CmcdValue) => formatNumbers(value, Math.round)
+
+const toNumber = (value: CmcdValue) => formatNumbers(value, Number)
 
 const toUrlSafe = (value: CmcdValue, options: CmcdFormatterOptions): ValueOrArray<string | SfItem<string>> => {
 	if (Array.isArray(value)) {
@@ -55,6 +69,8 @@ const nor = (value: CmcdValue, options: CmcdFormatterOptions) => {
 
 /**
  * The default formatters for CMCD values.
+ *
+ * The formatter of a numeric key drops a value or a list element that is not a finite number.
  *
  * @public
  */
@@ -153,6 +169,11 @@ export const CMCD_FORMATTER_MAP: Record<string, CmcdFormatter> = {
 	 * Playhead Bitrate (kbps) rounded integer
 	 */
 	pb: toRounded,
+
+	/**
+	 * Playback Rate decimal, not rounded
+	 */
+	pr: toNumber,
 
 	/**
 	 * Playhead Time (milliseconds) rounded integer

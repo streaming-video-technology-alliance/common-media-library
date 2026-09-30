@@ -122,6 +122,7 @@ reporter.update({ bl: [25432], br: [2500.7] }); // sent as bl=(25400) and br=(25
 The reporter applies the "MUST NOT" rules of CTA-5004-B when it encodes a report. It omits a key without an error in these cases:
 
 - The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted, except `bg` on a backgrounded-mode event.
+- The value of a numeric key is not a number, such as `pt: "123"`. In a list, the reporter drops each element that is not a finite number, such as `null` in `pb: [2500, null]`. It omits the key when no element is left.
 - `d` when `ot` is not `a`, `v`, `av`, `tt`, `c`, or `o`. For example, a manifest request with `ot: "m"` never carries `d`. The rule uses the object type you set, even if `ot` is not in `enabledKeys`.
 - `tpb` when `ot` is not `a`, `v`, `av`, or `c`.
 - `ab`, `lab`, or `tab` when the same report also carries `br`, `lb`, or `tb`. The report keeps the exact bitrate.

@@ -60,6 +60,32 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=ps,sta=p,ts=1727712000001,v=2')
 	})
 
+	it('drops an inner list element that is not a finite number', () => {
+		const input = { pb: [2500.4, null, 'abc', Infinity, toCmcdValue('x', { v: true }), toCmcdValue(1000.6, { a: true })] } as unknown as Cmcd
+		equal(encodeCmcd(input), 'pb=(2500 1001;a),v=2')
+	})
+
+	it('omits an inner list key when no element is a finite number', () => {
+		const input = { bl: [NaN], pb: ['abc'], tb: [null] } as unknown as Cmcd
+		equal(encodeCmcd(input), 'v=2')
+	})
+
+	it('drops an element that is not a number from an inner list that has parameters', () => {
+		const input = decodeCmcd('pb=(2500 "abc");p=2,tb=("x");p=1', { useSymbol: false }) as Cmcd
+		equal(encodeCmcd(input), 'pb=(2500);p=2,v=2')
+	})
+
+	it('omits a numeric key when the value is not a number', () => {
+		const input = { d: '4000', dfa: true, pr: 'abc', pt: '123' } as unknown as Cmcd
+		equal(encodeCmcd(input), 'v=2')
+	})
+
+	it('replaces a ts that is not a number with the current time', (context) => {
+		context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, ts: '1727712000000' } as unknown as Cmcd
+		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=ps,sta=p,ts=1234,v=2')
+	})
+
 	describe('version 1', () => {
 		it('returns encoded v1 string when version option is set to 1', () => {
 			const { v, ...input } = CMCD_INPUT
