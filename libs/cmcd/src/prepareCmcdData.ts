@@ -30,6 +30,10 @@ const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
  * Unwrap an inner list or SfItem value to a scalar.
  */
 function unwrapValue(value: any, ot?: unknown): any {
+	if (value instanceof SfItem) {
+		value = value.value
+	}
+
 	if (Array.isArray(value)) {
 		let item: any
 
@@ -43,10 +47,6 @@ function unwrapValue(value: any, ot?: unknown): any {
 		}
 
 		return unwrapValue(item)
-	}
-
-	if (value instanceof SfItem) {
-		return value.value
 	}
 
 	return value
