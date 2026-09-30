@@ -16,6 +16,7 @@ and this project adheres to
 - `validateCmcdValues` reports an error when `br` or `tb` is not an integer in a version 1 payload. The same applies to each element of a version 2 inner list. Both specifications define these values as integers. The version 1 check reported a warning. The version 2 check did not exist
 - `validateCmcd`, `validateCmcdRequest`, `validateCmcdHeaders`, `validateCmcdEvents`, and `validateCmcdEventReport` apply the three changes above, because each one calls `validateCmcdValues`
 - The encoder rounds `tbl` to the nearest 100 ms, as it does for `bl`. The change covers `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`. This is a wire output change
+- The encoder rounds the values inside an inner list that has parameters, such as `tbl=(21349;v 8051;a);p=2`. It keeps the parameters of the list and of each element. For `bl`, `br`, `mtp`, and `tb`, the encoder threw an error on such a list
 
 ## [2.7.0] - 2026-09-15
 

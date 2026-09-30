@@ -1,5 +1,5 @@
 import type { Cmcd, CmcdEncodeOptions } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, encodeCmcd } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, decodeCmcd, encodeCmcd } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -30,6 +30,23 @@ describe('encodeCmcd', () => {
 
 	it('rounds tbl to the nearest 100 ms', () => {
 		equal(encodeCmcd({ tbl: [21349, toCmcdValue(8051, { a: true })] }), 'tbl=(21300 8100;a),v=2')
+	})
+
+	it('keeps the parameters of a formatted inner list and of its elements', () => {
+		for (const s of [
+			'bl=(21300;v 8100;a);p=2,v=2',
+			'br=(3000;v 128;a);p=2,v=2',
+			'mtp=(10000;v);p=2,v=2',
+			'tb=(6000;v 320;a);p=2,v=2',
+			'tbl=(21300;v 8100;a);p=2,v=2',
+		]) {
+			equal(encodeCmcd(decodeCmcd(s, { convertToLatest: true }) as Cmcd), s)
+		}
+	})
+
+	it('rounds the values inside an inner list with parameters', () => {
+		equal(encodeCmcd(decodeCmcd('tbl=(21349;v 8051;a);p=2,v=2', { convertToLatest: true }) as Cmcd), 'tbl=(21300;v 8100;a);p=2,v=2')
+		equal(encodeCmcd(decodeCmcd('br=(3000.4;v 128.6;a);p=2,v=2', { convertToLatest: true }) as Cmcd), 'br=(3000;v 129;a);p=2,v=2')
 	})
 
 	describe('version 1', () => {
