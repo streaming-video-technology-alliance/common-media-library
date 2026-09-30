@@ -283,6 +283,11 @@ describe('encodeCmcd', () => {
 			const input = { nor: ['../testing/3.m4v'] }
 			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v"')
 		})
+
+		it('extracts nrr from the first item of a nor inner list with parameters for V1', () => {
+			const input = decodeCmcd('nor=("../testing/3.m4v";r="0-99" "../testing/4.m4v");x') as Cmcd
+			equal(encodeCmcd(input, { version: 1 }), 'nor="..%2Ftesting%2F3.m4v",nrr="0-99"')
+		})
 	})
 
 	describe('nor', () => {

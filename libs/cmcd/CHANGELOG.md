@@ -11,7 +11,7 @@ and this project adheres to
 ### Fixed
 
 - `validateCmcdStructure` accepts a `b` event without the `bg` key. CTA-5004-B defines that form as the exit from backgrounded mode. The validator reported an error on `bg`. The fix also applies to `validateCmcd`, `validateCmcdEvents`, and `validateCmcdEventReport`
-- In version 1 output, `prepareCmcdData` converts an inner list with parameters to one value. It selects the item that matches `ot`, or else the first item. `decodeCmcd` returns an inner list with parameters for a member such as `br=(3000 6000);p=2`. The version 1 output for that member was `br=(3000 6000)`. The output is now `br=3000`. CTA-5004 defines `bl`, `br`, `mtp`, and `tb` as integers. The fix also applies to `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`
+- In version 1 output, `prepareCmcdData` converts an inner list with parameters to one value. For `bl`, `br`, `mtp`, and `tb`, it selects the item that matches `ot`, or else the first item. For `nor`, it selects the first item. The `r` parameter of that item becomes `nrr`. `decodeCmcd` returns an inner list with parameters for a member such as `br=(3000 6000);p=2`. The version 1 output for that member was `br=(3000 6000)`. The output is now `br=3000`. CTA-5004 defines `bl`, `br`, `mtp`, and `tb` as integers and `nor` as a string. The fix also applies to `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`
 
 ## [2.7.0] - 2026-09-15
 

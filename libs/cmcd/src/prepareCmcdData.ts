@@ -68,8 +68,8 @@ function downConvertToV1(obj: Record<string, any>): Record<string, any> {
 		}
 
 		if (key === 'nor') {
-			const items = Array.isArray(value) ? value : [value]
-			const first = items[0]
+			const list = value instanceof SfItem && Array.isArray(value.value) ? value.value : value
+			const first = Array.isArray(list) ? list[0] : list
 
 			if (first instanceof SfItem) {
 				result['nor'] = first.value
