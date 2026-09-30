@@ -262,11 +262,11 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 			value = Date.now()
 		}
 
-		// Ignore invalid values, except `bg: false` on a backgrounded-mode (e=b) state-
-		// change event. The wire must carry `?0` per CTA-5004-B so the transition is
-		// reportable. `bg` is the only state-change required field typed as boolean.
-		// `false` on other required fields (for example `cid`, `sta`) is a caller bug and
-		// stays stripped.
+		// Ignore invalid values, except an explicit `bg: false` on a backgrounded-mode
+		// (e=b) event, which is written as `?0`. CTA-5004-B section 5 allows `?0` for
+		// a Boolean key. `bg` is the only state-change field typed as boolean.
+		// `false` on other state-change fields (for example `cid`, `sta`) is a caller
+		// bug and stays stripped.
 		const isBgFalseTransition = isEventMode
 			&& value === false
 			&& key === 'bg'

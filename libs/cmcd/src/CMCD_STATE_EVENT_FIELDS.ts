@@ -18,10 +18,11 @@ import type { CmcdKey } from './CmcdKey.ts'
  * removes it.
  *
  * Sending the field with each state-change event is a library choice.
- * CTA-5004-B requires the field only on the `ps` event, which MUST carry
- * `sta`. CTA-5004-B states no such rule for `pr`, `c`, or `bc`. It defines
- * a `b` event without `bg` as the exit from backgrounded mode.
- * `validateCmcdStructure` follows CTA-5004-B and does not read this map.
+ * The exception is the exit from backgrounded mode, which CTA-5004-B
+ * defines as a `b` event without `bg`. CTA-5004-B requires the field only
+ * on the `ps` event, which MUST carry `sta`. CTA-5004-B states no such rule
+ * for `pr`, `c`, or `bc`. `validateCmcdStructure` follows CTA-5004-B and
+ * does not read this map.
  *
  * Iteration order matters: `CmcdReporter.update()` records state-change
  * events in map order when several tracked fields change in one call.
