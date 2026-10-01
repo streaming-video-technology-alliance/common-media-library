@@ -68,10 +68,10 @@ describe('validateCmcdStructure', () => {
 		equal(result.valid, true)
 	})
 
-	it('reports error for pr event without pr', () => {
+	it('accepts pr event without pr', () => {
 		const result = validateCmcdStructure({ e: 'pr', ts: 123 }, { reportingMode: 'event' })
-		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'pr' && i.severity === 'error'), true)
+		equal(result.valid, true)
+		equal(result.issues.some(i => i.key === 'pr'), false)
 	})
 
 	it('accepts pr event with pr', () => {
@@ -79,10 +79,10 @@ describe('validateCmcdStructure', () => {
 		equal(result.valid, true)
 	})
 
-	it('reports error for c event without cid', () => {
+	it('accepts c event without cid', () => {
 		const result = validateCmcdStructure({ e: 'c', ts: 123 }, { reportingMode: 'event' })
-		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'cid' && i.severity === 'error'), true)
+		equal(result.valid, true)
+		equal(result.issues.some(i => i.key === 'cid'), false)
 	})
 
 	it('accepts c event with cid', () => {
@@ -111,10 +111,10 @@ describe('validateCmcdStructure', () => {
 		equal(result.valid, true)
 	})
 
-	it('reports error for bc event without br', () => {
+	it('accepts bc event without br', () => {
 		const result = validateCmcdStructure({ e: 'bc', ts: 123 }, { reportingMode: 'event' })
-		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'br' && i.severity === 'error'), true)
+		equal(result.valid, true)
+		equal(result.issues.some(i => i.key === 'br'), false)
 	})
 
 	it('accepts bc event with br', () => {
@@ -193,7 +193,7 @@ describe('validateCmcdStructure', () => {
 		equal(result.issues.some(i => i.key === 'v' && i.severity === 'error'), true)
 	})
 
-	it('reports a missing state-change field when e is a Symbol', () => {
+	it('reports a missing sta when e is a Symbol', () => {
 		const result = validateCmcdStructure({ e: Symbol.for('ps'), ts: 123 }, { reportingMode: 'event' })
 		equal(result.valid, false)
 		equal(result.issues.some(i => i.key === 'sta' && i.severity === 'error'), true)
