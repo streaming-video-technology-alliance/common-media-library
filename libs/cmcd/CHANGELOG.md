@@ -49,6 +49,7 @@ and this project adheres to
 ### Documentation
 
 - The user guide describes the value that `decodeCmcd` returns for a member with parameters
+- The user guide lists the values that the encoder drops, the version 1 limits, and the length limit of a custom string
 
 ## [2.7.0] - 2026-09-15
 
