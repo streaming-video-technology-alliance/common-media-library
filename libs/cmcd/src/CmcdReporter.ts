@@ -942,11 +942,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * request. The provenance record that
 	 * {@link CmcdReporter.createRequestReport} stored on the request's
 	 * `customData` (under {@link CMCD_REQUEST_PROVENANCE}) selects the session
-	 * by `sid`. Without a match, the reporter discards the response rather than
-	 * attributing it elsewhere. There is no other key. The reporter discards the
-	 * response when a serialization boundary lost the record and nothing
-	 * restored it (see {@link CMCD_REQUEST_PROVENANCE}). It also discards the
-	 * response when the session is no longer retained (see
+	 * by `sid`. A request without a record reports under the current session, as in
+	 * version 2.4.0. The request-time data then comes from `customData.cmcd`.
+	 * A record that names no retained session drops the response.
+	 * It also discards the response when the session is no longer retained (see
 	 * `CmcdReporterConfig.sessionRetention`). A per-call `data.sid` cannot
 	 * substitute. The reporter accepts any record whose `sid` names a retained
 	 * session. The record may come from another reporter with the same session
@@ -978,27 +977,20 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		// Attribution is by the provenance record alone: its sid names a
-		// retained session, or the response is dropped rather than relabeled.
 		const provenance = request.customData?.[CMCD_REQUEST_PROVENANCE]
-		const session = this.resolveSession(provenance)
+		const session = provenance === undefined ? this.session : this.resolveSession(provenance)
 
 		if (!session) {
 			return
 		}
 
-		// Request-time report data comes from the per-call snapshot on the
-		// same record, decoded fresh per response, never from the
-		// player-facing `customData.cmcd` object: the snapshot is
-		// reporter-written bytes, immune to caller mutation and lossless
-		// across any boundary the record is carried over.
-		const cmcd = decodeSnapshot(provenance)
+		const cmcd = provenance === undefined ? { ...request.customData?.cmcd } : decodeSnapshot(provenance)
 
 		// The record's cid is the content the request was issued under. It
 		// overrides the session store's current value so a response landing
 		// after a mid-session content change keeps its meaning, and it
 		// yields to the decoded snapshot and per-call data above it.
-		const { cid } = provenance as { cid?: unknown; }
+		const { cid } = (provenance ?? {}) as { cid?: unknown; }
 
 		const urlObj = new URL(url)
 		urlObj.searchParams.delete(CMCD_PARAM)
@@ -1035,8 +1027,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	/**
 	 * Resolves the session a response belongs to. The provenance record's `sid`
 	 * must name one of this reporter's retained sessions, or the reporter
-	 * discards the response. There is no other key. A lost record, or one that
-	 * names a removed or unknown `sid`, resolves nothing. Any other attribution
+	 * discards the response. There is no other key. A record that names a
+	 * removed or unknown `sid` resolves nothing. Any other attribution
 	 * would be wrong. The reporter reads the `sid` as a plain property. A record
 	 * copied through JSON therefore resolves the same session, and a hand-built
 	 * record that names a retained session is accepted.
