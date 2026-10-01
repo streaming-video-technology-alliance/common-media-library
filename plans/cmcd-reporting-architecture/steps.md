@@ -67,6 +67,8 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
 - [ ] **0.4 Ask the player maintainers for review (Casey).** Ask Daniel Silhavy (dash.js), Rob Walch (hls.js), Qualabs (@cotid-qualabs), Nicolas Levy, and the shaka-player maintainers.
   - Done when: each maintainer has a review request or a mention on the RFC PR.
 - [ ] **0.5 Resolve the unresolved questions (Casey and the reviewers).** The questions are the API name, the name of `includeOnce()`, the default for a missing `enabledKeys`, the queue limit, the retry rule, and the removal timing of `CmcdReporter`.
+  - Answers:
+    - The API name: keep `createCmcdSession()`.
   - Done when: the RFC records an answer for each question.
 - [ ] **0.6 Accept the RFC (Casey).** Write the Final Decision section, set `status: accepted`, and squash-merge with the subject `docs(rfc): CMCD session`.
   - Done when: the accepted RFC is on `main`.
@@ -403,6 +405,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Roadmap written. RFC drafted on `rfc/cmcd-session` (df085bba8, 22e9b3a44), not pushed. |
 | 2026-10-01 | Dry run of Task 2.3 on `refactor/cmcd-encode` (501281b70): the three changed tests fail before the patch, all 228 reporter tests pass after it, and a strict typecheck is clean. |
 | 2026-10-01 | Casey decided Task 1.3 (close PR 455 unmerged) and Task 2.1 (optimization 3 only, with the bundle gate). Casey approved pushes as the work goes on. Tasks 0.1 and 2.3 started. |
+| 2026-10-01 | Task 0.5: Casey kept the name `createCmcdSession()`. Casey approved Task 2.2, to start after Task 2.3. |
 
 ## Links
 

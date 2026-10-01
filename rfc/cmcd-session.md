@@ -403,6 +403,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **`CmcdReporter` alone, with fixes.** The store and the automatic events stay, together with their failure cases. Per-target routing still needs `transform`.
 - **`transform` instead of `filter`.** About 34 of the 54 transform tests of `CmcdReporter` guard the rewrite rules that the Motivation describes. A predicate needs none of them.
 - **Other names for `filter`.** `accept` suggests the HTTP `Accept` header. `include` is a boolean or an array in CML names. `shouldReport` is longer than the other target options. `CmcdEncodeOptions.filter` already uses `filter` for a predicate that keeps an item on `true`.
+- **Other names for the API.** In CMCD, "client" names the player, so `createCmcdClient()` is ambiguous. `createCmcdDispatcher()` does not describe request decoration. `createCmcdReporter()` would sit next to the deprecated class, with other behavior, until the next major version.
 - **Timers in the player.** shaka-player 5.2.0 shows the lifecycle risk of timers in the library. Targets have their own intervals, though, so the session needs to know them. `start()` and `stop()` keep the lifecycle explicit.
 
 ## Prior art
@@ -411,7 +412,6 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 
 ## Unresolved questions
 
-- The name of the API. The alternatives are `createCmcdClient()` and `createCmcdDispatcher()`. "Client" already names the player in CMCD, and "dispatcher" does not describe request decoration.
 - The name of `includeOnce()`.
 - The default for a missing `enabledKeys`. This RFC proposes every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 - The queue limit of 500 lines, and whether a configuration option should change it.
