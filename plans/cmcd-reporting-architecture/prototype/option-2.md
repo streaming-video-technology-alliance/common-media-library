@@ -82,6 +82,8 @@ type EventDestination = Destination & {
 	queue: string[]
 	gone: boolean
 	timer?: ReturnType<typeof setInterval>
+	delay: number
+	retry?: ReturnType<typeof setTimeout>
 }
 
 /** The values of one call that reach every destination: the first valid msd, and the bs, bsd, and ec values. */
@@ -92,6 +94,7 @@ type Scoped = {
 
 const CMCD_QUERY_PARAM = /([?&])CMCD=[^&#]*&?/
 const MAX_INTEGER = 999_999_999_999_999
+const MAX_DELAY = 60_000
 const SCOPED_KEYS = ['msd', 'bs', 'bsd', 'ec'] as const
 
 function withoutCmcdParam(url: string): string {
@@ -148,9 +151,10 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	const timeOrigin = performance.timeOrigin
 	const settings: CmcdSessionSettings = { version: 2, ...config }
 	const requestDestination: Destination = { sn: 0, waiting: {}, msdSent: false }
-	const eventDestinations: EventDestination[] = (config.eventTargets || []).map((target) => ({ target, sn: 0, waiting: {}, msdSent: false, keys: target.enabledKeys, queue: [], gone: false }))
+	const eventDestinations: EventDestination[] = (config.eventTargets || []).map((target) => ({ target, sn: 0, waiting: {}, msdSent: false, keys: target.enabledKeys, queue: [], gone: false, delay: 0 }))
 	const all: Destination[] = [requestDestination, ...eventDestinations]
 	let msd: number | undefined
+	let stopped = false
 
 	/** Reads the values of a call that every destination receives. Throws when one of them cannot be serialized. */
 	function scope(data: Cmcd, extra?: Cmcd): Scoped {
@@ -201,14 +205,29 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 	}
 
-	function send(destination: EventDestination): void {
-		if (destination.gone || !destination.queue.length) {
+	/** Sends the queue of a target. A target that waits after a failure sends only when `force` is set. */
+	function send(destination: EventDestination, force?: boolean): void {
+		if (destination.gone || !destination.queue.length || (destination.retry && !force)) {
 			return
 		}
 
+		clearTimeout(destination.retry)
+		destination.retry = undefined
+
 		const lines = destination.queue.splice(0)
-		const retry = () => {
+
+		// CTA-5004-B: back off after a 429 or 5xx response.
+		const backOff = () => {
 			destination.queue.unshift(...lines)
+			destination.delay = Math.min(destination.delay * 2 || 1000, MAX_DELAY)
+
+			if (!stopped && !destination.gone) {
+				clearTimeout(destination.retry)
+				destination.retry = setTimeout(() => {
+					destination.retry = undefined
+					send(destination)
+				}, destination.delay)
+			}
 		}
 
 		requester({ url: destination.target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }).then(({ status }) => {
@@ -218,13 +237,17 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 						sibling.gone = true
 						sibling.queue.length = 0
 						clearInterval(sibling.timer)
+						clearTimeout(sibling.retry)
 					}
 				}
 			}
 			else if (status === 429 || status > 499) {
-				retry()
+				backOff()
 			}
-		}, retry)
+			else {
+				destination.delay = 0
+			}
+		}, backOff)
 	}
 
 	function emit(type: CmcdEventType, data: Cmcd, request?: Readonly<HttpRequest>, candidates: readonly EventDestination[] = eventDestinations, extra?: Cmcd): void {
@@ -322,6 +345,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 		start(immediate = true) {
 			const { snapshot } = config
+			stopped = false
 
 			for (const destination of eventDestinations) {
 				clearInterval(destination.timer)
@@ -340,11 +364,17 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		},
 
 		stop() {
-			eventDestinations.forEach((destination) => clearInterval(destination.timer))
+			stopped = true
+
+			for (const destination of eventDestinations) {
+				clearInterval(destination.timer)
+				clearTimeout(destination.retry)
+				destination.retry = undefined
+			}
 		},
 
 		flush() {
-			eventDestinations.forEach(send)
+			eventDestinations.forEach((destination) => send(destination, true))
 		},
 	}
 

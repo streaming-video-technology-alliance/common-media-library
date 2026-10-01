@@ -73,6 +73,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
     - The name of `includeOnce()`: the method is gone. The session reads `msd`, `bs`, and `bsd` from the data of any call and applies their CTA-5004-B scope.
     - The default for a missing `enabledKeys`: every key, as the RFC proposed.
     - The queue limit: none, as in `CmcdReporter`. The default requester sends without `keepalive`.
+    - The retry rule: back off after a 429, a 5xx, or a rejected request, from 1 second doubling to 60 seconds, as RFC 455 proposed.
   - Done when: the RFC records an answer for each question.
 - [ ] **0.6 Accept the RFC (Casey).** Write the Final Decision section, set `status: accepted`, and squash-merge with the subject `docs(rfc): CMCD session`.
   - Done when: the accepted RFC is on `main`.
@@ -414,6 +415,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Casey removed `includeOnce()` (the session scopes `msd`, `bs`, and `bsd` by key) and chose the reduced configuration checks. Prototype: 6077 B, 13 of 13 scenario tests pass, the RFC examples run. The final review of the port branch returned "With fixes". |
 | 2026-10-01 | Task 0.5: Casey kept every key as the default for a missing `enabledKeys`. |
 | 2026-10-01 | Task 0.5: Casey removed the queue limit and the `keepalive` option of the default requester. Prototype: 6053 B. |
+| 2026-10-01 | Task 0.5: Casey adopted the back-off. Prototype: 6162 B, 15 of 15 scenario tests pass. |
 
 ## Links
 

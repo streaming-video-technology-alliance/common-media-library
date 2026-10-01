@@ -334,10 +334,12 @@ A target sends its queue when the queue reaches `batchSize`, and on `flush()`. O
 
 | Response | Action |
 |---|---|
-| 2xx | Done |
+| 2xx | Done. The wait resets. |
 | 410 | Every target with that URL stops for the life of the session |
-| 429, 5xx, or a rejected request | The batch returns to the front of the queue and goes out with the next send |
-| Any other status | The batch is dropped |
+| 429, 5xx, or a rejected request | The batch returns to the front of the queue, and the target waits before its next send |
+| Any other status | The batch is dropped. The wait resets. |
+
+The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new lines join the queue and go out with the retry. CTA-5004-B recommends this back-off for 429 and 5xx responses. `flush()` sends at once, also during a wait. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
 
 ### Errors
 
@@ -382,9 +384,9 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession`, prototype | 6053 B |
+| `createCmcdSession`, prototype | 6162 B |
 | `CmcdReporter`, current | 8423 B |
-| Both in one bundle | 9724 B |
+| Both in one bundle | 9833 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
@@ -398,7 +400,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - Each player must migrate. It replaces the store with its own state object and adds its own state change checks.
 - Until the next major version, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
 - A player that imports both APIs during a migration pays for both, as the bundle table shows.
-- During a long outage of a collector, the queue of each of its targets grows without a limit, as in `CmcdReporter`.
+- During a long outage of a collector, the queues of its targets grow without a limit. `CmcdReporter` has the same behavior.
 - A target cannot receive data that differs from the data of the other targets. The `bg=?0` opt-in of `CmcdReporter` has no equivalent.
 - The session derives no playback keys. Players keep computing `msd`, `bs`, `su`, and `dl`, as they do today.
 
@@ -414,6 +416,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **No keys without `enabledKeys`.** This default of `CmcdReporter` makes each player pass the full key list. hls.js, dash.js, and shaka-player all do so. The data of each call already selects the keys.
 - **A queue limit.** A limit bounds the memory that a long outage of a collector uses. It also drops reports, and a `batchSize` above the limit never fills. The session has no limit, like `CmcdReporter`.
 - **`keepalive` in the default requester.** It lets a send finish after the page closes. Browsers reject a `keepalive` body over 64 KiB, and a batch after an outage can be larger. A player that needs `keepalive` passes its own requester.
+- **The retry rule of `CmcdReporter`.** It sends a failed batch again with the next send. During an outage, each new event then sends the whole queue to the failing collector.
 - **Timers in the player.** shaka-player 5.2.0 shows the lifecycle risk of timers in the library. Targets have their own intervals, though, so the session needs to know them. `start()` and `stop()` keep the lifecycle explicit.
 
 ## Prior art
@@ -422,7 +425,6 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 
 ## Unresolved questions
 
-- The retry rule. This RFC keeps the rule of `CmcdReporter`, which returns a failed batch to the queue. RFC 455 proposed a back-off timer.
 - The major version that removes `CmcdReporter`, and whether the removal waits until hls.js, dash.js, and shaka-player have migrated.
 
 ## Future possibilities
