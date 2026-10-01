@@ -1,5 +1,5 @@
 import { getBaseUrl, urlToRelativePath } from '@svta/cml-utils'
-import { equal } from 'node:assert'
+import { deepEqual, equal } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('urlToRelativePath', () => {
@@ -32,6 +32,34 @@ describe('urlToRelativePath', () => {
 	it('returns url unchanged when it is already a relative path', () => {
 		equal(urlToRelativePath('1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '1.mp4')
 		equal(urlToRelativePath('../segments/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '../segments/1.mp4')
+	})
+
+	it('returns url unchanged when it has no scheme', () => {
+		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
+		equal(urlToRelativePath('seg-2.m4s', base), 'seg-2.m4s')
+		equal(urlToRelativePath('//cdn/x', base), '//cdn/x')
+		equal(urlToRelativePath('/a/b', base), '/a/b')
+	})
+
+	it('does not throw internally when url has no scheme', (t) => {
+		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
+		const urlSpy = t.mock.method(globalThis, 'URL')
+		urlToRelativePath('seg-2.m4s', base)
+		urlToRelativePath('//cdn/x', base)
+		urlToRelativePath('/a/b', base)
+		deepEqual(urlSpy.mock.calls.filter(call => call.error !== undefined).map(call => call.arguments[0]), [])
+	})
+
+	it('returns url unchanged when it has a scheme but is not a valid URL', () => {
+		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
+		equal(urlToRelativePath('https://', base), 'https://')
+		equal(urlToRelativePath('https://[::1/seg-2.m4s', base), 'https://[::1/seg-2.m4s')
+	})
+
+	it('produces a relative path when url has characters that the URL parser removes', () => {
+		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
+		equal(urlToRelativePath('\0\n https://cdn.example.com/v/1080p/seg-2.m4s', base), 'seg-2.m4s')
+		equal(urlToRelativePath('ht\ttps://cdn.example.com/v/1080p/seg-2.m4s', base), 'seg-2.m4s')
 	})
 
 	it('maintains query parameters and hash in the relative path', () => {
