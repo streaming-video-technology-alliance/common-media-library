@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-10-01
+
 ### Changed
 
 - The encoder reads its key rules from one internal table. It no longer reads `CMCD_FORMATTER_MAP`. To change a value, use `CmcdEncodeOptions.formatters`. A formatter runs at most once in a call, and only for a key that the encoder can send. The `ot` and `e` formatters also run when a rule needs their value. The encoder no longer calls a `v` formatter. `CmcdReporter` applies the same rules and has no option to change them. `CMCD_FORMATTER_MAP` has an entry for each integer key and for `pr`. `prepareCmcdData` returns a symbol token as an `SfToken`. It returns a `nor` value that is one `SfItem` as a list. Both shapes give the same wire output as before
@@ -313,7 +315,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.0...HEAD
+[2.8.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...cmcd-v2.8.0
 [2.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...cmcd-v2.7.0
 [2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
 [2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0
