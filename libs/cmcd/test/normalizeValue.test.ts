@@ -55,10 +55,11 @@ describe('normalizeValue', () => {
 		equal(normalizeValue('a'.repeat(65), CUSTOM, V1), 'a'.repeat(65))
 	})
 
-	it('returns a token from the token list of the key', () => {
+	it('returns a token for any token text, and drops an empty text', () => {
 		equal(tokenOf(normalizeValue('v', spec('ot'), V2)), 'v')
 		equal(tokenOf(normalizeValue(Symbol.for('v'), spec('ot'), V2)), 'v')
-		equal(normalizeValue('x', spec('ot'), V2), undefined)
+		equal(tokenOf(normalizeValue('x', spec('ot'), V2)), 'x')
+		equal(normalizeValue('', spec('ot'), V2), undefined)
 	})
 
 	it('maps st=ll and sf=e to version 1 tokens', () => {
@@ -69,8 +70,8 @@ describe('normalizeValue', () => {
 	})
 
 	it('does not map the name of an inherited property to a version 1 token', () => {
-		equal(normalizeValue('constructor', spec('st'), V1), undefined)
-		equal(normalizeValue('toString', spec('sf'), V1), undefined)
+		equal(tokenOf(normalizeValue('constructor', spec('st'), V1)), 'constructor')
+		equal(tokenOf(normalizeValue('toString', spec('sf'), V1)), 'toString')
 	})
 
 	it('wraps one value of a list key in a list in version 2', () => {
