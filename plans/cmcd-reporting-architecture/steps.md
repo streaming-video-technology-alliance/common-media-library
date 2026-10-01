@@ -422,6 +422,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Task 2.2: final review fixed, Task 7 approved. Pushed `refactor/cmcd-encode-pipeline-port` (32ec4383d, `encodeCmcd` +677 B against 501281b70) and `perf/cmcd-drop-token-lists` (dd83aaa24, `encodeCmcd` 3837 B). Casey opens both PRs. |
 | 2026-10-01 | Task 0.2: Casey asked the agent to create the PRs. RFC PR 486 is open. |
 | 2026-10-01 | Tasks 0.3 and 1.1: the four notices are posted on PRs 398, 422, 455, and 460, with the link to PR 486. |
+| 2026-10-01 | PRs opened: 487 (port, base `refactor/cmcd-encode`), 488 (token lists, base `refactor/cmcd-encode-pipeline-port`, retarget after 487 merges), 489 (`rr` fix, base `refactor/cmcd-encode`). |
 
 ## Links
 
@@ -433,3 +434,6 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | PR 455 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/455 |
 | PR 460 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/460 |
 | RFC PR 486 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/486 |
+| Port PR 487 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/487 |
+| Token list PR 488 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/488 |
+| rr fix PR 489 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/489 |
