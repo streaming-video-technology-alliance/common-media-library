@@ -60,6 +60,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
   - Response timing. `ttfb` is set only when `responseStart` is above 0 and not earlier than `startTime`. Resource Timing reports 0 for a cross-origin response without `Timing-Allow-Origin`. `ttlb` comes from `duration` when it is above 0, else from `responseEnd` minus `startTime`. PR 460 has the rules in `libs/cmcd/src/toResponseKeys.ts`.
   - The `h` event. Add `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` to the new exports. CTA-5004-B defines the event, and `main` has no constant for it. The key table on the port branch already accepts `e=h`.
   - Update the prototype in the session scratchpad, and run the example check from the RFC method again.
+  - Decision (Casey, 2026-10-01): only the checks that TypeScript cannot express (`sid`, `cid`, and the `url`, `interval`, and `batchSize` of a target), and no `responseEnd` fallback for `ttlb`.
   - Done when: the RFC describes the three parts, and the prototype and the RFC examples pass.
 - [ ] **0.2 Push the branch and open the RFC PR.** Casey approved the push of `rfc/cmcd-session` on 2026-10-01. Casey opens the PR "[RFC] CMCD session" with `/create-pr main`. Record the PR link here, and use it for `{rfc-pr}` in Phase 1.
   - Done when: the PR is open, and its link is in this file.
@@ -69,6 +70,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
 - [ ] **0.5 Resolve the unresolved questions (Casey and the reviewers).** The questions are the API name, the name of `includeOnce()`, the default for a missing `enabledKeys`, the queue limit, the retry rule, and the removal timing of `CmcdReporter`.
   - Answers:
     - The API name: keep `createCmcdSession()`.
+    - The name of `includeOnce()`: the method is gone. The session reads `msd`, `bs`, and `bsd` from the data of any call and applies their CTA-5004-B scope.
   - Done when: the RFC records an answer for each question.
 - [ ] **0.6 Accept the RFC (Casey).** Write the Final Decision section, set `status: accepted`, and squash-merge with the subject `docs(rfc): CMCD session`.
   - Done when: the accepted RFC is on `main`.
@@ -150,10 +152,10 @@ Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
     - `createRequestReport()`
     - `recordEvent()` and `filter`
     - `recordResponseReceived()` with the timing rules of Task 0.1
-    - `recordError()` and `includeOnce()`, with their value checks
+    - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks
     - delivery: batches, response statuses, and the queue limit
     - the timers, `start()`, and `stop()`
-    - `configure()` and the configuration checks
+    - `configure()`, and the configuration checks of `createCmcdSession()`
     - the README quick start, the user guide section, and the migration guide
     - TSDoc with `@example` regions in the tests, and the changelog entries
     - the API report review, the bundle measurement, the bare-import probe, and a speed check against `CmcdReporter`
@@ -178,7 +180,7 @@ One plan for each player, at phase start. Entry: release 2.9.0. Each upstream PR
 
 - [ ] **5.1 hls.js.** Replace `CmcdReporter` in `src/controller/cmcd-controller.ts`. The controller keeps a state object and checks state changes in `setPlayerState()`. It passes `snapshot` for `t` reports and records responses with `recordResponseReceived()`. Interstitial asset players can share the session of the primary player.
   - Done when: hls.js releases on the session API.
-- [ ] **5.2 dash.js.** Coordinate with Daniel Silhavy and Qualabs. Replace `CmcdReporter` in `src/streaming/controllers/CmcdController.js`. Apply `eventTargets[].includeInRequests` to `rr` reports with `filter`. Use `configure()` instead of a new reporter for manifest settings, and send `msd` with `includeOnce()`.
+- [ ] **5.2 dash.js.** Coordinate with Daniel Silhavy and Qualabs. Replace `CmcdReporter` in `src/streaming/controllers/CmcdController.js`. Apply `eventTargets[].includeInRequests` to `rr` reports with `filter`. Use `configure()` instead of a new reporter for manifest settings. Pass `msd`, `bs`, and `bsd` in the call data, with their object types.
   - Done when: dash.js releases on the session API.
 - [ ] **5.3 shaka-player.** Coordinate with the shaka-player maintainers. The vendored Closure port in `third_party/cml-cmcd` needs a new port, unless the TypeScript migration of shaka-player comes first.
   - Done when: shaka-player releases on the session API, or its maintainers choose to wait.
@@ -407,6 +409,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Casey decided Task 1.3 (close PR 455 unmerged) and Task 2.1 (optimization 3 only, with the bundle gate). Casey approved pushes as the work goes on. Tasks 0.1 and 2.3 started. |
 | 2026-10-01 | Task 0.5: Casey kept the name `createCmcdSession()`. Casey approved Task 2.2, to start after Task 2.3. |
 | 2026-10-01 | Task 2.3: `fix/cmcd-rr-without-provenance` pushed (b92800cd9, d3c9811b3), root `npm test` green. Casey opens the PR. Task 0.1: the prototype has the checks and the timing rules, 12 of 12 scenario tests pass, and the RFC examples run. |
+| 2026-10-01 | Casey removed `includeOnce()` (the session scopes `msd`, `bs`, and `bsd` by key) and chose the reduced configuration checks. Prototype: 6077 B, 13 of 13 scenario tests pass, the RFC examples run. The final review of the port branch returned "With fixes". |
 
 ## Links
 

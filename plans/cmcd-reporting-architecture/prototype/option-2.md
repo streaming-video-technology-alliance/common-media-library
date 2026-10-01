@@ -9,11 +9,12 @@ Reference code for [option-2.md](../option-2.md) and [the RFC](../../../rfc/cmcd
  * Prototype of the CMCD session RFC (rfc/cmcd-session.md). CmcdReporter is deprecated.
  *
  * One session is one sid. The session keeps only the state CTA-5004-B scopes
- * to a session or a destination: one sn per destination, the data each
- * destination receives once, the event queues, and the t timers.
+ * to a session or a destination: one sn per destination, the msd gate, the
+ * bs, bsd, and ec values that wait for the next report of each destination,
+ * the event queues, and the t timers.
  * The player passes the full data on every call. A call builds and encodes
- * every report before it changes any state. `createCmcdSession()` and
- * `configure()` check the configuration first, so a failed check changes nothing.
+ * every report before it changes any state. `createCmcdSession()` checks the
+ * configuration first.
  */
 import type { HttpRequest, HttpResponse, ResourceTiming } from '@svta/cml-utils'
 import { encodeSfDict } from '@svta/cml-structured-field-values'
@@ -21,14 +22,13 @@ import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from '#cmcd/CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_MIME_TYPE } from '#cmcd/CMCD_MIME_TYPE.ts'
 import type { Cmcd } from '#cmcd/Cmcd.ts'
-import { CmcdEventType } from '#cmcd/CmcdEventType.ts'
+import type { CmcdEventType } from '#cmcd/CmcdEventType.ts'
 import type { CmcdHeaderMap } from '#cmcd/CmcdHeaderMap.ts'
 import type { CmcdKey } from '#cmcd/CmcdKey.ts'
 import type { CmcdRequestReport } from '#cmcd/CmcdRequestReport.ts'
 import type { CmcdTransmissionMode } from '#cmcd/CmcdTransmissionMode.ts'
 import type { CmcdVersion } from '#cmcd/CmcdVersion.ts'
 import { encodePreparedCmcd } from '#cmcd/encodePreparedCmcd.ts'
-import { getKeySpec } from '#cmcd/getKeySpec.ts'
 import { prepareCmcdData } from '#cmcd/prepareCmcdData.ts'
 import { toPreparedCmcdHeaders } from '#cmcd/toPreparedCmcdHeaders.ts'
 
@@ -64,7 +64,6 @@ export type CmcdSession = {
 	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void
 	recordResponseReceived(response: HttpResponse, data?: Cmcd): void
 	recordError(codes: string | readonly string[], data?: Cmcd): void
-	includeOnce(data: Cmcd): void
 	configure(settings: CmcdSessionSettings): void
 	start(immediate?: boolean): void
 	stop(): void
@@ -73,7 +72,8 @@ export type CmcdSession = {
 
 type Destination = {
 	sn: number
-	pending: Cmcd
+	waiting: Cmcd
+	msdSent: boolean
 	keys?: readonly CmcdKey[]
 }
 
@@ -84,90 +84,36 @@ type EventDestination = Destination & {
 	timer?: ReturnType<typeof setInterval>
 }
 
-/** The members of a `PerformanceResourceTiming` entry that `recordResponseReceived()` reads. `ResourceTiming` has no `responseEnd` yet. */
-type ResponseTiming = Partial<ResourceTiming> & { responseEnd?: number }
+/** The values of one call that reach every destination: the first valid msd, and the bs, bsd, and ec values. */
+type Scoped = {
+	msd?: number
+	values: Cmcd
+}
 
 const CMCD_QUERY_PARAM = /([?&])CMCD=[^&#]*&?/
 const MAX_QUEUE = 500
 const MAX_INTEGER = 999_999_999_999_999
-// The implementation adds CMCD_EVENT_HOSTNAME ('h') to CmcdEventType, so the literal 'h' goes away there.
-const EVENT_TYPES: readonly string[] = [...Object.values(CmcdEventType), 'h']
+const SCOPED_KEYS = ['msd', 'bs', 'bsd', 'ec'] as const
 
 function withoutCmcdParam(url: string): string {
 	return url.replace(CMCD_QUERY_PARAM, '$1').replace(/[?&](#|$)/, '$1')
 }
 
-function merge(pending: Record<string, unknown>, data: Record<string, unknown>): void {
-	for (const key in data) {
-		const value = data[key]
-		const prior = pending[key]
-		pending[key] = Array.isArray(prior) && Array.isArray(value) ? [...prior, ...value] : value
+function merge(waiting: Record<string, unknown>, values: Record<string, unknown>): Record<string, unknown> {
+	for (const key in values) {
+		const value = values[key]
+		const prior = waiting[key]
+		waiting[key] = Array.isArray(prior) ? [...prior, ...(Array.isArray(value) ? value : [value])] : value
 	}
-}
 
-/** Throws when a value cannot be serialized, so a waiting key can never fail a later report. */
-function assertEncodable(data: Cmcd): void {
-	encodeSfDict(Object.fromEntries(Object.entries(data).filter(([, value]) => value !== undefined)))
+	return waiting
 }
 
 function configError(parameter: string, expected: string, received: unknown): Error {
 	return new Error(`createCmcdSession: ${parameter} must be ${expected}, received ${typeof received === 'string' ? JSON.stringify(received) : String(received)}`)
 }
 
-function checkKeys(parameter: string, keys: readonly string[] | undefined): void {
-	for (const key of keys ?? []) {
-		if (typeof key !== 'string' || getKeySpec(key) === undefined) {
-			throw configError(parameter, 'a CMCD key or a custom key with a hyphen', key)
-		}
-	}
-}
-
-/** Checks the settings that `createCmcdSession()` and `configure()` share. */
-function checkSettings({ version, transmissionMode, enabledKeys, customHeaderMap }: CmcdSessionSettings): void {
-	if (version !== undefined && version !== 1 && version !== 2) {
-		throw configError('version', '1 or 2', version)
-	}
-
-	if (transmissionMode !== undefined && transmissionMode !== 'query' && transmissionMode !== 'headers') {
-		throw configError('transmissionMode', '"query" or "headers"', transmissionMode)
-	}
-
-	checkKeys('enabledKeys', enabledKeys)
-
-	for (const keys of Object.values(customHeaderMap ?? {})) {
-		checkKeys('customHeaderMap', keys)
-	}
-}
-
-function checkTarget({ url, events, enabledKeys, interval, batchSize }: CmcdSessionEventTarget, parameter: string): void {
-	if (typeof url !== 'string' || url === '') {
-		throw configError(`${parameter}.url`, 'a URL', url)
-	}
-
-	if (!Array.isArray(events)) {
-		throw configError(`${parameter}.events`, 'CMCD event types', events)
-	}
-
-	for (const event of events) {
-		if (!EVENT_TYPES.includes(event)) {
-			throw configError(`${parameter}.events`, 'CMCD event types', event)
-		}
-	}
-
-	checkKeys(`${parameter}.enabledKeys`, enabledKeys)
-
-	if (interval !== undefined && !(Number.isFinite(interval) && interval >= 0)) {
-		throw configError(`${parameter}.interval`, 'a finite number of seconds, 0 or more', interval)
-	}
-
-	if (batchSize !== undefined && !(Number.isInteger(batchSize) && batchSize > 0)) {
-		throw configError(`${parameter}.batchSize`, 'a positive integer', batchSize)
-	}
-}
-
-function checkConfig(config: CmcdSessionConfig): void {
-	const { sid, cid, eventTargets } = config
-
+function checkConfig({ sid, cid, eventTargets }: CmcdSessionConfig): void {
 	if (sid !== undefined && (typeof sid !== 'string' || sid === '' || sid.length > 64)) {
 		throw configError('sid', 'a string of 1 to 64 characters', sid)
 	}
@@ -176,8 +122,19 @@ function checkConfig(config: CmcdSessionConfig): void {
 		throw configError('cid', 'a string of at most 128 characters', cid)
 	}
 
-	checkSettings(config)
-	eventTargets?.forEach((target, i) => checkTarget(target, `eventTargets[${i}]`))
+	eventTargets?.forEach(({ url, interval, batchSize }, i) => {
+		if (typeof url !== 'string' || url === '') {
+			throw configError(`eventTargets[${i}].url`, 'a URL', url)
+		}
+
+		if (interval !== undefined && !(Number.isFinite(interval) && interval >= 0)) {
+			throw configError(`eventTargets[${i}].interval`, 'a finite number of seconds, 0 or more', interval)
+		}
+
+		if (batchSize !== undefined && !(Number.isInteger(batchSize) && batchSize > 0)) {
+			throw configError(`eventTargets[${i}].batchSize`, 'a positive integer', batchSize)
+		}
+	})
 }
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
@@ -191,12 +148,35 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin
 	const settings: CmcdSessionSettings = { version: 2, ...config }
-	const requestDestination: Destination = { sn: 0, pending: {} }
-	const eventDestinations: EventDestination[] = (config.eventTargets || []).map((target) => ({ target, sn: 0, pending: {}, keys: target.enabledKeys, queue: [], gone: false }))
+	const requestDestination: Destination = { sn: 0, waiting: {}, msdSent: false }
+	const eventDestinations: EventDestination[] = (config.eventTargets || []).map((target) => ({ target, sn: 0, waiting: {}, msdSent: false, keys: target.enabledKeys, queue: [], gone: false }))
 	const all: Destination[] = [requestDestination, ...eventDestinations]
+	let msd: number | undefined
 
-	function build(destination: Destination, data: Cmcd, reportingMode: 'request' | 'event', keys?: readonly CmcdKey[], baseUrl?: string): Cmcd {
-		return prepareCmcdData({ cid: config.cid, ...data, msd: undefined, ...destination.pending, sid, sn: destination.sn }, {
+	/** Reads the values of a call that every destination receives. Throws when one of them cannot be serialized. */
+	function scope(data: Cmcd, extra?: Cmcd): Scoped {
+		const values: Cmcd = { ...extra }
+
+		if (data.bs === true) {
+			values.bs = true
+		}
+
+		if (data.bsd != null) {
+			values.bsd = data.bsd
+		}
+
+		encodeSfDict(values as Record<string, unknown>)
+
+		const value = data.msd
+		const valid = msd === undefined && typeof value === 'number' && value >= 0 && Math.round(value) <= MAX_INTEGER
+
+		return { msd: valid ? Math.round(value) : undefined, values }
+	}
+
+	function build(destination: Destination, data: Cmcd, scoped: Scoped, reportingMode: 'request' | 'event', keys?: readonly CmcdKey[], baseUrl?: string): Cmcd {
+		const waiting = merge({ ...destination.waiting }, scoped.values as Record<string, unknown>)
+
+		return prepareCmcdData({ cid: config.cid, ...data, msd: destination.msdSent ? undefined : msd ?? scoped.msd, ...waiting, sid, sn: destination.sn }, {
 			version: reportingMode === 'event' ? 2 : settings.version,
 			reportingMode,
 			filter: keys && ((key) => keys.includes(key)),
@@ -204,9 +184,22 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		})
 	}
 
-	function commit(destination: Destination): void {
-		destination.sn++
-		destination.pending = {}
+	/** The destinations that reported take their waiting values. Every other destination receives the values of the call. */
+	function commit(reported: readonly Destination[], prepared: readonly Cmcd[], scoped: Scoped): void {
+		msd ??= scoped.msd
+
+		for (const destination of all) {
+			const i = reported.indexOf(destination)
+
+			if (i < 0) {
+				merge(destination.waiting as Record<string, unknown>, scoped.values as Record<string, unknown>)
+			}
+			else {
+				destination.sn++
+				destination.waiting = {}
+				destination.msdSent ||= prepared[i].msd !== undefined
+			}
+		}
 	}
 
 	function send(destination: EventDestination): void {
@@ -236,7 +229,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}, retry)
 	}
 
-	function emit(candidates: readonly EventDestination[], type: CmcdEventType, data: Cmcd, request?: Readonly<HttpRequest>): void {
+	function emit(type: CmcdEventType, data: Cmcd, request?: Readonly<HttpRequest>, candidates: readonly EventDestination[] = eventDestinations, extra?: Cmcd): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
 
 		// CTA-5004-B: a b event without bg is the exit from backgrounded mode.
@@ -244,11 +237,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			delete report.bg
 		}
 
+		const scoped = scope(report, extra)
 		const selected = candidates.filter(({ gone, target }) => !gone && target.events.includes(type) && (!target.filter || target.filter(report, request)))
-		const lines = selected.map((destination) => encodePreparedCmcd(build(destination, report, 'event', destination.keys)))
+		const prepared = selected.map((destination) => build(destination, report, scoped, 'event', destination.keys))
+		const lines = prepared.map((cmcd) => encodePreparedCmcd(cmcd))
+
+		commit(selected, prepared, scoped)
 
 		selected.forEach((destination, i) => {
-			commit(destination)
 			destination.queue.push(lines[i])
 			destination.queue.splice(0, destination.queue.length - MAX_QUEUE)
 
@@ -262,7 +258,8 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		sid,
 
 		createRequestReport(request, data = {}) {
-			const cmcd = build(requestDestination, data, 'request', settings.enabledKeys, request.url)
+			const scoped = scope(data)
+			const cmcd = build(requestDestination, data, scoped, 'request', settings.enabledKeys, request.url)
 			const report = { ...request, headers: { ...request.headers }, customData: { ...request.customData, cmcd } }
 
 			if (settings.transmissionMode === 'headers') {
@@ -274,13 +271,13 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				report.url = encoded ? base.replace(/(#|$)/, `${base.includes('?') ? '&' : '?'}${new URLSearchParams({ CMCD: encoded })}$1`) : base
 			}
 
-			commit(requestDestination)
+			commit([requestDestination], [cmcd], scoped)
 
 			return report as typeof request & CmcdRequestReport<(typeof request)['customData']>
 		},
 
 		recordEvent(type, data = {}, request) {
-			emit(eventDestinations, type, data, request)
+			emit(type, data, request)
 		},
 
 		recordResponseReceived(response, data = {}) {
@@ -291,8 +288,15 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				return
 			}
 
+			// The request report already gave its msd, bs, bsd, and ec values to every destination.
+			const requestData: Cmcd = { ...request?.customData?.cmcd }
+
+			for (const key of SCOPED_KEYS) {
+				delete requestData[key]
+			}
+
 			const derived: Cmcd = { url: withoutCmcdParam(url), rc: response.status }
-			const { startTime, responseStart = 0, responseEnd = 0, duration = 0 }: ResponseTiming = response.resourceTiming ?? {}
+			const { startTime, responseStart = 0, duration = 0 }: Partial<ResourceTiming> = response.resourceTiming ?? {}
 
 			if (typeof startTime === 'number') {
 				derived.ts = Math.round(timeOrigin + startTime)
@@ -305,44 +309,17 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			if (duration > 0) {
 				derived.ttlb = Math.round(duration)
 			}
-			else if (typeof startTime === 'number' && responseEnd > startTime) {
-				derived.ttlb = Math.round(responseEnd - startTime)
-			}
 
-			emit(eventDestinations, 'rr', { ...request?.customData?.cmcd, ...derived, ...data }, request)
+			emit('rr', { ...requestData, ...derived, ...data }, request)
 		},
 
 		recordError(codes, data = {}) {
 			const ec = typeof codes === 'string' ? [codes] : [...codes]
-			assertEncodable({ ec })
 
-			const errorTargets = eventDestinations.filter((destination) => destination.target.events.includes('e'))
-			emit(errorTargets, 'e', { ...data, ec })
-
-			for (const destination of all) {
-				if (!errorTargets.includes(destination as EventDestination)) {
-					merge(destination.pending as Record<string, unknown>, { ec })
-				}
-			}
-		},
-
-		includeOnce(data) {
-			const { msd, ...rest } = data
-			const keys: Cmcd = rest
-
-			if (typeof msd === 'number' && msd >= 0 && Math.round(msd) <= MAX_INTEGER) {
-				keys.msd = Math.round(msd)
-			}
-
-			assertEncodable(keys)
-
-			for (const destination of all) {
-				merge(destination.pending as Record<string, unknown>, keys as Record<string, unknown>)
-			}
+			emit('e', { ...data, ec }, undefined, eventDestinations, { ec })
 		},
 
 		configure(next) {
-			checkSettings(next)
 			Object.assign(settings, next)
 		},
 
@@ -354,7 +331,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				const interval = destination.target.interval ?? CMCD_DEFAULT_TIME_INTERVAL
 
 				if (snapshot && interval > 0 && !destination.gone && destination.target.events.includes('t')) {
-					const tick = () => emit([destination], 't', snapshot())
+					const tick = () => emit('t', snapshot(), undefined, [destination])
 
 					destination.timer = setInterval(tick, interval * 1000)
 
