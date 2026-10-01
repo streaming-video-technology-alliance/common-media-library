@@ -419,6 +419,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Task 0.5 done: Casey chose removal in 3.0.0, without waiting for the players. Phase 6 depends on the plan for 3.0.0, not on Phase 5. |
 | 2026-10-01 | RFC consistency pass. Prototype: 6174 B. Benchmark, 3 runs, version 2 request: session 12.0 µs and 20.5 KB, `CmcdReporter` port 20.2 µs and 32.6 KB. |
 | 2026-10-01 | Casey approved the four notices without mentions. Casey already notified the contributors. |
+| 2026-10-01 | Task 2.2: final review fixed, Task 7 approved. Pushed `refactor/cmcd-encode-pipeline-port` (32ec4383d, `encodeCmcd` +677 B against 501281b70) and `perf/cmcd-drop-token-lists` (dd83aaa24, `encodeCmcd` 3837 B). Casey opens both PRs. |
 
 ## Links
 
