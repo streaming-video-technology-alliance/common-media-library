@@ -1,3 +1,4 @@
+import { SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -28,6 +29,7 @@ import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { isValid } from './isValid.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
+import { toBareValue } from './toBareValue.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
 type CmcdReportConfigNormalized = CmcdReportConfig & {
@@ -110,6 +112,35 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 	return true
 }
 
+/**
+ * Shallow equality for two `params` records.
+ */
+function paramsEqual(a: unknown, b: unknown): boolean {
+	const left = (a ?? {}) as Record<string, unknown>
+	const right = (b ?? {}) as Record<string, unknown>
+	const keys = Object.keys(left)
+
+	return keys.length === Object.keys(right).length && keys.every(key => Object.is(left[key], right[key]))
+}
+
+/**
+ * Equality for `br` deduplication. A `br` value can be an `SfItem` that
+ * wraps the list, as `decodeCmcd` returns for an inner list with
+ * parameters. Two values are equal when their lists and their list
+ * parameters are equal.
+ */
+function brEqual(a: unknown, b: unknown): boolean {
+	const listA = toBareValue(a)
+	const listB = toBareValue(b)
+
+	if (!Array.isArray(listA) || !Array.isArray(listB)) {
+		return Object.is(a, b)
+	}
+
+	return cmcdObjectTypeListEqual(listA, listB)
+		&& paramsEqual(a instanceof SfItem ? a.params : undefined, b instanceof SfItem ? b.params : undefined)
+}
+
 const equal = Object.is
 const identity = <T>(v: T): T => v
 
@@ -124,8 +155,8 @@ const STATE_FIELDS: readonly StateFieldEntry[] = /* @__PURE__ */ Array.from(
 			return {
 				event,
 				field,
-				equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
-				snapshot: (v) => (v as CmcdObjectTypeList).slice(),
+				equal: brEqual,
+				snapshot: (v) => Array.isArray(v) ? v.slice() : copyItemValue(v),
 			}
 		}
 		return { event, field: field as StateField, equal, snapshot: identity }
@@ -153,7 +184,8 @@ function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
 const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
 
 /**
- * Copies a value with the `SfItem` structure, including its `params` record.
+ * Copies a value with the `SfItem` structure, including its `params` record
+ * and the list of an `SfItem` that wraps a list.
  *
  * The copy keeps the prototype because `prepareCmcdData`, the formatter map,
  * validation, and the structured-field encoder all branch on
@@ -165,10 +197,14 @@ function copyItemValue(value: unknown): unknown {
 		return value
 	}
 
-	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; }
+	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; value?: unknown; }
 
 	if (copy.params !== null && typeof copy.params === 'object') {
 		copy.params = { ...copy.params }
+	}
+
+	if (Array.isArray(copy.value)) {
+		copy.value = copy.value.map(copyItemValue)
 	}
 
 	return copy
@@ -181,7 +217,8 @@ function copyItemValue(value: unknown): unknown {
  *
  * The copy is complete for the CMCD value space. `CmcdValue` and
  * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
- * those. `SfItem.params` is a flat record. The reporter calls this function
+ * those. `decodeCmcd` also returns an `SfItem` that wraps a list, and the
+ * copy includes that list. `SfItem.params` is a flat record. The reporter calls this function
  * where a transform is configured, at session end on the ended session's
  * store, and on the request's stored player-facing view. The session-end
  * copy detaches the frozen snapshot from caller-held references.

@@ -1,6 +1,7 @@
 import type { Cmcd, CmcdDecodeOptions } from '@svta/cml-cmcd'
-import { decodeCmcd, encodeCmcd, toCmcdHeaders, validateCmcd } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdReporter, decodeCmcd, encodeCmcd, toCmcdHeaders, validateCmcd } from '@svta/cml-cmcd'
 import { SfItem } from '@svta/cml-structured-field-values'
+import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 
@@ -27,6 +28,23 @@ function bareList(value: unknown): unknown[] {
 	ok(Array.isArray(list), 'expected a list inside the SfItem')
 	return list.map(item => item instanceof SfItem ? item.value : item)
 }
+
+function decodedBr(input: string): Cmcd['br'] {
+	return (decodeCmcd(input) as Cmcd).br
+}
+
+function createMockRequester() {
+	const requests: HttpRequest[] = []
+
+	const requester = async (request: HttpRequest): Promise<{ status: number; }> => {
+		requests.push(request)
+		return { status: 200 }
+	}
+
+	return { requester, requests }
+}
+
+const REPORT_KEYS = ['br', 'ec', 'sid', 'v', 'e', 'ts', 'sn'] as const
 
 describe('values with parameters', () => {
 	it('provides a valid example', () => {
@@ -127,6 +145,72 @@ describe('values with parameters', () => {
 		it('keeps a version 2 payload unchanged when v has parameters', () => {
 			const data = decodeToRecord('br=(1200);p=2,v=2;x', { convertToLatest: true })
 			deepEqual(bareList(data['br']), [1200])
+		})
+	})
+
+	describe('CmcdReporter', () => {
+		it('sends a br list with parameters in a request report', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({ sid: 'test-session', enabledKeys: ['br'] }, requester)
+
+			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
+
+			const report = reporter.createRequestReport({ url: 'https://example.com/segment.m4s' })
+			const sent = decodeToRecord(new URL(report.url).searchParams.get('CMCD') ?? '')
+			deepEqual(bareList(sent['br']), [3000, 6000])
+			deepEqual((sent['br'] as SfItem).params, { p: 2 })
+		})
+
+		it('fires one BITRATE_CHANGE event for two equal br lists with parameters', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: [...REPORT_KEYS],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.BITRATE_CHANGE],
+					enabledKeys: [...REPORT_KEYS],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
+			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
+			reporter.update({ br: decodedBr('br=(3000 6000);p=3') })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+		})
+
+		it('keeps the stored br list when a transform changes the list in its report', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: [...REPORT_KEYS],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.ERROR],
+					enabledKeys: [...REPORT_KEYS],
+					batchSize: 1,
+					transform: (data) => {
+						const br = data.br as unknown
+						if (br instanceof SfItem) {
+							(br.value as unknown as SfItem[]).push(new SfItem(9900))
+						}
+						return data
+					},
+				}],
+			}, requester)
+
+			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
+			reporter.recordEvent(CmcdEventType.ERROR)
+			reporter.recordEvent(CmcdEventType.ERROR)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 2)
+			ok((requests[1].body as string).includes('br=(3000 6000 9900);p=2'))
 		})
 	})
 })
