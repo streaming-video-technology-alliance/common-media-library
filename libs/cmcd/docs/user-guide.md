@@ -182,6 +182,17 @@ reporter.update({
 > [!NOTE]
 > CMCD version 1 has one number for each of these keys. For version 1, the reporter sends the value that has the object type (`ot`) of the request. It uses a value without an object type for every `ot`. If no value matches, it omits the key. For example, the list above gives `br=3000` for an audio request and no `br` for a manifest request.
 
+`decodeCmcd` keeps the parameters of a member. A member with parameters becomes an `SfItem`. For an inner list with parameters, such as `br=(3000 6000);p=2`, the value of the `SfItem` is the whole list. The encoder writes the parameters again, and the validators check the values inside the list:
+
+```typescript
+import { decodeCmcd, encodeCmcd, validateCmcd } from "@svta/cml-cmcd";
+
+const data = decodeCmcd("br=(3000 6000);p=2,v=2", { convertToLatest: true });
+
+console.log(encodeCmcd(data)); // br=(3000 6000);p=2,v=2
+console.log(validateCmcd(data).valid); // true
+```
+
 ### Absolute URLs for `nor`
 
 The CMCD specification defines `nor` (next object request) as a path relative to the current request URL. `CmcdReporter` also accepts absolute URLs and converts them. It emits same-origin URLs as relative paths. It passes cross-origin values, and values that are already relative, through unchanged.

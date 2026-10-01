@@ -30,6 +30,10 @@ and this project adheres to
 - `decodeCmcd` with `convertToLatest` keeps an inner list with parameters, such as `br=(3000 6000);p=2`, in a payload without `v`. It put the list inside a second list, and the encoder then dropped the key. A payload with parameters on `v`, such as `v=2;x`, is no longer converted as version 1 data. The fix also applies to `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
 - `CmcdReporter.update()` accepts a `br` value that is an inner list with parameters, as `decodeCmcd` returns for `br=(3000 6000);p=2`. It threw `v.slice is not a function`. Two equal values fire one `BITRATE_CHANGE` event. A transform can no longer change the stored list through the copy of its report
 
+### Documentation
+
+- The user guide describes the value that `decodeCmcd` returns for a member with parameters
+
 ## [2.7.0] - 2026-09-15
 
 ### Changed
