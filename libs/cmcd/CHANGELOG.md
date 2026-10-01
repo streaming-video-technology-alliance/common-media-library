@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The encoder reads its key rules from one internal table. Each formatter in `CmcdEncodeOptions.formatters` runs at most once in a call, and only for a key that the encoder can send. The formatters of `ot` and `e` also run when a rule needs their value. Before, the `ot` formatter could run twice, and the `br` formatter ran twice when `ab` was present. The encoder no longer calls a `v` formatter, because it sets `v` from the version. The encoder no longer reads `CMCD_FORMATTER_MAP`, so a change to an entry of the map no longer changes the output. To change a value, use `CmcdEncodeOptions.formatters`. `CmcdReporter` applies the same key rules and has no option to change them. `prepareCmcdData` now returns a symbol token as an `SfToken`. It returns a `nor` value that is one `SfItem` as a list of that `SfItem`. The wire output does not change
+
 ### Fixed
 
 - `validateCmcdStructure` accepts a `b` event without `bg`, a `pr` event without `pr`, a `c` event without `cid`, and a `bc` event without `br`. The validator reported an error for each of them. CTA-5004-B defines a `b` event without `bg` as the exit from backgrounded mode. CTA-5004-B has no rule that requires the other three keys. The fix also applies to `validateCmcd`, `validateCmcdEvents`, and `validateCmcdEventReport`. A `ps` event still requires `sta`. The error message for a `ps` event without `sta` now begins with "Play state change event" instead of "State-change event"
@@ -30,10 +34,23 @@ and this project adheres to
 - `decodeCmcd` with `convertToLatest` keeps an inner list with parameters, such as `br=(3000 6000);p=2`, in a payload without `v`. It put the list inside a second list, and the encoder then dropped the key. A payload with parameters on `v`, such as `v=2;x`, is no longer converted as version 1 data. The fix also applies to `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
 - `CmcdReporter.update()` accepts a `br` value that is an inner list with parameters, as `decodeCmcd` returns for `br=(3000 6000);p=2`. It threw `v.slice is not a function`. A `BITRATE_CHANGE` event fires only when a bitrate or an object type flag changes. A change to the parameters of the list alone fires no event. A transform can no longer change the stored list through the copy of its report
 - `CmcdReporter.recordResponseReceived()` again reports a response whose request has no provenance record, under the current session, as in version 2.4.0. Since version 2.6.0, the reporter dropped these responses. hls.js and dash.js therefore lost every `rr` event after an upgrade.
+- The encoder ignores a `baseUrl` that is not a valid URL. It also ignores a `baseUrl` with an opaque origin, such as a `file:`, `data:`, or custom-scheme URL. The encoder sends `nor` without the conversion. Before, encoding threw `Invalid URL`. The encoder also drops a `nor` entry that is not a non-empty string, such as `''`. `CMCD_FORMATTER_MAP.nor` follows these rules. This is a wire output change
+- The encoder drops a value that does not match the type of its key. Examples are `bs: 'yes'`, `sid: 123`, and `d: [4000]`. In a list, it drops only such an element, such as `5` in `ec: ['E1', 5]`. It also drops a token that its key does not define, such as `ot: 'x'`. It also drops a string longer than the maximum of its key. In version 2, a custom string has at most 64 characters. CTA-5004 and CTA-5004-B require a server to ignore such a value. Before, the encoder sent it. The encoder drops a plain object, a `Date`, or a byte sequence as the value of a custom key. Before, it sent a `Date` and a byte sequence. A plain object made encoding throw. The change covers `prepareCmcdData`, the encoding functions that call it, and `CmcdReporter`. This is a wire output change
+- An `ot` that is not a valid token counts as unknown. The encoder drops it and sends `d` and `tpb`, as it does for an empty `ot`. Before, it sent the invalid `ot` and dropped `d` and `tpb`. This is a wire output change
+- In version 1 output, the encoder applies the limits of CTA-5004. `cid` has at most 64 characters, and a custom string has no length limit. Version 1 has no `st=ll` and no `sf=e`, so the encoder sends `st=l` and `sf=o`. Before, it sent `st=ll` and `sf=e`, which a version 1 server MUST ignore. This is a wire output change
+- In version 2 output, the encoder sends one value on a list key as a list. `br: 3000` becomes `br=(3000)`, and `ec: 'E1'` becomes `ec=("E1")`. Before, the output was `br=3000`, which a version 2 server MUST ignore. `encodeCmcd(decodeCmcd('br=3000'))` took this path. This is a wire output change
+- The encoder sends `h` on an `h` event, even when the key filter removes `h`. The same rule already applied to the keys that the encoder always sends on an event. An example is `sta` on a `ps` event. This is a wire output change
+- In event mode, the encoder drops the response keys from a report without `e`. The keys are `cmsdd`, `cmsds`, `rc`, `smrt`, `ttfb`, `ttfbb`, `ttlb`, and `url`. CTA-5004-B allows them only on `rr` events. Before, the encoder sent them. This is a wire output change
+- The event rules of the encoder read `e` after its formatter in `CmcdEncodeOptions.formatters`. The object type rules read `ot` in the same way. Before, a formatter that changed `e` to `ce` sent `e=ce` without `cen`. This is a wire output change
+- In event mode, the encoder keeps a `ts` with parameters, such as the decoded `ts=1700000000000;x`. Before, it replaced the timestamp with the current time. This is a wire output change
+- The encoder omits a default value that has parameters, as it omits the bare value. Examples are `pr=1;x`, `bs=?0;x`, and `com.example-x=?0;a=1`. The exceptions stay the same: `pr` on a `pr` event and `bg` on a `b` event. This is a wire output change
+- In version 1, the encoder sends only version 1 keys and custom keys, also in event mode. Before, a version 1 event report had `e`, `ts`, and keys such as `sta`. CTA-5004-B defines event mode for version 2 only. This is a wire output change
+- The encoder reads the version from the value inside `v` and sends `v` without parameters. A decoded `v=1;x` gives version 1 output, like `v: 1`. Before, it gave version 2 output with `v=1;x`. A decoded `v=2;x` becomes `v=2`. This is a wire output change
 
 ### Documentation
 
 - The user guide describes the value that `decodeCmcd` returns for a member with parameters
+- The user guide lists the values that the encoder drops, the version 1 limits, and the length limit of a custom string
 
 ## [2.7.0] - 2026-09-15
 

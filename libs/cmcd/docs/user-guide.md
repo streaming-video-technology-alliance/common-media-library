@@ -122,14 +122,22 @@ reporter.update({ bl: [25432], br: [2500.7] }); // sent as bl=(25400) and br=(25
 The reporter applies the "MUST NOT" rules of CTA-5004-B when it encodes a report. It omits a key without an error in these cases:
 
 - The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted. The exception is a `bg: false` that a transform adds to a backgrounded-mode report (see [Recording Events](#recording-events)).
-- The value of a numeric key is not a number, such as `pt: "123"`. In a list, the reporter drops each element that is not a finite number, such as `null` in `pb: [2500, null]`. It omits the key when no element is left.
+- The value does not match the type of its key, such as `pt: "123"` or `sid: 123`. In a list, the reporter drops each element of the wrong type, such as `null` in `pb: [2500, null]`. It omits the key when no element is left.
+- The value is a token that its key does not define, such as `ot: "x"`. An `ot` that the reporter omits counts as unknown for the `d` and `tpb` rules below.
+- The value is a string longer than the maximum of its key, such as a `sid` of more than 64 characters.
 - `d` when `ot` is not `a`, `v`, `av`, `tt`, `c`, or `o`. For example, a manifest request with `ot: "m"` never carries `d`. The rule uses the object type you set, even if `ot` is not in `enabledKeys`.
 - `tpb` when `ot` is not `a`, `v`, `av`, or `c`.
 - `ab`, `lab`, or `tab` when the same report also carries `br`, `lb`, or `tb`. The report keeps the exact bitrate.
 - `cen` on every event except a custom event.
+- `cmsdd`, `cmsds`, `rc`, `smrt`, `ttfb`, `ttfbb`, `ttlb`, and `url` on every report except a response-received report.
 - `pr` when the value is `1`, except on a playback rate event.
 
 When `ot` is absent, `d` and `tpb` are sent unchanged. The validators report the same conflicts as errors. See the [Validation Guide](./validation-guide.md#version-specific-behavior).
+
+These rules read the value inside an `SfItem`. For example, the reporter omits a `pr` of `1` with a parameter, as it omits `pr: 1`.
+
+> [!NOTE]
+> Version 1 output follows CTA-5004. `cid` has at most 64 characters, and a custom string has no length limit. Version 1 has no `st=ll` and no `sf=e`, so the reporter sends `st=l` and `sf=o`.
 
 ### Parameterized Values with toCmcdValue
 
@@ -261,6 +269,7 @@ reporter.recordEvent(CmcdEventType.ERROR, {
 Custom values may be strings, numbers, booleans, or tokens. Wrap a value with `toCmcdValue()` to attach structured field parameters (see the `CmcdCustomValue` type). Notes on the wire format:
 
 - `true` is encoded as a bare key without a value (`com.example-flag`), per the RFC 8941 boolean convention. `false` is treated like other empty values and dropped.
+- In version 2, a string value has at most 64 characters. The reporter drops a longer string. It also drops a value of another type, such as a plain object.
 - Values that RFC 8941 cannot serialize currently make encoding throw. Examples are strings with control characters and integers outside ±999,999,999,999,999. Validate custom values before you pass them to the reporter. Graceful handling of such values is tracked in [#327](https://github.com/streaming-video-technology-alliance/common-media-library/issues/327).
 - The validators in this package expect custom values to be strings of at most 64 characters. Prefer short string values for interoperability. See the [Validation Guide](./validation-guide.md#custom-keys).
 
@@ -450,7 +459,7 @@ const reporter = new CmcdReporter({
 		{
 			url: "https://analytics.example.com/cmcd",
 			events: [CmcdEventType.RESPONSE_RECEIVED],
-			enabledKeys: ["url", "rc", "ttfb", "ttlb", "br", "d", "ot"],
+			enabledKeys: ["url", "rc", "ttfb", "ttfbb", "ttlb", "cmsdd", "cmsds", "smrt", "br", "d", "ot"],
 		},
 	],
 });
@@ -532,19 +541,14 @@ async function fetchSegment(
 
 #### Providing Additional Data
 
-You can supply CMCD keys that the method cannot derive, such as server-provided metrics:
+You can supply CMCD keys that the method cannot derive. The keys `cmsdd`, `cmsds`, and `smrt` are strings. Each one holds a Base64 copy of the data in a header:
 
 ```typescript
-// Include server-reported metrics from response headers
-const serverDeliveryDuration = parseFloat(
-	fetchResponse.headers.get("X-Server-Duration") || "0",
-);
-
 reporter.recordResponseReceived(response, {
 	ttfbb: 25, // Time to first body byte (player-measured)
-	cmsdd: serverDeliveryDuration, // CMS delivery duration (from server)
-	cmsds: 1500, // CMS delivery speed (from server)
-	smrt: 2000, // Server measured round-trip time (from server)
+	cmsdd: "ImNkbi1hIjtldHA9OTY7cnR0PTg=", // Base64 copy of the CMSD-Dynamic response header
+	cmsds: "b3Q9dixzZj1oLHN0PXYsZD00MDAwLGJyPTI1MDA=", // Base64 copy of the CMSD-Static response header
+	smrt: "KCk7bj1PcmlnaW5BO3N5bg==", // Base64 copy of the response tracing data, from the Request Tracing header
 });
 ```
 
