@@ -302,6 +302,27 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4";r="0-99"),v=2')
 	})
 
+	it('ignores a baseUrl that is not a valid URL', () => {
+		equal(encodeCmcd({ nor: ['https://a.test/x/seg2.m4s'] }, { baseUrl: 'not a url' }), 'nor=("https://a.test/x/seg2.m4s"),v=2')
+		equal(encodeCmcd({ nor: ['https://a.test/x/seg2.m4s'] }, { version: 1, baseUrl: 'not a url' }), 'nor="https%3A%2F%2Fa.test%2Fx%2Fseg2.m4s"')
+	})
+
+	it('ignores a baseUrl with an opaque origin', () => {
+		for (const baseUrl of ['file:///x/seg1.m4s', 'data:text/plain,x']) {
+			equal(encodeCmcd({ nor: ['https://a.test/x/seg2.m4s'] }, { baseUrl }), 'nor=("https://a.test/x/seg2.m4s"),v=2', baseUrl)
+			equal(encodeCmcd({ nor: ['https://a.test/x/seg2.m4s'] }, { version: 1, baseUrl }), 'nor="https%3A%2F%2Fa.test%2Fx%2Fseg2.m4s"', baseUrl)
+		}
+	})
+
+	it('drops a nor entry that is not a non-empty string', () => {
+		equal(encodeCmcd({ nor: ['a.m4s', ''] }), 'nor=("a.m4s"),v=2')
+		equal(encodeCmcd({ nor: [''] }), 'v=2')
+	})
+
+	it('drops a version 1 token that names an inherited property', () => {
+		equal(encodeCmcd({ st: 'constructor', sf: 'toString' } as unknown as Cmcd, { version: 1 }), '')
+	})
+
 	describe('reporting modes', () => {
 		it('defaults to request mode', () => {
 			equal(encodeCmcd(CMCD_INPUT), CMCD_STRING_REQUEST)

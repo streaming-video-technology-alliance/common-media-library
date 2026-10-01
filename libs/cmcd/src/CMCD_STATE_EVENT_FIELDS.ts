@@ -12,7 +12,8 @@ import type { CmcdKey } from './CmcdKey.ts'
  * Maps each state-change event type to the persistent field whose value
  * the event signals.
  *
- * `prepareCmcdData` force-includes the field after filtering.
+ * The key table (`CMCD_KEY_SPECS`) marks the field as always sent on its
+ * event, so the key filter of `prepareCmcdData` does not remove it.
  * `CmcdReporter` deduplicates events against the field value. It drops an
  * event whose field has no value and restores the field if a transform
  * removes it.

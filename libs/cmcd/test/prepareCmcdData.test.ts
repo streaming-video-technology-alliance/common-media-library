@@ -1,9 +1,16 @@
-import type { CmcdV1 } from '@svta/cml-cmcd'
+import type { CmcdFormatter, CmcdV1 } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, prepareCmcdData, toCmcdValue } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
-import { equal, ok } from 'node:assert'
+import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { CMCD_KEY_TYPE_INTEGER, CMCD_KEY_TYPE_NUMBER, CMCD_KEY_TYPE_NUMBER_LIST, CMCD_KEY_TYPES } from '../src/CMCD_KEY_TYPES.ts'
+
+function countCalls(calls: string[], key: string): CmcdFormatter {
+	return value => {
+		calls.push(key)
+		return value as ReturnType<CmcdFormatter>
+	}
+}
 
 describe('prepareCmcdData', () => {
 	it('provides a valid example', () => {
@@ -380,6 +387,139 @@ describe('prepareCmcdData', () => {
 			})
 			equal(called, false)
 			ok(!('d' in data))
+		})
+	})
+
+	describe('key table rules', () => {
+		it('drops a value that does not match the type of its key', () => {
+			const data = prepareCmcdData({ bs: 'yes', sid: 123, ot: 5, d: [4000], ec: ['E1', 5], cid: 'content-id' })
+			ok(!('bs' in data))
+			ok(!('sid' in data))
+			ok(!('ot' in data))
+			ok(!('d' in data))
+			deepEqual(data['ec'], ['E1'])
+		})
+
+		it('drops a token that its key does not define', () => {
+			ok(!('ot' in prepareCmcdData({ ot: 'x', cid: 'content-id' })))
+		})
+
+		it('drops a string longer than the maximum of its key', () => {
+			const data = prepareCmcdData({ sid: 'a'.repeat(65), cid: 'c'.repeat(129), cdn: 'd'.repeat(129), 'com.example-x': 'x'.repeat(65), su: true })
+			ok(!('sid' in data))
+			ok(!('cid' in data))
+			ok(!('cdn' in data))
+			ok(!('com.example-x' in data))
+		})
+
+		it('applies the version 1 limits of cid and of a custom string', () => {
+			const data = prepareCmcdData({ cid: 'c'.repeat(65), 'com.example-x': 'x'.repeat(65), su: true }, { version: 1 })
+			ok(!('cid' in data))
+			equal(data['com.example-x'], 'x'.repeat(65))
+		})
+
+		it('drops a plain object in a custom key', () => {
+			ok(!('com.example-x' in prepareCmcdData({ 'com.example-x': { a: 1 }, su: true })))
+		})
+
+		it('sends one value on a list key as a list in version 2', () => {
+			deepEqual(prepareCmcdData({ br: 3000 })['br'], [3000])
+			deepEqual(prepareCmcdData({ ec: 'E1' })['ec'], ['E1'])
+		})
+
+		it('maps st=ll and sf=e to version 1 tokens', () => {
+			const data: Record<string, unknown> = prepareCmcdData({ st: 'll', sf: 'e' }, { version: 1 })
+			equal((data['st'] as SfToken).description, 'l')
+			equal((data['sf'] as SfToken).description, 'o')
+			equal((prepareCmcdData({ st: 'll' })['st'] as unknown as SfToken).description, 'll')
+		})
+
+		it('treats an ot that is not a valid token as unknown', () => {
+			const data = prepareCmcdData({ ot: 'x', d: 4000 })
+			equal(data['d'], 4000)
+			ok(!('ot' in data))
+		})
+
+		it('sends h on an h event when the filter removes h', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const data: Record<string, unknown> = prepareCmcdData({ e: 'h', h: 'cdn.example.com', cid: 'content-id' }, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			equal(data['h'], 'cdn.example.com')
+		})
+
+		it('drops the response keys from an event report without e', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const data = prepareCmcdData({ rc: 200, url: 'https://example.com/seg.m4s', cid: 'content-id' }, { reportingMode: CmcdReportingMode.EVENT })
+			ok(!('rc' in data))
+			ok(!('url' in data))
+			equal(data['cid'], 'content-id')
+		})
+
+		it('reads the event type after the e formatter', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const data = prepareCmcdData({ e: 'custom', cen: 'my-event' }, { reportingMode: CmcdReportingMode.EVENT, formatters: { e: () => 'ce' } })
+			equal(data['cen'], 'my-event')
+		})
+
+		it('keeps a ts with parameters in an event report', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const ts = prepareCmcdData({ e: CmcdEventType.TIME_INTERVAL, ts: new SfItem(1700000000000, { x: true }) }, { reportingMode: CmcdReportingMode.EVENT })['ts'] as unknown
+			ok(ts instanceof SfItem)
+			equal(ts.value, 1700000000000)
+			deepEqual(ts.params, { x: true })
+		})
+
+		it('omits a default value that has parameters', () => {
+			const data = prepareCmcdData({ pr: new SfItem(1, { x: true }), bs: new SfItem(false, { x: true }), 'com.example-x': new SfItem(false, { a: 1 }), su: true })
+			ok(!('pr' in data))
+			ok(!('bs' in data))
+			ok(!('com.example-x' in data))
+		})
+
+		it('keeps a default value with parameters on the event that requires the key', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			ok((prepareCmcdData({ e: CmcdEventType.PLAYBACK_RATE, pr: new SfItem(1, { x: true }) }, { reportingMode: CmcdReportingMode.EVENT })['pr'] as unknown) instanceof SfItem)
+			ok((prepareCmcdData({ e: CmcdEventType.BACKGROUNDED_MODE, bg: new SfItem(false, { x: true }) }, { reportingMode: CmcdReportingMode.EVENT })['bg'] as unknown) instanceof SfItem)
+		})
+
+		it('sends only version 1 keys and custom keys in version 1 event mode', () => {
+			const data = prepareCmcdData({ e: CmcdEventType.PLAY_STATE, sta: 'p', ts: 1, sid: 'session-id', 'com.example-x': 'y' }, { version: 1, reportingMode: CmcdReportingMode.EVENT })
+			deepEqual(Object.keys(data), ['com.example-x', 'sid'])
+		})
+
+		it('sets v from the version', () => {
+			equal(prepareCmcdData({ v: new SfItem(2, { x: true }), sid: 'session-id' })['v'], 2)
+		})
+
+		it('reads the version from the value inside v', () => {
+			deepEqual(prepareCmcdData({ v: new SfItem(1, { x: true }), br: [3000], sid: 's' }), { br: 3000, sid: 's' })
+		})
+	})
+
+	describe('order of preparation', () => {
+		it('does not run the formatter of a key that the filter removes', () => {
+			const calls: string[] = []
+			prepareCmcdData({ nor: ['a.m4s'], sid: 'session-id' }, { filter: key => key !== 'nor', formatters: { nor: countCalls(calls, 'nor') } })
+			deepEqual(calls, [])
+		})
+
+		it('does not run the formatter of a key that the object type removes', () => {
+			const calls: string[] = []
+			prepareCmcdData({ ot: 'm', d: 4000 }, { formatters: { d: countCalls(calls, 'd') } })
+			deepEqual(calls, [])
+		})
+
+		it('runs each formatter at most once', () => {
+			const calls: string[] = []
+			prepareCmcdData({ ab: [5000], br: [3000], d: 4000, ot: 'v' }, {
+				formatters: { ab: countCalls(calls, 'ab'), br: countCalls(calls, 'br'), d: countCalls(calls, 'd'), ot: countCalls(calls, 'ot') },
+			})
+			deepEqual(calls.sort(), ['br', 'd', 'ot'])
+		})
+
+		it('sorts the generated ts and v with the other keys', (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+			const data = prepareCmcdData({ e: CmcdEventType.RESPONSE_RECEIVED, url: 'https://example.com/seg.m4s', rc: 200 }, { reportingMode: CmcdReportingMode.EVENT })
+			deepEqual(Object.keys(data), ['e', 'rc', 'ts', 'url', 'v'])
 		})
 	})
 })
