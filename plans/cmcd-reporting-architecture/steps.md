@@ -71,6 +71,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
   - Answers:
     - The API name: keep `createCmcdSession()`.
     - The name of `includeOnce()`: the method is gone. The session reads `msd`, `bs`, and `bsd` from the data of any call and applies their CTA-5004-B scope.
+    - The default for a missing `enabledKeys`: every key, as the RFC proposed.
   - Done when: the RFC records an answer for each question.
 - [ ] **0.6 Accept the RFC (Casey).** Write the Final Decision section, set `status: accepted`, and squash-merge with the subject `docs(rfc): CMCD session`.
   - Done when: the accepted RFC is on `main`.
@@ -410,6 +411,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Task 0.5: Casey kept the name `createCmcdSession()`. Casey approved Task 2.2, to start after Task 2.3. |
 | 2026-10-01 | Task 2.3: `fix/cmcd-rr-without-provenance` pushed (b92800cd9, d3c9811b3), root `npm test` green. Casey opens the PR. Task 0.1: the prototype has the checks and the timing rules, 12 of 12 scenario tests pass, and the RFC examples run. |
 | 2026-10-01 | Casey removed `includeOnce()` (the session scopes `msd`, `bs`, and `bsd` by key) and chose the reduced configuration checks. Prototype: 6077 B, 13 of 13 scenario tests pass, the RFC examples run. The final review of the port branch returned "With fixes". |
+| 2026-10-01 | Task 0.5: Casey kept every key as the default for a missing `enabledKeys`. |
 
 ## Links
 

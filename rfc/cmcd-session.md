@@ -412,6 +412,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **Other names for `filter`.** `accept` suggests the HTTP `Accept` header. `include` is a boolean or an array in CML names. `shouldReport` is longer than the other target options. `CmcdEncodeOptions.filter` already uses `filter` for a predicate that keeps an item on `true`.
 - **Other names for the API.** In CMCD, "client" names the player, so `createCmcdClient()` is ambiguous. `createCmcdDispatcher()` does not describe request decoration. `createCmcdReporter()` would sit next to the deprecated class, with other behavior, until the next major version.
 - **`includeOnce()`, or keys derived from `sta`.** A method for the keys with a destination scope adds a call that the key rules make unnecessary. The session could derive `msd`, `bs`, and `bsd` from the play states. shaka-player reports no starting state, though, and dash.js gives `bs` and `bsd` an object type that `sta` does not show.
+- **No keys without `enabledKeys`.** This default of `CmcdReporter` makes each player pass the full key list. hls.js, dash.js, and shaka-player all do so. The data of each call already selects the keys.
 - **Timers in the player.** shaka-player 5.2.0 shows the lifecycle risk of timers in the library. Targets have their own intervals, though, so the session needs to know them. `start()` and `stop()` keep the lifecycle explicit.
 
 ## Prior art
@@ -420,7 +421,6 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 
 ## Unresolved questions
 
-- The default for a missing `enabledKeys`. This RFC proposes every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 - The queue limit of 500 lines, and whether a configuration option should change it.
 - The retry rule. This RFC keeps the rule of `CmcdReporter`, which returns a failed batch to the queue. RFC 455 proposed a back-off timer.
 - The major version that removes `CmcdReporter`, and whether the removal waits until hls.js, dash.js, and shaka-player have migrated.
