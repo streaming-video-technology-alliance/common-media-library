@@ -1,6 +1,6 @@
 # CMCD reporting architecture: evidence and options
 
-Date: 2026-10-01. Status: analysis for a decision. Scope: `CmcdReporter`, the session API (RFC 455, PR 460), and the encoder normalization.
+Date: 2026-10-01. Status: decided. Option 2 was chosen, and `CmcdReporter` is deprecated. [The RFC](../../rfc/cmcd-session.md) is the proposal. Scope: `CmcdReporter`, the session API (RFC 455, PR 460), and the encoder normalization.
 
 The question: players control their own state, and TypeScript types describe each key. Is `CmcdReporter` too large for the players that use it? Is the encoder normalization necessary? Is a smaller architecture possible next to `CmcdReporter`?
 

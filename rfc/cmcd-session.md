@@ -9,12 +9,12 @@ status: draft
 | **Author** | Casey Occhialini |
 | **Date** | 2026-10-01 |
 | **Package** | `@svta/cml-cmcd` |
-| **Breaking change** | No |
+| **Breaking change** | No. The next major version removes `CmcdReporter`. |
 | **Supersedes** | RFC 455 (`rfc/cmcd-session-api.md`), when this RFC is accepted |
 
 ## Summary
 
-Add `createCmcdSession()`, a reporting API next to `CmcdReporter`. A session is one `sid`. It keeps only the state that CTA-5004-B scopes to a session or to a destination. This state is a sequence number for each destination, the event queues, and the interval timers. It also includes the keys that each destination receives once. The player passes its data on every call and decides itself when its state changes. A `filter` predicate on an event target selects the reports that the target receives. `CmcdReporter` does not change, and it accepts bug fixes only until a later decision on its future.
+Add `createCmcdSession()`, a reporting API next to `CmcdReporter`. A session is one `sid`. It keeps only the state that CTA-5004-B scopes to a session or to a destination. This state is a sequence number for each destination, the event queues, and the interval timers. It also includes the keys that each destination receives once. The player passes its data on every call and decides itself when its state changes. A `filter` predicate on an event target selects the reports that the target receives. The release that adds the session deprecates `CmcdReporter`, and the next major version removes it.
 
 ```ts
 import type { Cmcd } from '@svta/cml-cmcd'
@@ -52,7 +52,7 @@ The state that `CmcdReporter` keeps causes failures in these integrations:
 
 dash.js also needs to route `rr` reports by request type. Its setting `eventTargets[].includeInRequests` limits the `rr` reports of each target, and two targets can share one collector URL. `CmcdReporter` offers `transform` for this case. A transform can rewrite a report. The reporter must therefore copy nested values, restore required keys, and isolate errors for each target. dash.js only needs to choose targets.
 
-RFC 455 proposed a larger session API. The design record compares the options: [analysis](../plans/cmcd-reporting-architecture/analysis.md), [option 1](../plans/cmcd-reporting-architecture/option-1.md), and [option 2](../plans/cmcd-reporting-architecture/option-2.md). This RFC is option 2.
+RFC 455 proposed a larger session API. The design record compares the options: [analysis](../plans/cmcd-reporting-architecture/analysis.md), [option 1](../plans/cmcd-reporting-architecture/option-1.md), and [option 2](../plans/cmcd-reporting-architecture/option-2.md). This RFC is option 2, with one change. It deprecates `CmcdReporter` instead of a later decision on its future.
 
 ## Guide-level explanation
 
@@ -197,6 +197,29 @@ session.recordEvent(CmcdEventType.AD_START, { cid: 'ad-7' })
 session.recordEvent(CmcdEventType.PLAY_STATE, { cid: 'ad-7', sta: 'p' })
 ```
 
+### Migrate from `CmcdReporter`
+
+The table maps each member of `CmcdReporter` to the session API. The example in [Pass the state on every call](#pass-the-state-on-every-call) shows the state object and the change check.
+
+| `CmcdReporter` | Session API |
+|---|---|
+| `new CmcdReporter(config, requester)` | `createCmcdSession(config, requester)` |
+| `sid`, `cid`, `version`, `transmissionMode`, `enabledKeys`, `customHeaderMap`, `eventTargets` | The same names |
+| `update(data)` for values that persist | The player keeps the values and passes them with each call |
+| The events that `update()` fires for `sta`, `pr`, `cid`, `bg`, and `br` | The player compares the new value with the old value, then calls `recordEvent()` |
+| `update({ sid })` | A new session. The player calls `flush()` and `stop()` on the old session. |
+| `update({ msd })` | `includeOnce({ msd })` |
+| The data store in `t` reports | `snapshot` |
+| `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
+| `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
+| `transform` on an event target, to drop reports | `filter` |
+| `transform` on the request configuration, to drop reports | No `createRequestReport()` call for that request |
+| `transform`, to change a report | Other data in the call. A change for one target only has no equivalent. |
+| `sessionRetention` and the provenance record | The player keeps the old session object and records late responses there |
+| A new reporter for new settings | `configure()` |
+
+Without `enabledKeys`, the session reports every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
+
 ## Reference-level explanation
 
 ### New exports
@@ -217,7 +240,7 @@ type CmcdSessionEventTarget = {
 	events: readonly CmcdEventType[]
 	enabledKeys?: readonly CmcdKey[]            // default: every event key
 	batchSize?: number                          // default 1
-	interval?: number                           // seconds. default 30. 0 turns t reports off
+	interval?: number                           // seconds. default CMCD_DEFAULT_TIME_INTERVAL (30). 0 turns t reports off
 	filter?: CmcdReportFilter
 }
 
@@ -255,7 +278,7 @@ The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordRe
 
 ### Reports
 
-Every report starts from the data of the call. The session then adds the waiting keys of that destination, from `includeOnce()` and `recordError()`. Last, it writes `sid` and `sn`. An event report also receives `e`, and `ts` when the data has none. A `sid`, `sn`, or `e` in the data has no effect. An `msd` in the data has no effect either, because `msd` goes through `includeOnce()`. The configured `cid` applies when the data has no `cid`.
+Every report starts from the data of the call. The session then adds the waiting keys of that destination, from `includeOnce()` and `recordError()`. Last, it writes `sid` and `sn`. An event report also receives `e`, and `ts` when the data has none. A `sid`, `sn`, or `e` in the data has no effect. An `msd` in the data has no effect either, because `msd` goes through `includeOnce()`. The configured `cid` applies when the data has no `cid`. A `b` report with `bg: false` is the exit from backgrounded mode. The session writes that report without `bg`, as CTA-5004-B defines.
 
 The session encodes each report with the rules of `encodeCmcd`. The encoder rounds values, applies the rules of the version and the mode, and adds `v`. It writes `nor` as a path relative to the request URL. Request mode uses the configured `version`. Event mode always uses version 2. Each report keeps the keys in `enabledKeys`, plus the keys that its event requires.
 
@@ -265,7 +288,7 @@ The session encodes each report with the rules of `encodeCmcd`. The encoder roun
 
 ### Events
 
-`recordEvent()` selects its targets first. A target is selected when three conditions hold. It lists the event type, no 410 response stopped it, and its `filter` returns `true`. A target without a `filter` meets the third condition. The filter receives the report data with `e` set, and the request when the caller passes one. A filter must not change the data.
+`recordEvent()` selects its targets first. A target is selected when three conditions hold. It lists the event type, no 410 response stopped it, and its `filter` returns `true`. A target without a `filter` meets the third condition. The filter receives the report data with `e` and `ts` set, and the request when the caller passes one. A filter must not change the data.
 
 The session builds a report only for the selected targets. If a filter throws, no target receives the report, and the error goes to the caller. A target that is not selected keeps its sequence number and its waiting keys.
 
@@ -276,6 +299,8 @@ The session builds a report only for the selected targets. If a filter throws, n
 ### Keys that each destination receives once
 
 `includeOnce(data)` adds the keys to every destination. A list value appends to a waiting list, and any other value replaces a waiting value. The next report of a destination takes all of its waiting keys. A key that the report cannot carry, because of the version or `enabledKeys`, is dropped. This rule limits the memory that waiting keys use.
+
+`includeOnce()` checks `msd`. The value must be a finite number from 0 to 999,999,999,999,999 after rounding to an integer. The session ignores any other `msd`, as `CmcdReporter` does today.
 
 ### Settings and timers
 
@@ -298,46 +323,57 @@ A queue keeps at most 500 lines. Past that limit, the oldest lines drop.
 
 ### Errors
 
-A filter that throws stops the report for every target, and the error goes to the caller. A value that the structured-field encoder cannot serialize throws from the call that produced it. A failed send does not throw. The delivery table describes what happens instead.
+Each call builds and encodes all of its reports before it changes any state. A call that throws therefore changes no sequence number, no waiting key, and no queue.
 
-### `CmcdReporter`
+- A filter that throws stops the report for every target, and the error goes to the caller.
+- A value that the structured-field encoder cannot serialize throws from the call that produced it. `includeOnce()` and `recordError()` check their values when the player passes them, so a waiting key cannot fail a later report.
+- An error in a timer tick goes to the timer callback, as in `CmcdReporter` today. The error can come from `snapshot()` or from encoding.
+- A failed send does not throw. The delivery table describes what happens instead.
 
-`CmcdReporter` keeps its API and its behavior. This RFC sets one policy and one fix:
+### Deprecation of `CmcdReporter`
 
-1. `CmcdReporter` accepts bug fixes only, until the decision on its future.
-2. Release 2.8.0 fixes `recordResponseReceived()`: a response without a provenance record reports under the current session, as in 2.4.0. hls.js and dash.js can then upgrade without losing `rr` events.
+1. Release 2.8.0 fixes `recordResponseReceived()`: a response without a provenance record reports under the current session, as in 2.4.0. hls.js and dash.js can then upgrade before they migrate.
+2. The release that adds `createCmcdSession()` marks the exports in the table `@deprecated`. Each notice links to the migration table.
+3. Until its removal, `CmcdReporter` accepts bug fixes only.
+4. The next major version removes the deprecated exports.
 
-The decision on the future of `CmcdReporter` follows the first release of a player that uses the session API. One choice is to deprecate it. The other choice is a rebuild on the session API in a major version. Option 1 in the design record describes that rebuild.
+| Deprecated export | Kind |
+|---|---|
+| `CmcdReporter` | class |
+| `CmcdReporterConfig`, `CmcdRequestReportConfig`, `CmcdEventReportConfig`, `CmcdReportConfig` | types |
+| `CmcdReporterCustomData`, `CmcdTransformRequest`, `CmcdRequestReportTransform`, `CmcdEventReportTransform` | types |
+| `CMCD_REQUEST_PROVENANCE`, `CmcdRequestProvenance` | constant and type |
 
-A player must not report one `sid` through both APIs, because each API keeps its own sequence numbers.
+Three related exports stay. The session uses `CMCD_DEFAULT_TIME_INTERVAL`, and dash.js imports it. `CmcdRequestReport` is the result type of `createRequestReport()`. `CmcdReportRecorder` and its transports record HTTP traffic and do not depend on `CmcdReporter`.
+
+During a migration, a player must not report one `sid` through both APIs. Each API keeps its own sequence numbers.
 
 ### Bundle and performance
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession`, prototype | 5616 B |
+| `createCmcdSession`, prototype | 5718 B |
 | `CmcdReporter`, current | 8423 B |
-| Both in one bundle | 9318 B |
+| Both in one bundle | 9393 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
-| `createCmcdSession`, prototype | 12.1 µs | 20.3 KB |
-| `CmcdReporter`, current | 20.7 µs | 32.6 KB |
+| `createCmcdSession`, prototype | 12.0 µs | 20.3 KB |
+| `CmcdReporter`, current | 20.6 µs | 32.6 KB |
 
 The prototype writes the same request output as `CmcdReporter`, byte for byte, for the same data. The [design record](../plans/cmcd-reporting-architecture/analysis.md) has the method.
 
 ## Drawbacks
 
-- The package has two reporting APIs. The documentation must say which one to choose. The proposal is to recommend the session API for new integrations.
-- Until the decision on `CmcdReporter`, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
-- A player that imports both APIs pays for both, as the bundle table shows.
-- The player keeps its own state object and checks its own state changes.
+- Each player must migrate. It replaces the store with its own state object and adds its own state change checks.
+- Until the next major version, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
+- A player that imports both APIs during a migration pays for both, as the bundle table shows.
 - A target cannot receive data that differs from the data of the other targets. The `bg=?0` opt-in of `CmcdReporter` has no equivalent.
 - The session derives no playback keys. Players keep computing `msd`, `bs`, `su`, and `dl`, as they do today.
 
 ## Rationale and alternatives
 
-- **Rebuild `CmcdReporter` on the session in a major version.** It gives one implementation and a reporter of 6319 B. It removes features that no player uses, but the removal is a breaking change. This RFC defers that step to the decision on `CmcdReporter`.
+- **Rebuild `CmcdReporter` on the session in a major version.** It gives one implementation and a reporter of 6319 B. It keeps the class, the store, and the automatic events, and the automatic events cause the dash.js failure. CML APIs use `createX` factory functions, so this RFC deprecates the class instead.
 - **RFC 455.** It derives keys from pushed state, keeps one reporter for each media player, rotates the `sid`, and attributes late responses through request origins. It measures 9161 B. The players compute that state themselves. This RFC supersedes RFC 455.
 - **`CmcdReporter` alone, with fixes.** The store and the automatic events stay, together with their failure cases. Per-target routing still needs `transform`.
 - **`transform` instead of `filter`.** About 34 of the 54 transform tests of `CmcdReporter` guard the rewrite rules that the Motivation describes. A predicate needs none of them.
@@ -355,11 +391,11 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - The default for a missing `enabledKeys`. This RFC proposes every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 - The queue limit of 500 lines, and whether a configuration option should change it.
 - The retry rule. This RFC keeps the rule of `CmcdReporter`, which returns a failed batch to the queue. RFC 455 proposed a back-off timer.
-- The date of the decision on `CmcdReporter`, if no player releases the session API.
+- The major version that removes `CmcdReporter`, and whether the removal waits until hls.js, dash.js, and shaka-player have migrated.
 
 ## Future possibilities
 
-- A rebuild of `CmcdReporter` on the session API in a major version.
+- A factory function for `CmcdReportRecorder`, to follow the `createX` convention.
 - Helpers that derive `msd`, `bs`, and `bsd` from play-state transitions, if players ask for them.
 - A rewrite step for each target, if an adopter needs one.
 - A filter for request mode.

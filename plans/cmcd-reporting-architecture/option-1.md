@@ -1,6 +1,6 @@
 # Option 1: a CMCD client, and `CmcdReporter` rebuilt on it
 
-Date: 2026-10-01. Status: proposal for a decision. The evidence for this option is in [analysis.md](analysis.md).
+Date: 2026-10-01. Status: not chosen. `CmcdReporter` is deprecated instead of rebuilt. [The RFC](../../rfc/cmcd-session.md) keeps the client and three rules of the rebuilt reporter. The rules cover the `bg` exit, the `msd` checks, and reports that fail to encode. The evidence for this option is in [analysis.md](analysis.md).
 
 ## Summary
 

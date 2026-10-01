@@ -1,6 +1,6 @@
 # Option 2: a new API next to an unchanged `CmcdReporter`
 
-Date: 2026-10-01. Status: exploration for a decision. The evidence is in [analysis.md](analysis.md). [option-1.md](option-1.md) describes the client that this option renames.
+Date: 2026-10-01. Status: chosen, with one change. `CmcdReporter` is deprecated instead of a later decision. [The RFC](../../rfc/cmcd-session.md) is the current contract, and the numbers below come from an earlier prototype. The evidence is in [analysis.md](analysis.md). [option-1.md](option-1.md) describes the client that this option renames.
 
 ## Summary
 
