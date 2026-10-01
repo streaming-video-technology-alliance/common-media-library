@@ -136,7 +136,7 @@ Entry: none. This phase does not depend on the RFC.
   - Done when: the port PR is merged into `refactor/cmcd-encode`.
 - [x] **2.3 Fix `recordResponseReceived()` for requests without a provenance record (agent).** Merged as PR 489 (5ae9f1bf4). The full steps are in [Task 2.3 in detail](#task-23-in-detail).
   - Done when: the fix PR is merged into `refactor/cmcd-encode`.
-- [ ] **2.4 Merge `refactor/cmcd-encode` into `main` (Casey).** Casey opens the PR with `/create-pr main` from `refactor/cmcd-encode`. The perf fix of `urlToRelativePath` is a separate utils PR to `main`, from `perf/utils-relative-url-no-throw`. It can ship in the same release.
+- [ ] **2.4 Merge `refactor/cmcd-encode` into `main` (Casey).** PR 490, opened 2026-10-01. Casey opens the PR with `/create-pr main` from `refactor/cmcd-encode`. The perf fix of `urlToRelativePath` is a separate utils PR to `main`, from `perf/utils-relative-url-no-throw`. It can ship in the same release.
   - Done when: `main` contains the integration branch, and the root `npm test` passes on `main`.
 - [ ] **2.5 Prepare and publish release 2.8.0 (agent prepares, Casey merges).** Create `release/cmcd-2.8.0` from `main`. Run `npm run ver cmcd 2.8.0`. Fix the `????-??-??` date and remove the empty section that the script leaves. Run `npm run prepare-release` for the cascade. After the merge, the Publish workflow publishes the packages. Create the GitHub release with the changelog section as the notes.
   - Done when: `@svta/cml-cmcd@2.8.0` is on npm.
@@ -426,6 +426,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | PR 489 merged into `refactor/cmcd-encode` (5ae9f1bf4). Its changelog entry conflicted with PR 487. The merge of the base into the port branch (41e72f72b) keeps both entries. Root `npm test`: 3474 pass, 0 fail. |
 | 2026-10-01 | Copilot review of PR 486: the RFC removes every `CMCD` parameter, copies waiting values, treats a throwing requester as a rejection, clears the waiting values of a stopped target, and types the filter with `DeepReadonly`. The migration table gains three rows. Casey chose no upper limit for `interval`. |
 | 2026-10-01 | PR 487 squash-merged into `refactor/cmcd-encode` (9b7180e19). PR 488 was retargeted, synced by two merges without a force-push, and squash-merged (440821e01). The tree of `refactor/cmcd-encode` equals the port head plus Task 7. Next: Task 2.4, merge `refactor/cmcd-encode` into `main`. |
+| 2026-10-01 | The squash bodies of PRs 487 and 488 lacked `Signed-off-by`. The two commits were re-signed with identical trees, and Casey force-pushed `refactor/cmcd-encode` (961006e9d). PR 490 merges `refactor/cmcd-encode` into `main`. |
 
 ## Links
 
@@ -440,3 +441,4 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | Port PR 487 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/487 |
 | Token list PR 488 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/488 |
 | rr fix PR 489 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/489 |
+| Release branch PR 490 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/490 |
