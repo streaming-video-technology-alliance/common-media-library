@@ -419,6 +419,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Task 0.5: Casey removed the queue limit and the `keepalive` option of the default requester. Prototype: 6053 B. |
 | 2026-10-01 | Task 0.5: Casey adopted the back-off. Prototype: 6162 B, 15 of 15 scenario tests pass. |
 | 2026-10-01 | Task 0.5 done: Casey chose removal in 3.0.0, without waiting for the players. Phase 6 depends on the plan for 3.0.0, not on Phase 5. |
+| 2026-10-01 | RFC consistency pass. Prototype: 6174 B. Benchmark, 3 runs, version 2 request: session 12.0 µs and 20.5 KB, `CmcdReporter` port 20.2 µs and 32.6 KB. |
 
 ## Links
 

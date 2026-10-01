@@ -168,7 +168,9 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			values.bsd = data.bsd
 		}
 
-		encodeSfDict(values as Record<string, unknown>)
+		if (values.bsd !== undefined || values.ec !== undefined) {
+			encodeSfDict(values as Record<string, unknown>)
+		}
 
 		const value = data.msd
 		const valid = msd === undefined && typeof value === 'number' && value >= 0 && Math.round(value) <= MAX_INTEGER
