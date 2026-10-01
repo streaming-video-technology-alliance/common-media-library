@@ -517,6 +517,15 @@ describe('prepareCmcdData', () => {
 			deepEqual(calls.sort(), ['br', 'd', 'ot'])
 		})
 
+		it('runs the version 1 ot formatter only when the output needs the object type', () => {
+			const calls: string[] = []
+			const formatters = { ot: countCalls(calls, 'ot') }
+			deepEqual(prepareCmcdData({ ot: 'v', sid: 's' }, { version: 1, filter: key => key === 'sid', formatters }), { sid: 's' })
+			deepEqual(calls, [])
+			equal(prepareCmcdData({ ot: 'v', br: [toCmcdValue(5000, { v: true })] }, { version: 1, filter: key => key === 'br', formatters })['br'], 5000)
+			deepEqual(calls, ['ot'])
+		})
+
 		it('sorts the generated ts and v with the other keys', (context) => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const data = prepareCmcdData({ e: CmcdEventType.RESPONSE_RECEIVED, url: 'https://example.com/seg.m4s', rc: 200 }, { reportingMode: CmcdReportingMode.EVENT })

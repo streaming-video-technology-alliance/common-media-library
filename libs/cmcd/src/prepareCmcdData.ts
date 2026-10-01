@@ -1,4 +1,5 @@
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
+import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { CMCD_KEY_SPECS } from './CMCD_KEY_SPECS.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
@@ -27,6 +28,20 @@ function isRequired(spec: CmcdKeySpec, event: string | undefined): boolean {
 
 function hasObjectTypes(spec: CmcdKeySpec): boolean {
 	return (spec.type === 'integer' || spec.type === 'ot-list') && spec.ot !== undefined
+}
+
+function needsV1ObjectType(obj: Record<string, any>, filter: CmcdEncodeOptions['filter']): boolean {
+	if (typeof filter !== 'function' || filter('ot')) {
+		return true
+	}
+
+	for (const key of CMCD_INNER_LIST_KEYS) {
+		if (Array.isArray(toBareValue(obj[key])) && filter(key as CmcdKey)) {
+			return true
+		}
+	}
+
+	return false
 }
 
 function allowsObjectType(spec: CmcdKeySpec, objectType: string | undefined): boolean {
@@ -106,7 +121,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	let objectTypeValue: unknown
 	let objectType: string | undefined
 
-	if (isV1) {
+	if (isV1 && needsV1ObjectType(obj, filter)) {
 		objectTypeValue = prepareValue('ot', obj['ot'], CMCD_KEY_SPECS['ot'], options, formatterOptions)
 		objectType = toTokenString(objectTypeValue)
 	}
