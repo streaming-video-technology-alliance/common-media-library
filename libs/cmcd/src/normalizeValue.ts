@@ -36,7 +36,7 @@ function normalizeBare(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 			const v1Map = version === 1 ? spec.v1Map : undefined
 			const token = text !== undefined && v1Map !== undefined && Object.prototype.hasOwnProperty.call(v1Map, text) ? v1Map[text] : text
 
-			return token !== undefined && spec.tokens.includes(token) ? new SfToken(token) : undefined
+			return token ? new SfToken(token) : undefined
 		}
 
 		case 'custom':

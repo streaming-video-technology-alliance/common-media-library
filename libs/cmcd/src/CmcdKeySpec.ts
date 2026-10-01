@@ -35,7 +35,7 @@ type CmcdKeyRules = {
  * - `supersededBy` is the exact bitrate key that removes an aggregate key.
  * - `omitDefault` is the default value. The encoder omits it, except on the event that requires the key.
  * - `max` is the maximum string length. `v1Max` replaces it in version 1.
- * - `tokens` lists the valid tokens. `v1Map` maps a token that version 1 does not have to a version 1 token.
+ * - `v1Map` maps a token that version 1 does not have to a version 1 token.
  *
  * @internal
  */
@@ -44,7 +44,7 @@ export type CmcdKeySpec = CmcdKeyRules & (
 	| { readonly type: 'integer'; readonly round: number; readonly ot?: readonly string[]; }
 	| { readonly type: 'decimal'; readonly omitDefault?: number; }
 	| { readonly type: 'string'; readonly max?: number; readonly v1Max?: number; }
-	| { readonly type: 'token'; readonly tokens: readonly string[]; readonly v1Map?: Readonly<Record<string, string>>; }
+	| { readonly type: 'token'; readonly v1Map?: Readonly<Record<string, string>>; }
 	| { readonly type: 'string-list'; }
 	| { readonly type: 'ot-list'; readonly round: number; readonly ot?: readonly string[]; readonly supersededBy?: string; }
 	| { readonly type: 'nor'; }

@@ -123,7 +123,6 @@ The reporter applies the "MUST NOT" rules of CTA-5004-B when it encodes a report
 
 - The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted. The exception is a `bg: false` that a transform adds to a backgrounded-mode report (see [Recording Events](#recording-events)).
 - The value does not match the type of its key, such as `pt: "123"` or `sid: 123`. In a list, the reporter drops each element of the wrong type, such as `null` in `pb: [2500, null]`. It omits the key when no element is left.
-- The value is a token that its key does not define, such as `ot: "x"`. An `ot` that the reporter omits counts as unknown for the `d` and `tpb` rules below.
 - The value is a string longer than the maximum of its key, such as a `sid` of more than 64 characters.
 - `d` when `ot` is not `a`, `v`, `av`, `tt`, `c`, or `o`. For example, a manifest request with `ot: "m"` never carries `d`. The rule uses the object type you set, even if `ot` is not in `enabledKeys`.
 - `tpb` when `ot` is not `a`, `v`, `av`, or `c`.

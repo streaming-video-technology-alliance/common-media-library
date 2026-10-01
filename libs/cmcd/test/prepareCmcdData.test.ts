@@ -400,8 +400,9 @@ describe('prepareCmcdData', () => {
 			deepEqual(data['ec'], ['E1'])
 		})
 
-		it('drops a token that its key does not define', () => {
-			ok(!('ot' in prepareCmcdData({ ot: 'x', cid: 'content-id' })))
+		it('sends a token that is not in the list of its key', () => {
+			const data: Record<string, unknown> = prepareCmcdData({ ot: 'x', cid: 'content-id' })
+			equal((data['ot'] as SfToken).description, 'x')
 		})
 
 		it('drops a string longer than the maximum of its key', () => {
@@ -434,10 +435,10 @@ describe('prepareCmcdData', () => {
 			equal((prepareCmcdData({ st: 'll' })['st'] as unknown as SfToken).description, 'll')
 		})
 
-		it('treats an ot that is not a valid token as unknown', () => {
-			const data = prepareCmcdData({ ot: 'x', d: 4000 })
-			equal(data['d'], 4000)
-			ok(!('ot' in data))
+		it('applies the ot limits of d to a token outside the list', () => {
+			const data: Record<string, unknown> = prepareCmcdData({ ot: 'x', d: 4000 })
+			ok(!('d' in data))
+			equal((data['ot'] as SfToken).description, 'x')
 		})
 
 		it('sends h on an h event when the filter removes h', (context) => {

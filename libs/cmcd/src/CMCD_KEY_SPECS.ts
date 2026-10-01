@@ -1,6 +1,5 @@
 import type { CmcdKeySpec } from './CmcdKeySpec.ts'
 
-const EVENTS = ['abs', 'abe', 'ae', 'as', 'b', 'bc', 'c', 'ce', 'e', 'h', 'm', 'pc', 'pe', 'pr', 'ps', 'rr', 'sk', 't', 'um']
 const MEDIA = ['a', 'v', 'av', 'tt', 'c', 'o']
 
 /**
@@ -26,7 +25,7 @@ export const CMCD_KEY_SPECS: Readonly<Record<string, CmcdKeySpec>> = {
 	d: { type: 'integer', round: 1, ot: MEDIA },
 	dfa: { type: 'integer', round: 1, version: 2 },
 	dl: { type: 'integer', round: 100 },
-	e: { type: 'token', tokens: EVENTS, mode: 'event', requiredOn: 'always', version: 2 },
+	e: { type: 'token', mode: 'event', requiredOn: 'always', version: 2 },
 	ec: { type: 'string-list', requiredOn: 'e', version: 2 },
 	h: { type: 'string', max: 128, mode: 'event', requiredOn: 'h', version: 2 },
 	lab: { type: 'ot-list', round: 1, supersededBy: 'lb', version: 2 },
@@ -37,18 +36,18 @@ export const CMCD_KEY_SPECS: Readonly<Record<string, CmcdKeySpec>> = {
 	nor: { type: 'nor' },
 	nr: { type: 'boolean', omitDefault: false, version: 2 },
 	nrr: { type: 'string', version: 1 },
-	ot: { type: 'token', tokens: ['m', 'a', 'v', 'av', 'i', 'c', 'tt', 'k', 'o'] },
+	ot: { type: 'token' },
 	pb: { type: 'ot-list', round: 1, version: 2 },
 	pr: { type: 'decimal', omitDefault: 1, requiredOn: 'pr' },
 	pt: { type: 'integer', round: 1, version: 2 },
 	rc: { type: 'integer', round: 1, mode: 'event', onlyOn: 'rr', version: 2 },
 	rtp: { type: 'integer', round: 100 },
-	sf: { type: 'token', tokens: ['d', 'h', 'e', 's', 'o'], v1Map: { e: 'o' } },
+	sf: { type: 'token', v1Map: { e: 'o' } },
 	sid: { type: 'string', max: 64 },
 	smrt: { type: 'string', mode: 'event', onlyOn: 'rr', version: 2 },
 	sn: { type: 'integer', round: 1, version: 2 },
-	st: { type: 'token', tokens: ['v', 'l', 'll'], v1Map: { ll: 'l' } },
-	sta: { type: 'token', tokens: ['s', 'p', 'k', 'r', 'a', 'w', 'e', 'f', 'q', 'd'], requiredOn: 'ps', version: 2 },
+	st: { type: 'token', v1Map: { ll: 'l' } },
+	sta: { type: 'token', requiredOn: 'ps', version: 2 },
 	su: { type: 'boolean', omitDefault: false },
 	tab: { type: 'ot-list', round: 1, supersededBy: 'tb', version: 2 },
 	tb: { type: 'ot-list', round: 1 },

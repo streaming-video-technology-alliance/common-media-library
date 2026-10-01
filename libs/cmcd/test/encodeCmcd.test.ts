@@ -319,8 +319,8 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd({ nor: [''] }), 'v=2')
 	})
 
-	it('drops a version 1 token that names an inherited property', () => {
-		equal(encodeCmcd({ st: 'constructor', sf: 'toString' } as unknown as Cmcd, { version: 1 }), '')
+	it('sends a version 1 token that names an inherited property as its own text', () => {
+		equal(encodeCmcd({ st: 'constructor', sf: 'toString' } as unknown as Cmcd, { version: 1 }), 'sf=toString,st=constructor')
 	})
 
 	describe('reporting modes', () => {
