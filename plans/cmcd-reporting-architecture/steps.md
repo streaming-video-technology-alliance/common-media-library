@@ -36,7 +36,7 @@
 |---|---|---|---|
 | 0. RFC review and acceptance | in progress | none | this file |
 | 1. Superseded pull requests | not started | 0.2 for notices, 0.6 for closing | this file |
-| 2. Release 2.8.0 | in progress, next is Task 2.5 | none | this file, and [the port plan](../cmcd-encode-pipeline-port/steps.md) |
+| 2. Release 2.8.0 | done | none | this file, and [the port plan](../cmcd-encode-pipeline-port/steps.md) |
 | 3. Session API | blocked | 0.6, 2.4 | detailed plan at phase start |
 | 4. Deprecation and release | blocked | 3 | this file |
 | 5. Player migrations | blocked | 4 | one plan for each player, at phase start |
@@ -138,7 +138,7 @@ Entry: none. This phase does not depend on the RFC.
   - Done when: the fix PR is merged into `refactor/cmcd-encode`.
 - [x] **2.4 Merge `refactor/cmcd-encode` into `main` (Casey).** PR 490, merged 2026-10-01 with a merge commit (703e2f268). Casey opens the PR with `/create-pr main` from `refactor/cmcd-encode`. The perf fix of `urlToRelativePath` is a separate utils PR to `main`, from `perf/utils-relative-url-no-throw`. It can ship in the same release.
   - Done when: `main` contains the integration branch, and the root `npm test` passes on `main`.
-- [ ] **2.5 Prepare and publish release 2.8.0 (agent prepares, Casey merges).** PR 491, opened 2026-10-01: `cmcd` 2.8.0 and the cascaded `request` 1.0.19. Merged as 253dbff45. The Publish workflow starts by hand (`workflow_dispatch`). Create `release/cmcd-2.8.0` from `main`. Run `npm run ver cmcd 2.8.0`. Fix the `????-??-??` date and remove the empty section that the script leaves. Run `npm run prepare-release` for the cascade. After the merge, the Publish workflow publishes the packages. Create the GitHub release with the changelog section as the notes.
+- [x] **2.5 Prepare and publish release 2.8.0 (agent prepares, Casey merges).** PR 491, opened 2026-10-01: `cmcd` 2.8.0 and the cascaded `request` 1.0.19. Merged as 253dbff45. The Publish workflow starts by hand (`workflow_dispatch`). Create `release/cmcd-2.8.0` from `main`. Run `npm run ver cmcd 2.8.0`. Fix the `????-??-??` date and remove the empty section that the script leaves. Run `npm run prepare-release` for the cascade. After the merge, the Publish workflow publishes the packages. Create the GitHub release with the changelog section as the notes.
   - Done when: `@svta/cml-cmcd@2.8.0` is on npm.
 
 ## Phase 3: Session API
@@ -430,6 +430,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | PR 490: the changelog was consolidated from 34 entries to 6, and four Copilot findings were fixed (35649a756, d89a2d611). Root `npm test` passed on the merged tree. Merged into `main` with a merge commit (703e2f268). Next: Task 2.5, release 2.8.0. |
 | 2026-10-01 | Task 2.5: PR 491 prepares `cmcd` 2.8.0 and the cascaded `request` 1.0.19 (601f0c70b). Root `npm test` and the docs build pass. The README entries of other packages stay unreleased. |
 | 2026-10-01 | PR 491 merged (253dbff45). Publishing waits for a manual run of the Publish workflow. |
+| 2026-10-01 | Publish run 36933063046 succeeded. `@svta/cml-cmcd` 2.8.0 and `@svta/cml-request` 1.0.19 are on npm, with the GitHub releases `cmcd-v2.8.0` and `request-v1.0.19`. Phase 2 is done. Phase 3 waits for Task 0.6. |
 
 ## Links
 
