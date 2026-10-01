@@ -9,12 +9,12 @@ status: draft
 | **Author** | Casey Occhialini |
 | **Date** | 2026-10-01 |
 | **Package** | `@svta/cml-cmcd` |
-| **Breaking change** | No. The next major version removes `CmcdReporter`. |
+| **Breaking change** | No. Version 3.0.0 removes `CmcdReporter`. |
 | **Supersedes** | RFC 455 (`rfc/cmcd-session-api.md`), when this RFC is accepted |
 
 ## Summary
 
-Add `createCmcdSession()`, a reporting API next to `CmcdReporter`. A session is one `sid`. It keeps only the state that CTA-5004-B scopes to a session or to a destination. This state is a sequence number for each destination, the event queues, and the interval timers. It also includes the `msd`, `bs`, `bsd`, and `ec` values that wait for the next report of each destination. The player passes its data on every call and decides itself when its state changes. A `filter` predicate on an event target selects the reports that the target receives. The release that adds the session deprecates `CmcdReporter`, and the next major version removes it.
+Add `createCmcdSession()`, a reporting API next to `CmcdReporter`. A session is one `sid`. It keeps only the state that CTA-5004-B scopes to a session or to a destination. This state is a sequence number for each destination, the event queues, and the interval timers. It also includes the `msd`, `bs`, `bsd`, and `ec` values that wait for the next report of each destination. The player passes its data on every call and decides itself when its state changes. A `filter` predicate on an event target selects the reports that the target receives. The release that adds the session deprecates `CmcdReporter`, and version 3.0.0 removes it.
 
 ```ts
 import type { Cmcd } from '@svta/cml-cmcd'
@@ -367,7 +367,7 @@ The message names the parameter, the valid values, and the received value: `crea
 1. Release 2.8.0 fixes `recordResponseReceived()`: a response without a provenance record reports under the current session, as in 2.4.0. hls.js and dash.js can then upgrade before they migrate.
 2. The release that adds `createCmcdSession()` marks the exports in the table `@deprecated`. Each notice links to the migration table.
 3. Until its removal, `CmcdReporter` accepts bug fixes only.
-4. The next major version removes the deprecated exports.
+4. Version 3.0.0 removes the deprecated exports. The removal does not wait for the players to migrate.
 
 | Deprecated export | Kind |
 |---|---|
@@ -398,7 +398,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 ## Drawbacks
 
 - Each player must migrate. It replaces the store with its own state object and adds its own state change checks.
-- Until the next major version, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
+- Until version 3.0.0, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
 - A player that imports both APIs during a migration pays for both, as the bundle table shows.
 - During a long outage of a collector, the queues of its targets grow without a limit. `CmcdReporter` has the same behavior.
 - A target cannot receive data that differs from the data of the other targets. The `bg=?0` opt-in of `CmcdReporter` has no equivalent.
@@ -412,6 +412,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **`transform` instead of `filter`.** About 34 of the 54 transform tests of `CmcdReporter` guard the rewrite rules that the Motivation describes. A predicate needs none of them.
 - **Other names for `filter`.** `accept` suggests the HTTP `Accept` header. `include` is a boolean or an array in CML names. `shouldReport` is longer than the other target options. `CmcdEncodeOptions.filter` already uses `filter` for a predicate that keeps an item on `true`.
 - **Other names for the API.** In CMCD, "client" names the player, so `createCmcdClient()` is ambiguous. `createCmcdDispatcher()` does not describe request decoration. `createCmcdReporter()` would sit next to the deprecated class, with other behavior, until the next major version.
+- **Removal after the players migrate.** It would tie the removal to the schedules of three projects. Until the removal, each fix and each spec change lands twice. A player depends on a fixed version of the package, so version 3.0.0 reaches no player by surprise.
 - **`includeOnce()`, or keys derived from `sta`.** A method for the keys with a destination scope adds a call that the key rules make unnecessary. The session could derive `msd`, `bs`, and `bsd` from the play states. shaka-player reports no starting state, though, and dash.js gives `bs` and `bsd` an object type that `sta` does not show.
 - **No keys without `enabledKeys`.** This default of `CmcdReporter` makes each player pass the full key list. hls.js, dash.js, and shaka-player all do so. The data of each call already selects the keys.
 - **A queue limit.** A limit bounds the memory that a long outage of a collector uses. It also drops reports, and a `batchSize` above the limit never fills. The session has no limit, like `CmcdReporter`.
@@ -425,7 +426,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 
 ## Unresolved questions
 
-- The major version that removes `CmcdReporter`, and whether the removal waits until hls.js, dash.js, and shaka-player have migrated.
+None. The review of the RFC PR can add questions.
 
 ## Future possibilities
 

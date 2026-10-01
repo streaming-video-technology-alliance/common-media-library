@@ -40,7 +40,7 @@
 | 3. Session API | blocked | 0.6, 2.4 | detailed plan at phase start |
 | 4. Deprecation and release | blocked | 3 | this file |
 | 5. Player migrations | blocked | 4 | one plan for each player, at phase start |
-| 6. Removal of `CmcdReporter` | blocked | 5, or the date from 0.5 | detailed plan at phase start |
+| 6. Removal of `CmcdReporter` | blocked | 4, and the plan for 3.0.0 | detailed plan at phase start |
 
 ## Phase 0: RFC review and acceptance
 
@@ -67,13 +67,15 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
 - [ ] **0.3 Post the notices on the superseded PRs.** Task 1.1 has the steps.
 - [ ] **0.4 Ask the player maintainers for review (Casey).** Ask Daniel Silhavy (dash.js), Rob Walch (hls.js), Qualabs (@cotid-qualabs), Nicolas Levy, and the shaka-player maintainers.
   - Done when: each maintainer has a review request or a mention on the RFC PR.
-- [ ] **0.5 Resolve the unresolved questions (Casey and the reviewers).** The questions are the API name, the name of `includeOnce()`, the default for a missing `enabledKeys`, the queue limit, the retry rule, and the removal timing of `CmcdReporter`.
+- [x] **0.5 Resolve the unresolved questions (Casey and the reviewers).** The questions are the API name, the name of `includeOnce()`, the default for a missing `enabledKeys`, the queue limit, the retry rule, and the removal timing of `CmcdReporter`.
   - Answers:
     - The API name: keep `createCmcdSession()`.
     - The name of `includeOnce()`: the method is gone. The session reads `msd`, `bs`, and `bsd` from the data of any call and applies their CTA-5004-B scope.
     - The default for a missing `enabledKeys`: every key, as the RFC proposed.
     - The queue limit: none, as in `CmcdReporter`. The default requester sends without `keepalive`.
     - The retry rule: back off after a 429, a 5xx, or a rejected request, from 1 second doubling to 60 seconds, as RFC 455 proposed.
+    - The removal: version 3.0.0, without waiting for the players to migrate.
+    - The review of the RFC PR can add questions. Record each answer here.
   - Done when: the RFC records an answer for each question.
 - [ ] **0.6 Accept the RFC (Casey).** Write the Final Decision section, set `status: accepted`, and squash-merge with the subject `docs(rfc): CMCD session`.
   - Done when: the accepted RFC is on `main`.
@@ -99,7 +101,7 @@ Entry: the RFC PR exists (Task 0.2).
 
   PR 422:
 
-  > The session RFC ({rfc-pr}) deprecates `CmcdReporter`, and the next major version removes it. This restructure of `CmcdReporter` therefore has no further use. The branch includes #452, which merged into it. This PR closes when the session RFC is accepted. The branch stays until the session API ships.
+  > The session RFC ({rfc-pr}) deprecates `CmcdReporter`, and version 3.0.0 removes it. This restructure of `CmcdReporter` therefore has no further use. The branch includes #452, which merged into it. This PR closes when the session RFC is accepted. The branch stays until the session API ships.
 
   PR 455:
 
@@ -107,7 +109,7 @@ Entry: the RFC PR exists (Task 0.2).
 
   PR 460:
 
-  > This PR implements RFC #455, and the session RFC ({rfc-pr}) supersedes that RFC. The new implementation reuses four parts of this PR. Three are the `h` event constant, the response timing rules in `toResponseKeys.ts`, and the configuration checks in `checkRequestSettings.ts`. The fourth is the test scenarios of the delivery, error, request, and response tests. The key table already moved into the encoder on the port branch. This PR closes when the session RFC is accepted. The branch stays until the new implementation ships.
+  > This PR implements RFC #455, and the session RFC ({rfc-pr}) supersedes that RFC. The new implementation reuses four parts of this PR. Three are the `h` event constant, the `ttfb` rule in `toResponseKeys.ts`, and the `sid` and `cid` checks in `checkRequestSettings.ts`. The fourth is the test scenarios of the delivery, error, request, and response tests. The key table already moved into the encoder on the port branch. This PR closes when the session RFC is accepted. The branch stays until the new implementation ships.
 
   - Done when: all four comments are posted.
 - [ ] **1.2 Record the salvage list for Phase 3 (agent).** Copy into the Phase 3 plan the source paths of the four parts named in the PR 460 notice. The test files are `libs/cmcd/test/CmcdSession.delivery.test.ts`, `CmcdSession.errors.test.ts`, `CmcdSessionReporter.request.test.ts`, and `CmcdSessionReporter.responses.test.ts` on `feat/cmcd-session-api`.
@@ -190,12 +192,12 @@ One plan for each player, at phase start. Entry: release 2.9.0. Each upstream PR
 
 ## Phase 6: Removal of `CmcdReporter`
 
-Detailed plan at phase start. Entry: Phase 5 is done, or the removal date from Task 0.5 has come.
+Detailed plan at phase start. Entry: release 2.9.0 is out, and Casey plans 3.0.0. The removal does not wait for Phase 5 (Task 0.5).
 
-- [ ] **6.1 Confirm the removal version (Casey).** Compare the state of Phase 5 with the answer from Task 0.5.
-  - Done when: the version is in the log.
+- [ ] **6.1 Plan release 3.0.0 (Casey).** Decide whether a 2.x branch keeps receiving `CmcdReporter` fixes after 3.0.0.
+  - Done when: the decision is in the log.
 - [ ] **6.2 Remove the deprecated exports (agent).** Remove the 11 exports, their tests, and their documentation. Add a `### Removed` changelog entry with the migration guidance. Prepare the major release with the steps of Task 2.5.
-  - Done when: the major version is on npm without `CmcdReporter`.
+  - Done when: version 3.0.0 is on npm without `CmcdReporter`.
 
 ## Task 2.3 in detail
 
@@ -416,6 +418,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Task 0.5: Casey kept every key as the default for a missing `enabledKeys`. |
 | 2026-10-01 | Task 0.5: Casey removed the queue limit and the `keepalive` option of the default requester. Prototype: 6053 B. |
 | 2026-10-01 | Task 0.5: Casey adopted the back-off. Prototype: 6162 B, 15 of 15 scenario tests pass. |
+| 2026-10-01 | Task 0.5 done: Casey chose removal in 3.0.0, without waiting for the players. Phase 6 depends on the plan for 3.0.0, not on Phase 5. |
 
 ## Links
 
