@@ -57,7 +57,7 @@ function formatEntries(entries: unknown[], base: string | undefined, version: Cm
  * Version 1 encodes the path with `encodeURIComponent`. Version 2 wraps one path in a list.
  * The parameters of an entry and of an inner list stay on the value.
  *
- * @param value - A path, an `SfItem` of a path, a list of them, or an `SfItem` that wraps such a list.
+ * @param value - A path, an `SfItem` of a path, or a list of them. An `SfItem` can also wrap the list.
  * @param options - The version and `baseUrl` of the report.
  *
  * @returns The formatted value, or `undefined` when no entry is a non-empty string.

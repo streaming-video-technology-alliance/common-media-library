@@ -4,7 +4,7 @@ const EVENTS = ['abs', 'abe', 'ae', 'as', 'b', 'bc', 'c', 'ce', 'e', 'h', 'm', '
 const MEDIA = ['a', 'v', 'av', 'tt', 'c', 'o']
 
 /**
- * The encoder rules of each key: one row for each key of CTA-5004-B Table 1, plus `nrr` of CTA-5004 and `cdn`.
+ * The encoder rules of each key. The table has one row for each key of CTA-5004-B Table 1, plus `nrr` of CTA-5004 and `cdn`.
  *
  * @internal
  */

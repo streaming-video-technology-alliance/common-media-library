@@ -14,14 +14,14 @@ npm i @svta/cml-cmcd
 import { CmcdReportingMode, encodeCmcd } from "@svta/cml-cmcd";
 
 const input = {
-	br: 1000,
+	br: [1000],
 	"com.example-hello": "world",
 	ec: ["ERR001", "ERR002"],
 	su: true,
 };
 const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST };
 const result = encodeCmcd(input, options);
-// result === 'br=1000,com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2'
+// result === 'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2'
 ```
 
 ## Testing CMCD output with `CmcdReportRecorder`

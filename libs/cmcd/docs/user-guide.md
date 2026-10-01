@@ -459,7 +459,7 @@ const reporter = new CmcdReporter({
 		{
 			url: "https://analytics.example.com/cmcd",
 			events: [CmcdEventType.RESPONSE_RECEIVED],
-			enabledKeys: ["url", "rc", "ttfb", "ttlb", "br", "d", "ot"],
+			enabledKeys: ["url", "rc", "ttfb", "ttfbb", "ttlb", "cmsdd", "cmsds", "smrt", "br", "d", "ot"],
 		},
 	],
 });
@@ -541,19 +541,14 @@ async function fetchSegment(
 
 #### Providing Additional Data
 
-You can supply CMCD keys that the method cannot derive, such as server-provided metrics:
+You can supply CMCD keys that the method cannot derive. The keys `cmsdd`, `cmsds`, and `smrt` are strings. Each one holds a Base64 copy of the data in a header:
 
 ```typescript
-// Include server-reported metrics from response headers
-const serverDeliveryDuration = parseFloat(
-	fetchResponse.headers.get("X-Server-Duration") || "0",
-);
-
 reporter.recordResponseReceived(response, {
 	ttfbb: 25, // Time to first body byte (player-measured)
-	cmsdd: serverDeliveryDuration, // CMS delivery duration (from server)
-	cmsds: 1500, // CMS delivery speed (from server)
-	smrt: 2000, // Server measured round-trip time (from server)
+	cmsdd: "ImNkbi1hIjtldHA9OTY7cnR0PTg=", // Base64 copy of the CMSD-Dynamic response header
+	cmsds: "b3Q9dixzZj1oLHN0PXYsZD00MDAwLGJyPTI1MDA=", // Base64 copy of the CMSD-Static response header
+	smrt: "KCk7bj1PcmlnaW5BO3N5bg==", // Base64 copy of the response tracing data, from the Request Tracing header
 });
 ```
 

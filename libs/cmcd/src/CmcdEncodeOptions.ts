@@ -27,7 +27,15 @@ export type CmcdEncodeOptions = {
 
 	/**
 	 * A map of CMCD keys to custom formatters. A formatter replaces the value rule of its key.
-	 * The encoder sends the output without further checks, except that it drops an empty value.
+	 * The encoder does not apply the type, length, and token rules of the key to the output.
+	 * The encoder still applies these rules to the output:
+	 *
+	 * - It drops an empty value. An empty value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite.
+	 * - It drops a default value, with or without parameters. The default value is `false`, or `1` for `pr`. The exceptions are `pr` on a `pr` event and `bg` on a `b` event.
+	 * - It wraps a string for `e`, `ot`, `sf`, `st`, and `sta` in `SfToken`.
+	 * - It replaces a `ts` that is not a finite number with the current time.
+	 *
+	 * The encoder does not call a formatter for an empty value, for `false`, or for `v`. It also skips the formatter of a key that it does not send.
 	 */
 	formatters?: Partial<CmcdFormatterMap>;
 
