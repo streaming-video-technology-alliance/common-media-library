@@ -62,7 +62,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
   - Update the prototype in the session scratchpad, and run the example check from the RFC method again.
   - Decision (Casey, 2026-10-01): only the checks that TypeScript cannot express (`sid`, `cid`, and the `url`, `interval`, and `batchSize` of a target), and no `responseEnd` fallback for `ttlb`.
   - Done when: the RFC describes the three parts, and the prototype and the RFC examples pass.
-- [ ] **0.2 Push the branch and open the RFC PR.** Casey approved the push of `rfc/cmcd-session` on 2026-10-01. Casey opens the PR "[RFC] CMCD session" with `/create-pr main`. Record the PR link here, and use it for `{rfc-pr}` in Phase 1.
+- [x] **0.2 Push the branch and open the RFC PR.** PR 486, opened 2026-10-01. Casey approved the push of `rfc/cmcd-session` on 2026-10-01. Casey opens the PR "[RFC] CMCD session" with `/create-pr main`. Record the PR link here, and use it for `{rfc-pr}` in Phase 1.
   - Done when: the PR is open, and its link is in this file.
 - [ ] **0.3 Post the notices on the superseded PRs.** Task 1.1 has the steps.
 - [ ] **0.4 Ask the player maintainers for review (Casey).** Ask Daniel Silhavy (dash.js), Rob Walch (hls.js), Qualabs (@cotid-qualabs), Nicolas Levy, and the shaka-player maintainers.
@@ -420,6 +420,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | RFC consistency pass. Prototype: 6174 B. Benchmark, 3 runs, version 2 request: session 12.0 µs and 20.5 KB, `CmcdReporter` port 20.2 µs and 32.6 KB. |
 | 2026-10-01 | Casey approved the four notices without mentions. Casey already notified the contributors. |
 | 2026-10-01 | Task 2.2: final review fixed, Task 7 approved. Pushed `refactor/cmcd-encode-pipeline-port` (32ec4383d, `encodeCmcd` +677 B against 501281b70) and `perf/cmcd-drop-token-lists` (dd83aaa24, `encodeCmcd` 3837 B). Casey opens both PRs. |
+| 2026-10-01 | Task 0.2: Casey asked the agent to create the PRs. RFC PR 486 is open. |
 
 ## Links
 
@@ -430,3 +431,4 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | PR 452 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/452 |
 | PR 455 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/455 |
 | PR 460 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/460 |
+| RFC PR 486 | https://github.com/streaming-video-technology-alliance/common-media-library/pull/486 |
