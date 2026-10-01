@@ -34,9 +34,9 @@
 
 | Phase | State | Depends on | Detailed plan |
 |---|---|---|---|
-| 0. RFC review and acceptance | not started | none | this file |
+| 0. RFC review and acceptance | in progress | none | this file |
 | 1. Superseded pull requests | not started | 0.2 for notices, 0.6 for closing | this file |
-| 2. Release 2.8.0 | not started | none | this file, and [the port plan](../cmcd-encode-pipeline-port/steps.md) |
+| 2. Release 2.8.0 | in progress | none | this file, and [the port plan](../cmcd-encode-pipeline-port/steps.md) |
 | 3. Session API | blocked | 0.6, 2.4 | detailed plan at phase start |
 | 4. Deprecation and release | blocked | 3 | this file |
 | 5. Player migrations | blocked | 4 | one plan for each player, at phase start |
@@ -61,7 +61,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
   - The `h` event. Add `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` to the new exports. CTA-5004-B defines the event, and `main` has no constant for it. The key table on the port branch already accepts `e=h`.
   - Update the prototype in the session scratchpad, and run the example check from the RFC method again.
   - Done when: the RFC describes the three parts, and the prototype and the RFC examples pass.
-- [ ] **0.2 Push the branch and open the RFC PR.** The agent pushes `rfc/cmcd-session` after Casey agrees. Casey opens the PR "[RFC] CMCD session" with `/create-pr main`. Record the PR link here, and use it for `{rfc-pr}` in Phase 1.
+- [ ] **0.2 Push the branch and open the RFC PR.** Casey approved the push of `rfc/cmcd-session` on 2026-10-01. Casey opens the PR "[RFC] CMCD session" with `/create-pr main`. Record the PR link here, and use it for `{rfc-pr}` in Phase 1.
   - Done when: the PR is open, and its link is in this file.
 - [ ] **0.3 Post the notices on the superseded PRs.** Task 1.1 has the steps.
 - [ ] **0.4 Ask the player maintainers for review (Casey).** Ask Daniel Silhavy (dash.js), Rob Walch (hls.js), Qualabs (@cotid-qualabs), Nicolas Levy, and the shaka-player maintainers.
@@ -79,7 +79,7 @@ Entry: the RFC PR exists (Task 0.2).
 |---|---|---|---|
 | 398 | `claude/cmcdreporter-spawn-clone-4gzey8` | RFC: child reporters for `CmcdReporter` | Close. One shared session covers several players. |
 | 422 | `refactor/cmcd-reporter-architecture` | Restructure of `CmcdReporter`, with PR 452 merged into its branch | Close. `CmcdReporter` is deprecated. |
-| 455 | `rfc/cmcd-session-api` | Draft RFC: session API for CMCD version 2 | Close as superseded. Decision in Task 1.3. |
+| 455 | `rfc/cmcd-session-api` | Draft RFC: session API for CMCD version 2 | Close unmerged, as superseded (Task 1.3). |
 | 460 | `feat/cmcd-session-api` | Implementation of RFC 455, based on the branch of PR 455 | Close after the salvage in Task 1.2. |
 
 - [ ] **1.1 Post the notices (agent, after Casey approves the text).** Check the state of each PR first. Replace `{rfc-pr}` with the link from Task 0.2.
@@ -105,13 +105,13 @@ Entry: the RFC PR exists (Task 0.2).
   - Done when: all four comments are posted.
 - [ ] **1.2 Record the salvage list for Phase 3 (agent).** Copy into the Phase 3 plan the source paths of the four parts named in the PR 460 notice. The test files are `libs/cmcd/test/CmcdSession.delivery.test.ts`, `CmcdSession.errors.test.ts`, `CmcdSessionReporter.request.test.ts`, and `CmcdSessionReporter.responses.test.ts` on `feat/cmcd-session-api`.
   - Done when: the Phase 3 plan lists the paths and the scenarios to port.
-- [ ] **1.3 Decide how PR 455 ends (Casey).** Option A, recommended: close it unmerged. The new design record already explains the change. Option B: set `status: superseded`, add a Final Decision that links the session RFC, and squash-merge it as a record. Option B also adds about 5900 lines of the old design record to `main`.
+- [x] **1.3 Decide how PR 455 ends (Casey).** Decision: Option A, close it unmerged. The new design record already explains the change. Option B was a merge as a superseded record, with about 5900 lines of the old design record.
   - Done when: the decision is in the log.
 - [ ] **1.4 Close the four PRs after Task 0.6 (Casey, or the agent at Casey's request).** Use this comment:
 
   > Closed. The session RFC ({rfc-pr}) was accepted, and it supersedes this PR.
 
-  - Done when: PRs 398, 422, 455, and 460 are closed, or PR 455 is merged as a record (Option B).
+  - Done when: PRs 398, 422, 455, and 460 are closed.
 - [ ] **1.5 Delete the branches after Phase 3 merges (Casey).** The branches are the four in the table and `refactor/cmcd-reporter-structural-followups`, the branch of the merged PR 452. A deletion is permanent, so confirm the list first.
   - Done when: the five remote branches are gone.
 
@@ -119,7 +119,7 @@ Entry: the RFC PR exists (Task 0.2).
 
 Entry: none. This phase does not depend on the RFC.
 
-- [ ] **2.1 Decide the scope of the port optimizations (Casey).** Recommendation: optimization 3 only, which drops the token checks, as [analysis.md](analysis.md) explains in "Effect on the port branch". Skip optimizations 1 and 2. Replace the speed gate with the bundle gate. The prepare step costs about 1 µs of a report that takes 10 to 20 µs.
+- [x] **2.1 Decide the scope of the port optimizations (Casey).** Decision: optimization 3 only, which drops the token checks, as [analysis.md](analysis.md) explains in "Effect on the port branch". Skip optimizations 1 and 2. Replace the speed gate with the bundle gate. The prepare step costs about 1 µs of a report that takes 10 to 20 µs.
   - Done when: the decision is in the log.
 - [ ] **2.2 Finish the port branch (agent).** The branch is `refactor/cmcd-encode-pipeline-port`, with 6 local commits on 501281b70.
   1. Add the decided optimizations as Task 7 to [the port plan](../cmcd-encode-pipeline-port/steps.md), with full steps, and run it.
@@ -402,6 +402,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 |---|---|
 | 2026-10-01 | Roadmap written. RFC drafted on `rfc/cmcd-session` (df085bba8, 22e9b3a44), not pushed. |
 | 2026-10-01 | Dry run of Task 2.3 on `refactor/cmcd-encode` (501281b70): the three changed tests fail before the patch, all 228 reporter tests pass after it, and a strict typecheck is clean. |
+| 2026-10-01 | Casey decided Task 1.3 (close PR 455 unmerged) and Task 2.1 (optimization 3 only, with the bundle gate). Casey approved pushes as the work goes on. Tasks 0.1 and 2.3 started. |
 
 ## Links
 

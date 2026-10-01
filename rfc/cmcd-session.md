@@ -229,6 +229,9 @@ Without `enabledKeys`, the session reports every key. In the same case, `CmcdRep
 | `createCmcdSession` | function |
 | `CmcdSession`, `CmcdSessionConfig`, `CmcdSessionSettings`, `CmcdSessionEventTarget` | types |
 | `CmcdReportFilter` | type |
+| `CMCD_EVENT_HOSTNAME`, and `HOSTNAME` in `CmcdEventType` | constant |
+
+CTA-5004-B defines the `h` event for a change of the content host, and the package has no constant for it. The player records the event with the new host in the `h` key.
 
 ### Types
 
@@ -292,7 +295,13 @@ The session encodes each report with the rules of `encodeCmcd`. The encoder roun
 
 The session builds a report only for the selected targets. If a filter throws, no target receives the report, and the error goes to the caller. A target that is not selected keeps its sequence number and its waiting keys.
 
-`recordResponseReceived()` derives `url` without the `CMCD` parameter, `rc` from `status`, and `ts`, `ttfb`, and `ttlb` from `resourceTiming`. It adds the request-time data from `customData.cmcd`. The `data` argument overrides the derived keys. It then records an `rr` event and passes the request to the filters.
+`recordResponseReceived()` derives `url` without the `CMCD` parameter, and `rc` from `status`. It derives three keys from `resourceTiming`:
+
+- `ts` is the time origin plus `startTime`.
+- `ttfb` is `responseStart` minus `startTime`. The session omits `ttfb` when `responseStart` is 0 or earlier than `startTime`. Resource Timing reports 0 for a cross-origin response without the `Timing-Allow-Origin` header.
+- `ttlb` is `duration` when `duration` is above 0. Else it is `responseEnd` minus `startTime`, when `responseEnd` is later than `startTime`.
+
+The method adds the request-time data from `customData.cmcd`. The `data` argument overrides the derived keys. It then records an `rr` event and passes the request to the filters.
 
 `recordError()` sends `e=e` with `ec` at once to each selected target that lists `e`. Every other destination receives the codes with its next report, as CTA-5004-B recommends.
 
@@ -329,6 +338,22 @@ Each call builds and encodes all of its reports before it changes any state. A c
 - A value that the structured-field encoder cannot serialize throws from the call that produced it. `includeOnce()` and `recordError()` check their values when the player passes them, so a waiting key cannot fail a later report.
 - An error in a timer tick goes to the timer callback, as in `CmcdReporter` today. The error can come from `snapshot()` or from encoding.
 - A failed send does not throw. The delivery table describes what happens instead.
+
+`createCmcdSession()` and `configure()` check the configuration and throw on an invalid value. A `configure()` call that throws changes nothing. The checks serve JavaScript callers and settings from JSON, such as the dash.js settings.
+
+| Parameter | Valid values |
+|---|---|
+| `sid` | A string of 1 to 64 characters |
+| `cid` | A string of at most 128 characters |
+| `version` | 1 or 2 |
+| `transmissionMode` | `query` or `headers` |
+| `enabledKeys`, `customHeaderMap`, and the `enabledKeys` of a target | CMCD keys, and custom keys with a hyphen |
+| `events` of a target | CMCD event types |
+| `url` of a target | A non-empty string |
+| `interval` of a target | A finite number, 0 or more |
+| `batchSize` of a target | A positive integer |
+
+The message names the parameter, the valid values, and the received value: `createCmcdSession: eventTargets[1].batchSize must be a positive integer, received 0`.
 
 ### Deprecation of `CmcdReporter`
 
