@@ -68,6 +68,11 @@ describe('normalizeValue', () => {
 		equal(tokenOf(normalizeValue('e', spec('sf'), V2)), 'e')
 	})
 
+	it('does not map the name of an inherited property to a version 1 token', () => {
+		equal(normalizeValue('constructor', spec('st'), V1), undefined)
+		equal(normalizeValue('toString', spec('sf'), V1), undefined)
+	})
+
 	it('wraps one value of a list key in a list in version 2', () => {
 		deepEqual(normalizeValue(3000, spec('br'), V2), [3000])
 		deepEqual(normalizeValue('E1', spec('ec'), V2), ['E1'])

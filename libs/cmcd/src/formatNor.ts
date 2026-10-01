@@ -11,7 +11,7 @@ function toBase(baseUrl: string | undefined): string | undefined {
 	}
 
 	try {
-		return getBaseUrl(baseUrl)
+		return new URL(getBaseUrl(baseUrl)).href
 	}
 	catch {
 		return undefined
