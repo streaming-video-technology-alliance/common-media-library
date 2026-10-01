@@ -91,13 +91,11 @@ Entry: the RFC PR exists (Task 0.2).
 | 455 | `rfc/cmcd-session-api` | Draft RFC: session API for CMCD version 2 | Close unmerged, as superseded (Task 1.3). |
 | 460 | `feat/cmcd-session-api` | Implementation of RFC 455, based on the branch of PR 455 | Close after the salvage in Task 1.2. |
 
-- [ ] **1.1 Post the notices (agent, after Casey approves the text).** Check the state of each PR first. Replace `{rfc-pr}` with the link from Task 0.2.
+- [ ] **1.1 Post the notices (agent, after Casey approves the text).** Casey approved the text on 2026-10-01. The notices mention no one, because Casey already notified the contributors. Check the state of each PR first. Replace `{rfc-pr}` with the link from Task 0.2.
 
   PR 398:
 
-  > The session RFC ({rfc-pr}) replaces this proposal. In the session API, several media players share one session, because the session keeps no state for a player. Each player passes its own `cid`. All players report under one `sid`, with one sequence number for each target. That covers the interstitial and SGAI case of this RFC without child reporters. The session RFC also deprecates `CmcdReporter`.
-  >
-  > @nicolaslevy @cotid-qualabs @robwalch @dsilhavy, please review the session RFC. This PR closes when that RFC is accepted.
+  > The session RFC ({rfc-pr}) replaces this proposal. In the session API, several media players share one session, because the session keeps no state for a player. Each player passes its own `cid`. All players report under one `sid`, with one sequence number for each target. That covers the interstitial and SGAI case of this RFC without child reporters. The session RFC also deprecates `CmcdReporter`. This PR closes when the session RFC is accepted.
 
   PR 422:
 
@@ -420,6 +418,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Task 0.5: Casey adopted the back-off. Prototype: 6162 B, 15 of 15 scenario tests pass. |
 | 2026-10-01 | Task 0.5 done: Casey chose removal in 3.0.0, without waiting for the players. Phase 6 depends on the plan for 3.0.0, not on Phase 5. |
 | 2026-10-01 | RFC consistency pass. Prototype: 6174 B. Benchmark, 3 runs, version 2 request: session 12.0 µs and 20.5 KB, `CmcdReporter` port 20.2 µs and 32.6 KB. |
+| 2026-10-01 | Casey approved the four notices without mentions. Casey already notified the contributors. |
 
 ## Links
 
