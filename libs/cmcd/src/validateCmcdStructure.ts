@@ -10,6 +10,7 @@ import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
 import { resolveVersion } from './resolveVersion.ts'
+import { toBareValue } from './toBareValue.ts'
 import { toTokenString } from './toTokenString.ts'
 
 /**
@@ -164,10 +165,11 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 	}
 
 	// Version key checks
-	if ('v' in data && data['v'] !== 1 && data['v'] !== 2) {
+	const v = toBareValue(data['v'])
+	if ('v' in data && v !== 1 && v !== 2) {
 		issues.push({
 			key: 'v',
-			message: `Unsupported CMCD version "${String(data['v'])}". Expected 1 or 2.`,
+			message: `Unsupported CMCD version "${String(v)}". Expected 1 or 2.`,
 			severity: CMCD_VALIDATION_SEVERITY_ERROR
 		})
 	}
