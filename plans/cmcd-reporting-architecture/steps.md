@@ -36,7 +36,7 @@
 |---|---|---|---|
 | 0. RFC review and acceptance | in progress | none | this file |
 | 1. Superseded pull requests | not started | 0.2 for notices, 0.6 for closing | this file |
-| 2. Release 2.8.0 | in progress | none | this file, and [the port plan](../cmcd-encode-pipeline-port/steps.md) |
+| 2. Release 2.8.0 | in progress, next is Task 2.4 | none | this file, and [the port plan](../cmcd-encode-pipeline-port/steps.md) |
 | 3. Session API | blocked | 0.6, 2.4 | detailed plan at phase start |
 | 4. Deprecation and release | blocked | 3 | this file |
 | 5. Player migrations | blocked | 4 | one plan for each player, at phase start |
@@ -128,7 +128,7 @@ Entry: none. This phase does not depend on the RFC.
 
 - [x] **2.1 Decide the scope of the port optimizations (Casey).** Decision: optimization 3 only, which drops the token checks, as [analysis.md](analysis.md) explains in "Effect on the port branch". Skip optimizations 1 and 2. Replace the speed gate with the bundle gate. The prepare step costs about 1 µs of a report that takes 10 to 20 µs.
   - Done when: the decision is in the log.
-- [ ] **2.2 Finish the port branch (agent).** The branch is `refactor/cmcd-encode-pipeline-port`, with 6 local commits on 501281b70.
+- [x] **2.2 Finish the port branch (agent).** Merged as PR 487 (9b7180e19) and PR 488 (440821e01). The branch is `refactor/cmcd-encode-pipeline-port`, with 6 local commits on 501281b70.
   1. Add the decided optimizations as Task 7 to [the port plan](../cmcd-encode-pipeline-port/steps.md), with full steps, and run it.
   2. Run the final whole-branch review. The deferred minor findings are in `.superpowers/sdd/steps/progress.md`.
   3. Run the root `npm test`, the differential run, the bundle measurement, and the bare-import probe.
@@ -425,6 +425,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | PRs opened: 487 (port, base `refactor/cmcd-encode`), 488 (token lists, base `refactor/cmcd-encode-pipeline-port`, retarget after 487 merges), 489 (`rr` fix, base `refactor/cmcd-encode`). |
 | 2026-10-01 | PR 489 merged into `refactor/cmcd-encode` (5ae9f1bf4). Its changelog entry conflicted with PR 487. The merge of the base into the port branch (41e72f72b) keeps both entries. Root `npm test`: 3474 pass, 0 fail. |
 | 2026-10-01 | Copilot review of PR 486: the RFC removes every `CMCD` parameter, copies waiting values, treats a throwing requester as a rejection, clears the waiting values of a stopped target, and types the filter with `DeepReadonly`. The migration table gains three rows. Casey chose no upper limit for `interval`. |
+| 2026-10-01 | PR 487 squash-merged into `refactor/cmcd-encode` (9b7180e19). PR 488 was retargeted, synced by two merges without a force-push, and squash-merged (440821e01). The tree of `refactor/cmcd-encode` equals the port head plus Task 7. Next: Task 2.4, merge `refactor/cmcd-encode` into `main`. |
 
 ## Links
 
