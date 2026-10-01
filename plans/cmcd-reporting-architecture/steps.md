@@ -64,7 +64,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
   - Done when: the RFC describes the three parts, and the prototype and the RFC examples pass.
 - [x] **0.2 Push the branch and open the RFC PR.** PR 486, opened 2026-10-01. Casey approved the push of `rfc/cmcd-session` on 2026-10-01. Casey opens the PR "[RFC] CMCD session" with `/create-pr main`. Record the PR link here, and use it for `{rfc-pr}` in Phase 1.
   - Done when: the PR is open, and its link is in this file.
-- [ ] **0.3 Post the notices on the superseded PRs.** Task 1.1 has the steps.
+- [x] **0.3 Post the notices on the superseded PRs.** Task 1.1 has the steps.
 - [ ] **0.4 Ask the player maintainers for review (Casey).** Ask Daniel Silhavy (dash.js), Rob Walch (hls.js), Qualabs (@cotid-qualabs), Nicolas Levy, and the shaka-player maintainers.
   - Done when: each maintainer has a review request or a mention on the RFC PR.
 - [x] **0.5 Resolve the unresolved questions (Casey and the reviewers).** The questions are the API name, the name of `includeOnce()`, the default for a missing `enabledKeys`, the queue limit, the retry rule, and the removal timing of `CmcdReporter`.
@@ -91,7 +91,7 @@ Entry: the RFC PR exists (Task 0.2).
 | 455 | `rfc/cmcd-session-api` | Draft RFC: session API for CMCD version 2 | Close unmerged, as superseded (Task 1.3). |
 | 460 | `feat/cmcd-session-api` | Implementation of RFC 455, based on the branch of PR 455 | Close after the salvage in Task 1.2. |
 
-- [ ] **1.1 Post the notices (agent, after Casey approves the text).** Casey approved the text on 2026-10-01. The notices mention no one, because Casey already notified the contributors. Check the state of each PR first. Replace `{rfc-pr}` with the link from Task 0.2.
+- [x] **1.1 Post the notices (agent, after Casey approves the text).** Casey approved the text on 2026-10-01. The notices mention no one, because Casey already notified the contributors. Check the state of each PR first. Replace `{rfc-pr}` with the link from Task 0.2.
 
   PR 398:
 
@@ -421,6 +421,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Casey approved the four notices without mentions. Casey already notified the contributors. |
 | 2026-10-01 | Task 2.2: final review fixed, Task 7 approved. Pushed `refactor/cmcd-encode-pipeline-port` (32ec4383d, `encodeCmcd` +677 B against 501281b70) and `perf/cmcd-drop-token-lists` (dd83aaa24, `encodeCmcd` 3837 B). Casey opens both PRs. |
 | 2026-10-01 | Task 0.2: Casey asked the agent to create the PRs. RFC PR 486 is open. |
+| 2026-10-01 | Tasks 0.3 and 1.1: the four notices are posted on PRs 398, 422, 455, and 460, with the link to PR 486. |
 
 ## Links
 
