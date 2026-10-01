@@ -1,6 +1,14 @@
 # Option 2: a new API next to an unchanged `CmcdReporter`
 
-Date: 2026-10-01. Status: chosen, with one change. `CmcdReporter` is deprecated instead of a later decision. [The RFC](../../rfc/cmcd-session.md) is the current contract, and the numbers below come from an earlier prototype. The evidence is in [analysis.md](analysis.md). [option-1.md](option-1.md) describes the client that this option renames.
+Date: 2026-10-01. Status: chosen, with later changes. This file records the design as compared on 2026-10-01. [The RFC](../../rfc/cmcd-session.md) is the current contract, and its [alternatives section](../../rfc/cmcd-session.md#rationale-and-alternatives) records each later change:
+
+- `CmcdReporter` is deprecated instead of a later decision.
+- There is no `includeOnce()`. The session reads `msd`, `bs`, and `bsd` from the data of any call.
+- The queue has no limit, and the default requester sends without `keepalive`.
+- After a failed send, a target waits 1 second, doubling to 60 seconds.
+- `createCmcdSession()` checks the rules that TypeScript cannot express. The filter types are `DeepReadonly`.
+
+The numbers below come from an earlier prototype. The evidence is in [analysis.md](analysis.md). [option-1.md](option-1.md) describes the client that this option renames.
 
 ## Summary
 

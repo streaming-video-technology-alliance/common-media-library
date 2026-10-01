@@ -1,6 +1,6 @@
 # CMCD reporting architecture: evidence and options
 
-Date: 2026-10-01. Status: decided. Option 2 was chosen, and `CmcdReporter` is deprecated. [The RFC](../../rfc/cmcd-session.md) is the proposal. Scope: `CmcdReporter`, the session API (RFC 455, PR 460), and the encoder normalization.
+Date: 2026-10-01. Status: decided. Option 2 was chosen, and `CmcdReporter` is deprecated. [The RFC](../../rfc/cmcd-session.md) is the proposal, and it answers the open questions below. Scope: `CmcdReporter`, the session API (RFC 455, PR 460), and the encoder normalization.
 
 The question: players control their own state, and TypeScript types describe each key. Is `CmcdReporter` too large for the players that use it? Is the encoder normalization necessary? Is a smaller architecture possible next to `CmcdReporter`?
 
@@ -185,10 +185,12 @@ A player gives up four things:
 
 ## Open questions
 
-- Option 1, 2, or 3.
-- The name of the client. The prototype uses `createCmcdClient`.
-- The owner of the `t` timer: the client with `snapshot()`, or the player.
-- The speed gate of the port branch.
+All four questions have answers:
+
+- Option 2, with `CmcdReporter` deprecated.
+- The name is `createCmcdSession()`.
+- The session owns the `t` timers and reads `snapshot()`.
+- The bundle gate replaces the speed gate of the port branch (roadmap Task 2.1).
 
 ## Method
 
