@@ -35,7 +35,7 @@ export type CmcdEncodeOptions = {
 	 * - It wraps a string for `e`, `ot`, `sf`, `st`, and `sta` in `SfToken`.
 	 * - It replaces a `ts` that is not a finite number with the current time.
 	 *
-	 * The encoder does not call a formatter for an empty value, for `false`, or for `v`. It also skips the formatter of a key that it does not send.
+	 * The encoder does not call a formatter for an empty value, for `false`, or for `v`. It also skips the formatter of a key that it does not send. The formatters of `ot` and `e` still run when a rule needs their value.
 	 */
 	formatters?: Partial<CmcdFormatterMap>;
 

@@ -19,7 +19,7 @@ const input = {
 	ec: ["ERR001", "ERR002"],
 	su: true,
 };
-const options = { version: 2, reportingMode: CmcdReportingMode.REQUEST };
+const options = { version: 2 as const, reportingMode: CmcdReportingMode.REQUEST };
 const result = encodeCmcd(input, options);
 // result === 'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2'
 ```
