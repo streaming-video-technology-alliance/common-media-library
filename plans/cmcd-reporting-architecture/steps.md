@@ -406,6 +406,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Dry run of Task 2.3 on `refactor/cmcd-encode` (501281b70): the three changed tests fail before the patch, all 228 reporter tests pass after it, and a strict typecheck is clean. |
 | 2026-10-01 | Casey decided Task 1.3 (close PR 455 unmerged) and Task 2.1 (optimization 3 only, with the bundle gate). Casey approved pushes as the work goes on. Tasks 0.1 and 2.3 started. |
 | 2026-10-01 | Task 0.5: Casey kept the name `createCmcdSession()`. Casey approved Task 2.2, to start after Task 2.3. |
+| 2026-10-01 | Task 2.3: `fix/cmcd-rr-without-provenance` pushed (b92800cd9, d3c9811b3), root `npm test` green. Casey opens the PR. Task 0.1: the prototype has the checks and the timing rules, 12 of 12 scenario tests pass, and the RFC examples run. |
 
 ## Links
 
