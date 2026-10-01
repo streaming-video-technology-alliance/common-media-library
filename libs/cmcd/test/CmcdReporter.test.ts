@@ -212,7 +212,7 @@ describe('CmcdReporter', () => {
 			ok(!(requests[0].body as string).includes('INJECTED'))
 		})
 
-		it('drops a response whose per-call sid names no retained session', async () => {
+		it('reports a response without a provenance record under the current session, ignoring a per-call sid', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig({
 				eventTargets: [{
@@ -223,8 +223,6 @@ describe('CmcdReporter', () => {
 				}],
 			}), requester)
 
-			// The request carries no provenance record, so the response drops;
-			// a per-call sid is not an attribution key and cannot relabel it.
 			reporter.recordResponseReceived({
 				status: 200,
 				request: { url: 'https://cdn.example.com/segment.mp4' },
@@ -232,7 +230,9 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 0)
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="test-session"'))
+			ok(!(requests[0].body as string).includes('INJECTED'))
 		})
 
 		it('stamps the reporter sid over a per-call sid on createRequestReport', () => {
@@ -537,7 +537,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('msd=800'))
 		})
 
-		it('drops a response whose request carries no provenance', async () => {
+		it('reports a response without a provenance record under the current session', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -545,16 +545,17 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// A hand-built request was never decorated: with no record there
-			// is no attribution key, and a per-call sid cannot substitute.
 			reporter.recordResponseReceived({
 				status: 200,
-				request: { url: 'https://cdn.example.com/seg1.mp4' },
-			}, { sid: 's1' })
+				request: { url: 'https://cdn.example.com/seg1.mp4', customData: { cmcd: { bl: [5000] } } },
+			})
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 0)
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('e=rr'))
+			ok((requests[0].body as string).includes('sid="s1"'))
+			ok((requests[0].body as string).includes('bl=(5000)'))
 		})
 
 		it('attributes a transform-cancelled request to its issuing session', async () => {
@@ -1378,7 +1379,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 		})
 
-		it('drops an unbridged serialized response', async () => {
+		it('reports an unbridged serialized response under the current session', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -1387,16 +1388,13 @@ describe('CmcdReporter', () => {
 			}, requester)
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
-
-			// JSON drops the symbol-keyed record, and nothing restores it: the
-			// request has no attribution key left, so the response drops. The
-			// revived player-facing cmcd object is never read.
 			const lossy = JSON.parse(JSON.stringify(stale))
 			reporter.recordResponseReceived({ status: 200, request: lossy })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 0)
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
 		})
 
 		it('keeps CmcdRequestReport constructible without the provenance member', () => {
