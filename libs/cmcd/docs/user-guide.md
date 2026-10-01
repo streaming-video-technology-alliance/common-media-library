@@ -690,7 +690,7 @@ payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.provenance;
 reporter.recordResponseReceived({ status: 200, request: payload.request });
 ```
 
-The record is the only attribution key. A response whose request has no record is dropped, and a per-call `data.sid` is no substitute. The reporter accepts any record whose `sid` resolves, so you can also construct one. A hand-built request, or a request decorated by another reporter configured with the same session, attributes by naming the `sid`:
+The record is the only key that selects an ended session. A response whose request has no record reports under the current session, as in version 2.4.0. The request-time data then comes from `customData.cmcd`. A per-call `data.sid` is no substitute. The reporter accepts any record whose `sid` resolves, so you can also construct one. A hand-built request, or a request decorated by another reporter configured with the same session, attributes by naming the `sid`:
 
 ```typescript
 // The request was never decorated, so the player names the session.
