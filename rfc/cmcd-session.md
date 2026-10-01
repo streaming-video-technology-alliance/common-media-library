@@ -217,11 +217,15 @@ The table maps each member of `CmcdReporter` to the session API. The example in 
 | The data store in `t` reports | `snapshot` |
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
+| `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |
+| `applyRequestReport()`, deprecated | `createRequestReport()` |
 | `transform` on an event target, to drop reports | `filter` |
 | `transform` on the request configuration, to drop reports | No `createRequestReport()` call for that request |
 | `transform`, to change a report | Other data in the call. A change for one target only has no equivalent. |
 | `sessionRetention` and the provenance record | The player keeps the old session object and records late responses there |
-| A new reporter for new settings | `configure()` |
+| A new reporter for new request settings | `configure()` |
+| A new reporter for a new `sid` or new event targets | A new session |
+| A new reporter for a new `cid` | `cid` in the data of each call |
 
 Without `enabledKeys`, the session reports every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 
@@ -241,7 +245,7 @@ CTA-5004-B defines the `h` event for a change of the content host, and the packa
 ### Types
 
 ```ts
-type CmcdReportFilter = (report: Readonly<Cmcd>, request?: Readonly<HttpRequest>) => boolean
+type CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean
 
 type CmcdSessionEventTarget = {
 	url: string
@@ -291,15 +295,15 @@ The session encodes each report with the rules of `encodeCmcd`. The encoder roun
 
 ### Requests
 
-`createRequestReport()` returns a copy of the request. In query mode, the URL has the `CMCD` parameter, and an existing `CMCD` parameter is replaced. In header mode, the headers have the CMCD shards, and `customHeaderMap` places the custom keys. `customData.cmcd` holds the report data before encoding. Each call advances the sequence number of request mode. Version 1 does not send `sn`.
+`createRequestReport()` returns a copy of the request. In query mode, the session removes every existing `CMCD` parameter from the URL and adds one. In header mode, the headers have the CMCD shards, and `customHeaderMap` places the custom keys. `customData.cmcd` holds the report data before encoding. Each call advances the sequence number of request mode. Version 1 does not send `sn`.
 
 ### Events
 
-`recordEvent()` selects its targets first. A target is selected when three conditions hold. It lists the event type, no 410 response stopped it, and its `filter` returns `true`. A target without a `filter` meets the third condition. The filter receives the report data with `e` and `ts` set, and the request when the caller passes one. A filter must not change the data.
+`recordEvent()` selects its targets first. A target is selected when three conditions hold. It lists the event type, no 410 response stopped it, and its `filter` returns `true`. A target without a `filter` meets the third condition. The filter receives the report data with `e` and `ts` set, and the request when the caller passes one. A filter must not change the data. The `DeepReadonly` types of `CmcdReportFilter` reject a change at any depth.
 
 The session builds a report only for the selected targets. If a filter throws, no target receives the report, and the error goes to the caller. A target that is not selected keeps its sequence number. The values of the call with a destination scope wait for its next report.
 
-`recordResponseReceived()` derives `url` without the `CMCD` parameter, and `rc` from `status`. It derives three keys from `resourceTiming`:
+`recordResponseReceived()` derives `url` without any `CMCD` parameter, and `rc` from `status`. It derives three keys from `resourceTiming`:
 
 - `ts` is the time origin plus `startTime`.
 - `ttfb` is `responseStart` minus `startTime`. The session omits `ttfb` when `responseStart` is 0 or earlier than `startTime`. Resource Timing reports 0 for a cross-origin response without the `Timing-Allow-Origin` header.
@@ -320,7 +324,7 @@ CTA-5004-B scopes four keys to a destination or to the `sid`, so one report cann
 | `bsd` | The data of any call | Each destination adds the values to one list and sends the list with its next report. |
 | `ec` | `recordError()` | Each destination without the `e` report sends the codes with its next report. |
 
-The next report drops a waiting `bs`, `bsd`, or `ec` value that the version or `enabledKeys` does not allow. This rule limits the memory that waiting values use. A valid `msd` is a finite number from 0 to 999,999,999,999,999 after rounding to an integer. The session ignores any other `msd`, as `CmcdReporter` does today.
+The next report drops a waiting `bs`, `bsd`, or `ec` value that the version or `enabledKeys` does not allow. This rule limits the memory that waiting values use. The session copies each waiting value, including the value inside an `SfItem`. A later change to the data of the caller does not change a waiting value. A valid `msd` is a finite number from 0 to 999,999,999,999,999 after rounding to an integer. The session ignores any other `msd`, as `CmcdReporter` does today.
 
 ### Settings and timers
 
@@ -335,8 +339,8 @@ A target sends its queue when the queue reaches `batchSize`, and on `flush()`. O
 | Response | Action |
 |---|---|
 | 2xx | Done. The wait resets. |
-| 410 | Every target with that URL stops for the life of the session |
-| 429, 5xx, or a rejected request | The batch returns to the front of the queue, and the target waits before its next send |
+| 410 | Every target with that URL stops for the life of the session. The session clears its queue and its waiting values. |
+| 429, 5xx, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send |
 | Any other status | The batch is dropped. The wait resets. |
 
 The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new lines join the queue and go out with the retry. CTA-5004-B recommends this back-off for 429 and 5xx responses. `flush()` sends at once, also during a wait. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.

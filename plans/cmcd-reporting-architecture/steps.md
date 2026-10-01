@@ -151,12 +151,12 @@ Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
     - the eight scenarios of the prototype test
     - the spec-rule tests of the current `CmcdReporter` suite: `msd` checks, the `bg` exit, 410 by URL, batching, and response timing
   - The plan covers these deliverables, each with its own test cycle:
-    - the types and the exports, including `CMCD_EVENT_HOSTNAME`
-    - `createRequestReport()`
+    - the types and the exports, including `CMCD_EVENT_HOSTNAME`, and `DeepReadonly` in `CmcdReportFilter`
+    - `createRequestReport()`, which removes every existing `CMCD` parameter, also when the URL has several, a fragment, or a relative path
     - `recordEvent()` and `filter`
     - `recordResponseReceived()` with the timing rules of Task 0.1
-    - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks
-    - delivery: batches, response statuses, and the queue limit
+    - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks and the copies of waiting values
+    - delivery: batches, response statuses, and the back-off. A requester that throws counts as a rejected request. A 410 clears the queue and the waiting values of each target with that URL.
     - the timers, `start()`, and `stop()`
     - `configure()`, and the configuration checks of `createCmcdSession()`
     - the README quick start, the user guide section, and the migration guide
@@ -424,6 +424,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Tasks 0.3 and 1.1: the four notices are posted on PRs 398, 422, 455, and 460, with the link to PR 486. |
 | 2026-10-01 | PRs opened: 487 (port, base `refactor/cmcd-encode`), 488 (token lists, base `refactor/cmcd-encode-pipeline-port`, retarget after 487 merges), 489 (`rr` fix, base `refactor/cmcd-encode`). |
 | 2026-10-01 | PR 489 merged into `refactor/cmcd-encode` (5ae9f1bf4). Its changelog entry conflicted with PR 487. The merge of the base into the port branch (41e72f72b) keeps both entries. Root `npm test`: 3474 pass, 0 fail. |
+| 2026-10-01 | Copilot review of PR 486: the RFC removes every `CMCD` parameter, copies waiting values, treats a throwing requester as a rejection, clears the waiting values of a stopped target, and types the filter with `DeepReadonly`. The migration table gains three rows. Casey chose no upper limit for `interval`. |
 
 ## Links
 
