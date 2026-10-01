@@ -155,7 +155,7 @@ Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
     - `createRequestReport()`, which removes every existing `CMCD` parameter, also when the URL has several, a fragment, or a relative path
     - `recordEvent()` and `filter`, and one destination for the targets that share a URL: one `sn`, one `msd` gate, and one set of waiting values
     - `recordResponseReceived()` with the timing rules of Task 0.1
-    - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks, the copies of waiting values, and the `ot` scope of a waiting `bs`
+    - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks. The tests cover the copies of waiting values and the `ot` scope of a waiting `bs`.
     - delivery: batches, response statuses, and the back-off. A requester that throws counts as a rejected request. A 410 clears the queue and the waiting values of each target with that URL. It also drops a batch in flight. Each target has one POST in flight. An `e` report sends at once, except during a wait.
     - the timers, `start()`, and `stop()`
     - `configure()`, and the configuration checks of `createCmcdSession()`
