@@ -27,6 +27,7 @@ and this project adheres to
 - `CmcdReporter` fires `BACKGROUNDED_MODE` for `bg: false` only if the session started with `bg: true` or reported `bg: true`. A first `bg: false` in a session sent a `b` report, although the player never entered backgrounded mode
 - A target `transform` that sets `bg` to `false` on an entry report no longer turns the report into an exit. The reporter restores `bg: true`, as it does when the transform removes `bg`
 - `validateCmcdValues` accepts a value with parameters. `decodeCmcd` returns such a value as an `SfItem`, for a member such as `br=(3000 6000);p=2` or `d=1000;x`. The validator checks the value inside the `SfItem` and ignores the parameters. It reported `Key "br" must be an array.` or `Key "d" must be a finite integer.` `validateCmcdStructure` reads `v` inside an `SfItem` in the same way. The fix also applies to `validateCmcd`, `validateCmcdRequest`, `validateCmcdHeaders`, `validateCmcdEvents`, and `validateCmcdEventReport`
+- `decodeCmcd` with `convertToLatest` keeps an inner list with parameters, such as `br=(3000 6000);p=2`, in a payload without `v`. It put the list inside a second list, and the encoder then dropped the key. A payload with parameters on `v`, such as `v=2;x`, is no longer converted as version 1 data. The fix also applies to `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
 
 ## [2.7.0] - 2026-09-15
 

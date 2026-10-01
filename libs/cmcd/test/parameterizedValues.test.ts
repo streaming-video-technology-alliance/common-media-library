@@ -21,6 +21,13 @@ function hasMember(input: string, member: string): boolean {
 	return Object.values(toCmcdHeaders(decodeCmcd(input) as Cmcd)).some(value => value.includes(member))
 }
 
+function bareList(value: unknown): unknown[] {
+	ok(value instanceof SfItem, 'expected an SfItem that wraps a list')
+	const list = value.value as unknown
+	ok(Array.isArray(list), 'expected a list inside the SfItem')
+	return list.map(item => item instanceof SfItem ? item.value : item)
+}
+
 describe('values with parameters', () => {
 	it('provides a valid example', () => {
 		// #region example
@@ -49,6 +56,12 @@ describe('values with parameters', () => {
 
 			it('passes validation', () => {
 				deepEqual(errorsOf(input), [])
+			})
+
+			it('keeps the list when a payload without v is converted to version 2', () => {
+				const data = decodeToRecord(member, { convertToLatest: true })
+				deepEqual(bareList(data[key]), [1200, 3400])
+				deepEqual((data[key] as SfItem).params, { p: 2 })
 			})
 		})
 	}
@@ -109,6 +122,11 @@ describe('values with parameters', () => {
 		it('reports a wrong value inside an SfItem', () => {
 			ok(errorsOf('d=12.5;x,ot=v,v=2').includes('Key "d" must be a finite integer.'))
 			ok(errorsOf('br=(1200.5);p=2,v=2').includes('Key "br" array element [0] must be a finite integer.'))
+		})
+
+		it('keeps a version 2 payload unchanged when v has parameters', () => {
+			const data = decodeToRecord('br=(1200);p=2,v=2;x', { convertToLatest: true })
+			deepEqual(bareList(data['br']), [1200])
 		})
 	})
 })
