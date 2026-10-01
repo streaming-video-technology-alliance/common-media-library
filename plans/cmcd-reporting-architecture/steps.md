@@ -153,10 +153,10 @@ Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
   - The plan covers these deliverables, each with its own test cycle:
     - the types and the exports, including `CMCD_EVENT_HOSTNAME`, and `DeepReadonly` in `CmcdReportFilter`
     - `createRequestReport()`, which removes every existing `CMCD` parameter, also when the URL has several, a fragment, or a relative path
-    - `recordEvent()` and `filter`
+    - `recordEvent()` and `filter`, and one destination for the targets that share a URL: one `sn`, one `msd` gate, and one set of waiting values
     - `recordResponseReceived()` with the timing rules of Task 0.1
-    - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks and the copies of waiting values
-    - delivery: batches, response statuses, and the back-off. A requester that throws counts as a rejected request. A 410 clears the queue and the waiting values of each target with that URL.
+    - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks, the copies of waiting values, and the `ot` scope of a waiting `bs`
+    - delivery: batches, response statuses, and the back-off. A requester that throws counts as a rejected request. A 410 clears the queue and the waiting values of each target with that URL. It also drops a batch in flight. Each target has one POST in flight. An `e` report sends at once, except during a wait.
     - the timers, `start()`, and `stop()`
     - `configure()`, and the configuration checks of `createCmcdSession()`
     - the README quick start, the user guide section, and the migration guide
@@ -430,6 +430,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | PR 490: the changelog was consolidated from 34 entries to 6, and four Copilot findings were fixed (35649a756, d89a2d611). Root `npm test` passed on the merged tree. Merged into `main` with a merge commit (703e2f268). Next: Task 2.5, release 2.8.0. |
 | 2026-10-01 | Task 2.5: PR 491 prepares `cmcd` 2.8.0 and the cascaded `request` 1.0.19 (601f0c70b). Root `npm test` and the docs build pass. The README entries of other packages stay unreleased. |
 | 2026-10-01 | PR 491 merged (253dbff45). Publishing waits for a manual run of the Publish workflow. |
+| 2026-10-01 | Casey reviewed PR 486. In the RFC, the targets that share a URL now form one destination. A waiting `bs` keeps its `ot`. Each target has one POST in flight. An `e` report sends at once, except during a wait. |
 | 2026-10-01 | Publish run 36933063046 succeeded. `@svta/cml-cmcd` 2.8.0 and `@svta/cml-request` 1.0.19 are on npm, with the GitHub releases `cmcd-v2.8.0` and `request-v1.0.19`. Phase 2 is done. Phase 3 waits for Task 0.6. |
 
 ## Links
