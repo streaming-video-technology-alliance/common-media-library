@@ -1,0 +1,63 @@
+import type { CmcdKeySpec } from './CmcdKeySpec.ts'
+
+const EVENTS = ['abs', 'abe', 'ae', 'as', 'b', 'bc', 'c', 'ce', 'e', 'h', 'm', 'pc', 'pe', 'pr', 'ps', 'rr', 'sk', 't', 'um']
+const MEDIA = ['a', 'v', 'av', 'tt', 'c', 'o']
+
+/**
+ * The encoder rules of each key: one row for each key of CTA-5004-B Table 1, plus `nrr` of CTA-5004 and `cdn`.
+ *
+ * @internal
+ */
+export const CMCD_KEY_SPECS: Readonly<Record<string, CmcdKeySpec>> = {
+	ab: { type: 'ot-list', round: 1, supersededBy: 'br', version: 2 },
+	bg: { type: 'boolean', omitDefault: false, requiredOn: 'b', version: 2 },
+	bl: { type: 'ot-list', round: 100 },
+	br: { type: 'ot-list', round: 1, requiredOn: 'bc' },
+	bs: { type: 'boolean', omitDefault: false },
+	bsa: { type: 'ot-list', round: 1, version: 2 },
+	bsd: { type: 'ot-list', round: 1, version: 2 },
+	bsda: { type: 'ot-list', round: 1, version: 2 },
+	cdn: { type: 'string', max: 128, version: 2 },
+	cen: { type: 'string', max: 64, mode: 'event', onlyOn: 'ce', requiredOn: 'ce', version: 2 },
+	cid: { type: 'string', max: 128, v1Max: 64, requiredOn: 'c' },
+	cmsdd: { type: 'string', mode: 'event', onlyOn: 'rr', version: 2 },
+	cmsds: { type: 'string', mode: 'event', onlyOn: 'rr', version: 2 },
+	cs: { type: 'string', version: 2 },
+	d: { type: 'integer', round: 1, ot: MEDIA },
+	dfa: { type: 'integer', round: 1, version: 2 },
+	dl: { type: 'integer', round: 100 },
+	e: { type: 'token', tokens: EVENTS, mode: 'event', requiredOn: 'always', version: 2 },
+	ec: { type: 'string-list', requiredOn: 'e', version: 2 },
+	h: { type: 'string', max: 128, mode: 'event', requiredOn: 'h', version: 2 },
+	lab: { type: 'ot-list', round: 1, supersededBy: 'lb', version: 2 },
+	lb: { type: 'ot-list', round: 1, version: 2 },
+	ltc: { type: 'integer', round: 1, version: 2 },
+	msd: { type: 'integer', round: 1, version: 2 },
+	mtp: { type: 'ot-list', round: 100 },
+	nor: { type: 'nor' },
+	nr: { type: 'boolean', omitDefault: false, version: 2 },
+	nrr: { type: 'string', version: 1 },
+	ot: { type: 'token', tokens: ['m', 'a', 'v', 'av', 'i', 'c', 'tt', 'k', 'o'] },
+	pb: { type: 'ot-list', round: 1, version: 2 },
+	pr: { type: 'decimal', omitDefault: 1, requiredOn: 'pr' },
+	pt: { type: 'integer', round: 1, version: 2 },
+	rc: { type: 'integer', round: 1, mode: 'event', onlyOn: 'rr', version: 2 },
+	rtp: { type: 'integer', round: 100 },
+	sf: { type: 'token', tokens: ['d', 'h', 'e', 's', 'o'], v1Map: { e: 'o' } },
+	sid: { type: 'string', max: 64 },
+	smrt: { type: 'string', mode: 'event', onlyOn: 'rr', version: 2 },
+	sn: { type: 'integer', round: 1, version: 2 },
+	st: { type: 'token', tokens: ['v', 'l', 'll'], v1Map: { ll: 'l' } },
+	sta: { type: 'token', tokens: ['s', 'p', 'k', 'r', 'a', 'w', 'e', 'f', 'q', 'd'], requiredOn: 'ps', version: 2 },
+	su: { type: 'boolean', omitDefault: false },
+	tab: { type: 'ot-list', round: 1, supersededBy: 'tb', version: 2 },
+	tb: { type: 'ot-list', round: 1 },
+	tbl: { type: 'ot-list', round: 100, version: 2 },
+	tpb: { type: 'ot-list', round: 1, ot: ['a', 'v', 'av', 'c'], version: 2 },
+	ts: { type: 'integer', round: 1, mode: 'event', requiredOn: 'always', version: 2 },
+	ttfb: { type: 'integer', round: 1, mode: 'event', onlyOn: 'rr', version: 2 },
+	ttfbb: { type: 'integer', round: 1, mode: 'event', onlyOn: 'rr', version: 2 },
+	ttlb: { type: 'integer', round: 1, mode: 'event', onlyOn: 'rr', version: 2 },
+	url: { type: 'string', mode: 'event', onlyOn: 'rr', requiredOn: 'rr', version: 2 },
+	v: { type: 'integer', round: 1, requiredOn: 'always', version: 2 },
+}
