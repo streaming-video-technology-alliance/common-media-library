@@ -4662,6 +4662,37 @@ describe('CmcdReporter', () => {
 				ok(!('bg' in exit))
 			})
 
+			it('reports the exit after a sid change when bg is stored with parameters', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: new SfItem(true) as unknown as boolean })
+				reporter.update({ sid: 'session-2' })
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const exit = decodeCmcd((requests[requests.length - 1].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				equal(exit.sid, 'session-2')
+				ok(!('bg' in exit))
+			})
+
+			it('reports a decoded exit with parameters without bg', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ bg: decodeCmcd('bg=?0;x')['bg'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				const exit = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				ok(!('bg' in exit))
+			})
+
 			it('re-fires BACKGROUNDED_MODE for bg: true after a sid change', async () => {
 				const { requester, requests } = createMockRequester()
 				const reporter = new CmcdReporter(createBgConfig(), requester)
@@ -4714,6 +4745,31 @@ describe('CmcdReporter', () => {
 				await new Promise(resolve => setTimeout(resolve, 10))
 
 				equal(requests.length, 1)
+			})
+
+			it('does not fire BITRATE_CHANGE when only the parameters of the list change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [3000, 6000] })
+				reporter.update({ br: decodeCmcd('br=(3000 6000);p=2')['br'] as Cmcd['br'] })
+				reporter.update({ br: [3000, 6000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+
+			it('fires BITRATE_CHANGE when a bitrate changes in a list with parameters', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: decodeCmcd('br=(3000 6000);p=2')['br'] as Cmcd['br'] })
+				reporter.update({ br: [3000, 7000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
 			})
 
 			it('deduplicates SfItems with same value and params', async () => {

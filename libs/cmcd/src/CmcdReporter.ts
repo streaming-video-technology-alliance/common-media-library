@@ -94,14 +94,11 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 		const ai = a[i]
 		const bi = b[i]
 		if (ai === bi) continue
-		if (typeof ai === 'number' || typeof bi === 'number') return false
-
-		// Both are SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>
-		if (ai.value !== bi.value) return false
+		if ((typeof ai === 'number' ? ai : ai.value) !== (typeof bi === 'number' ? bi : bi.value)) return false
 
 		// ExclusiveRecord: params (when defined) has exactly one key
-		const ap = ai.params
-		const bp = bi.params
+		const ap = typeof ai === 'number' ? undefined : ai.params
+		const bp = typeof bi === 'number' ? undefined : bi.params
 		const ak = ap && Object.keys(ap)[0]
 		const bk = bp && Object.keys(bp)[0]
 		if (ak !== bk) return false
@@ -438,7 +435,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			msd: NaN,
 			// A session that does not start backgrounded has no exit to report.
 			// CTA-5004-B defines a `b` event without `bg` as the exit.
-			lastEmitted: data.bg === true ? {} : { bg: false },
+			lastEmitted: toBareValue(data.bg) === true ? {} : { bg: false },
 			eventTargets,
 			requestTarget: {
 				sn: 0,
@@ -830,7 +827,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// CTA-5004-B defines a `b` event without `bg` as the exit from
 		// backgrounded mode. A transform can add `bg: false`, which the encoder
 		// writes as `?0`.
-		if (type === CMCD_EVENT_BACKGROUNDED_MODE && item.bg === false) {
+		if (type === CMCD_EVENT_BACKGROUNDED_MODE && toBareValue(item.bg) === false) {
 			delete item.bg
 		}
 
