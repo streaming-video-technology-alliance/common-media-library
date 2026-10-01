@@ -2,6 +2,15 @@
 
 Reference code for [option-2.md](../option-2.md) and [the RFC](../../../rfc/cmcd-session.md). It is not production code. The `#cmcd/` imports point to `libs/cmcd/src` on the port branch. The repository typecheck covers every `.ts` file, so this folder keeps the code as a listing.
 
+> [!NOTE]
+> This listing is the code behind the measurements of the RFC, and it stays unchanged. The review of the RFC PR found five gaps in it. The RFC fixes them, and the Phase 3 plan tests them:
+>
+> - The code removes only the first `CMCD` query parameter. The RFC removes every one.
+> - A waiting `bsd` keeps the array of the caller. The RFC copies each waiting value.
+> - A requester that throws at once loses its batch, and later targets of the same call lose their reports. The RFC treats the throw as a rejected request.
+> - A target that a 410 stopped keeps collecting waiting values. The RFC clears them.
+> - `CmcdReportFilter` uses `Readonly`. The RFC uses `DeepReadonly`.
+
 ## createCmcdSession.ts
 
 ```ts
