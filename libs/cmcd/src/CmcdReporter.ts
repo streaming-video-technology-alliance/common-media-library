@@ -586,8 +586,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * writes them into every outgoing report, so this method is the only way
 	 * to change them. A per-call value on {@link CmcdReporter.recordEvent},
 	 * {@link CmcdReporter.createRequestReport}, or
-	 * {@link CmcdReporter.recordResponseReceived} has no effect. Response
-	 * attribution uses the provenance record alone.
+	 * {@link CmcdReporter.recordResponseReceived} has no effect.
 	 * `msd` must be a finite number of milliseconds between `0` and
 	 * `999_999_999_999_999` (the RFC 8941 integer maximum). The reporter
 	 * rounds `msd` to the nearest integer and ignores invalid values.
@@ -938,26 +937,24 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * TypeScript therefore rejects a call whose request the configured
 	 * transforms could not read. See {@link CmcdReporterCustomData}.
 	 *
-	 * The reporter attributes the event only to the session that issued the
-	 * request. The provenance record that
-	 * {@link CmcdReporter.createRequestReport} stored on the request's
-	 * `customData` (under {@link CMCD_REQUEST_PROVENANCE}) selects the session
-	 * by `sid`. A request without a record reports under the current session, as in
-	 * version 2.4.0. The request-time data then comes from `customData.cmcd`.
-	 * A record that names no retained session drops the response.
-	 * It also discards the response when the session is no longer retained (see
-	 * `CmcdReporterConfig.sessionRetention`). A per-call `data.sid` cannot
-	 * substitute. The reporter accepts any record whose `sid` names a retained
-	 * session. The record may come from another reporter with the same session
-	 * attributes, or be hand-built. A response that completes after a `sid`
-	 * change reports under its own retained session, with that session's data
-	 * snapshot and sequence numbers.
+	 * The provenance record that {@link CmcdReporter.createRequestReport}
+	 * stored on the request's `customData` (under
+	 * {@link CMCD_REQUEST_PROVENANCE}) selects the session by `sid`. A record
+	 * that names no retained session drops the response (see
+	 * `CmcdReporterConfig.sessionRetention`). A request without a record reports
+	 * under the current session, as in version 2.4.0. The request-time data then
+	 * comes from `customData.cmcd`. A per-call `data.sid` cannot substitute. The
+	 * reporter accepts any record whose `sid` names a retained session. The
+	 * record may come from another reporter with the same session attributes,
+	 * or be hand-built. If the request has a record, a response that completes
+	 * after a `sid` change reports under its own retained session, with that
+	 * session's data snapshot and sequence numbers.
 	 *
-	 * Request-time report keys come from the record's encoded per-call `data`
-	 * snapshot, which the reporter decodes for each response. The record's `cid`
-	 * replaces the session's current `cid` in the report. A response that
-	 * completes after a mid-session content change therefore reports its
-	 * request-time values.
+	 * With a record, request-time report keys come from the record's encoded
+	 * per-call `data` snapshot, which the reporter decodes for each response.
+	 * The record's `cid` replaces the session's current `cid` in the report. A
+	 * response that completes after a mid-session content change therefore
+	 * reports its request-time values.
 	 *
 	 * @typeParam RD - The `customData` of this request. Defaults to the
 	 *                reporter's own `C`.
@@ -966,7 +963,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override the derived values.
 	 *               The reporter ignores session-owned keys (`sid`, `msd`)
-	 *               supplied here. Attribution uses the provenance record alone.
+	 *               supplied here.
 	 */
 	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
@@ -1025,11 +1022,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Resolves the session a response belongs to. The provenance record's `sid`
+	 * Resolves the session that a provenance record names. The record's `sid`
 	 * must name one of this reporter's retained sessions, or the reporter
-	 * discards the response. There is no other key. A record that names a
-	 * removed or unknown `sid` resolves nothing. Any other attribution
-	 * would be wrong. The reporter reads the `sid` as a plain property. A record
+	 * discards the response. A record that names a removed or unknown `sid`
+	 * resolves nothing. Any other attribution would be wrong. The reporter reads
+	 * the `sid` as a plain property. A record
 	 * copied through JSON therefore resolves the same session, and a hand-built
 	 * record that names a retained session is accepted.
 	 */
