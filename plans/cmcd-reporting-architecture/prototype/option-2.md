@@ -91,7 +91,6 @@ type Scoped = {
 }
 
 const CMCD_QUERY_PARAM = /([?&])CMCD=[^&#]*&?/
-const MAX_QUEUE = 500
 const MAX_INTEGER = 999_999_999_999_999
 const SCOPED_KEYS = ['msd', 'bs', 'bsd', 'ec'] as const
 
@@ -139,7 +138,7 @@ function checkConfig({ sid, cid, eventTargets }: CmcdSessionConfig): void {
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
-	return fetch(url, { ...init, keepalive: true })
+	return fetch(url, init)
 }
 
 export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester): CmcdSession {
@@ -210,7 +209,6 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		const lines = destination.queue.splice(0)
 		const retry = () => {
 			destination.queue.unshift(...lines)
-			destination.queue.splice(0, destination.queue.length - MAX_QUEUE)
 		}
 
 		requester({ url: destination.target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }).then(({ status }) => {
@@ -246,7 +244,6 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 		selected.forEach((destination, i) => {
 			destination.queue.push(lines[i])
-			destination.queue.splice(0, destination.queue.length - MAX_QUEUE)
 
 			if (destination.queue.length >= (destination.target.batchSize || 1)) {
 				send(destination)

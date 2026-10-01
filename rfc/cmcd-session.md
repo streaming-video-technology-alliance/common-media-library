@@ -281,7 +281,7 @@ type CmcdSession = {
 function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status: number }>): CmcdSession
 ```
 
-The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordResponseReceived`, `enabledKeys`, `eventTargets`, `customHeaderMap`, and the `requester` argument. The default requester is `fetch` with `keepalive`.
+The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordResponseReceived`, `enabledKeys`, `eventTargets`, `customHeaderMap`, and the `requester` argument. The default requester is `fetch`.
 
 ### Reports
 
@@ -339,8 +339,6 @@ A target sends its queue when the queue reaches `batchSize`, and on `flush()`. O
 | 429, 5xx, or a rejected request | The batch returns to the front of the queue and goes out with the next send |
 | Any other status | The batch is dropped |
 
-A queue keeps at most 500 lines. Past that limit, the oldest lines drop.
-
 ### Errors
 
 Each call builds and encodes all of its reports before it changes any state. A call that throws therefore changes no sequence number, no waiting key, and no queue.
@@ -384,9 +382,9 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession`, prototype | 6077 B |
+| `createCmcdSession`, prototype | 6053 B |
 | `CmcdReporter`, current | 8423 B |
-| Both in one bundle | 9751 B |
+| Both in one bundle | 9724 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
@@ -400,6 +398,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - Each player must migrate. It replaces the store with its own state object and adds its own state change checks.
 - Until the next major version, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
 - A player that imports both APIs during a migration pays for both, as the bundle table shows.
+- During a long outage of a collector, the queue of each of its targets grows without a limit, as in `CmcdReporter`.
 - A target cannot receive data that differs from the data of the other targets. The `bg=?0` opt-in of `CmcdReporter` has no equivalent.
 - The session derives no playback keys. Players keep computing `msd`, `bs`, `su`, and `dl`, as they do today.
 
@@ -413,6 +412,8 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **Other names for the API.** In CMCD, "client" names the player, so `createCmcdClient()` is ambiguous. `createCmcdDispatcher()` does not describe request decoration. `createCmcdReporter()` would sit next to the deprecated class, with other behavior, until the next major version.
 - **`includeOnce()`, or keys derived from `sta`.** A method for the keys with a destination scope adds a call that the key rules make unnecessary. The session could derive `msd`, `bs`, and `bsd` from the play states. shaka-player reports no starting state, though, and dash.js gives `bs` and `bsd` an object type that `sta` does not show.
 - **No keys without `enabledKeys`.** This default of `CmcdReporter` makes each player pass the full key list. hls.js, dash.js, and shaka-player all do so. The data of each call already selects the keys.
+- **A queue limit.** A limit bounds the memory that a long outage of a collector uses. It also drops reports, and a `batchSize` above the limit never fills. The session has no limit, like `CmcdReporter`.
+- **`keepalive` in the default requester.** It lets a send finish after the page closes. Browsers reject a `keepalive` body over 64 KiB, and a batch after an outage can be larger. A player that needs `keepalive` passes its own requester.
 - **Timers in the player.** shaka-player 5.2.0 shows the lifecycle risk of timers in the library. Targets have their own intervals, though, so the session needs to know them. `start()` and `stop()` keep the lifecycle explicit.
 
 ## Prior art
@@ -421,7 +422,6 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 
 ## Unresolved questions
 
-- The queue limit of 500 lines, and whether a configuration option should change it.
 - The retry rule. This RFC keeps the rule of `CmcdReporter`, which returns a failed batch to the queue. RFC 455 proposed a back-off timer.
 - The major version that removes `CmcdReporter`, and whether the removal waits until hls.js, dash.js, and shaka-player have migrated.
 
