@@ -26,7 +26,8 @@ export type CmcdEncodeOptions = {
 	reportingMode?: CmcdReportingMode;
 
 	/**
-	 * A map of CMCD keys to custom formatters.
+	 * A map of CMCD keys to custom formatters. A formatter replaces the value rule of its key.
+	 * The encoder sends the output without further checks, except that it drops an empty value.
 	 */
 	formatters?: Partial<CmcdFormatterMap>;
 
@@ -49,6 +50,7 @@ export type CmcdEncodeOptions = {
 	 * into paths relative to this base, per the CMCD specification. This option does not modify values
 	 * that are already relative paths, but CMCD version 1 still URL-encodes them on emission. If omitted,
 	 * `nor` values are emitted unchanged (subject to the version 1 URL-encoding rule).
+	 * If `baseUrl` is not a valid URL, the encoder ignores it.
 	 */
 	baseUrl?: string;
 

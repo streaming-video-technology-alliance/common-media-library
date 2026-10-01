@@ -1,125 +1,81 @@
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
-import { CMCD_AGGREGATE_BITRATE_KEYS } from './CMCD_AGGREGATE_BITRATE_KEYS.ts'
-import { CMCD_FORMATTER_MAP } from './CMCD_FORMATTER_MAP.ts'
-import { CMCD_KEY_OBJECT_TYPES } from './CMCD_KEY_OBJECT_TYPES.ts'
+import { CMCD_KEY_SPECS } from './CMCD_KEY_SPECS.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAYBACK_RATE, CMCD_EVENT_RESPONSE_RECEIVED, type CmcdEventType } from './CmcdEventType.ts'
-import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
-import type { CmcdVersion } from './CmcdVersion.ts'
+import type { CmcdKeySpec } from './CmcdKeySpec.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE, type CmcdReportingMode } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
-import { isCmcdEventKey } from './isCmcdEventKey.ts'
-import { isCmcdRequestKey } from './isCmcdRequestKey.ts'
-import { isCmcdResponseReceivedKey } from './isCmcdResponseReceivedKey.ts'
-import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
-import { isCmcdV1Key } from './isCmcdV1Key.ts'
-import { isTokenField } from './isTokenField.ts'
+import type { CmcdVersion } from './CmcdVersion.ts'
+import { downConvertToV1 } from './downConvertToV1.ts'
+import { getKeySpec } from './getKeySpec.ts'
 import { isValid } from './isValid.ts'
+import { normalizeValue } from './normalizeValue.ts'
+import { toBareValue } from './toBareValue.ts'
 import { toTokenString } from './toTokenString.ts'
 
-const filterMap: Record<CmcdReportingMode, (key: string) => boolean> = {
-	event: isCmcdEventKey,
-	request: isCmcdRequestKey,
+function hasKey(spec: CmcdKeySpec, reportingMode: CmcdReportingMode, isV1: boolean): boolean {
+	return (spec.mode === undefined || spec.mode === reportingMode)
+		&& (spec.version === undefined || (spec.version === 1) === isV1)
 }
 
-function hasParams(params: object | undefined): boolean {
-	for (const _ in params) {
+function isRequired(spec: CmcdKeySpec, event: string | undefined): boolean {
+	return spec.requiredOn === 'always' || (event !== undefined && spec.requiredOn === event)
+}
+
+function hasObjectTypes(spec: CmcdKeySpec): boolean {
+	return (spec.type === 'integer' || spec.type === 'ot-list') && spec.ot !== undefined
+}
+
+function allowsObjectType(spec: CmcdKeySpec, objectType: string | undefined): boolean {
+	if (objectType === undefined || (spec.type !== 'integer' && spec.type !== 'ot-list') || spec.ot === undefined) {
 		return true
 	}
 
-	return false
+	return spec.ot.includes(objectType)
 }
 
-/**
- * Unwrap an inner list or SfItem value to a scalar.
- *
- * The scalar is the value of the item with the object type flag of `ot`
- * (CTA-5004-B section 4.1, item 14). Without that item, it is the value
- * of the first item without parameters. Otherwise it is `undefined`.
- */
-function unwrapValue(value: unknown, ot: string | undefined): unknown {
-	if (value instanceof SfItem) {
-		value = value.value
-	}
-
-	if (!Array.isArray(value)) {
-		return value
-	}
-
-	let fallback: unknown
-
-	for (const item of value) {
-		if (!(item instanceof SfItem)) {
-			if (fallback === undefined) {
-				fallback = item
-			}
-			continue
-		}
-
-		if (ot && item.params?.[ot] === true) {
-			return item.value
-		}
-
-		if (fallback === undefined && !hasParams(item.params)) {
-			fallback = item.value
-		}
-	}
-
-	return fallback
+function isDefaultValue(spec: CmcdKeySpec, value: unknown): boolean {
+	return 'omitDefault' in spec && toBareValue(value) === spec.omitDefault
 }
 
-/**
- * Down-convert version 2 CMCD data to version 1.
- *
- * - Extracts `nrr` from the `nor` SfItem's `r` parameter.
- * - Unwraps inner-list values to scalars for the object type `ot`.
- */
-function downConvertToV1(obj: Record<string, any>, ot: string | undefined): Record<string, any> {
-	const result: Record<string, any> = {}
+function insertKey(keys: string[], specs: CmcdKeySpec[], key: string): void {
+	let index = 0
 
-	for (const [key, value] of Object.entries(obj)) {
-		if (value == null) {
-			result[key] = value
-			continue
+	while (index < keys.length && keys[index] < key) {
+		index++
+	}
+
+	keys.splice(index, 0, key)
+	specs.splice(index, 0, CMCD_KEY_SPECS[key])
+}
+
+function prepareValue(key: string, value: unknown, spec: CmcdKeySpec, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): unknown {
+	const formatter = options.formatters?.[key as CmcdKey]
+
+	if (typeof formatter !== 'function') {
+		return value == null ? undefined : normalizeValue(value, spec, formatterOptions)
+	}
+
+	const formatted: unknown = isValid(value) ? formatter(value as CmcdValue, formatterOptions) : value
+
+	if (!isValid(formatted) && !(formatted === false && spec.type === 'boolean')) {
+		return undefined
+	}
+
+	if (spec.type === 'token') {
+		if (typeof formatted === 'string') {
+			return new SfToken(formatted)
 		}
 
-		if (key === 'nor') {
-			const list = value instanceof SfItem && Array.isArray(value.value) ? value.value : value
-			const first = Array.isArray(list) ? list[0] : list
-
-			if (first instanceof SfItem) {
-				result['nor'] = first.value
-				if (first.params?.r) {
-					result['nrr'] = first.params.r
-				}
-			}
-			else {
-				result['nor'] = first
-			}
-		}
-		else if (CMCD_INNER_LIST_KEYS.has(key)) {
-			result[key] = unwrapValue(value, ot)
-		}
-		else {
-			result[key] = value
+		if (formatted instanceof SfItem && typeof formatted.value === 'string') {
+			return new SfItem(new SfToken(formatted.value), formatted.params)
 		}
 	}
 
-	return result
-}
-
-function formatValue(key: CmcdKey, value: CmcdValue, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): CmcdValue {
-	const formatter = options.formatters?.[key] ?? CMCD_FORMATTER_MAP[key]
-	return typeof formatter === 'function' && isValid(value) ? formatter(value, formatterOptions) : value
-}
-
-function formatObjectType(data: Record<string, any>, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): string | undefined {
-	const ot = formatValue('ot', data['ot'] as CmcdValue, options, formatterOptions)
-	return isValid(ot) ? toTokenString(ot) : undefined
+	return formatted
 }
 
 /**
@@ -134,158 +90,121 @@ function formatObjectType(data: Record<string, any>, options: CmcdEncodeOptions,
  * {@includeCode ../test/prepareCmcdData.test.ts#example}
  */
 export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOptions = {}): Cmcd {
-	const results: Cmcd = {}
+	const results: Record<string, unknown> = {}
 
 	if (obj == null || typeof obj !== 'object') {
-		return results
+		return results as Cmcd
 	}
 
-	const version = options.version || (obj['v'] as CmcdVersion) || CMCD_V2
+	const version = options.version || toBareValue(obj['v']) as CmcdVersion || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
-	const formatterOptions: CmcdFormatterOptions = {
-		version,
-		reportingMode,
-		baseUrl: options.baseUrl,
-	}
-
-	// Down-convert V2 data to V1 format if needed
-	const data = version === 1 ? downConvertToV1(obj, formatObjectType(obj, options, formatterOptions)) : obj
-	const eventType = toTokenString(data['e'])
-
-	const keyFilter = version === 1 ? isCmcdV1Key : filterMap[reportingMode]
-
-	// Filter keys based on the version, reporting mode and options. Every key
-	// passing a filter is RFC 8941 serializable: standard keys by definition,
-	// custom keys because isCmcdCustomKey enforces the serializable charset.
-	let keys = Object.keys(data).filter(keyFilter) as CmcdKey[]
-
-	if (data['e'] && eventType !== CMCD_EVENT_RESPONSE_RECEIVED) {
-		keys = keys.filter(key => !isCmcdResponseReceivedKey(key))
-	}
-
+	const isV1 = version === 1
+	const isEventReport = !isV1 && reportingMode === CMCD_EVENT_MODE
+	const formatterOptions: CmcdFormatterOptions = { version, reportingMode, baseUrl: options.baseUrl }
 	const filter = options.filter
-	if (typeof filter === 'function') {
-		keys = keys.filter(filter)
-	}
 
-	// Ensure all required event keys are present before sorting
-	const isEventMode = reportingMode === CMCD_EVENT_MODE
-
-	if (isEventMode) {
-		if (!keys.includes('e') && data['e'] != null) {
-			keys.push('e')
-		}
-
-		if (!keys.includes('ts')) {
-			keys.push('ts')
-		}
-
-		if (!keys.includes('cen') && data['cen'] != null && eventType === CMCD_EVENT_CUSTOM_EVENT) {
-			keys.push('cen')
-		}
-
-		if (!keys.includes('ec') && data['ec'] != null && eventType === CMCD_EVENT_ERROR) {
-			keys.push('ec')
-		}
-
-		if (!keys.includes('url') && data['url'] != null && eventType === CMCD_EVENT_RESPONSE_RECEIVED) {
-			keys.push('url')
-		}
-
-		const requiredField = eventType ? CMCD_STATE_EVENT_FIELDS.get(eventType as CmcdEventType) : undefined
-		if (requiredField && data[requiredField] != null && !keys.includes(requiredField)) {
-			keys.push(requiredField)
-		}
-	}
-
-	if (keys.length === 0) {
-		return results
-	}
-
-	if (version > 1 && !keys.includes('v')) {
-		keys.push('v')
-	}
-
-	keys.sort()
-
+	let objectTypeValue: unknown
 	let objectType: string | undefined
-	let objectTypeResolved = false
 
-	for (const key of keys) {
-		let value = data[key] as CmcdValue
-
-		// An aggregate bitrate key is not sent alongside its exact bitrate key
-		const exactKey = CMCD_AGGREGATE_BITRATE_KEYS[key]
-		if (exactKey && keys.includes(exactKey) && isValid(formatValue(exactKey, data[exactKey] as CmcdValue, options, formatterOptions))) {
-			continue
-		}
-
-		// Some keys are only sent for certain object types. The object type is
-		// the formatted `ot` value, even when `ot` is filtered out of the report.
-		const objectTypes = version > 1 ? CMCD_KEY_OBJECT_TYPES[key] : undefined
-		if (objectTypes) {
-			if (!objectTypeResolved) {
-				objectType = formatObjectType(data, options, formatterOptions)
-				objectTypeResolved = true
-			}
-			if (objectType !== undefined && !objectTypes.includes(objectType)) {
-				continue
-			}
-		}
-
-		// The custom event name is only sent on a custom event
-		if (key === 'cen' && eventType !== CMCD_EVENT_CUSTOM_EVENT) {
-			continue
-		}
-
-		value = formatValue(key, value, options, formatterOptions)
-
-		// Version should only be reported if not equal to 1.
-		if (key === 'v') {
-			if (version === 1) {
-				continue
-			}
-			else {
-				value = version
-			}
-		}
-
-		// Playback rate should only be sent if not equal to 1, except as
-		// the value of a PLAYBACK_RATE state-change event (where pr=1 is
-		// the data being reported, not a default to skip).
-		if (key === 'pr' && value === 1 && !(isEventMode && eventType === CMCD_EVENT_PLAYBACK_RATE)) {
-			continue
-		}
-
-		// Ensure a timestamp is set for event mode
-		if (isEventMode && key === 'ts' && !Number.isFinite(value)) {
-			value = Date.now()
-		}
-
-		// Ignore invalid values, except an explicit `bg: false` on a backgrounded-mode
-		// (e=b) event, which is written as `?0`. CTA-5004-B section 5 allows `?0` for
-		// a Boolean key. `bg` is the only state-change field typed as boolean.
-		// `false` on other state-change fields (for example `cid`, `sta`) is a caller
-		// bug and stays stripped.
-		const isBgFalseTransition = isEventMode
-			&& value === false
-			&& key === 'bg'
-			&& eventType === CMCD_EVENT_BACKGROUNDED_MODE
-		if (!isValid(value) && !isBgFalseTransition) {
-			continue
-		}
-
-		if (isTokenField(key)) {
-			if (typeof value === 'string') {
-				value = new SfToken(value)
-			}
-			else if (value instanceof SfItem && typeof value.value === 'string') {
-				value = new SfItem(new SfToken(value.value), value.params)
-			}
-		}
-
-		(results as any)[key] = value
+	if (isV1) {
+		objectTypeValue = prepareValue('ot', obj['ot'], CMCD_KEY_SPECS['ot'], options, formatterOptions)
+		objectType = toTokenString(objectTypeValue)
 	}
 
-	return results
+	const data = isV1 ? downConvertToV1(obj, objectType) : obj
+	const eventValue = isEventReport ? prepareValue('e', data['e'], CMCD_KEY_SPECS['e'], options, formatterOptions) : undefined
+	const event = toTokenString(eventValue)
+	const keys: string[] = []
+	const specs: CmcdKeySpec[] = []
+	let passed = false
+	let needsObjectType = false
+
+	for (const key of Object.keys(data).sort()) {
+		const spec = getKeySpec(key)
+
+		if (spec === undefined || !hasKey(spec, reportingMode, isV1)) {
+			continue
+		}
+
+		if (typeof filter !== 'function' || filter(key as CmcdKey)) {
+			passed = true
+		}
+		else if (!isRequired(spec, event)) {
+			continue
+		}
+
+		if (spec.onlyOn !== undefined && spec.onlyOn !== event) {
+			continue
+		}
+
+		if (key === 'ot' || hasObjectTypes(spec)) {
+			needsObjectType = true
+		}
+
+		keys.push(key)
+		specs.push(spec)
+	}
+
+	if (!passed && !isEventReport) {
+		return results as Cmcd
+	}
+
+	if (needsObjectType && !isV1) {
+		objectTypeValue = prepareValue('ot', data['ot'], CMCD_KEY_SPECS['ot'], options, formatterOptions)
+		objectType = toTokenString(objectTypeValue)
+	}
+
+	if (isEventReport && !keys.includes('ts')) {
+		insertKey(keys, specs, 'ts')
+	}
+
+	if (!isV1 && !keys.includes('v')) {
+		insertKey(keys, specs, 'v')
+	}
+
+	const values: unknown[] = new Array(keys.length)
+
+	for (let i = keys.length - 1; i >= 0; i--) {
+		const key = keys[i]
+		const spec = specs[i]
+
+		if (spec.type === 'ot-list' && spec.supersededBy !== undefined) {
+			const exact = keys.indexOf(spec.supersededBy, i + 1)
+
+			if (exact !== -1 && values[exact] !== undefined) {
+				continue
+			}
+		}
+
+		if (key === 'v') {
+			values[i] = version
+		}
+		else if (key === 'ot') {
+			values[i] = objectTypeValue
+		}
+		else if (key === 'e') {
+			values[i] = eventValue
+		}
+		else if (isV1 || allowsObjectType(spec, objectType)) {
+			values[i] = prepareValue(key, data[key], spec, options, formatterOptions)
+		}
+
+		if (key === 'ts') {
+			const timestamp = toBareValue(values[i])
+
+			if (typeof timestamp !== 'number' || !Number.isFinite(timestamp)) {
+				values[i] = Date.now()
+			}
+		}
+	}
+
+	for (let i = 0; i < keys.length; i++) {
+		const value = values[i]
+
+		if (value !== undefined && (!isDefaultValue(specs[i], value) || isRequired(specs[i], event))) {
+			results[keys[i]] = value
+		}
+	}
+
+	return results as Cmcd
 }

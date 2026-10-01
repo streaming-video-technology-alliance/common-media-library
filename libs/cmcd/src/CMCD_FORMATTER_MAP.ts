@@ -38,8 +38,10 @@ const roundToHundred = (value: number): number => Math.round(value / 100) * 100
 const toHundred = (value: CmcdValue) => formatNumbers(value, roundToHundred)
 
 /**
- * The default formatters for CMCD values.
+ * Formatters for CMCD values.
  *
+ * The encoder applies the same rounding through its key table, and `nor` is the `nor` rule of the encoder.
+ * Use an entry to build a custom formatter for `CmcdEncodeOptions.formatters`.
  * The formatter of a numeric key drops a value or a list element that is not a finite number.
  *
  * @public

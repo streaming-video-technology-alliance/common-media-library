@@ -1242,10 +1242,11 @@ describe('CmcdReporter', () => {
 				}],
 			}, requester)
 
-			// A plain object is not an RFC 8941 bare item. Reports are encoded
-			// at enqueue, so the failure surfaces synchronously in the
-			// recording call instead of rejecting the send and re-queueing.
-			throws(() => reporter.recordEvent(CmcdEventType.ERROR, { 'ec': ['404'], 'com.example-bad': { junk: true } } as unknown as Partial<Cmcd>))
+			// An object inside a custom list is not an RFC 8941 bare item.
+			// Reports are encoded at enqueue, so the failure surfaces
+			// synchronously in the recording call instead of rejecting the
+			// send and re-queueing.
+			throws(() => reporter.recordEvent(CmcdEventType.ERROR, { 'ec': ['404'], 'com.example-bad': [{ junk: true }] } as unknown as Partial<Cmcd>))
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 0)
