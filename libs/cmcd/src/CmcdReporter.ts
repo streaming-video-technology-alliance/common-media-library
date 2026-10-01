@@ -1,4 +1,3 @@
-import { SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -113,21 +112,10 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 }
 
 /**
- * Shallow equality for two `params` records.
- */
-function paramsEqual(a: unknown, b: unknown): boolean {
-	const left = (a ?? {}) as Record<string, unknown>
-	const right = (b ?? {}) as Record<string, unknown>
-	const keys = Object.keys(left)
-
-	return keys.length === Object.keys(right).length && keys.every(key => Object.is(left[key], right[key]))
-}
-
-/**
  * Equality for `br` deduplication. A `br` value can be an `SfItem` that
  * wraps the list, as `decodeCmcd` returns for an inner list with
- * parameters. Two values are equal when their lists and their list
- * parameters are equal.
+ * parameters. Two values are equal when their lists are equal. The
+ * parameters of the list are not compared.
  */
 function brEqual(a: unknown, b: unknown): boolean {
 	const listA = toBareValue(a)
@@ -138,7 +126,6 @@ function brEqual(a: unknown, b: unknown): boolean {
 	}
 
 	return cmcdObjectTypeListEqual(listA, listB)
-		&& paramsEqual(a instanceof SfItem ? a.params : undefined, b instanceof SfItem ? b.params : undefined)
 }
 
 const equal = Object.is

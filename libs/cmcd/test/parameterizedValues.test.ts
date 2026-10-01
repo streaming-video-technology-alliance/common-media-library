@@ -176,11 +176,36 @@ describe('values with parameters', () => {
 
 			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
 			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
-			reporter.update({ br: decodedBr('br=(3000 6000);p=3') })
+			reporter.update({ br: decodedBr('br=(3000 7000);p=2') })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
 			equal(requests.length, 2)
+		})
+
+		it('fires no BITRATE_CHANGE event when only the list parameters change', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: [...REPORT_KEYS],
+				eventTargets: [{
+					url: 'https://example.com/cmcd',
+					events: [CmcdEventType.BITRATE_CHANGE],
+					enabledKeys: [...REPORT_KEYS],
+					batchSize: 1,
+				}],
+			}, requester)
+
+			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
+			reporter.update({ br: decodedBr('br=(3000 6000);p=3') })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			equal(requests.length, 1)
+
+			const report = reporter.createRequestReport({ url: 'https://example.com/segment.m4s' })
+			const sent = decodeToRecord(new URL(report.url).searchParams.get('CMCD') ?? '')
+			deepEqual((sent['br'] as SfItem).params, { p: 3 })
 		})
 
 		it('keeps the stored br list when a transform changes the list in its report', async () => {
