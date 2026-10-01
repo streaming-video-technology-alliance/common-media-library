@@ -134,7 +134,7 @@ Entry: none. This phase does not depend on the RFC.
   3. Run the root `npm test`, the differential run, the bundle measurement, and the bare-import probe.
   4. Push the branch. Casey opens the PR with `/create-pr refactor/cmcd-encode`.
   - Done when: the port PR is merged into `refactor/cmcd-encode`.
-- [ ] **2.3 Fix `recordResponseReceived()` for requests without a provenance record (agent).** The full steps are in [Task 2.3 in detail](#task-23-in-detail).
+- [x] **2.3 Fix `recordResponseReceived()` for requests without a provenance record (agent).** Merged as PR 489 (5ae9f1bf4). The full steps are in [Task 2.3 in detail](#task-23-in-detail).
   - Done when: the fix PR is merged into `refactor/cmcd-encode`.
 - [ ] **2.4 Merge `refactor/cmcd-encode` into `main` (Casey).** Casey opens the PR with `/create-pr main` from `refactor/cmcd-encode`. The perf fix of `urlToRelativePath` is a separate utils PR to `main`, from `perf/utils-relative-url-no-throw`. It can ship in the same release.
   - Done when: `main` contains the integration branch, and the root `npm test` passes on `main`.
@@ -423,6 +423,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Task 0.2: Casey asked the agent to create the PRs. RFC PR 486 is open. |
 | 2026-10-01 | Tasks 0.3 and 1.1: the four notices are posted on PRs 398, 422, 455, and 460, with the link to PR 486. |
 | 2026-10-01 | PRs opened: 487 (port, base `refactor/cmcd-encode`), 488 (token lists, base `refactor/cmcd-encode-pipeline-port`, retarget after 487 merges), 489 (`rr` fix, base `refactor/cmcd-encode`). |
+| 2026-10-01 | PR 489 merged into `refactor/cmcd-encode` (5ae9f1bf4). Its changelog entry conflicted with PR 487. The merge of the base into the port branch (41e72f72b) keeps both entries. Root `npm test`: 3474 pass, 0 fail. |
 
 ## Links
 
