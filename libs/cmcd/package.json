@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-cmcd",
-	"version": "2.7.0",
+	"version": "2.8.0",
 	"description": "Common Media Client Data (CMCD) encoding and decoding",
 	"license": "Apache-2.0",
 	"type": "module",
