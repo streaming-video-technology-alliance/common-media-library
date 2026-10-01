@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Changed
 
-- The encoder reads its key rules from one internal table. Each formatter in `CmcdEncodeOptions.formatters` runs at most once in a call, and only for a key that the encoder can send. The formatters of `ot` and `e` also run when a rule needs their value. Before, the `ot` formatter could run twice, and the `br` formatter ran twice when `ab` was present. The encoder no longer calls a `v` formatter, because it sets `v` from the version
+- The encoder reads its key rules from one internal table. Each formatter in `CmcdEncodeOptions.formatters` runs at most once in a call, and only for a key that the encoder can send. The formatters of `ot` and `e` also run when a rule needs their value. Before, the `ot` formatter could run twice, and the `br` formatter ran twice when `ab` was present. The encoder no longer calls a `v` formatter, because it sets `v` from the version. The encoder no longer reads `CMCD_FORMATTER_MAP`, so a change to an entry of the map no longer changes the output. To change a value, use `CmcdEncodeOptions.formatters`
 
 ### Fixed
 
@@ -44,7 +44,7 @@ and this project adheres to
 - In event mode, the encoder keeps a `ts` with parameters, such as the decoded `ts=1700000000000;x`. Before, it replaced the timestamp with the current time
 - The encoder omits a default value that has parameters, as it omits the bare value. Examples are `pr=1;x`, `bs=?0;x`, and `com.example-x=?0;a=1`. The exceptions stay the same: `pr` on a `pr` event and `bg` on a `b` event
 - In version 1, the encoder sends only version 1 keys and custom keys, also in event mode. Before, a version 1 event report had `e`, `ts`, and keys such as `sta`. CTA-5004-B defines event mode for version 2 only
-- The encoder sends `v` as the version number without parameters. Before, a decoded `v=2;x` kept its parameter
+- The encoder reads the version from the value inside `v` and sends `v` without parameters. A decoded `v=1;x` gives version 1 output, like `v: 1`. Before, it gave version 2 output with `v=1;x`. A decoded `v=2;x` becomes `v=2`. This is a wire output change
 
 ### Documentation
 

@@ -489,6 +489,10 @@ describe('prepareCmcdData', () => {
 		it('sets v from the version', () => {
 			equal(prepareCmcdData({ v: new SfItem(2, { x: true }), sid: 'session-id' })['v'], 2)
 		})
+
+		it('reads the version from the value inside v', () => {
+			deepEqual(prepareCmcdData({ v: new SfItem(1, { x: true }), br: [3000], sid: 's' }), { br: 3000, sid: 's' })
+		})
 	})
 
 	describe('order of preparation', () => {
