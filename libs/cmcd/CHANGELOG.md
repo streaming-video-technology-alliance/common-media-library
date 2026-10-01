@@ -26,6 +26,13 @@ and this project adheres to
 - `CmcdReporter` sends the exit from backgrounded mode as a `b` event without `bg`. The reporter sent `bg=?0`. CTA-5004-B defines a `b` event with `bg` as the entry and a `b` event without `bg` as the exit. It also says that `bg` SHOULD only be sent when it is TRUE. A receiver that checks for the key read `bg=?0` as an entry. This is a wire output change. If a receiver reads the exit from `bg=?0`, change it to treat a `b` event without `bg` as the exit. A target transform can also add `bg: false` to the exit report to send `bg=?0` to that target. The encoder still writes an explicit `bg: false` on a `b` event as `?0`
 - `CmcdReporter` fires `BACKGROUNDED_MODE` for `bg: false` only if the session started with `bg: true` or reported `bg: true`. A first `bg: false` in a session sent a `b` report, although the player never entered backgrounded mode
 - A target `transform` that sets `bg` to `false` on an entry report no longer turns the report into an exit. The reporter restores `bg: true`, as it does when the transform removes `bg`
+- `validateCmcdValues` accepts a value with parameters. `decodeCmcd` returns such a value as an `SfItem`, for a member such as `br=(3000 6000);p=2` or `d=1000;x`. The validator checks the value inside the `SfItem` and ignores the parameters. It reported `Key "br" must be an array.` or `Key "d" must be a finite integer.` `validateCmcdStructure` reads `v` inside an `SfItem` in the same way. The fix also applies to `validateCmcd`, `validateCmcdRequest`, `validateCmcdHeaders`, `validateCmcdEvents`, and `validateCmcdEventReport`
+- `decodeCmcd` with `convertToLatest` keeps an inner list with parameters, such as `br=(3000 6000);p=2`, in a payload without `v`. It put the list inside a second list, and the encoder then dropped the key. A payload with parameters on `v`, such as `v=2;x`, is no longer converted as version 1 data. The fix also applies to `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
+- `CmcdReporter.update()` accepts a `br` value that is an inner list with parameters, as `decodeCmcd` returns for `br=(3000 6000);p=2`. It threw `v.slice is not a function`. A `BITRATE_CHANGE` event fires only when a bitrate or an object type flag changes. A change to the parameters of the list alone fires no event. A transform can no longer change the stored list through the copy of its report
+
+### Documentation
+
+- The user guide describes the value that `decodeCmcd` returns for a member with parameters
 
 ## [2.7.0] - 2026-09-15
 

@@ -1,5 +1,6 @@
 import { CMCD_V1 } from './CMCD_V1.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
+import { toBareValue } from './toBareValue.ts'
 
 /**
  * Resolves the CMCD version from options, the payload's `v` key, or the default (version 1).
@@ -11,7 +12,7 @@ export function resolveVersion(data: Record<string, unknown>, options?: CmcdVali
 		return options.version
 	}
 
-	const payloadVersion = data['v']
+	const payloadVersion = toBareValue(data['v'])
 	if (payloadVersion === 1 || payloadVersion === 2) {
 		return payloadVersion
 	}
