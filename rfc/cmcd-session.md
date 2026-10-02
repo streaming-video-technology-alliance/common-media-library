@@ -295,7 +295,7 @@ The session encodes each report with the rules of `encodeCmcd`. The encoder roun
 
 ### Requests
 
-`createRequestReport()` returns a copy of the request. In query mode, the session removes every existing `CMCD` parameter from the URL and adds one. In header mode, the headers have the CMCD shards, and `customHeaderMap` places the custom keys. `customData.cmcd` holds the report data before encoding. Each call advances the sequence number of request mode. Version 1 does not send `sn`.
+`createRequestReport()` returns a copy of the request. In query mode, the first `CMCD` parameter of the URL takes the new value in place, and the session removes the other `CMCD` parameters. In header mode, the headers have the CMCD shards, and `customHeaderMap` places the custom keys. `customData.cmcd` holds the report data before encoding. Each call advances the sequence number of request mode. Version 1 does not send `sn`.
 
 ### Events
 
