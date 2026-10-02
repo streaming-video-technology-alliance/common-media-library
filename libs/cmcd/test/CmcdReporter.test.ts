@@ -355,7 +355,7 @@ describe('CmcdReporter', () => {
 
 			equal(requests.length, 1)
 			ok((requests[0].body as string).includes('msd=800'))
-			ok(!(requests[0].body as string).includes('5000'))
+			ok(!(requests[0].body as string).includes('msd=5000'))
 		})
 
 		it('strips a transform-written msd when the gate is closed', async () => {
@@ -513,7 +513,7 @@ describe('CmcdReporter', () => {
 			const body = requests[0].body as string
 			ok(body.includes('sid="s1"'))
 			ok(body.includes('bl=(25000)'))
-			ok(!body.includes('99000'))
+			ok(!body.includes('bl=(99000)'))
 		})
 
 		it('lets a stale response carry the originating session unsent msd', async () => {
@@ -711,7 +711,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			const body = requests[0].body as string
 			ok(body.includes('d=2000'), `expected untransformed d in ${body}`)
-			ok(!body.includes('9999'))
+			ok(!body.includes('d=9999'))
 		})
 
 		it('attributes a response whose per-call data cannot encode', async () => {
@@ -1048,7 +1048,7 @@ describe('CmcdReporter', () => {
 			const body = requests[0].body as string
 			ok(body.includes('sid="s1"'))
 			ok(body.includes('bl=(25000)'), `expected frozen bl=(25000) in ${body}`)
-			ok(!body.includes('99000'))
+			ok(!body.includes('bl=(99000)'))
 		})
 
 		it('never retries a batch invalidated by its session disposal', async () => {
@@ -1257,7 +1257,7 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('500'), `expected ec 500 in ${requests[0].body}`)
+			ok((requests[0].body as string).includes('ec=("500")'), `expected ec 500 in ${requests[0].body}`)
 
 			reporter.flush()
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1293,7 +1293,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			const body = requests[0].body as string
 			ok(body.includes('tab=(3000)'), `expected frozen tab=(3000) in ${body}`)
-			ok(!body.includes('9000'))
+			ok(!body.includes('tab=(9000)'))
 		})
 
 		it('encodes a JSON-bridged response report without poisoning the queue', async () => {
