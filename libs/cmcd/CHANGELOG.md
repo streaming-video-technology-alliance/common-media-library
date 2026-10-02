@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `fromCmcdUrl` decodes a `+` as a space, as `fromCmcdQuery` does. CTA-5004-B requires the `application/x-www-form-urlencoded` format for the `CMCD` query argument. `CmcdReporter` writes this format. In this format, a space is a `+`. Before, `fromCmcdUrl` threw `failed to parse ... as Dict` for an inner list with two or more items, such as `nor=("a.m4s" "b.m4s")`. It decoded the string `"a b"` as `a+b`. A `%2B` still decodes as a `+`
+
 ## [2.8.0] - 2026-10-01
 
 ### Changed
