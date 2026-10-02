@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.8.1] - 2026-10-01
+
 ### Fixed
 
 - The `CMCD` query parameter uses the encoding of the CTA-5004-B query examples. Only letters, digits, `-`, `.`, `_`, and `~` stay unencoded. A space becomes `%20`, and `(` and `)` become `%28` and `%29`. This is a wire output change. It covers `toCmcdUrl`, `toCmcdQuery`, `appendCmcdQuery`, and `CmcdReporter`. Before, `CmcdReporter` wrote a space as `+`, and the other functions sent `(` and `)` unencoded. A decoder that uses `URLSearchParams` reads the old and the new output as the same value. If a test compares exact URLs, update its expected strings. An unpaired surrogate in a string becomes U+FFFD. Before, it made `toCmcdUrl`, `toCmcdQuery`, and `appendCmcdQuery` throw `URIError`
@@ -322,7 +324,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.1...HEAD
+[2.8.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.0...cmcd-v2.8.1
 [2.8.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...cmcd-v2.8.0
 [2.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...cmcd-v2.7.0
 [2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
