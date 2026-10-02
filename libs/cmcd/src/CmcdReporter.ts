@@ -8,7 +8,7 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
@@ -26,7 +26,9 @@ import type { CmcdVersion } from './CmcdVersion.ts'
 import { decodeCmcd } from './decodeCmcd.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
+import { isValid } from './isValid.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
+import { toBareValue } from './toBareValue.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
 type CmcdReportConfigNormalized = CmcdReportConfig & {
@@ -92,14 +94,11 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 		const ai = a[i]
 		const bi = b[i]
 		if (ai === bi) continue
-		if (typeof ai === 'number' || typeof bi === 'number') return false
-
-		// Both are SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>
-		if (ai.value !== bi.value) return false
+		if ((typeof ai === 'number' ? ai : ai.value) !== (typeof bi === 'number' ? bi : bi.value)) return false
 
 		// ExclusiveRecord: params (when defined) has exactly one key
-		const ap = ai.params
-		const bp = bi.params
+		const ap = typeof ai === 'number' ? undefined : ai.params
+		const bp = typeof bi === 'number' ? undefined : bi.params
 		const ak = ap && Object.keys(ap)[0]
 		const bk = bp && Object.keys(bp)[0]
 		if (ak !== bk) return false
@@ -107,6 +106,23 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 	}
 
 	return true
+}
+
+/**
+ * Equality for `br` deduplication. A `br` value can be an `SfItem` that
+ * wraps the list, as `decodeCmcd` returns for an inner list with
+ * parameters. Two values are equal when their lists are equal. The
+ * parameters of the list are not compared.
+ */
+function brEqual(a: unknown, b: unknown): boolean {
+	const listA = toBareValue(a)
+	const listB = toBareValue(b)
+
+	if (!Array.isArray(listA) || !Array.isArray(listB)) {
+		return Object.is(a, b)
+	}
+
+	return cmcdObjectTypeListEqual(listA, listB)
 }
 
 const equal = Object.is
@@ -123,8 +139,8 @@ const STATE_FIELDS: readonly StateFieldEntry[] = /* @__PURE__ */ Array.from(
 			return {
 				event,
 				field,
-				equal: (a, b) => (a === undefined || b === undefined) ? a === b : cmcdObjectTypeListEqual(a as CmcdObjectTypeList, b as CmcdObjectTypeList),
-				snapshot: (v) => (v as CmcdObjectTypeList).slice(),
+				equal: brEqual,
+				snapshot: (v) => Array.isArray(v) ? v.slice() : copyItemValue(v),
 			}
 		}
 		return { event, field: field as StateField, equal, snapshot: identity }
@@ -145,37 +161,15 @@ function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
 }
 
 /**
- * Maps each event type to the key CTA-5004-B requires beyond `e` and `ts`.
- * Built from the state-change table plus the three event types whose
- * required key is event data, not player state.
+ * Maps each event type to the key that a report of that type must keep,
+ * beyond `e` and `ts`. Built from the state-change table plus the three
+ * event types whose required key is event data, not player state.
  */
 const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
 
 /**
- * Whether a required key's value will survive report preparation.
- *
- * This is `isValid` without its `false` exclusion. `false` must count as
- * usable because `bg: false` is a valid value on a backgrounded-mode event,
- * which the encoder writes as `?0`. If `false` counted as unusable,
- * restoration would silently revert a transform that cleared the key.
- * Later processing drops empty strings, empty lists, and non-finite numbers.
- * A transform that substitutes one of them leaves the report without a
- * required key.
- */
-function isUsableRequiredValue(value: unknown): boolean {
-	if (value == null || value === '') {
-		return false
-	}
-
-	if (typeof value === 'number') {
-		return Number.isFinite(value)
-	}
-
-	return !Array.isArray(value) || value.length > 0
-}
-
-/**
- * Copies a value with the `SfItem` structure, including its `params` record.
+ * Copies a value with the `SfItem` structure, including its `params` record
+ * and the list of an `SfItem` that wraps a list.
  *
  * The copy keeps the prototype because `prepareCmcdData`, the formatter map,
  * validation, and the structured-field encoder all branch on
@@ -187,10 +181,14 @@ function copyItemValue(value: unknown): unknown {
 		return value
 	}
 
-	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; }
+	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; value?: unknown; }
 
 	if (copy.params !== null && typeof copy.params === 'object') {
 		copy.params = { ...copy.params }
+	}
+
+	if (Array.isArray(copy.value)) {
+		copy.value = copy.value.map(copyItemValue)
 	}
 
 	return copy
@@ -203,7 +201,8 @@ function copyItemValue(value: unknown): unknown {
  *
  * The copy is complete for the CMCD value space. `CmcdValue` and
  * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
- * those. `SfItem.params` is a flat record. The reporter calls this function
+ * those. `decodeCmcd` also returns an `SfItem` that wraps a list, and the
+ * copy includes that list. `SfItem.params` is a flat record. The reporter calls this function
  * where a transform is configured, at session end on the ended session's
  * store, and on the request's stored player-facing view. The session-end
  * copy detaches the frozen snapshot from caller-held references.
@@ -434,7 +433,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			provenance: mintProvenance(sid, data.cid),
 			data,
 			msd: NaN,
-			lastEmitted: {},
+			// A session that does not start backgrounded has no exit to report.
+			// CTA-5004-B defines a `b` event without `bg` as the exit.
+			lastEmitted: toBareValue(data.bg) === true ? {} : { bg: false },
 			eventTargets,
 			requestTarget: {
 				sn: 0,
@@ -555,6 +556,14 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * a new session therefore always fires, even when the persisted value did
 	 * not change across the `sid` boundary.
 	 *
+	 * The `bg` field is an exception. A session that does not start with
+	 * `bg: true` begins with `false` as its last reported `bg` value.
+	 * `bg: false` therefore fires `BACKGROUNDED_MODE` only if the session
+	 * started with `bg: true` or reported `bg: true`. CTA-5004-B defines a
+	 * `b` event without `bg` as the exit from backgrounded mode, so the exit
+	 * report does not carry `bg`. A target transform can add `bg: false` to
+	 * the exit report. The encoder writes that value as `?0`.
+	 *
 	 * Multi-field updates fire the events in this order: `sta`, `pr`, `cid`,
 	 * `bg`, `br`. The order of keys in the input object does not affect the
 	 * firing order.
@@ -574,8 +583,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * writes them into every outgoing report, so this method is the only way
 	 * to change them. A per-call value on {@link CmcdReporter.recordEvent},
 	 * {@link CmcdReporter.createRequestReport}, or
-	 * {@link CmcdReporter.recordResponseReceived} has no effect. Response
-	 * attribution uses the provenance record alone.
+	 * {@link CmcdReporter.recordResponseReceived} has no effect.
 	 * `msd` must be a finite number of milliseconds between `0` and
 	 * `999_999_999_999_999` (the RFC 8941 integer maximum). The reporter
 	 * rounds `msd` to the nearest integer and ignores invalid values.
@@ -692,9 +700,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *    data store, as `update()` would.
 	 * 2. Discards the event if the state field has no value after that write
 	 *    (never set, or cleared with `update({ field: undefined })`).
-	 *    A state-change event without its required field would violate CTA-5004-B.
 	 * 3. Suppresses the event if the field's current value equals the
-	 *    last reported value (no state transition).
+	 *    last reported value (no state transition). {@link CmcdReporter.update}
+	 *    describes the `bg` value that a new session starts with.
 	 *
 	 * The reporter always records all other event types.
 	 *
@@ -749,9 +757,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 			const current = session.data[field]
 
-			// Never emit a state-change event with a missing required field. Per
-			// CTA-5004-B these events must include their state field. Catches both
-			// "no value ever set" and "previous value was cleared to undefined".
+			// Never emit a state-change event whose state field has no value.
+			// Catches both "no value ever set" and "previous value was cleared to
+			// undefined".
 			if (current === undefined) {
 				return
 			}
@@ -816,6 +824,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			ts: data.ts ?? Date.now(),
 		}
 
+		// CTA-5004-B defines a `b` event without `bg` as the exit from
+		// backgrounded mode. A transform can add `bg: false`, which the encoder
+		// writes as `?0`.
+		if (type === CMCD_EVENT_BACKGROUNDED_MODE && toBareValue(item.bg) === false) {
+			delete item.bg
+		}
+
 		const { transform } = config
 
 		if (!transform) {
@@ -842,15 +857,14 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 
 		// Restore, never fabricate: a required key that was already absent (or
-		// already unusable) before the transform ran was a caller bug, not a
-		// transform bug. Removal and substitution are both covered, because a
-		// value the encoder drops leaves the report just as invalid as a missing
-		// one.
-		if (!isUsableRequiredValue(report.ts)) {
+		// already unusable) before the transform ran is not restored. The
+		// restore covers removal and substitution with any value that `isValid`
+		// rejects, `false` included.
+		if (!isValid(report.ts)) {
 			report.ts = ts
 		}
 
-		if (requiredKey && isUsableRequiredValue(requiredValue) && !isUsableRequiredValue((report as Record<string, unknown>)[requiredKey])) {
+		if (requiredKey && isValid(requiredValue) && !isValid((report as Record<string, unknown>)[requiredKey])) {
 			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 
@@ -920,27 +934,24 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * TypeScript therefore rejects a call whose request the configured
 	 * transforms could not read. See {@link CmcdReporterCustomData}.
 	 *
-	 * The reporter attributes the event only to the session that issued the
-	 * request. The provenance record that
-	 * {@link CmcdReporter.createRequestReport} stored on the request's
-	 * `customData` (under {@link CMCD_REQUEST_PROVENANCE}) selects the session
-	 * by `sid`. Without a match, the reporter discards the response rather than
-	 * attributing it elsewhere. There is no other key. The reporter discards the
-	 * response when a serialization boundary lost the record and nothing
-	 * restored it (see {@link CMCD_REQUEST_PROVENANCE}). It also discards the
-	 * response when the session is no longer retained (see
-	 * `CmcdReporterConfig.sessionRetention`). A per-call `data.sid` cannot
-	 * substitute. The reporter accepts any record whose `sid` names a retained
-	 * session. The record may come from another reporter with the same session
-	 * attributes, or be hand-built. A response that completes after a `sid`
-	 * change reports under its own retained session, with that session's data
-	 * snapshot and sequence numbers.
+	 * The provenance record that {@link CmcdReporter.createRequestReport}
+	 * stored on the request's `customData` (under
+	 * {@link CMCD_REQUEST_PROVENANCE}) selects the session by `sid`. A record
+	 * that names no retained session drops the response (see
+	 * `CmcdReporterConfig.sessionRetention`). A request without a record reports
+	 * under the current session, as in version 2.4.0. The request-time data then
+	 * comes from `customData.cmcd`. A per-call `data.sid` cannot substitute. The
+	 * reporter accepts any record whose `sid` names a retained session. The
+	 * record may come from another reporter with the same session attributes,
+	 * or be hand-built. If the request has a record, a response that completes
+	 * after a `sid` change reports under its own retained session, with that
+	 * session's data snapshot and sequence numbers.
 	 *
-	 * Request-time report keys come from the record's encoded per-call `data`
-	 * snapshot, which the reporter decodes for each response. The record's `cid`
-	 * replaces the session's current `cid` in the report. A response that
-	 * completes after a mid-session content change therefore reports its
-	 * request-time values.
+	 * With a record, request-time report keys come from the record's encoded
+	 * per-call `data` snapshot, which the reporter decodes for each response.
+	 * The record's `cid` replaces the session's current `cid` in the report. A
+	 * response that completes after a mid-session content change therefore
+	 * reports its request-time values.
 	 *
 	 * @typeParam RD - The `customData` of this request. Defaults to the
 	 *                reporter's own `C`.
@@ -949,7 +960,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param data - Additional CMCD data to include with the event.
 	 *               Values provided here override the derived values.
 	 *               The reporter ignores session-owned keys (`sid`, `msd`)
-	 *               supplied here. Attribution uses the provenance record alone.
+	 *               supplied here.
 	 */
 	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance }>>, data: Partial<Cmcd> = {}): void {
 		const { request } = response
@@ -960,27 +971,20 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		// Attribution is by the provenance record alone: its sid names a
-		// retained session, or the response is dropped rather than relabeled.
 		const provenance = request.customData?.[CMCD_REQUEST_PROVENANCE]
-		const session = this.resolveSession(provenance)
+		const session = provenance === undefined ? this.session : this.resolveSession(provenance)
 
 		if (!session) {
 			return
 		}
 
-		// Request-time report data comes from the per-call snapshot on the
-		// same record, decoded fresh per response, never from the
-		// player-facing `customData.cmcd` object: the snapshot is
-		// reporter-written bytes, immune to caller mutation and lossless
-		// across any boundary the record is carried over.
-		const cmcd = decodeSnapshot(provenance)
+		const cmcd = provenance === undefined ? { ...request.customData?.cmcd } : decodeSnapshot(provenance)
 
 		// The record's cid is the content the request was issued under. It
 		// overrides the session store's current value so a response landing
 		// after a mid-session content change keeps its meaning, and it
 		// yields to the decoded snapshot and per-call data above it.
-		const { cid } = provenance as { cid?: unknown; }
+		const { cid } = (provenance ?? {}) as { cid?: unknown; }
 
 		const urlObj = new URL(url)
 		urlObj.searchParams.delete(CMCD_PARAM)
@@ -1015,11 +1019,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	}
 
 	/**
-	 * Resolves the session a response belongs to. The provenance record's `sid`
+	 * Resolves the session that a provenance record names. The record's `sid`
 	 * must name one of this reporter's retained sessions, or the reporter
-	 * discards the response. There is no other key. A lost record, or one that
-	 * names a removed or unknown `sid`, resolves nothing. Any other attribution
-	 * would be wrong. The reporter reads the `sid` as a plain property. A record
+	 * discards the response. A record that names a removed or unknown `sid`
+	 * resolves nothing. Any other attribution would be wrong. The reporter reads
+	 * the `sid` as a plain property. A record
 	 * copied through JSON therefore resolves the same session, and a hand-built
 	 * record that names a retained session is accepted.
 	 */
