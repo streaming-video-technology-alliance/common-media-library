@@ -588,6 +588,8 @@ const decoratedRequest = reporter.createRequestReport(request);
 fetch(decoratedRequest.url, decoratedRequest);
 ```
 
+`createRequestReport()` adds the `CMCD` parameter and makes no other change to the URL. If the URL already has a `CMCD` parameter, the new value replaces it. The value uses the encoding of the CTA-5004-B query examples. Only letters, digits, `-`, `.`, `_`, and `~` stay unencoded.
+
 ### Headers Mode
 
 ```typescript

@@ -1619,6 +1619,54 @@ describe('CmcdReporter', () => {
 			ok(url.searchParams.has('CMCD'))
 		})
 
+		it('changes no other part of the request URL', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://Example.com:443/a/./video.mp4?token=exp=1~acl=/*~hmac=ab&flag#t=10' })
+
+			equal(result.url, 'https://Example.com:443/a/./video.mp4?token=exp=1~acl=/*~hmac=ab&flag&CMCD=sid%3D%22test-session%22%2Cv%3D2#t=10')
+		})
+
+		it('encodes the CMCD query parameter as the CTA-5004-B examples do', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['nor', 'sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://example.com/1.m4s' }, { nor: ['https://example.com/2.m4s', 'https://example.com/3.m4s'] })
+
+			equal(result.url, 'https://example.com/1.m4s?CMCD=nor%3D%28%222.m4s%22%20%223.m4s%22%29%2Csid%3D%22test-session%22%2Cv%3D2')
+		})
+
+		it('replaces a CMCD query parameter of the request URL in place', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4?CMCD=sid%3D%22old%22&a=1&CMCD=su' })
+
+			equal(result.url, 'https://example.com/video.mp4?CMCD=sid%3D%22test-session%22%2Cv%3D2&a=1')
+		})
+
+		it('accepts a relative request URL', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'video.mp4?a=1' })
+
+			equal(result.url, 'video.mp4?a=1&CMCD=sid%3D%22test-session%22%2Cv%3D2')
+		})
+
 		it('appends CMCD data as headers when configured', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter({
@@ -3628,6 +3676,30 @@ describe('CmcdReporter', () => {
 			ok(body.includes('ttlb=200'))
 			ok(body.includes('ts='))
 			ok(body.includes('url="https://cdn.example.com/segment.mp4"'))
+		})
+
+		it('reports the request URL without the CMCD parameter and with no other change', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4?token=exp=1~acl=/*~hmac=ab&flag' })
+
+			reporter.recordResponseReceived(createResponse(reporter, { request }))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string).includes('url="https://cdn.example.com/segment.mp4?token=exp=1~acl=/*~hmac=ab&flag"'))
+		})
+
+		it('accepts a relative request URL', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+			const request = reporter.createRequestReport({ url: 'segment.mp4' })
+
+			reporter.recordResponseReceived(createResponse(reporter, { request }))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string).includes('url="segment.mp4"'))
 		})
 
 		it('falls back to Date.now() when resourceTiming is missing', async () => {
