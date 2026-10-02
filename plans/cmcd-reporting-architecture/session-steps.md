@@ -39,6 +39,8 @@ The code of each task ran before this plan was written, on a copy of `main` at 2
 
 Both APIs in one bundle measure 10475 B. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
 
+**Change after the check.** The fix PR of the branch `fix/cmcd-query-strict-encoding` (2026-10-01) adds `replaceCmcdParam()` to `main`. That version replaces the first `CMCD` parameter in place and encodes as the CTA-5004-B query examples do. `CmcdReporter` uses it too. Task 1 now only confirms the helper. One test of Task 2 and the request mode tests of Task 9 changed with it. These edits did not run with the code of Tasks 2 to 8. The measurements in the table are from before the fix PR.
+
 ## Decisions in This Plan
 
 The RFC does not settle these points. The plan applies the choice in the second column. Casey can change any of them before Task 3.2.
@@ -46,7 +48,7 @@ The RFC does not settle these points. The plan applies the choice in the second 
 | Point | Choice | Task |
 |---|---|---|
 | Two targets with one URL select the same call | The reports take sequence numbers in the order of the targets. Only the first report takes the waiting values and `msd`. | 3, 4 |
-| A request with CMCD headers, in header mode | The session removes the four CMCD headers of the request, and then it adds the new ones. Query mode treats `CMCD` parameters the same way. | 2 |
+| A request with CMCD headers, in header mode | The session removes the four CMCD headers of the request, and then it adds the new ones. In query mode, the first `CMCD` parameter takes the new value in place, and the session removes the other `CMCD` parameters, as `CmcdReporter` does. | 2 |
 | A waiting `bsd` or `ec` list with parameters on the list | The copy keeps the items and their parameters. It does not keep the parameters of the list itself, because two lists cannot merge them. | 4 |
 | A requester that resolves with status 0 | The session drops the batch, as the RFC table says for any other status. See the open question. | 6 |
 | A call to `flush()` during a POST that fails | The target sends again at once after the response. The RFC says that `flush()` sends after the response of a POST in flight. | 6 |
@@ -154,7 +156,7 @@ The other inputs of Task 3.1 map to these tasks:
 
 | File | Content | Task |
 |---|---|---|
-| `libs/cmcd/src/replaceCmcdParam.ts` | Internal. Removes every `CMCD` query parameter and adds one. | 1 |
+| `libs/cmcd/src/replaceCmcdParam.ts` | Internal, on `main` with its test. Replaces the `CMCD` query parameter. | 1 |
 | `libs/cmcd/src/CmcdSessionSettings.ts` | Public type of the request mode settings | 2 |
 | `libs/cmcd/src/CmcdSessionConfig.ts` | Public type of the configuration | 2, 3, 7 |
 | `libs/cmcd/src/CmcdSession.ts` | Public type of the session | 2 to 7 |
@@ -167,7 +169,7 @@ The other inputs of Task 3.1 map to these tasks:
 | `libs/cmcd/src/checkSessionConfig.ts` | Internal. The configuration checks. | 8 |
 | `libs/cmcd/src/index.ts` | Exports the public files | 2, 3 |
 | `libs/cmcd/test/createCmcdSession.test.ts` and seven files `createCmcdSession.<area>.test.ts` | One test file for each task from 2 to 9 | 2 to 9 |
-| `libs/cmcd/test/replaceCmcdParam.test.ts`, `libs/cmcd/test/toResponseKeys.test.ts` | Tests of the internal helpers | 1, 5 |
+| `libs/cmcd/test/toResponseKeys.test.ts` | Test of an internal helper | 5 |
 | `libs/cmcd/test/data/CTA_5004_B_EXAMPLES.ts` | The examples of CTA-5004-B section 8 | 9 |
 | `libs/cmcd/docs/session-guide.md`, `libs/cmcd/docs/migration-guide.md` | The guides | 10 |
 | `libs/cmcd/README.md`, `libs/cmcd/CHANGELOG.md` | The quick start and the changelog entry | 10 |
@@ -192,131 +194,23 @@ Expected: the build of every package passes.
 
 ### Task 1: Replace the CMCD Query Parameter
 
+The fix PR of the branch `fix/cmcd-query-strict-encoding` adds this helper and its test to `main`. `CmcdReporter` and `appendCmcdQuery` use the helper too, so the session writes the same request URL as `CmcdReporter`. This task only confirms the helper.
+
 **Files:**
-- Create: `libs/cmcd/src/replaceCmcdParam.ts`
-- Test: `libs/cmcd/test/replaceCmcdParam.test.ts`
+- On `main`: `libs/cmcd/src/replaceCmcdParam.ts`, `libs/cmcd/src/percentEncode.ts`, and `libs/cmcd/test/replaceCmcdParam.test.ts`
 
 **Interfaces:**
-- Produces: `replaceCmcdParam(url: string, value?: string): string`. The function removes every `CMCD` parameter. When `value` is not empty, it adds `CMCD=<value>` before the fragment. It encodes `value` with `URLSearchParams`, as `CmcdReporter` does. The URL can be relative.
+- Produces: `replaceCmcdParam(url: string, value?: string): string`. The first `CMCD` parameter takes the new value in place. The function removes the other `CMCD` parameters. If the URL has no `CMCD` parameter, the new parameter goes at the end of the query, before the fragment. An empty `value` only removes the parameters. The function does not change the rest of the URL. The URL can be relative.
+- The function encodes `value` as the query examples of CTA-5004-B do. Only letters, digits, `-`, `.`, `_`, and `~` stay unencoded. A space becomes `%20`.
 
-- [ ] **Step 1: Write the failing test**
-
-Create `libs/cmcd/test/replaceCmcdParam.test.ts`:
-
-```ts
-import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
-import { replaceCmcdParam } from '../src/replaceCmcdParam.ts'
-
-describe('replaceCmcdParam', () => {
-	it('adds the parameter to a URL without a query', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s', 'sn=0'), 'https://cdn.test/1.m4s?CMCD=sn%3D0')
-	})
-
-	it('adds the parameter after the other parameters', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1&b=2', 'sn=0'), 'https://cdn.test/1.m4s?a=1&b=2&CMCD=sn%3D0')
-	})
-
-	it('removes every existing CMCD parameter', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?CMCD=sn%3D1&a=1&CMCD=sn%3D2', 'sn=3'), 'https://cdn.test/1.m4s?a=1&CMCD=sn%3D3')
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?CMCD&a=1', 'sn=3'), 'https://cdn.test/1.m4s?a=1&CMCD=sn%3D3')
-	})
-
-	it('keeps the fragment at the end', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1#t=10', 'sn=0'), 'https://cdn.test/1.m4s?a=1&CMCD=sn%3D0#t=10')
-		equal(replaceCmcdParam('https://cdn.test/1.m4s#t=10', 'sn=0'), 'https://cdn.test/1.m4s?CMCD=sn%3D0#t=10')
-	})
-
-	it('does not read a query in the fragment', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s#x?CMCD=old', 'sn=0'), 'https://cdn.test/1.m4s?CMCD=sn%3D0#x?CMCD=old')
-	})
-
-	it('accepts a relative URL', () => {
-		equal(replaceCmcdParam('seg/1.m4s?CMCD=old', 'sn=0'), 'seg/1.m4s?CMCD=sn%3D0')
-	})
-
-	it('only removes the parameter when the value is empty', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?CMCD=sn%3D1'), 'https://cdn.test/1.m4s')
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?CMCD=sn%3D1&a=1#t', ''), 'https://cdn.test/1.m4s?a=1#t')
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1'), 'https://cdn.test/1.m4s?a=1')
-	})
-
-	it('keeps a parameter whose name only starts with CMCD', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?CMCDX=1&cmcd=2'), 'https://cdn.test/1.m4s?CMCDX=1&cmcd=2')
-	})
-
-	it('encodes the value as CmcdReporter does', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s', 'bl=(5000),ot=v,sid="s 1"'), 'https://cdn.test/1.m4s?CMCD=bl%3D%285000%29%2Cot%3Dv%2Csid%3D%22s+1%22')
-	})
-})
-```
-
-- [ ] **Step 2: Run the test and confirm that it fails**
+- [ ] **Step 1: Confirm the helper on `main`**
 
 ```bash
+git log --oneline -1 -- libs/cmcd/src/replaceCmcdParam.ts
 node --no-warnings --test libs/cmcd/test/replaceCmcdParam.test.ts
 ```
 
-Expected: FAIL with `ERR_MODULE_NOT_FOUND` for `src/replaceCmcdParam.ts`.
-
-- [ ] **Step 3: Write the implementation**
-
-Create `libs/cmcd/src/replaceCmcdParam.ts`:
-
-```ts
-import { CMCD_PARAM } from './CMCD_PARAM.ts'
-
-function isCmcdParam(param: string): boolean {
-	return param === CMCD_PARAM || param.startsWith(`${CMCD_PARAM}=`)
-}
-
-/**
- * Removes every `CMCD` query parameter of a URL, then adds one when `value` is not empty.
- *
- * The other parameters and the fragment stay as they are. The URL can be relative.
- *
- * @param url - The URL.
- * @param value - The encoded CMCD data, before URL encoding.
- * @returns The URL with at most one `CMCD` parameter.
- *
- * @internal
- */
-export function replaceCmcdParam(url: string, value?: string): string {
-	const hash = url.indexOf('#')
-	const end = hash < 0 ? url.length : hash
-	const start = url.indexOf('?')
-	const param = value ? new URLSearchParams([[CMCD_PARAM, value]]).toString() : ''
-
-	if (start < 0 || start > end) {
-		return param ? `${url.slice(0, end)}?${param}${url.slice(end)}` : url
-	}
-
-	const params = url.slice(start + 1, end).split('&').filter((item) => !isCmcdParam(item))
-
-	if (param) {
-		params.push(param)
-	}
-
-	return `${url.slice(0, start)}${params.length ? `?${params.join('&')}` : ''}${url.slice(end)}`
-}
-```
-
-- [ ] **Step 4: Run the checks and confirm that they pass**
-
-```bash
-node --no-warnings --test libs/cmcd/test/replaceCmcdParam.test.ts
-npm run typecheck
-npx eslint libs/cmcd
-```
-
-Expected: 9 tests pass. The typecheck and ESLint report nothing.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add libs/cmcd/src/replaceCmcdParam.ts libs/cmcd/test/replaceCmcdParam.test.ts
-git commit -s -m "feat(cmcd): replace every CMCD query parameter of a URL" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
-```
+Expected: the log shows the commit of the fix PR, and the tests pass. If the file is not on `main`, stop and report: the fix PR must merge before Task 2.
 
 ### Task 2: Request Reports
 
@@ -380,12 +274,12 @@ describe('createCmcdSession', () => {
 			ok(decodeURIComponent(session.createRequestReport({ url: SEGMENT }).url).includes(`sid="${session.sid}"`))
 		})
 
-		it('removes every existing CMCD parameter and keeps the fragment', () => {
+		it('replaces the first CMCD parameter in place and keeps the fragment', () => {
 			const session = createCmcdSession({ sid: 's1' })
 
 			const report = session.createRequestReport({ url: `${SEGMENT}?CMCD=sn%3D9&a=1&CMCD=x#t=5` })
 
-			equal(decodeURIComponent(report.url), `${SEGMENT}?a=1&CMCD=sid="s1",sn=0,v=2#t=5`)
+			equal(decodeURIComponent(report.url), `${SEGMENT}?CMCD=sid="s1",sn=0,v=2&a=1#t=5`)
 		})
 
 		it('writes nor as a path relative to the request URL', () => {
@@ -5140,43 +5034,45 @@ git commit -s -m "feat(cmcd): check the configuration of createCmcdSession" -m "
 
 The data file comes from PR 460. Its comments name the changes to the text of CTA-5004-B. Example 8.2.5 is not in the file. The PR 460 variant of that example derives `bs` from the play states, and the RFC rejected that derivation.
 
+The request mode constants are the Query-arg lines of the spec, without decoding. The tests compare the raw query of each URL with these lines, so they check the encoding too.
+
 - [ ] **Step 1: Add the example data**
 
 Create `libs/cmcd/test/data/CTA_5004_B_EXAMPLES.ts`:
 
 ```ts
-/** Raw key lines of CTA-5004-B section 8.1, request mode. */
-export const EX_8_1_1 = 'bl=(2000),br=(3000;v),cid="content-id-123",d=4000,dl=1000,mtp=(15000),nor=("next-seg.mp4"),ot=v,rtp=12000,sf=d,sid="session-id-123",st=v,sta=p,tb=(6000;v),v=2'
+/** Query-arg lines of CTA-5004-B section 8.1, request mode. */
+export const EX_8_1_1 = 'CMCD=bl%3D%282000%29%2Cbr%3D%283000%3Bv%29%2Ccid%3D%22content-id-123%22%2Cd%3D4000%2Cdl%3D1000%2Cmtp%3D%2815000%29%2Cnor%3D%28%22next-seg.mp4%22%29%2Cot%3Dv%2Crtp%3D12000%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csta%3Dp%2Ctb%3D%286000%3Bv%29%2Cv%3D2'
 export const EX_8_1_1_HEADERS = {
 	'CMCD-Request': 'bl=(2000),dl=1000,mtp=(15000),nor=("next-seg.mp4"),sta=p',
 	'CMCD-Object': 'br=(3000;v),d=4000,ot=v,tb=(6000;v)',
 	'CMCD-Status': 'rtp=12000',
 	'CMCD-Session': 'cid="content-id-123",sf=d,sid="session-id-123",st=v,v=2',
 }
-export const EX_8_1_2 = 'bl=(2000),br=(320),cid="content-id-123",d=2000,mtp=(15000),ot=a,sid="session-id-123",st=v,v=2'
-export const EX_8_1_3 = 'cid="content-id-123",sid="session-id-123",v=2'
+export const EX_8_1_2 = 'CMCD=bl%3D%282000%29%2Cbr%3D%28320%29%2Ccid%3D%22content-id-123%22%2Cd%3D2000%2Cmtp%3D%2815000%29%2Cot%3Da%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Cv%3D2'
+export const EX_8_1_3 = 'CMCD=cid%3D%22content-id-123%22%2Csid%3D%22session-id-123%22%2Cv%3D2'
 export const EX_8_1_4: readonly string[] = [
-	'cid="content-id-123",ot=m,sf=d,sid="session-id-123",st=v,su,v=2',
-	'bl=(0),br=(3000;v),cid="content-id-123",mtp=(15000),nor=("seg-1.m4v" "seg-2.m4v"),ot=i,sid="session-id-123",st=v,sta=s,su,v=2',
-	'bl=(0),br=(3000;v),cid="content-id-123",d=4000,mtp=(15000),nor=("seg-2.m4v" "seg-3.m4v"),ot=v,sid="session-id-123",st=v,sta=s,su,v=2',
-	'bl=(4000),br=(3000;v),cid="content-id-123",d=4000,msd=200,mtp=(15000),nor=("seg-3.m4v" "seg-4.m4v"),ot=v,sid="session-id-123",st=v,sta=p,v=2',
+	'CMCD=cid%3D%22content-id-123%22%2Cot%3Dm%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csu%2Cv%3D2',
+	'CMCD=bl%3D%280%29%2Cbr%3D%283000%3Bv%29%2Ccid%3D%22content-id-123%22%2Cmtp%3D%2815000%29%2Cnor%3D%28%22seg-1.m4v%22%20%22seg-2.m4v%22%29%2Cot%3Di%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csta%3Ds%2Csu%2Cv%3D2',
+	'CMCD=bl%3D%280%29%2Cbr%3D%283000%3Bv%29%2Ccid%3D%22content-id-123%22%2Cd%3D4000%2Cmtp%3D%2815000%29%2Cnor%3D%28%22seg-2.m4v%22%20%22seg-3.m4v%22%29%2Cot%3Dv%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csta%3Ds%2Csu%2Cv%3D2',
+	'CMCD=bl%3D%284000%29%2Cbr%3D%283000%3Bv%29%2Ccid%3D%22content-id-123%22%2Cd%3D4000%2Cmsd%3D200%2Cmtp%3D%2815000%29%2Cnor%3D%28%22seg-3.m4v%22%20%22seg-4.m4v%22%29%2Cot%3Dv%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csta%3Dp%2Cv%3D2',
 ]
 export const EX_8_1_5: readonly string[] = [
-	'cid="content-id-123",ec=("CODEC_NOT_SUPPORTED"),sid="session-id-123",sta=p,v=2',
-	'cid="content-id-123",ec=("DRM_NOT_SUPPORTED" "PLAYBACK_FAILED"),sid="session-id-123",sta=f,v=2',
+	'CMCD=cid%3D%22content-id-123%22%2Cec%3D%28%22CODEC_NOT_SUPPORTED%22%29%2Csid%3D%22session-id-123%22%2Csta%3Dp%2Cv%3D2',
+	'CMCD=cid%3D%22content-id-123%22%2Cec%3D%28%22DRM_NOT_SUPPORTED%22%20%22PLAYBACK_FAILED%22%29%2Csid%3D%22session-id-123%22%2Csta%3Df%2Cv%3D2',
 ]
 export const EX_8_1_6: readonly string[] = [
-	'bl=(0),bs,cid="content-id-123",ot=v,sid="session-id-123",sta=r,v=2',
-	'bl=(0;v 2000;a),bs,cid="content-id-123",ot=v,sid="session-id-123",sta=r,v=2',
+	'CMCD=bl%3D%280%29%2Cbs%2Ccid%3D%22content-id-123%22%2Cot%3Dv%2Csid%3D%22session-id-123%22%2Csta%3Dr%2Cv%3D2',
+	'CMCD=bl%3D%280%3Bv%202000%3Ba%29%2Cbs%2Ccid%3D%22content-id-123%22%2Cot%3Dv%2Csid%3D%22session-id-123%22%2Csta%3Dr%2Cv%3D2',
 ]
 export const EX_8_1_7 = {
-	primary: 'cid="movie-123",ot=v,sid="session-common-1",v=2',
-	ad: 'cid="ad-555",nr,ot=v,sid="session-common-1",v=2',
-	primaryHidden: 'cid="movie-123",nr,ot=v,sid="session-common-1",v=2',
-	adShown: 'cid="ad-555",ot=v,sid="session-common-1",v=2',
+	primary: 'CMCD=cid%3D%22movie-123%22%2Cot%3Dv%2Csid%3D%22session-common-1%22%2Cv%3D2',
+	ad: 'CMCD=cid%3D%22ad-555%22%2Cnr%2Cot%3Dv%2Csid%3D%22session-common-1%22%2Cv%3D2',
+	primaryHidden: 'CMCD=cid%3D%22movie-123%22%2Cnr%2Cot%3Dv%2Csid%3D%22session-common-1%22%2Cv%3D2',
+	adShown: 'CMCD=cid%3D%22ad-555%22%2Cot%3Dv%2Csid%3D%22session-common-1%22%2Cv%3D2',
 }
 /** 8.1.8 with `sn=129` replaced by the first sequence number of a fresh session. */
-export const EX_8_1_8 = 'bg,bl=(2100;v 1800;a),br=(3000;v 164;a),bs,bsa=(3;v),bsd=(1200;v 100;a),bsda=(4150;v 300;a),cid="content-id-123",cs="g48djn236sk2",d=4000,dfa=32,dl=1000,ec=("2001"),lb=(500;v 32;a),ltc=13500,msd=1700,mtp=(15000;v 6000;a),nor=("next-seg.mp4"),nr,ot=v,pb=(2000;v 164;a),pr=1.1,pt=632782,rtp=12000,sf=d,sid="session-id-123",sn=0,st=l,sta=p,su,tb=(6000;v 350;a),tbl=(2000;v 2000;a),tpb=(5000;v 164;a),v=2'
+export const EX_8_1_8 = 'CMCD=bg%2Cbl%3D%282100%3Bv%201800%3Ba%29%2Cbr%3D%283000%3Bv%20164%3Ba%29%2Cbs%2Cbsa%3D%283%3Bv%29%2Cbsd%3D%281200%3Bv%20100%3Ba%29%2Cbsda%3D%284150%3Bv%20300%3Ba%29%2Ccid%3D%22content-id-123%22%2Ccs%3D%22g48djn236sk2%22%2Cd%3D4000%2Cdfa%3D32%2Cdl%3D1000%2Cec%3D%28%222001%22%29%2Clb%3D%28500%3Bv%2032%3Ba%29%2Cltc%3D13500%2Cmsd%3D1700%2Cmtp%3D%2815000%3Bv%206000%3Ba%29%2Cnor%3D%28%22next-seg.mp4%22%29%2Cnr%2Cot%3Dv%2Cpb%3D%282000%3Bv%20164%3Ba%29%2Cpr%3D1.1%2Cpt%3D632782%2Crtp%3D12000%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Csn%3D0%2Cst%3Dl%2Csta%3Dp%2Csu%2Ctb%3D%286000%3Bv%20350%3Ba%29%2Ctbl%3D%282000%3Bv%202000%3Ba%29%2Ctpb%3D%285000%3Bv%20164%3Ba%29%2Cv%3D2'
 
 /** POST bodies of section 8.2, event mode. Document whitespace removed. */
 export const EX_8_2_1 = 'e=t,ts=1764752400000,v=2'
@@ -5218,7 +5114,7 @@ const CID = 'content-id-123'
 const SID = 'session-id-123'
 
 function query(url: string): string {
-	return new URLSearchParams(url.slice(url.indexOf('?') + 1)).get('CMCD') ?? ''
+	return url.slice(url.indexOf('?') + 1)
 }
 
 function settle(): Promise<void> {
@@ -5301,7 +5197,7 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 			const third = session.createRequestReport({ url: SEGMENT }, { cid: CID, sta: 'f' })
 
 			deepEqual([first, third].map((report) => query(report.url)), EX_8_1_5)
-			equal(query(second.url), `cid="${CID}",sid="${SID}",sta=p,v=2`)
+			equal(query(second.url), 'CMCD=cid%3D%22content-id-123%22%2Csid%3D%22session-id-123%22%2Csta%3Dp%2Cv%3D2')
 		})
 
 		it('8.1.6, buffer starvation', () => {
