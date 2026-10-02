@@ -2,27 +2,14 @@ import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { percentEncode } from './percentEncode.ts'
 
 function isCmcdParam(param: string): boolean {
-	const end = param.indexOf('=')
-	const name = end === -1 ? param : param.slice(0, end)
-
-	if (!name.includes('%')) {
-		return name === CMCD_PARAM
-	}
-
-	try {
-		return decodeURIComponent(name) === CMCD_PARAM
-	}
-	catch {
-		return false
-	}
+	return param === CMCD_PARAM || param.startsWith(`${CMCD_PARAM}=`)
 }
 
 /**
  * Replace the `CMCD` query parameter of a URL.
  *
  * The first `CMCD` parameter takes the new value in place. The function
- * removes the other `CMCD` parameters. A name with percent-encoding, such as
- * `%43MCD`, also counts as `CMCD`. If the URL has no `CMCD` parameter,
+ * removes the other `CMCD` parameters. If the URL has no `CMCD` parameter,
  * the new parameter goes at the end of the query. An empty `value` only
  * removes the parameters. The function does not change the rest of the URL.
  * The URL can be relative.
