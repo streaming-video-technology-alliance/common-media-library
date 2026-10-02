@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- `urlToRelativePath` no longer throws and catches a `TypeError` for a relative `url`. A call with a relative `url` now runs about 100 times faster in Node.js. CMCD encoding calls `urlToRelativePath` for `nor` values when the `baseUrl` option is set. The output does not change.
+
 ## [1.6.1] - 2026-09-15
 
 ### Changed
