@@ -44,6 +44,15 @@ describe('replaceCmcdParam', () => {
 		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1'), 'https://cdn.test/1.m4s?a=1')
 	})
 
+	it('reads a CMCD parameter name with percent-encoding', () => {
+		equal(replaceCmcdParam('https://cdn.test/1.m4s?%43MCD=old&a=1', 'sn=0'), 'https://cdn.test/1.m4s?CMCD=sn%3D0&a=1')
+		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1&CMC%44'), 'https://cdn.test/1.m4s?a=1')
+	})
+
+	it('keeps a parameter whose name does not decode to CMCD', () => {
+		equal(replaceCmcdParam('https://cdn.test/1.m4s?%ZZ=1&%43MCDX=2', 'sn=0'), 'https://cdn.test/1.m4s?%ZZ=1&%43MCDX=2&CMCD=sn%3D0')
+	})
+
 	it('keeps a parameter whose name only contains CMCD', () => {
 		equal(replaceCmcdParam('https://cdn.test/1.m4s?XCMCD=1&CMCDX=2&cmcd=3'), 'https://cdn.test/1.m4s?XCMCD=1&CMCDX=2&cmcd=3')
 		equal(replaceCmcdParam('https://cdn.test/1.m4s?XCMCD=1', 'sn=0'), 'https://cdn.test/1.m4s?XCMCD=1&CMCD=sn%3D0')
