@@ -355,7 +355,7 @@ describe('CmcdReporter', () => {
 
 			equal(requests.length, 1)
 			ok((requests[0].body as string).includes('msd=800'))
-			ok(!(requests[0].body as string).includes('5000'))
+			ok(!(requests[0].body as string).includes('msd=5000'))
 		})
 
 		it('strips a transform-written msd when the gate is closed', async () => {
@@ -513,7 +513,7 @@ describe('CmcdReporter', () => {
 			const body = requests[0].body as string
 			ok(body.includes('sid="s1"'))
 			ok(body.includes('bl=(25000)'))
-			ok(!body.includes('99000'))
+			ok(!body.includes('bl=(99000)'))
 		})
 
 		it('lets a stale response carry the originating session unsent msd', async () => {
@@ -711,7 +711,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			const body = requests[0].body as string
 			ok(body.includes('d=2000'), `expected untransformed d in ${body}`)
-			ok(!body.includes('9999'))
+			ok(!body.includes('d=9999'))
 		})
 
 		it('attributes a response whose per-call data cannot encode', async () => {
@@ -1048,7 +1048,7 @@ describe('CmcdReporter', () => {
 			const body = requests[0].body as string
 			ok(body.includes('sid="s1"'))
 			ok(body.includes('bl=(25000)'), `expected frozen bl=(25000) in ${body}`)
-			ok(!body.includes('99000'))
+			ok(!body.includes('bl=(99000)'))
 		})
 
 		it('never retries a batch invalidated by its session disposal', async () => {
@@ -1257,7 +1257,7 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('500'), `expected ec 500 in ${requests[0].body}`)
+			ok((requests[0].body as string).includes('ec=("500")'), `expected ec 500 in ${requests[0].body}`)
 
 			reporter.flush()
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1293,7 +1293,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			const body = requests[0].body as string
 			ok(body.includes('tab=(3000)'), `expected frozen tab=(3000) in ${body}`)
-			ok(!body.includes('9000'))
+			ok(!body.includes('tab=(9000)'))
 		})
 
 		it('encodes a JSON-bridged response report without poisoning the queue', async () => {
@@ -1617,6 +1617,54 @@ describe('CmcdReporter', () => {
 			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			const url = new URL(result.url)
 			ok(url.searchParams.has('CMCD'))
+		})
+
+		it('changes no other part of the request URL', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://Example.com:443/a/./video.mp4?token=exp=1~acl=/*~hmac=ab&flag#t=10' })
+
+			equal(result.url, 'https://Example.com:443/a/./video.mp4?token=exp=1~acl=/*~hmac=ab&flag&CMCD=sid%3D%22test-session%22%2Cv%3D2#t=10')
+		})
+
+		it('encodes the CMCD query parameter as the CTA-5004-B examples do', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['nor', 'sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://example.com/1.m4s' }, { nor: ['https://example.com/2.m4s', 'https://example.com/3.m4s'] })
+
+			equal(result.url, 'https://example.com/1.m4s?CMCD=nor%3D%28%222.m4s%22%20%223.m4s%22%29%2Csid%3D%22test-session%22%2Cv%3D2')
+		})
+
+		it('replaces a CMCD query parameter of the request URL in place', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4?CMCD=sid%3D%22old%22&a=1&CMCD=su' })
+
+			equal(result.url, 'https://example.com/video.mp4?CMCD=sid%3D%22test-session%22%2Cv%3D2&a=1')
+		})
+
+		it('accepts a relative request URL', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'video.mp4?a=1' })
+
+			equal(result.url, 'video.mp4?a=1&CMCD=sid%3D%22test-session%22%2Cv%3D2')
 		})
 
 		it('appends CMCD data as headers when configured', () => {
@@ -3628,6 +3676,30 @@ describe('CmcdReporter', () => {
 			ok(body.includes('ttlb=200'))
 			ok(body.includes('ts='))
 			ok(body.includes('url="https://cdn.example.com/segment.mp4"'))
+		})
+
+		it('reports the request URL without the CMCD parameter and with no other change', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4?token=exp=1~acl=/*~hmac=ab&flag' })
+
+			reporter.recordResponseReceived(createResponse(reporter, { request }))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string).includes('url="https://cdn.example.com/segment.mp4?token=exp=1~acl=/*~hmac=ab&flag"'))
+		})
+
+		it('accepts a relative request URL', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+			const request = reporter.createRequestReport({ url: 'segment.mp4' })
+
+			reporter.recordResponseReceived(createResponse(reporter, { request }))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string).includes('url="segment.mp4"'))
 		})
 
 		it('falls back to Date.now() when resourceTiming is missing', async () => {

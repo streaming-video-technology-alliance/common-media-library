@@ -2,7 +2,6 @@ import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
-import { CMCD_PARAM } from './CMCD_PARAM.ts'
 import { CMCD_REQUEST_PROVENANCE } from './CMCD_REQUEST_PROVENANCE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
@@ -28,6 +27,7 @@ import { encodeCmcd } from './encodeCmcd.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { isValid } from './isValid.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
+import { replaceCmcdParam } from './replaceCmcdParam.ts'
 import { toBareValue } from './toBareValue.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
@@ -986,11 +986,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// yields to the decoded snapshot and per-call data above it.
 		const { cid } = (provenance ?? {}) as { cid?: unknown; }
 
-		const urlObj = new URL(url)
-		urlObj.searchParams.delete(CMCD_PARAM)
-
 		const derived: Partial<Cmcd> = {
-			url: urlObj.toString(),
+			url: replaceCmcdParam(url),
 			rc: response.status,
 		}
 
@@ -1175,7 +1172,6 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			delete cmcdData.msd
 		}
 
-		const url = new URL(report.url)
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
 		// The player-facing view is detached from the persistent store:
@@ -1195,8 +1191,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		switch (this.config.transmissionMode) {
 			case CMCD_QUERY:
 				if (encoded) {
-					url.searchParams.set(CMCD_PARAM, encoded)
-					report.url = url.toString()
+					report.url = replaceCmcdParam(report.url, encoded)
 				}
 				break
 

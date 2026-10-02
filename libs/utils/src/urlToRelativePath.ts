@@ -1,3 +1,7 @@
+// RFC 3986 section 3.1 scheme and ":".
+// The WHATWG URL parser first removes leading C0 control or space and every ASCII tab or newline.
+const SCHEME_REGEX = /^[\0-\x20]*[a-z][a-z0-9+.\t\n\r-]*:/i
+
 /**
  * Constructs a relative path from a URL.
  *
@@ -13,6 +17,10 @@
  * {@includeCode ../test/urlToRelativePath.test.ts#example}
  */
 export function urlToRelativePath(url: string, base: string): string {
+	if (!SCHEME_REGEX.test(url)) {
+		return url
+	}
+
 	let to: URL
 	try {
 		to = new URL(url)
