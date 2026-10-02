@@ -1,3 +1,1 @@
-import { CMCD_STRING_REQUEST } from './CMCD_STRING_REQUEST.ts'
-
-export const CMCD_QUERY: string = `CMCD=${encodeURIComponent(CMCD_STRING_REQUEST)}`
+export const CMCD_QUERY: string = 'CMCD=bg%2Cbl%3D%285000%29%2Cbr%3D%28200%29%2Cbs%2Cbsd%3D%282000%29%2Ccdn%3D%22cdn-provider%22%2Ccid%3D%22content-id%22%2Ccom.example-exists%2Ccom.example-hello%3D%22world%22%2Ccom.example-quote%3D%22%5C%22Quote%5C%22%22%2Ccom.example-testing%3D1234%2Ccom.example-token%3Ds%2Ccs%3D%22123456%22%2Cd%3D325%2Cdfa%3D5%2Cdl%3D10000%2Cec%3D%28%22ERR001%22%20%22ERR002%22%29%2Clb%3D%28100%29%2Cltc%3D1500%2Cmsd%3D2500%2Cmtp%3D%2810000%29%2Cnor%3D%28%22..%2Ftesting%2F3.m4v%22%29%2Cot%3Dv%2Cpb%3D%281000%29%2Cpt%3D45000%2Crtp%3D8000%2Csf%3Dd%2Csid%3D%22session-id%22%2Csn%3D1%2Cst%3Dv%2Csta%3Dp%2Csu%2Ctb%3D%285000%29%2Ctbl%3D%288000%29%2Ctpb%3D%284000%29%2Cv%3D2'

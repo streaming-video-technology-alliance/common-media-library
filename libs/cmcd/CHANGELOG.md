@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The `CMCD` query parameter uses the encoding of the CTA-5004-B query examples. Only letters, digits, `-`, `.`, `_`, and `~` stay unencoded. A space becomes `%20`, and `(` and `)` become `%28` and `%29`. This is a wire output change. It covers `toCmcdUrl`, `toCmcdQuery`, `appendCmcdQuery`, and `CmcdReporter`. Before, `CmcdReporter` wrote a space as `+`, and the other functions sent `(` and `)` unencoded. A decoder that uses `URLSearchParams` reads the old and the new output as the same value. If a test compares exact URLs, update its expected strings. An unpaired surrogate in a string becomes U+FFFD. Before, it made `toCmcdUrl`, `toCmcdQuery`, and `appendCmcdQuery` throw `URIError`
+- `CmcdReporter` adds the `CMCD` query parameter and makes no other change to the request URL. Before, it parsed and serialized the whole URL. The serialization changed other query parameters, such as `~` to `%7E` and `flag` to `flag=`. It also lowercased the host, removed a default port, and resolved `./` and `../` in the path. A CDN that checks a token against the raw query could reject such a request. The `url` key of an `rr` event is the request URL without the `CMCD` parameter, also with no other change. `createRequestReport` and `recordResponseReceived` accept a relative URL. Before, they threw `Invalid URL`
+- `appendCmcdQuery` adds the parameter before the fragment. Before, it added the parameter after the fragment, so the request carried no CMCD data. It reads only the `CMCD` parameter of the query. Before, it replaced the value of a parameter such as `XCMCD`, or text that starts with `CMCD=` in the path. It removes every `CMCD` parameter after the first. If the data has no keys to send, it returns the URL unchanged. Before, it wrote a `CMCD` parameter with no value
+
 ## [2.8.0] - 2026-10-01
 
 ### Changed
