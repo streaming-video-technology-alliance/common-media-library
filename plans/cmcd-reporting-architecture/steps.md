@@ -35,9 +35,9 @@
 | Phase | State | Depends on | Detailed plan |
 |---|---|---|---|
 | 0. RFC review and acceptance | in progress | none | this file |
-| 1. Superseded pull requests | not started | 0.2 for notices, 0.6 for closing | this file |
+| 1. Superseded pull requests | in progress | 0.2 for notices, 0.6 for closing | this file |
 | 2. Release 2.8.0 | done | none | this file, and [the port plan](../cmcd-encode-pipeline-port/steps.md) |
-| 3. Session API | blocked | 0.6, 2.4 | detailed plan at phase start |
+| 3. Session API | blocked | 0.6, 2.4 | [session-steps.md](session-steps.md), draft |
 | 4. Deprecation and release | blocked | 3 | this file |
 | 5. Player migrations | blocked | 4 | one plan for each player, at phase start |
 | 6. Removal of `CmcdReporter` | blocked | 4, and the plan for 3.0.0 | detailed plan at phase start |
@@ -65,7 +65,7 @@ Entry: the RFC is committed on the local branch `rfc/cmcd-session` (commits df08
 - [x] **0.2 Push the branch and open the RFC PR.** PR 486, opened 2026-10-01. Casey approved the push of `rfc/cmcd-session` on 2026-10-01. Casey opens the PR "[RFC] CMCD session" with `/create-pr main`. Record the PR link here, and use it for `{rfc-pr}` in Phase 1.
   - Done when: the PR is open, and its link is in this file.
 - [x] **0.3 Post the notices on the superseded PRs.** Task 1.1 has the steps.
-- [ ] **0.4 Ask the player maintainers for review (Casey).** Ask Daniel Silhavy (dash.js), Rob Walch (hls.js), Qualabs (@cotid-qualabs), Nicolas Levy, and the shaka-player maintainers.
+- [x] **0.4 Ask the player maintainers for review (Casey).** Done 2026-10-01. Ask Daniel Silhavy (dash.js), Rob Walch (hls.js), Qualabs (@cotid-qualabs), Nicolas Levy, and the shaka-player maintainers.
   - Done when: each maintainer has a review request or a mention on the RFC PR.
 - [x] **0.5 Resolve the unresolved questions (Casey and the reviewers).** The questions are the API name, the name of `includeOnce()`, the default for a missing `enabledKeys`, the queue limit, the retry rule, and the removal timing of `CmcdReporter`.
   - Answers:
@@ -110,7 +110,7 @@ Entry: the RFC PR exists (Task 0.2).
   > This PR implements RFC #455, and the session RFC ({rfc-pr}) supersedes that RFC. The new implementation reuses four parts of this PR. Three are the `h` event constant, the `ttfb` rule in `toResponseKeys.ts`, and the `sid` and `cid` checks in `checkRequestSettings.ts`. The fourth is the test scenarios of the delivery, error, request, and response tests. The key table already moved into the encoder on the port branch. This PR closes when the session RFC is accepted. The branch stays until the new implementation ships.
 
   - Done when: all four comments are posted.
-- [ ] **1.2 Record the salvage list for Phase 3 (agent).** Copy into the Phase 3 plan the source paths of the four parts named in the PR 460 notice. The test files are `libs/cmcd/test/CmcdSession.delivery.test.ts`, `CmcdSession.errors.test.ts`, `CmcdSessionReporter.request.test.ts`, and `CmcdSessionReporter.responses.test.ts` on `feat/cmcd-session-api`.
+- [x] **1.2 Record the salvage list for Phase 3 (agent).** Done: the section "Salvage List from PR 460" of [session-steps.md](session-steps.md). It adds the CTA-5004-B example data of PR 460. Copy into the Phase 3 plan the source paths of the four parts named in the PR 460 notice. The test files are `libs/cmcd/test/CmcdSession.delivery.test.ts`, `CmcdSession.errors.test.ts`, `CmcdSessionReporter.request.test.ts`, and `CmcdSessionReporter.responses.test.ts` on `feat/cmcd-session-api`.
   - Done when: the Phase 3 plan lists the paths and the scenarios to port.
 - [x] **1.3 Decide how PR 455 ends (Casey).** Decision: Option A, close it unmerged. The new design record already explains the change. Option B was a merge as a superseded record, with about 5900 lines of the old design record.
   - Done when: the decision is in the log.
@@ -145,7 +145,7 @@ Entry: none. This phase does not depend on the RFC.
 
 Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
 
-- [ ] **3.1 Write the detailed plan (agent).** Use superpowers:writing-plans, and save the result as `plans/cmcd-reporting-architecture/session-steps.md`. The inputs are:
+- [x] **3.1 Write the detailed plan (agent).** Draft of 2026-10-01: [session-steps.md](session-steps.md), with 11 tasks. If the review of PR 486 changes the RFC, update the plan before Task 3.2. Use superpowers:writing-plans, and save the result as `plans/cmcd-reporting-architecture/session-steps.md`. The inputs are:
     - the accepted RFC and the prototype listing
     - the salvage list from Task 1.2
     - the eight scenarios of the prototype test
@@ -432,6 +432,8 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | PR 491 merged (253dbff45). Publishing waits for a manual run of the Publish workflow. |
 | 2026-10-01 | Casey reviewed PR 486. In the RFC, the targets that share a URL now form one destination. A waiting `bs` keeps its `ot`. Each target has one POST in flight. An `e` report sends at once, except during a wait. |
 | 2026-10-01 | Publish run 36933063046 succeeded. `@svta/cml-cmcd` 2.8.0 and `@svta/cml-request` 1.0.19 are on npm, with the GitHub releases `cmcd-v2.8.0` and `request-v1.0.19`. Phase 2 is done. Phase 3 waits for Task 0.6. |
+| 2026-10-01 | Task 0.4 done: Casey notified the player maintainers. |
+| 2026-10-01 | Tasks 1.2 and 3.1: [session-steps.md](session-steps.md) drafted, with 11 tasks and the salvage list. Each task ran on a copy of `main` at 253dbff45: its tests fail before its code and pass after it. Final code: 6756 B against 8501 B for `CmcdReporter`, and 7.35 µs against 15.23 µs for one request report. Open question for Casey: retry status 0 like a rejected request. |
 
 ## Links
 
