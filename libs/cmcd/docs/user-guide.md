@@ -103,28 +103,40 @@ reporter.update({ bs: true }); // Buffer starvation occurred
 
 ### Value Formatting
 
-The CMCD specification requires certain keys to be formatted before transmission. `CmcdReporter` does this formatting, so always pass raw values in their base units. Do not round or truncate values yourself. For example, pass the exact buffer length in milliseconds:
+CTA-5004 and CTA-5004-B define every numeric key as an integer, except `pr`. `CmcdReporter` and the encoding functions, such as `encodeCmcd`, format each value before transmission. Pass raw values in their base units. Do not round or truncate values yourself. The table shows the formatting rules:
+
+| Keys                            | Formatting                     |
+| ------------------------------- | ------------------------------ |
+| `bl`, `dl`, `mtp`, `rtp`, `tbl` | Rounded to the nearest 100     |
+| `pr`                            | Not rounded                    |
+| Every other numeric key         | Rounded to the nearest integer |
+
+For example, pass the exact buffer length in milliseconds and the exact bitrate in kbps:
 
 ```typescript
-// Correct: pass the raw value, the reporter rounds to nearest 100
-reporter.update({ bl: [25432] }); // encoded as bl=(25400)
-
-// Incorrect: do not pre-round the value
-reporter.update({ bl: [25400] });
+reporter.update({ bl: [25432], br: [2500.7] }); // sent as bl=(25400) and br=(2501)
 ```
 
 ### Keys the Reporter Omits
 
 The reporter applies the "MUST NOT" rules of CTA-5004-B when it encodes a report. It omits a key without an error in these cases:
 
-- The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted, except `bg` on a backgrounded-mode event.
+- The value is `undefined`, `null`, an empty string, an empty array, or a number that is not finite. The specification requires the key to be absent when the value is unknown. A `false` value is also omitted. The exception is a `bg: false` that a transform adds to a backgrounded-mode report (see [Recording Events](#recording-events)).
+- The value does not match the type of its key, such as `pt: "123"` or `sid: 123`. In a list, the reporter drops each element of the wrong type, such as `null` in `pb: [2500, null]`. It omits the key when no element is left.
+- The value is a string longer than the maximum of its key, such as a `sid` of more than 64 characters.
 - `d` when `ot` is not `a`, `v`, `av`, `tt`, `c`, or `o`. For example, a manifest request with `ot: "m"` never carries `d`. The rule uses the object type you set, even if `ot` is not in `enabledKeys`.
 - `tpb` when `ot` is not `a`, `v`, `av`, or `c`.
 - `ab`, `lab`, or `tab` when the same report also carries `br`, `lb`, or `tb`. The report keeps the exact bitrate.
 - `cen` on every event except a custom event.
+- `cmsdd`, `cmsds`, `rc`, `smrt`, `ttfb`, `ttfbb`, `ttlb`, and `url` on every report except a response-received report.
 - `pr` when the value is `1`, except on a playback rate event.
 
 When `ot` is absent, `d` and `tpb` are sent unchanged. The validators report the same conflicts as errors. See the [Validation Guide](./validation-guide.md#version-specific-behavior).
+
+These rules read the value inside an `SfItem`. For example, the reporter omits a `pr` of `1` with a parameter, as it omits `pr: 1`.
+
+> [!NOTE]
+> Version 1 output follows CTA-5004. `cid` has at most 64 characters, and a custom string has no length limit. Version 1 has no `st=ll` and no `sf=e`, so the reporter sends `st=l` and `sf=o`.
 
 ### Parameterized Values with toCmcdValue
 
@@ -172,6 +184,20 @@ reporter.update({
 });
 
 // This encodes to: br=(5000;v 3000;a)
+```
+
+> [!NOTE]
+> CMCD version 1 has one number for each of these keys. For version 1, the reporter sends the value that has the object type (`ot`) of the request. It uses a value without an object type for every `ot`. If no value matches, it omits the key. For example, the list above gives `br=3000` for an audio request and no `br` for a manifest request.
+
+`decodeCmcd` keeps the parameters of a member. A member with parameters becomes an `SfItem`. For an inner list with parameters, such as `br=(3000 6000);p=2`, the value of the `SfItem` is the whole list. The encoder writes the parameters again, and the validators check the values inside the list:
+
+```typescript
+import { decodeCmcd, encodeCmcd, validateCmcd } from "@svta/cml-cmcd";
+
+const data = decodeCmcd("br=(3000 6000);p=2,v=2", { convertToLatest: true });
+
+console.log(encodeCmcd(data)); // br=(3000 6000);p=2,v=2
+console.log(validateCmcd(data).valid); // true
 ```
 
 ### Absolute URLs for `nor`
@@ -242,6 +268,7 @@ reporter.recordEvent(CmcdEventType.ERROR, {
 Custom values may be strings, numbers, booleans, or tokens. Wrap a value with `toCmcdValue()` to attach structured field parameters (see the `CmcdCustomValue` type). Notes on the wire format:
 
 - `true` is encoded as a bare key without a value (`com.example-flag`), per the RFC 8941 boolean convention. `false` is treated like other empty values and dropped.
+- In version 2, a string value has at most 64 characters. The reporter drops a longer string. It also drops a value of another type, such as a plain object.
 - Values that RFC 8941 cannot serialize currently make encoding throw. Examples are strings with control characters and integers outside ±999,999,999,999,999. Validate custom values before you pass them to the reporter. Graceful handling of such values is tracked in [#327](https://github.com/streaming-video-technology-alliance/common-media-library/issues/327).
 - The validators in this package expect custom values to be strings of at most 64 characters. Prefer short string values for interoperability. See the [Validation Guide](./validation-guide.md#custom-keys).
 
@@ -289,10 +316,31 @@ reporter.update({ sta: "p" });        // → fires PLAY_STATE
 reporter.update({ pr: 1.5 });         // → fires PLAYBACK_RATE
 reporter.update({ cid: "movie-42" }); // → fires CONTENT_ID
 reporter.update({ bg: true });        // → fires BACKGROUNDED_MODE
+reporter.update({ bg: false });       // → fires BACKGROUNDED_MODE without bg
 reporter.update({ br: [5000] });      // → fires BITRATE_CHANGE
 
 // Consecutive updates with the same value are deduplicated.
 reporter.update({ sta: "p" }); // dropped (unchanged)
+```
+
+A `BACKGROUNDED_MODE` report with `bg` is the entry to backgrounded mode. A report without `bg` is the exit, as CTA-5004-B defines it. If the session has not reported `bg: true`, `update({ bg: false })` fires no event. The exception is a session that starts while `bg` is `true`, after a `sid` change.
+
+If a collector expects `bg=?0` on the exit, add `bg: false` to the exit report in the target's transform. The encoder writes that value as `?0`:
+
+```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
+const reporter = new CmcdReporter({
+	eventTargets: [
+		{
+			url: "https://legacy-collector.example.com/cmcd",
+			events: [CmcdEventType.BACKGROUNDED_MODE],
+			enabledKeys: ["bg", "sid", "v", "e", "ts", "sn"],
+			transform: (data) =>
+				data.e === CmcdEventType.BACKGROUNDED_MODE && !("bg" in data) ? { ...data, bg: false } : data,
+		},
+	],
+});
 ```
 
 ### Snapshot context on state changes
@@ -410,7 +458,7 @@ const reporter = new CmcdReporter({
 		{
 			url: "https://analytics.example.com/cmcd",
 			events: [CmcdEventType.RESPONSE_RECEIVED],
-			enabledKeys: ["url", "rc", "ttfb", "ttlb", "br", "d", "ot"],
+			enabledKeys: ["url", "rc", "ttfb", "ttfbb", "ttlb", "cmsdd", "cmsds", "smrt", "br", "d", "ot"],
 		},
 	],
 });
@@ -492,19 +540,14 @@ async function fetchSegment(
 
 #### Providing Additional Data
 
-You can supply CMCD keys that the method cannot derive, such as server-provided metrics:
+You can supply CMCD keys that the method cannot derive. The keys `cmsdd`, `cmsds`, and `smrt` are strings. Each one holds a Base64 copy of the data in a header:
 
 ```typescript
-// Include server-reported metrics from response headers
-const serverDeliveryDuration = parseFloat(
-	fetchResponse.headers.get("X-Server-Duration") || "0",
-);
-
 reporter.recordResponseReceived(response, {
 	ttfbb: 25, // Time to first body byte (player-measured)
-	cmsdd: serverDeliveryDuration, // CMS delivery duration (from server)
-	cmsds: 1500, // CMS delivery speed (from server)
-	smrt: 2000, // Server measured round-trip time (from server)
+	cmsdd: "ImNkbi1hIjtldHA9OTY7cnR0PTg=", // Base64 copy of the CMSD-Dynamic response header
+	cmsds: "b3Q9dixzZj1oLHN0PXYsZD00MDAwLGJyPTI1MDA=", // Base64 copy of the CMSD-Static response header
+	smrt: "KCk7bj1PcmlnaW5BO3N5bg==", // Base64 copy of the response tracing data, from the Request Tracing header
 });
 ```
 
@@ -544,6 +587,8 @@ const decoratedRequest = reporter.createRequestReport(request);
 // Use the decorated request with your HTTP client
 fetch(decoratedRequest.url, decoratedRequest);
 ```
+
+`createRequestReport()` adds the `CMCD` parameter and makes no other change to the URL. If the URL already has a `CMCD` parameter, the new value replaces it. The value uses the encoding of the CTA-5004-B query examples. Only letters, digits, `-`, `.`, `_`, and `~` stay unencoded.
 
 ### Headers Mode
 
@@ -646,7 +691,7 @@ payload.request.customData[CMCD_REQUEST_PROVENANCE] = payload.provenance;
 reporter.recordResponseReceived({ status: 200, request: payload.request });
 ```
 
-The record is the only attribution key. A response whose request has no record is dropped, and a per-call `data.sid` is no substitute. The reporter accepts any record whose `sid` resolves, so you can also construct one. A hand-built request, or a request decorated by another reporter configured with the same session, attributes by naming the `sid`:
+The record is the only key that selects an ended session. A response whose request has no record reports under the current session, as in version 2.4.0. The request-time data then comes from `customData.cmcd`. A per-call `data.sid` is no substitute. The reporter accepts any record whose `sid` resolves, so you can also construct one. A hand-built request, or a request decorated by another reporter configured with the same session, attributes by naming the `sid`:
 
 ```typescript
 // The request was never decorated, so the player names the session.
@@ -882,7 +927,7 @@ The first argument is a copy made for this one report. You can mutate it in plac
 
 After your transform returns, the reporter sets `e` and `sid` again and assigns the sequence number `sn` and `msd`. So a transform cannot change the event type of a report to pass a target's `events` filter. It cannot substitute the session ID, create gaps in the sequence numbers, or replay the media start delay marker. Cancelling a report consumes neither a sequence number nor `msd`. Wire `sn` values remain contiguous per destination, and `msd` goes on the next report that is sent.
 
-A transform also cannot remove a key that the event requires. Every event needs `e` and `ts`. State-change events need the key they signal (`sta`, `pr`, `cid`, `bg`, `br`). Custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these keys, the reporter restores the value it had before. The reporter does not invent values. A required key that was already missing before your transform ran remains missing. That is a bug at the call site, not something the transform did.
+A transform also cannot remove a key that the event requires. Every event needs `e` and `ts`. State-change events need the key they signal (`sta`, `pr`, `cid`, `bg`, `br`). Custom events need `cen`, error events need `ec`, and response-received events need `url`. If your transform drops one of these keys, or replaces its value with `false` or an empty value, the reporter restores the value it had before. The reporter does not invent values. A required key that was already missing before your transform ran remains missing. The exit from backgrounded mode has no `bg` by design. For the other events, a missing required key is a bug at the call site, not something the transform did.
 
 Configuration cannot remove required keys either. The reporter includes them after the `enabledKeys` filter, so omitting one from `enabledKeys` does not suppress it. The payload remains valid. If a destination must not receive a key that an event requires, leave that event out of the target's `events`. Do not try to remove the key.
 

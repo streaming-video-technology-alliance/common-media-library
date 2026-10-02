@@ -1,9 +1,13 @@
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { encodeCmcd } from './encodeCmcd.ts'
+import { percentEncode } from './percentEncode.ts'
 
 /**
  * Convert a CMCD object to a URL encoded string.
+ *
+ * Only letters, digits, `-`, `.`, `_`, and `~` stay unencoded, as in the
+ * query examples of CTA-5004-B.
  *
  * @param cmcd - The CMCD object to convert.
  * @param options - Options for encoding.
@@ -21,5 +25,5 @@ export function toCmcdUrl(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
 
 	const params = encodeCmcd(cmcd, options)
 
-	return encodeURIComponent(params)
+	return percentEncode(params)
 }

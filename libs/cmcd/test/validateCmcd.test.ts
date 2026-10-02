@@ -17,14 +17,14 @@ describe('validateCmcd', () => {
 	})
 
 	it('collects mixed errors and warnings', () => {
-		const result = validateCmcd({ xyz: 123, bl: 150 })
+		const result = validateCmcd({ xyz: 123, bl: [150], v: 2 })
 		equal(result.valid, false)
 		equal(result.issues.some(i => i.severity === 'error'), true)
 		equal(result.issues.some(i => i.severity === 'warning'), true)
 	})
 
 	it('returns valid when only warnings are present', () => {
-		const result = validateCmcd({ bl: 150 })
+		const result = validateCmcd({ bl: [150], v: 2 })
 		equal(result.valid, true)
 		equal(result.issues.length, 1)
 		equal(result.issues[0].severity, 'warning')

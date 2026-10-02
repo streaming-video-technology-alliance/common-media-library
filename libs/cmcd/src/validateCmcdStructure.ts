@@ -3,14 +3,14 @@ import { CMCD_EVENT_KEYS } from './CMCD_EVENT_KEYS.ts'
 import { CMCD_KEY_OBJECT_TYPES } from './CMCD_KEY_OBJECT_TYPES.ts'
 import { CMCD_RESPONSE_KEYS } from './CMCD_RESPONSE_KEYS.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
-import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
+import { CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_PLAY_STATE, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
 import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
 import { resolveVersion } from './resolveVersion.ts'
+import { toBareValue } from './toBareValue.ts'
 import { toTokenString } from './toTokenString.ts'
 
 /**
@@ -116,19 +116,13 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 			}
 		}
 
-		// State-change events require their associated field. CTA-5004-B defines
-		// a `b` event without `bg` as the exit from backgrounded mode.
-		for (const [stateEventType, requiredField] of CMCD_STATE_EVENT_FIELDS) {
-			if (stateEventType === CMCD_EVENT_BACKGROUNDED_MODE) {
-				continue
-			}
-			if (eventType === stateEventType && !(requiredField in data)) {
-				issues.push({
-					key: requiredField,
-					message: `State-change event (e="${stateEventType}") requires the "${requiredField}" key to be present.`,
-					severity: CMCD_VALIDATION_SEVERITY_ERROR
-				})
-			}
+		// Play state change event requires sta
+		if (eventType === CMCD_EVENT_PLAY_STATE && !('sta' in data)) {
+			issues.push({
+				key: 'sta',
+				message: 'Play state change event (e="ps") requires the "sta" key to be present.',
+				severity: CMCD_VALIDATION_SEVERITY_ERROR
+			})
 		}
 
 		// Error event requires ec
@@ -171,10 +165,11 @@ export function validateCmcdStructure(data: Record<string, unknown>, options?: C
 	}
 
 	// Version key checks
-	if ('v' in data && data['v'] !== 1 && data['v'] !== 2) {
+	const v = toBareValue(data['v'])
+	if ('v' in data && v !== 1 && v !== 2) {
 		issues.push({
 			key: 'v',
-			message: `Unsupported CMCD version "${String(data['v'])}". Expected 1 or 2.`,
+			message: `Unsupported CMCD version "${String(v)}". Expected 1 or 2.`,
 			severity: CMCD_VALIDATION_SEVERITY_ERROR
 		})
 	}

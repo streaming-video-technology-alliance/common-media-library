@@ -1,5 +1,5 @@
 import type { Cmcd, CmcdEventReportTransform, CmcdKey, CmcdReporterConfig, CmcdRequestProvenance, CmcdRequestReport, CmcdRequestReportTransform, CmcdTransformRequest } from '@svta/cml-cmcd'
-import { CMCD_REQUEST_PROVENANCE, CmcdEventType, CmcdReporter, CmcdTransmissionMode, validateCmcdEventReport } from '@svta/cml-cmcd'
+import { CMCD_REQUEST_PROVENANCE, CmcdEventType, CmcdReporter, CmcdTransmissionMode, decodeCmcd, validateCmcdEventReport } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, notEqual, ok, throws } from 'node:assert'
@@ -212,7 +212,7 @@ describe('CmcdReporter', () => {
 			ok(!(requests[0].body as string).includes('INJECTED'))
 		})
 
-		it('drops a response whose per-call sid names no retained session', async () => {
+		it('reports a response without a provenance record under the current session, ignoring a per-call sid', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig({
 				eventTargets: [{
@@ -223,8 +223,6 @@ describe('CmcdReporter', () => {
 				}],
 			}), requester)
 
-			// The request carries no provenance record, so the response drops;
-			// a per-call sid is not an attribution key and cannot relabel it.
 			reporter.recordResponseReceived({
 				status: 200,
 				request: { url: 'https://cdn.example.com/segment.mp4' },
@@ -232,7 +230,9 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 0)
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="test-session"'))
+			ok(!(requests[0].body as string).includes('INJECTED'))
 		})
 
 		it('stamps the reporter sid over a per-call sid on createRequestReport', () => {
@@ -355,7 +355,7 @@ describe('CmcdReporter', () => {
 
 			equal(requests.length, 1)
 			ok((requests[0].body as string).includes('msd=800'))
-			ok(!(requests[0].body as string).includes('5000'))
+			ok(!(requests[0].body as string).includes('msd=5000'))
 		})
 
 		it('strips a transform-written msd when the gate is closed', async () => {
@@ -513,7 +513,7 @@ describe('CmcdReporter', () => {
 			const body = requests[0].body as string
 			ok(body.includes('sid="s1"'))
 			ok(body.includes('bl=(25000)'))
-			ok(!body.includes('99000'))
+			ok(!body.includes('bl=(99000)'))
 		})
 
 		it('lets a stale response carry the originating session unsent msd', async () => {
@@ -537,7 +537,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('msd=800'))
 		})
 
-		it('drops a response whose request carries no provenance', async () => {
+		it('reports a response without a provenance record under the current session', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -545,16 +545,17 @@ describe('CmcdReporter', () => {
 				eventTargets: [rrTarget()],
 			}, requester)
 
-			// A hand-built request was never decorated: with no record there
-			// is no attribution key, and a per-call sid cannot substitute.
 			reporter.recordResponseReceived({
 				status: 200,
-				request: { url: 'https://cdn.example.com/seg1.mp4' },
-			}, { sid: 's1' })
+				request: { url: 'https://cdn.example.com/seg1.mp4', customData: { cmcd: { bl: [5000] } } },
+			})
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 0)
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('e=rr'))
+			ok((requests[0].body as string).includes('sid="s1"'))
+			ok((requests[0].body as string).includes('bl=(5000)'))
 		})
 
 		it('attributes a transform-cancelled request to its issuing session', async () => {
@@ -710,7 +711,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			const body = requests[0].body as string
 			ok(body.includes('d=2000'), `expected untransformed d in ${body}`)
-			ok(!body.includes('9999'))
+			ok(!body.includes('d=9999'))
 		})
 
 		it('attributes a response whose per-call data cannot encode', async () => {
@@ -1047,7 +1048,7 @@ describe('CmcdReporter', () => {
 			const body = requests[0].body as string
 			ok(body.includes('sid="s1"'))
 			ok(body.includes('bl=(25000)'), `expected frozen bl=(25000) in ${body}`)
-			ok(!body.includes('99000'))
+			ok(!body.includes('bl=(99000)'))
 		})
 
 		it('never retries a batch invalidated by its session disposal', async () => {
@@ -1242,10 +1243,11 @@ describe('CmcdReporter', () => {
 				}],
 			}, requester)
 
-			// A plain object is not an RFC 8941 bare item. Reports are encoded
-			// at enqueue, so the failure surfaces synchronously in the
-			// recording call instead of rejecting the send and re-queueing.
-			throws(() => reporter.recordEvent(CmcdEventType.ERROR, { 'ec': ['404'], 'com.example-bad': { junk: true } } as unknown as Partial<Cmcd>))
+			// An object inside a custom list is not an RFC 8941 bare item.
+			// Reports are encoded at enqueue, so the failure surfaces
+			// synchronously in the recording call instead of rejecting the
+			// send and re-queueing.
+			throws(() => reporter.recordEvent(CmcdEventType.ERROR, { 'ec': ['404'], 'com.example-bad': [{ junk: true }] } as unknown as Partial<Cmcd>))
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 0)
@@ -1255,7 +1257,7 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('500'), `expected ec 500 in ${requests[0].body}`)
+			ok((requests[0].body as string).includes('ec=("500")'), `expected ec 500 in ${requests[0].body}`)
 
 			reporter.flush()
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1291,7 +1293,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			const body = requests[0].body as string
 			ok(body.includes('tab=(3000)'), `expected frozen tab=(3000) in ${body}`)
-			ok(!body.includes('9000'))
+			ok(!body.includes('tab=(9000)'))
 		})
 
 		it('encodes a JSON-bridged response report without poisoning the queue', async () => {
@@ -1377,7 +1379,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 		})
 
-		it('drops an unbridged serialized response', async () => {
+		it('reports an unbridged serialized response under the current session', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter({
 				sid: 's1',
@@ -1386,16 +1388,13 @@ describe('CmcdReporter', () => {
 			}, requester)
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
-
-			// JSON drops the symbol-keyed record, and nothing restores it: the
-			// request has no attribution key left, so the response drops. The
-			// revived player-facing cmcd object is never read.
 			const lossy = JSON.parse(JSON.stringify(stale))
 			reporter.recordResponseReceived({ status: 200, request: lossy })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
-			equal(requests.length, 0)
+			equal(requests.length, 1)
+			ok((requests[0].body as string).includes('sid="s1"'))
 		})
 
 		it('keeps CmcdRequestReport constructible without the provenance member', () => {
@@ -1618,6 +1617,54 @@ describe('CmcdReporter', () => {
 			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			const url = new URL(result.url)
 			ok(url.searchParams.has('CMCD'))
+		})
+
+		it('changes no other part of the request URL', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://Example.com:443/a/./video.mp4?token=exp=1~acl=/*~hmac=ab&flag#t=10' })
+
+			equal(result.url, 'https://Example.com:443/a/./video.mp4?token=exp=1~acl=/*~hmac=ab&flag&CMCD=sid%3D%22test-session%22%2Cv%3D2#t=10')
+		})
+
+		it('encodes the CMCD query parameter as the CTA-5004-B examples do', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['nor', 'sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://example.com/1.m4s' }, { nor: ['https://example.com/2.m4s', 'https://example.com/3.m4s'] })
+
+			equal(result.url, 'https://example.com/1.m4s?CMCD=nor%3D%28%222.m4s%22%20%223.m4s%22%29%2Csid%3D%22test-session%22%2Cv%3D2')
+		})
+
+		it('replaces a CMCD query parameter of the request URL in place', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4?CMCD=sid%3D%22old%22&a=1&CMCD=su' })
+
+			equal(result.url, 'https://example.com/video.mp4?CMCD=sid%3D%22test-session%22%2Cv%3D2&a=1')
+		})
+
+		it('accepts a relative request URL', () => {
+			const { requester } = createMockRequester()
+			const reporter = new CmcdReporter({
+				sid: 'test-session',
+				enabledKeys: ['sid', 'v'],
+			}, requester)
+
+			const result = reporter.createRequestReport({ url: 'video.mp4?a=1' })
+
+			equal(result.url, 'video.mp4?a=1&CMCD=sid%3D%22test-session%22%2Cv%3D2')
 		})
 
 		it('appends CMCD data as headers when configured', () => {
@@ -2339,23 +2386,38 @@ describe('CmcdReporter', () => {
 				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
 			})
 
-			it('does not revert a transform that legitimately clears bg', async () => {
+			it('restores bg when a transform sets it to false on an entry report', async () => {
 				const { requester, requests } = createMockRequester()
 				const reporter = new CmcdReporter(createTarget(
 					[CmcdEventType.BACKGROUNDED_MODE],
 					data => ({ ...data, bg: false }),
 				), requester)
 
-				// `bg: false` is a real value for this event, emitted as `?0`. The
-				// restore predicate must not treat falsiness as unusable, or it
-				// would silently put the previous `true` back.
+				// Without the restore, the entry report would carry `bg=?0`, which a
+				// receiver that reads the value takes as the exit.
 				reporter.update({ bg: true })
 
 				await new Promise(resolve => setTimeout(resolve, 10))
 
 				equal(requests.length, 1)
-				ok((requests[0].body as string)?.includes('bg=?0'))
+				equal(decodeCmcd((requests[0].body as string).trim())['bg'], true)
 				deepEqual(validateCmcdEventReport(requests[0]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('sends bg=?0 on the exit when a transform adds bg: false', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createTarget(
+					[CmcdEventType.BACKGROUNDED_MODE],
+					data => data.e === CmcdEventType.BACKGROUNDED_MODE && !('bg' in data) ? { ...data, bg: false } : data,
+				), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				equal(decodeCmcd((requests[1].body as string).trim())['bg'], false)
 			})
 
 			it('does not fabricate a required key that was already absent', async () => {
@@ -2952,6 +3014,17 @@ describe('CmcdReporter', () => {
 
 			ok((requests[0].body as string)?.includes('e=e'))
 			ok((requests[0].body as string)?.includes('ts='))
+		})
+
+		it('rounds a fractional ts instead of throwing', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createConfig(), requester)
+
+			reporter.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', ts: 1727712000000.5 })
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string)?.includes('ts=1727712000001'))
 		})
 
 		it('increments sequence number for each event', async () => {
@@ -3603,6 +3676,30 @@ describe('CmcdReporter', () => {
 			ok(body.includes('ttlb=200'))
 			ok(body.includes('ts='))
 			ok(body.includes('url="https://cdn.example.com/segment.mp4"'))
+		})
+
+		it('reports the request URL without the CMCD parameter and with no other change', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4?token=exp=1~acl=/*~hmac=ab&flag' })
+
+			reporter.recordResponseReceived(createResponse(reporter, { request }))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string).includes('url="https://cdn.example.com/segment.mp4?token=exp=1~acl=/*~hmac=ab&flag"'))
+		})
+
+		it('accepts a relative request URL', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+			const request = reporter.createRequestReport({ url: 'segment.mp4' })
+
+			reporter.recordResponseReceived(createResponse(reporter, { request }))
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			ok((requests[0].body as string).includes('url="segment.mp4"'))
 		})
 
 		it('falls back to Date.now() when resourceTiming is missing', async () => {
@@ -4563,6 +4660,125 @@ describe('CmcdReporter', () => {
 
 				equal(requests.length, 1)
 			})
+
+			it('reports the exit without bg', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				const exit = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				ok(!('bg' in exit))
+				deepEqual(validateCmcdEventReport(requests[1]).issues.filter(i => i.severity === 'error'), [])
+			})
+
+			it('does not fire BACKGROUNDED_MODE for bg: false before an entry', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: false })
+				reporter.update({ bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(decodeCmcd((requests[0].body as string).trim())['bg'], true)
+			})
+
+			it('does not record BACKGROUNDED_MODE for bg: false before an entry', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.recordEvent(CmcdEventType.BACKGROUNDED_MODE, { bg: false })
+				reporter.recordEvent(CmcdEventType.BACKGROUNDED_MODE, { bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+				equal(decodeCmcd((requests[0].body as string).trim())['bg'], true)
+			})
+
+			it('reports the exit in a session that starts with bg: true', async () => {
+				const { requester, requests } = createMockRequester()
+				const keys = ['bg', 'sid', 'v', 'e', 'ts', 'sn'] as CmcdKey[]
+				const reporter = new CmcdReporter({
+					sid: 'test-session',
+					enabledKeys: keys,
+					eventTargets: [{
+						url: 'https://example.com/cmcd',
+						events: [CmcdEventType.BACKGROUNDED_MODE, CmcdEventType.TIME_INTERVAL],
+						enabledKeys: keys,
+						batchSize: 1,
+					}],
+				}, requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ sid: 'session-2' })
+				reporter.recordEvent(CmcdEventType.TIME_INTERVAL)
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 3)
+				const interval = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(interval.sid, 'session-2')
+				equal(interval.bg, true)
+				const exit = decodeCmcd((requests[2].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				equal(exit.sid, 'session-2')
+				ok(!('bg' in exit))
+			})
+
+			it('reports the exit after a sid change when bg is stored with parameters', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: new SfItem(true) as unknown as boolean })
+				reporter.update({ sid: 'session-2' })
+				reporter.update({ bg: false })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				const exit = decodeCmcd((requests[requests.length - 1].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				equal(exit.sid, 'session-2')
+				ok(!('bg' in exit))
+			})
+
+			it('reports a decoded exit with parameters without bg', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ bg: decodeCmcd('bg=?0;x')['bg'] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				const exit = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(exit.e, 'b')
+				ok(!('bg' in exit))
+			})
+
+			it('re-fires BACKGROUNDED_MODE for bg: true after a sid change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBgConfig(), requester)
+
+				reporter.update({ bg: true })
+				reporter.update({ sid: 'session-2', bg: true })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
+				const entry = decodeCmcd((requests[1].body as string).trim()) as Cmcd
+				equal(entry.sid, 'session-2')
+				equal(entry.bg, true)
+			})
 		})
 
 		describe('BITRATE_CHANGE', () => {
@@ -4601,6 +4817,31 @@ describe('CmcdReporter', () => {
 				await new Promise(resolve => setTimeout(resolve, 10))
 
 				equal(requests.length, 1)
+			})
+
+			it('does not fire BITRATE_CHANGE when only the parameters of the list change', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: [3000, 6000] })
+				reporter.update({ br: decodeCmcd('br=(3000 6000);p=2')['br'] as Cmcd['br'] })
+				reporter.update({ br: [3000, 6000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 1)
+			})
+
+			it('fires BITRATE_CHANGE when a bitrate changes in a list with parameters', async () => {
+				const { requester, requests } = createMockRequester()
+				const reporter = new CmcdReporter(createBrConfig(), requester)
+
+				reporter.update({ br: decodeCmcd('br=(3000 6000);p=2')['br'] as Cmcd['br'] })
+				reporter.update({ br: [3000, 7000] })
+
+				await new Promise(resolve => setTimeout(resolve, 10))
+
+				equal(requests.length, 2)
 			})
 
 			it('deduplicates SfItems with same value and params', async () => {
