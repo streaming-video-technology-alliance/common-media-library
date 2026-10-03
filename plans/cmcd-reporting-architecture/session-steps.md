@@ -4,11 +4,11 @@
 
 **Goal:** Add `createCmcdSession()` to `@svta/cml-cmcd`, as [the session RFC](../../rfc/cmcd-session.md) defines it.
 
-**Architecture:** One factory function returns a session object. The session keeps one destination for request mode and one destination for each event target URL. Each call builds and encodes all of its reports first, and then it commits the sequence numbers and the waiting values. Each event target has a queue, at most one POST in flight, and a back-off timer. The encoder of version 2.8.0 writes every report.
+**Architecture:** One factory function returns a session object. The session keeps one destination for request mode and one destination for each event target URL. Each call builds and encodes all of its reports first, and then it commits the sequence numbers and the waiting values. Each event target has a queue, at most one POST in flight, and a back-off timer. The encoder and `replaceCmcdParam()` of version 2.8.1 write every report. The configuration types are the types of `CmcdReporter`: `CmcdRequestReportConfig` and `CmcdEventReportConfig`.
 
 **Tech Stack:** TypeScript, `node:test` with mock timers, tsdown, API Extractor, TypeDoc, and rolldown for the bundle measurement.
 
-This plan is Task 3.1 of [the roadmap](steps.md). It is a draft of 2026-10-01, written while the RFC is in review in PR 486. If the review changes the RFC, update the affected tasks before Task 3.2 starts.
+This plan is Task 3.1 of [the roadmap](steps.md). It is a draft, last checked on 2026-10-02, while the RFC is in review in PR 486. If the review changes the RFC, update the affected tasks before Task 3.2 starts.
 
 ## Global Constraints
 
@@ -25,21 +25,21 @@ This plan is Task 3.1 of [the roadmap](steps.md). It is a draft of 2026-10-01, w
 
 ## How This Plan Was Checked
 
-The code of each task ran before this plan was written, on a copy of `main` at 253dbff45 (release 2.8.0):
+The code of each task ran before this plan was written, on a copy of `main` at 0e45a1db5 (release 2.8.1):
 
 - The tests of each task fail before its code and pass after it.
 - After each task, every `libs/cmcd` test passes. `tsc` and ESLint report nothing with the root configuration.
-- The final code passes the package build. API Extractor reports the same 10 warnings as `main`. The docs build reports the same 18 warnings as `main`.
+- The root `npm test` passes on the final code. API Extractor reports the same 10 warnings as `main`. The docs build reports the same 18 warnings as `main`.
 - Each code block of the new documents runs and passes a strict typecheck.
 
 | Measurement, final code | Session | `CmcdReporter` |
 |---|---:|---:|
-| Minified with gzip, with its dependencies | 6756 B | 8501 B |
-| One version 2 request report, Node 24 | 7.35 µs | 15.23 µs |
+| Minified with gzip, with its dependencies | 6910 B | 8696 B |
+| One version 2 request report, Node 24 | 7.98 µs | 14.52 µs |
 
-Both APIs in one bundle measure 10475 B. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
+Both APIs in one bundle measure 10541 B. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
 
-**Change after the check.** The fix PR of the branch `fix/cmcd-query-strict-encoding` (2026-10-01) adds `replaceCmcdParam()` to `main`. That version replaces the first `CMCD` parameter in place and encodes as the CTA-5004-B query examples do. `CmcdReporter` uses it too. Task 1 now only confirms the helper. One test of Task 2 and the request mode tests of Task 9 changed with it. These edits did not run with the code of Tasks 2 to 8. The measurements in the table are from before the fix PR.
+The configuration types follow the decision of Casey of 2026-10-02. The session uses `CmcdRequestReportConfig` and `CmcdEventReportConfig`, and version 3.0.0 removes their members for `CmcdReporter`. Until then, `enabledKeys` accepts a read-only array, and `CmcdEventReportConfig` gains `filter`.
 
 ## Decisions in This Plan
 
@@ -157,12 +157,12 @@ The other inputs of Task 3.1 map to these tasks:
 | File | Content | Task |
 |---|---|---|
 | `libs/cmcd/src/replaceCmcdParam.ts` | Internal, on `main` with its test. Replaces the `CMCD` query parameter. | 1 |
-| `libs/cmcd/src/CmcdSessionSettings.ts` | Public type of the request mode settings | 2 |
-| `libs/cmcd/src/CmcdSessionConfig.ts` | Public type of the configuration | 2, 3, 7 |
+| `libs/cmcd/src/CmcdReportConfig.ts` | Existing type. `enabledKeys` accepts a read-only array, and its TSDoc names the default of each API. | 2 |
+| `libs/cmcd/src/CmcdSessionConfig.ts` | Public type of the configuration, based on `CmcdRequestReportConfig` | 2, 3, 4, 7 |
 | `libs/cmcd/src/CmcdSession.ts` | Public type of the session | 2 to 7 |
 | `libs/cmcd/src/createCmcdSession.ts` | Public function. The destinations, the reports, the queues, and the timers. | 2 to 8 |
 | `libs/cmcd/src/CmcdReportFilter.ts` | Public type of the filter of an event target | 3 |
-| `libs/cmcd/src/CmcdSessionEventTarget.ts` | Public type of an event target | 3, 4, 7 |
+| `libs/cmcd/src/CmcdEventReportConfig.ts` | Existing type of an event target. Gains `filter`. | 3 |
 | `libs/cmcd/src/CmcdEventType.ts` | Gains `CMCD_EVENT_HOSTNAME` and `HOSTNAME` | 3 |
 | `libs/cmcd/src/readScopedValues.ts` | Internal. Reads and checks the `msd`, `bs`, `bsd`, and `ec` values of a call. | 4 |
 | `libs/cmcd/src/toResponseKeys.ts` | Internal. Derives the keys of an `rr` report. | 5 |
@@ -174,7 +174,7 @@ The other inputs of Task 3.1 map to these tasks:
 | `libs/cmcd/docs/session-guide.md`, `libs/cmcd/docs/migration-guide.md` | The guides | 10 |
 | `libs/cmcd/README.md`, `libs/cmcd/CHANGELOG.md` | The quick start and the changelog entry | 10 |
 
-The files `createCmcdSession.ts`, `CmcdSession.ts`, `CmcdSessionConfig.ts`, and `CmcdSessionEventTarget.ts` grow from task to task. Each task that changes them gives their complete content, so the step replaces the whole file.
+The files `createCmcdSession.ts`, `CmcdSession.ts`, and `CmcdSessionConfig.ts` grow from task to task. Each task that changes them gives their complete content, so the step replaces the whole file.
 
 ## Setup
 
@@ -215,13 +215,13 @@ Expected: the log shows the commit of the fix PR, and the tests pass. If the fil
 ### Task 2: Request Reports
 
 **Files:**
-- Create: `libs/cmcd/src/CmcdSessionSettings.ts`, `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`
-- Modify: `libs/cmcd/src/index.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
+- Create: `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`
+- Modify: `libs/cmcd/src/CmcdReportConfig.ts`, `libs/cmcd/src/index.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
 - Test: `libs/cmcd/test/createCmcdSession.test.ts`
 
 **Interfaces:**
-- Consumes: `replaceCmcdParam()` from Task 1.
-- Produces: `createCmcdSession(config?: CmcdSessionConfig): CmcdSession`, with `sid`, `createRequestReport()`, and `configure()`. Task 3 adds the `requester` argument and the event methods.
+- Consumes: `replaceCmcdParam()` from Task 1, and the existing type `CmcdRequestReportConfig`.
+- Produces: `createCmcdSession(config?: CmcdSessionConfig): CmcdSession`, with `sid`, `createRequestReport()`, and `configure(settings: CmcdRequestReportConfig)`. `CmcdSessionConfig` is `CmcdRequestReportConfig & { sid?, cid? }`. `CmcdReportConfig.enabledKeys` becomes `readonly CmcdKey[]`. Task 3 adds the `requester` argument and the event methods.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -341,7 +341,7 @@ describe('createCmcdSession', () => {
 		})
 
 		it('keeps only the enabled keys, and v', () => {
-			const session = createCmcdSession({ sid: 's1', enabledKeys: ['sid', 'br'] })
+			const session = createCmcdSession({ sid: 's1', enabledKeys: ['sid', 'br'] as const })
 
 			const report = session.createRequestReport({ url: SEGMENT }, { br: [3000], d: 4000 })
 
@@ -387,59 +387,51 @@ Expected: FAIL with `SyntaxError: The requested module '@svta/cml-cmcd' does not
 
 - [ ] **Step 3: Write the types**
 
-Create `libs/cmcd/src/CmcdSessionSettings.ts`:
+Replace the content of `libs/cmcd/src/CmcdReportConfig.ts` with:
 
 ```ts
-import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
 import type { CmcdKey } from './CmcdKey.ts'
-import type { CmcdTransmissionMode } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 
 /**
- * The request mode settings of a CMCD session. `configure()` replaces them.
+ * Configuration for a CMCD report.
  *
  * @public
  */
-export type CmcdSessionSettings = {
+export type CmcdReportConfig = {
 	/**
-	 * The CMCD version of request reports. Event reports always use version 2.
+	 * The version of the CMCD specification to use.
 	 *
-	 * @defaultValue `2`
+	 * @defaultValue `CMCD_V2`
 	 */
 	version?: CmcdVersion;
 
 	/**
-	 * The transmission mode of request reports: the `CMCD` query parameter or the CMCD headers.
+	 * The list of CMCD keys to include in the report. Without the list,
+	 * `CmcdReporter` reports no keys, and `createCmcdSession()` reports every
+	 * key. In event mode, this list cannot remove `e`, `ts`, or the
+	 * required key of the event type. Examples of required keys: `sta` for a
+	 * play state change, `ec` for an error, `url` for a response received.
 	 *
-	 * @defaultValue `'query'`
-	 */
-	transmissionMode?: CmcdTransmissionMode;
-
-	/**
-	 * The keys of each request report.
-	 *
-	 * @defaultValue Every key of the version
+	 * @defaultValue `undefined`
 	 */
 	enabledKeys?: readonly CmcdKey[];
-
-	/**
-	 * The CMCD header of each custom key, in header mode.
-	 */
-	customHeaderMap?: Partial<CmcdHeaderMap>;
 }
 ```
 
 Create `libs/cmcd/src/CmcdSessionConfig.ts`:
 
 ```ts
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * The configuration of a CMCD session.
  *
+ * The members of {@link CmcdRequestReportConfig} are the request mode settings. `configure()` replaces them.
+ *
  * @public
  */
-export type CmcdSessionConfig = CmcdSessionSettings & {
+export type CmcdSessionConfig = CmcdRequestReportConfig & {
 	/**
 	 * The session ID, a string of 1 to 64 characters.
 	 *
@@ -460,7 +452,7 @@ Create `libs/cmcd/src/CmcdSession.ts`:
 import type { HttpRequest } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * A CMCD session. One session reports one `sid`.
@@ -493,11 +485,12 @@ export type CmcdSession = {
 	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>;
 
 	/**
-	 * Replaces the request mode settings. The `sid` and every sequence number stay.
+	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
+	 * The `sid` and every sequence number stay.
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionSettings): void;
+	configure(settings: CmcdRequestReportConfig): void;
 }
 ```
 
@@ -514,9 +507,9 @@ import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import { CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
@@ -553,7 +546,7 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
  */
 export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 	const sid = config.sid ?? uuid()
-	const settings: CmcdSessionSettings = {
+	const settings: CmcdRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
 		enabledKeys: config.enabledKeys,
@@ -608,7 +601,6 @@ In `libs/cmcd/src/index.ts`, after the line `export type * from './CmcdResponse.
 ```ts
 export type * from './CmcdSession.ts'
 export type * from './CmcdSessionConfig.ts'
-export type * from './CmcdSessionSettings.ts'
 ```
 
 In the same file, before the line `export * from './createFetchTransport.ts'`, add:
@@ -627,25 +619,25 @@ npm run typecheck
 npx eslint libs/cmcd
 ```
 
-Expected: the 13 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing. The API report gains `CmcdSession`, `CmcdSessionConfig`, `CmcdSessionSettings`, and `createCmcdSession`.
+Expected: the 13 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing. The API report gains `CmcdSession`, `CmcdSessionConfig`, and `createCmcdSession`, and `enabledKeys` of `CmcdReportConfig` becomes `readonly CmcdKey[]`.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add libs/cmcd/src/CmcdSessionSettings.ts libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/src/index.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.test.ts
+git add libs/cmcd/src/CmcdReportConfig.ts libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/src/index.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.test.ts
 git commit -s -m "feat(cmcd): add createCmcdSession with request reports" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
 ### Task 3: Event Reports
 
 **Files:**
-- Create: `libs/cmcd/src/CmcdReportFilter.ts`, `libs/cmcd/src/CmcdSessionEventTarget.ts`
-- Modify: `libs/cmcd/src/CmcdEventType.ts`, `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, `libs/cmcd/src/index.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
+- Create: `libs/cmcd/src/CmcdReportFilter.ts`
+- Modify: `libs/cmcd/src/CmcdEventType.ts`, `libs/cmcd/src/CmcdEventReportConfig.ts`, `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, `libs/cmcd/src/index.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
 - Test: `libs/cmcd/test/createCmcdSession.events.test.ts`
 
 **Interfaces:**
-- Consumes: `createCmcdSession()` from Task 2.
-- Produces: `createCmcdSession(config?, requester?: (request: HttpRequest) => Promise<{ status: number; }>)`, `recordEvent()`, `flush()`, `CmcdReportFilter`, `CmcdSessionEventTarget` (`url`, `events`, `enabledKeys`, `batchSize`, `filter`), and `CMCD_EVENT_HOSTNAME`. Inside `createCmcdSession.ts`: `draftOf()`, `build()`, `commit()`, `send()`, and `emit()`, which Tasks 4 to 8 extend.
+- Consumes: `createCmcdSession()` from Task 2, and the existing type `CmcdEventReportConfig`.
+- Produces: `createCmcdSession(config?, requester?: (request: HttpRequest) => Promise<{ status: number; }>)`, `recordEvent()`, `flush()`, `CmcdReportFilter`, `CmcdEventReportConfig.filter`, `CmcdSessionConfig.eventTargets` (`readonly CmcdEventReportConfig[]`), and `CMCD_EVENT_HOSTNAME`. Inside `createCmcdSession.ts`: `draftOf()`, `build()`, `commit()`, `send()`, and `emit()`, which Tasks 4 to 8 extend.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -961,66 +953,104 @@ import type { Cmcd } from './Cmcd.ts'
 export type CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean
 ```
 
-Create `libs/cmcd/src/CmcdSessionEventTarget.ts`:
+Replace the content of `libs/cmcd/src/CmcdEventReportConfig.ts` with:
 
 ```ts
+import type { CMCD_V2 } from './CMCD_V2.ts'
+import type { CmcdEventReportTransform } from './CmcdEventReportTransform.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
-import type { CmcdKey } from './CmcdKey.ts'
+import type { CmcdReportConfig } from './CmcdReportConfig.ts'
 import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 
 /**
- * An event target of a CMCD session.
+ * Configuration for a CMCD event report.
  *
- * The targets with the same `url` form one destination.
- * They share one sequence number.
+ * @typeParam C - The type of the player's `customData` on the request that
+ *                triggered the event. Defaults to `Record<string, unknown>`.
  *
  * @public
  */
-export type CmcdSessionEventTarget = {
+export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
 	/**
-	 * The URL of the collector. The session sends each batch to this URL with a POST.
+	 * The version of the CMCD protocol to use. Event reporting
+	 * requires version 2.
+	 *
+	 * @defaultValue `CMCD_V2`
+	 */
+	version?: typeof CMCD_V2
+
+	/**
+	 * The URL of the collector. Each batch of event reports goes to this URL in a POST.
 	 */
 	url: string;
 
 	/**
-	 * The event types that the target receives.
-	 */
-	events: readonly CmcdEventType[];
-
-	/**
-	 * The keys of each report. A report always keeps the keys that its event requires.
+	 * The events to report. If the caller provides no events,
+	 * the event target is effectively disabled.
 	 *
-	 * @defaultValue Every event key
+	 * @defaultValue `undefined`
 	 */
-	enabledKeys?: readonly CmcdKey[];
+	events?: CmcdEventType[];
 
 	/**
-	 * The number of reports in one POST.
+	 * The interval of the `t` reports, in seconds. The value `0` turns them off.
+	 *
+	 * @defaultValue `CMCD_DEFAULT_TIME_INTERVAL`
+	 *
+	 * @see {@link CMCD_DEFAULT_TIME_INTERVAL}
+	 */
+	interval?: number;
+
+	/**
+	 * The number of events to batch before sending the report.
 	 *
 	 * @defaultValue `1`
 	 */
 	batchSize?: number;
 
 	/**
-	 * Selects the reports that the target receives.
-	 * Without a filter, the target receives every report of its events.
+	 * Selects the reports that the target receives. Only `createCmcdSession()`
+	 * reads this option. Without a filter, the target receives every report of
+	 * its events.
+	 *
+	 * @defaultValue `undefined`
 	 */
 	filter?: CmcdReportFilter;
-}
+
+	/**
+	 * Transform applied to each of this target's event reports before
+	 * it is queued. Return the data to continue, or `null` to cancel
+	 * the report for this target.
+	 *
+	 * The transform is scoped to this target only. Targets that share a
+	 * collector URL each run their own transform. Other targets that
+	 * accept the event still receive a report cancelled by this transform.
+	 * Only `CmcdReporter` reads this option. For `createCmcdSession()`, use
+	 * `filter`.
+	 *
+	 * @defaultValue `undefined`
+	 *
+	 * @example
+	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
+	 */
+	transform?: CmcdEventReportTransform<C>;
+};
 ```
 
 Replace the content of `libs/cmcd/src/CmcdSessionConfig.ts` with:
 
 ```ts
-import type { CmcdSessionEventTarget } from './CmcdSessionEventTarget.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * The configuration of a CMCD session.
  *
+ * The members of {@link CmcdRequestReportConfig} are the request mode settings. `configure()` replaces them.
+ *
  * @public
  */
-export type CmcdSessionConfig = CmcdSessionSettings & {
+export type CmcdSessionConfig = CmcdRequestReportConfig & {
 	/**
 	 * The session ID, a string of 1 to 64 characters.
 	 *
@@ -1035,8 +1065,9 @@ export type CmcdSessionConfig = CmcdSessionSettings & {
 
 	/**
 	 * The event targets. They cannot change after the session is created.
+	 * The targets with the same `url` form one destination, and they share one sequence number.
 	 */
-	eventTargets?: readonly CmcdSessionEventTarget[];
+	eventTargets?: readonly CmcdEventReportConfig[];
 }
 ```
 
@@ -1047,7 +1078,7 @@ import type { HttpRequest } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * A CMCD session. One session reports one `sid`.
@@ -1096,11 +1127,12 @@ export type CmcdSession = {
 	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void;
 
 	/**
-	 * Replaces the request mode settings. The `sid` and every sequence number stay.
+	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
+	 * The `sid` and every sequence number stay.
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionSettings): void;
+	configure(settings: CmcdRequestReportConfig): void;
 
 	/**
 	 * Sends the queue of each event target at once.
@@ -1114,12 +1146,6 @@ In `libs/cmcd/src/index.ts`, after the line `export type * from './CmcdReportCon
 
 ```ts
 export type * from './CmcdReportFilter.ts'
-```
-
-In the same file, after the line `export type * from './CmcdSessionConfig.ts'`, add:
-
-```ts
-export type * from './CmcdSessionEventTarget.ts'
 ```
 
 - [ ] **Step 5: Write the implementation**
@@ -1140,9 +1166,9 @@ import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -1211,7 +1237,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
  */
 export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
 	const sid = config.sid ?? uuid()
-	const settings: CmcdSessionSettings = {
+	const settings: CmcdRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
 		enabledKeys: config.enabledKeys,
@@ -1233,7 +1259,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		targets.push({
 			url: target.url,
 			destination,
-			events: [...target.events],
+			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			filter: target.filter,
@@ -1383,7 +1409,7 @@ Expected: the 14 tests of the file pass, and every package test passes. The type
 - [ ] **Step 7: Commit**
 
 ```bash
-git add libs/cmcd/src/CmcdEventType.ts libs/cmcd/src/CmcdReportFilter.ts libs/cmcd/src/CmcdSessionEventTarget.ts libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/src/index.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.events.test.ts
+git add libs/cmcd/src/CmcdEventType.ts libs/cmcd/src/CmcdReportFilter.ts libs/cmcd/src/CmcdEventReportConfig.ts libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/src/index.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.events.test.ts
 git commit -s -m "feat(cmcd): record event reports in the CMCD session" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
@@ -1391,7 +1417,7 @@ git commit -s -m "feat(cmcd): record event reports in the CMCD session" -m "Co-A
 
 **Files:**
 - Create: `libs/cmcd/src/readScopedValues.ts`
-- Modify: `libs/cmcd/src/CmcdSessionEventTarget.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
+- Modify: `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
 - Test: `libs/cmcd/test/createCmcdSession.errors.test.ts`
 
 **Interfaces:**
@@ -1717,51 +1743,38 @@ export function readScopedValues(data: Cmcd, ec?: readonly string[]): CmcdScoped
 
 - [ ] **Step 4: Update the types**
 
-Replace the content of `libs/cmcd/src/CmcdSessionEventTarget.ts` with:
+Replace the content of `libs/cmcd/src/CmcdSessionConfig.ts` with:
 
 ```ts
-import type { CmcdEventType } from './CmcdEventType.ts'
-import type { CmcdKey } from './CmcdKey.ts'
-import type { CmcdReportFilter } from './CmcdReportFilter.ts'
+import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
- * An event target of a CMCD session.
+ * The configuration of a CMCD session.
  *
- * The targets with the same `url` form one destination.
- * They share one sequence number, the `msd` rule, and the waiting values.
+ * The members of {@link CmcdRequestReportConfig} are the request mode settings. `configure()` replaces them.
  *
  * @public
  */
-export type CmcdSessionEventTarget = {
+export type CmcdSessionConfig = CmcdRequestReportConfig & {
 	/**
-	 * The URL of the collector. The session sends each batch to this URL with a POST.
-	 */
-	url: string;
-
-	/**
-	 * The event types that the target receives.
-	 */
-	events: readonly CmcdEventType[];
-
-	/**
-	 * The keys of each report. A report always keeps the keys that its event requires.
+	 * The session ID, a string of 1 to 64 characters.
 	 *
-	 * @defaultValue Every event key
+	 * @defaultValue A new UUID
 	 */
-	enabledKeys?: readonly CmcdKey[];
+	sid?: string;
 
 	/**
-	 * The number of reports in one POST.
-	 *
-	 * @defaultValue `1`
+	 * The content ID of each report whose data has no `cid`. It has at most 128 characters.
 	 */
-	batchSize?: number;
+	cid?: string;
 
 	/**
-	 * Selects the reports that the target receives.
-	 * Without a filter, the target receives every report of its events.
+	 * The event targets. They cannot change after the session is created.
+	 * The targets with the same `url` form one destination.
+	 * They share one sequence number, the `msd` rule, and the waiting values.
 	 */
-	filter?: CmcdReportFilter;
+	eventTargets?: readonly CmcdEventReportConfig[];
 }
 ```
 
@@ -1772,7 +1785,7 @@ import type { HttpRequest } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * A CMCD session. One session reports one `sid`.
@@ -1837,11 +1850,12 @@ export type CmcdSession = {
 	recordError(codes: string | readonly string[], data?: Cmcd): void;
 
 	/**
-	 * Replaces the request mode settings. The `sid` and every sequence number stay.
+	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
+	 * The `sid` and every sequence number stay.
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionSettings): void;
+	configure(settings: CmcdRequestReportConfig): void;
 
 	/**
 	 * Sends the queue of each event target at once.
@@ -1869,9 +1883,9 @@ import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -1951,7 +1965,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
  */
 export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
 	const sid = config.sid ?? uuid()
-	const settings: CmcdSessionSettings = {
+	const settings: CmcdRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
 		enabledKeys: config.enabledKeys,
@@ -1976,7 +1990,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		targets.push({
 			url: target.url,
 			destination,
-			events: [...target.events],
+			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			filter: target.filter,
@@ -2186,7 +2200,7 @@ Expected: the 10 tests of the file pass, and every package test passes. The type
 - [ ] **Step 7: Commit**
 
 ```bash
-git add libs/cmcd/src/readScopedValues.ts libs/cmcd/src/CmcdSessionEventTarget.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.errors.test.ts
+git add libs/cmcd/src/readScopedValues.ts libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.errors.test.ts
 git commit -s -m "feat(cmcd): record errors and the keys with a destination scope" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
@@ -2392,7 +2406,7 @@ import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * A CMCD session. One session reports one `sid`.
@@ -2475,11 +2489,12 @@ export type CmcdSession = {
 	recordError(codes: string | readonly string[], data?: Cmcd): void;
 
 	/**
-	 * Replaces the request mode settings. The `sid` and every sequence number stay.
+	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
+	 * The `sid` and every sequence number stay.
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionSettings): void;
+	configure(settings: CmcdRequestReportConfig): void;
 
 	/**
 	 * Sends the queue of each event target at once.
@@ -2505,9 +2520,9 @@ import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -2593,7 +2608,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
-	const settings: CmcdSessionSettings = {
+	const settings: CmcdRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
 		enabledKeys: config.enabledKeys,
@@ -2618,7 +2633,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		targets.push({
 			url: target.url,
 			destination,
-			events: [...target.events],
+			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			filter: target.filter,
@@ -3065,7 +3080,7 @@ import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * A CMCD session. One session reports one `sid`.
@@ -3148,11 +3163,12 @@ export type CmcdSession = {
 	recordError(codes: string | readonly string[], data?: Cmcd): void;
 
 	/**
-	 * Replaces the request mode settings. The `sid` and every sequence number stay.
+	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
+	 * The `sid` and every sequence number stay.
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionSettings): void;
+	configure(settings: CmcdRequestReportConfig): void;
 
 	/**
 	 * Sends the queue of each event target at once, also during a wait.
@@ -3181,9 +3197,9 @@ import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -3276,7 +3292,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
-	const settings: CmcdSessionSettings = {
+	const settings: CmcdRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
 		enabledKeys: config.enabledKeys,
@@ -3301,7 +3317,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		const state: Target = {
 			url: target.url,
 			destination,
-			events: [...target.events],
+			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			filter: target.filter,
@@ -3573,12 +3589,12 @@ git commit -s -m "feat(cmcd): back off and stop on the responses of a collector"
 ### Task 7: Timers
 
 **Files:**
-- Modify: `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSessionEventTarget.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
+- Modify: `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
 - Test: `libs/cmcd/test/createCmcdSession.timers.test.ts`
 
 **Interfaces:**
 - Consumes: `emit()` and `send()` from Task 6.
-- Produces: `start(immediate?: boolean): void`, `stop(): void`, `CmcdSessionConfig.snapshot`, and `CmcdSessionEventTarget.interval`. `emit()` gains the parameter `candidates` before `ec`.
+- Produces: `start(immediate?: boolean): void`, `stop(): void`, `CmcdSessionConfig.snapshot`, and the use of `CmcdEventReportConfig.interval`, which already exists. `emit()` gains the parameter `candidates` before `ec`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -3776,15 +3792,17 @@ Replace the content of `libs/cmcd/src/CmcdSessionConfig.ts` with:
 
 ```ts
 import type { Cmcd } from './Cmcd.ts'
-import type { CmcdSessionEventTarget } from './CmcdSessionEventTarget.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * The configuration of a CMCD session.
  *
+ * The members of {@link CmcdRequestReportConfig} are the request mode settings. `configure()` replaces them.
+ *
  * @public
  */
-export type CmcdSessionConfig = CmcdSessionSettings & {
+export type CmcdSessionConfig = CmcdRequestReportConfig & {
 	/**
 	 * The session ID, a string of 1 to 64 characters.
 	 *
@@ -3799,68 +3817,15 @@ export type CmcdSessionConfig = CmcdSessionSettings & {
 
 	/**
 	 * The event targets. They cannot change after the session is created.
+	 * The targets with the same `url` form one destination.
+	 * They share one sequence number, the `msd` rule, and the waiting values.
 	 */
-	eventTargets?: readonly CmcdSessionEventTarget[];
+	eventTargets?: readonly CmcdEventReportConfig[];
 
 	/**
 	 * Returns the data of each `t` report. Without `snapshot`, `start()` arms no timer.
 	 */
 	snapshot?: () => Cmcd;
-}
-```
-
-Replace the content of `libs/cmcd/src/CmcdSessionEventTarget.ts` with:
-
-```ts
-import type { CmcdEventType } from './CmcdEventType.ts'
-import type { CmcdKey } from './CmcdKey.ts'
-import type { CmcdReportFilter } from './CmcdReportFilter.ts'
-
-/**
- * An event target of a CMCD session.
- *
- * The targets with the same `url` form one destination.
- * They share one sequence number, the `msd` rule, and the waiting values.
- *
- * @public
- */
-export type CmcdSessionEventTarget = {
-	/**
-	 * The URL of the collector. The session sends each batch to this URL with a POST.
-	 */
-	url: string;
-
-	/**
-	 * The event types that the target receives.
-	 */
-	events: readonly CmcdEventType[];
-
-	/**
-	 * The keys of each report. A report always keeps the keys that its event requires.
-	 *
-	 * @defaultValue Every event key
-	 */
-	enabledKeys?: readonly CmcdKey[];
-
-	/**
-	 * The number of reports in one POST.
-	 *
-	 * @defaultValue `1`
-	 */
-	batchSize?: number;
-
-	/**
-	 * The time between two `t` reports, in seconds. The value `0` turns `t` reports off.
-	 *
-	 * @defaultValue {@link CMCD_DEFAULT_TIME_INTERVAL}
-	 */
-	interval?: number;
-
-	/**
-	 * Selects the reports that the target receives.
-	 * Without a filter, the target receives every report of its events.
-	 */
-	filter?: CmcdReportFilter;
 }
 ```
 
@@ -3871,7 +3836,7 @@ import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
 /**
  * A CMCD session. One session reports one `sid`.
@@ -3954,11 +3919,12 @@ export type CmcdSession = {
 	recordError(codes: string | readonly string[], data?: Cmcd): void;
 
 	/**
-	 * Replaces the request mode settings. The `sid` and every sequence number stay.
+	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
+	 * The `sid` and every sequence number stay.
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionSettings): void;
+	configure(settings: CmcdRequestReportConfig): void;
 
 	/**
 	 * Arms one timer for each event target that lists `t` and has an interval above 0.
@@ -4009,9 +3975,9 @@ import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -4106,7 +4072,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
-	const settings: CmcdSessionSettings = {
+	const settings: CmcdRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
 		enabledKeys: config.enabledKeys,
@@ -4132,7 +4098,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		const state: Target = {
 			url: target.url,
 			destination,
-			events: [...target.events],
+			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
@@ -4438,7 +4404,7 @@ Expected: the 8 tests of the file pass, and every package test passes. The typec
 - [ ] **Step 6: Commit**
 
 ```bash
-git add libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSessionEventTarget.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.timers.test.ts
+git add libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.timers.test.ts
 git commit -s -m "feat(cmcd): add the t report timers of the CMCD session" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
@@ -4584,9 +4550,9 @@ import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
+import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
-import type { CmcdSessionSettings } from './CmcdSessionSettings.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { checkSessionConfig } from './checkSessionConfig.ts'
@@ -4686,7 +4652,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
-	const settings: CmcdSessionSettings = {
+	const settings: CmcdRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
 		enabledKeys: config.enabledKeys,
@@ -4712,7 +4678,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		const state: Target = {
 			url: target.url,
 			destination,
-			events: [...target.events],
+			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
@@ -5394,6 +5360,8 @@ console.log(session.sid)
 
 The session generates a `sid` when the configuration has none. The second argument sends the event reports, so pass the HTTP client of the player there. Without it, the session sends with `fetch`, without the `keepalive` option.
 
+The configuration uses the types of `CmcdReporter`: `CmcdRequestReportConfig` for request mode, and `CmcdEventReportConfig` for each event target. The session ignores their `transform` options. Use `filter` on an event target instead.
+
 Request mode is one destination. Each event target URL is one destination, so the targets with the same URL share one destination. Each destination has its own sequence number (`sn`), which starts at 0.
 
 To change the `sid`, create a new session. Call `flush()` and `stop()` on the old session first. If the player keeps the old session, it can record late responses under the old `sid`.
@@ -5717,7 +5685,7 @@ console.log(report.url)
 | `CmcdReporter` | Session API |
 |---|---|
 | `new CmcdReporter(config, requester)` | `createCmcdSession(config, requester)` |
-| `sid`, `cid`, `version`, `transmissionMode`, `enabledKeys`, `customHeaderMap`, `eventTargets` | The same names |
+| `sid`, `cid`, `version`, `transmissionMode`, `enabledKeys`, `customHeaderMap`, `eventTargets` | The same names and types: `CmcdRequestReportConfig` and `CmcdEventReportConfig` |
 | `update(data)` for values that persist | The player keeps the values and passes them with each call |
 | The events that `update()` fires for `sta`, `pr`, `cid`, `bg`, and `br` | The player compares the new value with the old value, then calls `recordEvent()` |
 | `update({ sid })` | A new session. The player calls `flush()` and `stop()` on the old session. |
@@ -5740,6 +5708,7 @@ console.log(report.url)
 - Without `enabledKeys`, the session reports every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 - The session sends no event by itself. The player compares each new value with the old value, then calls `recordEvent()`.
 - The session reads `msd`, `bs`, and `bsd` from the data of any call and sends them to every destination. `CmcdReporter` reads `msd` from `update()` only.
+- The session ignores `transform` and `sessionRetention`. Version 3.0.0 removes `transform` from the configuration types.
 - Every target receives the same data. A `transform` that changes the report of one target has no equivalent, and neither has the `bg=?0` opt-in.
 - After a failed send, a target waits from 1 to 60 seconds before the retry. `CmcdReporter` sends a failed batch again with the next send.
 - During a migration, report each `sid` through one API only. Each API keeps its own sequence numbers.
@@ -5788,8 +5757,12 @@ In `libs/cmcd/CHANGELOG.md`, under `## [Unreleased]`, add:
 ````markdown
 ### Added
 
-- `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call. The session keeps one sequence number for each destination, the event queues, and the timers. A `filter` on an event target selects the reports of that target. The session guide and the migration guide describe the API
+- `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call. The session keeps one sequence number for each destination, the event queues, and the timers. Its configuration uses the types of `CmcdReporter`: `CmcdRequestReportConfig` and `CmcdEventReportConfig`. The new `filter` of `CmcdEventReportConfig` selects the reports of an event target. The session guide and the migration guide describe the API
 - `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` for the `h` event of CTA-5004-B
+
+### Changed
+
+- `enabledKeys` of `CmcdReportConfig` accepts a read-only array
 ````
 
 - [ ] **Step 5: Run every code block of the documents**
@@ -5859,12 +5832,13 @@ Expected: lint, the build of every package, the typecheck, and every package tes
 git diff origin/main -- libs/cmcd/config/cml-cmcd.api.md
 ```
 
-Expected: the diff adds these declarations, and nothing else:
+Expected: the diff has these changes, and nothing else:
 
 - `CMCD_EVENT_HOSTNAME: "h"`, and `HOSTNAME` in `CmcdEventType`
+- `enabledKeys?: readonly CmcdKey[]` in `CmcdReportConfig`, and `filter?: CmcdReportFilter` in `CmcdEventReportConfig`
 - `CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean`
 - `CmcdSession` with `sid`, `createRequestReport`, `recordEvent`, `recordResponseReceived`, `recordError`, `configure`, `start`, `stop`, and `flush`
-- `CmcdSessionConfig`, `CmcdSessionEventTarget`, and `CmcdSessionSettings`, with the members of the RFC
+- `CmcdSessionConfig = CmcdRequestReportConfig & { sid?, cid?, eventTargets?: readonly CmcdEventReportConfig[], snapshot? }`, and `configure(settings: CmcdRequestReportConfig)` in `CmcdSession`
 - `createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status: number; }>): CmcdSession`
 
 The diff must have no `ae-forgotten-export` warning. Compare each declaration with the section "Types" of the RFC.
@@ -5883,7 +5857,7 @@ printf "import { CmcdReporter, createCmcdSession } from '%s'\nglobalThis.x = [Cm
 for name in session reporter both; do npx rolldown $S/$name.mjs --format esm --minify --file $S/$name.min.js > /dev/null && printf "%s %s B\n" $name $(gzip -9 -c $S/$name.min.js | wc -c); done
 ```
 
-Expected: about 6.8 KB for the session, 8.5 KB for `CmcdReporter`, and 10.5 KB for both. If the session measures more than 7.5 KB, stop and report.
+Expected: about 6.9 KB for the session, 8.7 KB for `CmcdReporter`, and 10.5 KB for both. If the session measures more than 7.5 KB, stop and report.
 
 - [ ] **Step 4: Run the bare-import probes**
 

@@ -172,8 +172,8 @@ Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
 
 Entry: Phase 3 is merged. The RFC requires the deprecation and the session API in the same release.
 
-- [ ] **4.1 Deprecate `CmcdReporter` (agent).** Add `@deprecated` to the TSDoc of the 11 exports in the deprecation table of the RFC. Each notice says "Use `createCmcdSession()`" and links the migration guide. Add a `### Deprecated` changelog entry and a note in the user guide.
-  - Done when: the API report shows the 11 deprecation notices and no other change, and the root `npm test` passes.
+- [ ] **4.1 Deprecate `CmcdReporter` (agent).** Add `@deprecated` to the TSDoc of the 8 exports and the 2 `transform` members in the deprecation table of the RFC. Each notice says "Use `createCmcdSession()`" and links the migration guide. Add a `### Deprecated` changelog entry and a note in the user guide.
+  - Done when: the API report shows the deprecation notices and no other change, and the root `npm test` passes.
 - [ ] **4.2 Prepare and publish release 2.9.0 (agent prepares, Casey merges).** Follow the steps of Task 2.5 with version 2.9.0.
   - Done when: `@svta/cml-cmcd@2.9.0` is on npm with `createCmcdSession()` and the deprecation notices.
 
@@ -194,7 +194,7 @@ Detailed plan at phase start. Entry: release 2.9.0 is out, and Casey plans 3.0.0
 
 - [ ] **6.1 Plan release 3.0.0 (Casey).** Decide whether a 2.x branch keeps receiving `CmcdReporter` fixes after 3.0.0.
   - Done when: the decision is in the log.
-- [ ] **6.2 Remove the deprecated exports (agent).** Remove the 11 exports, their tests, and their documentation. Add a `### Removed` changelog entry with the migration guidance. Prepare the major release with the steps of Task 2.5.
+- [ ] **6.2 Remove the deprecated exports (agent).** Remove the 8 exports and the 2 `transform` members, their tests, and their documentation. Rework the configuration types as item 5 of the deprecation section of the RFC says. Add a `### Removed` changelog entry with the migration guidance. Prepare the major release with the steps of Task 2.5.
   - Done when: version 3.0.0 is on npm without `CmcdReporter`.
 
 ## Task 2.3 in detail
@@ -434,6 +434,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-01 | Publish run 36933063046 succeeded. `@svta/cml-cmcd` 2.8.0 and `@svta/cml-request` 1.0.19 are on npm, with the GitHub releases `cmcd-v2.8.0` and `request-v1.0.19`. Phase 2 is done. Phase 3 waits for Task 0.6. |
 | 2026-10-01 | Task 0.4 done: Casey notified the player maintainers. |
 | 2026-10-01 | Tasks 1.2 and 3.1: [session-steps.md](session-steps.md) drafted, with 11 tasks and the salvage list. Each task ran on a copy of `main` at 253dbff45: its tests fail before its code and pass after it. Final code: 6756 B against 8501 B for `CmcdReporter`, and 7.35 µs against 15.23 µs for one request report. Open question for Casey: retry status 0 like a rejected request. |
+| 2026-10-02 | Casey chose the configuration types of `CmcdReporter` for the session: `CmcdRequestReportConfig` and `CmcdEventReportConfig`, reworked in 3.0.0. `CmcdSessionSettings` and `CmcdSessionEventTarget` are gone. The RFC and the plan changed with it. The plan was replayed on `main` at 0e45a1db5 (release 2.8.1), with the edits of b08f99cb1. Each task fails before its code and passes after it, and the root `npm test` passes. Final code: 6910 B against 8696 B for `CmcdReporter`, and 7.98 µs against 14.52 µs. |
 
 ## Links
 
