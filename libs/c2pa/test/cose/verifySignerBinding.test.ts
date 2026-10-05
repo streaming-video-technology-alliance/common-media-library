@@ -1,6 +1,12 @@
 import { verifySignerBinding } from '../../src/cose/verifySignerBinding.ts'
+import { Encoder } from 'cbor-x/encode'
 import { ok, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { before, describe, it } from 'node:test'
+import { createTestSigner } from '../testSigner.ts'
+import { createTestSessionKey, encodeSignerBinding, type TestSessionKey } from '../vsi/vsiTestUtils.ts'
+
+// Byte strings without CBOR tag 64.
+const CBOR = new Encoder({ tagUint8Array: false })
 
 describe('verifySignerBinding', () => {
 	// #region example
@@ -37,5 +43,35 @@ describe('verifySignerBinding', () => {
 		} catch (err) {
 			ok((err as Error).message.includes('Unsupported COSE key type'))
 		}
+	})
+
+	describe('Sig_structure payload (§18.25.2)', () => {
+		let sessionKey: TestSessionKey
+		let certificate: Uint8Array
+		let otherCertificate: Uint8Array
+
+		before(async () => {
+			sessionKey = await createTestSessionKey('key_001')
+			certificate = (await createTestSigner('Signer')).certificateDER
+			otherCertificate = (await createTestSigner('Other Signer')).certificateDER
+		})
+
+		it('accepts a binding signed over the certificate', async () => {
+			const binding = await encodeSignerBinding(sessionKey, certificate)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), true)
+		})
+
+		it('accepts a binding signed over the certificate encoded as a CBOR byte string', async () => {
+			const binding = await encodeSignerBinding(sessionKey, Uint8Array.from(CBOR.encode(certificate)))
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), true)
+		})
+
+		it('rejects a binding that embeds and signs another certificate', async () => {
+			const binding = await encodeSignerBinding(sessionKey, otherCertificate, true)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), false)
+		})
 	})
 })
