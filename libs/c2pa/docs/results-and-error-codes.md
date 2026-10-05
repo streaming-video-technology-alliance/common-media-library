@@ -76,6 +76,14 @@ for (const code of result.errorCodes) {
 }
 ```
 
+### Invalid Session Keys
+
+`validateC2paInitSegment` reports `SESSIONKEY_INVALID` if any session key in the `c2pa.session-keys` assertion is invalid (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. `sessionKeys` contains only valid session keys.
+
+An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
+
+Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions throw an error if the library cannot verify a session key, for example a key type that it does not support. If your code catches that error, check `errorCodes` instead.
+
 ## C2PA Status Codes
 
 The `C2paStatusCode` constants represent manifest integrity failures defined in C2PA specification sections 15 and 18.

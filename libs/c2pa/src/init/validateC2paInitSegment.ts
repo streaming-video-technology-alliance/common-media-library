@@ -113,6 +113,11 @@ type SessionKeyFields = {
 	signerBindingBytes: Uint8Array
 }
 
+type SessionKeysValidation = {
+	readonly sessionKeys: ValidatedSessionKey[]
+	readonly hasInvalidSessionKey: boolean
+}
+
 function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 	const keyData = entry as Record<string, unknown>
 
@@ -122,8 +127,6 @@ function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 
 	if (minSequenceNumber == null || validityPeriod == null || !createdAt) return null
 
-	if (isKeyExpired(createdAt, Number(validityPeriod))) return null
-
 	const coseKey = ensureDecodedCbor(keyData['key'])
 	const kid = extractKidHex(keyData, coseKey)
 	if (!kid) return null
@@ -131,17 +134,13 @@ function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 	const signerBindingRaw = keyData['signerBinding']
 	if (!signerBindingRaw) return null
 
-	try {
-		return {
-			minSequenceNumber: Number(minSequenceNumber),
-			validityPeriod: Number(validityPeriod),
-			createdAt,
-			kid,
-			coseKey,
-			signerBindingBytes: normalizeToUint8Array(signerBindingRaw),
-		}
-	} catch {
-		return null
+	return {
+		minSequenceNumber: Number(minSequenceNumber),
+		validityPeriod: Number(validityPeriod),
+		createdAt,
+		kid,
+		coseKey,
+		signerBindingBytes: normalizeToUint8Array(signerBindingRaw),
 	}
 }
 
@@ -152,17 +151,12 @@ async function verifyAndConvertKey(
 	const isBindingValid = await verifySignerBinding(fields.signerBindingBytes, fields.coseKey, certificate)
 	if (!isBindingValid) return null
 
-	try {
-		const jwk = convertCoseKeyToJwk(fields.coseKey)
-		return {
-			kid: fields.kid,
-			jwk,
-			minSequenceNumber: fields.minSequenceNumber,
-			validityPeriod: fields.validityPeriod,
-			createdAt: fields.createdAt,
-		}
-	} catch {
-		return null
+	return {
+		kid: fields.kid,
+		jwk: convertCoseKeyToJwk(fields.coseKey),
+		minSequenceNumber: fields.minSequenceNumber,
+		validityPeriod: fields.validityPeriod,
+		createdAt: fields.createdAt,
 	}
 }
 
@@ -170,20 +164,32 @@ async function validateSingleSessionKey(
 	entry: unknown,
 	certificate: Uint8Array,
 ): Promise<ValidatedSessionKey | null> {
-	const fields = extractSessionKeyFields(entry)
-	if (!fields) return null
-	return verifyAndConvertKey(fields, certificate)
+	try {
+		const fields = extractSessionKeyFields(entry)
+		if (!fields) return null
+		return await verifyAndConvertKey(fields, certificate)
+	} catch {
+		return null
+	}
+}
+
+function isWithinValidityPeriod(key: ValidatedSessionKey): boolean {
+	return !isKeyExpired(key.createdAt, key.validityPeriod)
 }
 
 async function validateSessionKeys(
 	assertion: C2paAssertion,
 	certificate: Uint8Array,
-): Promise<ValidatedSessionKey[]> {
+): Promise<SessionKeysValidation> {
 	const keyEntries = extractKeyArray(ensureDecodedCbor(assertion.data))
 	const results = await Promise.all(
 		keyEntries.map(entry => validateSingleSessionKey(entry, certificate)),
 	)
-	return results.filter((key): key is ValidatedSessionKey => key !== null)
+	const validKeys = results.filter((key): key is ValidatedSessionKey => key !== null)
+	return {
+		sessionKeys: validKeys.filter(isWithinValidityPeriod),
+		hasInvalidSessionKey: validKeys.length < results.length,
+	}
 }
 
 /**
@@ -195,6 +201,10 @@ async function validateSessionKeys(
  *
  * Only session keys with a valid signer binding and an unexpired validity period
  * are included in the result.
+ *
+ * The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID` if any session key is invalid
+ * (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
+ * or if its signer binding fails verification. An expired session key does not count as invalid.
  *
  * @param bytes - Raw init segment bytes
  * @returns Structured validation result (with `INIT_INVALID` error code if `mdat` box is present)
@@ -230,15 +240,16 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const sessionKeysAssertion = manifest.assertions.find(
 		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
 	)
-	const sessionKeys =
+	const { sessionKeys, hasInvalidSessionKey } =
 		sessionKeysAssertion && certificate
 			? await validateSessionKeys(sessionKeysAssertion, certificate)
-			: []
+			: { sessionKeys: [], hasInvalidSessionKey: false }
 
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
 	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
 
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
+	if (hasInvalidSessionKey) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
 	if (sessionKeys.length === 0 && merkleMaps === null) {
 		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
