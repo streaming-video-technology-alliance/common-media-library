@@ -174,13 +174,15 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
 
 Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result.
 
-The validation function handles key matching and expiration:
+The validation function handles key matching and the validity period:
 
 1. **Key matching**: `validateC2paSegment` matches the `kid` (key ID) from the COSE_Sign1 header against the available session keys.
-2. **Expiration**: A key expires when `createdAt + validityPeriod` is in the past. If the matched key has expired, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`.
+2. **Validity period**: A key is active from `createdAt` until `createdAt + validityPeriod` (C2PA section 18.25.2). If the matched key is not yet active or has expired, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`.
 3. **No match**: If no session key matches the `kid`, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
 
 > [!NOTE]
+> An init segment can contain a session key that becomes active later. `sessionKeys` includes that key. You do not need to validate the same init segment again when the key becomes active.
+>
 > When a session key expires during the stream, the signer is expected to produce a new init segment with new session keys. Validate the new init segment and use its `sessionKeys` for the following media segments.
 
 ## Sequence Number Validation

@@ -6,6 +6,7 @@ import { encode } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { buildInitMediaBoxes, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
+import { buildSessionKeysInitSegment, createTestSessionKey, type TestSessionKey } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -28,6 +29,40 @@ describe('validateC2paInitSegment', () => {
 		strictEqual(result.isValid, false)
 		strictEqual(result.manifest, null)
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+	})
+
+	describe('session keys (§18.25)', () => {
+		let init: Uint8Array
+		let key001: TestSessionKey
+		let key002: TestSessionKey
+
+		// The two keys of the §18.25.3 example: key_002 becomes active before key_001 expires.
+		before(async () => {
+			const signer = await createTestSigner()
+			key001 = await createTestSessionKey('key_001')
+			key002 = await createTestSessionKey('key_002')
+			init = await buildSessionKeysInitSegment(signer, [
+				{ key: key001, minSequenceNumber: 175, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3900 },
+				{ key: key002, minSequenceNumber: 1975, createdAt: '2025-07-29T11:00:00Z', validityPeriod: 3900 },
+			])
+		})
+
+		it('keeps a session key that is not yet active', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2025-07-29T10:30:00Z') })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex, key002.kidHex])
+			deepStrictEqual(result.errorCodes, [])
+		})
+
+		it('drops an expired session key', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2025-07-29T11:30:00Z') })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key002.kidHex])
+		})
 	})
 })
 
