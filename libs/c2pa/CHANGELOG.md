@@ -11,11 +11,11 @@ and this project adheres to
 ### Fixed
 
 - `validateC2paInitSegment` no longer drops session keys that are not yet active. C2PA section 18.25.2 makes each session key valid from its own `createdAt`. An init segment can contain the next session key before that key becomes active. Before this fix, `sessionKeys` did not include that key. Each segment signed with that key then failed with `LiveVideoStatusCode.SEGMENT_INVALID`.
-- `validateC2paSegment` now rejects a segment signed with a session key that is not yet active. The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`, the same code as for an expired session key.
+- `validateC2paSegment` reports `LiveVideoStatusCode.SEGMENT_INVALID` when the matched session key is not yet active or has expired. C2PA section 19.7.3 requires this code for a segment outside the validity period of its key. Before this fix, `validateC2paSegment` reported `LiveVideoStatusCode.SESSIONKEY_INVALID` for a session key that expired after init segment validation. If your code handles `SESSIONKEY_INVALID` from `validateC2paSegment`, handle `SEGMENT_INVALID` instead. Also update dashboards and alert rules that count `livevideo.sessionkey.invalid` for media segments. To check the validity period of a session key, see Session Key Lifecycle in the VSI/EMSG Validation guide.
 
 ### Changed
 
-- Validation guides: the Session Key Lifecycle section and the error code table describe session keys that are not yet active.
+- Validation guides: the Session Key Lifecycle section and the error code table describe the validity period of session keys.
 
 ## [1.3.0] - 2026-09-29
 

@@ -41,11 +41,13 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 |----------|-------|---------|
 | `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box or BMFF hash mismatch |
 | `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
-| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure (signature, hash, or key mismatch), a broken `c2pa.manifestId` chain, or a failed custom continuity validator |
+| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure (signature, hash, or key mismatch), a session key outside its validity period, a broken `c2pa.manifestId` chain, or a failed custom continuity validator |
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
-| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | Session key invalid, expired, or not yet active |
+| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | Init segment has no valid session key: the keys are absent, invalid, or expired |
+
+Versions 1.3.0 and earlier report `SESSIONKEY_INVALID` from `validateC2paSegment` for a session key that expired after init segment validation. That code does not match C2PA section 19.7.3. To check the validity period of a session key, see [Session Key Lifecycle](vsi-validation.md#session-key-lifecycle).
 
 Example of handling specific error codes:
 
@@ -55,10 +57,10 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 for (const code of result.errorCodes) {
   switch (code) {
     case LiveVideoStatusCode.SEGMENT_INVALID:
-      // Cryptographic check failed (signature, hash, or key)
+      // Signature, hash, or session key check failed
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
-      // Session key expired, may need a fresh init segment
+      // Init segment has no valid session key
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
       // Sequence number or stream ID problem

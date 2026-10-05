@@ -16,9 +16,11 @@ describe('validateC2paSegment', () => {
 	})
 	// #endregion example
 
-	describe('session key validity period (§18.25.2)', () => {
+	describe('session key validity period (§18.25.2, §19.7.3)', () => {
 		const INIT_VALIDATION_TIME = Date.parse('2025-07-29T10:30:00Z')
 		const KEY_002_CREATED_AT = '2025-07-29T11:00:00Z'
+		// KEY_002_CREATED_AT + 3900 seconds
+		const KEY_002_EXPIRES_AT = '2025-07-29T12:05:00Z'
 		let init: Uint8Array
 		let segment: Uint8Array
 
@@ -46,7 +48,7 @@ describe('validateC2paSegment', () => {
 			const validated = await validateSegmentAt(context, Date.parse(KEY_002_CREATED_AT) - 1)
 
 			strictEqual(validated?.result.isValid, false)
-			deepStrictEqual(validated?.result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+			deepStrictEqual(validated?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
 		})
 
 		it('accepts the same segment once the session key is active', async (context) => {
@@ -54,6 +56,13 @@ describe('validateC2paSegment', () => {
 
 			strictEqual(validated?.result.isValid, true)
 			deepStrictEqual(validated?.result.errorCodes, [])
+		})
+
+		it('rejects a segment signed with an expired session key', async (context) => {
+			const validated = await validateSegmentAt(context, Date.parse(KEY_002_EXPIRES_AT) + 1)
+
+			strictEqual(validated?.result.isValid, false)
+			deepStrictEqual(validated?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
 		})
 	})
 })
