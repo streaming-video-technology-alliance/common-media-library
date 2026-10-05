@@ -100,12 +100,13 @@ export async function validateC2paSegment(
 	// §19.7.3 requires comparing against the segment's presentation time, but the
 	// VSI map does not carry it. We compare against `now` as an approximation,
 	// which is accurate for live streams validated in real time.
+	const keyNotYetActive = new Date() < new Date(sessionKey.createdAt)
 	const keyExpired = isKeyExpired(sessionKey.createdAt, sessionKey.validityPeriod)
 
 	const codes = new Set<LiveVideoStatusCode>()
 	if (!signatureValid || !hashValid || !sequenceAboveMin) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
 	if (!sequenceResult.isValid) codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
-	if (keyExpired) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	if (keyNotYetActive || keyExpired) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	const errorCodes = [...codes]
 
 	return {

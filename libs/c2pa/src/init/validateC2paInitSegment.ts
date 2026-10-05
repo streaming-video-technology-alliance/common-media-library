@@ -122,8 +122,7 @@ function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 
 	if (minSequenceNumber == null || validityPeriod == null || !createdAt) return null
 
-	const isNotYetActive = new Date() < new Date(createdAt)
-	if (isNotYetActive || isKeyExpired(createdAt, Number(validityPeriod))) return null
+	if (isKeyExpired(createdAt, Number(validityPeriod))) return null
 
 	const coseKey = ensureDecodedCbor(keyData['key'])
 	const kid = extractKidHex(keyData, coseKey)

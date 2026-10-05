@@ -130,7 +130,7 @@ function buildJumd(label: string): Uint8Array {
 	return buildBox('jumd', data)
 }
 
-function buildJumb(label: string, ...content: readonly Uint8Array[]): Uint8Array {
+export function buildJumb(label: string, ...content: readonly Uint8Array[]): Uint8Array {
 	return buildBox('jumb', concatBytes(buildJumd(label), ...content))
 }
 
