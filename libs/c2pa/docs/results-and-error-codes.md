@@ -45,7 +45,7 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
-| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | Init segment has no valid session key: the keys are absent, invalid, or expired |
+| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the init segment has no valid session key (the keys are absent or expired) |
 
 Versions 1.3.0 and earlier report `SESSIONKEY_INVALID` from `validateC2paSegment` for a session key that expired after init segment validation. That code does not match C2PA section 19.7.3. To check the validity period of a session key, see [Session Key Lifecycle](vsi-validation.md#session-key-lifecycle).
 
@@ -60,7 +60,7 @@ for (const code of result.errorCodes) {
       // Signature, hash, or session key check failed
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
-      // Init segment has no valid session key
+      // Init segment has an invalid session key or no valid session key
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
       // Sequence number or stream ID problem
