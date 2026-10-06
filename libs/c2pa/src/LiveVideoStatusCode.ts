@@ -15,7 +15,7 @@ export const LiveVideoStatusCode = {
 	INIT_INVALID: 'livevideo.init.invalid',
 	/** C2PA Manifest Box failed standard validation (§19.7.1) */
 	MANIFEST_INVALID: 'livevideo.manifest.invalid',
-	/** Segment structure invalid: missing Manifest Box/emsg, signature/hash/key failure (§19.7) */
+	/** Segment invalid: missing Manifest Box/emsg, signature/hash/key failure, or session key outside its validity period (§19.7) */
 	SEGMENT_INVALID: 'livevideo.segment.invalid',
 	/**
 	 * Live video assertion field invalid: sequenceNumber or streamId mismatch

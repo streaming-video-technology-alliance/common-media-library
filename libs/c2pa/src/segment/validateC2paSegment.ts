@@ -104,9 +104,10 @@ export async function validateC2paSegment(
 	const keyExpired = isKeyExpired(sessionKey.createdAt, sessionKey.validityPeriod)
 
 	const codes = new Set<LiveVideoStatusCode>()
-	if (!signatureValid || !hashValid || !sequenceAboveMin) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
+	if (!signatureValid || !hashValid || !sequenceAboveMin || keyNotYetActive || keyExpired) {
+		codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
+	}
 	if (!sequenceResult.isValid) codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
-	if (keyNotYetActive || keyExpired) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	const errorCodes = [...codes]
 
 	return {

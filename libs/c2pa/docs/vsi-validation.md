@@ -179,8 +179,27 @@ Session keys are extracted from the `c2pa.session-keys` assertion in the init se
 The validation function handles key matching and the validity period:
 
 1. **Key matching**: `validateC2paSegment` matches the `kid` (key ID) from the COSE_Sign1 header against the available session keys.
-2. **Validity period**: A key is active from `createdAt` until `createdAt + validityPeriod` (C2PA section 18.25.2). If the matched key is not yet active or has expired, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`.
+2. **Validity period**: A key is active from `createdAt` until `createdAt + validityPeriod` (C2PA section 18.25.2). If the matched key is not yet active or has expired, the result includes `LiveVideoStatusCode.SEGMENT_INVALID` (C2PA section 19.7.3).
 3. **No match**: If no session key matches the `kid`, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
+
+`SEGMENT_INVALID` is also the code for signature and hash failures. If you need to know whether the validity period caused the failure, check the matched key:
+
+```typescript
+import type { SegmentValidationResult, ValidatedSessionKey } from '@svta/cml-c2pa'
+
+function isOutsideValidityPeriod(
+  result: SegmentValidationResult,
+  sessionKeys: readonly ValidatedSessionKey[],
+): boolean {
+  const key = sessionKeys.find(k => k.kid === result.kidHex)
+  if (!key) return false
+
+  const now = Date.now()
+  const activeFrom = Date.parse(key.createdAt)
+  const activeUntil = activeFrom + key.validityPeriod * 1000
+  return now < activeFrom || now > activeUntil
+}
+```
 
 > [!NOTE]
 > An init segment can contain a session key that becomes active later. `sessionKeys` includes that key. You do not need to validate the same init segment again when the key becomes active.
