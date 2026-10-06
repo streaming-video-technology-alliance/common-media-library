@@ -25,7 +25,7 @@ const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
 
 if (!init.isValid) {
-  console.error('Init segment validation failed:', init.errorCodes)
+  throw new Error(`Init segment validation failed: ${init.errorCodes.join(', ')}`)
 }
 ```
 

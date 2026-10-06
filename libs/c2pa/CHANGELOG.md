@@ -29,6 +29,7 @@ and this project adheres to
 - VSI/EMSG Validation guide: the Session Key Lifecycle section describes the validity period of session keys. It also lists the two accepted forms of the signer binding payload. The Sequence Number Validation section states the unsigned integer rule and the supported range.
 - Results and Error Codes guide: the error code table describes the validity period of session keys. The new Invalid Session Keys section describes invalid session keys and the supported range of their fields. The VSI/EMSG Validation guide links to that section.
 - Manifest Box Validation guide: the Result Fields table states when `sequenceNumber` is `null`.
+- README and VSI/EMSG Validation guide: the VSI/EMSG examples check `isValid` before they use `sessionKeys`. If `isValid` is `false`, `sessionKeys` can still contain session keys. Do not use these session keys.
 
 ## [1.3.0] - 2026-09-29
 
