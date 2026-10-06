@@ -21,6 +21,36 @@ describe('decodeVsiMap', () => {
 	})
 	// #endregion example
 
+	function encodeVsiMapWithSequenceNumber(sequenceNumber: unknown): Uint8Array {
+		return new Uint8Array(encode({
+			sequenceNumber,
+			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
+			manifestId: 'urn:c2pa:12345',
+		}))
+	}
+
+	it('decodes a sequenceNumber of 2^32 or more to a number', () => {
+		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		const result = decodeVsiMap(encodeVsiMapWithSequenceNumber(BigInt(2 ** 32)))
+		strictEqual(result.sequenceNumber, 2 ** 32)
+	})
+
+	// §19.4.2: sequenceNumber is a uint.
+	const NONCONFORMING_SEQUENCE_NUMBERS: readonly (readonly [string, unknown])[] = [
+		['a text string', '7'],
+		['a negative integer', -1],
+		['a negative integer below -2^32', BigInt(-(2 ** 32)) - BigInt(1)],
+		['a fraction', 0.5],
+		['NaN', NaN],
+		['Infinity', Infinity],
+	]
+
+	for (const [description, sequenceNumber] of NONCONFORMING_SEQUENCE_NUMBERS) {
+		it(`throws when sequenceNumber is ${description}`, () => {
+			throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber(sequenceNumber)), /sequenceNumber/)
+		})
+	}
+
 	it('throws for non-object CBOR input', () => {
 		// CBOR integer 42 = 0x18 0x2a
 		throws(() => decodeVsiMap(new Uint8Array([0x18, 0x2a])), /VSI map/)

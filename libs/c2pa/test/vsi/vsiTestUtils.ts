@@ -134,7 +134,7 @@ export async function buildSessionKeysInitSegment(signer: TestSigner, entries: r
 }
 
 // VSI emsg box (§19.4.2) whose message data is a verifiable-segment-info signed with `key`.
-async function buildVsiEmsgBox(key: TestSessionKey, sequenceNumber: number, hash: Uint8Array): Promise<Uint8Array> {
+async function buildVsiEmsgBox(key: TestSessionKey, sequenceNumber: number | bigint, hash: Uint8Array): Promise<Uint8Array> {
 	const segmentInfoMap = {
 		sequenceNumber,
 		bmffHash: { exclusions: VSI_EXCLUSIONS, alg: 'sha256', hash },
@@ -150,7 +150,8 @@ async function buildVsiEmsgBox(key: TestSessionKey, sequenceNumber: number, hash
 		timescale: 1000,
 		presentationTimeDelta: 0,
 		eventDuration: 2000,
-		id: sequenceNumber,
+		// The emsg version 0 id field has 32 bits.
+		id: Number(sequenceNumber) % 2 ** 32,
 		messageData: Uint8Array.from(CBOR.encode(verifiableSegmentInfo)),
 	}).buffer)
 }
@@ -158,9 +159,10 @@ async function buildVsiEmsgBox(key: TestSessionKey, sequenceNumber: number, hash
 /**
  * Builds a media segment with a VSI emsg box signed with `key`. The bmffHash covers the
  * moof and mdat boxes with 8-byte box-offset prefixes (§18.6.2).
+ * A BigInt `sequenceNumber` encodes as a CBOR unsigned integer of 8 bytes.
  */
-export async function buildVsiSegment(key: TestSessionKey, sequenceNumber: number): Promise<Uint8Array> {
-	const media = buildMediaContent(sequenceNumber)
+export async function buildVsiSegment(key: TestSessionKey, sequenceNumber: number | bigint): Promise<Uint8Array> {
+	const media = buildMediaContent(Number(sequenceNumber))
 	// The emsg box has the same size for every hash value, so a placeholder gives the final media box offsets.
 	const placeholder = await buildVsiEmsgBox(key, sequenceNumber, new Uint8Array(SHA256_BYTES))
 	const hash = await computeBmffHash(concatBytes(placeholder, media), { exclusions: VSI_EXCLUSIONS, offsetPrefixSize: 8 })

@@ -1,6 +1,6 @@
 import { decode } from 'cbor-x/decode'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
-import { normalizeAlgorithmName } from '../utils.ts'
+import { asUnsignedInteger, normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'
 
 
@@ -25,8 +25,8 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 		throw new Error('VSI map must be a CBOR map')
 	}
 
-	const sequenceNumber = raw['sequenceNumber']
-	if (typeof sequenceNumber !== 'number') throw new Error('VSI map missing or invalid sequenceNumber')
+	const sequenceNumber = asUnsignedInteger(raw['sequenceNumber'])
+	if (sequenceNumber === null) throw new Error('VSI map missing or invalid sequenceNumber')
 
 	const bmffHashRaw = raw['bmffHash'] as Record<string, unknown> | undefined
 	if (!bmffHashRaw || typeof bmffHashRaw !== 'object') throw new Error('VSI map missing bmffHash')

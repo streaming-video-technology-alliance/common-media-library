@@ -208,7 +208,9 @@ function isOutsideValidityPeriod(
 
 ## Sequence Number Validation
 
-Each media segment has an increasing sequence number in its VSI map. The `sequenceResult` field is a discriminated union on `reason`, with `SequenceValidationReason` constants:
+Each media segment has an increasing sequence number in its VSI map. The sequence number must be an unsigned integer (C2PA section 19.4.2). If it is not, `validateC2paSegment` throws an error. The result stores the sequence number as a JavaScript number. A value above `Number.MAX_SAFE_INTEGER` (2^53 - 1) loses precision.
+
+The `sequenceResult` field is a discriminated union on `reason`, with `SequenceValidationReason` constants:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'

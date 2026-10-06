@@ -89,6 +89,14 @@ export function asInteger(value: unknown): number | null {
 	return typeof value === 'number' && Number.isInteger(value) ? value : null
 }
 
+// A CBOR uint as a number, or null. cbor-x decodes a uint of 2^32 or more to a BigInt.
+// Number() rounds a BigInt above 2^53 - 1.
+/** @internal */
+export function asUnsignedInteger(value: unknown): number | null {
+	if (typeof value === 'bigint') return value >= 0 ? Number(value) : null
+	return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : null
+}
+
 function isC2paUuid(usertype: readonly number[]): boolean {
 	return matchesUuid(usertype, C2PA_MANIFEST_UUID) || matchesUuid(usertype, JUMBF_UUID)
 }
