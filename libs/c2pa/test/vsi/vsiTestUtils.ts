@@ -55,6 +55,8 @@ export type TestSessionKeyEntry = {
 	readonly omitCreatedAtTag?: boolean
 	/** Seconds from `createdAt`. */
 	readonly validityPeriod: number
+	/** Adds a `kid` field next to the COSE key. §18.25.2 does not define this field. */
+	readonly topLevelKid?: Uint8Array
 }
 
 // COSE_Sign1_Tagged (RFC 9052 §4.2) with an ES256 protected header. A detached payload is nil in the structure.
@@ -103,6 +105,7 @@ async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: U
 		createdAt: entry.omitCreatedAtTag ? entry.createdAt : new Tag(entry.createdAt, CBOR_TAG_DATE_TIME),
 		validityPeriod: entry.validityPeriod,
 		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, true),
+		...(entry.topLevelKid && { kid: entry.topLevelKid }),
 	}
 }
 

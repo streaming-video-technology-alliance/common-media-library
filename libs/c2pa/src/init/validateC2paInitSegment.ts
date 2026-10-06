@@ -48,18 +48,13 @@ function ensureDecodedCbor(value: unknown): unknown {
 	return value
 }
 
-// §18.25.2: CBOR tag 0 (RFC 3339 date-time), which cbor-x decodes to a Date
+// §18.25.2: CBOR tag 0 (RFC 3339 date-time). cbor-x decodes tags 0 and 1 to a Date, so tag 1 also passes.
 function parseCreatedAt(value: unknown): string | null {
 	return value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString() : null
 }
 
-function extractKidHex(keyData: Record<string, unknown>, coseKey: unknown): string | null {
-	const kid = keyData['kid']
-	if (kid instanceof Uint8Array) return bytesToHex(kid)
-	if (typeof kid === 'string') return kid
-	if (Array.isArray(kid) && kid.length > 0) return bytesToHex(new Uint8Array(kid as number[]))
-
-	// Fallback: COSE key field 2 is the key ID per RFC 9052
+// §18.25.2: the COSE key includes the kid (COSE key label 2, RFC 9052)
+function extractKidHex(coseKey: unknown): string | null {
 	const coseKeyLike = coseKey as Map<number, unknown> | Record<number, unknown>
 	const coseKid = coseKeyLike instanceof Map ? coseKeyLike.get(COSE_KEY_ID_LABEL) : coseKeyLike[COSE_KEY_ID_LABEL]
 	if (coseKid instanceof Uint8Array) return bytesToHex(coseKid)
@@ -126,7 +121,7 @@ function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 	if (minSequenceNumber === null || validityPeriod === null || !createdAt) return null
 
 	const coseKey = ensureDecodedCbor(keyData['key'])
-	const kid = extractKidHex(keyData, coseKey)
+	const kid = extractKidHex(coseKey)
 	if (!kid) return null
 
 	const signerBindingRaw = keyData['signerBinding']
@@ -200,9 +195,10 @@ async function validateSessionKeys(
  * Only session keys with a valid signer binding and an unexpired validity period
  * are included in the result.
  *
- * The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID` if any session key is invalid
- * (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
- * or if its signer binding fails verification. An expired session key does not count as invalid.
+ * The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID` if the function finds an invalid
+ * session key (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
+ * or if its signer binding fails verification. The function does not check every rule of section 18.25.2.
+ * An expired session key does not count as invalid.
  *
  * @param bytes - Raw init segment bytes
  * @returns Structured validation result (with `INIT_INVALID` error code if `mdat` box is present)

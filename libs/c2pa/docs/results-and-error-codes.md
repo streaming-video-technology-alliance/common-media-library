@@ -80,13 +80,13 @@ for (const code of result.errorCodes) {
 
 ### Invalid Session Keys
 
-`validateC2paInitSegment` reports `SESSIONKEY_INVALID` if any session key in the `c2pa.session-keys` assertion is invalid (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. `sessionKeys` contains only valid session keys.
+`validateC2paInitSegment` reports `SESSIONKEY_INVALID` if it finds an invalid session key in the `c2pa.session-keys` assertion (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. The library does not check every rule of section 18.25.2. `sessionKeys` contains only the session keys that pass these checks.
 
-`minSequenceNumber` and `validityPeriod` must be unsigned integers up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). `createdAt` must be a valid date with CBOR tag 0. The library does not check the RFC 3339 syntax of `createdAt`.
+The COSE key must include a `kid` (label 2). `minSequenceNumber` and `validityPeriod` must be unsigned integers up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). `createdAt` must be a valid date with a CBOR date tag. The CBOR decoder converts both tag 0 and tag 1 to a `Date`, so the library cannot require tag 0. The library also does not check the RFC 3339 syntax of `createdAt`.
 
 An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
 
-Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions throw an error if the library cannot verify a session key, for example a key type that it does not support. If your code catches that error, check `errorCodes` instead.
+Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions also accept a `kid` outside the COSE key. They throw an error if the library cannot verify a session key, for example a key type that it does not support. If your code catches that error, check `errorCodes` instead.
 
 ## C2PA Status Codes
 

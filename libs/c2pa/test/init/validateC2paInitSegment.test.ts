@@ -386,6 +386,18 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, false)
 	})
 
+	it('fails with SESSIONKEY_INVALID if a session key has a kid only outside its COSE key', async (context) => {
+		const keyWithoutKid = { ...key002, coseKey: new Map([...key002.coseKey].filter(([label]) => label !== COSE_KEY_KID)) }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(keyWithoutKid), topLevelKid: key002.kid }])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
 	// Each entry breaks one §18.25.2 rule for a session key field.
 	const NONCONFORMING_FIELDS: readonly (readonly [string, Readonly<Record<string, unknown>>])[] = [
 		['a createdAt that is not a date', { createdAt: 'not a date' }],
