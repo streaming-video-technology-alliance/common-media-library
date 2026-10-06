@@ -63,6 +63,18 @@ describe('validateC2paInitSegment', () => {
 
 			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key002.kidHex])
 		})
+
+		it('keeps the session key of an init segment from an independent signer', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-09-21T00:00:00Z') })
+			const bytes = new Uint8Array(
+				readFileSync(new URL('../fixtures/vsi_init_with_signer_binding.mp4', import.meta.url)),
+			)
+
+			const result = await validateC2paInitSegment(bytes)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), ['ad0c9403ce98540f9569542619058da3'])
+			deepStrictEqual(result.errorCodes, [])
+		})
 	})
 })
 

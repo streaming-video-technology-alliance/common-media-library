@@ -1,6 +1,6 @@
 import { writeEmsg } from '@svta/cml-iso-bmff'
 import { Tag } from 'cbor-x'
-import { Encoder, encode } from 'cbor-x/encode'
+import { Encoder } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { buildSigStructure } from '../../src/cose/buildSigStructure.ts'
 import { bytesToHex, JUMBF_UUID } from '../../src/utils.ts'
@@ -85,16 +85,22 @@ export async function createTestSessionKey(kid: string): Promise<TestSessionKey>
 	}
 }
 
+/**
+ * Encodes a `signerBinding` (§18.25.2): a COSE_Sign1_Tagged signed with the session key over `payload`.
+ * The payload is detached, unless `embedded` is `true`.
+ */
+export async function encodeSignerBinding(key: TestSessionKey, payload: Uint8Array, embedded: boolean = false): Promise<Uint8Array> {
+	return Uint8Array.from(CBOR.encode(await signCoseSign1(key.privateKey, new Map(), payload, !embedded)))
+}
+
 // The signerBinding is a detached COSE_Sign1 over the end-entity certificate of the signer (§18.25.2).
 async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: Uint8Array): Promise<Record<string, unknown>> {
-	// The payload bytes that verifySignerBinding verifies: cbor-x encode() of the certificate.
-	const signerBindingPayload = Uint8Array.from(encode(certificateDER))
 	return {
 		key: entry.key.coseKey,
 		minSequenceNumber: entry.minSequenceNumber,
 		createdAt: new Tag(entry.createdAt, CBOR_TAG_DATE_TIME),
 		validityPeriod: entry.validityPeriod,
-		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), signerBindingPayload, true),
+		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, true),
 	}
 }
 

@@ -12,10 +12,12 @@ and this project adheres to
 
 - `validateC2paInitSegment` no longer drops session keys that are not yet active. C2PA section 18.25.2 makes each session key valid from its own `createdAt`. An init segment can contain the next session key before that key becomes active. Before this fix, `sessionKeys` did not include that key. Each segment signed with that key then failed with `LiveVideoStatusCode.SEGMENT_INVALID`.
 - `validateC2paSegment` now rejects a segment signed with a session key that is not yet active. The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`, the same code as for an expired session key.
+- `validateC2paInitSegment` now accepts the session keys of real signers. Before this fix, the signer binding check (C2PA section 18.25.2) required the certificate with CBOR tag 64 as the signed payload. No known signer adds this tag. So `sessionKeys` was empty, and the result included `LiveVideoStatusCode.SESSIONKEY_INVALID`. Each segment then failed with `LiveVideoStatusCode.SEGMENT_INVALID`. The check now accepts two forms of the signed payload: the certificate itself, or the certificate as a CBOR byte string. The text of section 18.25.2 allows both forms.
 
 ### Changed
 
 - Validation guides: the Session Key Lifecycle section and the error code table describe session keys that are not yet active.
+- VSI validation guide: the Session Key Lifecycle section lists the two accepted forms of the signer binding payload.
 
 ## [1.3.0] - 2026-09-29
 
