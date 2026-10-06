@@ -54,6 +54,8 @@ for (const key of init.sessionKeys) {
 }
 ```
 
+If a session key is invalid, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`. See [Invalid Session Keys](results-and-error-codes.md#invalid-session-keys).
+
 Each `ValidatedSessionKey` contains:
 
 | Field | Type | Description |
@@ -172,7 +174,7 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
 
 ## Session Key Lifecycle
 
-Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result.
+Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result. The signer binding verification accepts two forms of the signed payload: the end-entity certificate itself, or the certificate as a CBOR byte string. The text of C2PA section 18.25.2 allows both forms.
 
 The validation function handles key matching and the validity period:
 

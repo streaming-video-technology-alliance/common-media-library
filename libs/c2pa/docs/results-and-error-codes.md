@@ -78,6 +78,14 @@ for (const code of result.errorCodes) {
 }
 ```
 
+### Invalid Session Keys
+
+`validateC2paInitSegment` reports `SESSIONKEY_INVALID` if any session key in the `c2pa.session-keys` assertion is invalid (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. `sessionKeys` contains only valid session keys.
+
+An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
+
+Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions throw an error if the library cannot verify a session key, for example a key type that it does not support. If your code catches that error, check `errorCodes` instead.
+
 ## C2PA Status Codes
 
 The `C2paStatusCode` constants represent manifest integrity failures defined in C2PA specification sections 15 and 18.
@@ -102,7 +110,7 @@ Versions 1.2.0 and earlier report `claim.signature.mismatch` for `CLAIM_SIGNATUR
 > [!NOTE]
 > `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes`, which check manifest integrity. They do not appear in `SegmentValidationResult.errorCodes`: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only `LiveVideoStatusCode`.
 >
-> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. `LiveVideoStatusCode.SESSIONKEY_INVALID` is not reported when `merkleMaps` is not empty, because VOD Merkle segments do not use session keys.
+> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. VOD Merkle segments do not use session keys. When `merkleMaps` is not empty, the result does not report `LiveVideoStatusCode.SESSIONKEY_INVALID` for missing or expired session keys. An invalid session key still causes `SESSIONKEY_INVALID`. See [Invalid Session Keys](#invalid-session-keys).
 
 ## Working with Manifest Data
 

@@ -12,10 +12,15 @@ and this project adheres to
 
 - `validateC2paInitSegment` no longer drops session keys that are not yet active. C2PA section 18.25.2 makes each session key valid from its own `createdAt`. An init segment can contain the next session key before that key becomes active. Before this fix, `sessionKeys` did not include that key. Each segment signed with that key then failed with `LiveVideoStatusCode.SEGMENT_INVALID`.
 - `validateC2paSegment` reports `LiveVideoStatusCode.SEGMENT_INVALID` when the matched session key is not yet active or has expired. C2PA section 19.7.3 requires this code for a segment outside the validity period of its key. Before this fix, `validateC2paSegment` reported `LiveVideoStatusCode.SESSIONKEY_INVALID` for a session key that expired after init segment validation. If your code handles `SESSIONKEY_INVALID` from `validateC2paSegment`, handle `SEGMENT_INVALID` instead. Also update dashboards and alert rules that count `livevideo.sessionkey.invalid` for media segments. To check the validity period of a session key, see Session Key Lifecycle in the VSI/EMSG Validation guide.
+- `validateC2paInitSegment` now accepts the session keys of real signers. Before this fix, the signer binding check (C2PA section 18.25.2) required the certificate with CBOR tag 64 as the signed payload. No known signer adds this tag. So `sessionKeys` was empty, and the result included `LiveVideoStatusCode.SESSIONKEY_INVALID`. Each segment then failed with `LiveVideoStatusCode.SEGMENT_INVALID`. The check now accepts two forms of the signed payload: the certificate itself, or the certificate as a CBOR byte string. The text of section 18.25.2 allows both forms.
+- `validateC2paInitSegment` now fails with `LiveVideoStatusCode.SESSIONKEY_INVALID` if any session key in the `c2pa.session-keys` assertion is invalid (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. Before this fix, the function excluded the invalid key from `sessionKeys`. It returned `isValid: true` if another session key was valid. An expired session key does not count as invalid. If an init segment fails after this fix, the signer produced an invalid session key. Each session key needs a `kid` in its COSE key and the `minSequenceNumber`, `createdAt`, and `validityPeriod` fields. Its signer binding must verify.
+- `validateC2paInitSegment` no longer throws an error if it cannot verify a session key, for example a key type that the library does not support. The function now returns a result with `LiveVideoStatusCode.SESSIONKEY_INVALID`. If your code catches that error, check `errorCodes`.
 
 ### Changed
 
 - Validation guides: the Session Key Lifecycle section and the error code table describe the validity period of session keys.
+- VSI validation guide: the Session Key Lifecycle section lists the two accepted forms of the signer binding payload.
+- Results and Error Codes guide: new Invalid Session Keys section. The VSI validation guide links to that section.
 
 ## [1.3.0] - 2026-09-29
 
