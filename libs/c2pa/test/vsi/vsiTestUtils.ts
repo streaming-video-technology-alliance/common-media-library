@@ -51,6 +51,8 @@ export type TestSessionKeyEntry = {
 	readonly minSequenceNumber: number
 	/** RFC 3339 date-time, encoded with CBOR tag 0. */
 	readonly createdAt: string
+	/** Encodes `createdAt` as a text string without CBOR tag 0. */
+	readonly omitCreatedAtTag?: boolean
 	/** Seconds from `createdAt`. */
 	readonly validityPeriod: number
 }
@@ -98,7 +100,7 @@ async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: U
 	return {
 		key: entry.key.coseKey,
 		minSequenceNumber: entry.minSequenceNumber,
-		createdAt: new Tag(entry.createdAt, CBOR_TAG_DATE_TIME),
+		createdAt: entry.omitCreatedAtTag ? entry.createdAt : new Tag(entry.createdAt, CBOR_TAG_DATE_TIME),
 		validityPeriod: entry.validityPeriod,
 		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, true),
 	}
