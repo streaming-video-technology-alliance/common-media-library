@@ -289,3 +289,109 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID), false)
 	})
 })
+
+describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => {
+	const COSE_KEY_KTY = 1
+	const COSE_KEY_KID = 2
+	const COSE_KTY_RSA = 3
+	const NOW = Date.parse('2025-07-29T10:30:00Z')
+
+	let signer: TestSigner
+	let key001: TestSessionKey
+	let key002: TestSessionKey
+
+	before(async () => {
+		signer = await createTestSigner()
+		key001 = await createTestSessionKey('key_001')
+		key002 = await createTestSessionKey('key_002')
+	})
+
+	function activeEntry(key: TestSessionKey) {
+		return { key, minSequenceNumber: 0, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 }
+	}
+
+	function expiredEntry(key: TestSessionKey) {
+		return { key, minSequenceNumber: 0, createdAt: '2025-07-29T09:00:00Z', validityPeriod: 600 }
+	}
+
+	it('accepts an assertion in which every session key is valid', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(key002)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex, key002.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('excludes an expired session key from sessionKeys without SESSIONKEY_INVALID', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(key002)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('fails with SESSIONKEY_INVALID if a session key has no minSequenceNumber value', async (context) => {
+		// The assertion encodes minSequenceNumber as CBOR undefined.
+		const entryWithoutMinSequenceNumber = { ...activeEntry(key002), minSequenceNumber: undefined as unknown as number }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), entryWithoutMinSequenceNumber])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if a session key has no kid', async (context) => {
+		const keyWithoutKid = { ...key002, coseKey: new Map([...key002.coseKey].filter(([label]) => label !== COSE_KEY_KID)) }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(keyWithoutKid)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key does not verify', async (context) => {
+		// The private key of key_001 signs the signerBinding of key_002.
+		const keyWithWrongBinding = { ...key002, privateKey: key001.privateKey }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(keyWithWrongBinding)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.sessionKeys.some(key => key.kid === key002.kidHex), false)
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if the signerBinding of an expired session key does not verify', async (context) => {
+		const keyWithWrongBinding = { ...key002, privateKey: key001.privateKey }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(keyWithWrongBinding)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key cannot be verified', async (context) => {
+		// The library does not support COSE key type 3 (RSA).
+		const keyWithRsaType = { ...key002, coseKey: new Map([...key002.coseKey, [COSE_KEY_KTY, COSE_KTY_RSA]]) }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(keyWithRsaType)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+})

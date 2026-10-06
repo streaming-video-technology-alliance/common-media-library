@@ -54,6 +54,8 @@ for (const key of init.sessionKeys) {
 }
 ```
 
+If a session key is invalid, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`. See [Invalid Session Keys](results-and-error-codes.md#invalid-session-keys).
+
 Each `ValidatedSessionKey` contains:
 
 | Field | Type | Description |
