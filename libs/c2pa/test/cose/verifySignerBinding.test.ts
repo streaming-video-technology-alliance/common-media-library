@@ -25,8 +25,8 @@ describe('verifySignerBinding', () => {
 			[-2, xBytes],
 		])
 
-		// A minimal COSE_Sign1 with empty signature (will fail verification)
-		const minimal = new Uint8Array([0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
+		// A minimal COSE_Sign1 with a detached (nil) payload and an empty signature (will fail verification)
+		const minimal = new Uint8Array([0x84, 0x40, 0xa0, 0xf6, 0x40])
 		const certBytes = new Uint8Array([0x30, 0x03, 0x01, 0x01, 0xff])
 
 		const isValid = await verifySignerBinding(minimal, sessionCoseKey, certBytes)
@@ -48,11 +48,13 @@ describe('verifySignerBinding', () => {
 	describe('Sig_structure payload (§18.25.2)', () => {
 		let sessionKey: TestSessionKey
 		let certificate: Uint8Array
+		let certificateByteString: Uint8Array
 		let otherCertificate: Uint8Array
 
 		before(async () => {
 			sessionKey = await createTestSessionKey('key_001')
 			certificate = (await createTestSigner('Signer')).certificateDER
+			certificateByteString = Uint8Array.from(CBOR.encode(certificate))
 			otherCertificate = (await createTestSigner('Other Signer')).certificateDER
 		})
 
@@ -63,13 +65,56 @@ describe('verifySignerBinding', () => {
 		})
 
 		it('accepts a binding signed over the certificate encoded as a CBOR byte string', async () => {
-			const binding = await encodeSignerBinding(sessionKey, Uint8Array.from(CBOR.encode(certificate)))
+			const binding = await encodeSignerBinding(sessionKey, certificateByteString)
 
 			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), true)
 		})
 
+		it('accepts a binding with an empty payload', async () => {
+			// The session keys example of §18.25.3 has an empty byte string as the payload.
+			const binding = await encodeSignerBinding(sessionKey, certificate, new Uint8Array(0))
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), true)
+		})
+
+		it('accepts a binding that embeds the signed certificate', async () => {
+			const binding = await encodeSignerBinding(sessionKey, certificate, certificate)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), true)
+		})
+
+		it('accepts a binding that embeds the signed certificate encoded as a CBOR byte string', async () => {
+			const binding = await encodeSignerBinding(sessionKey, certificateByteString, certificateByteString)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), true)
+		})
+
+		it('rejects a binding signed over another certificate', async () => {
+			const binding = await encodeSignerBinding(sessionKey, otherCertificate)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), false)
+		})
+
 		it('rejects a binding that embeds and signs another certificate', async () => {
-			const binding = await encodeSignerBinding(sessionKey, otherCertificate, true)
+			const binding = await encodeSignerBinding(sessionKey, otherCertificate, otherCertificate)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), false)
+		})
+
+		it('rejects a binding signed over the certificate that embeds another certificate', async () => {
+			const binding = await encodeSignerBinding(sessionKey, certificate, otherCertificate)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), false)
+		})
+
+		it('rejects a binding signed over the certificate encoded as a CBOR byte string that embeds another certificate', async () => {
+			const binding = await encodeSignerBinding(sessionKey, certificateByteString, otherCertificate)
+
+			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), false)
+		})
+
+		it('rejects a binding that embeds the certificate in a form other than the signed form', async () => {
+			const binding = await encodeSignerBinding(sessionKey, certificate, certificateByteString)
 
 			strictEqual(await verifySignerBinding(binding, sessionKey.coseKey, certificate), false)
 		})

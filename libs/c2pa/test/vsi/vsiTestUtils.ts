@@ -57,13 +57,16 @@ export type TestSessionKeyEntry = {
 	readonly validityPeriod: number
 	/** Adds a `kid` field next to the COSE key. §18.25.2 does not define this field. */
 	readonly topLevelKid?: Uint8Array
+	/** Payload in the COSE_Sign1 structure of the `signerBinding`. The signature still covers the certificate. */
+	readonly signerBindingPayload?: Uint8Array
 }
 
-// COSE_Sign1_Tagged (RFC 9052 §4.2) with an ES256 protected header. A detached payload is nil in the structure.
-async function signCoseSign1(privateKey: CryptoKey, unprotectedHeader: ReadonlyMap<number, unknown>, payload: Uint8Array, detached: boolean): Promise<Tag> {
+// COSE_Sign1_Tagged (RFC 9052 §4.2) with an ES256 protected header, signed over `payload`.
+// The structure contains `embeddedPayload`. A detached payload is nil in the structure.
+async function signCoseSign1(privateKey: CryptoKey, unprotectedHeader: ReadonlyMap<number, unknown>, payload: Uint8Array, embeddedPayload: Uint8Array | null): Promise<Tag> {
 	const toBeSigned = buildSigStructure(ES256_PROTECTED_HEADER, payload) as Uint8Array<ArrayBuffer>
 	const signature = new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, toBeSigned))
-	return new Tag([ES256_PROTECTED_HEADER, unprotectedHeader, detached ? null : payload, signature], CBOR_TAG_COSE_SIGN1)
+	return new Tag([ES256_PROTECTED_HEADER, unprotectedHeader, embeddedPayload, signature], CBOR_TAG_COSE_SIGN1)
 }
 
 /**
@@ -91,20 +94,21 @@ export async function createTestSessionKey(kid: string): Promise<TestSessionKey>
 
 /**
  * Encodes a `signerBinding` (§18.25.2): a COSE_Sign1_Tagged signed with the session key over `payload`.
- * The payload is detached, unless `embedded` is `true`.
+ * The structure contains `embeddedPayload` as its payload. The payload is detached (nil) if `embeddedPayload` is `null`.
  */
-export async function encodeSignerBinding(key: TestSessionKey, payload: Uint8Array, embedded: boolean = false): Promise<Uint8Array> {
-	return Uint8Array.from(CBOR.encode(await signCoseSign1(key.privateKey, new Map(), payload, !embedded)))
+export async function encodeSignerBinding(key: TestSessionKey, payload: Uint8Array, embeddedPayload: Uint8Array | null = null): Promise<Uint8Array> {
+	return Uint8Array.from(CBOR.encode(await signCoseSign1(key.privateKey, new Map(), payload, embeddedPayload)))
 }
 
-// The signerBinding is a detached COSE_Sign1 over the end-entity certificate of the signer (§18.25.2).
+// The signerBinding is a COSE_Sign1 over the end-entity certificate of the signer (§18.25.2).
+// The payload is detached, unless the entry sets `signerBindingPayload`.
 async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: Uint8Array): Promise<Record<string, unknown>> {
 	return {
 		key: entry.key.coseKey,
 		minSequenceNumber: entry.minSequenceNumber,
 		createdAt: entry.omitCreatedAtTag ? entry.createdAt : new Tag(entry.createdAt, CBOR_TAG_DATE_TIME),
 		validityPeriod: entry.validityPeriod,
-		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, true),
+		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, entry.signerBindingPayload ?? null),
 		...(entry.topLevelKid && { kid: entry.topLevelKid }),
 	}
 }
@@ -143,7 +147,8 @@ async function buildVsiEmsgBox(key: TestSessionKey, sequenceNumber: number | big
 		bmffHash: { exclusions: VSI_EXCLUSIONS, alg: 'sha256', hash },
 		manifestId: MANIFEST_ID,
 	}
-	const verifiableSegmentInfo = await signCoseSign1(key.privateKey, new Map([[COSE_HEADER_KID, key.kid]]), Uint8Array.from(CBOR.encode(segmentInfoMap)), false)
+	const segmentInfoBytes = Uint8Array.from(CBOR.encode(segmentInfoMap))
+	const verifiableSegmentInfo = await signCoseSign1(key.privateKey, new Map([[COSE_HEADER_KID, key.kid]]), segmentInfoBytes, segmentInfoBytes)
 	return new Uint8Array(writeEmsg({
 		type: 'emsg',
 		version: 0,

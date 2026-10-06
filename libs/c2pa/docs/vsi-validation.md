@@ -176,6 +176,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
 
 Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result. The signer binding verification accepts two forms of the signed payload: the end-entity certificate itself, or the certificate as a CBOR byte string. The text of C2PA section 18.25.2 allows both forms.
 
+The signer binding is a `COSE_Sign1` structure with a payload field. The payload field can be nil, an empty byte string, or an exact copy of the signed payload. If the payload field has other content, the signer binding verification fails.
+
 The validation function handles key matching and the validity period:
 
 1. **Key matching**: `validateC2paSegment` matches the `kid` (key ID) from the COSE_Sign1 header against the available session keys.
