@@ -151,7 +151,7 @@ The first defect was verified with an independent script. The others come from r
 
 `SCOPING.md` lists standards-based media player features and excludes a working media player. It does not mention ABR. The `@svta/cml-throughput` package already ships estimators, so the scope moved past that document. A pure selector with no player code stays inside the exclusion.
 
-Upstream issue 116 produced the throughput estimators. Upstream issue 115, "Create a common ABR framework", was closed on 2026-09-29 with no linked pull request. Upstream issue 358 asked for BOLA.
+Issue 116 produced the throughput estimators. Issue 115, "Create a common ABR framework", was closed on 2026-09-29 with no linked pull request. Issue 358 asked for BOLA.
 
 ## Testing
 

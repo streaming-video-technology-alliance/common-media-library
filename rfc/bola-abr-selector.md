@@ -17,7 +17,7 @@ This RFC proposes a new package, `@svta/cml-abr`. It ships `BolaSelector`, an im
 
 The caller passes the throughput estimate as a plain number. Any `ThroughputEstimator` from `@svta/cml-throughput` can produce it. BOLA does not measure throughput.
 
-Upstream issue 358 asked to add BOLA to `@svta/cml-throughput`. BOLA does not fit that package. This RFC asks the maintainers to confirm the new package. See Rationale and alternatives.
+Issue 358 asked to add BOLA to `@svta/cml-throughput`. BOLA does not fit that package. This RFC asks the maintainers to confirm the new package. See Rationale and alternatives.
 
 ```ts
 import { BolaSelector } from '@svta/cml-abr'
@@ -268,7 +268,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. The only p
 7. **Media types.** The design uses one selector for each media type. Should the documentation state this, or should one selector handle both?
 8. **Abandon.** `onAbandon` has no abandon-decision rule behind it. Should v1 keep it?
 9. **Hybrid selector and common type.** Both are out of scope for v1. Do the maintainers want the common type earlier?
-10. **Placement and issue title.** Do the maintainers prefer a new package or `@svta/cml-throughput`? The upstream issue title says "estimator". Should it change?
+10. **Placement and issue title.** Do the maintainers prefer a new package or `@svta/cml-throughput`? The title of issue 358 says "estimator". Should it change?
 
 ## Future possibilities
 
