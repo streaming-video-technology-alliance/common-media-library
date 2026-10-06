@@ -35,7 +35,12 @@ describe('decodeVsiMap', () => {
 		strictEqual(result.sequenceNumber, 2 ** 32)
 	})
 
-	// §19.4.2: sequenceNumber is a uint.
+	it('decodes a sequenceNumber of 2^53 - 1', () => {
+		const result = decodeVsiMap(encodeVsiMapWithSequenceNumber(BigInt(2 ** 53) - BigInt(1)))
+		strictEqual(result.sequenceNumber, Number.MAX_SAFE_INTEGER)
+	})
+
+	// §19.4.2: sequenceNumber is a uint. The library supports values up to 2^53 - 1.
 	const NONCONFORMING_SEQUENCE_NUMBERS: readonly (readonly [string, unknown])[] = [
 		['a text string', '7'],
 		['a negative integer', -1],
@@ -43,6 +48,8 @@ describe('decodeVsiMap', () => {
 		['a fraction', 0.5],
 		['NaN', NaN],
 		['Infinity', Infinity],
+		['a BigInt above 2^53 - 1', BigInt(2 ** 53)],
+		['a number above 2^53 - 1', 2 ** 53],
 	]
 
 	for (const [description, sequenceNumber] of NONCONFORMING_SEQUENCE_NUMBERS) {
@@ -50,6 +57,15 @@ describe('decodeVsiMap', () => {
 			throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber(sequenceNumber)), /sequenceNumber/)
 		})
 	}
+
+	it('names the supported range and the received value in the sequenceNumber error', () => {
+		throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber(BigInt(2 ** 53))), {
+			message: 'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got 9007199254740992',
+		})
+		throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber('7')), {
+			message: 'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got string',
+		})
+	})
 
 	it('throws for non-object CBOR input', () => {
 		// CBOR integer 42 = 0x18 0x2a

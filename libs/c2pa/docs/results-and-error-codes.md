@@ -82,7 +82,7 @@ for (const code of result.errorCodes) {
 
 `validateC2paInitSegment` reports `SESSIONKEY_INVALID` if any session key in the `c2pa.session-keys` assertion is invalid (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. `sessionKeys` contains only valid session keys.
 
-`minSequenceNumber` and `validityPeriod` must be unsigned integers. `createdAt` must be a valid date with CBOR tag 0. The library does not check the RFC 3339 syntax of `createdAt`.
+`minSequenceNumber` and `validityPeriod` must be unsigned integers up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). `createdAt` must be a valid date with CBOR tag 0. The library does not check the RFC 3339 syntax of `createdAt`.
 
 An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
 
