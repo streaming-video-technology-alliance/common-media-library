@@ -23,7 +23,7 @@ The `errorCodes` array may contain several codes when several checks fail. When 
 
 ## Signer Trust
 
-`isValid` is `true` when the manifest is well formed, every assertion matches its hash, and the claim signature verifies. The signature is verified with the end-entity certificate that the manifest carries in its `x5chain` header. The library does not check that certificate against a trust list. Any party with a certificate can produce a manifest that validates.
+`isValid` is `true` when the manifest is well formed and the claim signature verifies. Every store assertion must be referenced by the claim and match its hash. The manifest must have at most one hard binding. The signature is verified with the end-entity certificate that the manifest carries in its `x5chain` header. The library does not check that certificate against a trust list. Any party with a certificate can produce a manifest that validates.
 
 Before you present content as authentic, compare the signer with your own trust anchors. `InitSegmentValidation.certificate` and `ManifestBoxValidationResult.certificate` hold the DER-encoded end-entity certificate from the claim signature. The value is `null` when the signature is absent or carries no certificate.
 
@@ -103,13 +103,16 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | Constant | Value | Meaning |
 |----------|-------|---------|
 | `ASSERTION_HASHEDURI_MISMATCH` | `assertion.hashedURI.mismatch` | Assertion hash does not match the claim reference |
-| `ASSERTION_MISSING` | `assertion.missing` | Referenced assertion not found in the assertion store |
+| `ASSERTION_MISSING` | `assertion.missing` | The store has no box for a claim reference, or more than one box for its label |
+| `ASSERTION_MULTIPLE_HARD_BINDINGS` | `assertion.multipleHardBindings` | The manifest has more than one hard binding assertion |
+| `ASSERTION_UNDECLARED` | `assertion.undeclared` | The assertion store holds an assertion that the claim does not reference |
 | `ASSERTION_ACTION_INGREDIENT_MISMATCH` | `assertion.action.ingredientMismatch` | Action requires an ingredient reference but none is present |
 | `CLAIM_SIGNATURE_MISMATCH` | `claimSignature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
 | `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box |
 | `CLAIM_MISSING` | `claim.missing` | The manifest has no claim box |
 | `CLAIM_CBOR_INVALID` | `claim.cbor.invalid` | The claim box holds CBOR that does not decode |
 | `CLAIM_MALFORMED` | `claim.malformed` | The claim box holds CBOR that is not a map |
+| `CLAIM_MULTIPLE` | `claim.multiple` | The manifest has more than one claim box |
 | `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 
@@ -130,7 +133,7 @@ The `C2paManifest` type represents a parsed C2PA manifest. It is available throu
 | `instanceId` | `string \| null` | Unique instance ID |
 | `claimGenerator` | `string \| null` | Tool that generated the claim |
 | `signatureInfo` | `C2paSignatureInfo` | Signature metadata |
-| `assertions` | `readonly C2paAssertion[]` | All assertions in the manifest |
+| `assertions` | `readonly C2paAssertion[]` | All assertions in the assertion store. Read them only when `isValid` is `true`. |
 
 The `signatureInfo` object contains:
 
@@ -140,9 +143,10 @@ The `signatureInfo` object contains:
 | `certNotBefore` | `string \| null` | Certificate validity start (ISO 8601) |
 
 ```typescript
-const { manifest } = init // or result.manifest for the Manifest Box method
+const { isValid, manifest } = init // or result for the Manifest Box method
 
-if (manifest) {
+// The assertions list is the raw assertion store, so read it only when isValid is true.
+if (isValid && manifest) {
   console.log('Label:', manifest.label)
   console.log('Instance ID:', manifest.instanceId)
   console.log('Claim generator:', manifest.claimGenerator)

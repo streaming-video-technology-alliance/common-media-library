@@ -138,13 +138,22 @@ export function buildInitMediaBoxes(): Uint8Array {
 	return concatBytes(buildBox('ftyp', TEXT_ENCODER.encode('isom')), buildBox('moov'))
 }
 
-function assembleMerkleInitSegment(assertionData: Record<string, unknown>, claimCborBytes: Uint8Array, signature: Uint8Array | null): Uint8Array {
-	const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData) as Uint8Array))
+const MERKLE_MANIFEST_ID = 'urn:uuid:merkle-test-manifest'
+const BMFF_HASH_LABEL = 'c2pa.hash.bmff.v3'
+
+// The claim declares the single bmff hash assertion by hash, so it lands in the validator's
+// claim-verified assertion set. A validator reads the assertion only from that set.
+async function assembleMerkleInitSegment(assertionData: Record<string, unknown>, sign: ((claimCborBytes: Uint8Array) => Promise<Uint8Array>) | null): Promise<Uint8Array> {
+	const bmffAssertion = buildJumb(BMFF_HASH_LABEL, buildBox('cbor', encodeCbor(assertionData)))
 	const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
+	const claimCborBytes = encodeCbor({
+		instanceID: MERKLE_MANIFEST_ID,
+		created_assertions: [{ url: `self#jumbf=c2pa.assertions/${BMFF_HASH_LABEL}`, hash: await sha256(bmffAssertion.subarray(8)), alg: 'sha256' }],
+	})
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 	const manifestContent = [claim, assertionStore]
-	if (signature) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', signature)))
-	const manifestJumb = buildJumb('urn:uuid:merkle-test-manifest', ...manifestContent)
+	if (sign) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
+	const manifestJumb = buildJumb(MERKLE_MANIFEST_ID, ...manifestContent)
 	const store = buildJumb('c2pa', manifestJumb)
 
 	const purpose = TEXT_ENCODER.encode('manifest')
@@ -155,18 +164,13 @@ function assembleMerkleInitSegment(assertionData: Record<string, unknown>, claim
 	return concatBytes(buildInitMediaBoxes(), uuidBox)
 }
 
-function merkleClaimCborBytes(): Uint8Array {
-	return encodeCbor({ instanceID: 'urn:uuid:merkle-test-manifest', created_assertions: [] })
-}
-
 // Unsigned init segment with a `c2pa.hash.bmff.v3` assertion. It has no signature box, so
 // validation reports CLAIM_SIGNATURE_MISSING next to the codes a test asserts on.
-export function buildMerkleInitSegment(assertionData: Record<string, unknown>): Uint8Array {
-	return assembleMerkleInitSegment(assertionData, merkleClaimCborBytes(), null)
+export async function buildMerkleInitSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
+	return assembleMerkleInitSegment(assertionData, null)
 }
 
 // Init segment with a `c2pa.hash.bmff.v3` assertion and a claim signed by `signer`.
 export async function buildSignedMerkleInitSegment(assertionData: Record<string, unknown>, signer: Pick<TestSigner, 'sign'>): Promise<Uint8Array> {
-	const claimCborBytes = merkleClaimCborBytes()
-	return assembleMerkleInitSegment(assertionData, claimCborBytes, await signer.sign(claimCborBytes))
+	return assembleMerkleInitSegment(assertionData, claimCborBytes => signer.sign(claimCborBytes))
 }

@@ -27,8 +27,8 @@ export type InternalManifestData = {
 	readonly manifest: C2paManifest
 	readonly claimAssertionRefs: readonly ClaimAssertionRef[]
 	readonly claimCborBytes: Uint8Array | null
-	/** `CLAIM_CBOR_INVALID` if the claim box CBOR does not decode, `CLAIM_MALFORMED` if it is not a map, else null */
-	readonly claimCode: typeof C2paStatusCode.CLAIM_CBOR_INVALID | typeof C2paStatusCode.CLAIM_MALFORMED | null
+	/** `CLAIM_MULTIPLE` if the manifest has more than one claim box, `CLAIM_CBOR_INVALID` if the claim box CBOR does not decode, `CLAIM_MALFORMED` if it is not a map, else null */
+	readonly claimCode: typeof C2paStatusCode.CLAIM_MULTIPLE | typeof C2paStatusCode.CLAIM_CBOR_INVALID | typeof C2paStatusCode.CLAIM_MALFORMED | null
 	readonly signatureBytes: Uint8Array | null
 	readonly assertions: readonly InternalAssertionData[]
 }

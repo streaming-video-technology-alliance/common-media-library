@@ -106,7 +106,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('returns empty merkleMaps when the assertion has no merkle field', async () => {
-		const init = buildMerkleInitSegment({ exclusions: [] })
+		const init = await buildMerkleInitSegment({ exclusions: [] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -133,7 +133,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 
 	it('rejects an unsigned init segment with CLAIM_SIGNATURE_MISSING', async () => {
 		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
-		const init = buildMerkleInitSegment({
+		const init = await buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
 			merkle: [merkleEntry({ initHash })],
 		})
@@ -147,7 +147,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 
 	it('rejects a mismatching initHash', async () => {
 		const wrongHash = await sha256(new Uint8Array([9, 9, 9]))
-		const init = buildMerkleInitSegment({
+		const init = await buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
 			merkle: [merkleEntry({ initHash: wrongHash })],
 		})
@@ -160,7 +160,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('rejects a merkle entry missing initHash as malformed (required for fragmented assets)', async () => {
-		const init = buildMerkleInitSegment({
+		const init = await buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
 			merkle: [merkleEntry({ initHash: undefined })],
 		})
@@ -173,7 +173,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('rejects an exclusion constraint whose value is not a byte string as malformed', async () => {
-		const init = buildMerkleInitSegment({
+		const init = await buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid', data: [{ offset: 8, value: [1] }] }],
 			merkle: [merkleEntry()],
 		})
@@ -186,7 +186,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('rejects a merkle entry with no alg anywhere as malformed (no default per spec)', async () => {
-		const init = buildMerkleInitSegment({
+		const init = await buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
 			merkle: [merkleEntry({ alg: undefined })],
 		})
@@ -199,7 +199,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('rejects an empty merkle array as malformed without flagging session keys', async () => {
-		const init = buildMerkleInitSegment({ exclusions: [], merkle: [] })
+		const init = await buildMerkleInitSegment({ exclusions: [], merkle: [] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -254,12 +254,16 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 	}
 
 	// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
-	// so integrity checks skip signature verification.
-	function buildInitSegment(assertionData: Record<string, unknown>): Uint8Array {
-		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData) as Uint8Array))
+	// so integrity checks skip signature verification. The claim declares the assertion by
+	// hash so it reaches the validator's claim-verified assertion set.
+	async function buildInitSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData)))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
-		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', created_assertions: [] }
-		const claim = buildJumb('c2pa.claim', buildBox('cbor', encodeCbor(claimData) as Uint8Array))
+		const claimData = {
+			instanceID: 'urn:uuid:bmff-hash-test-manifest',
+			created_assertions: [{ url: 'self#jumbf=c2pa.assertions/c2pa.hash.bmff.v3', hash: await sha256(bmffAssertion.subarray(8)), alg: 'sha256' }],
+		}
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', encodeCbor(claimData)))
 		const manifestJumb = buildJumb('urn:uuid:bmff-hash-test-manifest', claim, assertionStore)
 		const store = buildJumb('c2pa', manifestJumb)
 
@@ -295,7 +299,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 
 	it('rejects a hash that is a CBOR array of integers', async () => {
 		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
-		const init = buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: Array.from(hash) })
+		const init = await buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: Array.from(hash) })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -305,7 +309,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 	it('rejects an exclusion constraint whose value is not a byte string', async () => {
 		// The constraint never matches the empty moov box, so the hash is the flat hash of ftyp + moov.
 		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
-		const init = buildInitSegment({ exclusions: [{ xpath: '/uuid' }, { xpath: '/moov', data: [{ offset: 8, value: [0] }] }], alg: 'sha256', hash })
+		const init = await buildInitSegment({ exclusions: [{ xpath: '/uuid' }, { xpath: '/moov', data: [{ offset: 8, value: [0] }] }], alg: 'sha256', hash })
 
 		const result = await validateC2paInitSegment(init)
 

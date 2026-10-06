@@ -8,13 +8,29 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Security
+
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest whose assertion store holds two or more boxes with the same label. The result includes `C2paStatusCode.ASSERTION_MISSING` when the claim references that label, or `ASSERTION_UNDECLARED` when it does not.
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest with more than one hard binding assertion. The result includes the new `C2paStatusCode.ASSERTION_MULTIPLE_HARD_BINDINGS`.
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest whose assertion store holds an assertion the claim does not reference. The result includes the new `C2paStatusCode.ASSERTION_UNDECLARED`.
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest with more than one claim box. The result includes the new `C2paStatusCode.CLAIM_MULTIPLE`.
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest with more than one assertion store. The result includes `C2paStatusCode.ASSERTION_MISSING`.
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest with more than one signature box. The result includes `C2paStatusCode.CLAIM_SIGNATURE_MISSING`.
+- `validateC2paManifestBoxSegment` now reads `sequenceNumber`, `streamId`, `previousManifestId`, `continuityMethod`, and `bmffHashHex` only from assertions whose hash matches a claim reference. Each field is `null` otherwise. Check `isValid` before you use any field.
+- `validateC2paInitSegment` now returns empty `sessionKeys` and `merkleMaps` when any manifest integrity check fails. Check `isValid` before you use either list.
+
 ### Added
 
+- `C2paStatusCode` now has `ASSERTION_MULTIPLE_HARD_BINDINGS` (`assertion.multipleHardBindings`) for a manifest with more than one hard binding assertion.
+- `C2paStatusCode` now has `ASSERTION_UNDECLARED` (`assertion.undeclared`) for an assertion the claim does not reference.
+- `C2paStatusCode` now has `CLAIM_MULTIPLE` (`claim.multiple`) for a manifest with more than one claim box.
 - `C2paStatusCode` now has `CLAIM_CBOR_INVALID` (`claim.cbor.invalid`) for a claim box whose CBOR does not decode.
 - `C2paStatusCode` now has `CLAIM_MALFORMED` (`claim.malformed`) for a claim box whose CBOR is not a map.
 
 ### Changed
 
+- A manifest-box segment whose claim does not verify the `c2pa.livevideo.segment` assertion now also reports `LiveVideoStatusCode.ASSERTION_INVALID` and `LiveVideoStatusCode.CONTINUITY_METHOD_INVALID`. This includes a claim box that does not decode.
+- `ManifestBoxValidationResult.errorCodes` no longer repeats a `C2paStatusCode` value.
 - `C2paAssertion.data` now holds an unsigned integer up to `Number.MAX_SAFE_INTEGER` as a number instead of a BigInt. The same applies to the assertion data that a `ManifestBoxContinuityValidator` receives. See Working with Manifest Data in the Results and Error Codes guide.
 - A CBOR tag other than tag 0 and tag 1 is now a plain `{ tag, value }` object in `C2paAssertion.data`. This includes tags 2, 3, 65 to 87, 258, and 55799, which were a BigInt, a typed array, a `Set`, or the tagged value. Tag 0 and tag 1 are still a `Date`.
 - A map key `__proto__` in a CBOR assertion is now an own property of the decoded object.
