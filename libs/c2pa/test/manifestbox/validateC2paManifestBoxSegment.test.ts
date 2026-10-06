@@ -349,6 +349,37 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 		deepStrictEqual(result.certificate, signer.certificateDER)
 	})
 
+	it('accepts a sequenceNumber of 2^32 after the sequenceNumber 2^32 - 1 (§19.3.2.1)', async () => {
+		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		const liveVideoData = { ...chainedLiveVideoData('c2pa.manifestId'), sequenceNumber: BigInt(2 ** 32) }
+		const segment = await buildLiveSegment(liveVideoData, claim => signer.sign(claim))
+
+		const { result } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID, { lastStreamId: 'stream-1', lastSequenceNumber: 2 ** 32 - 1 })
+
+		strictEqual(result.sequenceNumber, 2 ** 32)
+		strictEqual(result.isValid, true)
+		deepStrictEqual(result.errorCodes, [])
+	})
+
+	// §19.3.2.1: sequenceNumber is a uint. The library supports values up to 2^53 - 1.
+	const NONCONFORMING_SEQUENCE_NUMBERS: readonly (readonly [string, unknown])[] = [
+		['a fraction', 3.5],
+		['a BigInt above 2^53 - 1', BigInt(2 ** 53)],
+	]
+
+	for (const [description, sequenceNumber] of NONCONFORMING_SEQUENCE_NUMBERS) {
+		it(`fails with ASSERTION_INVALID if the sequenceNumber is ${description} (§19.3.2.1)`, async () => {
+			const liveVideoData = { ...chainedLiveVideoData('c2pa.manifestId'), sequenceNumber }
+			const segment = await buildLiveSegment(liveVideoData, claim => signer.sign(claim))
+
+			const { result } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID, { lastStreamId: 'stream-1', lastSequenceNumber: 3 })
+
+			strictEqual(result.sequenceNumber, null)
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.ASSERTION_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
 	it('validates a signed segment end to end with a custom continuity method', async () => {
 		const method = 'com.test.happy-path'
 		const segment = await buildLiveSegment(chainedLiveVideoData(method), claim => signer.sign(claim))

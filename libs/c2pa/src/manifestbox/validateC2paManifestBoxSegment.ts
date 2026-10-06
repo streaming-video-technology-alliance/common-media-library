@@ -3,7 +3,7 @@ import type { C2paManifest } from '../C2paManifest.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { bytesToHex, hashesEqual, normalizeAlgorithmName, toUint8Array } from '../utils.ts'
+import { asUnsignedInteger, bytesToHex, hashesEqual, normalizeAlgorithmName, toUint8Array } from '../utils.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import { parseExclusions } from '../bmff/parseExclusions.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
@@ -53,7 +53,7 @@ function parseLiveVideoAssertion(assertions: readonly C2paAssertion[]): LiveVide
 	const rawContinuity = data?.['continuityMethod']
 
 	return {
-		sequenceNumber: typeof rawSeq === 'number' ? rawSeq : null,
+		sequenceNumber: asUnsignedInteger(rawSeq),
 		previousManifestId: typeof rawPrev === 'string' ? rawPrev : null,
 		streamId: typeof rawStreamId === 'string' ? rawStreamId : null,
 		continuityMethod: typeof rawContinuity === 'string' ? rawContinuity : null,

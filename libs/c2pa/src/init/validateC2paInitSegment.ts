@@ -12,7 +12,7 @@ import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
 import { validateMerkleMaps } from '../merkle/validateMerkleMaps.ts'
-import { bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
+import { asUnsignedInteger, bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
@@ -51,12 +51,6 @@ function ensureDecodedCbor(value: unknown): unknown {
 // §18.25.2: CBOR tag 0 (RFC 3339 date-time), which cbor-x decodes to a Date
 function parseCreatedAt(value: unknown): string | null {
 	return value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString() : null
-}
-
-// §18.25.2: uint. cbor-x decodes a uint of 2^32 or more to a BigInt.
-function asUnsignedInteger(value: unknown): number | null {
-	if (typeof value === 'bigint') return value >= 0 ? Number(value) : null
-	return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : null
 }
 
 function extractKidHex(keyData: Record<string, unknown>, coseKey: unknown): string | null {

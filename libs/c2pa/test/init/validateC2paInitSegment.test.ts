@@ -396,6 +396,8 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		['a validityPeriod that is a text string', { validityPeriod: '3600' }],
 		['a negative validityPeriod', { validityPeriod: -600 }],
 		['a validityPeriod that is not an integer', { validityPeriod: 3600.5 }],
+		['a minSequenceNumber above 2^53 - 1', { minSequenceNumber: BigInt(2 ** 53) }],
+		['a validityPeriod above 2^53 - 1', { validityPeriod: BigInt(2 ** 53) }],
 	]
 
 	for (const [description, fields] of NONCONFORMING_FIELDS) {

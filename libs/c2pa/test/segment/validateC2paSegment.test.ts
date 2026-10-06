@@ -1,8 +1,8 @@
-import { validateC2paInitSegment, validateC2paSegment, LiveVideoStatusCode } from '@svta/cml-c2pa'
-import { deepStrictEqual, strictEqual } from 'node:assert'
+import { validateC2paInitSegment, validateC2paSegment, LiveVideoStatusCode, SequenceValidationReason, type SequenceState } from '@svta/cml-c2pa'
+import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
 import { before, describe, it, type TestContext } from 'node:test'
 import { createTestSigner } from '../testSigner.ts'
-import { buildSessionKeysInitSegment, buildVsiSegment, createTestSessionKey } from '../vsi/vsiTestUtils.ts'
+import { buildSessionKeysInitSegment, buildVsiSegment, createTestSessionKey, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paSegment', () => {
 	// #region example
@@ -63,6 +63,61 @@ describe('validateC2paSegment', () => {
 
 			strictEqual(validated?.result.isValid, false)
 			deepStrictEqual(validated?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+		})
+	})
+
+	// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+	describe('sequenceNumber of 2^32 or more (§19.4.2)', () => {
+		const NOW = Date.parse('2025-07-29T10:30:00Z')
+		let init: Uint8Array
+		let unsafeMinimumInit: Uint8Array
+		let key: TestSessionKey
+
+		before(async () => {
+			const signer = await createTestSigner()
+			key = await createTestSessionKey('key_001')
+			init = await buildSessionKeysInitSegment(signer, [
+				{ key, minSequenceNumber: 0, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 },
+			])
+			unsafeMinimumInit = await buildSessionKeysInitSegment(signer, [
+				{ key, minSequenceNumber: BigInt(2 ** 53) + BigInt(1), createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 } as unknown as TestSessionKeyEntry,
+			])
+		})
+
+		async function validateInitAtNow(context: TestContext, initSegment: Uint8Array = init) {
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+			return (await validateC2paInitSegment(initSegment)).sessionKeys
+		}
+
+		it('accepts a segment with a sequenceNumber of 2^32', async (context) => {
+			const sessionKeys = await validateInitAtNow(context)
+
+			const validated = await validateC2paSegment(await buildVsiSegment(key, BigInt(2 ** 32)), sessionKeys)
+
+			strictEqual(validated?.result.sequenceNumber, 2 ** 32)
+			strictEqual(validated?.result.isValid, true)
+			deepStrictEqual(validated?.result.errorCodes, [])
+		})
+
+		it('detects no gap when the sequenceNumber passes 2^32', async (context) => {
+			const sessionKeys = await validateInitAtNow(context)
+			const reasons = []
+			let sequenceState: SequenceState | undefined
+
+			for (const sequenceNumber of [2 ** 32 - 1, BigInt(2 ** 32), BigInt(2 ** 32 + 1)]) {
+				const validated = await validateC2paSegment(await buildVsiSegment(key, sequenceNumber), sessionKeys, sequenceState)
+				reasons.push(validated?.result.sequenceResult.reason)
+				sequenceState = validated?.nextSequenceState
+			}
+
+			deepStrictEqual(reasons, [SequenceValidationReason.VALID, SequenceValidationReason.VALID, SequenceValidationReason.VALID])
+		})
+
+		// Number() converts both 2^53 and 2^53 + 1 to 2^53.
+		it('does not accept a segment below a minSequenceNumber above 2^53 - 1', async (context) => {
+			const sessionKeys = await validateInitAtNow(context, unsafeMinimumInit)
+
+			await rejects(validateC2paSegment(await buildVsiSegment(key, BigInt(2 ** 53)), sessionKeys), /sequenceNumber/)
 		})
 	})
 })

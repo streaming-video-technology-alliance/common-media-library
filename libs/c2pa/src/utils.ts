@@ -89,6 +89,14 @@ export function asInteger(value: unknown): number | null {
 	return typeof value === 'number' && Number.isInteger(value) ? value : null
 }
 
+// A CBOR uint up to Number.MAX_SAFE_INTEGER as a number, or null. cbor-x decodes a uint
+// of 2^32 or more to a BigInt. Number() converts a BigInt above 2^53 - 1 to 2^53 or more.
+/** @internal */
+export function asUnsignedInteger(value: unknown): number | null {
+	const number = typeof value === 'bigint' ? Number(value) : value
+	return typeof number === 'number' && Number.isSafeInteger(number) && number >= 0 ? number : null
+}
+
 function isC2paUuid(usertype: readonly number[]): boolean {
 	return matchesUuid(usertype, C2PA_MANIFEST_UUID) || matchesUuid(usertype, JUMBF_UUID)
 }

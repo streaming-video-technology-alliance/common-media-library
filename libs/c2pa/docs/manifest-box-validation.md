@@ -164,7 +164,7 @@ The `ManifestBoxValidationResult` contains:
 | `manifest` | `C2paManifest \| null` | Parsed manifest, or `null` on parse failure |
 | `issuer` | `string \| null` | Certificate issuer from the signature |
 | `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate |
-| `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion |
+| `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the value is not an unsigned integer up to `Number.MAX_SAFE_INTEGER` |
 | `previousManifestId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
 | `streamId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
 | `continuityMethod` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
