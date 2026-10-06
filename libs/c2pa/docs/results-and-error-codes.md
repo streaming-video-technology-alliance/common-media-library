@@ -108,7 +108,7 @@ Versions 1.2.0 and earlier report `claim.signature.mismatch` for `CLAIM_SIGNATUR
 > [!NOTE]
 > `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes`, which check manifest integrity. They do not appear in `SegmentValidationResult.errorCodes`: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only `LiveVideoStatusCode`.
 >
-> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. `LiveVideoStatusCode.SESSIONKEY_INVALID` is not reported when `merkleMaps` is not empty, because VOD Merkle segments do not use session keys.
+> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. VOD Merkle segments do not use session keys. When `merkleMaps` is not empty, the result does not report `LiveVideoStatusCode.SESSIONKEY_INVALID` for missing or expired session keys. An invalid session key still causes `SESSIONKEY_INVALID`. See [Invalid Session Keys](#invalid-session-keys).
 
 ## Working with Manifest Data
 
