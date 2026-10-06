@@ -48,11 +48,15 @@ function ensureDecodedCbor(value: unknown): unknown {
 	return value
 }
 
+// §18.25.2: CBOR tag 0 (RFC 3339 date-time), which cbor-x decodes to a Date
 function parseCreatedAt(value: unknown): string | null {
-	const resolved = extractCborTaggedValue(value) ?? value
-	if (typeof resolved === 'string') return resolved
-	if (resolved instanceof Date) return resolved.toISOString()
-	return null
+	return value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString() : null
+}
+
+// §18.25.2: uint. cbor-x decodes a uint of 2^32 or more to a BigInt.
+function asUnsignedInteger(value: unknown): number | null {
+	if (typeof value === 'bigint') return value >= 0 ? Number(value) : null
+	return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : null
 }
 
 function extractKidHex(keyData: Record<string, unknown>, coseKey: unknown): string | null {
@@ -121,11 +125,11 @@ type SessionKeysValidation = {
 function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 	const keyData = entry as Record<string, unknown>
 
-	const minSequenceNumber = keyData['minSequenceNumber']
-	const validityPeriod = keyData['validityPeriod']
+	const minSequenceNumber = asUnsignedInteger(keyData['minSequenceNumber'])
+	const validityPeriod = asUnsignedInteger(keyData['validityPeriod'])
 	const createdAt = parseCreatedAt(keyData['createdAt'])
 
-	if (minSequenceNumber == null || validityPeriod == null || !createdAt) return null
+	if (minSequenceNumber === null || validityPeriod === null || !createdAt) return null
 
 	const coseKey = ensureDecodedCbor(keyData['key'])
 	const kid = extractKidHex(keyData, coseKey)
@@ -135,8 +139,8 @@ function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 	if (!signerBindingRaw) return null
 
 	return {
-		minSequenceNumber: Number(minSequenceNumber),
-		validityPeriod: Number(validityPeriod),
+		minSequenceNumber,
+		validityPeriod,
 		createdAt,
 		kid,
 		coseKey,

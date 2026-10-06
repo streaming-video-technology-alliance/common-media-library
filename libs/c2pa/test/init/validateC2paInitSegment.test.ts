@@ -6,7 +6,7 @@ import { encode } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { buildInitMediaBoxes, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildSessionKeysInitSegment, createTestSessionKey, type TestSessionKey } from '../vsi/vsiTestUtils.ts'
+import { buildSessionKeysInitSegment, createTestSessionKey, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -325,8 +325,35 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
+	it('accepts a minSequenceNumber and a validityPeriod of 2^32 or more', async (context) => {
+		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		const entryWithLargeIntegers = { ...activeEntry(key002), minSequenceNumber: BigInt(2 ** 32), validityPeriod: BigInt(2 ** 32) } as unknown as TestSessionKeyEntry
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), entryWithLargeIntegers])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => [key.kid, key.minSequenceNumber, key.validityPeriod]), [
+			[key001.kidHex, 0, 3600],
+			[key002.kidHex, 4294967296, 4294967296],
+		])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
 	it('excludes an expired session key from sessionKeys without SESSIONKEY_INVALID', async (context) => {
 		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(key002)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('treats a session key with a validityPeriod of 0 as expired, without SESSIONKEY_INVALID', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(key002), validityPeriod: 0 }])
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
 
 		const result = await validateC2paInitSegment(init)
@@ -358,6 +385,32 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
 		strictEqual(result.isValid, false)
 	})
+
+	// Each entry breaks one §18.25.2 rule for a session key field.
+	const NONCONFORMING_FIELDS: readonly (readonly [string, Readonly<Record<string, unknown>>])[] = [
+		['a createdAt that is not a date', { createdAt: 'not a date' }],
+		['a createdAt without CBOR tag 0', { omitCreatedAtTag: true }],
+		['a minSequenceNumber that is a text string', { minSequenceNumber: '0' }],
+		['a negative minSequenceNumber', { minSequenceNumber: -1 }],
+		['a minSequenceNumber that is not an integer', { minSequenceNumber: 0.5 }],
+		['a validityPeriod that is a text string', { validityPeriod: '3600' }],
+		['a negative validityPeriod', { validityPeriod: -600 }],
+		['a validityPeriod that is not an integer', { validityPeriod: 3600.5 }],
+	]
+
+	for (const [description, fields] of NONCONFORMING_FIELDS) {
+		it(`fails with SESSIONKEY_INVALID if a session key has ${description}`, async (context) => {
+			const nonconformingEntry = { ...activeEntry(key002), ...fields } as TestSessionKeyEntry
+			const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), nonconformingEntry])
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
 
 	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key does not verify', async (context) => {
 		// The private key of key_001 signs the signerBinding of key_002.
