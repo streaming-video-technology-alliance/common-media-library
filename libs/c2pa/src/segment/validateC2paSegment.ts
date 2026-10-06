@@ -26,10 +26,13 @@ function findSessionKey(sessionKeys: readonly ValidatedSessionKey[], kidHex: str
  *
  * Returns `null` if the segment does not contain a C2PA EMSG box.
  *
+ * A segment whose signature, content hash, or key validity does not verify
+ * returns the received `sequenceState` unchanged.
+ *
  * @param segmentBytes - Raw segment bytes
  * @param sessionKeys - Available session keys from the init segment
  * @param sequenceState - Current sequence state for this stream
- * @returns Validation result and updated sequence state, or `null` if no C2PA EMSG box
+ * @returns Validation result and the sequence state for the next call, or `null` if no C2PA EMSG box
  *
  * @example
  * {@includeCode ../../test/segment/validateC2paSegment.test.ts#example}
@@ -75,7 +78,7 @@ export async function validateC2paSegment(
 				isValid: false,
 				errorCodes: [LiveVideoStatusCode.SEGMENT_INVALID],
 			},
-			nextSequenceState,
+			nextSequenceState: sequenceState,
 		}
 	}
 
@@ -103,15 +106,15 @@ export async function validateC2paSegment(
 	const keyNotYetActive = new Date() < new Date(sessionKey.createdAt)
 	const keyExpired = isKeyExpired(sessionKey.createdAt, sessionKey.validityPeriod)
 
+	const authentic = signatureValid && hashValid && !keyNotYetActive && !keyExpired
+
 	const codes = new Set<LiveVideoStatusCode>()
-	if (!signatureValid || !hashValid || !sequenceAboveMin || keyNotYetActive || keyExpired) {
-		codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
-	}
+	if (!authentic || !sequenceAboveMin) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
 	if (!sequenceResult.isValid) codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
 	const errorCodes = [...codes]
 
 	return {
 		result: { ...baseFields, isValid: errorCodes.length === 0, errorCodes },
-		nextSequenceState,
+		nextSequenceState: authentic ? nextSequenceState : sequenceState,
 	}
 }

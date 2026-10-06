@@ -100,7 +100,7 @@ for (const segmentUrl of segmentUrls) {
 `validateC2paSegment` returns `null` when the segment does not contain a C2PA EMSG box. Otherwise it returns an object with:
 
 - `result`: a `SegmentValidationResult` with the validation outcome
-- `nextSequenceState`: the updated sequence state to pass into the next call
+- `nextSequenceState`: the sequence state to pass into the next call
 
 The `SegmentValidationResult` contains:
 
@@ -115,7 +115,7 @@ The `SegmentValidationResult` contains:
 | `errorCodes` | `readonly LiveVideoStatusCode[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments.
+> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments. A segment whose signature or content hash does not verify leaves `nextSequenceState` equal to the `sequenceState` that the function received. The same applies to a segment whose session key is missing, not yet active, or expired. After a seek or an encoder restart, pass `undefined` to start a new state.
 
 ## Complete Example
 
@@ -124,6 +124,7 @@ import {
   validateC2paInitSegment,
   validateC2paSegment,
   SequenceValidationReason,
+  LiveVideoStatusCode,
 } from '@svta/cml-c2pa'
 import type { SequenceState } from '@svta/cml-c2pa'
 
@@ -165,8 +166,9 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
       console.error(`Segment ${result.sequenceNumber}: failed`, result.errorCodes)
     }
 
-    // Check sequence continuity
-    if (result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
+    // Check sequence continuity. A gap is meaningful only for a segment whose signature and hash verify.
+    const verified = !result.errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID)
+    if (verified && result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
       console.warn(
         `Missing segments ${result.sequenceResult.missingFrom}` +
         ` through ${result.sequenceResult.missingTo}`,
