@@ -439,6 +439,19 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, false)
 	})
 
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key embeds a payload other than the certificate', async (context) => {
+		// The signature covers the certificate of the signer, but the signerBinding embeds another certificate.
+		const otherCertificate = (await createTestSigner('Other Signer')).certificateDER
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(key002), signerBindingPayload: otherCertificate }])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
 	it('fails with SESSIONKEY_INVALID if the signerBinding of an expired session key does not verify', async (context) => {
 		const keyWithWrongBinding = { ...key002, privateKey: key001.privateKey }
 		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(keyWithWrongBinding)])
