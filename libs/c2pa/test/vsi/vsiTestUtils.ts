@@ -132,26 +132,29 @@ function encodeIndefiniteLengths(value: unknown): Uint8Array {
 	return Uint8Array.from(CBOR.encode(value))
 }
 
+/** One assertion of a test manifest: the JUMBF label and the CBOR content of the assertion. */
+export type TestAssertion = {
+	readonly label: string
+	readonly cbor: Uint8Array
+}
+
 /**
- * Builds an init segment whose manifest has a `c2pa.session-keys` assertion (§18.25) with the given keys.
- * The claim references the assertion and is signed by `signer`. If `indefiniteLengths` is `true`, the assertion
- * encodes its maps and arrays with indefinite lengths. The COSE keys and signer bindings keep definite lengths.
+ * Builds an init segment whose manifest has the given CBOR assertions.
+ * The claim references every assertion and is signed by `signer`.
  */
-export async function buildSessionKeysInitSegment(signer: TestSigner, entries: readonly TestSessionKeyEntry[], indefiniteLengths: boolean = false): Promise<Uint8Array> {
-	const keys = await Promise.all(entries.map(entry => buildSessionKeyData(entry, signer.certificateDER)))
-	const assertionCbor = indefiniteLengths ? encodeIndefiniteLengths({ keys }) : Uint8Array.from(CBOR.encode({ keys }))
-	const sessionKeysAssertion = buildJumb(SESSION_KEYS_LABEL, buildBox('cbor', assertionCbor))
+export async function buildSignedInitSegment(signer: TestSigner, assertions: readonly TestAssertion[]): Promise<Uint8Array> {
+	const assertionBoxes = assertions.map(assertion => buildJumb(assertion.label, buildBox('cbor', assertion.cbor)))
 	const claimCborBytes = Uint8Array.from(CBOR.encode({
 		instanceID: MANIFEST_ID,
-		created_assertions: [{
-			url: `self#jumbf=c2pa.assertions/${SESSION_KEYS_LABEL}`,
-			hash: await sha256(sessionKeysAssertion.subarray(8)),
+		created_assertions: await Promise.all(assertionBoxes.map(async (box, index) => ({
+			url: `self#jumbf=c2pa.assertions/${assertions[index].label}`,
+			hash: await sha256(box.subarray(8)),
 			alg: 'sha256',
-		}],
+		}))),
 	}))
 	const manifest = buildJumb(MANIFEST_ID,
 		buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes)),
-		buildJumb('c2pa.assertions', sessionKeysAssertion),
+		buildJumb('c2pa.assertions', ...assertionBoxes),
 		buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
 	)
 
@@ -159,6 +162,17 @@ export async function buildSessionKeysInitSegment(signer: TestSigner, entries: r
 	const prefix = new Uint8Array(4 + purpose.length + 1 + 8) // fullbox header + purpose\0 + aux offset
 	prefix.set(purpose, 4)
 	return concatBytes(buildInitMediaBoxes(), buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))))
+}
+
+/**
+ * Builds an init segment whose manifest has a `c2pa.session-keys` assertion (§18.25) with the given keys.
+ * The claim references the assertion and is signed by `signer`. If `indefiniteLengths` is `true`, the assertion
+ * encodes its maps and arrays with indefinite lengths. The COSE keys and signer bindings keep definite lengths.
+ */
+export async function buildSessionKeysInitSegment(signer: TestSigner, entries: readonly TestSessionKeyEntry[], indefiniteLengths: boolean = false): Promise<Uint8Array> {
+	const keys = await Promise.all(entries.map(entry => buildSessionKeyData(entry, signer.certificateDER)))
+	const cbor = indefiniteLengths ? encodeIndefiniteLengths({ keys }) : Uint8Array.from(CBOR.encode({ keys }))
+	return buildSignedInitSegment(signer, [{ label: SESSION_KEYS_LABEL, cbor }])
 }
 
 // VSI emsg box (§19.4.2) whose message data is a verifiable-segment-info signed with `key`.

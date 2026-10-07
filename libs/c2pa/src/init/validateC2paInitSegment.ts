@@ -229,11 +229,20 @@ function readTaggedKeyEntries(cborBytes: Uint8Array | undefined): unknown[] {
 	}
 }
 
+// §18.25.2: the assertion is a map with a keys array of one or more session keys
+function readKeyEntries(data: unknown): unknown[] {
+	try {
+		return extractKeyArray(ensureDecodedCbor(data))
+	} catch {
+		return []
+	}
+}
+
 async function validateSessionKeys(
 	assertion: InternalAssertionData,
 	certificate: Uint8Array,
 ): Promise<SessionKeysValidation> {
-	const keyEntries = extractKeyArray(ensureDecodedCbor(assertion.data))
+	const keyEntries = readKeyEntries(assertion.data)
 	const taggedKeyEntries = readTaggedKeyEntries(assertion.cborBytes)
 	const results = await Promise.all(
 		keyEntries.map((entry, index) => validateSingleSessionKey(entry, taggedKeyEntries[index], certificate)),
@@ -241,7 +250,7 @@ async function validateSessionKeys(
 	const validKeys = results.filter((key): key is ValidatedSessionKey => key !== null)
 	return {
 		sessionKeys: validKeys.filter(isWithinValidityPeriod),
-		hasInvalidSessionKey: validKeys.length < results.length,
+		hasInvalidSessionKey: keyEntries.length === 0 || validKeys.length < results.length,
 	}
 }
 
@@ -258,7 +267,8 @@ async function validateSessionKeys(
  * The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID` if the function finds an invalid
  * session key (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
  * or if its signer binding fails verification. The function does not check every rule of section 18.25.2.
- * An expired session key does not count as invalid.
+ * An expired session key does not count as invalid. A `c2pa.session-keys` assertion without a session key,
+ * or with CBOR that does not decode, also causes `SESSIONKEY_INVALID`.
  *
  * @param bytes - Raw init segment bytes
  * @returns Structured validation result (with `INIT_INVALID` error code if `mdat` box is present)

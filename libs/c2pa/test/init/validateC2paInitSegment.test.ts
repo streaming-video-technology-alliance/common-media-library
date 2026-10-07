@@ -6,7 +6,7 @@ import { encode } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { buildInitMediaBoxes, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildSessionKeysInitSegment, createTestSessionKey, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
+import { buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -518,6 +518,49 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 
 		const result = await validateC2paInitSegment(init)
 
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	// {"keys": [1 ... : the array of indefinite length has no break code
+	const SESSION_KEYS_CBOR_WITHOUT_BREAK = Uint8Array.of(0xa1, 0x64, 0x6b, 0x65, 0x79, 0x73, 0x9f, 0x01)
+
+	// Each entry breaks the §18.25.2 rule that the assertion is a map with a keys array of one or more session keys.
+	const NONCONFORMING_ASSERTIONS: readonly (readonly [string, Uint8Array])[] = [
+		['no session key', Uint8Array.from(encode({ keys: [] }))],
+		['a keys field that is not an array', Uint8Array.from(encode({ keys: 'key_001' }))],
+		['CBOR that does not decode', SESSION_KEYS_CBOR_WITHOUT_BREAK],
+	]
+
+	// A `c2pa.hash.bmff.v3` assertion with a merkle map. /uuid is excluded, so the initHash covers only ftyp + moov.
+	async function merkleAssertionCbor(): Promise<Uint8Array> {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const merkle = [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash }]
+		return Uint8Array.from(encode({ exclusions: [{ xpath: '/uuid' }], merkle }))
+	}
+
+	for (const [description, sessionKeysCbor] of NONCONFORMING_ASSERTIONS) {
+		it(`fails with SESSIONKEY_INVALID in VOD Merkle mode if the session keys assertion has ${description}`, async () => {
+			const init = await buildSignedInitSegment(signer, [
+				{ label: 'c2pa.hash.bmff.v3', cbor: await merkleAssertionCbor() },
+				{ label: 'c2pa.session-keys', cbor: sessionKeysCbor },
+			])
+
+			const result = await validateC2paInitSegment(init)
+
+			strictEqual(result.merkleMaps.length, 1)
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	it('fails with SESSIONKEY_INVALID if the session keys assertion has CBOR that does not decode', async () => {
+		const init = await buildSignedInitSegment(signer, [{ label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK }])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys, [])
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
 		strictEqual(result.isValid, false)
 	})
