@@ -82,7 +82,7 @@ for (const code of result.errorCodes) {
 
 `validateC2paInitSegment` reports `SESSIONKEY_INVALID` if it finds an invalid session key in the `c2pa.session-keys` assertion (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. The library does not check every rule of section 18.25.2. `sessionKeys` contains only the session keys that pass these checks.
 
-The COSE key must include a `kid` (label 2). `minSequenceNumber` and `validityPeriod` must be unsigned integers up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). `createdAt` must be a valid date with a CBOR date tag. The CBOR decoder converts both tag 0 and tag 1 to a `Date`, so the library cannot require tag 0. The library also does not check the RFC 3339 syntax of `createdAt`.
+The COSE key must include a `kid` (label 2). `minSequenceNumber` and `validityPeriod` must be unsigned integers up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). `createdAt` must be CBOR tag 0 with an RFC 3339 date-time string (RFC 8949 section 3.4.1). The letters `T` and `Z` must be uppercase. The date must exist, so `2025-02-30T00:00:00Z` is invalid. A leap second (second 60) is also invalid, because a JavaScript `Date` cannot represent it.
 
 An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
 

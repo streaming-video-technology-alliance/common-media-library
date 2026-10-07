@@ -69,8 +69,10 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 		)
 
 		let data: unknown = null
+		let cborBytes: Uint8Array | undefined
 		if (contentBox) {
 			if (contentBox.type === 'cbor') {
+				cborBytes = contentBox.data
 				try { data = decode(contentBox.data) as unknown } catch { data = contentBox.data }
 			}
 			else if (contentBox.type === 'json') {
@@ -81,7 +83,7 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 			}
 		}
 
-		assertions.push({ label, data, rawBoxPayload: box.data })
+		assertions.push({ label, data, rawBoxPayload: box.data, cborBytes })
 	}
 
 	return assertions

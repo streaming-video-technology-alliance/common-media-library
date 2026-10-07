@@ -341,6 +341,32 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
+	it('accepts a createdAt with a fraction of a second and a time offset', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(key002), createdAt: '2025-07-29T12:00:00.5+02:00' }])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => [key.kid, key.createdAt]), [
+			[key001.kidHex, '2025-07-29T10:00:00.000Z'],
+			[key002.kidHex, '2025-07-29T10:00:00.500Z'],
+		])
+		deepStrictEqual(result.errorCodes, [])
+	})
+
+	it('accepts an assertion with CBOR maps and arrays of indefinite length', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(key002)], true)
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => [key.kid, key.createdAt]), [
+			[key001.kidHex, '2025-07-29T10:00:00.000Z'],
+			[key002.kidHex, '2025-07-29T10:00:00.000Z'],
+		])
+		deepStrictEqual(result.errorCodes, [])
+	})
+
 	it('excludes an expired session key from sessionKeys without SESSIONKEY_INVALID', async (context) => {
 		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(key002)])
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
@@ -401,7 +427,13 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	// Each entry breaks one §18.25.2 rule for a session key field.
 	const NONCONFORMING_FIELDS: readonly (readonly [string, Readonly<Record<string, unknown>>])[] = [
 		['a createdAt that is not a date', { createdAt: 'not a date' }],
-		['a createdAt without CBOR tag 0', { omitCreatedAtTag: true }],
+		['a createdAt without CBOR tag 0', { createdAtTag: null }],
+		['a createdAt with CBOR tag 1', { createdAt: Date.parse('2025-07-29T10:00:00Z') / 1000, createdAtTag: 1 }],
+		['a createdAt with a date-time string in CBOR tag 1', { createdAtTag: 1 }],
+		['a createdAt with a number in CBOR tag 0', { createdAt: Date.parse('2025-07-29T10:00:00Z') }],
+		['a createdAt on a day that does not exist', { createdAt: '2025-02-30T00:00:00Z' }],
+		['a createdAt that is not an RFC 3339 date-time', { createdAt: 'Tue, 29 Jul 2025 10:00:00 GMT' }],
+		['a createdAt with a lowercase t and z', { createdAt: '2025-07-29t10:00:00z' }],
 		['a minSequenceNumber that is a text string', { minSequenceNumber: '0' }],
 		['a negative minSequenceNumber', { minSequenceNumber: -1 }],
 		['a minSequenceNumber that is not an integer', { minSequenceNumber: 0.5 }],
