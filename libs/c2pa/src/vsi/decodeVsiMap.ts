@@ -1,4 +1,4 @@
-import { decode } from 'cbor-x/decode'
+import { decodeCbor } from '../cbor/decodeCbor.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { asUnsignedInteger, normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'
@@ -19,7 +19,7 @@ import type { VsiMap } from './VsiMap.ts'
  * @internal
  */
 export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
-	const raw = decode(vsiCborBytes) as Record<string, unknown>
+	const raw = decodeCbor(vsiCborBytes) as Record<string, unknown>
 
 	if (typeof raw !== 'object' || raw === null) {
 		throw new Error('VSI map must be a CBOR map')
