@@ -62,6 +62,8 @@ export type TestSessionKeyEntry = {
 	readonly topLevelKid?: Uint8Array
 	/** Payload in the COSE_Sign1 structure of the `signerBinding`. The signature still covers the certificate. */
 	readonly signerBindingPayload?: Uint8Array
+	/** Encodes the fields in the deterministic key order of RFC 8949 section 4.2.1, which puts `minSequenceNumber` last. */
+	readonly deterministicKeyOrder?: boolean
 }
 
 // COSE_Sign1_Tagged (RFC 9052 §4.2) with an ES256 protected header, signed over `payload`.
@@ -106,7 +108,7 @@ export async function encodeSignerBinding(key: TestSessionKey, payload: Uint8Arr
 // The signerBinding is a COSE_Sign1 over the end-entity certificate of the signer (§18.25.2).
 // The payload is detached, unless the entry sets `signerBindingPayload`.
 async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: Uint8Array): Promise<Record<string, unknown>> {
-	return {
+	const data: Record<string, unknown> = {
 		key: entry.key.coseKey,
 		minSequenceNumber: entry.minSequenceNumber,
 		createdAt: entry.createdAtTag === null ? entry.createdAt : new Tag(entry.createdAt, entry.createdAtTag ?? CBOR_TAG_DATE_TIME),
@@ -114,6 +116,9 @@ async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: U
 		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, entry.signerBindingPayload ?? null),
 		...(entry.topLevelKid && { kid: entry.topLevelKid }),
 	}
+	if (!entry.deterministicKeyOrder) return data
+	// RFC 8949 section 4.2.1: a shorter encoded text key sorts first, then the bytes decide
+	return Object.fromEntries(Object.entries(data).sort(([a], [b]) => a.length - b.length || (a < b ? -1 : 1)))
 }
 
 // Encodes plain objects and arrays with indefinite lengths. Each ends with the break code (RFC 8949 section 3.2.2).
