@@ -434,6 +434,8 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		['a createdAt on a day that does not exist', { createdAt: '2025-02-30T00:00:00Z' }],
 		['a createdAt that is not an RFC 3339 date-time', { createdAt: 'Tue, 29 Jul 2025 10:00:00 GMT' }],
 		['a createdAt with a lowercase t and z', { createdAt: '2025-07-29t10:00:00z' }],
+		// A CBOR map with these keys decodes to the same shape as a tag 0, but it carries no CBOR tag.
+		['a createdAt that is a map with tag and value fields', { createdAt: { tag: 0, value: '2025-07-29T10:00:00Z' }, createdAtTag: null }],
 		['a minSequenceNumber that is a text string', { minSequenceNumber: '0' }],
 		['a negative minSequenceNumber', { minSequenceNumber: -1 }],
 		['a minSequenceNumber that is not an integer', { minSequenceNumber: 0.5 }],

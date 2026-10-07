@@ -53,12 +53,10 @@ function ensureDecodedCbor(value: unknown): unknown {
 const RFC_3339_DATE_TIME = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:[0-5]\d){2}(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/
 const CBOR_BREAK = 0xff
 
-type CborTaggedValue = {
-	readonly tag: number
-	readonly value: unknown
-}
+// A private key marks a real CBOR tag (RFC 8949 section 3.4), so a CBOR map with "tag" and "value" keys is not mistaken for one.
+const CBOR_TAG = Symbol()
 
-// Decodes CBOR like cbor-x, but keeps each tag as { tag, value }. cbor-x converts tags 0 and 1 to a Date.
+// Decodes CBOR like cbor-x, but marks each tag with CBOR_TAG. cbor-x converts tags 0 and 1 to a Date.
 function decodeWithTags(cbor: Uint8Array): unknown {
 	let offset = 0
 	const read = (): unknown => {
@@ -86,7 +84,7 @@ function decodeWithTags(cbor: Uint8Array): unknown {
 			for (let i = 0; i < items.length; i += 2) map[items[i] as string] = items[i + 1]
 			return map
 		}
-		if (majorType === 6) return { tag: argument, value: read() }
+		if (majorType === 6) return { [CBOR_TAG]: argument, value: read() }
 		if (majorType === 2 || majorType === 3) offset += argument
 		return decode(cbor.subarray(start, offset))
 	}
@@ -95,8 +93,9 @@ function decodeWithTags(cbor: Uint8Array): unknown {
 
 // §18.25.2: CBOR tag 0 with an RFC 3339 date-time
 function parseCreatedAt(value: unknown): string | null {
-	const { tag, value: text } = (value ?? {}) as Partial<CborTaggedValue>
-	if (tag !== 0 || typeof text !== 'string' || !RFC_3339_DATE_TIME.test(text)) return null
+	const tagged = value as Record<symbol | string, unknown> | null
+	const text = tagged?.['value']
+	if (tagged?.[CBOR_TAG] !== 0 || typeof text !== 'string' || !RFC_3339_DATE_TIME.test(text)) return null
 	// Date rolls a day that does not exist over to the next month
 	if (new Date(text.slice(0, 10)).getUTCDate() !== Number(text.slice(8, 10))) return null
 	return new Date(text).toISOString()

@@ -10,7 +10,6 @@ export type InternalAssertionData = {
 	readonly label: string
 	readonly data: unknown
 	readonly rawBoxPayload: Uint8Array
-	/** Bytes of the CBOR content box, if the assertion is CBOR. `data` holds their decoded value. */
 	readonly cborBytes?: Uint8Array
 }
 
