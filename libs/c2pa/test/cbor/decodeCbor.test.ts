@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual, throws } from 'node:assert'
+import { deepStrictEqual, ok, strictEqual, throws } from 'node:assert'
 import { describe, it } from 'node:test'
 import { encode } from 'cbor-x/encode'
 import { decodeCbor, readCborItemEnd } from '../../src/cbor/decodeCbor.ts'
@@ -40,6 +40,38 @@ describe('decodeCbor', () => {
 
 	it('rejects an empty input', () => {
 		throws(() => decodeCbor(new Uint8Array(0)), RangeError)
+	})
+
+	it('rejects an indefinite map whose break falls in value position', () => {
+		// bf 00 ff: indefinite map, key 0, then break before the value (malformed, RFC 8949 section 3.2.2).
+		// cbor-x reads it differently, so the walk and the decoder disagree on the item boundary.
+		throws(() => decodeCbor(toBytes('bf00ff')), RangeError)
+		throws(() => decodeCbor(toBytes('bf00ff616101ff')), RangeError)
+	})
+
+	it('rejects trailing bytes after the first data item', () => {
+		// 01 01: two integers. The first item ends at offset 1, so the second is trailing.
+		throws(() => decodeCbor(toBytes('0101')), RangeError)
+	})
+
+	it('rejects a cbor-x record or bundled-string tag', () => {
+		// cbor-x reads tags 0xdff9, 0xdffe, and 0xdfff with record semantics, not as a plain tagged item.
+		throws(() => decodeCbor(toBytes('d9dfff80')), RangeError)
+		throws(() => decodeCbor(toBytes('d9dff980')), RangeError)
+		throws(() => decodeCbor(toBytes('d9dffe80')), RangeError)
+	})
+
+	it('rejects a cbor-x packed, shared-value, or set-with-read tag', () => {
+		// Tags 28, 51, and 259 drive their own reading in cbor-x (handlesRead), so a plain walk cannot bound them.
+		throws(() => decodeCbor(toBytes('d81c80')), RangeError)
+		throws(() => decodeCbor(toBytes('d83380')), RangeError)
+		throws(() => decodeCbor(toBytes('d9010380')), RangeError)
+	})
+
+	it('decodes an allowed tag as a tagged value', () => {
+		// Tag 0 (date-time) is not a cbor-x divergent-read tag, so the walk accepts it and the decoder returns a Date.
+		const value = decodeCbor(toBytes('c074323032352d30372d32395431303a30303a30305a'))
+		ok(value instanceof Date)
 	})
 })
 
