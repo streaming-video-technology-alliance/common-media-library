@@ -1,4 +1,4 @@
-import { decodeCbor } from '../cbor/decodeCbor.ts'
+import { decodeCbor } from '../cbor/readCborItem.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { asUnsignedInteger, normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'

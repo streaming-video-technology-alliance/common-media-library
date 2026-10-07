@@ -30,7 +30,7 @@ describe('decodeVsiMap', () => {
 	}
 
 	it('decodes a sequenceNumber of 2^32 or more to a number', () => {
-		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
 		const result = decodeVsiMap(encodeVsiMapWithSequenceNumber(BigInt(2 ** 32)))
 		strictEqual(result.sequenceNumber, 2 ** 32)
 	})

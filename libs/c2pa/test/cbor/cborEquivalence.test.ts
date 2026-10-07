@@ -2,7 +2,7 @@ import { deepStrictEqual, ok, strictEqual, throws } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
 import { Tag } from 'cbor-x'
-import { decodeCbor as decodeWithCborX } from '../../src/cbor/decodeCbor.ts'
+import { decode as decodeWithCborX } from 'cbor-x/decode'
 import { projectCborTags } from '../../src/cbor/projectCborTags.ts'
 import { CborTag, decodeCbor } from '../../src/cbor/readCborItem.ts'
 import { parseJumbfBoxes } from '../../src/jumbf/parseJumbfBoxes.ts'
@@ -39,13 +39,14 @@ const SAME_VALUE = [
 	'd2 84 40 a0 f6 40', 'd8 18 42 0102', 'd8 20 61 61', 'd9 03e7 01',
 ]
 
-// Inputs that both decoders reject
+// Inputs that both decoders reject. cbor-x allocates the declared length of an array before it reads the items,
+// so the two preallocation cases of the reader tests stay out of this list.
 const BOTH_REJECT = [
 	// empty and incomplete items
-	'', '82 01', '43 0102', '19 03', 'a1 6161', '9a 06b9580f', 'a5 00',
-	// additional information 28 to 30, an indefinite integer, negative integer, or tag, and a break outside a container
-	'1c', '1d', '1e', 'fc', '3f', 'df', 'ff', '82 01 ff', 'bf 00 ff',
-	// indefinite strings, trailing bytes, reserved simple values, container keys, and a tag number above 2^53 - 1
+	'', '82 01', '43 0102', '19 03', 'a1 6161', 'a5 00',
+	// additional information 28 to 30, an indefinite integer, negative integer, or tag, and a break in value position
+	'1c', '1d', '1e', 'fc', '3f', 'df', 'bf 00 ff',
+	// indefinite strings, trailing bytes, reserved simple values, container keys, and a tag number above 2^64 - 1
 	'5f 41 01 41 02 ff', '7f 61 61 61 62 ff', '01 01', 'f0', 'f8 18', 'f8 20', 'a1 41 01 02', 'a1 80 02', 'db ffffffffffffffff 01',
 ]
 
@@ -74,11 +75,14 @@ function decodeWithBoth(bytes: Uint8Array, path: string): Decoded {
 	return { accepted: true, value: fromReader }
 }
 
-// Compares the byte strings inside `value` that both decoders accept as CBOR. Returns the number of compared items.
+// Compares the byte strings inside `value` that the reader accepts as CBOR. cbor-x must decode each of them to the
+// same value. Returns the number of compared items.
 function compareNested(value: unknown, path: string): number {
 	if (value instanceof Uint8Array) {
-		const nested = decodeWithBoth(value, `${path}/bstr`)
-		return nested.accepted ? 1 + compareNested(nested.value, `${path}/bstr`) : 0
+		let nested: unknown
+		try { nested = decodeCbor(value) } catch { return 0 }
+		deepStrictEqual(projectCborTags(nested), normalize(decodeWithCborX(value)), `${path}/bstr`)
+		return 1 + compareNested(nested, `${path}/bstr`)
 	}
 	if (value instanceof CborTag) return compareNested(value.value, `${path}/tag${value.tag}`)
 	if (Array.isArray(value)) return value.reduce<number>((count, item, index) => count + compareNested(item, `${path}[${index}]`), 0)
@@ -158,16 +162,6 @@ describe('readCborItem equivalence with cbor-x', () => {
 
 	it('rejects the malformed inputs of the reader tests like cbor-x', () => {
 		for (const hex of BOTH_REJECT) ok(!decodeWithBoth(toBytes(hex), hex).accepted, hex)
-
-		// Each 0x9a header declares a uint32 count equal to the bytes left after it
-		const size = 200
-		const headers = new Uint8Array(size)
-		const view = new DataView(headers.buffer)
-		for (let offset = 0; offset + 5 <= size; offset += 5) {
-			headers[offset] = 0x9a
-			view.setUint32(offset + 1, size - (offset + 5), false)
-		}
-		ok(!decodeWithBoth(headers, 'nested headers').accepted)
 	})
 
 	it('differs from cbor-x only in the cases of the design', () => {
@@ -181,6 +175,10 @@ describe('readCborItem equivalence with cbor-x', () => {
 		deepStrictEqual(projectCborTags(decodeCbor(toBytes('c1 61 61'))), { tag: 1, value: 'a' })
 		ok(Number.isNaN((decodeWithCborX(toBytes('c1 61 61')) as Date).getTime()))
 
+		// c1 1b 0020000000000000: tag 1 with an integer above 2^53 - 1. cbor-x throws.
+		deepStrictEqual(projectCborTags(decodeCbor(toBytes('c1 1b 0020000000000000'))), { tag: 1, value: BigInt(2) ** BigInt(53) })
+		throws(() => decodeWithCborX(toBytes('c1 1b 0020000000000000')), TypeError)
+
 		// c2 49 01 00..00, d8 41 42 0102, d9 0102 82 01 02, d9 d9f7 01: tags 2, 65, 258, and 55799.
 		// cbor-x returns a BigInt, a Uint16Array, a Set, and the content.
 		deepStrictEqual(projectCborTags(decodeCbor(toBytes('c2 49 010000000000000000'))), { tag: 2, value: toBytes('010000000000000000') })
@@ -192,15 +190,25 @@ describe('readCborItem equivalence with cbor-x', () => {
 		deepStrictEqual(projectCborTags(decodeCbor(toBytes('d9 d9f7 01'))), { tag: 55799, value: 1 })
 		strictEqual(decodeWithCborX(toBytes('d9 d9f7 01')), 1)
 
-		// d8 1c 80, d8 33 80, d9 0103 80, d9 dff9 80: tags 28, 51, 259, and 0xdff9. cbor-x rejects them.
+		// d8 1c 80, d8 33 80, d9 0103 80, d9 dff9 80: tags 28, 51, 259, and 0xdff9, which drive the decoding logic of cbor-x.
+		// cbor-x returns the content of tags 28 and 259 and throws on tags 51 and 0xdff9.
 		for (const [hex, tag] of [['d8 1c 80', 28], ['d8 33 80', 51], ['d9 0103 80', 259], ['d9 dff9 80', 0xdff9]] as const) {
 			deepStrictEqual(projectCborTags(decodeCbor(toBytes(hex))), { tag, value: [] }, hex)
-			throws(() => decodeWithCborX(toBytes(hex)), RangeError, hex)
 		}
+		deepStrictEqual(decodeWithCborX(toBytes('d8 1c 80')), [])
+		deepStrictEqual(decodeWithCborX(toBytes('d9 0103 80')), [])
+		throws(() => decodeWithCborX(toBytes('d8 33 80')))
+		throws(() => decodeWithCborX(toBytes('d9 dff9 80')))
 
-		// a1 69 5f5f70726f746f5f5f 01: the key __proto__. cbor-x renames the key to __proto_.
+		// ff and 82 01 ff: a break code outside an indefinite-length container. cbor-x reads it as an empty map.
+		throws(() => decodeCbor(toBytes('ff')), RangeError)
+		throws(() => decodeCbor(toBytes('82 01 ff')), RangeError)
+		deepStrictEqual(decodeWithCborX(toBytes('ff')), {})
+		deepStrictEqual(decodeWithCborX(toBytes('82 01 ff')), [1, {}])
+
+		// a1 69 5f5f70726f746f5f5f 01: the key __proto__. cbor-x does not keep the key as an own property.
 		deepStrictEqual(Object.keys(decodeCbor(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object), ['__proto__'])
-		deepStrictEqual(Object.keys(decodeWithCborX(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object), ['__proto_'])
+		strictEqual(Object.prototype.hasOwnProperty.call(decodeWithCborX(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object, '__proto__'), false)
 
 		// 129 nested arrays. cbor-x decodes them.
 		throws(() => decodeCbor(nestedArrays(129)), RangeError)

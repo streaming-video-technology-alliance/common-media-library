@@ -326,7 +326,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	})
 
 	it('accepts a minSequenceNumber and a validityPeriod of 2^32 or more', async (context) => {
-		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
 		const entryWithLargeIntegers = { ...activeEntry(key002), minSequenceNumber: BigInt(2 ** 32), validityPeriod: BigInt(2 ** 32) } as unknown as TestSessionKeyEntry
 		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), entryWithLargeIntegers])
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
