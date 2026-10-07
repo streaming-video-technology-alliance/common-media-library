@@ -367,6 +367,19 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		deepStrictEqual(result.errorCodes, [])
 	})
 
+	it('accepts an assertion that ends with an integer', async (context) => {
+		// In deterministic key order, the last byte of the assertion belongs to the minSequenceNumber of key_002.
+		const entries = [{ ...activeEntry(key001), deterministicKeyOrder: true }, { ...activeEntry(key002), deterministicKeyOrder: true }]
+		const init = await buildSessionKeysInitSegment(signer, entries)
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex, key002.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
 	it('excludes an expired session key from sessionKeys without SESSIONKEY_INVALID', async (context) => {
 		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(key002)])
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
