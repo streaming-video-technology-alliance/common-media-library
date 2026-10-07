@@ -86,7 +86,9 @@ The COSE key must include a `kid` (label 2). `minSequenceNumber` and `validityPe
 
 An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
 
-Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions also accept a `kid` outside the COSE key. They throw an error if the library cannot verify a session key, for example a key type that it does not support. If your code catches that error, check `errorCodes` instead.
+The assertion must contain at least one session key (section 18.25.2). `validateC2paInitSegment` reports `SESSIONKEY_INVALID` if the assertion has no session key, or if its CBOR does not decode. This rule also applies in VOD Merkle mode.
+
+Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions also accept a `kid` outside the COSE key. They throw an error if the library cannot verify a session key, for example a key type that it does not support. They also throw an error if the CBOR of the `c2pa.session-keys` assertion does not decode. If your code catches these errors, check `errorCodes` instead.
 
 ## C2PA Status Codes
 
