@@ -78,7 +78,7 @@ describe('validateManifestIntegrity', () => {
 
 	it('reports CLAIM_SIGNATURE_MISMATCH when the signature carries no certificate', async () => {
 		// COSE_Sign1 with an empty protected header, so there is no x5chain to verify against
-		const signatureBytes = new Uint8Array([0x84, 0x40, 0xa0, 0x40, 0x40])
+		const signatureBytes = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x40, 0x40])
 
 		const { codes } = await validateManifestIntegrity(internalData({ signatureBytes }))
 
