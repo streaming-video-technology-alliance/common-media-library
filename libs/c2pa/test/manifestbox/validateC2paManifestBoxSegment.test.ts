@@ -2,6 +2,7 @@ import { validateC2paManifestBoxSegment, C2paStatusCode, LiveVideoStatusCode } f
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
+import { Tag } from 'cbor-x'
 import { encodeCbor } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
@@ -294,6 +295,25 @@ describe('validateC2paManifestBoxSegment — BMFF hash assertion offset prefix (
 		ok(result.errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID))
 	})
 
+	it('rejects a hash that is a text string with ASSERTION_BMFFHASH_MALFORMED', async () => {
+		const segment = buildSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: 'not a byte string' })
+
+		const { result } = await validateC2paManifestBoxSegment(segment, null)
+
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+		strictEqual(result.bmffHashHex, null)
+	})
+
+	it('rejects a hash with CBOR tag 64 with ASSERTION_BMFFHASH_MALFORMED', async () => {
+		const hash = await computeBmffHash(buildMediaBoxes(), { offsetPrefixSize: 8 })
+		const segment = buildSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: new Tag(hash, 64) })
+
+		const { result } = await validateC2paManifestBoxSegment(segment, null)
+
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+		strictEqual(result.bmffHashHex, null)
+	})
+
 	it('accepts the flat hash of a real signed manifest-box segment', async () => {
 		const bytes = new Uint8Array(
 			readFileSync(new URL('../fixtures/test-segment.m4s', import.meta.url)),
@@ -350,7 +370,7 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 	})
 
 	it('accepts a sequenceNumber of 2^32 after the sequenceNumber 2^32 - 1 (§19.3.2.1)', async () => {
-		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
 		const liveVideoData = { ...chainedLiveVideoData('c2pa.manifestId'), sequenceNumber: BigInt(2 ** 32) }
 		const segment = await buildLiveSegment(liveVideoData, claim => signer.sign(claim))
 
@@ -407,7 +427,7 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 
 	it('rejects a signature that carries no certificate with CLAIM_SIGNATURE_MISMATCH', async () => {
 		// COSE_Sign1 with an empty protected header, so there is no x5chain to verify against
-		const noCertificate = new Uint8Array([0x84, 0x40, 0xa0, 0x40, 0x40])
+		const noCertificate = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x40, 0x40])
 		const segment = await buildLiveSegment(chainedLiveVideoData('c2pa.manifestId'), async () => noCertificate)
 
 		const { result } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID)
