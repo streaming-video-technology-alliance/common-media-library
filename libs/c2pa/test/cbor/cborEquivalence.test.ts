@@ -5,6 +5,7 @@ import { Tag } from 'cbor-x'
 import { decodeCbor as decodeWithCborX } from '../../src/cbor/decodeCbor.ts'
 import { projectCborTags } from '../../src/cbor/projectCborTags.ts'
 import { CborTag, decodeCbor } from '../../src/cbor/readCborItem.ts'
+import { parseJumbfBoxes } from '../../src/jumbf/parseJumbfBoxes.ts'
 import { readC2paManifest } from '../../src/readC2paManifest.ts'
 
 const toBytes = (hex: string): Uint8Array => Uint8Array.from(Buffer.from(hex.replace(/ /g, ''), 'hex'))
@@ -132,7 +133,10 @@ describe('readCborItem equivalence with cbor-x', () => {
 			const boxes: readonly (readonly [string, Uint8Array])[] = [
 				['claim', manifest.claimCborBytes],
 				['signature', manifest.signatureBytes],
-				...manifest.assertions.flatMap(assertion => assertion.cborBytes ? [[assertion.label, assertion.cborBytes] as const] : []),
+				...manifest.assertions.flatMap(assertion => {
+					const cbor = parseJumbfBoxes(assertion.rawBoxPayload).find(box => box.type === 'cbor')
+					return cbor ? [[assertion.label, cbor.data] as const] : []
+				}),
 			]
 
 			let count = 0
