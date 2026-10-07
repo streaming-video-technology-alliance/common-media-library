@@ -1,4 +1,4 @@
-import { encode } from 'cbor-x/encode'
+import { encodeCbor } from '../cborTestUtils.ts'
 import { JUMBF_UUID } from '../../src/utils.ts'
 import type { TestSigner } from '../testSigner.ts'
 
@@ -105,7 +105,7 @@ export function buildMerkleAuxBox(fields: AuxBoxFields, purpose: string = MERKLE
 	const purposeBytes = TEXT_ENCODER.encode(purpose)
 	const prefix = new Uint8Array(4 + purposeBytes.length + 1) // version/flags + purpose\0
 	prefix.set(purposeBytes, 4)
-	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encode(map) as Uint8Array, new Uint8Array(paddingBytes)))
+	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encodeCbor(map) as Uint8Array, new Uint8Array(paddingBytes)))
 }
 
 // Aux box with the right prefix but undecodable CBOR data, for malformed-payload tests.
@@ -139,7 +139,7 @@ export function buildInitMediaBoxes(): Uint8Array {
 }
 
 function assembleMerkleInitSegment(assertionData: Record<string, unknown>, claimCborBytes: Uint8Array, signature: Uint8Array | null): Uint8Array {
-	const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encode(assertionData) as Uint8Array))
+	const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData) as Uint8Array))
 	const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 	const manifestContent = [claim, assertionStore]
@@ -156,7 +156,7 @@ function assembleMerkleInitSegment(assertionData: Record<string, unknown>, claim
 }
 
 function merkleClaimCborBytes(): Uint8Array {
-	return Uint8Array.from(encode({ instanceID: 'urn:uuid:merkle-test-manifest', created_assertions: [] }))
+	return encodeCbor({ instanceID: 'urn:uuid:merkle-test-manifest', created_assertions: [] })
 }
 
 // Unsigned init segment with a `c2pa.hash.bmff.v3` assertion. It has no signature box, so

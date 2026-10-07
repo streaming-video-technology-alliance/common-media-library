@@ -2,7 +2,7 @@ import { validateC2paManifestBoxSegment, C2paStatusCode, LiveVideoStatusCode } f
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
-import { encode } from 'cbor-x/encode'
+import { encodeCbor } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
 
@@ -265,10 +265,10 @@ describe('validateC2paManifestBoxSegment — BMFF hash assertion offset prefix (
 	// box, so validation also reports CLAIM_SIGNATURE_MISSING; these tests assert on
 	// SEGMENT_INVALID only.
 	function buildSegment(assertionData: Record<string, unknown>): Uint8Array {
-		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encode(assertionData) as Uint8Array))
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData) as Uint8Array))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', created_assertions: [] }
-		const claim = buildJumb('c2pa.claim', buildBox('cbor', encode(claimData) as Uint8Array))
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', encodeCbor(claimData) as Uint8Array))
 		return buildManifestBoxSegment('urn:uuid:bmff-hash-test-manifest', claim, assertionStore)
 	}
 
@@ -321,13 +321,13 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 		sign?: (claimCborBytes: Uint8Array) => Promise<Uint8Array>,
 	): Promise<Uint8Array> {
 		const hash = await computeBmffHash(buildMediaBoxes(), { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
-		const liveVideoAssertion = buildJumb('c2pa.livevideo.segment', buildBox('cbor', encode(liveVideoData) as Uint8Array))
+		const liveVideoAssertion = buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor(liveVideoData) as Uint8Array))
 		const bmffAssertion = buildJumb(
 			'c2pa.hash.bmff.v3',
-			buildBox('cbor', encode({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash }) as Uint8Array),
+			buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash }) as Uint8Array),
 		)
 		const assertionStore = buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion)
-		const claimCborBytes = Uint8Array.from(encode({ instanceID: 'urn:uuid:live-segment-test-manifest', created_assertions: [] }))
+		const claimCborBytes = encodeCbor({ instanceID: 'urn:uuid:live-segment-test-manifest', created_assertions: [] })
 		const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 		const manifestContent = [claim, assertionStore]
 		if (sign) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
