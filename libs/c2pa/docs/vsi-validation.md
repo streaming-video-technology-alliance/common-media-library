@@ -21,11 +21,12 @@ A `SequenceState` object passes from each media segment call to the next and tra
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
-const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+const initResponse = await fetch(initUrl)
+const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
 
 if (!init.isValid) {
-  console.error('Init segment validation failed:', init.errorCodes)
+  throw new Error(`Init segment validation failed: ${init.errorCodes.join(', ')}`)
 }
 ```
 
@@ -76,7 +77,8 @@ import type { SequenceState } from '@svta/cml-c2pa'
 let sequenceState: SequenceState | undefined
 
 for (const segmentUrl of segmentUrls) {
-  const segmentBytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+  const segmentResponse = await fetch(segmentUrl)
+  const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())
   const validated = await validateC2paSegment(segmentBytes, init.sessionKeys, sequenceState)
 
   if (!validated) {
@@ -127,7 +129,8 @@ import type { SequenceState } from '@svta/cml-c2pa'
 
 async function validateStream(initUrl: string, segmentUrls: string[]) {
   // Phase 1: Validate the init segment
-  const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+  const initResponse = await fetch(initUrl)
+  const initBytes = new Uint8Array(await initResponse.arrayBuffer())
   const init = await validateC2paInitSegment(initBytes)
 
   if (!init.isValid) {
@@ -144,7 +147,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
   let sequenceState: SequenceState | undefined
 
   for (const segmentUrl of segmentUrls) {
-    const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
     const validated = await validateC2paSegment(bytes, init.sessionKeys, sequenceState)
 
     if (!validated) {

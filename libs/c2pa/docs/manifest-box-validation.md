@@ -28,7 +28,8 @@ let lastManifestId: string | null = null
 let state: ManifestBoxValidationState | undefined
 
 for (const segmentUrl of segmentUrls) {
-  const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+  const response = await fetch(segmentUrl)
+  const bytes = new Uint8Array(await response.arrayBuffer())
 
   const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
     bytes,
@@ -66,7 +67,8 @@ async function validateStream(segmentUrls: string[]) {
   let state: ManifestBoxValidationState | undefined
 
   for (const segmentUrl of segmentUrls) {
-    const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
 
     const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
       bytes,
