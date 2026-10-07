@@ -14,6 +14,9 @@ const CBOR = new Encoder({ tagUint8Array: false, useRecords: false, mapsAsObject
 
 const CBOR_TAG_DATE_TIME = 0
 const CBOR_TAG_COSE_SIGN1 = 18
+const CBOR_ARRAY_INDEFINITE = 0x9f
+const CBOR_MAP_INDEFINITE = 0xbf
+const CBOR_BREAK = 0xff
 const COSE_HEADER_ALG = 1
 const COSE_HEADER_KID = 4
 const COSE_ALG_ES256 = -7
@@ -49,10 +52,10 @@ export type TestSessionKey = {
 export type TestSessionKeyEntry = {
 	readonly key: TestSessionKey
 	readonly minSequenceNumber: number
-	/** RFC 3339 date-time, encoded with CBOR tag 0. */
-	readonly createdAt: string
-	/** Encodes `createdAt` as a text string without CBOR tag 0. */
-	readonly omitCreatedAtTag?: boolean
+	/** RFC 3339 date-time. A number tests other encodings, such as seconds since the epoch with CBOR tag 1. */
+	readonly createdAt: string | number
+	/** CBOR tag of `createdAt`. The default is tag 0. `null` encodes `createdAt` without a tag. */
+	readonly createdAtTag?: number | null
 	/** Seconds from `createdAt`. */
 	readonly validityPeriod: number
 	/** Adds a `kid` field next to the COSE key. §18.25.2 does not define this field. */
@@ -106,20 +109,33 @@ async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: U
 	return {
 		key: entry.key.coseKey,
 		minSequenceNumber: entry.minSequenceNumber,
-		createdAt: entry.omitCreatedAtTag ? entry.createdAt : new Tag(entry.createdAt, CBOR_TAG_DATE_TIME),
+		createdAt: entry.createdAtTag === null ? entry.createdAt : new Tag(entry.createdAt, entry.createdAtTag ?? CBOR_TAG_DATE_TIME),
 		validityPeriod: entry.validityPeriod,
 		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, entry.signerBindingPayload ?? null),
 		...(entry.topLevelKid && { kid: entry.topLevelKid }),
 	}
 }
 
+// Encodes plain objects and arrays with indefinite lengths. Each ends with the break code (RFC 8949 section 3.2.2).
+// cbor-x does not decode byte strings or text strings of indefinite length.
+function encodeIndefiniteLengths(value: unknown): Uint8Array {
+	if (Array.isArray(value)) return concatBytes(Uint8Array.of(CBOR_ARRAY_INDEFINITE), ...value.map(encodeIndefiniteLengths), Uint8Array.of(CBOR_BREAK))
+	if (typeof value === 'object' && value !== null && Object.getPrototypeOf(value) === Object.prototype) {
+		const entries = Object.entries(value).flatMap(([key, item]) => [Uint8Array.from(CBOR.encode(key)), encodeIndefiniteLengths(item)])
+		return concatBytes(Uint8Array.of(CBOR_MAP_INDEFINITE), ...entries, Uint8Array.of(CBOR_BREAK))
+	}
+	return Uint8Array.from(CBOR.encode(value))
+}
+
 /**
  * Builds an init segment whose manifest has a `c2pa.session-keys` assertion (§18.25) with the given keys.
- * The claim references the assertion and is signed by `signer`.
+ * The claim references the assertion and is signed by `signer`. If `indefiniteLengths` is `true`, the assertion
+ * encodes its maps and arrays with indefinite lengths. The COSE keys and signer bindings keep definite lengths.
  */
-export async function buildSessionKeysInitSegment(signer: TestSigner, entries: readonly TestSessionKeyEntry[]): Promise<Uint8Array> {
+export async function buildSessionKeysInitSegment(signer: TestSigner, entries: readonly TestSessionKeyEntry[], indefiniteLengths: boolean = false): Promise<Uint8Array> {
 	const keys = await Promise.all(entries.map(entry => buildSessionKeyData(entry, signer.certificateDER)))
-	const sessionKeysAssertion = buildJumb(SESSION_KEYS_LABEL, buildBox('cbor', Uint8Array.from(CBOR.encode({ keys }))))
+	const assertionCbor = indefiniteLengths ? encodeIndefiniteLengths({ keys }) : Uint8Array.from(CBOR.encode({ keys }))
+	const sessionKeysAssertion = buildJumb(SESSION_KEYS_LABEL, buildBox('cbor', assertionCbor))
 	const claimCborBytes = Uint8Array.from(CBOR.encode({
 		instanceID: MANIFEST_ID,
 		created_assertions: [{

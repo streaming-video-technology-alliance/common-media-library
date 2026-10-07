@@ -10,6 +10,7 @@ export type InternalAssertionData = {
 	readonly label: string
 	readonly data: unknown
 	readonly rawBoxPayload: Uint8Array
+	readonly cborBytes?: Uint8Array
 }
 
 /**

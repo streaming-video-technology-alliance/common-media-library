@@ -7,6 +7,7 @@ import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import type { InternalAssertionData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
@@ -48,9 +49,56 @@ function ensureDecodedCbor(value: unknown): unknown {
 	return value
 }
 
-// §18.25.2: CBOR tag 0 (RFC 3339 date-time). cbor-x decodes tags 0 and 1 to a Date, so tag 1 also passes.
+// RFC 8949 section 3.4.1: the date-time of RFC 3339, as refined by RFC 4287 section 3.3 (C2PA section 6.9)
+const RFC_3339_DATE_TIME = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:[0-5]\d){2}(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/
+const CBOR_BREAK = 0xff
+
+// A private key marks a real CBOR tag (RFC 8949 section 3.4), so a CBOR map with "tag" and "value" keys is not mistaken for one.
+const CBOR_TAG = Symbol()
+
+// Decodes CBOR like cbor-x, but marks each tag with CBOR_TAG. cbor-x converts tags 0 and 1 to a Date.
+function decodeWithTags(cbor: Uint8Array): unknown {
+	let offset = 0
+	const read = (): unknown => {
+		const start = offset
+		const initialByte = cbor[offset++]
+		const majorType = initialByte >> 5
+		const additionalInfo = initialByte & 31
+		const isContainer = majorType === 4 || majorType === 5
+		let argument = additionalInfo
+		if (additionalInfo > 23 && additionalInfo < 28) {
+			let size = 1 << (additionalInfo - 24)
+			for (argument = 0; size--;) argument = argument * 256 + cbor[offset++]
+		}
+		const indefinite = additionalInfo === 31 && isContainer
+		if ((additionalInfo > 27 && !indefinite) || !(offset <= cbor.length)) throw new RangeError('Malformed CBOR')
+		if (isContainer) {
+			// RFC 8949 section 3.2.2: an array or a map of indefinite length ends with the break code
+			const items: unknown[] = []
+			const itemCount = majorType === 5 ? 2 * argument : argument
+			while (indefinite ? cbor[offset] !== CBOR_BREAK : items.length < itemCount) items.push(read())
+			if (indefinite) offset++
+			if (majorType === 4) return items
+			// Without a prototype, a "__proto__" key is a plain key
+			const map: Record<string, unknown> = Object.create(null)
+			for (let i = 0; i < items.length; i += 2) map[items[i] as string] = items[i + 1]
+			return map
+		}
+		if (majorType === 6) return { [CBOR_TAG]: argument, value: read() }
+		if (majorType === 2 || majorType === 3) offset += argument
+		return decode(cbor.subarray(start, offset))
+	}
+	return read()
+}
+
+// §18.25.2: CBOR tag 0 with an RFC 3339 date-time
 function parseCreatedAt(value: unknown): string | null {
-	return value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString() : null
+	const tagged = value as Record<symbol | string, unknown> | null
+	const text = tagged?.['value']
+	if (tagged?.[CBOR_TAG] !== 0 || typeof text !== 'string' || !RFC_3339_DATE_TIME.test(text)) return null
+	// Date rolls a day that does not exist over to the next month
+	if (new Date(text.slice(0, 10)).getUTCDate() !== Number(text.slice(8, 10))) return null
+	return new Date(text).toISOString()
 }
 
 // §18.25.2: the COSE key includes the kid (COSE key label 2, RFC 9052)
@@ -111,12 +159,12 @@ type SessionKeysValidation = {
 	readonly hasInvalidSessionKey: boolean
 }
 
-function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
+function extractSessionKeyFields(entry: unknown, taggedEntry: unknown): SessionKeyFields | null {
 	const keyData = entry as Record<string, unknown>
 
 	const minSequenceNumber = asUnsignedInteger(keyData['minSequenceNumber'])
 	const validityPeriod = asUnsignedInteger(keyData['validityPeriod'])
-	const createdAt = parseCreatedAt(keyData['createdAt'])
+	const createdAt = parseCreatedAt((taggedEntry as Record<string, unknown> | undefined)?.['createdAt'])
 
 	if (minSequenceNumber === null || validityPeriod === null || !createdAt) return null
 
@@ -155,10 +203,11 @@ async function verifyAndConvertKey(
 
 async function validateSingleSessionKey(
 	entry: unknown,
+	taggedEntry: unknown,
 	certificate: Uint8Array,
 ): Promise<ValidatedSessionKey | null> {
 	try {
-		const fields = extractSessionKeyFields(entry)
+		const fields = extractSessionKeyFields(entry, taggedEntry)
 		if (!fields) return null
 		return await verifyAndConvertKey(fields, certificate)
 	} catch {
@@ -170,13 +219,23 @@ function isWithinValidityPeriod(key: ValidatedSessionKey): boolean {
 	return !isKeyExpired(key.createdAt, key.validityPeriod)
 }
 
+// The session key entries with their CBOR tags, in the same order as the decoded entries
+function readTaggedKeyEntries(cborBytes: Uint8Array | undefined): unknown[] {
+	try {
+		return cborBytes ? extractKeyArray(decodeWithTags(cborBytes)) : []
+	} catch {
+		return []
+	}
+}
+
 async function validateSessionKeys(
-	assertion: C2paAssertion,
+	assertion: InternalAssertionData,
 	certificate: Uint8Array,
 ): Promise<SessionKeysValidation> {
 	const keyEntries = extractKeyArray(ensureDecodedCbor(assertion.data))
+	const taggedKeyEntries = readTaggedKeyEntries(assertion.cborBytes)
 	const results = await Promise.all(
-		keyEntries.map(entry => validateSingleSessionKey(entry, certificate)),
+		keyEntries.map((entry, index) => validateSingleSessionKey(entry, taggedKeyEntries[index], certificate)),
 	)
 	const validKeys = results.filter((key): key is ValidatedSessionKey => key !== null)
 	return {
@@ -234,9 +293,10 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const sessionKeysAssertion = manifest.assertions.find(
 		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
 	)
+	// manifest.assertions has the order of internalData.assertions
 	const { sessionKeys, hasInvalidSessionKey } =
 		sessionKeysAssertion && certificate
-			? await validateSessionKeys(sessionKeysAssertion, certificate)
+			? await validateSessionKeys(internalData.assertions[manifest.assertions.indexOf(sessionKeysAssertion)], certificate)
 			: { sessionKeys: [], hasInvalidSessionKey: false }
 
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
