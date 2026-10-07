@@ -1,7 +1,7 @@
 const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 
 import { readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
-import { decode } from 'cbor-x/decode'
+import { decodeCbor } from './cbor/decodeCbor.ts'
 import type { C2paAssertion } from './C2paAssertion.ts'
 import type { C2paManifest } from './C2paManifest.ts'
 import type { ClaimAssertionRef } from './claim/ClaimAssertionRef.ts'
@@ -73,7 +73,7 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 		if (contentBox) {
 			if (contentBox.type === 'cbor') {
 				cborBytes = contentBox.data
-				try { data = decode(contentBox.data) as unknown } catch { data = contentBox.data }
+				try { data = decodeCbor(contentBox.data) as unknown } catch { data = contentBox.data }
 			}
 			else if (contentBox.type === 'json') {
 				try { data = JSON.parse(TEXT_DECODER.decode(contentBox.data)) as unknown } catch { data = contentBox.data }
@@ -193,7 +193,7 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 			const contentBox = inner.find(b => b.type === 'cbor')
 			if (contentBox) {
 				claimCborBytes = contentBox.data
-				try { claimData = decode(contentBox.data) as Record<string, unknown> } catch { /* malformed claim — continue */ }
+				try { claimData = decodeCbor(contentBox.data) as Record<string, unknown> } catch { /* malformed claim — continue */ }
 			}
 		}
 		else if (label === 'c2pa.assertions') {

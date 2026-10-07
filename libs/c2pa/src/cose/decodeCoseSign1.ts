@@ -1,4 +1,4 @@
-import { decode } from 'cbor-x/decode'
+import { decodeCbor } from '../cbor/decodeCbor.ts'
 import type { CoseSign1 } from './CoseSign1.ts'
 
 const COSE_SIGN1_TAG_SINGLE_BYTE = 0xd2
@@ -44,7 +44,7 @@ function toUint8Array(value: unknown): Uint8Array {
 export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 	try {
 		const stripped = stripCoseTag(coseBytes)
-		const coseArray = decode(stripped) as unknown
+		const coseArray = decodeCbor(stripped) as unknown
 
 		if (!Array.isArray(coseArray) || coseArray.length !== COSE_SIGN1_ARRAY_LENGTH) {
 			throw new Error('Invalid COSE_Sign1 structure: expected array with 4 elements')
@@ -55,7 +55,7 @@ export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 		const protectedBytes = toUint8Array(protectedRaw)
 		let protectedHeader: CoseHeader = {}
 		if (protectedBytes.length > 0) {
-			protectedHeader = decode(protectedBytes) as CoseHeader
+			protectedHeader = decodeCbor(protectedBytes) as CoseHeader
 		}
 
 		const unprotectedHeader = (unprotectedRaw ?? {}) as CoseHeader

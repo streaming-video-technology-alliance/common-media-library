@@ -1,6 +1,7 @@
 import { decode } from 'cbor-x/decode'
 import { encode } from 'cbor-x/encode'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
+import { decodeCbor } from '../cbor/decodeCbor.ts'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
@@ -42,9 +43,9 @@ function normalizeToUint8Array(value: unknown): Uint8Array {
 }
 
 function ensureDecodedCbor(value: unknown): unknown {
-	if (value instanceof Uint8Array) return decode(value)
+	if (value instanceof Uint8Array) return decodeCbor(value)
 	if (Array.isArray(value) && value.length > 0 && typeof (value as number[])[0] === 'number') {
-		return decode(new Uint8Array(value as number[]))
+		return decodeCbor(new Uint8Array(value as number[]))
 	}
 	return value
 }
