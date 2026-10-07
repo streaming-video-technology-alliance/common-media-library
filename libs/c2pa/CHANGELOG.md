@@ -13,6 +13,7 @@ and this project adheres to
 - `validateC2paInitSegment` checks session keys more strictly (C2PA sections 18.25.2 and 19.7.3):
   - It keeps a session key that is not yet active. Each session key is valid from its own `createdAt`. An init segment can contain the next session key before that key becomes active. Before, `sessionKeys` did not include that key. Each segment signed with that key then failed with `LiveVideoStatusCode.SEGMENT_INVALID`.
   - It accepts the session keys of real signers. The signer binding check required the certificate with CBOR tag 64 as the signed payload. No known signer adds this tag, so `sessionKeys` was empty. The check now accepts the certificate itself, or the certificate as a CBOR byte string. The text of section 18.25.2 allows both forms.
+  - It checks the payload field of the signer binding. The field must be nil, an empty byte string, or an exact copy of the signed payload. Other content makes the session key invalid. Before, the check ignored this field.
   - It fails with `LiveVideoStatusCode.SESSIONKEY_INVALID` if it finds an invalid session key in the `c2pa.session-keys` assertion. A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. An expired session key does not count as invalid. Before, the function excluded the invalid key from `sessionKeys`. It returned `isValid: true` if another session key was valid.
   - It reads the `kid` only from the COSE key, as section 18.25.2 requires. Before, a `kid` field outside the COSE key also counted.
   - It checks the types of the session key fields. `minSequenceNumber` and `validityPeriod` must be unsigned integers up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). `createdAt` must be a valid date with a CBOR date tag. A session key that breaks one of these rules is invalid. Before, a text string, a negative value, or a fraction in these fields caused no error code. A `validityPeriod` such as `'one hour'` kept the key valid forever.
@@ -26,7 +27,7 @@ and this project adheres to
 
 ### Changed
 
-- VSI/EMSG Validation guide: the Session Key Lifecycle section describes the validity period of session keys. It also lists the two accepted forms of the signer binding payload. The Sequence Number Validation section states the unsigned integer rule and the supported range.
+- VSI/EMSG Validation guide: the Session Key Lifecycle section describes the validity period of session keys. It also lists the accepted forms of the signed payload and the payload field of the signer binding. The Sequence Number Validation section states the unsigned integer rule and the supported range.
 - Results and Error Codes guide: the error code table describes the validity period of session keys. The new Invalid Session Keys section describes invalid session keys and the supported range of their fields. The VSI/EMSG Validation guide links to that section.
 - Manifest Box Validation guide: the Result Fields table states when `sequenceNumber` is `null`.
 - README and VSI/EMSG Validation guide: the VSI/EMSG examples check `isValid` before they use `sessionKeys`. If `isValid` is `false`, `sessionKeys` can still contain session keys. Do not use these session keys.
