@@ -89,4 +89,13 @@ describe('decodeVsiMap', () => {
 		})
 		throws(() => decodeVsiMap(new Uint8Array(vsiCbor)), /manifestId/)
 	})
+
+	it('throws for an exclusion constraint whose value is not a byte string', () => {
+		const vsiCbor = encodeCbor({
+			sequenceNumber: 1,
+			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [{ xpath: '/mdat', data: [{ offset: 8, value: [1] }] }] },
+			manifestId: 'urn:c2pa:12345',
+		})
+		throws(() => decodeVsiMap(new Uint8Array(vsiCbor)), /exclusions/)
+	})
 })

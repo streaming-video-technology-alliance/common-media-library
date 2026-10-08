@@ -380,6 +380,39 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 		deepStrictEqual(result.certificate, signer.certificateDER)
 	})
 
+	function payloadOffsetOf(bytes: Uint8Array, boxType: string): number {
+		const code = Array.from(boxType, c => c.charCodeAt(0))
+		for (let i = 4; i + 4 <= bytes.length; i++) {
+			if (code.every((byte, j) => bytes[i + j] === byte)) return i + 4
+		}
+		throw new Error(`no ${boxType} box`)
+	}
+
+	it('rejects an exclusion constraint that is not a byte string, also after the constrained byte changed', async () => {
+		const media = buildMediaBoxes()
+		const constrainedOffset = payloadOffsetOf(media, 'mdat')
+		// The hash excludes mdat only while its first payload byte keeps the value of the constraint.
+		const constraint = { offset: 8, value: Uint8Array.of(media[constrainedOffset]) }
+		const hash = await computeBmffHash(media, { exclusions: [{ xpath: '/uuid' }, { xpath: '/mdat', data: [constraint] }], offsetPrefixSize: 8 })
+		// The assertion encodes the constraint value as a CBOR array of integers instead of a byte string.
+		const assertionData = { exclusions: [{ xpath: '/uuid' }, { xpath: '/mdat', data: [{ offset: 8, value: Array.from(constraint.value) }] }], alg: 'sha256', hash }
+		const claimCborBytes = encodeCbor({ instanceID: 'urn:uuid:live-segment-test-manifest', created_assertions: [] })
+		const segment = buildManifestBoxSegment('urn:uuid:live-segment-test-manifest',
+			buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes)),
+			buildJumb('c2pa.assertions',
+				buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor(chainedLiveVideoData('c2pa.manifestId')))),
+				buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData))),
+			),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
+		)
+		segment[constrainedOffset] ^= 0xff
+
+		const { result } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID)
+
+		strictEqual(result.isValid, false)
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
 	// A claim that references an assertion the segment does not have. Only a decoded claim can report that.
 	const CLAIM_WITH_MISSING_ASSERTION = {
 		instanceID: 'urn:uuid:live-segment-test-manifest',

@@ -5,7 +5,7 @@ import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
-import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { parseExclusions } from '../bmff/parseExclusions.ts'
 import type { InternalAssertionData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
@@ -73,7 +73,8 @@ async function validateBmffHashAssertion(
 	if (!rawHash) return true
 	if (!(rawHash instanceof Uint8Array)) return false
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
-	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
+	const exclusions = parseExclusions(data['exclusions'])
+	if (!exclusions) return false
 	// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
 	// box; only Merkle tree hashes may omit the 8-byte offset prefix.
 	const computed = await computeBmffHash(bytes, { exclusions, alg, offsetPrefixSize: 8 })

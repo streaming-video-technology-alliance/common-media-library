@@ -1,5 +1,5 @@
 import { decodeCbor } from '../cbor/readCborItem.ts'
-import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { parseExclusions } from '../bmff/parseExclusions.ts'
 import { asUnsignedInteger, normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'
 
@@ -38,8 +38,8 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 	const hash = bmffHashRaw['hash']
 	if (!(hash instanceof Uint8Array)) throw new Error('VSI map bmffHash.hash must be a Uint8Array')
 
-	const exclusions = bmffHashRaw['exclusions']
-	if (exclusions !== undefined && !Array.isArray(exclusions)) throw new Error('VSI map bmffHash.exclusions must be an array')
+	const exclusions = parseExclusions(bmffHashRaw['exclusions'])
+	if (!exclusions) throw new Error('VSI map bmffHash.exclusions must be an array of maps with an xpath text string, and data constraints with an unsigned integer offset and a byte string value')
 
 	const manifestId = raw['manifestId']
 	if (typeof manifestId !== 'string') throw new Error('VSI map missing or invalid manifestId')
@@ -51,7 +51,7 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 		bmffHash: {
 			hash,
 			alg,
-			exclusions: (exclusions as BmffHashExclusion[] | undefined) ?? [],
+			exclusions,
 		},
 		manifestId,
 	}

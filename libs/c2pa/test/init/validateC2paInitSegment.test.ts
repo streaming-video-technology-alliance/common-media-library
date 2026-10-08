@@ -172,6 +172,19 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
 	})
 
+	it('rejects an exclusion constraint whose value is not a byte string as malformed', async () => {
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid', data: [{ offset: 8, value: [1] }] }],
+			merkle: [merkleEntry()],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
 	it('rejects a merkle entry with no alg anywhere as malformed (no default per spec)', async () => {
 		const init = buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
@@ -283,6 +296,16 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 	it('rejects a hash that is a CBOR array of integers', async () => {
 		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const init = buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: Array.from(hash) })
+
+		const result = await validateC2paInitSegment(init)
+
+		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+	})
+
+	it('rejects an exclusion constraint whose value is not a byte string', async () => {
+		// The constraint never matches the empty moov box, so the hash is the flat hash of ftyp + moov.
+		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const init = buildInitSegment({ exclusions: [{ xpath: '/uuid' }, { xpath: '/moov', data: [{ offset: 8, value: [0] }] }], alg: 'sha256', hash })
 
 		const result = await validateC2paInitSegment(init)
 
