@@ -5,6 +5,7 @@ import { projectCborTags } from './cbor/projectCborTags.ts'
 import { decodeCbor } from './cbor/readCborItem.ts'
 import type { C2paAssertion } from './C2paAssertion.ts'
 import type { C2paManifest } from './C2paManifest.ts'
+import { C2paStatusCode } from './C2paStatusCode.ts'
 import type { ClaimAssertionRef } from './claim/ClaimAssertionRef.ts'
 import type { InternalAssertionData, InternalManifestData } from './claim/InternalManifestData.ts'
 import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
@@ -112,6 +113,25 @@ function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string
 	}
 }
 
+type Claim = {
+	readonly data: Record<string, unknown> | null
+	readonly code: InternalManifestData['claimCode']
+}
+
+// C2PA section 15.6.2: the claim box holds one CBOR map
+function readClaim(bytes: Uint8Array): Claim {
+	let value: unknown
+	try {
+		value = decodeCbor(bytes)
+	} catch {
+		return { data: null, code: C2paStatusCode.CLAIM_CBOR_INVALID }
+	}
+	if (value === null || typeof value !== 'object' || Object.getPrototypeOf(value) !== Object.prototype) {
+		return { data: null, code: C2paStatusCode.CLAIM_MALFORMED }
+	}
+	return { data: projectCborTags(value) as Record<string, unknown>, code: null }
+}
+
 function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAssertionRef[] {
 	const created = claimData['created_assertions'] as unknown[] | undefined
 	const gathered = claimData['gathered_assertions'] as unknown[] | undefined
@@ -182,6 +202,7 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 
 	let claimData: Record<string, unknown> | null = null
 	let claimCborBytes: Uint8Array | null = null
+	let claimCode: InternalManifestData['claimCode'] = null
 	let internalAssertions: InternalAssertionData[] = []
 	let signatureBytes: Uint8Array | null = null
 
@@ -199,7 +220,9 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 			const contentBox = inner.find(b => b.type === 'cbor')
 			if (contentBox) {
 				claimCborBytes = contentBox.data
-				try { claimData = projectCborTags(decodeCbor(contentBox.data)) as Record<string, unknown> } catch { /* a claim that does not decode has no fields */ }
+				const claim = readClaim(contentBox.data)
+				claimData = claim.data
+				claimCode = claim.code
 			}
 		}
 		else if (label === 'c2pa.assertions') {
@@ -238,6 +261,7 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 		manifest,
 		claimAssertionRefs,
 		claimCborBytes,
+		claimCode,
 		signatureBytes,
 		assertions: internalAssertions,
 	}

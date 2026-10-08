@@ -29,6 +29,8 @@ Before you present content as authentic, compare the signer with your own trust 
 
 A manifest without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate, or that does not verify over the claim, fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`.
 
+A claim box whose CBOR does not decode fails with `C2paStatusCode.CLAIM_CBOR_INVALID`. A claim box whose CBOR is not a map, for example a map inside a CBOR tag, fails with `C2paStatusCode.CLAIM_MALFORMED`. The library does not check the fields of the claim.
+
 ## Live Video Error Codes
 
 The `LiveVideoStatusCode` constants are the live video validation failures that C2PA specification section 19.7 defines.
@@ -106,6 +108,8 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `CLAIM_SIGNATURE_MISMATCH` | `claimSignature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
 | `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box |
 | `CLAIM_MISSING` | `claim.missing` | The manifest has no claim box |
+| `CLAIM_CBOR_INVALID` | `claim.cbor.invalid` | The claim box holds CBOR that does not decode |
+| `CLAIM_MALFORMED` | `claim.malformed` | The claim box holds CBOR that is not a map |
 | `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 

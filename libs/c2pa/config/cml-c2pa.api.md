@@ -47,6 +47,8 @@ export const C2paStatusCode: {
     readonly CLAIM_SIGNATURE_MISMATCH: "claimSignature.mismatch";
     readonly CLAIM_SIGNATURE_MISSING: "claimSignature.missing";
     readonly CLAIM_MISSING: "claim.missing";
+    readonly CLAIM_CBOR_INVALID: "claim.cbor.invalid";
+    readonly CLAIM_MALFORMED: "claim.malformed";
     readonly ASSERTION_BMFFHASH_MALFORMED: "assertion.bmffHash.malformed";
     readonly ASSERTION_BMFFHASH_MISMATCH: "assertion.bmffHash.mismatch";
 };
