@@ -17,7 +17,7 @@ status: draft
 Add `createCmcdSession()`, a reporting API next to `CmcdReporter`. A session is one `sid`. It keeps only the state that CTA-5004-B scopes to a session or to a destination. This state is a sequence number for each destination, the event queues, and the timers. It also includes the `msd`, `bs`, `bsd`, and `ec` values that wait for the next report of each destination. The player passes its data on every call and decides itself when its state changes. A `filter` predicate on an event target selects the reports that the target receives. The release that adds the session deprecates `CmcdReporter`, and version 3.0.0 removes it.
 
 ```ts
-import type { Cmcd } from '@svta/cml-cmcd'
+import type { CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, createCmcdSession } from '@svta/cml-cmcd'
 
 const session = createCmcdSession({
@@ -32,7 +32,7 @@ const session = createCmcdSession({
 	return { status: 200 }
 })
 
-const state: Cmcd = { sta: 'p', bl: [12000], mtp: [25000] }
+const state: CmcdSnapshot = { sta: 'p', bl: [12000], mtp: [25000] }
 
 const report = session.createRequestReport({ url: 'https://cdn.example.com/movie/seg-1.m4s' }, { ...state, ot: 'v', d: 4000, br: [3000] })
 console.log(report.url)
@@ -67,14 +67,14 @@ Request mode is one destination. Each target URL is one destination, so targets 
 The session keeps no player state. The player builds its CMCD data from its own fields and passes it with each call. The player also decides when a state changes. That check is one comparison.
 
 ```ts
-import type { Cmcd } from '@svta/cml-cmcd'
+import type { CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, createCmcdSession } from '@svta/cml-cmcd'
 
-let playerState: Cmcd['sta'] = CmcdPlayerState.STARTING
+let playerState: CmcdPlayerState = CmcdPlayerState.STARTING
 const bufferLength = 21300
 const bandwidth = 25_000_000
 
-const state = (): Cmcd => ({ sf: 'h', st: 'v', sta: playerState, bl: [bufferLength], mtp: [bandwidth / 1000] })
+const state = (): CmcdSnapshot => ({ sf: 'h', st: 'v', sta: playerState, bl: [bufferLength], mtp: [bandwidth / 1000] })
 
 const session = createCmcdSession({
 	cid: 'movie-42',
@@ -92,7 +92,7 @@ const session = createCmcdSession({
 
 session.start()
 
-function setPlayerState(next: Cmcd['sta']): void {
+function setPlayerState(next: CmcdPlayerState): void {
 	if (next === playerState) {
 		return
 	}
@@ -110,7 +110,7 @@ console.log(report.url)
 session.stop()
 ```
 
-The second `setPlayerState()` call sends nothing, because the state did not change. `start()` sends the first `t` report at once and then one report every 30 seconds. Each `t` report reads `snapshot()`. The request report carries `nor` as a path relative to the request URL.
+The second `setPlayerState()` call sends nothing, because the state did not change. `start()` sends the first `t` report at once and then one report every 30 seconds. Each `t` report reads `snapshot()`, and every other report reads only the data of its call. The state function returns `CmcdSnapshot`, so one function serves both. The request report carries `nor` as a path relative to the request URL.
 
 ### Errors, startup delay, and stalls
 
@@ -121,6 +121,8 @@ Three more keys have a scope that one report cannot cover. The player passes the
 - `msd` goes once to each destination. The session keeps the first valid value.
 - `bs: true` reports a stall. Each destination sends `bs` with its next report of the same object type.
 - `bsd` holds the duration of a stall. Each destination sends the durations with its next report, as one list.
+
+Pass `bs` and `bsd` once, in the call that reports the stall. A `bs` flag in the state object would report the stall again with each call, so `CmcdSnapshot` rejects both keys. `msd` can stay in the state object.
 
 ```ts
 import { CmcdEventType, createCmcdSession } from '@svta/cml-cmcd'
@@ -181,7 +183,7 @@ The first target receives only the segment response, and the second target recei
 
 ### Several players, one session
 
-Several media players can share one session, because the session keeps no state for a player. Each player passes its own `cid`. During an interstitial, the primary player and the ad player report under one `sid`, with one sequence for each target.
+Several media players can share one session, because the session keeps no state for a player. Each player passes its own `cid`. During an interstitial, the primary player and the ad player report under one `sid`, with one sequence for each target. The `t` reports read one `snapshot()`, so they carry the state of one player.
 
 ```ts
 import { CmcdEventType, createCmcdSession } from '@svta/cml-cmcd'
@@ -210,11 +212,11 @@ The table maps each member of `CmcdReporter` to the session API. The example in 
 |---|---|
 | `new CmcdReporter(config, requester)` | `createCmcdSession(config, requester)` |
 | `sid`, `cid`, `version`, `transmissionMode`, `enabledKeys`, `customHeaderMap`, `eventTargets` | The same names and types |
-| `update(data)` for values that persist | The player keeps the values and passes them with each call |
+| `update(data)` for values that persist | The player keeps the values in a `CmcdSnapshot` object and passes them with each call |
 | The events that `update()` fires for `sta`, `pr`, `cid`, `bg`, and `br` | The player compares the new value with the old value, then calls `recordEvent()` |
 | `update({ sid })` | A new session. The player calls `flush()` and `stop()` on the old session. |
 | `update({ msd })` | `msd` in the data of any call. The session sends it once to each destination. |
-| The data store in `t` reports | `snapshot` |
+| The data store in `t` reports | `snapshot`, which returns `CmcdSnapshot` |
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
 | `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |
@@ -236,7 +238,7 @@ Without `enabledKeys`, the session reports every key. In the same case, `CmcdRep
 | Export | Kind |
 |---|---|
 | `createCmcdSession` | function |
-| `CmcdSession`, `CmcdSessionConfig` | types |
+| `CmcdSession`, `CmcdSessionConfig`, `CmcdSnapshot` | types |
 | `CmcdReportFilter` | type |
 | `CMCD_EVENT_HOSTNAME`, and `HOSTNAME` in `CmcdEventType` | constant |
 
@@ -280,15 +282,21 @@ type CmcdSessionConfig = CmcdRequestReportConfig & {
 	sid?: string                                // default: a new UUID
 	cid?: string                                // used when a report has no cid
 	eventTargets?: readonly CmcdEventReportConfig[]
-	snapshot?: () => Cmcd                       // the data of each t report
+	snapshot?: () => CmcdSnapshot               // the data of each t report
+}
+
+// The state of a player. The session writes e, sid, sn, ts, and v. The other keys describe one occurrence.
+// In the package, each never member has a TSDoc note that says where the key goes.
+type CmcdSnapshot = Omit<CmcdEvent, 'bs' | 'bsd' | 'cen' | 'e' | 'ec' | 'sid' | 'sn' | 'ts' | 'v'> & {
+	bs?: never; bsd?: never; cen?: never; e?: never; ec?: never; sid?: never; sn?: never; ts?: never; v?: never
 }
 
 type CmcdSession = {
 	readonly sid: string
-	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>
-	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void
-	recordResponseReceived(response: HttpResponse, data?: Cmcd): void
-	recordError(codes: string | readonly string[], data?: Cmcd): void
+	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>
+	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void
+	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void
+	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void
 	configure(settings: CmcdRequestReportConfig): void
 	start(immediate?: boolean): void
 	stop(): void
@@ -302,7 +310,7 @@ The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordRe
 
 ### Reports
 
-Every report starts from the data of the call. The session then adds the waiting values of that destination, as [Keys with a destination scope](#keys-with-a-destination-scope) describes. Last, it writes `sid` and `sn`. An event report also receives `e`, and `ts` when the data has none. A `sid`, `sn`, or `e` in the data has no effect. The configured `cid` applies when the data has no `cid`. A `b` report with `bg: false` is the exit from backgrounded mode. The session writes that report without `bg`, as CTA-5004-B defines.
+Every report starts from the data of the call. The session then adds the waiting values of that destination, as [Keys with a destination scope](#keys-with-a-destination-scope) describes. Last, it writes `sid` and `sn`. An event report also receives `e`, and `ts` when the data has none. The data types leave out `sid`, `sn`, `e`, and `v`, which the session writes, and `ec`, which only `recordError()` sets. In JavaScript, a `sid`, `sn`, or `e` in the data has no effect. The configured `cid` applies when the data has no `cid`. A `b` report with `bg: false` is the exit from backgrounded mode. The session writes that report without `bg`, as CTA-5004-B defines.
 
 The session encodes each report with the rules of `encodeCmcd`. The encoder rounds values, applies the rules of the version and the mode, and adds `v`. It writes `nor` as a path relative to the request URL. Request mode uses the configured `version`. Event mode always uses version 2. Each report keeps the keys in `enabledKeys`, plus the keys that its event requires.
 
@@ -346,6 +354,8 @@ The next report drops a waiting `bs`, `bsd`, or `ec` value that the version or `
 `configure()` replaces `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap` for request mode. It keeps the `sid` and every sequence number. Event targets cannot change after creation.
 
 `start()` arms one timer for each event target whose events include `t` and whose interval is above 0. Each tick records a `t` report with the data from `snapshot()`, and the filter applies. `start()` sends the first `t` report at once, and `start(false)` waits one interval. `stop()` clears these timers. Without `snapshot`, `start()` arms nothing.
+
+`snapshot()` supplies the data of the `t` reports only. The session never adds that data to another report. A tick drops `bs` and `bsd` from the data. A stall flag in the state object of a JavaScript player therefore cannot repeat with each tick.
 
 ### Delivery
 
@@ -417,7 +427,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 
 ## Drawbacks
 
-- Each player must migrate. It replaces the store with its own state object and adds its own state change checks.
+- Each player must migrate. It replaces the store with its own state object, typed as `CmcdSnapshot`, and adds its own state change checks.
 - Until version 3.0.0, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
 - A player that imports both APIs during a migration pays for both, as the bundle table shows.
 - Until version 3.0.0, each configuration type has a member that one API ignores: `transform` for the session, and `filter` for `CmcdReporter`.
@@ -441,6 +451,9 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **`keepalive` in the default requester.** It lets a send finish after the page closes. Browsers reject a `keepalive` body over 64 KiB, and a batch after an outage can be larger. A player that needs `keepalive` passes its own requester.
 - **The retry rule of `CmcdReporter`.** It sends a failed batch again with the next send. During an outage, each new event then sends the whole queue to the failing collector.
 - **Timers in the player.** shaka-player 5.2.0 shows the lifecycle risk of timers in the library. Targets have their own intervals, though, so the session needs to know them. `start()` and `stop()` keep the lifecycle explicit.
+- **A store, as in `update()`, without the automatic events.** One store gives one way to pass data, but the session would keep player state again. The `t` reports would carry old `bl` and `mtp` values unless the player updates the store before each tick. Each key would need a rule for whether it persists, and two players in one session would overwrite one store. `CmcdReporter` also merges its store with the data of each call, so its players already use two sources.
+- **`snapshot()` for every report, under the data of the call.** It removes the `...state()` spread from each call. One snapshot describes one player, though. In a shared session, the reports of the ad player would carry the state of the primary player.
+- **Types that sort keys into state keys and object keys.** CTA-5004-B has no such classes. Table 1 allows most keys in both modes, and `br` changes meaning between the modes. Section 2 leaves the choice of keys to the application. The types leave out only the keys that the session writes and the keys of one occurrence. `CmcdSnapshot` uses `never` members, because `Omit` alone accepts a value typed `Cmcd`. The data arguments use `Omit`, so the `Cmcd` values of existing players still compile. Required keys for each event type, such as `sta` for `ps`, need conditional parameter lists. They also reject a state object whose `sta` is optional.
 
 ## Prior art
 
