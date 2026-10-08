@@ -24,6 +24,7 @@ function internalData(overrides: Partial<InternalManifestData>): InternalManifes
 		},
 		claimAssertionRefs: [],
 		claimCborBytes: EMPTY_CLAIM_CBOR,
+		claimCode: null,
 		signatureBytes: null,
 		assertions: [],
 		...overrides,
@@ -100,5 +101,13 @@ describe('validateManifestIntegrity', () => {
 		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, signatureBytes }))
 
 		ok(codes.includes(C2paStatusCode.CLAIM_MISSING))
+	})
+
+	it('reports the claim code of the manifest data', async () => {
+		const signatureBytes = await signer.sign(EMPTY_CLAIM_CBOR)
+
+		const { codes } = await validateManifestIntegrity(internalData({ claimCode: C2paStatusCode.CLAIM_MALFORMED, signatureBytes }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MALFORMED])
 	})
 })

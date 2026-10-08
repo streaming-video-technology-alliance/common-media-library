@@ -67,6 +67,9 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 	if (signature.code) {
 		codes.push(signature.code)
 	}
+	if (internal.claimCode) {
+		codes.push(internal.claimCode)
+	}
 
 	return { codes, certificate: signature.certificate }
 }

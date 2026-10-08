@@ -1,5 +1,5 @@
 import { readC2paManifest } from '../src/readC2paManifest.ts'
-import type { C2paAssertion } from '@svta/cml-c2pa'
+import { C2paStatusCode, type C2paAssertion } from '@svta/cml-c2pa'
 import { deepStrictEqual, doesNotThrow, ok, strictEqual, throws } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { describe, it } from 'node:test'
@@ -108,5 +108,46 @@ describe('readC2paManifest', () => {
 			['com.example.json', { kind: 'json' }, undefined],
 			['com.example.binary', Uint8Array.of(0xff, 0xd8), undefined],
 		])
+	})
+
+	function manifestWithClaim(claimCbor: Uint8Array): Uint8Array {
+		return buildInitSegmentWithManifest(buildJumb('urn:uuid:test-manifest',
+			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+			buildJumb('c2pa.assertions'),
+		))
+	}
+
+	it('reports no claim code for a claim box that holds a map', () => {
+		strictEqual(readC2paManifest(manifestWithClaim(Uint8Array.of(0xa0))).claimCode, null)
+	})
+
+	// Each claim box holds well-formed CBOR that is not a map (C2PA section 15.6.2).
+	// The tests compare with the status code values of C2PA section 15.2.
+	const CLAIMS_THAT_ARE_NOT_MAPS: readonly (readonly [string, Uint8Array])[] = [
+		['a map in CBOR tag 55799', Uint8Array.of(0xd9, 0xd9, 0xf7, 0xa0)],
+		['an array', Uint8Array.of(0x80)],
+		['a byte string', Uint8Array.of(0x40)],
+		['an integer', Uint8Array.of(0x01)],
+	]
+
+	for (const [description, claimCbor] of CLAIMS_THAT_ARE_NOT_MAPS) {
+		it(`reports CLAIM_MALFORMED for a claim box that holds ${description}`, () => {
+			const { claimCode, claimCborBytes, claimAssertionRefs, manifest } = readC2paManifest(manifestWithClaim(claimCbor))
+
+			strictEqual(claimCode, 'claim.malformed')
+			strictEqual(claimCode, C2paStatusCode.CLAIM_MALFORMED)
+			deepStrictEqual(claimCborBytes, claimCbor)
+			deepStrictEqual(claimAssertionRefs, [])
+			strictEqual(manifest.instanceId, null)
+		})
+	}
+
+	it('reports CLAIM_CBOR_INVALID for a claim box whose CBOR does not decode', () => {
+		// a1: a map of one pair, without the pair
+		const { claimCode, claimCborBytes } = readC2paManifest(manifestWithClaim(Uint8Array.of(0xa1)))
+
+		strictEqual(claimCode, 'claim.cbor.invalid')
+		strictEqual(claimCode, C2paStatusCode.CLAIM_CBOR_INVALID)
+		deepStrictEqual(claimCborBytes, Uint8Array.of(0xa1))
 	})
 })
