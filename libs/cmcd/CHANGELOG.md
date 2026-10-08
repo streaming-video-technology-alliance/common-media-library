@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The package build parses as ES2021 again. `CmcdReportRecorder` used private class fields, which are ES2022 syntax. A bundler that does not transpile `node_modules` copied them into its output, and the dash.js modern build then failed its `es-check es2021` step. The class now uses TypeScript private members, which the build emits as constructor assignments. The public API is unchanged
+
 ## [2.8.1] - 2026-10-01
 
 ### Fixed
