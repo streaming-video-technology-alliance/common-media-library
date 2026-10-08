@@ -1,6 +1,6 @@
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paManifest } from '../C2paManifest.ts'
-import type { C2paStatusCode } from '../C2paStatusCode.ts'
+import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { asUnsignedInteger, bytesToHex, hashesEqual, normalizeAlgorithmName, toUint8Array } from '../utils.ts'
@@ -68,9 +68,11 @@ type BmffHashFields = {
 	hashHex: string | null
 	exclusions: readonly BmffHashExclusion[]
 	alg: string | null
+	/** The assertion has a hash that is not a byte string */
+	malformed: boolean
 }
 
-const EMPTY_BMFF_HASH: BmffHashFields = { hashBytes: null, hashHex: null, exclusions: [], alg: null }
+const EMPTY_BMFF_HASH: BmffHashFields = { hashBytes: null, hashHex: null, exclusions: [], alg: null, malformed: false }
 
 function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashFields {
 	const assertion = assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL)
@@ -79,11 +81,12 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const data = extractAssertionData(assertion.data)
 	if (!data) return EMPTY_BMFF_HASH
 
-	const hashBytes = toUint8Array(data['hash'] ?? data['value'])
+	const rawHash = data['hash'] ?? data['value']
+	const hashBytes = toUint8Array(rawHash)
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
 	const alg = typeof data['alg'] === 'string' ? normalizeAlgorithmName(data['alg']) : null
-	return { hashBytes, hashHex, exclusions, alg }
+	return { hashBytes, hashHex, exclusions, alg, malformed: rawHash != null && hashBytes === null }
 }
 
 // --- Manifest parsing ---
@@ -235,6 +238,7 @@ export async function validateC2paManifestBoxSegment(
 	const integrityCodes: readonly C2paStatusCode[] = integrity?.codes ?? []
 
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
+	if (bmff.malformed) errorCodes.push(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
 
 	const currentManifestId = manifest?.instanceId ?? null
 

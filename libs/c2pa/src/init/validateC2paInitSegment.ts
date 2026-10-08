@@ -1,7 +1,5 @@
-import { decode } from 'cbor-x/decode'
-import { encode } from 'cbor-x/encode'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
-import { decodeCbor } from '../cbor/decodeCbor.ts'
+import { CborTag, decodeCbor } from '../cbor/readCborItem.ts'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
@@ -20,25 +18,11 @@ const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
 const COSE_KEY_ID_LABEL = 2
 
-// cbor-x represents CBOR tagged values in multiple ways depending on version/config:
-// - { tag: number, value: unknown } (structured)
-// - Tag class instance with constructor name 'Tag'
-// - { '@@TAGGED@@': [tag, value] } (internal key)
-const CBOR_TAGGED_KEY = '@@TAGGED@@'
-
-function extractCborTaggedValue(value: unknown): unknown | null {
-	if (typeof value !== 'object' || value === null) return null
-	const obj = value as Record<string, unknown>
-	if (typeof obj['tag'] === 'number' && 'value' in obj) return obj['value']
-	const tagged = obj[CBOR_TAGGED_KEY]
-	if (Array.isArray(tagged) && tagged.length === 2) return tagged[1]
-	return null
-}
-
+// §18.25.3: an inline COSE_Sign1 passes through as the bytes of the tagged item
 function normalizeToUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
 	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	if (extractCborTaggedValue(value) !== null) return encode(value) as Uint8Array
+	if (value instanceof CborTag) return value.bytes
 	throw new Error('Cannot convert value to Uint8Array')
 }
 
@@ -52,51 +36,13 @@ function ensureDecodedCbor(value: unknown): unknown {
 
 // RFC 8949 section 3.4.1: the date-time of RFC 3339, as refined by RFC 4287 section 3.3 (C2PA section 6.9)
 const RFC_3339_DATE_TIME = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:[0-5]\d){2}(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/
-const CBOR_BREAK = 0xff
-
-// A private key marks a real CBOR tag (RFC 8949 section 3.4), so a CBOR map with "tag" and "value" keys is not mistaken for one.
-const CBOR_TAG = Symbol()
-
-// Decodes CBOR like cbor-x, but marks each tag with CBOR_TAG. cbor-x converts tags 0 and 1 to a Date.
-function decodeWithTags(cbor: Uint8Array): unknown {
-	let offset = 0
-	const read = (): unknown => {
-		const start = offset
-		const initialByte = cbor[offset++]
-		const majorType = initialByte >> 5
-		const additionalInfo = initialByte & 31
-		const isContainer = majorType === 4 || majorType === 5
-		let argument = additionalInfo
-		if (additionalInfo > 23 && additionalInfo < 28) {
-			let size = 1 << (additionalInfo - 24)
-			for (argument = 0; size--;) argument = argument * 256 + cbor[offset++]
-		}
-		const indefinite = additionalInfo === 31 && isContainer
-		if ((additionalInfo > 27 && !indefinite) || !(offset <= cbor.length)) throw new RangeError('Malformed CBOR')
-		if (isContainer) {
-			// RFC 8949 section 3.2.2: an array or a map of indefinite length ends with the break code
-			const items: unknown[] = []
-			const itemCount = majorType === 5 ? 2 * argument : argument
-			while (indefinite ? cbor[offset] !== CBOR_BREAK : items.length < itemCount) items.push(read())
-			if (indefinite) offset++
-			if (majorType === 4) return items
-			// Without a prototype, a "__proto__" key is a plain key
-			const map: Record<string, unknown> = Object.create(null)
-			for (let i = 0; i < items.length; i += 2) map[items[i] as string] = items[i + 1]
-			return map
-		}
-		if (majorType === 6) return { [CBOR_TAG]: argument, value: read() }
-		if (majorType === 2 || majorType === 3) offset += argument
-		return decode(cbor.subarray(start, offset))
-	}
-	return read()
-}
+const CBOR_TAG_DATE_TIME = 0
 
 // §18.25.2: CBOR tag 0 with an RFC 3339 date-time
 function parseCreatedAt(value: unknown): string | null {
-	const tagged = value as Record<symbol | string, unknown> | null
-	const text = tagged?.['value']
-	if (tagged?.[CBOR_TAG] !== 0 || typeof text !== 'string' || !RFC_3339_DATE_TIME.test(text)) return null
+	if (!(value instanceof CborTag) || value.tag !== CBOR_TAG_DATE_TIME) return null
+	const text = value.value
+	if (typeof text !== 'string' || !RFC_3339_DATE_TIME.test(text)) return null
 	// Date rolls a day that does not exist over to the next month
 	if (new Date(text.slice(0, 10)).getUTCDate() !== Number(text.slice(8, 10))) return null
 	return new Date(text).toISOString()
@@ -160,12 +106,12 @@ type SessionKeysValidation = {
 	readonly hasInvalidSessionKey: boolean
 }
 
-function extractSessionKeyFields(entry: unknown, taggedEntry: unknown): SessionKeyFields | null {
+function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 	const keyData = entry as Record<string, unknown>
 
 	const minSequenceNumber = asUnsignedInteger(keyData['minSequenceNumber'])
 	const validityPeriod = asUnsignedInteger(keyData['validityPeriod'])
-	const createdAt = parseCreatedAt((taggedEntry as Record<string, unknown> | undefined)?.['createdAt'])
+	const createdAt = parseCreatedAt(keyData['createdAt'])
 
 	if (minSequenceNumber === null || validityPeriod === null || !createdAt) return null
 
@@ -204,11 +150,10 @@ async function verifyAndConvertKey(
 
 async function validateSingleSessionKey(
 	entry: unknown,
-	taggedEntry: unknown,
 	certificate: Uint8Array,
 ): Promise<ValidatedSessionKey | null> {
 	try {
-		const fields = extractSessionKeyFields(entry, taggedEntry)
+		const fields = extractSessionKeyFields(entry)
 		if (!fields) return null
 		return await verifyAndConvertKey(fields, certificate)
 	} catch {
@@ -220,33 +165,13 @@ function isWithinValidityPeriod(key: ValidatedSessionKey): boolean {
 	return !isKeyExpired(key.createdAt, key.validityPeriod)
 }
 
-// The session key entries with their CBOR tags, in the same order as the decoded entries
-function readTaggedKeyEntries(cborBytes: Uint8Array | undefined): unknown[] {
-	try {
-		return cborBytes ? extractKeyArray(decodeWithTags(cborBytes)) : []
-	} catch {
-		return []
-	}
-}
-
-// §18.25.2: the assertion is a map with a keys array of one or more session keys
-function readKeyEntries(data: unknown): unknown[] {
-	try {
-		return extractKeyArray(ensureDecodedCbor(data))
-	} catch {
-		return []
-	}
-}
-
 async function validateSessionKeys(
 	assertion: InternalAssertionData,
 	certificate: Uint8Array,
 ): Promise<SessionKeysValidation> {
-	const keyEntries = readKeyEntries(assertion.data)
-	const taggedKeyEntries = readTaggedKeyEntries(assertion.cborBytes)
-	const results = await Promise.all(
-		keyEntries.map((entry, index) => validateSingleSessionKey(entry, taggedKeyEntries[index], certificate)),
-	)
+	// §18.25.2: the assertion is a map with a keys array of one or more session keys
+	const keyEntries = extractKeyArray(assertion.taggedData)
+	const results = await Promise.all(keyEntries.map(entry => validateSingleSessionKey(entry, certificate)))
 	const validKeys = results.filter((key): key is ValidatedSessionKey => key !== null)
 	return {
 		sessionKeys: validKeys.filter(isWithinValidityPeriod),

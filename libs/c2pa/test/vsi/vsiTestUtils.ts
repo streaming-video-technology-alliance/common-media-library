@@ -138,6 +138,14 @@ export type TestAssertion = {
 	readonly cbor: Uint8Array
 }
 
+/** Builds an init segment with a manifest store that holds the given manifest JUMBF box */
+export function buildInitSegmentWithManifest(manifest: Uint8Array): Uint8Array {
+	const purpose = TEXT_ENCODER.encode('manifest')
+	const prefix = new Uint8Array(4 + purpose.length + 1 + 8) // fullbox header + purpose\0 + aux offset
+	prefix.set(purpose, 4)
+	return concatBytes(buildInitMediaBoxes(), buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))))
+}
+
 /**
  * Builds an init segment whose manifest has the given CBOR assertions.
  * The claim references every assertion and is signed by `signer`.
@@ -157,11 +165,7 @@ export async function buildSignedInitSegment(signer: TestSigner, assertions: rea
 		buildJumb('c2pa.assertions', ...assertionBoxes),
 		buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
 	)
-
-	const purpose = TEXT_ENCODER.encode('manifest')
-	const prefix = new Uint8Array(4 + purpose.length + 1 + 8) // fullbox header + purpose\0 + aux offset
-	prefix.set(purpose, 4)
-	return concatBytes(buildInitMediaBoxes(), buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))))
+	return buildInitSegmentWithManifest(manifest)
 }
 
 /**

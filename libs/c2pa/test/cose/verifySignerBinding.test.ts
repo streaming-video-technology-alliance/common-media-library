@@ -26,7 +26,7 @@ describe('verifySignerBinding', () => {
 		])
 
 		// A minimal COSE_Sign1 with a detached (nil) payload and an empty signature (will fail verification)
-		const minimal = new Uint8Array([0x84, 0x40, 0xa0, 0xf6, 0x40])
+		const minimal = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0xf6, 0x40])
 		const certBytes = new Uint8Array([0x30, 0x03, 0x01, 0x01, 0xff])
 
 		const isValid = await verifySignerBinding(minimal, sessionCoseKey, certBytes)
@@ -36,7 +36,7 @@ describe('verifySignerBinding', () => {
 
 	it('throws for an unsupported COSE key type', async () => {
 		const invalidKey = new Map([[1, 99]])
-		const minimal = new Uint8Array([0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
+		const minimal = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
 		try {
 			await verifySignerBinding(minimal, invalidKey, new Uint8Array(4))
 			ok(false, 'should have thrown')

@@ -24,6 +24,7 @@ function internalData(overrides: Partial<InternalManifestData>): InternalManifes
 		},
 		claimAssertionRefs: [],
 		claimCborBytes: EMPTY_CLAIM_CBOR,
+		claimCode: null,
 		signatureBytes: null,
 		assertions: [],
 		...overrides,
@@ -78,7 +79,7 @@ describe('validateManifestIntegrity', () => {
 
 	it('reports CLAIM_SIGNATURE_MISMATCH when the signature carries no certificate', async () => {
 		// COSE_Sign1 with an empty protected header, so there is no x5chain to verify against
-		const signatureBytes = new Uint8Array([0x84, 0x40, 0xa0, 0x40, 0x40])
+		const signatureBytes = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x40, 0x40])
 
 		const { codes } = await validateManifestIntegrity(internalData({ signatureBytes }))
 
@@ -100,5 +101,13 @@ describe('validateManifestIntegrity', () => {
 		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, signatureBytes }))
 
 		ok(codes.includes(C2paStatusCode.CLAIM_MISSING))
+	})
+
+	it('reports the claim code of the manifest data', async () => {
+		const signatureBytes = await signer.sign(EMPTY_CLAIM_CBOR)
+
+		const { codes } = await validateManifestIntegrity(internalData({ claimCode: C2paStatusCode.CLAIM_MALFORMED, signatureBytes }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MALFORMED])
 	})
 })

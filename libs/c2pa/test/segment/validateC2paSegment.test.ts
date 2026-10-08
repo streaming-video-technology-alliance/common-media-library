@@ -66,7 +66,7 @@ describe('validateC2paSegment', () => {
 		})
 	})
 
-	// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+	// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
 	describe('sequenceNumber of 2^32 or more (§19.4.2)', () => {
 		const NOW = Date.parse('2025-07-29T10:30:00Z')
 		let init: Uint8Array

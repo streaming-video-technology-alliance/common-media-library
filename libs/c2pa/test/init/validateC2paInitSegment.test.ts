@@ -2,11 +2,12 @@ import { validateC2paInitSegment, C2paStatusCode, LiveVideoStatusCode } from '@s
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
-import { encode } from 'cbor-x/encode'
+import { encodeCbor } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
-import { buildInitMediaBoxes, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
+import { Tag } from 'cbor-x'
+import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
+import { buildInitSegmentWithManifest, buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -242,10 +243,10 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 	// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
 	// so integrity checks skip signature verification.
 	function buildInitSegment(assertionData: Record<string, unknown>): Uint8Array {
-		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encode(assertionData) as Uint8Array))
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData) as Uint8Array))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', created_assertions: [] }
-		const claim = buildJumb('c2pa.claim', buildBox('cbor', encode(claimData) as Uint8Array))
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', encodeCbor(claimData) as Uint8Array))
 		const manifestJumb = buildJumb('urn:uuid:bmff-hash-test-manifest', claim, assertionStore)
 		const store = buildJumb('c2pa', manifestJumb)
 
@@ -326,7 +327,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	})
 
 	it('accepts a minSequenceNumber and a validityPeriod of 2^32 or more', async (context) => {
-		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
 		const entryWithLargeIntegers = { ...activeEntry(key002), minSequenceNumber: BigInt(2 ** 32), validityPeriod: BigInt(2 ** 32) } as unknown as TestSessionKeyEntry
 		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), entryWithLargeIntegers])
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
@@ -527,8 +528,8 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 
 	// Each entry breaks the §18.25.2 rule that the assertion is a map with a keys array of one or more session keys.
 	const NONCONFORMING_ASSERTIONS: readonly (readonly [string, Uint8Array])[] = [
-		['no session key', Uint8Array.from(encode({ keys: [] }))],
-		['a keys field that is not an array', Uint8Array.from(encode({ keys: 'key_001' }))],
+		['no session key', encodeCbor({ keys: [] })],
+		['a keys field that is not an array', encodeCbor({ keys: 'key_001' })],
 		['CBOR that does not decode', SESSION_KEYS_CBOR_WITHOUT_BREAK],
 	]
 
@@ -536,7 +537,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	async function merkleAssertionCbor(): Promise<Uint8Array> {
 		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const merkle = [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash }]
-		return Uint8Array.from(encode({ exclusions: [{ xpath: '/uuid' }], merkle }))
+		return encodeCbor({ exclusions: [{ xpath: '/uuid' }], merkle })
 	}
 
 	for (const [description, sessionKeysCbor] of NONCONFORMING_ASSERTIONS) {
@@ -562,6 +563,32 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 
 		deepStrictEqual(result.sessionKeys, [])
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+})
+
+describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	it('fails with CLAIM_MALFORMED if the signed claim box holds a map in CBOR tag 55799', async () => {
+		// The claim references an assertion that the manifest does not have. Only a decoded claim can report that.
+		const claimCbor = encodeCbor(new Tag({
+			instanceID: 'urn:uuid:claim-test-manifest',
+			created_assertions: [{ url: 'self#jumbf=c2pa.assertions/c2pa.hash.bmff.v3', hash: new Uint8Array(32), alg: 'sha256' }],
+		}, 55799))
+		const manifest = buildJumb('urn:uuid:claim-test-manifest',
+			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+			buildJumb('c2pa.assertions'),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCbor))),
+		)
+
+		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
 		strictEqual(result.isValid, false)
 	})
 })

@@ -1,13 +1,13 @@
 import { decodeVsiMap } from '../../src/vsi/decodeVsiMap.ts'
 import { deepStrictEqual, strictEqual, throws } from 'node:assert'
 import { describe, it } from 'node:test'
-import { encode } from 'cbor-x/encode'
+import { encodeCbor } from '../cborTestUtils.ts'
 
 describe('decodeVsiMap', () => {
 	// #region example
 	it('decodes a valid VSI map with string manifestId', () => {
 		const hash = new Uint8Array([0xaa, 0xbb, 0xcc])
-		const vsiCbor = encode({
+		const vsiCbor = encodeCbor({
 			sequenceNumber: 7,
 			bmffHash: { hash, alg: 'sha256', exclusions: [] },
 			manifestId: 'urn:c2pa:12345',
@@ -22,7 +22,7 @@ describe('decodeVsiMap', () => {
 	// #endregion example
 
 	function encodeVsiMapWithSequenceNumber(sequenceNumber: unknown): Uint8Array {
-		return new Uint8Array(encode({
+		return new Uint8Array(encodeCbor({
 			sequenceNumber,
 			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
 			manifestId: 'urn:c2pa:12345',
@@ -30,7 +30,7 @@ describe('decodeVsiMap', () => {
 	}
 
 	it('decodes a sequenceNumber of 2^32 or more to a number', () => {
-		// cbor-x decodes a CBOR unsigned integer of 2^32 or more as a BigInt.
+		// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
 		const result = decodeVsiMap(encodeVsiMapWithSequenceNumber(BigInt(2 ** 32)))
 		strictEqual(result.sequenceNumber, 2 ** 32)
 	})
@@ -82,7 +82,7 @@ describe('decodeVsiMap', () => {
 	})
 
 	it('throws when manifestId is not a string', () => {
-		const vsiCbor = encode({
+		const vsiCbor = encodeCbor({
 			sequenceNumber: 1,
 			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
 			manifestId: new Uint8Array([0x01, 0x02]),

@@ -1,9 +1,7 @@
-import { decodeCbor } from '../cbor/decodeCbor.ts'
+import { CborTag, decodeCbor } from '../cbor/readCborItem.ts'
 import type { CoseSign1 } from './CoseSign1.ts'
 
-const COSE_SIGN1_TAG_SINGLE_BYTE = 0xd2
-const COSE_SIGN1_TAG_TWO_BYTE_FIRST = 0xd8
-const COSE_SIGN1_TAG_TWO_BYTE_SECOND = 0x12
+const COSE_SIGN1_TAG = 18
 const COSE_SIGN1_ARRAY_LENGTH = 4
 const COSE_KEY_KID = 4
 const COSE_KEY_ALG = 1
@@ -15,12 +13,6 @@ function coseGet(header: CoseHeader, key: number): unknown {
 	return (header as Record<number | string, unknown>)[key]
 }
 
-function stripCoseTag(bytes: Uint8Array): Uint8Array {
-	if (bytes[0] === COSE_SIGN1_TAG_SINGLE_BYTE) return bytes.subarray(1)
-	if (bytes[0] === COSE_SIGN1_TAG_TWO_BYTE_FIRST && bytes[1] === COSE_SIGN1_TAG_TWO_BYTE_SECOND) return bytes.subarray(2)
-	return bytes
-}
-
 function toUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
 	if (Array.isArray(value)) return new Uint8Array(value as number[])
@@ -28,13 +20,13 @@ function toUint8Array(value: unknown): Uint8Array {
 }
 
 /**
- * Decodes a `COSE_Sign1` structure from raw bytes (RFC 9052).
+ * Decodes a `COSE_Sign1_Tagged` structure from raw bytes (RFC 9052 section 4.2).
  *
- * Handles CBOR tag 18 in both single-byte (0xD2) and two-byte (0xD8 0x12) form.
+ * The bytes must carry CBOR tag 18 in any encoding length (C2PA section 14).
  *
- * @param coseBytes - Raw COSE_Sign1 bytes, optionally prefixed with CBOR tag 18
+ * @param coseBytes - Raw `COSE_Sign1_Tagged` bytes
  * @returns The decoded COSE_Sign1 structure
- * @throws If the bytes do not represent a valid COSE_Sign1 structure
+ * @throws If the bytes do not represent a `COSE_Sign1` structure with CBOR tag 18
  *
  * @example
  * {@includeCode ../../test/cose/decodeCoseSign1.test.ts#example}
@@ -43,9 +35,12 @@ function toUint8Array(value: unknown): Uint8Array {
  */
 export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 	try {
-		const stripped = stripCoseTag(coseBytes)
-		const coseArray = decodeCbor(stripped) as unknown
+		const tagged = decodeCbor(coseBytes)
+		if (!(tagged instanceof CborTag) || tagged.tag !== COSE_SIGN1_TAG) {
+			throw new Error('Invalid COSE_Sign1 structure: expected CBOR tag 18')
+		}
 
+		const coseArray = tagged.value
 		if (!Array.isArray(coseArray) || coseArray.length !== COSE_SIGN1_ARRAY_LENGTH) {
 			throw new Error('Invalid COSE_Sign1 structure: expected array with 4 elements')
 		}

@@ -1,6 +1,5 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
-import { decode } from 'cbor-x/decode'
-import { readCborItemEnd } from '../cbor/decodeCbor.ts'
+import { readCborItem } from '../cbor/readCborItem.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
@@ -59,7 +58,7 @@ function readMapField(map: unknown, name: string): unknown {
 // so trailing bytes after the CBOR item are expected and not part of the data.
 function decodeFirstCbor(payload: Uint8Array): unknown {
 	try {
-		return decode(payload.subarray(0, readCborItemEnd(payload)))
+		return readCborItem(payload).value
 	} catch {
 		return undefined
 	}

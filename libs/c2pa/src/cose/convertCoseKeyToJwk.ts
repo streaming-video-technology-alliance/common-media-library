@@ -26,7 +26,7 @@ function toBase64Url(value: unknown): string {
  * Converts a COSE public key (RFC 9052 / IANA COSE Key registry) to JWK format.
  *
  * Supports EC2 keys (P-256, P-384, P-521) and OKP keys (Ed25519, Ed448, X25519, X448).
- * Input may be a `Map\<number, unknown\>` (from CBOR decoders like cbor-x) or a plain
+ * Input may be a `Map\<number, unknown\>` or a plain
  * object with integer keys.
  *
  * @param coseKey - COSE key structure as decoded from a C2PA `c2pa.session-keys` assertion
