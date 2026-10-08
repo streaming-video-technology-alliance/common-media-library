@@ -27,8 +27,8 @@ const SAME_VALUE = [
 	'00', '17', '18 18', '19 0100', '1a ffffffff', '1b 0000000100000000', '1b 001fffffffffffff', '1b 0020000000000000', '1b ffffffffffffffff',
 	// negative integers
 	'20', '38 18', '3b 001fffffffffffff', '3b 0020000000000000', '3b ffffffffffffffff',
-	// byte and text strings, with a text string above the ASCII fast path of the reader
-	'40', '42 0102', '60', '63 616263', '62 ffff', '78 28 ' + '61'.repeat(40), 'a1 62 c3a9 01',
+	// byte and text strings, with a leading U+FEFF and a text string above the ASCII fast path of the reader
+	'40', '42 0102', '60', '63 616263', '62 ffff', '64 efbbbf61', '78 28 ' + '61'.repeat(40), 'a1 62 c3a9 01',
 	// arrays and maps, with integer, float, boolean, and null keys, and a duplicate key
 	'80', '84 f4 f5 f6 f7', '9f 01 02 ff', 'a0', 'a2 01 02 03 04', 'a1 20 02', 'a2 61 61 01 61 61 02', 'a1 f9 3e00 02', 'a1 f5 02', 'a1 f6 02', 'bf 61 61 01 ff',
 	// floats, with a subnormal half float, negative zero, NaN, and Infinity
