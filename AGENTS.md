@@ -83,7 +83,7 @@ CML collaborators and adopters live in many countries. Many of them do not read 
 - Give every pronoun a visible noun in the same or previous sentence: "this check", not "this".
 - At most three nouns in a row. Break longer strings with prepositions.
 - Keep the author's hedges. "May have failed" does not become "failed". Never add a fact the source did not state.
-- Write for the reader's decision. An RFC reader needs what the API is, one example, the contract, the costs, the alternatives, and the open questions. Methodology, history, and engine internals go to the plan files while the work is in progress, and to the PR description when the work merges.
+- Write for the reader's decision. An RFC reader needs what the API is, one example, the contract, the costs, the alternatives, and the open questions. Plan files contain methodology, history, and engine internals while work is in progress. The PR description contains that information when the work merges.
 - State each finding once, in one place, and reference it from elsewhere. Numbers go in tables or lists, at most one per sentence of prose.
 - After a clarity pass, do a second pass that removes duplication. Splitting sentences adds words, so the document must get shorter, not longer.
 
