@@ -10,8 +10,8 @@ and this project adheres to
 
 ### Fixed
 
-- The build parses as ES2021. `CmcdReportRecorder` uses TypeScript private members, and the build emits the members as constructor assignments. Before, the class used private class fields. Private class fields are ES2022 syntax. A bundle that copied the build unchanged failed an ES2021 syntax check. The dash.js build runs such a check with `es-check es2021` and failed on the class. The public API does not change
-- A bundle with a bare import of the package contains no code from the package. Before, webpack kept the `Set` of `CMCD_INNER_LIST_KEYS`. The `Set` constructor had no PURE annotation, so webpack did not treat the build as free of side effects
+- `dist/index.js` now parses as ES2021. A bundler no longer needs to transpile the package for an ES2021 target
+- A webpack bundle with a bare import of the package no longer contains code from the package
 
 ## [2.8.1] - 2026-10-01
 
