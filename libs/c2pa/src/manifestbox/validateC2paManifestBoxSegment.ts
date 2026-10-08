@@ -68,7 +68,7 @@ type BmffHashFields = {
 	hashHex: string | null
 	exclusions: readonly BmffHashExclusion[]
 	alg: string | null
-	/** The assertion has a hash that is not a byte string */
+	/** The assertion has a hash that is not a byte string, or an exclusion that does not conform */
 	malformed: boolean
 }
 
@@ -86,7 +86,7 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
 	const alg = typeof data['alg'] === 'string' ? normalizeAlgorithmName(data['alg']) : null
-	return { hashBytes, hashHex, exclusions, alg, malformed: rawHash != null && hashBytes === null }
+	return { hashBytes, hashHex, exclusions: exclusions ?? [], alg, malformed: (rawHash != null && hashBytes === null) || exclusions === null }
 }
 
 // --- Manifest parsing ---

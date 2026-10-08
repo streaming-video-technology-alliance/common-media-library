@@ -49,11 +49,6 @@ type BmffMerkleMapSegment = {
 	readonly hashes: readonly (Uint8Array | null)[] | null
 }
 
-function readMapField(map: unknown, name: string): unknown {
-	if (map instanceof Map) return map.get(name)
-	return (map as Record<string, unknown>)[name]
-}
-
 // §A.5.4.1.4: multiple merkle boxes for one tree are padded to a fixed size,
 // so trailing bytes after the CBOR item are expected and not part of the data.
 function decodeFirstCbor(payload: Uint8Array): unknown {
@@ -67,13 +62,14 @@ function decodeFirstCbor(payload: Uint8Array): unknown {
 function parseBmffMerkleMap(payload: Uint8Array): BmffMerkleMapSegment | null {
 	const decoded = decodeFirstCbor(payload)
 	if (decoded === null || decoded === undefined || typeof decoded !== 'object') return null
+	const map = decoded as Record<string, unknown>
 
-	const uniqueId = asInteger(readMapField(decoded, 'uniqueId'))
-	const localId = asInteger(readMapField(decoded, 'localId'))
-	const location = asInteger(readMapField(decoded, 'location'))
+	const uniqueId = asInteger(map['uniqueId'])
+	const localId = asInteger(map['localId'])
+	const location = asInteger(map['location'])
 	if (uniqueId === null || localId === null || location === null) return null
 
-	const rawHashes = readMapField(decoded, 'hashes')
+	const rawHashes = map['hashes']
 	if (rawHashes == null) return { uniqueId, localId, location, hashes: null }
 	if (!Array.isArray(rawHashes)) return null
 

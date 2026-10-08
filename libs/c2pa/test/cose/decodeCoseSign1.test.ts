@@ -47,4 +47,10 @@ describe('decodeCoseSign1', () => {
 		const withTextPayload = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x65, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
 		throws(() => decodeCoseSign1(withTextPayload), /Failed to decode COSE_Sign1/)
 	})
+
+	it('throws on a payload that is a CBOR array', () => {
+		// 18([protected="", {}, [], ""]): 0x80 = an empty array instead of a byte string
+		const withArrayPayload = Uint8Array.of(0xd2, 0x84, 0x40, 0xa0, 0x80, 0x40)
+		throws(() => decodeCoseSign1(withArrayPayload), /Failed to decode COSE_Sign1/)
+	})
 })
