@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `dist/index.js` now parses as ES2021. A bundler no longer needs to transpile the package for an ES2021 target
+- A webpack bundle with a bare import of the package no longer contains code from the package
+
 ## [2.8.1] - 2026-10-01
 
 ### Fixed
