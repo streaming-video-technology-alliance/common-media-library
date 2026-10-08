@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript, `node:test` with mock timers, tsdown, API Extractor, TypeDoc, and rolldown for the bundle measurement.
 
-This plan is Task 3.1 of [the roadmap](steps.md). It is a draft, last checked on 2026-10-02, while the RFC is in review in PR 486. If the review changes the RFC, update the affected tasks before Task 3.2 starts.
+This plan is Task 3.1 of [the roadmap](steps.md). It is a draft, last checked on 2026-10-08, while the RFC is in review in PR 486. If the review changes the RFC, update the affected tasks before Task 3.2 starts.
 
 ## Global Constraints
 
@@ -34,12 +34,14 @@ The code of each task ran before this plan was written, on a copy of `main` at 0
 
 | Measurement, final code | Session | `CmcdReporter` |
 |---|---:|---:|
-| Minified with gzip, with its dependencies | 6910 B | 8696 B |
-| One version 2 request report, Node 24 | 7.98 µs | 14.52 µs |
+| Minified with gzip, with its dependencies | 6923 B | 8696 B |
+| One version 2 request report, Node 24 | 8.11 µs | 14.60 µs |
 
-Both APIs in one bundle measure 10541 B. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
+Both APIs in one bundle measure 10556 B. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
 
 The configuration types follow the decision of Casey of 2026-10-02. The session uses `CmcdRequestReportConfig` and `CmcdEventReportConfig`, and version 3.0.0 removes their members for `CmcdReporter`. Until then, `enabledKeys` accepts a read-only array, and `CmcdEventReportConfig` gains `filter`.
+
+The data types follow the decision of Casey of 2026-10-08. `snapshot()` supplies only the `t` reports, and a tick drops `bs` and `bsd` from its data. `CmcdSnapshot` rejects nine keys with `never` members. The data arguments use `Omit`, so the existing `Cmcd` values of a player still compile.
 
 ## Decisions in This Plan
 
@@ -161,13 +163,14 @@ The other inputs of Task 3.1 map to these tasks:
 | `libs/cmcd/src/CmcdSessionConfig.ts` | Public type of the configuration, based on `CmcdRequestReportConfig` | 2, 3, 4, 7 |
 | `libs/cmcd/src/CmcdSession.ts` | Public type of the session | 2 to 7 |
 | `libs/cmcd/src/createCmcdSession.ts` | Public function. The destinations, the reports, the queues, and the timers. | 2 to 8 |
+| `libs/cmcd/src/CmcdSnapshot.ts` | Public type of the player state that `snapshot` returns | 7 |
 | `libs/cmcd/src/CmcdReportFilter.ts` | Public type of the filter of an event target | 3 |
 | `libs/cmcd/src/CmcdEventReportConfig.ts` | Existing type of an event target. Gains `filter`. | 3 |
 | `libs/cmcd/src/CmcdEventType.ts` | Gains `CMCD_EVENT_HOSTNAME` and `HOSTNAME` | 3 |
 | `libs/cmcd/src/readScopedValues.ts` | Internal. Reads and checks the `msd`, `bs`, `bsd`, and `ec` values of a call. | 4 |
 | `libs/cmcd/src/toResponseKeys.ts` | Internal. Derives the keys of an `rr` report. | 5 |
 | `libs/cmcd/src/checkSessionConfig.ts` | Internal. The configuration checks. | 8 |
-| `libs/cmcd/src/index.ts` | Exports the public files | 2, 3 |
+| `libs/cmcd/src/index.ts` | Exports the public files | 2, 3, 7 |
 | `libs/cmcd/test/createCmcdSession.test.ts` and seven files `createCmcdSession.<area>.test.ts` | One test file for each task from 2 to 9 | 2 to 9 |
 | `libs/cmcd/test/toResponseKeys.test.ts` | Test of an internal helper | 5 |
 | `libs/cmcd/test/data/CTA_5004_B_EXAMPLES.ts` | The examples of CTA-5004-B section 8 | 9 |
@@ -262,6 +265,7 @@ describe('createCmcdSession', () => {
 		it('ignores sid and sn in the data', () => {
 			const session = createCmcdSession({ sid: 's1' })
 
+			// @ts-expect-error - The data type leaves out sid and sn. A JavaScript caller can still pass them.
 			const report = session.createRequestReport({ url: SEGMENT }, { sid: 'other', sn: 99 })
 
 			equal(decodeURIComponent(report.url), `${SEGMENT}?CMCD=sid="s1",sn=0,v=2`)
@@ -450,7 +454,7 @@ Create `libs/cmcd/src/CmcdSession.ts`:
 
 ```ts
 import type { HttpRequest } from '@svta/cml-utils'
-import type { Cmcd } from './Cmcd.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
@@ -459,6 +463,7 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  *
  * The session keeps only the state that CTA-5004-B scopes to a session or to a destination.
  * The player passes its CMCD data with each call.
+ * The data types leave out the keys that the session writes: `sid`, `sn`, `e`, and `v`.
  *
  * @public
  */
@@ -471,7 +476,8 @@ export type CmcdSession = {
 	/**
 	 * Returns a copy of the request with a CMCD request report.
 	 *
-	 * In query mode, the session removes every `CMCD` parameter of the URL and adds one.
+	 * In query mode, the first `CMCD` parameter of the URL takes the new value in place.
+	 * The session removes the other `CMCD` parameters.
 	 * In header mode, the session replaces the CMCD headers.
 	 * `customData.cmcd` holds the report data before encoding.
 	 * Each call advances the sequence number of request mode.
@@ -482,7 +488,7 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -791,6 +797,7 @@ describe('createCmcdSession events', () => {
 		it('ignores sid, sn, and e in the data, and uses the configured cid when the data has none', async () => {
 			const { session, lines } = setup({ cid: 'c1', eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
 
+			// @ts-expect-error - The data type leaves out sid, sn, and e. A JavaScript caller can still pass them.
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sid: 'x', sn: 7, e: 'rr', cid: undefined, sta: 'p' })
 			session.recordEvent(CmcdEventType.PLAY_STATE, { cid: 'ad-7', sta: 'a' })
 			await settle()
@@ -1077,6 +1084,7 @@ Replace the content of `libs/cmcd/src/CmcdSession.ts` with:
 import type { HttpRequest } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
@@ -1085,6 +1093,7 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  *
  * The session keeps only the state that CTA-5004-B scopes to a session or to a destination.
  * The player passes its CMCD data with each call.
+ * The data types leave out the keys that the session writes: `sid`, `sn`, `e`, and `v`.
  *
  * @public
  */
@@ -1097,7 +1106,8 @@ export type CmcdSession = {
 	/**
 	 * Returns a copy of the request with a CMCD request report.
 	 *
-	 * In query mode, the session removes every `CMCD` parameter of the URL and adds one.
+	 * In query mode, the first `CMCD` parameter of the URL takes the new value in place.
+	 * The session removes the other `CMCD` parameters.
 	 * In header mode, the session replaces the CMCD headers.
 	 * `customData.cmcd` holds the report data before encoding.
 	 * Each call advances the sequence number of request mode.
@@ -1108,7 +1118,7 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
 
 	/**
 	 * Records an event report for each selected event target.
@@ -1124,7 +1134,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void;
+	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -1783,7 +1793,9 @@ Replace the content of `libs/cmcd/src/CmcdSession.ts` with:
 ```ts
 import type { HttpRequest } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEvent } from './CmcdEvent.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
@@ -1792,6 +1804,8 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  *
  * The session keeps only the state that CTA-5004-B scopes to a session or to a destination.
  * The player passes its CMCD data with each call.
+ * The data types leave out the keys that the session writes: `sid`, `sn`, `e`, and `v`.
+ * `ec` goes only through `recordError()`.
  *
  * @public
  */
@@ -1804,7 +1818,8 @@ export type CmcdSession = {
 	/**
 	 * Returns a copy of the request with a CMCD request report.
 	 *
-	 * In query mode, the session removes every `CMCD` parameter of the URL and adds one.
+	 * In query mode, the first `CMCD` parameter of the URL takes the new value in place.
+	 * The session removes the other `CMCD` parameters.
 	 * In header mode, the session replaces the CMCD headers.
 	 * `customData.cmcd` holds the report data before encoding.
 	 * Each call advances the sequence number of request mode.
@@ -1815,7 +1830,7 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
 
 	/**
 	 * Records an event report for each selected event target.
@@ -1831,7 +1846,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void;
+	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
 
 	/**
 	 * Records an error.
@@ -1847,7 +1862,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Cmcd): void;
+	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -2404,7 +2419,9 @@ Replace the content of `libs/cmcd/src/CmcdSession.ts` with:
 ```ts
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEvent } from './CmcdEvent.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
@@ -2413,6 +2430,8 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  *
  * The session keeps only the state that CTA-5004-B scopes to a session or to a destination.
  * The player passes its CMCD data with each call.
+ * The data types leave out the keys that the session writes: `sid`, `sn`, `e`, and `v`.
+ * `ec` goes only through `recordError()`.
  *
  * @public
  */
@@ -2425,7 +2444,8 @@ export type CmcdSession = {
 	/**
 	 * Returns a copy of the request with a CMCD request report.
 	 *
-	 * In query mode, the session removes every `CMCD` parameter of the URL and adds one.
+	 * In query mode, the first `CMCD` parameter of the URL takes the new value in place.
+	 * The session removes the other `CMCD` parameters.
 	 * In header mode, the session replaces the CMCD headers.
 	 * `customData.cmcd` holds the report data before encoding.
 	 * Each call advances the sequence number of request mode.
@@ -2436,7 +2456,7 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
 
 	/**
 	 * Records an event report for each selected event target.
@@ -2452,7 +2472,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void;
+	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
 
 	/**
 	 * Records an `rr` report for a response.
@@ -2470,7 +2490,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.responses.test.ts#example}
 	 */
-	recordResponseReceived(response: HttpResponse, data?: Cmcd): void;
+	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
 
 	/**
 	 * Records an error.
@@ -2486,7 +2506,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Cmcd): void;
+	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -3078,7 +3098,9 @@ Replace the content of `libs/cmcd/src/CmcdSession.ts` with:
 ```ts
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEvent } from './CmcdEvent.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
@@ -3087,6 +3109,8 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  *
  * The session keeps only the state that CTA-5004-B scopes to a session or to a destination.
  * The player passes its CMCD data with each call.
+ * The data types leave out the keys that the session writes: `sid`, `sn`, `e`, and `v`.
+ * `ec` goes only through `recordError()`.
  *
  * @public
  */
@@ -3099,7 +3123,8 @@ export type CmcdSession = {
 	/**
 	 * Returns a copy of the request with a CMCD request report.
 	 *
-	 * In query mode, the session removes every `CMCD` parameter of the URL and adds one.
+	 * In query mode, the first `CMCD` parameter of the URL takes the new value in place.
+	 * The session removes the other `CMCD` parameters.
 	 * In header mode, the session replaces the CMCD headers.
 	 * `customData.cmcd` holds the report data before encoding.
 	 * Each call advances the sequence number of request mode.
@@ -3110,7 +3135,7 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
 
 	/**
 	 * Records an event report for each selected event target.
@@ -3126,7 +3151,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void;
+	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
 
 	/**
 	 * Records an `rr` report for a response.
@@ -3144,7 +3169,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.responses.test.ts#example}
 	 */
-	recordResponseReceived(response: HttpResponse, data?: Cmcd): void;
+	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
 
 	/**
 	 * Records an error.
@@ -3160,7 +3185,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Cmcd): void;
+	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -3589,19 +3614,20 @@ git commit -s -m "feat(cmcd): back off and stop on the responses of a collector"
 ### Task 7: Timers
 
 **Files:**
-- Modify: `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
+- Create: `libs/cmcd/src/CmcdSnapshot.ts`
+- Modify: `libs/cmcd/src/CmcdSessionConfig.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, `libs/cmcd/src/index.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
 - Test: `libs/cmcd/test/createCmcdSession.timers.test.ts`
 
 **Interfaces:**
 - Consumes: `emit()` and `send()` from Task 6.
-- Produces: `start(immediate?: boolean): void`, `stop(): void`, `CmcdSessionConfig.snapshot`, and the use of `CmcdEventReportConfig.interval`, which already exists. `emit()` gains the parameter `candidates` before `ec`.
+- Produces: `start(immediate?: boolean): void`, `stop(): void`, `CmcdSessionConfig.snapshot` (`() => CmcdSnapshot`), the type `CmcdSnapshot`, and the use of `CmcdEventReportConfig.interval`, which already exists. `emit()` gains the parameter `candidates` before `ec`. A tick drops `bs` and `bsd` from the snapshot data.
 
 - [ ] **Step 1: Write the failing test**
 
 Create `libs/cmcd/test/createCmcdSession.timers.test.ts`:
 
 ```ts
-import type { Cmcd, CmcdSessionConfig } from '@svta/cml-cmcd'
+import type { CmcdSessionConfig, CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, CmcdStreamType, createCmcdSession } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok, throws } from 'node:assert'
@@ -3627,7 +3653,7 @@ function setup(config: CmcdSessionConfig, status = 200) {
 }
 
 describe('createCmcdSession timers', () => {
-	const state: Cmcd = { sta: 'p' }
+	const state: CmcdSnapshot = { sta: 'p' }
 
 	beforeEach(() => mock.timers.enable({ apis: ['setTimeout', 'setInterval', 'Date'], now: ts }))
 	afterEach(() => mock.timers.reset())
@@ -3635,9 +3661,9 @@ describe('createCmcdSession timers', () => {
 	it('provides a valid example', () => {
 		// #region example
 		const bodies: string[] = []
-		let playerState: Cmcd['sta'] = CmcdPlayerState.STARTING
+		let playerState: CmcdPlayerState = CmcdPlayerState.STARTING
 
-		const data = (): Cmcd => ({ st: CmcdStreamType.VOD, sta: playerState, bl: [21300] })
+		const data = (): CmcdSnapshot => ({ st: CmcdStreamType.VOD, sta: playerState, bl: [21300] })
 
 		const session = createCmcdSession({
 			cid: 'movie-42',
@@ -3653,7 +3679,7 @@ describe('createCmcdSession timers', () => {
 			return { status: 200 }
 		})
 
-		function setPlayerState(next: Cmcd['sta']): void {
+		function setPlayerState(next: CmcdPlayerState): void {
 			if (next === playerState) {
 				return
 			}
@@ -3715,7 +3741,7 @@ describe('createCmcdSession timers', () => {
 	})
 
 	it('ticks each target at its own interval and applies its filter', async () => {
-		const data: Cmcd = { sta: 'p' }
+		const data: CmcdSnapshot = { sta: 'p' }
 		const { session, posts } = setup({
 			eventTargets: [
 				{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 },
@@ -3758,6 +3784,22 @@ describe('createCmcdSession timers', () => {
 		session.stop()
 	})
 
+	it('ignores bs and bsd in the data of snapshot()', () => {
+		const stall = { sta: CmcdPlayerState.REBUFFERING, bs: true, bsd: [1200] }
+		const { session, lines } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 }],
+			// @ts-expect-error - CmcdSnapshot rejects bs and bsd. A JavaScript caller can still return them.
+			snapshot: () => stall,
+		})
+
+		session.start()
+		session.stop()
+		const report = session.createRequestReport({ url: 'https://cdn.test/v/1.m4s' })
+
+		deepEqual(lines(0), [`e=t,sid="s1",sn=0,sta=r,ts=${ts},v=2`])
+		equal(decodeURIComponent(report.url), 'https://cdn.test/v/1.m4s?CMCD=sid="s1",sn=0,v=2')
+	})
+
 	it('clears the wait on stop(), and a failure after stop() starts no timer', async () => {
 		const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] }, 503)
 
@@ -3784,16 +3826,79 @@ npm run build -w libs/cmcd
 node --no-warnings --test libs/cmcd/test/createCmcdSession.timers.test.ts
 ```
 
-Expected: FAIL. The 8 tests fail with `TypeError`, because `start()` and `stop()` do not exist yet.
+Expected: FAIL. The 9 tests fail with `TypeError`, because `start()` and `stop()` do not exist yet.
 
 - [ ] **Step 3: Update the types**
+
+Create `libs/cmcd/src/CmcdSnapshot.ts`:
+
+```ts
+import type { CmcdEvent } from './CmcdEvent.ts'
+
+/**
+ * The CMCD data that a player keeps as its state.
+ *
+ * `CmcdSessionConfig.snapshot` returns this type for the `t` reports.
+ * The player can pass the same object with each call.
+ * The type rejects the keys that the session writes.
+ * It also rejects the keys of one occurrence, such as a stall or an error.
+ *
+ * @public
+ */
+export type CmcdSnapshot = Omit<CmcdEvent, 'bs' | 'bsd' | 'cen' | 'e' | 'ec' | 'sid' | 'sn' | 'ts' | 'v'> & {
+	/**
+	 * `bs` reports a stall. Pass it once, in the data of a call at the stall.
+	 */
+	bs?: never;
+
+	/**
+	 * `bsd` reports the duration of a stall. Pass it once, in the data of a call after the stall.
+	 */
+	bsd?: never;
+
+	/**
+	 * CTA-5004-B allows `cen` only on `ce` events.
+	 */
+	cen?: never;
+
+	/**
+	 * The session writes `e`.
+	 */
+	e?: never;
+
+	/**
+	 * Pass error codes to `recordError()`.
+	 */
+	ec?: never;
+
+	/**
+	 * The session writes `sid`.
+	 */
+	sid?: never;
+
+	/**
+	 * The session writes `sn`.
+	 */
+	sn?: never;
+
+	/**
+	 * The session writes the time of each `t` report.
+	 */
+	ts?: never;
+
+	/**
+	 * The session writes `v`.
+	 */
+	v?: never;
+}
+```
 
 Replace the content of `libs/cmcd/src/CmcdSessionConfig.ts` with:
 
 ```ts
-import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
+import type { CmcdSnapshot } from './CmcdSnapshot.ts'
 
 /**
  * The configuration of a CMCD session.
@@ -3823,9 +3928,10 @@ export type CmcdSessionConfig = CmcdRequestReportConfig & {
 	eventTargets?: readonly CmcdEventReportConfig[];
 
 	/**
-	 * Returns the data of each `t` report. Without `snapshot`, `start()` arms no timer.
+	 * Returns the data of each `t` report. The other reports use only the data of their call.
+	 * Without `snapshot`, `start()` arms no timer.
 	 */
-	snapshot?: () => Cmcd;
+	snapshot?: () => CmcdSnapshot;
 }
 ```
 
@@ -3834,7 +3940,9 @@ Replace the content of `libs/cmcd/src/CmcdSession.ts` with:
 ```ts
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEvent } from './CmcdEvent.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
+import type { CmcdRequest } from './CmcdRequest.ts'
 import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
 
@@ -3843,6 +3951,8 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  *
  * The session keeps only the state that CTA-5004-B scopes to a session or to a destination.
  * The player passes its CMCD data with each call.
+ * The data types leave out the keys that the session writes: `sid`, `sn`, `e`, and `v`.
+ * `ec` goes only through `recordError()`.
  *
  * @public
  */
@@ -3855,7 +3965,8 @@ export type CmcdSession = {
 	/**
 	 * Returns a copy of the request with a CMCD request report.
 	 *
-	 * In query mode, the session removes every `CMCD` parameter of the URL and adds one.
+	 * In query mode, the first `CMCD` parameter of the URL takes the new value in place.
+	 * The session removes the other `CMCD` parameters.
 	 * In header mode, the session replaces the CMCD headers.
 	 * `customData.cmcd` holds the report data before encoding.
 	 * Each call advances the sequence number of request mode.
@@ -3866,7 +3977,7 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Cmcd): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
 
 	/**
 	 * Records an event report for each selected event target.
@@ -3882,7 +3993,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Cmcd, request?: Readonly<HttpRequest>): void;
+	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
 
 	/**
 	 * Records an `rr` report for a response.
@@ -3900,7 +4011,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.responses.test.ts#example}
 	 */
-	recordResponseReceived(response: HttpResponse, data?: Cmcd): void;
+	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
 
 	/**
 	 * Records an error.
@@ -3916,7 +4027,7 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Cmcd): void;
+	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -3954,6 +4065,12 @@ export type CmcdSession = {
 	 */
 	flush(): void;
 }
+```
+
+In `libs/cmcd/src/index.ts`, after the line `export type * from './CmcdSessionConfig.ts'`, add:
+
+```ts
+export type * from './CmcdSnapshot.ts'
 ```
 
 - [ ] **Step 4: Write the implementation**
@@ -4040,6 +4157,10 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 }
 
 function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
+	return data
+}
+
+function withoutStallKeys({ bs, bsd, ...data }: Cmcd): Cmcd {
 	return data
 }
 
@@ -4356,7 +4477,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				target.timer = undefined
 
 				if (snapshot && target.interval > 0 && !target.destination.gone && target.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
-					const tick = (): void => emit(CMCD_EVENT_TIME_INTERVAL, snapshot(), undefined, [target])
+					const tick = (): void => emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
 
 					target.timer = setInterval(tick, target.interval * 1000)
 
@@ -4399,12 +4520,12 @@ npm run typecheck
 npx eslint libs/cmcd
 ```
 
-Expected: the 8 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing.
+Expected: the 9 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing. The typecheck also confirms the `@ts-expect-error` line of the test: `CmcdSnapshot` rejects `bs` and `bsd`. The API report gains `CmcdSnapshot`.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.timers.test.ts
+git add libs/cmcd/src/CmcdSnapshot.ts libs/cmcd/src/CmcdSessionConfig.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/src/index.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.timers.test.ts
 git commit -s -m "feat(cmcd): add the t report timers of the CMCD session" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
@@ -4616,6 +4737,10 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 }
 
 function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
+	return data
+}
+
+function withoutStallKeys({ bs, bsd, ...data }: Cmcd): Cmcd {
 	return data
 }
 
@@ -4936,7 +5061,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				target.timer = undefined
 
 				if (snapshot && target.interval > 0 && !target.destination.gone && target.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
-					const tick = (): void => emit(CMCD_EVENT_TIME_INTERVAL, snapshot(), undefined, [target])
+					const tick = (): void => emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
 
 					target.timer = setInterval(tick, target.interval * 1000)
 
@@ -5066,7 +5191,7 @@ export const EX_8_2_8: readonly string[] = [
 Create `libs/cmcd/test/createCmcdSession.examples.test.ts`:
 
 ```ts
-import type { Cmcd, CmcdKey, CmcdSessionConfig } from '@svta/cml-cmcd'
+import type { Cmcd, CmcdKey, CmcdSessionConfig, CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType, CmcdTransmissionMode, createCmcdSession, toCmcdValue } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal } from 'node:assert'
@@ -5219,8 +5344,8 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 
 		it('8.2.2, t reports with msd, a stall, and an error between two reports', async () => {
 			mock.timers.enable({ apis: ['setInterval', 'Date'], now: 1764752400000 - 30_000 })
-			const media: Cmcd = { cid: CID, h: 'example.com', sf: CmcdStreamingFormat.DASH, st: CmcdStreamType.VOD, br: [v(4200), a(256)], lb: [v(523), a(64)], pb: [v(4200), a(256)], tb: [v(4200), a(256)], tpb: [v(4200), a(256)] }
-			const snapshots: Cmcd[] = [
+			const media: CmcdSnapshot = { cid: CID, h: 'example.com', sf: CmcdStreamingFormat.DASH, st: CmcdStreamType.VOD, br: [v(4200), a(256)], lb: [v(523), a(64)], pb: [v(4200), a(256)], tb: [v(4200), a(256)], tpb: [v(4200), a(256)] }
+			const snapshots: CmcdSnapshot[] = [
 				{ cid: CID },
 				{ cid: CID, h: 'example.com', bl: [0], pt: 0, sta: CmcdPlayerState.STARTING, su: true },
 				{ ...media, bl: [6000], msd: 812, mtp: [v(87000), a(49000)], pt: 29188, sta: CmcdPlayerState.PLAYING },
@@ -5371,14 +5496,14 @@ To change the `sid`, create a new session. Call `flush()` and `stop()` on the ol
 The player builds its CMCD data from its own fields and passes the data with each call. A state change check is one comparison.
 
 ```typescript
-import type { Cmcd } from '@svta/cml-cmcd'
+import type { CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, createCmcdSession } from '@svta/cml-cmcd'
 
-let playerState: Cmcd['sta'] = CmcdPlayerState.STARTING
+let playerState: CmcdPlayerState = CmcdPlayerState.STARTING
 const bufferLength = 21300
 const bandwidth = 25_000_000
 
-const state = (): Cmcd => ({ sf: 'h', st: 'v', sta: playerState, bl: [bufferLength], mtp: [bandwidth / 1000] })
+const state = (): CmcdSnapshot => ({ sf: 'h', st: 'v', sta: playerState, bl: [bufferLength], mtp: [bandwidth / 1000] })
 
 const session = createCmcdSession({
 	cid: 'movie-42',
@@ -5395,7 +5520,7 @@ const session = createCmcdSession({
 
 session.start()
 
-function setPlayerState(next: Cmcd['sta']): void {
+function setPlayerState(next: CmcdPlayerState): void {
 	if (next === playerState) {
 		return
 	}
@@ -5410,7 +5535,9 @@ setPlayerState(CmcdPlayerState.PLAYING)
 session.stop()
 ```
 
-The second `setPlayerState()` call sends nothing, because the state did not change. `start()` sends the first `t` report at once and then one report every 30 seconds. Each `t` report reads `snapshot()`. `start(false)` waits one interval before the first report. `stop()` clears the timers.
+The second `setPlayerState()` call sends nothing, because the state did not change. `start()` sends the first `t` report at once and then one report every 30 seconds. `start(false)` waits one interval before the first report. `stop()` clears the timers.
+
+`snapshot()` supplies the data of the `t` reports only. Every other report uses only the data of its call. Type the state function as `CmcdSnapshot`, so that one function serves both. The type rejects the keys that the session writes: `sid`, `sn`, `e`, `v`, and the `ts` of a `t` report. It also rejects `bs` and `bsd`, because they report one stall. `ec` goes to `recordError()`, and only a `ce` event can have `cen`.
 
 ## Decorate Requests
 
@@ -5437,7 +5564,7 @@ console.log(next.headers['CMCD-Request'])
 
 `createRequestReport()` returns a copy of the request:
 
-- In query mode, the session removes every `CMCD` parameter of the URL and adds one. The other parameters and the fragment stay.
+- In query mode, the first `CMCD` parameter of the URL takes the new value in place. The session removes the other `CMCD` parameters. The other parameters and the fragment stay.
 - In header mode, the session replaces the CMCD headers of the request. `customHeaderMap` places the custom keys.
 - `customData.cmcd` holds the report data before encoding.
 - The session writes `nor` as a path relative to the request URL.
@@ -5448,7 +5575,7 @@ console.log(next.headers['CMCD-Request'])
 
 ## Record Events and Responses
 
-`recordEvent()` sends a report to each event target that lists the event type. The session adds `e`, and `ts` when the data has none. It writes `sid` and `sn` last, so a `sid`, `sn`, or `e` in the data has no effect. The configured `cid` applies when the data has no `cid`. A `b` report with `bg: false` is the exit from backgrounded mode, so the session writes it without `bg`.
+`recordEvent()` sends a report to each event target that lists the event type. The session adds `e`, and `ts` when the data has none. It writes `sid` and `sn` last. The data types of all methods leave out `sid`, `sn`, `e`, `v`, and `ec`. In JavaScript, a `sid`, `sn`, or `e` in the data has no effect. The configured `cid` applies when the data has no `cid`. A `b` report with `bg: false` is the exit from backgrounded mode, so the session writes it without `bg`.
 
 `recordResponseReceived()` records an `rr` report. The session derives these keys:
 
@@ -5496,6 +5623,8 @@ Three more keys have a scope that one report cannot cover. The player passes the
 | `bsd` | Each destination adds the values to one list and sends the list with its next report. |
 
 A valid `msd` is a finite number from 0 to 999,999,999,999,999 after rounding to an integer. The session ignores any other `msd`. The next report drops a waiting `bs`, `bsd`, or `ec` value that the version or `enabledKeys` does not allow. The session copies each waiting value, so a later change to the data of the caller does not change it.
+
+Pass `bs` and `bsd` once, in the data of the call that reports the stall. If the state object of the player keeps `bs: true`, each call reports the stall again. `CmcdSnapshot` rejects both keys, and a tick ignores them. `msd` can stay in the state object, because only its first valid value counts.
 
 ```typescript
 import { CmcdEventType, CmcdObjectType, CmcdPlayerState, createCmcdSession } from '@svta/cml-cmcd'
@@ -5554,7 +5683,7 @@ The first target receives only the segment response, and the second target recei
 
 ## Several Players, One Session
 
-Several media players can share one session, because the session keeps no state for a player. Each player passes its own `cid`. During an interstitial, the primary player and the ad player report under one `sid`, with one sequence for each destination.
+Several media players can share one session, because the session keeps no state for a player. Each player passes its own `cid`. During an interstitial, the primary player and the ad player report under one `sid`, with one sequence for each destination. The `t` reports read one `snapshot()`, so they carry the state of one player.
 
 ```typescript
 import { CmcdEventType, createCmcdSession } from '@svta/cml-cmcd'
@@ -5656,7 +5785,7 @@ console.log(report.url)
 The session keeps no store. The player keeps its data, passes it with each call, and sends the `ps` event itself:
 
 ```typescript
-import type { Cmcd } from '@svta/cml-cmcd'
+import type { CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, createCmcdSession } from '@svta/cml-cmcd'
 
 const session = createCmcdSession({
@@ -5672,7 +5801,7 @@ const session = createCmcdSession({
 	return { status: 200 }
 })
 
-const state: Cmcd = { sta: 'p', bl: [12000] }
+const state: CmcdSnapshot = { sta: 'p', bl: [12000] }
 
 session.recordEvent(CmcdEventType.PLAY_STATE, state)
 
@@ -5686,11 +5815,11 @@ console.log(report.url)
 |---|---|
 | `new CmcdReporter(config, requester)` | `createCmcdSession(config, requester)` |
 | `sid`, `cid`, `version`, `transmissionMode`, `enabledKeys`, `customHeaderMap`, `eventTargets` | The same names and types: `CmcdRequestReportConfig` and `CmcdEventReportConfig` |
-| `update(data)` for values that persist | The player keeps the values and passes them with each call |
+| `update(data)` for values that persist | The player keeps the values in a `CmcdSnapshot` object and passes them with each call |
 | The events that `update()` fires for `sta`, `pr`, `cid`, `bg`, and `br` | The player compares the new value with the old value, then calls `recordEvent()` |
 | `update({ sid })` | A new session. The player calls `flush()` and `stop()` on the old session. |
 | `update({ msd })` | `msd` in the data of any call. The session sends it once to each destination. |
-| The data store in `t` reports | `snapshot` |
+| The data store in `t` reports | `snapshot`, which returns `CmcdSnapshot` |
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
 | `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |
@@ -5708,6 +5837,7 @@ console.log(report.url)
 - Without `enabledKeys`, the session reports every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 - The session sends no event by itself. The player compares each new value with the old value, then calls `recordEvent()`.
 - The session reads `msd`, `bs`, and `bsd` from the data of any call and sends them to every destination. `CmcdReporter` reads `msd` from `update()` only.
+- A `bs` flag that stays in the store until the next request becomes `bs: true` in the data of one call. `CmcdSnapshot` rejects `bs` and `bsd`.
 - The session ignores `transform` and `sessionRetention`. Version 3.0.0 removes `transform` from the configuration types.
 - Every target receives the same data. A `transform` that changes the report of one target has no equivalent, and neither has the `bg=?0` opt-in.
 - After a failed send, a target waits from 1 to 60 seconds before the retry. `CmcdReporter` sends a failed batch again with the next send.
@@ -5724,7 +5854,7 @@ In `libs/cmcd/README.md`, before the line ``## Testing CMCD output with `CmcdRep
 `createCmcdSession()` adds CMCD data to the requests of a player and sends event reports to collectors. One session reports one `sid`. The player passes its CMCD data with each call.
 
 ```typescript
-import type { Cmcd } from '@svta/cml-cmcd'
+import type { CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, createCmcdSession } from '@svta/cml-cmcd'
 
 const session = createCmcdSession({
@@ -5738,7 +5868,7 @@ const session = createCmcdSession({
 	return { status: 200 }
 })
 
-const state: Cmcd = { sta: 'p', bl: [12000], mtp: [25000] }
+const state: CmcdSnapshot = { sta: 'p', bl: [12000], mtp: [25000] }
 
 const report = session.createRequestReport({ url: 'https://cdn.example.com/movie/seg-1.m4s' }, { ...state, ot: 'v', d: 4000, br: [3000] })
 console.log(report.url)
@@ -5758,6 +5888,7 @@ In `libs/cmcd/CHANGELOG.md`, under `## [Unreleased]`, add:
 ### Added
 
 - `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call. The session keeps one sequence number for each destination, the event queues, and the timers. Its configuration uses the types of `CmcdReporter`: `CmcdRequestReportConfig` and `CmcdEventReportConfig`. The new `filter` of `CmcdEventReportConfig` selects the reports of an event target. The session guide and the migration guide describe the API
+- `CmcdSnapshot`, the type of the player state. `snapshot` returns it for the `t` reports, and the player can pass it with each call. It rejects the keys that the session writes, `bs`, `bsd`, `ec`, and `cen`
 - `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` for the `h` event of CTA-5004-B
 
 ### Changed
@@ -5838,7 +5969,9 @@ Expected: the diff has these changes, and nothing else:
 - `enabledKeys?: readonly CmcdKey[]` in `CmcdReportConfig`, and `filter?: CmcdReportFilter` in `CmcdEventReportConfig`
 - `CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean`
 - `CmcdSession` with `sid`, `createRequestReport`, `recordEvent`, `recordResponseReceived`, `recordError`, `configure`, `start`, `stop`, and `flush`
-- `CmcdSessionConfig = CmcdRequestReportConfig & { sid?, cid?, eventTargets?: readonly CmcdEventReportConfig[], snapshot? }`, and `configure(settings: CmcdRequestReportConfig)` in `CmcdSession`
+- The data arguments of `CmcdSession`: `Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>` for `createRequestReport`, `Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>` for `recordEvent` and `recordResponseReceived`, and `Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>` for `recordError`
+- `CmcdSessionConfig = CmcdRequestReportConfig & { sid?, cid?, eventTargets?: readonly CmcdEventReportConfig[], snapshot?: () => CmcdSnapshot }`, and `configure(settings: CmcdRequestReportConfig)` in `CmcdSession`
+- `CmcdSnapshot = Omit<CmcdEvent, 'bs' | 'bsd' | 'cen' | 'e' | 'ec' | 'sid' | 'sn' | 'ts' | 'v'>`, with each of the nine keys as a `never` member
 - `createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status: number; }>): CmcdSession`
 
 The diff must have no `ae-forgotten-export` warning. Compare each declaration with the section "Types" of the RFC.
@@ -5857,7 +5990,7 @@ printf "import { CmcdReporter, createCmcdSession } from '%s'\nglobalThis.x = [Cm
 for name in session reporter both; do npx rolldown $S/$name.mjs --format esm --minify --file $S/$name.min.js > /dev/null && printf "%s %s B\n" $name $(gzip -9 -c $S/$name.min.js | wc -c); done
 ```
 
-Expected: about 6.9 KB for the session, 8.7 KB for `CmcdReporter`, and 10.5 KB for both. If the session measures more than 7.5 KB, stop and report.
+Expected: about 6.9 KB for the session, 8.7 KB for `CmcdReporter`, and 10.6 KB for both. If the session measures more than 7.5 KB, stop and report.
 
 - [ ] **Step 4: Run the bare-import probes**
 
