@@ -131,7 +131,7 @@ export function findC2paUuidBox(boxes: ParsedIsoBox[]): UuidParsedBox | undefine
 
 const FULLBOX_HEADER_SIZE = 4
 const AUX_UUID_OFFSET_SIZE = 8
-const TEXT_DECODER = new TextDecoder()
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 
 // Reads a version/flags + null-terminated purpose prefix, or null if malformed.
 /** @internal */
