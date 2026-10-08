@@ -314,6 +314,16 @@ describe('validateC2paManifestBoxSegment — BMFF hash assertion offset prefix (
 		strictEqual(result.bmffHashHex, null)
 	})
 
+	it('rejects a hash that is a CBOR array of integers with ASSERTION_BMFFHASH_MALFORMED', async () => {
+		const hash = await computeBmffHash(buildMediaBoxes(), { offsetPrefixSize: 8 })
+		const segment = buildSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: Array.from(hash) })
+
+		const { result } = await validateC2paManifestBoxSegment(segment, null)
+
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+		strictEqual(result.bmffHashHex, null)
+	})
+
 	it('accepts the flat hash of a real signed manifest-box segment', async () => {
 		const bytes = new Uint8Array(
 			readFileSync(new URL('../fixtures/test-segment.m4s', import.meta.url)),

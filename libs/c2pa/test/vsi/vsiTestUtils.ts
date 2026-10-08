@@ -64,6 +64,8 @@ export type TestSessionKeyEntry = {
 	readonly signerBindingPayload?: Uint8Array
 	/** Encodes the fields in the deterministic key order of RFC 8949 section 4.2.1, which puts `minSequenceNumber` last. */
 	readonly deterministicKeyOrder?: boolean
+	/** Replaces fields of the encoded session key, after the other options. */
+	readonly fields?: Readonly<Record<string, unknown>>
 }
 
 // COSE_Sign1_Tagged (RFC 9052 §4.2) with an ES256 protected header, signed over `payload`.
@@ -115,6 +117,7 @@ async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: U
 		validityPeriod: entry.validityPeriod,
 		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, entry.signerBindingPayload ?? null),
 		...(entry.topLevelKid && { kid: entry.topLevelKid }),
+		...entry.fields,
 	}
 	if (!entry.deterministicKeyOrder) return data
 	// RFC 8949 section 4.2.1: a shorter encoded text key sorts first, then the bytes decide

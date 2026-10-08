@@ -21,17 +21,12 @@ const COSE_KEY_ID_LABEL = 2
 // §18.25.3: an inline COSE_Sign1 passes through as the bytes of the tagged item
 function normalizeToUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
 	if (value instanceof CborTag) return value.bytes
 	throw new Error('Cannot convert value to Uint8Array')
 }
 
 function ensureDecodedCbor(value: unknown): unknown {
-	if (value instanceof Uint8Array) return decodeCbor(value)
-	if (Array.isArray(value) && value.length > 0 && typeof (value as number[])[0] === 'number') {
-		return decodeCbor(new Uint8Array(value as number[]))
-	}
-	return value
+	return value instanceof Uint8Array ? decodeCbor(value) : value
 }
 
 // RFC 8949 section 3.4.1: the date-time of RFC 3339, as refined by RFC 4287 section 3.3 (C2PA section 6.9)
@@ -50,14 +45,8 @@ function parseCreatedAt(value: unknown): string | null {
 
 // §18.25.2: the COSE key includes the kid (COSE key label 2, RFC 9052)
 function extractKidHex(coseKey: unknown): string | null {
-	const coseKeyLike = coseKey as Map<number, unknown> | Record<number, unknown>
-	const coseKid = coseKeyLike instanceof Map ? coseKeyLike.get(COSE_KEY_ID_LABEL) : coseKeyLike[COSE_KEY_ID_LABEL]
-	if (coseKid instanceof Uint8Array) return bytesToHex(coseKid)
-	if (Array.isArray(coseKid) && coseKid.length > 0) {
-		return bytesToHex(new Uint8Array(coseKid as number[]))
-	}
-
-	return null
+	const coseKid = (coseKey as Record<number, unknown>)[COSE_KEY_ID_LABEL]
+	return coseKid instanceof Uint8Array ? bytesToHex(coseKid) : null
 }
 
 function extractKeyArray(data: unknown): unknown[] {
@@ -82,14 +71,13 @@ async function validateBmffHashAssertion(
 	const data = assertion.data as Record<string, unknown>
 	const rawHash = data['hash'] ?? data['value']
 	if (!rawHash) return true
-	const expectedHash =
-		rawHash instanceof Uint8Array ? rawHash : new Uint8Array(rawHash as number[])
+	if (!(rawHash instanceof Uint8Array)) return false
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
 	// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
 	// box; only Merkle tree hashes may omit the 8-byte offset prefix.
 	const computed = await computeBmffHash(bytes, { exclusions, alg, offsetPrefixSize: 8 })
-	return hashesEqual(computed, expectedHash)
+	return hashesEqual(computed, rawHash)
 }
 
 type SessionKeyFields = {

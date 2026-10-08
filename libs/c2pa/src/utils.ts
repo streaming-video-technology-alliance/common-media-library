@@ -76,12 +76,10 @@ export function matchesUuid(usertype: readonly number[], expected: readonly numb
 	return usertype.length === expected.length && expected.every((b, i) => b === usertype[i])
 }
 
-// Converts CBOR-decoded bytes (Uint8Array or number[]) to Uint8Array, or null.
+// A CBOR byte string as a Uint8Array, or null for a value of another type.
 /** @internal */
 export function toUint8Array(value: unknown): Uint8Array | null {
-	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	return null
+	return value instanceof Uint8Array ? value : null
 }
 
 /** @internal */

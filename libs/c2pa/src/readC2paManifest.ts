@@ -125,11 +125,12 @@ function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAss
 		const e = entry as Record<string, unknown>
 		const url = e['url'] as string | undefined
 		const hash = e['hash']
-		if (!url || !hash) continue
+		if (!url || hash == null) continue
 
 		refs.push({
 			url,
-			hash: hash instanceof Uint8Array ? hash : new Uint8Array(hash as number[]),
+			// hashed-uri-map CDDL: hash is a byte string. Another type never matches.
+			hash: hash instanceof Uint8Array ? hash : new Uint8Array(0),
 			alg: (e['alg'] as string | undefined) ?? null,
 		})
 	}

@@ -6,17 +6,11 @@ const COSE_SIGN1_ARRAY_LENGTH = 4
 const COSE_KEY_KID = 4
 const COSE_KEY_ALG = 1
 
-type CoseHeader = Map<number, unknown> | Record<number | string, unknown>
-
-function coseGet(header: CoseHeader, key: number): unknown {
-	if (header instanceof Map) return header.get(key)
-	return (header as Record<number | string, unknown>)[key]
-}
+type CoseHeader = Record<number | string, unknown>
 
 function toUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	throw new Error(`Expected Uint8Array or number[], got ${typeof value}`)
+	throw new Error(`Expected a byte string, got ${typeof value}`)
 }
 
 /**
@@ -54,9 +48,9 @@ export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 		}
 
 		const unprotectedHeader = (unprotectedRaw ?? {}) as CoseHeader
-		const kidRaw = coseGet(protectedHeader, COSE_KEY_KID) ?? coseGet(unprotectedHeader, COSE_KEY_KID) ?? null
+		const kidRaw = protectedHeader[COSE_KEY_KID] ?? unprotectedHeader[COSE_KEY_KID] ?? null
 		const kid = kidRaw != null ? toUint8Array(kidRaw) : null
-		const alg = (coseGet(protectedHeader, COSE_KEY_ALG) ?? coseGet(unprotectedHeader, COSE_KEY_ALG) ?? null) as number | null
+		const alg = (protectedHeader[COSE_KEY_ALG] ?? unprotectedHeader[COSE_KEY_ALG] ?? null) as number | null
 
 		return {
 			protectedBytes,

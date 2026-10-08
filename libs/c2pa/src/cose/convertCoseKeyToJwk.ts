@@ -8,15 +8,9 @@ const EC2_KEY_TYPE = 2
 const EC_CURVE_NAMES: Record<number, string> = { 1: 'P-256', 2: 'P-384', 3: 'P-521' }
 const OKP_CURVE_NAMES: Record<number, string> = { 4: 'X25519', 5: 'X448', 6: 'Ed25519', 7: 'Ed448' }
 
-type CoseKeyLike = Map<number, unknown> | Record<number | string, unknown>
+type CoseKey = Record<number | string, unknown>
 
-function coseGet(key: CoseKeyLike, intKey: number): unknown {
-	if (key instanceof Map) return key.get(intKey)
-	return (key as Record<number | string, unknown>)[intKey]
-}
-
-function toBase64Url(value: unknown): string {
-	const bytes = value instanceof Uint8Array ? value : new Uint8Array(value as number[])
+function toBase64Url(bytes: Uint8Array): string {
 	let binary = ''
 	for (const byte of bytes) binary += String.fromCharCode(byte)
 	return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
@@ -26,8 +20,7 @@ function toBase64Url(value: unknown): string {
  * Converts a COSE public key (RFC 9052 / IANA COSE Key registry) to JWK format.
  *
  * Supports EC2 keys (P-256, P-384, P-521) and OKP keys (Ed25519, Ed448, X25519, X448).
- * Input may be a `Map\<number, unknown\>` or a plain
- * object with integer keys.
+ * The input is a plain object whose keys are the integer labels of the COSE key, as the CBOR reader decodes a map.
  *
  * @param coseKey - COSE key structure as decoded from a C2PA `c2pa.session-keys` assertion
  * @returns JWK representation of the public key
@@ -39,15 +32,15 @@ function toBase64Url(value: unknown): string {
  * @public
  */
 export function convertCoseKeyToJwk(coseKey: unknown): CoseKeyJwk {
-	const key = coseKey as CoseKeyLike
-	const kty = coseGet(key, 1)
-	const crv = coseGet(key, -1) as number
-	const x = coseGet(key, -2)
+	const key = coseKey as CoseKey
+	const kty = key[1]
+	const crv = key[-1] as number
+	const x = key[-2]
 
 	if (kty === EC2_KEY_TYPE) {
 		const curveName = EC_CURVE_NAMES[crv]
 		if (!curveName) throw new Error(`Unsupported EC curve: ${crv}`)
-		const y = coseGet(key, -3)
+		const y = key[-3]
 		if (!(x instanceof Uint8Array)) throw new Error('EC2 key missing or invalid x coordinate')
 		if (!(y instanceof Uint8Array)) throw new Error('EC2 key missing or invalid y coordinate')
 		return { kty: 'EC', crv: curveName, x: toBase64Url(x), y: toBase64Url(y) }
@@ -56,6 +49,7 @@ export function convertCoseKeyToJwk(coseKey: unknown): CoseKeyJwk {
 	if (kty === OKP_KEY_TYPE) {
 		const curveName = OKP_CURVE_NAMES[crv]
 		if (!curveName) throw new Error(`Unsupported OKP curve: ${crv}`)
+		if (!(x instanceof Uint8Array)) throw new Error('OKP key missing or invalid x coordinate')
 		return { kty: 'OKP', crv: curveName, x: toBase64Url(x) }
 	}
 
