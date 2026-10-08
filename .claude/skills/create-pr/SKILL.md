@@ -67,7 +67,7 @@ git rebase main --exec "git commit --amend --signoff --no-edit"
 git diff --name-only --diff-filter=ACMR main...HEAD -- plans/
 ```
 
-If the base branch is `main` and the command prints a file, stop. Tell the user to delete the plan files from the branch and to record unfinished work as GitHub issues. If the base branch is not `main`, remind the user that the plan files must be deleted before the branch merges to `main`.
+If the base branch is `main` and the command prints a file, stop. Tell the user to delete the plan files from the branch. Tell the user to record unfinished work as GitHub issues. For another base branch, remind the user to delete plan files before the branch merges to `main`.
 
 ### Step 1: Identify affected packages
 
