@@ -77,6 +77,14 @@ describe('decodeCbor', () => {
 			strictEqual(decodeCbor(Uint8Array.from(PLAIN.encode(utf8))), utf8)
 		})
 
+		it('keeps a leading U+FEFF in a text string and in a map key', () => {
+			// 64 efbbbf 61: text(4) U+FEFF "a". 78 21 efbbbf 61..: text(33) above the ASCII fast path.
+			strictEqual(decodeCbor(toBytes('64 efbbbf61')), '﻿a')
+			strictEqual(decodeCbor(toBytes('78 21 efbbbf' + '61'.repeat(30))), '﻿' + 'a'.repeat(30))
+			// a2 64 efbbbf61 01 61 61 02: { U+FEFF "a": 1, "a": 2 }, two keys
+			deepStrictEqual(decodeCbor(toBytes('a2 64 efbbbf61 01 61 61 02')), { '﻿a': 1, a: 2 })
+		})
+
 		it('replaces invalid UTF-8 with U+FFFD', () => {
 			strictEqual(decodeCbor(toBytes('61 ff')), '�')
 		})

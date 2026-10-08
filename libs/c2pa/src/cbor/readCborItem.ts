@@ -1,4 +1,5 @@
-const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
+// ignoreBOM keeps a leading U+FEFF, which the default TextDecoder removes (WHATWG Encoding, TextDecoder)
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder('utf-8', { ignoreBOM: true })
 
 const MAJOR_UINT = 0
 const MAJOR_NEGINT = 1
