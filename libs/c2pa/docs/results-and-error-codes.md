@@ -151,6 +151,8 @@ if (manifest) {
 }
 ```
 
+`data` is the decoded content of the assertion. For a CBOR assertion, a map is a plain object with string keys, a byte string is a `Uint8Array`, and an unsigned integer up to `Number.MAX_SAFE_INTEGER` (2^53 - 1) is a number. A larger integer is a BigInt. CBOR tag 0 and tag 1 are a `Date`. Every other tag is a `{ tag, value }` object. For a JSON assertion, `data` is the parsed JSON. For other content, or for CBOR that does not decode, `data` is the raw bytes of the content box.
+
 ## Sequence Validation Reasons
 
 With the [VSI/EMSG method](vsi-validation.md), each `SegmentValidationResult` includes a `sequenceResult` field: a discriminated union on `reason` with `SequenceValidationReason` constants:
