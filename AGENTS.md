@@ -59,6 +59,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Bump versions only in dedicated release-prep PRs, with `npm run ver` and then `npm run prepare-release` (see Build Commands).
 - Avoid breaking changes. If one is unavoidable, provide migration guidance in the changelog and the docs.
 - Save plans and design-session artifacts in `plans/<feature-name>/`, where the folder name is the feature or issue. Save each part of the plan, such as steps or architecture, in its own file: `plans/<feature-name>/steps.md`. Do not use `docs/` for planning documents.
+- Plan files are working artifacts. They may exist on a feature branch while the work is in progress, and never on `main`. Delete them before the PR merges. Record unfinished work and follow-up items as GitHub issues. Record decisions that adopters need in the package docs.
 - Proposals that need community agreement are RFCs, not plans: public API changes, new packages, and significant architecture changes. Save an RFC as `rfc/<feature-name>.md` and follow the process in `rfc/README.md`.
 
 ## Documentation
@@ -82,7 +83,7 @@ CML collaborators and adopters live in many countries. Many of them do not read 
 - Give every pronoun a visible noun in the same or previous sentence: "this check", not "this".
 - At most three nouns in a row. Break longer strings with prepositions.
 - Keep the author's hedges. "May have failed" does not become "failed". Never add a fact the source did not state.
-- Write for the reader's decision. An RFC reader needs what the API is, one example, the contract, the costs, the alternatives, and the open questions. Methodology, history, and engine internals go to the design record in `plans/`, with a link.
+- Write for the reader's decision. An RFC reader needs what the API is, one example, the contract, the costs, the alternatives, and the open questions. Plan files contain methodology, history, and engine internals while work is in progress. The PR description contains that information when the work merges.
 - State each finding once, in one place, and reference it from elsewhere. Numbers go in tables or lists, at most one per sentence of prose.
 - After a clarity pass, do a second pass that removes duplication. Splitting sentences adds words, so the document must get shorter, not longer.
 
