@@ -21,11 +21,12 @@ A `SequenceState` object passes from each media segment call to the next and tra
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
-const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+const initResponse = await fetch(initUrl)
+const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
 
 if (!init.isValid) {
-  console.error('Init segment validation failed:', init.errorCodes)
+  throw new Error(`Init segment validation failed: ${init.errorCodes.join(', ')}`)
 }
 ```
 
@@ -54,6 +55,8 @@ for (const key of init.sessionKeys) {
 }
 ```
 
+If a session key is invalid, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`. See [Invalid Session Keys](results-and-error-codes.md#invalid-session-keys).
+
 Each `ValidatedSessionKey` contains:
 
 | Field | Type | Description |
@@ -74,7 +77,8 @@ import type { SequenceState } from '@svta/cml-c2pa'
 let sequenceState: SequenceState | undefined
 
 for (const segmentUrl of segmentUrls) {
-  const segmentBytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+  const segmentResponse = await fetch(segmentUrl)
+  const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())
   const validated = await validateC2paSegment(segmentBytes, init.sessionKeys, sequenceState)
 
   if (!validated) {
@@ -125,7 +129,8 @@ import type { SequenceState } from '@svta/cml-c2pa'
 
 async function validateStream(initUrl: string, segmentUrls: string[]) {
   // Phase 1: Validate the init segment
-  const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+  const initResponse = await fetch(initUrl)
+  const initBytes = new Uint8Array(await initResponse.arrayBuffer())
   const init = await validateC2paInitSegment(initBytes)
 
   if (!init.isValid) {
@@ -142,7 +147,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
   let sequenceState: SequenceState | undefined
 
   for (const segmentUrl of segmentUrls) {
-    const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
     const validated = await validateC2paSegment(bytes, init.sessionKeys, sequenceState)
 
     if (!validated) {
@@ -172,20 +178,45 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
 
 ## Session Key Lifecycle
 
-Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result.
+Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result. The signer binding verification accepts two forms of the signed payload: the end-entity certificate itself, or the certificate as a CBOR byte string. The text of C2PA section 18.25.2 allows both forms.
 
-The validation function handles key matching and expiration:
+The signer binding is a `COSE_Sign1` structure with CBOR tag 18 and a payload field. The payload field can be nil, an empty byte string, or an exact copy of the signed payload. If the payload field has other content, the signer binding verification fails.
+
+The validation function handles key matching and the validity period:
 
 1. **Key matching**: `validateC2paSegment` matches the `kid` (key ID) from the COSE_Sign1 header against the available session keys.
-2. **Expiration**: A key expires when `createdAt + validityPeriod` is in the past. If the matched key has expired, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`.
+2. **Validity period**: A key is active from `createdAt` until `createdAt + validityPeriod` (C2PA section 18.25.2). If the matched key is not yet active or has expired, the result includes `LiveVideoStatusCode.SEGMENT_INVALID` (C2PA section 19.7.3).
 3. **No match**: If no session key matches the `kid`, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
 
+`SEGMENT_INVALID` is also the code for signature and hash failures. If you need to know whether the validity period caused the failure, check the matched key:
+
+```typescript
+import type { SegmentValidationResult, ValidatedSessionKey } from '@svta/cml-c2pa'
+
+function isOutsideValidityPeriod(
+  result: SegmentValidationResult,
+  sessionKeys: readonly ValidatedSessionKey[],
+): boolean {
+  const key = sessionKeys.find(k => k.kid === result.kidHex)
+  if (!key) return false
+
+  const now = Date.now()
+  const activeFrom = Date.parse(key.createdAt)
+  const activeUntil = activeFrom + key.validityPeriod * 1000
+  return now < activeFrom || now > activeUntil
+}
+```
+
 > [!NOTE]
+> An init segment can contain a session key that becomes active later. `sessionKeys` includes that key. You do not need to validate the same init segment again when the key becomes active.
+>
 > When a session key expires during the stream, the signer is expected to produce a new init segment with new session keys. Validate the new init segment and use its `sessionKeys` for the following media segments.
 
 ## Sequence Number Validation
 
-Each media segment has an increasing sequence number in its VSI map. The `sequenceResult` field is a discriminated union on `reason`, with `SequenceValidationReason` constants:
+Each media segment has an increasing sequence number in its VSI map. The sequence number must be an unsigned integer (C2PA section 19.4.2). The library supports values up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). For any other value, `validateC2paSegment` throws an error.
+
+The `sequenceResult` field is a discriminated union on `reason`, with `SequenceValidationReason` constants:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'

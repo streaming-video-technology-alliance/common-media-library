@@ -58,7 +58,9 @@
 	},
 	"peerDependencies": {
 		"@svta/cml-iso-bmff": ">=1.0.1",
-		"@svta/cml-utils": ">=1.0.0",
-		"cbor-x": "^1.6.4"
+		"@svta/cml-utils": ">=1.0.0"
+	},
+	"devDependencies": {
+		"cbor-x": "^1.6.6"
 	}
 }

@@ -2,10 +2,12 @@ import { validateC2paInitSegment, C2paStatusCode, LiveVideoStatusCode } from '@s
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
-import { encode } from 'cbor-x/encode'
+import { encodeCbor } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
-import { buildInitMediaBoxes, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
+import { Tag } from 'cbor-x'
+import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
+import { buildInitSegmentWithManifest, buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -28,6 +30,52 @@ describe('validateC2paInitSegment', () => {
 		strictEqual(result.isValid, false)
 		strictEqual(result.manifest, null)
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+	})
+
+	describe('session keys (§18.25)', () => {
+		let init: Uint8Array
+		let key001: TestSessionKey
+		let key002: TestSessionKey
+
+		// The two keys of the §18.25.3 example: key_002 becomes active before key_001 expires.
+		before(async () => {
+			const signer = await createTestSigner()
+			key001 = await createTestSessionKey('key_001')
+			key002 = await createTestSessionKey('key_002')
+			init = await buildSessionKeysInitSegment(signer, [
+				{ key: key001, minSequenceNumber: 175, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3900 },
+				{ key: key002, minSequenceNumber: 1975, createdAt: '2025-07-29T11:00:00Z', validityPeriod: 3900 },
+			])
+		})
+
+		it('keeps a session key that is not yet active', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2025-07-29T10:30:00Z') })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex, key002.kidHex])
+			deepStrictEqual(result.errorCodes, [])
+		})
+
+		it('drops an expired session key', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2025-07-29T11:30:00Z') })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key002.kidHex])
+		})
+
+		it('keeps the session key of an init segment from an independent signer', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-09-21T00:00:00Z') })
+			const bytes = new Uint8Array(
+				readFileSync(new URL('../fixtures/vsi_init_with_signer_binding.mp4', import.meta.url)),
+			)
+
+			const result = await validateC2paInitSegment(bytes)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), ['ad0c9403ce98540f9569542619058da3'])
+			deepStrictEqual(result.errorCodes, [])
+		})
 	})
 })
 
@@ -124,6 +172,19 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
 	})
 
+	it('rejects an exclusion constraint whose value is not a byte string as malformed', async () => {
+		const init = buildMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid', data: [{ offset: 8, value: [1] }] }],
+			merkle: [merkleEntry()],
+		})
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
 	it('rejects a merkle entry with no alg anywhere as malformed (no default per spec)', async () => {
 		const init = buildMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
@@ -195,10 +256,10 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 	// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
 	// so integrity checks skip signature verification.
 	function buildInitSegment(assertionData: Record<string, unknown>): Uint8Array {
-		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encode(assertionData) as Uint8Array))
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData) as Uint8Array))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', created_assertions: [] }
-		const claim = buildJumb('c2pa.claim', buildBox('cbor', encode(claimData) as Uint8Array))
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', encodeCbor(claimData) as Uint8Array))
 		const manifestJumb = buildJumb('urn:uuid:bmff-hash-test-manifest', claim, assertionStore)
 		const store = buildJumb('c2pa', manifestJumb)
 
@@ -232,6 +293,25 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
 	})
 
+	it('rejects a hash that is a CBOR array of integers', async () => {
+		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const init = buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: Array.from(hash) })
+
+		const result = await validateC2paInitSegment(init)
+
+		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+	})
+
+	it('rejects an exclusion constraint whose value is not a byte string', async () => {
+		// The constraint never matches the empty moov box, so the hash is the flat hash of ftyp + moov.
+		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const init = buildInitSegment({ exclusions: [{ xpath: '/uuid' }, { xpath: '/moov', data: [{ offset: 8, value: [0] }] }], alg: 'sha256', hash })
+
+		const result = await validateC2paInitSegment(init)
+
+		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+	})
+
 	it('accepts the flat hash of a real signed init segment', async () => {
 		const bytes = new Uint8Array(
 			readFileSync(new URL('../fixtures/init_signed_with_session_keys.m4s', import.meta.url)),
@@ -240,5 +320,327 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 		const result = await validateC2paInitSegment(bytes)
 
 		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID), false)
+	})
+})
+
+describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => {
+	const COSE_KEY_KTY = 1
+	const COSE_KEY_KID = 2
+	const COSE_KTY_RSA = 3
+	const NOW = Date.parse('2025-07-29T10:30:00Z')
+
+	let signer: TestSigner
+	let key001: TestSessionKey
+	let key002: TestSessionKey
+
+	before(async () => {
+		signer = await createTestSigner()
+		key001 = await createTestSessionKey('key_001')
+		key002 = await createTestSessionKey('key_002')
+	})
+
+	function activeEntry(key: TestSessionKey) {
+		return { key, minSequenceNumber: 0, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 }
+	}
+
+	function expiredEntry(key: TestSessionKey) {
+		return { key, minSequenceNumber: 0, createdAt: '2025-07-29T09:00:00Z', validityPeriod: 600 }
+	}
+
+	it('accepts an assertion in which every session key is valid', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(key002)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex, key002.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('accepts a minSequenceNumber and a validityPeriod of 2^32 or more', async (context) => {
+		// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
+		const entryWithLargeIntegers = { ...activeEntry(key002), minSequenceNumber: BigInt(2 ** 32), validityPeriod: BigInt(2 ** 32) } as unknown as TestSessionKeyEntry
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), entryWithLargeIntegers])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => [key.kid, key.minSequenceNumber, key.validityPeriod]), [
+			[key001.kidHex, 0, 3600],
+			[key002.kidHex, 4294967296, 4294967296],
+		])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('accepts a createdAt with a fraction of a second and a time offset', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(key002), createdAt: '2025-07-29T12:00:00.5+02:00' }])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => [key.kid, key.createdAt]), [
+			[key001.kidHex, '2025-07-29T10:00:00.000Z'],
+			[key002.kidHex, '2025-07-29T10:00:00.500Z'],
+		])
+		deepStrictEqual(result.errorCodes, [])
+	})
+
+	it('accepts an assertion with CBOR maps and arrays of indefinite length', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(key002)], true)
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => [key.kid, key.createdAt]), [
+			[key001.kidHex, '2025-07-29T10:00:00.000Z'],
+			[key002.kidHex, '2025-07-29T10:00:00.000Z'],
+		])
+		deepStrictEqual(result.errorCodes, [])
+	})
+
+	it('accepts an assertion that ends with an integer', async (context) => {
+		// In deterministic key order, the last byte of the assertion belongs to the minSequenceNumber of key_002.
+		const entries = [{ ...activeEntry(key001), deterministicKeyOrder: true }, { ...activeEntry(key002), deterministicKeyOrder: true }]
+		const init = await buildSessionKeysInitSegment(signer, entries)
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex, key002.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('excludes an expired session key from sessionKeys without SESSIONKEY_INVALID', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(key002)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('treats a session key with a validityPeriod of 0 as expired, without SESSIONKEY_INVALID', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(key002), validityPeriod: 0 }])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('fails with SESSIONKEY_INVALID if a session key has no minSequenceNumber value', async (context) => {
+		// The assertion encodes minSequenceNumber as CBOR undefined.
+		const entryWithoutMinSequenceNumber = { ...activeEntry(key002), minSequenceNumber: undefined as unknown as number }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), entryWithoutMinSequenceNumber])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if a session key has no kid', async (context) => {
+		const keyWithoutKid = { ...key002, coseKey: new Map([...key002.coseKey].filter(([label]) => label !== COSE_KEY_KID)) }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(keyWithoutKid)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if a session key has a kid only outside its COSE key', async (context) => {
+		const keyWithoutKid = { ...key002, coseKey: new Map([...key002.coseKey].filter(([label]) => label !== COSE_KEY_KID)) }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(keyWithoutKid), topLevelKid: key002.kid }])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	// Each entry breaks one §18.25.2 rule for a session key field.
+	const NONCONFORMING_FIELDS: readonly (readonly [string, Readonly<Record<string, unknown>>])[] = [
+		['a createdAt that is not a date', { createdAt: 'not a date' }],
+		['a createdAt without CBOR tag 0', { createdAtTag: null }],
+		['a createdAt with CBOR tag 1', { createdAt: Date.parse('2025-07-29T10:00:00Z') / 1000, createdAtTag: 1 }],
+		['a createdAt with a date-time string in CBOR tag 1', { createdAtTag: 1 }],
+		['a createdAt with a number in CBOR tag 0', { createdAt: Date.parse('2025-07-29T10:00:00Z') }],
+		['a createdAt on a day that does not exist', { createdAt: '2025-02-30T00:00:00Z' }],
+		['a createdAt that is not an RFC 3339 date-time', { createdAt: 'Tue, 29 Jul 2025 10:00:00 GMT' }],
+		['a createdAt with a lowercase t and z', { createdAt: '2025-07-29t10:00:00z' }],
+		// A CBOR map with these keys decodes to the same shape as a tag 0, but it carries no CBOR tag.
+		['a createdAt that is a map with tag and value fields', { createdAt: { tag: 0, value: '2025-07-29T10:00:00Z' }, createdAtTag: null }],
+		['a minSequenceNumber that is a text string', { minSequenceNumber: '0' }],
+		['a negative minSequenceNumber', { minSequenceNumber: -1 }],
+		['a minSequenceNumber that is not an integer', { minSequenceNumber: 0.5 }],
+		['a validityPeriod that is a text string', { validityPeriod: '3600' }],
+		['a negative validityPeriod', { validityPeriod: -600 }],
+		['a validityPeriod that is not an integer', { validityPeriod: 3600.5 }],
+		['a minSequenceNumber above 2^53 - 1', { minSequenceNumber: BigInt(2 ** 53) }],
+		['a validityPeriod above 2^53 - 1', { validityPeriod: BigInt(2 ** 53) }],
+	]
+
+	for (const [description, fields] of NONCONFORMING_FIELDS) {
+		it(`fails with SESSIONKEY_INVALID if a session key has ${description}`, async (context) => {
+			const nonconformingEntry = { ...activeEntry(key002), ...fields } as TestSessionKeyEntry
+			const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), nonconformingEntry])
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key does not verify', async (context) => {
+		// The private key of key_001 signs the signerBinding of key_002.
+		const keyWithWrongBinding = { ...key002, privateKey: key001.privateKey }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(keyWithWrongBinding)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.sessionKeys.some(key => key.kid === key002.kidHex), false)
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key embeds a payload other than the certificate', async (context) => {
+		// The signature covers the certificate of the signer, but the signerBinding embeds another certificate.
+		const otherCertificate = (await createTestSigner('Other Signer')).certificateDER
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(key002), signerBindingPayload: otherCertificate }])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if the signerBinding of an expired session key does not verify', async (context) => {
+		const keyWithWrongBinding = { ...key002, privateKey: key001.privateKey }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), expiredEntry(keyWithWrongBinding)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key cannot be verified', async (context) => {
+		// The library does not support COSE key type 3 (RSA).
+		const keyWithRsaType = { ...key002, coseKey: new Map([...key002.coseKey, [COSE_KEY_KTY, COSE_KTY_RSA]]) }
+		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), activeEntry(keyWithRsaType)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	// Each entry encodes a byte string field of a session key as a CBOR array of integers (§18.25.2 CDDL: bstr).
+	const BYTE_STRING_FIELDS_AS_ARRAYS: readonly (readonly [string, () => Promise<TestSessionKeyEntry>])[] = [
+		['signerBinding', async () => ({ ...activeEntry(key002), fields: { signerBinding: Array.from(await encodeSignerBinding(key002, signer.certificateDER)) } })],
+		['COSE key', async () => ({ ...activeEntry(key002), fields: { key: Array.from(encodeCbor(key002.coseKey)) } })],
+		['kid', async () => activeEntry({ ...key002, coseKey: new Map([...key002.coseKey, [COSE_KEY_KID, Array.from(key002.kid)]]) })],
+	]
+
+	for (const [field, buildEntry] of BYTE_STRING_FIELDS_AS_ARRAYS) {
+		it(`fails with SESSIONKEY_INVALID if the ${field} of a session key is a CBOR array of integers`, async (context) => {
+			const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), await buildEntry()])
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	// {"keys": [1 ... : the array of indefinite length has no break code
+	const SESSION_KEYS_CBOR_WITHOUT_BREAK = Uint8Array.of(0xa1, 0x64, 0x6b, 0x65, 0x79, 0x73, 0x9f, 0x01)
+
+	// Each entry breaks the §18.25.2 rule that the assertion is a map with a keys array of one or more session keys.
+	const NONCONFORMING_ASSERTIONS: readonly (readonly [string, Uint8Array])[] = [
+		['no session key', encodeCbor({ keys: [] })],
+		['a keys field that is not an array', encodeCbor({ keys: 'key_001' })],
+		['CBOR that does not decode', SESSION_KEYS_CBOR_WITHOUT_BREAK],
+	]
+
+	// A `c2pa.hash.bmff.v3` assertion with a merkle map. /uuid is excluded, so the initHash covers only ftyp + moov.
+	async function merkleAssertionCbor(): Promise<Uint8Array> {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const merkle = [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash }]
+		return encodeCbor({ exclusions: [{ xpath: '/uuid' }], merkle })
+	}
+
+	for (const [description, sessionKeysCbor] of NONCONFORMING_ASSERTIONS) {
+		it(`fails with SESSIONKEY_INVALID in VOD Merkle mode if the session keys assertion has ${description}`, async () => {
+			const init = await buildSignedInitSegment(signer, [
+				{ label: 'c2pa.hash.bmff.v3', cbor: await merkleAssertionCbor() },
+				{ label: 'c2pa.session-keys', cbor: sessionKeysCbor },
+			])
+
+			const result = await validateC2paInitSegment(init)
+
+			strictEqual(result.merkleMaps.length, 1)
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	it('fails with SESSIONKEY_INVALID if the session keys assertion has CBOR that does not decode', async () => {
+		const init = await buildSignedInitSegment(signer, [{ label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK }])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys, [])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		strictEqual(result.isValid, false)
+	})
+})
+
+describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	it('fails with CLAIM_MALFORMED if the signed claim box holds a map in CBOR tag 55799', async () => {
+		// The claim references an assertion that the manifest does not have. Only a decoded claim can report that.
+		const claimCbor = encodeCbor(new Tag({
+			instanceID: 'urn:uuid:claim-test-manifest',
+			created_assertions: [{ url: 'self#jumbf=c2pa.assertions/c2pa.hash.bmff.v3', hash: new Uint8Array(32), alg: 'sha256' }],
+		}, 55799))
+		const manifest = buildJumb('urn:uuid:claim-test-manifest',
+			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+			buildJumb('c2pa.assertions'),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCbor))),
+		)
+
+		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
+		strictEqual(result.isValid, false)
 	})
 })

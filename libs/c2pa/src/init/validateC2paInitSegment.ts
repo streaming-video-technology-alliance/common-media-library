@@ -1,75 +1,52 @@
-import { decode } from 'cbor-x/decode'
-import { encode } from 'cbor-x/encode'
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
+import { CborTag, decodeCbor } from '../cbor/readCborItem.ts'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import type { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
-import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
+import { parseExclusions } from '../bmff/parseExclusions.ts'
+import type { InternalAssertionData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
 import { convertCoseKeyToJwk } from '../cose/convertCoseKeyToJwk.ts'
 import { verifySignerBinding } from '../cose/verifySignerBinding.ts'
 import type { InitSegmentValidation, ValidatedSessionKey } from './InitSegmentValidation.ts'
 import { validateMerkleMaps } from '../merkle/validateMerkleMaps.ts'
-import { bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
+import { asUnsignedInteger, bytesToHex, hashesEqual, isKeyExpired, normalizeAlgorithmName } from '../utils.ts'
 
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
 const SESSION_KEYS_ASSERTION_LABEL = 'c2pa.session-keys'
 const COSE_KEY_ID_LABEL = 2
 
-// cbor-x represents CBOR tagged values in multiple ways depending on version/config:
-// - { tag: number, value: unknown } (structured)
-// - Tag class instance with constructor name 'Tag'
-// - { '@@TAGGED@@': [tag, value] } (internal key)
-const CBOR_TAGGED_KEY = '@@TAGGED@@'
-
-function extractCborTaggedValue(value: unknown): unknown | null {
-	if (typeof value !== 'object' || value === null) return null
-	const obj = value as Record<string, unknown>
-	if (typeof obj['tag'] === 'number' && 'value' in obj) return obj['value']
-	const tagged = obj[CBOR_TAGGED_KEY]
-	if (Array.isArray(tagged) && tagged.length === 2) return tagged[1]
-	return null
-}
-
+// §18.25.3: an inline COSE_Sign1 passes through as the bytes of the tagged item
 function normalizeToUint8Array(value: unknown): Uint8Array {
 	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	if (extractCborTaggedValue(value) !== null) return encode(value) as Uint8Array
+	if (value instanceof CborTag) return value.bytes
 	throw new Error('Cannot convert value to Uint8Array')
 }
 
 function ensureDecodedCbor(value: unknown): unknown {
-	if (value instanceof Uint8Array) return decode(value)
-	if (Array.isArray(value) && value.length > 0 && typeof (value as number[])[0] === 'number') {
-		return decode(new Uint8Array(value as number[]))
-	}
-	return value
+	return value instanceof Uint8Array ? decodeCbor(value) : value
 }
 
+// RFC 8949 section 3.4.1: the date-time of RFC 3339, as refined by RFC 4287 section 3.3 (C2PA section 6.9)
+const RFC_3339_DATE_TIME = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:[0-5]\d){2}(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/
+const CBOR_TAG_DATE_TIME = 0
+
+// §18.25.2: CBOR tag 0 with an RFC 3339 date-time
 function parseCreatedAt(value: unknown): string | null {
-	const resolved = extractCborTaggedValue(value) ?? value
-	if (typeof resolved === 'string') return resolved
-	if (resolved instanceof Date) return resolved.toISOString()
-	return null
+	if (!(value instanceof CborTag) || value.tag !== CBOR_TAG_DATE_TIME) return null
+	const text = value.value
+	if (typeof text !== 'string' || !RFC_3339_DATE_TIME.test(text)) return null
+	// Date rolls a day that does not exist over to the next month
+	if (new Date(text.slice(0, 10)).getUTCDate() !== Number(text.slice(8, 10))) return null
+	return new Date(text).toISOString()
 }
 
-function extractKidHex(keyData: Record<string, unknown>, coseKey: unknown): string | null {
-	const kid = keyData['kid']
-	if (kid instanceof Uint8Array) return bytesToHex(kid)
-	if (typeof kid === 'string') return kid
-	if (Array.isArray(kid) && kid.length > 0) return bytesToHex(new Uint8Array(kid as number[]))
-
-	// Fallback: COSE key field 2 is the key ID per RFC 9052
-	const coseKeyLike = coseKey as Map<number, unknown> | Record<number, unknown>
-	const coseKid = coseKeyLike instanceof Map ? coseKeyLike.get(COSE_KEY_ID_LABEL) : coseKeyLike[COSE_KEY_ID_LABEL]
-	if (coseKid instanceof Uint8Array) return bytesToHex(coseKid)
-	if (Array.isArray(coseKid) && coseKid.length > 0) {
-		return bytesToHex(new Uint8Array(coseKid as number[]))
-	}
-
-	return null
+// §18.25.2: the COSE key includes the kid (COSE key label 2, RFC 9052)
+function extractKidHex(coseKey: unknown): string | null {
+	const coseKid = (coseKey as Record<number, unknown>)[COSE_KEY_ID_LABEL]
+	return coseKid instanceof Uint8Array ? bytesToHex(coseKid) : null
 }
 
 function extractKeyArray(data: unknown): unknown[] {
@@ -94,14 +71,14 @@ async function validateBmffHashAssertion(
 	const data = assertion.data as Record<string, unknown>
 	const rawHash = data['hash'] ?? data['value']
 	if (!rawHash) return true
-	const expectedHash =
-		rawHash instanceof Uint8Array ? rawHash : new Uint8Array(rawHash as number[])
+	if (!(rawHash instanceof Uint8Array)) return false
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
-	const exclusions = (data['exclusions'] as BmffHashExclusion[] | undefined) ?? []
+	const exclusions = parseExclusions(data['exclusions'])
+	if (!exclusions) return false
 	// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
 	// box; only Merkle tree hashes may omit the 8-byte offset prefix.
 	const computed = await computeBmffHash(bytes, { exclusions, alg, offsetPrefixSize: 8 })
-	return hashesEqual(computed, expectedHash)
+	return hashesEqual(computed, rawHash)
 }
 
 type SessionKeyFields = {
@@ -113,36 +90,34 @@ type SessionKeyFields = {
 	signerBindingBytes: Uint8Array
 }
 
+type SessionKeysValidation = {
+	readonly sessionKeys: ValidatedSessionKey[]
+	readonly hasInvalidSessionKey: boolean
+}
+
 function extractSessionKeyFields(entry: unknown): SessionKeyFields | null {
 	const keyData = entry as Record<string, unknown>
 
-	const minSequenceNumber = keyData['minSequenceNumber']
-	const validityPeriod = keyData['validityPeriod']
+	const minSequenceNumber = asUnsignedInteger(keyData['minSequenceNumber'])
+	const validityPeriod = asUnsignedInteger(keyData['validityPeriod'])
 	const createdAt = parseCreatedAt(keyData['createdAt'])
 
-	if (minSequenceNumber == null || validityPeriod == null || !createdAt) return null
-
-	const isNotYetActive = new Date() < new Date(createdAt)
-	if (isNotYetActive || isKeyExpired(createdAt, Number(validityPeriod))) return null
+	if (minSequenceNumber === null || validityPeriod === null || !createdAt) return null
 
 	const coseKey = ensureDecodedCbor(keyData['key'])
-	const kid = extractKidHex(keyData, coseKey)
+	const kid = extractKidHex(coseKey)
 	if (!kid) return null
 
 	const signerBindingRaw = keyData['signerBinding']
 	if (!signerBindingRaw) return null
 
-	try {
-		return {
-			minSequenceNumber: Number(minSequenceNumber),
-			validityPeriod: Number(validityPeriod),
-			createdAt,
-			kid,
-			coseKey,
-			signerBindingBytes: normalizeToUint8Array(signerBindingRaw),
-		}
-	} catch {
-		return null
+	return {
+		minSequenceNumber,
+		validityPeriod,
+		createdAt,
+		kid,
+		coseKey,
+		signerBindingBytes: normalizeToUint8Array(signerBindingRaw),
 	}
 }
 
@@ -153,17 +128,12 @@ async function verifyAndConvertKey(
 	const isBindingValid = await verifySignerBinding(fields.signerBindingBytes, fields.coseKey, certificate)
 	if (!isBindingValid) return null
 
-	try {
-		const jwk = convertCoseKeyToJwk(fields.coseKey)
-		return {
-			kid: fields.kid,
-			jwk,
-			minSequenceNumber: fields.minSequenceNumber,
-			validityPeriod: fields.validityPeriod,
-			createdAt: fields.createdAt,
-		}
-	} catch {
-		return null
+	return {
+		kid: fields.kid,
+		jwk: convertCoseKeyToJwk(fields.coseKey),
+		minSequenceNumber: fields.minSequenceNumber,
+		validityPeriod: fields.validityPeriod,
+		createdAt: fields.createdAt,
 	}
 }
 
@@ -171,20 +141,31 @@ async function validateSingleSessionKey(
 	entry: unknown,
 	certificate: Uint8Array,
 ): Promise<ValidatedSessionKey | null> {
-	const fields = extractSessionKeyFields(entry)
-	if (!fields) return null
-	return verifyAndConvertKey(fields, certificate)
+	try {
+		const fields = extractSessionKeyFields(entry)
+		if (!fields) return null
+		return await verifyAndConvertKey(fields, certificate)
+	} catch {
+		return null
+	}
+}
+
+function isWithinValidityPeriod(key: ValidatedSessionKey): boolean {
+	return !isKeyExpired(key.createdAt, key.validityPeriod)
 }
 
 async function validateSessionKeys(
-	assertion: C2paAssertion,
+	assertion: InternalAssertionData,
 	certificate: Uint8Array,
-): Promise<ValidatedSessionKey[]> {
-	const keyEntries = extractKeyArray(ensureDecodedCbor(assertion.data))
-	const results = await Promise.all(
-		keyEntries.map(entry => validateSingleSessionKey(entry, certificate)),
-	)
-	return results.filter((key): key is ValidatedSessionKey => key !== null)
+): Promise<SessionKeysValidation> {
+	// §18.25.2: the assertion is a map with a keys array of one or more session keys
+	const keyEntries = extractKeyArray(assertion.taggedData)
+	const results = await Promise.all(keyEntries.map(entry => validateSingleSessionKey(entry, certificate)))
+	const validKeys = results.filter((key): key is ValidatedSessionKey => key !== null)
+	return {
+		sessionKeys: validKeys.filter(isWithinValidityPeriod),
+		hasInvalidSessionKey: keyEntries.length === 0 || validKeys.length < results.length,
+	}
 }
 
 /**
@@ -196,6 +177,12 @@ async function validateSessionKeys(
  *
  * Only session keys with a valid signer binding and an unexpired validity period
  * are included in the result.
+ *
+ * The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID` if the function finds an invalid
+ * session key (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
+ * or if its signer binding fails verification. The function does not check every rule of section 18.25.2.
+ * An expired session key does not count as invalid. A `c2pa.session-keys` assertion without a session key,
+ * or with CBOR that does not decode, also causes `SESSIONKEY_INVALID`.
  *
  * @param bytes - Raw init segment bytes
  * @returns Structured validation result (with `INIT_INVALID` error code if `mdat` box is present)
@@ -231,15 +218,17 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const sessionKeysAssertion = manifest.assertions.find(
 		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
 	)
-	const sessionKeys =
+	// manifest.assertions has the order of internalData.assertions
+	const { sessionKeys, hasInvalidSessionKey } =
 		sessionKeysAssertion && certificate
-			? await validateSessionKeys(sessionKeysAssertion, certificate)
-			: []
+			? await validateSessionKeys(internalData.assertions[manifest.assertions.indexOf(sessionKeysAssertion)], certificate)
+			: { sessionKeys: [], hasInvalidSessionKey: false }
 
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
 	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
 
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
+	if (hasInvalidSessionKey) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
 	if (sessionKeys.length === 0 && merkleMaps === null) {
 		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)

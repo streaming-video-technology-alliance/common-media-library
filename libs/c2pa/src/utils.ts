@@ -76,17 +76,21 @@ export function matchesUuid(usertype: readonly number[], expected: readonly numb
 	return usertype.length === expected.length && expected.every((b, i) => b === usertype[i])
 }
 
-// Converts CBOR-decoded bytes (Uint8Array or number[]) to Uint8Array, or null.
+// A CBOR byte string as a Uint8Array, or null for a value of another type.
 /** @internal */
 export function toUint8Array(value: unknown): Uint8Array | null {
-	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	return null
+	return value instanceof Uint8Array ? value : null
 }
 
 /** @internal */
 export function asInteger(value: unknown): number | null {
 	return typeof value === 'number' && Number.isInteger(value) ? value : null
+}
+
+// A CBOR uint up to Number.MAX_SAFE_INTEGER as a number, or null. The reader decodes a larger uint to a BigInt.
+/** @internal */
+export function asUnsignedInteger(value: unknown): number | null {
+	return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : null
 }
 
 function isC2paUuid(usertype: readonly number[]): boolean {
@@ -125,7 +129,7 @@ export function findC2paUuidBox(boxes: ParsedIsoBox[]): UuidParsedBox | undefine
 
 const FULLBOX_HEADER_SIZE = 4
 const AUX_UUID_OFFSET_SIZE = 8
-const TEXT_DECODER = new TextDecoder()
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 
 // Reads a version/flags + null-terminated purpose prefix, or null if malformed.
 /** @internal */

@@ -8,6 +8,51 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `C2paStatusCode` now has `CLAIM_CBOR_INVALID` (`claim.cbor.invalid`) for a claim box whose CBOR does not decode.
+- `C2paStatusCode` now has `CLAIM_MALFORMED` (`claim.malformed`) for a claim box whose CBOR is not a map.
+
+### Changed
+
+- `C2paAssertion.data` now holds an unsigned integer up to `Number.MAX_SAFE_INTEGER` as a number instead of a BigInt. The same applies to the assertion data that a `ManifestBoxContinuityValidator` receives. See Working with Manifest Data in the Results and Error Codes guide.
+- A CBOR tag other than tag 0 and tag 1 is now a plain `{ tag, value }` object in `C2paAssertion.data`. This includes tags 2, 3, 65 to 87, 258, and 55799, which were a BigInt, a typed array, a `Set`, or the tagged value. Tag 0 and tag 1 are still a `Date`.
+- A map key `__proto__` in a CBOR assertion is now an own property of the decoded object.
+- A byte string with CBOR tag 64 no longer counts as a byte string in any field, such as the `hash` of a `c2pa.hash.bmff.v3` assertion. If your signer uses the cbor-x encoder in Node.js, set `tagUint8Array: false`.
+- A `COSE_Sign1` structure must now carry CBOR tag 18 (`COSE_Sign1_Tagged`). A claim signature without the tag fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`, and a signer binding without the tag makes its session key invalid. If your signer writes the bare array, write `COSE_Sign1_Tagged` instead.
+- `validateC2paSegment` now throws an error for a Verifiable Segment Info without CBOR tag 18.
+- CBOR nested deeper than 128 levels of arrays, maps, and tags no longer decodes.
+- A CBOR array of integers no longer counts as a byte string in any field, such as a `kid`, a `signerBinding`, or a hash.
+- The VSI/EMSG Validation guide now describes the session key validity period, the accepted signer binding payloads with CBOR tag 18, and the sequence number range.
+- The Results and Error Codes guide now has an Invalid Session Keys section and describes the value shapes of `C2paAssertion.data`. Its error code table now describes the validity period of session keys.
+- The Manifest Box Validation guide now states when `sequenceNumber` is `null` and names the error code for a malformed hash.
+- The examples in the README and the VSI/EMSG Validation guide now check `isValid` before they use `sessionKeys`. Do not use the session keys of a result with `isValid: false`.
+- The code examples in the validation guides now typecheck.
+
+### Removed
+
+- The package no longer has the `cbor-x` peer dependency. If you installed `cbor-x` for this package only, remove it from your dependencies.
+
+### Fixed
+
+- `validateC2paInitSegment` now keeps a session key that is not yet active. Segments signed with that key no longer fail with `LiveVideoStatusCode.SEGMENT_INVALID`.
+- The signer binding check now accepts the certificate itself or the certificate as a CBOR byte string as the signed payload.
+- The payload field of a signer binding must now be nil, an empty byte string, or an exact copy of the signed payload. Other content makes the session key invalid.
+- `validateC2paInitSegment` now reports `LiveVideoStatusCode.SESSIONKEY_INVALID` for an invalid session key in the `c2pa.session-keys` assertion. An expired session key does not count as invalid. The function does not check every rule of C2PA section 18.25.2.
+- `validateC2paInitSegment` now reads the `kid` of a session key only from its COSE key.
+- `minSequenceNumber` and `validityPeriod` must now be unsigned integers up to `Number.MAX_SAFE_INTEGER`, and `createdAt` must be CBOR tag 0 with an RFC 3339 date-time. A session key that breaks one of these rules is invalid. If an init segment now fails, check the fields of its session keys and the signer binding.
+- `validateC2paInitSegment` now reports `SESSIONKEY_INVALID` for a session key that it cannot verify, such as an unsupported key type. It no longer throws an error in that case.
+- `validateC2paInitSegment` now reports `SESSIONKEY_INVALID` when the `c2pa.session-keys` assertion has no session key or holds CBOR that does not decode. This also applies in VOD Merkle mode.
+- `validateC2paSegment` now reports `LiveVideoStatusCode.SEGMENT_INVALID` for a segment whose session key is not yet active or has expired. It no longer reports `SESSIONKEY_INVALID` for such a segment. Handle `SEGMENT_INVALID` instead, and update dashboards that count `livevideo.sessionkey.invalid` for media segments.
+- `validateC2paSegment` now accepts a `sequenceNumber` of 2^32 or more, up to `Number.MAX_SAFE_INTEGER`. A larger value, a negative value, or a fraction causes an error that names the supported range.
+- `validateC2paManifestBoxSegment` now accepts a `sequenceNumber` of 2^32 or more, up to `Number.MAX_SAFE_INTEGER`. A larger value, or a value that is not an unsigned integer, counts as a missing value and yields `sequenceNumber: null`.
+- The validation functions now fail fast on a CBOR item that declares more content than the input holds. Such a segment no longer costs seconds of processor time or gigabytes of memory.
+- `validateC2paManifestBoxSegment` now reports `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` when the `hash` of the `c2pa.hash.bmff.v3` assertion is not a byte string.
+- A `c2pa.hash.bmff.v3` exclusion must now have an `xpath` text string, and each `data` constraint must have an unsigned integer `offset` and a byte string `value`. `validateC2paManifestBoxSegment` reports `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` for an exclusion that breaks this rule. `validateC2paInitSegment` reports `ASSERTION_BMFFHASH_MALFORMED` for a Merkle assertion and `LiveVideoStatusCode.INIT_INVALID` for a flat hash, and `validateC2paSegment` throws an error.
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now report `C2paStatusCode.CLAIM_CBOR_INVALID` for a claim box whose CBOR does not decode. Such a manifest no longer validates on the claim signature alone.
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now report `C2paStatusCode.CLAIM_MALFORMED` for a claim box whose CBOR is not a map.
+- A bundle that imports only a constant from the package no longer keeps a `TextDecoder` construction or the certificate and signature constants of the package.
+
 ## [1.3.0] - 2026-09-29
 
 ### Fixed

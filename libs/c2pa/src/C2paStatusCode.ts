@@ -23,6 +23,10 @@ export const C2paStatusCode = {
 	CLAIM_SIGNATURE_MISSING: 'claimSignature.missing',
 	/** The manifest has no claim box (§15.6.1) */
 	CLAIM_MISSING: 'claim.missing',
+	/** The claim box holds CBOR that does not decode (§15.6.2) */
+	CLAIM_CBOR_INVALID: 'claim.cbor.invalid',
+	/** The claim box holds CBOR that is not a map (§15.6.2). The library does not check the fields of the claim. */
+	CLAIM_MALFORMED: 'claim.malformed',
 	/** BMFF hash assertion or Merkle structure is malformed (§15.2.2.3) */
 	ASSERTION_BMFFHASH_MALFORMED: 'assertion.bmffHash.malformed',
 	/** BMFF content hash does not match the committed value (§15.2.2.3) */
