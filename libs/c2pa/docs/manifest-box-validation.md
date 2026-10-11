@@ -15,7 +15,7 @@ Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method needs n
 
 Two pieces of state pass from one call to the next:
 
-- `lastManifestId`: the manifest ID from the previous segment, used for the continuity check
+- `lastManifestId`: the manifest ID from the last segment that updated the state, used for the continuity check
 - `state`: a `ManifestBoxValidationState` object that tracks `lastStreamId` and `lastSequenceNumber`
 
 ## Validating Segments
@@ -51,7 +51,7 @@ The function returns an object with:
 
 - `result`: a `ManifestBoxValidationResult` with the validation outcome
 - `nextManifestId`: the manifest ID to pass into the next call
-- `nextState`: the updated state to pass into the next call
+- `nextState`: the state to pass into the next call
 
 > [!NOTE]
 > For the first segment, pass `null` as `lastManifestId`, and `undefined` or nothing for `state`. When `lastManifestId` is `null`, the validator skips the chain comparison with the previous segment. It still checks that the segment declares a valid `continuityMethod` and a non-empty `previousManifestId`.
@@ -113,10 +113,10 @@ The `ManifestBoxValidationState` object contains the state between segments for 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `lastStreamId` | `string \| null` | Stream ID from the previous segment |
-| `lastSequenceNumber` | `number \| null` | Sequence number from the previous segment |
+| `lastStreamId` | `string \| null` | Stream ID from the last segment that updated the state |
+| `lastSequenceNumber` | `number \| null` | Sequence number from the last segment that updated the state |
 
-The function is pure. It does not mutate any external state. The caller must keep `nextManifestId` and `nextState` between calls.
+The function is pure. It does not mutate any external state. The caller must keep `nextManifestId` and `nextState` between calls. A segment with an integrity error, a malformed or mismatched content hash, or no live video assertion does not change `nextManifestId` or `nextState`. The same applies to a segment on another stream or with a sequence number that does not move forward. A segment that fails only the continuity check still updates both values. After a seek, an encoder restart, or a new stream ID, pass `null` as `lastManifestId` and `undefined` as `state` to start a new state. If your application rejects the signer of a segment, discard the `nextManifestId` and `nextState` of that call.
 
 When `state` is omitted or `undefined`, the function skips the checks for a consistent stream ID and for increasing sequence numbers.
 

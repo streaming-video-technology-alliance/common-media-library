@@ -175,11 +175,14 @@ async function validateContinuity(
  *
  * This function is **pure** — it does not access any external state. The
  * caller is responsible for persisting `nextManifestId` and `nextState`
- * between calls.
+ * between calls. A segment that fails verification, is on another stream, or
+ * does not move the sequence number forward returns the received
+ * `lastManifestId` and `state` unchanged. A segment that fails only the
+ * continuity check still updates them.
  *
  * @param bytes - Raw segment bytes
- * @param lastManifestId - Manifest ID from the previous segment, or null for the first segment
- * @param state - Optional state from the previous segment for streamId/sequenceNumber checks
+ * @param lastManifestId - Manifest ID from the last segment that updated the state, or `null` for the first segment
+ * @param state - Optional state from the last segment that updated the state, for the streamId and sequenceNumber checks
  * @param options - Optional custom continuity method validator
  * @returns Validation result, the manifest ID, and state to persist for the next call
  *
@@ -242,6 +245,9 @@ export async function validateC2paManifestBoxSegment(
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
 	if (bmff.malformed) errorCodes.push(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
 
+	// The continuity check does not gate the advance.
+	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed
+	const advance = authentic && streamIdValid && sequenceNumberValid
 	const currentManifestId = manifest?.instanceId ?? null
 
 	return {
@@ -257,10 +263,12 @@ export async function validateC2paManifestBoxSegment(
 			isValid: errorCodes.length === 0,
 			errorCodes,
 		},
-		nextManifestId: currentManifestId ?? lastManifestId,
-		nextState: {
-			lastStreamId: streamId ?? state?.lastStreamId,
-			lastSequenceNumber: sequenceNumber ?? state?.lastSequenceNumber,
-		},
+		nextManifestId: advance ? (currentManifestId ?? lastManifestId) : lastManifestId,
+		nextState: advance
+			? {
+					lastStreamId: streamId ?? state?.lastStreamId,
+					lastSequenceNumber: sequenceNumber ?? state?.lastSequenceNumber,
+				}
+			: (state ?? {}),
 	}
 }

@@ -18,6 +18,8 @@ and this project adheres to
 - `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest with more than one signature box. The result includes `C2paStatusCode.CLAIM_SIGNATURE_MISSING`.
 - `validateC2paManifestBoxSegment` now reads `sequenceNumber`, `streamId`, `previousManifestId`, `continuityMethod`, and `bmffHashHex` only from assertions whose hash matches a claim reference. Each field is `null` otherwise. Check `isValid` before you use any field.
 - `validateC2paInitSegment` now returns empty `sessionKeys` and `merkleMaps` when any manifest integrity check fails. Check `isValid` before you use either list.
+- `validateC2paManifestBoxSegment` no longer updates `nextManifestId` and `nextState` from a segment that fails verification, is on another stream, or does not move the sequence number forward. A segment that fails only the continuity check still updates them, so a stream recovers after a lost or rejected segment. After a seek, an encoder restart, or a new stream ID, pass `null` as `lastManifestId` and `undefined` as `state` to start a new state ([GHSA-jjpj-wgh4-rm9c](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/GHSA-jjpj-wgh4-rm9c)).
+- `validateC2paSegment` no longer updates `nextSequenceState` from a segment whose signature or content hash does not verify. The same applies to a segment whose session key is missing, not yet active, or expired. A replayed or forged sequence number from such a segment no longer affects later segments ([GHSA-jjpj-wgh4-rm9c](https://github.com/streaming-video-technology-alliance/common-media-library/security/advisories/GHSA-jjpj-wgh4-rm9c)).
 
 ### Added
 

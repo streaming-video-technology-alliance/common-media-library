@@ -526,3 +526,207 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 		deepStrictEqual(result.certificate, signer.certificateDER)
 	})
 })
+
+
+// --- Replay protection: manifest ID and sequence state advance only from authentic forward-moving segments ---
+
+describe('validateC2paManifestBoxSegment — state advances only from authentic forward-moving segments', () => {
+	const INITIAL_MANIFEST_ID = 'urn:uuid:manifestbox-replay-initial'
+	const MANIFEST_ID_1 = 'urn:uuid:manifestbox-replay-1'
+	const MANIFEST_ID_2 = 'urn:uuid:manifestbox-replay-2'
+	const MANIFEST_ID_3 = 'urn:uuid:manifestbox-replay-3'
+	const MANIFEST_ID_4 = 'urn:uuid:manifestbox-replay-4'
+	const MANIFEST_ID_5 = 'urn:uuid:manifestbox-replay-5'
+	const FORGED_MANIFEST_ID = 'urn:uuid:manifestbox-replay-forged'
+	const STREAM_ID = 'stream-replay'
+	const HIGH_SEQUENCE_NUMBER = 2 ** 40
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	type ChainedSegmentFields = {
+		readonly instanceId: string
+		readonly sequenceNumber: number
+		readonly previousManifestId: string
+		readonly streamId?: string
+		/** Replaces the computed content hash of the `c2pa.hash.bmff.v3` assertion. */
+		readonly bmffHash?: unknown
+		/** Leaves the `c2pa.livevideo.segment` assertion out of the store and out of the claim. */
+		readonly omitLiveVideo?: boolean
+	}
+
+	// A claim `created_assertions` entry for an assertion box. The hash covers the box content after its 8-byte header.
+	async function declaredAssertion(label: string, assertionBox: Uint8Array): Promise<Record<string, unknown>> {
+		const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', assertionBox.subarray(8) as Uint8Array<ArrayBuffer>))
+		return { url: `self#jumbf=c2pa.assertions/${label}`, hash, alg: 'sha256' }
+	}
+
+	// A manifest-box segment with a chained c2pa.livevideo.segment assertion and a flat hash. The claim
+	// declares every assertion in the store. Omit `sign` for an unsigned segment. The claim instanceID
+	// sets manifest.instanceId, which the validator returns as nextManifestId.
+	async function buildChainedSegment(
+		fields: ChainedSegmentFields,
+		sign?: (claimCborBytes: Uint8Array) => Promise<Uint8Array>,
+	): Promise<Uint8Array> {
+		const hash = fields.bmffHash ?? await computeBmffHash(buildMediaBoxes(), { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const liveVideoData = {
+			sequenceNumber: fields.sequenceNumber,
+			previousManifestId: fields.previousManifestId,
+			streamId: fields.streamId ?? STREAM_ID,
+			continuityMethod: 'c2pa.manifestId',
+		}
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })))
+		const assertions = [bmffAssertion]
+		const declaredAssertions = [await declaredAssertion('c2pa.hash.bmff.v3', bmffAssertion)]
+		if (!fields.omitLiveVideo) {
+			const liveVideoAssertion = buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor(liveVideoData)))
+			assertions.unshift(liveVideoAssertion)
+			declaredAssertions.unshift(await declaredAssertion('c2pa.livevideo.segment', liveVideoAssertion))
+		}
+		const assertionStore = buildJumb('c2pa.assertions', ...assertions)
+		const claimCborBytes = encodeCbor({ instanceID: fields.instanceId, created_assertions: declaredAssertions })
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
+		const manifestContent = [claim, assertionStore]
+		if (sign) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
+		return buildManifestBoxSegment(fields.instanceId, ...manifestContent)
+	}
+
+	function signed(fields: ChainedSegmentFields): Promise<Uint8Array> {
+		return buildChainedSegment(fields, claim => signer.sign(claim))
+	}
+
+	// Flips the first payload byte of the mdat box, which the flat hash covers.
+	function tamperMedia(segment: Uint8Array): Uint8Array {
+		const tampered = new Uint8Array(segment)
+		const mdat = Array.from('mdat', c => c.charCodeAt(0))
+		for (let i = 4; i + 4 <= tampered.length; i++) {
+			if (mdat.every((byte, j) => tampered[i + j] === byte)) {
+				tampered[i + 4] ^= 0xff
+				return tampered
+			}
+		}
+		throw new Error('no mdat box')
+	}
+
+	// Validates one signed segment at sequence number 5 as the first segment and returns its result.
+	async function firstSegmentAtFive() {
+		const r = await validateC2paManifestBoxSegment(await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 5, previousManifestId: INITIAL_MANIFEST_ID }), null)
+		strictEqual(r.result.isValid, true)
+		return r
+	}
+
+	it('rejects a replayed segment instead of rewinding state on a failed segment', async () => {
+		const s1 = await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
+		const s2 = await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 2, previousManifestId: MANIFEST_ID_1 })
+		const s3 = await signed({ instanceId: MANIFEST_ID_3, sequenceNumber: 3, previousManifestId: MANIFEST_ID_2 })
+
+		// Normal forward playback advances the state.
+		const r1 = await validateC2paManifestBoxSegment(s1, null)
+		strictEqual(r1.result.isValid, true)
+		const r2 = await validateC2paManifestBoxSegment(s2, r1.nextManifestId, r1.nextState)
+		strictEqual(r2.result.isValid, true)
+		const r3 = await validateC2paManifestBoxSegment(s3, r2.nextManifestId, r2.nextState)
+		strictEqual(r3.result.isValid, true)
+
+		// A failed replay of s2 must not rewind lastManifestId or lastSequenceNumber.
+		const replay2 = await validateC2paManifestBoxSegment(s2, r3.nextManifestId, r3.nextState)
+		strictEqual(replay2.result.isValid, false)
+		strictEqual(replay2.nextManifestId, MANIFEST_ID_3)
+		deepStrictEqual(replay2.nextState, r3.nextState)
+
+		// Replaying s3 against the state the failed replay produced must still fail. An equal sequence number is not forward.
+		const replay3 = await validateC2paManifestBoxSegment(s3, replay2.nextManifestId, replay2.nextState)
+		strictEqual(replay3.result.isValid, false)
+		deepStrictEqual(replay3.result.errorCodes, [LiveVideoStatusCode.ASSERTION_INVALID, LiveVideoStatusCode.SEGMENT_INVALID])
+	})
+
+	it('does not advance for an unsigned segment with a lower sequence number', async () => {
+		const r5 = await firstSegmentAtFive()
+		const rewind = await buildChainedSegment({ instanceId: INITIAL_MANIFEST_ID, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
+
+		const rR = await validateC2paManifestBoxSegment(rewind, r5.nextManifestId, r5.nextState)
+
+		strictEqual(rR.result.isValid, false)
+		strictEqual(rR.nextManifestId, r5.nextManifestId)
+		deepStrictEqual(rR.nextState, r5.nextState)
+	})
+
+	it('does not advance for an unsigned segment with a higher sequence number', async () => {
+		const r5 = await firstSegmentAtFive()
+		const forged = await buildChainedSegment({ instanceId: FORGED_MANIFEST_ID, sequenceNumber: HIGH_SEQUENCE_NUMBER, previousManifestId: MANIFEST_ID_1 })
+
+		const rF = await validateC2paManifestBoxSegment(forged, r5.nextManifestId, r5.nextState)
+
+		ok(rF.result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
+		strictEqual(rF.nextManifestId, r5.nextManifestId)
+		deepStrictEqual(rF.nextState, r5.nextState)
+	})
+
+	it('does not advance for a signed segment whose media was tampered', async () => {
+		const r5 = await firstSegmentAtFive()
+		const tampered = tamperMedia(await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1 }))
+
+		const rT = await validateC2paManifestBoxSegment(tampered, r5.nextManifestId, r5.nextState)
+
+		deepStrictEqual(rT.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+		strictEqual(rT.nextManifestId, r5.nextManifestId)
+		deepStrictEqual(rT.nextState, r5.nextState)
+	})
+
+	it('does not advance for a signed segment with a malformed content hash', async () => {
+		const r5 = await firstSegmentAtFive()
+		const malformed = await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1, bmffHash: 'not a byte string' })
+
+		const rM = await validateC2paManifestBoxSegment(malformed, r5.nextManifestId, r5.nextState)
+
+		ok(rM.result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+		strictEqual(rM.nextManifestId, r5.nextManifestId)
+		deepStrictEqual(rM.nextState, r5.nextState)
+	})
+
+	it('does not advance for an authentic segment on another stream', async () => {
+		const r5 = await firstSegmentAtFive()
+		const other = await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1, streamId: 'stream-other' })
+
+		const rO = await validateC2paManifestBoxSegment(other, r5.nextManifestId, r5.nextState)
+
+		deepStrictEqual(rO.result.errorCodes, [LiveVideoStatusCode.ASSERTION_INVALID])
+		strictEqual(rO.nextManifestId, r5.nextManifestId)
+		deepStrictEqual(rO.nextState, r5.nextState)
+	})
+
+	it('does not update the state for a signed segment without a live video assertion', async () => {
+		const segment = await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID, omitLiveVideo: true })
+
+		const r = await validateC2paManifestBoxSegment(segment, null)
+
+		strictEqual(r.result.isValid, false)
+		strictEqual(r.nextManifestId, null)
+		deepStrictEqual(r.nextState, {})
+	})
+
+	it('recovers after a missing segment through an authentic forward-moving segment', async () => {
+		const s1 = await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
+		// s2 is never delivered. s3 chains to it, so s3 fails only the continuity check.
+		const s3 = await signed({ instanceId: MANIFEST_ID_3, sequenceNumber: 3, previousManifestId: MANIFEST_ID_2 })
+		const s4 = await signed({ instanceId: MANIFEST_ID_4, sequenceNumber: 4, previousManifestId: MANIFEST_ID_3 })
+		const s5 = await signed({ instanceId: MANIFEST_ID_5, sequenceNumber: 5, previousManifestId: MANIFEST_ID_4 })
+
+		const r1 = await validateC2paManifestBoxSegment(s1, null)
+		strictEqual(r1.result.isValid, true)
+
+		// The authentic segment after the gap is reported invalid but updates the state.
+		const r3 = await validateC2paManifestBoxSegment(s3, r1.nextManifestId, r1.nextState)
+		deepStrictEqual(r3.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+		strictEqual(r3.nextManifestId, MANIFEST_ID_3)
+		strictEqual(r3.nextState.lastSequenceNumber, 3)
+
+		// The stream recovers from there.
+		const r4 = await validateC2paManifestBoxSegment(s4, r3.nextManifestId, r3.nextState)
+		strictEqual(r4.result.isValid, true)
+		const r5 = await validateC2paManifestBoxSegment(s5, r4.nextManifestId, r4.nextState)
+		strictEqual(r5.result.isValid, true)
+	})
+})
