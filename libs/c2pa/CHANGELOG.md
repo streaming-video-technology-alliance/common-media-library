@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-10
+
 ### Security
 
 - `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now reject a manifest whose assertion store holds two or more boxes with the same label. The result includes `C2paStatusCode.ASSERTION_MISSING` when the claim references that label, or `ASSERTION_UNDECLARED` when it does not.
@@ -162,7 +164,8 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.3.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.0...HEAD
+[1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.3.0...c2pa-v1.4.0
 [1.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.2.0...c2pa-v1.3.0
 [1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.3...c2pa-v1.2.0
 [1.1.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.1.2...c2pa-v1.1.3
