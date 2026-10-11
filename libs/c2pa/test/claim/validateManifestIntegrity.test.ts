@@ -132,3 +132,51 @@ describe('validateManifestIntegrity', () => {
 		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MALFORMED])
 	})
 })
+
+describe('validateManifestIntegrity: hard binding labels (§15.10.1.2, §6.4, §18.9.2)', () => {
+	const BMFF_V3 = 'c2pa.hash.bmff.v3'
+
+	function assertion(label: string) {
+		return { label, data: {}, rawBoxPayload: new Uint8Array(0) }
+	}
+
+	async function hasMultipleHardBindings(secondLabel: string): Promise<boolean> {
+		const { codes } = await validateManifestIntegrity(internalData({ assertions: [assertion(BMFF_V3), assertion(secondLabel)] }))
+		return codes.includes(C2paStatusCode.ASSERTION_MULTIPLE_HARD_BINDINGS)
+	}
+
+	// Each label is a standard hard binding, so two of them in one manifest are too many.
+	for (const label of ['c2pa.hash.data', 'c2pa.hash.boxes', 'c2pa.hash.collection.data', 'c2pa.hash.bmff.v2', `${BMFF_V3}__1`]) {
+		it(`counts ${label} next to ${BMFF_V3}`, async () => {
+			strictEqual(await hasMultipleHardBindings(label), true)
+		})
+	}
+
+	// A part binding, the multi-asset assertion, and the legacy label are not standard hard bindings (§18.9.2).
+	for (const label of ['c2pa.hash.data.part', 'c2pa.hash.data.part__2', 'c2pa.hash.multi-asset', 'c2pa.hash.bmff']) {
+		it(`does not count ${label} next to ${BMFF_V3}`, async () => {
+			strictEqual(await hasMultipleHardBindings(label), false)
+		})
+	}
+})
+
+describe('validateManifestIntegrity: claim box codes (§15.6.1)', () => {
+	let signatureBytes: Uint8Array
+
+	before(async () => {
+		signatureBytes = await (await createTestSigner()).sign(EMPTY_CLAIM_CBOR)
+	})
+
+	it('reports CLAIM_MULTIPLE once, without CLAIM_MISSING', async () => {
+		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, claimCode: C2paStatusCode.CLAIM_MULTIPLE, signatureBytes }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MULTIPLE])
+	})
+
+	it('reports only CLAIM_MISSING for a manifest without a claim box next to store assertions', async () => {
+		const assertions = [{ label: 'com.example.a', data: {}, rawBoxPayload: new Uint8Array(0) }]
+		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, signatureBytes, assertions }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MISSING])
+	})
+})

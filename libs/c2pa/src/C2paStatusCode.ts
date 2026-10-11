@@ -13,8 +13,12 @@ import type { ValueOf } from '@svta/cml-utils'
 export const C2paStatusCode = {
 	/** Assertion hash does not match the hashed URI in the claim (§15.10.3.1) */
 	ASSERTION_HASHEDURI_MISMATCH: 'assertion.hashedURI.mismatch',
-	/** An assertion referenced in the claim is missing from the assertion store (§15.10.3.1) */
+	/** The assertion store has no box for a claim reference, or more than one box for its label (§8.4.1, §15.10.3.1) */
 	ASSERTION_MISSING: 'assertion.missing',
+	/** The manifest has more than one hard binding assertion (§9.1, §15.10.1.2) */
+	ASSERTION_MULTIPLE_HARD_BINDINGS: 'assertion.multipleHardBindings',
+	/** The assertion store holds an assertion that the claim does not reference (§15.10.3.1) */
+	ASSERTION_UNDECLARED: 'assertion.undeclared',
 	/** An action requiring an ingredient reference does not have one (§18.15.4.7) */
 	ASSERTION_ACTION_INGREDIENT_MISMATCH: 'assertion.action.ingredientMismatch',
 	/** Claim signature verification failed, or the signature carries no certificate (§15.7) */
@@ -27,6 +31,8 @@ export const C2paStatusCode = {
 	CLAIM_CBOR_INVALID: 'claim.cbor.invalid',
 	/** The claim box holds CBOR that is not a map (§15.6.2). The library does not check the fields of the claim. */
 	CLAIM_MALFORMED: 'claim.malformed',
+	/** The manifest has more than one claim box (§15.6.1) */
+	CLAIM_MULTIPLE: 'claim.multiple',
 	/** BMFF hash assertion or Merkle structure is malformed (§15.2.2.3) */
 	ASSERTION_BMFFHASH_MALFORMED: 'assertion.bmffHash.malformed',
 	/** BMFF content hash does not match the committed value (§15.2.2.3) */

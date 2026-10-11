@@ -98,8 +98,8 @@ async function validateStream(segmentUrls: string[]) {
       }
     }
 
-    // Access the full manifest when needed
-    if (result.manifest) {
+    // Access the full manifest when needed. Its assertions list is the raw store, so check isValid first.
+    if (result.isValid && result.manifest) {
       console.log('Claim generator:', result.manifest.claimGenerator)
       console.log('Assertions:', result.manifest.assertions.length)
     }
@@ -166,16 +166,16 @@ The `ManifestBoxValidationResult` contains:
 | `manifest` | `C2paManifest \| null` | Parsed manifest, or `null` on parse failure |
 | `issuer` | `string \| null` | Certificate issuer from the signature |
 | `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate |
-| `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the value is not an unsigned integer up to `Number.MAX_SAFE_INTEGER` |
-| `previousManifestId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
-| `streamId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
-| `continuityMethod` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
-| `bmffHashHex` | `string \| null` | Hex-encoded BMFF content hash |
+| `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the value is not an unsigned integer up to `Number.MAX_SAFE_INTEGER` or the claim does not verify the assertion |
+| `previousManifestId` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `streamId` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `continuityMethod` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `bmffHashHex` | `string \| null` | Hex-encoded hash from the `c2pa.hash.bmff.v3` assertion, or `null` if the claim does not verify it |
 | `isValid` | `boolean` | All checks passed |
 | `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes. Each segment contains a full manifest, and the manifest goes through integrity checks: assertion hashes and claim signature verification.
+> Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes. Each segment contains a full manifest. The library runs these integrity checks on it: assertion references and hashes, undeclared assertions, the hard binding count, duplicate manifest boxes, and claim signature verification. The segment fields above come only from assertions whose hash matches a claim reference. Check `isValid` before you use any field. A `ManifestBoxContinuityValidator` receives the parsed manifest, whose `assertions` list is the raw assertion store.
 >
 > A segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The claim signature is verified with the certificate inside the segment. The library does not check that certificate against a trust list. See [Signer Trust](results-and-error-codes.md#signer-trust).
 >

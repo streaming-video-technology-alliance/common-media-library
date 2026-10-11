@@ -205,6 +205,9 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 	let claimCode: InternalManifestData['claimCode'] = null
 	let internalAssertions: InternalAssertionData[] = []
 	let signatureBytes: Uint8Array | null = null
+	let claimBoxes = 0
+	let assertionStores = 0
+	let signatureBoxes = 0
 
 	for (const box of manifestBoxes) {
 		if (box.type !== 'jumb') continue
@@ -217,6 +220,7 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 		if (!label) continue
 
 		if (label === 'c2pa.claim' || label === 'c2pa.claim.v2') {
+			claimBoxes++
 			const contentBox = inner.find(b => b.type === 'cbor')
 			if (contentBox) {
 				claimCborBytes = contentBox.data
@@ -226,13 +230,25 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 			}
 		}
 		else if (label === 'c2pa.assertions') {
+			assertionStores++
 			internalAssertions = parseAssertionsInternal(inner)
 		}
 		else if (label === 'c2pa.signature') {
+			signatureBoxes++
 			const contentBox = inner.find(b => b.type === 'cbor' || b.type === 'jumc')
 			if (contentBox) signatureBytes = contentBox.data
 		}
 	}
+
+	// §15.6.1: a manifest has one claim box. §8.4.1: a label that appears twice is ambiguous, so
+	// the signature URI and every assertion URI of the claim are unresolved.
+	if (claimBoxes > 1) {
+		claimData = null
+		claimCborBytes = null
+		claimCode = C2paStatusCode.CLAIM_MULTIPLE
+	}
+	if (assertionStores > 1) internalAssertions = []
+	if (signatureBoxes > 1) signatureBytes = null
 
 	const { issuer, certNotBefore } = parseSignatureInfo(signatureBytes)
 

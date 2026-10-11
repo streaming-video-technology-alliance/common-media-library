@@ -94,8 +94,6 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 type ParsedManifest = {
 	manifest: C2paManifest | null
 	issuer: string | null
-	liveVideo: LiveVideoFields | null
-	bmff: BmffHashFields
 	internalData: InternalManifestData | null
 }
 
@@ -103,17 +101,15 @@ function parseManifest(bytes: Uint8Array): ParsedManifest {
 	try {
 		const internalData = readC2paManifest(bytes)
 		const { manifest } = internalData
-		if (!manifest) return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH, internalData: null }
+		if (!manifest) return { manifest: null, issuer: null, internalData: null }
 
 		return {
 			manifest,
 			issuer: manifest.signatureInfo?.issuer ?? null,
-			liveVideo: parseLiveVideoAssertion(manifest.assertions),
-			bmff: parseBmffHashAssertion(manifest.assertions),
 			internalData,
 		}
 	} catch {
-		return { manifest: null, issuer: null, liveVideo: null, bmff: EMPTY_BMFF_HASH, internalData: null }
+		return { manifest: null, issuer: null, internalData: null }
 	}
 }
 
@@ -138,11 +134,11 @@ function collectErrorCodes(
 }
 
 async function validateContinuity(
-	parsed: ParsedManifest,
+	manifest: C2paManifest | null,
+	liveVideo: LiveVideoFields | null,
 	lastManifestId: string | null,
 	options?: ManifestBoxValidationOptions,
 ): Promise<readonly LiveVideoStatusCode[]> {
-	const { manifest, liveVideo } = parsed
 	const method = liveVideo?.continuityMethod ?? null
 
 	if (!method) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
@@ -172,6 +168,8 @@ async function validateContinuity(
  * Recomputes the `c2pa.hash.bmff.v3` content hash from the raw segment bytes and compares
  * it against the expected hash in the manifest assertion. Checks live-video assertions
  * (sequenceNumber, streamId, continuityMethod) and manifest-ID chain continuity.
+ * The live-video and BMFF hash fields of the result come only from assertions whose
+ * hash matches a claim reference. Check `isValid` before you use any field.
  * A validator for an implementer-defined continuity method can be registered
  * via {@link ManifestBoxValidationOptions}.
  *
@@ -200,7 +198,12 @@ export async function validateC2paManifestBoxSegment(
 	readonly nextManifestId: string | null
 	readonly nextState: ManifestBoxValidationState
 }> {
-	const { manifest, issuer, liveVideo, bmff, internalData } = parseManifest(bytes)
+	const { manifest, issuer, internalData } = parseManifest(bytes)
+
+	const integrity = internalData ? await validateManifestIntegrity(internalData) : null
+	const verifiedAssertions = integrity?.verifiedAssertions ?? []
+	const liveVideo = parseLiveVideoAssertion(verifiedAssertions)
+	const bmff = parseBmffHashAssertion(verifiedAssertions)
 
 	const sequenceNumber = liveVideo?.sequenceNumber ?? null
 	const previousManifestId = liveVideo?.previousManifestId ?? null
@@ -224,7 +227,7 @@ export async function validateC2paManifestBoxSegment(
 		bmffHashMatches = hashesEqual(computed, bmff.hashBytes)
 	}
 
-	const continuityCodes = await validateContinuity({ manifest, issuer, liveVideo, bmff, internalData }, lastManifestId, options)
+	const continuityCodes = await validateContinuity(manifest, liveVideo, lastManifestId, options)
 
 	const liveVideoCodes = [...new Set([
 		...collectErrorCodes(
@@ -234,7 +237,6 @@ export async function validateC2paManifestBoxSegment(
 		...continuityCodes,
 	])]
 
-	const integrity = internalData ? await validateManifestIntegrity(internalData) : null
 	const integrityCodes: readonly C2paStatusCode[] = integrity?.codes ?? []
 
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]

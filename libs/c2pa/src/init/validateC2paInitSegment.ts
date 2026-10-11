@@ -172,11 +172,13 @@ async function validateSessionKeys(
  * Validates a C2PA init segment: parses the manifest, extracts and verifies
  * the certificate, validates the BMFF hard binding hash, verifies all
  * session keys from the `c2pa.session-keys` assertion, and performs
- * manifest integrity checks (assertion hashes, missing assertions,
- * action ingredients, and claim signature verification).
+ * manifest integrity checks (assertion references and hashes, undeclared
+ * assertions, the hard binding count, duplicate manifest boxes, action
+ * ingredients, and claim signature verification).
  *
  * Only session keys with a valid signer binding and an unexpired validity period
- * are included in the result.
+ * are included in the result. The result holds `sessionKeys` and `merkleMaps` only when
+ * every manifest integrity check passes, so check `isValid` before you use either list.
  *
  * The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID` if the function finds an invalid
  * session key (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
@@ -209,28 +211,31 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 
 	const internalData = readC2paManifest(bytes, boxes)
 	const { manifest } = internalData
-	const { codes: integrityCodes, certificate } = await validateManifestIntegrity(internalData)
+	const { codes: integrityCodes, certificate, verifiedAssertions } = await validateManifestIntegrity(internalData)
 
 	const bmffHashAssertion =
-		manifest.assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
+		verifiedAssertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
 	const bmffHashValid = await validateBmffHashAssertion(bytes, bmffHashAssertion)
-
-	const sessionKeysAssertion = manifest.assertions.find(
-		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
-	)
-	// manifest.assertions has the order of internalData.assertions
-	const { sessionKeys, hasInvalidSessionKey } =
-		sessionKeysAssertion && certificate
-			? await validateSessionKeys(internalData.assertions[manifest.assertions.indexOf(sessionKeysAssertion)], certificate)
-			: { sessionKeys: [], hasInvalidSessionKey: false }
 
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
 	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
 
+	const sessionKeysAssertion = verifiedAssertions.find(
+		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
+	)
+	const sessionKeysValidation =
+		sessionKeysAssertion && certificate
+			? await validateSessionKeys(sessionKeysAssertion, certificate)
+			: { sessionKeys: [], hasInvalidSessionKey: false }
+	// The result exposes session keys and merkle maps only when every integrity check passes.
+	const integrityPassed = integrityCodes.length === 0
+	const sessionKeys = integrityPassed ? sessionKeysValidation.sessionKeys : []
+	const exposedMerkleMaps = integrityPassed ? (merkleMaps ?? []) : []
+
 	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
-	if (hasInvalidSessionKey) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	if (sessionKeysValidation.hasInvalidSessionKey) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
-	if (sessionKeys.length === 0 && merkleMaps === null) {
+	if (sessionKeysValidation.sessionKeys.length === 0 && merkleMaps === null) {
 		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	}
 	for (const code of integrityCodes) codes.add(code)
@@ -241,7 +246,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		certificate,
 		manifestId: manifest.instanceId,
 		sessionKeys,
-		merkleMaps: merkleMaps ?? [],
+		merkleMaps: exposedMerkleMaps,
 		isValid: errorCodes.length === 0,
 		errorCodes,
 	}
