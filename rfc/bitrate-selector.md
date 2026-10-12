@@ -155,12 +155,19 @@ The `ThroughputSelector` constructor validates its options before it stores them
 
 ### `ThroughputSelector`
 
-The selector picks the highest rung at or below the safe throughput. The safe throughput is `throughput * safetyFactor`. Two rules refine the pick:
+The selector divides the throughput by `playbackRate` to get the effective throughput. It picks the highest rung at or below the safe throughput, which is `effectiveThroughput * safetyFactor`. When no rung is at or below the safe throughput, the pick is rung 0. The same fallback applies to the upgrade pick below. Two rules refine the pick:
 
-- **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bitrate of the last `sample` that was not aborted, mapped into the ladder of the call as the contract states.
-- **Starvation guard.** The guard runs when the player passes `segmentDuration` and `bufferLevel` is above 0. The selector estimates the download time of the pick as `bitrate * segmentDuration / safeThroughput`. If that time exceeds `bufferLevel / playbackRate`, the selector steps down one rung and checks again. Rung 0 always passes. A `bufferLevel` of 0 skips the guard. The player is then at startup or in a stall, and the throughput pick is the restart choice.
+- **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `effectiveThroughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bitrate of the last `sample` that was not aborted, mapped into the ladder of the call as the contract states.
+- **Starvation guard.** The guard runs when the player passes `segmentDuration` and `bufferLevel` is above 0. The selector estimates the download time of the pick as `bitrate * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. If that time exceeds `bufferLevel / playbackRate`, the selector steps down one rung and checks again. Rung 0 always passes. A `bufferLevel` of 0 skips the guard. The player is then at startup or in a stall, and the throughput pick is the restart choice.
 
 When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. The delay is always 0.
+
+The playback rate changes the pick before the hysteresis and the guard run:
+
+| Playback rate | Throughput | Effective throughput | Pick |
+|---|---|---|---|
+| 1 | 5 Mbps | 5 Mbps | 3 Mbps |
+| 2 | 5 Mbps | 2.5 Mbps | 1.5 Mbps |
 
 With the ladder of the guide and a current rung of 1.5 Mbps, the hysteresis gives these picks:
 
@@ -243,6 +250,8 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 
 - v1 (2026-10-12): initial draft.
 - v2 (2026-10-12): review feedback. The constructor options have a validity contract, and the current rung maps into the ladder of each call.
+- v3 (2026-10-12): review feedback. The pick divides the throughput by the playback rate, and rung 0 is the pick when no rung fits.
+
 ## Final Decision
 
 Pending maintainer review.
