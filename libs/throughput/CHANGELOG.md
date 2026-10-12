@@ -12,6 +12,10 @@ and this project adheres to
 
 - README: the usage example imports from `@svta/cml-throughput` instead of an unexported subpath, and prints its result instead of calling an undefined `assert`.
 
+### Fixed
+
+- The `getEstimate` TSDoc states the unit as bits per second. Before, the comment said bytes per second.
+
 
 ## [1.0.9] - 2026-09-15
 
