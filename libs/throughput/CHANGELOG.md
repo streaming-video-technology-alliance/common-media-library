@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - README: the usage example imports from `@svta/cml-throughput` instead of an unexported subpath, and prints its result instead of calling an undefined `assert`.
+- The TSDoc of `EwmaEstimatorOptions` describes each option, the default value, and the shaka-player value.
 
 ### Fixed
 
@@ -20,7 +21,7 @@ and this project adheres to
 - `Ewma.sample` now weights the new value by `1 - alpha ^ weight` and the previous estimate by `alpha ^ weight`. Before, the new value received the weight `alpha ^ weight`. The constructor still takes the smoothing factor `alpha`, and the estimate of a direct `Ewma` instance changes.
 - `Ewma.getEstimate` now returns 0 for an empty `Ewma`. Before, the method returned `NaN`. With an `alpha` of 0, the method now returns the last value.
 - `Ewma.sample` now ignores a sample that would make the estimate `NaN`. The estimate and the total duration do not change for that sample.
-- `EwmaEstimator.sample` now ignores a sample with a zero duration. Before, one such sample made every later estimate infinite or `NaN`.
+- `EwmaEstimator.sample` now ignores a sample with a duration of 0 or less. Before, a zero duration made every later estimate infinite or `NaN`, and a negative duration gave a negative estimate.
 
 
 ## [1.0.9] - 2026-09-15

@@ -83,6 +83,32 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 285)
 	})
 
+	it('ignores a sample with a negative duration', async () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		// 500 bps
+		estimator.sample({
+			startTime: 0,
+			encodedBodySize: 125,
+			duration: 2000,
+		})
+
+		// 250 bps
+		estimator.sample({
+			startTime: 2000,
+			encodedBodySize: 125,
+			duration: 4000,
+		})
+
+		estimator.sample({
+			startTime: 6000,
+			encodedBodySize: 125,
+			duration: -1000,
+		})
+
+		equal(estimator.getEstimate(), 285)
+	})
+
 	it('returns NaN when the only sample has a zero duration', async () => {
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 

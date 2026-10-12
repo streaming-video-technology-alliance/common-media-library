@@ -42,17 +42,16 @@ export class EwmaEstimator implements ThroughputEstimator {
 			return
 		}
 
+		if (duration <= 0) {
+			return
+		}
+
 		if (encodedBodySize < this.minBodySize) {
 			return
 		}
 
 		const durationSeconds = sample.duration / 1000
 		const bandwidthBps = getBandwidthBps(sample)
-
-		if (!Number.isFinite(bandwidthBps)) {
-			return
-		}
-
 		this.totalBytes += encodedBodySize
 		this.hasSamples = true
 
