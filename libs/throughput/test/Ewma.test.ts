@@ -38,6 +38,17 @@ describe('Ewma', () => {
 		equal(ewma.getEstimate(), 50)
 	})
 
+	it('ignores a sample whose estimate is NaN', async () => {
+		const ewma = new Ewma(0.5)
+
+		ewma.sample(2, 100)
+		ewma.sample(0, Infinity)
+		ewma.sample(1, NaN)
+
+		equal(ewma.getEstimate(), 100)
+		equal(ewma.getTotalDuration(), 2)
+	})
+
 	it('derives alpha from a half-life', async () => {
 		//#region example
 		// A half-life of 2 seconds

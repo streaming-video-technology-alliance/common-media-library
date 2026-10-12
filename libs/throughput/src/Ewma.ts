@@ -30,10 +30,17 @@ export class Ewma {
 	 * Samples the value of the resource and updates the estimate.
 	 *
 	 * The new value has the weight `1 - alpha ^ weight`.
+	 * The method ignores a sample that would make the estimate `NaN`.
 	 */
 	public sample(weight: number, value: number): void {
 		const adjustedAlpha = Math.pow(this.alpha, weight)
-		this.estimate = value * (1 - adjustedAlpha) + adjustedAlpha * this.estimate
+		const estimate = value * (1 - adjustedAlpha) + adjustedAlpha * this.estimate
+
+		if (Number.isNaN(estimate)) {
+			return
+		}
+
+		this.estimate = estimate
 		this.totalDuration += weight
 	}
 
