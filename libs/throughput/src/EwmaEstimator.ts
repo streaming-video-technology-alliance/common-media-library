@@ -7,6 +7,9 @@ import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 /**
  * Exponential Weighted Moving Average (EWMA) throughput estimator based on 2 half-lives
  *
+ * @example
+ * {@includeCode ../test/EwmaEstimator.test.ts#example}
+ *
  * @public
  */
 export class EwmaEstimator implements ThroughputEstimator {
@@ -14,6 +17,7 @@ export class EwmaEstimator implements ThroughputEstimator {
 	private minTotalBytes: number
 	private minBodySize: number
 	private totalBytes: number = 0
+	private hasSamples: boolean = false
 	private fastEwma: Ewma
 	private slowEwma: Ewma
 
@@ -22,8 +26,8 @@ export class EwmaEstimator implements ThroughputEstimator {
 		this.minBodySize = options.minBodySize || 0
 		this.defaultEstimate = options.defaultEstimate ?? NaN
 
-		this.slowEwma = new Ewma(options.slowHalfLife)
-		this.fastEwma = new Ewma(options.fastHalfLife)
+		this.slowEwma = new Ewma(halfLifeToAlpha(options.slowHalfLife))
+		this.fastEwma = new Ewma(halfLifeToAlpha(options.fastHalfLife))
 
 		if (!isNaN(this.defaultEstimate)) {
 			this.fastEwma.sample(1, this.defaultEstimate)
@@ -45,16 +49,21 @@ export class EwmaEstimator implements ThroughputEstimator {
 		const durationSeconds = sample.duration / 1000
 		const bandwidthBps = getBandwidthBps(sample)
 		this.totalBytes += encodedBodySize
+		this.hasSamples = true
 
 		this.slowEwma.sample(durationSeconds, bandwidthBps)
 		this.fastEwma.sample(durationSeconds, bandwidthBps)
 	}
 
 	public getEstimate(): number {
-		if (this.totalBytes < this.minTotalBytes) {
+		if (!this.hasSamples || this.totalBytes < this.minTotalBytes) {
 			return this.defaultEstimate
 		}
 
 		return Math.floor(Math.min(this.fastEwma.getEstimate(), this.slowEwma.getEstimate()))
 	}
+}
+
+function halfLifeToAlpha(halfLife: number): number {
+	return halfLife ? Math.exp(Math.log(0.5) / halfLife) : 0
 }

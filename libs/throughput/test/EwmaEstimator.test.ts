@@ -1,5 +1,5 @@
 import { EwmaEstimator } from '@svta/cml-throughput'
-import { equal } from 'node:assert'
+import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('EwmaEstimator', () => {
@@ -27,6 +27,36 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 1e6)
 	})
 
+	it('returns the default estimate before the first sample', async () => {
+		const estimator = new EwmaEstimator({
+			fastHalfLife: 3,
+			slowHalfLife: 9,
+			defaultEstimate: 1e6,
+		})
+
+		equal(estimator.getEstimate(), 1e6)
+	})
+
+	it('returns a positive estimate after one sample', async () => {
+		const estimator = new EwmaEstimator({
+			fastHalfLife: 3,
+			slowHalfLife: 9,
+			defaultEstimate: 1e6,
+		})
+
+		// 6 Mbps
+		estimator.sample({
+			startTime: 0,
+			encodedBodySize: 750_000,
+			duration: 1000,
+		})
+
+		const estimate = estimator.getEstimate()
+
+		ok(estimate > 1e6, `expected an estimate above the default, received ${estimate}`)
+		ok(estimate < 6e6, `expected an estimate below the sample, received ${estimate}`)
+	})
+
 	it('returns positive number when there are at least 2 entries', async () => {
 		//#region example
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
@@ -45,7 +75,7 @@ describe('EwmaEstimator', () => {
 			duration: 4000,
 		})
 
-		equal(estimator.getEstimate(), 412)
+		equal(estimator.getEstimate(), 285)
 		//#endregion example
 	})
 })

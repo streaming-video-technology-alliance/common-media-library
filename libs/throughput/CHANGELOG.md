@@ -15,6 +15,10 @@ and this project adheres to
 ### Fixed
 
 - The `getEstimate` TSDoc states the unit as bits per second. Before, the comment said bytes per second.
+- `EwmaEstimator` now returns a positive estimate. Before, the estimator used the half-life as the smoothing factor and could return a negative estimate. All estimates change after this fix.
+- `EwmaEstimator` now returns `defaultEstimate` until the first sample.
+- `Ewma.sample` now weights the new value by `1 - alpha ^ weight` and the previous estimate by `alpha ^ weight`. Before, the new value received the weight `alpha ^ weight`. The constructor still takes the smoothing factor `alpha`, and the estimate of a direct `Ewma` instance changes.
+- `Ewma.getEstimate` now returns 0 for an empty `Ewma`. Before, the method returned `NaN`. With an `alpha` of 0, the method now returns the last value.
 
 
 ## [1.0.9] - 2026-09-15
