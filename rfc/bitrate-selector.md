@@ -131,7 +131,7 @@ The package also exports `DEFAULT_SAFETY_FACTOR` (0.9) and `DEFAULT_UPGRADE_FACT
 | `sample` | Records a finished or abandoned download. The player passes the `ResourceTiming` object it gave the estimator. A selector that needs the current rung reads `bitrate`. |
 | `reset` | Returns the selector to its initial state. The player calls it after a seek or a source change. |
 
-A selector reads the fields it needs and ignores the rest. A selector that needs an optional field and does not receive it uses a documented default. There is no stall notification. A selector that reacts to stalls derives them from `bufferLevel` in `select` and `sample`.
+A selector reads the fields it needs and ignores the rest. A selector that needs an optional field and does not receive it uses a documented default. A selector that keeps a current rung stores its bitrate, not its index. In each `select` call, the selector maps that bitrate to the highest rung at or below it in the ladder of the call. When no rung is at or below it, the current rung is rung 0. This rule keeps the current rung defined when the player removes a rung from the ladder. There is no stall notification. A selector that reacts to stalls derives them from `bufferLevel` in `select` and `sample`.
 
 The decision is one index, not a ranked list. When a rung fails, the player removes it from the ladder and calls `select` again. See Rationale and alternatives.
 
@@ -145,11 +145,19 @@ The decision is one index, not a ranked list. When a rung fails, the player remo
 | `bufferLevel` not finite or negative | Treated as 0. |
 | `playbackRate` not a positive finite number | Treated as 1. |
 
+The `ThroughputSelector` constructor validates its options before it stores them. Equal factors are accepted and disable the hysteresis.
+
+| Option | Behavior |
+|---|---|
+| `safetyFactor` not a finite number in `(0, 1]` | Throws a `RangeError` that names the option, the expected range, and the received value. |
+| `upgradeFactor` not a finite number in `(0, 1]` | Throws the same `RangeError`. |
+| `upgradeFactor` above `safetyFactor` | Throws a `RangeError` with both values. An upgrade must need at least the margin of a downgrade. |
+
 ### `ThroughputSelector`
 
 The selector picks the highest rung at or below the safe throughput. The safe throughput is `throughput * safetyFactor`. Two rules refine the pick:
 
-- **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the rung of the last `sample` that was not aborted.
+- **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bitrate of the last `sample` that was not aborted, mapped into the ladder of the call as the contract states.
 - **Starvation guard.** The guard runs when the player passes `segmentDuration` and `bufferLevel` is above 0. The selector estimates the download time of the pick as `bitrate * segmentDuration / safeThroughput`. If that time exceeds `bufferLevel / playbackRate`, the selector steps down one rung and checks again. Rung 0 always passes. A `bufferLevel` of 0 skips the guard. The player is then at startup or in a stall, and the throughput pick is the restart choice.
 
 When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. The delay is always 0.
@@ -234,7 +242,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 ## Revision history
 
 - v1 (2026-10-12): initial draft.
-
+- v2 (2026-10-12): review feedback. The constructor options have a validity contract, and the current rung maps into the ladder of each call.
 ## Final Decision
 
 Pending maintainer review.
