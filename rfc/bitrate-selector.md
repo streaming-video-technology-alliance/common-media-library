@@ -65,10 +65,11 @@ const second = selector.select({ ladder, bufferLevel: 4, throughput: estimator.g
 The player follows these rules:
 
 - `index` is a position in the `ladder` array of the same call. The player sorts the ladder by `bandwidth` in ascending order and removes the rungs it cannot play before the call.
+- Pass the declared peak bandwidth of each rung: `BANDWIDTH` in HLS and `@bandwidth` in DASH.
 - Call `select` once per request. A second call before the request replaces the first decision.
 - If the chosen rung is unavailable, remove it from the ladder and call `select` again.
 - `delay` is the time in seconds to wait before the next request. The throughput selector always returns 0. A player that cannot wait may ignore the value.
-- Call `sample` for every finished download, and for every abandoned download with `aborted: true`.
+- Call `sample` for every finished download, and for every abandoned download with `aborted: true`. The `bandwidth` of the sample is the same number as the ladder entry of the requested rung, never a measured rate.
 - Call `reset` after a seek or a source change.
 
 ## Reference-level explanation
@@ -141,6 +142,8 @@ The decision is one index, not a ranked list. When a rung fails, the player remo
 |---|---|
 | `ladder` empty | Throws a `RangeError` that names the parameter. |
 | `ladder` not in ascending order of `bandwidth` | Throws a `RangeError` with both positions and values. The index refers to the player array, so the selector cannot sort it. |
+| An entry whose `bandwidth` is not a positive finite number | Throws a `RangeError` with the position and the value. |
+| Equal neighbouring `bandwidth` values | Accepted. The highest index wins. |
 | `throughput` not a positive finite number | Treated as unknown. |
 | `bufferLevel` not finite or negative | Treated as 0. |
 | `playbackRate` not a positive finite number | Treated as 1. |
@@ -258,7 +261,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v5 (2026-10-12): the option bounds are written in words, and the upgrade factor rule states its reason.
 - v6 (2026-10-13): the default selector is a factory function, `createThroughputSelector`, not a class.
 - v7 (2026-10-13): the ladder is an array of `LadderRung` objects with `bandwidth`, and the sample names its rung by `bandwidth`.
-- v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules. The starvation guard has two passes and a tolerance option.
+- v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules. The starvation guard has two passes and a tolerance option. The ladder rows cover entry values and equal neighbours, and the guide names the bandwidth to pass.
 
 ## Final Decision
 
