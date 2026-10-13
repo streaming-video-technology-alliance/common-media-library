@@ -12,10 +12,11 @@ export type SegmentSample = {
 	timing: ResourceTiming;
 
 	/**
-	 * The bitrate of the requested rung, in bits per second.
+	 * The bandwidth of the requested rung, in bits per second.
+	 * The value is the same number as the ladder entry of the rung, never a measured rate.
 	 * The value is authoritative. A selector that keeps a current rung corrects it from this value.
 	 */
-	bitrate: number;
+	bandwidth: number;
 
 	/**
 	 * The media duration of the segment, in seconds.

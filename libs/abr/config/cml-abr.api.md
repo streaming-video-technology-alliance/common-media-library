@@ -21,7 +21,7 @@ export type BitrateSelector = {
 
 // @beta
 export type BitrateSelectorInput = {
-    ladder: readonly number[];
+    ladder: readonly LadderRung[];
     bufferLevel: number;
     throughput: number;
     now: number;
@@ -31,15 +31,26 @@ export type BitrateSelectorInput = {
 };
 
 // @beta
+export function createThroughputSelector(options?: ThroughputSelectorOptions): BitrateSelector;
+
+// @beta
 export const DEFAULT_SAFETY_FACTOR = .9;
+
+// @beta
+export const DEFAULT_STARVATION_TOLERANCE = 4;
 
 // @beta
 export const DEFAULT_UPGRADE_FACTOR = .7;
 
 // @beta
+export type LadderRung = {
+    bandwidth: number;
+};
+
+// @beta
 export type SegmentSample = {
     timing: ResourceTiming;
-    bitrate: number;
+    bandwidth: number;
     duration: number;
     bufferLevel: number;
     isReplacement?: boolean;
@@ -47,17 +58,10 @@ export type SegmentSample = {
 };
 
 // @beta
-export class ThroughputSelector implements BitrateSelector {
-    constructor(options?: ThroughputSelectorOptions);
-    reset(): void;
-    sample(segment: SegmentSample): void;
-    select(input: BitrateSelectorInput): BitrateDecision;
-}
-
-// @beta
 export type ThroughputSelectorOptions = {
     safetyFactor?: number;
     upgradeFactor?: number;
+    starvationTolerance?: number;
 };
 
 // (No @packageDocumentation comment for this package)

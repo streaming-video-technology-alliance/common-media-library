@@ -1,3 +1,5 @@
+import type { LadderRung } from './LadderRung.ts'
+
 /**
  * The input of one `select` call.
  *
@@ -5,11 +7,12 @@
  */
 export type BitrateSelectorInput = {
 	/**
-	 * The bitrate of each rung the player can play, in bits per second, in ascending order.
+	 * The rungs the player can play, in ascending order of `bandwidth`.
 	 * The player removes the rungs it cannot play before the call.
+	 * Equal neighbouring bandwidths are accepted, and the highest position wins.
 	 * The `index` of the decision is a position in this array.
 	 */
-	ladder: readonly number[];
+	ladder: readonly LadderRung[];
 
 	/**
 	 * The seconds of media buffered ahead of the playhead.
@@ -30,11 +33,13 @@ export type BitrateSelectorInput = {
 
 	/**
 	 * The buffer level, in seconds, that the player aims for.
+	 * The player passes this field in every call or in none.
 	 */
 	bufferTarget?: number;
 
 	/**
 	 * The media duration, in seconds, of the next segment.
+	 * A player omits this field to skip the starvation guard, for example near the live edge.
 	 */
 	segmentDuration?: number;
 

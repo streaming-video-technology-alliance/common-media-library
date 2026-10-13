@@ -11,8 +11,8 @@ and this project adheres to
 ### Added
 
 - Initial implementation of the [bitrate selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/526)
-- `BitrateSelector`, the type that every bitrate selection algorithm implements, with its `BitrateSelectorInput`, `BitrateDecision`, and `SegmentSample` types
-- `ThroughputSelector`, a rate-based selector with a safety factor, an upgrade factor for the hysteresis, and a starvation guard
-- `DEFAULT_SAFETY_FACTOR` (0.9) and `DEFAULT_UPGRADE_FACTOR` (0.7)
+- `BitrateSelector`, the type that every bitrate selection algorithm implements, with its `BitrateSelectorInput`, `LadderRung`, `BitrateDecision`, and `SegmentSample` types
+- `createThroughputSelector`, which creates a rate-based selector with a safety factor, an upgrade factor for the hysteresis, and a two-pass starvation guard
+- `DEFAULT_SAFETY_FACTOR` (0.9), `DEFAULT_UPGRADE_FACTOR` (0.7), and `DEFAULT_STARVATION_TOLERANCE` (4)
 
 [Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/main...HEAD

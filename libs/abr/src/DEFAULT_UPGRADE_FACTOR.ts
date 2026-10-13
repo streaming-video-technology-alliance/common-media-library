@@ -1,6 +1,6 @@
 /**
- * The default `upgradeFactor` of `ThroughputSelector`.
- * An upgrade needs a rung at or below 0.7 times the throughput estimate.
+ * The default `upgradeFactor` of the throughput selector.
+ * An upgrade needs a rung at or below 0.7 times the effective throughput.
  *
  * @beta
  */
