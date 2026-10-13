@@ -255,6 +255,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v5 (2026-10-12): the option bounds are written in words, and the upgrade factor rule states its reason.
 - v6 (2026-10-13): the default selector is a factory function, `createThroughputSelector`, not a class.
 - v7 (2026-10-13): the ladder is an array of `LadderRung` objects with `bandwidth`, and the sample names its rung by `bandwidth`.
+- v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules.
 
 ## Final Decision
 
