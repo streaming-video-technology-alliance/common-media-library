@@ -25,13 +25,13 @@ status: draft
 ---
 ```
 
-When implemented, link the shipped version and the plan that executed it:
+When implemented, link the shipped version and the pull request that executed it:
 
 ```markdown
 ---
 status: implemented
 implemented-in: <package>@<version>
-implementation-plan: plans/<feature-name>/
+implementation-pr: <pull request URL>
 ---
 ```
 
