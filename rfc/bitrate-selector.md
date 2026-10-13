@@ -13,14 +13,14 @@ status: draft
 
 ## Summary
 
-This RFC proposes a new package, `@svta/cml-abr`, for bitrate selection. The package defines one type, `BitrateSelector`, that every selection algorithm implements. It ships one default implementation, `ThroughputSelector`. That selector picks the highest rung that the throughput estimate sustains. A selector takes a bitrate ladder, the buffer level, and a throughput estimate. It returns one index into the ladder.
+This RFC proposes a new package, `@svta/cml-abr`, for bitrate selection. The package defines one type, `BitrateSelector`, that every selection algorithm implements. It ships one default implementation, created by `createThroughputSelector`. That selector picks the highest rung that the throughput estimate sustains. A selector takes a bitrate ladder, the buffer level, and a throughput estimate. It returns one index into the ladder.
 
 The type follows the `ThroughputEstimator` pattern of `@svta/cml-throughput`. A player feeds every finished download into a selector with `sample` and asks for the next rung with `select`. The [BOLA RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/505) proposes the second implementation.
 
 ```ts
-import { ThroughputSelector } from '@svta/cml-abr'
+import { createThroughputSelector } from '@svta/cml-abr'
 
-const selector = new ThroughputSelector()
+const selector = createThroughputSelector()
 const ladder = [300_000, 750_000, 1_500_000, 3_000_000, 6_000_000]
 
 const { index } = selector.select({ ladder, bufferLevel: 4, throughput: 3_000_000, now: 0 })
@@ -43,12 +43,12 @@ Without a common type, each selector defines its own inputs, and a player must w
 A player creates one estimator and one selector for each media type. Before every segment request, the player calls `select`. After every finished download, the player calls `sample` on the estimator and on the selector with the same timing object.
 
 ```ts
-import { ThroughputSelector } from '@svta/cml-abr'
+import { createThroughputSelector } from '@svta/cml-abr'
 import { EwmaEstimator } from '@svta/cml-throughput'
 
 const ladder = [300_000, 750_000, 1_500_000, 3_000_000, 6_000_000]
 const estimator = new EwmaEstimator({ fastHalfLife: 3, slowHalfLife: 9, defaultEstimate: 1_000_000 })
-const selector = new ThroughputSelector()
+const selector = createThroughputSelector()
 
 // First request. The estimate is the 1 Mbps default, so the selector picks rung 1 (750 kbps).
 const first = selector.select({ ladder, bufferLevel: 0, throughput: estimator.getEstimate(), now: 0 })
@@ -67,7 +67,7 @@ The player follows these rules:
 - `index` is a position in the `ladder` array of the same call. The player sorts the ladder in ascending order and removes the rungs it cannot play before the call.
 - Call `select` once per request. A second call before the request replaces the first decision.
 - If the chosen rung is unavailable, remove it from the ladder and call `select` again.
-- `delay` is the time in seconds to wait before the next request. `ThroughputSelector` always returns 0. A player that cannot wait may ignore the value.
+- `delay` is the time in seconds to wait before the next request. The throughput selector always returns 0. A player that cannot wait may ignore the value.
 - Call `sample` for every finished download, and for every abandoned download with `aborted: true`.
 - Call `reset` after a seek or a source change.
 
@@ -113,12 +113,7 @@ export type ThroughputSelectorOptions = {
 	upgradeFactor?: number         // @defaultValue DEFAULT_UPGRADE_FACTOR
 }
 
-export class ThroughputSelector implements BitrateSelector {
-	public constructor(options?: ThroughputSelectorOptions)
-	public select(input: BitrateSelectorInput): BitrateDecision
-	public sample(segment: SegmentSample): void
-	public reset(): void
-}
+export function createThroughputSelector(options?: ThroughputSelectorOptions): BitrateSelector
 ```
 
 The package also exports `DEFAULT_SAFETY_FACTOR` (0.9) and `DEFAULT_UPGRADE_FACTOR` (0.7). The only peer dependency is `@svta/cml-utils`, imported with `import type` for `ResourceTiming`. The package does not import `@svta/cml-throughput`.
@@ -145,7 +140,7 @@ The decision is one index, not a ranked list. When a rung fails, the player remo
 | `bufferLevel` not finite or negative | Treated as 0. |
 | `playbackRate` not a positive finite number | Treated as 1. |
 
-The `ThroughputSelector` constructor validates its options before it stores them. Equal factors are accepted and disable the hysteresis.
+`createThroughputSelector` validates its options before it stores them. Equal factors are accepted and disable the hysteresis.
 
 | Option | Behavior |
 |---|---|
@@ -153,7 +148,7 @@ The `ThroughputSelector` constructor validates its options before it stores them
 | `upgradeFactor` not a finite number above 0 and at most 1 | Throws the same `RangeError`. |
 | `upgradeFactor` above `safetyFactor` | Throws a `RangeError` with both values. An upgrade must need at least the margin of a downgrade. With a larger upgrade factor, an upgrade could pass the safe pick, and the next call would undo it. |
 
-### `ThroughputSelector`
+### Throughput selector
 
 The selector divides the throughput by `playbackRate` to get the effective throughput. It picks the highest rung at or below the safe throughput, which is `effectiveThroughput * safetyFactor`. When no rung is at or below the safe throughput, the pick is rung 0. The same fallback applies to the upgrade pick below. Two rules refine the pick:
 
@@ -218,7 +213,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - **Plain names with units in TSDoc** over unit suffixes. The other packages name `duration`, `timeout`, `interval`, and `ttl` without a suffix. The only suffixes in the public API are `Bytes` and one `Bps`.
 - **A `ResourceTiming` in the sample** over separate timing fields. The player already builds the object for the estimator. A selector that needs the request start and end reads `startTime` and `duration`.
 - **One writer `update(event)`** with a discriminated union was considered. It extends without a type change. It costs a discriminant on every event and loses the `sample` parallel. It remains an option if seek or playback rate events appear.
-- **A class** over a factory function. The estimators are classes, and the selectors are the same kind of object.
+- **A factory function** over a class. `createThroughputSelector` returns the type and nothing else. The API report shows no private members, and no adopter can subclass a selector and depend on its internals. The factory is also smaller than a class with the same logic by 104 B minified. After gzip the difference is 27 B. The throughput estimators are classes, and the newer `createCmcdSession` and `createSteeringEngine` are factories. The selectors follow the newer pattern.
 
 ## Prior art
 
@@ -231,17 +226,17 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 ## Unresolved questions
 
 1. **Upgrade factor.** hls.js uses 0.7 and shaka-player 0.85. Which default do the maintainers prefer?
-2. **Starvation guard placement.** Should the guard live in `ThroughputSelector`, or in a wrapper that any selector can use? dash.js keeps it in a separate rule.
+2. **Starvation guard placement.** Should the guard live in the throughput selector, or in a wrapper that any selector can use? dash.js keeps it in a separate rule.
 3. **Startup floor.** hls.js allows up to 4 s of download time when the buffer is empty. The draft skips the guard instead. Should the floor be an option?
-4. **Minimum switch interval.** shaka-player blocks switches for 8 s after a switch. Should `ThroughputSelector` offer that option?
+4. **Minimum switch interval.** shaka-player blocks switches for 8 s after a switch. Should the throughput selector offer that option?
 5. **`bufferTarget` placement.** The draft puts it in the input, so a player can change it during playback. Should it be a constructor option instead?
 6. **Release tag.** `@beta` until the second selector ships, or `@public` from the first release?
 7. **Package name.** `@svta/cml-abr` names the family. Do the maintainers prefer another name?
 
 ## Future possibilities
 
-- `BolaSelector`, from the BOLA RFC, as the second implementation.
-- A `HybridSelector` that runs one child below a buffer level and another above it, as dash.js does.
+- The BOLA selector from the BOLA RFC, as the second implementation.
+- A hybrid selector that runs one child below a buffer level and another above it, as dash.js does.
 - Optional inputs for low-latency selectors: `latency` and `targetLatency`.
 - Optional per-rung segment sizes for selectors that plan over a horizon.
 - A real-buffer guard that any selector can wrap.
@@ -253,6 +248,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v3 (2026-10-12): review feedback. The pick divides the throughput by the playback rate, and rung 0 is the pick when no rung fits.
 - v4 (2026-10-12): the bitrate in `sample` is authoritative when a composer or the player loads a rung other than the decision.
 - v5 (2026-10-12): the option bounds are written in words, and the upgrade factor rule states its reason.
+- v6 (2026-10-13): the default selector is a factory function, `createThroughputSelector`, not a class.
 
 ## Final Decision
 
