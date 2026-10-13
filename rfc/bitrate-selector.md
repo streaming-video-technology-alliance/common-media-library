@@ -131,7 +131,7 @@ The package also exports `DEFAULT_SAFETY_FACTOR` (0.9) and `DEFAULT_UPGRADE_FACT
 | `sample` | Records a finished or abandoned download. The player passes the `ResourceTiming` object it gave the estimator. A selector that needs the current rung reads `bitrate`. |
 | `reset` | Returns the selector to its initial state. The player calls it after a seek or a source change. |
 
-A selector reads the fields it needs and ignores the rest. A selector that needs an optional field and does not receive it uses a documented default. A selector that keeps a current rung stores its bitrate, not its index. In each `select` call, the selector maps that bitrate to the highest rung at or below it in the ladder of the call. When no rung is at or below it, the current rung is rung 0. This rule keeps the current rung defined when the player removes a rung from the ladder. There is no stall notification. A selector that reacts to stalls derives them from `bufferLevel` in `select` and `sample`.
+A selector reads the fields it needs and ignores the rest. A selector that needs an optional field and does not receive it uses a documented default. A selector that keeps a current rung stores its bitrate, not its index. In each `select` call, the selector maps that bitrate to the highest rung at or below it in the ladder of the call. When no rung is at or below it, the current rung is rung 0. This rule keeps the current rung defined when the player removes a rung from the ladder. A hybrid, a wrapper, or the player may load a rung other than the decision. The bitrate in `sample` is then authoritative. A selector corrects its current rung and its derived state from that bitrate. There is no stall notification. A selector that reacts to stalls derives them from `bufferLevel` in `select` and `sample`.
 
 The decision is one index, not a ranked list. When a rung fails, the player removes it from the ladder and calls `select` again. See Rationale and alternatives.
 
@@ -251,6 +251,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v1 (2026-10-12): initial draft.
 - v2 (2026-10-12): review feedback. The constructor options have a validity contract, and the current rung maps into the ladder of each call.
 - v3 (2026-10-12): review feedback. The pick divides the throughput by the playback rate, and rung 0 is the pick when no rung fits.
+- v4 (2026-10-12): the bitrate in `sample` is authoritative when a composer or the player loads a rung other than the decision.
 
 ## Final Decision
 
