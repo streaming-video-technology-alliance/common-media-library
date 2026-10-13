@@ -40,7 +40,7 @@ Without a common type, each selector defines its own inputs, and a player must w
 
 ## Guide-level explanation
 
-A player creates one estimator and one selector for each media type. Before every segment request, the player calls `select`. After every finished download, the player calls `sample` on the estimator and on the selector with the same timing object.
+A player creates one estimator and one selector for each media type. A player with one shared estimator passes the same estimate to both selectors. Before every segment request, the player calls `select`. After every finished download, the player calls `sample` on the estimator and on the selector with the same timing object.
 
 ```ts
 import { createThroughputSelector } from '@svta/cml-abr'
@@ -69,7 +69,7 @@ The player follows these rules:
 - Call `select` once per request. A second call before the request replaces the first decision.
 - If the chosen rung is unavailable, remove it from the ladder and call `select` again.
 - `delay` is the time in seconds to wait before the next request. The throughput selector always returns 0. A player that cannot wait may ignore the value.
-- Call `sample` for every finished download, and for every abandoned download with `aborted: true`. The `bandwidth` of the sample is the same number as the ladder entry of the requested rung, never a measured rate.
+- Call `sample` for every finished download, and for every abandoned download with `aborted: true`. The `bandwidth` of the sample is the same number as the ladder entry of the requested rung, never a measured rate. Whether an aborted download produces an estimator sample is the contract of `ThroughputEstimator`, not of the selector.
 - Call `reset` after a seek or a source change.
 
 ## Reference-level explanation
@@ -199,6 +199,8 @@ The defaults follow the players:
 | Starvation tolerance | 4 s | 4 s (`maxStarvationDelay`) | none | none |
 | Minimum switch interval | none | none | 8 s (`switchInterval`) | none |
 
+The shaka-player targets are band edges around each rung and do not depend on the current rung. Its hysteresis is the switch interval.
+
 ### Bundle and performance impact
 
 Each file contains one export, so a player that imports only the type adds no runtime code. `select` scans the ladder in O(N) and allocates only the returned decision. `sample` stores one number. The implementation PR will report the minified size.
@@ -236,7 +238,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 
 ## Unresolved questions
 
-1. **Upgrade factor.** hls.js uses 0.7 and shaka-player 0.85. Which default do the maintainers prefer?
+1. **Upgrade factor.** hls.js uses 0.7 for the same rule, and it is the only like-for-like reference. The shaka-player 0.85 is a band edge, not a hysteresis factor. Does 0.7 stand?
 2. **Starvation guard placement.** Should the guard live in the throughput selector, or in a wrapper that any selector can use? dash.js keeps it in a separate rule.
 3. **Startup floor.** Resolved in v8. The second pass of the guard adds `min(segmentDuration, starvationTolerance)` to the budget. The tolerance is an option with a default of 4 s.
 4. **Minimum switch interval.** shaka-player blocks switches for 8 s after a switch. Should the throughput selector offer that option?
@@ -261,7 +263,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v5 (2026-10-12): the option bounds are written in words, and the upgrade factor rule states its reason.
 - v6 (2026-10-13): the default selector is a factory function, `createThroughputSelector`, not a class.
 - v7 (2026-10-13): the ladder is an array of `LadderRung` objects with `bandwidth`, and the sample names its rung by `bandwidth`.
-- v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules. The starvation guard has two passes and a tolerance option. The ladder rows cover entry values and equal neighbours, and the guide names the bandwidth to pass.
+- v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules. The starvation guard has two passes and a tolerance option. The ladder rows cover entry values and equal neighbours, and the guide names the bandwidth to pass. The prior-art notes separate the shaka-player bands from the hysteresis.
 
 ## Final Decision
 
