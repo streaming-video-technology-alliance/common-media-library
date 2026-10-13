@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-10-12
+
 ### Changed
 
 - README: the usage example imports from `@svta/cml-throughput` instead of an unexported subpath, and prints its result instead of calling an undefined `assert`.
@@ -22,7 +24,6 @@ and this project adheres to
 - `Ewma.getEstimate` now returns 0 for an empty `Ewma`. Before, the method returned `NaN`. With an `alpha` of 0, the method now returns the last value.
 - `Ewma.sample` now ignores a sample that would make the estimate `NaN`. The estimate and the total duration do not change for that sample.
 - `EwmaEstimator.sample` now ignores a sample with a duration of 0 or less. Before, a zero duration made every later estimate infinite or `NaN`, and a negative duration gave a negative estimate.
-
 
 ## [1.0.9] - 2026-09-15
 
@@ -86,7 +87,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.9...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.10...HEAD
+[1.0.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.9...throughput-v1.0.10
 [1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.8...throughput-v1.0.9
 [1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.7...throughput-v1.0.8
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.6...throughput-v1.0.7
