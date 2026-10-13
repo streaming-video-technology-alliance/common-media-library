@@ -115,12 +115,13 @@ export type BitrateSelector = {
 export type ThroughputSelectorOptions = {
 	safetyFactor?: number          // @defaultValue DEFAULT_SAFETY_FACTOR
 	upgradeFactor?: number         // @defaultValue DEFAULT_UPGRADE_FACTOR
+	starvationTolerance?: number   // seconds, @defaultValue DEFAULT_STARVATION_TOLERANCE
 }
 
 export function createThroughputSelector(options?: ThroughputSelectorOptions): BitrateSelector
 ```
 
-The package also exports `DEFAULT_SAFETY_FACTOR` (0.9) and `DEFAULT_UPGRADE_FACTOR` (0.7). The only peer dependency is `@svta/cml-utils`, imported with `import type` for `ResourceTiming`. The package does not import `@svta/cml-throughput`.
+The package also exports `DEFAULT_SAFETY_FACTOR` (0.9), `DEFAULT_UPGRADE_FACTOR` (0.7), and `DEFAULT_STARVATION_TOLERANCE` (4 seconds). The only peer dependency is `@svta/cml-utils`, imported with `import type` for `ResourceTiming`. The package does not import `@svta/cml-throughput`.
 
 ### Contract of the type
 
@@ -151,13 +152,14 @@ The decision is one index, not a ranked list. When a rung fails, the player remo
 | `safetyFactor` not a finite number above 0 and at most 1 | Throws a `RangeError` that names the option, the expected range, and the received value. |
 | `upgradeFactor` not a finite number above 0 and at most 1 | Throws the same `RangeError`. |
 | `upgradeFactor` above `safetyFactor` | Throws a `RangeError` with both values. An upgrade must need at least the margin of a downgrade. With a larger upgrade factor, an upgrade could pass the safe pick, and the next call would undo it. |
+| `starvationTolerance` not a finite number of 0 or more | Throws the same `RangeError`. |
 
 ### Throughput selector
 
 The selector divides the throughput by `playbackRate` to get the effective throughput. It picks the highest rung at or below the safe throughput, which is `effectiveThroughput * safetyFactor`. When no rung is at or below the safe throughput, the pick is rung 0. The same fallback applies to the upgrade pick below. Two rules refine the pick:
 
 - **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `effectiveThroughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bandwidth of the last `sample` that was not aborted, mapped into the ladder of the call as the contract states.
-- **Starvation guard.** The guard runs when the player passes `segmentDuration` and `bufferLevel` is above 0. The selector estimates the download time of the pick as `bandwidth * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. If that time exceeds `bufferLevel / playbackRate`, the selector steps down one rung and checks again. Rung 0 always passes. A `bufferLevel` of 0 skips the guard. The player is then at startup or in a stall, and the throughput pick is the restart choice.
+- **Starvation guard.** The guard runs when the player passes `segmentDuration`. The selector estimates the download time of a rung as `bandwidth * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. The first pass keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. If no rung passes, the second pass adds `min(segmentDuration, starvationTolerance)` to that budget and keeps the highest rung within it. Rung 0 passes the second pass in every case. A live player omits `segmentDuration` to skip the guard, as hls.js skips the check near the live edge.
 
 When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. The delay is always 0.
 
@@ -178,11 +180,11 @@ The downgrade happens when the safe throughput falls below the current rung, at 
 
 With a current rung of 6 Mbps, a throughput of 6 Mbps, and 4 second segments, the guard gives these picks:
 
-| Buffer level | 8 s | 3 s | 1.5 s | 0.5 s | 0 s |
+| Buffer level | 8 s | 1.5 s | 0.5 s | 0.1 s | 0 s |
 |---|---|---|---|---|---|
-| Rung | 3 Mbps | 3 Mbps | 1.5 Mbps | 300 kbps | 3 Mbps |
+| Rung | 3 Mbps | 1.5 Mbps | 300 kbps | 3 Mbps | 3 Mbps |
 
-The safe throughput of 5.4 Mbps does not sustain the 6 Mbps rung, so the pick starts at 3 Mbps. That rung downloads in 2.2 s and fails the guard below that buffer level. At 0 s the guard is skipped.
+The safe throughput of 5.4 Mbps does not sustain the 6 Mbps rung, so the pick starts at 3 Mbps. That rung downloads in 2.2 s and fails the first pass below that buffer level. Below 0.2 s no rung passes the first pass, and the second pass allows 4 s more. The step from 300 kbps to 3 Mbps is the policy of the two passes: avoid a stall when any rung can, otherwise take the best rung within the tolerance.
 
 The defaults follow the players:
 
@@ -190,7 +192,8 @@ The defaults follow the players:
 |---|---|---|---|---|
 | Safety factor | 0.9 | 0.95 (`abrBandWidthFactor`) | 0.95 (`bandwidthDowngradeTarget`) | 0.9 (`bandwidthSafetyFactor`) |
 | Upgrade factor | 0.7 | 0.7 (`abrBandWidthUpFactor`) | 0.85 (`bandwidthUpgradeTarget`) | none |
-| Starvation guard | yes | yes, with a 4 s floor | no | separate rule |
+| Starvation guard | two passes | two passes | no | separate rule |
+| Starvation tolerance | 4 s | 4 s (`maxStarvationDelay`) | none | none |
 | Minimum switch interval | none | none | 8 s (`switchInterval`) | none |
 
 ### Bundle and performance impact
@@ -232,7 +235,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 
 1. **Upgrade factor.** hls.js uses 0.7 and shaka-player 0.85. Which default do the maintainers prefer?
 2. **Starvation guard placement.** Should the guard live in the throughput selector, or in a wrapper that any selector can use? dash.js keeps it in a separate rule.
-3. **Startup floor.** hls.js allows up to 4 s of download time when the buffer is empty. The draft skips the guard instead. Should the floor be an option?
+3. **Startup floor.** Resolved in v8: the second pass of the guard adds `min(segmentDuration, starvationTolerance)` to the budget, and the tolerance is an option with a default of 4 s.
 4. **Minimum switch interval.** shaka-player blocks switches for 8 s after a switch. Should the throughput selector offer that option?
 5. **`bufferTarget` placement.** The draft puts it in the input, so a player can change it during playback. Should it be a constructor option instead?
 6. **Release tag.** `@beta` until the second selector ships, or `@public` from the first release?
@@ -255,7 +258,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v5 (2026-10-12): the option bounds are written in words, and the upgrade factor rule states its reason.
 - v6 (2026-10-13): the default selector is a factory function, `createThroughputSelector`, not a class.
 - v7 (2026-10-13): the ladder is an array of `LadderRung` objects with `bandwidth`, and the sample names its rung by `bandwidth`.
-- v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules.
+- v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules. The starvation guard has two passes and a tolerance option.
 
 ## Final Decision
 
