@@ -149,9 +149,9 @@ The `ThroughputSelector` constructor validates its options before it stores them
 
 | Option | Behavior |
 |---|---|
-| `safetyFactor` not a finite number in `(0, 1]` | Throws a `RangeError` that names the option, the expected range, and the received value. |
-| `upgradeFactor` not a finite number in `(0, 1]` | Throws the same `RangeError`. |
-| `upgradeFactor` above `safetyFactor` | Throws a `RangeError` with both values. An upgrade must need at least the margin of a downgrade. |
+| `safetyFactor` not a finite number above 0 and at most 1 | Throws a `RangeError` that names the option, the expected range, and the received value. |
+| `upgradeFactor` not a finite number above 0 and at most 1 | Throws the same `RangeError`. |
+| `upgradeFactor` above `safetyFactor` | Throws a `RangeError` with both values. An upgrade must need at least the margin of a downgrade. With a larger upgrade factor, an upgrade could pass the safe pick, and the next call would undo it. |
 
 ### `ThroughputSelector`
 
@@ -252,6 +252,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v2 (2026-10-12): review feedback. The constructor options have a validity contract, and the current rung maps into the ladder of each call.
 - v3 (2026-10-12): review feedback. The pick divides the throughput by the playback rate, and rung 0 is the pick when no rung fits.
 - v4 (2026-10-12): the bitrate in `sample` is authoritative when a composer or the player loads a rung other than the decision.
+- v5 (2026-10-12): the option bounds are written in words, and the upgrade factor rule states its reason.
 
 ## Final Decision
 
