@@ -184,7 +184,7 @@ With a current rung of 6 Mbps, a throughput of 6 Mbps, and 4 second segments, th
 |---|---|---|---|---|---|
 | Rung | 3 Mbps | 1.5 Mbps | 300 kbps | 3 Mbps | 3 Mbps |
 
-The safe throughput of 5.4 Mbps does not sustain the 6 Mbps rung, so the pick starts at 3 Mbps. That rung downloads in 2.2 s and fails the first pass below that buffer level. Below 0.2 s no rung passes the first pass, and the second pass allows 4 s more. The step from 300 kbps to 3 Mbps is the policy of the two passes: avoid a stall when any rung can, otherwise take the best rung within the tolerance.
+The safe throughput of 5.4 Mbps does not sustain the 6 Mbps rung, so the pick starts at 3 Mbps. That rung downloads in 2.2 s and fails the first pass below that buffer level. Below 0.2 s no rung passes the first pass, and the second pass allows 4 s more. The step from 300 kbps to 3 Mbps is the policy of the two passes. The first pass avoids a stall when any rung can. The second pass takes the best rung within the tolerance.
 
 The defaults follow the players:
 
@@ -235,7 +235,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 
 1. **Upgrade factor.** hls.js uses 0.7 and shaka-player 0.85. Which default do the maintainers prefer?
 2. **Starvation guard placement.** Should the guard live in the throughput selector, or in a wrapper that any selector can use? dash.js keeps it in a separate rule.
-3. **Startup floor.** Resolved in v8: the second pass of the guard adds `min(segmentDuration, starvationTolerance)` to the budget, and the tolerance is an option with a default of 4 s.
+3. **Startup floor.** Resolved in v8. The second pass of the guard adds `min(segmentDuration, starvationTolerance)` to the budget. The tolerance is an option with a default of 4 s.
 4. **Minimum switch interval.** shaka-player blocks switches for 8 s after a switch. Should the throughput selector offer that option?
 5. **`bufferTarget` placement.** The draft puts it in the input, so a player can change it during playback. Should it be a constructor option instead?
 6. **Release tag.** `@beta` until the second selector ships, or `@public` from the first release?
