@@ -21,7 +21,7 @@ The type follows the `ThroughputEstimator` pattern of `@svta/cml-throughput`. A 
 import { createThroughputSelector } from '@svta/cml-abr'
 
 const selector = createThroughputSelector()
-const ladder = [300_000, 750_000, 1_500_000, 3_000_000, 6_000_000]
+const ladder = [{ bandwidth: 300_000 }, { bandwidth: 750_000 }, { bandwidth: 1_500_000 }, { bandwidth: 3_000_000 }, { bandwidth: 6_000_000 }]
 
 const { index } = selector.select({ ladder, bufferLevel: 4, throughput: 3_000_000, now: 0 })
 // index is 2. The highest rung at or below 0.9 * 3 Mbps is 1.5 Mbps.
@@ -46,7 +46,7 @@ A player creates one estimator and one selector for each media type. Before ever
 import { createThroughputSelector } from '@svta/cml-abr'
 import { EwmaEstimator } from '@svta/cml-throughput'
 
-const ladder = [300_000, 750_000, 1_500_000, 3_000_000, 6_000_000]
+const ladder = [{ bandwidth: 300_000 }, { bandwidth: 750_000 }, { bandwidth: 1_500_000 }, { bandwidth: 3_000_000 }, { bandwidth: 6_000_000 }]
 const estimator = new EwmaEstimator({ fastHalfLife: 3, slowHalfLife: 9, defaultEstimate: 1_000_000 })
 const selector = createThroughputSelector()
 
@@ -56,7 +56,7 @@ const first = selector.select({ ladder, bufferLevel: 0, throughput: estimator.ge
 // The player downloads a 4 second segment of rung 1 (375,000 bytes) in 500 ms, at 6 Mbps.
 const timing = { startTime: 0, encodedBodySize: 375_000, duration: 500 }
 estimator.sample(timing)
-selector.sample({ timing, bitrate: ladder[first.index], duration: 4, bufferLevel: 0 })
+selector.sample({ timing, bandwidth: ladder[first.index].bandwidth, duration: 4, bufferLevel: 0 })
 
 // Second request. The estimate is about 2.7 Mbps, so the selector picks rung 2 (1.5 Mbps).
 const second = selector.select({ ladder, bufferLevel: 4, throughput: estimator.getEstimate(), now: 500, segmentDuration: 4 })
@@ -64,7 +64,7 @@ const second = selector.select({ ladder, bufferLevel: 4, throughput: estimator.g
 
 The player follows these rules:
 
-- `index` is a position in the `ladder` array of the same call. The player sorts the ladder in ascending order and removes the rungs it cannot play before the call.
+- `index` is a position in the `ladder` array of the same call. The player sorts the ladder by `bandwidth` in ascending order and removes the rungs it cannot play before the call.
 - Call `select` once per request. A second call before the request replaces the first decision.
 - If the chosen rung is unavailable, remove it from the ladder and call `select` again.
 - `delay` is the time in seconds to wait before the next request. The throughput selector always returns 0. A player that cannot wait may ignore the value.
@@ -78,8 +78,12 @@ The player follows these rules:
 All types use `type`. Names have no unit suffix. The unit of every field is in its TSDoc, as in the other packages. Bitrates are in bits per second, buffer and segment values in seconds, and clocks in milliseconds.
 
 ```ts
+export type LadderRung = {
+	bandwidth: number              // bits per second, the declared peak rate of the rung
+}
+
 export type BitrateSelectorInput = {
-	ladder: readonly number[]      // ascending, bits per second, filtered by the player
+	ladder: readonly LadderRung[]  // ascending by bandwidth, filtered by the player
 	bufferLevel: number            // seconds of media ahead of the playhead
 	throughput: number             // bits per second, NaN when unknown
 	now: number                    // milliseconds, same clock as ResourceTiming.startTime
@@ -95,7 +99,7 @@ export type BitrateDecision = {
 
 export type SegmentSample = {
 	timing: ResourceTiming         // the object the estimator received
-	bitrate: number                // bits per second of the requested rung
+	bandwidth: number              // the bandwidth of the requested rung, equal to its ladder entry
 	duration: number               // seconds of media in the segment
 	bufferLevel: number            // seconds, at response end, before the segment is appended
 	isReplacement?: boolean        // the segment replaced buffered media
@@ -123,10 +127,10 @@ The package also exports `DEFAULT_SAFETY_FACTOR` (0.9) and `DEFAULT_UPGRADE_FACT
 | Member | Contract |
 |---|---|
 | `select` | Returns one index into `ladder` and a delay. The player calls it once per request. A second call before the request replaces the first decision. A selector may change its state in this call. |
-| `sample` | Records a finished or abandoned download. The player passes the `ResourceTiming` object it gave the estimator. A selector that needs the current rung reads `bitrate`. |
+| `sample` | Records a finished or abandoned download. The player passes the `ResourceTiming` object it gave the estimator. A selector that needs the current rung reads `bandwidth`. |
 | `reset` | Returns the selector to its initial state. The player calls it after a seek or a source change. |
 
-A selector reads the fields it needs and ignores the rest. A selector that needs an optional field and does not receive it uses a documented default. A selector that keeps a current rung stores its bitrate, not its index. In each `select` call, the selector maps that bitrate to the highest rung at or below it in the ladder of the call. When no rung is at or below it, the current rung is rung 0. This rule keeps the current rung defined when the player removes a rung from the ladder. A hybrid, a wrapper, or the player may load a rung other than the decision. The bitrate in `sample` is then authoritative. A selector corrects its current rung and its derived state from that bitrate. There is no stall notification. A selector that reacts to stalls derives them from `bufferLevel` in `select` and `sample`.
+A selector reads the fields it needs and ignores the rest. A selector that needs an optional field and does not receive it uses a documented default. A selector that keeps a current rung stores its bandwidth, not its index. In each `select` call, the selector maps that bandwidth to the highest rung at or below it in the ladder of the call. When no rung is at or below it, the current rung is rung 0. This rule keeps the current rung defined when the player removes a rung from the ladder. A hybrid, a wrapper, or the player may load a rung other than the decision. The bandwidth in `sample` is then authoritative. A selector corrects its current rung and its derived state from that bandwidth. There is no stall notification. A selector that reacts to stalls derives them from `bufferLevel` in `select` and `sample`.
 
 The decision is one index, not a ranked list. When a rung fails, the player removes it from the ladder and calls `select` again. See Rationale and alternatives.
 
@@ -135,7 +139,7 @@ The decision is one index, not a ranked list. When a rung fails, the player remo
 | Input | Behavior |
 |---|---|
 | `ladder` empty | Throws a `RangeError` that names the parameter. |
-| `ladder` not in ascending order | Throws a `RangeError` with both positions and values. The index refers to the player array, so the selector cannot sort it. |
+| `ladder` not in ascending order of `bandwidth` | Throws a `RangeError` with both positions and values. The index refers to the player array, so the selector cannot sort it. |
 | `throughput` not a positive finite number | Treated as unknown. |
 | `bufferLevel` not finite or negative | Treated as 0. |
 | `playbackRate` not a positive finite number | Treated as 1. |
@@ -152,8 +156,8 @@ The decision is one index, not a ranked list. When a rung fails, the player remo
 
 The selector divides the throughput by `playbackRate` to get the effective throughput. It picks the highest rung at or below the safe throughput, which is `effectiveThroughput * safetyFactor`. When no rung is at or below the safe throughput, the pick is rung 0. The same fallback applies to the upgrade pick below. Two rules refine the pick:
 
-- **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `effectiveThroughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bitrate of the last `sample` that was not aborted, mapped into the ladder of the call as the contract states.
-- **Starvation guard.** The guard runs when the player passes `segmentDuration` and `bufferLevel` is above 0. The selector estimates the download time of the pick as `bitrate * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. If that time exceeds `bufferLevel / playbackRate`, the selector steps down one rung and checks again. Rung 0 always passes. A `bufferLevel` of 0 skips the guard. The player is then at startup or in a stall, and the throughput pick is the restart choice.
+- **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `effectiveThroughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bandwidth of the last `sample` that was not aborted, mapped into the ladder of the call as the contract states.
+- **Starvation guard.** The guard runs when the player passes `segmentDuration` and `bufferLevel` is above 0. The selector estimates the download time of the pick as `bandwidth * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. If that time exceeds `bufferLevel / playbackRate`, the selector steps down one rung and checks again. Rung 0 always passes. A `bufferLevel` of 0 skips the guard. The player is then at startup or in a stall, and the throughput pick is the restart choice.
 
 When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. The delay is always 0.
 
@@ -211,6 +215,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - **One `sample` with an `aborted` flag** over separate abandon and stall methods. An abandoned download is a segment request the player cancelled, with known timing. A stall is visible in `bufferLevel`. The dash.js buffer-empty event is itself defined as a buffer level at or below a threshold.
 - **One index** over a ranked list. A list cannot encode the constraints a player applies when a rung fails. For a fallback, hls.js skips penalized levels, other codec sets, other audio groups, and GAP tags. A stateful selector cannot give a consistent second choice, because the delay and the hysteresis belong to the chosen rung. For both known algorithms, a second `select` with the rung removed gives the same answer as the next entry of a list. All three players filter first and then choose.
 - **Plain names with units in TSDoc** over unit suffixes. The other packages name `duration`, `timeout`, `interval`, and `ttl` without a suffix. The only suffixes in the public API are `Bytes` and one `Bps`.
+- **An object ladder** over an array of numbers. A change from numbers to objects later would break every caller, while a new optional field on `LadderRung` breaks nothing. Selectors read more than the peak rate. hls.js switches to the average bandwidth when the buffer holds two segments. The HLS `SCORE` attribute ranks rungs of equal bandwidth. Planning selectors need segment sizes. The field is `bandwidth` because HLS, DASH, shaka-player, and the cmaf-ham `Track` type all use that name. A dash.js or shaka-player array therefore passes without a mapping step. The sample names its rung by `bandwidth` and not by object reference, because a value survives a ladder rebuild.
 - **A `ResourceTiming` in the sample** over separate timing fields. The player already builds the object for the estimator. A selector that needs the request start and end reads `startTime` and `duration`.
 - **One writer `update(event)`** with a discriminated union was considered. It extends without a type change. It costs a discriminant on every event and loses the `sample` parallel. It remains an option if seek or playback rate events appear.
 - **A factory function** over a class. `createThroughputSelector` returns the type and nothing else. The API report shows no private members, and no adopter can subclass a selector and depend on its internals. The factory is also smaller than a class with the same logic by 104 B minified. After gzip the difference is 27 B. The throughput estimators are classes, and the newer `createCmcdSession` and `createSteeringEngine` are factories. The selectors follow the newer pattern.
@@ -238,7 +243,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - The BOLA selector from the BOLA RFC, as the second implementation.
 - A hybrid selector that runs one child below a buffer level and another above it, as dash.js does.
 - Optional inputs for low-latency selectors: `latency` and `targetLatency`.
-- Optional per-rung segment sizes for selectors that plan over a horizon.
+- Optional `LadderRung` fields: `averageBandwidth`, `score`, `qualityRanking`, and segment sizes for selectors that plan over a horizon.
 - A real-buffer guard that any selector can wrap.
 
 ## Revision history
@@ -249,6 +254,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v4 (2026-10-12): the bitrate in `sample` is authoritative when a composer or the player loads a rung other than the decision.
 - v5 (2026-10-12): the option bounds are written in words, and the upgrade factor rule states its reason.
 - v6 (2026-10-13): the default selector is a factory function, `createThroughputSelector`, not a class.
+- v7 (2026-10-13): the ladder is an array of `LadderRung` objects with `bandwidth`, and the sample names its rung by `bandwidth`.
 
 ## Final Decision
 
