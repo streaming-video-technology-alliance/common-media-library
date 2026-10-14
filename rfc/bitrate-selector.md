@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: Bitrate selector type and default selector (`@svta/cml-abr`)
@@ -266,7 +266,17 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v7 (2026-10-13): the ladder is an array of `LadderRung` objects with `bandwidth`, and the sample names its rung by `bandwidth`.
 - v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules. The starvation guard has two passes and a tolerance option. The ladder rows cover entry values and equal neighbours, and the guide names the bandwidth to pass. The prior-art notes separate the shaka-player bands from the hysteresis.
 - v9 (2026-10-13): the rationale explains the injected clock.
+- v10 (2026-10-14): status set to `accepted`.
 
 ## Final Decision
 
-Pending maintainer review.
+Accepted on 2026-10-14. The RFC PR #526 carries the export surface above as the contract. The implementation PR #529 follows the draft on the open questions:
+
+- an upgrade factor of 0.7
+- the starvation guard inside the throughput selector
+- no minimum switch interval
+- `bufferTarget` in the input
+- `@beta` on every export
+- the package name `@svta/cml-abr`
+
+The BOLA RFC #505 is the second implementation of the type.
