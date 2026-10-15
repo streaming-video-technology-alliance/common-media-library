@@ -13,7 +13,7 @@ describe('verifyClaimSignature', () => {
 	// #region example
 	it('returns false when signature bytes are tampered', async () => {
 		const result = await verifyClaimSignature(
-			new Uint8Array([0x84, 0x40, 0xa0, 0x40, 0x40]),
+			new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x40, 0x40]),
 			new Uint8Array([0x01]),
 			new Uint8Array([0x30, 0x00]),
 		)

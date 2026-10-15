@@ -15,7 +15,7 @@ Supported C2PA segment validation methods:
 npm i @svta/cml-c2pa
 ```
 
-> **Note:** `@svta/cml-iso-bmff`, `@svta/cml-utils`, and `cbor-x` are peer dependencies. Most package managers install them automatically, but you may need to add them explicitly.
+> **Note:** `@svta/cml-iso-bmff` and `@svta/cml-utils` are peer dependencies. Most package managers install them automatically, but you may need to add them explicitly.
 
 > **Note:** This library uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) (`crypto.subtle`) to verify COSE signatures and compute BMFF hashes. In Node.js 20+, `crypto.subtle` is available globally. In browsers, it requires a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) (HTTPS or `localhost`).
 
@@ -55,6 +55,10 @@ import { validateC2paInitSegment, validateC2paSegment } from '@svta/cml-c2pa'
 async function validateVsiSegment(initUrl: string, segmentUrl: string): Promise<void> {
   const initResponse = await fetch(initUrl)
   const init = await validateC2paInitSegment(new Uint8Array(await initResponse.arrayBuffer()))
+  if (!init.isValid) {
+    console.error(init.errorCodes)
+    return
+  }
 
   const segmentResponse = await fetch(segmentUrl)
   const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())

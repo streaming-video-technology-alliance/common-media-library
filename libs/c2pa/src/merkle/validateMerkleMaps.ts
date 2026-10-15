@@ -22,6 +22,7 @@ function extractMerkleMaps(bmffHashAssertionData: Record<string, unknown>): Merk
 	if (!Array.isArray(rawMerkle) || rawMerkle.length === 0) return null
 
 	const exclusions = parseExclusions(bmffHashAssertionData['exclusions'])
+	if (!exclusions) return null
 	const assertionAlg = bmffHashAssertionData['alg']
 	const offsetPrefixSize = bmffHashAssertionData['hash'] == null ? 8 : 0
 

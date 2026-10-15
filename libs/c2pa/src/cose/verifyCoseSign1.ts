@@ -1,7 +1,6 @@
 import type { CoseSign1 } from './CoseSign1.ts'
 import { buildSigStructure } from './buildSigStructure.ts'
 import {
-	CURVE_P256, 
 	CURVE_P384, 
 	CURVE_P521,
 	ECDSA_ALGORITHM, 
@@ -15,15 +14,15 @@ import {
 const DER_SEQUENCE_TAG = 0x30
 const DER_INTEGER_TAG = 0x02
 
-const CURVE_COMPONENT_BYTES: Record<string, number> = { [CURVE_P256]: 32, [CURVE_P384]: 48, [CURVE_P521]: 66 }
+const CURVE_COMPONENT_BYTES: Record<string, number> = { 'P-256': 32, 'P-384': 48, 'P-521': 66 }
 
 type EcKeyAlgorithm = KeyAlgorithm & { readonly namedCurve: string }
 type RsaHashedKeyAlgorithm = KeyAlgorithm & { readonly hash: { readonly name: string } }
 
 const RSA_PSS_SALT_LENGTH: Record<string, number> = {
-	[HASH_SHA256]: 32,
-	[HASH_SHA384]: 48,
-	[HASH_SHA512]: 64,
+	'SHA-256': 32,
+	'SHA-384': 48,
+	'SHA-512': 64,
 }
 
 function getComponentSize(publicKey: CryptoKey): number {

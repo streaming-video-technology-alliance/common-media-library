@@ -15,7 +15,7 @@ Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method needs n
 
 Two pieces of state pass from one call to the next:
 
-- `lastManifestId`: the manifest ID from the previous segment, used for the continuity check
+- `lastManifestId`: the manifest ID from the last segment that updated the state, used for the continuity check
 - `state`: a `ManifestBoxValidationState` object that tracks `lastStreamId` and `lastSequenceNumber`
 
 ## Validating Segments
@@ -28,7 +28,8 @@ let lastManifestId: string | null = null
 let state: ManifestBoxValidationState | undefined
 
 for (const segmentUrl of segmentUrls) {
-  const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+  const response = await fetch(segmentUrl)
+  const bytes = new Uint8Array(await response.arrayBuffer())
 
   const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
     bytes,
@@ -50,7 +51,7 @@ The function returns an object with:
 
 - `result`: a `ManifestBoxValidationResult` with the validation outcome
 - `nextManifestId`: the manifest ID to pass into the next call
-- `nextState`: the updated state to pass into the next call
+- `nextState`: the state to pass into the next call
 
 > [!NOTE]
 > For the first segment, pass `null` as `lastManifestId`, and `undefined` or nothing for `state`. When `lastManifestId` is `null`, the validator skips the chain comparison with the previous segment. It still checks that the segment declares a valid `continuityMethod` and a non-empty `previousManifestId`.
@@ -66,7 +67,8 @@ async function validateStream(segmentUrls: string[]) {
   let state: ManifestBoxValidationState | undefined
 
   for (const segmentUrl of segmentUrls) {
-    const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
 
     const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
       bytes,
@@ -96,8 +98,8 @@ async function validateStream(segmentUrls: string[]) {
       }
     }
 
-    // Access the full manifest when needed
-    if (result.manifest) {
+    // Access the full manifest when needed. Its assertions list is the raw store, so check isValid first.
+    if (result.isValid && result.manifest) {
       console.log('Claim generator:', result.manifest.claimGenerator)
       console.log('Assertions:', result.manifest.assertions.length)
     }
@@ -111,10 +113,10 @@ The `ManifestBoxValidationState` object contains the state between segments for 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `lastStreamId` | `string \| null` | Stream ID from the previous segment |
-| `lastSequenceNumber` | `number \| null` | Sequence number from the previous segment |
+| `lastStreamId` | `string \| null` | Stream ID from the last segment that updated the state |
+| `lastSequenceNumber` | `number \| null` | Sequence number from the last segment that updated the state |
 
-The function is pure. It does not mutate any external state. The caller must keep `nextManifestId` and `nextState` between calls.
+The function is pure. It does not mutate any external state. The caller must keep `nextManifestId` and `nextState` between calls. A segment with an integrity error, a malformed or mismatched content hash, or no live video assertion does not change `nextManifestId` or `nextState`. The same applies to a segment on another stream or with a sequence number that does not move forward. A segment that fails only the continuity check still updates both values. After a seek, an encoder restart, or a new stream ID, pass `null` as `lastManifestId` and `undefined` as `state` to start a new state. If your application rejects the signer of a segment, discard the `nextManifestId` and `nextState` of that call.
 
 When `state` is omitted or `undefined`, the function skips the checks for a consistent stream ID and for increasing sequence numbers.
 
@@ -164,15 +166,17 @@ The `ManifestBoxValidationResult` contains:
 | `manifest` | `C2paManifest \| null` | Parsed manifest, or `null` on parse failure |
 | `issuer` | `string \| null` | Certificate issuer from the signature |
 | `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate |
-| `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion |
-| `previousManifestId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
-| `streamId` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
-| `continuityMethod` | `string \| null` | From the `c2pa.livevideo.segment` assertion |
-| `bmffHashHex` | `string \| null` | Hex-encoded BMFF content hash |
+| `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the value is not an unsigned integer up to `Number.MAX_SAFE_INTEGER` or the claim does not verify the assertion |
+| `previousManifestId` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `streamId` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `continuityMethod` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `bmffHashHex` | `string \| null` | Hex-encoded hash from the `c2pa.hash.bmff.v3` assertion, or `null` if the claim does not verify it |
 | `isValid` | `boolean` | All checks passed |
 | `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes. Each segment contains a full manifest, and the manifest goes through integrity checks: assertion hashes and claim signature verification.
+> Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes. Each segment contains a full manifest. The library runs these integrity checks on it: assertion references and hashes, undeclared assertions, the hard binding count, duplicate manifest boxes, and claim signature verification. The segment fields above come only from assertions whose hash matches a claim reference. Check `isValid` before you use any field. A `ManifestBoxContinuityValidator` receives the parsed manifest, whose `assertions` list is the raw assertion store.
 >
 > A segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The claim signature is verified with the certificate inside the segment. The library does not check that certificate against a trust list. See [Signer Trust](results-and-error-codes.md#signer-trust).
+>
+> A `c2pa.hash.bmff.v3` assertion whose `hash` is not a byte string fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`. An assertion with an exclusion that does not conform to C2PA section 18.6 fails with the same code. Each `data` constraint of an exclusion needs an unsigned integer `offset` and a byte string `value`.

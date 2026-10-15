@@ -5,6 +5,7 @@
 		"noUnusedParameters": false,
 		"paths": {
 			"@svta/cml-608": ["./libs/608/src/index.ts"],
+			"@svta/cml-abr": ["./libs/abr/src/index.ts"],
 			"@svta/cml-cmaf-ham": ["./libs/cmaf-ham/src/index.ts"],
 			"@svta/cml-cmcd": ["./libs/cmcd/src/index.ts"],
 			"@svta/cml-cmsd": ["./libs/cmsd/src/index.ts"],

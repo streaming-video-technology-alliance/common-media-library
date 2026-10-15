@@ -23,7 +23,8 @@ A stream is in VOD Merkle mode only when `merkleMaps` is not empty. Otherwise it
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
-const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+const initResponse = await fetch(initUrl)
+const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
 
 if (init.isValid && init.merkleMaps.length > 0) {
@@ -44,7 +45,8 @@ import type { MerkleSegmentState } from '@svta/cml-c2pa'
 let state: MerkleSegmentState | undefined
 
 for (const segmentUrl of segmentUrls) {
-  const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+  const response = await fetch(segmentUrl)
+  const bytes = new Uint8Array(await response.arrayBuffer())
 
   const { result, nextState } = await validateC2paMerkleSegment(bytes, init.merkleMaps, state)
   state = nextState
@@ -69,7 +71,8 @@ import { validateC2paInitSegment, validateC2paMerkleSegment, LiveVideoStatusCode
 import type { MerkleSegmentState } from '@svta/cml-c2pa'
 
 async function validateStream(initUrl: string, segmentUrls: string[]) {
-  const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+  const initResponse = await fetch(initUrl)
+  const initBytes = new Uint8Array(await initResponse.arrayBuffer())
   const init = await validateC2paInitSegment(initBytes)
 
   if (!init.isValid) {
@@ -85,7 +88,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
   let state: MerkleSegmentState | undefined
 
   for (const segmentUrl of segmentUrls) {
-    const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
 
     const { result, nextState } = await validateC2paMerkleSegment(bytes, init.merkleMaps, state)
     state = nextState

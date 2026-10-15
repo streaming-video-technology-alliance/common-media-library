@@ -42,9 +42,11 @@ describe('validateSequenceNumber', () => {
 		let state = createSequenceState()
 		state = validateSequenceNumber(state, 5, 0).nextState
 
-		const { result } = validateSequenceNumber(state, 3, 0)
+		const { result, nextState } = validateSequenceNumber(state, 3, 0)
 		strictEqual(result.isValid, false)
 		strictEqual(result.reason, SequenceValidationReason.OUT_OF_ORDER)
+		// An out-of-order number does not move the floor backward.
+		strictEqual(nextState.lastSequenceNumber, 5)
 	})
 
 	it('detects gap and reports missing range', () => {

@@ -43,10 +43,15 @@ export type C2paSignatureInfo = {
 export const C2paStatusCode: {
     readonly ASSERTION_HASHEDURI_MISMATCH: "assertion.hashedURI.mismatch";
     readonly ASSERTION_MISSING: "assertion.missing";
+    readonly ASSERTION_MULTIPLE_HARD_BINDINGS: "assertion.multipleHardBindings";
+    readonly ASSERTION_UNDECLARED: "assertion.undeclared";
     readonly ASSERTION_ACTION_INGREDIENT_MISMATCH: "assertion.action.ingredientMismatch";
     readonly CLAIM_SIGNATURE_MISMATCH: "claimSignature.mismatch";
     readonly CLAIM_SIGNATURE_MISSING: "claimSignature.missing";
     readonly CLAIM_MISSING: "claim.missing";
+    readonly CLAIM_CBOR_INVALID: "claim.cbor.invalid";
+    readonly CLAIM_MALFORMED: "claim.malformed";
+    readonly CLAIM_MULTIPLE: "claim.multiple";
     readonly ASSERTION_BMFFHASH_MALFORMED: "assertion.bmffHash.malformed";
     readonly ASSERTION_BMFFHASH_MISMATCH: "assertion.bmffHash.mismatch";
 };

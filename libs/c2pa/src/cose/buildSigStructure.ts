@@ -84,3 +84,17 @@ export function buildSigStructure(
 
 	return result
 }
+
+/**
+ * Encodes bytes as a CBOR byte string (RFC 8949 §3.1, major type 2), without a tag.
+ *
+ * @param bytes - Bytes to encode
+ * @returns The byte string header, followed by `bytes`
+ *
+ * @internal
+ */
+export function encodeCborByteString(bytes: Uint8Array): Uint8Array {
+	const result = new Uint8Array(byteStringHeaderSize(bytes.length) + bytes.length)
+	result.set(bytes, writeByteStringHeader(result, 0, bytes.length))
+	return result
+}

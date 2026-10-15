@@ -1,11 +1,11 @@
 import { readElement, ASN1_TAG_SEQUENCE } from './asn1.ts'
 
 // OID 1.2.840.113549.1.1.10 (rsassaPss)
-const OID_RSASSA_PSS = new Uint8Array([0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0a])
+const OID_RSASSA_PSS = /* @__PURE__ */ new Uint8Array([0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0a])
 
 // AlgorithmIdentifier for rsaEncryption (OID 1.2.840.113549.1.1.1) with NULL params
 // SEQUENCE { OID rsaEncryption, NULL }
-const RSA_ENCRYPTION_ALGORITHM_ID = new Uint8Array([
+const RSA_ENCRYPTION_ALGORITHM_ID = /* @__PURE__ */ new Uint8Array([
 	0x30, 0x0d, // SEQUENCE, 13 bytes
 	0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, // OID rsaEncryption
 	0x05, 0x00, // NULL

@@ -5,7 +5,10 @@ import type { InternalManifestData } from '../../src/claim/InternalManifestData.
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
+import { encodeCbor } from '../cborTestUtils.ts'
+import { buildBox, buildJumb, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
+import { buildInitSegmentWithManifest } from '../vsi/vsiTestUtils.ts'
 
 function loadFixture(name: string): Uint8Array {
 	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
@@ -24,6 +27,7 @@ function internalData(overrides: Partial<InternalManifestData>): InternalManifes
 		},
 		claimAssertionRefs: [],
 		claimCborBytes: EMPTY_CLAIM_CBOR,
+		claimCode: null,
 		signatureBytes: null,
 		assertions: [],
 		...overrides,
@@ -78,7 +82,7 @@ describe('validateManifestIntegrity', () => {
 
 	it('reports CLAIM_SIGNATURE_MISMATCH when the signature carries no certificate', async () => {
 		// COSE_Sign1 with an empty protected header, so there is no x5chain to verify against
-		const signatureBytes = new Uint8Array([0x84, 0x40, 0xa0, 0x40, 0x40])
+		const signatureBytes = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x40, 0x40])
 
 		const { codes } = await validateManifestIntegrity(internalData({ signatureBytes }))
 
@@ -100,5 +104,79 @@ describe('validateManifestIntegrity', () => {
 		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, signatureBytes }))
 
 		ok(codes.includes(C2paStatusCode.CLAIM_MISSING))
+	})
+
+	it('reports ASSERTION_HASHEDURI_MISMATCH for a claim hash that is a CBOR array of integers', async () => {
+		const assertionBox = buildJumb('com.example.cbor', buildBox('cbor', Uint8Array.of(0xa0)))
+		// hashed-uri-map CDDL: hash is a byte string. This claim encodes the correct hash as an array.
+		const claim = encodeCbor({
+			instanceID: 'urn:uuid:test-manifest',
+			created_assertions: [{ url: 'self#jumbf=c2pa.assertions/com.example.cbor', hash: Array.from(await sha256(assertionBox.subarray(8))), alg: 'sha256' }],
+		})
+		const manifest = buildJumb('urn:uuid:test-manifest',
+			buildJumb('c2pa.claim', buildBox('cbor', claim)),
+			buildJumb('c2pa.assertions', assertionBox),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claim))),
+		)
+
+		const { codes } = await validateManifestIntegrity(readC2paManifest(buildInitSegmentWithManifest(manifest)))
+
+		deepStrictEqual(codes, [C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH])
+	})
+
+	it('reports the claim code of the manifest data', async () => {
+		const signatureBytes = await signer.sign(EMPTY_CLAIM_CBOR)
+
+		const { codes } = await validateManifestIntegrity(internalData({ claimCode: C2paStatusCode.CLAIM_MALFORMED, signatureBytes }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MALFORMED])
+	})
+})
+
+describe('validateManifestIntegrity: hard binding labels (§15.10.1.2, §6.4, §18.9.2)', () => {
+	const BMFF_V3 = 'c2pa.hash.bmff.v3'
+
+	function assertion(label: string) {
+		return { label, data: {}, rawBoxPayload: new Uint8Array(0) }
+	}
+
+	async function hasMultipleHardBindings(secondLabel: string): Promise<boolean> {
+		const { codes } = await validateManifestIntegrity(internalData({ assertions: [assertion(BMFF_V3), assertion(secondLabel)] }))
+		return codes.includes(C2paStatusCode.ASSERTION_MULTIPLE_HARD_BINDINGS)
+	}
+
+	// Each label is a standard hard binding, so two of them in one manifest are too many.
+	for (const label of ['c2pa.hash.data', 'c2pa.hash.boxes', 'c2pa.hash.collection.data', 'c2pa.hash.bmff.v2', `${BMFF_V3}__1`]) {
+		it(`counts ${label} next to ${BMFF_V3}`, async () => {
+			strictEqual(await hasMultipleHardBindings(label), true)
+		})
+	}
+
+	// A part binding, the multi-asset assertion, and the legacy label are not standard hard bindings (§18.9.2).
+	for (const label of ['c2pa.hash.data.part', 'c2pa.hash.data.part__2', 'c2pa.hash.multi-asset', 'c2pa.hash.bmff']) {
+		it(`does not count ${label} next to ${BMFF_V3}`, async () => {
+			strictEqual(await hasMultipleHardBindings(label), false)
+		})
+	}
+})
+
+describe('validateManifestIntegrity: claim box codes (§15.6.1)', () => {
+	let signatureBytes: Uint8Array
+
+	before(async () => {
+		signatureBytes = await (await createTestSigner()).sign(EMPTY_CLAIM_CBOR)
+	})
+
+	it('reports CLAIM_MULTIPLE once, without CLAIM_MISSING', async () => {
+		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, claimCode: C2paStatusCode.CLAIM_MULTIPLE, signatureBytes }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MULTIPLE])
+	})
+
+	it('reports only CLAIM_MISSING for a manifest without a claim box next to store assertions', async () => {
+		const assertions = [{ label: 'com.example.a', data: {}, rawBoxPayload: new Uint8Array(0) }]
+		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, signatureBytes, assertions }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MISSING])
 	})
 })

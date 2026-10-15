@@ -30,5 +30,5 @@ estimator.sample({
 });
 
 console.log(estimator.getEstimate());
-// 412
+// 285
 ```

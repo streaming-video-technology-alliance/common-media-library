@@ -1,0 +1,18 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- Initial implementation of the [bitrate selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/526)
+- `BitrateSelector`, the type that every bitrate selection algorithm implements, with its `BitrateSelectorInput`, `LadderRung`, `BitrateDecision`, and `SegmentSample` types
+- `createThroughputSelector`, which creates a rate-based selector with a safety factor, an upgrade factor for the hysteresis, and a two-pass starvation guard
+- `DEFAULT_SAFETY_FACTOR` (0.9), `DEFAULT_UPGRADE_FACTOR` (0.7), and `DEFAULT_STARVATION_TOLERANCE` (4)
+
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/main...HEAD

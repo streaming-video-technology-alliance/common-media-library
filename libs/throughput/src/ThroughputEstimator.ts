@@ -14,7 +14,7 @@ export type ThroughputEstimator = {
 	sample(sample: ResourceTiming): void;
 
 	/**
-	 * Returns the current estimate of the throughput (in bytes per second)
+	 * Returns the current estimate of the throughput (in bits per second)
 	 *
 	 * @returns The current estimate of the throughput
 	 */

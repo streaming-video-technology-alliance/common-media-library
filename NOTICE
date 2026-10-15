@@ -8,6 +8,7 @@ library (https://github.com/video-dev/hls.js/)
 
 - src/id3.ts
 - src/608.ts
+- libs/throughput/src/Ewma.ts
 
 ```
 Copyright (c) 2017 Dailymotion (http://www.dailymotion.com)

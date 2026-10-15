@@ -69,18 +69,18 @@ type CmcdReportWaiter = {
  * @public
  */
 export class CmcdReportRecorder {
-	#reports: CmcdRecordedReport[] = []
-	#detachers: (() => void)[] = []
-	#attached = false
-	#eventTargetUrls: readonly string[] = []
-	#waiters = new Map<ReturnType<typeof setTimeout>, CmcdReportWaiter>()
-	#onReport: ((report: CmcdRecordedReport) => void) | undefined
-	#waitTimeout = 15000
+	private reports: CmcdRecordedReport[] = []
+	private detachers: (() => void)[] = []
+	private attached = false
+	private eventTargetUrls: readonly string[] = []
+	private waiters = new Map<ReturnType<typeof setTimeout>, CmcdReportWaiter>()
+	private onReport: ((report: CmcdRecordedReport) => void) | undefined
+	private waitTimeout = 15000
 
-	readonly #deliver = (request: HttpRequest): Response | undefined => {
+	private readonly deliver = (request: HttpRequest): Response | undefined => {
 		const url = request.url
 		const method = (request.method ?? 'GET').toUpperCase()
-		const isEventTarget = method === 'POST' && this.#eventTargetUrls.some((t) => url.startsWith(t))
+		const isEventTarget = method === 'POST' && this.eventTargetUrls.some((t) => url.startsWith(t))
 
 		const reportingMode = detectReportingMode(url, request.headers, isEventTarget)
 		if (reportingMode === null) {
@@ -93,58 +93,58 @@ export class CmcdReportRecorder {
 			reportingMode,
 			timestamp: Date.now(),
 		}
-		this.#reports.push(captured)
-		if (this.#onReport) {
+		this.reports.push(captured)
+		if (this.onReport) {
 			try {
-				this.#onReport(captured)
+				this.onReport(captured)
 			} catch (err) {
 				console.error('CmcdReportRecorder onReport listener threw:', err)
 			}
 		}
-		this.#notifyWaiters()
+		this.notifyWaiters()
 
 		return isEventTarget ? new Response(null, { status: 204 }) : undefined
 	}
 
-	#getMatching(type: CmcdRecordedRequestType | undefined): CmcdRecordedReport[] {
+	private getMatching(type: CmcdRecordedRequestType | undefined): CmcdRecordedReport[] {
 		return type === undefined
-			? [...this.#reports]
-			: this.#reports.filter((r) => r.type === type)
+			? [...this.reports]
+			: this.reports.filter((r) => r.type === type)
 	}
 
-	#notifyWaiters(): void {
-		for (const [timer, waiter] of this.#waiters) {
-			const matching = this.#getMatching(waiter.type)
+	private notifyWaiters(): void {
+		for (const [timer, waiter] of this.waiters) {
+			const matching = this.getMatching(waiter.type)
 			if (matching.length >= waiter.count) {
 				clearTimeout(timer)
-				this.#waiters.delete(timer)
+				this.waiters.delete(timer)
 				waiter.resolve(matching)
 			}
 		}
 	}
 
-	#waitFor(
+	private waitFor(
 		type: CmcdRecordedRequestType | undefined,
 		options: CmcdReportRecorderWaitOptions,
 	): Promise<CmcdRecordedReport[]> {
 		const count = options.count ?? 1
-		const timeout = options.timeout ?? this.#waitTimeout
+		const timeout = options.timeout ?? this.waitTimeout
 
-		const matching = this.#getMatching(type)
+		const matching = this.getMatching(type)
 		if (matching.length >= count) {
 			return Promise.resolve(matching)
 		}
 
 		return new Promise<CmcdRecordedReport[]>((resolve, reject) => {
 			const timer = setTimeout(() => {
-				this.#waiters.delete(timer)
-				const current = this.#getMatching(type)
+				this.waiters.delete(timer)
+				const current = this.getMatching(type)
 				reject(new Error(
-					`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.#reports.length}.`,
+					`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.reports.length}.`,
 				))
 			}, timeout)
 
-			this.#waiters.set(timer, { type, count, resolve, reject })
+			this.waiters.set(timer, { type, count, resolve, reject })
 		})
 	}
 
@@ -158,17 +158,17 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	attach(options: CmcdReportRecorderOptions = {}): void {
-		if (this.#attached) {
+		if (this.attached) {
 			return
 		}
-		this.#attached = true
-		this.#eventTargetUrls = options.eventTargetUrls ?? []
-		this.#onReport = options.onReport
-		this.#waitTimeout = options.waitTimeout ?? 15000
+		this.attached = true
+		this.eventTargetUrls = options.eventTargetUrls ?? []
+		this.onReport = options.onReport
+		this.waitTimeout = options.waitTimeout ?? 15000
 
 		const transports = options.transports ?? [createXhrTransport(), createFetchTransport()]
 		for (const transport of transports) {
-			this.#detachers.push(transport.attach(this.#deliver))
+			this.detachers.push(transport.attach(this.deliver))
 		}
 	}
 
@@ -179,22 +179,22 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	detach(): void {
-		if (!this.#attached) {
+		if (!this.attached) {
 			return
 		}
-		for (const detacher of this.#detachers) {
+		for (const detacher of this.detachers) {
 			detacher()
 		}
-		this.#detachers = []
-		this.#attached = false
-		this.#eventTargetUrls = []
-		this.#onReport = undefined
+		this.detachers = []
+		this.attached = false
+		this.eventTargetUrls = []
+		this.onReport = undefined
 
-		for (const [timer, waiter] of this.#waiters) {
+		for (const [timer, waiter] of this.waiters) {
 			clearTimeout(timer)
 			waiter.reject(new Error('Recorder detached while waiting'))
 		}
-		this.#waiters.clear()
+		this.waiters.clear()
 	}
 
 	/**
@@ -203,7 +203,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	clear(): void {
-		this.#reports = []
+		this.reports = []
 	}
 
 	/**
@@ -212,7 +212,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	getReports(): CmcdRecordedReport[] {
-		return [...this.#reports]
+		return [...this.reports]
 	}
 
 	/**
@@ -224,7 +224,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForReports(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(undefined, options)
+		return this.waitFor(undefined, options)
 	}
 
 	/**
@@ -236,7 +236,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForManifest(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecordedRequestType.MANIFEST, options)
+		return this.waitFor(CmcdRecordedRequestType.MANIFEST, options)
 	}
 
 	/**
@@ -248,7 +248,7 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForSegments(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecordedRequestType.SEGMENT, options)
+		return this.waitFor(CmcdRecordedRequestType.SEGMENT, options)
 	}
 
 	/**
@@ -260,6 +260,6 @@ export class CmcdReportRecorder {
 	 * @public
 	 */
 	waitForEvents(options: CmcdReportRecorderWaitOptions = {}): Promise<CmcdRecordedReport[]> {
-		return this.#waitFor(CmcdRecordedRequestType.EVENT, options)
+		return this.waitFor(CmcdRecordedRequestType.EVENT, options)
 	}
 }

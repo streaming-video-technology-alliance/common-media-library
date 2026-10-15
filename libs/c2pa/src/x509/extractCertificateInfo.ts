@@ -13,8 +13,8 @@ import {
 	type Asn1Element,
 } from './asn1.ts'
 
-const OID_COMMON_NAME = new Uint8Array([0x55, 0x04, 0x03])
-const OID_ORG_NAME = new Uint8Array([0x55, 0x04, 0x0a])
+const OID_COMMON_NAME = /* @__PURE__ */ new Uint8Array([0x55, 0x04, 0x03])
+const OID_ORG_NAME = /* @__PURE__ */ new Uint8Array([0x55, 0x04, 0x0a])
 
 function matchesOID(value: Uint8Array, oid: Uint8Array): boolean {
 	if (value.length < oid.length) return false
