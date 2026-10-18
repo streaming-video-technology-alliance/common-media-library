@@ -1,5 +1,7 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-abr@0.1.0
+implementation-pr: https://github.com/streaming-video-technology-alliance/common-media-library/pull/529
 ---
 
 # RFC: Bitrate selector type and default selector (`@svta/cml-abr`)
@@ -267,6 +269,7 @@ The scaffold follows `libs/error-codes`. The version starts at 0.0.1. Every expo
 - v8 (2026-10-13): review feedback from the BOLA RFC author. The contract states the call rules. The starvation guard has two passes and a tolerance option. The ladder rows cover entry values and equal neighbours, and the guide names the bandwidth to pass. The prior-art notes separate the shaka-player bands from the hysteresis.
 - v9 (2026-10-13): the rationale explains the injected clock.
 - v10 (2026-10-14): status set to `accepted`.
+- v11 (2026-10-18): status set to `implemented`. The first release is `@svta/cml-abr@0.1.0`.
 
 ## Final Decision
 
@@ -280,3 +283,5 @@ Accepted on 2026-10-14. The RFC PR #526 carries the export surface above as the 
 - the package name `@svta/cml-abr`
 
 The BOLA RFC #505 is the second implementation of the type.
+
+The first release-prep PR set the status to `implemented`. The first release is `@svta/cml-abr@0.1.0`.

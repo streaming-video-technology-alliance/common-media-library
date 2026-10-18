@@ -2,9 +2,9 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { cmd } from './cmd.ts'
-import { compareVersions, isVersion } from './compareVersions.ts'
-import { exec } from './exec.ts'
+import { viewPublished, viewPublishedPeers } from './npmView.ts'
 import { projects } from './projects.ts'
+import { satisfiesRange } from './satisfiesRange.ts'
 
 type PackageName = string;
 type PackageFolder = string;
@@ -34,20 +34,6 @@ async function loadPackages(): Promise<Packages> {
 
 const tagRegex = /^\d+\.\d+\.\d+(.*$)/
 
-// npm view exits with E404 for a package that has never been published
-async function viewPublished(name: PackageName, prop: string): Promise<string | undefined> {
-	try {
-		return await exec(`npm view ${name} ${prop}`)
-	}
-	catch (error) {
-		if (error instanceof Error && error.message.includes('E404')) {
-			return undefined
-		}
-
-		throw error
-	}
-}
-
 async function getChanges(folder: string, version: string): Promise<string> {
 	const changelog = await readFile(path.resolve(folder, 'CHANGELOG.md'), 'utf8')
 	const sections = changelog.split(/^## /m)
@@ -67,20 +53,20 @@ async function createRelease(folder: string, json: PackageJson): Promise<void> {
 	await cmd(`gh release create "${tag}" --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`)
 }
 
-// Check for updates and resolve wildcard dependencies
+// Check for updates and resolve wildcard peer dependencies to caret ranges
 async function processPackage(name: PackageName, pkg: Package, packages: Packages): Promise<string> {
 	console.log(`Processing ${name}...`)
 	const [folder, file, packageJson] = pkg
 	const { version, peerDependencies = {} } = packageJson
 
 	let peersUpdated = false
-	Object.entries(peerDependencies).forEach(([dep, version]) => {
-		if (!packages[dep] || version !== '*') {
+	Object.entries(peerDependencies).forEach(([dep, range]) => {
+		if (!packages[dep] || range !== '*') {
 			return
 		}
 
 		peersUpdated = true
-		peerDependencies[dep] = packages[dep][2].version
+		peerDependencies[dep] = `^${packages[dep][2].version}`
 	})
 
 	if (peersUpdated) {
@@ -96,25 +82,21 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 		return folder
 	}
 
-	const updated = latest.trim() !== version
-	const deps = await exec(`npm view ${name} peerDependencies --json`)
+	const updated = latest !== version
 
-	if (!updated && deps) {
-		const parsed = JSON.parse(deps)
-		// npm 12 wraps the `--json` output of a single field in an array. npm 11 prints the object.
-		const publishedPeers: Record<string, string> = (Array.isArray(parsed) ? parsed[0] : parsed) ?? {}
+	if (!updated) {
+		const publishedPeers = await viewPublishedPeers(name)
 
 		for (const dep in publishedPeers) {
-			const publishedPeer = publishedPeers[dep]
-
-			if (!packages[dep] || !isVersion(publishedPeer)) {
+			if (!packages[dep]) {
 				continue
 			}
 
+			const range = publishedPeers[dep]
 			const currentPeer = packages[dep][2].version
 
-			if (compareVersions(publishedPeer, currentPeer) < 0) {
-				throw new Error(`Package ${name} (${version}) needs a version bump. Its published release depends on ${dep}@${publishedPeer}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`)
+			if (!satisfiesRange(currentPeer, range)) {
+				throw new Error(`Package ${name} (${version}) needs a version bump. Its published release accepts ${dep}@${range}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`)
 			}
 		}
 	}
