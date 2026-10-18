@@ -28,11 +28,6 @@ export class EwmaEstimator implements ThroughputEstimator {
 
 		this.slowEwma = new Ewma(halfLifeToAlpha(options.slowHalfLife))
 		this.fastEwma = new Ewma(halfLifeToAlpha(options.fastHalfLife))
-
-		if (!isNaN(this.defaultEstimate)) {
-			this.fastEwma.sample(1, this.defaultEstimate)
-			this.slowEwma.sample(1, this.defaultEstimate)
-		}
 	}
 
 	public sample(sample: ResourceTiming): void {
