@@ -32,3 +32,9 @@ estimator.sample({
 console.log(estimator.getEstimate());
 // 285
 ```
+
+## Samples
+
+A sample needs an `encodedBodySize` above 0 and a `duration` above 0. The estimators ignore every other sample, and the estimate does not change.
+
+A player can pass entries from `performance.getEntriesByName` as samples. A cross-origin entry reports an `encodedBodySize` of 0 when the response has no `Timing-Allow-Origin` header. The estimators ignore those entries. Add the header to the segment responses, or build the sample from the byte count of the loader.

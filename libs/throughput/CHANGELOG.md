@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- README: a section on the samples the estimators ignore, with a note on the `Timing-Allow-Origin` header for cross-origin segments.
+
+### Fixed
+
+- Every estimator now ignores a sample with an `encodedBodySize` of 0 or less, `NaN`, or `Infinity`. Before, a zero-byte sample counted as 0 bits per second and moved the estimate toward 0.
+- `ArithmeticMeanEstimator`, `HarmonicMeanEstimator`, and `ZlemaEstimator` now ignore a sample with a `duration` of 0 or less, `NaN`, or `Infinity`. Before, a zero duration made the estimate `Infinity` or `NaN`. `EwmaEstimator` already ignored that sample.
+
 ## [1.0.10] - 2026-10-12
 
 ### Changed

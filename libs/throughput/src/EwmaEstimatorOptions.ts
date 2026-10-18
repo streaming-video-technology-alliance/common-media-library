@@ -24,6 +24,7 @@ export type EwmaEstimatorOptions = {
 
 	/**
 	 * The smallest `encodedBodySize`, in bytes, that counts as a sample.
+	 * A sample with an `encodedBodySize` of 0 never counts.
 	 * The estimator ignores smaller responses, because the time to first byte dominates their duration.
 	 * shaka-player uses 16000.
 	 *
