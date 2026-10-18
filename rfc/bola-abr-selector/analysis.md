@@ -1,6 +1,6 @@
 # BOLA analysis
 
-This record supports the [RFC](../../rfc/bola-abr-selector.md). It explains BOLA, lists the benefits and the costs, and records what the dash.js reference does. The RFC holds the formulas and the API. This record holds the evidence.
+This record supports the [RFC](./index.md). It explains BOLA, lists the benefits and the costs, and records what the dash.js reference does. The RFC holds the formulas and the API. This record holds the evidence.
 
 ## What BOLA does
 
@@ -95,7 +95,7 @@ These results come from a simplified model. The model has no packet-level effect
 ## Costs and risks
 
 - BOLA suits large buffers. In the follow-up paper, a throughput rule oscillates less than BOLA with a 10 s buffer. Low-latency streams often have such a small buffer. The dash.js player runs BOLA only above a buffer level and uses a throughput rule below it.
-- BOLA keeps state. The player must forward the segment, stall, seek, and abandon events.
+- BOLA keeps state. The player calls `sample` for every download and `reset` after a seek, as the `BitrateSelector` type requires.
 - The pure core is small. Most of `BolaRule.js` handles player wiring. That part is where the tuning decisions and the defects live.
 - The behavior can drift from dash.js. The RFC lists the deliberate differences. A manual comparison with the real dash.js rule covers the rest.
 - The port derives from BSD-3 code. The package needs a `NOTICE.md` entry and an entry in the root `NOTICE` file.
@@ -155,4 +155,4 @@ Issue 116 produced the throughput estimators. Issue 115, "Create a common ABR fr
 
 ## Testing
 
-The [steps](steps.md) hold the test strategy.
+The implementation PR holds the test strategy.
