@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-10-18
+
 ### Changed
 
 - `urlToRelativePath` no longer throws and catches a `TypeError` for a relative `url`. A call with a relative `url` now runs about 100 times faster in Node.js. CMCD encoding calls `urlToRelativePath` for `nor` values when the `baseUrl` option is set. The output does not change.
@@ -100,7 +102,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.2...HEAD
+[1.6.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...utils-v1.6.2
 [1.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.6.1
 [1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...utils-v1.6.0
 [1.5.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...utils-v1.5.1
