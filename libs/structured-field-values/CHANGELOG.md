@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.7] - 2026-10-18
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.6.2
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
+
 ## [1.1.6] - 2026-09-15
 
 ### Changed
@@ -81,7 +88,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.6...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.7...HEAD
+[1.1.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.6...structured-field-values-v1.1.7
 [1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.5...structured-field-values-v1.1.6
 [1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.4...structured-field-values-v1.1.5
 [1.1.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.3...structured-field-values-v1.1.4

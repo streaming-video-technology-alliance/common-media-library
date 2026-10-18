@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.0.22] - 2026-10-18
+
+### Changed
+
+- Update `@svta/cml-cmcd` to 2.8.3
+- Update `@svta/cml-xml` to 1.2.2
+- Update `@svta/cml-utils` to 1.6.2
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
+
 ## [1.0.21] - 2026-10-08
 
 ### Changed
@@ -161,7 +170,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.21...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.22...HEAD
+[1.0.22]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.21...request-v1.0.22
 [1.0.21]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.20...request-v1.0.21
 [1.0.20]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.19...request-v1.0.20
 [1.0.19]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/request-v1.0.18...request-v1.0.19

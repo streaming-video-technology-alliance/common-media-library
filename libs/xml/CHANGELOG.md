@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-10-18
+
+### Changed
+
+- Update `@svta/cml-utils` to 1.6.2
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
+
 ## [1.2.1] - 2026-09-15
 
 ### Changed
@@ -98,7 +105,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.2...HEAD
+[1.2.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.1...xml-v1.2.2
 [1.2.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.0...xml-v1.2.1
 [1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.1.6...xml-v1.2.0
 [1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.1.5...xml-v1.1.6

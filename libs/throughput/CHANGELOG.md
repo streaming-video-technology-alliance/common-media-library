@@ -8,10 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-18
+
 ### Changed
 
 - `EwmaEstimator` no longer adds `defaultEstimate` to both averages as a sample with a weight of 1 second. The first valid estimate is the measured rate. Before, the estimate stayed near `defaultEstimate` for about 1 second of download time.
 - README: a section on the samples the estimators ignore, with the browser rules for the body size of a cross-origin response.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
 
 ### Fixed
 
@@ -97,7 +100,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.10...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.10...throughput-v1.1.0
 [1.0.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.9...throughput-v1.0.10
 [1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.8...throughput-v1.0.9
 [1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.7...throughput-v1.0.8
