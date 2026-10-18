@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The `validateCmcdEventReport` doc now renders the example code block. The docs build no longer warns about the `@example` tag.
+
 ## [2.8.3] - 2026-10-18
 
 ### Changed
