@@ -146,7 +146,7 @@ The decision is one index, not a ranked list. When a rung fails, the player remo
 | `ladder` not in ascending order of `bandwidth` | Throws a `RangeError` with both positions and values. The index refers to the player array, so the selector cannot sort it. |
 | An entry whose `bandwidth` is not a positive finite number | Throws a `RangeError` with the position and the value. |
 | Equal neighbouring `bandwidth` values | Accepted. The highest index wins. |
-| `throughput` not a positive finite number | Treated as unknown. |
+| `throughput` not a finite number of 0 or more | Treated as unknown. |
 | `bufferLevel` not finite or negative | Treated as 0. |
 | `playbackRate` not a positive finite number | Treated as 1. |
 
@@ -166,7 +166,7 @@ The selector divides the throughput by `playbackRate` to get the effective throu
 - **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `effectiveThroughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bandwidth of the last `sample` that was not aborted, mapped into the ladder of the call as the contract states.
 - **Starvation guard.** The guard runs when the player passes `segmentDuration`. The selector estimates the download time of a rung as `bandwidth * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. The first pass keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. If no rung passes, the second pass adds `min(segmentDuration, starvationTolerance)` to that budget and keeps the highest rung within it. Rung 0 passes the second pass in every case. A live player omits `segmentDuration` to skip the guard, as hls.js skips the check near the live edge.
 
-When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. The delay is always 0.
+When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. A throughput of 0 is a measurement, so the pick is rung 0. The delay is always 0.
 
 The playback rate changes the pick before the hysteresis and the guard run:
 
