@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `createThroughputSelector` now picks rung 0 for a `throughput` of 0 instead of the current rung. A negative value, `NaN`, or `Infinity` still counts as unknown ([#532](https://github.com/streaming-video-technology-alliance/common-media-library/issues/532))
+
 ## [0.1.0] - 2026-10-18
 
 ### Added
