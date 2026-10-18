@@ -7,7 +7,8 @@ import type { ResourceTiming } from '@svta/cml-utils'
  */
 export type ThroughputEstimator = {
 	/**
-	 * Adds a sample to the throughput estimator
+	 * Adds a sample to the throughput estimator.
+	 * The estimator ignores a sample with an `encodedBodySize` or a `duration` at or below 0, `NaN`, or `Infinity`.
 	 *
 	 * @param sample - The timing sample to add
 	 */

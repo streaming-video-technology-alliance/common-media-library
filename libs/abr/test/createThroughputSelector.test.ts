@@ -140,7 +140,7 @@ describe('createThroughputSelector', () => {
 		it('returns rung 0 before the first sample when the throughput is unknown', () => {
 			const selector = createThroughputSelector()
 
-			for (const throughput of [NaN, 0, -1, Infinity]) {
+			for (const throughput of [NaN, -1, Infinity]) {
 				equal(selector.select({ ladder, bufferLevel: 4, throughput, now: 0 }).index, 0)
 			}
 		})
@@ -149,7 +149,16 @@ describe('createThroughputSelector', () => {
 			const selector = createThroughputSelector()
 			load(selector, 3_000_000)
 
-			equal(selector.select({ ladder, bufferLevel: 4, throughput: NaN, now: 0 }).index, 3)
+			for (const throughput of [NaN, -1, Infinity]) {
+				equal(selector.select({ ladder, bufferLevel: 4, throughput, now: 0 }).index, 3)
+			}
+		})
+
+		it('picks rung 0 when the throughput is 0', () => {
+			const selector = createThroughputSelector()
+			load(selector, 3_000_000)
+
+			equal(selector.select({ ladder, bufferLevel: 4, throughput: 0, now: 0 }).index, 0)
 		})
 
 		it('treats an invalid bufferLevel as 0', () => {
@@ -298,6 +307,14 @@ describe('createThroughputSelector', () => {
 			load(selector, 6_000_000)
 
 			equal(selector.select({ ladder, bufferLevel: 0, throughput: 6_000_000, now: 0, segmentDuration: 4 }).index, 0)
+		})
+
+		it('falls through to rung 0 when the throughput is 0', () => {
+			const selector = createThroughputSelector()
+			load(selector, 6_000_000)
+
+			// Every download time is Infinity, so neither pass keeps a rung above 0.
+			equal(selector.select({ ladder, bufferLevel: 8, throughput: 0, now: 0, segmentDuration: 4 }).index, 0)
 		})
 
 		it('skips the guard when segmentDuration is not a positive number', () => {

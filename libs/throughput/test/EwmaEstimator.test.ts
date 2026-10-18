@@ -118,6 +118,42 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), NaN)
 	})
 
+	it('ignores a sample with a body size of 0 or less', async () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		// 500 bps
+		estimator.sample({
+			startTime: 0,
+			encodedBodySize: 125,
+			duration: 2000,
+		})
+
+		// 250 bps
+		estimator.sample({
+			startTime: 2000,
+			encodedBodySize: 125,
+			duration: 4000,
+		})
+
+		for (const encodedBodySize of [0, -125, NaN, Infinity]) {
+			estimator.sample({ startTime: 6000, encodedBodySize, duration: 1000 })
+
+			equal(estimator.getEstimate(), 285, `expected the estimate to ignore a body size of ${encodedBodySize}`)
+		}
+	})
+
+	it('returns NaN when the only sample has a body size of 0', async () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		estimator.sample({
+			startTime: 0,
+			encodedBodySize: 0,
+			duration: 1000,
+		})
+
+		equal(estimator.getEstimate(), NaN)
+	})
+
 	it('returns positive number when there are at least 2 entries', async () => {
 		//#region example
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })

@@ -2,6 +2,7 @@ import type { ResourceTiming } from '@svta/cml-utils'
 import { getBandwidthBps } from '@svta/cml-utils'
 import { Ewma } from './Ewma.ts'
 import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions.ts'
+import { isValidSample } from './isValidSample.ts'
 import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 
 /**
@@ -31,17 +32,9 @@ export class EwmaEstimator implements ThroughputEstimator {
 	}
 
 	public sample(sample: ResourceTiming): void {
-		const { encodedBodySize, duration } = sample
+		const { encodedBodySize } = sample
 
-		if (!Number.isFinite(encodedBodySize) || !Number.isFinite(duration)) {
-			return
-		}
-
-		if (duration <= 0) {
-			return
-		}
-
-		if (encodedBodySize < this.minBodySize) {
+		if (!isValidSample(sample) || encodedBodySize < this.minBodySize) {
 			return
 		}
 
