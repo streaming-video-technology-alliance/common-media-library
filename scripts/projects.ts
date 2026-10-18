@@ -20,5 +20,6 @@ export const projects: string[] = [
 	'libs/cmaf-ham',
 	'libs/c2pa',
 	'libs/error-codes',
+	'libs/abr',
 	// 'libs/mse',
 ]
