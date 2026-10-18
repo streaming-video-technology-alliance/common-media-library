@@ -26,7 +26,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm test`: Full validation at the root. It runs lint, build all, typecheck, then every package's tests. The PR checks run this command.
 - `npm run format`: Run the linter with auto-fix
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
-- `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the dependent packages. A dependent needs the bump when the peer range in the published package rejects the new version. Packages declare workspace peers as `*`. The Publish workflow rewrites `*` to a caret range of the current peer version. A cascade therefore happens when the new peer version falls outside that caret range, such as a major bump.
+- `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the dependent packages. A dependent needs the bump when the peer range in the published package rejects the new version. Packages declare workspace peers as `*`. The Publish workflow rewrites `*` to a caret range of the current peer version. A cascade therefore happens when the new peer version falls outside that caret range, such as a major bump. The command also warns about packages that have unreleased changelog entries and no version change.
 
 ## Publishing a New Package
 
